@@ -45,7 +45,32 @@ public class UIWidgetInspector : Editor
 		mView = (ViewOptions)EditorGUILayout.EnumPopup("View Style", mView);
 		EditorGUILayout.Separator();
 
-		Material mat = EditorGUILayout.ObjectField("Material", mWidget.material, typeof(Material), true) as Material;
+		UIAtlas atlas = EditorGUILayout.ObjectField("Atlas", mWidget.atlas, typeof(UIAtlas), true) as UIAtlas;
+		UIAtlas.Sprite sprite = null;
+		
+		if (atlas != null)
+		{
+			string[] sprites = atlas.GetListOfSprites();
+
+			if (sprites != null && sprites.Length > 0)
+			{
+				int index = 0;
+				string spriteName = (mWidget.sprite != null) ? mWidget.sprite.name : sprites[0];
+
+				for (int i = 0; i < sprites.Length; ++i)
+				{
+					if (string.Equals(sprites[i], spriteName, System.StringComparison.OrdinalIgnoreCase))
+					{
+						index = i;
+						break;
+					}
+				}
+
+				index = EditorGUILayout.Popup("Sprite", index, sprites);
+				sprite = atlas.GetSprite(sprites[index]);
+			}
+		}
+
 		Color color = EditorGUILayout.ColorField("Color Tint", mWidget.color);
 
 		int depth = mWidget.depth;
@@ -88,7 +113,8 @@ public class UIWidgetInspector : Editor
 
 		if (mRegisteredUndo)
 		{
-			mWidget.material = mat;
+			mWidget.atlas = atlas;
+			mWidget.sprite = sprite;
 			mWidget.color = color;
 			mWidget.autoDepth = autoDepth;
 

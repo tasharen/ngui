@@ -7,14 +7,17 @@ using System.Collections.Generic;
 
 public abstract class UIWidget : MonoBehaviour
 {
-	// Widget to copy sprite coordinates from -- reset after copying
-	public UIWidget copyFrom = null;
-
 	// When set to 'true', the size will be set automatically from the widget's scale
 	public bool sizeMatchesScale = false;
 
 	// Material should ideally be the same for all UI widgets -- generally this will be the UI texture atlas
 	public Material material = null;
+
+	// Atlas used by this widget
+	public UIAtlas atlas = null;
+
+	// Sprite within the atlas used to draw this widget
+	public UIAtlas.Sprite sprite = null;
 
 	// Color tint applied to this widget
 	public Color color = Color.white;
@@ -33,6 +36,8 @@ public abstract class UIWidget : MonoBehaviour
 
 	// Cached values, used to check if anything has changed
 	Material mMat;
+	UIAtlas mAtlas;
+	UIAtlas.Sprite mSprite;
 	Color mColor;
 	UIScreen mScreen;
 	Vector3 mPos;
@@ -78,6 +83,8 @@ public abstract class UIWidget : MonoBehaviour
 
 	void Start ()
 	{
+		if (atlas != null) material = atlas.material;
+
 		if (mScreen == null && material != null)
 		{
 			mColor		= color;
@@ -85,6 +92,8 @@ public abstract class UIWidget : MonoBehaviour
 			mPos		= mTrans.position;
 			mRot		= mTrans.rotation;
 			mScale		= mTrans.lossyScale;
+			mAtlas		= atlas;
+			mSprite		= sprite;
 
 			if (autoDepth) depth = CalculateDepth();
 			mAutoDepth	= autoDepth;
@@ -122,12 +131,6 @@ public abstract class UIWidget : MonoBehaviour
 			OnMatchScale(transform.localScale);
 			sizeMatchesScale = false;
 		}
-
-		if (copyFrom != null)
-		{
-			OnCopyFrom(copyFrom);
-			copyFrom = null;
-		}
 	}
 
 	/// <summary>
@@ -146,12 +149,22 @@ public abstract class UIWidget : MonoBehaviour
 		// Call the virtual function
 		bool retVal = OnUpdate();
 
+		// If the atlas changes, update the material
+		if (mAtlas != atlas)
+		{
+			mAtlas = atlas;
+			sprite = null;
+			material = (mAtlas != null) ? mAtlas.material : null;
+		}
+
 		// If the material or layer has changed, act accordingly
-		if (mMat != material || mGroup != group || mLayer != gameObject.layer || mColor != color)
+		if (mMat != material || mSprite != sprite || mGroup != group || mLayer != gameObject.layer || mColor != color)
 		{
 			if (mMat != null) mScreen.RemoveWidget(this);
 
 			mMat	= material;
+			mAtlas	= atlas;
+			mSprite	= sprite;
 			mColor	= color;
 			mPos	= mTrans.position;
 			mRot	= mTrans.rotation;
@@ -210,12 +223,6 @@ public abstract class UIWidget : MonoBehaviour
 	/// </summary>
 
 	virtual protected void OnMatchScale (Vector3 scale) { }
-
-	/// <summary>
-	/// Called when a "copy from" widget gets assigned
-	/// </summary>
-
-	virtual protected void OnCopyFrom (UIWidget widget) { color = widget.color; }
 
 	/// <summary>
 	/// Virtual function called by the UIScreen that fills the buffers.

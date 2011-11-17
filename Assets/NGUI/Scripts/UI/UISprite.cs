@@ -32,17 +32,6 @@ public class UISprite : UIWidget
 		textureRect.height = scale.y;
 	}
 
-	protected override void OnCopyFrom (UIWidget widget)
-	{
-		UISprite copy = widget as UISprite;
-
-		if (copy != null)
-		{
-			textureRect = copy.textureRect;
-			centered = copy.centered;
-		}
-	}
-
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
 		Texture tex = material.mainTexture;

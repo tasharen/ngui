@@ -55,19 +55,6 @@ public class UIBorderedSprite : UIWidget
 		size.y = scale.y;
 	}
 
-	protected override void OnCopyFrom (UIWidget widget)
-	{
-		base.OnCopyFrom(widget);
-
-		UIBorderedSprite copy = widget as UIBorderedSprite;
-
-		if (copy != null)
-		{
-			outerRect = copy.outerRect;
-			innerRect = copy.innerRect;
-		}
-	}
-
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
 		Texture tex = material.mainTexture;
