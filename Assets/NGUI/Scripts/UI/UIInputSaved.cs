@@ -4,7 +4,7 @@
 /// Editable text input field that automatically saves its data to PlayerPrefs.
 /// </summary>
 
-[AddComponentMenu("UI/Input (Saved)")]
+[AddComponentMenu("NGUI/Input (Saved)")]
 public class UIInputSaved : UIInput
 {
 	public string playerPrefsField;

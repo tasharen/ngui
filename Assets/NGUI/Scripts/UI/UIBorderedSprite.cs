@@ -26,7 +26,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("UI/Sprite (Bordered)")]
+[AddComponentMenu("NGUI/Bordered Sprite")]
 public class UIBorderedSprite : UIWidget
 {
 	public Vector2 size = new Vector2(100f, 100f);

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("UI/Sprite (Tiled)")]
+[AddComponentMenu("NGUI/Sprite (Tiled)")]
 public class UITiledSprite : UIWidget
 {
 	// Size of the area in pixels

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿//#define SHOW_GENERATED_GEOMETRY
+
+using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
@@ -50,21 +52,20 @@ public class UIScreen : MonoBehaviour
 			GameObject go = new GameObject("_UIScreen [" + mat.name + "]: " +
 				LayerMask.LayerToName(layer) + " " + group);
 
-			if (Application.isPlaying)
-			{
-				DontDestroyOnLoad(go);
-			}
-			else
-			{
-				go.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
-			}
+			// We don't want to destroy this object
+			if (Application.isPlaying) DontDestroyOnLoad(go);
+
+#if SHOW_GENERATED_GEOMETRY
+			go.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
+#else
+			go.hideFlags = HideFlags.HideAndDontSave;
+#endif
 
 			// Use the specified layer
 			go.layer = layer;
 
 			// Add the UI screen script
-			UIScreen screen = go.GetComponent<UIScreen>();
-			if (screen == null) screen = go.AddComponent<UIScreen>();
+			UIScreen screen = go.AddComponent<UIScreen>();
 			screen.mMat = mat;
 			screen.mGroup = group;
 			return screen;
@@ -110,6 +111,36 @@ public class UIScreen : MonoBehaviour
 	void Awake ()
 	{
 		mScreens.Add(this);
+	}
+
+	/// <summary>
+	/// Cleanup.
+	/// </summary>
+
+	void OnDestroy ()
+	{
+		foreach (UIScreen s in mScreens)
+		{
+			if (s.mMat == mMat && s.mGroup == mGroup && s.gameObject.layer == gameObject.layer)
+			{
+				// Curiously enough, (s == this) always returns 'false', even with just one widget in the scene.
+				// It must be some odd side-effect of Unity's edit/play mode mechanic.
+				mScreens.Remove(s);
+				break;
+			}
+		}
+
+		if (Application.isPlaying)
+		{
+			if (mRen	!= null) Destroy(mRen);
+			if (mFilter != null) Destroy(mFilter);
+			if (mMesh	!= null) Destroy(mMesh);
+		}
+		else if (mMesh != null)
+		{
+			DestroyImmediate(mMesh);
+			mMesh = null;
+		}
 	}
 
 	/// <summary>
@@ -229,26 +260,5 @@ public class UIScreen : MonoBehaviour
 
 		// Don't rebuild the screen next frame
 		mRebuild = false;
-	}
-
-	/// <summary>
-	/// Cleanup.
-	/// </summary>
-
-	void OnDestroy ()
-	{
-		mScreens.Remove(this);
-
-		if (Application.isPlaying)
-		{
-			if (mRen	!= null) Destroy(mRen);
-			if (mFilter != null) Destroy(mFilter);
-			if (mMesh	!= null) Destroy(mMesh);
-		}
-		else if (mMesh != null)
-		{
-			DestroyImmediate(mMesh);
-			mMesh = null;
-		}
 	}
 }

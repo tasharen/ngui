@@ -7,8 +7,8 @@
 /// game objects or UI components around, changing color, and more.
 /// </summary>
 
-[AddComponentMenu("UI/Set State")]
-public class UISetState : MonoBehaviour
+[AddComponentMenu("NGUI/Send State")]
+public class UISendState : MonoBehaviour
 {
 	public GameObject target;
 	public int state = 0;

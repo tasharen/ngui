@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("UI/Sprite (Simple)")]
+[AddComponentMenu("NGUI/Sprite (Simple)")]
 public class UISprite : UIWidget
 {
 	public bool centered = false;

@@ -4,7 +4,7 @@
 /// Editable text input field.
 /// </summary>
 
-[AddComponentMenu("UI/Input")]
+[AddComponentMenu("NGUI/Input")]
 public class UIInput : MonoBehaviour
 {
 	public TextMesh textMesh;

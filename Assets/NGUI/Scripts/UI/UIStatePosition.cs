@@ -5,7 +5,7 @@
 /// Tip: Use UISetState to change the state of a remote widget that has UIStatePosition attached.
 /// </summary>
 
-[AddComponentMenu("UI/State Position")]
+[AddComponentMenu("NGUI/State Position")]
 public class UIStatePosition : MonoBehaviour
 {
 	public int currentState = 0;

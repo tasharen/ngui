@@ -5,7 +5,7 @@
 /// Tip: Use UISetState to change the state of a remote widget that has UIStateRotation attached.
 /// </summary>
 
-[AddComponentMenu("UI/State Rotation")]
+[AddComponentMenu("NGUI/State Rotation")]
 public class UIStateRotation : MonoBehaviour
 {
 	public int currentState = 0;

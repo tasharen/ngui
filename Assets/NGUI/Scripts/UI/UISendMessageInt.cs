@@ -4,7 +4,7 @@
 /// Same as UISendMessage, but passes the specified integer component when calling the target function.
 /// </summary>
 
-[AddComponentMenu("UI/Send Message (int)")]
+[AddComponentMenu("NGUI/Send Message (int)")]
 public class UISendMessageInt : MonoBehaviour
 {
 	public GameObject target;

@@ -5,7 +5,7 @@
 /// If no target was specified, it will use the game object this script is attached to.
 /// </summary>
 
-[AddComponentMenu("UI/Send Message")]
+[AddComponentMenu("NGUI/Send Message")]
 public class UISendMessage : MonoBehaviour
 {
 	public GameObject target;

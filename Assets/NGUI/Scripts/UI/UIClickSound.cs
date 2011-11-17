@@ -4,7 +4,7 @@
 /// Plays the specified sound on click.
 /// </summary>
 
-[AddComponentMenu("UI/Click Sound")]
+[AddComponentMenu("NGUI/Click Sound")]
 public class UIClickSound : MonoBehaviour
 {
 	public AudioClip clip;

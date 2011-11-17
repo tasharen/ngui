@@ -6,7 +6,7 @@
 /// </summary>
 
 [RequireComponent(typeof(UIWidget))]
-[AddComponentMenu("UI/State Color")]
+[AddComponentMenu("NGUI/State Color")]
 public class UIStateColor : MonoBehaviour
 {
 	public int currentState = 0;

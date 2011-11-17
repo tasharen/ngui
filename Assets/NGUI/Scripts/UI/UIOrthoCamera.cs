@@ -9,7 +9,7 @@
 
 [ExecuteInEditMode]
 [RequireComponent(typeof(Camera))]
-[AddComponentMenu("UI/Orthographic Camera")]
+[AddComponentMenu("NGUI/Orthographic Camera")]
 public class UIOrthoCamera : MonoBehaviour
 {
 	public float scale = 1f;
