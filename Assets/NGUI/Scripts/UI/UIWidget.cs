@@ -19,6 +19,9 @@ public abstract class UIWidget : MonoBehaviour
 	// Color tint applied to this widget
 	public Color color = Color.white;
 
+	// Whether the depth is calculated automatically
+	public bool autoDepth = true;
+
 	// Depth controls the rendering order -- lowest to highest
 	public int depth = 0;
 
@@ -35,6 +38,7 @@ public abstract class UIWidget : MonoBehaviour
 	Vector3 mPos;
 	Quaternion mRot;
 	Vector3 mScale;
+	bool mAutoDepth = true;
 	int mLayer = 0;
 	int mGroup = 0;
 	int mDepth = 0;
@@ -51,6 +55,24 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Helper function that automatically calculates depth of this widget based on the hierarchy.
+	/// </summary>
+
+	public int CalculateDepth ()
+	{
+		Transform t = mTrans;
+		int val = 0;
+
+		for (;;)
+		{
+			t = t.parent;
+			if (t == null) break;
+			++val;
+		}
+		return val;
+	}
+
+	/// <summary>
 	/// Register this widget with the manager.
 	/// </summary>
 
@@ -63,6 +85,9 @@ public abstract class UIWidget : MonoBehaviour
 			mPos		= mTrans.position;
 			mRot		= mTrans.rotation;
 			mScale		= mTrans.lossyScale;
+
+			if (autoDepth) depth = CalculateDepth();
+			mAutoDepth	= autoDepth;
 			mDepth		= depth;
 			mScreen		= UIScreen.GetScreen(mMat = material, mLayer = gameObject.layer, mGroup = group, true);
 
@@ -149,13 +174,20 @@ public abstract class UIWidget : MonoBehaviour
 			Quaternion rot = mTrans.rotation;
 			Vector3 scale = mTrans.lossyScale;
 
+			if (mAutoDepth != autoDepth)
+			{
+				mAutoDepth = autoDepth;
+				if (mAutoDepth) depth = CalculateDepth();
+			}
+
 			if (mDepth != depth || mPos != pos || mRot != rot || mScale != scale)
 			{
-				mPos	= pos;
-				mRot	= rot;
-				mScale	= scale;
-				mDepth	= depth;
-				retVal = true;
+				mPos		= pos;
+				mRot		= rot;
+				mScale		= scale;
+				mAutoDepth	= autoDepth;
+				mDepth		= depth;
+				retVal		= true;
 			}
 		}
 		return retVal;
