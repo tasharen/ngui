@@ -9,26 +9,12 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/Sprite (Simple)")]
 public class UISprite : UIWidget
 {
-	public bool centered = false;
-
-	protected bool mCentered;
-
-	public override bool OnUpdate ()
-	{
-		if (mCentered != centered)
-		{
-			mCentered = centered;
-			return true;
-		}
-		return false;
-	}
-
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
 		Vector2 uv0 = new Vector2(mOuterUV.xMin, mOuterUV.yMin);
 		Vector2 uv1 = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
 
-		if (mCentered)
+		if (centered)
 		{
 			verts.Add(new Vector3(0.5f, 0.5f, 0f));
 			verts.Add(new Vector3(0.5f, -0.5f, 0f));

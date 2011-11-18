@@ -29,49 +29,44 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/Bordered Sprite")]
 public class UIBorderedSprite : UIWidget
 {
-	public Vector2 size = new Vector2(100f, 100f);
-
-	Vector2 mSize;
-
-	public override bool OnUpdate ()
-	{
-		if (mSize != size)
-		{
-			mSize = size;
-			return true;
-		}
-		return false;
-	}
-
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
-		Texture tex = material.mainTexture;
-
 		Vector2[] v  = new Vector2[4];
 		Vector2[] uv = new Vector2[4];
 
-		float borderLeft	= mInnerUV.xMin - mOuterUV.xMin;
-		float borderRight	= mOuterUV.xMax - mInnerUV.xMax;
-		float borderTop		= mInnerUV.yMin - mOuterUV.yMin;
-		float borderBottom	= mOuterUV.yMax - mInnerUV.yMax;
-
-		Vector2 sz = new Vector2(mSize.x / tex.width, mSize.y / tex.height);
+		Texture tex = mainTexture;
 
 		v[0] = Vector2.zero;
-		v[1] = new Vector2(borderLeft / sz.x, -borderTop / sz.y);
-		v[2] = new Vector2(1.0f - borderRight / sz.x, -(1.0f - borderBottom / sz.y));
 		v[3] = new Vector2(1f, -1f);
 
 		if (tex != null)
 		{
-			uv[0] = new Vector2(mOuterUV.xMin / tex.width, 1.0f - mOuterUV.yMin / tex.height);
-			uv[1] = new Vector2(mInnerUV.xMin / tex.width, 1.0f - mInnerUV.yMin / tex.height);
-			uv[2] = new Vector2(mInnerUV.xMax / tex.width, 1.0f - mInnerUV.yMax / tex.height);
-			uv[3] = new Vector2(mOuterUV.xMax / tex.width, 1.0f - mOuterUV.yMax / tex.height);
+			float borderLeft	= mInnerUV.xMin - mOuterUV.xMin;
+			float borderRight	= mOuterUV.xMax - mInnerUV.xMax;
+			float borderTop		= mInnerUV.yMin - mOuterUV.yMin;
+			float borderBottom	= mOuterUV.yMax - mInnerUV.yMax;
+
+			Vector2 sz = new Vector2(mScale.x / tex.width, mScale.z / tex.height);
+			v[1] = new Vector2(borderLeft / sz.x, -borderTop / sz.y);
+			v[2] = new Vector2(borderRight / sz.x, -borderBottom / sz.y);
+
+			uv[0] = new Vector2(mOuterUV.xMin, mOuterUV.yMin);
+			uv[1] = new Vector2(mInnerUV.xMin, mInnerUV.yMin);
+			uv[2] = new Vector2(mInnerUV.xMax, mInnerUV.yMax);
+			uv[3] = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
 		}
 		else
 		{
+			v[1] = v[0];
+			v[2] = v[3];
+
 			for (int i = 0; i < 4; ++i) uv[i] = Vector2.zero;
+		}
+
+		if (centered)
+		{
+			Vector2 offset = new Vector2(-0.5f, 0.5f);
+			for (int i = 0; i < 4; ++i) v[i] += offset;
 		}
 
 		for (int x = 0; x < 3; ++x)

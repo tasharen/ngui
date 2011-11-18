@@ -7,48 +7,36 @@ using System.Collections.Generic;
 
 public abstract class UIWidget : MonoBehaviour
 {
-	// Atlas used by this widget
-	public UIAtlas atlas = null;
+	// Cached and saved values
+	[SerializeField] UIAtlas mAtlas;
+	[SerializeField] string mSpriteName;
+	[SerializeField] Color mColor;
+	[SerializeField] bool mCentered = false;
+	[SerializeField] bool mAutoDepth = true;
+	[SerializeField] int mDepth = 0;
+	[SerializeField] int mGroup = 0;
 
-	// Sprite within the atlas used to draw this widget
-	public string spriteName = "Dark";
-
-	// Color tint applied to this widget
-	public Color color = Color.white;
-
-	// Whether the depth is calculated automatically
-	public bool autoDepth = true;
-
-	// Depth controls the rendering order -- lowest to highest
-	public int depth = 0;
-
-	// Groups can be used to break up the rendering into separate batches
-	public int group = 0;
-
-	// Cached for efficiency, used by UIScreen
-	[HideInInspector] public Transform mTrans;
-
-	// Cached values, used to check if anything has changed
+	Transform mTrans;
+	UIScreen mScreen;
 	Material mMat;
 	Texture2D mTex;
-	UIAtlas mAtlas;
 	UIAtlas.Sprite mSprite;
-	Color mColor;
-	UIScreen mScreen;
-	Vector3 mPos;
-	Quaternion mRot;
-	Vector3 mScale;
-	bool mAutoDepth = true;
-	bool mDynamicUpdate = false;
+	bool mIsDirty = false;
 	int mLayer = 0;
-	int mGroup = 0;
-	int mDepth = 0;
 	Rect mInner;
 	Rect mOuter;
 
-	// Texture coordinates
+	protected Vector3 mPos;
+	protected Quaternion mRot;
+	protected Vector3 mScale;
 	protected Rect mInnerUV;
 	protected Rect mOuterUV;
+
+	/// <summary>
+	/// Cached for speed.
+	/// </summary>
+
+	public Transform cachedTransform { get { return mTrans; } }
 
 	/// <summary>
 	/// Returns the material used by this widget.
@@ -63,6 +51,184 @@ public abstract class UIWidget : MonoBehaviour
 	public Texture2D mainTexture { get { Material mat = material; return mat != null ? mat.mainTexture as Texture2D : null; } }
 
 	/// <summary>
+	/// Atlas used by this widget.
+	/// </summary>
+ 
+	public UIAtlas atlas
+	{
+		get
+		{
+			return mAtlas;
+		}
+		set
+		{
+			if (mAtlas != value)
+			{
+				RemoveFromScreen();
+				mIsDirty = true;
+				mAtlas = value;
+
+				// Update the atlas and the texture
+				if (mAtlas != null)
+				{
+					mMat = mAtlas.material;
+					mTex = (mMat != null) ? mMat.mainTexture as Texture2D : null;
+				}
+				else
+				{
+					mMat = null;
+					mTex = null;
+				}
+
+				// Re-link the sprite
+				if (!string.IsNullOrEmpty(mSpriteName))
+				{
+					string sprite = mSpriteName;
+					mSpriteName = "";
+					spriteName = sprite;
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Sprite within the atlas used to draw this widget.
+	/// </summary>
+ 
+	public string spriteName
+	{
+		get
+		{
+			return mSpriteName;
+		}
+		set
+		{
+			if (string.IsNullOrEmpty(value))
+			{
+				// If the sprite name hasn't been set yet, no need to do anything
+				if (string.IsNullOrEmpty(mSpriteName)) return;
+
+				// Clear the sprite name and the sprite reference
+				mIsDirty = true;
+				mSpriteName = "";
+				mSprite = null;
+			}
+			else if (string.IsNullOrEmpty(mSpriteName) || !string.Equals(mSpriteName, value,
+				System.StringComparison.OrdinalIgnoreCase))
+			{
+				// If the sprite name changes, the sprite reference should also be updated
+				mIsDirty = true;
+				mSpriteName = value;
+				mSprite = (mAtlas != null) ? mAtlas.GetSprite(mSpriteName) : null;
+				UpdateUVs();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Color used by the widget.
+	/// </summary>
+
+	public Color color
+	{
+		get
+		{
+			return mColor;
+		}
+		set
+		{
+			if (mColor != value)
+			{
+				mIsDirty = true;
+				mColor = value;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Whether the widget is centered or top-left aligned.
+	/// </summary>
+
+	public bool centered
+	{
+		get
+		{
+			return mCentered;
+		}
+		set
+		{
+			if (mCentered != value)
+			{
+				mIsDirty = true;
+				mCentered = value;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Whether the depth is calculated automatically.
+	/// </summary>
+
+	public bool autoDepth
+	{
+		get
+		{
+			return mAutoDepth;
+		}
+		set
+		{
+			if (mAutoDepth != value)
+			{
+				mIsDirty = true;
+				mAutoDepth = value;
+				if (mAutoDepth) mDepth = CalculateDepth();
+			}
+		}
+	}
+
+	
+	/// <summary>
+	/// Depth controls the rendering order -- lowest to highest.
+	/// </summary>
+
+	public int depth
+	{
+		get
+		{
+			return mDepth;
+		}
+		set
+		{
+			if (mDepth != value)
+			{
+				mIsDirty = true;
+				mDepth = value;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Groups can be used to break up the rendering into separate batches
+	/// </summary>
+
+	public int group
+	{
+		get
+		{
+			return mGroup;
+		}
+		set
+		{
+			if (mGroup != value)
+			{
+				RemoveFromScreen();
+				mIsDirty = true;
+				mGroup = value;
+			}
+		}
+	}
+
+	/// <summary>
 	/// Static widget comparison function used for Z-sorting.
 	/// </summary>
 
@@ -74,12 +240,79 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Update the texture UVs used by the widget.
+	/// </summary>
+
+	void UpdateUVs ()
+	{
+		if (mSprite != null && mTex != null)
+		{
+			if (mInner != mSprite.inner || mOuter != mSprite.outer)
+			{
+				mIsDirty = true;
+				mInner = mSprite.inner;
+				mOuter = mSprite.outer;
+
+				mInnerUV = mInner;
+				mOuterUV = mOuter;
+
+				if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
+				{
+					Vector2 size = new Vector2(mTex.width, mTex.height);
+					mInnerUV = UIAtlas.ConvertToTexCoords(mInnerUV, size);
+					mOuterUV = UIAtlas.ConvertToTexCoords(mOuterUV, size);
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Helper function, removes the widget from the rendering screen.
+	/// </summary>
+
+	void RemoveFromScreen ()
+	{
+		if (mMat != null && mScreen != null)
+		{
+			Debug.Log("Removed " + Application.isPlaying + " " + Tools.GetHierarchy(gameObject));
+			mScreen.RemoveWidget(this);
+			mScreen = null;
+		}
+	}
+
+	/// <summary>
+	/// If we haven't created a UI screen yet, do so now.
+	/// </summary>
+
+	void AddToScreen ()
+	{
+		// Material and texture values are not saved, so they need to be reset
+		if (mAtlas != null)
+		{
+			if (mMat == null && mAtlas.material != null)
+			{
+				UIAtlas atl = mAtlas;
+				mAtlas = null;
+				atlas = atl;
+			}
+		}
+
+		if (mMat != null && mScreen == null)
+		{
+			Debug.Log("Added " + Application.isPlaying);
+			mScreen = UIScreen.GetScreen(mMat, mLayer, mGroup, true);
+			mScreen.AddWidget(this);
+			mIsDirty = true;
+		}
+	}
+
+	/// <summary>
 	/// Helper function that automatically calculates depth of this widget based on the hierarchy.
 	/// </summary>
 
 	public int CalculateDepth ()
 	{
-		Transform t = mTrans;
+		Transform t = transform;
 		int val = 0;
 
 		for (;;)
@@ -92,79 +325,38 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Register this widget with the manager.
+	/// Cache the transform.
 	/// </summary>
 
-	void Start ()
-	{
-		if (mScreen == null && atlas != null && atlas.material != null && !string.IsNullOrEmpty(spriteName))
-		{
-			mColor	= color;
-			mTrans	= transform;
-			mPos	= mTrans.position;
-			mRot	= mTrans.rotation;
-			mScale	= mTrans.lossyScale;
-			mAtlas	= atlas;
-			mTex	= mainTexture;
-			mSprite = mAtlas.GetSprite(spriteName);
-
-			if (mSprite != null)
-			{
-				mInner = mSprite.inner;
-				mOuter = mSprite.outer;
-
-				mInnerUV = mInner;
-				mOuterUV = mOuter;
-
-				if (mTex != null && mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
-				{
-					Vector2 size = new Vector2(mTex.width, mTex.height);
-					mInnerUV = UIAtlas.ConvertToTexCoords(mInnerUV, size);
-					mOuterUV = UIAtlas.ConvertToTexCoords(mOuterUV, size);
-				}
-			}
-
-			if (autoDepth) depth = CalculateDepth();
-			mAutoDepth	= autoDepth;
-			mDepth		= depth;
-			mScreen		= UIScreen.GetScreen(mMat = atlas.material, mLayer = gameObject.layer, mGroup = group, true);
-
-			// We want to update the widgets right away in the editor mode
-			mDynamicUpdate = !Application.isPlaying;
-
-			OnStart();
-			mScreen.AddWidget(this);
-		}
-	}
+	void Awake () { mTrans = transform; }
 
 	/// <summary>
 	/// Unregister this widget.
 	/// </summary>
 
-	void OnDestroy ()
-	{
-		if (mMat != null && mScreen != null)
-		{
-			mScreen.RemoveWidget(this);
-		}
-		mScreen = null;
-	}
+	void OnDestroy () { RemoveFromScreen(); }
 
 	/// <summary>
-	/// Work-around for Unity not calling OnEnable in some cases.
+	/// Unregister this widget.
+	/// </summary>
+
+	void OnDisable () { RemoveFromScreen(); }
+
+	/// <summary>
+	/// If the layer changes, we need to place the widget on a different screen.
 	/// </summary>
 
 	void Update ()
 	{
-		if (mScreen == null) Start();
+		if (mTrans == null) mTrans = transform;
+
+		if (mLayer != gameObject.layer)
+		{
+			RemoveFromScreen();
+			mLayer = gameObject.layer;
+		}
+		if (mScreen == null) AddToScreen();
 	}
-
-	/// <summary>
-	/// Enable and Disable functionality should mirror Start and Destroy.
-	/// </summary>
-
-	void OnEnable () { Start(); }
-	void OnDisable () { OnDestroy(); }
 
 	/// <summary>
 	/// Check to see if anything has changed, and if it has, mark the screen as having changed.
@@ -175,129 +367,39 @@ public abstract class UIWidget : MonoBehaviour
 		// Call the virtual function
 		bool retVal = OnUpdate();
 
-		// If something has changed, act accordingly
-		if (HasSpriteChanged() || mMat != material || mTex != mainTexture || mGroup != group || mLayer != gameObject.layer || mColor != color)
+		// Update the UV coordinates
+		if (!Application.isPlaying) UpdateUVs();
+
+		// If there is no material to work with, there is no point in updating the pos/rot/scale
+		if (mMat != null)
 		{
-			if (mMat != null) mScreen.RemoveWidget(this);
-
-			mMat	= material;
-			mTex	= mainTexture;
-			mColor	= color;
-			mPos	= mTrans.position;
-			mRot	= mTrans.rotation;
-			mScale	= mTrans.lossyScale;
-			mLayer	= gameObject.layer;
-			mDepth	= depth;
-			mGroup	= group;
-			retVal	= true;
-
-			if (mMat != null)
+			if (mIsDirty)
 			{
-				mScreen = UIScreen.GetScreen(mMat, mLayer, mGroup, true);
-				mScreen.AddWidget(this);
-			}
-		}
-		// Check to see if the position, rotation or scale has changed
-		else if (mMat != null)
-		{
-			Vector3 pos = mTrans.position;
-			Quaternion rot = mTrans.rotation;
-			Vector3 scale = mTrans.lossyScale;
-
-			if (mAutoDepth != autoDepth)
-			{
-				mAutoDepth = autoDepth;
-				if (mAutoDepth) depth = CalculateDepth();
-			}
-
-			if (mDepth != depth || mPos != pos || mRot != rot || mScale != scale)
-			{
-				mPos		= pos;
-				mRot		= rot;
-				mScale		= scale;
-				mAutoDepth	= autoDepth;
-				mDepth		= depth;
-				retVal		= true;
-			}
-		}
-		return retVal;
-	}
-
-	/// <summary>
-	/// Checks to see if the sprite has changed. Used in the Update function above.
-	/// </summary>
-
-	bool HasSpriteChanged ()
-	{
-		bool spriteChanged = false;
-
-		// If the atlas changes, the sprite should also change
-		if (mAtlas != atlas)
-		{
-			mAtlas = atlas;
-
-			if (mAtlas != null)
-			{
-				mMat = mAtlas.material;
-				mTex = mainTexture;
-				mSprite = mAtlas.GetSprite(spriteName);
+				// If something has changed, simply update the cached values
+				mPos = mTrans.position;
+				mRot = mTrans.rotation;
+				mScale = mTrans.lossyScale;
+				retVal = true;
 			}
 			else
 			{
-				mMat = null;
-				mTex = null;
-				mSprite = null;
-			}
-			spriteChanged = true;
-		}
-		else if (mSprite != null && !string.Equals(mSprite.name, spriteName))
-		{
-			// If the sprite name changes, update the local reference
-			mSprite = mAtlas.GetSprite(spriteName);
-			spriteChanged = true;
-		}
+				Vector3 pos = mTrans.position;
+				Quaternion rot = mTrans.rotation;
+				Vector3 scale = mTrans.lossyScale;
 
-		// If the sprite reference changed we need to update the inner and outer rectangles
-		if (mSprite != null)
-		{
-			if (spriteChanged)
-			{
-				mInner = mSprite.inner;
-				mOuter = mSprite.outer;
-				mInnerUV = mInner;
-				mOuterUV = mOuter;
-			}
-			else if (mDynamicUpdate && (mInner != mSprite.inner || mOuter != mSprite.outer))
-			{
-				// If the rectangles change we also need to update the widget
-				mInner = mSprite.inner;
-				mOuter = mSprite.outer;
-				mInnerUV = mInner;
-				mOuterUV = mOuter;
-				spriteChanged = true;
-			}
-
-			// Widgets always work with texture-space coordinates rather than pixels
-			if (spriteChanged && mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
-			{
-				Texture2D tex = mainTexture;
-
-				if (tex != null)
+				// Check to see if the position, rotation or scale has changed
+				if (mPos != pos || mRot != rot || mScale != scale)
 				{
-					Vector2 size = new Vector2(tex.width, tex.height);
-					mInnerUV = UIAtlas.ConvertToTexCoords(mInnerUV, size);
-					mOuterUV = UIAtlas.ConvertToTexCoords(mOuterUV, size);
+					mPos = pos;
+					mRot = rot;
+					mScale = scale;
+					retVal = true;
 				}
 			}
 		}
-		return spriteChanged;
+		mIsDirty = false;
+		return retVal;
 	}
-
-	/// <summary>
-	/// Virtual version of the Start function.
-	/// </summary>
-
-	virtual public void OnStart () { }
 
 	/// <summary>
 	/// Virtual version of the Update function. Should return 'true' if the widget has changed visually.

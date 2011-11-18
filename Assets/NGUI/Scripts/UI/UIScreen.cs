@@ -52,14 +52,13 @@ public class UIScreen : MonoBehaviour
 			GameObject go = new GameObject("_UIScreen [" + mat.name + "]: " +
 				LayerMask.LayerToName(layer) + " " + group);
 
-			// We don't want to destroy this object
-			if (Application.isPlaying) DontDestroyOnLoad(go);
-
 #if SHOW_GENERATED_GEOMETRY
 			go.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
 #else
 			go.hideFlags = HideFlags.HideAndDontSave;
 #endif
+			// We don't want to destroy this object
+			if (Application.isPlaying) DontDestroyOnLoad(go);
 
 			// Use the specified layer
 			go.layer = layer;
@@ -201,7 +200,7 @@ public class UIScreen : MonoBehaviour
 			w.OnFill(mVerts, mUvs, mCols);
 
 			// Transform all vertices into world space
-			Transform t = w.mTrans;
+			Transform t = w.cachedTransform;
 
 			for (int i = offset, imax = mVerts.Count; i < imax; ++i)
 			{
