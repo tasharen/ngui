@@ -7,17 +7,11 @@ using System.Collections.Generic;
 
 public abstract class UIWidget : MonoBehaviour
 {
-	// When set to 'true', the size will be set automatically from the widget's scale
-	public bool sizeMatchesScale = false;
-
-	// Material should ideally be the same for all UI widgets -- generally this will be the UI texture atlas
-	public Material material = null;
-
 	// Atlas used by this widget
 	public UIAtlas atlas = null;
 
 	// Sprite within the atlas used to draw this widget
-	public UIAtlas.Sprite sprite = null;
+	public string spriteName = "Dark";
 
 	// Color tint applied to this widget
 	public Color color = Color.white;
@@ -36,6 +30,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	// Cached values, used to check if anything has changed
 	Material mMat;
+	Texture2D mTex;
 	UIAtlas mAtlas;
 	UIAtlas.Sprite mSprite;
 	Color mColor;
@@ -44,9 +39,28 @@ public abstract class UIWidget : MonoBehaviour
 	Quaternion mRot;
 	Vector3 mScale;
 	bool mAutoDepth = true;
+	bool mDynamicUpdate = false;
 	int mLayer = 0;
 	int mGroup = 0;
 	int mDepth = 0;
+	Rect mInner;
+	Rect mOuter;
+
+	// Texture coordinates
+	protected Rect mInnerUV;
+	protected Rect mOuterUV;
+
+	/// <summary>
+	/// Returns the material used by this widget.
+	/// </summary>
+
+	public Material material { get { return mAtlas != null ? mAtlas.material : null; } }
+
+	/// <summary>
+	/// Returns the texture used to draw this widget.
+	/// </summary>
+
+	public Texture2D mainTexture { get { Material mat = material; return mat != null ? mat.mainTexture as Texture2D : null; } }
 
 	/// <summary>
 	/// Static widget comparison function used for Z-sorting.
@@ -83,22 +97,40 @@ public abstract class UIWidget : MonoBehaviour
 
 	void Start ()
 	{
-		if (atlas != null) material = atlas.material;
-
-		if (mScreen == null && material != null)
+		if (mScreen == null && atlas != null && atlas.material != null && !string.IsNullOrEmpty(spriteName))
 		{
-			mColor		= color;
-			mTrans		= transform;
-			mPos		= mTrans.position;
-			mRot		= mTrans.rotation;
-			mScale		= mTrans.lossyScale;
-			mAtlas		= atlas;
-			mSprite		= sprite;
+			mColor	= color;
+			mTrans	= transform;
+			mPos	= mTrans.position;
+			mRot	= mTrans.rotation;
+			mScale	= mTrans.lossyScale;
+			mAtlas	= atlas;
+			mTex	= mainTexture;
+			mSprite = mAtlas.GetSprite(spriteName);
+
+			if (mSprite != null)
+			{
+				mInner = mSprite.inner;
+				mOuter = mSprite.outer;
+
+				mInnerUV = mInner;
+				mOuterUV = mOuter;
+
+				if (mTex != null && mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
+				{
+					Vector2 size = new Vector2(mTex.width, mTex.height);
+					mInnerUV = UIAtlas.ConvertToTexCoords(mInnerUV, size);
+					mOuterUV = UIAtlas.ConvertToTexCoords(mOuterUV, size);
+				}
+			}
 
 			if (autoDepth) depth = CalculateDepth();
 			mAutoDepth	= autoDepth;
 			mDepth		= depth;
-			mScreen		= UIScreen.GetScreen(mMat = material, mLayer = gameObject.layer, mGroup = group, true);
+			mScreen		= UIScreen.GetScreen(mMat = atlas.material, mLayer = gameObject.layer, mGroup = group, true);
+
+			// We want to update the widgets right away in the editor mode
+			mDynamicUpdate = !Application.isPlaying;
 
 			OnStart();
 			mScreen.AddWidget(this);
@@ -111,7 +143,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnDestroy ()
 	{
-		if (material != null && mScreen != null)
+		if (mMat != null && mScreen != null)
 		{
 			mScreen.RemoveWidget(this);
 		}
@@ -125,12 +157,6 @@ public abstract class UIWidget : MonoBehaviour
 	void Update ()
 	{
 		if (mScreen == null) Start();
-
-		if (sizeMatchesScale)
-		{
-			OnMatchScale(transform.localScale);
-			sizeMatchesScale = false;
-		}
 	}
 
 	/// <summary>
@@ -149,22 +175,13 @@ public abstract class UIWidget : MonoBehaviour
 		// Call the virtual function
 		bool retVal = OnUpdate();
 
-		// If the atlas changes, update the material
-		if (mAtlas != atlas)
-		{
-			mAtlas = atlas;
-			sprite = null;
-			material = (mAtlas != null) ? mAtlas.material : null;
-		}
-
-		// If the material or layer has changed, act accordingly
-		if (mMat != material || mSprite != sprite || mGroup != group || mLayer != gameObject.layer || mColor != color)
+		// If something has changed, act accordingly
+		if (HasSpriteChanged() || mMat != material || mTex != mainTexture || mGroup != group || mLayer != gameObject.layer || mColor != color)
 		{
 			if (mMat != null) mScreen.RemoveWidget(this);
 
 			mMat	= material;
-			mAtlas	= atlas;
-			mSprite	= sprite;
+			mTex	= mainTexture;
 			mColor	= color;
 			mPos	= mTrans.position;
 			mRot	= mTrans.rotation;
@@ -207,6 +224,76 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Checks to see if the sprite has changed. Used in the Update function above.
+	/// </summary>
+
+	bool HasSpriteChanged ()
+	{
+		bool spriteChanged = false;
+
+		// If the atlas changes, the sprite should also change
+		if (mAtlas != atlas)
+		{
+			mAtlas = atlas;
+
+			if (mAtlas != null)
+			{
+				mMat = mAtlas.material;
+				mTex = mainTexture;
+				mSprite = mAtlas.GetSprite(spriteName);
+			}
+			else
+			{
+				mMat = null;
+				mTex = null;
+				mSprite = null;
+			}
+			spriteChanged = true;
+		}
+		else if (mSprite != null && !string.Equals(mSprite.name, spriteName))
+		{
+			// If the sprite name changes, update the local reference
+			mSprite = mAtlas.GetSprite(spriteName);
+			spriteChanged = true;
+		}
+
+		// If the sprite reference changed we need to update the inner and outer rectangles
+		if (mSprite != null)
+		{
+			if (spriteChanged)
+			{
+				mInner = mSprite.inner;
+				mOuter = mSprite.outer;
+				mInnerUV = mInner;
+				mOuterUV = mOuter;
+			}
+			else if (mDynamicUpdate && (mInner != mSprite.inner || mOuter != mSprite.outer))
+			{
+				// If the rectangles change we also need to update the widget
+				mInner = mSprite.inner;
+				mOuter = mSprite.outer;
+				mInnerUV = mInner;
+				mOuterUV = mOuter;
+				spriteChanged = true;
+			}
+
+			// Widgets always work with texture-space coordinates rather than pixels
+			if (spriteChanged && mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
+			{
+				Texture2D tex = mainTexture;
+
+				if (tex != null)
+				{
+					Vector2 size = new Vector2(tex.width, tex.height);
+					mInnerUV = UIAtlas.ConvertToTexCoords(mInnerUV, size);
+					mOuterUV = UIAtlas.ConvertToTexCoords(mOuterUV, size);
+				}
+			}
+		}
+		return spriteChanged;
+	}
+
+	/// <summary>
 	/// Virtual version of the Start function.
 	/// </summary>
 
@@ -217,12 +304,6 @@ public abstract class UIWidget : MonoBehaviour
 	/// </summary>
 
 	virtual public bool OnUpdate () { return false; }
-
-	/// <summary>
-	/// Should set the widget's size to match the specified scale.
-	/// </summary>
-
-	virtual protected void OnMatchScale (Vector3 scale) { }
 
 	/// <summary>
 	/// Virtual function called by the UIScreen that fills the buffers.

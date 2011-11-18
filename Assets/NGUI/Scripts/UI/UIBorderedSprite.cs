@@ -30,29 +30,17 @@ using System.Collections.Generic;
 public class UIBorderedSprite : UIWidget
 {
 	public Vector2 size = new Vector2(100f, 100f);
-	public Rect outerRect;
-	public Rect innerRect;
 
 	Vector2 mSize;
-	Rect mSavedOuter;
-	Rect mSavedInner;
 
 	public override bool OnUpdate ()
 	{
-		if (mSize != size || mSavedOuter != outerRect || mSavedInner != innerRect)
+		if (mSize != size)
 		{
 			mSize = size;
-			mSavedOuter = outerRect;
-			mSavedInner = innerRect;
 			return true;
 		}
 		return false;
-	}
-
-	protected override void OnMatchScale (Vector3 scale)
-	{
-		size.x = scale.x;
-		size.y = scale.y;
 	}
 
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
@@ -62,22 +50,24 @@ public class UIBorderedSprite : UIWidget
 		Vector2[] v  = new Vector2[4];
 		Vector2[] uv = new Vector2[4];
 
-		float borderLeft	= mSavedInner.xMin - mSavedOuter.xMin;
-		float borderRight	= mSavedOuter.xMax - mSavedInner.xMax;
-		float borderTop		= mSavedInner.yMin - mSavedOuter.yMin;
-		float borderBottom	= mSavedOuter.yMax - mSavedInner.yMax;
+		float borderLeft	= mInnerUV.xMin - mOuterUV.xMin;
+		float borderRight	= mOuterUV.xMax - mInnerUV.xMax;
+		float borderTop		= mInnerUV.yMin - mOuterUV.yMin;
+		float borderBottom	= mOuterUV.yMax - mInnerUV.yMax;
+
+		Vector2 sz = new Vector2(mSize.x / tex.width, mSize.y / tex.height);
 
 		v[0] = Vector2.zero;
-		v[1] = new Vector2(borderLeft / mSize.x, -borderTop / mSize.y);
-		v[2] = new Vector2(1.0f - borderRight / mSize.x, -(1.0f - borderBottom / mSize.y));
+		v[1] = new Vector2(borderLeft / sz.x, -borderTop / sz.y);
+		v[2] = new Vector2(1.0f - borderRight / sz.x, -(1.0f - borderBottom / sz.y));
 		v[3] = new Vector2(1f, -1f);
 
 		if (tex != null)
 		{
-			uv[0] = new Vector2(mSavedOuter.xMin / tex.width, 1.0f - mSavedOuter.yMin / tex.height);
-			uv[1] = new Vector2(mSavedInner.xMin / tex.width, 1.0f - mSavedInner.yMin / tex.height);
-			uv[2] = new Vector2(mSavedInner.xMax / tex.width, 1.0f - mSavedInner.yMax / tex.height);
-			uv[3] = new Vector2(mSavedOuter.xMax / tex.width, 1.0f - mSavedOuter.yMax / tex.height);
+			uv[0] = new Vector2(mOuterUV.xMin / tex.width, 1.0f - mOuterUV.yMin / tex.height);
+			uv[1] = new Vector2(mInnerUV.xMin / tex.width, 1.0f - mInnerUV.yMin / tex.height);
+			uv[2] = new Vector2(mInnerUV.xMax / tex.width, 1.0f - mInnerUV.yMax / tex.height);
+			uv[3] = new Vector2(mOuterUV.xMax / tex.width, 1.0f - mOuterUV.yMax / tex.height);
 		}
 		else
 		{

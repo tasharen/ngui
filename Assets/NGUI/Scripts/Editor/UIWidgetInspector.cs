@@ -40,14 +40,18 @@ public class UIWidgetInspector : Editor
 		EditorGUIUtility.LookLikeControls(120f);
 		mWidget = target as UIWidget;
 
+		// This flag gets set to 'true' if RegisterUndo() gets called
 		mRegisteredUndo = false;
 
+		// View style comes first -- simple or advanced
 		mView = (ViewOptions)EditorGUILayout.EnumPopup("View Style", mView);
 		EditorGUILayout.Separator();
 
+		// Atlas field comes next
 		UIAtlas atlas = EditorGUILayout.ObjectField("Atlas", mWidget.atlas, typeof(UIAtlas), true) as UIAtlas;
 		UIAtlas.Sprite sprite = null;
 		
+		// If we have an atlas we should draw a list of sprites contained by the atlas
 		if (atlas != null)
 		{
 			string[] sprites = atlas.GetListOfSprites();
@@ -55,28 +59,35 @@ public class UIWidgetInspector : Editor
 			if (sprites != null && sprites.Length > 0)
 			{
 				int index = 0;
-				string spriteName = (mWidget.sprite != null) ? mWidget.sprite.name : sprites[0];
+				string spriteName = (mWidget.spriteName != null) ? mWidget.spriteName : sprites[0];
 
-				for (int i = 0; i < sprites.Length; ++i)
+				// We need to find the sprite in order to have it selected
+				if (!string.IsNullOrEmpty(spriteName))
 				{
-					if (string.Equals(sprites[i], spriteName, System.StringComparison.OrdinalIgnoreCase))
+					for (int i = 0; i < sprites.Length; ++i)
 					{
-						index = i;
-						break;
+						if (string.Equals(sprites[i], spriteName, System.StringComparison.OrdinalIgnoreCase))
+						{
+							index = i;
+							break;
+						}
 					}
 				}
 
+				// Draw the sprite selection popup
 				index = EditorGUILayout.Popup("Sprite", index, sprites);
 				sprite = atlas.GetSprite(sprites[index]);
 			}
 		}
 
+		// All widgets have a color tint
 		Color color = EditorGUILayout.ColorField("Color Tint", mWidget.color);
 
-		int depth = mWidget.depth;
 		bool autoDepth = mWidget.autoDepth;
+		int depth = mWidget.depth;
 		int group = mWidget.group;
 
+		// Advanced options exposes depth and draw group properties
 		if (mView == ViewOptions.Advanced)
 		{
 			EditorGUILayout.Separator();
@@ -111,10 +122,11 @@ public class UIWidgetInspector : Editor
 		EditorGUILayout.Separator();
 		OnCustomGUI();
 
+		// Update the widget's properties if something has changed
 		if (mRegisteredUndo)
 		{
 			mWidget.atlas = atlas;
-			mWidget.sprite = sprite;
+			mWidget.spriteName = (sprite != null) ? sprite.name : "";
 			mWidget.color = color;
 			mWidget.autoDepth = autoDepth;
 
@@ -125,14 +137,7 @@ public class UIWidgetInspector : Editor
 			{
 				int prev = mWidget.group;
 				UIWidget[] widgets = mWidget.gameObject.GetComponentsInChildren<UIWidget>();
-				
-				foreach (UIWidget w in widgets)
-				{
-					if (w.group == prev)
-					{
-						w.group = group;
-					}
-				}
+				foreach (UIWidget w in widgets) if (w.group == prev) w.group = group;
 			}
 			mWidget.ScreenUpdate();
 		}

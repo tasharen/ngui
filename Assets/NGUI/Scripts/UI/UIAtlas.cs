@@ -34,8 +34,14 @@ public class UIAtlas : MonoBehaviour
 	/// </summary>
 
 	public Material material;
+
+	/// <summary>
+	/// List of all sprites inside the atlas.
+	/// </summary>
+
 	public List<Sprite> sprites = new List<Sprite>();
 
+	// Currently active set of coordinates
 	Coordinates mCoordinates = Coordinates.Pixels;
 
 	/// <summary>
@@ -83,12 +89,15 @@ public class UIAtlas : MonoBehaviour
 	/// Helper function.
 	/// </summary>
 
-	static Rect ConvertToTexCoords (Rect rect, Vector2 texSize)
+	public static Rect ConvertToTexCoords (Rect rect, Vector2 texSize)
 	{
-		rect.xMin = rect.xMin / texSize.x;
-		rect.xMax = rect.xMax / texSize.x;
-		rect.yMin = 1f - rect.yMin / texSize.y;
-		rect.yMax = 1f - rect.yMax / texSize.y;
+		if (texSize.x != 0f && texSize.y != 0f)
+		{
+			rect.xMin = rect.xMin / texSize.x;
+			rect.xMax = rect.xMax / texSize.x;
+			rect.yMin = 1f - rect.yMin / texSize.y;
+			rect.yMax = 1f - rect.yMax / texSize.y;
+		}
 		return rect;
 	}
 
@@ -96,7 +105,7 @@ public class UIAtlas : MonoBehaviour
 	/// Helper function.
 	/// </summary>
 
-	static Rect ConvertToPixels (Rect rect, Vector2 texSize)
+	public static Rect ConvertToPixels (Rect rect, Vector2 texSize)
 	{
 		rect.xMin = Mathf.RoundToInt(rect.xMin * texSize.x);
 		rect.xMax = Mathf.RoundToInt(rect.xMax * texSize.x);
@@ -111,12 +120,19 @@ public class UIAtlas : MonoBehaviour
 
 	public Sprite GetSprite (string name)
 	{
-		foreach (Sprite s in sprites)
+		if (!string.IsNullOrEmpty(name))
 		{
-			if (string.Equals(s.name, name, System.StringComparison.OrdinalIgnoreCase))
+			foreach (Sprite s in sprites)
 			{
-				return s;
+				if (!string.IsNullOrEmpty(s.name) && string.Equals(s.name, name, System.StringComparison.OrdinalIgnoreCase))
+				{
+					return s;
+				}
 			}
+		}
+		else
+		{
+			Debug.LogWarning("Expected a valid name, found nothing");
 		}
 		return null;
 	}
