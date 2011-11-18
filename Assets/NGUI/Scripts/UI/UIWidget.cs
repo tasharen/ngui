@@ -16,6 +16,7 @@ public abstract class UIWidget : MonoBehaviour
 	[SerializeField] int mDepth = 0;
 	[SerializeField] int mGroup = 0;
 
+	bool mPlayMode = true;
 	Transform mTrans;
 	UIScreen mScreen;
 	Material mMat;
@@ -64,7 +65,7 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			if (mAtlas != value)
 			{
-				RemoveFromScreen();
+				RemoveFromScreen(true);
 				mIsDirty = true;
 				mAtlas = value;
 
@@ -221,7 +222,7 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			if (mGroup != value)
 			{
-				RemoveFromScreen();
+				RemoveFromScreen(true);
 				mIsDirty = true;
 				mGroup = value;
 			}
@@ -270,12 +271,12 @@ public abstract class UIWidget : MonoBehaviour
 	/// Helper function, removes the widget from the rendering screen.
 	/// </summary>
 
-	void RemoveFromScreen ()
+	void RemoveFromScreen (bool update)
 	{
 		if (mMat != null && mScreen != null)
 		{
-			Debug.Log("Removed " + Application.isPlaying + " " + Tools.GetHierarchy(gameObject));
 			mScreen.RemoveWidget(this);
+			if (update && !mPlayMode) mScreen.LateUpdate();
 			mScreen = null;
 		}
 	}
@@ -299,10 +300,10 @@ public abstract class UIWidget : MonoBehaviour
 
 		if (mMat != null && mScreen == null)
 		{
-			Debug.Log("Added " + Application.isPlaying);
 			mScreen = UIScreen.GetScreen(mMat, mLayer, mGroup, true);
 			mScreen.AddWidget(this);
 			mIsDirty = true;
+			//if (!mPlayMode) mScreen.LateUpdate();
 		}
 	}
 
@@ -328,19 +329,19 @@ public abstract class UIWidget : MonoBehaviour
 	/// Cache the transform.
 	/// </summary>
 
-	void Awake () { mTrans = transform; }
+	void Awake () { mTrans = transform; mPlayMode = Application.isPlaying; }
 
 	/// <summary>
 	/// Unregister this widget.
 	/// </summary>
 
-	void OnDestroy () { RemoveFromScreen(); }
+	void OnDestroy () { RemoveFromScreen(false); }
 
 	/// <summary>
 	/// Unregister this widget.
 	/// </summary>
 
-	void OnDisable () { RemoveFromScreen(); }
+	void OnDisable () { RemoveFromScreen(false); }
 
 	/// <summary>
 	/// If the layer changes, we need to place the widget on a different screen.
@@ -352,10 +353,23 @@ public abstract class UIWidget : MonoBehaviour
 
 		if (mLayer != gameObject.layer)
 		{
-			RemoveFromScreen();
+			RemoveFromScreen(false);
 			mLayer = gameObject.layer;
 		}
 		if (mScreen == null) AddToScreen();
+	}
+
+	/// <summary>
+	/// Force-refresh the widget. Only meant to be executed from the edit mode.
+	/// </summary>
+
+	public void Refresh ()
+	{
+		if (!mPlayMode)
+		{
+			Update();
+			if (mScreen != null) mScreen.LateUpdate();
+		}
 	}
 
 	/// <summary>
@@ -364,11 +378,13 @@ public abstract class UIWidget : MonoBehaviour
 
 	public bool ScreenUpdate ()
 	{
+		if (mMat == null) return false;
+
 		// Call the virtual function
 		bool retVal = OnUpdate();
 
 		// Update the UV coordinates
-		if (!Application.isPlaying) UpdateUVs();
+		if (!mPlayMode) UpdateUVs();
 
 		// If there is no material to work with, there is no point in updating the pos/rot/scale
 		if (mMat != null)

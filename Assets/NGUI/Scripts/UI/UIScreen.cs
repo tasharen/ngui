@@ -1,4 +1,4 @@
-﻿//#define SHOW_GENERATED_GEOMETRY
+﻿#define SHOW_GENERATED_GEOMETRY
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -42,6 +42,7 @@ public class UIScreen : MonoBehaviour
 		{
 			if (s.mMat == mat && s.mGroup == group && s.gameObject.layer == layer)
 			{
+				Debug.Log("Exists " + layer + " " + group + " -- " + mScreens.Count);
 				return s;
 			}
 		}
@@ -49,6 +50,8 @@ public class UIScreen : MonoBehaviour
 		// No existing entry found -- create a new one
 		if (createIfMissing)
 		{
+			Debug.Log("New " + layer + " " + group + " -- " + mScreens.Count);
+
 			GameObject go = new GameObject("_UIScreen [" + mat.name + "]: " +
 				LayerMask.LayerToName(layer) + " " + group);
 
@@ -67,6 +70,8 @@ public class UIScreen : MonoBehaviour
 			UIScreen screen = go.AddComponent<UIScreen>();
 			screen.mMat = mat;
 			screen.mGroup = group;
+			mScreens.Add(screen);
+			Debug.Log("Now? " + mScreens.Count);
 			return screen;
 		}
 		return null;
@@ -104,15 +109,6 @@ public class UIScreen : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Add this screen to the list.
-	/// </summary>
-
-	void Awake ()
-	{
-		mScreens.Add(this);
-	}
-
-	/// <summary>
 	/// Cleanup.
 	/// </summary>
 
@@ -125,6 +121,7 @@ public class UIScreen : MonoBehaviour
 				// Curiously enough, (s == this) always returns 'false', even with just one widget in the scene.
 				// It must be some odd side-effect of Unity's edit/play mode mechanic.
 				mScreens.Remove(s);
+				Debug.Log("Removing " + mGroup);
 				break;
 			}
 		}
@@ -146,7 +143,7 @@ public class UIScreen : MonoBehaviour
 	/// Rebuild the UI.
 	/// </summary>
 
-	void LateUpdate ()
+	public void LateUpdate ()
 	{
 		if (mWidgets == null) return;
 

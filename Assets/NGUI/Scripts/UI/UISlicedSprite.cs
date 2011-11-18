@@ -26,18 +26,26 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/Bordered Sprite")]
-public class UIBorderedSprite : UIWidget
+[AddComponentMenu("NGUI/Sliced Sprite")]
+public class UISlicedSprite : UISprite
 {
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
+		if (mOuterUV == mInnerUV)
+		{
+			base.OnFill(verts, uvs, cols);
+			return;
+		}
+
 		Vector2[] v  = new Vector2[4];
 		Vector2[] uv = new Vector2[4];
 
 		Texture tex = mainTexture;
 
 		v[0] = Vector2.zero;
-		v[3] = new Vector2(1f, -1f);
+		v[1] = v[0];
+		v[2] = new Vector2(1f, -1f);
+		v[3] = v[2];
 
 		if (tex != null)
 		{
@@ -46,9 +54,9 @@ public class UIBorderedSprite : UIWidget
 			float borderTop		= mInnerUV.yMin - mOuterUV.yMin;
 			float borderBottom	= mOuterUV.yMax - mInnerUV.yMax;
 
-			Vector2 sz = new Vector2(mScale.x / tex.width, mScale.z / tex.height);
-			v[1] = new Vector2(borderLeft / sz.x, -borderTop / sz.y);
-			v[2] = new Vector2(borderRight / sz.x, -borderBottom / sz.y);
+			Vector2 sz = new Vector2(mScale.x / tex.width, mScale.y / tex.height);
+			v[1] += new Vector2(borderLeft / sz.x, borderTop / sz.y);
+			v[2] -= new Vector2(borderRight / sz.x, borderBottom / sz.y);
 
 			uv[0] = new Vector2(mOuterUV.xMin, mOuterUV.yMin);
 			uv[1] = new Vector2(mInnerUV.xMin, mInnerUV.yMin);
@@ -57,9 +65,7 @@ public class UIBorderedSprite : UIWidget
 		}
 		else
 		{
-			v[1] = v[0];
-			v[2] = v[3];
-
+			// No texture -- just use zeroed out texture coordinates
 			for (int i = 0; i < 4; ++i) uv[i] = Vector2.zero;
 		}
 

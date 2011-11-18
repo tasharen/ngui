@@ -16,7 +16,7 @@ public class UIWidgetInspector : Editor
 
 	protected UIWidget mWidget;
 	protected bool mRegisteredUndo = false;
-	protected static ViewOptions mView = ViewOptions.Simple;
+	protected static ViewOptions mView = ViewOptions.Advanced;
 
 	/// <summary>
 	/// Register an Undo command with the Unity editor.
@@ -139,7 +139,7 @@ public class UIWidgetInspector : Editor
 				UIWidget[] widgets = mWidget.gameObject.GetComponentsInChildren<UIWidget>();
 				foreach (UIWidget w in widgets) if (w.group == prev) w.group = group;
 			}
-			mWidget.ScreenUpdate();
+			mWidget.Refresh();
 		}
 	}
 
