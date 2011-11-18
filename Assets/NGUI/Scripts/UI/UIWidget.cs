@@ -14,7 +14,6 @@ public abstract class UIWidget : MonoBehaviour
 	[SerializeField] bool mCentered = false;
 	[SerializeField] bool mAutoDepth = true;
 	[SerializeField] int mDepth = 0;
-	[SerializeField] int mGroup = 0;
 
 	bool mPlayMode = true;
 	Transform mTrans;
@@ -209,27 +208,6 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Groups can be used to break up the rendering into separate batches
-	/// </summary>
-
-	public int group
-	{
-		get
-		{
-			return mGroup;
-		}
-		set
-		{
-			if (mGroup != value)
-			{
-				RemoveFromScreen(true);
-				mIsDirty = true;
-				mGroup = value;
-			}
-		}
-	}
-
-	/// <summary>
 	/// Static widget comparison function used for Z-sorting.
 	/// </summary>
 
@@ -300,7 +278,8 @@ public abstract class UIWidget : MonoBehaviour
 
 		if (mMat != null && mScreen == null)
 		{
-			mScreen = UIScreen.GetScreen(mMat, mLayer, mGroup, true);
+			if (mTrans == null) mTrans = transform;
+			mScreen = UIScreen.GetScreen(mTrans, mMat);
 			mScreen.AddWidget(this);
 			mIsDirty = true;
 			//if (!mPlayMode) mScreen.LateUpdate();

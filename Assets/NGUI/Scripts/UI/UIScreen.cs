@@ -15,7 +15,6 @@ public class UIScreen : MonoBehaviour
 	Mesh			mMesh;		// Generated mesh
 	MeshFilter		mFilter;	// Mesh filter for this screen
 	MeshRenderer	mRen;		// Mesh renderer for this screen
-	int				mGroup;		// Group used by this screen
 
 	// Whether the screen should be rebuilt next update
 	bool mRebuild = false;
@@ -28,53 +27,40 @@ public class UIScreen : MonoBehaviour
 	List<Vector2> mUvs = new List<Vector2>();
 	List<Color> mCols = new List<Color>();
 
-	// List of all the UI screens in the scene
-	static List<UIScreen> mScreens = new List<UIScreen>();
+	/// <summary>
+	/// Get or create a UI panel on the specified transform or its parents.
+	/// </summary>
+
+	static public GameObject GetPanelObject (Transform trans)
+	{
+		UIPanel panel = null;
+
+		while (panel == null && trans != null)
+		{
+			panel = trans.GetComponent<UIPanel>();
+			if (panel != null) break;
+			if (trans.parent == null) return trans.gameObject;
+			trans = trans.parent;
+		}
+		return panel.gameObject;
+	}
 
 	/// <summary>
 	/// Retrieve a UI screen for the specified material, creating one if necessary.
 	/// </summary>
 
-	static public UIScreen GetScreen (Material mat, int layer, int group, bool createIfMissing)
+	static public UIScreen GetScreen (Transform trans, Material mat)
 	{
+		GameObject go = GetPanelObject(trans);
+		UIScreen[] screens = go.GetComponents<UIScreen>();
+
 		// Find an existing entry
-		foreach (UIScreen s in mScreens)
-		{
-			if (s.mMat == mat && s.mGroup == group && s.gameObject.layer == layer)
-			{
-				Debug.Log("Exists " + layer + " " + group + " -- " + mScreens.Count);
-				return s;
-			}
-		}
+		foreach (UIScreen s in screens) if (s.mMat == mat) return s;
 
-		// No existing entry found -- create a new one
-		if (createIfMissing)
-		{
-			Debug.Log("New " + layer + " " + group + " -- " + mScreens.Count);
-
-			GameObject go = new GameObject("_UIScreen [" + mat.name + "]: " +
-				LayerMask.LayerToName(layer) + " " + group);
-
-#if SHOW_GENERATED_GEOMETRY
-			go.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
-#else
-			go.hideFlags = HideFlags.HideAndDontSave;
-#endif
-			// We don't want to destroy this object
-			if (Application.isPlaying) DontDestroyOnLoad(go);
-
-			// Use the specified layer
-			go.layer = layer;
-
-			// Add the UI screen script
-			UIScreen screen = go.AddComponent<UIScreen>();
-			screen.mMat = mat;
-			screen.mGroup = group;
-			mScreens.Add(screen);
-			Debug.Log("Now? " + mScreens.Count);
-			return screen;
-		}
-		return null;
+		// Add the UI screen script
+		UIScreen screen = go.AddComponent<UIScreen>();
+		screen.mMat = mat;
+		return screen;
 	}
 
 	/// <summary>
@@ -114,18 +100,6 @@ public class UIScreen : MonoBehaviour
 
 	void OnDestroy ()
 	{
-		foreach (UIScreen s in mScreens)
-		{
-			if (s.mMat == mMat && s.mGroup == mGroup && s.gameObject.layer == gameObject.layer)
-			{
-				// Curiously enough, (s == this) always returns 'false', even with just one widget in the scene.
-				// It must be some odd side-effect of Unity's edit/play mode mechanic.
-				mScreens.Remove(s);
-				Debug.Log("Removing " + mGroup);
-				break;
-			}
-		}
-
 		if (Application.isPlaying)
 		{
 			if (mRen	!= null) Destroy(mRen);
@@ -160,8 +134,20 @@ public class UIScreen : MonoBehaviour
 		{
 			if (Application.isPlaying)
 			{
-				Destroy(gameObject);
+				Destroy(this);
 				return;
+			}
+
+			if (mRen != null)
+			{
+				DestroyImmediate(mRen);
+				mRen = null;
+			}
+
+			if (mFilter != null)
+			{
+				DestroyImmediate(mFilter);
+				mFilter = null;
 			}
 
 			if (mMesh != null)
@@ -169,7 +155,7 @@ public class UIScreen : MonoBehaviour
 				DestroyImmediate(mMesh);
 				mMesh = null;
 			}
-			if (this != null) DestroyImmediate(gameObject);
+			if (this != null) DestroyImmediate(this);
 			return;
 		}
 

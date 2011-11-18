@@ -8,15 +8,8 @@ using UnityEditor;
 [CustomEditor(typeof(UIWidget))]
 public class UIWidgetInspector : Editor
 {
-	public enum ViewOptions
-	{
-		Simple,
-		Advanced,
-	}
-
 	protected UIWidget mWidget;
 	protected bool mRegisteredUndo = false;
-	protected static ViewOptions mView = ViewOptions.Advanced;
 
 	/// <summary>
 	/// Register an Undo command with the Unity editor.
@@ -43,11 +36,7 @@ public class UIWidgetInspector : Editor
 		// This flag gets set to 'true' if RegisterUndo() gets called
 		mRegisteredUndo = false;
 
-		// View style comes first -- simple or advanced
-		mView = (ViewOptions)EditorGUILayout.EnumPopup("View Style", mView);
-		EditorGUILayout.Separator();
-
-		// Atlas field comes next
+		// Atlas field comes first
 		UIAtlas atlas = EditorGUILayout.ObjectField("Atlas", mWidget.atlas, typeof(UIAtlas), true) as UIAtlas;
 		UIAtlas.Sprite sprite = null;
 		
@@ -85,34 +74,19 @@ public class UIWidgetInspector : Editor
 
 		bool autoDepth = mWidget.autoDepth;
 		int depth = mWidget.depth;
-		int group = mWidget.group;
 
-		// Advanced options exposes depth and draw group properties
-		if (mView == ViewOptions.Advanced)
+		GUILayout.BeginHorizontal();
+		autoDepth = EditorGUILayout.Toggle("Automatic Depth", autoDepth);
+		GUILayout.EndHorizontal();
+
+		if (!autoDepth)
 		{
-			EditorGUILayout.Separator();
-			GUILayout.BeginHorizontal();
-			autoDepth = EditorGUILayout.Toggle("Automatic Depth", autoDepth);
-			GUILayout.EndHorizontal();
-
-			if (!autoDepth)
-			{
-				GUILayout.BeginHorizontal();
-				{
-					EditorGUILayout.PrefixLabel("Depth");
-					if (GUILayout.Button("<")) { RegisterUndo(); --depth; }
-					depth = EditorGUILayout.IntField(depth);
-					if (GUILayout.Button(">")) { RegisterUndo(); ++depth; }
-				}
-				GUILayout.EndHorizontal();
-			}
-
 			GUILayout.BeginHorizontal();
 			{
-				EditorGUILayout.PrefixLabel("Draw Group");
-				if (GUILayout.Button("<")) { RegisterUndo(); --group; }
-				group = EditorGUILayout.IntField(group);
-				if (GUILayout.Button(">")) { RegisterUndo(); ++group; }
+				EditorGUILayout.PrefixLabel("Manual Depth");
+				if (GUILayout.Button("<")) { RegisterUndo(); --depth; }
+				depth = EditorGUILayout.IntField(depth);
+				if (GUILayout.Button(">")) { RegisterUndo(); ++depth; }
 			}
 			GUILayout.EndHorizontal();
 		}
@@ -129,16 +103,7 @@ public class UIWidgetInspector : Editor
 			mWidget.spriteName = (sprite != null) ? sprite.name : "";
 			mWidget.color = color;
 			mWidget.autoDepth = autoDepth;
-
 			if (!autoDepth) mWidget.depth = depth;
-
-			// Changing the group should affect all children
-			if (mWidget.group != group)
-			{
-				int prev = mWidget.group;
-				UIWidget[] widgets = mWidget.gameObject.GetComponentsInChildren<UIWidget>();
-				foreach (UIWidget w in widgets) if (w.group == prev) w.group = group;
-			}
 			mWidget.Refresh();
 		}
 	}
