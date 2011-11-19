@@ -92,9 +92,11 @@ public class TransformInspector : Editor
 	static Vector3 DrawVector3 (Vector3 value)
 	{
 		GUILayoutOption opt = GUILayout.MinWidth(30f);
+		GUI.backgroundColor = GUITools.backgroundColor;
 		value.x = EditorGUILayout.FloatField("X", value.x, opt);
 		value.y = EditorGUILayout.FloatField("Y", value.y, opt);
 		value.z = EditorGUILayout.FloatField("Z", value.z, opt);
+		GUI.backgroundColor = Color.white;
 		return value;
 	}
 

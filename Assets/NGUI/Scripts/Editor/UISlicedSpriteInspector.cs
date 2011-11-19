@@ -9,25 +9,35 @@ using UnityEditor;
 public class UISlicedSpriteInspector : UISpriteInspector
 {
 	/// <summary>
-	/// Draw the selection outline.
+	/// Any and all derived functionality.
 	/// </summary>
 
-	protected override void DrawSelection (UISprite sprite, Rect rect)
+	protected override void OnCustomGUI ()
 	{
-		// Calculate where the inner rectangle would be
-		Rect inner = sprite.innerUV;
-		float x = rect.xMin + rect.width * inner.xMin;
-		float y = rect.yMax - rect.height * inner.yMin;
-		float width = rect.width * inner.width;
-		float height = -rect.height * inner.height;
-		inner = new Rect(x, y, width, height);
+		UISprite sprite = mWidget as UISprite;
+		Texture2D tex = sprite.mainTexture;
 
-		// Draw the selection
-		GUI.color = new Color(0f, 0.7f, 1f, 1f);
-		GUITools.DrawOutline(inner, mSelectionTex);
-		GUI.color = Color.white;
+		if (tex != null)
+		{
+			if (mCheckerTex == null) mCheckerTex = GUITools.CreateCheckerTex();
+			if (mSelectionTex == null) mSelectionTex = GUITools.CreateDummyTex();
 
-		// Draw the outer selection
-		base.DrawSelection(sprite, rect);
+			// Draw the atlas
+			Rect rect = GUITools.DrawAtlas(tex, mSelectionTex, mCheckerTex);
+
+			// Draw the selection
+			GUI.color = new Color(0f, 0.7f, 1f, 1f);
+			GUITools.DrawOutline(rect, sprite.innerUV, mSelectionTex);
+			GUI.color = new Color(0.4f, 1f, 0f, 1f);
+			GUITools.DrawOutline(rect, sprite.outerUV, mSelectionTex);
+			GUI.color = Color.white;
+
+			// Sprite size label
+			string text = "Sprite Size: ";
+			text += Mathf.RoundToInt(Mathf.Abs(sprite.outerUV.width * tex.width));
+			text += "x";
+			text += Mathf.RoundToInt(Mathf.Abs(sprite.outerUV.height * tex.height));
+			EditorGUI.DropShadowLabel(new Rect(rect.xMin, rect.yMax, rect.width, 18f), text);
+		}
 	}
 }

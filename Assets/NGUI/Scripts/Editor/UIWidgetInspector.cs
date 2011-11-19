@@ -32,7 +32,7 @@ public class UIWidgetInspector : Editor
 
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.LookLikeControls(120f);
+		EditorGUIUtility.LookLikeControls(80f);
 		mWidget = target as UIWidget;
 
 		// Check the hierarchy to ensure that this widget is not parented to another widget
@@ -83,6 +83,7 @@ public class UIWidgetInspector : Editor
 			color = EditorGUILayout.ColorField("Color Tint", color);
 			center = EditorGUILayout.Toggle("Centered", center);
 
+			// Depth navigation
 			GUILayout.BeginHorizontal();
 			EditorGUILayout.PrefixLabel("Depth");
 			if (GUILayout.Button("Back")) { RegisterUndo(); --depth; }
