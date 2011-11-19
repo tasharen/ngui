@@ -33,6 +33,18 @@ public abstract class UIWidget : MonoBehaviour
 	protected Rect mOuterUV;
 
 	/// <summary>
+	/// Inner set of UV coordinates.
+	/// </summary>
+
+	public Rect innerUV { get { return mInnerUV; } }
+
+	/// <summary>
+	/// Outer set of UV coordinates.
+	/// </summary>
+
+	public Rect outerUV { get { return mOuterUV; } }
+
+	/// <summary>
 	/// Cached for speed.
 	/// </summary>
 

@@ -76,20 +76,16 @@ public class UIWidgetInspector : Editor
 		int depth = mWidget.depth;
 
 		GUILayout.BeginHorizontal();
-		autoDepth = EditorGUILayout.Toggle("Automatic Depth", autoDepth);
-		GUILayout.EndHorizontal();
+		EditorGUILayout.PrefixLabel("Depth (Auto?    )");
+		autoDepth = EditorGUI.Toggle(new Rect(83f, 201f, 40f, 40f), autoDepth);
 
 		if (!autoDepth)
 		{
-			GUILayout.BeginHorizontal();
-			{
-				EditorGUILayout.PrefixLabel("Manual Depth");
-				if (GUILayout.Button("<")) { RegisterUndo(); --depth; }
-				depth = EditorGUILayout.IntField(depth);
-				if (GUILayout.Button(">")) { RegisterUndo(); ++depth; }
-			}
-			GUILayout.EndHorizontal();
+			if (GUILayout.Button("<")) { RegisterUndo(); --depth; }
+			depth = EditorGUILayout.IntField(depth);
+			if (GUILayout.Button(">")) { RegisterUndo(); ++depth; }
 		}
+		GUILayout.EndHorizontal();
 
 		// Draw all derived functionality
 		if (GUI.changed) RegisterUndo();
