@@ -29,10 +29,10 @@ public class UISprite : UIWidget
 			verts.Add(new Vector3(0f, 0f, 0f));
 		}
 
-		uvs.Add(new Vector2(uv1.x, uv0.y));
 		uvs.Add(uv1);
-		uvs.Add(new Vector2(uv0.x, uv1.y));
+		uvs.Add(new Vector2(uv1.x, uv0.y));
 		uvs.Add(uv0);
+		uvs.Add(new Vector2(uv0.x, uv1.y));
 
 		cols.Add(color);
 		cols.Add(color);

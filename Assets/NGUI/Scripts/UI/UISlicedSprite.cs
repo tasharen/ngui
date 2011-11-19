@@ -51,8 +51,8 @@ public class UISlicedSprite : UISprite
 		{
 			float borderLeft	= mInnerUV.xMin - mOuterUV.xMin;
 			float borderRight	= mOuterUV.xMax - mInnerUV.xMax;
-			float borderTop		= mInnerUV.yMin - mOuterUV.yMin;
-			float borderBottom	= mOuterUV.yMax - mInnerUV.yMax;
+			float borderTop		= mOuterUV.yMin - mInnerUV.yMin;
+			float borderBottom	= mInnerUV.yMax - mOuterUV.yMax;
 
 			Vector2 sz = new Vector2(mScale.x / tex.width, mScale.y / tex.height);
 			v[1] += new Vector2(borderLeft / sz.x, borderTop / sz.y);

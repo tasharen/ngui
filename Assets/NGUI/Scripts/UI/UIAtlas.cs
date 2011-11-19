@@ -91,14 +91,16 @@ public class UIAtlas : MonoBehaviour
 
 	public static Rect ConvertToTexCoords (Rect rect, Vector2 texSize)
 	{
+		Rect final = rect;
+
 		if (texSize.x != 0f && texSize.y != 0f)
 		{
-			rect.xMin = rect.xMin / texSize.x;
-			rect.xMax = rect.xMax / texSize.x;
-			rect.yMin = 1f - rect.yMin / texSize.y;
-			rect.yMax = 1f - rect.yMax / texSize.y;
+			final.xMin = rect.xMin / texSize.x;
+			final.xMax = rect.xMax / texSize.x;
+			final.yMin = 1f - rect.yMax / texSize.y;
+			final.yMax = 1f - rect.yMin / texSize.y;
 		}
-		return rect;
+		return final;
 	}
 
 	/// <summary>
@@ -107,11 +109,14 @@ public class UIAtlas : MonoBehaviour
 
 	public static Rect ConvertToPixels (Rect rect, Vector2 texSize)
 	{
-		rect.xMin = Mathf.RoundToInt(rect.xMin * texSize.x);
-		rect.xMax = Mathf.RoundToInt(rect.xMax * texSize.x);
-		rect.yMin = Mathf.RoundToInt((1f - rect.yMin) * texSize.y);
-		rect.yMax = Mathf.RoundToInt((1f - rect.yMax) * texSize.y);
-		return rect;
+		Rect final = rect;
+
+		final.xMin = Mathf.RoundToInt(rect.xMin * texSize.x);
+		final.xMax = Mathf.RoundToInt(rect.xMax * texSize.x);
+		final.yMin = Mathf.RoundToInt((1f - rect.yMax) * texSize.y);
+		final.yMax = Mathf.RoundToInt((1f - rect.yMin) * texSize.y);
+
+		return final;
 	}
 
 	/// <summary>

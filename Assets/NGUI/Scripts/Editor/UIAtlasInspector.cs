@@ -38,13 +38,15 @@ public class UIAtlasInspector : Editor
 		EditorGUIUtility.LookLikeControls(80f);
 		mAtlas = target as UIAtlas;
 
-		GUITools.DrawSeparator(mSelectionTex);
-
 		Material mat = mAtlas.material;
 		UIAtlas.Coordinates coords = mAtlas.coordinates;
-
-		mat = EditorGUILayout.ObjectField("Material", mat, typeof(Material), true) as Material;
-		coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", coords);
+		
+		if (!mConfirmDelete)
+		{
+			GUITools.DrawSeparator(mSelectionTex);
+			mat = EditorGUILayout.ObjectField("Material", mat, typeof(Material), true) as Material;
+			coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", coords);
+		}
 
 		if (GUI.changed)
 		{
