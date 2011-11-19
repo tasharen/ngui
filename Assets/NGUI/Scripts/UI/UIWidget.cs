@@ -10,9 +10,8 @@ public abstract class UIWidget : MonoBehaviour
 	// Cached and saved values
 	[SerializeField] UIAtlas mAtlas;
 	[SerializeField] string mSpriteName;
-	[SerializeField] Color mColor;
-	[SerializeField] bool mCentered = false;
-	[SerializeField] bool mAutoDepth = true;
+	[SerializeField] Color mColor = Color.white;
+	[SerializeField] bool mCentered = true;
 	[SerializeField] int mDepth = 0;
 
 	bool mPlayMode = true;
@@ -33,16 +32,16 @@ public abstract class UIWidget : MonoBehaviour
 	protected Rect mOuterUV;
 
 	/// <summary>
-	/// Inner set of UV coordinates.
-	/// </summary>
-
-	public Rect innerUV { get { return mInnerUV; } }
-
-	/// <summary>
 	/// Outer set of UV coordinates.
 	/// </summary>
 
 	public Rect outerUV { get { return mOuterUV; } }
+
+	/// <summary>
+	/// Inner set of UV coordinates.
+	/// </summary>
+
+	public Rect innerUV { get { return mInnerUV; } }
 
 	/// <summary>
 	/// Cached for speed.
@@ -176,28 +175,6 @@ public abstract class UIWidget : MonoBehaviour
 			}
 		}
 	}
-
-	/// <summary>
-	/// Whether the depth is calculated automatically.
-	/// </summary>
-
-	public bool autoDepth
-	{
-		get
-		{
-			return mAutoDepth;
-		}
-		set
-		{
-			if (mAutoDepth != value)
-			{
-				mIsDirty = true;
-				mAutoDepth = value;
-				if (mAutoDepth) mDepth = CalculateDepth();
-			}
-		}
-	}
-
 	
 	/// <summary>
 	/// Depth controls the rendering order -- lowest to highest.
@@ -302,7 +279,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Helper function that automatically calculates depth of this widget based on the hierarchy.
 	/// </summary>
 
-	public int CalculateDepth ()
+	int CalculateDepth ()
 	{
 		Transform t = transform;
 		int val = 0;
@@ -312,6 +289,8 @@ public abstract class UIWidget : MonoBehaviour
 			t = t.parent;
 			if (t == null) break;
 			++val;
+			UIWidget w = t.GetComponent<UIWidget>();
+			if (w != null) return w.depth + val;
 		}
 		return val;
 	}
@@ -320,7 +299,12 @@ public abstract class UIWidget : MonoBehaviour
 	/// Cache the transform.
 	/// </summary>
 
-	void Awake () { mTrans = transform; mPlayMode = Application.isPlaying; }
+	void Awake ()
+	{
+		if (mDepth == 0) mDepth = CalculateDepth();
+		mTrans = transform;
+		mPlayMode = Application.isPlaying;
+	}
 
 	/// <summary>
 	/// Unregister this widget.
