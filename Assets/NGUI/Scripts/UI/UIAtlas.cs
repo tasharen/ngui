@@ -42,7 +42,7 @@ public class UIAtlas : MonoBehaviour
 	public List<Sprite> sprites = new List<Sprite>();
 
 	// Currently active set of coordinates
-	Coordinates mCoordinates = Coordinates.Pixels;
+	[SerializeField] Coordinates mCoordinates = Coordinates.Pixels;
 
 	/// <summary>
 	/// Allows switching of the coordinate system from pixel coordinates to texture coordinates.

@@ -41,14 +41,17 @@ public class UIAtlasInspector : Editor
 		GUITools.DrawSeparator(mSelectionTex);
 
 		Material mat = mAtlas.material;
+		UIAtlas.Coordinates coords = mAtlas.coordinates;
 
 		mat = EditorGUILayout.ObjectField("Material", mat, typeof(Material), true) as Material;
+		coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", coords);
 
 		if (GUI.changed)
 		{
 			// Atlas material has changed
 			RegisterUndo();
 			mAtlas.material = mat;
+			mAtlas.coordinates = coords;
 			mConfirmDelete = false;
 		}
 		else if (mat != null)
