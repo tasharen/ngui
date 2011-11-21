@@ -4,6 +4,26 @@ using System.Collections.Generic;
 
 public class SelectionTools
 {
+	[MenuItem("Selection/Force Delete")]
+	static void ForceDelete()
+	{
+		GameObject go = Selection.activeGameObject;
+
+		if (go != null)
+		{
+			go.hideFlags = HideFlags.DontSave;
+
+			if (Application.isPlaying)
+			{
+				GameObject.Destroy(go);
+			}
+			else
+			{
+				GameObject.DestroyImmediate(go);
+			}
+		}
+	}
+
 	[MenuItem("Selection/Toggle 'Active' #&a")]
 	static void ActivateDeactivate()
 	{

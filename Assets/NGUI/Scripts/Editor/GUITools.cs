@@ -6,9 +6,6 @@
 
 static public class GUITools
 {
-	// Not a fan of the darker hues? Change this to 'Color.white'.
-	static public Color backgroundColor = Color.white;//new Color(0.65f, 0.65f, 0.65f, 1f);
-
 	/// <summary>
 	/// Draws the tiled texture. Like GUI.DrawTexture() but tiled instead of stretched.
 	/// </summary>

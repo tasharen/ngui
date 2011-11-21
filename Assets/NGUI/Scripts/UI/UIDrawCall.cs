@@ -1,6 +1,4 @@
-﻿#define SHOW_GENERATED_GEOMETRY
-
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
@@ -8,8 +6,8 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("Internal/UI Screen")]
-public class UIScreen : MonoBehaviour
+[AddComponentMenu("Internal/UI Draw Call")]
+public class UIDrawCall : MonoBehaviour
 {
 	Material		mMat;		// Material used by this screen
 	Mesh			mMesh;		// Generated mesh
@@ -28,40 +26,16 @@ public class UIScreen : MonoBehaviour
 	List<Color> mCols = new List<Color>();
 
 	/// <summary>
-	/// Get or create a UI panel on the specified transform or its parents.
+	/// Material used by this screen.
 	/// </summary>
 
-	static public GameObject GetPanelObject (Transform trans)
-	{
-		UIPanel panel = null;
-
-		while (panel == null && trans != null)
-		{
-			panel = trans.GetComponent<UIPanel>();
-			if (panel != null) break;
-			if (trans.parent == null) return trans.gameObject;
-			trans = trans.parent;
-		}
-		return panel.gameObject;
-	}
+	public Material material { get { return mMat; } set { mMat = value; } }
 
 	/// <summary>
-	/// Retrieve a UI screen for the specified material, creating one if necessary.
+	/// Number of widgets managed by this draw call.
 	/// </summary>
 
-	static public UIScreen GetScreen (Transform trans, Material mat)
-	{
-		GameObject go = GetPanelObject(trans);
-		UIScreen[] screens = go.GetComponents<UIScreen>();
-
-		// Find an existing entry
-		foreach (UIScreen s in screens) if (s.mMat == mat) return s;
-
-		// Add the UI screen script
-		UIScreen screen = go.AddComponent<UIScreen>();
-		screen.mMat = mat;
-		return screen;
-	}
+	public int widgets { get { return mWidgets.Count; } }
 
 	/// <summary>
 	/// Add the specified widget to the managed list.
@@ -134,7 +108,7 @@ public class UIScreen : MonoBehaviour
 		{
 			if (Application.isPlaying)
 			{
-				Destroy(this);
+				Destroy(gameObject);
 				return;
 			}
 
@@ -155,7 +129,7 @@ public class UIScreen : MonoBehaviour
 				DestroyImmediate(mMesh);
 				mMesh = null;
 			}
-			if (this != null) DestroyImmediate(this);
+			if (this != null) DestroyImmediate(gameObject);
 			return;
 		}
 

@@ -16,7 +16,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	bool mPlayMode = true;
 	Transform mTrans;
-	UIScreen mScreen;
+	UIDrawCall mScreen;
 	Material mMat;
 	Texture2D mTex;
 	UIAtlas.Sprite mSprite;
@@ -268,7 +268,7 @@ public abstract class UIWidget : MonoBehaviour
 		if (mMat != null && mScreen == null)
 		{
 			if (mTrans == null) mTrans = transform;
-			mScreen = UIScreen.GetScreen(mTrans, mMat);
+			mScreen = UIPanel.GetScreen(mTrans, mMat);
 			mScreen.AddWidget(this);
 			mIsDirty = true;
 			//if (!mPlayMode) mScreen.LateUpdate();

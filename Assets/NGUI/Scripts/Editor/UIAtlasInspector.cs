@@ -115,9 +115,8 @@ public class UIAtlasInspector : Editor
 					{
 						if (mIndex == 0) GUI.backgroundColor = Color.grey;
 						if (GUILayout.Button("<<")) { mConfirmDelete = false; --mIndex; }
-						GUI.backgroundColor = GUITools.backgroundColor;
-						mIndex = EditorGUILayout.IntField(mIndex + 1, GUILayout.Width(40f)) - 1;
 						GUI.backgroundColor = Color.white;
+						mIndex = EditorGUILayout.IntField(mIndex + 1, GUILayout.Width(40f)) - 1;
 						GUILayout.Label("/ " + mAtlas.sprites.Count, GUILayout.Width(40f));
 						if (mIndex + 1 == mAtlas.sprites.Count) GUI.backgroundColor = Color.grey;
 						if (GUILayout.Button(">>")) { mConfirmDelete = false; ++mIndex; }
@@ -144,7 +143,6 @@ public class UIAtlasInspector : Editor
 
 						GUILayout.BeginHorizontal();
 						{
-							GUI.backgroundColor = GUITools.backgroundColor;
 							name = EditorGUILayout.TextField("Sprite Name", name);
 
 							// Show the delete button
