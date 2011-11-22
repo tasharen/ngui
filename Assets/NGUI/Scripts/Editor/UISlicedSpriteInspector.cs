@@ -19,18 +19,12 @@ public class UISlicedSpriteInspector : UISpriteInspector
 
 		if (tex != null)
 		{
-			if (mCheckerTex == null) mCheckerTex = GUITools.CreateCheckerTex();
-			if (mSelectionTex == null) mSelectionTex = GUITools.CreateDummyTex();
-
 			// Draw the atlas
-			Rect rect = GUITools.DrawAtlas(tex, mSelectionTex, mCheckerTex);
+			Rect rect = GUITools.DrawAtlas(tex);
 
 			// Draw the selection
-			GUI.color = new Color(0f, 0.7f, 1f, 1f);
-			GUITools.DrawOutline(rect, sprite.innerUV, mSelectionTex);
-			GUI.color = new Color(0.4f, 1f, 0f, 1f);
-			GUITools.DrawOutline(rect, sprite.outerUV, mSelectionTex);
-			GUI.color = Color.white;
+			GUITools.DrawOutline(rect, sprite.innerUV, new Color(0f, 0.7f, 1f, 1f));
+			GUITools.DrawOutline(rect, sprite.outerUV, new Color(0.4f, 1f, 0f, 1f));
 
 			// Sprite size label
 			string text = "Sprite Size: ";

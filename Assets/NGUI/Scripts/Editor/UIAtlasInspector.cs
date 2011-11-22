@@ -12,8 +12,6 @@ public class UIAtlasInspector : Editor
 	int mIndex = 0;
 	bool mRegisteredUndo = false;
 	bool mConfirmDelete = false;
-	Texture2D mCheckerTex;
-	Texture2D mSelectionTex;
 
 	/// <summary>
 	/// Register an Undo command with the Unity editor.
@@ -43,7 +41,7 @@ public class UIAtlasInspector : Editor
 		
 		if (!mConfirmDelete)
 		{
-			GUITools.DrawSeparator(mSelectionTex);
+			GUITools.DrawSeparator();
 			mat = EditorGUILayout.ObjectField("Material", mat, typeof(Material), true) as Material;
 			coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", coords);
 		}
@@ -86,9 +84,9 @@ public class UIAtlasInspector : Editor
 				if (mConfirmDelete)
 				{
 					// Show the confirmation dialog
-					GUITools.DrawSeparator(mSelectionTex);
+					GUITools.DrawSeparator();
 					GUILayout.Label("Are you sure you want to delete '" + sprite.name + "'?");
-					GUITools.DrawSeparator(mSelectionTex);
+					GUITools.DrawSeparator();
 
 					GUILayout.BeginHorizontal();
 					{
@@ -108,7 +106,7 @@ public class UIAtlasInspector : Editor
 				}
 				else
 				{
-					GUITools.DrawSeparator(mSelectionTex);
+					GUITools.DrawSeparator();
 
 					// Navigation section
 					GUILayout.BeginHorizontal();
@@ -124,7 +122,7 @@ public class UIAtlasInspector : Editor
 					}
 					GUILayout.EndHorizontal();
 
-					GUITools.DrawSeparator(mSelectionTex);
+					GUITools.DrawSeparator();
 
 					string name = sprite.name;
 
@@ -136,9 +134,6 @@ public class UIAtlasInspector : Editor
 
 					if (tex != null)
 					{
-						if (mCheckerTex == null) mCheckerTex = GUITools.CreateCheckerTex();
-						if (mSelectionTex == null) mSelectionTex = GUITools.CreateDummyTex();
-
 						Vector2 size = new Vector2(tex.width, tex.height);
 
 						GUILayout.BeginHorizontal();
@@ -172,7 +167,7 @@ public class UIAtlasInspector : Editor
 						EditorGUILayout.Separator();
 
 						// Draw the atlas
-						Rect rect = GUITools.DrawAtlas(tex, mSelectionTex, mCheckerTex);
+						Rect rect = GUITools.DrawAtlas(tex);
 
 						// If the atlas uses pixel coordinates, calculate the UVs
 						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
@@ -182,11 +177,8 @@ public class UIAtlasInspector : Editor
 						}
 
 						// Draw the sprite outline
-						GUI.color = blue;
-						GUITools.DrawOutline(rect, inner, mSelectionTex);
-						GUI.color = green;
-						GUITools.DrawOutline(rect, outer, mSelectionTex);
-						GUI.color = Color.white;
+						GUITools.DrawOutline(rect, inner, blue);
+						GUITools.DrawOutline(rect, outer, green);
 						EditorGUILayout.Separator();
 					}
 

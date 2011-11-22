@@ -8,9 +8,6 @@ using UnityEditor;
 [CustomEditor(typeof(UISprite))]
 public class UISpriteInspector : UIWidgetInspector
 {
-	protected Texture2D mCheckerTex;
-	protected Texture2D mSelectionTex;
-
 	/// <summary>
 	/// Any and all derived functionality.
 	/// </summary>
@@ -22,16 +19,11 @@ public class UISpriteInspector : UIWidgetInspector
 
 		if (tex != null)
 		{
-			if (mCheckerTex == null) mCheckerTex = GUITools.CreateCheckerTex();
-			if (mSelectionTex == null) mSelectionTex = GUITools.CreateDummyTex();
-
 			// Draw the atlas
-			Rect rect = GUITools.DrawAtlas(tex, mSelectionTex, mCheckerTex);
+			Rect rect = GUITools.DrawAtlas(tex);
 
 			// Draw the selection
-			GUI.color = new Color(0.4f, 1f, 0f, 1f);
-			GUITools.DrawOutline(rect, sprite.outerUV, mSelectionTex);
-			GUI.color = Color.white;
+			GUITools.DrawOutline(rect, sprite.outerUV, new Color(0.4f, 1f, 0f, 1f));
 
 			// Sprite size label
 			string text = "Sprite Size: ";
@@ -39,27 +31,6 @@ public class UISpriteInspector : UIWidgetInspector
 			text += "x";
 			text += Mathf.RoundToInt(Mathf.Abs(sprite.outerUV.height * tex.height));
 			EditorGUI.DropShadowLabel(new Rect(rect.xMin, rect.yMax, rect.width, 18f), text);
-		}
-	}
-
-	/// <summary>
-	/// Release the checker-box texture.
-	/// </summary>
-
-	void OnDestroy ()
-	{
-		if (mSelectionTex != null)
-		{
-			if (Application.isPlaying) Destroy(mSelectionTex);
-			else DestroyImmediate(mSelectionTex);
-			mSelectionTex = null;
-		}
-
-		if (mCheckerTex != null)
-		{
-			if (Application.isPlaying) Destroy(mCheckerTex);
-			else DestroyImmediate(mCheckerTex);
-			mCheckerTex = null;
 		}
 	}
 }
