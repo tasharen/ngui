@@ -93,7 +93,18 @@ public class UIWidgetInspector : Editor
 			GUILayout.EndHorizontal();
 
 			color = EditorGUILayout.ColorField("Color Tint", color);
-			center = EditorGUILayout.Toggle("Centered", center);
+
+			GUILayout.BeginHorizontal();
+			{
+				center = EditorGUILayout.Toggle("Centered", center, GUILayout.Width(100f));
+
+				if (GUILayout.Button("Make Pixel-Perfect"))
+				{
+					Undo.RegisterUndo(mWidget.transform, "Make Pixel-Perfect");
+					mWidget.MakePixelPerfect();
+				}
+			}
+			GUILayout.EndHorizontal();
 
 			// Draw all derived functionality
 			if (GUI.changed) RegisterUndo();

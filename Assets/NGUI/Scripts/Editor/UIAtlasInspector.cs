@@ -134,8 +134,6 @@ public class UIAtlasInspector : Editor
 
 					if (tex != null)
 					{
-						Vector2 size = new Vector2(tex.width, tex.height);
-
 						GUILayout.BeginHorizontal();
 						{
 							name = EditorGUILayout.TextField("Sprite Name", name);
@@ -172,8 +170,8 @@ public class UIAtlasInspector : Editor
 						// If the atlas uses pixel coordinates, calculate the UVs
 						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 						{
-							GUITools.DrawOutline(rect, UIAtlas.ConvertToTexCoords(inner, size), blue);
-							GUITools.DrawOutline(rect, UIAtlas.ConvertToTexCoords(outer, size), green);
+							GUITools.DrawOutline(rect, UIAtlas.ConvertToTexCoords(inner, tex.width, tex.height), blue);
+							GUITools.DrawOutline(rect, UIAtlas.ConvertToTexCoords(outer, tex.width, tex.height), green);
 						}
 						else
 						{

@@ -58,10 +58,10 @@ public class UISlicedSprite : UISprite
 			v[1] += new Vector2(borderLeft / sz.x, borderTop / sz.y);
 			v[2] -= new Vector2(borderRight / sz.x, borderBottom / sz.y);
 
-			uv[0] = new Vector2(mOuterUV.xMin, mOuterUV.yMin);
-			uv[1] = new Vector2(mInnerUV.xMin, mInnerUV.yMin);
-			uv[2] = new Vector2(mInnerUV.xMax, mInnerUV.yMax);
-			uv[3] = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
+			uv[0] = new Vector2(mOuterUV.xMin, mOuterUV.yMax);
+			uv[1] = new Vector2(mInnerUV.xMin, mInnerUV.yMax);
+			uv[2] = new Vector2(mInnerUV.xMax, mInnerUV.yMin);
+			uv[3] = new Vector2(mOuterUV.xMax, mOuterUV.yMin);
 		}
 		else
 		{

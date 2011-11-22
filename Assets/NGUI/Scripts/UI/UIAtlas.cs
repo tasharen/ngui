@@ -66,19 +66,18 @@ public class UIAtlas : MonoBehaviour
 
 				mCoordinates = value;
 				Texture tex = material.mainTexture;
-				Vector2 size = new Vector2(tex.width, tex.height);
 
 				foreach (Sprite s in sprites)
 				{
 					if (mCoordinates == Coordinates.TexCoords)
 					{
-						s.outer = ConvertToTexCoords(s.outer, size);
-						s.inner = ConvertToTexCoords(s.inner, size);
+						s.outer = ConvertToTexCoords(s.outer, tex.width, tex.height);
+						s.inner = ConvertToTexCoords(s.inner, tex.width, tex.height);
 					}
 					else
 					{
-						s.outer = ConvertToPixels(s.outer, size);
-						s.inner = ConvertToPixels(s.inner, size);
+						s.outer = ConvertToPixels(s.outer, tex.width, tex.height);
+						s.inner = ConvertToPixels(s.inner, tex.width, tex.height);
 					}
 				}
 			}
@@ -89,16 +88,16 @@ public class UIAtlas : MonoBehaviour
 	/// Helper function.
 	/// </summary>
 
-	public static Rect ConvertToTexCoords (Rect rect, Vector2 texSize)
+	public static Rect ConvertToTexCoords (Rect rect, int width, int height)
 	{
 		Rect final = rect;
 
-		if (texSize.x != 0f && texSize.y != 0f)
+		if (width != 0f && height != 0f)
 		{
-			final.xMin = rect.xMin / texSize.x;
-			final.xMax = rect.xMax / texSize.x;
-			final.yMin = 1f - rect.yMax / texSize.y;
-			final.yMax = 1f - rect.yMin / texSize.y;
+			final.xMin = rect.xMin / width;
+			final.xMax = rect.xMax / width;
+			final.yMin = 1f - rect.yMax / height;
+			final.yMax = 1f - rect.yMin / height;
 		}
 		return final;
 	}
@@ -107,14 +106,14 @@ public class UIAtlas : MonoBehaviour
 	/// Helper function.
 	/// </summary>
 
-	public static Rect ConvertToPixels (Rect rect, Vector2 texSize)
+	public static Rect ConvertToPixels (Rect rect, int width, int height)
 	{
 		Rect final = rect;
 
-		final.xMin = Mathf.RoundToInt(rect.xMin * texSize.x);
-		final.xMax = Mathf.RoundToInt(rect.xMax * texSize.x);
-		final.yMin = Mathf.RoundToInt((1f - rect.yMax) * texSize.y);
-		final.yMax = Mathf.RoundToInt((1f - rect.yMin) * texSize.y);
+		final.xMin = Mathf.RoundToInt(rect.xMin * width);
+		final.xMax = Mathf.RoundToInt(rect.xMax * width);
+		final.yMin = Mathf.RoundToInt((1f - rect.yMax) * height);
+		final.yMax = Mathf.RoundToInt((1f - rect.yMin) * height);
 
 		return final;
 	}

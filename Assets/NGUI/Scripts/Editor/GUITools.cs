@@ -139,7 +139,7 @@ static public class GUITools
 	{
 		Rect rect = GUILayoutUtility.GetRect(0f, 0f);
 		rect.width = Screen.width;
-		rect.height = rect.width * (tex.height / tex.width);
+		rect.height = Screen.width * (tex.height / tex.width);
 		GUILayout.Space(Screen.width);
 
 		if (Event.current.type == EventType.Repaint)

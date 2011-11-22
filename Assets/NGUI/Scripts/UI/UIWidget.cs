@@ -47,7 +47,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Cached for speed.
 	/// </summary>
 
-	public Transform cachedTransform { get { return mTrans; } }
+	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
 
 	/// <summary>
 	/// Returns the material used by this widget.
@@ -226,9 +226,8 @@ public abstract class UIWidget : MonoBehaviour
 
 				if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 				{
-					Vector2 size = new Vector2(mTex.width, mTex.height);
-					mInnerUV = UIAtlas.ConvertToTexCoords(mInnerUV, size);
-					mOuterUV = UIAtlas.ConvertToTexCoords(mOuterUV, size);
+					mInnerUV = UIAtlas.ConvertToTexCoords(mInnerUV, mTex.width, mTex.height);
+					mOuterUV = UIAtlas.ConvertToTexCoords(mOuterUV, mTex.width, mTex.height);
 				}
 			}
 		}
@@ -393,6 +392,30 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Make the widget pixel-perfect.
+	/// </summary>
+
+	public void MakePixelPerfect ()
+	{
+		UIAtlas a = atlas;
+		Texture2D tex = mainTexture;
+		if (a == null || tex == null) return;
+
+		// Position the widget on whole pixels
+		Vector3 pos = mTrans.localPosition;
+		pos.x = Mathf.RoundToInt(pos.x);
+		pos.y = Mathf.RoundToInt(pos.y);
+		pos.z = Mathf.RoundToInt(pos.z);
+		mTrans.localPosition = pos;
+
+		// We need to know the pixel size of the widget
+		Rect rect = UIAtlas.ConvertToPixels(outerUV, tex.width, tex.height);
+
+		// Any derived functionality
+		MakePixelPerfect(rect, tex.width, tex.height);
+	}
+
+	/// <summary>
 	/// Virtual version of the Update function. Should return 'true' if the widget has changed visually.
 	/// </summary>
 
@@ -403,4 +426,17 @@ public abstract class UIWidget : MonoBehaviour
 	/// </summary>
 
 	virtual public void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols) { }
+
+	/// <summary>
+	/// Make the widget pixel-perfect.
+	/// </summary>
+
+	virtual protected void MakePixelPerfect (Rect rect, int width, int height)
+	{
+		Vector3 scale = mTrans.localScale;
+		scale.x = rect.width;
+		scale.y = rect.height;
+		scale.z = 1f;
+		mTrans.localScale = scale;
+	}
 }

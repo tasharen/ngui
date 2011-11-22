@@ -87,6 +87,7 @@ public class UIPanel : MonoBehaviour
 
 		GameObject go = new GameObject("_UIScreen [" + mat.name + "]");
 		go.hideFlags = panel.mHidden ? HideFlags.HideAndDontSave : HideFlags.DontSave | HideFlags.NotEditable;
+		go.layer = trans.gameObject.layer;
 
 		UIDrawCall sc = go.AddComponent<UIDrawCall>();
 		sc.material = mat;
