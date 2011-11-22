@@ -253,6 +253,7 @@ public class UIMouse : MonoBehaviour
 				else if (!mUseTouchInput) mDown.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
 			}
 			mDown = null;
+			mHover = null;
 		}
 
 		// Send out a hover(true) message last
