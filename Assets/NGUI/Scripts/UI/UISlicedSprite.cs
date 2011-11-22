@@ -100,4 +100,10 @@ public class UISlicedSprite : UISprite
 			}
 		}
 	}
+
+	/// <summary>
+	/// Sliced sprites don't need to adjust the scale.
+	/// </summary>
+
+	protected override void MakePixelPerfect (Rect rect, int width, int height) { }
 }

@@ -428,15 +428,15 @@ public abstract class UIWidget : MonoBehaviour
 	virtual public void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols) { }
 
 	/// <summary>
-	/// Make the widget pixel-perfect.
+	/// Adjust the scale of the widget to make it pixel-perfect.
 	/// </summary>
 
 	virtual protected void MakePixelPerfect (Rect rect, int width, int height)
 	{
-		Vector3 scale = mTrans.localScale;
+		Vector3 scale = cachedTransform.localScale;
 		scale.x = rect.width;
 		scale.y = rect.height;
 		scale.z = 1f;
-		mTrans.localScale = scale;
+		cachedTransform.localScale = scale;
 	}
 }
