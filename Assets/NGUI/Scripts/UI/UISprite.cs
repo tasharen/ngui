@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/Sprite (Simple)")]
+[AddComponentMenu("NGUI/UI/Sprite (Basic)")]
 public class UISprite : UIWidget
 {
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// UI Atlas contains a collection of sprites inside one large texture atlas.
 /// </summary>
 
-[AddComponentMenu("NGUI/Atlas")]
+[AddComponentMenu("NGUI/UI/Atlas")]
 public class UIAtlas : MonoBehaviour
 {
 	[System.Serializable]

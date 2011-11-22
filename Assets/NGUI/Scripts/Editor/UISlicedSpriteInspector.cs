@@ -32,6 +32,7 @@ public class UISlicedSpriteInspector : UISpriteInspector
 			text += "x";
 			text += Mathf.RoundToInt(Mathf.Abs(sprite.outerUV.height * tex.height));
 			EditorGUI.DropShadowLabel(new Rect(rect.xMin, rect.yMax, rect.width, 18f), text);
+			GUILayout.Space(22f);
 		}
 	}
 }

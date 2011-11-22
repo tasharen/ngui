@@ -10,7 +10,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/Mouse")]
+[AddComponentMenu("NGUI/UI/Mouse")]
 [RequireComponent(typeof(Camera))]
 public class UIMouse : MonoBehaviour
 {

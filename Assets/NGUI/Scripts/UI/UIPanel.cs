@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// a child of the game object that the UI Panel resides on will be drawn together.
 /// </summary>
 
-[AddComponentMenu("NGUI/UI Panel")]
+[AddComponentMenu("NGUI/UI/Panel")]
 public class UIPanel : MonoBehaviour
 {
 	[SerializeField] bool mHidden = true;

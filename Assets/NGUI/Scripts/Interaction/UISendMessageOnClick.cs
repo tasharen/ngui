@@ -5,12 +5,12 @@
 /// If no target was specified, it will use the game object this script is attached to.
 /// </summary>
 
-[AddComponentMenu("NGUI/Send Message")]
-public class UISendMessage : MonoBehaviour
+[AddComponentMenu("NGUI/Interaction/Send Message (OnClick)")]
+public class UISendMessageOnClick : MonoBehaviour
 {
 	public GameObject target;
-	public string functionName = "OnSendMessage";
 	public bool includeChildren = false;
+	public string functionName = "OnSendMessage";
 
 	void OnClick ()
 	{

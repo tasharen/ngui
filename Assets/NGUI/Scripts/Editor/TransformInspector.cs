@@ -5,7 +5,7 @@ using UnityEditor;
 public class TransformInspector : Editor
 {
 	/// <summary>
-	/// Draw the transform inspector widget.
+	/// Draw the inspector widget.
 	/// </summary>
 
 	public override void OnInspectorGUI ()

@@ -6,7 +6,7 @@
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/Anchor")]
+[AddComponentMenu("NGUI/UI/Anchor")]
 public class UIAnchor : MonoBehaviour
 {
 	public enum Side

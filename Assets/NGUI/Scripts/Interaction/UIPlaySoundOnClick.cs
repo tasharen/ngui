@@ -4,8 +4,8 @@
 /// Plays the specified sound on click.
 /// </summary>
 
-[AddComponentMenu("NGUI/Click Sound")]
-public class UIClickSound : MonoBehaviour
+[AddComponentMenu("NGUI/Interaction/Play Sound (OnClick)")]
+public class UIPlaySoundOnClick : MonoBehaviour
 {
 	public AudioClip clip;
 	public float volume = 1f;

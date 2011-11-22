@@ -26,7 +26,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/Sliced Sprite")]
+[AddComponentMenu("NGUI/UI/Sprite (Sliced)")]
 public class UISlicedSprite : UISprite
 {
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
