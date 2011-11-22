@@ -38,6 +38,12 @@ public class UIDrawCall : MonoBehaviour
 	public int widgets { get { return mWidgets.Count; } }
 
 	/// <summary>
+	/// The number of triangles in this draw call.
+	/// </summary>
+
+	public int triangles { get { return mMesh.vertexCount >> 1; } }
+
+	/// <summary>
 	/// Add the specified widget to the managed list.
 	/// </summary>
 

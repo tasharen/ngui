@@ -9,7 +9,7 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI Panel")]
 public class UIPanel : MonoBehaviour
 {
-	bool mHidden = true;
+	[SerializeField] bool mHidden = true;
 
 	// List of UI Screens created on hidden and invisible game objects
 	List<UIDrawCall> mDrawCalls = new List<UIDrawCall>();

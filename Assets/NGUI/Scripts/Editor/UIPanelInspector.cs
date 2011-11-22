@@ -12,14 +12,20 @@ public class UIPanelInspector : Editor
 	public override void OnInspectorGUI ()
 	{
 		UIPanel panel = target as UIPanel;
+		List<UIDrawCall> drawcalls = panel.drawCalls;
 		EditorGUIUtility.LookLikeControls(80f);
 
-		List<UIDrawCall> drawcalls = panel.drawCalls;
-		int widgets = 0;
-		foreach (UIDrawCall dc in drawcalls) widgets += dc.widgets;
+		GUITools.DrawSeparator();
 
-		EditorGUILayout.LabelField("Widgets", widgets.ToString());
-		EditorGUILayout.LabelField("Draw Calls", drawcalls.Count.ToString());
 		panel.hidden = EditorGUILayout.Toggle("Hidden", panel.hidden);
+		EditorGUILayout.LabelField("Draw Calls", drawcalls.Count.ToString());
+
+		foreach (UIDrawCall dc in drawcalls)
+		{
+			GUITools.DrawSeparator();
+			EditorGUILayout.ObjectField("Material", dc.material, typeof(Material), false);
+			EditorGUILayout.LabelField("Widgets", dc.widgets.ToString());
+			EditorGUILayout.LabelField("Triangles", dc.triangles.ToString());
+		}
 	}
 }

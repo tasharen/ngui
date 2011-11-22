@@ -42,6 +42,7 @@ public class UIWidgetInspector : Editor
 		mRegisteredUndo = false;
 
 		// Atlas field comes first
+		GUITools.DrawSeparator();
 		UIAtlas atlas = EditorGUILayout.ObjectField("Atlas", mWidget.atlas, typeof(UIAtlas), true) as UIAtlas;
 
 		UIAtlas.Sprite sprite = null;
@@ -77,19 +78,22 @@ public class UIWidgetInspector : Editor
 					// Draw the sprite selection popup
 					index = EditorGUILayout.Popup("Sprite", index, sprites);
 					sprite = atlas.GetSprite(sprites[index]);
+					GUITools.DrawSeparator();
 				}
 			}
 
-			color = EditorGUILayout.ColorField("Color Tint", color);
-			center = EditorGUILayout.Toggle("Centered", center);
-
 			// Depth navigation
 			GUILayout.BeginHorizontal();
-			EditorGUILayout.PrefixLabel("Depth");
-			if (GUILayout.Button("Back")) { RegisterUndo(); --depth; }
-			depth = EditorGUILayout.IntField(depth, GUILayout.Width(40f));
-			if (GUILayout.Button("Forward")) { RegisterUndo(); ++depth; }
+			{
+				EditorGUILayout.PrefixLabel("Depth");
+				if (GUILayout.Button("Back")) { RegisterUndo(); --depth; }
+				depth = EditorGUILayout.IntField(depth, GUILayout.Width(40f));
+				if (GUILayout.Button("Forward")) { RegisterUndo(); ++depth; }
+			}
 			GUILayout.EndHorizontal();
+
+			color = EditorGUILayout.ColorField("Color Tint", color);
+			center = EditorGUILayout.Toggle("Centered", center);
 
 			// Draw all derived functionality
 			if (GUI.changed) RegisterUndo();
