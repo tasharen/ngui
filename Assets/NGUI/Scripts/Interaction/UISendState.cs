@@ -5,8 +5,8 @@
 /// target when the script receives OnHover or OnPress messages from UIMouse.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/Send State (Button)")]
-public class UISendStateOnButton : UISend
+[AddComponentMenu("NGUI/Interaction/Send State")]
+public class UISendState : UISend
 {
 	public int normalState	= 0;
 	public int hoverState	= 1;
