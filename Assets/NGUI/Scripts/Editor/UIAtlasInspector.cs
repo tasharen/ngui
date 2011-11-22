@@ -172,13 +172,14 @@ public class UIAtlasInspector : Editor
 						// If the atlas uses pixel coordinates, calculate the UVs
 						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 						{
-							inner = UIAtlas.ConvertToTexCoords(inner, size);
-							outer = UIAtlas.ConvertToTexCoords(outer, size);
+							GUITools.DrawOutline(rect, UIAtlas.ConvertToTexCoords(inner, size), blue);
+							GUITools.DrawOutline(rect, UIAtlas.ConvertToTexCoords(outer, size), green);
 						}
-
-						// Draw the sprite outline
-						GUITools.DrawOutline(rect, inner, blue);
-						GUITools.DrawOutline(rect, outer, green);
+						else
+						{
+							GUITools.DrawOutline(rect, inner, blue);
+							GUITools.DrawOutline(rect, outer, green);
+						}
 						EditorGUILayout.Separator();
 					}
 
