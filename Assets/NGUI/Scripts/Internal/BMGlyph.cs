@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class UIGlyph
+/// <summary>
+/// Glyph structure used by BMFont. For more information see http://www.angelcode.com/products/bmfont/
+/// </summary>
+
+public class BMGlyph
 {
 	public struct Kerning
 	{
