@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿/*using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/Sprite (Tiled)")]
-public class UITiledSprite : UIWidget
+public class UITiledSprite : UISprite
 {
 	// Size of the area in pixels
 	public Vector2 size = new Vector2(100f, 100f);
@@ -89,4 +89,4 @@ public class UITiledSprite : UIWidget
 			}
 		}
 	}
-}
+}*/

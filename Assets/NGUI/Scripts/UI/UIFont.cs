@@ -23,9 +23,6 @@ public class UIFont : MonoBehaviour
 
 	public void Reload ()
 	{
-		if (fontData != null)
-		{
-			mFont.Load(fontData.name, fontData.bytes);
-		}
+		mFont.Load(Tools.GetHierarchy(gameObject), (fontData != null) ? fontData.bytes : null);
 	}
 }
