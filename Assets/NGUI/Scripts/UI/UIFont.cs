@@ -97,25 +97,17 @@ public class UIFont : MonoBehaviour
 					if (split.Length == 11)
 					{
 						int id = GetValue(split[1]);
-						int x  = GetValue(split[2]);
-						int y  = GetValue(split[3]);
-						int w  = GetValue(split[4]);
-						int h  = GetValue(split[5]);
-						int xo = GetValue(split[6]);
-						int yo = GetValue(split[7]);
-						int xa = GetValue(split[8]);
-
 						UIGlyph glyph = GetGlyph(id, true);
 						
 						if (glyph != null)
 						{
-							glyph.x = x;
-							glyph.y = y;
-							glyph.width = w;
-							glyph.height = h;
-							glyph.offsetX = xo;
-							glyph.offsetY = yo;
-							glyph.advance = xa;
+							glyph.x = GetValue(split[2]);
+							glyph.y = GetValue(split[3]);
+							glyph.width = GetValue(split[4]);
+							glyph.height = GetValue(split[5]);
+							glyph.offsetX = GetValue(split[6]);
+							glyph.offsetY = GetValue(split[7]);
+							glyph.advance = GetValue(split[8]);
 						}
 					}
 					else
