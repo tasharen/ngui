@@ -8,14 +8,57 @@ using UnityEditor;
 [CustomEditor(typeof(UISprite))]
 public class UISpriteInspector : UIWidgetInspector
 {
+	UIAtlas mAtlas;
+	UISprite mSprite;
+	UIAtlas.Sprite mAtlasSprite;
+
+	/// <summary>
+	/// Draw the atlas and sprite selection fields.
+	/// </summary>
+
+	protected override bool OnCustomStart ()
+	{
+		mSprite = mWidget as UISprite;
+		mAtlas = EditorGUILayout.ObjectField("Atlas", mSprite.atlas, typeof(UIAtlas), true) as UIAtlas;
+
+		mAtlasSprite = null;
+		if (mAtlas == null) return false;
+
+		string[] sprites = mAtlas.GetListOfSprites();
+
+		if (sprites != null && sprites.Length > 0)
+		{
+			int index = 0;
+			string spriteName = (mSprite.spriteName != null) ? mSprite.spriteName : sprites[0];
+
+			// We need to find the sprite in order to have it selected
+			if (!string.IsNullOrEmpty(spriteName))
+			{
+				for (int i = 0; i < sprites.Length; ++i)
+				{
+					if (string.Equals(sprites[i], spriteName, System.StringComparison.OrdinalIgnoreCase))
+					{
+						index = i;
+						break;
+					}
+				}
+			}
+
+			// Draw the sprite selection popup
+			index = EditorGUILayout.Popup("Sprite", index, sprites);
+			mAtlasSprite = mAtlas.GetSprite(sprites[index]);
+			GUITools.DrawSeparator();
+		}
+		return true;
+	}
+
 	/// <summary>
 	/// Any and all derived functionality.
 	/// </summary>
 
-	protected override void OnCustomGUI ()
+	protected override void OnCustomEnd ()
 	{
-		UISprite sprite = mWidget as UISprite;
-		Texture2D tex = sprite.mainTexture;
+		Texture2D tex = mSprite.mainTexture;
 
 		if (tex != null)
 		{
@@ -23,15 +66,25 @@ public class UISpriteInspector : UIWidgetInspector
 			Rect rect = GUITools.DrawAtlas(tex);
 
 			// Draw the selection
-			GUITools.DrawOutline(rect, sprite.outerUV, new Color(0.4f, 1f, 0f, 1f));
+			GUITools.DrawOutline(rect, mSprite.outerUV, new Color(0.4f, 1f, 0f, 1f));
 
 			// Sprite size label
 			string text = "Sprite Size: ";
-			text += Mathf.RoundToInt(Mathf.Abs(sprite.outerUV.width * tex.width));
+			text += Mathf.RoundToInt(Mathf.Abs(mSprite.outerUV.width * tex.width));
 			text += "x";
-			text += Mathf.RoundToInt(Mathf.Abs(sprite.outerUV.height * tex.height));
+			text += Mathf.RoundToInt(Mathf.Abs(mSprite.outerUV.height * tex.height));
 			EditorGUI.DropShadowLabel(new Rect(rect.xMin, rect.yMax, rect.width, 18f), text);
 			GUILayout.Space(22f);
 		}
+	}
+
+	/// <summary>
+	/// Save the atlas and sprites.
+	/// </summary>
+
+	protected override void OnCustomSave ()
+	{
+		mSprite.atlas = mAtlas;
+		mSprite.spriteName = (mAtlasSprite != null) ? mAtlasSprite.name : "";
 	}
 }

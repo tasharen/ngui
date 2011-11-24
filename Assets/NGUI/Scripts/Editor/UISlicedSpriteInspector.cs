@@ -12,9 +12,9 @@ public class UISlicedSpriteInspector : UISpriteInspector
 	/// Any and all derived functionality.
 	/// </summary>
 
-	protected override void OnCustomGUI ()
+	protected override void OnCustomEnd ()
 	{
-		UISprite sprite = mWidget as UISprite;
+		UISlicedSprite sprite = mWidget as UISlicedSprite;
 		Texture2D tex = sprite.mainTexture;
 
 		if (tex != null)

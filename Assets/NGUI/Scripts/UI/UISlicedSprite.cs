@@ -29,7 +29,67 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Sprite (Sliced)")]
 public class UISlicedSprite : UISprite
 {
-	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
+	protected Rect mInner;
+	protected Rect mInnerUV;
+
+	/// <summary>
+	/// Inner set of UV coordinates.
+	/// </summary>
+
+	public Rect innerUV { get { return mInnerUV; } }
+
+	/// <summary>
+	/// Update the texture UVs used by the widget.
+	/// </summary>
+
+	override protected void UpdateUVs ()
+	{
+		if (mSprite != null && (mInner != mSprite.inner || mOuter != mSprite.outer))
+		{
+			Texture2D tex = mainTexture;
+
+			if (tex != null)
+			{
+				mIsDirty = true;
+				mInner = mSprite.inner;
+				mOuter = mSprite.outer;
+
+				mInnerUV = mInner;
+				mOuterUV = mOuter;
+
+				if (atlas.coordinates == UIAtlas.Coordinates.Pixels)
+				{
+					mInnerUV = UIAtlas.ConvertToTexCoords(mInnerUV, tex.width, tex.height);
+					mOuterUV = UIAtlas.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Sliced sprite shouldn't inherit the sprite's changes to this function.
+	/// </summary>
+
+	override public void MakePixelPerfect ()
+	{
+		Vector3 pos = cachedTransform.localPosition;
+		pos.x = Mathf.RoundToInt(pos.x);
+		pos.y = Mathf.RoundToInt(pos.y);
+		pos.z = Mathf.RoundToInt(pos.z);
+		cachedTransform.localPosition = pos;
+
+		Vector3 scale = cachedTransform.localScale;
+		scale.x = Mathf.RoundToInt(scale.x);
+		scale.y = Mathf.RoundToInt(scale.y);
+		scale.z = 1f;
+		cachedTransform.localScale = scale;
+	}
+
+	/// <summary>
+	/// Draw the widget.
+	/// </summary>
+
+	override public void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
 		if (mOuterUV == mInnerUV)
 		{
@@ -101,10 +161,4 @@ public class UISlicedSprite : UISprite
 			}
 		}
 	}
-
-	/// <summary>
-	/// Sliced sprites don't need to adjust the scale.
-	/// </summary>
-
-	protected override void MakePixelPerfect (Rect rect, int width, int height) { }
 }
