@@ -55,32 +55,6 @@ public class UILabel : UIWidget
 
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
-		Vector2 uv0 = Vector2.zero;
-		Vector2 uv1 = Vector2.one;
-
-		if (centered)
-		{
-			verts.Add(new Vector3(0.5f, 0.5f, 0f));
-			verts.Add(new Vector3(0.5f, -0.5f, 0f));
-			verts.Add(new Vector3(-0.5f, -0.5f, 0f));
-			verts.Add(new Vector3(-0.5f, 0.5f, 0f));
-		}
-		else
-		{
-			verts.Add(new Vector3(1f, 0f, 0f));
-			verts.Add(new Vector3(1f, -1f, 0f));
-			verts.Add(new Vector3(0f, -1f, 0f));
-			verts.Add(new Vector3(0f, 0f, 0f));
-		}
-
-		uvs.Add(uv1);
-		uvs.Add(new Vector2(uv1.x, uv0.y));
-		uvs.Add(uv0);
-		uvs.Add(new Vector2(uv0.x, uv1.y));
-
-		cols.Add(color);
-		cols.Add(color);
-		cols.Add(color);
-		cols.Add(color);
+		mFont.Print(mText, Vector2.one, color, verts, uvs, cols);
 	}
 }

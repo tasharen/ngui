@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
 
 [CustomEditor(typeof(UILabel))]
 public class UILabelInspector : UIWidgetInspector
@@ -38,7 +37,6 @@ public class UILabelInspector : UIWidgetInspector
 		if (!string.Equals(text, mLabel.text))
 		{
 			RegisterUndo();
-			mLabel.font = mFont;
 			mLabel.text = text;
 		}
 	}
