@@ -20,6 +20,7 @@ public class UISlicedSpriteInspector : UISpriteInspector
 		if (tex != null)
 		{
 			// Draw the atlas
+			EditorGUILayout.Separator();
 			Rect rect = GUITools.DrawAtlas(tex);
 
 			// Draw the selection

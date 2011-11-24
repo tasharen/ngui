@@ -162,9 +162,8 @@ public class UIAtlasInspector : Editor
 						inner.yMin = Mathf.Clamp(inner.yMin, outer.yMin, outer.yMax);
 						inner.yMax = Mathf.Clamp(inner.yMax, outer.yMin, outer.yMax);
 
-						EditorGUILayout.Separator();
-
 						// Draw the atlas
+						EditorGUILayout.Separator();
 						Rect rect = GUITools.DrawAtlas(tex);
 
 						// If the atlas uses pixel coordinates, calculate the UVs

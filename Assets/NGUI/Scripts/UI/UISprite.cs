@@ -136,7 +136,7 @@ public class UISprite : UIWidget
 	/// Virtual Awake functionality.
 	/// </summary>
 
-	override public void OnAwake ()
+	override protected void OnAwake ()
 	{
 		// Re-assign the atlas, which will set the material and texture references.
 		UIAtlas atl = mAtlas;

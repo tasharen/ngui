@@ -8,13 +8,13 @@ using System.Collections.Generic;
 public abstract class UIWidget : MonoBehaviour
 {
 	// Cached and saved values
+	[SerializeField] Material mMat;
 	[SerializeField] Color mColor = Color.white;
 	[SerializeField] bool mCentered = true;
 	[SerializeField] int mDepth = 0;
 
 	Transform mTrans;
 	UIDrawCall mScreen;
-	Material mMat;
 	Texture2D mTex;
 
 	protected bool mPlayMode = true;
@@ -107,6 +107,7 @@ public abstract class UIWidget : MonoBehaviour
 				mMat = value;
 				mTex = (mMat != null) ? mMat.mainTexture as Texture2D : null;
 				mIsDirty = true;
+				Refresh();
 			}
 		}
 	}
@@ -295,7 +296,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Virtual Awake functionality.
 	/// </summary>
 
-	virtual public void OnAwake () { }
+	virtual protected void OnAwake () { }
 
 	/// <summary>
 	/// Virtual version of the Update function. Should return 'true' if the widget has changed visually.

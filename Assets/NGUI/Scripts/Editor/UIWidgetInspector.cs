@@ -75,7 +75,6 @@ public class UIWidgetInspector : Editor
 
 			// Draw all derived functionality
 			if (GUI.changed) RegisterUndo();
-			EditorGUILayout.Separator();
 
 			// Custom functionality
 			OnCustomEnd();

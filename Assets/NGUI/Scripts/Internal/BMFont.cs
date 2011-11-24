@@ -14,6 +14,7 @@ public class BMFont
 	int mWidth = 0;		// Original width of the texture
 	int mHeight = 0;	// Original height of the texture
 
+	public bool isValid		{ get { return mGlyphs != null; } }
 	public int charSize		{ get { return mSize; } }
 	public int baseOffset	{ get { return mBase; } }
 	public int texWidth		{ get { return mWidth; } }

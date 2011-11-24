@@ -16,7 +16,7 @@ public class UISpriteInspector : UIWidgetInspector
 	/// Draw the atlas and sprite selection fields.
 	/// </summary>
 
-	protected override bool OnCustomStart ()
+	override protected bool OnCustomStart ()
 	{
 		mSprite = mWidget as UISprite;
 		mAtlas = EditorGUILayout.ObjectField("Atlas", mSprite.atlas, typeof(UIAtlas), true) as UIAtlas;
@@ -56,13 +56,14 @@ public class UISpriteInspector : UIWidgetInspector
 	/// Any and all derived functionality.
 	/// </summary>
 
-	protected override void OnCustomEnd ()
+	override protected void OnCustomEnd ()
 	{
 		Texture2D tex = mSprite.mainTexture;
 
 		if (tex != null)
 		{
 			// Draw the atlas
+			EditorGUILayout.Separator();
 			Rect rect = GUITools.DrawAtlas(tex);
 
 			// Draw the selection
@@ -82,7 +83,7 @@ public class UISpriteInspector : UIWidgetInspector
 	/// Save the atlas and sprites.
 	/// </summary>
 
-	protected override void OnCustomSave ()
+	override protected void OnCustomSave ()
 	{
 		mSprite.atlas = mAtlas;
 		mSprite.spriteName = (mAtlasSprite != null) ? mAtlasSprite.name : "";
