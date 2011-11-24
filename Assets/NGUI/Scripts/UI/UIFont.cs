@@ -93,14 +93,13 @@ public class UIFont : MonoBehaviour
 	/// Get the printed size of the specified string.
 	/// </summary>
 
-	public Vector2 CalculatePrintedSize (string text, Vector2 scale)
+	public Vector2 CalculatePrintedSize (string text)
 	{
 		Vector2 v = Vector2.zero;
 
 		if (mFont != null && mFont.isValid)
 		{
-			scale.x *= (float)mFont.charSize / mFont.texWidth;
-			scale.y *= (float)mFont.charSize / mFont.texHeight;
+			Vector2 scale = new Vector2(1f / mFont.charSize, 1f / mFont.charSize);
 
 			int maxX = 0;
 			int x = 0;
@@ -139,12 +138,11 @@ public class UIFont : MonoBehaviour
 	/// Print the specified text into the buffers.
 	/// </summary>
 
-	public void Print (string text, Vector2 scale, Color color, List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
+	public void Print (string text, Color color, List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
 		if (mFont != null && mFont.isValid)
 		{
-			//scale.x *= (float)mFont.charSize / mFont.texWidth;
-			//scale.y *= (float)mFont.charSize / mFont.texHeight;
+			Vector2 scale = new Vector2(1f / mFont.charSize, 1f / mFont.charSize);
 
 			int maxX = 0;
 			int x = 0;

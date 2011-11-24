@@ -50,11 +50,34 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Text is pixel-perfect when its scale matches the size.
+	/// </summary>
+
+	override public void MakePixelPerfect ()
+	{
+		if (mFont != null)
+		{
+			Vector3 pos = cachedTransform.localPosition;
+			pos.x = Mathf.RoundToInt(pos.x);
+			pos.y = Mathf.RoundToInt(pos.y);
+			pos.z = Mathf.RoundToInt(pos.z);
+			cachedTransform.localPosition = pos;
+
+			Vector3 scale = cachedTransform.localScale;
+			scale.x = mFont.size;
+			scale.y = scale.x;
+			scale.z = 1f;
+			cachedTransform.localScale = scale;
+		}
+		else base.MakePixelPerfect();
+	}
+
+	/// <summary>
 	/// Draw the label.
 	/// </summary>
 
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
-		mFont.Print(mText, Vector2.one, color, verts, uvs, cols);
+		mFont.Print(mText, color, verts, uvs, cols);
 	}
 }
