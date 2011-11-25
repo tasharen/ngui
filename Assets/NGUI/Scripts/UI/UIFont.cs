@@ -9,6 +9,7 @@ public class UIFont : MonoBehaviour
 	[SerializeField] Material mMat;
 
 	BMFont mFont = new BMFont();
+	Stack<Color> mColors = new Stack<Color>();
 
 	/// <summary>
 	/// Get or set the text asset containing the font's exported data.
@@ -25,7 +26,7 @@ public class UIFont : MonoBehaviour
 			if (mData != value)
 			{
 				mData = value;
-				mFont.Load(Tools.GetHierarchy(gameObject), (mData != null) ? mData.bytes : null);
+				mFont.Load(NGUITools.GetHierarchy(gameObject), (mData != null) ? mData.bytes : null);
 				Refresh();
 			}
 		}
@@ -65,7 +66,7 @@ public class UIFont : MonoBehaviour
 	{
 		if (mData != null)
 		{
-			mFont.Load(Tools.GetHierarchy(gameObject), mData.bytes);
+			mFont.Load(NGUITools.GetHierarchy(gameObject), mData.bytes);
 		}
 	}
 
@@ -142,6 +143,9 @@ public class UIFont : MonoBehaviour
 	{
 		if (mFont != null && mFont.isValid)
 		{
+			mColors.Clear();
+			mColors.Push(color);
+
 			Vector2 scale = new Vector2(1f / mFont.charSize, 1f / mFont.charSize);
 
 			int maxX = 0;
@@ -153,53 +157,66 @@ public class UIFont : MonoBehaviour
 			float invX = 1f / mFont.texWidth;
 			float invY = 1f / mFont.texHeight;
 
-			foreach (char c in text)
+			for (int i = 0, imax = text.Length; i < imax; ++i)
 			{
+				char c = text[i];
+
 				if (c == '\n')
 				{
 					if (x > maxX) maxX = x;
 					x = 0;
 					y += mFont.charSize;
+					continue;
 				}
-				else if (c == '\r') continue;
-				else
+				if (c == '\r') continue;
+
+				if (c == '[')
 				{
-					BMGlyph glyph = mFont.GetGlyph(c);
+					int retVal = NGUITools.ParseSymbol(text, i, mColors);
 
-					if (glyph != null)
+					if (retVal > 0)
 					{
-						if (prev != 0) x += glyph.GetKerning(prev);
-
-						v0.x =  scale.x * (x + glyph.offsetX);
-						v0.y = -scale.y * (y + glyph.offsetY);
-
-						v1.x = v0.x + scale.x * glyph.width;
-						v1.y = v0.y - scale.y * glyph.height;
-
-						u0.x = invX * glyph.x;
-						u0.y = 1f - invY * glyph.y;
-
-						u1.x = u0.x + invX * glyph.width;
-						u1.y = u0.y - invY * glyph.height;
-
-						verts.Add(new Vector3(v1.x, v0.y, 0f));
-						verts.Add(v1);
-						verts.Add(new Vector3(v0.x, v1.y, 0f));
-						verts.Add(v0);
-
-						uvs.Add(new Vector2(u1.x, u0.y));
-						uvs.Add(u1);
-						uvs.Add(new Vector2(u0.x, u1.y));
-						uvs.Add(u0);
-
-						cols.Add(color);
-						cols.Add(color);
-						cols.Add(color);
-						cols.Add(color);
-
-						x += glyph.advance;
-						prev = c;
+						color = mColors.Peek();
+						i += retVal - 1;
+						continue;
 					}
+				}
+
+				BMGlyph glyph = mFont.GetGlyph(c);
+
+				if (glyph != null)
+				{
+					if (prev != 0) x += glyph.GetKerning(prev);
+
+					v0.x =  scale.x * (x + glyph.offsetX);
+					v0.y = -scale.y * (y + glyph.offsetY);
+
+					v1.x = v0.x + scale.x * glyph.width;
+					v1.y = v0.y - scale.y * glyph.height;
+
+					u0.x = invX * glyph.x;
+					u0.y = 1f - invY * glyph.y;
+
+					u1.x = u0.x + invX * glyph.width;
+					u1.y = u0.y - invY * glyph.height;
+
+					verts.Add(new Vector3(v1.x, v0.y, 0f));
+					verts.Add(v1);
+					verts.Add(new Vector3(v0.x, v1.y, 0f));
+					verts.Add(v0);
+
+					uvs.Add(new Vector2(u1.x, u0.y));
+					uvs.Add(u1);
+					uvs.Add(new Vector2(u0.x, u1.y));
+					uvs.Add(u0);
+
+					cols.Add(color);
+					cols.Add(color);
+					cols.Add(color);
+					cols.Add(color);
+
+					x += glyph.advance;
+					prev = c;
 				}
 			}
 		}

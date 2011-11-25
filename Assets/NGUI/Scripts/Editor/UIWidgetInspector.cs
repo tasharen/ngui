@@ -104,7 +104,7 @@ public class UIWidgetInspector : Editor
 
 		if (Mathf.Abs(scale.x - scale.y) > 0.001f || Mathf.Abs(scale.y - scale.x) > 0.001f)
 		{
-			Debug.LogWarning("Parent of " + Tools.GetHierarchy(mWidget.gameObject) + " does not have a uniform absolute scale.\n" +
+			Debug.LogWarning("Parent of " + NGUITools.GetHierarchy(mWidget.gameObject) + " does not have a uniform absolute scale.\n" +
 				"Consider re-parenting to a uniformly-scaled game object instead.");
 
 			// If the warning above gets triggered, it means that the widget's parent does not have a uniform scale.

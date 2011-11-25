@@ -24,7 +24,7 @@ public class UIDrawCallInspector : Editor
 			{
 				if (p.drawCalls.Contains(dc))
 				{
-					EditorGUILayout.LabelField("Owner Panel", Tools.GetHierarchy(p.gameObject));
+					EditorGUILayout.LabelField("Owner Panel", NGUITools.GetHierarchy(p.gameObject));
 					EditorGUILayout.LabelField("Triangles", dc.triangles.ToString());
 					return;
 				}

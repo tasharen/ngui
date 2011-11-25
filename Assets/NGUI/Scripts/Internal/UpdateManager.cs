@@ -134,6 +134,7 @@ public class UpdateManager : MonoBehaviour
 
 	void OnApplicationQuit ()
 	{
-		Tools.Broadcast("End");
+		GameObject[] gos = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
+		foreach (GameObject go in gos) go.SendMessage("End", SendMessageOptions.DontRequireReceiver);
 	}
 }
