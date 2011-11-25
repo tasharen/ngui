@@ -91,11 +91,37 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Runs through the specified string and removes all color-encoding symbols.
+	/// </summary>
+
+	static public string StripSymbols (string text)
+	{
+		for (int i = 0, imax = text.Length; i < imax; )
+		{
+			char c = text[i];
+
+			if (c == '[')
+			{
+				int retVal = NGUITools.ParseSymbol(text, i, null);
+
+				if (retVal > 0)
+				{
+					text = text.Remove(i, retVal);
+					continue;
+				}
+			}
+			++i;
+		}
+		return text;
+	}
+
+	/// <summary>
 	/// Get the printed size of the specified string.
 	/// </summary>
 
 	public Vector2 CalculatePrintedSize (string text)
 	{
+		text = StripSymbols(text);
 		Vector2 v = Vector2.zero;
 
 		if (mFont != null && mFont.isValid)
@@ -114,17 +140,22 @@ public class UIFont : MonoBehaviour
 					if (x > maxX) maxX = x;
 					x = 0;
 					y += mFont.charSize;
+					prev = 0;
+					continue;
 				}
-				else if (c == '\r') continue;
-				else
-				{
-					BMGlyph glyph = mFont.GetGlyph(c);
 
-					if (glyph != null)
-					{
-						x += (prev != 0) ? glyph.advance + glyph.GetKerning(prev) : glyph.advance;
-						prev = c;
-					}
+				if (c < ' ')
+				{
+					prev = 0;
+					continue;
+				}
+
+				BMGlyph glyph = mFont.GetGlyph(c);
+
+				if (glyph != null)
+				{
+					x += (prev != 0) ? glyph.advance + glyph.GetKerning(prev) : glyph.advance;
+					prev = c;
 				}
 			}
 
@@ -166,9 +197,15 @@ public class UIFont : MonoBehaviour
 					if (x > maxX) maxX = x;
 					x = 0;
 					y += mFont.charSize;
+					prev = 0;
 					continue;
 				}
-				if (c == '\r') continue;
+
+				if (c < ' ')
+				{
+					prev = 0;
+					continue;
+				}
 
 				if (c == '[')
 				{
