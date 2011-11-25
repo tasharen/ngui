@@ -36,7 +36,7 @@ public class UIFont : MonoBehaviour
 	/// Pixel-perfect size of this font.
 	/// </summary>
 
-	public int size { get { if (!mFont.isValid) Awake(); return mFont.charSize; } }
+	public int size { get { Awake(); return mFont.charSize; } }
 
 	/// <summary>
 	/// Get or set the material used by this font.
@@ -64,7 +64,7 @@ public class UIFont : MonoBehaviour
 
 	void Awake ()
 	{
-		if (mData != null)
+		if (mData != null && !mFont.isValid)
 		{
 			mFont.Load(NGUITools.GetHierarchy(gameObject), mData.bytes);
 		}
@@ -96,50 +96,56 @@ public class UIFont : MonoBehaviour
 
 	public Vector2 CalculatePrintedSize (string text, bool encoding)
 	{
-		if (encoding) text = NGUITools.StripSymbols(text);
 		Vector2 v = Vector2.zero;
 
-		if (mFont != null && mFont.isValid)
+		if (mFont != null)
 		{
-			Vector2 scale = new Vector2(1f / mFont.charSize, 1f / mFont.charSize);
+			Awake();
 
-			int maxX = 0;
-			int x = 0;
-			int y = 0;
-			int prev = 0;
-
-			for (int i = 0, imax = text.Length; i < imax; ++i)
+			if (mFont.isValid)
 			{
-				char c = text[i];
+				if (encoding) text = NGUITools.StripSymbols(text);
 
-				if (c == '\n' || (encoding && (c == '\\') && (i + 1 < imax) && (text[i + 1] == 'n')))
+				Vector2 scale = mFont.charSize > 0 ? new Vector2(1f / mFont.charSize, 1f / mFont.charSize) : Vector2.one;
+
+				int maxX = 0;
+				int x = 0;
+				int y = 0;
+				int prev = 0;
+
+				for (int i = 0, imax = text.Length; i < imax; ++i)
 				{
-					if (x > maxX) maxX = x;
-					x = 0;
-					y += mFont.charSize;
-					prev = 0;
-					if (c != '\n') ++i;
-					continue;
+					char c = text[i];
+
+					if (c == '\n' || (encoding && (c == '\\') && (i + 1 < imax) && (text[i + 1] == 'n')))
+					{
+						if (x > maxX) maxX = x;
+						x = 0;
+						y += mFont.charSize;
+						prev = 0;
+						if (c != '\n') ++i;
+						continue;
+					}
+
+					if (c < ' ')
+					{
+						prev = 0;
+						continue;
+					}
+
+					BMGlyph glyph = mFont.GetGlyph(c);
+
+					if (glyph != null)
+					{
+						x += (prev != 0) ? glyph.advance + glyph.GetKerning(prev) : glyph.advance;
+						prev = c;
+					}
 				}
 
-				if (c < ' ')
-				{
-					prev = 0;
-					continue;
-				}
-
-				BMGlyph glyph = mFont.GetGlyph(c);
-
-				if (glyph != null)
-				{
-					x += (prev != 0) ? glyph.advance + glyph.GetKerning(prev) : glyph.advance;
-					prev = c;
-				}
+				if (x > maxX) maxX = x;
+				v.x = scale.x * maxX;
+				v.y = scale.y * (y + mFont.charSize);
 			}
-
-			if (x > maxX) maxX = x;
-			v.x = scale.x * maxX;
-			v.y = scale.y * (y + mFont.charSize);
 		}
 		return v;
 	}
@@ -150,12 +156,20 @@ public class UIFont : MonoBehaviour
 
 	public void Print (string text, Color color, List<Vector3> verts, List<Vector2> uvs, List<Color> cols, bool encoding)
 	{
-		if (mFont != null && mFont.isValid)
+		if (mFont != null)
 		{
+			Awake();
+
+			if (!mFont.isValid)
+			{
+				Debug.LogError("Attempting to print using an invalid font!");
+				return;
+			}
+
 			mColors.Clear();
 			mColors.Push(color);
 
-			Vector2 scale = new Vector2(1f / mFont.charSize, 1f / mFont.charSize);
+			Vector2 scale = mFont.charSize > 0 ? new Vector2(1f / mFont.charSize, 1f / mFont.charSize) : Vector2.one;
 
 			int maxX = 0;
 			int x = 0;
