@@ -100,6 +100,36 @@ public class UILabel : UIWidget
 
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
+		int start = verts.Count;
 		mFont.Print(mText, color, verts, uvs, cols, mEncoding);
+
+		// If the label should be centered, we need to figure out where the center would be
+		if (centered && verts.Count > start)
+		{
+			float minX = verts[start].x;
+			float maxX = minX;
+			float minY = verts[start].y;
+			float maxY = minY;
+
+			for (int i = start + 1, imax = verts.Count; i < imax; ++i)
+			{
+				Vector3 v = verts[i];
+				if (v.x < minX) minX = v.x;
+				if (v.x > maxX) maxX = v.x;
+				if (v.y < minY) minY = v.y;
+				if (v.y > maxY) maxY = v.y;
+			}
+
+			float offsetX = (maxX - minX) * 0.5f;
+			float offsetY = (maxY - minY) * 0.5f;
+
+			for (int i = start, imax = verts.Count; i < imax; ++i)
+			{
+				Vector3 v = verts[i];
+				v.x -= offsetX;
+				v.y += offsetY;
+				verts[i] = v;
+			}
+		}
 	}
 }
