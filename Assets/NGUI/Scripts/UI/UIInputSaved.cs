@@ -17,7 +17,7 @@ public class UIInputSaved : UIInput
 		}
 	}
 
-	void End ()
+	void OnApplicationQuit ()
 	{
 		if (!string.IsNullOrEmpty(playerPrefsField))
 		{

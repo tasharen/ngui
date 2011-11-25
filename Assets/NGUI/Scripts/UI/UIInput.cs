@@ -7,7 +7,7 @@
 [AddComponentMenu("NGUI/UI/Input (Basic)")]
 public class UIInput : MonoBehaviour
 {
-	public TextMesh textMesh;
+	public UILabel label;
 
 	string mText = "";
 	bool mSelected = false;
@@ -25,24 +25,42 @@ public class UIInput : MonoBehaviour
 		get
 		{
 			if (mSelected) return mText;
-			return (textMesh != null) ? textMesh.text : "";
+			return (label != null) ? label.text : "";
 		}
 		set
 		{
 			mText = value;
-			if (textMesh != null) textMesh.text = mSelected ? value + "|" : value;
+
+			if (label != null)
+			{
+				label.supportEncoding = false;
+				label.text = mSelected ? value + "|" : value;
+			}
 		}
 	}
 
+	/// <summary>
+	/// Labels used for input shouldn't support color encoding.
+	/// </summary>
+
+	void Awake ()
+	{
+		if (label != null) label.supportEncoding = false;
+	}
+
+	/// <summary>
+	/// Selection event, sent by UIMouse.
+	/// </summary>
+
 	void OnSelect (bool selected)
 	{
-		if (textMesh != null && mSelected != selected && enabled && gameObject.active)
+		if (label != null && mSelected != selected && enabled && gameObject.active)
 		{
 			mSelected = selected;
 
 			if (mSelected)
 			{
-				mText = textMesh.text;
+				mText = label.text;
 
 #if UNITY_IPHONE || UNITY_ANDROID
 				if (Application.platform == RuntimePlatform.IPhonePlayer ||
@@ -53,7 +71,7 @@ public class UIInput : MonoBehaviour
 				else
 #endif
 				{
-					textMesh.text = mText + "|";
+					label.text = mText + "|";
 				}
 			}
 #if UNITY_IPHONE || UNITY_ANDROID
@@ -64,10 +82,14 @@ public class UIInput : MonoBehaviour
 #endif
 			else
 			{
-				textMesh.text = mText;
+				label.text = mText;
 			}
 		}
 	}
+
+	/// <summary>
+	/// Input event, sent by UIMouse.
+	/// </summary>
 
 	void OnInput (string input)
 	{
@@ -76,6 +98,7 @@ public class UIInput : MonoBehaviour
 #if UNITY_IPHONE || UNITY_ANDROID
 			if (mKeyboard != null && mKeyboard.done)
 			{
+				input = k.text;
 				mSelected = false;
 				mKeyboard = null;
 				mText = "";
@@ -100,7 +123,7 @@ public class UIInput : MonoBehaviour
 					mText += c;
 				}
 			}
-			textMesh.text = mSelected ? (mText + "|") : mText;
+			label.text = mSelected ? (mText + "|") : mText;
 		}
 	}
 }

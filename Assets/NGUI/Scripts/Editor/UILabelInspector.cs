@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
+/// <summary>
+/// Inspector class used to edit UILabels.
+/// </summary>
+
 [CustomEditor(typeof(UILabel))]
 public class UILabelInspector : UIWidgetInspector
 {
@@ -32,13 +36,12 @@ public class UILabelInspector : UIWidgetInspector
 		}
 
 		GUITools.DrawSeparator();
-		string text = EditorGUILayout.TextField("Text", mLabel.text);
 
-		if (!string.Equals(text, mLabel.text))
-		{
-			RegisterUndo();
-			mLabel.text = text;
-		}
+		string text = EditorGUILayout.TextField("Text", mLabel.text);
+		if (!string.Equals(text, mLabel.text)) { RegisterUndo(); mLabel.text = text; }
+
+		bool encoding = EditorGUILayout.Toggle("Encoding", mLabel.supportEncoding);
+		if (encoding != mLabel.supportEncoding) { RegisterUndo(); mLabel.supportEncoding = encoding; }
 	}
 
 	override protected void OnCustomSave ()

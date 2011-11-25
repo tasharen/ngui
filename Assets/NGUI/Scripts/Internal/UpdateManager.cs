@@ -43,6 +43,7 @@ public class UpdateManager : MonoBehaviour
 		if (mInstance == null)
 		{
 			GameObject go = new GameObject("_UpdateManager");
+			go.hideFlags = HideFlags.HideAndDontSave;
 			mInstance = go.AddComponent<UpdateManager>();
 			DontDestroyOnLoad(go);
 		}

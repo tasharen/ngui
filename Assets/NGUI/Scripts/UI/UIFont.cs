@@ -91,37 +91,12 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Runs through the specified string and removes all color-encoding symbols.
-	/// </summary>
-
-	static public string StripSymbols (string text)
-	{
-		for (int i = 0, imax = text.Length; i < imax; )
-		{
-			char c = text[i];
-
-			if (c == '[')
-			{
-				int retVal = NGUITools.ParseSymbol(text, i, null);
-
-				if (retVal > 0)
-				{
-					text = text.Remove(i, retVal);
-					continue;
-				}
-			}
-			++i;
-		}
-		return text;
-	}
-
-	/// <summary>
 	/// Get the printed size of the specified string.
 	/// </summary>
 
-	public Vector2 CalculatePrintedSize (string text)
+	public Vector2 CalculatePrintedSize (string text, bool encoding)
 	{
-		text = StripSymbols(text);
+		if (encoding) text = NGUITools.StripSymbols(text);
 		Vector2 v = Vector2.zero;
 
 		if (mFont != null && mFont.isValid)
@@ -133,14 +108,17 @@ public class UIFont : MonoBehaviour
 			int y = 0;
 			int prev = 0;
 
-			foreach (char c in text)
+			for (int i = 0, imax = text.Length; i < imax; ++i)
 			{
-				if (c == '\n')
+				char c = text[i];
+
+				if (c == '\n' || (encoding && (c == '\\') && (i + 1 < imax) && (text[i + 1] == 'n')))
 				{
 					if (x > maxX) maxX = x;
 					x = 0;
 					y += mFont.charSize;
 					prev = 0;
+					if (c != '\n') ++i;
 					continue;
 				}
 
@@ -170,7 +148,7 @@ public class UIFont : MonoBehaviour
 	/// Print the specified text into the buffers.
 	/// </summary>
 
-	public void Print (string text, Color color, List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
+	public void Print (string text, Color color, List<Vector3> verts, List<Vector2> uvs, List<Color> cols, bool encoding)
 	{
 		if (mFont != null && mFont.isValid)
 		{
@@ -192,12 +170,13 @@ public class UIFont : MonoBehaviour
 			{
 				char c = text[i];
 
-				if (c == '\n')
+				if (c == '\n' || (encoding && (c == '\\') && (i + 1 < imax) && (text[i + 1] == 'n')))
 				{
 					if (x > maxX) maxX = x;
 					x = 0;
 					y += mFont.charSize;
 					prev = 0;
+					if (c != '\n') ++i;
 					continue;
 				}
 
@@ -207,7 +186,7 @@ public class UIFont : MonoBehaviour
 					continue;
 				}
 
-				if (c == '[')
+				if (encoding && c == '[')
 				{
 					int retVal = NGUITools.ParseSymbol(text, i, mColors);
 

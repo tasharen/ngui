@@ -7,6 +7,7 @@ public class UILabel : UIWidget
 {
 	[SerializeField] UIFont mFont;
 	[SerializeField] string mText = "";
+	[SerializeField] bool mEncoding = true;
 
 	/// <summary>
 	/// Set the font used by this label.
@@ -50,6 +51,27 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Whether this label will support color encoding in the format of [RRGGBB] and new line in the form of a "\\n" string.
+	/// </summary>
+
+	public bool supportEncoding
+	{
+		get
+		{
+			return mEncoding;
+		}
+		set
+		{
+			if (mEncoding != value)
+			{
+				mEncoding = value;
+				mIsDirty = true;
+				Refresh();
+			}
+		}
+	}
+
+	/// <summary>
 	/// Text is pixel-perfect when its scale matches the size.
 	/// </summary>
 
@@ -78,6 +100,6 @@ public class UILabel : UIWidget
 
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
-		mFont.Print(mText, color, verts, uvs, cols);
+		mFont.Print(mText, color, verts, uvs, cols, mEncoding);
 	}
 }

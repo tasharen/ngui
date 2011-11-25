@@ -101,7 +101,7 @@ static public class NGUITools
 					return 3;
 				}
 			}
-			else if (index + 8 < length)
+			else if (index + 7 < length)
 			{
 				if (text[index + 7] == ']')
 				{
@@ -111,5 +111,33 @@ static public class NGUITools
 			}
 		}
 		return 0;
+	}
+
+	/// <summary>
+	/// Runs through the specified string and removes all color-encoding symbols.
+	/// </summary>
+
+	static public string StripSymbols (string text)
+	{
+		text = text.Replace("\\n", "");
+
+		for (int i = 0, imax = text.Length; i < imax; )
+		{
+			char c = text[i];
+
+			if (c == '[')
+			{
+				int retVal = ParseSymbol(text, i, null);
+
+				if (retVal > 0)
+				{
+					text = text.Remove(i, retVal);
+					imax = text.Length;
+					continue;
+				}
+			}
+			++i;
+		}
+		return text;
 	}
 }
