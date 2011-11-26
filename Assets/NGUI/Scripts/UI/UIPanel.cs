@@ -109,7 +109,6 @@ public class UIPanel : MonoBehaviour
 	/// <summary>
 	/// Add the specified widget to the managed list.
 	/// </summary>
-	/// <param name="widget"></param>
 
 	public void AddWidget (UIWidget widget)
 	{

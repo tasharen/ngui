@@ -166,7 +166,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	void CreatePanel ()
 	{
-		if (mPanel == null && mMat != null)
+		if (mPanel == null && mMat != null && enabled && gameObject.active)
 		{
 			mIsDirty = true;
 			mPanel = UIPanel.Find(cachedTransform);
@@ -220,7 +220,6 @@ public abstract class UIWidget : MonoBehaviour
 		if (mPanel != null)
 		{
 			mPanel.RemoveWidget(this);
-			if (!mPlayMode) mPanel.Refresh(mMat);
 			mPanel = null;
 		}
 	}
@@ -245,7 +244,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Force-refresh the widget. Only meant to be executed from the edit mode.
 	/// </summary>
 
-	public void Refresh () { if (!mPlayMode && mMat != null) panel.Refresh(mMat); }
+	public void Refresh () { if (!mPlayMode && mMat != null && panel != null) mPanel.Refresh(mMat); }
 
 	/// <summary>
 	/// Check to see if anything has changed.

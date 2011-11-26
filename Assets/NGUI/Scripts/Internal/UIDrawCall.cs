@@ -51,7 +51,7 @@ public class UIDrawCall : MonoBehaviour
 	{
 		if (widget != null && !mWidgets.Contains(widget))
 		{
-			//Debug.Log("Adding " + widget.name + " to " + name);
+			Debug.Log("Adding " + widget.name + " to " + name);
 
 			mWidgets.Add(widget);
 			mRebuild = true;
@@ -67,12 +67,10 @@ public class UIDrawCall : MonoBehaviour
 	{
 		if (mWidgets != null && mWidgets.Remove(widget))
 		{
+			Debug.Log("Removing " + widget.name + " from " + name);
+
 			mRebuild = true;
-
-			//Debug.Log("Removing " + widget.name + " from " + name);
-
-			// Uncommenting this causes widgets to disappear after exiting play mode
-			//if (!Application.isPlaying) CustomUpdate();
+			CustomUpdate();
 		}
 	}
 
@@ -101,10 +99,44 @@ public class UIDrawCall : MonoBehaviour
 
 	public void CustomUpdate ()
 	{
-		UpdateWidgets();
+		// Update all widgets
+		for (int i = mWidgets.Count; i > 0; )
+		{
+			UIWidget w = mWidgets[--i];
+			if (w == null) mWidgets.RemoveAt(i);
+			else mRebuild |= w.CustomUpdate();
+		}
 
-		// Only continue if we need to rebuild
-		if (mRebuild)
+		// If we have no widgets, this class is no longer needed
+		if (mWidgets.Count == 0)
+		{
+			if (Application.isPlaying)
+			{
+				Destroy(gameObject);
+			}
+			else
+			{
+				if (mRen != null)
+				{
+					DestroyImmediate(mRen);
+					mRen = null;
+				}
+
+				if (mFilter != null)
+				{
+					DestroyImmediate(mFilter);
+					mFilter = null;
+				}
+
+				if (mMesh != null)
+				{
+					DestroyImmediate(mMesh);
+					mMesh = null;
+				}
+				if (this != null) DestroyImmediate(gameObject);
+			}
+		}
+		else if (mRebuild)
 		{
 			RefillGeometry();
 			RebuildMeshes();
@@ -113,54 +145,7 @@ public class UIDrawCall : MonoBehaviour
 			mVerts.Clear();
 			mUvs.Clear();
 			mCols.Clear();
-
-			// Don't rebuild the screen next frame
 			mRebuild = false;
-		}
-	}
-
-	/// <summary>
-	/// Update all widgets.
-	/// </summary>
-
-	void UpdateWidgets ()
-	{
-		for (int i = mWidgets.Count; i > 0; )
-		{
-			UIWidget w = mWidgets[--i];
-			if (w == null) mWidgets.RemoveAt(i);
-			else mRebuild |= w.CustomUpdate();
-		}
-
-		// No need to keep this screen if we don't have any widgets left
-		if (mWidgets.Count == 0)
-		{
-			mRebuild = false;
-
-			if (Application.isPlaying)
-			{
-				Destroy(gameObject);
-				return;
-			}
-
-			if (mRen != null)
-			{
-				DestroyImmediate(mRen);
-				mRen = null;
-			}
-
-			if (mFilter != null)
-			{
-				DestroyImmediate(mFilter);
-				mFilter = null;
-			}
-
-			if (mMesh != null)
-			{
-				DestroyImmediate(mMesh);
-				mMesh = null;
-			}
-			if (this != null) DestroyImmediate(gameObject);
 		}
 	}
 
