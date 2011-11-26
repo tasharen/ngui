@@ -49,7 +49,7 @@ public class UIInput : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Selection event, sent by UIMouse.
+	/// Selection event, sent by UICamera.
 	/// </summary>
 
 	void OnSelect (bool selected)
@@ -88,7 +88,7 @@ public class UIInput : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Input event, sent by UIMouse.
+	/// Input event, sent by UICamera.
 	/// </summary>
 
 	void OnInput (string input)

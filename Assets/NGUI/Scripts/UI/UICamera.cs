@@ -10,13 +10,11 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/Mouse")]
+[AddComponentMenu("NGUI/UI/Camera")]
 [RequireComponent(typeof(Camera))]
-public class UIMouse : MonoBehaviour
+public class UICamera : MonoBehaviour
 {
-	public LayerMask layerMask;
-
-	static List<UIMouse> mList = new List<UIMouse>();
+	static List<UICamera> mList = new List<UICamera>();
 
 	bool mUseTouchInput = false;
 	Camera mCam = null;
@@ -27,17 +25,30 @@ public class UIMouse : MonoBehaviour
 	Vector3 mPos = Vector3.zero;
 	Vector3 mDelta = Vector3.zero;
 	Vector3 mTotalDelta = Vector3.zero;
+	LayerMask mLayerMask;
 	bool mConsiderForClick = false;
+
+	/// <summary>
+	/// Caching is always preferable for performance.
+	/// </summary>
+
+	Camera cachedCamera { get { if (mCam == null) mCam = camera; return mCam; } }
+
+	/// <summary>
+	/// Helper function that determines if this script should be handling the events.
+	/// </summary>
+
+	bool handlesEvents { get { return eventHandler == this; } }
 
 	/// <summary>
 	/// Current mouse or touch position.
 	/// </summary>
 
-	static public Vector3 position
+	static public Vector3 mousePosition
 	{
 		get
 		{
-			UIMouse mouse = eventHandler;
+			UICamera mouse = eventHandler;
 			return (mouse != null) ? mouse.mPos : Vector3.zero;
 		}
 	}
@@ -50,62 +61,20 @@ public class UIMouse : MonoBehaviour
 	{
 		get
 		{
-			UIMouse mouse = eventHandler;
-			return (mouse != null) ? mouse.mCam : null;
+			UICamera mouse = eventHandler;
+			return (mouse != null) ? mouse.cachedCamera : null;
 		}
-	}
-
-	/// <summary>
-	/// Static comparison function used for sorting.
-	/// </summary>
-
-	static int CompareFunc (UIMouse a, UIMouse b)
-	{
-		if (a.mCam.depth < b.mCam.depth) return 1;
-		if (a.mCam.depth > b.mCam.depth) return -1;
-		return 0;
-	}
-
-	/// <summary>
-	/// Returns the object under the specified position.
-	/// </summary>
-
-	static GameObject GetObject (Vector3 inPos)
-	{
-		foreach (UIMouse mouse in mList)
-		{
-			// Skip inactive scripts
-			if (!mouse.enabled || !mouse.gameObject.active) continue;
-
-			// Convert to view space
-			Camera cam = mouse.mCam;
-			Vector3 pos = cam.ScreenToViewportPoint(inPos);
-
-			// If it's outside the camera's viewport, do nothing
-			if (pos.x < 0f || pos.x > 1f || pos.y < 0f || pos.y > 1f) continue;
-
-			// Cast a ray into the screen
-			Ray ray = cam.ScreenPointToRay(inPos);
-			RaycastHit hitInfo;
-
-			// Raycast into the screen
-			if (Physics.Raycast(ray, out hitInfo, cam.farClipPlane - cam.nearClipPlane, mouse.layerMask))
-			{
-				return hitInfo.collider.gameObject;
-			}
-		}
-		return null;
 	}
 
 	/// <summary>
 	/// Event handler for all types of events.
 	/// </summary>
 
-	static UIMouse eventHandler
+	static UICamera eventHandler
 	{
 		get
 		{
-			foreach (UIMouse mouse in mList)
+			foreach (UICamera mouse in mList)
 			{
 				// Invalid or inactive entry -- keep going
 				if (mouse == null || !mouse.enabled || !mouse.gameObject.active) continue;
@@ -116,10 +85,46 @@ public class UIMouse : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Helper function that determines if this script should be handling the events.
+	/// Static comparison function used for sorting.
 	/// </summary>
 
-	bool handlesEvents { get { return eventHandler == this; } }
+	static int CompareFunc (UICamera a, UICamera b)
+	{
+		if (a.cachedCamera.depth < b.cachedCamera.depth) return 1;
+		if (a.cachedCamera.depth > b.cachedCamera.depth) return -1;
+		return 0;
+	}
+
+	/// <summary>
+	/// Returns the object under the specified position.
+	/// </summary>
+
+	static GameObject GetObject (Vector3 inPos)
+	{
+		foreach (UICamera mouse in mList)
+		{
+			// Skip inactive scripts
+			if (!mouse.enabled || !mouse.gameObject.active) continue;
+
+			// Convert to view space
+			Camera cam = mouse.cachedCamera;
+			Vector3 pos = cam.ScreenToViewportPoint(inPos);
+
+			// If it's outside the camera's viewport, do nothing
+			if (pos.x < 0f || pos.x > 1f || pos.y < 0f || pos.y > 1f) continue;
+
+			// Cast a ray into the screen
+			Ray ray = cam.ScreenPointToRay(inPos);
+			RaycastHit hitInfo;
+
+			// Raycast into the screen
+			if (Physics.Raycast(ray, out hitInfo, cam.farClipPlane - cam.nearClipPlane, mouse.cachedCamera.cullingMask))
+			{
+				return hitInfo.collider.gameObject;
+			}
+		}
+		return null;
+	}
 
 	/// <summary>
 	/// Add this camera to the list.
@@ -127,11 +132,6 @@ public class UIMouse : MonoBehaviour
 
 	void Start ()
 	{
-		mCam = camera;
-
-		// Use the same layer by default if none was specified.
-		if (layerMask == 0 && Application.isPlaying) layerMask = mCam.cullingMask;
-
 		// We should be using touch-based input on Android and iOS-based devices.
 		mUseTouchInput = Application.platform == RuntimePlatform.Android ||
 						 Application.platform == RuntimePlatform.IPhonePlayer;

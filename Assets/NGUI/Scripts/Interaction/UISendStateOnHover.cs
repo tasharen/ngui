@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Calls "OnState" function on all of the scripts attached to the specified
-/// target when the script receives OnHover message from UIMouse.
+/// target when the script receives OnHover message from UICamera.
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Send State (OnHover)")]

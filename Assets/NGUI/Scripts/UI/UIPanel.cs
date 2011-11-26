@@ -85,7 +85,7 @@ public class UIPanel : MonoBehaviour
 			foreach (UIDrawCall dc in list) if (dc.material == mat) return dc;
 		}
 
-		GameObject go = new GameObject("_UIScreen [" + mat.name + "]");
+		GameObject go = new GameObject("_UIDrawCall [" + mat.name + "]");
 		go.hideFlags = panel.mHidden ? HideFlags.HideAndDontSave : HideFlags.DontSave | HideFlags.NotEditable;
 		go.layer = trans.gameObject.layer;
 

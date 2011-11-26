@@ -26,6 +26,15 @@ public class UIPanelInspector : Editor
 			EditorGUILayout.ObjectField("Material", dc.material, typeof(Material), false);
 			EditorGUILayout.LabelField("Widgets", dc.widgets.ToString());
 			EditorGUILayout.LabelField("Triangles", dc.triangles.ToString());
+			//bool merge = EditorGUILayout.Toggle("Merge Atlas", dc.merge);
+
+			//if (merge != dc.merge)
+			{
+				//dc.merge = merge;
+				//Debug.Log("TODO: Merge the atlas");
+
+				// TODO: 
+			}
 		}
 	}
 }

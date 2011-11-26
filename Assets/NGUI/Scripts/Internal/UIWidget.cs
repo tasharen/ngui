@@ -14,7 +14,7 @@ public abstract class UIWidget : MonoBehaviour
 	[SerializeField] int mDepth = 0;
 
 	Transform mTrans;
-	UIDrawCall mScreen;
+	UIDrawCall mDC;
 	Texture2D mTex;
 
 	protected bool mPlayMode = true;
@@ -146,11 +146,11 @@ public abstract class UIWidget : MonoBehaviour
 
 	void RemoveFromScreen (bool update)
 	{
-		if (mMat != null && mScreen != null)
+		if (mMat != null && mDC != null)
 		{
-			mScreen.RemoveWidget(this);
-			if (update && !mPlayMode) mScreen.LateUpdate();
-			mScreen = null;
+			mDC.RemoveWidget(this);
+			if (update && !mPlayMode) mDC.LateUpdate();
+			mDC = null;
 		}
 	}
 
@@ -160,10 +160,10 @@ public abstract class UIWidget : MonoBehaviour
 
 	void AddToScreen ()
 	{
-		if (mMat != null && mScreen == null)
+		if (mMat != null && mDC == null)
 		{
-			mScreen = UIPanel.GetScreen(cachedTransform, mMat);
-			mScreen.AddWidget(this);
+			mDC = UIPanel.GetScreen(cachedTransform, mMat);
+			mDC.AddWidget(this);
 			mIsDirty = true;
 		}
 	}
@@ -216,7 +216,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Always ensure that the widget has a screen that's referencing it.
 	/// </summary>
 
-	void Update () { if (mScreen == null) AddToScreen(); }
+	void Update () { if (mDC == null) AddToScreen(); }
 
 	/// <summary>
 	/// Force-refresh the widget. Only meant to be executed from the edit mode.
@@ -227,7 +227,7 @@ public abstract class UIWidget : MonoBehaviour
 		if (!mPlayMode)
 		{
 			Update();
-			if (mScreen != null) mScreen.LateUpdate();
+			if (mDC != null) mDC.LateUpdate();
 		}
 	}
 

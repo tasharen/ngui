@@ -6,13 +6,14 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("Internal/UI Draw Call")]
+[AddComponentMenu("NGUI/Internal/UI Draw Call")]
 public class UIDrawCall : MonoBehaviour
 {
 	Material		mMat;		// Material used by this screen
 	Mesh			mMesh;		// Generated mesh
 	MeshFilter		mFilter;	// Mesh filter for this screen
 	MeshRenderer	mRen;		// Mesh renderer for this screen
+	UIDrawCall		mMerged;	// Multiple draw calls can be merged into one
 
 	// Whether the screen should be rebuilt next update
 	bool mRebuild = false;
@@ -51,11 +52,17 @@ public class UIDrawCall : MonoBehaviour
 	{
 		//Debug.Log("Adding " + widget.name + " to " + name);
 
-		if (widget != null && !mWidgets.Contains(widget))
+		/*if (mMerged != null)
+		{
+			mMerged.AddWidget(widget);
+		}
+		else*/ if (widget != null && !mWidgets.Contains(widget))
 		{
 			mWidgets.Add(widget);
 			mRebuild = true;
 			if (!Application.isPlaying) LateUpdate();
+
+			// TODO: Adding a widget. Great. Now the merged needs to be notified
 		}
 	}
 
@@ -66,12 +73,8 @@ public class UIDrawCall : MonoBehaviour
 	public void RemoveWidget (UIWidget widget)
 	{
 		//Debug.Log("Removing " + widget.name + " from " + name);
-
-		if (mWidgets != null)
-		{
-			mWidgets.Remove(widget);
-			mRebuild = true;
-		}
+		if (mWidgets != null && mWidgets.Remove(widget)) mRebuild = true;
+		//else if (mMerged != null) mMerged.RemoveWidget(widget);
 	}
 
 	/// <summary>
@@ -99,9 +102,30 @@ public class UIDrawCall : MonoBehaviour
 
 	public void LateUpdate ()
 	{
-		if (mWidgets == null) return;
+		UpdateWidgets();
 
-		// Update all widgets
+		// Only continue if we need to rebuild
+		if (mRebuild)
+		{
+			RefillGeometry();
+			RebuildMeshes();
+			
+			// Cleanup
+			mVerts.Clear();
+			mUvs.Clear();
+			mCols.Clear();
+
+			// Don't rebuild the screen next frame
+			mRebuild = false;
+		}
+	}
+
+	/// <summary>
+	/// Update all widgets.
+	/// </summary>
+
+	void UpdateWidgets ()
+	{
 		for (int i = mWidgets.Count; i > 0; )
 		{
 			UIWidget w = mWidgets[--i];
@@ -112,49 +136,46 @@ public class UIDrawCall : MonoBehaviour
 		// No need to keep this screen if we don't have any widgets left
 		if (mWidgets.Count == 0)
 		{
-			if (Application.isPlaying)
-			{
-				Destroy(gameObject);
-				return;
-			}
+			mRebuild = false;
 
-			if (mRen != null)
+			if (mMerged == null)
 			{
-				DestroyImmediate(mRen);
-				mRen = null;
-			}
+				if (Application.isPlaying)
+				{
+					Destroy(gameObject);
+					return;
+				}
 
-			if (mFilter != null)
-			{
-				DestroyImmediate(mFilter);
-				mFilter = null;
-			}
+				if (mRen != null)
+				{
+					DestroyImmediate(mRen);
+					mRen = null;
+				}
 
-			if (mMesh != null)
-			{
-				DestroyImmediate(mMesh);
-				mMesh = null;
+				if (mFilter != null)
+				{
+					DestroyImmediate(mFilter);
+					mFilter = null;
+				}
+
+				if (mMesh != null)
+				{
+					DestroyImmediate(mMesh);
+					mMesh = null;
+				}
+				if (this != null) DestroyImmediate(gameObject);
 			}
-			if (this != null) DestroyImmediate(gameObject);
-			return;
 		}
+	}
 
-		// Only continue if we need to rebuild
-		if (!mRebuild) return;
+	/// <summary>
+	/// Refill the arrays.
+	/// </summary>
 
+	void RefillGeometry ()
+	{
 		// Sort all widgets back-to-front
 		mWidgets.Sort(UIWidget.CompareFunc);
-
-		// Cache all components
-		if (mFilter == null) mFilter = gameObject.GetComponent<MeshFilter>();
-		if (mFilter == null) mFilter = gameObject.AddComponent<MeshFilter>();
-		if (mRen == null) mRen = gameObject.GetComponent<MeshRenderer>();
-
-		if (mRen == null)
-		{
-			mRen = gameObject.AddComponent<MeshRenderer>();
-			mRen.sharedMaterial = mMat;
-		}
 
 		// Fill the vertices and UVs
 		foreach (UIWidget w in mWidgets)
@@ -170,6 +191,14 @@ public class UIDrawCall : MonoBehaviour
 				mVerts[i] = t.TransformPoint(mVerts[i]);
 			}
 		}
+	}
+
+	/// <summary>
+	/// Rebuild the meshes.
+	/// </summary>
+
+	void RebuildMeshes ()
+	{
 		int count = mVerts.Count;
 
 		// Safety check to ensure we get valid values
@@ -190,6 +219,17 @@ public class UIDrawCall : MonoBehaviour
 				indices[index++] = i + 2;
 				indices[index++] = i + 3;
 				indices[index++] = i;
+			}
+
+			// Cache all components
+			if (mFilter == null) mFilter = gameObject.GetComponent<MeshFilter>();
+			if (mFilter == null) mFilter = gameObject.AddComponent<MeshFilter>();
+			if (mRen == null) mRen = gameObject.GetComponent<MeshRenderer>();
+
+			if (mRen == null)
+			{
+				mRen = gameObject.AddComponent<MeshRenderer>();
+				mRen.sharedMaterial = mMat;
 			}
 
 			if (mMesh == null)
@@ -214,13 +254,5 @@ public class UIDrawCall : MonoBehaviour
 		{
 			Debug.LogError("UIWidgets must fill the buffer with 4 vertices per quad. Found " + count);
 		}
-
-		// Cleanup
-		mVerts.Clear();
-		mUvs.Clear();
-		mCols.Clear();
-
-		// Don't rebuild the screen next frame
-		mRebuild = false;
 	}
 }
