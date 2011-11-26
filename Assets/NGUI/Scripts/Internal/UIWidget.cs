@@ -14,8 +14,8 @@ public abstract class UIWidget : MonoBehaviour
 	[SerializeField] int mDepth = 0;
 
 	Transform mTrans;
-	UIDrawCall mDC;
 	Texture2D mTex;
+	UIPanel mPanel;
 
 	protected bool mPlayMode = true;
 	protected Vector3 mPos;
@@ -103,11 +103,18 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			if (mMat != value)
 			{
-				RemoveFromScreen(true);
+				mIsDirty = true;
+
+				if (mPanel != null)
+				{
+					mPanel.RemoveWidget(this);
+					mPanel = null;
+				}
+				
 				mMat = value;
 				mTex = (mMat != null) ? mMat.mainTexture as Texture2D : null;
-				mIsDirty = true;
-				Refresh();
+
+				CreatePanel();
 			}
 		}
 	}
@@ -130,6 +137,19 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Returns the UI panel responsible for this widget.
+	/// </summary>
+
+	public UIPanel panel
+	{
+		get
+		{
+			CreatePanel();
+			return mPanel;
+		}
+	}
+
+	/// <summary>
 	/// Static widget comparison function used for Z-sorting.
 	/// </summary>
 
@@ -141,30 +161,16 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Helper function, removes the widget from the rendering screen.
+	/// Ensure we have a panel referencing this widget.
 	/// </summary>
 
-	void RemoveFromScreen (bool update)
+	void CreatePanel ()
 	{
-		if (mMat != null && mDC != null)
+		if (mPanel == null && mMat != null)
 		{
-			mDC.RemoveWidget(this);
-			if (update && !mPlayMode) mDC.LateUpdate();
-			mDC = null;
-		}
-	}
-
-	/// <summary>
-	/// If we haven't created a UI screen yet, do so now.
-	/// </summary>
-
-	void AddToScreen ()
-	{
-		if (mMat != null && mDC == null)
-		{
-			mDC = UIPanel.GetScreen(cachedTransform, mMat);
-			mDC.AddWidget(this);
 			mIsDirty = true;
+			mPanel = UIPanel.Find(cachedTransform);
+			mPanel.AddWidget(this);
 		}
 	}
 
@@ -195,7 +201,6 @@ public abstract class UIWidget : MonoBehaviour
 	void Awake ()
 	{
 		if (mDepth == 0) mDepth = CalculateDepth();
-		mTrans = transform;
 		mPlayMode = Application.isPlaying;
 		OnAwake();
 	}
@@ -204,69 +209,78 @@ public abstract class UIWidget : MonoBehaviour
 	/// Unregister this widget.
 	/// </summary>
 
-	void OnDestroy () { RemoveFromScreen(false); }
+	void OnDestroy () { OnDisable(); }
 
 	/// <summary>
 	/// Unregister this widget.
 	/// </summary>
 
-	void OnDisable () { RemoveFromScreen(false); }
+	void OnDisable ()
+	{
+		if (mPanel != null)
+		{
+			mPanel.RemoveWidget(this);
+			if (!mPlayMode) mPanel.Refresh(mMat);
+			mPanel = null;
+		}
+	}
 
 	/// <summary>
-	/// Always ensure that the widget has a screen that's referencing it.
+	/// Always ensure the widget has a panel responsible for it.
 	/// </summary>
 
-	void Update () { if (mDC == null) AddToScreen(); }
+	void Update ()
+	{
+		CreatePanel();
+
+		// Update the widget in edit mode, and if something changes -- refresh it
+		if (!mPlayMode && CustomUpdate())
+		{
+			mIsDirty = true;
+			Refresh();
+		}
+	}
 
 	/// <summary>
 	/// Force-refresh the widget. Only meant to be executed from the edit mode.
 	/// </summary>
 
-	public void Refresh ()
-	{
-		if (!mPlayMode)
-		{
-			Update();
-			if (mDC != null) mDC.LateUpdate();
-		}
-	}
+	public void Refresh () { if (!mPlayMode && mMat != null) panel.Refresh(mMat); }
 
 	/// <summary>
-	/// Check to see if anything has changed, and if it has, mark the screen as having changed.
+	/// Check to see if anything has changed.
 	/// </summary>
 
-	public bool ScreenUpdate ()
+	public bool CustomUpdate ()
 	{
 		if (mMat == null) return false;
 
 		// Call the virtual function
-		bool retVal = OnScreenUpdate();
+		bool retVal = OnUpdate();
 
-		// If there is no material to work with, there is no point in updating the pos/rot/scale
-		if (mMat != null)
+		Transform t = cachedTransform;
+
+		if (mIsDirty)
 		{
-			if (mIsDirty)
-			{
-				// If something has changed, simply update the cached values
-				mPos = mTrans.position;
-				mRot = mTrans.rotation;
-				mScale = mTrans.lossyScale;
-				retVal = true;
-			}
-			else
-			{
-				Vector3 pos = mTrans.position;
-				Quaternion rot = mTrans.rotation;
-				Vector3 scale = mTrans.lossyScale;
+			// If something has changed, simply update the cached values
+			mPos = t.position;
+			mRot = t.rotation;
+			mScale = t.lossyScale;
+			retVal = true;
+		}
+		else
+		{
+			Vector3 pos = t.position;
+			Quaternion rot = t.rotation;
+			Vector3 scale = t.lossyScale;
 
-				// Check to see if the position, rotation or scale has changed
-				if (mPos != pos || mRot != rot || mScale != scale)
-				{
-					mPos = pos;
-					mRot = rot;
-					mScale = scale;
-					retVal = true;
-				}
+			// Check to see if the position, rotation or scale has changed
+			if (mPos != pos || mRot != rot || mScale != scale)
+			{
+				mPos = pos;
+				mRot = rot;
+				mScale = scale;
+				retVal = true;
 			}
 		}
 		mIsDirty = false;
@@ -302,7 +316,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Virtual version of the Update function. Should return 'true' if the widget has changed visually.
 	/// </summary>
 
-	virtual public bool OnScreenUpdate () { return false; }
+	virtual public bool OnUpdate () { return false; }
 
 	/// <summary>
 	/// Virtual function called by the UIScreen that fills the buffers.

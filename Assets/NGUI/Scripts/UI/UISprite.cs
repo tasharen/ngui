@@ -148,7 +148,7 @@ public class UISprite : UIWidget
 	/// Update the UV coordinates.
 	/// </summary>
 
-	override public bool OnScreenUpdate ()
+	override public bool OnUpdate ()
 	{
 		if (!mPlayMode) UpdateUVs();
 		return false;

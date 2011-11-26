@@ -60,10 +60,10 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Get or create a UIScreen responsible for drawing the widgets using the specified material.
+	/// Find a UIPanel responsible for handling the specified transform.
 	/// </summary>
 
-	static public UIDrawCall GetScreen (Transform trans, Material mat)
+	static public UIPanel Find (Transform trans)
 	{
 		UIPanel panel = null;
 
@@ -79,20 +79,85 @@ public class UIPanel : MonoBehaviour
 		{
 			panel = trans.gameObject.AddComponent<UIPanel>();
 		}
-		else
+		return panel;
+	}
+
+	/// <summary>
+	/// Get or create a UIScreen responsible for drawing the widgets using the specified material.
+	/// </summary>
+
+	UIDrawCall GetDrawCall (Material mat, bool createIfMissing)
+	{
+		foreach (UIDrawCall dc in drawCalls) if (dc.material == mat) return dc;
+
+		UIDrawCall sc = null;
+
+		if (createIfMissing)
 		{
-			List<UIDrawCall> list = panel.drawCalls;
-			foreach (UIDrawCall dc in list) if (dc.material == mat) return dc;
+			GameObject go = new GameObject("_UIDrawCall [" + mat.name + "]");
+			go.hideFlags = mHidden ? HideFlags.HideAndDontSave : HideFlags.DontSave | HideFlags.NotEditable;
+			go.layer = gameObject.layer;
+
+			sc = go.AddComponent<UIDrawCall>();
+			sc.material = mat;
+
+			mDrawCalls.Add(sc);
 		}
-
-		GameObject go = new GameObject("_UIDrawCall [" + mat.name + "]");
-		go.hideFlags = panel.mHidden ? HideFlags.HideAndDontSave : HideFlags.DontSave | HideFlags.NotEditable;
-		go.layer = trans.gameObject.layer;
-
-		UIDrawCall sc = go.AddComponent<UIDrawCall>();
-		sc.material = mat;
-
-		panel.mDrawCalls.Add(sc);
 		return sc;
+	}
+
+	/// <summary>
+	/// Add the specified widget to the managed list.
+	/// </summary>
+	/// <param name="widget"></param>
+
+	public void AddWidget (UIWidget widget)
+	{
+		if (widget != null && widget.material != null)
+		{
+			UIDrawCall dc = GetDrawCall(widget.material, true);
+			dc.AddWidget(widget);
+		}
+	}
+
+	/// <summary>
+	/// Remove the specified widget from the managed list.
+	/// </summary>
+
+	public void RemoveWidget (UIWidget widget)
+	{
+		if (widget != null)
+		{
+			UIDrawCall dc = GetDrawCall(widget.material, false);
+			if (dc != null) dc.RemoveWidget(widget);
+		}
+	}
+
+	/// <summary>
+	/// Refresh a draw call responsible for the specified material.
+	/// </summary>
+
+	public void Refresh (Material mat)
+	{
+		foreach (UIDrawCall dc in drawCalls)
+		{
+			if (dc.material == mat)
+			{
+				dc.CustomUpdate();
+				return;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Update all draw calls.
+	/// </summary>
+
+	public void LateUpdate ()
+	{
+		foreach (UIDrawCall dc in drawCalls)
+		{
+			dc.CustomUpdate();
+		}
 	}
 }

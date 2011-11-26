@@ -49,13 +49,13 @@ public class UIDrawCall : MonoBehaviour
 
 	public void AddWidget (UIWidget widget)
 	{
-		//Debug.Log("Adding " + widget.name + " to " + name);
-
 		if (widget != null && !mWidgets.Contains(widget))
 		{
+			//Debug.Log("Adding " + widget.name + " to " + name);
+
 			mWidgets.Add(widget);
 			mRebuild = true;
-			if (!Application.isPlaying) LateUpdate();
+			if (!Application.isPlaying) CustomUpdate();
 		}
 	}
 
@@ -65,7 +65,15 @@ public class UIDrawCall : MonoBehaviour
 
 	public void RemoveWidget (UIWidget widget)
 	{
-		if (mWidgets != null && mWidgets.Remove(widget)) mRebuild = true;
+		if (mWidgets != null && mWidgets.Remove(widget))
+		{
+			mRebuild = true;
+
+			//Debug.Log("Removing " + widget.name + " from " + name);
+
+			// Uncommenting this causes widgets to disappear after exiting play mode
+			//if (!Application.isPlaying) CustomUpdate();
+		}
 	}
 
 	/// <summary>
@@ -91,7 +99,7 @@ public class UIDrawCall : MonoBehaviour
 	/// Rebuild the UI.
 	/// </summary>
 
-	public void LateUpdate ()
+	public void CustomUpdate ()
 	{
 		UpdateWidgets();
 
@@ -121,7 +129,7 @@ public class UIDrawCall : MonoBehaviour
 		{
 			UIWidget w = mWidgets[--i];
 			if (w == null) mWidgets.RemoveAt(i);
-			else mRebuild |= w.ScreenUpdate();
+			else mRebuild |= w.CustomUpdate();
 		}
 
 		// No need to keep this screen if we don't have any widgets left
