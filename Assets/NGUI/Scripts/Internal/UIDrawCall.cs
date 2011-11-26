@@ -13,7 +13,6 @@ public class UIDrawCall : MonoBehaviour
 	Mesh			mMesh;		// Generated mesh
 	MeshFilter		mFilter;	// Mesh filter for this screen
 	MeshRenderer	mRen;		// Mesh renderer for this screen
-	UIDrawCall		mMerged;	// Multiple draw calls can be merged into one
 
 	// Whether the screen should be rebuilt next update
 	bool mRebuild = false;
@@ -52,17 +51,11 @@ public class UIDrawCall : MonoBehaviour
 	{
 		//Debug.Log("Adding " + widget.name + " to " + name);
 
-		/*if (mMerged != null)
-		{
-			mMerged.AddWidget(widget);
-		}
-		else*/ if (widget != null && !mWidgets.Contains(widget))
+		if (widget != null && !mWidgets.Contains(widget))
 		{
 			mWidgets.Add(widget);
 			mRebuild = true;
 			if (!Application.isPlaying) LateUpdate();
-
-			// TODO: Adding a widget. Great. Now the merged needs to be notified
 		}
 	}
 
@@ -72,9 +65,7 @@ public class UIDrawCall : MonoBehaviour
 
 	public void RemoveWidget (UIWidget widget)
 	{
-		//Debug.Log("Removing " + widget.name + " from " + name);
 		if (mWidgets != null && mWidgets.Remove(widget)) mRebuild = true;
-		//else if (mMerged != null) mMerged.RemoveWidget(widget);
 	}
 
 	/// <summary>
@@ -138,33 +129,30 @@ public class UIDrawCall : MonoBehaviour
 		{
 			mRebuild = false;
 
-			if (mMerged == null)
+			if (Application.isPlaying)
 			{
-				if (Application.isPlaying)
-				{
-					Destroy(gameObject);
-					return;
-				}
-
-				if (mRen != null)
-				{
-					DestroyImmediate(mRen);
-					mRen = null;
-				}
-
-				if (mFilter != null)
-				{
-					DestroyImmediate(mFilter);
-					mFilter = null;
-				}
-
-				if (mMesh != null)
-				{
-					DestroyImmediate(mMesh);
-					mMesh = null;
-				}
-				if (this != null) DestroyImmediate(gameObject);
+				Destroy(gameObject);
+				return;
 			}
+
+			if (mRen != null)
+			{
+				DestroyImmediate(mRen);
+				mRen = null;
+			}
+
+			if (mFilter != null)
+			{
+				DestroyImmediate(mFilter);
+				mFilter = null;
+			}
+
+			if (mMesh != null)
+			{
+				DestroyImmediate(mMesh);
+				mMesh = null;
+			}
+			if (this != null) DestroyImmediate(gameObject);
 		}
 	}
 
