@@ -166,7 +166,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	void CreatePanel ()
 	{
-		if (mPanel == null && mMat != null && enabled && gameObject.active)
+		if (mPanel == null && mMat != null)
 		{
 			mIsDirty = true;
 			mPanel = UIPanel.Find(cachedTransform);
@@ -225,6 +225,17 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Re-register this widget, forcing it to find the panel again.
+	/// Unity is full of wonders when it comes to going from play mode to edit mode...
+	/// </summary>
+
+	void OnEnable ()
+	{
+		mPanel = null;
+		CreatePanel();
+	}
+
+	/// <summary>
 	/// Always ensure the widget has a panel responsible for it.
 	/// </summary>
 
@@ -252,6 +263,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	public bool CustomUpdate ()
 	{
+		//Debug.Log("WC");
 		if (mMat == null) return false;
 
 		// Call the virtual function

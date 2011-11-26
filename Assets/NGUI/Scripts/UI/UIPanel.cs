@@ -25,7 +25,17 @@ public class UIPanel : MonoBehaviour
 			for (int i = mDrawCalls.Count; i > 0; )
 			{
 				UIDrawCall dc = mDrawCalls[--i];
-				if (dc == null || dc.widgets == 0) mDrawCalls.RemoveAt(i);
+
+				if (dc == null)
+				{
+					mDrawCalls.RemoveAt(i);
+				}
+				else if (dc.widgets == 0)
+				{
+					if (Application.isPlaying) Destroy(dc);
+					else DestroyImmediate(dc);
+					mDrawCalls.RemoveAt(i);
+				}
 			}
 			return mDrawCalls;
 		}
@@ -106,6 +116,19 @@ public class UIPanel : MonoBehaviour
 		return sc;
 	}
 
+	/*void OnDisable ()
+	{
+		List<UIDrawCall> dcs = drawCalls;
+
+		for (int i = dcs.Count; i > 0; )
+		{
+			UIDrawCall dc = dcs[--i];
+			if (Application.isPlaying) Destroy(dc.gameObject);
+			else DestroyImmediate(dc.gameObject);
+		}
+		mDrawCalls.Clear();
+	}*/
+
 	/// <summary>
 	/// Add the specified widget to the managed list.
 	/// </summary>
@@ -142,21 +165,9 @@ public class UIPanel : MonoBehaviour
 		{
 			if (dc.material == mat)
 			{
-				dc.CustomUpdate();
+				dc.LateUpdate();
 				return;
 			}
-		}
-	}
-
-	/// <summary>
-	/// Update all draw calls.
-	/// </summary>
-
-	public void LateUpdate ()
-	{
-		foreach (UIDrawCall dc in drawCalls)
-		{
-			dc.CustomUpdate();
 		}
 	}
 }

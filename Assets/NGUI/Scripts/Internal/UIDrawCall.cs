@@ -51,11 +51,10 @@ public class UIDrawCall : MonoBehaviour
 	{
 		if (widget != null && !mWidgets.Contains(widget))
 		{
-			Debug.Log("Adding " + widget.name + " to " + name);
-
+			//Debug.Log("Adding " + widget.name + " to " + name);
 			mWidgets.Add(widget);
 			mRebuild = true;
-			if (!Application.isPlaying) CustomUpdate();
+			if (!Application.isPlaying) LateUpdate();
 		}
 	}
 
@@ -67,10 +66,9 @@ public class UIDrawCall : MonoBehaviour
 	{
 		if (mWidgets != null && mWidgets.Remove(widget))
 		{
-			Debug.Log("Removing " + widget.name + " from " + name);
-
+			//Debug.Log("Removing " + widget.name + " from " + name);
 			mRebuild = true;
-			CustomUpdate();
+			LateUpdate();
 		}
 	}
 
@@ -78,26 +76,13 @@ public class UIDrawCall : MonoBehaviour
 	/// Cleanup.
 	/// </summary>
 
-	void OnDestroy ()
-	{
-		if (Application.isPlaying)
-		{
-			if (mRen	!= null) Destroy(mRen);
-			if (mFilter != null) Destroy(mFilter);
-			if (mMesh	!= null) Destroy(mMesh);
-		}
-		else if (mMesh != null)
-		{
-			DestroyImmediate(mMesh);
-			mMesh = null;
-		}
-	}
+	void OnDestroy () { if (mMesh != null) DestroyImmediate(mMesh); }
 
 	/// <summary>
 	/// Rebuild the UI.
 	/// </summary>
 
-	public void CustomUpdate ()
+	public void LateUpdate ()
 	{
 		// Update all widgets
 		for (int i = mWidgets.Count; i > 0; )
@@ -107,40 +92,15 @@ public class UIDrawCall : MonoBehaviour
 			else mRebuild |= w.CustomUpdate();
 		}
 
-		// If we have no widgets, this class is no longer needed
 		if (mWidgets.Count == 0)
 		{
-			if (Application.isPlaying)
-			{
-				Destroy(gameObject);
-			}
-			else
-			{
-				if (mRen != null)
-				{
-					DestroyImmediate(mRen);
-					mRen = null;
-				}
-
-				if (mFilter != null)
-				{
-					DestroyImmediate(mFilter);
-					mFilter = null;
-				}
-
-				if (mMesh != null)
-				{
-					DestroyImmediate(mMesh);
-					mMesh = null;
-				}
-				if (this != null) DestroyImmediate(gameObject);
-			}
+			DestroyImmediate(gameObject);
 		}
 		else if (mRebuild)
 		{
 			RefillGeometry();
 			RebuildMeshes();
-			
+
 			// Cleanup
 			mVerts.Clear();
 			mUvs.Clear();
