@@ -23,56 +23,51 @@ public class UIPanelInspector : Editor
 		EditorGUILayout.LabelField("Widgets", widgets.Count.ToString());
 		EditorGUILayout.LabelField("Draw Calls", drawcalls.Count.ToString());
 
-		Dictionary<Material, bool> mats = new Dictionary<Material, bool>();
-		foreach (Material mat in panel.mergeable) mats[mat] = true;
+		// We want to figure out which materials get merged
+		Dictionary<Material, int> mats = new Dictionary<Material, int>();
+		foreach (Material mat in panel.mergeable) mats[mat] = 1;
 
 		foreach (UIWidget w in widgets)
 		{
 			if (!mats.ContainsKey(w.material))
 			{
-				mats[w.material] = false;
+				// The material is absent -- make note of it
+				mats[w.material] = 0;
+			}
+			else if (mats[w.material] == 1)
+			{
+				// The material is present and is being merged
+				mats[w.material] = 2;
 			}
 		}
 
+		// List all materials that are in use
 		if (mats.Count > 0)
 		{
 			GUITools.DrawSeparator();
 
-			foreach (KeyValuePair<Material, bool> val in mats)
+			foreach (KeyValuePair<Material, int> val in mats)
 			{
-				if (val.Value)
+				if (val.Value == 0)
 				{
-					// Start with an orange color
-					Color c = new Color(1f, 0.5f, 0f);
+					// Materials that aren't being merged should show up as red.
+					GUI.backgroundColor = Color.red;
 
-					// Check the draw calls -- is this material being used? If so, change the color to green.
-					if (Event.current.type == EventType.Repaint)
+					if (GUILayout.Button("\"" + val.Key.name + "\" is separate"))
 					{
-						foreach (UIDrawCall dc in panel.drawCalls)
-						{
-							if (dc.material == val.Key)
-							{
-								c = Color.green;
-								break;
-							}
-						}
-					}
-
-					GUI.backgroundColor = c;
-
-					if (GUILayout.Button(val.Key.name + " is merged"))
-					{
-						panel.mergeable.Remove(val.Key);
+						panel.mergeable.Add(val.Key);
 						panel.Merge();
 					}
 				}
 				else
 				{
-					GUI.backgroundColor = Color.red;
+					// Materials that get merged but aren't being used should be orange.
+					// Materials that get merged and are being used should be green.
+					GUI.backgroundColor = (val.Value == 1) ? new Color(1f, 0.5f, 0f) : Color.green;
 
-					if (GUILayout.Button(val.Key.name + " is separate"))
+					if (GUILayout.Button("\"" + val.Key.name + "\" is merged"))
 					{
-						panel.mergeable.Add(val.Key);
+						panel.mergeable.Remove(val.Key);
 						panel.Merge();
 					}
 				}
