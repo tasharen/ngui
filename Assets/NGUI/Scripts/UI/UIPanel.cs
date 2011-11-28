@@ -9,8 +9,10 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Panel")]
 public class UIPanel : MonoBehaviour
 {
-	//public List<Material> mergeable = new List<Material>();
+	// All materials in the mergeable list will be combined into one
+	public List<Material> mergeable = new List<Material>();
 
+	// Whether generated geometry is shown or hidden
 	[SerializeField] bool mHidden = true;
 
 	// List of all widgets managed by this panel
@@ -28,10 +30,10 @@ public class UIPanel : MonoBehaviour
 	List<Color> mCols = new List<Color>();
 
 	/// <summary>
-	/// The number of widgets managed by this panel.
+	/// Widgets managed by this panel.
 	/// </summary>
 
-	public int widgetCount { get { return mWidgets.Count; } }
+	public List<UIWidget> widgets { get { return mWidgets; } }
 
 	/// <summary>
 	/// Retrieve the list of all active draw calls, removing inactive ones in the process.
@@ -236,5 +238,14 @@ public class UIPanel : MonoBehaviour
 		mVerts.Clear();
 		mUvs.Clear();
 		mCols.Clear();
+	}
+
+	/// <summary>
+	/// Merge all marked materials into one.
+	/// </summary>
+
+	public void Merge ()
+	{
+		Debug.Log("TODO");
 	}
 }

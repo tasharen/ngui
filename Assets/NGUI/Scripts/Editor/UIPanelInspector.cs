@@ -17,24 +17,74 @@ public class UIPanelInspector : Editor
 
 		GUITools.DrawSeparator();
 
+		List<UIWidget> widgets = panel.widgets;
+
 		panel.hidden = EditorGUILayout.Toggle("Hidden", panel.hidden);
-		EditorGUILayout.LabelField("Widgets", panel.widgetCount.ToString());
+		EditorGUILayout.LabelField("Widgets", widgets.Count.ToString());
 		EditorGUILayout.LabelField("Draw Calls", drawcalls.Count.ToString());
+
+		Dictionary<Material, bool> mats = new Dictionary<Material, bool>();
+		foreach (Material mat in panel.mergeable) mats[mat] = true;
+
+		foreach (UIWidget w in widgets)
+		{
+			if (!mats.ContainsKey(w.material))
+			{
+				mats[w.material] = false;
+			}
+		}
+
+		if (mats.Count > 0)
+		{
+			GUITools.DrawSeparator();
+
+			foreach (KeyValuePair<Material, bool> val in mats)
+			{
+				if (val.Value)
+				{
+					// Start with an orange color
+					Color c = new Color(1f, 0.5f, 0f);
+
+					// Check the draw calls -- is this material being used? If so, change the color to green.
+					if (Event.current.type == EventType.Repaint)
+					{
+						foreach (UIDrawCall dc in panel.drawCalls)
+						{
+							if (dc.material == val.Key)
+							{
+								c = Color.green;
+								break;
+							}
+						}
+					}
+
+					GUI.backgroundColor = c;
+
+					if (GUILayout.Button(val.Key.name + " is merged"))
+					{
+						panel.mergeable.Remove(val.Key);
+						panel.Merge();
+					}
+				}
+				else
+				{
+					GUI.backgroundColor = Color.red;
+
+					if (GUILayout.Button(val.Key.name + " is separate"))
+					{
+						panel.mergeable.Add(val.Key);
+						panel.Merge();
+					}
+				}
+			}
+			GUI.backgroundColor = Color.white;
+		}
 
 		foreach (UIDrawCall dc in drawcalls)
 		{
 			GUITools.DrawSeparator();
 			EditorGUILayout.ObjectField("Material", dc.material, typeof(Material), false);
 			EditorGUILayout.LabelField("Triangles", dc.triangles.ToString());
-
-			// TODO:
-			// 1. UIPanel needs to have a List<> of mergeable materials.
-			// 2. Add toggles here for each draw call.
-			// 3. When toggled, add/remove the DC's material from the UIPanel's list of mergeable materials and panel.Remerge().
-
-			// NOTE:
-			// Wouldn't it better to instead select a bunch of DCs, click on a Merge button, and have it save out a permanent PNG
-			// that's then used instead? But how to create a permanent material? Hmm...
 		}
 	}
 }
