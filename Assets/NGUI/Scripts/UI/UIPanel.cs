@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 
 /// <summary>
-/// UI Panel acts as a separator in the UI drawing process. Every widget that's
-/// a child of the game object that the UI Panel resides on will be drawn together.
+/// UI Panel is responsible for collecting, sorting and updating widgets in addition to generating widgets' geometry.
 /// </summary>
 
 [ExecuteInEditMode]
@@ -32,7 +31,7 @@ public class UIPanel : MonoBehaviour
 	/// The number of widgets managed by this panel.
 	/// </summary>
 
-	public int widgets { get { return mWidgets.Count; } }
+	public int widgetCount { get { return mWidgets.Count; } }
 
 	/// <summary>
 	/// Retrieve the list of all active draw calls, removing inactive ones in the process.
