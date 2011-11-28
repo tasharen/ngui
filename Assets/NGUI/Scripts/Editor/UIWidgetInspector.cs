@@ -87,7 +87,7 @@ public class UIWidgetInspector : Editor
 			mWidget.centered = center;
 			mWidget.depth = depth;
 			OnCustomSave();
-			mWidget.Refresh();
+			mWidget.MarkAsChanged();
 		}
 	}
 

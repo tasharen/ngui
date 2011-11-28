@@ -44,8 +44,7 @@ public class UILabel : UIWidget
 			if (value != null && !string.Equals(mText, value))
 			{
 				mText = value;
-				mIsDirty = true;
-				Refresh();
+				mChanged = true;
 			}
 		}
 	}
@@ -65,8 +64,7 @@ public class UILabel : UIWidget
 			if (mEncoding != value)
 			{
 				mEncoding = value;
-				mIsDirty = true;
-				Refresh();
+				mChanged = true;
 			}
 		}
 	}

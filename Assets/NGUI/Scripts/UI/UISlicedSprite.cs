@@ -50,7 +50,6 @@ public class UISlicedSprite : UISprite
 
 			if (tex != null)
 			{
-				mIsDirty = true;
 				mInner = mSprite.inner;
 				mOuter = mSprite.outer;
 
@@ -62,6 +61,7 @@ public class UISlicedSprite : UISprite
 					mInnerUV = UIAtlas.ConvertToTexCoords(mInnerUV, tex.width, tex.height);
 					mOuterUV = UIAtlas.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
 				}
+				mChanged = true;
 			}
 		}
 	}

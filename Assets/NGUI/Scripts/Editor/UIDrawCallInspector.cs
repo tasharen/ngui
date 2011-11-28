@@ -29,7 +29,7 @@ public class UIDrawCallInspector : Editor
 					return;
 				}
 			}
-			if (Event.current.type == EventType.Repaint) Debug.LogWarning("Orphaned UIDrawCall detected");
+			if (Event.current.type == EventType.Repaint) Debug.LogWarning("Orphaned UIDrawCall detected!\nUse [Selection -> Force Delete] to get rid of it.");
 		}
 	}
 }

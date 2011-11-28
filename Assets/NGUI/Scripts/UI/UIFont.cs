@@ -84,7 +84,7 @@ public class UIFont : MonoBehaviour
 			{
 				if (lbl.font == this)
 				{
-					lbl.Refresh();
+					lbl.MarkAsChanged();
 				}
 			}
 		}

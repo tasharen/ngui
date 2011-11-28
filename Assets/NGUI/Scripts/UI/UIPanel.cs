@@ -6,13 +6,33 @@ using System.Collections.Generic;
 /// a child of the game object that the UI Panel resides on will be drawn together.
 /// </summary>
 
+[ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/Panel")]
 public class UIPanel : MonoBehaviour
 {
+	//public List<Material> mergeable = new List<Material>();
+
 	[SerializeField] bool mHidden = true;
+
+	// List of all widgets managed by this panel
+	List<UIWidget> mWidgets = new List<UIWidget>();
+
+	// Widgets using these materials will be rebuilt next frame
+	HashSet<Material> mChanged = new HashSet<Material>();
 
 	// List of UI Screens created on hidden and invisible game objects
 	List<UIDrawCall> mDrawCalls = new List<UIDrawCall>();
+
+	// Cached in order to reduce memory allocations
+	List<Vector3> mVerts = new List<Vector3>();
+	List<Vector2> mUvs = new List<Vector2>();
+	List<Color> mCols = new List<Color>();
+
+	/// <summary>
+	/// The number of widgets managed by this panel.
+	/// </summary>
+
+	public int widgets { get { return mWidgets.Count; } }
 
 	/// <summary>
 	/// Retrieve the list of all active draw calls, removing inactive ones in the process.
@@ -25,17 +45,7 @@ public class UIPanel : MonoBehaviour
 			for (int i = mDrawCalls.Count; i > 0; )
 			{
 				UIDrawCall dc = mDrawCalls[--i];
-
-				if (dc == null)
-				{
-					mDrawCalls.RemoveAt(i);
-				}
-				else if (dc.widgets == 0)
-				{
-					if (Application.isPlaying) Destroy(dc);
-					else DestroyImmediate(dc);
-					mDrawCalls.RemoveAt(i);
-				}
+				if (dc == null) mDrawCalls.RemoveAt(i);
 			}
 			return mDrawCalls;
 		}
@@ -93,6 +103,25 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Add the specified widget to the managed list.
+	/// </summary>
+
+	public void AddWidget (UIWidget w)
+	{
+		if (w == null || mWidgets.Contains(w)) return;
+		Material mat = w.material;
+		if (mat == null) return;
+		mWidgets.Add(w);
+		mChanged.Add(w.material);
+	}
+
+	/// <summary>
+	/// Remove the specified widget from the managed list.
+	/// </summary>
+
+	public void RemoveWidget (UIWidget w) { if (w != null && mWidgets.Remove(w)) mChanged.Add(w.material); }
+
+	/// <summary>
 	/// Get or create a UIScreen responsible for drawing the widgets using the specified material.
 	/// </summary>
 
@@ -116,58 +145,97 @@ public class UIPanel : MonoBehaviour
 		return sc;
 	}
 
-	/*void OnDisable ()
-	{
-		List<UIDrawCall> dcs = drawCalls;
+	/// <summary>
+	/// Mark all widgets as having been changed so the draw calls get re-created.
+	/// </summary>
 
-		for (int i = dcs.Count; i > 0; )
+	void OnEnable () { foreach (UIWidget w in mWidgets) mChanged.Add(w.material); }
+
+	/// <summary>
+	/// Destroy all draw calls we've created when this script gets disabled.
+	/// </summary>
+
+	void OnDisable ()
+	{
+		for (int i = mDrawCalls.Count; i > 0; )
 		{
-			UIDrawCall dc = dcs[--i];
-			if (Application.isPlaying) Destroy(dc.gameObject);
-			else DestroyImmediate(dc.gameObject);
+			UIDrawCall dc = mDrawCalls[--i];
+			if (dc != null) DestroyImmediate(dc.gameObject);
 		}
 		mDrawCalls.Clear();
-	}*/
+		mChanged.Clear();
+	}
 
 	/// <summary>
-	/// Add the specified widget to the managed list.
+	/// Update all widgets and rebuild the draw calls if necessary.
 	/// </summary>
 
-	public void AddWidget (UIWidget widget)
+	void LateUpdate ()
 	{
-		if (widget != null && widget.material != null)
+		// Update all widgets
+		for (int i = mWidgets.Count; i > 0; )
 		{
-			UIDrawCall dc = GetDrawCall(widget.material, true);
-			dc.AddWidget(widget);
+			UIWidget w = mWidgets[--i];
+			if (w == null) mWidgets.RemoveAt(i);
+			else if (w.PanelUpdate()) mChanged.Add(w.material);
+		}
+
+		// If something has changed we have more work to be done
+		if (mChanged.Count > 0)
+		{
+			// Sort all widgets based on their depth
+			mWidgets.Sort(UIWidget.CompareFunc);
+
+			// Run through all the materials that have been marked as changed and rebuild them
+			foreach (Material mat in mChanged) Rebuild(mat);
+			mChanged.Clear();
 		}
 	}
 
 	/// <summary>
-	/// Remove the specified widget from the managed list.
+	/// Set the draw call's geometry responsible for the specified material.
 	/// </summary>
 
-	public void RemoveWidget (UIWidget widget)
+	void Rebuild (Material mat)
 	{
-		if (widget != null)
+		foreach (UIWidget w in mWidgets)
 		{
-			UIDrawCall dc = GetDrawCall(widget.material, false);
-			if (dc != null) dc.RemoveWidget(widget);
-		}
-	}
+			if (w.material != mat) continue;
+			int offset = mVerts.Count;
 
-	/// <summary>
-	/// Refresh a draw call responsible for the specified material.
-	/// </summary>
+			// Fill the geometry
+			w.OnFill(mVerts, mUvs, mCols);
 
-	public void Refresh (Material mat)
-	{
-		foreach (UIDrawCall dc in drawCalls)
-		{
-			if (dc.material == mat)
+			// Transform all vertices into world space
+			Transform t = w.cachedTransform;
+
+			for (int i = offset, imax = mVerts.Count; i < imax; ++i)
 			{
-				dc.LateUpdate();
-				return;
+				mVerts[i] = t.TransformPoint(mVerts[i]);
 			}
 		}
+
+		if (mVerts.Count > 0)
+		{
+			// Rebuild the draw call's mesh
+			UIDrawCall dc = GetDrawCall(mat, true);
+			dc.Set(mVerts, mUvs, mCols);
+		}
+		else
+		{
+			// There is nothing to draw for this material -- eliminate the draw call
+			UIDrawCall dc = GetDrawCall(mat, false);
+
+			if (dc != null)
+			{
+				mDrawCalls.Remove(dc);
+				DestroyImmediate(dc.gameObject);
+			}
+		}
+
+		// Cleanup
+		mVerts.Clear();
+		mUvs.Clear();
+		mCols.Clear();
 	}
 }

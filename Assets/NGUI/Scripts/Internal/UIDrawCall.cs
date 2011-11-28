@@ -14,28 +14,11 @@ public class UIDrawCall : MonoBehaviour
 	MeshFilter		mFilter;	// Mesh filter for this screen
 	MeshRenderer	mRen;		// Mesh renderer for this screen
 
-	// Whether the screen should be rebuilt next update
-	bool mRebuild = false;
-
-	// List of widgets sharing this screen's material
-	List<UIWidget> mWidgets = new List<UIWidget>();
-
-	// Cached in order to reduce memory allocations
-	List<Vector3> mVerts = new List<Vector3>();
-	List<Vector2> mUvs = new List<Vector2>();
-	List<Color> mCols = new List<Color>();
-
 	/// <summary>
 	/// Material used by this screen.
 	/// </summary>
 
 	public Material material { get { return mMat; } set { mMat = value; } }
-
-	/// <summary>
-	/// Number of widgets managed by this draw call.
-	/// </summary>
-
-	public int widgets { get { return mWidgets.Count; } }
 
 	/// <summary>
 	/// The number of triangles in this draw call.
@@ -44,106 +27,21 @@ public class UIDrawCall : MonoBehaviour
 	public int triangles { get { return mMesh.vertexCount >> 1; } }
 
 	/// <summary>
-	/// Add the specified widget to the managed list.
-	/// </summary>
-
-	public void AddWidget (UIWidget widget)
-	{
-		if (widget != null && !mWidgets.Contains(widget))
-		{
-			//Debug.Log("Adding " + widget.name + " to " + name);
-			mWidgets.Add(widget);
-			mRebuild = true;
-			if (!Application.isPlaying) LateUpdate();
-		}
-	}
-
-	/// <summary>
-	/// Remove the specified widget from the managed list.
-	/// </summary>
-
-	public void RemoveWidget (UIWidget widget)
-	{
-		if (mWidgets != null && mWidgets.Remove(widget))
-		{
-			//Debug.Log("Removing " + widget.name + " from " + name);
-			mRebuild = true;
-			LateUpdate();
-		}
-	}
-
-	/// <summary>
 	/// Cleanup.
 	/// </summary>
 
-	void OnDestroy () { if (mMesh != null) DestroyImmediate(mMesh); }
+	void OnDestroy () { if (mMesh != null) { DestroyImmediate(mMesh); } }
 
 	/// <summary>
-	/// Rebuild the UI.
+	/// Set the draw call's geometry.
 	/// </summary>
 
-	public void LateUpdate ()
+	public void Set (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
-		// Update all widgets
-		for (int i = mWidgets.Count; i > 0; )
-		{
-			UIWidget w = mWidgets[--i];
-			if (w == null) mWidgets.RemoveAt(i);
-			else mRebuild |= w.CustomUpdate();
-		}
-
-		if (mWidgets.Count == 0)
-		{
-			DestroyImmediate(gameObject);
-		}
-		else if (mRebuild)
-		{
-			RefillGeometry();
-			RebuildMeshes();
-
-			// Cleanup
-			mVerts.Clear();
-			mUvs.Clear();
-			mCols.Clear();
-			mRebuild = false;
-		}
-	}
-
-	/// <summary>
-	/// Refill the arrays.
-	/// </summary>
-
-	void RefillGeometry ()
-	{
-		// Sort all widgets back-to-front
-		mWidgets.Sort(UIWidget.CompareFunc);
-
-		// Fill the vertices and UVs
-		foreach (UIWidget w in mWidgets)
-		{
-			int offset = mVerts.Count;
-			w.OnFill(mVerts, mUvs, mCols);
-
-			// Transform all vertices into world space
-			Transform t = w.cachedTransform;
-
-			for (int i = offset, imax = mVerts.Count; i < imax; ++i)
-			{
-				mVerts[i] = t.TransformPoint(mVerts[i]);
-			}
-		}
-	}
-
-	/// <summary>
-	/// Rebuild the meshes.
-	/// </summary>
-
-	void RebuildMeshes ()
-	{
-		int count = mVerts.Count;
+		int count = verts.Count;
 
 		// Safety check to ensure we get valid values
-		if (count > 0 && (count == mUvs.Count && count == mCols.Count) && (count % 4) == 0)
+		if (count > 0 && (count == uvs.Count && count == cols.Count) && (count % 4) == 0)
 		{
 			int index = 0;
 
@@ -176,7 +74,7 @@ public class UIDrawCall : MonoBehaviour
 			if (mMesh == null)
 			{
 				mMesh = new Mesh();
-				mMesh.name = "UIScreen for " + mMat.name;
+				mMesh.name = "UIDrawCall for " + mMat.name;
 			}
 			else
 			{
@@ -184,15 +82,16 @@ public class UIDrawCall : MonoBehaviour
 			}
 
 			// Set the mesh values
-			mMesh.vertices = mVerts.ToArray();
-			mMesh.uv = mUvs.ToArray();
-			mMesh.colors = mCols.ToArray();
+			mMesh.vertices = verts.ToArray();
+			mMesh.uv = uvs.ToArray();
+			mMesh.colors = cols.ToArray();
 			mMesh.triangles = indices;
 			mMesh.RecalculateBounds();
 			mFilter.mesh = mMesh;
 		}
 		else
 		{
+			if (mMesh != null) mMesh.Clear();
 			Debug.LogError("UIWidgets must fill the buffer with 4 vertices per quad. Found " + count);
 		}
 	}

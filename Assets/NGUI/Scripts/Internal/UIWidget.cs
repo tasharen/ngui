@@ -17,11 +17,11 @@ public abstract class UIWidget : MonoBehaviour
 	Texture2D mTex;
 	UIPanel mPanel;
 
+	protected bool mChanged = true;
 	protected bool mPlayMode = true;
 	protected Vector3 mPos;
 	protected Quaternion mRot;
 	protected Vector3 mScale;
-	protected bool mIsDirty = false;
 
 	/// <summary>
 	/// Color used by the widget.
@@ -37,8 +37,8 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			if (mColor != value)
 			{
-				mIsDirty = true;
 				mColor = value;
+				mChanged = true;
 			}
 		}
 	}
@@ -57,8 +57,8 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			if (mCentered != value)
 			{
-				mIsDirty = true;
 				mCentered = value;
+				mChanged = true;
 			}
 		}
 	}
@@ -77,8 +77,8 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			if (mDepth != value)
 			{
-				mIsDirty = true;
 				mDepth = value;
+				mChanged = true;
 			}
 		}
 	}
@@ -103,8 +103,6 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			if (mMat != value)
 			{
-				mIsDirty = true;
-
 				if (mPanel != null)
 				{
 					mPanel.RemoveWidget(this);
@@ -161,6 +159,12 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Tell the panel responsible for the widget that something has changed and the buffers need to be rebuilt.
+	/// </summary>
+
+	public void MarkAsChanged () { mChanged = true; }
+
+	/// <summary>
 	/// Ensure we have a panel referencing this widget.
 	/// </summary>
 
@@ -168,9 +172,9 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		if (mPanel == null && mMat != null)
 		{
-			mIsDirty = true;
 			mPanel = UIPanel.Find(cachedTransform);
 			mPanel.AddWidget(this);
+			mChanged = true;
 		}
 	}
 
@@ -202,14 +206,17 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		if (mDepth == 0) mDepth = CalculateDepth();
 		mPlayMode = Application.isPlaying;
-		OnAwake();
 	}
 
 	/// <summary>
-	/// Unregister this widget.
+	/// Mark the widget as having been changed so it gets rebuilt.
 	/// </summary>
 
-	void OnDestroy () { OnDisable(); }
+	void OnEnable ()
+	{
+		CreatePanel();
+		mChanged = true;
+	}
 
 	/// <summary>
 	/// Unregister this widget.
@@ -225,59 +232,36 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Re-register this widget, forcing it to find the panel again.
-	/// Unity is full of wonders when it comes to going from play mode to edit mode...
+	/// Unregister this widget.
 	/// </summary>
 
-	void OnEnable ()
+	void OnDestroy ()
 	{
-		mPanel = null;
-		CreatePanel();
-	}
-
-	/// <summary>
-	/// Always ensure the widget has a panel responsible for it.
-	/// </summary>
-
-	void Update ()
-	{
-		CreatePanel();
-
-		// Update the widget in edit mode, and if something changes -- refresh it
-		if (!mPlayMode && CustomUpdate())
+		if (mPanel != null)
 		{
-			mIsDirty = true;
-			Refresh();
+			mPanel.RemoveWidget(this);
+			mPanel = null;
 		}
 	}
 
 	/// <summary>
-	/// Force-refresh the widget. Only meant to be executed from the edit mode.
+	/// Update the widget.
 	/// </summary>
 
-	public void Refresh () { if (!mPlayMode && mMat != null && panel != null) mPanel.Refresh(mMat); }
-
-	/// <summary>
-	/// Check to see if anything has changed.
-	/// </summary>
-
-	public bool CustomUpdate ()
+	public bool PanelUpdate ()
 	{
-		//Debug.Log("WC");
-		if (mMat == null) return false;
-
-		// Call the virtual function
-		bool retVal = OnUpdate();
+		if (material == null) return false;
 
 		Transform t = cachedTransform;
 
-		if (mIsDirty)
+		bool retVal = OnUpdate() | mChanged;
+
+		if (retVal)
 		{
 			// If something has changed, simply update the cached values
 			mPos = t.position;
 			mRot = t.rotation;
 			mScale = t.lossyScale;
-			retVal = true;
 		}
 		else
 		{
@@ -294,7 +278,7 @@ public abstract class UIWidget : MonoBehaviour
 				retVal = true;
 			}
 		}
-		mIsDirty = false;
+		mChanged = false;
 		return retVal;
 	}
 
@@ -316,12 +300,6 @@ public abstract class UIWidget : MonoBehaviour
 		scale.z = 1f;
 		cachedTransform.localScale = scale;
 	}
-
-	/// <summary>
-	/// Virtual Awake functionality.
-	/// </summary>
-
-	virtual protected void OnAwake () { }
 
 	/// <summary>
 	/// Virtual version of the Update function. Should return 'true' if the widget has changed visually.

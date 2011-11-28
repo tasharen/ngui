@@ -18,23 +18,23 @@ public class UIPanelInspector : Editor
 		GUITools.DrawSeparator();
 
 		panel.hidden = EditorGUILayout.Toggle("Hidden", panel.hidden);
+		EditorGUILayout.LabelField("Widgets", panel.widgets.ToString());
 		EditorGUILayout.LabelField("Draw Calls", drawcalls.Count.ToString());
 
 		foreach (UIDrawCall dc in drawcalls)
 		{
 			GUITools.DrawSeparator();
 			EditorGUILayout.ObjectField("Material", dc.material, typeof(Material), false);
-			EditorGUILayout.LabelField("Widgets", dc.widgets.ToString());
 			EditorGUILayout.LabelField("Triangles", dc.triangles.ToString());
-			//bool merge = EditorGUILayout.Toggle("Merge Atlas", dc.merge);
 
-			//if (merge != dc.merge)
-			{
-				//dc.merge = merge;
-				//Debug.Log("TODO: Merge the atlas");
+			// TODO:
+			// 1. UIPanel needs to have a List<> of mergeable materials.
+			// 2. Add toggles here for each draw call.
+			// 3. When toggled, add/remove the DC's material from the UIPanel's list of mergeable materials and panel.Remerge().
 
-				// TODO: 
-			}
+			// NOTE:
+			// Wouldn't it better to instead select a bunch of DCs, click on a Merge button, and have it save out a permanent PNG
+			// that's then used instead? But how to create a permanent material? Hmm...
 		}
 	}
 }

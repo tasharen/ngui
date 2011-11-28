@@ -48,7 +48,7 @@ public class UISprite : UIWidget
 					string sprite = mSpriteName;
 					mSpriteName = "";
 					spriteName = sprite;
-					mIsDirty = true;
+					mChanged = true;
 				}
 			}
 		}
@@ -72,18 +72,18 @@ public class UISprite : UIWidget
 				if (string.IsNullOrEmpty(mSpriteName)) return;
 
 				// Clear the sprite name and the sprite reference
-				mIsDirty = true;
 				mSpriteName = "";
 				mSprite = null;
+				mChanged = true;
 			}
 			else if (string.IsNullOrEmpty(mSpriteName) || !string.Equals(mSpriteName, value,
 				System.StringComparison.OrdinalIgnoreCase))
 			{
 				// If the sprite name changes, the sprite reference should also be updated
-				mIsDirty = true;
 				mSpriteName = value;
 				mSprite = (mAtlas != null) ? mAtlas.GetSprite(mSpriteName) : null;
 				UpdateUVs();
+				mChanged = true;
 			}
 		}
 	}
@@ -100,7 +100,6 @@ public class UISprite : UIWidget
 
 			if (tex != null)
 			{
-				mIsDirty = true;
 				mOuter = mSprite.outer;
 				mOuterUV = mOuter;
 
@@ -108,6 +107,7 @@ public class UISprite : UIWidget
 				{
 					mOuterUV = UIAtlas.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
 				}
+				mChanged = true;
 			}
 		}
 	}
@@ -133,15 +133,17 @@ public class UISprite : UIWidget
 	}
 
 	/// <summary>
-	/// Virtual Awake functionality.
+	/// Set the atlas and the sprite.
 	/// </summary>
 
-	override protected void OnAwake ()
+	void Start ()
 	{
-		// Re-assign the atlas, which will set the material and texture references.
-		UIAtlas atl = mAtlas;
-		mAtlas = null;
-		atlas = atl;
+		if (mAtlas != null)
+		{
+			material = mAtlas.material;
+			mSprite = string.IsNullOrEmpty(mSpriteName) ? null : mAtlas.GetSprite(mSpriteName);
+			UpdateUVs();
+		}
 	}
 
 	/// <summary>
@@ -165,17 +167,17 @@ public class UISprite : UIWidget
 
 		if (centered)
 		{
-			verts.Add(new Vector3(0.5f, 0.5f, 0f));
-			verts.Add(new Vector3(0.5f, -0.5f, 0f));
+			verts.Add(new Vector3( 0.5f,  0.5f, 0f));
+			verts.Add(new Vector3( 0.5f, -0.5f, 0f));
 			verts.Add(new Vector3(-0.5f, -0.5f, 0f));
-			verts.Add(new Vector3(-0.5f, 0.5f, 0f));
+			verts.Add(new Vector3(-0.5f,  0.5f, 0f));
 		}
 		else
 		{
-			verts.Add(new Vector3(1f, 0f, 0f));
+			verts.Add(new Vector3(1f,  0f, 0f));
 			verts.Add(new Vector3(1f, -1f, 0f));
 			verts.Add(new Vector3(0f, -1f, 0f));
-			verts.Add(new Vector3(0f, 0f, 0f));
+			verts.Add(new Vector3(0f,  0f, 0f));
 		}
 
 		uvs.Add(uv1);
