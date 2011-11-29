@@ -122,7 +122,7 @@ public class UISprite : UIWidget
 
 		if (tex != null)
 		{
-			Rect rect = UIAtlas.ConvertToPixels(outerUV, tex.width, tex.height);
+			Rect rect = UIAtlas.ConvertToPixels(outerUV, tex.width, tex.height, true);
 			Vector3 scale = cachedTransform.localScale;
 			scale.x = rect.width;
 			scale.y = rect.height;

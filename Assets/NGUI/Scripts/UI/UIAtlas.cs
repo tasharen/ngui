@@ -76,8 +76,8 @@ public class UIAtlas : MonoBehaviour
 					}
 					else
 					{
-						s.outer = ConvertToPixels(s.outer, tex.width, tex.height);
-						s.inner = ConvertToPixels(s.inner, tex.width, tex.height);
+						s.outer = ConvertToPixels(s.outer, tex.width, tex.height, true);
+						s.inner = ConvertToPixels(s.inner, tex.width, tex.height, true);
 					}
 				}
 			}
@@ -106,15 +106,24 @@ public class UIAtlas : MonoBehaviour
 	/// Helper function.
 	/// </summary>
 
-	public static Rect ConvertToPixels (Rect rect, int width, int height)
+	public static Rect ConvertToPixels (Rect rect, int width, int height, bool round)
 	{
 		Rect final = rect;
 
-		final.xMin = Mathf.RoundToInt(rect.xMin * width);
-		final.xMax = Mathf.RoundToInt(rect.xMax * width);
-		final.yMin = Mathf.RoundToInt((1f - rect.yMax) * height);
-		final.yMax = Mathf.RoundToInt((1f - rect.yMin) * height);
-
+		if (round)
+		{
+			final.xMin = Mathf.RoundToInt(rect.xMin * width);
+			final.xMax = Mathf.RoundToInt(rect.xMax * width);
+			final.yMin = Mathf.RoundToInt((1f - rect.yMax) * height);
+			final.yMax = Mathf.RoundToInt((1f - rect.yMin) * height);
+		}
+		else
+		{
+			final.xMin = rect.xMin * width;
+			final.xMax = rect.xMax * width;
+			final.yMin = (1f - rect.yMax) * height;
+			final.yMax = (1f - rect.yMin) * height;
+		}
 		return final;
 	}
 

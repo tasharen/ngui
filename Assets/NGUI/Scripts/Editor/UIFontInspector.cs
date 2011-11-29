@@ -36,19 +36,24 @@ public class UIFontInspector : Editor
 			{
 				Color green = new Color(0.4f, 1f, 0f, 1f);
 				GUI.backgroundColor = green;
-				Rect uvRect = EditorGUILayout.RectField("UV Rect", font.uvRect);
-				GUI.backgroundColor = Color.white;
-
-				if (font.uvRect != uvRect)
-				{
-					Undo.RegisterUndo(font, "Font UV Rect");
-					font.uvRect = uvRect;
-				}
 
 				Texture2D tex = mat.mainTexture as Texture2D;
 
 				if (tex != null)
 				{
+					// Pixels are easier to work with than UVs
+					Rect pixels = UIAtlas.ConvertToPixels(font.uvRect, tex.width, tex.height, false);
+					Rect uvRect = EditorGUILayout.RectField("Pixel Rect", pixels);
+					uvRect = UIAtlas.ConvertToTexCoords(uvRect, tex.width, tex.height);
+
+					GUI.backgroundColor = Color.white;
+
+					if (font.uvRect != uvRect)
+					{
+						Undo.RegisterUndo(font, "Font Pixel Rect");
+						font.uvRect = uvRect;
+					}
+
 					EditorGUILayout.Separator();
 					Rect rect = GUITools.DrawAtlas(tex);
 					GUITools.DrawOutline(rect, uvRect, green);
