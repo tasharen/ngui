@@ -1,12 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// UIFont contains everything needed to be able to print text.
+/// </summary>
+
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/Font")]
 public class UIFont : MonoBehaviour
 {
 	[SerializeField] TextAsset mData;
 	[SerializeField] Material mMat;
+	[SerializeField] Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
 
 	BMFont mFont = new BMFont();
 	Stack<Color> mColors = new Stack<Color>();
@@ -33,12 +38,6 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Pixel-perfect size of this font.
-	/// </summary>
-
-	public int size { get { Awake(); return mFont.charSize; } }
-
-	/// <summary>
 	/// Get or set the material used by this font.
 	/// </summary>
 
@@ -59,6 +58,32 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Offset and scale applied to all UV coordinates.
+	/// </summary>
+
+	public Rect uvRect
+	{
+		get
+		{
+			return mUVRect;
+		}
+		set
+		{
+			if (mUVRect != value)
+			{
+				mUVRect = value;
+				Refresh();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Pixel-perfect size of this font.
+	/// </summary>
+
+	public int size { get { Awake(); return mFont.charSize; } }
+
+	/// <summary>
 	/// Load the font data on awake.
 	/// </summary>
 
@@ -74,7 +99,7 @@ public class UIFont : MonoBehaviour
 	/// Refresh all labels that use this font.
 	/// </summary>
 
-	public void Refresh ()
+	void Refresh ()
 	{
 		if (!Application.isPlaying)
 		{
@@ -177,8 +202,9 @@ public class UIFont : MonoBehaviour
 			int prev = 0;
 			Vector3 v0 = Vector3.zero, v1 = Vector3.zero;
 			Vector2 u0 = Vector2.zero, u1 = Vector2.zero;
-			float invX = 1f / mFont.texWidth;
-			float invY = 1f / mFont.texHeight;
+			float invX = mUVRect.width / mFont.texWidth;
+			float invY = mUVRect.height / mFont.texHeight;
+			float invYUV = 1f - mUVRect.yMax;
 
 			for (int i = 0, imax = text.Length; i < imax; ++i)
 			{
@@ -224,8 +250,8 @@ public class UIFont : MonoBehaviour
 					v1.x = v0.x + scale.x * glyph.width;
 					v1.y = v0.y - scale.y * glyph.height;
 
-					u0.x = invX * glyph.x;
-					u0.y = 1f - invY * glyph.y;
+					u0.x = mUVRect.xMin + invX * glyph.x;
+					u0.y = invYUV + (1f - invY * glyph.y);
 
 					u1.x = u0.x + invX * glyph.width;
 					u1.y = u0.y - invY * glyph.height;

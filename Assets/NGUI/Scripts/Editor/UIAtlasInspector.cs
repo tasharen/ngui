@@ -156,6 +156,15 @@ public class UIAtlasInspector : Editor
 						inner = EditorGUILayout.RectField("Inner Rect", sprite.inner);
 						GUI.backgroundColor = Color.white;
 
+						if (outer != sprite.outer)
+						{
+							float x = outer.xMin - sprite.outer.xMin;
+							float y = outer.yMin - sprite.outer.yMin;
+
+							inner.x += x;
+							inner.y += y;
+						}
+
 						// Sanity checks to ensure that the inner rect is always inside the outer
 						inner.xMin = Mathf.Clamp(inner.xMin, outer.xMin, outer.xMax);
 						inner.xMax = Mathf.Clamp(inner.xMax, outer.xMin, outer.xMax);
