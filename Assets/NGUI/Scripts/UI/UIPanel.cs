@@ -9,9 +9,6 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Panel")]
 public class UIPanel : MonoBehaviour
 {
-	// All materials in the mergeable list will be combined into one
-	public List<Material> mergeable = new List<Material>();
-
 	// Whether generated geometry is shown or hidden
 	[SerializeField] bool mHidden = true;
 
@@ -23,6 +20,10 @@ public class UIPanel : MonoBehaviour
 
 	// List of UI Screens created on hidden and invisible game objects
 	List<UIDrawCall> mDrawCalls = new List<UIDrawCall>();
+
+	// Merged atlas and draw calls
+	UIMergedAtlas mMergedAtlas;
+	UIMergedDrawCall mMergedDC;
 
 	// Cached in order to reduce memory allocations
 	List<Vector3> mVerts = new List<Vector3>();
@@ -72,35 +73,13 @@ public class UIPanel : MonoBehaviour
 
 				foreach (UIDrawCall dc in list)
 				{
-					dc.gameObject.active = false;
-					dc.gameObject.hideFlags = flags;
-					dc.gameObject.active = true;
+					GameObject go = dc.gameObject;
+					go.active = false;
+					go.hideFlags = flags;
+					go.active = true;
 				}
 			}
 		}
-	}
-
-	/// <summary>
-	/// Find a UIPanel responsible for handling the specified transform.
-	/// </summary>
-
-	static public UIPanel Find (Transform trans)
-	{
-		UIPanel panel = null;
-
-		while (panel == null && trans != null)
-		{
-			panel = trans.GetComponent<UIPanel>();
-			if (panel != null) break;
-			if (trans.parent == null) break;
-			trans = trans.parent;
-		}
-
-		if (panel == null)
-		{
-			panel = trans.gameObject.AddComponent<UIPanel>();
-		}
-		return panel;
 	}
 
 	/// <summary>
@@ -158,6 +137,8 @@ public class UIPanel : MonoBehaviour
 
 	void OnDisable ()
 	{
+		if (mMergedDC != null) DestroyImmediate(mMergedDC.gameObject);
+
 		for (int i = mDrawCalls.Count; i > 0; )
 		{
 			UIDrawCall dc = mDrawCalls[--i];
@@ -187,10 +168,60 @@ public class UIPanel : MonoBehaviour
 			// Sort all widgets based on their depth
 			mWidgets.Sort(UIWidget.CompareFunc);
 
+			foreach (Material mat in mChanged)
+			{
+				if (mMergedAtlas != null && mMergedAtlas.material == mat)
+				{
+					RebuildMerged();
+				}
+				else
+				{
+					Rebuild(mat);
+				}
+			}
+
 			// Run through all the materials that have been marked as changed and rebuild them
-			foreach (Material mat in mChanged) Rebuild(mat);
 			mChanged.Clear();
 		}
+	}
+
+	/// <summary>
+	/// Rebuild the merged draw call's geometry.
+	/// </summary>
+
+	void RebuildMerged ()
+	{
+		/*foreach (UIWidget w in mWidgets)
+		{
+			if (!mMergedAtlas.Contains(w.material.mainTexture)) continue;
+
+			int offset = mVerts.Count;
+
+			// Fill the geometry
+			w.OnFill(mVerts, mUvs, mCols);
+			Transform t = w.cachedTransform;
+
+			// Transform all vertices into world space
+			for (int i = offset, imax = mVerts.Count; i < imax; ++i) mVerts[i] = t.TransformPoint(mVerts[i]);
+
+			// Adjust the UVs to be within the merged atlas
+			mMergedAtlas.AdjustUVs(w.material, mUvs, offset);
+		}
+
+		if (mVerts.Count > 0)
+		{
+			mMergedDC.Set(mVerts, mUvs, mCols);
+		}
+		else
+		{
+			DestroyImmediate(mMergedDC);
+			mMergedDC = null;
+		}
+
+		// Cleanup
+		mVerts.Clear();
+		mUvs.Clear();
+		mCols.Clear();*/
 	}
 
 	/// <summary>
@@ -244,8 +275,49 @@ public class UIPanel : MonoBehaviour
 	/// Merge all marked materials into one.
 	/// </summary>
 
-	public void Merge ()
+	/*public void Merge ()
 	{
-		Debug.Log("TODO");
+		List<Texture2D> textures = MaterialsToTextures(mergeable);
+
+		if (textures.Count > 1)
+		{
+			if (mMergedDC == null && mergedShader != null)
+			{
+				GameObject go = new GameObject("_UIDrawCall [" + name + "]");
+				go.hideFlags = mHidden ? HideFlags.HideAndDontSave : HideFlags.DontSave | HideFlags.NotEditable;
+				go.layer = gameObject.layer;
+
+				mMergedDC = go.AddComponent<UIMergedDrawCall>();
+				mMergedDC.material = new Material(mergedShader);
+			}
+		}
+		else if (mMergedDC != null)
+		{
+			DestroyImmediate(mMergedDC);
+			mMergedDC = null;
+		}
+	}*/
+
+	/// <summary>
+	/// Find a UIPanel responsible for handling the specified transform.
+	/// </summary>
+
+	static public UIPanel Find (Transform trans)
+	{
+		UIPanel panel = null;
+
+		while (panel == null && trans != null)
+		{
+			panel = trans.GetComponent<UIPanel>();
+			if (panel != null) break;
+			if (trans.parent == null) break;
+			trans = trans.parent;
+		}
+
+		if (panel == null)
+		{
+			panel = trans.gameObject.AddComponent<UIPanel>();
+		}
+		return panel;
 	}
 }

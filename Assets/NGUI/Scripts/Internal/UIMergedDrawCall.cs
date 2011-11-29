@@ -34,38 +34,6 @@ public class UIMergedDrawCall : UIDrawCall
 	}
 
 	/// <summary>
-	/// Collect textures of specified materials, only returning a valid list if there are 2 or more textures to work with.
-	/// </summary>
-
-	List<Texture2D> GetTextures (List<Material> mats)
-	{
-		if (mats.Count < 2) return null;
-		List<Texture2D> textures = new List<Texture2D>();
-		Shader shader = mats[0].shader;
-
-		// Run through all specified materials and collect their textures
-		foreach (Material mat in mats)
-		{
-			Texture2D tex = mat.mainTexture as Texture2D;
-
-			if (tex != null)
-			{
-				if (!textures.Contains(tex))
-				{
-					if (mat.shader != shader)
-					{
-						Debug.LogWarning("You must use identical shaders on all of the materials you are trying to merge");
-						return null;
-					}
-					textures.Add(tex);
-				}
-			}
-			else Debug.LogWarning("Material \"" + mat.name + "\" has no texture");
-		}
-		return (textures.Count > 1) ? textures : null;
-	}
-
-	/// <summary>
 	/// Whether the draw call contains the specified texture.
 	/// </summary>
 
@@ -90,10 +58,8 @@ public class UIMergedDrawCall : UIDrawCall
 	/// Create the texture and material that can be used to draw all of the specified materials in a single draw call.
 	/// </summary>
 
-	public bool Create (List<Material> mats)
+	public bool Create (Shader shader, List<Texture2D> textures)
 	{
-		List<Texture2D> textures = GetTextures(mats);
-
 		// If 'null' was returned, there isn't much for us to do here
 		if (textures == null)
 		{
@@ -102,9 +68,11 @@ public class UIMergedDrawCall : UIDrawCall
 		}
 
 		// Don't redo the work if we've already done it
-		if (Matches(textures)) return true;
-
-		Shader shader = mats[0].shader;
+		if (Matches(textures))
+		{
+			if (mMat.shader != shader) mMat.shader = shader;
+			return true;
+		}
 
 		// Create the merged texture
 		if (mTex == null) mTex = new Texture2D(1, 1);
@@ -139,41 +107,5 @@ public class UIMergedDrawCall : UIDrawCall
 		mMat.shader = shader;
 		mMat.mainTexture = mTex;
 		return true;
-	}
-
-	/// <summary>
-	/// Adjust the specified list of UV coordinates to point to UVs within the merged texture.
-	/// </summary>
-
-	void AdjustUVs (Entry ent, List<Vector2> uvs, int offset)
-	{
-		for (int i = offset, imax = uvs.Count; i < imax; ++i)
-		{
-			Vector2 uv = uvs[i];
-			uv.x = uv.x * ent.scale.x + ent.offset.x;
-			uv.y = uv.y * ent.scale.y + ent.offset.y;
-			uvs[i] = uv;
-		}
-	}
-
-	/// <summary>
-	/// Adjust the specified list of UV coordinates to point to UVs within the merged texture.
-	/// </summary>
-
-	public void AdjustUVs (Material mat, List<Vector2> uvs, int offset)
-	{
-		Texture2D tex = mat.mainTexture as Texture2D;
-		
-		if (tex != null)
-		{
-			foreach (Entry ent in mEntries)
-			{
-				if (ent.tex == tex)
-				{
-					AdjustUVs(ent, uvs, offset);
-					return;
-				}
-			}
-		}
 	}
 }
