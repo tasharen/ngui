@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿/*using UnityEngine;
 using System.Collections.Generic;
 
 [ExecuteInEditMode]
@@ -17,6 +17,41 @@ public class UIMergedAtlas : MonoBehaviour
 	[SerializeField] List<Entry> mEntries = new List<Entry>();
 
 	public Material material { get { return mMat; } set { mMat = value; } }
+
+	/// <summary>
+	/// Returns the list of entries, removing invalid entries in the process.
+	/// </summary>
+
+	List<Entry> entries
+	{
+		get
+		{
+			for (int i = mEntries.Count; i > 0; )
+			{
+				if (mEntries[--i].tex == null)
+				{
+					mEntries.RemoveAt(i);
+				}
+			}
+			return mEntries;
+		}
+	}
+
+	/// <summary>
+	/// List of used textures.
+	/// </summary>
+
+	public Texture2D[] textures
+	{
+		get
+		{
+			if (mEntries.Count == 0) return null;
+			Texture2D[] texs = new Texture2D[mEntries.Count];
+			List<Entry> ents = entries;
+			for (int i = 0, imax = ents.Count; i < imax; ++i) texs[i] = ents[i].tex;
+			return texs;
+		}
+	}
 
 	/// <summary>
 	/// Whether the specified texture is already present in the atlas.
@@ -56,6 +91,25 @@ public class UIMergedAtlas : MonoBehaviour
 			if (ent.tex == tex)
 			{
 				mEntries.Remove(ent);
+				Remerge();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Replace the specified texture.
+	/// </summary>
+
+	public bool ReplaceTexture (Texture2D existing, Texture2D final)
+	{
+		foreach (Entry ent in mEntries)
+		{
+			if (ent.tex == existing)
+			{
+				if (final == null || Contains(final)) mEntries.Remove(ent);
+				else ent.tex = final;
 				Remerge();
 				return true;
 			}
@@ -105,63 +159,4 @@ public class UIMergedAtlas : MonoBehaviour
 	{
 		Debug.Log("TODO");
 	}
-}
-
-/*
-		UIMergedAtlas ma = panel.GetComponent<UIMergedAtlas>();
-
-		// We want to figure out which textures get merged
-		Dictionary<Texture2D, int> texs = new Dictionary<Texture2D, int>();
-		foreach (Texture2D tex in panel.mergedTextures) texs[tex] = 1;
-
-		foreach (UIWidget w in widgets)
-		{
-			Texture2D t = w.material.mainTexture;
-			if (t == null) continue;
-
-			if (!texs.ContainsKey(t))
-			{
-				// The texture is absent -- make note of it
-				texs[t] = 0;
-			}
-			else if (texs[t] == 1)
-			{
-				// The texture is present and is being merged
-				texs[t] = 2;
-			}
-		}
-
-		// List all textures that are in use
-		if (texs.Count > 0)
-		{
-			GUITools.DrawSeparator();
-
-			foreach (KeyValuePair<Texture2D, int> val in texs)
-			{
-				if (val.Value == 0)
-				{
-					// Textures that aren't being merged should show up as red.
-					GUI.backgroundColor = Color.red;
-
-					if (GUILayout.Button("\"" + val.Key.name + "\" is separate"))
-					{
-						panel.mergedTextures.Add(val.Key);
-						panel.Merge();
-					}
-				}
-				else
-				{
-					// Textures that get merged but aren't being used should be orange.
-					// Textures that get merged and are being used should be green.
-					GUI.backgroundColor = (val.Value == 1) ? new Color(1f, 0.5f, 0f) : Color.green;
-
-					if (GUILayout.Button("\"" + val.Key.name + "\" is merged"))
-					{
-						panel.mergedTextures.Remove(val.Key);
-						panel.Merge();
-					}
-				}
-			}
-			GUI.backgroundColor = Color.white;
-		}
- */
+}*/

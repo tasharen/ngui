@@ -21,10 +21,6 @@ public class UIPanel : MonoBehaviour
 	// List of UI Screens created on hidden and invisible game objects
 	List<UIDrawCall> mDrawCalls = new List<UIDrawCall>();
 
-	// Merged atlas and draw calls
-	UIMergedAtlas mMergedAtlas;
-	UIMergedDrawCall mMergedDC;
-
 	// Cached in order to reduce memory allocations
 	List<Vector3> mVerts = new List<Vector3>();
 	List<Vector2> mUvs = new List<Vector2>();
@@ -137,8 +133,6 @@ public class UIPanel : MonoBehaviour
 
 	void OnDisable ()
 	{
-		if (mMergedDC != null) DestroyImmediate(mMergedDC.gameObject);
-
 		for (int i = mDrawCalls.Count; i > 0; )
 		{
 			UIDrawCall dc = mDrawCalls[--i];
@@ -167,61 +161,11 @@ public class UIPanel : MonoBehaviour
 		{
 			// Sort all widgets based on their depth
 			mWidgets.Sort(UIWidget.CompareFunc);
-
-			foreach (Material mat in mChanged)
-			{
-				if (mMergedAtlas != null && mMergedAtlas.material == mat)
-				{
-					RebuildMerged();
-				}
-				else
-				{
-					Rebuild(mat);
-				}
-			}
+			foreach (Material mat in mChanged) Rebuild(mat);
 
 			// Run through all the materials that have been marked as changed and rebuild them
 			mChanged.Clear();
 		}
-	}
-
-	/// <summary>
-	/// Rebuild the merged draw call's geometry.
-	/// </summary>
-
-	void RebuildMerged ()
-	{
-		/*foreach (UIWidget w in mWidgets)
-		{
-			if (!mMergedAtlas.Contains(w.material.mainTexture)) continue;
-
-			int offset = mVerts.Count;
-
-			// Fill the geometry
-			w.OnFill(mVerts, mUvs, mCols);
-			Transform t = w.cachedTransform;
-
-			// Transform all vertices into world space
-			for (int i = offset, imax = mVerts.Count; i < imax; ++i) mVerts[i] = t.TransformPoint(mVerts[i]);
-
-			// Adjust the UVs to be within the merged atlas
-			mMergedAtlas.AdjustUVs(w.material, mUvs, offset);
-		}
-
-		if (mVerts.Count > 0)
-		{
-			mMergedDC.Set(mVerts, mUvs, mCols);
-		}
-		else
-		{
-			DestroyImmediate(mMergedDC);
-			mMergedDC = null;
-		}
-
-		// Cleanup
-		mVerts.Clear();
-		mUvs.Clear();
-		mCols.Clear();*/
 	}
 
 	/// <summary>
@@ -270,33 +214,6 @@ public class UIPanel : MonoBehaviour
 		mUvs.Clear();
 		mCols.Clear();
 	}
-
-	/// <summary>
-	/// Merge all marked materials into one.
-	/// </summary>
-
-	/*public void Merge ()
-	{
-		List<Texture2D> textures = MaterialsToTextures(mergeable);
-
-		if (textures.Count > 1)
-		{
-			if (mMergedDC == null && mergedShader != null)
-			{
-				GameObject go = new GameObject("_UIDrawCall [" + name + "]");
-				go.hideFlags = mHidden ? HideFlags.HideAndDontSave : HideFlags.DontSave | HideFlags.NotEditable;
-				go.layer = gameObject.layer;
-
-				mMergedDC = go.AddComponent<UIMergedDrawCall>();
-				mMergedDC.material = new Material(mergedShader);
-			}
-		}
-		else if (mMergedDC != null)
-		{
-			DestroyImmediate(mMergedDC);
-			mMergedDC = null;
-		}
-	}*/
 
 	/// <summary>
 	/// Find a UIPanel responsible for handling the specified transform.

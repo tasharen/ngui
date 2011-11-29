@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿/*using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
@@ -108,4 +108,4 @@ public class UIMergedDrawCall : UIDrawCall
 		mMat.mainTexture = mTex;
 		return true;
 	}
-}
+}*/

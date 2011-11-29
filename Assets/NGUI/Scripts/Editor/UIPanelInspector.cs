@@ -18,7 +18,7 @@ public class UIPanelInspector : Editor
 		GUITools.DrawSeparator();
 
 		panel.hidden = EditorGUILayout.Toggle("Hidden", panel.hidden);
-		//EditorGUILayout.LabelField("Widgets", panel.widgets.Count.ToString());
+		EditorGUILayout.LabelField("Widgets", panel.widgets.Count.ToString());
 		EditorGUILayout.LabelField("Draw Calls", drawcalls.Count.ToString());
 
 		foreach (UIDrawCall dc in drawcalls)
