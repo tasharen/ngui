@@ -6,13 +6,13 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/Internal/UI Draw Call")]
+[AddComponentMenu("NGUI/Internal/Draw Call")]
 public class UIDrawCall : MonoBehaviour
 {
-	Material		mMat;		// Material used by this screen
-	Mesh			mMesh;		// Generated mesh
-	MeshFilter		mFilter;	// Mesh filter for this screen
-	MeshRenderer	mRen;		// Mesh renderer for this screen
+	protected Material		mMat;		// Material used by this screen
+	protected Mesh			mMesh;		// Generated mesh
+	protected MeshFilter	mFilter;	// Mesh filter for this draw call
+	protected MeshRenderer	mRen;		// Mesh renderer for this screen
 
 	/// <summary>
 	/// Material used by this screen.
