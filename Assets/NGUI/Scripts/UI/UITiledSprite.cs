@@ -1,8 +1,8 @@
-﻿/*using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// Widget that tiles a part of the texture atlas, filling the specified size in pixels.
+/// Widget that tiles the sprite repeatedly, fully filling the area.
 /// Used best with repeating tileable backgrounds.
 /// </summary>
 
@@ -10,40 +10,30 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Sprite (Tiled)")]
 public class UITiledSprite : UISprite
 {
-	// Size of the area in pixels
-	public Vector2 size = new Vector2(100f, 100f);
-
-	// Sprite's rectangle within the atlas (in pixels)
-	public Rect textureRect;
-
-	Vector2 mSize;
-	Rect mRect;
-
-	public override bool OnUpdate ()
-	{
-		if (mSize != size || mRect != textureRect)
-		{
-			mSize = size;
-			mRect = textureRect;
-			return true;
-		}
-		return false;
-	}
-
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
 		Texture tex = material.mainTexture;
 
 		if (tex != null)
 		{
-			float width  = Mathf.Abs(mRect.width  / mSize.x);
-			float height = Mathf.Abs(mRect.height / mSize.y);
+			Rect rect = mOuter;
 
-			Vector2 min = new Vector2(mRect.xMin / tex.width, mRect.yMin / tex.height);
-			Vector2 max = new Vector2(mRect.xMax / tex.width, mRect.yMax / tex.height);
+			if (atlas.coordinates == UIAtlas.Coordinates.TexCoords)
+			{
+				rect = NGUITools.ConvertToPixels(mOuter, tex.width, tex.height, true);
+			}
+
+			float width  = Mathf.Abs(rect.width / mScale.x);
+			float height = Mathf.Abs(rect.height / mScale.y);
+
+			Vector2 min = new Vector2(rect.xMin / tex.width, rect.yMin / tex.height);
+			Vector2 max = new Vector2(rect.xMax / tex.width, rect.yMax / tex.height);
+
 			Vector2 clipped = max;
 
 			float y = 0f;
+
+			int start = verts.Count;
 
 			while (y < 1f)
 			{
@@ -87,6 +77,17 @@ public class UITiledSprite : UISprite
 				}
 				y += height;
 			}
+
+			if (centered)
+			{
+				for (int i = start, imax = verts.Count; i < imax; ++i)
+				{
+					Vector3 v = verts[i];
+					v.x -= 0.5f;
+					v.y += 0.5f;
+					verts[i] = v;
+				}
+			}
 		}
 	}
-}*/
+}

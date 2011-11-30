@@ -146,7 +146,7 @@ public class UIPanel : MonoBehaviour
 	/// Update all widgets and rebuild the draw calls if necessary.
 	/// </summary>
 
-	void LateUpdate ()
+	public void LateUpdate ()
 	{
 		// Update all widgets
 		for (int i = mWidgets.Count; i > 0; )

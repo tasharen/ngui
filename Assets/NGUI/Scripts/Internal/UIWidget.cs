@@ -162,7 +162,11 @@ public abstract class UIWidget : MonoBehaviour
 	/// Tell the panel responsible for the widget that something has changed and the buffers need to be rebuilt.
 	/// </summary>
 
-	public void MarkAsChanged () { mChanged = true; }
+	public void MarkAsChanged ()
+	{
+		mChanged = true;
+		if (!Application.isPlaying) panel.LateUpdate();
+	}
 
 	/// <summary>
 	/// Ensure we have a panel referencing this widget.
