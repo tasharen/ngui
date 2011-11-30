@@ -10,12 +10,20 @@ public class UILabelInspector : UIWidgetInspector
 {
 	UILabel mLabel;
 	UIFont mFont;
+	bool mShow = false;
 
 	override protected bool OnCustomStart ()
 	{
 		mLabel = mWidget as UILabel;
 		mFont = EditorGUILayout.ObjectField("Font", mLabel.font, typeof(UIFont), true) as UIFont;
 		if (mFont == null) return false;
+
+		string text = EditorGUILayout.TextField("Text", mLabel.text);
+		if (!string.Equals(text, mLabel.text)) { RegisterUndo(); mLabel.text = text; }
+
+		bool encoding = EditorGUILayout.Toggle("Encoding", mLabel.supportEncoding, GUILayout.Width(100f));
+		if (encoding != mLabel.supportEncoding) { RegisterUndo(); mLabel.supportEncoding = encoding; }
+
 		GUITools.DrawSeparator();
 		return true;
 	}
@@ -26,22 +34,19 @@ public class UILabelInspector : UIWidgetInspector
 
 		if (tex != null)
 		{
-			// Draw the atlas
-			EditorGUILayout.Separator();
-			Rect rect = GUITools.DrawAtlas(tex);
+			mShow = EditorGUILayout.Toggle("Show Atlas", mShow, GUILayout.Width(110f));
 
-			// Sprite size label
-			EditorGUI.DropShadowLabel(new Rect(rect.xMin, rect.yMax, rect.width, 18f), "Font Size: " + mFont.size);
-			GUILayout.Space(22f);
+			if (mShow)
+			{
+				// Draw the atlas
+				EditorGUILayout.Separator();
+				GUITools.DrawSprite(tex, mFont.uvRect);
+
+				// Sprite size label
+				Rect rect = GUILayoutUtility.GetRect(Screen.width, 18f);
+				EditorGUI.DropShadowLabel(rect, "Font Size: " + mFont.size);
+			}
 		}
-
-		GUITools.DrawSeparator();
-
-		string text = EditorGUILayout.TextField("Text", mLabel.text);
-		if (!string.Equals(text, mLabel.text)) { RegisterUndo(); mLabel.text = text; }
-
-		bool encoding = EditorGUILayout.Toggle("Encoding", mLabel.supportEncoding);
-		if (encoding != mLabel.supportEncoding) { RegisterUndo(); mLabel.supportEncoding = encoding; }
 	}
 
 	override protected void OnCustomSave ()

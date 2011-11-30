@@ -14,7 +14,7 @@ public class UIAtlasInspector : Editor
 		Sprite,
 	}
 
-	static View view = View.Sprite;
+	static View mView = View.Sprite;
 
 	UIAtlas mAtlas;
 	int mIndex = 0;
@@ -62,16 +62,41 @@ public class UIAtlasInspector : Editor
 			mAtlas.coordinates = coords;
 			mConfirmDelete = false;
 		}
-		else if (mat != null)
+
+		if (mat != null)
 		{
 			Color blue = new Color(0f, 0.7f, 1f, 1f);
 			Color green = new Color(0.4f, 1f, 0f, 1f);
 
-			mIndex = Mathf.Clamp(mIndex, 0, mAtlas.sprites.Count - 1);
+			mIndex = Mathf.Min(mIndex, mAtlas.sprites.Count - 1);
+			mIndex = Mathf.Max(mIndex, 0);
+
 			UIAtlas.Sprite sprite = (mIndex < mAtlas.sprites.Count) ? mAtlas.sprites[mIndex] : null;
 
-			// New sprite button
-			if (!mConfirmDelete)
+			if (mConfirmDelete)
+			{
+				// Show the confirmation dialog
+				GUITools.DrawSeparator();
+				GUILayout.Label("Are you sure you want to delete '" + sprite.name + "'?");
+				GUITools.DrawSeparator();
+
+				GUILayout.BeginHorizontal();
+				{
+					GUI.backgroundColor = Color.green;
+					if (GUILayout.Button("Cancel")) mConfirmDelete = false;
+					GUI.backgroundColor = Color.red;
+
+					if (GUILayout.Button("Delete"))
+					{
+						RegisterUndo();
+						mAtlas.sprites.RemoveAt(mIndex);
+						mConfirmDelete = false;
+					}
+					GUI.backgroundColor = Color.white;
+				}
+				GUILayout.EndHorizontal();
+			}
+			else
 			{
 				GUI.backgroundColor = Color.green;
 
@@ -84,35 +109,8 @@ public class UIAtlasInspector : Editor
 					mIndex = mAtlas.sprites.Count - 1;
 				}
 				GUI.backgroundColor = Color.white;
-			}
 
-			// Only proceed if we have a valid sprite to work with
-			if (sprite != null)
-			{
-				if (mConfirmDelete)
-				{
-					// Show the confirmation dialog
-					GUITools.DrawSeparator();
-					GUILayout.Label("Are you sure you want to delete '" + sprite.name + "'?");
-					GUITools.DrawSeparator();
-
-					GUILayout.BeginHorizontal();
-					{
-						GUI.backgroundColor = Color.green;
-						if (GUILayout.Button("Cancel")) mConfirmDelete = false;
-						GUI.backgroundColor = Color.red;
-
-						if (GUILayout.Button("Delete"))
-						{
-							RegisterUndo();
-							mAtlas.sprites.RemoveAt(mIndex);
-							mConfirmDelete = false;
-						}
-						GUI.backgroundColor = Color.white;
-					}
-					GUILayout.EndHorizontal();
-				}
-				else
+				if (sprite != null)
 				{
 					GUITools.DrawSeparator();
 
@@ -218,8 +216,7 @@ public class UIAtlasInspector : Editor
 						}
 						GUILayout.EndHorizontal();
 
-						//GUITools.DrawSeparator();
-						view = (View)EditorGUILayout.EnumPopup("Show", view);
+						mView = (View)EditorGUILayout.EnumPopup("Show", mView);
 
 						Rect uv0 = outer;
 						Rect uv1 = inner;
@@ -232,7 +229,7 @@ public class UIAtlasInspector : Editor
 
 						// Draw the atlas
 						EditorGUILayout.Separator();
-						Rect rect = (view == View.Atlas) ? GUITools.DrawAtlas(tex) : GUITools.DrawSprite(tex, uv0);
+						Rect rect = (mView == View.Atlas) ? GUITools.DrawAtlas(tex) : GUITools.DrawSprite(tex, uv0);
 
 						// Draw the sprite outline
 						GUITools.DrawOutline(rect, uv1, blue);

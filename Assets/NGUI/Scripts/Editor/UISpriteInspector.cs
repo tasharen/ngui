@@ -64,7 +64,7 @@ public class UISpriteInspector : UIWidgetInspector
 		{
 			// Draw the atlas
 			EditorGUILayout.Separator();
-			Rect rect = GUITools.DrawAtlas(tex);
+			Rect rect = GUITools.DrawSprite(tex, mSprite.outerUV);
 
 			// Draw the selection
 			GUITools.DrawOutline(rect, mSprite.outerUV, new Color(0.4f, 1f, 0f, 1f));
@@ -74,8 +74,9 @@ public class UISpriteInspector : UIWidgetInspector
 			text += Mathf.RoundToInt(Mathf.Abs(mSprite.outerUV.width * tex.width));
 			text += "x";
 			text += Mathf.RoundToInt(Mathf.Abs(mSprite.outerUV.height * tex.height));
-			EditorGUI.DropShadowLabel(new Rect(rect.xMin, rect.yMax, rect.width, 18f), text);
-			GUILayout.Space(22f);
+
+			rect = GUILayoutUtility.GetRect(Screen.width, 18f);
+			EditorGUI.DropShadowLabel(rect, text);
 		}
 	}
 

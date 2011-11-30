@@ -10,6 +10,29 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Sprite (Tiled)")]
 public class UITiledSprite : UISprite
 {
+	/// <summary>
+	/// Tiled sprite shouldn't inherit the sprite's changes to this function.
+	/// </summary>
+
+	override public void MakePixelPerfect ()
+	{
+		Vector3 pos = cachedTransform.localPosition;
+		pos.x = Mathf.RoundToInt(pos.x);
+		pos.y = Mathf.RoundToInt(pos.y);
+		pos.z = Mathf.RoundToInt(pos.z);
+		cachedTransform.localPosition = pos;
+
+		Vector3 scale = cachedTransform.localScale;
+		scale.x = Mathf.RoundToInt(scale.x);
+		scale.y = Mathf.RoundToInt(scale.y);
+		scale.z = 1f;
+		cachedTransform.localScale = scale;
+	}
+
+	/// <summary>
+	/// Fill the draw buffers.
+	/// </summary>
+
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
 		Texture tex = material.mainTexture;
