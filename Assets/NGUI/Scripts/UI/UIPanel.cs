@@ -95,7 +95,13 @@ public class UIPanel : MonoBehaviour
 	/// Remove the specified widget from the managed list.
 	/// </summary>
 
-	public void RemoveWidget (UIWidget w) { if (w != null && mWidgets.Remove(w)) mChanged.Add(w.material); }
+	public void RemoveWidget (UIWidget w)
+	{
+		if (w != null && mWidgets.Remove(w))
+		{
+			mChanged.Add(w.material);
+		}
+	}
 
 	/// <summary>
 	/// Get or create a UIScreen responsible for drawing the widgets using the specified material.

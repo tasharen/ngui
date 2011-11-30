@@ -19,9 +19,10 @@ public abstract class UIWidget : MonoBehaviour
 
 	protected bool mChanged = true;
 	protected bool mPlayMode = true;
-	protected Vector3 mPos;
-	protected Quaternion mRot;
-	protected Vector3 mScale;
+
+	Vector3 mPos;
+	Quaternion mRot;
+	Vector3 mScale;
 
 	/// <summary>
 	/// Color used by the widget.
@@ -135,6 +136,19 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Return the widget's final scale.
+	/// </summary>
+
+	public Vector2 finalScale
+	{
+		get
+		{
+			Transform t = cachedTransform;
+			return t.localScale;
+		}
+	}
+
+	/// <summary>
 	/// Returns the UI panel responsible for this widget.
 	/// </summary>
 
@@ -165,7 +179,12 @@ public abstract class UIWidget : MonoBehaviour
 	public void MarkAsChanged ()
 	{
 		mChanged = true;
-		if (!Application.isPlaying) panel.LateUpdate();
+
+		if (enabled && gameObject.active && !Application.isPlaying)
+		{
+			panel.AddWidget(this);
+			panel.LateUpdate();
+		}
 	}
 
 	/// <summary>
@@ -219,7 +238,7 @@ public abstract class UIWidget : MonoBehaviour
 	void OnEnable ()
 	{
 		CreatePanel();
-		mChanged = true;
+		MarkAsChanged();
 	}
 
 	/// <summary>
