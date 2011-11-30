@@ -183,7 +183,7 @@ public abstract class UIWidget : MonoBehaviour
 		if (enabled && gameObject.active && !Application.isPlaying)
 		{
 			panel.AddWidget(this);
-			panel.LateUpdate();
+			mPanel.LateUpdate();
 		}
 	}
 
@@ -237,8 +237,8 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnEnable ()
 	{
-		CreatePanel();
-		MarkAsChanged();
+		mChanged = true;
+		panel.AddWidget(this);
 	}
 
 	/// <summary>

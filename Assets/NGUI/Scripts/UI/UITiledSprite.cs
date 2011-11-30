@@ -26,9 +26,14 @@ public class UITiledSprite : UISprite
 		float width  = Mathf.Abs(rect.width / scale.x);
 		float height = Mathf.Abs(rect.height / scale.y);
 
-		// Safety
-		if (width < 0.01f) width = 0.01f;
-		if (height < 0.01f) height = 0.01f;
+		// Safety check. Useful so Unity doesn't run out of memory if the sprites are too small.
+		if (width < 0.01f || height < 0.01f)
+		{
+			Debug.LogWarning("The tiled sprite (" + NGUITools.GetHierarchy(gameObject) + ") is too small.\nConsider using a bigger one.");
+
+			width = 0.01f;
+			height = 0.01f;
+		}
 
 		Vector2 min = new Vector2(rect.xMin / tex.width, rect.yMin / tex.height);
 		Vector2 max = new Vector2(rect.xMax / tex.width, rect.yMax / tex.height);
