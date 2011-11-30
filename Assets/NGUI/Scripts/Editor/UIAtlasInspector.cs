@@ -8,6 +8,14 @@ using UnityEditor;
 [CustomEditor(typeof(UIAtlas))]
 public class UIAtlasInspector : Editor
 {
+	enum View
+	{
+		Atlas,
+		Sprite,
+	}
+
+	static View view = View.Sprite;
+
 	UIAtlas mAtlas;
 	int mIndex = 0;
 	bool mRegisteredUndo = false;
@@ -111,14 +119,14 @@ public class UIAtlasInspector : Editor
 					// Navigation section
 					GUILayout.BeginHorizontal();
 					{
-						if (mIndex == 0) GUI.backgroundColor = Color.grey;
+						if (mIndex == 0) GUI.color = Color.grey;
 						if (GUILayout.Button("<<")) { mConfirmDelete = false; --mIndex; }
-						GUI.backgroundColor = Color.white;
+						GUI.color = Color.white;
 						mIndex = EditorGUILayout.IntField(mIndex + 1, GUILayout.Width(40f)) - 1;
 						GUILayout.Label("/ " + mAtlas.sprites.Count, GUILayout.Width(40f));
-						if (mIndex + 1 == mAtlas.sprites.Count) GUI.backgroundColor = Color.grey;
+						if (mIndex + 1 == mAtlas.sprites.Count) GUI.color = Color.grey;
 						if (GUILayout.Button(">>")) { mConfirmDelete = false; ++mIndex; }
-						GUI.backgroundColor = Color.white;
+						GUI.color = Color.white;
 					}
 					GUILayout.EndHorizontal();
 
@@ -156,6 +164,9 @@ public class UIAtlasInspector : Editor
 						inner = EditorGUILayout.RectField("Inner Rect", sprite.inner);
 						GUI.backgroundColor = Color.white;
 
+						if (outer.xMax < outer.xMin) outer.xMax = outer.xMin;
+						if (outer.yMax < outer.yMin) outer.yMax = outer.yMin;
+
 						if (outer != sprite.outer)
 						{
 							float x = outer.xMin - sprite.outer.xMin;
@@ -171,21 +182,62 @@ public class UIAtlasInspector : Editor
 						inner.yMin = Mathf.Clamp(inner.yMin, outer.yMin, outer.yMax);
 						inner.yMax = Mathf.Clamp(inner.yMax, outer.yMin, outer.yMax);
 
-						// Draw the atlas
 						EditorGUILayout.Separator();
-						Rect rect = GUITools.DrawAtlas(tex);
 
-						// If the atlas uses pixel coordinates, calculate the UVs
+						// Create a button that can make the coordinates pixel-perfect on click
+						GUILayout.BeginHorizontal();
+						{
+							GUILayout.Label("Correction", GUILayout.Width(75f));
+
+							Rect corrected0 = outer;
+							Rect corrected1 = inner;
+
+							if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
+							{
+								corrected0 = NGUITools.MakePixelPerfect(corrected0);
+								corrected1 = NGUITools.MakePixelPerfect(corrected1);
+							}
+							else
+							{
+								corrected0 = NGUITools.MakePixelPerfect(corrected0, tex.width, tex.height);
+								corrected1 = NGUITools.MakePixelPerfect(corrected1, tex.width, tex.height);
+							}
+
+							if (corrected0 == sprite.outer && corrected1 == sprite.inner)
+							{
+								GUI.color = Color.grey;
+								GUILayout.Button("Make Pixel-Perfect");
+								GUI.color = Color.white;
+							}
+							else if (GUILayout.Button("Make Pixel-Perfect"))
+							{
+								outer = corrected0;
+								inner = corrected1;
+								GUI.changed = true;
+							}
+						}
+						GUILayout.EndHorizontal();
+
+						//GUITools.DrawSeparator();
+						view = (View)EditorGUILayout.EnumPopup("Show", view);
+
+						Rect uv0 = outer;
+						Rect uv1 = inner;
+
 						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 						{
-							GUITools.DrawOutline(rect, UIAtlas.ConvertToTexCoords(inner, tex.width, tex.height), blue);
-							GUITools.DrawOutline(rect, UIAtlas.ConvertToTexCoords(outer, tex.width, tex.height), green);
+							uv0 = NGUITools.ConvertToTexCoords(uv0, tex.width, tex.height);
+							uv1 = NGUITools.ConvertToTexCoords(uv1, tex.width, tex.height);
 						}
-						else
-						{
-							GUITools.DrawOutline(rect, inner, blue);
-							GUITools.DrawOutline(rect, outer, green);
-						}
+
+						// Draw the atlas
+						EditorGUILayout.Separator();
+						Rect rect = (view == View.Atlas) ? GUITools.DrawAtlas(tex) : GUITools.DrawSprite(tex, uv0);
+
+						// Draw the sprite outline
+						GUITools.DrawOutline(rect, uv1, blue);
+						GUITools.DrawOutline(rect, uv0, green);
+
 						EditorGUILayout.Separator();
 					}
 

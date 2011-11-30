@@ -132,14 +132,14 @@ static public class GUITools
 	}
 
 	/// <summary>
-	/// Draw a texture atlas, complete with a background texture and an outline.
+	/// Draw a checkered background for the specified texture.
 	/// </summary>
 
-	static public Rect DrawAtlas (Texture2D tex)
+	static Rect DrawBackground (Texture2D tex, float ratio)
 	{
 		Rect rect = GUILayoutUtility.GetRect(0f, 0f);
 		rect.width = Screen.width;
-		rect.height = Screen.width * (tex.height / tex.width);
+		rect.height = Screen.width * ratio;
 		GUILayout.Space(rect.height);
 
 		if (Event.current.type == EventType.Repaint)
@@ -155,10 +155,56 @@ static public class GUITools
 
 			// Checker background
 			DrawTiledTexture(rect, check);
+		}
+		return rect;
+	}
 
-			// Actual texture
+	/// <summary>
+	/// Draw a texture atlas, complete with a background texture and an outline.
+	/// </summary>
+
+	static public Rect DrawAtlas (Texture2D tex)
+	{
+		Rect rect = DrawBackground(tex, (float)tex.height / tex.width);
+
+		if (Event.current.type == EventType.Repaint)
+		{
 			GUI.DrawTexture(rect, tex);
 		}
+		return rect;
+	}
+
+	/// <summary>
+	/// Draw an enlarged sprite within the specified texture atlas.
+	/// </summary>
+
+	static public Rect DrawSprite (Texture2D tex, Rect sprite)
+	{
+		float paddingX = 4f / tex.width;
+		float paddingY = 4f / tex.height;
+		float ratio = (sprite.height + paddingY) / (sprite.width + paddingX);
+
+		// Draw the checkered background
+		Rect rect = DrawBackground(tex, ratio);
+
+		// We only want to draw into this rectangle
+		GUI.BeginGroup(rect);
+		{
+			if (Event.current.type == EventType.Repaint)
+			{
+				// We need to calculate where to begin and how to stretch the texture
+				// for it to appear properly scaled in the rectangle
+				float scaleX = rect.width  / (sprite.width  + paddingX);
+				float scaleY = rect.height / (sprite.height + paddingY);
+				float ox = scaleX * (sprite.x - paddingX * 0.5f);
+				float oy = scaleY * (1f - (sprite.yMax + paddingY * 0.5f));
+
+				Rect drawRect = new Rect(-ox, -oy, scaleX, scaleY);
+				GUI.DrawTexture(drawRect, tex);
+				rect = new Rect(drawRect.x + rect.x, drawRect.y + rect.y, drawRect.width, drawRect.height);
+			}
+		}
+		GUI.EndGroup();
 		return rect;
 	}
 

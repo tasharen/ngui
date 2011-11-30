@@ -105,7 +105,7 @@ public class UISprite : UIWidget
 
 				if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 				{
-					mOuterUV = UIAtlas.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
+					mOuterUV = NGUITools.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
 				}
 				mChanged = true;
 			}
@@ -122,7 +122,7 @@ public class UISprite : UIWidget
 
 		if (tex != null)
 		{
-			Rect rect = UIAtlas.ConvertToPixels(outerUV, tex.width, tex.height, true);
+			Rect rect = NGUITools.ConvertToPixels(outerUV, tex.width, tex.height, true);
 			Vector3 scale = cachedTransform.localScale;
 			scale.x = rect.width;
 			scale.y = rect.height;

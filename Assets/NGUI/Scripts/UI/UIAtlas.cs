@@ -71,60 +71,17 @@ public class UIAtlas : MonoBehaviour
 				{
 					if (mCoordinates == Coordinates.TexCoords)
 					{
-						s.outer = ConvertToTexCoords(s.outer, tex.width, tex.height);
-						s.inner = ConvertToTexCoords(s.inner, tex.width, tex.height);
+						s.outer = NGUITools.ConvertToTexCoords(s.outer, tex.width, tex.height);
+						s.inner = NGUITools.ConvertToTexCoords(s.inner, tex.width, tex.height);
 					}
 					else
 					{
-						s.outer = ConvertToPixels(s.outer, tex.width, tex.height, true);
-						s.inner = ConvertToPixels(s.inner, tex.width, tex.height, true);
+						s.outer = NGUITools.ConvertToPixels(s.outer, tex.width, tex.height, true);
+						s.inner = NGUITools.ConvertToPixels(s.inner, tex.width, tex.height, true);
 					}
 				}
 			}
 		}
-	}
-
-	/// <summary>
-	/// Helper function.
-	/// </summary>
-
-	public static Rect ConvertToTexCoords (Rect rect, int width, int height)
-	{
-		Rect final = rect;
-
-		if (width != 0f && height != 0f)
-		{
-			final.xMin = rect.xMin / width;
-			final.xMax = rect.xMax / width;
-			final.yMin = 1f - rect.yMax / height;
-			final.yMax = 1f - rect.yMin / height;
-		}
-		return final;
-	}
-
-	/// <summary>
-	/// Helper function.
-	/// </summary>
-
-	public static Rect ConvertToPixels (Rect rect, int width, int height, bool round)
-	{
-		Rect final = rect;
-
-		if (round)
-		{
-			final.xMin = Mathf.RoundToInt(rect.xMin * width);
-			final.xMax = Mathf.RoundToInt(rect.xMax * width);
-			final.yMin = Mathf.RoundToInt((1f - rect.yMax) * height);
-			final.yMax = Mathf.RoundToInt((1f - rect.yMin) * height);
-		}
-		else
-		{
-			final.xMin = rect.xMin * width;
-			final.xMax = rect.xMax * width;
-			final.yMin = (1f - rect.yMax) * height;
-			final.yMax = (1f - rect.yMin) * height;
-		}
-		return final;
 	}
 
 	/// <summary>

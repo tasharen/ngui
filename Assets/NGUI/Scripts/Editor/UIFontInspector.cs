@@ -42,9 +42,9 @@ public class UIFontInspector : Editor
 				if (tex != null)
 				{
 					// Pixels are easier to work with than UVs
-					Rect pixels = UIAtlas.ConvertToPixels(font.uvRect, tex.width, tex.height, false);
+					Rect pixels = NGUITools.ConvertToPixels(font.uvRect, tex.width, tex.height, false);
 					Rect uvRect = EditorGUILayout.RectField("Pixel Rect", pixels);
-					uvRect = UIAtlas.ConvertToTexCoords(uvRect, tex.width, tex.height);
+					uvRect = NGUITools.ConvertToTexCoords(uvRect, tex.width, tex.height);
 
 					GUI.backgroundColor = Color.white;
 

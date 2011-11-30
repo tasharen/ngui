@@ -2,6 +2,10 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Helper class containing generic functions used throughout the UI library.
+/// </summary>
+
 static public class NGUITools
 {
 	/// <summary>
@@ -139,5 +143,75 @@ static public class NGUITools
 			++i;
 		}
 		return text;
+	}
+
+	/// <summary>
+	/// Convert from top-left based pixel coordinates to bottom-left based UV coordinates.
+	/// </summary>
+
+	static public Rect ConvertToTexCoords (Rect rect, int width, int height)
+	{
+		Rect final = rect;
+
+		if (width != 0f && height != 0f)
+		{
+			final.xMin = rect.xMin / width;
+			final.xMax = rect.xMax / width;
+			final.yMin = 1f - rect.yMax / height;
+			final.yMax = 1f - rect.yMin / height;
+		}
+		return final;
+	}
+
+	/// <summary>
+	/// Convert from bottom-left based UV coordinates to top-left based pixel coordinates.
+	/// </summary>
+
+	static public Rect ConvertToPixels (Rect rect, int width, int height, bool round)
+	{
+		Rect final = rect;
+
+		if (round)
+		{
+			final.xMin = Mathf.RoundToInt(rect.xMin * width);
+			final.xMax = Mathf.RoundToInt(rect.xMax * width);
+			final.yMin = Mathf.RoundToInt((1f - rect.yMax) * height);
+			final.yMax = Mathf.RoundToInt((1f - rect.yMin) * height);
+		}
+		else
+		{
+			final.xMin = rect.xMin * width;
+			final.xMax = rect.xMax * width;
+			final.yMin = (1f - rect.yMax) * height;
+			final.yMax = (1f - rect.yMin) * height;
+		}
+		return final;
+	}
+
+	/// <summary>
+	/// Round the pixel rectangle's dimensions.
+	/// </summary>
+
+	static public Rect MakePixelPerfect (Rect rect)
+	{
+		rect.xMin = Mathf.RoundToInt(rect.xMin);
+		rect.yMin = Mathf.RoundToInt(rect.yMin);
+		rect.xMax = Mathf.RoundToInt(rect.xMax);
+		rect.yMax = Mathf.RoundToInt(rect.yMax);
+		return rect;
+	}
+
+	/// <summary>
+	/// Round the texture coordinate rectangle's dimensions.
+	/// </summary>
+
+	static public Rect MakePixelPerfect (Rect rect, int width, int height)
+	{
+		rect = ConvertToPixels(rect, width, height, true);
+		rect.xMin = Mathf.RoundToInt(rect.xMin);
+		rect.yMin = Mathf.RoundToInt(rect.yMin);
+		rect.xMax = Mathf.RoundToInt(rect.xMax);
+		rect.yMax = Mathf.RoundToInt(rect.yMax);
+		return ConvertToTexCoords(rect, width, height);
 	}
 }
