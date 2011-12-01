@@ -16,7 +16,12 @@ Shader "Unlit/Transparent Colored"
 		}
 		
 		LOD 100
+		Cull Off
+		Lighting Off
 		ZWrite Off
+		Fog { Color (0,0,0,0) }
+		ColorMask RGB
+		AlphaTest Greater .01
 		Blend SrcAlpha OneMinusSrcAlpha
 		
 		Pass

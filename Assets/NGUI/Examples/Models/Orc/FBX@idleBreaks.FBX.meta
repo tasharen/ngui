@@ -1,0 +1,137 @@
+fileFormatVersion: 1
+guid: d9a637e69b9f0a7449ee6b6e158ddd5b
+ModelImporter:
+  importerVersion: 7
+  meshes:
+    scaleFactor: 0.1
+    useFileUnits: 1
+    meshCompression: 0
+    generateColliders: 0
+    swapUVs: 0
+  tangentSpace:
+    normalImportMode: 0
+    tangentImportMode: 1
+    smoothingAngle: 60
+    splitTangents: 1
+  materials:
+    generation: 0
+  animations:
+    generation: 3
+    bakeAnimations: 0
+    animationCompression: 1
+    animationWrapMode: 0
+    splitAnimations: 1
+    clips:
+      idle0:
+        firstFrame: 1
+        lastFrame: 78
+        loop: 0
+        wrapMode: 0
+      idle1:
+        firstFrame: 78
+        lastFrame: 155
+        loop: 0
+        wrapMode: 0
+      idle2:
+        firstFrame: 155
+        lastFrame: 271
+        loop: 0
+        wrapMode: 0
+  nodeInfo:
+    Bip01 L Thigh:
+    - 100000
+    - 400000
+    Bip01 L Forearm:
+    - 100002
+    - 400002
+    Bip01 R Calf:
+    - 100004
+    - 400004
+    Bip01 Neck:
+    - 100006
+    - 400006
+    Bip01 R Toe0Nub:
+    - 100008
+    - 400008
+    Bip01 Spine1:
+    - 100010
+    - 400010
+    Bip01 R Thigh:
+    - 100012
+    - 400012
+    Bip01 Head:
+    - 100014
+    - 400014
+    Bip01 L Hand:
+    - 100016
+    - 400016
+    Bip01 L Toe0Nub:
+    - 100018
+    - 400018
+    //RootNode:
+    - 100020
+    - 400020
+    - 11100000
+    Bip01 L Foot:
+    - 100022
+    - 400022
+    Bip01 Spine:
+    - 100024
+    - 400024
+    Orc Biped:
+    - 100026
+    - 400026
+    Bip01 HeadNub:
+    - 100028
+    - 400028
+    Bip01 R Foot:
+    - 100030
+    - 400030
+    Bip01 R Forearm:
+    - 100032
+    - 400032
+    Bip01 L Calf:
+    - 100034
+    - 400034
+    Bip01 Footsteps:
+    - 100036
+    - 400036
+    Bip01 R Hand:
+    - 100038
+    - 400038
+    Bip01 Pelvis:
+    - 100040
+    - 400040
+    - 13700000
+    Orc:
+    - 100042
+    - 400042
+    Bip01 L UpperArm:
+    - 100044
+    - 400044
+    Bip01 L Toe0 - Ignore Me:
+    - 100046
+    - 400046
+    Bip01 R Toe0 - Ignore Me:
+    - 100048
+    - 400048
+    Bip01 R UpperArm:
+    - 100050
+    - 400050
+    Bip01 L Clavicle:
+    - 100052
+    - 400052
+    Bip01 R Clavicle:
+    - 100054
+    - 400054
+AssetImporter:
+  importerVersion: 1
+  fileIDToRecycleName:
+    4300000: Orc
+    7400000: Take 001 //// FBX@IdleBreaks
+    7400002: idle0 //// FBX@IdleBreaks
+    7400004: idle1 //// FBX@IdleBreaks
+    7400006: idle2 //// FBX@IdleBreaks
+    7400008: idle0 //// FBX@idleBreaks
+    7400010: idle1 //// FBX@idleBreaks
+    7400012: idle2 //// FBX@idleBreaks

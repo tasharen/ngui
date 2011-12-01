@@ -1,0 +1,118 @@
+fileFormatVersion: 1
+guid: 12e164431dbd8714bbde0aeef453b764
+ModelImporter:
+  importerVersion: 7
+  meshes:
+    scaleFactor: 0.1
+    useFileUnits: 1
+    meshCompression: 0
+    generateColliders: 0
+    swapUVs: 0
+  tangentSpace:
+    normalImportMode: 0
+    tangentImportMode: 1
+    smoothingAngle: 60
+    splitTangents: 1
+  materials:
+    generation: 0
+  animations:
+    generation: 3
+    bakeAnimations: 0
+    animationCompression: 1
+    animationWrapMode: 2
+    splitAnimations: 1
+  nodeInfo:
+    Bip01 R Toe0 - Ignore Me:
+    - 100000
+    - 400000
+    Bip01 R UpperArm:
+    - 100002
+    - 400002
+    Bip01 R Clavicle:
+    - 100004
+    - 400004
+    Bip01 L Toe0 - Ignore Me:
+    - 100006
+    - 400006
+    Bip01 L UpperArm:
+    - 100008
+    - 400008
+    Bip01 L Clavicle:
+    - 100010
+    - 400010
+    Bip01 R Forearm:
+    - 100012
+    - 400012
+    //RootNode:
+    - 100014
+    - 400014
+    - 11100000
+    Bip01 R Hand:
+    - 100016
+    - 400016
+    Bip01 L Hand:
+    - 100018
+    - 400018
+    Bip01 L Forearm:
+    - 100020
+    - 400020
+    Bip01 HeadNub:
+    - 100022
+    - 400022
+    Bip01 Head:
+    - 100024
+    - 400024
+    Bip01 Neck:
+    - 100026
+    - 400026
+    Bip01 Spine1:
+    - 100028
+    - 400028
+    Bip01 R Toe0Nub:
+    - 100030
+    - 400030
+    Bip01 R Foot:
+    - 100032
+    - 400032
+    Bip01 R Calf:
+    - 100034
+    - 400034
+    Bip01 R Thigh:
+    - 100036
+    - 400036
+    Bip01 L Toe0Nub:
+    - 100038
+    - 400038
+    Bip01 L Foot:
+    - 100040
+    - 400040
+    Bip01 L Calf:
+    - 100042
+    - 400042
+    Bip01 L Thigh:
+    - 100044
+    - 400044
+    Bip01 Spine:
+    - 100046
+    - 400046
+    Bip01 Pelvis:
+    - 100048
+    - 400048
+    - 13700000
+    Bip01 Footsteps:
+    - 100050
+    - 400050
+    Orc Biped:
+    - 100052
+    - 400052
+    Orc:
+    - 100054
+    - 400054
+AssetImporter:
+  importerVersion: 1
+  fileIDToRecycleName:
+    4300000: Orc
+    7400000: Take 001 //// Orc@Idle
+    7400002: Take 001 //// OrcFBX@Idle
+    7400004: Take 001 //// FBX@Idle
+    7400006: Take 001 //// FBX@idle
