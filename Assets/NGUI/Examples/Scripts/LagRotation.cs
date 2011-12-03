@@ -4,7 +4,7 @@ using UnityEngine;
 /// Attach to a game object to make its rotation always lag behind its parent as the parent rotates.
 /// </summary>
 
-[AddComponentMenu("Misc/Lag Rotation")]
+[AddComponentMenu("NGUI/Examples/Lag Rotation")]
 public class LagRotation : MonoBehaviour
 {
 	public int level = 0;

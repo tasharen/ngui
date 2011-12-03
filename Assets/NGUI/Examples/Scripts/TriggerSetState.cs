@@ -5,7 +5,7 @@ using UnityEngine;
 /// </summary>
 
 [RequireComponent(typeof(Collider))]
-[AddComponentMenu("Misc/Trigger Set State")]
+[AddComponentMenu("NGUI/Examples/Trigger Set State")]
 public class TriggerSetState : MonoBehaviour
 {
 	public GameObject target;

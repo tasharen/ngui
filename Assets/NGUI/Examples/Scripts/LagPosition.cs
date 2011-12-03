@@ -4,7 +4,7 @@ using UnityEngine;
 /// Attach to a game object to make its position always lag behind its parent as the parent moves.
 /// </summary>
 
-[AddComponentMenu("Misc/Lag Position")]
+[AddComponentMenu("NGUI/Examples/Lag Position")]
 public class LagPosition : MonoBehaviour
 {
 	public int level = 0;

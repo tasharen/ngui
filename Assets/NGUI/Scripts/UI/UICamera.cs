@@ -23,8 +23,8 @@ public class UICamera : MonoBehaviour
 	GameObject mDown = null;
 	GameObject mSel = null;
 	Vector3 mPos = Vector3.zero;
-	Vector3 mDelta = Vector3.zero;
-	Vector3 mTotalDelta = Vector3.zero;
+	Vector2 mDelta = Vector2.zero;
+	Vector2 mTotalDelta = Vector2.zero;
 	LayerMask mLayerMask;
 	bool mConsiderForClick = false;
 

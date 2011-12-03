@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Spin))]
-[AddComponentMenu("Examples/Spin On State")]
+[AddComponentMenu("NGUI/Examples/Spin On State")]
 public class SpinOnState : MonoBehaviour
 {
 	void OnState (int state)

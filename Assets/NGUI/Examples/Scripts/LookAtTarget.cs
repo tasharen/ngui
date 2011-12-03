@@ -5,7 +5,7 @@
 /// The most ideal use for this script is to attach it to the camera and make the camera look at its target.
 /// </summary>
 
-[AddComponentMenu("Misc/Look At Target")]
+[AddComponentMenu("NGUI/Examples/Look At Target")]
 public class LookAtTarget : MonoBehaviour
 {
 	public int level = 0;

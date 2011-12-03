@@ -4,7 +4,7 @@ using UnityEngine;
 /// Want something to spin? Attach this script to it. Works equally well with rigidbodies as without.
 /// </summary>
 
-[AddComponentMenu("Misc/Spin")]
+[AddComponentMenu("NGUI/Examples/Spin")]
 [RequireComponent(typeof(Rigidbody))]
 public class Spin : MonoBehaviour
 {
