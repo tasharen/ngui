@@ -79,7 +79,7 @@ public class SelectionTools
 		}
 	}
 	
-	[MenuItem("Selection/List Dependencies #&i")]
+	[MenuItem("Selection/List Dependencies")]
 	static void ListDependencies()
 	{
 		if (HasValidSelection())
@@ -143,9 +143,8 @@ public class SelectionTools
 					"This action will lose the prefab connection. Are you sure you wish to continue?",
 					"Continue", "Cancel");
             }
-			return true;
         }
-		return false;
+		return true;
 	}
 	
 	/// <summary>
