@@ -163,13 +163,20 @@ static public class GUITools
 	/// Draw a texture atlas, complete with a background texture and an outline.
 	/// </summary>
 
-	static public Rect DrawAtlas (Texture2D tex)
+	static public Rect DrawAtlas (Texture2D tex, Material mat)
 	{
 		Rect rect = DrawBackground(tex, (float)tex.height / tex.width);
 
 		if (Event.current.type == EventType.Repaint)
 		{
-			GUI.DrawTexture(rect, tex);
+			if (mat == null)
+			{
+				GUI.DrawTexture(rect, tex);
+			}
+			else
+			{
+				UnityEditor.EditorGUI.DrawPreviewTexture(rect, tex, mat);
+			}
 		}
 		return rect;
 	}
@@ -178,11 +185,13 @@ static public class GUITools
 	/// Draw an enlarged sprite within the specified texture atlas.
 	/// </summary>
 
-	static public Rect DrawSprite (Texture2D tex, Rect sprite)
+	static public Rect DrawSprite (Texture2D tex, Rect sprite, Material mat)
 	{
 		float paddingX = 4f / tex.width;
 		float paddingY = 4f / tex.height;
 		float ratio = (sprite.height + paddingY) / (sprite.width + paddingX);
+
+		ratio *= (float)tex.height / tex.width;
 
 		// Draw the checkered background
 		Rect rect = DrawBackground(tex, ratio);
@@ -200,7 +209,20 @@ static public class GUITools
 				float oy = scaleY * (1f - (sprite.yMax + paddingY * 0.5f));
 
 				Rect drawRect = new Rect(-ox, -oy, scaleX, scaleY);
-				GUI.DrawTexture(drawRect, tex);
+
+				if (mat == null)
+				{
+					GUI.DrawTexture(drawRect, tex);
+				}
+				else
+				{
+					// NOTE: DrawPreviewTexture doesn't seem to support BeginGroup-based clipping
+					// when a custom material is specified. It seems to be a bug in Unity.
+					// Passing 'null' for the material or omitting the parameter clips as expected.
+					UnityEditor.EditorGUI.DrawPreviewTexture(drawRect, tex, mat);
+					//UnityEditor.EditorGUI.DrawPreviewTexture(drawRect, tex);
+					//GUI.DrawTexture(drawRect, tex);
+				}
 				rect = new Rect(drawRect.x + rect.x, drawRect.y + rect.y, drawRect.width, drawRect.height);
 			}
 		}

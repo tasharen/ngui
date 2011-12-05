@@ -15,6 +15,7 @@ public class UIAtlasInspector : Editor
 	}
 
 	static View mView = View.Sprite;
+	static bool mUseShader = false;
 
 	UIAtlas mAtlas;
 	int mIndex = 0;
@@ -216,7 +217,24 @@ public class UIAtlasInspector : Editor
 						}
 						GUILayout.EndHorizontal();
 
-						mView = (View)EditorGUILayout.EnumPopup("Show", mView);
+						GUILayout.BeginHorizontal();
+						{
+							mView = (View)EditorGUILayout.EnumPopup("Show", mView);
+							GUILayout.Label("Shader", GUILayout.Width(45f));
+
+							if (mUseShader != EditorGUILayout.Toggle(mUseShader, GUILayout.Width(20f)))
+							{
+								mUseShader = !mUseShader;
+
+								if (mUseShader && mView == View.Sprite)
+								{
+									// TODO: Remove this when Unity fixes the bug with DrawPreviewTexture not being affected by BeginGroup
+									Debug.LogWarning("There is a bug in Unity that prevents the texture from getting clipped properly.\n" +
+										"Until it's fixed by Unity, your texture may spill onto the rest of the Unity's GUI while using this mode.");
+								}
+							}
+						}
+						GUILayout.EndHorizontal();
 
 						Rect uv0 = outer;
 						Rect uv1 = inner;
@@ -229,7 +247,8 @@ public class UIAtlasInspector : Editor
 
 						// Draw the atlas
 						EditorGUILayout.Separator();
-						Rect rect = (mView == View.Atlas) ? GUITools.DrawAtlas(tex) : GUITools.DrawSprite(tex, uv0);
+						Material m = mUseShader ? mAtlas.material : null;
+						Rect rect = (mView == View.Atlas) ? GUITools.DrawAtlas(tex, m) : GUITools.DrawSprite(tex, uv0, m);
 
 						// Draw the sprite outline
 						GUITools.DrawOutline(rect, uv1, blue);

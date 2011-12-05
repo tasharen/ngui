@@ -10,6 +10,7 @@ public class UIWidgetInspector : Editor
 {
 	protected UIWidget mWidget;
 	protected bool mRegisteredUndo = false;
+	protected bool mUseShader = false;
 
 	bool mHierarchyCheck = true;
 
@@ -75,6 +76,18 @@ public class UIWidgetInspector : Editor
 
 			// Draw all derived functionality
 			if (GUI.changed) RegisterUndo();
+
+			if (mUseShader != EditorGUILayout.Toggle("Use Shader", mUseShader))
+			{
+				mUseShader = !mUseShader;
+
+				if (mUseShader)
+				{
+					// TODO: Remove this when Unity fixes the bug with DrawPreviewTexture not being affected by BeginGroup
+					Debug.LogWarning("There is a bug in Unity that prevents the texture from getting clipped properly.\n" +
+						"Until it's fixed by Unity, your texture may spill onto the rest of the Unity's GUI while using this mode.");
+				}
+			}
 
 			// Custom functionality
 			OnCustomEnd();

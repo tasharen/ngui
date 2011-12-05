@@ -8,7 +8,7 @@ using UnityEditor;
 [CustomEditor(typeof(UISprite))]
 public class UISpriteInspector : UIWidgetInspector
 {
-	UIAtlas mAtlas;
+	protected UIAtlas mAtlas;
 	UISprite mSprite;
 	UIAtlas.Sprite mAtlasSprite;
 
@@ -64,7 +64,7 @@ public class UISpriteInspector : UIWidgetInspector
 		{
 			// Draw the atlas
 			EditorGUILayout.Separator();
-			Rect rect = GUITools.DrawSprite(tex, mSprite.outerUV);
+			Rect rect = GUITools.DrawSprite(tex, mSprite.outerUV, mUseShader ? mAtlas.material : null);
 
 			// Draw the selection
 			GUITools.DrawOutline(rect, mSprite.outerUV, new Color(0.4f, 1f, 0f, 1f));

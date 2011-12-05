@@ -27,7 +27,6 @@ Shader "Unlit/Transparent Colored"
 		Pass
 		{
 			ColorMaterial AmbientAndDiffuse
-			Lighting Off
 			
 			SetTexture [_MainTex]
 			{

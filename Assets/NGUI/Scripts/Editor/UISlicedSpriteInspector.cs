@@ -21,7 +21,7 @@ public class UISlicedSpriteInspector : UISpriteInspector
 		{
 			// Draw the atlas
 			EditorGUILayout.Separator();
-			Rect rect = GUITools.DrawSprite(tex, sprite.outerUV);
+			Rect rect = GUITools.DrawSprite(tex, sprite.outerUV, mUseShader ? mAtlas.material : null);
 
 			// Draw the selection
 			GUITools.DrawOutline(rect, sprite.innerUV, new Color(0f, 0.7f, 1f, 1f));

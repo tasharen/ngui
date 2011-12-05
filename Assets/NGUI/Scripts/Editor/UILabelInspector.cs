@@ -40,7 +40,7 @@ public class UILabelInspector : UIWidgetInspector
 			{
 				// Draw the atlas
 				EditorGUILayout.Separator();
-				GUITools.DrawSprite(tex, mFont.uvRect);
+				GUITools.DrawSprite(tex, mFont.uvRect, mFont.material);
 
 				// Sprite size label
 				Rect rect = GUILayoutUtility.GetRect(Screen.width, 18f);

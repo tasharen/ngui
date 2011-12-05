@@ -15,6 +15,7 @@ public class UIFontInspector : Editor
 	}
 
 	static View mView = View.Atlas;
+	static bool mUseShader = false;
 
 	override public void OnInspectorGUI ()
 	{
@@ -78,7 +79,24 @@ public class UIFontInspector : Editor
 					}
 					GUILayout.EndHorizontal();
 
-					mView = (View)EditorGUILayout.EnumPopup("Show", mView);
+					GUILayout.BeginHorizontal();
+					{
+						mView = (View)EditorGUILayout.EnumPopup("Show", mView);
+						GUILayout.Label("Shader", GUILayout.Width(45f));
+
+						if (mUseShader != EditorGUILayout.Toggle(mUseShader, GUILayout.Width(20f)))
+						{
+							mUseShader = !mUseShader;
+
+							if (mUseShader && mView == View.Font)
+							{
+								// TODO: Remove this when Unity fixes the bug with DrawPreviewTexture not being affected by BeginGroup
+								Debug.LogWarning("There is a bug in Unity that prevents the texture from getting clipped properly.\n" +
+									"Until it's fixed by Unity, your texture may spill onto the rest of the Unity's GUI while using this mode.");
+							}
+						}
+					}
+					GUILayout.EndHorizontal();
 
 					// Convert the pixel coordinates back to UV coordinates
 					Rect uvRect = NGUITools.ConvertToTexCoords(pixels, tex.width, tex.height);
@@ -91,7 +109,8 @@ public class UIFontInspector : Editor
 
 					// Draw the atlas
 					EditorGUILayout.Separator();
-					Rect rect = (mView == View.Atlas) ? GUITools.DrawAtlas(tex) : GUITools.DrawSprite(tex, uvRect);
+					Material m = mUseShader ? font.material : null;
+					Rect rect = (mView == View.Atlas) ? GUITools.DrawAtlas(tex, m) : GUITools.DrawSprite(tex, uvRect, m);
 					GUITools.DrawOutline(rect, uvRect, green);
 
 					rect = GUILayoutUtility.GetRect(Screen.width, 18f);
