@@ -24,6 +24,21 @@ public class UIItemSlot : MonoBehaviour
 			mItem = item;
 
 			if (label != null) label.text = (mItem != null) ? mItem.name : slot.ToString();
+			
+			if (icon != null)
+			{
+				if (mItem == null || mItem.iconAtlas == null)
+				{
+					icon.enabled = false;
+				}
+				else
+				{
+					icon.atlas = mItem.iconAtlas;
+					icon.spriteName = mItem.iconName;
+					icon.enabled = true;
+					icon.MakePixelPerfect();
+				}
+			}
 		}
 	}
 }
