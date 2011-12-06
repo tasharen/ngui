@@ -238,7 +238,7 @@ public abstract class UIWidget : MonoBehaviour
 	void OnEnable ()
 	{
 		mChanged = true;
-		panel.AddWidget(this);
+		if (mMat != null) panel.AddWidget(this);
 	}
 
 	/// <summary>

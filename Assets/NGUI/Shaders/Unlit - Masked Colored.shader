@@ -10,7 +10,7 @@ Shader "Unlit/Masked Colored"
 	{
 		Tags
 		{
-			"Queue" = "Transparent"
+			"Queue" = "Transparent+1"
 			"IgnoreProjector" = "True"
 			"RenderType" = "Transparent"
 		}
