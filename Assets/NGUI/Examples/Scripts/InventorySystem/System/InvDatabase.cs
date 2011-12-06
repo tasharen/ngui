@@ -43,6 +43,12 @@ public class InvDatabase : MonoBehaviour
 	public List<InvItem> items = new List<InvItem>();
 
 	/// <summary>
+	/// UI atlas used for icons.
+	/// </summary>
+
+	public UIAtlas iconAtlas;
+
+	/// <summary>
 	/// Add this database to the list.
 	/// </summary>
 

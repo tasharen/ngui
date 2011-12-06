@@ -112,4 +112,22 @@ public class InvEquipment : MonoBehaviour
 	{
 		return InvTools.CombineStats(mItems);
 	}
+
+	/// <summary>
+	/// Retrieves the item in the specified slot.
+	/// </summary>
+
+	public InvItem GetItem (InvItem.Slot slot)
+	{
+		if (slot != InvItem.Slot.None)
+		{
+			int index = (int)slot - 1;
+
+			if (mItems != null && index < mItems.Length)
+			{
+				return mItems[index];
+			}
+		}
+		return null;
+	}
 }

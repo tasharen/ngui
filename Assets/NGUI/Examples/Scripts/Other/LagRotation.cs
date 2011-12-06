@@ -19,10 +19,9 @@ public class LagRotation : MonoBehaviour
 		mTrans = transform;
 		mRelative = mTrans.localRotation;
 		mAbsolute = mTrans.rotation;
-		UpdateManager.AddLateUpdate(level, this, OnLateUpdate);
 	}
 
-	bool OnLateUpdate()
+	void LateUpdate()
 	{
 		Transform parent = mTrans.parent;
 		
@@ -31,6 +30,5 @@ public class LagRotation : MonoBehaviour
 			mAbsolute = Quaternion.Slerp(mAbsolute, parent.rotation * mRelative, Time.deltaTime * speed);
 			mTrans.rotation = mAbsolute;
 		}
-		return true;
 	}
 }

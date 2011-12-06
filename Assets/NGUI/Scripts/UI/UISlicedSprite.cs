@@ -36,14 +36,16 @@ public class UISlicedSprite : UISprite
 	/// Inner set of UV coordinates.
 	/// </summary>
 
-	public Rect innerUV { get { return mInnerUV; } }
+	public Rect innerUV { get { UpdateUVs(); return mInnerUV; } }
 
 	/// <summary>
 	/// Update the texture UVs used by the widget.
 	/// </summary>
 
-	override protected void UpdateUVs ()
+	override protected void UpdateUVs()
 	{
+		Init();
+
 		if (mSprite != null && (mInner != mSprite.inner || mOuter != mSprite.outer))
 		{
 			Texture2D tex = mainTexture;

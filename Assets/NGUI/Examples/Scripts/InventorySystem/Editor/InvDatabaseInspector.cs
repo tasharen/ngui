@@ -74,6 +74,16 @@ public class InvDatabaseInspector : Editor
 		}
 		else
 		{
+			// Database icon atlas
+			UIAtlas atlas = EditorGUILayout.ObjectField("Icon Atlas", db.iconAtlas, typeof(UIAtlas), false) as UIAtlas;
+
+			if (atlas != db.iconAtlas)
+			{
+				Undo.RegisterUndo(db, "Databse Atlas change");
+				db.iconAtlas = atlas;
+				foreach (InvItem i in db.items) i.iconAtlas = atlas;
+			}
+
 			// Database ID
 			int dbID = EditorGUILayout.IntField("Database ID", db.databaseID);
 
@@ -93,6 +103,7 @@ public class InvDatabaseInspector : Editor
 				item.name = "New Item";
 				item.description = "Item Description";
 				item.id16 = (db.items.Count > 0) ? db.items[db.items.Count - 1].id16 + 1 : 0;
+				item.iconAtlas = db.iconAtlas;
 				db.items.Add(item);
 				mIndex = db.items.Count - 1;
 			}
@@ -142,16 +153,89 @@ public class InvDatabaseInspector : Editor
 				// Item properties
 				string itemDesc = GUILayout.TextArea(item.description, 200, GUILayout.Height(100f));
 				InvItem.Slot slot = (InvItem.Slot)EditorGUILayout.EnumPopup("Slot", item.slot);
-				GameObject go = (GameObject)EditorGUILayout.ObjectField("Attachment", item.attachment, typeof(GameObject), false);
-				Color color = EditorGUILayout.ColorField("Color", item.color);
 
-				if (!string.Equals(itemDesc, item.description) || slot != item.slot || go != item.attachment || color != item.color)
+				string iconName = "";
+				float iconSize = 64f;
+				bool drawIcon = false;
+				float extraSpace = 0f;
+
+				if (item.iconAtlas != null)
 				{
-					Undo.RegisterUndo(db, "Item Properties");
-					item.description = itemDesc;
-					item.slot = slot;
-					item.attachment = go;
-					item.color = color;
+					List<string> sprites = item.iconAtlas.GetListOfSprites();
+
+					sprites.Insert(0, "<None>");
+
+					int index = 0;
+					string spriteName = (item.iconName != null) ? item.iconName : sprites[0];
+
+					// We need to find the sprite in order to have it selected
+					if (!string.IsNullOrEmpty(spriteName))
+					{
+						for (int i = 1; i < sprites.Count; ++i)
+						{
+							if (string.Equals(sprites[i], spriteName, System.StringComparison.OrdinalIgnoreCase))
+							{
+								index = i;
+								break;
+							}
+						}
+					}
+
+					// Draw the sprite selection popup
+					index = EditorGUILayout.Popup("Icon", index, sprites.ToArray());
+					UIAtlas.Sprite sprite = (index > 0) ? item.iconAtlas.GetSprite(sprites[index]) : null;
+
+					if (sprite != null)
+					{
+						iconName = sprite.name;
+
+						Material mat = item.iconAtlas.material;
+
+						if (mat != null)
+						{
+							Texture2D tex = mat.mainTexture as Texture2D;
+
+							if (tex != null)
+							{
+								drawIcon = true;
+								Rect rect = sprite.outer;
+
+								if (item.iconAtlas.coordinates == UIAtlas.Coordinates.Pixels)
+								{
+									rect = NGUITools.ConvertToTexCoords(rect, tex.width, tex.height);
+								}
+
+								GUILayout.Space(4f);
+								GUILayout.BeginHorizontal();
+								{
+									GUILayout.Space(Screen.width - iconSize);
+									GUITools.DrawSprite(tex, rect, null);
+								}
+								GUILayout.EndHorizontal();
+
+								extraSpace = iconSize * (float)sprite.outer.height / sprite.outer.width;
+							}
+						}
+					}
+				}
+
+				// Game Object attachment field, left of the icon
+				GUILayout.BeginHorizontal();
+				GameObject go = (GameObject)EditorGUILayout.ObjectField("Attachment", item.attachment, typeof(GameObject), false);
+				if (drawIcon) GUILayout.Space(iconSize);
+				GUILayout.EndHorizontal();
+
+				// Color tint field, left of the icon
+				GUILayout.BeginHorizontal();
+				Color color = EditorGUILayout.ColorField("Color", item.color);
+				if (drawIcon) GUILayout.Space(iconSize);
+				GUILayout.EndHorizontal();
+
+				// Calculate the extra spacing necessary for the icon to show up properly and not overlap anything
+				if (drawIcon)
+				{
+					extraSpace = Mathf.Max(0f, extraSpace - 40f);
+					GUILayout.Space(extraSpace);
 				}
 
 				// Item stats
@@ -199,6 +283,18 @@ public class InvDatabaseInspector : Editor
 				{
 					Undo.RegisterUndo(db, "Add Item Stat");
 					item.stats.Add(new InvStat());
+				}
+
+				// Save all values
+				if (!string.Equals(itemDesc, item.description) || slot != item.slot || go != item.attachment || color != item.color ||
+					!string.Equals(iconName, item.iconName))
+				{
+					Undo.RegisterUndo(db, "Item Properties");
+					item.description = itemDesc;
+					item.slot = slot;
+					item.attachment = go;
+					item.color = color;
+					item.iconName = iconName;
 				}
 			}
 		}

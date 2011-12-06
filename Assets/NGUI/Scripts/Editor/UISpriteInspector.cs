@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 /// <summary>
 /// Inspector class used to edit UISprites.
@@ -24,9 +25,9 @@ public class UISpriteInspector : UIWidgetInspector
 		mAtlasSprite = null;
 		if (mAtlas == null) return false;
 
-		string[] sprites = mAtlas.GetListOfSprites();
+		List<string> sprites = mAtlas.GetListOfSprites();
 
-		if (sprites != null && sprites.Length > 0)
+		if (sprites != null && sprites.Count > 0)
 		{
 			int index = 0;
 			string spriteName = (mSprite.spriteName != null) ? mSprite.spriteName : sprites[0];
@@ -34,7 +35,7 @@ public class UISpriteInspector : UIWidgetInspector
 			// We need to find the sprite in order to have it selected
 			if (!string.IsNullOrEmpty(spriteName))
 			{
-				for (int i = 0; i < sprites.Length; ++i)
+				for (int i = 0; i < sprites.Count; ++i)
 				{
 					if (string.Equals(sprites[i], spriteName, System.StringComparison.OrdinalIgnoreCase))
 					{
@@ -45,7 +46,7 @@ public class UISpriteInspector : UIWidgetInspector
 			}
 
 			// Draw the sprite selection popup
-			index = EditorGUILayout.Popup("Sprite", index, sprites);
+			index = EditorGUILayout.Popup("Sprite", index, sprites.ToArray());
 			mAtlasSprite = mAtlas.GetSprite(sprites[index]);
 			GUITools.DrawSeparator();
 		}

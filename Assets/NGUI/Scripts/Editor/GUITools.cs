@@ -138,8 +138,8 @@ static public class GUITools
 	static Rect DrawBackground (Texture2D tex, float ratio)
 	{
 		Rect rect = GUILayoutUtility.GetRect(0f, 0f);
-		rect.width = Screen.width;
-		rect.height = Screen.width * ratio;
+		rect.width = Screen.width - rect.xMin;
+		rect.height = rect.width * ratio;
 		GUILayout.Space(rect.height);
 
 		if (Event.current.type == EventType.Repaint)

@@ -21,7 +21,7 @@ public class UISprite : UIWidget
 	/// Outer set of UV coordinates.
 	/// </summary>
 
-	public Rect outerUV { get { return mOuterUV; } }
+	public Rect outerUV { get { UpdateUVs(); return mOuterUV; } }
 
 	/// <summary>
 	/// Atlas used by this widget.
@@ -92,8 +92,10 @@ public class UISprite : UIWidget
 	/// Update the texture UVs used by the widget.
 	/// </summary>
 
-	virtual protected void UpdateUVs ()
+	virtual protected void UpdateUVs()
 	{
+		Init();
+
 		if (mSprite != null && mOuter != mSprite.outer)
 		{
 			Texture2D tex = mainTexture;
@@ -133,6 +135,21 @@ public class UISprite : UIWidget
 	}
 
 	/// <summary>
+	/// Ensure that the sprite has been initialized properly.
+	/// This is necessary because the order of execution is unreliable.
+	/// Sometimes the sprite's functions may be called prior to Start().
+	/// </summary>
+
+	protected void Init ()
+	{
+		if (mAtlas != null)
+		{
+			if (material == null) material = mAtlas.material;
+			if (mSprite == null) mSprite = string.IsNullOrEmpty(mSpriteName) ? null : mAtlas.GetSprite(mSpriteName);
+		}
+	}
+
+	/// <summary>
 	/// Set the atlas and the sprite.
 	/// </summary>
 
@@ -140,8 +157,6 @@ public class UISprite : UIWidget
 	{
 		if (mAtlas != null)
 		{
-			material = mAtlas.material;
-			mSprite = string.IsNullOrEmpty(mSpriteName) ? null : mAtlas.GetSprite(mSpriteName);
 			UpdateUVs();
 		}
 	}
