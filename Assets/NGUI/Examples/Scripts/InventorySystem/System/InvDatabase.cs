@@ -40,7 +40,7 @@ public class InvDatabase : MonoBehaviour
 	/// List of items in this database.
 	/// </summary>
 
-	public List<InvItem> items = new List<InvItem>();
+	public List<InvBaseItem> items = new List<InvBaseItem>();
 
 	/// <summary>
 	/// UI atlas used for icons.
@@ -64,9 +64,9 @@ public class InvDatabase : MonoBehaviour
 	/// Find an item by its 16-bit ID.
 	/// </summary>
 
-	InvItem GetItem (int id16)
+	InvBaseItem GetItem (int id16)
 	{
-		foreach (InvItem item in items)
+		foreach (InvBaseItem item in items)
 		{
 			if (item.id16 == id16) return item;
 		}
@@ -93,7 +93,7 @@ public class InvDatabase : MonoBehaviour
 	/// Find the specified item given its full 32-bit ID (not to be confused with individual 16-bit item IDs).
 	/// </summary>
 
-	static public InvItem FindByID (int id32)
+	static public InvBaseItem FindByID (int id32)
 	{
 		InvDatabase db = GetDatabase(id32 >> 16);
 		return (db != null) ? db.GetItem(id32 & 0xFFFF) : null;
@@ -103,11 +103,11 @@ public class InvDatabase : MonoBehaviour
 	/// Find the item with the specified name.
 	/// </summary>
 
-	static public InvItem FindByName (string exact)
+	static public InvBaseItem FindByName (string exact)
 	{
 		foreach (InvDatabase db in list)
 		{
-			foreach (InvItem item in db.items)
+			foreach (InvBaseItem item in db.items)
 			{
 				if (item.name.Equals(exact, System.StringComparison.OrdinalIgnoreCase))
 				{
@@ -123,7 +123,7 @@ public class InvDatabase : MonoBehaviour
 	/// Use this to get a list of items on the character that can get saved out to an external database or file.
 	/// </summary>
 
-	static public int FindItemID (InvItem item)
+	static public int FindItemID (InvBaseItem item)
 	{
 		foreach (InvDatabase db in list)
 		{

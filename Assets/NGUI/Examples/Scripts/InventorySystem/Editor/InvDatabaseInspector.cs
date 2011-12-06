@@ -17,11 +17,11 @@ public class InvDatabaseInspector : Editor
 	/// Helper function that sets the index to the index of the specified item.
 	/// </summary>
 
-	public static void SelectIndex (InvDatabase db, InvItem item)
+	public static void SelectIndex (InvDatabase db, InvBaseItem item)
 	{
 		mIndex = 0;
 
-		foreach (InvItem i in db.items)
+		foreach (InvBaseItem i in db.items)
 		{
 			if (i == item) break;
 			++mIndex;
@@ -38,7 +38,7 @@ public class InvDatabaseInspector : Editor
 		InvDatabase db = target as InvDatabase;
 		GUITools.DrawSeparator();
 
-		InvItem item = null;
+		InvBaseItem item = null;
 
 		if (db.items == null || db.items.Count == 0)
 		{
@@ -81,7 +81,7 @@ public class InvDatabaseInspector : Editor
 			{
 				Undo.RegisterUndo(db, "Databse Atlas change");
 				db.iconAtlas = atlas;
-				foreach (InvItem i in db.items) i.iconAtlas = atlas;
+				foreach (InvBaseItem i in db.items) i.iconAtlas = atlas;
 			}
 
 			// Database ID
@@ -99,7 +99,7 @@ public class InvDatabaseInspector : Editor
 			if (GUILayout.Button("New Item"))
 			{
 				Undo.RegisterUndo(db, "Add Inventory Item");
-				item = new InvItem();
+				item = new InvBaseItem();
 				item.name = "New Item";
 				item.description = "Item Description";
 				item.id16 = (db.items.Count > 0) ? db.items[db.items.Count - 1].id16 + 1 : 0;
@@ -150,10 +150,8 @@ public class InvDatabaseInspector : Editor
 				}
 				GUILayout.EndHorizontal();
 
-				// Item properties
 				string itemDesc = GUILayout.TextArea(item.description, 200, GUILayout.Height(100f));
-				InvItem.Slot slot = (InvItem.Slot)EditorGUILayout.EnumPopup("Slot", item.slot);
-
+				InvBaseItem.Slot slot = (InvBaseItem.Slot)EditorGUILayout.EnumPopup("Slot", item.slot);
 				string iconName = "";
 				float iconSize = 64f;
 				bool drawIcon = false;
@@ -219,6 +217,14 @@ public class InvDatabaseInspector : Editor
 					}
 				}
 
+				// Item level range
+				GUILayout.BeginHorizontal();
+				GUILayout.Label("Level Range", GUILayout.Width(77f));
+				EditorGUILayout.IntField(1, GUILayout.MinWidth(40f));
+				EditorGUILayout.IntField(50, GUILayout.MinWidth(40f));
+				if (drawIcon) GUILayout.Space(iconSize);
+				GUILayout.EndHorizontal();
+
 				// Game Object attachment field, left of the icon
 				GUILayout.BeginHorizontal();
 				GameObject go = (GameObject)EditorGUILayout.ObjectField("Attachment", item.attachment, typeof(GameObject), false);
@@ -234,7 +240,7 @@ public class InvDatabaseInspector : Editor
 				// Calculate the extra spacing necessary for the icon to show up properly and not overlap anything
 				if (drawIcon)
 				{
-					extraSpace = Mathf.Max(0f, extraSpace - 40f);
+					extraSpace = Mathf.Max(0f, extraSpace - 60f);
 					GUILayout.Space(extraSpace);
 				}
 

@@ -16,17 +16,22 @@ public class EquipItems : MonoBehaviour
 			InvEquipment eq = GetComponent<InvEquipment>();
 			if (eq == null) eq = gameObject.AddComponent<InvEquipment>();
 
+			int qualityLevels = System.Enum.GetNames(typeof(InvGameItem.Quality)).Length;
+
 			foreach (int i in itemIDs)
 			{
-				InvItem item = InvDatabase.FindByID(i);
+				InvBaseItem item = InvDatabase.FindByID(i);
 
 				if (item != null)
 				{
-					eq.Equip(item);
+					InvGameItem gi = new InvGameItem(i, item);
+					gi.quality = (InvGameItem.Quality)Random.Range(0, qualityLevels - 1);
+					gi.itemLevel = Random.Range(item.minItemLevel, item.maxItemLevel);
+					eq.Equip(gi);
 				}
 				else
 				{
-					Debug.LogWarning("Unable to find the item with the ID of " + i);
+					Debug.LogWarning("Can't resolve the item ID of " + i);
 				}
 			}
 		}

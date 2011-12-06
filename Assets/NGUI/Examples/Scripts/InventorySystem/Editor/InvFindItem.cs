@@ -15,7 +15,7 @@ public class InvFindItem : ScriptableWizard
 	struct FindResult
 	{
 		public InvDatabase db;
-		public InvItem item;
+		public InvBaseItem item;
 	}
 
 	string mItemName = "";
@@ -113,12 +113,13 @@ public class InvFindItem : ScriptableWizard
 
 	void FindAllByName (string partial)
 	{
+		partial = partial.ToLower();
 		mResults.Clear();
 
 		// Exact match comes first
 		foreach (InvDatabase db in InvDatabase.list)
 		{
-			foreach (InvItem item in db.items)
+			foreach (InvBaseItem item in db.items)
 			{
 				if (item.name.Equals(partial, System.StringComparison.OrdinalIgnoreCase))
 				{
@@ -133,7 +134,7 @@ public class InvFindItem : ScriptableWizard
 		// Next come partial matches that begin with the specified string
 		foreach (InvDatabase db in InvDatabase.list)
 		{
-			foreach (InvItem item in db.items)
+			foreach (InvBaseItem item in db.items)
 			{
 				if (item.name.StartsWith(partial, System.StringComparison.OrdinalIgnoreCase))
 				{
@@ -162,9 +163,9 @@ public class InvFindItem : ScriptableWizard
 		// Other partial matches come last
 		foreach (InvDatabase db in InvDatabase.list)
 		{
-			foreach (InvItem item in db.items)
+			foreach (InvBaseItem item in db.items)
 			{
-				if (item.name.Contains(partial))
+				if (item.name.ToLower().Contains(partial))
 				{
 					bool exists = false;
 

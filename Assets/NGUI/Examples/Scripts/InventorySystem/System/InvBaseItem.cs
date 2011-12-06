@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 
 /// <summary>
-/// Inventory System -- Item
+/// Inventory System -- Base Item. Note that it would be incredibly tedious to create all items by hand, Warcraft style.
+/// It's a lot more straightforward to create all items to be of the same level as far as stats go, then specify an
+/// appropriate level range for the item where it will appear. Effective item stats can then be calculated by lowering
+/// the base stats by an appropriate amount. Add a quality modifier, and you have additional variety, Terraria 1.1 style.
 /// </summary>
 
 [System.Serializable]
-public class InvItem
+public class InvBaseItem
 {
 	public enum Slot
 	{
@@ -18,22 +21,6 @@ public class InvItem
 		Bracers,
 		Boots,
 		Trinket,
-	}
-
-	public enum Quality
-	{
-		Broken,
-		Cursed,
-		Damaged,
-		Worn,
-		Sturdy,		// Normal quality
-		Polished,
-		Improved,
-		Crafted,
-		Superior,
-		Enchanted,
-		Epic,
-		Legendary,
 	}
 
 	/// <summary>
@@ -62,13 +49,16 @@ public class InvItem
 	public Slot slot = Slot.None;
 
 	/// <summary>
-	/// Item quality -- applies a penalty or bonus to all base stats.
+	/// Minimum and maximum allowed level for this item. When random loot gets generated,
+	/// only items within appropriate level should be considered.
 	/// </summary>
 
-	public Quality quality = Quality.Sturdy;
+	public int minItemLevel = 1;
+	public int maxItemLevel = 50;
 
 	/// <summary>
-	/// And and all base stats this item may have.
+	/// And and all base stats this item may have at a maximum level (50).
+	/// Actual object's stats are calculated based on item's level and quality.
 	/// </summary>
 
 	public List<InvStat> stats = new List<InvStat>();
@@ -98,31 +88,4 @@ public class InvItem
 	/// </summary>
 
 	public string iconName = "";
-
-	/// <summary>
-	/// Convenience function -- convert quality to a multiplier value.
-	/// </summary>
-
-	public float qualityFactor
-	{
-		get
-		{
-			switch (quality)
-			{
-				case Quality.Cursed:	return -1f;
-				case Quality.Broken:	return 0f;
-				case Quality.Damaged:	return 0.25f;
-				case Quality.Worn:		return 0.9f;
-				case Quality.Sturdy:	return 1f;
-				case Quality.Polished:	return 1.1f;
-				case Quality.Improved:	return 1.25f;
-				case Quality.Crafted:	return 1.5f;
-				case Quality.Superior:	return 1.75f;
-				case Quality.Enchanted:	return 2f;
-				case Quality.Epic:		return 2.5f;
-				case Quality.Legendary:	return 3f;
-			}
-			return 0f;
-		}
-	}
 }

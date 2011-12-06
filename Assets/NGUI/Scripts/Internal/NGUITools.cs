@@ -214,4 +214,42 @@ static public class NGUITools
 		rect.yMax = Mathf.RoundToInt(rect.yMax);
 		return ConvertToTexCoords(rect, width, height);
 	}
+
+	/// <summary>
+	/// Convert the specified color to RGBA32 integer format.
+	/// </summary>
+
+	static public int ColorToInt (Color c)
+	{
+		int retVal = 0;
+		retVal |= Mathf.RoundToInt(c.r * 255f) << 24;
+		retVal |= Mathf.RoundToInt(c.g * 255f) << 16;
+		retVal |= Mathf.RoundToInt(c.b * 255f) << 8;
+		retVal |= Mathf.RoundToInt(c.a * 255f);
+		return retVal;
+	}
+
+	/// <summary>
+	/// Convert the specified RGBA32 integer to Color.
+	/// </summary>
+
+	static public Color IntToColor (int val)
+	{
+		float inv = 1f / 255f;
+		Color c = Color.black;
+		c.r = inv * ((val >> 24) & 0xFF);
+		c.g = inv * ((val >> 16) & 0xFF);
+		c.b = inv * ((val >> 8) & 0xFF);
+		c.a = inv * (val & 0xFF);
+		return c;
+	}
+
+	/// <summary>
+	/// Convenience conversion function, allowing hex format (0xRrGgBbAa).
+	/// </summary>
+
+	static public Color HexToColor (uint val)
+	{
+		return IntToColor((int)val);
+	}
 }

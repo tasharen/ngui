@@ -9,22 +9,24 @@ public class InvEquipment : MonoBehaviour
 	/// List of items that have been equipped.
 	/// </summary>
 
-	InvItem[] mItems;
+	InvGameItem[] mItems;
 	InvAttachmentPoint[] mAttachments;
 
 	/// <summary>
 	/// Equip the specified item automatically replacing an existing one.
 	/// </summary>
 
-	void Equip (InvItem.Slot slot, InvItem item)
+	void Equip (InvBaseItem.Slot slot, InvGameItem item)
 	{
-		if (slot != InvItem.Slot.None)
+		InvBaseItem baseItem = (item != null) ? item.baseItem : null;
+
+		if (slot != InvBaseItem.Slot.None)
 		{
 			if (mItems == null)
 			{
 				// Automatically figure out how many item slots we need
-				int count = Enum.GetNames(typeof(InvItem.Slot)).Length - 1;
-				mItems = new InvItem[count];
+				int count = Enum.GetNames(typeof(InvBaseItem.Slot)).Length - 1;
+				mItems = new InvGameItem[count];
 			}
 
 			// Equip this item
@@ -38,12 +40,12 @@ public class InvEquipment : MonoBehaviour
 			{
 				if (ip.slot == slot)
 				{
-					GameObject go = ip.Attach(item == null ? null : item.attachment);
-					
+					GameObject go = ip.Attach(baseItem != null ? baseItem.attachment : null);
+
 					if (go != null)
 					{
 						Renderer ren = go.renderer;
-						if (ren != null) ren.material.color = item.color;
+						if (ren != null) ren.material.color = baseItem.color;
 					}
 				}
 			}
@@ -58,29 +60,44 @@ public class InvEquipment : MonoBehaviour
 	/// Equip the specified item.
 	/// </summary>
 
-	public void Equip (InvItem item) { if (item != null) Equip(item.slot, item); }
+	public void Equip (InvGameItem item)
+	{
+		if (item != null)
+		{
+			InvBaseItem baseItem = item.baseItem;
+			if (baseItem != null) Equip(baseItem.slot, item);
+			else Debug.LogWarning("Can't resolve the item ID of " + item.baseItemID);
+		}
+	}
 
 	/// <summary>
 	/// Unequip the specified item.
 	/// </summary>
 
-	public void Unequip (InvItem item) { if (item != null) Equip(item.slot, null); }
+	public void Unequip (InvGameItem item)
+	{
+		if (item != null)
+		{
+			InvBaseItem baseItem = item.baseItem;
+			if (baseItem != null) Equip(baseItem.slot, null);
+		}
+	}
 
 	/// <summary>
 	/// Unequip the item from the specified slot.
 	/// </summary>
 
-	public void Unequip (InvItem.Slot slot) { Equip(slot, null); }
+	public void Unequip (InvBaseItem.Slot slot) { Equip(slot, null); }
 
 	/// <summary>
 	/// Whether the specified item is currently equipped.
 	/// </summary>
 
-	public bool HasEquipped (InvItem item)
+	public bool HasEquipped (InvGameItem item)
 	{
 		if (mItems != null)
 		{
-			foreach (InvItem i in mItems)
+			foreach (InvGameItem i in mItems)
 			{
 				if (i == item) return true;
 			}
@@ -92,34 +109,26 @@ public class InvEquipment : MonoBehaviour
 	/// Whether the specified slot currently has an item equipped.
 	/// </summary>
 
-	public bool HasEquipped (InvItem.Slot slot)
+	public bool HasEquipped (InvBaseItem.Slot slot)
 	{
 		if (mItems != null)
 		{
-			foreach (InvItem i in mItems)
+			foreach (InvGameItem i in mItems)
 			{
-				if (i.slot == slot) return true;
+				InvBaseItem baseItem = i.baseItem;
+				if (baseItem != null && baseItem.slot == slot) return true;
 			}
 		}
 		return false;
 	}
 
 	/// <summary>
-	/// Get the summed up stats of all of the equipped items.
-	/// </summary>
-
-	public List<InvStat> GetStats ()
-	{
-		return InvTools.CombineStats(mItems);
-	}
-
-	/// <summary>
 	/// Retrieves the item in the specified slot.
 	/// </summary>
 
-	public InvItem GetItem (InvItem.Slot slot)
+	public InvGameItem GetItem (InvBaseItem.Slot slot)
 	{
-		if (slot != InvItem.Slot.None)
+		if (slot != InvBaseItem.Slot.None)
 		{
 			int index = (int)slot - 1;
 
@@ -130,4 +139,54 @@ public class InvEquipment : MonoBehaviour
 		}
 		return null;
 	}
+
+	/// <summary>
+	/// Get the summed up stats of all of the equipped items.
+	/// </summary>
+
+	/*public List<InvStat> GetStats ()
+	{
+		List<InvStat> list = new List<InvStat>();
+
+		if (items != null)
+		{
+			foreach (InvBaseItem item in items)
+			{
+				if (item == null) continue;
+				if (item.stats == null) continue;
+
+				foreach (InvStat stat in item.stats)
+				{
+					bool found = false;
+
+					foreach (InvStat existingStat in list)
+					{
+						if (existingStat.id == stat.id)
+						{
+							if (stat.id != InvStat.Identifier.Other && existingStat.modifier == stat.modifier)
+							{
+								// If the stat is already present, simply increment it
+								InvStat copy = existingStat;
+								copy.amount += stat.amount;
+								found = true;
+								break;
+							}
+						}
+					}
+
+					// InvStat is not present -- add a new one
+					if (!found)
+					{
+						InvStat newStat = new InvStat();
+						newStat.id = stat.id;
+						newStat.modifier = stat.modifier;
+						newStat.amount = stat.amount;
+						list.Add(newStat);
+					}
+				}
+			}
+			list.Sort(InvStat.Compare);
+		}
+		return list;
+	}*/
 }
