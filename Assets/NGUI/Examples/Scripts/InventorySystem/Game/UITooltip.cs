@@ -106,7 +106,7 @@ public class UITooltip : MonoBehaviour
 			if (bi != null)
 			{
 				string t = "[" + NGUITools.EncodeColor(item.color) + "]" + item.name + "[-]\n";
-				t += "[AFAFAF]Level " + item.itemLevel + " " + bi.slot + "\n";
+				t += "[AFAFAF]Level " + item.itemLevel + " " + bi.slot;
 
 				List<InvStat> stats = item.CalculateStats();
 
@@ -116,19 +116,19 @@ public class UITooltip : MonoBehaviour
 
 					if (stat.amount < 0)
 					{
-						t += "[FF0000]" + stat.amount;
+						t += "\n[FF0000]" + stat.amount;
 					}
 					else
 					{
-						t += "[00FF00]+" + stat.amount;
+						t += "\n[00FF00]+" + stat.amount;
 					}
 
 					if (stat.modifier == InvStat.Modifier.Percent) t += "%";
 					t += " " + stat.id;
-					t += "[-]\n";
+					t += "[-]";
 				}
 
-				t += "[FF9900]" + bi.description;
+				if (!string.IsNullOrEmpty(bi.description)) t += "\n[FF9900]" + bi.description;
 				ShowText(t);
 				return;
 			}

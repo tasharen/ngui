@@ -99,13 +99,40 @@ public class InvDatabaseInspector : Editor
 			if (GUILayout.Button("New Item"))
 			{
 				Undo.RegisterUndo(db, "Add Inventory Item");
-				item = new InvBaseItem();
-				item.name = "New Item";
-				item.description = "Item Description";
-				item.id16 = (db.items.Count > 0) ? db.items[db.items.Count - 1].id16 + 1 : 0;
-				item.iconAtlas = db.iconAtlas;
-				db.items.Add(item);
+
+				InvBaseItem bi = new InvBaseItem();
+				bi.iconAtlas = db.iconAtlas;
+				bi.id16 = (db.items.Count > 0) ? db.items[db.items.Count - 1].id16 + 1 : 0;
+				db.items.Add(bi);
 				mIndex = db.items.Count - 1;
+
+				if (item != null)
+				{
+					bi.name = "Copy of " + item.name;
+					bi.description = item.description;
+					bi.slot = item.slot;
+					bi.color = item.color;
+					bi.iconName = item.iconName;
+					bi.attachment = item.attachment;
+					bi.minItemLevel = item.minItemLevel;
+					bi.maxItemLevel = item.maxItemLevel;
+
+					foreach (InvStat stat in item.stats)
+					{
+						InvStat copy = new InvStat();
+						copy.id = stat.id;
+						copy.amount = stat.amount;
+						copy.modifier = stat.modifier;
+						bi.stats.Add(copy);
+					}
+				}
+				else
+				{
+					bi.name = "New Item";
+					bi.description = "Item Description";
+				}
+
+				item = bi;
 			}
 			GUI.backgroundColor = Color.white;
 
@@ -220,8 +247,8 @@ public class InvDatabaseInspector : Editor
 				// Item level range
 				GUILayout.BeginHorizontal();
 				GUILayout.Label("Level Range", GUILayout.Width(77f));
-				EditorGUILayout.IntField(1, GUILayout.MinWidth(40f));
-				EditorGUILayout.IntField(50, GUILayout.MinWidth(40f));
+				int min = EditorGUILayout.IntField(item.minItemLevel, GUILayout.MinWidth(40f));
+				int max = EditorGUILayout.IntField(item.maxItemLevel, GUILayout.MinWidth(40f));
 				if (drawIcon) GUILayout.Space(iconSize);
 				GUILayout.EndHorizontal();
 
@@ -294,7 +321,12 @@ public class InvDatabaseInspector : Editor
 				}
 
 				// Save all values
-				if (!string.Equals(itemDesc, item.description) || slot != item.slot || go != item.attachment || color != item.color ||
+				if (!string.Equals(itemDesc, item.description) ||
+					slot	!= item.slot ||
+					go		!= item.attachment ||
+					color	!= item.color ||
+					min		!= item.minItemLevel ||
+					max		!= item.maxItemLevel ||
 					!string.Equals(iconName, item.iconName))
 				{
 					Undo.RegisterUndo(db, "Item Properties");
@@ -303,6 +335,8 @@ public class InvDatabaseInspector : Editor
 					item.attachment = go;
 					item.color = color;
 					item.iconName = iconName;
+					item.minItemLevel = min;
+					item.maxItemLevel = max;
 				}
 			}
 		}
