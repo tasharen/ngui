@@ -5,8 +5,8 @@ using System.Collections.Generic;
 /// Storage container that stores items.
 /// </summary>
 
-[AddComponentMenu("NGUI/Examples/Item Storage")]
-public class InvStorage : MonoBehaviour
+[AddComponentMenu("NGUI/Examples/UI Item Storage")]
+public class UIItemStorage : MonoBehaviour
 {
 	/// <summary>
 	/// Maximum size of the container. Adding more items than this number will not work.
@@ -59,6 +59,12 @@ public class InvStorage : MonoBehaviour
 	public List<InvGameItem> items { get { while (mItems.Count < maxItemCount) mItems.Add(null); return mItems; } }
 
 	/// <summary>
+	/// Convenience function that returns an item at the specified slot.
+	/// </summary>
+
+	public InvGameItem GetItem (int slot) { return (slot < items.Count) ? mItems[slot] : null; }
+
+	/// <summary>
 	/// Replace an item in the container with the specified one.
 	/// </summary>
 	/// <returns>An item that was replaced.</returns>
@@ -73,6 +79,10 @@ public class InvStorage : MonoBehaviour
 		}
 		return item;
 	}
+
+	/// <summary>
+	/// Initialize the container and create an appropriate number of UI slots.
+	/// </summary>
 
 	void Start ()
 	{
@@ -93,6 +103,14 @@ public class InvStorage : MonoBehaviour
 					t.localPosition = new Vector3(padding + (x + 0.5f) * spacing, -padding - (y + 0.5f) * spacing, 0f);
 					t.localRotation = Quaternion.identity;
 					t.localScale = Vector3.one;
+
+					UIStorageSlot slot = go.GetComponent<UIStorageSlot>();
+					
+					if (slot != null)
+					{
+						slot.storage = this;
+						slot.slot = count;
+					}
 
 					b.Encapsulate(new Vector3(padding * 2f + (x + 1) * spacing, -padding * 2f - (y + 1) * spacing, 0f));
 

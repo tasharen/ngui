@@ -240,6 +240,7 @@ public class UIPanel : MonoBehaviour
 		if (panel == null)
 		{
 			panel = trans.gameObject.AddComponent<UIPanel>();
+			//Debug.Log("Adding UIPanel for " + NGUITools.GetHierarchy(trans.gameObject));
 		}
 		return panel;
 	}

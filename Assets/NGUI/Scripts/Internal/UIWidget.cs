@@ -20,6 +20,7 @@ public abstract class UIWidget : MonoBehaviour
 	protected bool mChanged = true;
 	protected bool mPlayMode = true;
 
+	bool mStarted = false;
 	Vector3 mPos;
 	Quaternion mRot;
 	Vector3 mScale;
@@ -225,10 +226,18 @@ public abstract class UIWidget : MonoBehaviour
 	/// Cache the transform.
 	/// </summary>
 
-	void Awake ()
+	void Awake () { mPlayMode = Application.isPlaying; }
+
+	/// <summary>
+	/// Calculate depth automatically.
+	/// </summary>
+
+	void Start ()
 	{
+		mStarted = true;
 		if (mDepth == 0) mDepth = CalculateDepth();
-		mPlayMode = Application.isPlaying;
+		if (mMat != null) panel.AddWidget(this);
+		OnStart();
 	}
 
 	/// <summary>
@@ -238,7 +247,8 @@ public abstract class UIWidget : MonoBehaviour
 	void OnEnable ()
 	{
 		mChanged = true;
-		if (mMat != null) panel.AddWidget(this);
+		if (mTrans == null) mTrans = transform;
+		if (mMat != null && (mStarted || (!Application.isPlaying && mTrans.parent != null))) panel.AddWidget(this);
 	}
 
 	/// <summary>
@@ -323,6 +333,12 @@ public abstract class UIWidget : MonoBehaviour
 		scale.z = 1f;
 		cachedTransform.localScale = scale;
 	}
+
+	/// <summary>
+	/// Virtual Start() functionality for widgets.
+	/// </summary>
+
+	virtual protected void OnStart () { }
 
 	/// <summary>
 	/// Virtual version of the Update function. Should return 'true' if the widget has changed visually.

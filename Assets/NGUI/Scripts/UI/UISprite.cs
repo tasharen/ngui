@@ -163,7 +163,7 @@ public class UISprite : UIWidget
 	/// Set the atlas and the sprite.
 	/// </summary>
 
-	void Start ()
+	override protected void OnStart ()
 	{
 		if (mAtlas != null)
 		{

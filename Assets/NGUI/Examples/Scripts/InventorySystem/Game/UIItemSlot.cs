@@ -1,39 +1,55 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// One of the scripts tying the UI with the inventory system
+/// Abstract UI component observing an item somewhere in the inventory. This item can be equipped on
+/// the character, it can be lying in a chest, or it can be hot-linked by another player. Either way,
+/// all the common behavior is in this class. What the observed item actually is...
+/// that's up to the derived class to determine.
 /// </summary>
 
-[AddComponentMenu("NGUI/Examples/UI Item Slot")]
-public class UIItemSlot : MonoBehaviour
+public abstract class UIItemSlot : MonoBehaviour
 {
-	public InvBaseItem.Slot slot;
-	public InvEquipment equipment;
 	public UISprite icon;
 	public UIWidget background;
 	public UILabel label;
 
 	InvGameItem mItem;
+	string mText = "";
+
+	/// <summary>
+	/// This function should return the item observed by this UI class.
+	/// </summary>
+
+	abstract protected InvGameItem observedItem { get; }
+
+	/// <summary>
+	/// Show a tooltip for the item.
+	/// </summary>
 
 	void OnTooltip (bool show)
 	{
 		UITooltip.ShowItem(show ? mItem : null);
 	}
 
+	/// <summary>
+	/// Keep an eye on the item and update the icon when it changes.
+	/// </summary>
+
 	void Update ()
 	{
-		InvGameItem item = (equipment != null) ? equipment.GetItem(slot) : null;
+		InvGameItem i = observedItem;
 
-		if (mItem != item)
+		if (mItem != i)
 		{
-			mItem = item;
+			mItem = i;
 
-			InvBaseItem baseItem = (item != null) ? item.baseItem : null;
+			InvBaseItem baseItem = (i != null) ? i.baseItem : null;
 
 			if (label != null)
 			{
-				string itemName = (item != null) ? item.name : null;
-				label.text = (itemName != null) ? itemName : slot.ToString();
+				string itemName = (i != null) ? i.name : null;
+				if (string.IsNullOrEmpty(mText)) mText = label.text;
+				label.text = (itemName != null) ? itemName : mText;
 			}
 			
 			if (icon != null)
@@ -53,7 +69,7 @@ public class UIItemSlot : MonoBehaviour
 
 			if (background != null)
 			{
-				background.color = (item != null) ? item.color : Color.grey;
+				background.color = (i != null) ? i.color : Color.grey;
 			}
 		}
 	}
