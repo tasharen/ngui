@@ -13,6 +13,7 @@ public class UITooltip : MonoBehaviour
 	public UILabel text;
 	public UISlicedSprite background;
 
+	Transform mTrans;
 	float mTarget = 0f;
 	float mCurrent = 0f;
 
@@ -20,7 +21,17 @@ public class UITooltip : MonoBehaviour
 
 	void Awake () { mInstance = this; }
 	void OnDestroy () { mInstance = null; }
-	void Start () { mWidgets = GetComponentsInChildren<UIWidget>(); SetAlpha(0f); }
+
+	/// <summary>
+	/// Get a list of widgets underneath the tooltip.
+	/// </summary>
+
+	void Start ()
+	{
+		mTrans = transform;
+		mWidgets = GetComponentsInChildren<UIWidget>();
+		SetAlpha(0f);
+	}
 
 	/// <summary>
 	/// Update the tooltip's alpha based on the target value.
@@ -83,6 +94,17 @@ public class UITooltip : MonoBehaviour
 					backgroundTrans.localScale = size;
 				}
 			}
+
+			// Orthographic camera positioning is trivial
+			Vector3 pos = Input.mousePosition;
+			pos.x -= Screen.width * 0.5f;
+			pos.y -= Screen.height * 0.5f;
+			mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(pos);
+
+			// An alternative UIAnchor-based approach that will work even with a non-orthographic camera
+			//UIAnchor anchor = mTrans.GetComponent<UIAnchor>();
+			//anchor.offset = Input.mousePosition;
+			//anchor.Update();
 		}
 		else mTarget = 0f;
 	}

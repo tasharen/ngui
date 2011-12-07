@@ -279,4 +279,23 @@ static public class NGUITools
 		rect.yMax = Mathf.RoundToInt(rect.yMax);
 		return ConvertToTexCoords(rect, width, height);
 	}
+
+	/// <summary>
+	/// The much-dreaded half-pixel offset of DirectX9:
+	/// http://drilian.com/2008/11/25/understanding-half-pixel-and-half-texel-offsets/
+	/// </summary>
+
+	static public Vector3 ApplyHalfPixelOffset (Vector3 pos)
+	{
+		RuntimePlatform platform = Application.platform;
+
+		if (platform == RuntimePlatform.WindowsPlayer ||
+			platform == RuntimePlatform.WindowsWebPlayer ||
+			platform == RuntimePlatform.WindowsEditor)
+		{
+			pos.x -= 0.5f;
+			pos.y += 0.5f;
+		}
+		return pos;
+	}
 }

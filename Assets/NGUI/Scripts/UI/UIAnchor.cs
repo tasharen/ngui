@@ -19,11 +19,13 @@ public class UIAnchor : MonoBehaviour
 		Right,
 		BottomRight,
 		Bottom,
+		Center,
 	}
 
 	public Camera hudCamera = null;
 	public Side side = Side.BottomLeft;
 	public Vector3 offset = Vector3.zero;
+	public bool halfPixelOffset = false;
 	public bool stretchToFill = false;
 
 	Transform mTrans;
@@ -44,40 +46,50 @@ public class UIAnchor : MonoBehaviour
 		}
 	}
 
-	void Update ()
+	public void Update ()
 	{
 		if (hudCamera != null)
 		{
 			Vector3 v = offset;
 
-			if (side == Side.Right || side == Side.TopRight || side == Side.BottomRight)
+			if (side == Side.Center)
 			{
-				v.x += Screen.width * hudCamera.rect.xMax;
+				v.x += Screen.width * hudCamera.rect.width * 0.5f;
+				v.y += (Screen.height - v.y) * hudCamera.rect.height * 0.5f;
 			}
 			else
 			{
-				v.x += Screen.width * hudCamera.rect.xMin;
+				if (side == Side.Right || side == Side.TopRight || side == Side.BottomRight)
+				{
+					v.x += Screen.width * hudCamera.rect.xMax;
+				}
+				else
+				{
+					v.x += Screen.width * hudCamera.rect.xMin;
+				}
+
+				if (side == Side.Top || side == Side.TopRight || side == Side.TopLeft)
+				{
+					v.y += (Screen.height - v.y) * hudCamera.rect.yMax;
+				}
+				else
+				{
+					v.y += (Screen.height - v.y) * hudCamera.rect.yMin;
+				}
 			}
 
-			if (side == Side.Top || side == Side.TopRight || side == Side.TopLeft)
-			{
-				v.y = (Screen.height - v.y) * hudCamera.rect.yMax;
-			}
-			else
-			{
-				v.y = (Screen.height - v.y) * hudCamera.rect.yMin;
-			}
-
-			// Wrapped in an 'if' so the scene doesnt get marked as 'edited' every frame
+			if (halfPixelOffset) v = NGUITools.ApplyHalfPixelOffset(v);
 			Vector3 newPos = hudCamera.ScreenToWorldPoint(v);
 			Vector3 currPos = mTrans.position;
-			if ((newPos - currPos).sqrMagnitude > 0.001) mTrans.position = newPos;
+
+			// Wrapped in an 'if' so the scene doesnt get marked as 'edited' every frame
+			if (newPos != currPos) mTrans.position = newPos;
 
 			if (stretchToFill && side == Side.TopLeft)
 			{
 				Vector3 localPos = mTrans.localPosition;
 				Vector3 localScale = new Vector3(Mathf.Abs(localPos.x) * 2f, Mathf.Abs(localPos.y) * 2f, 1f);
-				if ((mTrans.localScale - localScale).sqrMagnitude > 0.001f) mTrans.localScale = localScale;
+				if (mTrans.localScale != localScale) mTrans.localScale = localScale;
 			}
 		}
 	}

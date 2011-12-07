@@ -42,7 +42,7 @@ public class UICamera : MonoBehaviour
 	/// Caching is always preferable for performance.
 	/// </summary>
 
-	Camera cachedCamera { get { if (mCam == null) mCam = camera; return mCam; } }
+	public Camera cachedCamera { get { if (mCam == null) mCam = camera; return mCam; } }
 
 	/// <summary>
 	/// Helper function that determines if this script should be handling the events.
