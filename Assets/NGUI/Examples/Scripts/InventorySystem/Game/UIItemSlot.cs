@@ -16,11 +16,19 @@ public abstract class UIItemSlot : MonoBehaviour
 	InvGameItem mItem;
 	string mText = "";
 
+	static InvGameItem mDraggedItem;
+
 	/// <summary>
 	/// This function should return the item observed by this UI class.
 	/// </summary>
 
 	abstract protected InvGameItem observedItem { get; }
+
+	/// <summary>
+	/// Replace the observed item with the specified value. Should return the item that was replaced.
+	/// </summary>
+
+	abstract protected InvGameItem Replace (InvGameItem item);
 
 	/// <summary>
 	/// Show a tooltip for the item.
@@ -29,6 +37,25 @@ public abstract class UIItemSlot : MonoBehaviour
 	void OnTooltip (bool show)
 	{
 		UITooltip.ShowItem(show ? mItem : null);
+	}
+
+	/// <summary>
+	/// Allow to move objects around via drag & drop.
+	/// </summary>
+
+	void OnClick ()
+	{
+		if (mDraggedItem == null)
+		{
+			if (mItem != null)
+			{
+				mDraggedItem = Replace(null);
+			}
+		}
+		else
+		{
+			mDraggedItem = Replace(mDraggedItem);
+		}
 	}
 
 	/// <summary>
