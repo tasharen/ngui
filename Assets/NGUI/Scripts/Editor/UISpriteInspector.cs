@@ -9,9 +9,24 @@ using System.Collections.Generic;
 [CustomEditor(typeof(UISprite))]
 public class UISpriteInspector : UIWidgetInspector
 {
-	protected UIAtlas mAtlas;
-	UISprite mSprite;
+	protected UISprite mSprite;
 	UIAtlas.Sprite mAtlasSprite;
+
+	/// <summary>
+	/// Atlas selection callback.
+	/// </summary>
+
+	void OnSelectAtlas (MonoBehaviour obj)
+	{
+		mSprite.atlas = obj as UIAtlas;
+
+		if (mSprite != null)
+		{
+			Undo.RegisterUndo(mSprite, "Atlas Selection");
+			mSprite.atlas = mSprite.atlas;
+			EditorUtility.SetDirty(mSprite.gameObject);
+		}
+	}
 
 	/// <summary>
 	/// Draw the atlas and sprite selection fields.
@@ -20,12 +35,13 @@ public class UISpriteInspector : UIWidgetInspector
 	override protected bool OnCustomStart ()
 	{
 		mSprite = mWidget as UISprite;
-		mAtlas = EditorGUILayout.ObjectField("Atlas", mSprite.atlas, typeof(UIAtlas), true) as UIAtlas;
+		UIAtlas atlas = ComponentSelector.Draw<UIAtlas>(mSprite.atlas, OnSelectAtlas);
+		if (mSprite.atlas != atlas) OnSelectAtlas(atlas);
 
 		mAtlasSprite = null;
-		if (mAtlas == null) return false;
+		if (mSprite.atlas == null) return false;
 
-		List<string> sprites = mAtlas.GetListOfSprites();
+		List<string> sprites = mSprite.atlas.GetListOfSprites();
 
 		if (sprites != null && sprites.Count > 0)
 		{
@@ -47,7 +63,7 @@ public class UISpriteInspector : UIWidgetInspector
 
 			// Draw the sprite selection popup
 			index = EditorGUILayout.Popup("Sprite", index, sprites.ToArray());
-			mAtlasSprite = mAtlas.GetSprite(sprites[index]);
+			mAtlasSprite = mSprite.atlas.GetSprite(sprites[index]);
 			GUITools.DrawSeparator();
 		}
 		return true;
@@ -65,7 +81,7 @@ public class UISpriteInspector : UIWidgetInspector
 		{
 			// Draw the atlas
 			EditorGUILayout.Separator();
-			Rect rect = GUITools.DrawSprite(tex, mSprite.outerUV, mUseShader ? mAtlas.material : null);
+			Rect rect = GUITools.DrawSprite(tex, mSprite.outerUV, mUseShader ? mSprite.atlas.material : null);
 
 			// Draw the selection
 			GUITools.DrawOutline(rect, mSprite.outerUV, new Color(0.4f, 1f, 0f, 1f));
@@ -87,7 +103,7 @@ public class UISpriteInspector : UIWidgetInspector
 
 	override protected void OnCustomSave ()
 	{
-		mSprite.atlas = mAtlas;
+		mSprite.atlas = mSprite.atlas;
 		mSprite.spriteName = (mAtlasSprite != null) ? mAtlasSprite.name : "";
 	}
 }

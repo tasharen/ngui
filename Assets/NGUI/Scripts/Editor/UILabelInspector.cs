@@ -9,14 +9,29 @@ using UnityEditor;
 public class UILabelInspector : UIWidgetInspector
 {
 	UILabel mLabel;
-	UIFont mFont;
 	bool mShow = false;
+
+	/// <summary>
+	/// Font selection callback.
+	/// </summary>
+
+	void OnSelectFont (MonoBehaviour obj)
+	{
+		Undo.RegisterUndo(mLabel, "Font Selection");
+
+		if (mLabel != null)
+		{
+			mLabel.font = obj as UIFont;
+			EditorUtility.SetDirty(mLabel.gameObject);
+		}
+	}
 
 	override protected bool OnCustomStart ()
 	{
 		mLabel = mWidget as UILabel;
-		mFont = EditorGUILayout.ObjectField("Font", mLabel.font, typeof(UIFont), true) as UIFont;
-		if (mFont == null) return false;
+		UIFont font = ComponentSelector.Draw<UIFont>(mLabel.font, OnSelectFont);
+		if (font != mLabel.font) OnSelectFont(font);
+		if (mLabel.font == null) return false;
 
 		string text = EditorGUILayout.TextField("Text", mLabel.text);
 		if (!string.Equals(text, mLabel.text)) { RegisterUndo(); mLabel.text = text; }
@@ -40,17 +55,12 @@ public class UILabelInspector : UIWidgetInspector
 			{
 				// Draw the atlas
 				EditorGUILayout.Separator();
-				GUITools.DrawSprite(tex, mFont.uvRect, mFont.material);
+				GUITools.DrawSprite(tex, mLabel.font.uvRect, mLabel.font.material);
 
 				// Sprite size label
 				Rect rect = GUILayoutUtility.GetRect(Screen.width, 18f);
-				EditorGUI.DropShadowLabel(rect, "Font Size: " + mFont.size);
+				EditorGUI.DropShadowLabel(rect, "Font Size: " + mLabel.font.size);
 			}
 		}
-	}
-
-	override protected void OnCustomSave ()
-	{
-		mLabel.font = mFont;
 	}
 }

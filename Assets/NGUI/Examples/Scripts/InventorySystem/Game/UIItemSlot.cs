@@ -68,7 +68,7 @@ public class UIItemSlot : MonoBehaviour
 						case InvGameItem.Quality.Crafted:	c = NGUITools.HexToColor(0x4eff00ff);	break;
 						case InvGameItem.Quality.Superior:	c = NGUITools.HexToColor(0x00baffff);	break;
 						case InvGameItem.Quality.Enchanted: c = NGUITools.HexToColor(0x7376fdff);	break;
-						case InvGameItem.Quality.Epic:		c = NGUITools.HexToColor(0x4e00ffff);	break;
+						case InvGameItem.Quality.Epic:		c = NGUITools.HexToColor(0x9600ffff);	break;
 						case InvGameItem.Quality.Legendary:	c = NGUITools.HexToColor(0xff9000ff);	break;
 					}
 					background.color = c;

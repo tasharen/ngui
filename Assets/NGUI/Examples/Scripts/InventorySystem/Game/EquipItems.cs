@@ -25,8 +25,8 @@ public class EquipItems : MonoBehaviour
 				if (item != null)
 				{
 					InvGameItem gi = new InvGameItem(i, item);
-					gi.quality = (InvGameItem.Quality)Random.Range(0, qualityLevels - 1);
-					gi.itemLevel = Random.Range(item.minItemLevel, item.maxItemLevel);
+					gi.quality = (InvGameItem.Quality)Random.Range(0, qualityLevels);
+					gi.itemLevel = NGUITools.RandomRange(item.minItemLevel, item.maxItemLevel);
 					eq.Equip(gi);
 				}
 				else

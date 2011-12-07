@@ -1,0 +1,97 @@
+﻿using UnityEditor;
+using UnityEngine;
+using System.Collections.Generic;
+
+/// <summary>
+/// EditorGUILayout.ObjectField doesn't support custom components, so a custom wizard saves the day.
+/// Unfortunately this tool only shows components that are being used by the scene, so it's a "recently used" selection tool.
+/// </summary>
+
+public class ComponentSelector : ScriptableWizard
+{
+	public delegate void OnSelectionCallback (MonoBehaviour obj);
+
+	System.Type mType;
+	OnSelectionCallback mCallback;
+	MonoBehaviour[] mObjects;
+
+	/// <summary>
+	/// Draw a button + object selection combo filtering specified types.
+	/// </summary>
+
+	static public T Draw<T> (T obj, OnSelectionCallback cb) where T : MonoBehaviour
+	{
+		GUILayout.BeginHorizontal();
+		bool show = GUILayout.Button(typeof(T).ToString(), GUILayout.Width(76f));
+		T o = EditorGUILayout.ObjectField(obj, typeof(T), false) as T;
+		GUILayout.EndHorizontal();
+		if (show) Show<T>(cb);
+		return o;
+	}
+
+	/// <summary>
+	/// Show the selection wizard.
+	/// </summary>
+
+	static public void Show<T> (OnSelectionCallback cb) where T : MonoBehaviour
+	{
+		System.Type type = typeof(T);
+		ComponentSelector comp = ScriptableWizard.DisplayWizard<ComponentSelector>("Select " + type.ToString());
+		comp.mType = type;
+		comp.mCallback = cb;
+		comp.mObjects = Resources.FindObjectsOfTypeAll(type) as MonoBehaviour[];
+	}
+
+	/// <summary>
+	/// Draw the custom wizard.
+	/// </summary>
+
+	void OnGUI ()
+	{
+		EditorGUIUtility.LookLikeControls(80f);
+
+		if (mObjects.Length == 0)
+		{
+			GUILayout.Label("No " + mType.ToString() + " components found");
+		}
+		else
+		{
+			GUILayout.Label("List of recently used components:");
+			GUITools.DrawSeparator();
+
+			MonoBehaviour sel = null;
+
+			foreach (MonoBehaviour o in mObjects)
+			{
+				if (DrawObject(o))
+				{
+					sel = o;
+				}
+			}
+
+			if (sel != null)
+			{
+				mCallback(sel);
+				Close();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Draw details about the specified monobehavior in column format.
+	/// </summary>
+
+	bool DrawObject (MonoBehaviour mb)
+	{
+		bool retVal = false;
+
+		GUILayout.BeginHorizontal();
+		{
+			GUILayout.Label(mb.GetType().ToString(), GUILayout.Width(80f));
+			GUILayout.Label(NGUITools.GetHierarchy(mb.gameObject));
+			retVal = GUILayout.Button("Select", GUILayout.Width(60f));
+		}
+		GUILayout.EndHorizontal();
+		return retVal;
+	}
+}

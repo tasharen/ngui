@@ -9,6 +9,18 @@ using System.Collections.Generic;
 static public class NGUITools
 {
 	/// <summary>
+	/// Same as Random.Range, but the returned value is >= min and <= max.
+	/// Random.Range is < max instead, unless min == max.
+	/// This means Range(0,1) produces 0 instead of 0 or 1. That's unacceptable.
+	/// </summary>
+
+	static public int RandomRange (int min, int max)
+	{
+		if (min == max) return min;
+		return UnityEngine.Random.Range(min, max + 1);
+	}
+
+	/// <summary>
 	/// Finds the component on the current game object or its parents.
 	/// </summary>
 

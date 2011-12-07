@@ -40,7 +40,7 @@ public class UISprite : UIWidget
 				mAtlas = value;
 
 				// Update the material
-				material = mAtlas.material;
+				material = (mAtlas != null) ? mAtlas.material : null;
 
 				// Re-link the sprite
 				if (!string.IsNullOrEmpty(mSpriteName))

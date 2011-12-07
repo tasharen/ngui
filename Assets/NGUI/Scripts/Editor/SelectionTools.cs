@@ -75,7 +75,7 @@ public class SelectionTools
 			}
 
 			// Select our newly created GameObject
-			Selection.activeTransform = newGameObject.transform;
+			Selection.activeGameObject = newGameObject;
 		}
 	}
 	
