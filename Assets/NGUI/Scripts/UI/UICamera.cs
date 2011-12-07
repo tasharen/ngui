@@ -11,6 +11,8 @@ using System.Collections.Generic;
 /// - OnPress (isDown) is sent when a mouse button gets pressed on the collider.
 /// - OnSelect (selected) is sent when a mouse button is released on the same object as it was pressed on.
 /// - OnClick is sent with the same conditions as OnSelect, with the added check to see if the mouse has not moved much.
+/// - OnDrag (delta) is sent when a mouse or touch gets pressed on a collider and starts dragging it.
+/// - OnDrop is sent when the mouse or touch get released on a different collider than the one that was being dragged.
 /// - OnInput (text) is sent when typing after selecting a collider by clicking on it.
 /// - OnTooltip (show) is sent when the mouse hovers over a collider for some time without moving.
 /// </summary>
@@ -272,8 +274,14 @@ public class UICamera : MonoBehaviour
 					mDown.SendMessage("OnSelect", true, SendMessageOptions.DontRequireReceiver);
 					if (mConsiderForClick) mDown.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
 				}
-				// The button/touch was released on a different object, send a hover(false) message
-				else if (!mUseTouchInput) mDown.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
+				else // The button/touch was released on a different object
+				{
+					// Send a drop notification (for drag & drop)
+					if (mMouse != null) mMouse.SendMessage("OnDrop", SendMessageOptions.DontRequireReceiver);
+					
+					// If we're using mouse-based input, send a hover notification
+					if (!mUseTouchInput) mDown.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
+				}
 			}
 			mDown = null;
 			mHover = null;

@@ -59,6 +59,27 @@ public abstract class UIItemSlot : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Start dragging the item.
+	/// </summary>
+
+	void OnDrag (Vector2 delta)
+	{
+		if (mDraggedItem == null && mItem != null)
+		{
+			mDraggedItem = Replace(null);
+		}
+	}
+
+	/// <summary>
+	/// Stop dragging the item.
+	/// </summary>
+
+	void OnDrop()
+	{
+		mDraggedItem = Replace(mDraggedItem);
+	}
+
+	/// <summary>
 	/// Keep an eye on the item and update the icon when it changes.
 	/// </summary>
 
