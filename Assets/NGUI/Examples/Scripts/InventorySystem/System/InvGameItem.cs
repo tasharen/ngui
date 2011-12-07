@@ -127,12 +127,12 @@ public class InvGameItem
 	{
 		get
 		{
-			Color c = Color.grey;
+			Color c = Color.white;
 
 			switch (quality)
 			{
 				case Quality.Cursed:	c = Color.red; break;
-				case Quality.Broken:	c = new Color(0.1f, 0.1f, 0.1f); break;
+				case Quality.Broken:	c = new Color(0.4f, 0.2f, 0.2f); break;
 				case Quality.Damaged:	c = new Color(0.4f, 0.4f, 0.4f); break;
 				case Quality.Worn:		c = new Color(0.7f, 0.7f, 0.7f); break;
 				case Quality.Sturdy:	c = new Color(1.0f, 1.0f, 1.0f); break;

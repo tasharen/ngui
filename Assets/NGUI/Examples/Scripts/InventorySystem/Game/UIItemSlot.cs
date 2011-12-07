@@ -117,7 +117,7 @@ public abstract class UIItemSlot : MonoBehaviour
 
 			if (background != null)
 			{
-				background.color = (i != null) ? i.color : Color.grey;
+				background.color = (i != null) ? i.color : Color.white;
 			}
 		}
 	}
