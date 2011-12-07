@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Since it would be incredibly tedious to create thousands of unique items by hand, a simple solution is needed.
@@ -158,4 +159,50 @@ public class InvGameItem
 	/// </summary>
 
 	public InvGameItem (int id, InvBaseItem bi) { mBaseItemID = id; mBaseItem = bi; }
+
+	/// <summary>
+	/// Calculate and return the list of effective stats based on item level and quality.
+	/// </summary>
+
+	public List<InvStat> CalculateStats ()
+	{
+		List<InvStat> stats = new List<InvStat>();
+
+		if (baseItem != null)
+		{
+			float mult = statMultiplier;
+			List<InvStat> baseStats = baseItem.stats;
+			
+			foreach (InvStat bs in baseStats)
+			{
+				int amount = Mathf.RoundToInt(mult * bs.amount);
+				if (amount == 0) continue;
+
+				bool found = false;
+
+				foreach (InvStat s in stats)
+				{
+					if (s.id == bs.id && s.modifier == bs.modifier)
+					{
+						s.amount += amount;
+						found = true;
+						break;
+					}
+				}
+
+				if (!found)
+				{
+					InvStat stat = new InvStat();
+					stat.id = bs.id;
+					stat.amount = amount;
+					stat.modifier = bs.modifier;
+					stats.Add(stat);
+				}
+			}
+
+			// This would be the place to determine if it's a weapon or armor and sort stats accordingly
+			stats.Sort(InvStat.CompareArmor);
+		}
+		return stats;
+	}
 }

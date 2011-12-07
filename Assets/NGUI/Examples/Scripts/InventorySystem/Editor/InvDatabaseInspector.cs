@@ -288,7 +288,9 @@ public class InvDatabaseInspector : Editor
 				if (GUILayout.Button("Add Stat", GUILayout.Width(80f)))
 				{
 					Undo.RegisterUndo(db, "Add Item Stat");
-					item.stats.Add(new InvStat());
+					InvStat stat = new InvStat();
+					stat.id = InvStat.Identifier.Armor;
+					item.stats.Add(stat);
 				}
 
 				// Save all values

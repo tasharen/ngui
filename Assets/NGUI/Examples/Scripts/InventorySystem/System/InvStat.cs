@@ -71,16 +71,48 @@ public class InvStat
 	}
 
 	/// <summary>
-	/// Static comparison function for sorting:
-	/// 1. Raw modifiers
-	/// 2. Percent modifiers
-	/// 3. Other
+	/// Comparison function for sorting armor. Armor value will show up first, followed by damage.
 	/// </summary>
 
-	static public int Compare (InvStat a, InvStat b)
+	static public int CompareArmor (InvStat a, InvStat b)
 	{
-		if (b.id == Identifier.Other) return (a.id == Identifier.Other) ? 0 : -1;
-		if (a.modifier != b.modifier) return (a.modifier == Modifier.Percent) ? 1 : -1;
-		return a.amount.CompareTo(b.amount);
+		int ia = (int)a.id;
+		int ib = (int)b.id;
+		
+		if		(a.id == Identifier.Armor)	ia -= 10000;
+		else if (a.id == Identifier.Damage) ia -= 5000;
+		if		(b.id == Identifier.Armor)	ib -= 10000;
+		else if (b.id == Identifier.Damage) ib -= 5000;
+		
+		if (a.amount < 0) ia += 1000;
+		if (b.amount < 0) ib += 1000;
+		
+		if (a.modifier == Modifier.Percent) ia += 100;
+		if (b.modifier == Modifier.Percent) ib += 100;
+		
+		return ia.CompareTo(ib);
+	}
+
+	/// <summary>
+	/// Comparison function for sorting weapons. Damage value will show up first, followed by armor.
+	/// </summary>
+
+	static public int CompareWeapon (InvStat a, InvStat b)
+	{
+		int ia = (int)a.id;
+		int ib = (int)b.id;
+
+		if		(a.id == Identifier.Damage) ia -= 10000;
+		else if (a.id == Identifier.Armor)  ia -= 5000;
+		if		(b.id == Identifier.Damage) ib -= 10000;
+		else if (b.id == Identifier.Armor)  ib -= 5000;
+
+		if (a.amount < 0) ia += 1000;
+		if (b.amount < 0) ib += 1000;
+		
+		if (a.modifier == Modifier.Percent) ia += 100;
+		if (b.modifier == Modifier.Percent) ib += 100;
+		
+		return ia.CompareTo(ib);
 	}
 }

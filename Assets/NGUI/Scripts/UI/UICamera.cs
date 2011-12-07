@@ -243,7 +243,7 @@ public class UICamera : MonoBehaviour
 		{
 			if (mTooltip != null) ShowTooltip(false);
 			mDown = mMouse;
-			mConsiderForClick = false;
+			mConsiderForClick = true;
 			mTotalDelta = Vector3.zero;
 			if (mDown != null) mDown.SendMessage("OnPress", true, SendMessageOptions.DontRequireReceiver);
 		}

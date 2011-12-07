@@ -10,7 +10,7 @@ static public class NGUITools
 {
 	/// <summary>
 	/// Same as Random.Range, but the returned value is >= min and <= max.
-	/// Random.Range is < max instead, unless min == max.
+	/// Unity's Random.Range is < max instead, unless min == max.
 	/// This means Range(0,1) produces 0 instead of 0 or 1. That's unacceptable.
 	/// </summary>
 
@@ -87,16 +87,64 @@ static public class NGUITools
 	}
 
 	/// <summary>
-	/// Parse a color encoded in the string.
+	/// Convert the specified color to RGBA32 integer format.
 	/// </summary>
 
-	static Color ParseColor (string text, int offset)
+	static public int ColorToInt (Color c)
+	{
+		int retVal = 0;
+		retVal |= Mathf.RoundToInt(c.r * 255f) << 24;
+		retVal |= Mathf.RoundToInt(c.g * 255f) << 16;
+		retVal |= Mathf.RoundToInt(c.b * 255f) << 8;
+		retVal |= Mathf.RoundToInt(c.a * 255f);
+		return retVal;
+	}
+
+	/// <summary>
+	/// Convert the specified RGBA32 integer to Color.
+	/// </summary>
+
+	static public Color IntToColor (int val)
+	{
+		float inv = 1f / 255f;
+		Color c = Color.black;
+		c.r = inv * ((val >> 24) & 0xFF);
+		c.g = inv * ((val >> 16) & 0xFF);
+		c.b = inv * ((val >> 8) & 0xFF);
+		c.a = inv * (val & 0xFF);
+		return c;
+	}
+
+	/// <summary>
+	/// Convenience conversion function, allowing hex format (0xRrGgBbAa).
+	/// </summary>
+
+	static public Color HexToColor (uint val)
+	{
+		return IntToColor((int)val);
+	}
+
+	/// <summary>
+	/// Parse a RrGgBb color encoded in the string.
+	/// </summary>
+
+	static public Color ParseColor (string text, int offset)
 	{
 		int r = (HexToDecimal(text[offset])		<< 4) | HexToDecimal(text[offset + 1]);
 		int g = (HexToDecimal(text[offset + 2]) << 4) | HexToDecimal(text[offset + 3]);
 		int b = (HexToDecimal(text[offset + 4]) << 4) | HexToDecimal(text[offset + 5]);
 		float f = 1f / 255f;
 		return new Color(f * r, f * g, f * b);
+	}
+
+	/// <summary>
+	/// The reverse of ParseColor -- encodes a color in RrGgBb format.
+	/// </summary>
+
+	static public string EncodeColor (Color c)
+	{
+		int i = 0xFFFFFF & (ColorToInt(c) >> 8);
+		return i.ToString("X6");
 	}
 
 	/// <summary>
@@ -230,43 +278,5 @@ static public class NGUITools
 		rect.xMax = Mathf.RoundToInt(rect.xMax);
 		rect.yMax = Mathf.RoundToInt(rect.yMax);
 		return ConvertToTexCoords(rect, width, height);
-	}
-
-	/// <summary>
-	/// Convert the specified color to RGBA32 integer format.
-	/// </summary>
-
-	static public int ColorToInt (Color c)
-	{
-		int retVal = 0;
-		retVal |= Mathf.RoundToInt(c.r * 255f) << 24;
-		retVal |= Mathf.RoundToInt(c.g * 255f) << 16;
-		retVal |= Mathf.RoundToInt(c.b * 255f) << 8;
-		retVal |= Mathf.RoundToInt(c.a * 255f);
-		return retVal;
-	}
-
-	/// <summary>
-	/// Convert the specified RGBA32 integer to Color.
-	/// </summary>
-
-	static public Color IntToColor (int val)
-	{
-		float inv = 1f / 255f;
-		Color c = Color.black;
-		c.r = inv * ((val >> 24) & 0xFF);
-		c.g = inv * ((val >> 16) & 0xFF);
-		c.b = inv * ((val >> 8) & 0xFF);
-		c.a = inv * (val & 0xFF);
-		return c;
-	}
-
-	/// <summary>
-	/// Convenience conversion function, allowing hex format (0xRrGgBbAa).
-	/// </summary>
-
-	static public Color HexToColor (uint val)
-	{
-		return IntToColor((int)val);
 	}
 }
