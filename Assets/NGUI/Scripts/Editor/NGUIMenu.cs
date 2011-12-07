@@ -3,6 +3,10 @@ using UnityEditor;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// This script adds the NGUI menu options to the Unity Editor.
+/// </summary>
+
 static public class NGUIMenu
 {
 	[MenuItem("NGUI/Add Label")]
@@ -85,6 +89,7 @@ static public class NGUIMenu
 				}
 			}
 
+			box.isTrigger = true;
 			box.center = b.center;
 			box.size = b.size;
 		}

@@ -43,12 +43,22 @@ public class UISprite : UIWidget
 				material = (mAtlas != null) ? mAtlas.material : null;
 
 				// Re-link the sprite
+				if (string.IsNullOrEmpty(mSpriteName))
+				{
+					if (mAtlas != null && mAtlas.sprites.Count > 0)
+					{
+						mSprite = mAtlas.sprites[0];
+						mSpriteName = mSprite.name;
+					}
+				}
+
 				if (!string.IsNullOrEmpty(mSpriteName))
 				{
 					string sprite = mSpriteName;
 					mSpriteName = "";
 					spriteName = sprite;
 					mChanged = true;
+					UpdateUVs();
 				}
 			}
 		}
