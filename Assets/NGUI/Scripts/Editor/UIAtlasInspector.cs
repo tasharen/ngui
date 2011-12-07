@@ -100,14 +100,26 @@ public class UIAtlasInspector : Editor
 			else
 			{
 				GUI.backgroundColor = Color.green;
-
+				
 				if (GUILayout.Button("New Sprite"))
 				{
 					RegisterUndo();
-					sprite = new UIAtlas.Sprite();
-					sprite.name = "New Sprite";
-					mAtlas.sprites.Add(sprite);
+					UIAtlas.Sprite newSprite = new UIAtlas.Sprite();
+
+					if (sprite != null)
+					{
+						newSprite.name = "Copy of " + sprite.name;
+						newSprite.outer = sprite.outer;
+						newSprite.inner = sprite.inner;
+					}
+					else
+					{
+						newSprite.name = "New Sprite";
+					}
+
+					mAtlas.sprites.Add(newSprite);
 					mIndex = mAtlas.sprites.Count - 1;
+					sprite = newSprite;
 				}
 				GUI.backgroundColor = Color.white;
 
