@@ -5,8 +5,14 @@ using System.Collections.Generic;
 /// This script should be attached to each camera that's used to draw the objects with
 /// UI components on them. This may mean only one camera (main camera or your UI camera),
 /// or multiple cameras if you happen to have multiple viewports. Failing to attach this
-/// script simply means that objects drawn by this camera won't receive UI notifications
-/// such as OnClick, OnPress, OnHover, etc.
+/// script simply means that objects drawn by this camera won't receive UI notifications:
+/// 
+/// - OnHover (isOver) is sent when the mouse hovers over a collider or moves away.
+/// - OnPress (isDown) is sent when a mouse button gets pressed on the collider.
+/// - OnSelect (selected) is sent when a mouse button is released on the same object as it was pressed on.
+/// - OnClick is sent with the same conditions as OnSelect, with the added check to see if the mouse has not moved much.
+/// - OnInput (text) is sent when typing after selecting a collider by clicking on it.
+/// - OnTooltip (show) is sent when the mouse hovers over a collider for some time without moving.
 /// </summary>
 
 [ExecuteInEditMode]
@@ -14,6 +20,8 @@ using System.Collections.Generic;
 [RequireComponent(typeof(Camera))]
 public class UICamera : MonoBehaviour
 {
+	public float tooltipDelay = 1f;
+
 	static List<UICamera> mList = new List<UICamera>();
 
 	bool mUseTouchInput = false;
@@ -22,11 +30,13 @@ public class UICamera : MonoBehaviour
 	GameObject mHover = null;
 	GameObject mDown = null;
 	GameObject mSel = null;
+	GameObject mTooltip = null;
 	Vector3 mPos = Vector3.zero;
 	Vector2 mDelta = Vector2.zero;
 	Vector2 mTotalDelta = Vector2.zero;
 	LayerMask mLayerMask;
 	bool mConsiderForClick = false;
+	float mTooltipTime = 0f;
 
 	/// <summary>
 	/// Caching is always preferable for performance.
@@ -197,19 +207,28 @@ public class UICamera : MonoBehaviour
 		{
 			pressed = Input.GetMouseButtonDown(0);
 			unpressed = Input.GetMouseButtonUp(0);
-			mDelta = Input.mousePosition - mPos;
-			mPos = Input.mousePosition;
+			Vector3 pos = Input.mousePosition;
+			mDelta = pos - mPos;
+
+			if (mPos != pos)
+			{
+				if (mTooltipTime != 0f) mTooltipTime = Time.time + tooltipDelay;
+				else if (mTooltip != null) ShowTooltip(false);
+				mPos = pos;
+			}
 		}
 
 		// If we're using the mouse for input, we should send out a hover(false) message first
 		if (!mUseTouchInput && mDown == null && mHover != mMouse && mHover != null)
 		{
+			if (mTooltip != null) ShowTooltip(false);
 			mHover.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
 		}
 
 		// Send the drag notification, intentionally before the pressed object gets changed
 		if (mDown != null && mDelta.magnitude != 0f)
 		{
+			if (mTooltip != null) ShowTooltip(false);
 			mTotalDelta += mDelta;
 			mDown.SendMessage("OnDrag", mDelta, SendMessageOptions.DontRequireReceiver);
 
@@ -222,8 +241,9 @@ public class UICamera : MonoBehaviour
 		// Send out the press message
 		if (pressed)
 		{
+			if (mTooltip != null) ShowTooltip(false);
 			mDown = mMouse;
-			mConsiderForClick = true;
+			mConsiderForClick = false;
 			mTotalDelta = Vector3.zero;
 			if (mDown != null) mDown.SendMessage("OnPress", true, SendMessageOptions.DontRequireReceiver);
 		}
@@ -231,6 +251,7 @@ public class UICamera : MonoBehaviour
 		// Clear the selection
 		if ((mSel != null) && (pressed || Input.GetKeyDown(KeyCode.Escape)))
 		{
+			if (mTooltip != null) ShowTooltip(false);
 			mSel.SendMessage("OnSelect", false, SendMessageOptions.DontRequireReceiver);
 			mSel = null;
 		}
@@ -238,6 +259,8 @@ public class UICamera : MonoBehaviour
 		// Send out the unpress message
 		if (unpressed)
 		{
+			if (mTooltip != null) ShowTooltip(false);
+
 			if (mDown != null)
 			{
 				mDown.SendMessage("OnPress", false, SendMessageOptions.DontRequireReceiver);
@@ -259,6 +282,7 @@ public class UICamera : MonoBehaviour
 		// Send out a hover(true) message last
 		if (!mUseTouchInput && mDown == null && mHover != mMouse)
 		{
+			mTooltipTime = Time.time + tooltipDelay;
 			mHover = mMouse;
 			if (mHover != null) mHover.SendMessage("OnHover", true, SendMessageOptions.DontRequireReceiver);
 		}
@@ -266,7 +290,26 @@ public class UICamera : MonoBehaviour
 		// Forward the input to the selected object
 		if (mSel != null && Input.inputString.Length > 0)
 		{
+			if (mTooltip != null) ShowTooltip(false);
 			mSel.SendMessage("OnInput", Input.inputString, SendMessageOptions.DontRequireReceiver);
 		}
+
+		// If it's time to show a tooltip, inform the object we're hovering over
+		if (!mUseTouchInput && mHover != null && mTooltipTime != 0f && mTooltipTime < Time.time)
+		{
+			mTooltip = mHover;
+			ShowTooltip(true);
+		}
+	}
+
+	/// <summary>
+	/// Show or hide the tooltip.
+	/// </summary>
+
+	void ShowTooltip (bool val)
+	{
+		mTooltipTime = 0f;
+		mTooltip.SendMessage("OnTooltip", val, SendMessageOptions.DontRequireReceiver);
+		if (!val) mTooltip = null;
 	}
 }

@@ -68,6 +68,19 @@ public class InvGameItem
 	}
 
 	/// <summary>
+	/// Game item's name should prefix the quality
+	/// </summary>
+
+	public string name
+	{
+		get
+		{
+			if (baseItem == null) return null;
+			return quality.ToString() + " " + baseItem.name;
+		}
+	}
+
+	/// <summary>
 	/// Put your formula for calculating the item stat modifier here.
 	/// Simplest formula -- scale it with quality and item level.
 	/// Since all stats on base items are specified at max item level,
@@ -106,15 +119,31 @@ public class InvGameItem
 	}
 
 	/// <summary>
-	/// Game item's name should prefix the quality
+	/// Item's color based on quality. You will likely want to change this to your own colors.
 	/// </summary>
 
-	public string name
+	public Color color
 	{
 		get
 		{
-			if (baseItem == null) return null;
-			return quality.ToString() + " " + baseItem.name;
+			Color c = Color.grey;
+
+			switch (quality)
+			{
+				case Quality.Cursed:	c = Color.red; break;
+				case Quality.Broken:	c = new Color(0.1f, 0.1f, 0.1f); break;
+				case Quality.Damaged:	c = new Color(0.4f, 0.4f, 0.4f); break;
+				case Quality.Worn:		c = new Color(0.7f, 0.7f, 0.7f); break;
+				case Quality.Sturdy:	c = new Color(1.0f, 1.0f, 1.0f); break;
+				case Quality.Polished:	c = NGUITools.HexToColor(0xe0ffbeff); break;
+				case Quality.Improved:	c = NGUITools.HexToColor(0x93d749ff); break;
+				case Quality.Crafted:	c = NGUITools.HexToColor(0x4eff00ff); break;
+				case Quality.Superior:	c = NGUITools.HexToColor(0x00baffff); break;
+				case Quality.Enchanted: c = NGUITools.HexToColor(0x7376fdff); break;
+				case Quality.Epic:		c = NGUITools.HexToColor(0x9600ffff); break;
+				case Quality.Legendary: c = NGUITools.HexToColor(0xff9000ff); break;
+			}
+			return c;
 		}
 	}
 

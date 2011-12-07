@@ -331,7 +331,7 @@ public abstract class UIWidget : MonoBehaviour
 	virtual public bool OnUpdate () { return false; }
 
 	/// <summary>
-	/// Virtual function called by the UIScreen that fills the buffers.
+	/// Virtual function called by the UIPanel that fills the buffers.
 	/// </summary>
 
 	virtual public void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols) { }

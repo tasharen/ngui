@@ -15,6 +15,11 @@ public class UIItemSlot : MonoBehaviour
 
 	InvGameItem mItem;
 
+	void OnTooltip (bool show)
+	{
+		UITooltip.ShowItem(show ? mItem : null);
+	}
+
 	void Update ()
 	{
 		InvGameItem item = (equipment != null) ? equipment.GetItem(slot) : null;
@@ -48,31 +53,7 @@ public class UIItemSlot : MonoBehaviour
 
 			if (background != null)
 			{
-				if (item == null)
-				{
-					background.color = Color.grey;
-				}
-				else
-				{
-					Color c = Color.grey;
-
-					switch (item.quality)
-					{
-						case InvGameItem.Quality.Cursed:	c = Color.red;							break;
-						case InvGameItem.Quality.Broken:	c = new Color(0.1f, 0.1f, 0.1f);		break;
-						case InvGameItem.Quality.Damaged:	c = new Color(0.4f, 0.4f, 0.4f);		break;
-						case InvGameItem.Quality.Worn:		c = new Color(0.7f, 0.7f, 0.7f);		break;
-						case InvGameItem.Quality.Sturdy:	c = new Color(1.0f, 1.0f, 1.0f);		break;
-						case InvGameItem.Quality.Polished:	c = NGUITools.HexToColor(0xe0ffbeff);	break;
-						case InvGameItem.Quality.Improved:	c = NGUITools.HexToColor(0x93d749ff);	break;
-						case InvGameItem.Quality.Crafted:	c = NGUITools.HexToColor(0x4eff00ff);	break;
-						case InvGameItem.Quality.Superior:	c = NGUITools.HexToColor(0x00baffff);	break;
-						case InvGameItem.Quality.Enchanted: c = NGUITools.HexToColor(0x7376fdff);	break;
-						case InvGameItem.Quality.Epic:		c = NGUITools.HexToColor(0x9600ffff);	break;
-						case InvGameItem.Quality.Legendary:	c = NGUITools.HexToColor(0xff9000ff);	break;
-					}
-					background.color = c;
-				}
+				background.color = (item != null) ? item.color : Color.grey;
 			}
 		}
 	}

@@ -121,7 +121,12 @@ static public class NGUITools
 			{
 				if (text[index + 7] == ']')
 				{
-					if (colors != null) colors.Push(ParseColor(text, index + 1));
+					if (colors != null)
+					{
+						Color c = ParseColor(text, index + 1);
+						c.a = colors.Peek().a;
+						colors.Push(c);
+					}
 					return 8;
 				}
 			}
