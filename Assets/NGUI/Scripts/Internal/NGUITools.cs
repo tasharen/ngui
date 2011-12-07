@@ -293,8 +293,8 @@ static public class NGUITools
 			platform == RuntimePlatform.WindowsWebPlayer ||
 			platform == RuntimePlatform.WindowsEditor)
 		{
-			pos.x -= 0.5f;
-			pos.y += 0.5f;
+			pos.x = pos.x - 0.5f;
+			pos.y = pos.y + 0.5f;
 		}
 		return pos;
 	}

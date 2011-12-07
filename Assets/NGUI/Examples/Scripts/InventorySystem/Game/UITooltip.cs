@@ -12,10 +12,13 @@ public class UITooltip : MonoBehaviour
 
 	public UILabel text;
 	public UISlicedSprite background;
+	public bool scalingTransitions = true;
 
 	Transform mTrans;
 	float mTarget = 0f;
 	float mCurrent = 0f;
+	Vector3 mPos;
+	Vector3 mSize;
 
 	UIWidget[] mWidgets;
 
@@ -30,6 +33,8 @@ public class UITooltip : MonoBehaviour
 	{
 		mTrans = transform;
 		mWidgets = GetComponentsInChildren<UIWidget>();
+		mPos = mTrans.localPosition;
+		mSize = mTrans.localScale;
 		SetAlpha(0f);
 	}
 
@@ -41,9 +46,21 @@ public class UITooltip : MonoBehaviour
 	{
 		if (mCurrent != mTarget)
 		{
-			mCurrent = Mathf.Lerp(mCurrent, mTarget, Time.deltaTime * 8f);
+			mCurrent = Mathf.Lerp(mCurrent, mTarget, Time.deltaTime * 10f);
 			if (Mathf.Abs(mCurrent - mTarget) < 0.001f) mCurrent = mTarget;
-			SetAlpha(mCurrent);
+			SetAlpha(mCurrent * mCurrent);
+
+			if (scalingTransitions)
+			{
+				Vector3 offset = mSize * 0.25f;
+				offset.y = -offset.y;
+
+				Vector3 pos = Vector3.Lerp(mPos - offset, mPos, mCurrent);
+				pos = NGUITools.ApplyHalfPixelOffset(pos);
+
+				mTrans.localPosition = pos;
+				mTrans.localScale = Vector3.one * (1.5f - mCurrent * 0.5f);
+			}
 		}
 	}
 
@@ -73,6 +90,17 @@ public class UITooltip : MonoBehaviour
 			
 			if (text != null) text.text = tooltipText;
 
+			// Orthographic camera positioning is trivial
+			mPos = Input.mousePosition;
+			mPos.x -= Screen.width * 0.5f;
+			mPos.y -= Screen.height * 0.5f;
+			mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(mPos);
+
+			// An alternative UIAnchor-based approach that will work even with a non-orthographic camera
+			//UIAnchor anchor = mTrans.GetComponent<UIAnchor>();
+			//anchor.offset = Input.mousePosition;
+			//anchor.Update();
+
 			if (background != null)
 			{
 				Transform backgroundTrans = background.transform;
@@ -82,29 +110,18 @@ public class UITooltip : MonoBehaviour
 					Transform textTrans = text.transform;
 					Vector3 offset = textTrans.localPosition;
 					Vector3 textScale = textTrans.localScale;
-					Vector3 size = text.font.CalculatePrintedSize(tooltipText, true);
+					mSize = text.font.CalculatePrintedSize(tooltipText, true);
 
-					size.x *= textScale.x;
-					size.y *= textScale.y;
+					mSize.x *= textScale.x;
+					mSize.y *= textScale.y;
 
-					size.x += offset.x * 2f;
-					size.y -= offset.y * 2f;
-					size.z = 1f;
+					mSize.x += offset.x * 2f;
+					mSize.y -= offset.y * 2f;
+					mSize.z = 1f;
 
-					backgroundTrans.localScale = size;
+					backgroundTrans.localScale = mSize;
 				}
 			}
-
-			// Orthographic camera positioning is trivial
-			Vector3 pos = Input.mousePosition;
-			pos.x -= Screen.width * 0.5f;
-			pos.y -= Screen.height * 0.5f;
-			mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(pos);
-
-			// An alternative UIAnchor-based approach that will work even with a non-orthographic camera
-			//UIAnchor anchor = mTrans.GetComponent<UIAnchor>();
-			//anchor.offset = Input.mousePosition;
-			//anchor.Update();
 		}
 		else mTarget = 0f;
 	}

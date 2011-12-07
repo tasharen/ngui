@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System;
 
+/// <summary>
+/// Inventory system -- Equipment class works with InvAttachmentPoints and allows to visually equip and remove items.
+/// </summary>
+
 [AddComponentMenu("NGUI/Examples/Equipment")]
 public class InvEquipment : MonoBehaviour
 {
