@@ -50,11 +50,13 @@ public abstract class UIItemSlot : MonoBehaviour
 			if (mItem != null)
 			{
 				mDraggedItem = Replace(null);
+				UpdateCursor();
 			}
 		}
 		else
 		{
 			mDraggedItem = Replace(mDraggedItem);
+			UpdateCursor();
 		}
 	}
 
@@ -67,6 +69,7 @@ public abstract class UIItemSlot : MonoBehaviour
 		if (mDraggedItem == null && mItem != null)
 		{
 			mDraggedItem = Replace(null);
+			UpdateCursor();
 		}
 	}
 
@@ -77,6 +80,23 @@ public abstract class UIItemSlot : MonoBehaviour
 	void OnDrop()
 	{
 		mDraggedItem = Replace(mDraggedItem);
+		UpdateCursor();
+	}
+
+	/// <summary>
+	/// Set the cursor to the icon of the item being dragged.
+	/// </summary>
+
+	void UpdateCursor ()
+	{
+		if (mDraggedItem != null && mDraggedItem.baseItem != null)
+		{
+			UICursor.Set(mDraggedItem.baseItem.iconAtlas, mDraggedItem.baseItem.iconName);
+		}
+		else
+		{
+			UICursor.Clear();
+		}
 	}
 
 	/// <summary>

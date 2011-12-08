@@ -115,10 +115,16 @@ public class UIPanel : MonoBehaviour
 
 		if (createIfMissing)
 		{
+#if UNITY_EDITOR
+			// If we're in the editor, create the game object with hide flags set right away
+			GameObject go = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags("_UIDrawCall [" + mat.name + "]",
+				mHidden ? HideFlags.HideAndDontSave : HideFlags.DontSave | HideFlags.NotEditable);
+#else
 			GameObject go = new GameObject("_UIDrawCall [" + mat.name + "]");
 			go.hideFlags = mHidden ? HideFlags.HideAndDontSave : HideFlags.DontSave | HideFlags.NotEditable;
-			go.layer = gameObject.layer;
+#endif
 
+			go.layer = gameObject.layer;
 			sc = go.AddComponent<UIDrawCall>();
 			sc.material = mat;
 

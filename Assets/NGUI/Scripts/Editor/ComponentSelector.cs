@@ -87,8 +87,20 @@ public class ComponentSelector : ScriptableWizard
 
 		GUILayout.BeginHorizontal();
 		{
-			GUILayout.Label(mb.GetType().ToString(), GUILayout.Width(80f));
+			PrefabType type = EditorUtility.GetPrefabType(mb.gameObject);
+
+			if (type == PrefabType.Prefab)
+			{
+				GUILayout.Label("Prefab", GUILayout.Width(80f));
+			}
+			else
+			{
+				GUI.color = Color.grey;
+				GUILayout.Label("Object", GUILayout.Width(80f));
+			}
+
 			GUILayout.Label(NGUITools.GetHierarchy(mb.gameObject));
+			GUI.color = Color.white;
 			retVal = GUILayout.Button("Select", GUILayout.Width(60f));
 		}
 		GUILayout.EndHorizontal();
