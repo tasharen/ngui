@@ -55,11 +55,12 @@ public class UITooltip : MonoBehaviour
 				Vector3 offset = mSize * 0.25f;
 				offset.y = -offset.y;
 
+				Vector3 size = Vector3.one * (1.5f - mCurrent * 0.5f);
 				Vector3 pos = Vector3.Lerp(mPos - offset, mPos, mCurrent);
 				pos = NGUITools.ApplyHalfPixelOffset(pos);
 
 				mTrans.localPosition = pos;
-				mTrans.localScale = Vector3.one * (1.5f - mCurrent * 0.5f);
+				mTrans.localScale = size;
 			}
 		}
 	}
@@ -92,14 +93,6 @@ public class UITooltip : MonoBehaviour
 
 			// Orthographic camera positioning is trivial
 			mPos = Input.mousePosition;
-			mPos.x -= Screen.width * 0.5f;
-			mPos.y -= Screen.height * 0.5f;
-			mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(mPos);
-
-			// An alternative UIAnchor-based approach that will work even with a non-orthographic camera
-			//UIAnchor anchor = mTrans.GetComponent<UIAnchor>();
-			//anchor.offset = Input.mousePosition;
-			//anchor.Update();
 
 			if (background != null)
 			{
@@ -110,18 +103,36 @@ public class UITooltip : MonoBehaviour
 					Transform textTrans = text.transform;
 					Vector3 offset = textTrans.localPosition;
 					Vector3 textScale = textTrans.localScale;
+
+					// Calculate the dimensions of the printed text
 					mSize = text.font.CalculatePrintedSize(tooltipText, true);
 
+					// Scale by the transform and adjust by the padding offset
 					mSize.x *= textScale.x;
 					mSize.y *= textScale.y;
-
 					mSize.x += offset.x * 2f;
 					mSize.y -= offset.y * 2f;
 					mSize.z = 1f;
 
 					backgroundTrans.localScale = mSize;
+
+					// Don't let the tooltip leave the screen area
+					if (mPos.x + mSize.x > Screen.width) mPos.x = Screen.width  - mSize.x;
+					if (mPos.y - mSize.y < 0f) mPos.y = mSize.y;
 				}
 			}
+
+			// The camera's coordinates are actually (-halfScreen, halfScreen)
+			mPos.x -= Screen.width * 0.5f;
+			mPos.y -= Screen.height * 0.5f;
+
+			// Set the transform position with a half-pixel offset
+			mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(mPos);
+
+			// An alternative UIAnchor-based approach that will work even with a non-orthographic camera
+			//UIAnchor anchor = mTrans.GetComponent<UIAnchor>();
+			//anchor.offset = Input.mousePosition;
+			//anchor.Update();
 		}
 		else mTarget = 0f;
 	}
