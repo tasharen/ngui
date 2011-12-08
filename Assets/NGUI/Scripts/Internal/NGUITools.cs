@@ -8,6 +8,36 @@ using System.Collections.Generic;
 
 static public class NGUITools
 {
+	static AudioListener mListener;
+
+	/// <summary>
+	/// Play the specifid audio clip.
+	/// </summary>
+	/// <param name="clip"></param>
+
+	static public void PlaySound (AudioClip clip) { PlaySound(clip, 1f); }
+
+	/// <summary>
+	/// Play the specified audio clip with the specified volume.
+	/// </summary>
+
+	static public void PlaySound (AudioClip clip, float volume)
+	{
+		if (clip != null)
+		{
+			if (mListener == null)
+			{
+				mListener = GameObject.FindObjectOfType(typeof(AudioListener)) as AudioListener;
+				if (mListener == null) mListener = Camera.main.gameObject.AddComponent<AudioListener>();
+			}
+
+			AudioSource source = mListener.audio;
+			if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
+
+			source.PlayOneShot(clip, volume);
+		}
+	}
+
 	/// <summary>
 	/// Same as Random.Range, but the returned value is >= min and <= max.
 	/// Unity's Random.Range is < max instead, unless min == max.

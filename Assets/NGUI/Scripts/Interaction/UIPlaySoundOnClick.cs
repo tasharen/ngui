@@ -10,22 +10,22 @@ public class UIPlaySoundOnClick : MonoBehaviour
 	public AudioClip clip;
 	public float volume = 1f;
 
+	AudioListener mListener;
+
 	void OnClick ()
 	{
 		if (clip != null)
 		{
-			Camera cam = Camera.main;
-
-			if (cam != null)
+			if (mListener == null)
 			{
-				AudioListener listener = cam.GetComponent<AudioListener>();
-				if (listener == null) listener = cam.gameObject.AddComponent<AudioListener>();
-
-				AudioSource source = cam.audio;
-				if (source == null) source = cam.gameObject.AddComponent<AudioSource>();
-
-				source.PlayOneShot(clip, volume);
+				mListener = FindObjectOfType(typeof(AudioListener)) as AudioListener;
+				if (mListener == null) mListener = Camera.main.gameObject.AddComponent<AudioListener>();
 			}
+
+			AudioSource source = mListener.audio;
+			if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
+
+			source.PlayOneShot(clip, volume);
 		}
 	}
 }

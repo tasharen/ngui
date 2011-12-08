@@ -13,6 +13,10 @@ public abstract class UIItemSlot : MonoBehaviour
 	public UIWidget background;
 	public UILabel label;
 
+	public AudioClip grabSound;
+	public AudioClip placeSound;
+	public AudioClip errorSound;
+
 	InvGameItem mItem;
 	string mText = "";
 
@@ -45,17 +49,14 @@ public abstract class UIItemSlot : MonoBehaviour
 
 	void OnClick ()
 	{
-		if (mDraggedItem == null)
+		if (mDraggedItem != null)
 		{
-			if (mItem != null)
-			{
-				mDraggedItem = Replace(null);
-				UpdateCursor();
-			}
+			OnDrop();
 		}
-		else
+		else if (mItem != null)
 		{
-			mDraggedItem = Replace(mDraggedItem);
+			mDraggedItem = Replace(null);
+			if (mDraggedItem != null) NGUITools.PlaySound(grabSound);
 			UpdateCursor();
 		}
 	}
@@ -69,6 +70,7 @@ public abstract class UIItemSlot : MonoBehaviour
 		if (mDraggedItem == null && mItem != null)
 		{
 			mDraggedItem = Replace(null);
+			NGUITools.PlaySound(grabSound);
 			UpdateCursor();
 		}
 	}
@@ -79,7 +81,13 @@ public abstract class UIItemSlot : MonoBehaviour
 
 	void OnDrop()
 	{
-		mDraggedItem = Replace(mDraggedItem);
+		InvGameItem item = Replace(mDraggedItem);
+
+		if (mDraggedItem == item) NGUITools.PlaySound(errorSound);
+		else if (item != null) NGUITools.PlaySound(grabSound);
+		else NGUITools.PlaySound(placeSound);
+
+		mDraggedItem = item;
 		UpdateCursor();
 	}
 
