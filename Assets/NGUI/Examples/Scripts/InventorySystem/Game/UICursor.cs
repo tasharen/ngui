@@ -47,7 +47,7 @@ public class UICursor : MonoBehaviour
 			Vector3 pos = Input.mousePosition;
 			pos.x -= Screen.width * 0.5f;
 			pos.y -= Screen.height * 0.5f;
-			mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(pos);
+			mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(pos, mTrans.localScale);
 		}
 	}
 

@@ -328,4 +328,24 @@ static public class NGUITools
 		}
 		return pos;
 	}
+
+	/// <summary>
+	/// Per-pixel offset taking scale into consideration.
+	/// If the scale dimension is an odd number, it won't apply the offset.
+	/// This is useful for centered sprites.
+	/// </summary>
+
+	static public Vector3 ApplyHalfPixelOffset (Vector3 pos, Vector3 scale)
+	{
+		RuntimePlatform platform = Application.platform;
+
+		if (platform == RuntimePlatform.WindowsPlayer ||
+			platform == RuntimePlatform.WindowsWebPlayer ||
+			platform == RuntimePlatform.WindowsEditor)
+		{
+			if (Mathf.RoundToInt(scale.x) == (Mathf.RoundToInt(scale.x * 0.5f) * 2)) pos.x = pos.x - 0.5f;
+			if (Mathf.RoundToInt(scale.y) == (Mathf.RoundToInt(scale.y * 0.5f) * 2)) pos.y = pos.y + 0.5f;
+		}
+		return pos;
+	}
 }
