@@ -51,7 +51,7 @@ public abstract class UIItemSlot : MonoBehaviour
 	{
 		if (mDraggedItem != null)
 		{
-			OnDrop();
+			OnDrop(null);
 		}
 		else if (mItem != null)
 		{
@@ -79,7 +79,7 @@ public abstract class UIItemSlot : MonoBehaviour
 	/// Stop dragging the item.
 	/// </summary>
 
-	void OnDrop()
+	void OnDrop (GameObject go)
 	{
 		InvGameItem item = Replace(mDraggedItem);
 
