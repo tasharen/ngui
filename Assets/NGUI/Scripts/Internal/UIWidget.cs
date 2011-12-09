@@ -240,6 +240,8 @@ public abstract class UIWidget : MonoBehaviour
 		OnStart();
 	}
 
+	bool mRecentlyEnabled = false;
+
 	/// <summary>
 	/// Mark the widget as having been changed so it gets rebuilt.
 	/// </summary>
@@ -248,7 +250,25 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		mChanged = true;
 		if (mTrans == null) mTrans = transform;
-		if (mMat != null && (mStarted || (!Application.isPlaying && mTrans.parent != null))) panel.AddWidget(this);
+		if (mMat != null)
+		{
+			if (mStarted) panel.AddWidget(this);
+			else mRecentlyEnabled = true;
+		}
+	}
+
+	/// <summary>
+	/// Ensure that this widget has been added to a panel. It's a work-around for the problem of
+	/// Unity calling OnEnable prior to parenting objects after Copy/Paste.
+	/// </summary>
+
+	void Update ()
+	{
+		if (mRecentlyEnabled)
+		{
+			mRecentlyEnabled = false;
+			panel.AddWidget(this);
+		}
 	}
 
 	/// <summary>
