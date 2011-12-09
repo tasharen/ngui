@@ -82,7 +82,7 @@ public class UIAnchor : MonoBehaviour
 			Vector3 newPos = hudCamera.ScreenToWorldPoint(v);
 			Vector3 currPos = mTrans.position;
 
-			// Wrapped in an 'if' so the scene doesnt get marked as 'edited' every frame
+			// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
 			if (newPos != currPos) mTrans.position = newPos;
 
 			if (stretchToFill && side == Side.TopLeft)

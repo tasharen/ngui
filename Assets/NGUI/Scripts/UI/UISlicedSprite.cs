@@ -3,26 +3,6 @@ using System.Collections.Generic;
 
 /// <summary>
 /// 9-sliced widget component used to draw large widgets using small textures.
-/// Take a look at the following diagram:
-/// 
-/// +---+------------------+---+
-/// | 1 |        2         | 3 |
-/// +---+------------------+---+
-/// |   |                  |   |
-/// |   |                  |   |
-/// | 4 |        5         | 6 |
-/// |   |                  |   |
-/// |   |                  |   |
-/// +---+------------------+---+
-/// | 7 |        8         | 9 |
-/// +---+------------------+---+
-/// 
-/// When the widget is resized, corners (1, 3, 7, 9) are not stretched at all.
-/// Sides (2, 4, 6, 8) are stretched in 1 direction (vertically or horizontally).
-/// Center (5) is stretched both vertically and horizontally.
-/// 
-/// Generally it's a good idea to create the texture within the atlas that keeps this
-/// stretching in mind. Smooth gradients work best for the center (5), as an example.
 /// </summary>
 
 [ExecuteInEditMode]
