@@ -33,7 +33,7 @@ public class UILabelInspector : UIWidgetInspector
 		if (font != mLabel.font) OnSelectFont(font);
 		if (mLabel.font == null) return false;
 
-		string text = EditorGUILayout.TextField("Text", mLabel.text);
+		string text = EditorGUILayout.TextArea(mLabel.text, GUILayout.Height(100f));
 		if (!string.Equals(text, mLabel.text)) { RegisterUndo(); mLabel.text = text; }
 
 		bool encoding = EditorGUILayout.Toggle("Encoding", mLabel.supportEncoding, GUILayout.Width(100f));

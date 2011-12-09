@@ -7,7 +7,7 @@
 [AddComponentMenu("NGUI/Interaction/Grow On Hover")]
 public class UIGrowOnHover : MonoBehaviour
 {
-	public Vector2 amount = new Vector2(1.1f, 1.1f);
+	public Vector3 amount = new Vector3(1.1f, 1.1f, 1.1f);
 	public float animationSpeed = 8f;
 
 	Transform mTrans;
@@ -33,6 +33,7 @@ public class UIGrowOnHover : MonoBehaviour
 		{
 			target.x *= amount.x;
 			target.y *= amount.y;
+			target.z *= amount.z;
 		}
 
 		mTrans.localScale = Vector3.Lerp(mTrans.localScale, target, Time.deltaTime * animationSpeed);
