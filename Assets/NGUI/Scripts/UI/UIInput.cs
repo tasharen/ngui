@@ -8,6 +8,7 @@
 public class UIInput : MonoBehaviour
 {
 	public UILabel label;
+	public int maxChars = 0;
 
 	string mText = "";
 	bool mSelected = false;
@@ -45,6 +46,7 @@ public class UIInput : MonoBehaviour
 
 	void Awake ()
 	{
+		if (label == null) label = GetComponentInChildren<UILabel>();
 		if (label != null) label.supportEncoding = false;
 	}
 
@@ -123,6 +125,9 @@ public class UIInput : MonoBehaviour
 					mText += c;
 				}
 			}
+
+			// Ensure that we don't exceed the maximum length
+			if (maxChars > 0 && mText.Length > maxChars) mText = mText.Substring(0, maxChars);
 			label.text = mSelected ? (mText + "|") : mText;
 		}
 	}
