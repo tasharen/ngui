@@ -99,7 +99,7 @@ public class BMFont
 					// Expected data style:
 					// char id=13 x=506 y=62 width=3 height=3 xoffset=-1 yoffset=50 xadvance=0 page=0 chnl=15
 
-					if (split.Length == 11)
+					if (split.Length > 8)
 					{
 						int id = GetValue(split[1]);
 						BMGlyph glyph = GetGlyph(id, true);
@@ -148,7 +148,7 @@ public class BMFont
 					// Expected data style:
 					// common lineHeight=64 base=51 scaleW=512 scaleH=512 pages=1 packed=0 alphaChnl=1 redChnl=4 greenChnl=4 blueChnl=4
 
-					if (split.Length == 11)
+					if (split.Length > 5)
 					{
 						mSize = GetValue(split[1]);
 						mBase = GetValue(split[2]);
