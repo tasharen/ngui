@@ -100,7 +100,7 @@ public class UIInput : MonoBehaviour
 #if UNITY_IPHONE || UNITY_ANDROID
 			if (mKeyboard != null && mKeyboard.done)
 			{
-				input = k.text;
+				input = mKeyboard.text;
 				mSelected = false;
 				mKeyboard = null;
 				mText = "";
