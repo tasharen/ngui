@@ -51,7 +51,16 @@ public class UIAtlasInspector : Editor
 		if (!mConfirmDelete)
 		{
 			GUITools.DrawSeparator();
-			mat = EditorGUILayout.ObjectField("Material", mat, typeof(Material), true) as Material;
+			mat = EditorGUILayout.ObjectField("Material", mat, typeof(Material), false) as Material;
+
+			TextAsset json = EditorGUILayout.ObjectField("Load JSON", null, typeof(TextAsset), false) as TextAsset;
+			
+			if (json != null)
+			{
+				Undo.RegisterUndo(mAtlas, "Load JSON");
+				MiniJSON.LoadSpriteData(mAtlas, json);
+			}
+
 			coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", coords);
 		}
 
