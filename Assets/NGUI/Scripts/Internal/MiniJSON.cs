@@ -70,22 +70,22 @@ public class MiniJSON
 			int frameH = int.Parse(frame["h"].ToString());
 
 			// Read the rotation value
-			//bool item1 = (bool)((Hashtable)item.Value)["rotated"];
+			bool item1 = (bool)((Hashtable)item.Value)["rotated"];
 
 			UIAtlas.Sprite newSprite = new UIAtlas.Sprite();
 			newSprite.name = item.Key.ToString();
 
 			// Fill in the proper values
-			//if (item1)
-			//{
-			//	newSprite.outer = new Rect(frameX, frameY, frameH, frameW);
-			//	newSprite.inner = new Rect(frameX, frameY, frameH, frameW);
-			//}
-			//else
-			//{
+			if (item1)
+			{
+				newSprite.outer = new Rect(frameX, frameY, frameH, frameW);
+				newSprite.inner = new Rect(frameX, frameY, frameH, frameW);
+			}
+			else
+			{
 				newSprite.outer = new Rect(frameX, frameY, frameW, frameH);
 				newSprite.inner = new Rect(frameX, frameY, frameW, frameH);
-			//}
+			}
 
 			atlas.sprites.Add(newSprite);
 		}
