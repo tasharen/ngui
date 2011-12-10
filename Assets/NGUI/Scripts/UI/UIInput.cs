@@ -90,7 +90,6 @@ public class UIInput : MonoBehaviour
 	}
 
 #if UNITY_IPHONE || UNITY_ANDROID
-
 	/// <summary>
 	/// Update the text and the label by grabbing it from the iOS/Android keyboard.
 	/// </summary>
@@ -101,10 +100,15 @@ public class UIInput : MonoBehaviour
 		{
 			mText = mKeyboard.text;
 			UpdateLabel();
+
+			if (mKeyboard.done)
+			{
+				mKeyboard = null;
+				mSelected = false;
+			}
 		}
 	}
-#endif
-
+#else
 	/// <summary>
 	/// Input event, sent by UICamera.
 	/// </summary>
@@ -113,40 +117,31 @@ public class UIInput : MonoBehaviour
 	{
 		if (mSelected && enabled && gameObject.active)
 		{
-#if UNITY_IPHONE || UNITY_ANDROID
-			if (mKeyboard != null && mKeyboard.done)
+			foreach (char c in input)
 			{
-				mSelected = false;
-				mKeyboard = null;
-			}
-			else
-#endif
-			{
-				foreach (char c in input)
+				if (c == '\b')
 				{
-					if (c == '\b')
-					{
-						// Backspace
-						if (mText.Length > 0) mText = mText.Substring(0, mText.Length - 1);
-					}
-					else if (c == '\r' || c == '\n')
-					{
-						// Enter
-						OnSelect(false);
-						return;
-					}
-					else
-					{
-						// All other characters get appended to the text
-						mText += c;
-					}
+					// Backspace
+					if (mText.Length > 0) mText = mText.Substring(0, mText.Length - 1);
 				}
-
-				// Ensure that we don't exceed the maximum length
-				UpdateLabel();
+				else if (c == '\r' || c == '\n')
+				{
+					// Enter
+					OnSelect(false);
+					return;
+				}
+				else
+				{
+					// All other characters get appended to the text
+					mText += c;
+				}
 			}
+
+			// Ensure that we don't exceed the maximum length
+			UpdateLabel();
 		}
 	}
+#endif
 
 	/// <summary>
 	/// Update the visual text label, capping it at maxChars correctly.
