@@ -85,10 +85,10 @@ static public class NGUIMenu
 					}
 					else
 					{
-						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(0f, 0f, 0f))));
-						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(0f, 1f, 0f))));
-						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(1f, 0f, 0f))));
-						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(1f, 1f, 0f))));
+						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(0f,  0f, 0f))));
+						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(0f, -1f, 0f))));
+						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(1f,  0f, 0f))));
+						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(1f, -1f, 0f))));
 					}
 				}
 			}

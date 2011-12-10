@@ -98,8 +98,17 @@ public class UISlicedSprite : UISprite
 
 			Vector3 scale = cachedTransform.localScale;
 			Vector2 sz = new Vector2(scale.x / tex.width, scale.y / tex.height);
-			v[1] += new Vector2(borderLeft / sz.x, borderTop / sz.y);
-			v[2] -= new Vector2(borderRight / sz.x, borderBottom / sz.y);
+			Vector2 tl = new Vector2(borderLeft / sz.x, borderTop / sz.y);
+			Vector2 br = new Vector2(borderRight / sz.x, borderBottom / sz.y);
+
+			v[1] += tl;
+			v[2] -= br;
+
+			v[2].x = Mathf.Max(tl.x, v[2].x);
+			v[2].y = Mathf.Min(tl.y, v[2].y);
+
+			v[3].x = Mathf.Max(tl.x + br.x, v[3].x);
+			v[3].y = Mathf.Min(tl.y + br.y, v[3].y);
 
 			uv[0] = new Vector2(mOuterUV.xMin, mOuterUV.yMax);
 			uv[1] = new Vector2(mInnerUV.xMin, mInnerUV.yMax);
