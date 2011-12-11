@@ -7,13 +7,31 @@
 [AddComponentMenu("NGUI/Interaction/Checkbox")]
 public class UICheckbox : UISend
 {
-	public bool isChecked = true;
+	public bool startsChecked = true;
 
-	void Start () { Send(isChecked ? 1 : 0); }
+	bool mChecked = true;
 
-	void OnClick ()
+	public bool isChecked
 	{
-		isChecked = !isChecked;
-		Send(isChecked ? 1 : 0);
+		get
+		{
+			return mChecked;
+		}
+		set
+		{
+			if (mChecked != value)
+			{
+				mChecked = value;
+				Send(mChecked ? 1 : 0);
+			}
+		}
 	}
+
+	void Start ()
+	{
+		mChecked = startsChecked;
+		Send(mChecked ? 1 : 0);
+	}
+
+	void OnClick () { isChecked = !isChecked; }
 }
