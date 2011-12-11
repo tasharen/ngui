@@ -25,10 +25,13 @@ public class UIFontInspector : Editor
 		UIFont font = target as UIFont;
 		TextAsset data = EditorGUILayout.ObjectField("Font Data", font.data, typeof(TextAsset), false) as TextAsset;
 
+		bool resetWidthHeight = false;
+
 		if (font.data != data)
 		{
 			Undo.RegisterUndo(font, "Font Data");
 			font.data = data;
+			resetWidthHeight = true;
 		}
 
 		if (data != null)
@@ -51,6 +54,13 @@ public class UIFontInspector : Editor
 				{
 					// Pixels are easier to work with than UVs
 					Rect pixels = NGUITools.ConvertToPixels(font.uvRect, tex.width, tex.height, false);
+
+					// Automatically set the width and height of the rectangle to be the original font texture's dimensions
+					if (resetWidthHeight)
+					{
+						pixels.width = font.texWidth;
+						pixels.height = font.texHeight;
+					}
 
 					GUI.backgroundColor = green;
 					pixels = EditorGUILayout.RectField("Pixel Rect", pixels);

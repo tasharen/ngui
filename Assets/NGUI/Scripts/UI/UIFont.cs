@@ -17,6 +17,18 @@ public class UIFont : MonoBehaviour
 	Stack<Color> mColors = new Stack<Color>();
 
 	/// <summary>
+	/// Original width of the font's texture in pixels.
+	/// </summary>
+
+	public int texWidth { get { return (mFont != null) ? mFont.texWidth : 1; } }
+
+	/// <summary>
+	/// Original height of the font's texture in pixels.
+	/// </summary>
+
+	public int texHeight { get { return (mFont != null) ? mFont.texHeight : 1; } }
+
+	/// <summary>
 	/// Get or set the text asset containing the font's exported data.
 	/// </summary>
 
