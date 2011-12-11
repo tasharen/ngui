@@ -53,12 +53,12 @@ public class UIAtlasInspector : Editor
 			GUITools.DrawSeparator();
 			mat = EditorGUILayout.ObjectField("Material", mat, typeof(Material), false) as Material;
 
-			TextAsset json = EditorGUILayout.ObjectField("Load JSON", null, typeof(TextAsset), false) as TextAsset;
+			TextAsset ta = EditorGUILayout.ObjectField("TP Import", null, typeof(TextAsset), false) as TextAsset;
 			
-			if (json != null)
+			if (ta != null)
 			{
-				Undo.RegisterUndo(mAtlas, "Load JSON");
-				MiniJSON.LoadSpriteData(mAtlas, json);
+				Undo.RegisterUndo(mAtlas, "Import Sprites");
+				MiniJSON.LoadSpriteData(mAtlas, ta);
 			}
 
 			coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", coords);

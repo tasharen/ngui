@@ -204,7 +204,6 @@ public class UIFont : MonoBehaviour
 			Vector2 u0 = Vector2.zero, u1 = Vector2.zero;
 			float invX = mUVRect.width / mFont.texWidth;
 			float invY = mUVRect.height / mFont.texHeight;
-			float invYUV = 1f - mUVRect.yMax;
 
 			for (int i = 0, imax = text.Length; i < imax; ++i)
 			{
@@ -251,7 +250,7 @@ public class UIFont : MonoBehaviour
 					v1.y = v0.y - scale.y * glyph.height;
 
 					u0.x = mUVRect.xMin + invX * glyph.x;
-					u0.y = invYUV + (1f - invY * glyph.y);
+					u0.y = mUVRect.yMax - invY * glyph.y;
 
 					u1.x = u0.x + invX * glyph.width;
 					u1.y = u0.y - invY * glyph.height;
