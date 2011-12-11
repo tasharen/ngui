@@ -1,7 +1,7 @@
 ----------------------------------------
         NGUI: Next-Gen UI kit
  Copyright © 2011 Tasharen Entertainment
-             Version 1.02
+             Version 1.03
   http://www.tasharen.com/?page_id=140
         support@tasharen.com
 ----------------------------------------
@@ -9,7 +9,7 @@
 Thank you for buying NGUI!
 
 If you have any questions, suggestions, comments or feature requests, please don't hesitate to
-email support@tasharen.com or PM 'ArenMook' on the Unity forums.
+email support@tasharen.com, PM 'ArenMook' on the Unity forums, or add 'arenmook' to Skype.
 
 ------------------------------------
 ****** !!! IMPORTANT NOTE !!! ******
