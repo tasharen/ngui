@@ -296,10 +296,18 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Forward the input to the selected object
-		if (mSel != null && Input.inputString.Length > 0)
+		if (mSel != null)
 		{
-			if (mTooltip != null) ShowTooltip(false);
-			mSel.SendMessage("OnInput", Input.inputString, SendMessageOptions.DontRequireReceiver);
+			string input = Input.inputString;
+
+			// Adding support for some macs only having the "Delete" key instead of "Backspace"
+			if (Input.GetKeyDown(KeyCode.Delete)) input += "\b";
+
+			if (input.Length > 0)
+			{
+				if (mTooltip != null) ShowTooltip(false);
+				mSel.SendMessage("OnInput", input, SendMessageOptions.DontRequireReceiver);
+			}
 		}
 
 		// If it's time to show a tooltip, inform the object we're hovering over
