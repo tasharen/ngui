@@ -108,7 +108,8 @@ public class UIInput : MonoBehaviour
 			}
 		}
 	}
-#else
+#endif
+
 	/// <summary>
 	/// Input event, sent by UICamera.
 	/// </summary>
@@ -117,6 +118,10 @@ public class UIInput : MonoBehaviour
 	{
 		if (mSelected && enabled && gameObject.active)
 		{
+			// Mobile devices handle input in Update()
+			if (Application.platform == RuntimePlatform.Android) return;
+			if (Application.platform == RuntimePlatform.IPhonePlayer) return;
+
 			foreach (char c in input)
 			{
 				if (c == '\b')
@@ -141,7 +146,6 @@ public class UIInput : MonoBehaviour
 			UpdateLabel();
 		}
 	}
-#endif
 
 	/// <summary>
 	/// Update the visual text label, capping it at maxChars correctly.
