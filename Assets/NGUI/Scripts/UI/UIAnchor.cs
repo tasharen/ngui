@@ -23,7 +23,7 @@ public class UIAnchor : MonoBehaviour
 	}
 
 	public Camera hudCamera = null;
-	public Side side = Side.BottomLeft;
+	public Side side = Side.Center;
 	public bool halfPixelOffset = true;
 	public bool stretchToFill = false;
 
