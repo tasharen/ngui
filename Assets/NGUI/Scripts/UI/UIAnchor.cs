@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Attach this script to a game object if you want it to be anchored to the side of the screen,
-/// maintaining its position as the resolution and aspect ratio changes.
+/// This script can be used to anchor an object to the side of the screen,
+/// or scale an object to always match the dimensions of the screen.
 /// </summary>
 
 [ExecuteInEditMode]
@@ -24,33 +24,49 @@ public class UIAnchor : MonoBehaviour
 
 	public Camera hudCamera = null;
 	public Side side = Side.BottomLeft;
-	public Vector3 offset = Vector3.zero;
-	public bool halfPixelOffset = false;
+	public bool halfPixelOffset = true;
 	public bool stretchToFill = false;
 
 	Transform mTrans;
+	bool mIsWindows = false;
 
-	void Start ()
+	/// <summary>
+	/// Automatically find the camera responsible for drawing the widgets under this object.
+	/// </summary>
+
+	void OnEnable ()
 	{
 		mTrans = transform;
 
+		mIsWindows = (Application.platform == RuntimePlatform.WindowsPlayer ||
+			Application.platform == RuntimePlatform.WindowsWebPlayer ||
+			Application.platform == RuntimePlatform.WindowsEditor);
+
 		if (hudCamera == null)
 		{
-			Transform t = mTrans;
+			int layerMask = 1 << gameObject.layer;
+			Camera[] cameras = GameObject.FindSceneObjectsOfType(typeof(Camera)) as Camera[];
 
-			while (hudCamera == null && t != null)
+			foreach (Camera cam in cameras)
 			{
-				hudCamera = t.GetComponent<Camera>();
-				t = t.parent;
+				if ((cam.cullingMask & layerMask) != 0)
+				{
+					hudCamera = cam;
+					break;
+				}
 			}
 		}
 	}
+
+	/// <summary>
+	/// Anchor the object to the appropriate point.
+	/// </summary>
 
 	public void Update ()
 	{
 		if (hudCamera != null)
 		{
-			Vector3 v = offset;
+			Vector3 v = Vector3.zero;
 
 			if (side == Side.Center)
 			{
@@ -70,15 +86,20 @@ public class UIAnchor : MonoBehaviour
 
 				if (side == Side.Top || side == Side.TopRight || side == Side.TopLeft)
 				{
-					v.y += (Screen.height - v.y) * hudCamera.rect.yMax;
+					v.y = (Screen.height - v.y) * hudCamera.rect.yMax;
 				}
 				else
 				{
-					v.y += (Screen.height - v.y) * hudCamera.rect.yMin;
+					v.y = (Screen.height - v.y) * hudCamera.rect.yMin;
 				}
 			}
 
-			if (halfPixelOffset) v = NGUITools.ApplyHalfPixelOffset(v);
+			if (halfPixelOffset && mIsWindows && hudCamera.orthographic)
+			{
+				v.x -= 0.5f;
+				v.y += 0.5f;
+			}
+
 			Vector3 newPos = hudCamera.ScreenToWorldPoint(v);
 			Vector3 currPos = mTrans.position;
 

@@ -3,7 +3,7 @@
 /// <summary>
 /// Convenience script that resizes the camera's orthographic size to match the screen size.
 /// This script can be used to create pixel-perfect UI, however it's usually more convenient
-/// to create the UI that has the same proportions at all resolutions. If that is what you
+/// to create the UI that stays proportional as the screen scales. If that is what you
 /// want, you don't need this script (or at least don't need it to be active).
 /// </summary>
 
@@ -12,13 +12,13 @@
 [AddComponentMenu("NGUI/UI/Orthographic Camera")]
 public class UIOrthoCamera : MonoBehaviour
 {
-	public float scale = 1f;
-
 	Camera mCam;
+	Transform mTrans;
 
 	void Start ()
 	{
 		mCam = camera;
+		mTrans = transform;
 		mCam.orthographic = true;
 	}
 
@@ -27,7 +27,7 @@ public class UIOrthoCamera : MonoBehaviour
 		float y0 = mCam.rect.yMin * Screen.height;
 		float y1 = mCam.rect.yMax * Screen.height;
 
-		float size = (y1 - y0) * 0.5f * scale;
+		float size = (y1 - y0) * 0.5f * mTrans.lossyScale.y;
 		if (!Mathf.Approximately(mCam.orthographicSize, size)) mCam.orthographicSize = size;
 	}
 }
