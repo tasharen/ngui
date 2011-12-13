@@ -9,6 +9,7 @@ public class UIInput : MonoBehaviour
 {
 	public UILabel label;
 	public int maxChars = 0;
+	public string caratChar = "|";
 
 	string mText = "";
 	bool mSelected = false;
@@ -35,7 +36,7 @@ public class UIInput : MonoBehaviour
 			if (label != null)
 			{
 				label.supportEncoding = false;
-				label.text = mSelected ? value + "|" : value;
+				label.text = mSelected ? value + caratChar : value;
 			}
 		}
 	}
@@ -73,7 +74,7 @@ public class UIInput : MonoBehaviour
 				else
 #endif
 				{
-					label.text = mText + "|";
+					label.text = mText + caratChar;
 				}
 			}
 #if UNITY_IPHONE || UNITY_ANDROID
@@ -154,6 +155,6 @@ public class UIInput : MonoBehaviour
 	void UpdateLabel ()
 	{
 		if (maxChars > 0 && mText.Length > maxChars) mText = mText.Substring(0, maxChars);
-		label.text = mSelected ? (mText + "|") : mText;
+		label.text = mSelected ? (mText + caratChar) : mText;
 	}
 }
