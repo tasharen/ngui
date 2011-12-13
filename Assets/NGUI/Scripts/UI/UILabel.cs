@@ -8,6 +8,12 @@ public class UILabel : UIWidget
 	[SerializeField] UIFont mFont;
 	[SerializeField] string mText = "";
 	[SerializeField] bool mEncoding = true;
+	[SerializeField] float mLineWidth = 0;
+	[SerializeField] bool mMultiline = true;
+
+	bool mShouldBeProcessed = true;
+	string mProcessedText = null;
+	float mLastSize = 0f;
 
 	/// <summary>
 	/// Set the font used by this label.
@@ -45,6 +51,7 @@ public class UILabel : UIWidget
 			{
 				mText = value;
 				mChanged = true;
+				mShouldBeProcessed = true;
 			}
 		}
 	}
@@ -65,6 +72,71 @@ public class UILabel : UIWidget
 			{
 				mEncoding = value;
 				mChanged = true;
+				mShouldBeProcessed = true;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Maximum width of the label in pixels.
+	/// </summary>
+
+	public float lineWidth
+	{
+		get
+		{
+			return mLineWidth;
+		}
+		set
+		{
+			if (mLineWidth != value)
+			{
+				mLineWidth = value;
+				mChanged = true;
+				mShouldBeProcessed = true;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Whether the label supports multiple lines.
+	/// </summary>
+
+	public bool multiLine
+	{
+		get
+		{
+			return mMultiline;
+		}
+		set
+		{
+			if (mMultiline != value)
+			{
+				mMultiline = value;
+				mChanged = true;
+				mShouldBeProcessed = true;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Helper function that processes the text, splitting it up into multiple lines as necessary.
+	/// </summary>
+
+	void ProcessText ()
+	{
+		if (mShouldBeProcessed)
+		{
+			mShouldBeProcessed = false;
+			mProcessedText = mText.Replace("\\n", "\n");
+
+			if (mLineWidth > 0f)
+			{
+				mProcessedText = mFont.WrapText(mProcessedText, mLineWidth / cachedTransform.localScale.y, mMultiline, mEncoding);
+			}
+			else if (!mMultiline)
+			{
+				mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, mEncoding);
 			}
 		}
 	}
@@ -99,7 +171,24 @@ public class UILabel : UIWidget
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
 		int start = verts.Count;
-		mFont.Print(mText, color, verts, uvs, cols, mEncoding);
+
+		// If the height changes, we should re-process the text
+		if (mLineWidth > 0f)
+		{
+			float size = cachedTransform.localScale.y;
+
+			if (mLastSize != size)
+			{
+				mLastSize = size;
+				mShouldBeProcessed = true;
+			}
+		}
+
+		// Process the text if necessary
+		if (mShouldBeProcessed) ProcessText();
+
+		// Print the text into the buffers
+		mFont.Print(mProcessedText, color, verts, uvs, cols, mEncoding);
 
 		// If the label should be centered, we need to figure out where the center would be
 		if (centered && verts.Count > start)

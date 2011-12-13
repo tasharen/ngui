@@ -77,16 +77,24 @@ public class UIAnchor : MonoBehaviour
 			{
 				if (side == Side.Right || side == Side.TopRight || side == Side.BottomRight)
 				{
-					v.x += Screen.width * hudCamera.rect.xMax;
+					v.x = Screen.width * hudCamera.rect.xMax;
+				}
+				else if (side == Side.Top || side == Side.Center || side == Side.Bottom)
+				{
+					v.x = Screen.width * (hudCamera.rect.xMax - hudCamera.rect.xMin) * 0.5f;
 				}
 				else
 				{
-					v.x += Screen.width * hudCamera.rect.xMin;
+					v.x = Screen.width * hudCamera.rect.xMin;
 				}
 
 				if (side == Side.Top || side == Side.TopRight || side == Side.TopLeft)
 				{
 					v.y = (Screen.height - v.y) * hudCamera.rect.yMax;
+				}
+				else if (side == Side.Left || side == Side.Center || side == Side.Right)
+				{
+					v.y = (Screen.height - v.y) * (hudCamera.rect.yMax - hudCamera.rect.yMin) * 0.5f;
 				}
 				else
 				{

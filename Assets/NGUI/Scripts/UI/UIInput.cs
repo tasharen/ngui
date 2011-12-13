@@ -48,7 +48,11 @@ public class UIInput : MonoBehaviour
 	void Awake ()
 	{
 		if (label == null) label = GetComponentInChildren<UILabel>();
-		if (label != null) label.supportEncoding = false;
+		if (label != null)
+		{
+			label.supportEncoding = false;
+			label.multiLine = false;
+		}
 	}
 
 	/// <summary>

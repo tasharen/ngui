@@ -298,6 +298,31 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Draw some selectable gizmos.
+	/// </summary>
+
+	void OnDrawGizmos ()
+	{
+		Color outline = new Color(1f, 1f, 1f, 0.2f);
+
+		Vector3 scale = cachedTransform.lossyScale;
+
+		Vector3 offset = scale;
+		offset.x = 0f;
+		offset.y = 0f;
+		offset.z *= mDepth;
+
+		Vector3 pos = cachedTransform.position - cachedTransform.TransformDirection(offset);
+
+		if (!centered) pos += new Vector3(scale.x, -scale.y, scale.z) * 0.5f;
+
+		Gizmos.color = outline;
+		Gizmos.DrawWireCube(pos, scale);
+		Gizmos.color = Color.clear;
+		Gizmos.DrawCube(pos, scale);
+	}  
+
+	/// <summary>
 	/// Update the widget.
 	/// </summary>
 

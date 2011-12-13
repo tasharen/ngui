@@ -128,6 +128,56 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Text wrapping functionality.
+	/// </summary>
+
+	public string WrapText (string text, float maxWidth, bool multiline, bool encoding)
+	{
+		string newText = "";
+		float widthOfSpace = CalculatePrintedSize(" ", false).x;
+		bool addNewLine = false;
+
+		// Break the text into lines
+		string[] lines = text.Split(new char[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
+
+		// Run through each line
+		foreach (string line in lines)
+		{
+			if (addNewLine) newText += "\n";
+
+			// Break lines into words
+			string[] words = line.Split(new char[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
+			float spaceLeft = maxWidth;
+
+			foreach (string word in words)
+			{
+				float width = CalculatePrintedSize(word, encoding).x;
+
+				if (width + widthOfSpace > spaceLeft)
+				{
+					// If multi-line is not supported, we're done
+					if (!multiline) return newText;
+
+					// Insert line break before word.
+					newText += "\n" + word + " ";
+
+					// Reset space left on line
+					spaceLeft = maxWidth - width;
+				}
+				else
+				{
+					// Append the word
+					newText += word + " ";
+					spaceLeft = spaceLeft - (width + widthOfSpace);
+				}
+			}
+			addNewLine = true;
+			if (!multiline) break;
+		}
+		return newText;
+	}
+
+	/// <summary>
 	/// Get the printed size of the specified string.
 	/// </summary>
 
@@ -193,7 +243,7 @@ public class UIFont : MonoBehaviour
 
 	public void Print (string text, Color color, List<Vector3> verts, List<Vector2> uvs, List<Color> cols, bool encoding)
 	{
-		if (mFont != null)
+		if (mFont != null && text != null)
 		{
 			Awake();
 

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System;
 
 /// <summary>
 /// Inspector class used to edit UILabels.
@@ -35,6 +36,16 @@ public class UILabelInspector : UIWidgetInspector
 
 		string text = EditorGUILayout.TextArea(mLabel.text, GUILayout.Height(100f));
 		if (!string.Equals(text, mLabel.text)) { RegisterUndo(); mLabel.text = text; }
+
+		GUILayout.BeginHorizontal();
+		{
+			float len = EditorGUILayout.FloatField("Line Width", mLabel.lineWidth, GUILayout.Width(120f));
+			if (len != mLabel.lineWidth) { RegisterUndo(); mLabel.lineWidth = len; }
+
+			bool multi = EditorGUILayout.Toggle("Multi-line", mLabel.multiLine, GUILayout.Width(100f));
+			if (multi != mLabel.multiLine) { RegisterUndo(); mLabel.multiLine = multi; }
+		}
+		GUILayout.EndHorizontal();
 
 		bool encoding = EditorGUILayout.Toggle("Encoding", mLabel.supportEncoding, GUILayout.Width(100f));
 		if (encoding != mLabel.supportEncoding) { RegisterUndo(); mLabel.supportEncoding = encoding; }
