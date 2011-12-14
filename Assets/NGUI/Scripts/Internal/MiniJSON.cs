@@ -57,6 +57,7 @@ public class MiniJSON
 		}
 
 		atlas.sprites.Clear();
+		atlas.coordinates = UIAtlas.Coordinates.Pixels;
 
 		Hashtable frames = (Hashtable)decodedHash["frames"];
 
