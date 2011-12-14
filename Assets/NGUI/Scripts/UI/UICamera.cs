@@ -22,22 +22,40 @@ using System.Collections.Generic;
 [RequireComponent(typeof(Camera))]
 public class UICamera : MonoBehaviour
 {
+	public class MouseOrTouch
+	{
+		public Vector3 pos;			// Current position of the mouse or touch event
+		public Vector2 delta;		// Delta since last update
+		public Vector2 totalDelta;	// Delta since the event started being tracked
+
+		public GameObject current;	// The current game object under the touch or mouse
+		public GameObject hover;	// The last game object to receive OnHover
+		public GameObject pressed;	// The last game object to receive OnPress
+
+		// Whether the touch is currently being considered for click events
+		public bool considerForClick = false;
+	}
+
 	public float tooltipDelay = 1f;
 
+	// List of all active cameras in the scene
 	static List<UICamera> mList = new List<UICamera>();
+
+	// Mouse event
+	MouseOrTouch mMouse = new MouseOrTouch();
+
+	// List of currently active touches
+	Dictionary<int, MouseOrTouch> mTouches = new Dictionary<int, MouseOrTouch>();
+
+	// Selected widget (for input)
+	GameObject mSel = null;
+
+	// Tooltip widget (mouse only)
+	GameObject mTooltip = null;
 
 	bool mUseTouchInput = false;
 	Camera mCam = null;
-	GameObject mMouse = null;
-	GameObject mHover = null;
-	GameObject mDown = null;
-	GameObject mSel = null;
-	GameObject mTooltip = null;
-	Vector3 mPos = Vector3.zero;
-	Vector2 mDelta = Vector2.zero;
-	Vector2 mTotalDelta = Vector2.zero;
 	LayerMask mLayerMask;
-	bool mConsiderForClick = false;
 	float mTooltipTime = 0f;
 
 	/// <summary>
@@ -51,19 +69,6 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	bool handlesEvents { get { return eventHandler == this; } }
-
-	/// <summary>
-	/// Current mouse or touch position.
-	/// </summary>
-
-	static public Vector3 mousePosition
-	{
-		get
-		{
-			UICamera mouse = eventHandler;
-			return (mouse != null) ? mouse.mPos : Vector3.zero;
-		}
-	}
 
 	/// <summary>
 	/// Convenience function that returns the main HUD camera.
@@ -139,6 +144,31 @@ public class UICamera : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Get or create a touch event.
+	/// </summary>
+
+	MouseOrTouch GetTouch (int id)
+	{
+		MouseOrTouch touch;
+
+		if (!mTouches.TryGetValue(id, out touch))
+		{
+			touch = new MouseOrTouch();
+			mTouches.Add(id, touch);
+		}
+		return touch;
+	}
+
+	/// <summary>
+	/// Remove a touch event from the list.
+	/// </summary>
+
+	void RemoveTouch (int id)
+	{
+		mTouches.Remove(id);
+	}
+
+	/// <summary>
 	/// Add this camera to the list.
 	/// </summary>
 
@@ -147,6 +177,8 @@ public class UICamera : MonoBehaviour
 		// We should be using touch-based input on Android and iOS-based devices.
 		mUseTouchInput = Application.platform == RuntimePlatform.Android ||
 						 Application.platform == RuntimePlatform.IPhonePlayer;
+
+		if (!mUseTouchInput) mMouse.pos = Input.mousePosition;
 
 		// Add this camera to the list
 		mList.Add(this);
@@ -170,7 +202,7 @@ public class UICamera : MonoBehaviour
 	{
 		if (Application.isPlaying && !mUseTouchInput && handlesEvents)
 		{
-			mMouse = GetObject(Input.mousePosition);
+			mMouse.current = GetObject(Input.mousePosition);
 		}
 	}
 
@@ -183,116 +215,48 @@ public class UICamera : MonoBehaviour
 		// Only the first UI layer should be processing events
 		if (!Application.isPlaying || !handlesEvents) return;
 
-		bool pressed = false;
-		bool unpressed = false;
-		
 		if (mUseTouchInput)
 		{
 			if (Input.touchCount > 0)
 			{
-				// Figure out what we're touching
-				Touch touch = Input.touches[0];
-				pressed = (touch.phase == TouchPhase.Began);
-				unpressed = (touch.phase == TouchPhase.Canceled) || (touch.phase == TouchPhase.Ended);
-				mPos = Input.touches[0].position;
-				mDelta = Input.touches[0].deltaPosition;
-				if (pressed || unpressed) mMouse = GetObject(mPos);
-			}
-			else
-			{
-				// Nothing being touched -- no object under the cursor
-				mMouse = null;
-				mDelta = Vector3.zero;
+				foreach (Touch input in Input.touches)
+				{
+					MouseOrTouch touch = GetTouch(input.fingerId);
+
+					bool pressed = (input.phase == TouchPhase.Began);
+					bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
+
+					touch.pos = input.position;
+					touch.delta = input.deltaPosition;
+
+					// Update the object under this touch
+					if (pressed || unpressed) touch.current = GetObject(input.position);
+
+					// Process the events from this touch
+					ProcessTouch(touch, pressed, unpressed);
+
+					// If the touch has ended, remove it from the list
+					if (unpressed) RemoveTouch(input.fingerId);
+				}
 			}
 		}
 		else
 		{
-			pressed = Input.GetMouseButtonDown(0);
-			unpressed = Input.GetMouseButtonUp(0);
-			Vector3 pos = Input.mousePosition;
-			mDelta = pos - mPos;
+			bool pressed = Input.GetMouseButtonDown(0);
+			bool unpressed = Input.GetMouseButtonUp(0);
 
-			if (mPos != pos)
+			Vector3 pos = Input.mousePosition;
+			mMouse.delta = pos - mMouse.pos;
+
+			if (mMouse.pos != pos)
 			{
 				if (mTooltipTime != 0f) mTooltipTime = Time.time + tooltipDelay;
 				else if (mTooltip != null) ShowTooltip(false);
-				mPos = pos;
+				mMouse.pos = pos;
 			}
-		}
 
-		// If we're using the mouse for input, we should send out a hover(false) message first
-		if (!mUseTouchInput && mDown == null && mHover != mMouse && mHover != null)
-		{
-			if (mTooltip != null) ShowTooltip(false);
-			mHover.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
-		}
-
-		// Send the drag notification, intentionally before the pressed object gets changed
-		if (mDown != null && mDelta.magnitude != 0f)
-		{
-			if (mTooltip != null) ShowTooltip(false);
-			mTotalDelta += mDelta;
-			mDown.SendMessage("OnDrag", mDelta, SendMessageOptions.DontRequireReceiver);
-
-			float threshold = (Application.platform == RuntimePlatform.Android ||
-				Application.platform == RuntimePlatform.IPhonePlayer) ? 30f : 5f;
-			
-			if (mTotalDelta.magnitude > threshold) mConsiderForClick = false;
-		}
-
-		// Send out the press message
-		if (pressed)
-		{
-			if (mTooltip != null) ShowTooltip(false);
-			mDown = mMouse;
-			mConsiderForClick = true;
-			mTotalDelta = Vector3.zero;
-			if (mDown != null) mDown.SendMessage("OnPress", true, SendMessageOptions.DontRequireReceiver);
-		}
-
-		// Clear the selection
-		if ((mSel != null) && (pressed || Input.GetKeyDown(KeyCode.Escape)))
-		{
-			if (mTooltip != null) ShowTooltip(false);
-			mSel.SendMessage("OnSelect", false, SendMessageOptions.DontRequireReceiver);
-			mSel = null;
-		}
-
-		// Send out the unpress message
-		if (unpressed)
-		{
-			if (mTooltip != null) ShowTooltip(false);
-
-			if (mDown != null)
-			{
-				mDown.SendMessage("OnPress", false, SendMessageOptions.DontRequireReceiver);
-
-				// If the button/touch was released on the same object, consider it a click and select it
-				if (mDown == mMouse)
-				{
-					mSel = mDown;
-					mDown.SendMessage("OnSelect", true, SendMessageOptions.DontRequireReceiver);
-					if (mConsiderForClick) mDown.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
-				}
-				else // The button/touch was released on a different object
-				{
-					// Send a drop notification (for drag & drop)
-					if (mMouse != null) mMouse.SendMessage("OnDrop", mDown, SendMessageOptions.DontRequireReceiver);
-					
-					// If we're using mouse-based input, send a hover notification
-					if (!mUseTouchInput) mDown.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
-				}
-			}
-			mDown = null;
-			mHover = null;
-		}
-
-		// Send out a hover(true) message last
-		if (!mUseTouchInput && mDown == null && mHover != mMouse)
-		{
-			mTooltipTime = Time.time + tooltipDelay;
-			mHover = mMouse;
-			if (mHover != null) mHover.SendMessage("OnHover", true, SendMessageOptions.DontRequireReceiver);
+			// Process the mouse events
+			ProcessTouch(mMouse, pressed, unpressed);
 		}
 
 		// Forward the input to the selected object
@@ -311,10 +275,90 @@ public class UICamera : MonoBehaviour
 		}
 
 		// If it's time to show a tooltip, inform the object we're hovering over
-		if (!mUseTouchInput && mHover != null && mTooltipTime != 0f && mTooltipTime < Time.time)
+		if (!mUseTouchInput && mMouse.hover != null && mTooltipTime != 0f && mTooltipTime < Time.time)
 		{
-			mTooltip = mHover;
+			mTooltip = mMouse.hover;
 			ShowTooltip(true);
+		}
+	}
+
+	/// <summary>
+	/// Process the events of the specified touch.
+	/// </summary>
+
+	void ProcessTouch (MouseOrTouch touch, bool pressed, bool unpressed)
+	{
+		// If we're using the mouse for input, we should send out a hover(false) message first
+		if (!mUseTouchInput && touch.pressed == null && touch.hover != touch.current && touch.hover != null)
+		{
+			if (mTooltip != null) ShowTooltip(false);
+			touch.hover.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
+		}
+
+		// Send the drag notification, intentionally before the pressed object gets changed
+		if (touch.pressed != null && touch.delta.magnitude != 0f)
+		{
+			if (mTooltip != null) ShowTooltip(false);
+			touch.totalDelta += touch.delta;
+			touch.pressed.SendMessage("OnDrag", touch.delta, SendMessageOptions.DontRequireReceiver);
+
+			float threshold = mUseTouchInput ? 30f : 5f;
+			if (touch.totalDelta.magnitude > threshold) touch.considerForClick = false;
+		}
+
+		// Send out the press message
+		if (pressed)
+		{
+			if (mTooltip != null) ShowTooltip(false);
+			touch.pressed = touch.current;
+			touch.considerForClick = true;
+			touch.totalDelta = Vector3.zero;
+			if (touch.pressed != null) touch.pressed.SendMessage("OnPress", true, SendMessageOptions.DontRequireReceiver);
+		}
+
+		// Clear the selection
+		if ((mSel != null) && (pressed || Input.GetKeyDown(KeyCode.Escape)))
+		{
+			if (mTooltip != null) ShowTooltip(false);
+			mSel.SendMessage("OnSelect", false, SendMessageOptions.DontRequireReceiver);
+			mSel = null;
+		}
+
+		// Send out the unpress message
+		if (unpressed)
+		{
+			if (mTooltip != null) ShowTooltip(false);
+
+			if (touch.pressed != null)
+			{
+				touch.pressed.SendMessage("OnPress", false, SendMessageOptions.DontRequireReceiver);
+
+				// If the button/touch was released on the same object, consider it a click and select it
+				if (touch.pressed == touch.current)
+				{
+					mSel = touch.pressed;
+					touch.pressed.SendMessage("OnSelect", true, SendMessageOptions.DontRequireReceiver);
+					if (touch.considerForClick) touch.pressed.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
+				}
+				else // The button/touch was released on a different object
+				{
+					// Send a drop notification (for drag & drop)
+					if (touch.current != null) touch.current.SendMessage("OnDrop", touch.pressed, SendMessageOptions.DontRequireReceiver);
+
+					// If we're using mouse-based input, send a hover notification
+					if (!mUseTouchInput) touch.pressed.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
+				}
+			}
+			touch.pressed = null;
+			touch.hover = null;
+		}
+
+		// Send out a hover(true) message last
+		if (!mUseTouchInput && touch.pressed == null && touch.hover != touch.current)
+		{
+			mTooltipTime = Time.time + tooltipDelay;
+			touch.hover = touch.current;
+			if (touch.hover != null) touch.hover.SendMessage("OnHover", true, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 
