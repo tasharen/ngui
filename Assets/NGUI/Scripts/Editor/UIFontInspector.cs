@@ -32,6 +32,7 @@ public class UIFontInspector : Editor
 			Undo.RegisterUndo(font, "Font Data");
 			font.data = data;
 			resetWidthHeight = true;
+			EditorUtility.SetDirty(font);
 		}
 
 		if (data != null)
@@ -42,6 +43,7 @@ public class UIFontInspector : Editor
 			{
 				Undo.RegisterUndo(font, "Font Material");
 				font.material = mat;
+				EditorUtility.SetDirty(font);
 			}
 
 			if (mat != null)
@@ -115,6 +117,7 @@ public class UIFontInspector : Editor
 					{
 						Undo.RegisterUndo(font, "Font Pixel Rect");
 						font.uvRect = uvRect;
+						EditorUtility.SetDirty(font);
 					}
 
 					// Draw the atlas
