@@ -153,22 +153,26 @@ public class UIFont : MonoBehaviour
 			{
 				float width = CalculatePrintedSize(word, encoding).x;
 
-				if (width + widthOfSpace > spaceLeft)
+				// If this is not a brand-new line, we'll need to append a space as well
+				if (spaceLeft != maxWidth) spaceLeft -= widthOfSpace;
+
+				if (width < spaceLeft)
+				{
+					// Append the word
+					if (spaceLeft != maxWidth) newText += " ";
+					newText += word;
+					spaceLeft -= width;
+				}
+				else
 				{
 					// If multi-line is not supported, we're done
 					if (!multiline) return newText;
 
 					// Insert line break before word.
-					newText += "\n" + word + " ";
+					newText += "\n" + word;
 
 					// Reset space left on line
 					spaceLeft = maxWidth - width;
-				}
-				else
-				{
-					// Append the word
-					newText += word + " ";
-					spaceLeft = spaceLeft - (width + widthOfSpace);
 				}
 			}
 			addNewLine = true;

@@ -10,6 +10,8 @@ public class UILabel : UIWidget
 	[SerializeField] bool mEncoding = true;
 	[SerializeField] float mLineWidth = 0;
 	[SerializeField] bool mMultiline = true;
+	[SerializeField] bool mPassword = false;
+	[SerializeField] bool mShowLastChar = false;
 
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
@@ -73,6 +75,7 @@ public class UILabel : UIWidget
 				mEncoding = value;
 				mChanged = true;
 				mShouldBeProcessed = true;
+				if (value) mPassword = false;
 			}
 		}
 	}
@@ -115,6 +118,51 @@ public class UILabel : UIWidget
 				mMultiline = value;
 				mChanged = true;
 				mShouldBeProcessed = true;
+				if (value) mPassword = false;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Whether the label's contents should be hidden
+	/// </summary>
+
+	public bool password
+	{
+		get
+		{
+			return mPassword;
+		}
+		set
+		{
+			if (mPassword != value)
+			{
+				mPassword = value;
+				mMultiline = false;
+				mEncoding = false;
+				mChanged = true;
+				mShouldBeProcessed = true;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Whether the last character of a password field will be shown
+	/// </summary>
+
+	public bool showLastPasswordChar
+	{
+		get
+		{
+			return mShowLastChar;
+		}
+		set
+		{
+			if (mShowLastChar != value)
+			{
+				mShowLastChar = value;
+				mChanged = true;
+				mShouldBeProcessed = true;
 			}
 		}
 	}
@@ -130,7 +178,24 @@ public class UILabel : UIWidget
 			mShouldBeProcessed = false;
 			mProcessedText = mText.Replace("\\n", "\n");
 
-			if (mLineWidth > 0f)
+			if (mPassword)
+			{
+				mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, false);
+
+				string hidden = "";
+
+				if (mShowLastChar)
+				{
+					for (int i = 1, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
+					if (mProcessedText.Length > 0) hidden += mProcessedText[mProcessedText.Length - 1];
+				}
+				else
+				{
+					for (int i = 0, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
+				}
+				mProcessedText = hidden;
+			}
+			else if (mLineWidth > 0f)
 			{
 				mProcessedText = mFont.WrapText(mProcessedText, mLineWidth / cachedTransform.localScale.y, mMultiline, mEncoding);
 			}

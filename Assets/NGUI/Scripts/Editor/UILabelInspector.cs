@@ -43,12 +43,19 @@ public class UILabelInspector : UIWidgetInspector
 			if (len != mLabel.lineWidth) { RegisterUndo(); mLabel.lineWidth = len; }
 
 			bool multi = EditorGUILayout.Toggle("Multi-line", mLabel.multiLine, GUILayout.Width(100f));
-			if (multi != mLabel.multiLine) { RegisterUndo(); mLabel.multiLine = multi; }
+			if (multi != mLabel.multiLine) { RegisterUndo(); mLabel.multiLine = multi; } 
 		}
 		GUILayout.EndHorizontal();
 
-		bool encoding = EditorGUILayout.Toggle("Encoding", mLabel.supportEncoding, GUILayout.Width(100f));
-		if (encoding != mLabel.supportEncoding) { RegisterUndo(); mLabel.supportEncoding = encoding; }
+		GUILayout.BeginHorizontal();
+		{
+			bool password = EditorGUILayout.Toggle("Password", mLabel.password, GUILayout.Width(120f));
+			if (password != mLabel.password) { RegisterUndo(); mLabel.password = password; }
+
+			bool encoding = EditorGUILayout.Toggle("Encoding", mLabel.supportEncoding, GUILayout.Width(100f));
+			if (encoding != mLabel.supportEncoding) { RegisterUndo(); mLabel.supportEncoding = encoding; }
+		}
+		GUILayout.EndHorizontal();
 
 		GUITools.DrawSeparator();
 		return true;

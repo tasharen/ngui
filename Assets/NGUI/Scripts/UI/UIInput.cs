@@ -37,6 +37,7 @@ public class UIInput : MonoBehaviour
 			{
 				label.supportEncoding = false;
 				label.text = mSelected ? value + caratChar : value;
+				label.showLastPasswordChar = mSelected;
 			}
 		}
 	}
@@ -79,6 +80,7 @@ public class UIInput : MonoBehaviour
 #endif
 				{
 					label.text = mText + caratChar;
+					label.showLastPasswordChar = mSelected;
 				}
 			}
 #if UNITY_IPHONE || UNITY_ANDROID
@@ -90,6 +92,7 @@ public class UIInput : MonoBehaviour
 			else
 			{
 				label.text = mText;
+				label.showLastPasswordChar = mSelected;
 			}
 		}
 	}
@@ -160,5 +163,6 @@ public class UIInput : MonoBehaviour
 	{
 		if (maxChars > 0 && mText.Length > maxChars) mText = mText.Substring(0, maxChars);
 		label.text = mSelected ? (mText + caratChar) : mText;
+		label.showLastPasswordChar = mSelected;
 	}
 }
