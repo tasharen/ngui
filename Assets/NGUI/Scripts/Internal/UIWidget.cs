@@ -303,23 +303,26 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-		Color outline = new Color(1f, 1f, 1f, 0.2f);
+		if (panel.showGizmos)
+		{
+			Color outline = new Color(1f, 1f, 1f, 0.2f);
 
-		Vector3 scale = cachedTransform.lossyScale;
+			Vector3 scale = cachedTransform.lossyScale;
 
-		Vector3 offset = scale;
-		offset.x = 0f;
-		offset.y = 0f;
-		offset.z *= mDepth;
+			Vector3 offset = scale;
+			offset.x = 0f;
+			offset.y = 0f;
+			offset.z *= mDepth;
 
-		Vector3 pos = cachedTransform.position - cachedTransform.TransformDirection(offset);
+			Vector3 pos = cachedTransform.position - cachedTransform.TransformDirection(offset);
 
-		if (!centered) pos += new Vector3(scale.x, -scale.y, scale.z) * 0.5f;
+			if (!centered) pos += new Vector3(scale.x, -scale.y, scale.z) * 0.5f;
 
-		Gizmos.color = outline;
-		Gizmos.DrawWireCube(pos, scale);
-		Gizmos.color = Color.clear;
-		Gizmos.DrawCube(pos, scale);
+			Gizmos.color = outline;
+			Gizmos.DrawWireCube(pos, scale);
+			Gizmos.color = Color.clear;
+			Gizmos.DrawCube(pos, scale);
+		}
 	}  
 
 	/// <summary>

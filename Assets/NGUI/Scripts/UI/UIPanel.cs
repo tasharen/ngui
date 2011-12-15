@@ -9,6 +9,9 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Panel")]
 public class UIPanel : MonoBehaviour
 {
+	// Whether selectable gizmos will be shown for widgets under this panel
+	public bool showGizmos = true;
+
 	// Whether generated geometry is shown or hidden
 	[SerializeField] bool mHidden = true;
 

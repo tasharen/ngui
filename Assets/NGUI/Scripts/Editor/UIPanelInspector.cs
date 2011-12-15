@@ -17,6 +17,14 @@ public class UIPanelInspector : Editor
 
 		GUITools.DrawSeparator();
 
+		bool gizmos = EditorGUILayout.Toggle("Gizmos", panel.showGizmos);
+
+		if (panel.showGizmos != gizmos)
+		{
+			panel.showGizmos = gizmos;
+			EditorUtility.SetDirty(panel);
+		}
+
 		panel.hidden = EditorGUILayout.Toggle("Hidden", panel.hidden);
 		EditorGUILayout.LabelField("Widgets", panel.widgets.Count.ToString());
 		EditorGUILayout.LabelField("Draw Calls", drawcalls.Count.ToString());
