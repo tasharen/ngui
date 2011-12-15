@@ -56,8 +56,9 @@ public class MiniJSON
 			return;
 		}
 
-		atlas.sprites.Clear();
 		atlas.coordinates = UIAtlas.Coordinates.Pixels;
+		List<UIAtlas.Sprite> oldSprites = atlas.sprites;
+		atlas.sprites = new List<UIAtlas.Sprite>();
 
 		Hashtable frames = (Hashtable)decodedHash["frames"];
 
@@ -88,12 +89,45 @@ public class MiniJSON
 				newSprite.inner = new Rect(frameX, frameY, frameW, frameH);
 			}
 
+			// If the sprite was present before, see if we can copy its inner rect
+			foreach (UIAtlas.Sprite oldSprite in oldSprites)
+			{
+				if (string.Equals(oldSprite.name, newSprite.name, StringComparison.OrdinalIgnoreCase))
+				{
+					CopyInnerRect(oldSprite, newSprite);
+				}
+			}
+
+			// Add this new sprite
 			atlas.sprites.Add(newSprite);
 		}
 
 		// Unload the asset
 		asset = null;
 		Resources.UnloadUnusedAssets();
+	}
+
+	/// <summary>
+	/// Copy the inner rectangle from one sprite to another.
+	/// </summary>
+
+	static void CopyInnerRect (UIAtlas.Sprite oldSprite, UIAtlas.Sprite newSprite)
+	{
+		float offsetX = oldSprite.inner.xMin - oldSprite.outer.xMin;
+		float offsetY = oldSprite.inner.yMin - oldSprite.outer.yMin;
+		float sizeX = oldSprite.inner.width;
+		float sizeY = oldSprite.inner.height;
+
+		if (Mathf.Approximately(newSprite.outer.width, sizeX))
+		{
+			// The sprite has not been rotated or it's a square
+			newSprite.inner = new Rect(newSprite.outer.xMin + offsetX, newSprite.outer.yMin + offsetY, sizeX, sizeY);
+		}
+		else if (Mathf.Approximately(newSprite.outer.width, sizeY))
+		{
+			// The sprite was rotated since the last time it was imported
+			newSprite.inner = new Rect(newSprite.outer.xMin + offsetY, newSprite.outer.yMin + offsetX, sizeY, sizeX);
+		}
 	}
 
 	/// <summary>
