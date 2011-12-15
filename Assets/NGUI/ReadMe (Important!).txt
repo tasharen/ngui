@@ -40,6 +40,7 @@ Version History
 - NEW: Added password fields (specified on the label)
 - FIX: Working directly with atlas and font prefabs will now save their data correctly
 - NEW: Showing gizmos is now an option specified on the panel
+- NEW: Sprite inner rects will now be preserved on re-import
 
 1.08
 - NEW: Added support for multi-touch
