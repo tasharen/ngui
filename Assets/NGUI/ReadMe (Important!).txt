@@ -1,7 +1,7 @@
 ----------------------------------------
         NGUI: Next-Gen UI kit
  Copyright © 2011 Tasharen Entertainment
-             Version 1.08
+             Version 1.09
   http://www.tasharen.com/?page_id=140
         support@tasharen.com
 ----------------------------------------
@@ -23,9 +23,23 @@ do either of the two steps in order to get some examples to work properly:
 2. Alternatively, or if it's an existing project, add 2 new layers: "2D UI" and "3D UI", without quotes.
    Not sure how? Select any game object, top right has a drop-down called "Layer", and it's likely set to
    "Default". Expand it, click "Add Layer", and add the 2 layers by typing them in the User Layer 8 and 9 fields.
+   
+If you are not importing examples, you can ignore this step.
 
 -------------------------------------
 Support, documentation, and tutorials
 -------------------------------------
 
 All can be found here: http://www.tasharen.com/?page_id=140
+
+---------------
+Version History
+---------------
+
+1.09
+- NEW: Added password fields (specified on the label)
+- FIX: Working directly with atlas and font prefabs will now save their data correctly
+- NEW: Showing gizmos is now an option specified on the panel
+
+1.08
+- NEW: Added support for multi-touch
