@@ -59,6 +59,7 @@ public class UIAtlasInspector : Editor
 			{
 				Undo.RegisterUndo(mAtlas, "Import Sprites");
 				MiniJSON.LoadSpriteData(mAtlas, ta);
+				mRegisteredUndo = true;
 			}
 
 			coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", coords);
@@ -289,5 +290,8 @@ public class UIAtlasInspector : Editor
 				}
 			}
 		}
+
+		// If something changed, mark the atlas as dirty
+		if (mRegisteredUndo) EditorUtility.SetDirty(mAtlas);
 	}
 }
