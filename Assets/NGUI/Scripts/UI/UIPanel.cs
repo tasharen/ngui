@@ -192,6 +192,7 @@ public class UIPanel : MonoBehaviour
 		foreach (UIWidget w in mWidgets)
 		{
 			if (w.material != mat || w.color.a < 0.001f) continue;
+			if (!w.enabled || !w.gameObject.active) continue;
 			int offset = mVerts.Count;
 
 			// Fill the geometry

@@ -1,7 +1,7 @@
 ----------------------------------------
         NGUI: Next-Gen UI kit
  Copyright © 2011 Tasharen Entertainment
-             Version 1.09
+             Version 1.09b
   http://www.tasharen.com/?page_id=140
         support@tasharen.com
 ----------------------------------------
@@ -41,6 +41,7 @@ Version History
 - FIX: Working directly with atlas and font prefabs will now save their data correctly
 - NEW: Showing gizmos is now an option specified on the panel
 - NEW: Sprite inner rects will now be preserved on re-import
+- FIX: Disabled widgets should no longer remain visible in play mode
 
 1.08
 - NEW: Added support for multi-touch
