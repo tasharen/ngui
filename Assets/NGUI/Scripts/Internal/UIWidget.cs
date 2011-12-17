@@ -303,7 +303,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-		if (panel.showGizmos)
+		if (mPanel != null & mPanel.showGizmos)
 		{
 			Color outline = new Color(1f, 1f, 1f, 0.2f);
 
