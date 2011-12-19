@@ -58,7 +58,7 @@ public class UIAtlasInspector : Editor
 			if (ta != null)
 			{
 				Undo.RegisterUndo(mAtlas, "Import Sprites");
-				MiniJSON.LoadSpriteData(mAtlas, ta);
+				NGUIJson.LoadSpriteData(mAtlas, ta);
 				mRegisteredUndo = true;
 			}
 

@@ -17,7 +17,7 @@ using UnityEngine;
 /// All numbers are parsed to doubles.
 /// </summary>
 
-public class MiniJSON
+public class NGUIJson
 {
 	private const int TOKEN_NONE = 0;
 	private const int TOKEN_CURLY_OPEN = 1;
@@ -138,19 +138,19 @@ public class MiniJSON
 	public static object jsonDecode( string json )
 	{
 		// save the string for debug information
-		MiniJSON.lastDecode = json;
+		NGUIJson.lastDecode = json;
 
 		if( json != null )
 		{
 			char[] charArray = json.ToCharArray();
 			int index = 0;
 			bool success = true;
-			object value = MiniJSON.parseValue( charArray, ref index, ref success );
+			object value = NGUIJson.parseValue( charArray, ref index, ref success );
 
 			if( success )
-				MiniJSON.lastErrorIndex = -1;
+				NGUIJson.lastErrorIndex = -1;
 			else
-				MiniJSON.lastErrorIndex = index;
+				NGUIJson.lastErrorIndex = index;
 
 			return value;
 		}
@@ -169,7 +169,7 @@ public class MiniJSON
 	public static string jsonEncode( object json )
 	{
 		var builder = new StringBuilder( BUILDER_CAPACITY );
-		var success = MiniJSON.serializeValue( json, builder );
+		var success = NGUIJson.serializeValue( json, builder );
 		
 		return ( success ? builder.ToString() : null );
 	}
@@ -181,7 +181,7 @@ public class MiniJSON
 	/// <returns></returns>
 	public static bool lastDecodeSuccessful()
 	{
-		return ( MiniJSON.lastErrorIndex == -1 );
+		return ( NGUIJson.lastErrorIndex == -1 );
 	}
 
 
@@ -191,7 +191,7 @@ public class MiniJSON
 	/// <returns></returns>
 	public static int getLastErrorIndex()
 	{
-		return MiniJSON.lastErrorIndex;
+		return NGUIJson.lastErrorIndex;
 	}
 
 
@@ -202,21 +202,21 @@ public class MiniJSON
 	/// <returns></returns>
 	public static string getLastErrorSnippet()
 	{
-		if( MiniJSON.lastErrorIndex == -1 )
+		if( NGUIJson.lastErrorIndex == -1 )
 		{
 			return "";
 		}
 		else
 		{
-			int startIndex = MiniJSON.lastErrorIndex - 5;
-			int endIndex = MiniJSON.lastErrorIndex + 15;
+			int startIndex = NGUIJson.lastErrorIndex - 5;
+			int endIndex = NGUIJson.lastErrorIndex + 15;
 			if( startIndex < 0 )
 				startIndex = 0;
 
-			if( endIndex >= MiniJSON.lastDecode.Length )
-				endIndex = MiniJSON.lastDecode.Length - 1;
+			if( endIndex >= NGUIJson.lastDecode.Length )
+				endIndex = NGUIJson.lastDecode.Length - 1;
 
-			return MiniJSON.lastDecode.Substring( startIndex, endIndex - startIndex + 1 );
+			return NGUIJson.lastDecode.Substring( startIndex, endIndex - startIndex + 1 );
 		}
 	}
 
@@ -235,15 +235,15 @@ public class MiniJSON
 		while( !done )
 		{
 			token = lookAhead( json, index );
-			if( token == MiniJSON.TOKEN_NONE )
+			if( token == NGUIJson.TOKEN_NONE )
 			{
 				return null;
 			}
-			else if( token == MiniJSON.TOKEN_COMMA )
+			else if( token == NGUIJson.TOKEN_COMMA )
 			{
 				nextToken( json, ref index );
 			}
-			else if( token == MiniJSON.TOKEN_CURLY_CLOSE )
+			else if( token == NGUIJson.TOKEN_CURLY_CLOSE )
 			{
 				nextToken( json, ref index );
 				return table;
@@ -259,7 +259,7 @@ public class MiniJSON
 
 				// :
 				token = nextToken( json, ref index );
-				if( token != MiniJSON.TOKEN_COLON )
+				if( token != NGUIJson.TOKEN_COLON )
 					return null;
 
 				// value
@@ -287,15 +287,15 @@ public class MiniJSON
 		while( !done )
 		{
 			int token = lookAhead( json, index );
-			if( token == MiniJSON.TOKEN_NONE )
+			if( token == NGUIJson.TOKEN_NONE )
 			{
 				return null;
 			}
-			else if( token == MiniJSON.TOKEN_COMMA )
+			else if( token == NGUIJson.TOKEN_COMMA )
 			{
 				nextToken( json, ref index );
 			}
-			else if( token == MiniJSON.TOKEN_SQUARED_CLOSE )
+			else if( token == NGUIJson.TOKEN_SQUARED_CLOSE )
 			{
 				nextToken( json, ref index );
 				break;
@@ -319,24 +319,24 @@ public class MiniJSON
 	{
 		switch( lookAhead( json, index ) )
 		{
-			case MiniJSON.TOKEN_STRING:
+			case NGUIJson.TOKEN_STRING:
 				return parseString( json, ref index );
-			case MiniJSON.TOKEN_NUMBER:
+			case NGUIJson.TOKEN_NUMBER:
 				return parseNumber( json, ref index );
-			case MiniJSON.TOKEN_CURLY_OPEN:
+			case NGUIJson.TOKEN_CURLY_OPEN:
 				return parseObject( json, ref index );
-			case MiniJSON.TOKEN_SQUARED_OPEN:
+			case NGUIJson.TOKEN_SQUARED_OPEN:
 				return parseArray( json, ref index );
-			case MiniJSON.TOKEN_TRUE:
+			case NGUIJson.TOKEN_TRUE:
 				nextToken( json, ref index );
 				return Boolean.Parse( "TRUE" );
-			case MiniJSON.TOKEN_FALSE:
+			case NGUIJson.TOKEN_FALSE:
 				nextToken( json, ref index );
 				return Boolean.Parse( "FALSE" );
-			case MiniJSON.TOKEN_NULL:
+			case NGUIJson.TOKEN_NULL:
 				nextToken( json, ref index );
 				return null;
-			case MiniJSON.TOKEN_NONE:
+			case NGUIJson.TOKEN_NONE:
 				break;
 		}
 
@@ -495,7 +495,7 @@ s += Char.ConvertFromUtf32((int)codePoint);
 
 		if( index == json.Length )
 		{
-			return MiniJSON.TOKEN_NONE;
+			return NGUIJson.TOKEN_NONE;
 		}
 		
 		char c = json[index];
@@ -503,17 +503,17 @@ s += Char.ConvertFromUtf32((int)codePoint);
 		switch( c )
 		{
 			case '{':
-				return MiniJSON.TOKEN_CURLY_OPEN;
+				return NGUIJson.TOKEN_CURLY_OPEN;
 			case '}':
-				return MiniJSON.TOKEN_CURLY_CLOSE;
+				return NGUIJson.TOKEN_CURLY_CLOSE;
 			case '[':
-				return MiniJSON.TOKEN_SQUARED_OPEN;
+				return NGUIJson.TOKEN_SQUARED_OPEN;
 			case ']':
-				return MiniJSON.TOKEN_SQUARED_CLOSE;
+				return NGUIJson.TOKEN_SQUARED_CLOSE;
 			case ',':
-				return MiniJSON.TOKEN_COMMA;
+				return NGUIJson.TOKEN_COMMA;
 			case '"':
-				return MiniJSON.TOKEN_STRING;
+				return NGUIJson.TOKEN_STRING;
 			case '0':
 			case '1':
 			case '2':
@@ -525,9 +525,9 @@ s += Char.ConvertFromUtf32((int)codePoint);
 			case '8':
 			case '9':
 			case '-': 
-				return MiniJSON.TOKEN_NUMBER;
+				return NGUIJson.TOKEN_NUMBER;
 			case ':':
-				return MiniJSON.TOKEN_COLON;
+				return NGUIJson.TOKEN_COLON;
 		}
 		index--;
 
@@ -543,7 +543,7 @@ s += Char.ConvertFromUtf32((int)codePoint);
 				json[index + 4] == 'e' )
 			{
 				index += 5;
-				return MiniJSON.TOKEN_FALSE;
+				return NGUIJson.TOKEN_FALSE;
 			}
 		}
 
@@ -556,7 +556,7 @@ s += Char.ConvertFromUtf32((int)codePoint);
 				json[index + 3] == 'e' )
 			{
 				index += 4;
-				return MiniJSON.TOKEN_TRUE;
+				return NGUIJson.TOKEN_TRUE;
 			}
 		}
 
@@ -569,11 +569,11 @@ s += Char.ConvertFromUtf32((int)codePoint);
 				json[index + 3] == 'l' )
 			{
 				index += 4;
-				return MiniJSON.TOKEN_NULL;
+				return NGUIJson.TOKEN_NULL;
 			}
 		}
 
-		return MiniJSON.TOKEN_NONE;
+		return NGUIJson.TOKEN_NONE;
 	}
 
 	#endregion
@@ -803,25 +803,25 @@ public static class MiniJsonExtensions
 {
 	public static string toJson( this Hashtable obj )
 	{
-		return MiniJSON.jsonEncode( obj );
+		return NGUIJson.jsonEncode( obj );
 	}
 	
 	
 	public static string toJson( this Dictionary<string,string> obj )
 	{
-		return MiniJSON.jsonEncode( obj );
+		return NGUIJson.jsonEncode( obj );
 	}
 	
 	
 	public static ArrayList arrayListFromJson( this string json )
 	{
-		return MiniJSON.jsonDecode( json ) as ArrayList;
+		return NGUIJson.jsonDecode( json ) as ArrayList;
 	}
 
 
 	public static Hashtable hashtableFromJson( this string json )
 	{
-		return MiniJSON.jsonDecode( json ) as Hashtable;
+		return NGUIJson.jsonDecode( json ) as Hashtable;
 	}
 }
 
