@@ -48,7 +48,7 @@ public class NGUIJson
 		if (asset == null || atlas == null) return;
 
 		string jsonString = asset.text;
-		Hashtable decodedHash = jsonString.hashtableFromJson();
+		Hashtable decodedHash = jsonDecode(jsonString) as Hashtable;
 		
 		if (decodedHash == null)
 		{
@@ -794,35 +794,3 @@ s += Char.ConvertFromUtf32((int)codePoint);
 	#endregion
 	
 }
-
-
-
-#region Extension methods
-
-public static class MiniJsonExtensions
-{
-	public static string toJson( this Hashtable obj )
-	{
-		return NGUIJson.jsonEncode( obj );
-	}
-	
-	
-	public static string toJson( this Dictionary<string,string> obj )
-	{
-		return NGUIJson.jsonEncode( obj );
-	}
-	
-	
-	public static ArrayList arrayListFromJson( this string json )
-	{
-		return NGUIJson.jsonDecode( json ) as ArrayList;
-	}
-
-
-	public static Hashtable hashtableFromJson( this string json )
-	{
-		return NGUIJson.jsonDecode( json ) as Hashtable;
-	}
-}
-
-#endregion
