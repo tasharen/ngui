@@ -118,12 +118,12 @@ public class NGUIJson
 		float sizeX = oldSprite.inner.width;
 		float sizeY = oldSprite.inner.height;
 
-		if (Mathf.Approximately(newSprite.outer.width, sizeX))
+		if (Mathf.Approximately(newSprite.outer.width, oldSprite.outer.width))
 		{
 			// The sprite has not been rotated or it's a square
 			newSprite.inner = new Rect(newSprite.outer.xMin + offsetX, newSprite.outer.yMin + offsetY, sizeX, sizeY);
 		}
-		else if (Mathf.Approximately(newSprite.outer.width, sizeY))
+		else if (Mathf.Approximately(newSprite.outer.width, oldSprite.outer.height))
 		{
 			// The sprite was rotated since the last time it was imported
 			newSprite.inner = new Rect(newSprite.outer.xMin + offsetY, newSprite.outer.yMin + offsetX, sizeY, sizeX);
