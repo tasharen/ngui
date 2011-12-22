@@ -90,7 +90,7 @@ public class UICamera : MonoBehaviour
 	/// Event handler for all types of events.
 	/// </summary>
 
-	static UICamera eventHandler
+	static public UICamera eventHandler
 	{
 		get
 		{
@@ -105,10 +105,16 @@ public class UICamera : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Current mouse touch.
+	/// </summary>
+
+	public MouseOrTouch mouse { get { return mMouse; } }
+
+	/// <summary>
 	/// Access to current touch events if additional info is required (such as HitInfo).
 	/// </summary>
 
-	public Dictionary<int, MouseOrTouch> currentTouches { get { return mTouches; } }
+	public Dictionary<int, MouseOrTouch> touches { get { return mTouches; } }
 
 	/// <summary>
 	/// Static comparison function used for sorting.
