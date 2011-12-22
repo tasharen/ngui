@@ -74,6 +74,18 @@ public class UICamera : MonoBehaviour
 	bool handlesEvents { get { return eventHandler == this; } }
 
 	/// <summary>
+	/// Current mouse touch.
+	/// </summary>
+
+	public MouseOrTouch mouse { get { return mMouse; } }
+
+	/// <summary>
+	/// Access to current touch events if additional info is required (such as HitInfo).
+	/// </summary>
+
+	public Dictionary<int, MouseOrTouch> touches { get { return mTouches; } }
+
+	/// <summary>
 	/// Convenience function that returns the main HUD camera.
 	/// </summary>
 
@@ -103,18 +115,6 @@ public class UICamera : MonoBehaviour
 			return null;
 		}
 	}
-
-	/// <summary>
-	/// Current mouse touch.
-	/// </summary>
-
-	public MouseOrTouch mouse { get { return mMouse; } }
-
-	/// <summary>
-	/// Access to current touch events if additional info is required (such as HitInfo).
-	/// </summary>
-
-	public Dictionary<int, MouseOrTouch> touches { get { return mTouches; } }
 
 	/// <summary>
 	/// Static comparison function used for sorting.
