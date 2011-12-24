@@ -49,7 +49,7 @@ public class UILabel : UIWidget
 		}
 		set
 		{
-			if (value != null && !mText.Equals(value))
+			if (value != null && !mText == value)
 			{
 				mText = value;
 				mChanged = true;

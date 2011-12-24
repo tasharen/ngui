@@ -95,8 +95,7 @@ public class UIAtlas : MonoBehaviour
 		{
 			foreach (Sprite s in sprites)
 			{
-				// string.Equals doesn't seem to work with Flash export if the variable
-				// happens to not be a member variable as of 3.5b6, so using == here.
+				// string.Equals doesn't seem to work with Flash export
 				if (!string.IsNullOrEmpty(s.name) && name == s.name)
 				{
 					return s;
