@@ -90,7 +90,10 @@ public class InvStat
 		if (a.modifier == Modifier.Percent) ia += 100;
 		if (b.modifier == Modifier.Percent) ib += 100;
 		
-		return ia.CompareTo(ib);
+		// Not using ia.CompareTo(ib) here because Flash export doesn't understand that
+		if (ia < ib) return -1;
+		if (ia > ib) return 1;
+		return 0;
 	}
 
 	/// <summary>
@@ -113,6 +116,8 @@ public class InvStat
 		if (a.modifier == Modifier.Percent) ia += 100;
 		if (b.modifier == Modifier.Percent) ib += 100;
 		
-		return ia.CompareTo(ib);
+		if (ia < ib) return -1;
+		if (ia > ib) return 1;
+		return 0;
 	}
 }

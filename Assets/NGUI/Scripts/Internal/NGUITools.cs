@@ -51,22 +51,6 @@ static public class NGUITools
 	}
 
 	/// <summary>
-	/// Finds the component on the current game object or its parents.
-	/// </summary>
-
-	static public T FindInParents<T> (Transform trans) where T : Component
-	{
-		T comp = null;
-
-		while (comp == null && trans != null)
-		{
-			comp = trans.GetComponent<T>();
-			trans = trans.parent;
-		}
-		return comp;
-	}
-
-	/// <summary>
 	/// Returns the hierarchy of the object in a human-readable format.
 	/// </summary>
 
