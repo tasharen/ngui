@@ -181,7 +181,7 @@ static public class NGUITools
 	/// Parse an embedded symbol, such as [FFAA00] (set color) or [-] (undo color change)
 	/// </summary>
 
-	static public int ParseSymbol (string text, int index, Stack<Color> colors)
+	static public int ParseSymbol (string text, int index, List<Color> colors)
 	{
 		int length = text.Length;
 
@@ -191,7 +191,7 @@ static public class NGUITools
 			{
 				if (text[index + 2] == ']')
 				{
-					if (colors != null && colors.Count > 1) colors.Pop();
+					if (colors != null && colors.Count > 1) colors.RemoveAt(colors.Count - 1);
 					return 3;
 				}
 			}
@@ -202,8 +202,8 @@ static public class NGUITools
 					if (colors != null)
 					{
 						Color c = ParseColor(text, index + 1);
-						c.a = colors.Peek().a;
-						colors.Push(c);
+						c.a = colors[colors.Count - 1].a;
+						colors.Add(c);
 					}
 					return 8;
 				}

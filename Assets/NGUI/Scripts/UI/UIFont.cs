@@ -14,7 +14,7 @@ public class UIFont : MonoBehaviour
 	[SerializeField] Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
 
 	BMFont mFont = new BMFont();
-	Stack<Color> mColors = new Stack<Color>();
+	List<Color> mColors = new List<Color>(); // I'd use a Stack here, but then Flash export wouldn't work as it doesn't support it
 
 	/// <summary>
 	/// Original width of the font's texture in pixels.
@@ -258,7 +258,7 @@ public class UIFont : MonoBehaviour
 			}
 
 			mColors.Clear();
-			mColors.Push(color);
+			mColors.Add(color);
 
 			Vector2 scale = mFont.charSize > 0 ? new Vector2(1f / mFont.charSize, 1f / mFont.charSize) : Vector2.one;
 
@@ -297,7 +297,7 @@ public class UIFont : MonoBehaviour
 
 					if (retVal > 0)
 					{
-						color = mColors.Peek();
+						color = mColors[mColors.Count - 1];
 						i += retVal - 1;
 						continue;
 					}

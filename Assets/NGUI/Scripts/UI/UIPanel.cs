@@ -19,7 +19,7 @@ public class UIPanel : MonoBehaviour
 	List<UIWidget> mWidgets = new List<UIWidget>();
 
 	// Widgets using these materials will be rebuilt next frame
-	HashSet<Material> mChanged = new HashSet<Material>();
+	List<Material> mChanged = new List<Material>();
 
 	// List of UI Screens created on hidden and invisible game objects
 	List<UIDrawCall> mDrawCalls = new List<UIDrawCall>();
@@ -82,6 +82,13 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Helper function that marks the specified material as having changed so its mesh is rebuilt next frame.
+	/// </summary>
+	/// <param name="mat"></param>
+
+	void MarkAsChanged (Material mat) { if (!mChanged.Contains(mat)) mChanged.Add(mat); }
+
+	/// <summary>
 	/// Add the specified widget to the managed list.
 	/// </summary>
 
@@ -91,20 +98,14 @@ public class UIPanel : MonoBehaviour
 		Material mat = w.material;
 		if (mat == null) return;
 		mWidgets.Add(w);
-		mChanged.Add(w.material);
+		MarkAsChanged(w.material);
 	}
 
 	/// <summary>
 	/// Remove the specified widget from the managed list.
 	/// </summary>
 
-	public void RemoveWidget (UIWidget w)
-	{
-		if (w != null && mWidgets.Remove(w))
-		{
-			mChanged.Add(w.material);
-		}
-	}
+	public void RemoveWidget (UIWidget w) { if (w != null && mWidgets.Remove(w)) MarkAsChanged(w.material); }
 
 	/// <summary>
 	/// Get or create a UIScreen responsible for drawing the widgets using the specified material.
@@ -140,7 +141,7 @@ public class UIPanel : MonoBehaviour
 	/// Mark all widgets as having been changed so the draw calls get re-created.
 	/// </summary>
 
-	void OnEnable () { foreach (UIWidget w in mWidgets) mChanged.Add(w.material); }
+	void OnEnable () { foreach (UIWidget w in mWidgets) MarkAsChanged(w.material); }
 
 	/// <summary>
 	/// Destroy all draw calls we've created when this script gets disabled.
@@ -168,7 +169,7 @@ public class UIPanel : MonoBehaviour
 		{
 			UIWidget w = mWidgets[--i];
 			if (w == null) mWidgets.RemoveAt(i);
-			else if (w.PanelUpdate()) mChanged.Add(w.material);
+			else if (w.PanelUpdate()) MarkAsChanged(w.material);
 		}
 
 		// If something has changed we have more work to be done

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 /// <summary>
 /// BMFont reader. C# implementation of http://www.angelcode.com/products/bmfont/
@@ -29,7 +30,11 @@ public class BMFont
 		int idx = s.IndexOf('=');
 		if (idx == -1) return 0;
 		int val = 0;
-		int.TryParse(s.Substring(idx + 1), out val);
+
+		// This would be a lot more elegant, but Flash export doesn't support it :(
+		//int.TryParse(s.Substring(idx + 1), out val);
+		try { val = int.Parse(s.Substring(idx + 1)); }
+		catch (System.Exception) {}
 		return val;
 	}
 
@@ -74,6 +79,16 @@ public class BMFont
 	public BMGlyph GetGlyph (int index) { return GetGlyph(index, false); }
 
 	/// <summary>
+	/// Helper function that does the same thing as StreamReader.ReadLine, since IO functions can't be used for Flash export.
+	/// </summary>
+
+	int ReadLine (byte[] bytes, int offset, int max, ref string line)
+	{
+		line = Encoding.UTF8.GetString(bytes, offset, max);
+		return max;
+	}
+
+	/// <summary>
 	/// Reload the font data.
 	/// </summary>
 
@@ -83,14 +98,14 @@ public class BMFont
 
 		if (bytes != null)
 		{
-			MemoryStream stream = new MemoryStream(bytes);
-			StreamReader reader = new StreamReader(stream);
-
+			int offset = 0;
+			int max = bytes.Length;
 			char[] separator = new char[1] {' '};
+			string line = "";
 
-			while (stream.Position < stream.Length)
+			while (offset < max)
 			{
-				string line = reader.ReadLine();
+				offset = ReadLine(bytes, offset, max, ref line);
 				if (string.IsNullOrEmpty(line)) break;
 				string[] split = line.Split(separator, System.StringSplitOptions.RemoveEmptyEntries);
 
@@ -170,10 +185,6 @@ public class BMFont
 					}
 				}
 			}
-
-			reader.Close();
-			stream.Close();
-			stream.Dispose();
 		}
 	}
 }
