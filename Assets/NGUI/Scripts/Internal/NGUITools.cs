@@ -348,4 +348,23 @@ static public class NGUITools
 		}
 		return pos;
 	}
+
+	/// <summary>
+	/// Find the camera responsible for drawing the objects on the specified layer.
+	/// </summary>
+
+	static public Camera FindCameraForLayer (int layer)
+	{
+		int layerMask = 1 << layer;
+		Camera[] cameras = GameObject.FindSceneObjectsOfType(typeof(Camera)) as Camera[];
+
+		foreach (Camera cam in cameras)
+		{
+			if ((cam.cullingMask & layerMask) != 0)
+			{
+				return cam;
+			}
+		}
+		return null;
+	}
 }

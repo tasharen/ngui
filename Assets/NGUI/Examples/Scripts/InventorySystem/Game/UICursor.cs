@@ -37,6 +37,7 @@ public class UICursor : MonoBehaviour
 		mAtlas = mSprite.atlas;
 		mSpriteName = mSprite.spriteName;
 		mSprite.depth = 100;
+		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
 	}
 
 	/// <summary>
