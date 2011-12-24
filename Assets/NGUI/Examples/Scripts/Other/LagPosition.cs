@@ -19,10 +19,9 @@ public class LagPosition : MonoBehaviour
 		mTrans = transform;
 		mRelative = mTrans.localPosition;
 		mAbsolute = mTrans.position;
-		UpdateManager.AddLateUpdate(level, this, OnLateUpdate);
 	}
 	
-	bool OnLateUpdate()
+	void LateUpdate()
 	{
 		Transform parent = mTrans.parent;
 		
@@ -35,6 +34,5 @@ public class LagPosition : MonoBehaviour
 			mAbsolute.z = Mathf.Lerp(mAbsolute.z, target.z, Mathf.Clamp01(delta * speed.z));
 			mTrans.position = mAbsolute;
 		}
-		return true;
 	}
 }

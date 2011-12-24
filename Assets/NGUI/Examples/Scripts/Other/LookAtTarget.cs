@@ -17,10 +17,9 @@ public class LookAtTarget : MonoBehaviour
 	void Start ()
 	{
 		mTrans = transform;
-		UpdateManager.AddLateUpdate(level, this, OnLateUpdate);
 	}
 
-	bool OnLateUpdate ()
+	void LateUpdate ()
 	{
 		if (target != null)
 		{
@@ -33,6 +32,5 @@ public class LookAtTarget : MonoBehaviour
 				mTrans.rotation = Quaternion.Slerp(mTrans.rotation, lookRot, Mathf.Clamp01(speed * Time.deltaTime));
 			}
 		}
-		return true;
 	}
 }
