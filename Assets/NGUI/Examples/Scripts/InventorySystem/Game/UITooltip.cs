@@ -10,6 +10,7 @@ public class UITooltip : MonoBehaviour
 {
 	static UITooltip mInstance;
 
+	public Camera uiCamera;
 	public UILabel text;
 	public UISlicedSprite background;
 	public float appearSpeed = 10f;
@@ -116,24 +117,44 @@ public class UITooltip : MonoBehaviour
 					mSize.z = 1f;
 
 					backgroundTrans.localScale = mSize;
-
-					// Don't let the tooltip leave the screen area
-					if (mPos.x + mSize.x > Screen.width) mPos.x = Screen.width  - mSize.x;
-					if (mPos.y - mSize.y < 0f) mPos.y = mSize.y;
 				}
 			}
 
-			// The camera's coordinates are actually (-halfScreen, halfScreen)
-			mPos.x -= Screen.width * 0.5f;
-			mPos.y -= Screen.height * 0.5f;
+			if (uiCamera != null)
+			{
+				// Since the screen can be of different than expected size, we want to convert
+				// mouse coordinates to view space, then convert that to world position.
+				mPos.x = Mathf.Clamp01(mPos.x / Screen.width);
+				mPos.y = Mathf.Clamp01(mPos.y / Screen.height);
 
-			// Set the transform position with a half-pixel offset
+				// Calculate the ratio of the camera's target orthographic size to current screen size
+				float activeSize = uiCamera.orthographicSize / mTrans.parent.lossyScale.y;
+				float ratio = (Screen.height * 0.5f) / activeSize;
+
+				// Calculate the maximum on-screen size of the tooltip window
+				Vector2 max = new Vector2(ratio * mSize.x / Screen.width, ratio * mSize.y / Screen.height);
+
+				// Limit the tooltip to always be visible
+				mPos.x = Mathf.Min(mPos.x, 1f - max.x);
+				mPos.y = Mathf.Max(mPos.y, max.y);
+
+				// Update the absolute position and save the local one
+				mTrans.position = uiCamera.ViewportToWorldPoint(mPos);
+				mPos = mTrans.localPosition;
+			}
+			else
+			{
+				// Don't let the tooltip leave the screen area
+				if (mPos.x + mSize.x > Screen.width) mPos.x = Screen.width - mSize.x;
+				if (mPos.y - mSize.y < 0f) mPos.y = mSize.y;
+
+				// Simple calculation that assumes that the camera is of fixed size
+				mPos.x -= Screen.width * 0.5f;
+				mPos.y -= Screen.height * 0.5f;
+			}
+
+			// Set the final position
 			mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(mPos);
-
-			// An alternative UIAnchor-based approach that will work even with a non-orthographic camera
-			//UIAnchor anchor = mTrans.GetComponent<UIAnchor>();
-			//anchor.offset = Input.mousePosition;
-			//anchor.Update();
 		}
 		else mTarget = 0f;
 	}

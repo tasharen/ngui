@@ -10,6 +10,9 @@ public class UICursor : MonoBehaviour
 {
 	static UICursor mInstance;
 
+	// Camera used to draw this cursor
+	public Camera uiCamera;
+
 	Transform mTrans;
 	UISprite mSprite;
 
@@ -45,9 +48,28 @@ public class UICursor : MonoBehaviour
 		if (mSprite.atlas != null)
 		{
 			Vector3 pos = Input.mousePosition;
-			pos.x -= Screen.width * 0.5f;
-			pos.y -= Screen.height * 0.5f;
-			mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(pos, mTrans.localScale);
+
+			if (uiCamera != null)
+			{
+				// Since the screen can be of different than expected size, we want to convert
+				// mouse coordinates to view space, then convert that to world position.
+				pos.x = Mathf.Clamp01(pos.x / Screen.width);
+				pos.y = Mathf.Clamp01(pos.y / Screen.height);
+				mTrans.position = uiCamera.ViewportToWorldPoint(pos);
+
+				// For pixel-perfect results
+				if (uiCamera.isOrthoGraphic)
+				{
+					mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(mTrans.localPosition, mTrans.localScale);
+				}
+			}
+			else
+			{
+				// Simple calculation that assumes that the camera is of fixed size
+				pos.x -= Screen.width * 0.5f;
+				pos.y -= Screen.height * 0.5f;
+				mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(pos, mTrans.localScale);
+			}
 		}
 	}
 
