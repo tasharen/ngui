@@ -109,7 +109,7 @@ public class InvDatabase : MonoBehaviour
 		{
 			foreach (InvBaseItem item in db.items)
 			{
-				if (item.name.Equals(exact, System.StringComparison.OrdinalIgnoreCase))
+				if (item.name == exact)
 				{
 					return item;
 				}

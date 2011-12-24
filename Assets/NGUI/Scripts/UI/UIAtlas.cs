@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 /// <summary>
 /// UI Atlas contains a collection of sprites inside one large texture atlas.
@@ -94,7 +95,9 @@ public class UIAtlas : MonoBehaviour
 		{
 			foreach (Sprite s in sprites)
 			{
-				if (!string.IsNullOrEmpty(s.name) && s.name.Equals(name, System.StringComparison.OrdinalIgnoreCase))
+				// string.Equals doesn't seem to work with Flash export if the variable
+				// happens to not be a member variable as of 3.5b6, so using == here.
+				if (!string.IsNullOrEmpty(s.name) && name == s.name)
 				{
 					return s;
 				}
