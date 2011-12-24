@@ -5,6 +5,7 @@ using System.Collections.Generic;
 /// Glyph structure used by BMFont. For more information see http://www.angelcode.com/products/bmfont/
 /// </summary>
 
+[System.Serializable]
 public class BMGlyph
 {
 	public struct Kerning

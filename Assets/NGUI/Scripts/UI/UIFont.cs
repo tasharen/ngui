@@ -9,12 +9,18 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Font")]
 public class UIFont : MonoBehaviour
 {
-	[SerializeField] TextAsset mData;
 	[SerializeField] Material mMat;
 	[SerializeField] Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
+	[SerializeField] BMFont mFont = new BMFont();
 
-	BMFont mFont = new BMFont();
-	List<Color> mColors = new List<Color>(); // I'd use a Stack here, but then Flash export wouldn't work as it doesn't support it
+	// I'd use a Stack here, but then Flash export wouldn't work as it doesn't support it
+	List<Color> mColors = new List<Color>();
+
+	/// <summary>
+	/// Access to the BMFont class directly.
+	/// </summary>
+
+	public BMFont bmFont { get { return mFont; } }
 
 	/// <summary>
 	/// Original width of the font's texture in pixels.
@@ -27,27 +33,6 @@ public class UIFont : MonoBehaviour
 	/// </summary>
 
 	public int texHeight { get { return (mFont != null) ? mFont.texHeight : 1; } }
-
-	/// <summary>
-	/// Get or set the text asset containing the font's exported data.
-	/// </summary>
-
-	public TextAsset data
-	{
-		get
-		{
-			return mData;
-		}
-		set
-		{
-			if (mData != value)
-			{
-				mData = value;
-				mFont.Load(NGUITools.GetHierarchy(gameObject), (mData != null) ? mData.bytes : null);
-				Refresh();
-			}
-		}
-	}
 
 	/// <summary>
 	/// Get or set the material used by this font.
@@ -93,25 +78,13 @@ public class UIFont : MonoBehaviour
 	/// Pixel-perfect size of this font.
 	/// </summary>
 
-	public int size { get { Awake(); return mFont.charSize; } }
-
-	/// <summary>
-	/// Load the font data on awake.
-	/// </summary>
-
-	void Awake ()
-	{
-		if (mData != null && !mFont.isValid)
-		{
-			mFont.Load(NGUITools.GetHierarchy(gameObject), mData.bytes);
-		}
-	}
+	public int size { get { return mFont.charSize; } }
 
 	/// <summary>
 	/// Refresh all labels that use this font.
 	/// </summary>
 
-	void Refresh ()
+	public void Refresh ()
 	{
 		if (!Application.isPlaying)
 		{
@@ -189,54 +162,49 @@ public class UIFont : MonoBehaviour
 	{
 		Vector2 v = Vector2.zero;
 
-		if (mFont != null)
+		if (mFont != null && mFont.isValid)
 		{
-			Awake();
+			if (encoding) text = NGUITools.StripSymbols(text);
 
-			if (mFont.isValid)
+			Vector2 scale = mFont.charSize > 0 ? new Vector2(1f / mFont.charSize, 1f / mFont.charSize) : Vector2.one;
+
+			int maxX = 0;
+			int x = 0;
+			int y = 0;
+			int prev = 0;
+
+			for (int i = 0, imax = text.Length; i < imax; ++i)
 			{
-				if (encoding) text = NGUITools.StripSymbols(text);
+				char c = text[i];
 
-				Vector2 scale = mFont.charSize > 0 ? new Vector2(1f / mFont.charSize, 1f / mFont.charSize) : Vector2.one;
-
-				int maxX = 0;
-				int x = 0;
-				int y = 0;
-				int prev = 0;
-
-				for (int i = 0, imax = text.Length; i < imax; ++i)
+				if (c == '\n' || (encoding && (c == '\\') && (i + 1 < imax) && (text[i + 1] == 'n')))
 				{
-					char c = text[i];
-
-					if (c == '\n' || (encoding && (c == '\\') && (i + 1 < imax) && (text[i + 1] == 'n')))
-					{
-						if (x > maxX) maxX = x;
-						x = 0;
-						y += mFont.charSize;
-						prev = 0;
-						if (c != '\n') ++i;
-						continue;
-					}
-
-					if (c < ' ')
-					{
-						prev = 0;
-						continue;
-					}
-
-					BMGlyph glyph = mFont.GetGlyph(c);
-
-					if (glyph != null)
-					{
-						x += (prev != 0) ? glyph.advance + glyph.GetKerning(prev) : glyph.advance;
-						prev = c;
-					}
+					if (x > maxX) maxX = x;
+					x = 0;
+					y += mFont.charSize;
+					prev = 0;
+					if (c != '\n') ++i;
+					continue;
 				}
 
-				if (x > maxX) maxX = x;
-				v.x = scale.x * maxX;
-				v.y = scale.y * (y + mFont.charSize);
+				if (c < ' ')
+				{
+					prev = 0;
+					continue;
+				}
+
+				BMGlyph glyph = mFont.GetGlyph(c);
+
+				if (glyph != null)
+				{
+					x += (prev != 0) ? glyph.advance + glyph.GetKerning(prev) : glyph.advance;
+					prev = c;
+				}
 			}
+
+			if (x > maxX) maxX = x;
+			v.x = scale.x * maxX;
+			v.y = scale.y * (y + mFont.charSize);
 		}
 		return v;
 	}
@@ -249,8 +217,6 @@ public class UIFont : MonoBehaviour
 	{
 		if (mFont != null && text != null)
 		{
-			Awake();
-
 			if (!mFont.isValid)
 			{
 				Debug.LogError("Attempting to print using an invalid font!");

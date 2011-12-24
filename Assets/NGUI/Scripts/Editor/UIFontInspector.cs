@@ -23,19 +23,21 @@ public class UIFontInspector : Editor
 		GUITools.DrawSeparator();
 
 		UIFont font = target as UIFont;
-		TextAsset data = EditorGUILayout.ObjectField("Font Data", font.data, typeof(TextAsset), false) as TextAsset;
+		TextAsset data = EditorGUILayout.ObjectField("Import Font", null, typeof(TextAsset), false) as TextAsset;
 
 		bool resetWidthHeight = false;
 
-		if (font.data != data)
+		if (data != null)
 		{
-			Undo.RegisterUndo(font, "Font Data");
-			font.data = data;
+			Undo.RegisterUndo(font, "Import Font Data");
+			BMFontReader.Load(font.bmFont, NGUITools.GetHierarchy(font.gameObject), data.bytes);
+			font.Refresh();
 			resetWidthHeight = true;
 			EditorUtility.SetDirty(font);
+			Debug.Log("Imported " + font.bmFont.glyphCount + " characters");
 		}
 
-		if (data != null)
+		if (font.bmFont.isValid)
 		{
 			Material mat = EditorGUILayout.ObjectField("Material", font.material, typeof(Material), false) as Material;
 
