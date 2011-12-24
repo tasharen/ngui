@@ -92,7 +92,7 @@ public class NGUIJson
 			// If the sprite was present before, see if we can copy its inner rect
 			foreach (UIAtlas.Sprite oldSprite in oldSprites)
 			{
-				if (string.Equals(oldSprite.name, newSprite.name, StringComparison.OrdinalIgnoreCase))
+				if (oldSprite.name.Equals(newSprite.name, StringComparison.OrdinalIgnoreCase))
 				{
 					CopyInnerRect(oldSprite, newSprite);
 				}

@@ -86,8 +86,7 @@ public class UISprite : UIWidget
 				mSprite = null;
 				mChanged = true;
 			}
-			else if (string.IsNullOrEmpty(mSpriteName) || !string.Equals(mSpriteName, value,
-				System.StringComparison.OrdinalIgnoreCase))
+			else if (string.IsNullOrEmpty(mSpriteName) || !mSpriteName.Equals(value, System.StringComparison.OrdinalIgnoreCase))
 			{
 				// If the sprite name changes, the sprite reference should also be updated
 				mSpriteName = value;

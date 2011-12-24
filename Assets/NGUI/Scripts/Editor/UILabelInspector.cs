@@ -35,7 +35,7 @@ public class UILabelInspector : UIWidgetInspector
 		if (mLabel.font == null) return false;
 
 		string text = EditorGUILayout.TextArea(mLabel.text, GUILayout.Height(100f));
-		if (!string.Equals(text, mLabel.text)) { RegisterUndo(); mLabel.text = text; }
+		if (!text.Equals(mLabel.text)) { RegisterUndo(); mLabel.text = text; }
 
 		GUILayout.BeginHorizontal();
 		{

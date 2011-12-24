@@ -34,7 +34,7 @@ public class PlayIdleAnimations : MonoBehaviour
 		{
 			foreach (AnimationState state in mAnim)
 			{
-				if (string.Equals(state.clip.name, "idle", System.StringComparison.OrdinalIgnoreCase))
+				if (state.clip.name.Equals("idle", System.StringComparison.OrdinalIgnoreCase))
 				{
 					state.layer = 0;
 					mIdle = state.clip;

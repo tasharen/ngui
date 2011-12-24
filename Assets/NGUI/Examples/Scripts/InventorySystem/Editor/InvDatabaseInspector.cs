@@ -169,7 +169,7 @@ public class InvDatabaseInspector : Editor
 					}
 					GUI.backgroundColor = Color.white;
 
-					if (!string.Equals(itemName, item.name))
+					if (!itemName.Equals(item.name))
 					{
 						Undo.RegisterUndo(db, "Rename Item");
 						item.name = itemName;
@@ -198,7 +198,7 @@ public class InvDatabaseInspector : Editor
 					{
 						for (int i = 1; i < sprites.Count; ++i)
 						{
-							if (string.Equals(sprites[i], spriteName, System.StringComparison.OrdinalIgnoreCase))
+							if (spriteName.Equals(sprites[i], System.StringComparison.OrdinalIgnoreCase))
 							{
 								index = i;
 								break;
@@ -321,13 +321,13 @@ public class InvDatabaseInspector : Editor
 				}
 
 				// Save all values
-				if (!string.Equals(itemDesc, item.description) ||
+				if (!itemDesc.Equals(item.description) ||
 					slot	!= item.slot ||
 					go		!= item.attachment ||
 					color	!= item.color ||
 					min		!= item.minItemLevel ||
 					max		!= item.maxItemLevel ||
-					!string.Equals(iconName, item.iconName))
+					!iconName.Equals(item.iconName))
 				{
 					Undo.RegisterUndo(db, "Item Properties");
 					item.description = itemDesc;

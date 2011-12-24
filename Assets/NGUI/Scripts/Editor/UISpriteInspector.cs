@@ -53,7 +53,7 @@ public class UISpriteInspector : UIWidgetInspector
 			{
 				for (int i = 0; i < sprites.Count; ++i)
 				{
-					if (string.Equals(sprites[i], spriteName, System.StringComparison.OrdinalIgnoreCase))
+					if (spriteName.Equals(sprites[i], System.StringComparison.OrdinalIgnoreCase))
 					{
 						index = i;
 						break;

@@ -168,7 +168,7 @@ public class SelectionTools
 				
 				foreach (AssetEntry ent in list)
 				{
-					if (string.Equals(ent.path, path))
+					if (ent.path.Equals(path))
 					{
 						if (!ent.types.Contains(type)) ent.types.Add(type);
 						found = true;

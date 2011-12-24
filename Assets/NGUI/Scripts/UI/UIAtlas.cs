@@ -94,7 +94,7 @@ public class UIAtlas : MonoBehaviour
 		{
 			foreach (Sprite s in sprites)
 			{
-				if (!string.IsNullOrEmpty(s.name) && string.Equals(s.name, name, System.StringComparison.OrdinalIgnoreCase))
+				if (!string.IsNullOrEmpty(s.name) && s.name.Equals(name, System.StringComparison.OrdinalIgnoreCase))
 				{
 					return s;
 				}
