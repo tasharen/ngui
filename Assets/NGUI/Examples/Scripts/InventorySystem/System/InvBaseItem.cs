@@ -13,14 +13,15 @@ public class InvBaseItem
 {
 	public enum Slot
 	{
-		None,		// First element MUST be 'None'
-		Weapon,		// All the following elements are yours to customize -- edit, add or remove as you desire
+		None,			// First element MUST be 'None'
+		Weapon,			// All the following elements are yours to customize -- edit, add or remove as you desire
 		Shield,
 		Body,
 		Shoulders,
 		Bracers,
 		Boots,
 		Trinket,
+		_LastDoNotUse,	// Flash export doesn't support Enum.GetNames :(
 	}
 
 	/// <summary>

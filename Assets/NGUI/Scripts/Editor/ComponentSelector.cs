@@ -87,7 +87,11 @@ public class ComponentSelector : ScriptableWizard
 
 		GUILayout.BeginHorizontal();
 		{
+#if UNITY_3_4
 			PrefabType type = EditorUtility.GetPrefabType(mb.gameObject);
+#else
+			PrefabType type = PrefabUtility.GetPrefabType(mb.gameObject);
+#endif
 
 			if (type == PrefabType.Prefab)
 			{

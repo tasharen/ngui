@@ -135,7 +135,11 @@ public class SelectionTools
 		if (Selection.activeTransform != null)
         {
             // Check if the selected object is a prefab instance and display a warning
-            PrefabType type = EditorUtility.GetPrefabType( Selection.activeGameObject );
+#if UNITY_3_4
+			PrefabType type = EditorUtility.GetPrefabType(Selection.activeGameObject);
+#else
+			PrefabType type = PrefabUtility.GetPrefabType(Selection.activeGameObject);
+#endif
 
             if (type == PrefabType.PrefabInstance)
             {

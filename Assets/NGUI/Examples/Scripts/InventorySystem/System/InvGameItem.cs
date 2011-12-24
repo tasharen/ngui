@@ -18,7 +18,7 @@ public class InvGameItem
 		Cursed,
 		Damaged,
 		Worn,
-		Sturdy,		// Normal quality
+		Sturdy,			// Normal quality
 		Polished,
 		Improved,
 		Crafted,
@@ -26,6 +26,7 @@ public class InvGameItem
 		Enchanted,
 		Epic,
 		Legendary,
+		_LastDoNotUse,	// Flash export doesn't support Enum.GetNames :(
 	}
 
 	// ID of the base item used to create this game item

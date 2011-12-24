@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System;
 
 /// <summary>
 /// Inventory system -- Equipment class works with InvAttachmentPoints and allows to visually equip and remove items.
@@ -32,7 +31,7 @@ public class InvEquipment : MonoBehaviour
 			if (mItems == null)
 			{
 				// Automatically figure out how many item slots we need
-				int count = Enum.GetNames(typeof(InvBaseItem.Slot)).Length - 1;
+				int count = (int)InvBaseItem.Slot._LastDoNotUse;
 				mItems = new InvGameItem[count];
 			}
 

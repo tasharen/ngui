@@ -16,7 +16,7 @@ public class EquipItems : MonoBehaviour
 			InvEquipment eq = GetComponent<InvEquipment>();
 			if (eq == null) eq = gameObject.AddComponent<InvEquipment>();
 
-			int qualityLevels = System.Enum.GetNames(typeof(InvGameItem.Quality)).Length;
+			int qualityLevels = (int)InvGameItem.Quality._LastDoNotUse;
 
 			foreach (int i in itemIDs)
 			{

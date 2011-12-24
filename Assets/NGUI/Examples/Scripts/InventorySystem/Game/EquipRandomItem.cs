@@ -16,7 +16,7 @@ public class EquipRandomItem : MonoBehaviour
 		List<InvBaseItem> list = InvDatabase.list[0].items;
 		if (list.Count == 0) return;
 
-		int qualityLevels = System.Enum.GetNames(typeof(InvGameItem.Quality)).Length;
+		int qualityLevels = (int)InvGameItem.Quality._LastDoNotUse;
 		int index = Random.Range(0, list.Count);
 		InvBaseItem item = list[index];
 
