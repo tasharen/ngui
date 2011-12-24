@@ -40,7 +40,7 @@ public class PlayIdleAnimations : MonoBehaviour
 					mIdle = state.clip;
 					mAnim.Play(mIdle.name);
 				}
-				else if (state.clip.name.StartsWith("idle", System.StringComparison.OrdinalIgnoreCase))
+				else if (state.clip.name.StartsWith("idle"))
 				{
 					state.layer = 1;
 					mBreaks.Add(state.clip);
