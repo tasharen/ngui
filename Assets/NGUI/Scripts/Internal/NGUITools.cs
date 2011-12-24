@@ -23,7 +23,12 @@ static public class NGUITools
 
 	static public void PlaySound (AudioClip clip, float volume)
 	{
+#if UNITY_3_4
 		if (clip != null)
+#else
+		// NOTE: There seems to be a bug with PlayOneShot in Flash using Unity 3.5 b6
+		if (clip != null && Application.platform != RuntimePlatform.FlashPlayer)
+#endif
 		{
 			if (mListener == null)
 			{
