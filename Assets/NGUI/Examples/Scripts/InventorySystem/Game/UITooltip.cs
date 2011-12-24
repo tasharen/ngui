@@ -88,7 +88,7 @@ public class UITooltip : MonoBehaviour
 
 	void SetText (string tooltipText)
 	{
-		if (tooltipText != null)
+		if (!string.IsNullOrEmpty(tooltipText))
 		{
 			mTarget = 1f;
 			
@@ -164,7 +164,13 @@ public class UITooltip : MonoBehaviour
 	/// Show a tooltip with the specified text.
 	/// </summary>
 
-	static public void ShowText (string tooltipText) { if (mInstance != null) mInstance.SetText(tooltipText); }
+	static public void ShowText (string tooltipText)
+	{
+		if (mInstance != null)
+		{
+			mInstance.SetText(tooltipText);
+		}
+	}
 
 	/// <summary>
 	/// Show a tooltip with the tooltip text for the specified item.
@@ -179,10 +185,11 @@ public class UITooltip : MonoBehaviour
 			if (bi != null)
 			{
 				string t = "[" + NGUITools.EncodeColor(item.color) + "]" + item.name + "[-]\n";
+				
 				t += "[AFAFAF]Level " + item.itemLevel + " " + bi.slot;
-
+				
 				List<InvStat> stats = item.CalculateStats();
-
+				
 				foreach (InvStat stat in stats)
 				{
 					if (stat.amount == 0) continue;
@@ -200,7 +207,7 @@ public class UITooltip : MonoBehaviour
 					t += " " + stat.id;
 					t += "[-]";
 				}
-
+				
 				if (!string.IsNullOrEmpty(bi.description)) t += "\n[FF9900]" + bi.description;
 				ShowText(t);
 				return;

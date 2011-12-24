@@ -158,7 +158,12 @@ static public class NGUITools
 	static public string EncodeColor (Color c)
 	{
 		int i = 0xFFFFFF & (ColorToInt(c) >> 8);
+#if UNITY_3_4
 		return i.ToString("X6");
+#else
+		// int.ToString(format) doesn't seem to be supported on Flash as of 3.5 b6 -- it simply silently crashes
+		return (Application.platform == RuntimePlatform.FlashPlayer) ? "FFFFFF" : i.ToString("X6");
+#endif
 	}
 
 	/// <summary>
@@ -202,7 +207,7 @@ static public class NGUITools
 
 	static public string StripSymbols (string text)
 	{
-		text = text.Replace("\\n", "");
+		text = text.Replace("\\n", "\n");
 
 		for (int i = 0, imax = text.Length; i < imax; )
 		{
