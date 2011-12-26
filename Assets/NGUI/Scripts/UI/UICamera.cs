@@ -82,6 +82,27 @@ public class UICamera : MonoBehaviour
 	bool handlesEvents { get { return eventHandler == this; } }
 
 	/// <summary>
+	/// Option to manually set the selected game object.
+	/// </summary>
+
+	public GameObject selectedObject
+	{
+		get
+		{
+			return mSel;
+		}
+		set
+		{
+			if (mSel != value)
+			{
+				if (mSel != null) mSel.SendMessage("OnSelect", false, SendMessageOptions.DontRequireReceiver);
+				mSel = value;
+				if (mSel != null) mSel.SendMessage("OnSelect", true, SendMessageOptions.DontRequireReceiver);
+			}
+		}
+	}
+
+	/// <summary>
 	/// Convenience function that returns the main HUD camera.
 	/// </summary>
 
