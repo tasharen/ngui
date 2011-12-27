@@ -70,16 +70,16 @@ public class UICamera : MonoBehaviour
 	float mTooltipTime = 0f;
 
 	/// <summary>
-	/// Caching is always preferable for performance.
-	/// </summary>
-
-	public Camera cachedCamera { get { if (mCam == null) mCam = camera; return mCam; } }
-
-	/// <summary>
 	/// Helper function that determines if this script should be handling the events.
 	/// </summary>
 
 	bool handlesEvents { get { return eventHandler == this; } }
+
+	/// <summary>
+	/// Caching is always preferable for performance.
+	/// </summary>
+
+	public Camera cachedCamera { get { if (mCam == null) mCam = camera; return mCam; } }
 
 	/// <summary>
 	/// Option to manually set the selected game object.
@@ -346,7 +346,7 @@ public class UICamera : MonoBehaviour
 			if (mTooltip != null) ShowTooltip(false);
 			touch.pressed = touch.current;
 			touch.considerForClick = true;
-			touch.totalDelta = Vector3.zero;
+			touch.totalDelta = Vector2.zero;
 			if (touch.pressed != null) touch.pressed.SendMessage("OnPress", true, SendMessageOptions.DontRequireReceiver);
 		}
 

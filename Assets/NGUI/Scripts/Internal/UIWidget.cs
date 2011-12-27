@@ -181,7 +181,7 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		mChanged = true;
 
-		if (enabled && gameObject.active && !Application.isPlaying)
+		if (enabled && gameObject.active && !Application.isPlaying && mMat != null)
 		{
 			panel.AddWidget(this);
 			mPanel.LateUpdate();
@@ -252,7 +252,7 @@ public abstract class UIWidget : MonoBehaviour
 		if (mTrans == null) mTrans = transform;
 		if (mMat != null)
 		{
-			if (mStarted) panel.AddWidget(this);
+			if (mStarted && mMat != null) panel.AddWidget(this);
 			else mRecentlyEnabled = true;
 		}
 	}
@@ -267,7 +267,7 @@ public abstract class UIWidget : MonoBehaviour
 		if (mRecentlyEnabled)
 		{
 			mRecentlyEnabled = false;
-			panel.AddWidget(this);
+			if (mMat != null) panel.AddWidget(this);
 		}
 	}
 
