@@ -12,7 +12,6 @@ public class UIInput : MonoBehaviour
 	public string caratChar = "|";
 
 	string mText = "";
-	bool mSelected = false;
 
 #if UNITY_IPHONE || UNITY_ANDROID
 	iPhoneKeyboard mKeyboard;
@@ -26,7 +25,7 @@ public class UIInput : MonoBehaviour
 	{
 		get
 		{
-			if (mSelected) return mText;
+			if (selected) return mText;
 			return (label != null) ? label.text : "";
 		}
 		set
@@ -36,9 +35,26 @@ public class UIInput : MonoBehaviour
 			if (label != null)
 			{
 				label.supportEncoding = false;
-				label.text = mSelected ? value + caratChar : value;
-				label.showLastPasswordChar = mSelected;
+				label.text = selected ? value + caratChar : value;
+				label.showLastPasswordChar = selected;
 			}
+		}
+	}
+
+	/// <summary>
+	/// Whether the input is currently selected.
+	/// </summary>
+
+	public bool selected
+	{
+		get
+		{
+			return UICamera.selectedObject == gameObject;
+		}
+		set
+		{
+			if (!value && UICamera.selectedObject == gameObject) UICamera.selectedObject = null;
+			else if (value) UICamera.selectedObject = gameObject;
 		}
 	}
 
@@ -60,13 +76,11 @@ public class UIInput : MonoBehaviour
 	/// Selection event, sent by UICamera.
 	/// </summary>
 
-	void OnSelect (bool selected)
+	void OnSelect (bool isSelected)
 	{
-		if (label != null && mSelected != selected && enabled && gameObject.active)
+		if (label != null && enabled && gameObject.active)
 		{
-			mSelected = selected;
-
-			if (mSelected)
+			if (isSelected)
 			{
 				mText = label.text;
 
@@ -80,7 +94,7 @@ public class UIInput : MonoBehaviour
 #endif
 				{
 					label.text = mText + caratChar;
-					label.showLastPasswordChar = mSelected;
+					label.showLastPasswordChar = isSelected;
 				}
 			}
 #if UNITY_IPHONE || UNITY_ANDROID
@@ -92,7 +106,7 @@ public class UIInput : MonoBehaviour
 			else
 			{
 				label.text = mText;
-				label.showLastPasswordChar = mSelected;
+				label.showLastPasswordChar = isSelected;
 			}
 		}
 	}
@@ -113,6 +127,7 @@ public class UIInput : MonoBehaviour
 			{
 				mKeyboard = null;
 				mSelected = false;
+				gameObject.SendMessage("OnSubmit", SendMessageOptions.DontRequireReceiver);
 			}
 		}
 	}
@@ -124,7 +139,7 @@ public class UIInput : MonoBehaviour
 
 	void OnInput (string input)
 	{
-		if (mSelected && enabled && gameObject.active)
+		if (selected && enabled && gameObject.active)
 		{
 			// Mobile devices handle input in Update()
 			if (Application.platform == RuntimePlatform.Android) return;
@@ -141,6 +156,7 @@ public class UIInput : MonoBehaviour
 				{
 					// Enter
 					OnSelect(false);
+					gameObject.SendMessage("OnSubmit", SendMessageOptions.DontRequireReceiver);
 					return;
 				}
 				else
@@ -162,7 +178,7 @@ public class UIInput : MonoBehaviour
 	void UpdateLabel ()
 	{
 		if (maxChars > 0 && mText.Length > maxChars) mText = mText.Substring(0, maxChars);
-		label.text = mSelected ? (mText + caratChar) : mText;
-		label.showLastPasswordChar = mSelected;
+		label.text = selected ? (mText + caratChar) : mText;
+		label.showLastPasswordChar = selected;
 	}
 }

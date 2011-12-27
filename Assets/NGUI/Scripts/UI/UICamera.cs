@@ -52,14 +52,14 @@ public class UICamera : MonoBehaviour
 	// List of all active cameras in the scene
 	static List<UICamera> mList = new List<UICamera>();
 
+	// Selected widget (for input)
+	static GameObject mSel = null;
+
 	// Mouse event
 	MouseOrTouch mMouse = new MouseOrTouch();
 
 	// List of currently active touches
 	Dictionary<int, MouseOrTouch> mTouches = new Dictionary<int, MouseOrTouch>();
-
-	// Selected widget (for input)
-	GameObject mSel = null;
 
 	// Tooltip widget (mouse only)
 	GameObject mTooltip = null;
@@ -85,7 +85,7 @@ public class UICamera : MonoBehaviour
 	/// Option to manually set the selected game object.
 	/// </summary>
 
-	public GameObject selectedObject
+	static public GameObject selectedObject
 	{
 		get
 		{
