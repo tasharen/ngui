@@ -41,7 +41,6 @@ public class ChatInput : MonoBehaviour
 		{
 			if (!mIgnoreNextEnter && !mInput.selected)
 			{
-				mInput.text = "";
 				mInput.selected = true;
 			}
 			mIgnoreNextEnter = false;
@@ -62,7 +61,7 @@ public class ChatInput : MonoBehaviour
 			if (!string.IsNullOrEmpty(text))
 			{
 				textList.Add(text);
-				mInput.text = "Press Enter to start typing";
+				mInput.text = "";
 				mInput.selected = false;
 				mIgnoreNextEnter = true;
 			}
