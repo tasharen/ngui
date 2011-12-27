@@ -1,7 +1,7 @@
 ----------------------------------------
         NGUI: Next-Gen UI kit
  Copyright © 2011 Tasharen Entertainment
-             Version 1.10c
+             Version 1.11
   http://www.tasharen.com/?page_id=140
         support@tasharen.com
 ----------------------------------------
@@ -35,6 +35,9 @@ All can be found here: http://www.tasharen.com/?page_id=140
 ---------------
 Version History
 ---------------
+
+1.11
+- NEW: Added a new example (4) - Chat Window.
 
 1.10
 - NEW: Added support for Unity 3.5 and its "export to Flash" feature.
