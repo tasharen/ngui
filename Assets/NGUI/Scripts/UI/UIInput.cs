@@ -126,8 +126,8 @@ public class UIInput : MonoBehaviour
 			if (mKeyboard.done)
 			{
 				mKeyboard = null;
-				mSelected = false;
 				gameObject.SendMessage("OnSubmit", SendMessageOptions.DontRequireReceiver);
+				selected = false;
 			}
 		}
 	}
@@ -155,8 +155,8 @@ public class UIInput : MonoBehaviour
 				else if (c == '\r' || c == '\n')
 				{
 					// Enter
-					OnSelect(false);
 					gameObject.SendMessage("OnSubmit", SendMessageOptions.DontRequireReceiver);
+					selected = false;
 					return;
 				}
 				else

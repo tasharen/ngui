@@ -63,8 +63,8 @@ public class ChatInput : MonoBehaviour
 				textList.Add(text);
 				mInput.text = "";
 				mInput.selected = false;
-				mIgnoreNextEnter = true;
 			}
 		}
+		mIgnoreNextEnter = true;
 	}
 }
