@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEditor;
-using System.IO;
+using System.Text;
 
 /// <summary>
 /// Helper class that takes care of loading BMFont's glyph information from the specified byte array.
@@ -27,6 +27,40 @@ public static class BMFontReader
 	}
 
 	/// <summary>
+	/// MemoryStream.ReadLine has an interesting oddity: it doesn't always advance the stream's position by the correct amount:
+	/// http://social.msdn.microsoft.com/Forums/en-AU/Vsexpressvcs/thread/b8f7837b-e396-494e-88e1-30547fcf385f
+	/// Solution? Custom line reader with the added benefit of not having to use streams at all.
+	/// </summary>
+
+	static string ReadLine (byte[] buffer, ref int offset)
+	{
+		int max = buffer.Length;
+
+		// Skip empty characters
+		while (offset < max && buffer[offset] < 32) ++offset;
+
+		int end = offset;
+
+		if (end < max)
+		{
+			for (;;)
+			{
+				if (end < max)
+				{
+					int ch = buffer[end++];
+					if (ch != '\n' && ch != '\r') continue;
+				}
+
+				string line = Encoding.UTF8.GetString(buffer, offset, end - (end < max ? offset - 1 : offset));
+				offset = end;
+				return line;
+			}
+		}
+		offset = max;
+		return null;
+	}
+
+	/// <summary>
 	/// Reload the font data.
 	/// </summary>
 
@@ -36,14 +70,12 @@ public static class BMFontReader
 
 		if (bytes != null)
 		{
-			MemoryStream stream = new MemoryStream(bytes);
-			StreamReader reader = new StreamReader(stream);
-
+			int offset = 0;
 			char[] separator = new char[1] { ' ' };
 
-			while (stream.Position < stream.Length)
+			while (offset < bytes.Length)
 			{
-				string line = reader.ReadLine();
+				string line = ReadLine(bytes, ref offset);
 				if (string.IsNullOrEmpty(line)) break;
 				string[] split = line.Split(separator, System.StringSplitOptions.RemoveEmptyEntries);
 
@@ -59,14 +91,15 @@ public static class BMFontReader
 
 						if (glyph != null)
 						{
-							glyph.x = GetValue(split[2]);
-							glyph.y = GetValue(split[3]);
-							glyph.width = GetValue(split[4]);
-							glyph.height = GetValue(split[5]);
-							glyph.offsetX = GetValue(split[6]);
-							glyph.offsetY = GetValue(split[7]);
-							glyph.advance = GetValue(split[8]);
+							glyph.x			= GetValue(split[2]);
+							glyph.y			= GetValue(split[3]);
+							glyph.width		= GetValue(split[4]);
+							glyph.height	= GetValue(split[5]);
+							glyph.offsetX	= GetValue(split[6]);
+							glyph.offsetY	= GetValue(split[7]);
+							glyph.advance	= GetValue(split[8]);
 						}
+						else Debug.Log("Char: " + split[1] + " (" + id + ") is NULL");
 					}
 					else
 					{
@@ -124,10 +157,6 @@ public static class BMFontReader
 					}
 				}
 			}
-
-			reader.Close();
-			stream.Close();
-			stream.Dispose();
 		}
 	}
 }

@@ -275,7 +275,7 @@ public class UIFont : MonoBehaviour
 				{
 					if (prev != 0) x += glyph.GetKerning(prev);
 
-					v0.x =  scale.x * (x + glyph.offsetX);
+					v0.x = scale.x * (x + glyph.offsetX);
 					v0.y = -scale.y * (y + glyph.offsetY);
 
 					v1.x = v0.x + scale.x * glyph.width;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class SelectionTools
 {
-	[MenuItem("Selection/Force Delete")]
+	[MenuItem("GameObject/Selection/Force Delete")]
 	static void ForceDelete()
 	{
 		GameObject go = Selection.activeGameObject;
@@ -24,7 +24,7 @@ public class SelectionTools
 		}
 	}
 
-	[MenuItem("Selection/Toggle 'Active' #&a")]
+	[MenuItem("GameObject/Selection/Toggle 'Active' #&a")]
 	static void ActivateDeactivate()
 	{
 		if (HasValidTransform())
@@ -35,7 +35,7 @@ public class SelectionTools
 		}
 	}
 	
-	[MenuItem("Selection/Clear Local Transform #&c")]
+	[MenuItem("GameObject/Selection/Clear Local Transform #&c")]
 	static void ClearLocalTransform()
 	{
 		if (HasValidTransform())
@@ -49,7 +49,7 @@ public class SelectionTools
 		}
 	}
 
-	[MenuItem("Selection/Add New Child #&n")]
+	[MenuItem("GameObject/Selection/Add New Child #&n")]
 	static void CreateLocalGameObject ()
 	{
 		if (PrefabCheck())
@@ -79,7 +79,7 @@ public class SelectionTools
 		}
 	}
 	
-	[MenuItem("Selection/List Dependencies")]
+	[MenuItem("GameObject/Selection/List Dependencies")]
 	static void ListDependencies()
 	{
 		if (HasValidSelection())
