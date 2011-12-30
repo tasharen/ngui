@@ -1,0 +1,29 @@
+using UnityEngine;
+
+/// <summary>
+/// Sample script showing how easy it is to implement a standard button that swaps sprites.
+/// </summary>
+
+[AddComponentMenu("NGUI/UI/Image Button")]
+public class UIImageButton : MonoBehaviour
+{
+	public UISprite target;
+	public string normalSprite;
+	public string hoverSprite;
+	public string pressedSprite;
+
+	void Start ()
+	{
+		if (target == null) target = GetComponentInChildren<UISprite>();
+	}
+
+	void OnHover (bool isOver)
+	{
+		if (target != null) target.spriteName = isOver ? hoverSprite : normalSprite;
+	}
+
+	void OnPress (bool pressed)
+	{
+		if (target != null) target.spriteName = pressed ? pressedSprite : normalSprite;
+	}
+}
