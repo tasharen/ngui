@@ -36,7 +36,7 @@ public class UIDrawCall : MonoBehaviour
 	/// Set the draw call's geometry.
 	/// </summary>
 
-	public void Set (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
+	public void Set (List<Vector3> verts, List<Vector3> norms, List<Vector4> tans, List<Vector2> uvs, List<Color> cols)
 	{
 		int count = verts.Count;
 
@@ -83,6 +83,8 @@ public class UIDrawCall : MonoBehaviour
 
 			// Set the mesh values
 			mMesh.vertices = verts.ToArray();
+			if (norms != null) mMesh.normals = norms.ToArray();
+			if (tans != null) mMesh.tangents = tans.ToArray();
 			mMesh.uv = uvs.ToArray();
 			mMesh.colors = cols.ToArray();
 			mMesh.triangles = indices;

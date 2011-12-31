@@ -9,6 +9,9 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Panel")]
 public class UIPanel : MonoBehaviour
 {
+	// Whether normals and tangents will be generated for all meshes
+	public bool generateNormals = false;
+
 	// Whether selectable gizmos will be shown for widgets under this panel
 	public bool showGizmos = true;
 
@@ -26,6 +29,8 @@ public class UIPanel : MonoBehaviour
 
 	// Cached in order to reduce memory allocations
 	List<Vector3> mVerts = new List<Vector3>();
+	List<Vector3> mNorms = new List<Vector3>();
+	List<Vector4> mTans = new List<Vector4>();
 	List<Vector2> mUvs = new List<Vector2>();
 	List<Color> mCols = new List<Color>();
 
@@ -202,9 +207,25 @@ public class UIPanel : MonoBehaviour
 			// Transform all vertices into world space
 			Transform t = w.cachedTransform;
 
-			for (int i = offset, imax = mVerts.Count; i < imax; ++i)
+			if (generateNormals)
 			{
-				mVerts[i] = t.TransformPoint(mVerts[i]);
+				Vector3 normal = t.TransformDirection(Vector3.back);
+				Vector3 tangent = t.TransformDirection(Vector3.right);
+				Vector4 tan4 = new Vector4(tangent.x, tangent.y, tangent.z, 1f);
+
+				for (int i = offset, imax = mVerts.Count; i < imax; ++i)
+				{
+					mVerts[i] = t.TransformPoint(mVerts[i]);
+					mNorms.Add(normal);
+					mTans.Add(tan4);
+				}
+			}
+			else
+			{
+				for (int i = offset, imax = mVerts.Count; i < imax; ++i)
+				{
+					mVerts[i] = t.TransformPoint(mVerts[i]);
+				}
 			}
 		}
 
@@ -212,7 +233,7 @@ public class UIPanel : MonoBehaviour
 		{
 			// Rebuild the draw call's mesh
 			UIDrawCall dc = GetDrawCall(mat, true);
-			dc.Set(mVerts, mUvs, mCols);
+			dc.Set(mVerts, generateNormals ? mNorms : null, generateNormals ? mTans : null, mUvs, mCols);
 		}
 		else
 		{
@@ -228,6 +249,8 @@ public class UIPanel : MonoBehaviour
 
 		// Cleanup
 		mVerts.Clear();
+		mNorms.Clear();
+		mTans.Clear();
 		mUvs.Clear();
 		mCols.Clear();
 	}

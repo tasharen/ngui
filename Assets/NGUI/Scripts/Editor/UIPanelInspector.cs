@@ -17,6 +17,14 @@ public class UIPanelInspector : Editor
 
 		GUITools.DrawSeparator();
 
+		bool norms = EditorGUILayout.Toggle("Normals", panel.generateNormals);
+
+		if (panel.generateNormals != norms)
+		{
+			panel.generateNormals = norms;
+			EditorUtility.SetDirty(panel);
+		}
+
 		bool gizmos = EditorGUILayout.Toggle("Gizmos", panel.showGizmos);
 
 		if (panel.showGizmos != gizmos)
