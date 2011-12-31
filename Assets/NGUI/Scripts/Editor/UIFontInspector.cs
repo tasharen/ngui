@@ -10,6 +10,7 @@ public class UIFontInspector : Editor
 {
 	enum View
 	{
+		Nothing,
 		Atlas,
 		Font,
 	}
@@ -122,14 +123,17 @@ public class UIFontInspector : Editor
 						EditorUtility.SetDirty(font);
 					}
 
-					// Draw the atlas
-					EditorGUILayout.Separator();
-					Material m = mUseShader ? font.material : null;
-					Rect rect = (mView == View.Atlas) ? GUITools.DrawAtlas(tex, m) : GUITools.DrawSprite(tex, uvRect, m);
-					GUITools.DrawOutline(rect, uvRect, green);
+					if (mView != View.Nothing)
+					{
+						// Draw the atlas
+						EditorGUILayout.Separator();
+						Material m = mUseShader ? font.material : null;
+						Rect rect = (mView == View.Atlas) ? GUITools.DrawAtlas(tex, m) : GUITools.DrawSprite(tex, uvRect, m);
+						GUITools.DrawOutline(rect, uvRect, green);
 
-					rect = GUILayoutUtility.GetRect(Screen.width, 18f);
-					EditorGUI.DropShadowLabel(rect, "Font Size: " + font.size);
+						rect = GUILayoutUtility.GetRect(Screen.width, 18f);
+						EditorGUI.DropShadowLabel(rect, "Font Size: " + font.size);
+					}
 				}
 			}
 		}

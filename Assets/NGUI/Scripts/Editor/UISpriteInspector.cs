@@ -30,7 +30,7 @@ public class UISpriteInspector : UIWidgetInspector
 	/// Draw the atlas and sprite selection fields.
 	/// </summary>
 
-	override protected bool OnCustomStart ()
+	override protected bool OnDrawProperties ()
 	{
 		mSprite = mWidget as UISprite;
 		UIAtlas atlas = ComponentSelector.Draw<UIAtlas>(mSprite.atlas, OnSelectAtlas);
@@ -62,16 +62,24 @@ public class UISpriteInspector : UIWidgetInspector
 			// Draw the sprite selection popup
 			index = EditorGUILayout.Popup("Sprite", index, sprites.ToArray());
 			mAtlasSprite = mSprite.atlas.GetSprite(sprites[index]);
-			GUITools.DrawSeparator();
+			string sn = (mAtlasSprite != null) ? mAtlasSprite.name : "";
+
+			// If the sprite changes, update the widget
+			if (mSprite.spriteName != sn)
+			{
+				Undo.RegisterUndo(mSprite, "Sprite Change");
+				mSprite.spriteName = sn;
+				EditorUtility.SetDirty(mSprite.gameObject);
+			}
 		}
 		return true;
 	}
 
 	/// <summary>
-	/// Any and all derived functionality.
+	/// Draw the sprite texture.
 	/// </summary>
 
-	override protected void OnCustomEnd ()
+	override protected void OnDrawTexture ()
 	{
 		Texture2D tex = mSprite.mainTexture;
 
@@ -93,15 +101,5 @@ public class UISpriteInspector : UIWidgetInspector
 			rect = GUILayoutUtility.GetRect(Screen.width, 18f);
 			EditorGUI.DropShadowLabel(rect, text);
 		}
-	}
-
-	/// <summary>
-	/// Save the atlas and sprites.
-	/// </summary>
-
-	override protected void OnCustomSave ()
-	{
-		mSprite.atlas = mSprite.atlas;
-		mSprite.spriteName = (mAtlasSprite != null) ? mAtlasSprite.name : "";
 	}
 }

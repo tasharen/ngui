@@ -10,8 +10,10 @@ public class UIWidgetInspector : Editor
 {
 	protected UIWidget mWidget;
 	protected bool mRegisteredUndo = false;
+	protected bool mShowTexture = true;
 	protected bool mUseShader = false;
 
+	bool mInitialized = false;
 	bool mHierarchyCheck = true;
 
 	/// <summary>
@@ -35,6 +37,13 @@ public class UIWidgetInspector : Editor
 	{
 		EditorGUIUtility.LookLikeControls(80f);
 		mWidget = target as UIWidget;
+
+		if (!mInitialized)
+		{
+			mInitialized = true;
+			OnInit();
+		}
+
 		GUITools.DrawSeparator();
 
 		// Check the hierarchy to ensure that this widget is not parented to another widget
@@ -43,65 +52,100 @@ public class UIWidgetInspector : Editor
 		// This flag gets set to 'true' if RegisterUndo() gets called
 		mRegisteredUndo = false;
 
-		Color color = mWidget.color;
-		bool center = mWidget.centered;
-		int depth = mWidget.depth;
-
 		// Check to see if we can draw the widget's default properties to begin with
-		if (OnCustomStart())
+		if (OnDrawProperties())
 		{
-			// Depth navigation
-			GUILayout.BeginHorizontal();
-			{
-				EditorGUILayout.PrefixLabel("Depth");
-				if (GUILayout.Button("Back")) { RegisterUndo(); --depth; }
-				depth = EditorGUILayout.IntField(depth, GUILayout.Width(40f));
-				if (GUILayout.Button("Forward")) { RegisterUndo(); ++depth; }
-			}
-			GUILayout.EndHorizontal();
-
-			color = EditorGUILayout.ColorField("Color Tint", color);
-
-			GUILayout.BeginHorizontal();
-			{
-				center = EditorGUILayout.Toggle("Centered", center, GUILayout.Width(100f));
-
-				if (GUILayout.Button("Make Pixel-Perfect"))
-				{
-					Undo.RegisterUndo(mWidget.transform, "Make Pixel-Perfect");
-					mWidget.MakePixelPerfect();
-					EditorUtility.SetDirty(mWidget.transform);
-				}
-			}
-			GUILayout.EndHorizontal();
-
-			// Draw all derived functionality
-			if (GUI.changed) RegisterUndo();
-
-			if (mUseShader != EditorGUILayout.Toggle("Use Shader", mUseShader))
-			{
-				mUseShader = !mUseShader;
-
-				if (mUseShader)
-				{
-					// TODO: Remove this when Unity fixes the bug with DrawPreviewTexture not being affected by BeginGroup
-					Debug.LogWarning("There is a bug in Unity that prevents the texture from getting clipped properly.\n" +
-						"Until it's fixed by Unity, your texture may spill onto the rest of the Unity's GUI while using this mode.");
-				}
-			}
-
-			// Custom functionality
-			OnCustomEnd();
+			// Draw all common properties next
+			DrawCommonProperties();
 		}
 
 		// Update the widget's properties if something has changed
-		if (mRegisteredUndo)
+		if (mRegisteredUndo) mWidget.MarkAsChanged();
+	}
+
+	/// <summary>
+	/// All widgets have depth, color and make pixel-perfect options
+	/// </summary>
+
+	protected void DrawCommonProperties ()
+	{
+		GUITools.DrawSeparator();
+
+		// Depth navigation
+		GUILayout.BeginHorizontal();
 		{
+			EditorGUILayout.PrefixLabel("Depth");
+
+			int depth = mWidget.depth;
+			if (GUILayout.Button("Back")) --depth;
+			depth = EditorGUILayout.IntField(depth, GUILayout.Width(40f));
+			if (GUILayout.Button("Forward")) ++depth;
+
+			if (mWidget.depth != depth)
+			{
+				Undo.RegisterUndo(mWidget, "Depth Change");
+				mWidget.depth = depth;
+				EditorUtility.SetDirty(mWidget.gameObject);
+			}
+		}
+		GUILayout.EndHorizontal();
+
+		Color color = EditorGUILayout.ColorField("Color Tint", mWidget.color);
+
+		if (mWidget.color != color)
+		{
+			Undo.RegisterUndo(mWidget, "Color Change");
 			mWidget.color = color;
-			mWidget.centered = center;
-			mWidget.depth = depth;
-			OnCustomSave();
-			mWidget.MarkAsChanged();
+			EditorUtility.SetDirty(mWidget.gameObject);
+		}
+
+		GUILayout.BeginHorizontal();
+		{
+			//EditorGUIUtility.LookLikeControls(64f);
+			bool center = EditorGUILayout.Toggle("Centered", mWidget.centered, GUILayout.Width(96f));
+
+			if (center != mWidget.centered)
+			{
+				Undo.RegisterUndo(mWidget, "Center UITexture");
+				mWidget.centered = center;
+				EditorUtility.SetDirty(mWidget.gameObject);
+			}
+
+			if (GUILayout.Button("Make Pixel-Perfect"))
+			{
+				Undo.RegisterUndo(mWidget.transform, "Make Pixel-Perfect");
+				mWidget.MakePixelPerfect();
+				EditorUtility.SetDirty(mWidget.transform);
+			}
+			//EditorGUIUtility.LookLikeControls(80f);
+		}
+		GUILayout.EndHorizontal();
+
+		if (mWidget.mainTexture != null)
+		{
+			GUILayout.BeginHorizontal();
+			{
+				mShowTexture = EditorGUILayout.Toggle("Preview", mShowTexture, GUILayout.Width(100f));
+
+				if (mShowTexture)
+				{
+					if (mUseShader != EditorGUILayout.Toggle("Use Shader", mUseShader))
+					{
+						mUseShader = !mUseShader;
+
+						if (mUseShader)
+						{
+							// TODO: Remove this when Unity fixes the bug with DrawPreviewTexture not being affected by BeginGroup
+							Debug.LogWarning("There is a bug in Unity that prevents the texture from getting clipped properly.\n" +
+								"Until it's fixed by Unity, your texture may spill onto the rest of the Unity's GUI while using this mode.");
+						}
+					}
+				}
+			}
+			GUILayout.EndHorizontal();
+
+			// Draw the texture last
+			if (mShowTexture) OnDrawTexture();
 		}
 	}
 
@@ -142,7 +186,7 @@ public class UIWidgetInspector : Editor
 	/// Any and all derived functionality.
 	/// </summary>
 
-	protected virtual bool OnCustomStart () { return true; }
-	protected virtual void OnCustomEnd () { }
-	protected virtual void OnCustomSave () { }
+	protected virtual void OnInit() { }
+	protected virtual bool OnDrawProperties () { return true; }
+	protected virtual void OnDrawTexture () { }
 }

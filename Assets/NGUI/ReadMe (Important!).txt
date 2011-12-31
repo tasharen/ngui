@@ -38,6 +38,7 @@ Version History
 
 1.2
 - NEW: Added the ability to generate normals and tangents for all widgets via a flag on UIPanel.
+- NEW: Added a UITexture class that can be used to draw a texture without having to create an atlas.
 - NEW: Example 5: Lights and Refraction.
 - Moved all atlases into the Examples folder.
 

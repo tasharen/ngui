@@ -10,7 +10,6 @@ using System;
 public class UILabelInspector : UIWidgetInspector
 {
 	UILabel mLabel;
-	bool mShow = false;
 
 	/// <summary>
 	/// Font selection callback.
@@ -27,7 +26,9 @@ public class UILabelInspector : UIWidgetInspector
 		}
 	}
 
-	override protected bool OnCustomStart ()
+	override protected void OnInit () { mShowTexture = false; }
+
+	override protected bool OnDrawProperties ()
 	{
 		mLabel = mWidget as UILabel;
 		UIFont font = ComponentSelector.Draw<UIFont>(mLabel.font, OnSelectFont);
@@ -56,29 +57,22 @@ public class UILabelInspector : UIWidgetInspector
 			if (encoding != mLabel.supportEncoding) { RegisterUndo(); mLabel.supportEncoding = encoding; }
 		}
 		GUILayout.EndHorizontal();
-
-		GUITools.DrawSeparator();
 		return true;
 	}
 
-	override protected void OnCustomEnd ()
+	override protected void OnDrawTexture ()
 	{
 		Texture2D tex = mLabel.mainTexture;
 
 		if (tex != null)
 		{
-			mShow = EditorGUILayout.Toggle("Show Atlas", mShow, GUILayout.Width(110f));
+			// Draw the atlas
+			EditorGUILayout.Separator();
+			GUITools.DrawSprite(tex, mLabel.font.uvRect, mUseShader ? mLabel.font.material : null);
 
-			if (mShow)
-			{
-				// Draw the atlas
-				EditorGUILayout.Separator();
-				GUITools.DrawSprite(tex, mLabel.font.uvRect, mUseShader ? mLabel.font.material : null);
-
-				// Sprite size label
-				Rect rect = GUILayoutUtility.GetRect(Screen.width, 18f);
-				EditorGUI.DropShadowLabel(rect, "Font Size: " + mLabel.font.size);
-			}
+			// Sprite size label
+			Rect rect = GUILayoutUtility.GetRect(Screen.width, 18f);
+			EditorGUI.DropShadowLabel(rect, "Font Size: " + mLabel.font.size);
 		}
 	}
 }

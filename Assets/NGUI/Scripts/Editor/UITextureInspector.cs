@@ -9,7 +9,7 @@ using System.Collections.Generic;
 [CustomEditor(typeof(UITexture))]
 public class UITextureInspector : UIWidgetInspector
 {
-	override protected bool OnCustomStart ()
+	override protected bool OnDrawProperties ()
 	{
 		Material mat = EditorGUILayout.ObjectField("Material", mWidget.material, typeof(Material), false) as Material;
 
@@ -19,38 +19,22 @@ public class UITextureInspector : UIWidgetInspector
 			mWidget.material = mat;
 			EditorUtility.SetDirty(mWidget.gameObject);
 		}
+		return (mWidget.material != null);
+	}
 
-		if (mWidget.material != null)
+	override protected void OnDrawTexture ()
+	{
+		Texture2D tex = mWidget.mainTexture;
+
+		if (tex != null)
 		{
-			Color color = EditorGUILayout.ColorField("Color Tint", mWidget.color);
+			// Draw the atlas
+			EditorGUILayout.Separator();
+			GUITools.DrawSprite(tex, new Rect(0f, 0f, 1f, 1f), null);
 
-			if (mWidget.color != color)
-			{
-				Undo.RegisterUndo(mWidget, "Color Change");
-				mWidget.color = color;
-				EditorUtility.SetDirty(mWidget.gameObject);
-			}
-
-			GUILayout.BeginHorizontal();
-			{
-				bool center = EditorGUILayout.Toggle("Centered", mWidget.centered, GUILayout.Width(100f));
-
-				if (center != mWidget.centered)
-				{
-					Undo.RegisterUndo(mWidget, "Center UITexture");
-					mWidget.centered = center;
-					EditorUtility.SetDirty(mWidget.gameObject);
-				}
-
-				if (GUILayout.Button("Make Pixel-Perfect"))
-				{
-					Undo.RegisterUndo(mWidget.transform, "Make Pixel-Perfect");
-					mWidget.MakePixelPerfect();
-					EditorUtility.SetDirty(mWidget.transform);
-				}
-			}
-			GUILayout.EndHorizontal();
+			// Sprite size label
+			Rect rect = GUILayoutUtility.GetRect(Screen.width, 18f);
+			EditorGUI.DropShadowLabel(rect, "Texture Size: " + tex.width + "x" + tex.height);
 		}
-		return false;
 	}
 }
