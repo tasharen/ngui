@@ -18,12 +18,10 @@ public class UISpriteInspector : UIWidgetInspector
 
 	void OnSelectAtlas (MonoBehaviour obj)
 	{
-		mSprite.atlas = obj as UIAtlas;
-
 		if (mSprite != null)
 		{
 			Undo.RegisterUndo(mSprite, "Atlas Selection");
-			mSprite.atlas = mSprite.atlas;
+			mSprite.atlas = obj as UIAtlas;
 			EditorUtility.SetDirty(mSprite.gameObject);
 		}
 	}

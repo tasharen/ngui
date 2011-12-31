@@ -70,6 +70,7 @@ public class UIWidgetInspector : Editor
 				{
 					Undo.RegisterUndo(mWidget.transform, "Make Pixel-Perfect");
 					mWidget.MakePixelPerfect();
+					EditorUtility.SetDirty(mWidget.transform);
 				}
 			}
 			GUILayout.EndHorizontal();

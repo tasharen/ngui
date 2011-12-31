@@ -5,7 +5,6 @@ using UnityEngine;
 /// </summary>
 
 [AddComponentMenu("NGUI/Examples/Spin")]
-[RequireComponent(typeof(Rigidbody))]
 public class Spin : MonoBehaviour
 {
 	public Vector3 rotationsPerSecond = new Vector3(0f, 0.1f, 0f);

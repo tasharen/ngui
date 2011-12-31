@@ -211,7 +211,7 @@ public class UIPanel : MonoBehaviour
 			{
 				Vector3 normal = t.TransformDirection(Vector3.back);
 				Vector3 tangent = t.TransformDirection(Vector3.right);
-				Vector4 tan4 = new Vector4(tangent.x, tangent.y, tangent.z, 1f);
+				Vector4 tan4 = new Vector4(tangent.x, tangent.y, tangent.z, -1f);
 
 				for (int i = offset, imax = mVerts.Count; i < imax; ++i)
 				{

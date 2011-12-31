@@ -45,6 +45,15 @@ static public class NGUIMenu
 		}
 	}
 
+	[MenuItem("NGUI/Add Texture")]
+	static void AddTexture ()
+	{
+		if (PrefabCheck())
+		{
+			AddWidget<UITexture>();
+		}
+	}
+
 	[MenuItem("NGUI/Add Collider")]
 	static void AddCollider ()
 	{
