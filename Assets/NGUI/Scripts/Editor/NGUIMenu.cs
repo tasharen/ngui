@@ -45,7 +45,7 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Add Texture")]
+	[MenuItem("NGUI/Add Texture (no atlas)")]
 	static void AddTexture ()
 	{
 		if (PrefabCheck())
