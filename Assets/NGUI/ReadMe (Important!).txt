@@ -1,7 +1,7 @@
 ----------------------------------------
         NGUI: Next-Gen UI kit
  Copyright © 2011 Tasharen Entertainment
-             Version 1.12
+             Version 1.2
   http://www.tasharen.com/?page_id=140
         support@tasharen.com
 ----------------------------------------
@@ -35,6 +35,11 @@ All can be found here: http://www.tasharen.com/?page_id=140
 ---------------
 Version History
 ---------------
+
+1.2
+- NEW: Added the ability to generate normals and tangents for all widgets via a flag on UIPanel.
+- NEW: Example 5: Lights and Refraction.
+- Moved all atlases into the Examples folder.
 
 1.12
 - FIX: Unicode fonts should now get imported correctly.
