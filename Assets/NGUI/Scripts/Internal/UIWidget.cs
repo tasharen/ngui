@@ -307,21 +307,15 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			Color outline = new Color(1f, 1f, 1f, 0.2f);
 
-			Vector3 scale = cachedTransform.lossyScale;
+			Vector3 pos = Vector3.zero;
+			pos.z -= mDepth * cachedTransform.lossyScale.z * 10f;
+			if (!centered) pos += new Vector3(0.5f, -0.5f, 0f);
 
-			Vector3 offset = scale;
-			offset.x = 0f;
-			offset.y = 0f;
-			offset.z *= mDepth;
-
-			Vector3 pos = cachedTransform.position - cachedTransform.TransformDirection(offset);
-
-			if (!centered) pos += new Vector3(scale.x, -scale.y, scale.z) * 0.5f;
-
+			Gizmos.matrix = cachedTransform.localToWorldMatrix;
 			Gizmos.color = outline;
-			Gizmos.DrawWireCube(pos, scale);
+			Gizmos.DrawWireCube(pos, Vector3.one);
 			Gizmos.color = Color.clear;
-			Gizmos.DrawCube(pos, scale);
+			Gizmos.DrawCube(pos, Vector3.one);
 		}
 	}  
 
