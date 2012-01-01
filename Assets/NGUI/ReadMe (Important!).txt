@@ -1,7 +1,7 @@
 ----------------------------------------
         NGUI: Next-Gen UI kit
  Copyright © 2011 Tasharen Entertainment
-             Version 1.2
+             Version 1.20
   http://www.tasharen.com/?page_id=140
         support@tasharen.com
 ----------------------------------------
@@ -19,7 +19,7 @@ If you are importing examples, since Unity project settings don't seem to get in
 do either of the two steps in order to get some examples to work properly:
 
 1. If it's a clean project, simply extract the contents of the LibraryAssets.zip file
-   into the Library folder (Unity 3.4) or the ProjectSettings folder (unity 3.5+), overwriting what's there.
+   into the Library folder (Unity 3.4) or the ProjectSettings folder (Unity 3.5+), overwriting what's there.
 2. Alternatively, or if it's an existing project, add 2 new layers: "2D UI" and "3D UI", without quotes.
    Not sure how? Select any game object, top right has a drop-down called "Layer", and it's likely set to
    "Default". Expand it, click "Add Layer", and add the 2 layers by typing them in the User Layer 8 and 9 fields.
@@ -36,7 +36,7 @@ All can be found here: http://www.tasharen.com/?page_id=140
 Version History
 ---------------
 
-1.2
+1.20
 - NEW: Added the ability to generate normals and tangents for all widgets via a flag on UIPanel.
 - NEW: Added a UITexture class that can be used to draw a texture without having to create an atlas.
 - NEW: Example 5: Lights and Refraction.
