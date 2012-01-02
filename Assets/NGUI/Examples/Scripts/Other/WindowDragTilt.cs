@@ -9,7 +9,7 @@ using UnityEngine;
 public class WindowDragTilt : MonoBehaviour
 {
 	public float tiltAmount = 100f;
-	public bool smooth = true;
+	public bool smoothen = false;
 
 	Vector3 mLastPos;
 	Transform mTrans;
@@ -25,6 +25,6 @@ public class WindowDragTilt : MonoBehaviour
 		Vector3 delta = mTrans.position - mLastPos;
 		mLastPos = mTrans.position;
 		Quaternion targetRot = Quaternion.Euler(0f, 0f, -delta.x * tiltAmount);
-		mTrans.localRotation = smooth ? Quaternion.Slerp(mTrans.localRotation, targetRot, Time.deltaTime * 10f) : targetRot;
+		mTrans.localRotation = smoothen ? Quaternion.Slerp(mTrans.localRotation, targetRot, Time.deltaTime * 10f) : targetRot;
 	}
 }
