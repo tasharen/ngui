@@ -121,12 +121,6 @@ public class UISlicedSprite : UISprite
 			for (int i = 0; i < 4; ++i) uv[i] = Vector2.zero;
 		}
 
-		if (centered)
-		{
-			Vector2 offset = new Vector2(-0.5f, 0.5f);
-			for (int i = 0; i < 4; ++i) v[i] += offset;
-		}
-
 		for (int x = 0; x < 3; ++x)
 		{
 			int x2 = x + 1;

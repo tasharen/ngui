@@ -36,20 +36,10 @@ public class UITexture : UIWidget
 
 	override public void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
-		if (centered)
-		{
-			verts.Add(new Vector3( 0.5f,  0.5f, 0f));
-			verts.Add(new Vector3( 0.5f, -0.5f, 0f));
-			verts.Add(new Vector3(-0.5f, -0.5f, 0f));
-			verts.Add(new Vector3(-0.5f,  0.5f, 0f));
-		}
-		else
-		{
-			verts.Add(new Vector3(1f,  0f, 0f));
-			verts.Add(new Vector3(1f, -1f, 0f));
-			verts.Add(new Vector3(0f, -1f, 0f));
-			verts.Add(new Vector3(0f,  0f, 0f));
-		}
+		verts.Add(new Vector3(1f,  0f, 0f));
+		verts.Add(new Vector3(1f, -1f, 0f));
+		verts.Add(new Vector3(0f, -1f, 0f));
+		verts.Add(new Vector3(0f,  0f, 0f));
 
 		uvs.Add(Vector2.one);
 		uvs.Add(new Vector2(1f, 0f));

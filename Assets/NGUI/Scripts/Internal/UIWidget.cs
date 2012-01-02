@@ -7,10 +7,24 @@ using System.Collections.Generic;
 
 public abstract class UIWidget : MonoBehaviour
 {
+	public enum Pivot
+	{
+		TopLeft,
+		Top,
+		TopRight,
+		Left,
+		Center,
+		Right,
+		BottomLeft,
+		Bottom,
+		BottomRight,
+	}
+
 	// Cached and saved values
 	[SerializeField] Material mMat;
 	[SerializeField] Color mColor = Color.white;
-	[SerializeField] bool mCentered = true;
+	[SerializeField] Pivot mPivot = Pivot.Center;
+	[SerializeField] bool mCentered = true;			// DEPRECATED: no longer used (will be removed)
 	[SerializeField] int mDepth = 0;
 
 	Transform mTrans;
@@ -46,20 +60,20 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Whether the widget is centered or top-left aligned.
+	/// Set or get the value that specifies where the widget's pivot point should be.
 	/// </summary>
 
-	public bool centered
+	public Pivot pivot
 	{
 		get
 		{
-			return mCentered;
+			return mPivot;
 		}
 		set
 		{
-			if (mCentered != value)
+			if (mPivot != value)
 			{
-				mCentered = value;
+				mPivot = value;
 				mChanged = true;
 			}
 		}
@@ -163,6 +177,26 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Helper function that calculates the relative pivot offset based on the current pivot.
+	/// </summary>
+
+	public Vector2 pivotOffset
+	{
+		get
+		{
+			Vector2 v = Vector2.zero;
+
+			if (mPivot == Pivot.Top || mPivot == Pivot.Center || mPivot == Pivot.Bottom) v.x -= 0.5f;
+			else if (mPivot == Pivot.TopRight || mPivot == Pivot.Right || mPivot == Pivot.BottomRight) v.x -= 1f;
+
+			if (mPivot == Pivot.Left || mPivot == Pivot.Center || mPivot == Pivot.Right) v.y += 0.5f;
+			else if (mPivot == Pivot.BottomLeft || mPivot == Pivot.Bottom || mPivot == Pivot.BottomRight) v.y += 1f;
+
+			return v;
+		}
+	}
+
+	/// <summary>
 	/// Static widget comparison function used for Z-sorting.
 	/// </summary>
 
@@ -234,6 +268,8 @@ public abstract class UIWidget : MonoBehaviour
 
 	void Start ()
 	{
+		// DEPRECATED: Support for loading older scenes before Pivot was introduced (will be removed)
+		if (!mCentered) { mCentered = true; mPivot = Pivot.TopLeft; }
 		mStarted = true;
 		if (mDepth == 0) mDepth = CalculateDepth();
 		if (mMat != null) panel.AddWidget(this);
@@ -248,6 +284,8 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnEnable ()
 	{
+		// DEPRECATED: Support for loading older scenes before Pivot was introduced (will be removed)
+		if (!mCentered) { mCentered = true; mPivot = Pivot.TopLeft; }
 		mChanged = true;
 		if (mTrans == null) mTrans = transform;
 		if (mMat != null)
@@ -312,21 +350,24 @@ public abstract class UIWidget : MonoBehaviour
 			Matrix4x4 mat = (parent != null) ? parent.localToWorldMatrix : Matrix4x4.identity;
 
 			// Local matrix
-			Matrix4x4 local = Matrix4x4.TRS(cachedTransform.localPosition, cachedTransform.localRotation, gizmoScale);
+			Matrix4x4 local = Matrix4x4.TRS(cachedTransform.localPosition, cachedTransform.localRotation, cachedTransform.localScale);
 
 			// Position should be offset by depth so selection works properly
 			Vector3 pos = Vector3.zero;
 			pos.z -= mDepth * cachedTransform.lossyScale.z * 50f;
 
-			// Centered widget? Offset the position of the gizmo
-			if (!centered) pos += new Vector3(0.5f, -0.5f, 0f);
+			// Widget's local size
+			Vector2 size = visibleSize;
+			Vector2 offset = pivotOffset;
+			pos.x += (offset.x + 0.5f) * size.x;
+			pos.y += (offset.y - 0.5f) * size.y;
 
 			// Draw the gizmo
 			Gizmos.matrix = mat * local;
 			Gizmos.color = outline;
-			Gizmos.DrawWireCube(pos, Vector3.one);
+			Gizmos.DrawWireCube(pos, size);
 			Gizmos.color = Color.clear;
-			Gizmos.DrawCube(pos, Vector3.one);
+			Gizmos.DrawCube(pos, size);
 		}
 	}
 
@@ -369,18 +410,6 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Local scale of the widget for gizmos. Mainly for labels since they can have an arbitrary visual size.
-	/// </summary>
-
-	virtual protected Vector3 gizmoScale
-	{
-		get
-		{
-			return cachedTransform.localScale;
-		}
-	}
-
-	/// <summary>
 	/// Make the widget pixel-perfect.
 	/// </summary>
 
@@ -398,6 +427,12 @@ public abstract class UIWidget : MonoBehaviour
 		scale.z = 1f;
 		cachedTransform.localScale = scale;
 	}
+
+	/// <summary>
+	/// Visible size of the widget in local coordinates. In most cases this can remain at (1, 1).
+	/// </summary>
+
+	virtual public Vector2 visibleSize { get { return Vector2.one; } }
 
 	/// <summary>
 	/// Virtual Start() functionality for widgets.

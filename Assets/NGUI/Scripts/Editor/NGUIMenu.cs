@@ -82,24 +82,13 @@ static public class NGUIMenu
 
 			foreach (UIWidget w in widgets)
 			{
-				// Only sprites can be estimated for now
-				if (w is UISprite)
-				{
-					if (w.centered)
-					{
-						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(-0.5f, -0.5f, 0f))));
-						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(-0.5f,  0.5f, 0f))));
-						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3( 0.5f, -0.5f, 0f))));
-						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3( 0.5f,  0.5f, 0f))));
-					}
-					else
-					{
-						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(0f,  0f, 0f))));
-						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(0f, -1f, 0f))));
-						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(1f,  0f, 0f))));
-						b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(1f, -1f, 0f))));
-					}
-				}
+				Vector2 v0 = w.pivotOffset;
+				Vector2 v1 = w.pivotOffset + w.visibleSize;
+
+				b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(v0.x, v0.y, 0f))));
+				b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(v0.x, v1.y, 0f))));
+				b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(v1.x, v0.y, 0f))));
+				b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(v1.x, v1.y, 0f))));
 			}
 
 			box.isTrigger = true;

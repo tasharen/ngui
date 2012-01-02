@@ -189,20 +189,10 @@ public class UISprite : UIWidget
 		Vector2 uv0 = new Vector2(mOuterUV.xMin, mOuterUV.yMin);
 		Vector2 uv1 = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
 
-		if (centered)
-		{
-			verts.Add(new Vector3( 0.5f,  0.5f, 0f));
-			verts.Add(new Vector3( 0.5f, -0.5f, 0f));
-			verts.Add(new Vector3(-0.5f, -0.5f, 0f));
-			verts.Add(new Vector3(-0.5f,  0.5f, 0f));
-		}
-		else
-		{
-			verts.Add(new Vector3(1f,  0f, 0f));
-			verts.Add(new Vector3(1f, -1f, 0f));
-			verts.Add(new Vector3(0f, -1f, 0f));
-			verts.Add(new Vector3(0f,  0f, 0f));
-		}
+		verts.Add(new Vector3(1f,  0f, 0f));
+		verts.Add(new Vector3(1f, -1f, 0f));
+		verts.Add(new Vector3(0f, -1f, 0f));
+		verts.Add(new Vector3(0f,  0f, 0f));
 
 		uvs.Add(uv1);
 		uvs.Add(new Vector2(uv1.x, uv0.y));

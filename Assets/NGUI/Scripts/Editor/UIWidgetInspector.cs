@@ -101,15 +101,7 @@ public class UIWidgetInspector : Editor
 
 		GUILayout.BeginHorizontal();
 		{
-			//EditorGUIUtility.LookLikeControls(64f);
-			bool center = EditorGUILayout.Toggle("Centered", mWidget.centered, GUILayout.Width(96f));
-
-			if (center != mWidget.centered)
-			{
-				Undo.RegisterUndo(mWidget, "Center UITexture");
-				mWidget.centered = center;
-				EditorUtility.SetDirty(mWidget.gameObject);
-			}
+			EditorGUILayout.PrefixLabel("Correction");
 
 			if (GUILayout.Button("Make Pixel-Perfect"))
 			{
@@ -117,9 +109,17 @@ public class UIWidgetInspector : Editor
 				mWidget.MakePixelPerfect();
 				EditorUtility.SetDirty(mWidget.transform);
 			}
-			//EditorGUIUtility.LookLikeControls(80f);
 		}
 		GUILayout.EndHorizontal();
+
+		UIWidget.Pivot pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", mWidget.pivot);
+
+		if (mWidget.pivot != pivot)
+		{
+			Undo.RegisterUndo(mWidget, "Pivot Change");
+			mWidget.pivot = pivot;
+			EditorUtility.SetDirty(mWidget.gameObject);
+		}
 
 		if (mWidget.mainTexture != null)
 		{

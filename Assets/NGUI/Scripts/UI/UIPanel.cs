@@ -199,10 +199,15 @@ public class UIPanel : MonoBehaviour
 		{
 			if (w.material != mat || w.color.a < 0.001f) continue;
 			if (!w.enabled || !w.gameObject.active) continue;
-			int offset = mVerts.Count;
+			int index = mVerts.Count;
 
 			// Fill the geometry
 			w.OnFill(mVerts, mUvs, mCols);
+
+			Vector3 offset = w.pivotOffset;
+			Vector2 scale = w.visibleSize;
+			offset.x *= scale.x;
+			offset.y *= scale.y;
 
 			// Transform all vertices into world space
 			Transform t = w.cachedTransform;
@@ -213,18 +218,18 @@ public class UIPanel : MonoBehaviour
 				Vector3 tangent = t.TransformDirection(Vector3.right);
 				Vector4 tan4 = new Vector4(tangent.x, tangent.y, tangent.z, -1f);
 
-				for (int i = offset, imax = mVerts.Count; i < imax; ++i)
+				for (int i = index, imax = mVerts.Count; i < imax; ++i)
 				{
-					mVerts[i] = t.TransformPoint(mVerts[i]);
+					mVerts[i] = t.TransformPoint(mVerts[i] + offset);
 					mNorms.Add(normal);
 					mTans.Add(tan4);
 				}
 			}
 			else
 			{
-				for (int i = offset, imax = mVerts.Count; i < imax; ++i)
+				for (int i = index, imax = mVerts.Count; i < imax; ++i)
 				{
-					mVerts[i] = t.TransformPoint(mVerts[i]);
+					mVerts[i] = t.TransformPoint(mVerts[i] + offset);
 				}
 			}
 		}

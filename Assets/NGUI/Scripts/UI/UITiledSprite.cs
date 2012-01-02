@@ -65,8 +65,6 @@ public class UITiledSprite : UISprite
 
 		float y = 0f;
 
-		int start = verts.Count;
-
 		while (y < 1f)
 		{
 			float x = 0f;
@@ -108,17 +106,6 @@ public class UITiledSprite : UISprite
 				x += width;
 			}
 			y += height;
-		}
-
-		if (centered)
-		{
-			for (int i = start, imax = verts.Count; i < imax; ++i)
-			{
-				Vector3 v = verts[i];
-				v.x -= 0.5f;
-				v.y += 0.5f;
-				verts[i] = v;
-			}
 		}
 	}
 }
