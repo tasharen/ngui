@@ -21,6 +21,18 @@ public class BMFont
 	public int glyphCount	{ get { return mGlyphs == null ? 0 : mGlyphs.Length; } }
 
 	/// <summary>
+	/// Helper function that calculates the ideal size of the array given an index.
+	/// </summary>
+
+	int GetArraySize (int index)
+	{
+		if (index < 256) return 256;
+		if (index < 65536) return 65536;
+		if (index < 262144) return 262144;
+		return 0;
+	}
+
+	/// <summary>
 	/// Helper function that retrieves the specified glyph, creating it if necessary.
 	/// </summary>
 
@@ -30,15 +42,19 @@ public class BMFont
 		if (mGlyphs == null)
 		{
 			if (!createIfMissing) return null;
-			mGlyphs = new BMGlyph[256];
+			int size = GetArraySize(index);
+			if (size == 0) return null;
+			mGlyphs = new BMGlyph[size];
 		}
 
 		// If necessary, upgrade to a unicode character set
 		if (index >= mGlyphs.Length)
 		{
-			if (!createIfMissing || index > 65535) return null;
-			BMGlyph[] glyphs = new BMGlyph[65535];
-			for (int i = 0; i < 256; ++i) glyphs[i] = mGlyphs[i];
+			if (!createIfMissing) return null;
+			int size = GetArraySize(index);
+			if (size == 0) return null;
+			BMGlyph[] glyphs = new BMGlyph[size];
+			for (int i = 0; i < mGlyphs.Length; ++i) glyphs[i] = mGlyphs[i];
 			mGlyphs = glyphs;
 		}
 
