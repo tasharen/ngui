@@ -38,6 +38,7 @@ Version History
 
 1.22
 - NEW: Example 6: Draggable Window
+- FIX: UISlider will now function properly for arbitrarily scaled objects.
 
 1.21
 - FIX: Gizmos are now rotated properly, matching the widget's rotation.

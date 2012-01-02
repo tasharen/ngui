@@ -104,7 +104,7 @@ static public class NGUIMenu
 
 			box.isTrigger = true;
 			box.center = b.center;
-			box.size = b.size;
+			box.size = b.size; // Need 3D colliders? Try this: new Vector3(b.size.x, b.size.y, Mathf.Max(1f, b.size.z));
 		}
 	}
 
