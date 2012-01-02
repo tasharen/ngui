@@ -9,6 +9,8 @@ public class UICheckbox : UISend
 {
 	public bool startsChecked = true;
 
+	public MonoBehaviour[] controlledComponents;
+
 	bool mChecked = true;
 
 	public bool isChecked
@@ -23,6 +25,7 @@ public class UICheckbox : UISend
 			{
 				mChecked = value;
 				Send(mChecked ? 1 : 0);
+				UpdateComponents();
 			}
 		}
 	}
@@ -31,7 +34,19 @@ public class UICheckbox : UISend
 	{
 		mChecked = startsChecked;
 		Send(mChecked ? 1 : 0);
+		UpdateComponents();
 	}
 
 	void OnClick () { isChecked = !isChecked; }
+
+	void UpdateComponents ()
+	{
+		if (controlledComponents != null)
+		{
+			foreach (MonoBehaviour mb in controlledComponents)
+			{
+				mb.enabled = mChecked;
+			}
+		}
+	}
 }

@@ -43,11 +43,23 @@ public class UICamera : MonoBehaviour
 	public float tooltipDelay = 1f;
 
 	/// <summary>
+	/// Last camera active prior to sending out the event. This will always be the camera that actually sent out the event.
+	/// </summary>
+
+	static public Camera lastCamera;
+
+	/// <summary>
 	/// Last raycast hit prior to sending out the event. This is useful if you want detailed information
 	/// about what was actually hit in your OnClick, OnHover, and other event functions.
 	/// </summary>
 	
 	static public RaycastHit lastHit;
+
+	/// <summary>
+	/// Last mouse or touch position prior to sending out the event in screen coordinates.
+	/// </summary>
+
+	static public Vector3 lastTouchPosition;
 
 	// List of all active cameras in the scene
 	static List<UICamera> mList = new List<UICamera>();
@@ -246,6 +258,8 @@ public class UICamera : MonoBehaviour
 		// Only the first UI layer should be processing events
 		if (!Application.isPlaying || !handlesEvents) return;
 
+		lastCamera = mCam;
+
 		if (mUseTouchInput)
 		{
 			if (Input.touchCount > 0)
@@ -259,6 +273,7 @@ public class UICamera : MonoBehaviour
 
 					touch.pos = input.position;
 					touch.delta = input.deltaPosition;
+					lastTouchPosition = touch.pos;
 
 					// Update the object under this touch
 					if (pressed || unpressed)
@@ -281,6 +296,7 @@ public class UICamera : MonoBehaviour
 
 			Vector3 pos = Input.mousePosition;
 			mMouse.delta = pos - mMouse.pos;
+			lastTouchPosition = pos;
 
 			if (mMouse.pos != pos)
 			{

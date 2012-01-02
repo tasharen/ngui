@@ -111,7 +111,7 @@ public class UIFont : MonoBehaviour
 		bool addNewLine = false;
 
 		// Break the text into lines
-		string[] lines = text.Split(new char[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] lines = text.Split(new char[] { '\n' });
 
 		// Run through each line
 		foreach (string line in lines)

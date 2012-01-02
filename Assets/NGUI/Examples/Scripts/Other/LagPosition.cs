@@ -7,17 +7,21 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Examples/Lag Position")]
 public class LagPosition : MonoBehaviour
 {
-	public int level = 0;
 	public Vector3 speed = new Vector3(10f, 10f, 10f);
 	
 	Transform mTrans;
 	Vector3 mRelative;
 	Vector3 mAbsolute;
-	
-	void Start()
+
+	void Start ()
 	{
 		mTrans = transform;
 		mRelative = mTrans.localPosition;
+	}
+
+	void OnEnable()
+	{
+		mTrans = transform;
 		mAbsolute = mTrans.position;
 	}
 	

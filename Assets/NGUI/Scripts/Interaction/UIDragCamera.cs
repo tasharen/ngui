@@ -1,24 +1,49 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Allows dragging of the camera and restricts camera's movement within bounds of the area created by colliders.
+/// Allows dragging of the camera object and restricts camera's movement to be within bounds of the area created by the rootForBounds colliders.
 /// </summary>
 
-[AddComponentMenu("NGUI/Examples/Drag")]
-public class UIDrag : MonoBehaviour
+[AddComponentMenu("NGUI/Interaction/Drag Camera")]
+public class UIDragCamera : MonoBehaviour
 {
+	/// <summary>
+	/// Target object that will be dragged.
+	/// </summary>
+
 	public Transform target;
+
+	/// <summary>
+	/// Root object that will be used for drag-limiting bounds.
+	/// </summary>
+
 	public Transform rootForBounds;
+
+	/// <summary>
+	/// Scale value applied to the drag delta. Set X or Y to 0 to disallow dragging in that direction.
+	/// </summary>
+
 	public Vector2 scale = Vector2.one;
+
+	/// <summary>
+	/// Drag event receiver.
+	/// </summary>
 
 	void OnDrag (Vector2 delta)
 	{
 		if (target != null)
 		{
+			// Adjust the position
 			target.position += new Vector3(delta.x * scale.x, delta.y * scale.y, 0f);
-			UpdateTargetPosition();
+
+			// Limit the movement to be within the target's bounds
+			if (rootForBounds != null) UpdateTargetPosition();
 		}
 	}
+
+	/// <summary>
+	/// Update the target's position, limiting it to be within the root's bounds.
+	/// </summary>
 
 	public void UpdateTargetPosition ()
 	{
