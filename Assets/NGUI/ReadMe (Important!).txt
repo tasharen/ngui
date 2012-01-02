@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.20
+                Version 1.21
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -35,6 +35,10 @@ All can be found here: http://www.tasharen.com/?page_id=140
 ---------------
 Version History
 ---------------
+
+1.21
+- FIX: Gizmos are now rotated properly, matching the widget's rotation.
+- FIX: Labels now have gizmos properly scaled to envelop their entire content.
 
 1.20
 - NEW: Added the ability to generate normals and tangents for all widgets via a flag on UIPanel.

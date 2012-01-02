@@ -307,17 +307,28 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			Color outline = new Color(1f, 1f, 1f, 0.2f);
 
+			// Parent matrix
+			Transform parent = cachedTransform.parent;
+			Matrix4x4 mat = (parent != null) ? parent.localToWorldMatrix : Matrix4x4.identity;
+
+			// Local matrix
+			Matrix4x4 local = Matrix4x4.TRS(cachedTransform.localPosition, cachedTransform.localRotation, gizmoScale);
+
+			// Position should be offset by depth so selection works properly
 			Vector3 pos = Vector3.zero;
-			pos.z -= mDepth * cachedTransform.lossyScale.z * 10f;
+			pos.z -= mDepth * cachedTransform.lossyScale.z * 50f;
+
+			// Centered widget? Offset the position of the gizmo
 			if (!centered) pos += new Vector3(0.5f, -0.5f, 0f);
 
-			Gizmos.matrix = cachedTransform.localToWorldMatrix;
+			// Draw the gizmo
+			Gizmos.matrix = mat * local;
 			Gizmos.color = outline;
 			Gizmos.DrawWireCube(pos, Vector3.one);
 			Gizmos.color = Color.clear;
 			Gizmos.DrawCube(pos, Vector3.one);
 		}
-	}  
+	}
 
 	/// <summary>
 	/// Update the widget.
@@ -355,6 +366,18 @@ public abstract class UIWidget : MonoBehaviour
 		}
 		mChanged = false;
 		return retVal;
+	}
+
+	/// <summary>
+	/// Local scale of the widget for gizmos. Mainly for labels since they can have an arbitrary visual size.
+	/// </summary>
+
+	virtual protected Vector3 gizmoScale
+	{
+		get
+		{
+			return cachedTransform.localScale;
+		}
 	}
 
 	/// <summary>

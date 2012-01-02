@@ -207,6 +207,26 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Local scale of the widget for gizmos.
+	/// </summary>
+
+	override protected Vector3 gizmoScale
+	{
+		get
+		{
+			Vector3 scale = cachedTransform.localScale;
+
+			if (mFont != null)
+			{
+				Vector2 size = mFont.CalculatePrintedSize(mProcessedText, mEncoding);
+				scale.x *= size.x;
+				scale.y *= size.y;
+			}
+			return scale;
+		}
+	}
+
+	/// <summary>
 	/// Text is pixel-perfect when its scale matches the size.
 	/// </summary>
 
@@ -258,22 +278,9 @@ public class UILabel : UIWidget
 		// If the label should be centered, we need to figure out where the center would be
 		if (centered && verts.Count > start)
 		{
-			float minX = verts[start].x;
-			float maxX = minX;
-			float minY = verts[start].y;
-			float maxY = minY;
-
-			for (int i = start + 1, imax = verts.Count; i < imax; ++i)
-			{
-				Vector3 v = verts[i];
-				if (v.x < minX) minX = v.x;
-				if (v.x > maxX) maxX = v.x;
-				if (v.y < minY) minY = v.y;
-				if (v.y > maxY) maxY = v.y;
-			}
-
-			float offsetX = (maxX - minX) * 0.5f;
-			float offsetY = (maxY - minY) * 0.5f;
+			Vector2 size = mFont.CalculatePrintedSize(mProcessedText, mEncoding);
+			float offsetX = size.x * 0.5f;
+			float offsetY = size.y * 0.5f;
 
 			for (int i = start, imax = verts.Count; i < imax; ++i)
 			{

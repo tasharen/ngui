@@ -212,24 +212,27 @@ static public class NGUITools
 
 	static public string StripSymbols (string text)
 	{
-		text = text.Replace("\\n", "\n");
-
-		for (int i = 0, imax = text.Length; i < imax; )
+		if (text != null)
 		{
-			char c = text[i];
+			text = text.Replace("\\n", "\n");
 
-			if (c == '[')
+			for (int i = 0, imax = text.Length; i < imax; )
 			{
-				int retVal = ParseSymbol(text, i, null);
+				char c = text[i];
 
-				if (retVal > 0)
+				if (c == '[')
 				{
-					text = text.Remove(i, retVal);
-					imax = text.Length;
-					continue;
+					int retVal = ParseSymbol(text, i, null);
+
+					if (retVal > 0)
+					{
+						text = text.Remove(i, retVal);
+						imax = text.Length;
+						continue;
+					}
 				}
+				++i;
 			}
-			++i;
 		}
 		return text;
 	}

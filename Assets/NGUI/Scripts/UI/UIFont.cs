@@ -162,7 +162,7 @@ public class UIFont : MonoBehaviour
 	{
 		Vector2 v = Vector2.zero;
 
-		if (mFont != null && mFont.isValid)
+		if (mFont != null && mFont.isValid && !string.IsNullOrEmpty(text))
 		{
 			if (encoding) text = NGUITools.StripSymbols(text);
 
