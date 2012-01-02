@@ -291,6 +291,9 @@ public class UICamera : MonoBehaviour
 		}
 		else
 		{
+			// We still want to update what's under the mouse even if the game is paused
+			if (Time.timeScale == 0f) mMouse.current = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : null;
+
 			bool pressed = Input.GetMouseButtonDown(0);
 			bool unpressed = Input.GetMouseButtonUp(0);
 
