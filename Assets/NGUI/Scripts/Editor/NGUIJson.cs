@@ -102,10 +102,19 @@ public class NGUIJson
 			atlas.sprites.Add(newSprite);
 		}
 
+		// Sort imported sprites alphabetically
+		atlas.sprites.Sort(CompareSprites);
+
 		// Unload the asset
 		asset = null;
 		Resources.UnloadUnusedAssets();
 	}
+
+	/// <summary>
+	/// Sprite comparison function for sorting.
+	/// </summary>
+
+	static int CompareSprites (UIAtlas.Sprite a, UIAtlas.Sprite b) { return a.name.CompareTo(b.name); }
 
 	/// <summary>
 	/// Copy the inner rectangle from one sprite to another.
