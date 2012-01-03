@@ -117,6 +117,7 @@ public class UIAtlas : MonoBehaviour
 	{
 		List<string> list = new List<string>();
 		foreach (Sprite s in sprites) if (s != null && !string.IsNullOrEmpty(s.name)) list.Add(s.name);
+		list.Sort();
 		return list;
 	}
 }
