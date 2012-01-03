@@ -22,14 +22,14 @@ Shader "Transparent/Refractive"
 
 		SubShader
 		{
-			LOD 400
+			LOD 500
 
 			GrabPass
 			{
 				Name "BASE"
 				Tags { "LightMode" = "Always" }
 			}
-		   
+
 			Cull Off
 			ZWrite Off
 			ZTest LEqual
@@ -126,7 +126,7 @@ Shader "Transparent/Refractive"
 		
 		SubShader
 		{
-			LOD 300
+			LOD 400
 
 			Cull Off
 			ZWrite Off
@@ -196,7 +196,48 @@ Shader "Transparent/Refractive"
 				c.a = s.Alpha;
 				return c;
 			}
+			ENDCG
+		}
+		
+		SubShader
+		{
+			LOD 300
 
+			Cull Off
+			ZWrite Off
+			ZTest LEqual
+			Blend SrcAlpha OneMinusSrcAlpha
+			AlphaTest Greater 0
+
+			CGPROGRAM
+			#pragma surface surf BlinnPhong alpha
+			#include "UnityCG.cginc"
+
+			sampler2D _MainTex;
+			sampler2D _Mask;
+
+			float4 _Color;
+
+			struct Input
+			{
+				float4 position : POSITION;
+				float2 uv_MainTex : TEXCOORD0;
+				float4 color : COLOR;
+			};
+
+			void surf (Input IN, inout SurfaceOutput o)
+			{
+				half4 tex	= tex2D(_MainTex, IN.uv_MainTex);
+				half3 mask	= tex2D(_Mask, IN.uv_MainTex);
+
+				half4 col;
+				col.rgb = IN.color.rgb * tex.rgb;
+				col.rgb = lerp(col.rgb, _Color.rgb, mask.b * 0.5);
+				col.a = IN.color.a * _Color.a * tex.a;
+
+				o.Albedo = col.rgb;
+				o.Alpha = col.a;
+			}
 			ENDCG
 		}
 		

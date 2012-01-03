@@ -15,15 +15,15 @@ TextureImporter:
     border: 0
     filter: 0
     fadeout: 0
-    fadeoutStart: 1
-    fadeoutEnd: 3
+    fadeoutStart: 0
+    fadeoutEnd: 0
   bumpmap:
     generation: 0
     external: 1
-    bumpyness: 0.25
+    bumpyness: 0
     filter: 0
   textureSettings:
-    filterMode: -1
-    anisoLevel: -1
-    mipmapBias: -1
-    wrapMode: -1
+    filterMode: 1
+    anisoLevel: 0
+    mipmapBias: 0
+    wrapMode: 0
