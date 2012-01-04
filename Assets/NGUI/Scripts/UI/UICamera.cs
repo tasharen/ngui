@@ -76,7 +76,8 @@ public class UICamera : MonoBehaviour
 	// Tooltip widget (mouse only)
 	GameObject mTooltip = null;
 
-	bool mUseTouchInput = false;
+	// Mouse input is turned off on iOS
+	bool mUseMouseInput = true;
 	Camera mCam = null;
 	LayerMask mLayerMask;
 	float mTooltipTime = 0f;
@@ -217,11 +218,11 @@ public class UICamera : MonoBehaviour
 
 	void Start ()
 	{
-		// We should be using touch-based input on Android and iOS-based devices.
-		mUseTouchInput = Application.platform == RuntimePlatform.Android ||
-						 Application.platform == RuntimePlatform.IPhonePlayer;
+		// We should be using only touch-based input on Android and iOS-based devices.
+		mUseMouseInput = Application.platform != RuntimePlatform.Android &&
+						 Application.platform != RuntimePlatform.IPhonePlayer;
 
-		if (!mUseTouchInput) mMouse.pos = Input.mousePosition;
+		if (mUseMouseInput) mMouse.pos = Input.mousePosition;
 
 		// Add this camera to the list
 		mList.Add(this);
@@ -243,7 +244,7 @@ public class UICamera : MonoBehaviour
 
 	void FixedUpdate ()
 	{
-		if (Application.isPlaying && !mUseTouchInput && handlesEvents)
+		if (Application.isPlaying && mUseMouseInput && handlesEvents)
 		{
 			mMouse.current = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : null;
 		}
@@ -260,36 +261,7 @@ public class UICamera : MonoBehaviour
 
 		lastCamera = mCam;
 
-		if (mUseTouchInput)
-		{
-			if (Input.touchCount > 0)
-			{
-				foreach (Touch input in Input.touches)
-				{
-					MouseOrTouch touch = GetTouch(input.fingerId);
-
-					bool pressed = (input.phase == TouchPhase.Began);
-					bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
-
-					touch.pos = input.position;
-					touch.delta = input.deltaPosition;
-					lastTouchPosition = touch.pos;
-
-					// Update the object under this touch
-					if (pressed || unpressed)
-					{
-						touch.current = Raycast(input.position, ref lastHit) ? lastHit.collider.gameObject : null;
-					}
-
-					// Process the events from this touch
-					ProcessTouch(touch, pressed, unpressed);
-
-					// If the touch has ended, remove it from the list
-					if (unpressed) RemoveTouch(input.fingerId);
-				}
-			}
-		}
-		else
+		if (mUseMouseInput)
 		{
 			// We still want to update what's under the mouse even if the game is paused
 			if (Time.timeScale == 0f) mMouse.current = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : null;
@@ -312,6 +284,34 @@ public class UICamera : MonoBehaviour
 			ProcessTouch(mMouse, pressed, unpressed);
 		}
 
+		// Process touch input
+		if (Input.touchCount > 0)
+		{
+			foreach (Touch input in Input.touches)
+			{
+				MouseOrTouch touch = GetTouch(input.fingerId);
+
+				bool pressed = (input.phase == TouchPhase.Began);
+				bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
+
+				touch.pos = input.position;
+				touch.delta = input.deltaPosition;
+				lastTouchPosition = touch.pos;
+
+				// Update the object under this touch
+				if (pressed || unpressed)
+				{
+					touch.current = Raycast(input.position, ref lastHit) ? lastHit.collider.gameObject : null;
+				}
+
+				// Process the events from this touch
+				ProcessTouch(touch, pressed, unpressed);
+
+				// If the touch has ended, remove it from the list
+				if (unpressed) RemoveTouch(input.fingerId);
+			}
+		}
+
 		// Forward the input to the selected object
 		if (mSel != null)
 		{
@@ -328,7 +328,7 @@ public class UICamera : MonoBehaviour
 		}
 
 		// If it's time to show a tooltip, inform the object we're hovering over
-		if (!mUseTouchInput && mMouse.hover != null && mTooltipTime != 0f && mTooltipTime < Time.time)
+		if (mUseMouseInput && mMouse.hover != null && mTooltipTime != 0f && mTooltipTime < Time.time)
 		{
 			mTooltip = mMouse.hover;
 			ShowTooltip(true);
@@ -342,7 +342,7 @@ public class UICamera : MonoBehaviour
 	void ProcessTouch (MouseOrTouch touch, bool pressed, bool unpressed)
 	{
 		// If we're using the mouse for input, we should send out a hover(false) message first
-		if (!mUseTouchInput && touch.pressed == null && touch.hover != touch.current && touch.hover != null)
+		if (mUseMouseInput && touch.pressed == null && touch.hover != touch.current && touch.hover != null)
 		{
 			if (mTooltip != null) ShowTooltip(false);
 			touch.hover.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
@@ -355,7 +355,7 @@ public class UICamera : MonoBehaviour
 			touch.totalDelta += touch.delta;
 			touch.pressed.SendMessage("OnDrag", touch.delta, SendMessageOptions.DontRequireReceiver);
 
-			float threshold = mUseTouchInput ? 30f : 5f;
+			float threshold = (touch == mMouse) ? 5f : 30f;
 			if (touch.totalDelta.magnitude > threshold) touch.considerForClick = false;
 		}
 
@@ -399,7 +399,7 @@ public class UICamera : MonoBehaviour
 					if (touch.current != null) touch.current.SendMessage("OnDrop", touch.pressed, SendMessageOptions.DontRequireReceiver);
 
 					// If we're using mouse-based input, send a hover notification
-					if (!mUseTouchInput) touch.pressed.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
+					if (mUseMouseInput) touch.pressed.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
 				}
 			}
 			touch.pressed = null;
@@ -407,7 +407,7 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Send out a hover(true) message last
-		if (!mUseTouchInput && touch.pressed == null && touch.hover != touch.current)
+		if (mUseMouseInput && touch.pressed == null && touch.hover != touch.current)
 		{
 			mTooltipTime = Time.time + tooltipDelay;
 			touch.hover = touch.current;
