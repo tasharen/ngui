@@ -14,7 +14,7 @@ static public class NGUIMenu
 	{
 		if (PrefabCheck())
 		{
-			AddWidget<UILabel>();
+			AddWidget<UILabel>().SetToLastValues();
 		}
 	}
 
@@ -23,7 +23,7 @@ static public class NGUIMenu
 	{
 		if (PrefabCheck())
 		{
-			AddWidget<UISprite>();
+			AddWidget<UISprite>().SetToLastValues();
 		}
 	}
 
@@ -32,7 +32,7 @@ static public class NGUIMenu
 	{
 		if (PrefabCheck())
 		{
-			AddWidget<UISlicedSprite>();
+			AddWidget<UISlicedSprite>().SetToLastValues();
 		}
 	}
 	
@@ -41,7 +41,7 @@ static public class NGUIMenu
 	{
 		if (PrefabCheck())
 		{
-			AddWidget<UITiledSprite>();
+			AddWidget<UITiledSprite>().SetToLastValues();
 		}
 	}
 

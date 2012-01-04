@@ -38,8 +38,11 @@ Version History
 
 1.24
 - NEW: Added character and line spacing parameters to UIFont.
-- FIX: UICamera will now be able to handle both mouse and touch-based input on non-mobile devices.
 - NEW: Sprites will now be sorted alphabetically, both on import and in the drop-down menu.
+- NEW: NGUI menu Add* functions now automatically choose last used font and UI atlases and resize the new elements.
+- FIX: UICamera will now be able to handle both mouse and touch-based input on non-mobile devices.
+- FIX: 'Add Collider' menu option got semi-broken in 1.23.
+- FIX: Changing the font will now correctly update the visible text while in the editor.
 
 1.23
 - NEW: Added a pivot property to the widget class, replacing the old 'centered' flag.

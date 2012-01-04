@@ -5,6 +5,9 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Label")]
 public class UILabel : UIWidget
 {
+	// Last used value, here for convenience (auto-set when a new label gets added via NGUI's menu)
+	static UIFont mLastFont;
+
 	[SerializeField] UIFont mFont;
 	[SerializeField] string mText = "";
 	[SerializeField] bool mEncoding = true;
@@ -31,8 +34,11 @@ public class UILabel : UIWidget
 		{
 			if (mFont != value)
 			{
+				mLastFont = value;
 				mFont = value;
 				material = mFont.material;
+				mChanged = true;
+				mShouldBeProcessed = true;
 			}
 		}
 	}
@@ -165,6 +171,17 @@ public class UILabel : UIWidget
 				mShouldBeProcessed = true;
 			}
 		}
+	}
+
+	/// <summary>
+	/// Convenience function used by NGUIMenu.
+	/// </summary>
+
+	public void SetToLastValues ()
+	{
+		font = mLastFont;
+		text = "Text";
+		MakePixelPerfect();
 	}
 
 	/// <summary>

@@ -9,6 +9,10 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Sprite (Basic)")]
 public class UISprite : UIWidget
 {
+	// Last used values, here for convenience
+	static UIAtlas mLastAtlas;
+	static string mLastSprite = "";
+
 	// Cached and saved values
 	[SerializeField] UIAtlas mAtlas;
 	[SerializeField] string mSpriteName;
@@ -37,6 +41,7 @@ public class UISprite : UIWidget
 		{
 			if (mAtlas != value)
 			{
+				mLastAtlas = value;
 				mAtlas = value;
 
 				// Update the material
@@ -76,6 +81,8 @@ public class UISprite : UIWidget
 		}
 		set
 		{
+			bool noSprite = string.IsNullOrEmpty(mSpriteName);
+
 			if (string.IsNullOrEmpty(value))
 			{
 				// If the sprite name hasn't been set yet, no need to do anything
@@ -86,13 +93,15 @@ public class UISprite : UIWidget
 				mSprite = null;
 				mChanged = true;
 			}
-			else if (string.IsNullOrEmpty(mSpriteName) || mSpriteName != value)
+			else if (noSprite || mSpriteName != value)
 			{
 				// If the sprite name changes, the sprite reference should also be updated
+				mLastSprite = value;
 				mSpriteName = value;
 				mSprite = (mAtlas != null) ? mAtlas.GetSprite(mSpriteName) : null;
 				UpdateUVs();
 				mChanged = true;
+				if (noSprite) MakePixelPerfect();
 			}
 		}
 	}
@@ -141,6 +150,17 @@ public class UISprite : UIWidget
 			cachedTransform.localScale = scale;
 		}
 		base.MakePixelPerfect();
+	}
+
+	/// <summary>
+	/// Convenience function used by NGUIMenu.
+	/// </summary>
+
+	public void SetToLastValues ()
+	{
+		atlas = mLastAtlas;
+		spriteName = mLastSprite;
+		MakePixelPerfect();
 	}
 
 	/// <summary>

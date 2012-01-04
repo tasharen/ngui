@@ -307,6 +307,15 @@ public abstract class UIWidget : MonoBehaviour
 			mRecentlyEnabled = false;
 			if (mMat != null) panel.AddWidget(this);
 		}
+		
+		// Automatically reset the Z scaling component back to 1 as it's not used
+		Vector3 scale = mTrans.localScale;
+
+		if (scale.z != 1f)
+		{
+			scale.z = 1f;
+			mTrans.localScale = scale;
+		}
 	}
 
 	/// <summary>
@@ -354,7 +363,7 @@ public abstract class UIWidget : MonoBehaviour
 
 			// Position should be offset by depth so selection works properly
 			Vector3 pos = Vector3.zero;
-			pos.z -= mDepth * cachedTransform.lossyScale.z * 50f;
+			pos.z -= mDepth * (parent != null ? parent.lossyScale.z * 50f : 1f);
 
 			// Widget's local size
 			Vector2 size = visibleSize;
