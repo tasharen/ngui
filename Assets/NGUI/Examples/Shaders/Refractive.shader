@@ -37,7 +37,7 @@ Shader "Transparent/Refractive"
 			AlphaTest Greater 0
 
 			CGPROGRAM
-			#pragma exclude_renderers gles
+			#pragma exclude_renderers gles opengl
 			#pragma vertex vert
 			#pragma surface surf PPL alpha
 			#include "UnityCG.cginc"

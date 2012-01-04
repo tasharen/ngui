@@ -36,6 +36,11 @@ All can be found here: http://www.tasharen.com/?page_id=140
 Version History
 ---------------
 
+1.24
+- NEW: Added character and line spacing parameters to UIFont.
+- FIX: UICamera will now be able to handle both mouse and touch-based input on non-mobile devices.
+- NEW: Sprites will now be sorted alphabetically, both on import and in the drop-down menu.
+
 1.23
 - NEW: Added a pivot property to the widget class, replacing the old 'centered' flag.
 

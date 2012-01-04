@@ -63,16 +63,20 @@ static public class NGUIMenu
 			Collider col = go.GetComponent<Collider>();
 			BoxCollider box = col as BoxCollider;
 
-			Undo.RegisterUndo(go, "Add a collider");
-			
 			if (box == null)
 			{
+				Undo.RegisterUndo(go, "Add a collider");
+
 				if (col != null)
 				{
 					if (Application.isPlaying) GameObject.Destroy(col);
 					else GameObject.DestroyImmediate(col);
 				}
 				box = go.AddComponent<BoxCollider>();
+			}
+			else
+			{
+				Undo.RegisterUndo(box, "Resize the collider");
 			}
 
 			UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>() as UIWidget[];
@@ -82,13 +86,16 @@ static public class NGUIMenu
 
 			foreach (UIWidget w in widgets)
 			{
-				Vector2 v0 = w.pivotOffset;
-				Vector2 v1 = w.pivotOffset + w.visibleSize;
+				Vector2 size = w.visibleSize;
+				Vector2 offset = w.pivotOffset;
+				float x = (offset.x + 0.5f) * size.x;
+				float y = (offset.y - 0.5f) * size.y;
+				size *= 0.5f;
 
-				b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(v0.x, v0.y, 0f))));
-				b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(v0.x, v1.y, 0f))));
-				b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(v1.x, v0.y, 0f))));
-				b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(v1.x, v1.y, 0f))));
+				b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x - size.x, y - size.y, 0f))));
+				b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x - size.x, y + size.y, 0f))));
+				b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x + size.x, y - size.y, 0f))));
+				b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x + size.x, y + size.y, 0f))));
 			}
 
 			box.isTrigger = true;
