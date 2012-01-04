@@ -211,7 +211,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Tell the panel responsible for the widget that something has changed and the buffers need to be rebuilt.
 	/// </summary>
 
-	public void MarkAsChanged ()
+	public virtual void MarkAsChanged ()
 	{
 		mChanged = true;
 

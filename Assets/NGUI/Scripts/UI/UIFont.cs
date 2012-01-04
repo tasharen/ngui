@@ -12,6 +12,8 @@ public class UIFont : MonoBehaviour
 	[SerializeField] Material mMat;
 	[SerializeField] Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
 	[SerializeField] BMFont mFont = new BMFont();
+	[SerializeField] int mSpacingX = 0;
+	[SerializeField] int mSpacingY = 0;
 
 	// I'd use a Stack here, but then Flash export wouldn't work as it doesn't support it
 	List<Color> mColors = new List<Color>();
@@ -69,6 +71,46 @@ public class UIFont : MonoBehaviour
 			if (mUVRect != value)
 			{
 				mUVRect = value;
+				Refresh();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Horizontal spacing applies to characters. If positive, it will add extra spacing between characters. If negative, it will make them be closer together.
+	/// </summary>
+
+	public int horizontalSpacing
+	{
+		get
+		{
+			return mSpacingX;
+		}
+		set
+		{
+			if (mSpacingX != value)
+			{
+				mSpacingX = value;
+				Refresh();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Vertical spacing applies to lines. If positive, it will add extra spacing between lines. If negative, it will make them be closer together.
+	/// </summary>
+
+	public int verticalSpacing
+	{
+		get
+		{
+			return mSpacingY;
+		}
+		set
+		{
+			if (mSpacingY != value)
+			{
+				mSpacingY = value;
 				Refresh();
 			}
 		}
@@ -172,6 +214,7 @@ public class UIFont : MonoBehaviour
 			int x = 0;
 			int y = 0;
 			int prev = 0;
+			int lineHeight = (mFont.charSize + mSpacingY);
 
 			for (int i = 0, imax = text.Length; i < imax; ++i)
 			{
@@ -181,7 +224,7 @@ public class UIFont : MonoBehaviour
 				{
 					if (x > maxX) maxX = x;
 					x = 0;
-					y += mFont.charSize;
+					y += lineHeight;
 					prev = 0;
 					if (c != '\n') ++i;
 					continue;
@@ -197,14 +240,14 @@ public class UIFont : MonoBehaviour
 
 				if (glyph != null)
 				{
-					x += (prev != 0) ? glyph.advance + glyph.GetKerning(prev) : glyph.advance;
+					x += mSpacingX + ((prev != 0) ? glyph.advance + glyph.GetKerning(prev) : glyph.advance);
 					prev = c;
 				}
 			}
 
 			if (x > maxX) maxX = x;
 			v.x = scale.x * maxX;
-			v.y = scale.y * (y + mFont.charSize);
+			v.y = scale.y * (y + lineHeight);
 		}
 		return v;
 	}
@@ -232,6 +275,7 @@ public class UIFont : MonoBehaviour
 			int x = 0;
 			int y = 0;
 			int prev = 0;
+			int lineHeight = (mFont.charSize + mSpacingY);
 			Vector3 v0 = Vector3.zero, v1 = Vector3.zero;
 			Vector2 u0 = Vector2.zero, u1 = Vector2.zero;
 			float invX = mUVRect.width / mFont.texWidth;
@@ -245,7 +289,7 @@ public class UIFont : MonoBehaviour
 				{
 					if (x > maxX) maxX = x;
 					x = 0;
-					y += mFont.charSize;
+					y += lineHeight;
 					prev = 0;
 					if (c != '\n') ++i;
 					continue;
@@ -302,7 +346,7 @@ public class UIFont : MonoBehaviour
 					cols.Add(color);
 					cols.Add(color);
 
-					x += glyph.advance;
+					x += mSpacingX + glyph.advance;
 					prev = c;
 				}
 			}

@@ -67,6 +67,28 @@ public class UIFontInspector : Editor
 						pixels.height = font.texHeight;
 					}
 
+					// Font spacing
+					GUILayout.BeginHorizontal();
+					{
+						EditorGUIUtility.LookLikeControls(0f);
+						GUILayout.Label("Spacing", GUILayout.Width(60f));
+						GUILayout.Label("X", GUILayout.Width(12f));
+						int x = EditorGUILayout.IntField(font.horizontalSpacing);
+						GUILayout.Label("Y", GUILayout.Width(12f));
+						int y = EditorGUILayout.IntField(font.verticalSpacing);
+						EditorGUIUtility.LookLikeControls(80f);
+
+						if (font.horizontalSpacing != x || font.verticalSpacing != y)
+						{
+							Undo.RegisterUndo(font, "Font Spacing");
+							font.horizontalSpacing = x;
+							font.verticalSpacing = y;
+							EditorUtility.SetDirty(font);
+						}
+					}
+					GUILayout.EndHorizontal();
+
+					// Font sprite rectangle
 					GUI.backgroundColor = green;
 					pixels = EditorGUILayout.RectField("Pixel Rect", pixels);
 					GUI.backgroundColor = Color.white;

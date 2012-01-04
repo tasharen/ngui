@@ -207,6 +207,16 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// UILabel needs additional processing when something changes.
+	/// </summary>
+
+	public override void MarkAsChanged ()
+	{
+		mShouldBeProcessed = true;
+		base.MarkAsChanged();
+	}
+
+	/// <summary>
 	/// Text is pixel-perfect when its scale matches the size.
 	/// </summary>
 
