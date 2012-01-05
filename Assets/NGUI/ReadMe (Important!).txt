@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.24b
+                Version 1.25
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -35,6 +35,9 @@ All can be found here: http://www.tasharen.com/?page_id=140
 ---------------
 Version History
 ---------------
+
+1.25:
+- NEW: Added a UIGrid script that can be used to easily arrange icons into a grid.
 
 1.24
 - NEW: Added character and line spacing parameters to UIFont.
