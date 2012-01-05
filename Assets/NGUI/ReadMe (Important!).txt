@@ -38,6 +38,7 @@ Version History
 
 1.25:
 - NEW: Added a UIGrid script that can be used to easily arrange icons into a grid.
+- NEW: UIFont can now specify a UIAtlas/sprite combo instead of explicitly defining the material and pixel rect.
 
 1.24
 - NEW: Added character and line spacing parameters to UIFont.
