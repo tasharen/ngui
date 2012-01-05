@@ -171,7 +171,10 @@ public class UISprite : UIWidget
 
 	protected void Init ()
 	{
+#if !UNITY_FLASH
+		// Flash is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
 		if (mAtlas != null)
+#endif
 		{
 			if (material == null) material = mAtlas.material;
 			if (mSprite == null) mSprite = string.IsNullOrEmpty(mSpriteName) ? null : mAtlas.GetSprite(mSpriteName);
@@ -184,7 +187,10 @@ public class UISprite : UIWidget
 
 	override protected void OnStart ()
 	{
+#if !UNITY_FLASH
+		// Flash is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
 		if (mAtlas != null)
+#endif
 		{
 			UpdateUVs();
 		}

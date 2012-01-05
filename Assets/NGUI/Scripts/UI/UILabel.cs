@@ -274,8 +274,10 @@ public class UILabel : UIWidget
 
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
+#if !UNITY_FLASH
+		// Flash is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
 		if (mFont == null) return;
-
+#endif	
 		// If the height changes, we should re-process the text
 		if (mLineWidth > 0f)
 		{
