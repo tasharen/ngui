@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.24
+                Version 1.24b
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -43,6 +43,7 @@ Version History
 - FIX: UICamera will now be able to handle both mouse and touch-based input on non-mobile devices.
 - FIX: 'Add Collider' menu option got semi-broken in 1.23.
 - FIX: Changing the font will now correctly update the visible text while in the editor.
+- Work-around for a bug in 3.5b6 Flash export.
 
 1.23
 - NEW: Added a pivot property to the widget class, replacing the old 'centered' flag.
