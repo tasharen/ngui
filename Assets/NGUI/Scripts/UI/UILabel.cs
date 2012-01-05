@@ -36,7 +36,7 @@ public class UILabel : UIWidget
 			{
 				mLastFont = value;
 				mFont = value;
-				material = mFont.material;
+				material = (mFont != null) ? mFont.material : null;
 				mChanged = true;
 				mShouldBeProcessed = true;
 			}
@@ -264,7 +264,7 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			return mFont.CalculatePrintedSize(mProcessedText, mEncoding);
+			return (mFont != null) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding) : Vector2.zero;
 		}
 	}
 

@@ -113,7 +113,7 @@ public static class BMFontReader
 					// Expected data style:
 					// kerning first=84 second=244 amount=-5 
 
-					if (split.Length == 4)
+					if (split.Length > 3)
 					{
 						int first  = GetValue(split[1]);
 						int second = GetValue(split[2]);

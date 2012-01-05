@@ -17,145 +17,194 @@ public class UIFontInspector : Editor
 
 	static View mView = View.Atlas;
 	static bool mUseShader = false;
+	UIFont mFont;
+
+	void OnSelectAtlas (MonoBehaviour obj)
+	{
+		if (mFont != null)
+		{
+			Undo.RegisterUndo(mFont, "Font Atlas");
+			mFont.atlas = obj as UIAtlas;
+			EditorUtility.SetDirty(mFont);
+			MarkAsChanged();
+		}
+	}
+
+	void MarkAsChanged ()
+	{
+		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+
+		foreach (UILabel lbl in labels)
+		{
+			if (lbl.font == mFont)
+			{
+				lbl.font = null;
+				lbl.font = mFont;
+			}
+		}
+	}
 
 	override public void OnInspectorGUI ()
 	{
 		EditorGUIUtility.LookLikeControls(80f);
 		GUITools.DrawSeparator();
 
-		UIFont font = target as UIFont;
+		mFont = target as UIFont;
 		TextAsset data = EditorGUILayout.ObjectField("Import Font", null, typeof(TextAsset), false) as TextAsset;
 
 		bool resetWidthHeight = false;
 
 		if (data != null)
 		{
-			Undo.RegisterUndo(font, "Import Font Data");
-			BMFontReader.Load(font.bmFont, NGUITools.GetHierarchy(font.gameObject), data.bytes);
-			font.Refresh();
+			Undo.RegisterUndo(mFont, "Import Font Data");
+			BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), data.bytes);
+			mFont.Refresh();
 			resetWidthHeight = true;
-			EditorUtility.SetDirty(font);
-			Debug.Log("Imported " + font.bmFont.glyphCount + " characters");
+			EditorUtility.SetDirty(mFont);
+			Debug.Log("Imported " + mFont.bmFont.glyphCount + " characters");
 		}
 
-		if (font.bmFont.isValid)
+		if (mFont.bmFont.isValid)
 		{
-			Material mat = EditorGUILayout.ObjectField("Material", font.material, typeof(Material), false) as Material;
+			Color green = new Color(0.4f, 1f, 0f, 1f);
+			UIAtlas atlas = ComponentSelector.Draw<UIAtlas>(mFont.atlas, OnSelectAtlas);
+			if (mFont.atlas != atlas) OnSelectAtlas(atlas);
 
-			if (font.material != mat)
+			if (mFont.atlas != null)
 			{
-				Undo.RegisterUndo(font, "Font Material");
-				font.material = mat;
-				EditorUtility.SetDirty(font);
-			}
+				string spriteName = UISlicedSpriteInspector.SpriteField(atlas, mFont.spriteName);
 
-			if (mat != null)
-			{
-				Color green = new Color(0.4f, 1f, 0f, 1f);
-
-				Texture2D tex = mat.mainTexture as Texture2D;
-
-				if (tex != null)
+				if (mFont.spriteName != spriteName)
 				{
-					// Pixels are easier to work with than UVs
-					Rect pixels = NGUITools.ConvertToPixels(font.uvRect, tex.width, tex.height, false);
+					Undo.RegisterUndo(mFont, "Font Sprite");
+					mFont.spriteName = spriteName;
+					EditorUtility.SetDirty(mFont);
+					MarkAsChanged();
+				}
+			}
+			else
+			{
+				// No atlas specified -- set the material and texture rectangle directly
+				Material mat = EditorGUILayout.ObjectField("Material", mFont.material, typeof(Material), false) as Material;
 
-					// Automatically set the width and height of the rectangle to be the original font texture's dimensions
-					if (resetWidthHeight)
+				if (mFont.material != mat)
+				{
+					Undo.RegisterUndo(mFont, "Font Material");
+					mFont.material = mat;
+					EditorUtility.SetDirty(mFont);
+				}
+
+				if (mat != null)
+				{
+					Texture2D t = mFont.texture;
+
+					if (t != null)
 					{
-						pixels.width = font.texWidth;
-						pixels.height = font.texHeight;
-					}
+						// Pixels are easier to work with than UVs
+						Rect pixels = NGUITools.ConvertToPixels(mFont.uvRect, t.width, t.height, false);
 
-					// Font spacing
-					GUILayout.BeginHorizontal();
-					{
-						EditorGUIUtility.LookLikeControls(0f);
-						GUILayout.Label("Spacing", GUILayout.Width(60f));
-						GUILayout.Label("X", GUILayout.Width(12f));
-						int x = EditorGUILayout.IntField(font.horizontalSpacing);
-						GUILayout.Label("Y", GUILayout.Width(12f));
-						int y = EditorGUILayout.IntField(font.verticalSpacing);
-						EditorGUIUtility.LookLikeControls(80f);
-
-						if (font.horizontalSpacing != x || font.verticalSpacing != y)
+						// Automatically set the width and height of the rectangle to be the original font texture's dimensions
+						if (resetWidthHeight)
 						{
-							Undo.RegisterUndo(font, "Font Spacing");
-							font.horizontalSpacing = x;
-							font.verticalSpacing = y;
-							EditorUtility.SetDirty(font);
+							pixels.width = mFont.texWidth;
+							pixels.height = mFont.texHeight;
 						}
-					}
-					GUILayout.EndHorizontal();
 
-					// Font sprite rectangle
-					GUI.backgroundColor = green;
-					pixels = EditorGUILayout.RectField("Pixel Rect", pixels);
-					GUI.backgroundColor = Color.white;
+						// Font sprite rectangle
+						GUI.backgroundColor = green;
+						pixels = EditorGUILayout.RectField("Pixel Rect", pixels);
+						GUI.backgroundColor = Color.white;
 
-					EditorGUILayout.Separator();
-
-					// Create a button that can make the coordinates pixel-perfect on click
-					GUILayout.BeginHorizontal();
-					{
-						GUILayout.Label("Correction", GUILayout.Width(75f));
-
-						Rect corrected = NGUITools.MakePixelPerfect(pixels);
-
-						if (corrected == pixels)
+						// Create a button that can make the coordinates pixel-perfect on click
+						GUILayout.BeginHorizontal();
 						{
-							GUI.color = Color.grey;
-							GUILayout.Button("Make Pixel-Perfect");
-							GUI.color = Color.white;
-						}
-						else if (GUILayout.Button("Make Pixel-Perfect"))
-						{
-							pixels = corrected;
-							GUI.changed = true;
-						}
-					}
-					GUILayout.EndHorizontal();
+							GUILayout.Label("Correction", GUILayout.Width(75f));
 
-					GUILayout.BeginHorizontal();
-					{
-						mView = (View)EditorGUILayout.EnumPopup("Show", mView);
-						GUILayout.Label("Shader", GUILayout.Width(45f));
+							Rect corrected = NGUITools.MakePixelPerfect(pixels);
 
-						if (mUseShader != EditorGUILayout.Toggle(mUseShader, GUILayout.Width(20f)))
-						{
-							mUseShader = !mUseShader;
-
-							if (mUseShader && mView == View.Font)
+							if (corrected == pixels)
 							{
-								// TODO: Remove this when Unity fixes the bug with DrawPreviewTexture not being affected by BeginGroup
-								Debug.LogWarning("There is a bug in Unity that prevents the texture from getting clipped properly.\n" +
-									"Until it's fixed by Unity, your texture may spill onto the rest of the Unity's GUI while using this mode.");
+								GUI.color = Color.grey;
+								GUILayout.Button("Make Pixel-Perfect");
+								GUI.color = Color.white;
+							}
+							else if (GUILayout.Button("Make Pixel-Perfect"))
+							{
+								pixels = corrected;
+								GUI.changed = true;
 							}
 						}
+						GUILayout.EndHorizontal();
+
+						// Convert the pixel coordinates back to UV coordinates
+						Rect uvRect = NGUITools.ConvertToTexCoords(pixels, t.width, t.height);
+
+						if (mFont.uvRect != uvRect)
+						{
+							Undo.RegisterUndo(mFont, "Font Pixel Rect");
+							mFont.uvRect = uvRect;
+							EditorUtility.SetDirty(mFont);
+						}
 					}
-					GUILayout.EndHorizontal();
+				}
+			}
 
-					// Convert the pixel coordinates back to UV coordinates
-					Rect uvRect = NGUITools.ConvertToTexCoords(pixels, tex.width, tex.height);
+			Texture2D tex = mFont.texture;
 
-					if (font.uvRect != uvRect)
+			if (tex != null)
+			{
+				// Font spacing
+				GUILayout.BeginHorizontal();
+				{
+					EditorGUIUtility.LookLikeControls(0f);
+					GUILayout.Label("Spacing", GUILayout.Width(60f));
+					GUILayout.Label("X", GUILayout.Width(12f));
+					int x = EditorGUILayout.IntField(mFont.horizontalSpacing);
+					GUILayout.Label("Y", GUILayout.Width(12f));
+					int y = EditorGUILayout.IntField(mFont.verticalSpacing);
+					EditorGUIUtility.LookLikeControls(80f);
+
+					if (mFont.horizontalSpacing != x || mFont.verticalSpacing != y)
 					{
-						Undo.RegisterUndo(font, "Font Pixel Rect");
-						font.uvRect = uvRect;
-						EditorUtility.SetDirty(font);
+						Undo.RegisterUndo(mFont, "Font Spacing");
+						mFont.horizontalSpacing = x;
+						mFont.verticalSpacing = y;
+						EditorUtility.SetDirty(mFont);
 					}
+				}
+				GUILayout.EndHorizontal();
 
-					if (mView != View.Nothing)
+				EditorGUILayout.Separator();
+
+				GUILayout.BeginHorizontal();
+				{
+					mView = (View)EditorGUILayout.EnumPopup("Show", mView);
+					GUILayout.Label("Shader", GUILayout.Width(45f));
+
+					if (mUseShader != EditorGUILayout.Toggle(mUseShader, GUILayout.Width(20f)))
 					{
-						// Draw the atlas
-						EditorGUILayout.Separator();
-						Material m = mUseShader ? font.material : null;
-						Rect rect = (mView == View.Atlas) ? GUITools.DrawAtlas(tex, m) : GUITools.DrawSprite(tex, uvRect, m);
-						GUITools.DrawOutline(rect, uvRect, green);
+						mUseShader = !mUseShader;
 
-						rect = GUILayoutUtility.GetRect(Screen.width, 18f);
-						EditorGUI.DropShadowLabel(rect, "Font Size: " + font.size);
+						if (mUseShader && mView == View.Font)
+						{
+							// TODO: Remove this when Unity fixes the bug with DrawPreviewTexture not being affected by BeginGroup
+							Debug.LogWarning("There is a bug in Unity that prevents the texture from getting clipped properly.\n" +
+								"Until it's fixed by Unity, your texture may spill onto the rest of the Unity's GUI while using this mode.");
+						}
 					}
+				}
+				GUILayout.EndHorizontal();
+
+				if (mView != View.Nothing)
+				{
+					// Draw the atlas
+					EditorGUILayout.Separator();
+					Material m = mUseShader ? mFont.material : null;
+					Rect rect = (mView == View.Atlas) ? GUITools.DrawAtlas(tex, m) : GUITools.DrawSprite(tex, mFont.uvRect, m);
+					GUITools.DrawOutline(rect, mFont.uvRect, green);
+
+					rect = GUILayoutUtility.GetRect(Screen.width, 18f);
+					EditorGUI.DropShadowLabel(rect, "Font Size: " + mFont.size);
 				}
 			}
 		}

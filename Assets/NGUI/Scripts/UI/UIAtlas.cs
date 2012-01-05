@@ -46,6 +46,12 @@ public class UIAtlas : MonoBehaviour
 	[SerializeField] Coordinates mCoordinates = Coordinates.Pixels;
 
 	/// <summary>
+	/// Texture used by the atlas.
+	/// </summary>
+
+	public Texture2D texture { get { return material != null ? material.mainTexture as Texture2D : null; } }
+
+	/// <summary>
 	/// Allows switching of the coordinate system from pixel coordinates to texture coordinates.
 	/// </summary>
 

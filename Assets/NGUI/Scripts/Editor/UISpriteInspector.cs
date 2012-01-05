@@ -10,7 +10,6 @@ using System.Collections.Generic;
 public class UISpriteInspector : UIWidgetInspector
 {
 	protected UISprite mSprite;
-	UIAtlas.Sprite mAtlasSprite;
 
 	/// <summary>
 	/// Atlas selection callback.
@@ -27,31 +26,24 @@ public class UISpriteInspector : UIWidgetInspector
 	}
 
 	/// <summary>
-	/// Draw the atlas and sprite selection fields.
+	/// Convenience function that displays a list of sprites and returns the selected value.
 	/// </summary>
 
-	override protected bool OnDrawProperties ()
+	static public string SpriteField (UIAtlas atlas, string name)
 	{
-		mSprite = mWidget as UISprite;
-		UIAtlas atlas = ComponentSelector.Draw<UIAtlas>(mSprite.atlas, OnSelectAtlas);
-		if (mSprite.atlas != atlas) OnSelectAtlas(atlas);
-
-		mAtlasSprite = null;
-		if (mSprite.atlas == null) return false;
-
-		List<string> sprites = mSprite.atlas.GetListOfSprites();
+		List<string> sprites = atlas.GetListOfSprites();
 
 		if (sprites != null && sprites.Count > 0)
 		{
 			int index = 0;
-			string spriteName = (mSprite.spriteName != null) ? mSprite.spriteName : sprites[0];
+			if (string.IsNullOrEmpty(name)) name = sprites[0];
 
 			// We need to find the sprite in order to have it selected
-			if (!string.IsNullOrEmpty(spriteName))
+			if (!string.IsNullOrEmpty(name))
 			{
 				for (int i = 0; i < sprites.Count; ++i)
 				{
-					if (spriteName.Equals(sprites[i], System.StringComparison.OrdinalIgnoreCase))
+					if (name.Equals(sprites[i], System.StringComparison.OrdinalIgnoreCase))
 					{
 						index = i;
 						break;
@@ -61,16 +53,29 @@ public class UISpriteInspector : UIWidgetInspector
 
 			// Draw the sprite selection popup
 			index = EditorGUILayout.Popup("Sprite", index, sprites.ToArray());
-			mAtlasSprite = mSprite.atlas.GetSprite(sprites[index]);
-			string sn = (mAtlasSprite != null) ? mAtlasSprite.name : "";
+			return atlas.GetSprite(sprites[index]).name;
+		}
+		return null;
+	}
 
-			// If the sprite changes, update the widget
-			if (mSprite.spriteName != sn)
-			{
-				Undo.RegisterUndo(mSprite, "Sprite Change");
-				mSprite.spriteName = sn;
-				EditorUtility.SetDirty(mSprite.gameObject);
-			}
+	/// <summary>
+	/// Draw the atlas and sprite selection fields.
+	/// </summary>
+
+	override protected bool OnDrawProperties ()
+	{
+		mSprite = mWidget as UISprite;
+		UIAtlas atlas = ComponentSelector.Draw<UIAtlas>(mSprite.atlas, OnSelectAtlas);
+		if (mSprite.atlas != atlas) OnSelectAtlas(atlas);
+		if (mSprite.atlas == null) return false;
+
+		string spriteName = SpriteField(atlas, mSprite.spriteName);
+
+		if (mSprite.spriteName != spriteName)
+		{
+			Undo.RegisterUndo(mSprite, "Sprite Change");
+			mSprite.spriteName = spriteName;
+			EditorUtility.SetDirty(mSprite.gameObject);
 		}
 		return true;
 	}

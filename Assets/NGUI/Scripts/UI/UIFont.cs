@@ -14,6 +14,11 @@ public class UIFont : MonoBehaviour
 	[SerializeField] BMFont mFont = new BMFont();
 	[SerializeField] int mSpacingX = 0;
 	[SerializeField] int mSpacingY = 0;
+	[SerializeField] UIAtlas mAtlas;
+	[SerializeField] string mSpriteName = "";
+
+	// Cached value
+	UIAtlas.Sprite mSprite;
 
 	// I'd use a Stack here, but then Flash export wouldn't work as it doesn't support it
 	List<Color> mColors = new List<Color>();
@@ -37,6 +42,33 @@ public class UIFont : MonoBehaviour
 	public int texHeight { get { return (mFont != null) ? mFont.texHeight : 1; } }
 
 	/// <summary>
+	/// Atlas used by the font, if any.
+	/// </summary>
+
+	public UIAtlas atlas
+	{
+		get
+		{
+			return mAtlas;
+		}
+		set
+		{
+			if (mAtlas != value)
+			{
+				if (value == null)
+				{
+					if (mAtlas != null) mMat = mAtlas.material;
+					if (mSprite != null) mUVRect = uvRect;
+				}
+
+				mSprite = null;
+				mAtlas = value;
+				Refresh();
+			}
+		}
+	}
+
+	/// <summary>
 	/// Get or set the material used by this font.
 	/// </summary>
 
@@ -44,15 +76,28 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			return mMat;
+			return (mAtlas != null) ? mAtlas.material : mMat;
 		}
 		set
 		{
-			if (mMat != value)
+			if (mAtlas == null && mMat != value)
 			{
 				mMat = value;
 				Refresh();
 			}
+		}
+	}
+
+	/// <summary>
+	/// Convenience function that returns the texture used by the font.
+	/// </summary>
+
+	public Texture2D texture
+	{
+		get
+		{
+			Material mat = material;
+			return (mat != null) ? mat.mainTexture as Texture2D : null;
 		}
 	}
 
@@ -64,11 +109,25 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
+			if (mAtlas != null && sprite != null)
+			{
+				Texture2D tex = mAtlas.texture;
+
+				if (tex != null)
+				{
+					mUVRect = mSprite.outer;
+
+					if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
+					{
+						mUVRect = NGUITools.ConvertToTexCoords(mUVRect, tex.width, tex.height);
+					}
+				}
+			}
 			return mUVRect;
 		}
 		set
 		{
-			if (mUVRect != value)
+			if (mSprite == null && mUVRect != value)
 			{
 				mUVRect = value;
 				Refresh();
@@ -77,50 +136,53 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Sprite used by the font, if any.
+	/// </summary>
+
+	public string spriteName { get { return mSpriteName; } set { if (mSpriteName != value) { mSpriteName = value; mSprite = null; Refresh(); } } }
+
+	/// <summary>
 	/// Horizontal spacing applies to characters. If positive, it will add extra spacing between characters. If negative, it will make them be closer together.
 	/// </summary>
 
-	public int horizontalSpacing
-	{
-		get
-		{
-			return mSpacingX;
-		}
-		set
-		{
-			if (mSpacingX != value)
-			{
-				mSpacingX = value;
-				Refresh();
-			}
-		}
-	}
+	public int horizontalSpacing { get { return mSpacingX; } set { if (mSpacingX != value) { mSpacingX = value; Refresh(); } } }
 
 	/// <summary>
 	/// Vertical spacing applies to lines. If positive, it will add extra spacing between lines. If negative, it will make them be closer together.
 	/// </summary>
 
-	public int verticalSpacing
-	{
-		get
-		{
-			return mSpacingY;
-		}
-		set
-		{
-			if (mSpacingY != value)
-			{
-				mSpacingY = value;
-				Refresh();
-			}
-		}
-	}
+	public int verticalSpacing { get { return mSpacingY; } set { if (mSpacingY != value) { mSpacingY = value; Refresh(); } } }
 
 	/// <summary>
 	/// Pixel-perfect size of this font.
 	/// </summary>
 
 	public int size { get { return mFont.charSize; } }
+
+	/// <summary>
+	/// Retrieves the sprite used by the font, if any.
+	/// </summary>
+
+	UIAtlas.Sprite sprite
+	{
+		get
+		{
+			if (mSprite == null)
+			{
+				if (mAtlas != null && !string.IsNullOrEmpty(mSpriteName))
+				{
+					mSprite = mAtlas.GetSprite(mSpriteName);
+					
+					if (mSprite == null)
+					{
+						Debug.LogError("Can't find the sprite '" + mSpriteName + "' in UIAtlas on " + NGUITools.GetHierarchy(mAtlas.gameObject));
+						mSpriteName = null;
+					}
+				}
+			}
+			return mSprite;
+		}
+	}
 
 	/// <summary>
 	/// Refresh all labels that use this font.
