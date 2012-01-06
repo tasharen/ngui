@@ -37,8 +37,9 @@ Version History
 ---------------
 
 1.26:
-- NEW: Added support for trimmed sprites exported via TexturePacker.
+- NEW: Added support for trimmed sprites (and fonts) exported via TexturePacker.
 - NEW: UISlider now has horizontal and vertical styles.
+- NEW: Selected widgets now have their gizmos colored green.
 - FIX: UISlider now uses the collider's bounds instead of the target's bounds.
 - FIX: Sliced sprite will now behave better when scaled with all pivot points, not just top-left.
 

@@ -121,6 +121,16 @@ public class UIFont : MonoBehaviour
 					{
 						mUVRect = NGUITools.ConvertToTexCoords(mUVRect, tex.width, tex.height);
 					}
+
+					// Account for trimmed sprites
+					if (mSprite.hasPadding)
+					{
+						Rect rect = mUVRect;
+						mUVRect.xMin = rect.xMin - mSprite.paddingLeft * rect.width;
+						mUVRect.xMax = rect.xMax + mSprite.paddingRight * rect.width;
+						mUVRect.yMin = rect.yMin - mSprite.paddingBottom * rect.height;
+						mUVRect.yMax = rect.yMax + mSprite.paddingTop * rect.height;
+					}
 				}
 			}
 			return mUVRect;

@@ -21,6 +21,8 @@ public class UIAtlas : MonoBehaviour
 		public float paddingRight	= 0f;
 		public float paddingTop		= 0f;
 		public float paddingBottom	= 0f;
+
+		public bool hasPadding { get { return paddingLeft != 0f || paddingRight != 0f || paddingTop != 0f || paddingBottom != 0f; } }
 	}
 
 	/// <summary>

@@ -266,10 +266,11 @@ public class UIAtlasInspector : Editor
 						EditorGUILayout.Separator();
 
 						// Padding is mainly meant to be used by the 'trimmed' feature of TexturePacker
+						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 						{
-							int l0 = Mathf.RoundToInt(mSprite.paddingLeft * mSprite.outer.width);
-							int r0 = Mathf.RoundToInt(mSprite.paddingRight * mSprite.outer.width);
-							int t0 = Mathf.RoundToInt(mSprite.paddingTop * mSprite.outer.height);
+							int l0 = Mathf.RoundToInt(mSprite.paddingLeft	* mSprite.outer.width);
+							int r0 = Mathf.RoundToInt(mSprite.paddingRight	* mSprite.outer.width);
+							int t0 = Mathf.RoundToInt(mSprite.paddingTop	* mSprite.outer.height);
 							int b0 = Mathf.RoundToInt(mSprite.paddingBottom * mSprite.outer.height);
 
 							int l1 = l0;
@@ -305,7 +306,6 @@ public class UIAtlasInspector : Editor
 								mSprite.paddingBottom	= b1 / mSprite.outer.height;
 								MarkSpriteAsDirty();
 							}
-
 							EditorGUIUtility.LookLikeControls(80f);
 						}
 
