@@ -135,6 +135,7 @@ public class NGUIJson
 
 		// Sort imported sprites alphabetically
 		atlas.sprites.Sort(CompareSprites);
+		Debug.Log("Imported " + atlas.sprites.Count + " sprites");
 
 		// Unload the asset
 		asset = null;

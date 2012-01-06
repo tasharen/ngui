@@ -36,7 +36,8 @@ public class UIAtlasInspector : Editor
 		{
 			if (sp.atlas == mAtlas)
 			{
-				sp.MarkAsChanged();
+				sp.atlas = null;
+				sp.atlas = mAtlas;
 				EditorUtility.SetDirty(sp);
 			}
 		}
@@ -47,7 +48,8 @@ public class UIAtlasInspector : Editor
 		{
 			if (lbl.font != null && lbl.font.atlas == mAtlas)
 			{
-				lbl.MarkAsChanged();
+				lbl.font.atlas = null;
+				lbl.font.atlas = mAtlas;
 				EditorUtility.SetDirty(lbl);
 			}
 		}
@@ -67,7 +69,8 @@ public class UIAtlasInspector : Editor
 		{
 			if (sp.spriteName == mSprite.name)
 			{
-				sp.MarkAsChanged();
+				sp.atlas = null;
+				sp.atlas = mAtlas;
 				EditorUtility.SetDirty(sp);
 			}
 		}
@@ -78,7 +81,8 @@ public class UIAtlasInspector : Editor
 		{
 			if (lbl.font != null && lbl.font.atlas == mAtlas && lbl.font.spriteName == mSprite.name)
 			{
-				lbl.MarkAsChanged();
+				lbl.font.atlas = null;
+				lbl.font.atlas = mAtlas;
 				EditorUtility.SetDirty(lbl);
 			}
 		}
@@ -124,6 +128,7 @@ public class UIAtlasInspector : Editor
 					Undo.RegisterUndo(mAtlas, "Import Sprites");
 					NGUIJson.LoadSpriteData(mAtlas, ta);
 					mRegisteredUndo = true;
+					mSprite = mAtlas.GetSprite(mSprite.name);
 					MarkAtlasAsDirty();
 				}
 				coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", coords);
