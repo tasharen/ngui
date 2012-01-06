@@ -23,6 +23,68 @@ public class UIAtlasInspector : Editor
 	UIAtlas.Sprite mSprite;
 
 	/// <summary>
+	/// Convenience function -- mark all widgets using the atlas as changed.
+	/// </summary>
+
+	void MarkAtlasAsDirty ()
+	{
+		if (mAtlas == null) return;
+
+		UISprite[] sprites = Resources.FindObjectsOfTypeAll(typeof(UISprite)) as UISprite[];
+
+		foreach (UISprite sp in sprites)
+		{
+			if (sp.atlas == mAtlas)
+			{
+				sp.MarkAsChanged();
+				EditorUtility.SetDirty(sp);
+			}
+		}
+
+		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+
+		foreach (UILabel lbl in labels)
+		{
+			if (lbl.font != null && lbl.font.atlas == mAtlas)
+			{
+				lbl.MarkAsChanged();
+				EditorUtility.SetDirty(lbl);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Convenience function -- mark all widgets using the sprite as changed.
+	/// </summary>
+
+	void MarkSpriteAsDirty ()
+	{
+		if (mSprite == null) return;
+
+		UISprite[] sprites = Resources.FindObjectsOfTypeAll(typeof(UISprite)) as UISprite[];
+
+		foreach (UISprite sp in sprites)
+		{
+			if (sp.spriteName == mSprite.name)
+			{
+				sp.MarkAsChanged();
+				EditorUtility.SetDirty(sp);
+			}
+		}
+
+		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+
+		foreach (UILabel lbl in labels)
+		{
+			if (lbl.font != null && lbl.font.atlas == mAtlas && lbl.font.spriteName == mSprite.name)
+			{
+				lbl.MarkAsChanged();
+				EditorUtility.SetDirty(lbl);
+			}
+		}
+	}
+
+	/// <summary>
 	/// Register an Undo command with the Unity editor.
 	/// </summary>
 
@@ -62,28 +124,7 @@ public class UIAtlasInspector : Editor
 					Undo.RegisterUndo(mAtlas, "Import Sprites");
 					NGUIJson.LoadSpriteData(mAtlas, ta);
 					mRegisteredUndo = true;
-
-					UISprite[] sprites = Resources.FindObjectsOfTypeAll(typeof(UISprite)) as UISprite[];
-
-					foreach (UISprite sp in sprites)
-					{
-						if (sp.atlas == mAtlas)
-						{
-							sp.MarkAsChanged();
-							EditorUtility.SetDirty(sp);
-						}
-					}
-
-					UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
-
-					foreach (UILabel lbl in labels)
-					{
-						if (lbl.font != null && lbl.font.atlas == mAtlas)
-						{
-							lbl.MarkAsChanged();
-							EditorUtility.SetDirty(lbl);
-						}
-					}
+					MarkAtlasAsDirty();
 				}
 				coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", coords);
 			}
@@ -223,6 +264,50 @@ public class UIAtlasInspector : Editor
 						inner.yMax = Mathf.Clamp(inner.yMax, outer.yMin, outer.yMax);
 
 						EditorGUILayout.Separator();
+
+						// Padding is mainly meant to be used by the 'trimmed' feature of TexturePacker
+						{
+							int l0 = Mathf.RoundToInt(mSprite.paddingLeft * mSprite.outer.width);
+							int r0 = Mathf.RoundToInt(mSprite.paddingRight * mSprite.outer.width);
+							int t0 = Mathf.RoundToInt(mSprite.paddingTop * mSprite.outer.height);
+							int b0 = Mathf.RoundToInt(mSprite.paddingBottom * mSprite.outer.height);
+
+							int l1 = l0;
+							int r1 = r0;
+							int t1 = t0;
+							int b1 = b0;
+
+							GUILayout.BeginHorizontal();
+							{
+								GUILayout.Label("Padding");
+								GUILayout.Space(7f);
+								EditorGUIUtility.LookLikeControls(40f);
+								l1 = EditorGUILayout.IntField("Left", l0, GUILayout.MinWidth(40f));
+								r1 = EditorGUILayout.IntField("Right", r0, GUILayout.MinWidth(40f));
+							}
+							GUILayout.EndHorizontal();
+
+							GUILayout.BeginHorizontal();
+							{
+								GUILayout.Space(60f);
+								EditorGUIUtility.LookLikeControls(40f);
+								t1 = EditorGUILayout.IntField("Top", t0, GUILayout.MinWidth(40f));
+								b1 = EditorGUILayout.IntField("Btm.", b0, GUILayout.MinWidth(40f));
+							}
+							GUILayout.EndHorizontal();
+
+							if (l0 != l1 || r0 != r1 || t0 != t1 || b0 != b1)
+							{
+								RegisterUndo();
+								mSprite.paddingLeft		= l1 / mSprite.outer.width;
+								mSprite.paddingRight	= r1 / mSprite.outer.width;
+								mSprite.paddingTop		= t1 / mSprite.outer.height;
+								mSprite.paddingBottom	= b1 / mSprite.outer.height;
+								MarkSpriteAsDirty();
+							}
+
+							EditorGUIUtility.LookLikeControls(80f);
+						}
 
 						// Create a button that can make the coordinates pixel-perfect on click
 						GUILayout.BeginHorizontal();

@@ -107,7 +107,7 @@ public class UISprite : UIWidget
 	}
 
 	/// <summary>
-	/// Helper function that calculates the relative pivot offset based on the current pivot.
+	/// Helper function that calculates the relative offset based on the current pivot.
 	/// </summary>
 
 	override public Vector2 pivotOffset
@@ -126,25 +126,6 @@ public class UISprite : UIWidget
 			else v.y = -mSprite.paddingTop;
 
 			return v;
-		}
-	}
-
-	/// <summary>
-	/// Visible size of the widget in relative coordinates. In most cases this can remain at (1, 1).
-	/// </summary>
-
-	override public Vector2 visibleSize
-	{
-		get
-		{
-			Vector2 size = Vector2.one;
-
-			/*if (mSprite != null)
-			{
-				size.x += mSprite.paddingLeft + mSprite.paddingRight;
-				size.y += mSprite.paddingTop + mSprite.paddingBottom;
-			}*/
-			return size;
 		}
 	}
 

@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.25
+                Version 1.26
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -35,6 +35,12 @@ All can be found here: http://www.tasharen.com/?page_id=140
 ---------------
 Version History
 ---------------
+
+1.26:
+- NEW: Added support for trimmed sprites exported via TexturePacker.
+- NEW: UISlider now has horizontal and vertical styles.
+- FIX: UISlider now uses the collider's bounds instead of the target's bounds.
+- FIX: Sliced sprite will now behave better when scaled with all pivot points, not just top-left.
 
 1.25:
 - NEW: Added a UIGrid script that can be used to easily arrange icons into a grid.

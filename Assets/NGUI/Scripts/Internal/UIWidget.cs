@@ -365,7 +365,7 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Helper function that calculates the relative pivot offset based on the current pivot.
+	/// Helper function that calculates the relative offset based on the current pivot.
 	/// </summary>
 
 	virtual public Vector2 pivotOffset
