@@ -15,6 +15,12 @@ public class UIAtlas : MonoBehaviour
 		public string name;
 		public Rect outer = new Rect(0f, 0f, 1f, 1f);
 		public Rect inner = new Rect(0f, 0f, 1f, 1f);
+
+		// Padding is needed for trimmed sprites and is relative to sprite width and height
+		public float paddingLeft	= 0f;
+		public float paddingRight	= 0f;
+		public float paddingTop		= 0f;
+		public float paddingBottom	= 0f;
 	}
 
 	/// <summary>

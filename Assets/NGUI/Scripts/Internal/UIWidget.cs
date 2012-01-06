@@ -43,61 +43,19 @@ public abstract class UIWidget : MonoBehaviour
 	/// Color used by the widget.
 	/// </summary>
 
-	public Color color
-	{
-		get
-		{
-			return mColor;
-		}
-		set
-		{
-			if (mColor != value)
-			{
-				mColor = value;
-				mChanged = true;
-			}
-		}
-	}
+	public Color color { get { return mColor; } set { if (mColor != value) { mColor = value; mChanged = true; } } }
 
 	/// <summary>
 	/// Set or get the value that specifies where the widget's pivot point should be.
 	/// </summary>
 
-	public Pivot pivot
-	{
-		get
-		{
-			return mPivot;
-		}
-		set
-		{
-			if (mPivot != value)
-			{
-				mPivot = value;
-				mChanged = true;
-			}
-		}
-	}
+	public Pivot pivot { get { return mPivot; } set { if (mPivot != value) { mPivot = value; mChanged = true; } } }
 	
 	/// <summary>
 	/// Depth controls the rendering order -- lowest to highest.
 	/// </summary>
 
-	public int depth
-	{
-		get
-		{
-			return mDepth;
-		}
-		set
-		{
-			if (mDepth != value)
-			{
-				mDepth = value;
-				mChanged = true;
-			}
-		}
-	}
+	public int depth { get { return mDepth; } set { if (mDepth != value) { mDepth = value; mChanged = true; } } }
 
 	/// <summary>
 	/// Transform gets cached for speed.
@@ -154,47 +112,13 @@ public abstract class UIWidget : MonoBehaviour
 	/// Return the widget's final scale.
 	/// </summary>
 
-	public Vector2 finalScale
-	{
-		get
-		{
-			Transform t = cachedTransform;
-			return t.localScale;
-		}
-	}
+	public Vector2 finalScale { get { Transform t = cachedTransform; return t.localScale; } }
 
 	/// <summary>
 	/// Returns the UI panel responsible for this widget.
 	/// </summary>
 
-	public UIPanel panel
-	{
-		get
-		{
-			CreatePanel();
-			return mPanel;
-		}
-	}
-
-	/// <summary>
-	/// Helper function that calculates the relative pivot offset based on the current pivot.
-	/// </summary>
-
-	public Vector2 pivotOffset
-	{
-		get
-		{
-			Vector2 v = Vector2.zero;
-
-			if (mPivot == Pivot.Top || mPivot == Pivot.Center || mPivot == Pivot.Bottom) v.x -= 0.5f;
-			else if (mPivot == Pivot.TopRight || mPivot == Pivot.Right || mPivot == Pivot.BottomRight) v.x -= 1f;
-
-			if (mPivot == Pivot.Left || mPivot == Pivot.Center || mPivot == Pivot.Right) v.y += 0.5f;
-			else if (mPivot == Pivot.BottomLeft || mPivot == Pivot.Bottom || mPivot == Pivot.BottomRight) v.y += 1f;
-
-			return v;
-		}
-	}
+	public UIPanel panel { get { CreatePanel(); return mPanel; } }
 
 	/// <summary>
 	/// Static widget comparison function used for Z-sorting.
@@ -344,6 +268,8 @@ public abstract class UIWidget : MonoBehaviour
 		}
 	}
 
+#if UNITY_EDITOR
+
 	/// <summary>
 	/// Draw some selectable gizmos.
 	/// </summary>
@@ -373,12 +299,13 @@ public abstract class UIWidget : MonoBehaviour
 
 			// Draw the gizmo
 			Gizmos.matrix = mat * local;
-			Gizmos.color = outline;
+			Gizmos.color = (UnityEditor.Selection.activeGameObject == gameObject) ? Color.green : outline;
 			Gizmos.DrawWireCube(pos, size);
 			Gizmos.color = Color.clear;
 			Gizmos.DrawCube(pos, size);
 		}
 	}
+#endif
 
 	/// <summary>
 	/// Update the widget.
@@ -438,7 +365,27 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Visible size of the widget in local coordinates. In most cases this can remain at (1, 1).
+	/// Helper function that calculates the relative pivot offset based on the current pivot.
+	/// </summary>
+
+	virtual public Vector2 pivotOffset
+	{
+		get
+		{
+			Vector2 v = Vector2.zero;
+
+			if (mPivot == Pivot.Top || mPivot == Pivot.Center || mPivot == Pivot.Bottom) v.x = -0.5f;
+			else if (mPivot == Pivot.TopRight || mPivot == Pivot.Right || mPivot == Pivot.BottomRight) v.x = -1f;
+
+			if (mPivot == Pivot.Left || mPivot == Pivot.Center || mPivot == Pivot.Right) v.y = 0.5f;
+			else if (mPivot == Pivot.BottomLeft || mPivot == Pivot.Bottom || mPivot == Pivot.BottomRight) v.y = 1f;
+
+			return v;
+		}
+	}
+
+	/// <summary>
+	/// Visible size of the widget in relative coordinates. In most cases this can remain at (1, 1).
 	/// </summary>
 
 	virtual public Vector2 visibleSize { get { return Vector2.one; } }

@@ -64,21 +64,23 @@ public class NGUIJson
 
 		foreach (System.Collections.DictionaryEntry item in frames)
 		{
+			UIAtlas.Sprite newSprite = new UIAtlas.Sprite();
+			newSprite.name = item.Key.ToString();
+
 			// Extract the info we need from the TexturePacker json file, mainly uvRect and size
-			Hashtable frame = (Hashtable)((Hashtable)item.Value)["frame"];
+			Hashtable table = (Hashtable)item.Value;
+			Hashtable frame = (Hashtable)table["frame"];
+
 			int frameX = int.Parse(frame["x"].ToString());
 			int frameY = int.Parse(frame["y"].ToString());
 			int frameW = int.Parse(frame["w"].ToString());
 			int frameH = int.Parse(frame["h"].ToString());
 
 			// Read the rotation value
-			bool item1 = (bool)((Hashtable)item.Value)["rotated"];
-
-			UIAtlas.Sprite newSprite = new UIAtlas.Sprite();
-			newSprite.name = item.Key.ToString();
+			bool rotated = (bool)table["rotated"];
 
 			// Fill in the proper values
-			if (item1)
+			if (rotated)
 			{
 				newSprite.outer = new Rect(frameX, frameY, frameH, frameW);
 				newSprite.inner = new Rect(frameX, frameY, frameH, frameW);
@@ -87,6 +89,35 @@ public class NGUIJson
 			{
 				newSprite.outer = new Rect(frameX, frameY, frameW, frameH);
 				newSprite.inner = new Rect(frameX, frameY, frameW, frameH);
+			}
+
+			// Support for trimmed sprites
+			Hashtable sourceSize = (Hashtable)table["sourceSize"];
+			Hashtable spriteSize = (Hashtable)table["spriteSourceSize"];
+
+			if (spriteSize != null && sourceSize != null)
+			{
+				// TODO: Account for rotated sprites
+				// TODO: Fonts should take padding into account as well -- by using the original texture's dimensions in new texture's space
+				if (frameW > 0)
+				{
+					float spriteX = int.Parse(spriteSize["x"].ToString());
+					float spriteW = int.Parse(spriteSize["w"].ToString());
+					float sourceW = int.Parse(sourceSize["w"].ToString());
+
+					newSprite.paddingLeft = spriteX / frameW;
+					newSprite.paddingRight = (sourceW - (spriteX + spriteW)) / frameW;
+				}
+
+				if (frameH > 0)
+				{
+					float spriteY = int.Parse(spriteSize["y"].ToString());
+					float spriteH = int.Parse(spriteSize["h"].ToString());
+					float sourceH = int.Parse(sourceSize["h"].ToString());
+
+					newSprite.paddingTop = spriteY / frameH;
+					newSprite.paddingBottom = (sourceH - (spriteY + spriteH)) / frameH;
+				}
 			}
 
 			// If the sprite was present before, see if we can copy its inner rect

@@ -107,6 +107,48 @@ public class UISprite : UIWidget
 	}
 
 	/// <summary>
+	/// Helper function that calculates the relative pivot offset based on the current pivot.
+	/// </summary>
+
+	override public Vector2 pivotOffset
+	{
+		get
+		{
+			Vector2 v = Vector2.zero;
+			Pivot pv = pivot;
+
+			if (pv == Pivot.Top || pv == Pivot.Center || pv == Pivot.Bottom) v.x = (-1f - mSprite.paddingRight + mSprite.paddingLeft) * 0.5f;
+			else if (pv == Pivot.TopRight || pv == Pivot.Right || pv == Pivot.BottomRight) v.x = -1f - mSprite.paddingRight;
+			else v.x = mSprite.paddingLeft;
+
+			if (pv == Pivot.Left || pv == Pivot.Center || pv == Pivot.Right) v.y = (1f + mSprite.paddingBottom - mSprite.paddingTop) * 0.5f;
+			else if (pv == Pivot.BottomLeft || pv == Pivot.Bottom || pv == Pivot.BottomRight) v.y = 1f + mSprite.paddingBottom;
+			else v.y = -mSprite.paddingTop;
+
+			return v;
+		}
+	}
+
+	/// <summary>
+	/// Visible size of the widget in relative coordinates. In most cases this can remain at (1, 1).
+	/// </summary>
+
+	override public Vector2 visibleSize
+	{
+		get
+		{
+			Vector2 size = Vector2.one;
+
+			/*if (mSprite != null)
+			{
+				size.x += mSprite.paddingLeft + mSprite.paddingRight;
+				size.y += mSprite.paddingTop + mSprite.paddingBottom;
+			}*/
+			return size;
+		}
+	}
+
+	/// <summary>
 	/// Update the texture UVs used by the widget.
 	/// </summary>
 

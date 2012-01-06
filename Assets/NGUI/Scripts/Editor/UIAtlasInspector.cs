@@ -18,9 +18,9 @@ public class UIAtlasInspector : Editor
 	static bool mUseShader = false;
 
 	UIAtlas mAtlas;
-	int mIndex = 0;
 	bool mRegisteredUndo = false;
 	bool mConfirmDelete = false;
+	UIAtlas.Sprite mSprite;
 
 	/// <summary>
 	/// Register an Undo command with the Unity editor.
@@ -53,16 +53,40 @@ public class UIAtlasInspector : Editor
 			GUITools.DrawSeparator();
 			mat = EditorGUILayout.ObjectField("Material", mat, typeof(Material), false) as Material;
 
-			TextAsset ta = EditorGUILayout.ObjectField("TP Import", null, typeof(TextAsset), false) as TextAsset;
-			
-			if (ta != null)
+			if (mat != null)
 			{
-				Undo.RegisterUndo(mAtlas, "Import Sprites");
-				NGUIJson.LoadSpriteData(mAtlas, ta);
-				mRegisteredUndo = true;
-			}
+				TextAsset ta = EditorGUILayout.ObjectField("TP Import", null, typeof(TextAsset), false) as TextAsset;
 
-			coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", coords);
+				if (ta != null)
+				{
+					Undo.RegisterUndo(mAtlas, "Import Sprites");
+					NGUIJson.LoadSpriteData(mAtlas, ta);
+					mRegisteredUndo = true;
+
+					UISprite[] sprites = Resources.FindObjectsOfTypeAll(typeof(UISprite)) as UISprite[];
+
+					foreach (UISprite sp in sprites)
+					{
+						if (sp.atlas == mAtlas)
+						{
+							sp.MarkAsChanged();
+							EditorUtility.SetDirty(sp);
+						}
+					}
+
+					UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+
+					foreach (UILabel lbl in labels)
+					{
+						if (lbl.font != null && lbl.font.atlas == mAtlas)
+						{
+							lbl.MarkAsChanged();
+							EditorUtility.SetDirty(lbl);
+						}
+					}
+				}
+				coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", coords);
+			}
 		}
 
 		if (GUI.changed)
@@ -79,119 +103,114 @@ public class UIAtlasInspector : Editor
 			Color blue = new Color(0f, 0.7f, 1f, 1f);
 			Color green = new Color(0.4f, 1f, 0f, 1f);
 
-			mIndex = Mathf.Min(mIndex, mAtlas.sprites.Count - 1);
-			mIndex = Mathf.Max(mIndex, 0);
-
-			UIAtlas.Sprite sprite = (mIndex < mAtlas.sprites.Count) ? mAtlas.sprites[mIndex] : null;
+			if (mSprite == null && mAtlas.sprites.Count > 0)
+			{
+				mSprite = mAtlas.sprites[0];
+			}
 
 			if (mConfirmDelete)
 			{
-				// Show the confirmation dialog
-				GUITools.DrawSeparator();
-				GUILayout.Label("Are you sure you want to delete '" + sprite.name + "'?");
-				GUITools.DrawSeparator();
-
-				GUILayout.BeginHorizontal();
+				if (mSprite != null)
 				{
-					GUI.backgroundColor = Color.green;
-					if (GUILayout.Button("Cancel")) mConfirmDelete = false;
-					GUI.backgroundColor = Color.red;
+					// Show the confirmation dialog
+					GUITools.DrawSeparator();
+					GUILayout.Label("Are you sure you want to delete '" + mSprite.name + "'?");
+					GUITools.DrawSeparator();
 
-					if (GUILayout.Button("Delete"))
+					GUILayout.BeginHorizontal();
 					{
-						RegisterUndo();
-						mAtlas.sprites.RemoveAt(mIndex);
-						mConfirmDelete = false;
+						GUI.backgroundColor = Color.green;
+						if (GUILayout.Button("Cancel")) mConfirmDelete = false;
+						GUI.backgroundColor = Color.red;
+
+						if (GUILayout.Button("Delete"))
+						{
+							RegisterUndo();
+							mAtlas.sprites.Remove(mSprite);
+							mConfirmDelete = false;
+						}
+						GUI.backgroundColor = Color.white;
 					}
-					GUI.backgroundColor = Color.white;
+					GUILayout.EndHorizontal();
 				}
-				GUILayout.EndHorizontal();
+				else mConfirmDelete = false;
 			}
 			else
 			{
 				GUI.backgroundColor = Color.green;
-				
-				if (GUILayout.Button("New Sprite"))
+
+				GUILayout.BeginHorizontal();
 				{
-					RegisterUndo();
-					UIAtlas.Sprite newSprite = new UIAtlas.Sprite();
+					EditorGUILayout.PrefixLabel("Add/Delete");
 
-					if (sprite != null)
+					if (GUILayout.Button("New Sprite"))
 					{
-						newSprite.name = "Copy of " + sprite.name;
-						newSprite.outer = sprite.outer;
-						newSprite.inner = sprite.inner;
-					}
-					else
-					{
-						newSprite.name = "New Sprite";
+						RegisterUndo();
+						UIAtlas.Sprite newSprite = new UIAtlas.Sprite();
+
+						if (mSprite != null)
+						{
+							newSprite.name = "Copy of " + mSprite.name;
+							newSprite.outer = mSprite.outer;
+							newSprite.inner = mSprite.inner;
+						}
+						else
+						{
+							newSprite.name = "New Sprite";
+						}
+
+						mAtlas.sprites.Add(newSprite);
+						mSprite = newSprite;
 					}
 
-					mAtlas.sprites.Add(newSprite);
-					mIndex = mAtlas.sprites.Count - 1;
-					sprite = newSprite;
+					// Show the delete button
+					GUI.backgroundColor = Color.red;
+
+					if (GUILayout.Button("Delete", GUILayout.Width(55f)))
+					{
+						mConfirmDelete = true;
+					}
+					GUI.backgroundColor = Color.white;
 				}
-				GUI.backgroundColor = Color.white;
+				GUILayout.EndHorizontal();
 
-				if (sprite != null)
+				if (!mConfirmDelete && mSprite != null)
 				{
 					GUITools.DrawSeparator();
 
-					// Navigation section
-					GUILayout.BeginHorizontal();
+					string spriteName = UISpriteInspector.SpriteField(mAtlas, mSprite.name);
+
+					if (spriteName != mSprite.name)
 					{
-						if (mIndex == 0) GUI.color = Color.grey;
-						if (GUILayout.Button("<<")) { mConfirmDelete = false; --mIndex; }
-						GUI.color = Color.white;
-						mIndex = EditorGUILayout.IntField(mIndex + 1, GUILayout.Width(40f)) - 1;
-						GUILayout.Label("/ " + mAtlas.sprites.Count, GUILayout.Width(40f));
-						if (mIndex + 1 == mAtlas.sprites.Count) GUI.color = Color.grey;
-						if (GUILayout.Button(">>")) { mConfirmDelete = false; ++mIndex; }
-						GUI.color = Color.white;
+						mSprite = mAtlas.GetSprite(spriteName);
 					}
-					GUILayout.EndHorizontal();
 
-					GUITools.DrawSeparator();
-
-					string name = sprite.name;
+					string name = mSprite.name;
 
 					// Grab the sprite's inner and outer dimensions
-					Rect inner = sprite.inner;
-					Rect outer = sprite.outer;
+					Rect inner = mSprite.inner;
+					Rect outer = mSprite.outer;
 
 					Texture2D tex = mat.mainTexture as Texture2D;
 
 					if (tex != null)
 					{
-						GUILayout.BeginHorizontal();
-						{
-							name = EditorGUILayout.TextField("Sprite Name", name);
-
-							// Show the delete button
-							GUI.backgroundColor = Color.red;
-							if (GUILayout.Button("Delete", GUILayout.Width(55f)))
-							{
-								mConfirmDelete = true;
-								return;
-							}
-							GUI.backgroundColor = Color.white;
-						}
-						GUILayout.EndHorizontal();
+						name = EditorGUILayout.TextField("Edit Name", name);
 
 						// Draw the inner and outer rectangle dimensions
 						GUI.backgroundColor = green;
-						outer = EditorGUILayout.RectField("Outer Rect", sprite.outer);
+						outer = EditorGUILayout.RectField("Outer Rect", mSprite.outer);
 						GUI.backgroundColor = blue;
-						inner = EditorGUILayout.RectField("Inner Rect", sprite.inner);
+						inner = EditorGUILayout.RectField("Inner Rect", mSprite.inner);
 						GUI.backgroundColor = Color.white;
 
 						if (outer.xMax < outer.xMin) outer.xMax = outer.xMin;
 						if (outer.yMax < outer.yMin) outer.yMax = outer.yMin;
 
-						if (outer != sprite.outer)
+						if (outer != mSprite.outer)
 						{
-							float x = outer.xMin - sprite.outer.xMin;
-							float y = outer.yMin - sprite.outer.yMin;
+							float x = outer.xMin - mSprite.outer.xMin;
+							float y = outer.yMin - mSprite.outer.yMin;
 
 							inner.x += x;
 							inner.y += y;
@@ -224,7 +243,7 @@ public class UIAtlasInspector : Editor
 								corrected1 = NGUITools.MakePixelPerfect(corrected1, tex.width, tex.height);
 							}
 
-							if (corrected0 == sprite.outer && corrected1 == sprite.inner)
+							if (corrected0 == mSprite.outer && corrected1 == mSprite.inner)
 							{
 								GUI.color = Color.grey;
 								GUILayout.Button("Make Pixel-Perfect");
@@ -282,9 +301,9 @@ public class UIAtlasInspector : Editor
 					if (GUI.changed)
 					{
 						RegisterUndo();
-						sprite.name = name;
-						sprite.outer = outer;
-						sprite.inner = inner;
+						mSprite.name = name;
+						mSprite.outer = outer;
+						mSprite.inner = inner;
 						mConfirmDelete = false;
 					}
 				}
