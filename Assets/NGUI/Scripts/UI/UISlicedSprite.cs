@@ -97,18 +97,43 @@ public class UISlicedSprite : UISprite
 			float borderBottom	= mInnerUV.yMax - mOuterUV.yMax;
 
 			Vector3 scale = cachedTransform.localScale;
+			scale.x = Mathf.Max(0f, scale.x);
+			scale.y = Mathf.Max(0f, scale.y);
+
 			Vector2 sz = new Vector2(scale.x / tex.width, scale.y / tex.height);
 			Vector2 tl = new Vector2(borderLeft / sz.x, borderTop / sz.y);
 			Vector2 br = new Vector2(borderRight / sz.x, borderBottom / sz.y);
 
-			v[1] += tl;
-			v[2] -= br;
+			Pivot pv = pivot;
 
-			v[2].x = Mathf.Max(tl.x, v[2].x);
-			v[2].y = Mathf.Min(tl.y, v[2].y);
+			// We don't want the sliced sprite to become smaller than the summed up border size
+			if (pv == Pivot.Right || pv == Pivot.TopRight || pv == Pivot.BottomRight)
+			{
+				v[0].y = Mathf.Min(0f, 1f - (br.x + tl.x));
+				v[1].x = v[0].x + tl.x;
+				v[2].x = v[0].x + Mathf.Max(tl.x, 1f - br.x);
+				v[3].x = v[0].x + Mathf.Max(tl.x + br.x, 1f);
+			}
+			else
+			{
+				v[1].x = tl.x;
+				v[2].x = Mathf.Max(tl.x, 1f - br.x);
+				v[3].x = Mathf.Max(tl.x + br.x, 1f);
+			}
 
-			v[3].x = Mathf.Max(tl.x + br.x, v[3].x);
-			v[3].y = Mathf.Min(tl.y + br.y, v[3].y);
+			if (pv == Pivot.Bottom || pv == Pivot.BottomLeft || pv == Pivot.BottomRight)
+			{
+				v[0].y = Mathf.Max(0f, -1f - (br.y + tl.y));
+				v[1].y = v[0].y + tl.y;
+				v[2].y = v[0].y + Mathf.Min(tl.y, -1f - br.y);
+				v[3].y = v[0].y + Mathf.Min(tl.y + br.y, -1f);
+			}
+			else
+			{
+				v[1].y = tl.y;
+				v[2].y = Mathf.Min(tl.y, -1f - br.y);
+				v[3].y = Mathf.Min(tl.y + br.y, -1f);
+			}
 
 			uv[0] = new Vector2(mOuterUV.xMin, mOuterUV.yMax);
 			uv[1] = new Vector2(mInnerUV.xMin, mInnerUV.yMax);

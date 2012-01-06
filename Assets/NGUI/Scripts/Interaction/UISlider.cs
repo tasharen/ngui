@@ -4,15 +4,25 @@ using UnityEngine;
 /// Simple slider functionality.
 /// </summary>
 
+[RequireComponent(typeof(BoxCollider))]
 [AddComponentMenu("NGUI/Interaction/Slider")]
 public class UISlider : MonoBehaviour
 {
+	public enum Direction
+	{
+		Horizontal,
+		Vertical,
+	}
+
 	public Transform foreground;
 
+	public Direction direction = Direction.Horizontal;
 	public float initialValue = 1f;
 
 	float mValue = 1f;
 	Vector3 mScale = Vector3.one;
+	BoxCollider mCol;
+	Transform mTrans;
 	Transform mForeTrans;
 
 	/// <summary>
@@ -52,6 +62,8 @@ public class UISlider : MonoBehaviour
 		{
 			mForeTrans = foreground.transform;
 			mScale = foreground.localScale;
+			mCol = collider as BoxCollider;
+			mTrans = transform;
 		}
 	}
 
@@ -92,18 +104,16 @@ public class UISlider : MonoBehaviour
 		float dist;
 		if (!plane.Raycast(ray, out dist)) return;
 
-		// Reset the scale so TransformPoint calculations are correct
-		mForeTrans.localScale = mScale;
-		mValue = 1f;
+		// Collider's bottom-left corner in local space
+		Vector3 localOrigin = mTrans.localPosition + mCol.center - mCol.extents;
+		Vector3 localOffset = localOrigin - mTrans.localPosition;
 
 		// Direction to the point on the plane in scaled local space
-		Vector3 dir = mForeTrans.InverseTransformDirection(ray.GetPoint(dist) - mForeTrans.position);
+		Vector3 localCursor = mTrans.InverseTransformPoint(ray.GetPoint(dist));
+		Vector3 dir = localCursor + localOffset;
 
-		// Direction of the full slider in scaled local space
-		Vector3 fullDir = mForeTrans.InverseTransformDirection(mForeTrans.TransformPoint(Vector3.right) - mForeTrans.TransformPoint(Vector3.zero));
-
-		// Update the value of the slider
-		sliderValue = dir.x / fullDir.x;
+		// Update the slider
+		sliderValue = (direction == Direction.Horizontal) ? dir.x / mCol.size.x : dir.y / mCol.size.y;
 	}
 
 	/// <summary>
@@ -113,7 +123,8 @@ public class UISlider : MonoBehaviour
 	void UpdateSlider ()
 	{
 		Vector3 scale = mScale;
-		scale.x *= mValue;
+		if (direction == Direction.Horizontal) scale.x *= mValue;
+		else scale.y *= mValue;
 		mForeTrans.localScale = scale;
 	}
 }
