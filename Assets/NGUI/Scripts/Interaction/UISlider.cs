@@ -106,7 +106,7 @@ public class UISlider : MonoBehaviour
 
 		// Collider's bottom-left corner in local space
 		Vector3 localOrigin = mTrans.localPosition + mCol.center - mCol.extents;
-		Vector3 localOffset = localOrigin - mTrans.localPosition;
+		Vector3 localOffset = mTrans.localPosition - localOrigin;
 
 		// Direction to the point on the plane in scaled local space
 		Vector3 localCursor = mTrans.InverseTransformPoint(ray.GetPoint(dist));

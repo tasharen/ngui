@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.26
+                Version 1.27
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -35,6 +35,11 @@ All can be found here: http://www.tasharen.com/?page_id=140
 ---------------
 Version History
 ---------------
+
+1.27:
+- FIX: UISlider should now work properly when centered again.
+- FIX: UI should now work in Flash after LoadLevel (added some work-arounds for current bugs in the flash export).
+- FIX: Sliced sprites should now look properly in Flash again (added another work-around for another bug in the Flash export).
 
 1.26:
 - NEW: Added support for trimmed sprites (and fonts) exported via TexturePacker.
