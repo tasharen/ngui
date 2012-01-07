@@ -9,6 +9,15 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Font")]
 public class UIFont : MonoBehaviour
 {
+#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
+	public Material mMat;
+	public Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
+	public BMFont mFont = new BMFont();
+	public int mSpacingX = 0;
+	public int mSpacingY = 0;
+	public UIAtlas mAtlas;
+	public string mSpriteName = "";
+#else
 	[SerializeField] Material mMat;
 	[SerializeField] Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
 	[SerializeField] BMFont mFont = new BMFont();
@@ -16,6 +25,7 @@ public class UIFont : MonoBehaviour
 	[SerializeField] int mSpacingY = 0;
 	[SerializeField] UIAtlas mAtlas;
 	[SerializeField] string mSpriteName = "";
+#endif
 
 	// Cached value
 	UIAtlas.Sprite mSprite;

@@ -14,8 +14,13 @@ public class UISprite : UIWidget
 	static string mLastSprite = "";
 
 	// Cached and saved values
+#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
+	public UIAtlas mAtlas;
+	public string mSpriteName;
+#else
 	[SerializeField] UIAtlas mAtlas;
 	[SerializeField] string mSpriteName;
+#endif
 
 	protected UIAtlas.Sprite mSprite;
 	protected Rect mOuter;
@@ -195,7 +200,7 @@ public class UISprite : UIWidget
 	protected void Init ()
 	{
 #if !UNITY_FLASH
-		// Flash is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
+		// Unity 3.5b6 is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
 		if (mAtlas != null)
 #endif
 		{
@@ -211,7 +216,7 @@ public class UISprite : UIWidget
 	override protected void OnStart ()
 	{
 #if !UNITY_FLASH
-		// Flash is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
+		// Unity 3.5b6 is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
 		if (mAtlas != null)
 #endif
 		{

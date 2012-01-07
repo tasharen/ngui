@@ -8,6 +8,15 @@ public class UILabel : UIWidget
 	// Last used value, here for convenience (auto-set when a new label gets added via NGUI's menu)
 	static UIFont mLastFont;
 
+#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
+	public UIFont mFont;
+	public string mText = "";
+	public bool mEncoding = true;
+	public float mLineWidth = 0;
+	public bool mMultiline = true;
+	public bool mPassword = false;
+	public bool mShowLastChar = false;
+#else
 	[SerializeField] UIFont mFont;
 	[SerializeField] string mText = "";
 	[SerializeField] bool mEncoding = true;
@@ -15,6 +24,7 @@ public class UILabel : UIWidget
 	[SerializeField] bool mMultiline = true;
 	[SerializeField] bool mPassword = false;
 	[SerializeField] bool mShowLastChar = false;
+#endif
 
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
@@ -275,7 +285,7 @@ public class UILabel : UIWidget
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
 #if !UNITY_FLASH
-		// Flash is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
+		// Unity 3.5b6 is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
 		if (mFont == null) return;
 #endif	
 		// If the height changes, we should re-process the text

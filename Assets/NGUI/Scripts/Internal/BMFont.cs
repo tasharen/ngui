@@ -7,11 +7,19 @@
 [System.Serializable]
 public class BMFont
 {
+#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
+	public BMGlyph[] mGlyphs = null;
+	public int mSize = 0;	// How much to move the cursor when moving to the next line
+	public int mBase = 0;	// Offset from the top of the line to the base of each character
+	public int mWidth = 0;	// Original width of the texture
+	public int mHeight = 0;	// Original height of the texture
+#else
 	[SerializeField] BMGlyph[] mGlyphs = null;
 	[SerializeField] int mSize = 0;		// How much to move the cursor when moving to the next line
 	[SerializeField] int mBase = 0;		// Offset from the top of the line to the base of each character
-	[SerializeField] int mWidth = 0;		// Original width of the texture
+	[SerializeField] int mWidth = 0;	// Original width of the texture
 	[SerializeField] int mHeight = 0;	// Original height of the texture
+#endif
 
 	public bool isValid		{ get { return mGlyphs != null && mGlyphs.Length > 0; } }
 	public int charSize		{ get { return mSize; } set { mSize = value; } }
