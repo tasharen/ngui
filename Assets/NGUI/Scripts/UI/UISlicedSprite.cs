@@ -85,9 +85,9 @@ public class UISlicedSprite : UISprite
 		Texture tex = mainTexture;
 
 		v[0] = Vector2.zero;
-		v[1] = v[0];
+		v[1] = Vector2.zero;
 		v[2] = new Vector2(1f, -1f);
-		v[3] = v[2];
+		v[3] = new Vector2(1f, -1f);
 
 		if (tex != null)
 		{
@@ -109,7 +109,7 @@ public class UISlicedSprite : UISprite
 			// We don't want the sliced sprite to become smaller than the summed up border size
 			if (pv == Pivot.Right || pv == Pivot.TopRight || pv == Pivot.BottomRight)
 			{
-				v[0].y = Mathf.Min(0f, 1f - (br.x + tl.x));
+				v[0].x = Mathf.Min(0f, 1f - (br.x + tl.x));
 				v[1].x = v[0].x + tl.x;
 				v[2].x = v[0].x + Mathf.Max(tl.x, 1f - br.x);
 				v[3].x = v[0].x + Mathf.Max(tl.x + br.x, 1f);
