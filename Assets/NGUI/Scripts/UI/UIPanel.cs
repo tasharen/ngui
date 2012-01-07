@@ -15,9 +15,6 @@ public class UIPanel : MonoBehaviour
 	// Whether selectable gizmos will be shown for widgets under this panel
 	public bool showGizmos = true;
 
-	// Whether generated geometry is shown or hidden
-	[SerializeField] bool mHidden = true;
-
 	// List of all widgets managed by this panel
 	List<UIWidget> mWidgets = new List<UIWidget>();
 
@@ -34,28 +31,9 @@ public class UIPanel : MonoBehaviour
 	List<Vector2> mUvs = new List<Vector2>();
 	List<Color> mCols = new List<Color>();
 
-	/// <summary>
-	/// Widgets managed by this panel.
-	/// </summary>
-
-	public List<UIWidget> widgets { get { return mWidgets; } }
-
-	/// <summary>
-	/// Retrieve the list of all active draw calls, removing inactive ones in the process.
-	/// </summary>
-
-	public List<UIDrawCall> drawCalls
-	{
-		get
-		{
-			for (int i = mDrawCalls.Count; i > 0; )
-			{
-				UIDrawCall dc = mDrawCalls[--i];
-				if (dc == null) mDrawCalls.RemoveAt(i);
-			}
-			return mDrawCalls;
-		}
-	}
+#if UNITY_EDITOR
+	// Whether generated geometry is shown or hidden
+	[SerializeField] bool mHidden = true;
 
 	/// <summary>
 	/// Whether the panel's generated geometry will be hidden or not.
@@ -83,6 +61,30 @@ public class UIPanel : MonoBehaviour
 					go.active = true;
 				}
 			}
+		}
+	}
+#endif
+
+	/// <summary>
+	/// Widgets managed by this panel.
+	/// </summary>
+
+	public List<UIWidget> widgets { get { return mWidgets; } }
+
+	/// <summary>
+	/// Retrieve the list of all active draw calls, removing inactive ones in the process.
+	/// </summary>
+
+	public List<UIDrawCall> drawCalls
+	{
+		get
+		{
+			for (int i = mDrawCalls.Count; i > 0; )
+			{
+				UIDrawCall dc = mDrawCalls[--i];
+				if (dc == null) mDrawCalls.RemoveAt(i);
+			}
+			return mDrawCalls;
 		}
 	}
 
@@ -130,7 +132,7 @@ public class UIPanel : MonoBehaviour
 				mHidden ? HideFlags.HideAndDontSave : HideFlags.DontSave | HideFlags.NotEditable);
 #else
 			GameObject go = new GameObject("_UIDrawCall [" + mat.name + "]");
-			go.hideFlags = mHidden ? HideFlags.HideAndDontSave : HideFlags.DontSave | HideFlags.NotEditable;
+			go.hideFlags = HideFlags.HideAndDontSave;
 #endif
 
 			go.layer = gameObject.layer;
