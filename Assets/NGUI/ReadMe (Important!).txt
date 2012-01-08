@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.27
+                Version 1.28
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -35,6 +35,9 @@ All can be found here: http://www.tasharen.com/?page_id=140
 ---------------
 Version History
 ---------------
+
+1.28:
+- NEW: Added a simple tweener and a set of tweening scripts (position, rotation, scale, and color).
 
 1.27:
 - FIX: UISlider should now work properly when centered again.

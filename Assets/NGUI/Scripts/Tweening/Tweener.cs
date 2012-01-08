@@ -20,6 +20,7 @@ public abstract class Tweener : MonoBehaviour
 
 	public Method method = Method.Linear;
 	public float duration = 1f;
+	public bool loop = false;
 
 	float mDuration = 0f;
 	float mAmountPerDelta = 1f;
@@ -59,7 +60,14 @@ public abstract class Tweener : MonoBehaviour
 		if (mFactor > 1f)
 		{
 			mFactor = 1f;
-			enabled = false;
+			if (loop) mAmountPerDelta = -mAmountPerDelta;
+			else enabled = false;
+		}
+		else if (mFactor < 0f)
+		{
+			mFactor = 0f;
+			if (loop) mAmountPerDelta = -mAmountPerDelta;
+			else enabled = false;
 		}
 	}
 
@@ -80,6 +88,7 @@ public abstract class Tweener : MonoBehaviour
 		comp.duration = duration;
 		comp.mFactor = 0f;
 		comp.enabled = true;
+		comp.loop = false;
 		return comp;
 	}
 }
