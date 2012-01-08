@@ -364,4 +364,16 @@ static public class NGUITools
 		}
 		return null;
 	}
+
+	/// <summary>
+	/// Since Unity doesn't have a Vector*Vector function...
+	/// </summary>
+
+	static public Vector3 Multiply (Vector3 a, Vector3 b)
+	{
+		a.x *= b.x;
+		a.y *= b.y;
+		a.z *= b.z;
+		return a;
+	}
 }

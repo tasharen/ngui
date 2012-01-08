@@ -9,7 +9,7 @@ using UnityEngine;
 public class WindowDragTilt : MonoBehaviour
 {
 	public float tiltAmount = 100f;
-	public bool smoothen = false;
+	public bool smoothen = true;
 
 	Vector3 mLastPos;
 	Transform mTrans;

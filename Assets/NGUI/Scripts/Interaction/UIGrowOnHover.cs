@@ -7,35 +7,20 @@
 [AddComponentMenu("NGUI/Interaction/Grow On Hover")]
 public class UIGrowOnHover : MonoBehaviour
 {
+	public float duration = 0.25f;
 	public Vector3 amount = new Vector3(1.1f, 1.1f, 1.1f);
-	public float animationSpeed = 8f;
 
-	Transform mTrans;
 	Vector3 mBaseScale;
-	bool mMouseOver = false;
-
-	void OnHover (bool isOver)
-	{
-		mMouseOver = isOver;
-	}
+	Vector3 mTargetScale;
 
 	void Start ()
 	{
-		mTrans = transform;
-		mBaseScale = mTrans.localScale;
+		mBaseScale = transform.localScale;
+		mTargetScale = NGUITools.Multiply(mBaseScale, amount);
 	}
 
-	void Update ()
+	void OnHover (bool isOver)
 	{
-		Vector3 target = mBaseScale;
-		
-		if (mMouseOver)
-		{
-			target.x *= amount.x;
-			target.y *= amount.y;
-			target.z *= amount.z;
-		}
-
-		mTrans.localScale = Vector3.Lerp(mTrans.localScale, target, Time.deltaTime * animationSpeed);
+		TweenScale.Begin(gameObject, duration, isOver ? mTargetScale : mBaseScale).method = Tweener.Method.EaseInOut;
 	}
 }

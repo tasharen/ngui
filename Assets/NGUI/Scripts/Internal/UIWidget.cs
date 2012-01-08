@@ -395,6 +395,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	/// <summary>
 	/// Visible size of the widget in relative coordinates. In most cases this can remain at (1, 1).
+	/// If you want to figure out the widget's size in pixels, multiply this value by localScale.xy.
 	/// </summary>
 
 	virtual public Vector2 visibleSize { get { return Vector2.one; } }

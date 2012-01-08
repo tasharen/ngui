@@ -9,25 +9,28 @@
 public class UIStatePositions : MonoBehaviour
 {
 	public int currentState = 0;
-	public float animationSpeed = 8f;
+	public float duration = 0.5f;
 	public Vector3[] positions;
 
 	Transform mTrans;
-
-	void OnState (int state)
-	{
-		currentState = state;
-	}
 
 	void Start ()
 	{
 		mTrans = transform;
 	}
 
-	void Update ()
+	void OnState (int state)
 	{
-		if (positions == null || positions.Length == 0) return;
-		int index = Mathf.Clamp(currentState, 0, positions.Length - 1);
-		mTrans.localPosition = Vector3.Lerp(mTrans.localPosition, positions[index], Mathf.Clamp01(Time.deltaTime * animationSpeed));
+		if (currentState != state)
+		{
+			currentState = state;
+			if (positions == null || positions.Length == 0) return;
+			int index = Mathf.Clamp(currentState, 0, positions.Length - 1);
+
+			TweenPosition tc = Tweener.Begin<TweenPosition>(gameObject, duration);
+			tc.method = Tweener.Method.EaseInOut;
+			tc.from = mTrans.localPosition;
+			tc.to = positions[index];
+		}
 	}
 }

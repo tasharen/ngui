@@ -9,29 +9,28 @@
 public class UIStateRotations : MonoBehaviour
 {
 	public int currentState = 0;
-	public float animationSpeed = 8f;
+	public float duration = 0.5f;
 	public Vector3[] rotations;
 
 	Transform mTrans;
-	Quaternion mTargetRot;
-
-	void OnState (int state)
-	{
-		currentState = state;
-	}
 
 	void Start ()
 	{
 		mTrans = transform;
-		mTargetRot = mTrans.localRotation;
 	}
 
-	void Update ()
+	void OnState (int state)
 	{
-		if (rotations == null || rotations.Length == 0) return;
-		int index = Mathf.Clamp(currentState, 0, rotations.Length - 1);
-		mTargetRot = Quaternion.Euler(rotations[index]);
-		mTrans.localRotation = Quaternion.Slerp(mTrans.localRotation, mTargetRot,
-			Mathf.Clamp01(Time.deltaTime * animationSpeed));
+		if (currentState != state)
+		{
+			currentState = state;
+			if (rotations == null || rotations.Length == 0) return;
+			int index = Mathf.Clamp(currentState, 0, rotations.Length - 1);
+
+			TweenRotation tc = Tweener.Begin<TweenRotation>(gameObject, duration);
+			tc.method = Tweener.Method.EaseInOut;
+			tc.from = mTrans.localRotation;
+			tc.to = Quaternion.Euler(rotations[index]);
+		}
 	}
 }

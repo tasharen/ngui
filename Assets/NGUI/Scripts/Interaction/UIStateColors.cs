@@ -1,34 +1,24 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Changes the color of the widget based on the currently active state.
-/// Tip: Use UISendState to change the state of a remote widget that has UIStateColors attached.
+/// Changes the color of the widget, renderer or light based on the currently active state.
 /// </summary>
 
-[RequireComponent(typeof(UIWidget))]
 [AddComponentMenu("NGUI/Interaction/State Colors")]
 public class UIStateColors : MonoBehaviour
 {
 	public int currentState = 0;
-	public float animationSpeed = 8f;
+	public float duration = 0.2f;
 	public Color[] colors;
-
-	UIWidget mWidget;
 
 	void OnState (int state)
 	{
-		currentState = state;
-	}
-
-	void Start ()
-	{
-		mWidget = GetComponent<UIWidget>();
-	}
-
-	void Update ()
-	{
-		if (colors == null || colors.Length == 0) return;
-		int index = Mathf.Clamp(currentState, 0, colors.Length - 1);
-		mWidget.color = Color.Lerp(mWidget.color, colors[index], Mathf.Clamp01(Time.deltaTime * animationSpeed));
+		if (currentState != state)
+		{
+			currentState = state;
+			if (colors == null || colors.Length == 0) return;
+			int index = Mathf.Clamp(currentState, 0, colors.Length - 1);
+			TweenColor.Begin(gameObject, duration, colors[index]);
+		}
 	}
 }

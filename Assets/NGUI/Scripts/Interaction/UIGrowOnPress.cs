@@ -7,40 +7,25 @@
 [AddComponentMenu("NGUI/Interaction/Grow On Press")]
 public class UIGrowOnPress : MonoBehaviour
 {
+	public float duration = 0.25f;
 	public Vector3 amount = new Vector3(1.1f, 1.1f, 1.1f);
-	public float animationSpeed = 8f;
 
-	Transform mTrans;
 	Vector3 mBaseScale;
-	bool mPressed = false;
+	Vector3 mTargetScale;
+
+	void Start ()
+	{
+		mBaseScale = transform.localScale;
+		mTargetScale = NGUITools.Multiply(mBaseScale, amount);
+	}
 
 	void OnPress (bool isOver)
 	{
-		mPressed = isOver;
+		TweenScale.Begin(gameObject, duration, isOver ? mTargetScale : mBaseScale).method = Tweener.Method.EaseInOut;
 	}
 
 	void OnDrag (Vector2 delta)
 	{
-		mPressed = (UICamera.lastHit.collider == collider);
-	}
-
-	void Start ()
-	{
-		mTrans = transform;
-		mBaseScale = mTrans.localScale;
-	}
-
-	void Update ()
-	{
-		Vector3 target = mBaseScale;
-
-		if (mPressed)
-		{
-			target.x *= amount.x;
-			target.y *= amount.y;
-			target.z *= amount.z;
-		}
-
-		mTrans.localScale = Vector3.Lerp(mTrans.localScale, target, Time.deltaTime * animationSpeed);
+		OnPress(UICamera.lastHit.collider == collider);
 	}
 }
