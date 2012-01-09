@@ -16,7 +16,7 @@ public class TweenScale : Tweener
 
 	void Awake () { mTrans = transform; }
 
-	override protected void OnUpdate (float factor) { mTrans.localScale = Vector3.Lerp(from, to, factor); }
+	override protected void OnUpdate (float factor) { mTrans.localScale = from * (1f - factor) + to * factor; }
 
 	/// <summary>
 	/// Start the tweening operation.

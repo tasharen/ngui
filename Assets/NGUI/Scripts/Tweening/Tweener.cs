@@ -110,7 +110,11 @@ public abstract class Tweener : MonoBehaviour
 	static public T Begin<T> (GameObject go, float duration) where T : Tweener
 	{
 		T comp = go.GetComponent<T>();
+#if UNITY_FLASH
+		if ((object)comp == null) comp = (T)go.AddComponent<T>();
+#else
 		if (comp == null) comp = go.AddComponent<T>();
+#endif
 		comp.duration = duration;
 		comp.mFactor = 0f;
 		comp.style = Style.Once;

@@ -371,10 +371,11 @@ static public class NGUITools
 
 	static public Vector3 Multiply (Vector3 a, Vector3 b)
 	{
-		a.x *= b.x;
-		a.y *= b.y;
-		a.z *= b.z;
-		return a;
+		Vector3 v = a;
+		v.x *= b.x;
+		v.y *= b.y;
+		v.z *= b.z;
+		return v;
 	}
 
 	/// <summary>
