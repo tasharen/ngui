@@ -12,6 +12,7 @@ public class UISprite : UIWidget
 	// Last used values, here for convenience
 	static UIAtlas mLastAtlas;
 	static string mLastSprite = "";
+	static bool mAutoResize = true;
 
 	// Cached and saved values
 #if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
@@ -64,11 +65,14 @@ public class UISprite : UIWidget
 
 				if (!string.IsNullOrEmpty(mSpriteName))
 				{
+					// We don't want to resize the sprite on atlas change
+					mAutoResize = false;
 					string sprite = mSpriteName;
 					mSpriteName = "";
 					spriteName = sprite;
 					mChanged = true;
 					UpdateUVs();
+					mAutoResize = true;
 				}
 			}
 		}
@@ -104,9 +108,13 @@ public class UISprite : UIWidget
 				mLastSprite = value;
 				mSpriteName = value;
 				mSprite = (mAtlas != null) ? mAtlas.GetSprite(mSpriteName) : null;
-				UpdateUVs();
 				mChanged = true;
-				if (noSprite) MakePixelPerfect();
+
+				if (mSprite != null)
+				{
+					UpdateUVs();
+					if (noSprite && mAutoResize) MakePixelPerfect();
+				}
 			}
 		}
 	}
@@ -199,10 +207,7 @@ public class UISprite : UIWidget
 
 	protected void Init ()
 	{
-#if !UNITY_FLASH
-		// Unity 3.5b6 is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
 		if (mAtlas != null)
-#endif
 		{
 			if (material == null) material = mAtlas.material;
 			if (mSprite == null) mSprite = string.IsNullOrEmpty(mSpriteName) ? null : mAtlas.GetSprite(mSpriteName);
@@ -215,10 +220,7 @@ public class UISprite : UIWidget
 
 	override protected void OnStart ()
 	{
-#if !UNITY_FLASH
-		// Unity 3.5b6 is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
 		if (mAtlas != null)
-#endif
 		{
 			UpdateUVs();
 		}
