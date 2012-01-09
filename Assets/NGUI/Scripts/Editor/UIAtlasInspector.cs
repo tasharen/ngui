@@ -128,7 +128,7 @@ public class UIAtlasInspector : Editor
 					Undo.RegisterUndo(mAtlas, "Import Sprites");
 					NGUIJson.LoadSpriteData(mAtlas, ta);
 					mRegisteredUndo = true;
-					mSprite = mAtlas.GetSprite(mSprite.name);
+					if (mSprite != null) mSprite = mAtlas.GetSprite(mSprite.name);
 					MarkAtlasAsDirty();
 				}
 				coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", coords);

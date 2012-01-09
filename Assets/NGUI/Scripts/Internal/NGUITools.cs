@@ -376,4 +376,47 @@ static public class NGUITools
 		a.z *= b.z;
 		return a;
 	}
+
+	/// <summary>
+	/// Add a collider to the game object containing one or more widgets.
+	/// </summary>
+
+	static public void AddWidgetCollider (GameObject go)
+	{
+		Collider col = go.GetComponent<Collider>();
+		BoxCollider box = col as BoxCollider;
+
+		if (box == null)
+		{
+			if (col != null)
+			{
+				if (Application.isPlaying) GameObject.Destroy(col);
+				else GameObject.DestroyImmediate(col);
+			}
+			box = go.AddComponent<BoxCollider>();
+		}
+
+		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>() as UIWidget[];
+
+		Matrix4x4 mat = go.transform.worldToLocalMatrix;
+		Bounds b = new Bounds(Vector3.zero, Vector3.zero);
+
+		foreach (UIWidget w in widgets)
+		{
+			Vector2 size = w.visibleSize;
+			Vector2 offset = w.pivotOffset;
+			float x = (offset.x + 0.5f) * size.x;
+			float y = (offset.y - 0.5f) * size.y;
+			size *= 0.5f;
+
+			b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x - size.x, y - size.y, 0f))));
+			b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x - size.x, y + size.y, 0f))));
+			b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x + size.x, y - size.y, 0f))));
+			b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x + size.x, y + size.y, 0f))));
+		}
+
+		box.isTrigger = true;
+		box.center = b.center;
+		box.size = b.size; // Need 3D colliders? Try this: new Vector3(b.size.x, b.size.y, Mathf.Max(1f, b.size.z));
+	}
 }

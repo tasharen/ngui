@@ -31,7 +31,6 @@ public class UIPanel : MonoBehaviour
 	List<Vector2> mUvs = new List<Vector2>();
 	List<Color> mCols = new List<Color>();
 
-#if UNITY_EDITOR
 	// Whether generated geometry is shown or hidden
 	[SerializeField] bool mHidden = true;
 
@@ -63,7 +62,6 @@ public class UIPanel : MonoBehaviour
 			}
 		}
 	}
-#endif
 
 	/// <summary>
 	/// Widgets managed by this panel.

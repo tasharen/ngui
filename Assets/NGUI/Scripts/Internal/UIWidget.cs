@@ -298,7 +298,7 @@ public abstract class UIWidget : MonoBehaviour
 
 			// Position should be offset by depth so selection works properly
 			Vector3 pos = Vector3.zero;
-			pos.z -= mDepth * (parent != null ? parent.lossyScale.z * 50f : 1f);
+			pos.z -= mDepth * 0.25f;
 
 			// Widget's local size
 			Vector2 size = visibleSize;

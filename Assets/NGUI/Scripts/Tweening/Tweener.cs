@@ -14,13 +14,20 @@ public abstract class Tweener : MonoBehaviour
 		EaseInOut,
 	}
 
+	public enum Style
+	{
+		Once,
+		Loop,
+		PingPong,
+	}
+
 	/// <summary>
 	/// Tweening method used.
 	/// </summary>
 
 	public Method method = Method.Linear;
+	public Style style = Style.Once;
 	public float duration = 1f;
-	public bool loop = false;
 
 	float mDuration = 0f;
 	float mAmountPerDelta = 1f;
@@ -32,13 +39,41 @@ public abstract class Tweener : MonoBehaviour
 
 	void Update ()
 	{
+		// Calculate the delta-per-time
 		if (mDuration != duration)
 		{
 			mDuration = duration;
 			mAmountPerDelta = Mathf.Abs((duration > 0f) ? 1f / duration : 1000f);
 		}
 
+		// Advance the sampling factor
 		mFactor += mAmountPerDelta * Time.deltaTime;
+
+		// Loop style simply resets the play factor after it exceeds 1.
+		if (style == Style.Loop)
+		{
+			if (mFactor > 1f)
+			{
+				mFactor -= Mathf.Floor(mFactor);
+			}
+		}
+		else if (style == Style.PingPong)
+		{
+			// Ping-pong style reverses the direction
+			if (mFactor > 1f)
+			{
+				mFactor = 1f - (mFactor - Mathf.Floor(mFactor));
+				mAmountPerDelta = -mAmountPerDelta;
+			}
+			else if (mFactor < 0f)
+			{
+				mFactor = -mFactor;
+				mFactor -= Mathf.Floor(mFactor);
+				mAmountPerDelta = -mAmountPerDelta;
+			}
+		}
+
+		// Calculate the sampling value
 		float val = Mathf.Clamp01(mFactor);
 
 		if (method == Method.EaseIn)
@@ -55,20 +90,11 @@ public abstract class Tweener : MonoBehaviour
 			val = val - Mathf.Sin(val * pi2) / pi2;
 		}
 
+		// Call the virtual update
 		OnUpdate(val);
 
-		if (mFactor > 1f)
-		{
-			mFactor = 1f;
-			if (loop) mAmountPerDelta = -mAmountPerDelta;
-			else enabled = false;
-		}
-		else if (mFactor < 0f)
-		{
-			mFactor = 0f;
-			if (loop) mAmountPerDelta = -mAmountPerDelta;
-			else enabled = false;
-		}
+		// If the factor goes out of range and this is a one-time tweening operation, disable the script
+		if (style == Style.Once && mFactor > 1f || mFactor < 0f) enabled = false;
 	}
 
 	/// <summary>
@@ -87,8 +113,8 @@ public abstract class Tweener : MonoBehaviour
 		if (comp == null) comp = go.AddComponent<T>();
 		comp.duration = duration;
 		comp.mFactor = 0f;
+		comp.style = Style.Once;
 		comp.enabled = true;
-		comp.loop = false;
 		return comp;
 	}
 }
