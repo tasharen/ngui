@@ -419,4 +419,31 @@ static public class NGUITools
 		box.center = b.center;
 		box.size = b.size; // Need 3D colliders? Try this: new Vector3(b.size.x, b.size.y, Mathf.Max(1f, b.size.z));
 	}
+
+	/// <summary>
+	/// Want to swap a low-res atlas for a hi-res one? Just use this function.
+	/// </summary>
+
+	static public void ReplaceAtlas (UIAtlas before, UIAtlas after)
+	{
+		UISprite[] sprites = Resources.FindObjectsOfTypeAll(typeof(UISprite)) as UISprite[];
+		
+		foreach (UISprite sprite in sprites)
+		{
+			if (sprite.atlas == before)
+			{
+				sprite.atlas = after;
+			}
+		}
+
+		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+
+		foreach (UILabel lbl in labels)
+		{
+			if (lbl.font != null && lbl.font.atlas == before)
+			{
+				lbl.font.atlas = after;
+			}
+		}
+	}
 }

@@ -184,6 +184,62 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Returns the processed version of 'text', with new line characters, line wrapping, etc.
+	/// </summary>
+
+	public string processedText
+	{
+		get
+		{
+			// If the height changes, we should re-process the text
+			if (mLineWidth > 0f)
+			{
+				float size = cachedTransform.localScale.y;
+
+				if (mLastSize != size)
+				{
+					mLastSize = size;
+					mShouldBeProcessed = true;
+				}
+			}
+
+			// Process the text if necessary
+			if (mShouldBeProcessed)
+			{
+				mShouldBeProcessed = false;
+				mProcessedText = mText.Replace("\\n", "\n");
+
+				if (mPassword)
+				{
+					mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, false);
+
+					string hidden = "";
+
+					if (mShowLastChar)
+					{
+						for (int i = 1, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
+						if (mProcessedText.Length > 0) hidden += mProcessedText[mProcessedText.Length - 1];
+					}
+					else
+					{
+						for (int i = 0, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
+					}
+					mProcessedText = hidden;
+				}
+				else if (mLineWidth > 0f)
+				{
+					mProcessedText = mFont.WrapText(mProcessedText, mLineWidth / cachedTransform.localScale.y, mMultiline, mEncoding);
+				}
+				else if (!mMultiline)
+				{
+					mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, mEncoding);
+				}
+			}
+			return mProcessedText;
+		}
+	}
+
+	/// <summary>
 	/// Convenience function used by NGUIMenu.
 	/// </summary>
 
@@ -192,45 +248,6 @@ public class UILabel : UIWidget
 		font = mLastFont;
 		text = "Text";
 		MakePixelPerfect();
-	}
-
-	/// <summary>
-	/// Helper function that processes the text, splitting it up into multiple lines as necessary.
-	/// </summary>
-
-	void ProcessText ()
-	{
-		if (mShouldBeProcessed)
-		{
-			mShouldBeProcessed = false;
-			mProcessedText = mText.Replace("\\n", "\n");
-
-			if (mPassword)
-			{
-				mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, false);
-
-				string hidden = "";
-
-				if (mShowLastChar)
-				{
-					for (int i = 1, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
-					if (mProcessedText.Length > 0) hidden += mProcessedText[mProcessedText.Length - 1];
-				}
-				else
-				{
-					for (int i = 0, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
-				}
-				mProcessedText = hidden;
-			}
-			else if (mLineWidth > 0f)
-			{
-				mProcessedText = mFont.WrapText(mProcessedText, mLineWidth / cachedTransform.localScale.y, mMultiline, mEncoding);
-			}
-			else if (!mMultiline)
-			{
-				mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, mEncoding);
-			}
-		}
 	}
 
 	/// <summary>
@@ -247,7 +264,7 @@ public class UILabel : UIWidget
 	/// Text is pixel-perfect when its scale matches the size.
 	/// </summary>
 
-	override public void MakePixelPerfect ()
+	public override void MakePixelPerfect ()
 	{
 		if (mFont != null)
 		{
@@ -274,7 +291,7 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			return (mFont != null) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding) : Vector2.zero;
+			return (mFont != null) ? mFont.CalculatePrintedSize(processedText, mEncoding) : Vector2.zero;
 		}
 	}
 
@@ -288,22 +305,7 @@ public class UILabel : UIWidget
 		// Unity 3.5b6 is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
 		if (mFont == null) return;
 #endif	
-		// If the height changes, we should re-process the text
-		if (mLineWidth > 0f)
-		{
-			float size = cachedTransform.localScale.y;
-
-			if (mLastSize != size)
-			{
-				mLastSize = size;
-				mShouldBeProcessed = true;
-			}
-		}
-
-		// Process the text if necessary
-		if (mShouldBeProcessed) ProcessText();
-
 		// Print the text into the buffers
-		mFont.Print(mProcessedText, color, verts, uvs, cols, mEncoding);
+		mFont.Print(processedText, color, verts, uvs, cols, mEncoding);
 	}
 }
