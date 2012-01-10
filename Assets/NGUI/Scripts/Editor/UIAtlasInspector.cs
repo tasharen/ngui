@@ -111,13 +111,18 @@ public class UIAtlasInspector : Editor
 		EditorGUIUtility.LookLikeControls(80f);
 		mAtlas = target as UIAtlas;
 
-		Material mat = mAtlas.material;
-		UIAtlas.Coordinates coords = mAtlas.coordinates;
-		
 		if (!mConfirmDelete)
 		{
 			GUITools.DrawSeparator();
-			mat = EditorGUILayout.ObjectField("Material", mat, typeof(Material), false) as Material;
+			Material mat = EditorGUILayout.ObjectField("Material", mAtlas.material, typeof(Material), false) as Material;
+
+			if (mAtlas.material != mat)
+			{
+				RegisterUndo();
+				mAtlas.material = mat;
+				MarkAtlasAsDirty();
+				mConfirmDelete = false;
+			}
 
 			if (mat != null)
 			{
@@ -131,20 +136,19 @@ public class UIAtlasInspector : Editor
 					if (mSprite != null) mSprite = mAtlas.GetSprite(mSprite.name);
 					MarkAtlasAsDirty();
 				}
-				coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", coords);
+				
+				UIAtlas.Coordinates coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", mAtlas.coordinates);
+
+				if (coords != mAtlas.coordinates)
+				{
+					RegisterUndo();
+					mAtlas.coordinates = coords;
+					mConfirmDelete = false;
+				}
 			}
 		}
 
-		if (GUI.changed)
-		{
-			// Atlas material has changed
-			RegisterUndo();
-			mAtlas.material = mat;
-			mAtlas.coordinates = coords;
-			mConfirmDelete = false;
-		}
-
-		if (mat != null)
+		if (mAtlas.material != null)
 		{
 			Color blue = new Color(0f, 0.7f, 1f, 1f);
 			Color green = new Color(0.4f, 1f, 0f, 1f);
@@ -237,7 +241,7 @@ public class UIAtlasInspector : Editor
 					Rect inner = mSprite.inner;
 					Rect outer = mSprite.outer;
 
-					Texture2D tex = mat.mainTexture as Texture2D;
+					Texture2D tex = mAtlas.material.mainTexture as Texture2D;
 
 					if (tex != null)
 					{

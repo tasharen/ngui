@@ -379,24 +379,13 @@ static public class NGUITools
 	}
 
 	/// <summary>
-	/// Add a collider to the game object containing one or more widgets.
+	/// Calculate the combined bounds of the widgets attached to the specified game object or its children.
 	/// </summary>
+	/// <param name="go"></param>
+	/// <returns></returns>
 
-	static public void AddWidgetCollider (GameObject go)
+	static public Bounds CalculateWidgetBounds (GameObject go)
 	{
-		Collider col = go.GetComponent<Collider>();
-		BoxCollider box = col as BoxCollider;
-
-		if (box == null)
-		{
-			if (col != null)
-			{
-				if (Application.isPlaying) GameObject.Destroy(col);
-				else GameObject.DestroyImmediate(col);
-			}
-			box = go.AddComponent<BoxCollider>();
-		}
-
 		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>() as UIWidget[];
 
 		Matrix4x4 mat = go.transform.worldToLocalMatrix;
@@ -415,7 +404,29 @@ static public class NGUITools
 			b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x + size.x, y - size.y, 0f))));
 			b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x + size.x, y + size.y, 0f))));
 		}
+		return b;
+	}
 
+	/// <summary>
+	/// Add a collider to the game object containing one or more widgets.
+	/// </summary>
+
+	static public void AddWidgetCollider (GameObject go)
+	{
+		Collider col = go.GetComponent<Collider>();
+		BoxCollider box = col as BoxCollider;
+
+		if (box == null)
+		{
+			if (col != null)
+			{
+				if (Application.isPlaying) GameObject.Destroy(col);
+				else GameObject.DestroyImmediate(col);
+			}
+			box = go.AddComponent<BoxCollider>();
+		}
+
+		Bounds b = CalculateWidgetBounds(go);
 		box.isTrigger = true;
 		box.center = b.center;
 		box.size = b.size; // Need 3D colliders? Try this: new Vector3(b.size.x, b.size.y, Mathf.Max(1f, b.size.z));

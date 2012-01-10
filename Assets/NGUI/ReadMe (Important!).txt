@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.28b
+                Version 1.30
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -36,9 +36,13 @@ All can be found here: http://www.tasharen.com/?page_id=140
 Version History
 ---------------
 
+1.30:
+- NEW: UIPanels can now specify a clipping area that's to be used with a new Clipped series of shaders.
+
 1.28:
 - NEW: Added a simple tweener and a set of tweening scripts (position, rotation, scale, and color).
 - FIX: Several fixes for rare non-critical issues.
+- FIX: Flash export bug work-arounds.
 
 1.27:
 - FIX: UISlider should now work properly when centered again.

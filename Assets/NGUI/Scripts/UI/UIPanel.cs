@@ -15,6 +15,9 @@ public class UIPanel : MonoBehaviour
 	// Whether selectable gizmos will be shown for widgets under this panel
 	public bool showGizmos = true;
 
+	// Clipping rectangle
+	Rect mClip = new Rect();
+
 	// List of all widgets managed by this panel
 	List<UIWidget> mWidgets = new List<UIWidget>();
 
@@ -32,25 +35,27 @@ public class UIPanel : MonoBehaviour
 	List<Color> mCols = new List<Color>();
 
 	// Whether generated geometry is shown or hidden
-	[SerializeField] bool mHidden = true;
+	[SerializeField] bool mDebug = false;
+
+	Transform mTrans;
 
 	/// <summary>
 	/// Whether the panel's generated geometry will be hidden or not.
 	/// </summary>
 
-	public bool hidden
+	public bool debug
 	{
 		get
 		{
-			return mHidden;
+			return mDebug;
 		}
 		set
 		{
-			if (mHidden != value)
+			if (mDebug != value)
 			{
-				mHidden = value;
+				mDebug = value;
 				List<UIDrawCall> list = drawCalls;
-				HideFlags flags = mHidden ? HideFlags.HideAndDontSave : HideFlags.DontSave | HideFlags.NotEditable;
+				HideFlags flags = mDebug ? HideFlags.DontSave | HideFlags.NotEditable : HideFlags.HideAndDontSave;
 
 				foreach (UIDrawCall dc in list)
 				{
@@ -59,6 +64,32 @@ public class UIPanel : MonoBehaviour
 					go.hideFlags = flags;
 					go.active = true;
 				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Whether the UIPanel has a clipping area.
+	/// </summary>
+
+	public bool isClipped { get { return mClip.width > 0f && mClip.height > 0f; } }
+
+	/// <summary>
+	/// Rectangle used for clipping (used with a valid shader)
+	/// </summary>
+
+	public Rect clippingRect
+	{
+		get
+		{
+			return mClip;
+		}
+		set
+		{
+			if (value.width >= 0f && value.height >= 0f && mClip != value)
+			{
+				mClip = value;
+				UpdateClippingRect();
 			}
 		}
 	}
@@ -94,6 +125,35 @@ public class UIPanel : MonoBehaviour
 	void MarkAsChanged (Material mat) { if (!mChanged.Contains(mat)) mChanged.Add(mat); }
 
 	/// <summary>
+	/// Update the clipping rect in the shaders.
+	/// </summary>
+
+	void UpdateClippingRect ()
+	{
+		if (mTrans == null) mTrans = transform;
+		Vector3 scale = mTrans.lossyScale;
+
+		Vector4 clip = new Vector4(
+					(mClip.xMax + mClip.xMin) * 0.5f,
+					(mClip.yMax + mClip.yMin) * 0.5f,
+					(mClip.xMax - mClip.xMin) * 0.5f,
+					(mClip.yMax - mClip.yMin) * 0.5f);
+
+		clip.x *= scale.x;
+		clip.y *= scale.y;
+		clip.z *= scale.x;
+		clip.w *= scale.y;
+
+		foreach (UIDrawCall dc in mDrawCalls)
+		{
+			if (dc.material != null && dc.material.shader != null && dc.material.HasProperty("_Range"))
+			{
+				dc.material.SetVector("_Range", clip);
+			}
+		}
+	}
+
+	/// <summary>
 	/// Add the specified widget to the managed list.
 	/// </summary>
 
@@ -127,7 +187,7 @@ public class UIPanel : MonoBehaviour
 #if UNITY_EDITOR
 			// If we're in the editor, create the game object with hide flags set right away
 			GameObject go = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags("_UIDrawCall [" + mat.name + "]",
-				mHidden ? HideFlags.HideAndDontSave : HideFlags.DontSave | HideFlags.NotEditable);
+				mDebug ? HideFlags.DontSave | HideFlags.NotEditable : HideFlags.HideAndDontSave);
 #else
 			GameObject go = new GameObject("_UIDrawCall [" + mat.name + "]");
 			go.hideFlags = HideFlags.HideAndDontSave;
@@ -187,6 +247,9 @@ public class UIPanel : MonoBehaviour
 			// Run through all the materials that have been marked as changed and rebuild them
 			mChanged.Clear();
 		}
+
+		// Update the clipping rects
+		UpdateClippingRect();
 	}
 
 	/// <summary>
@@ -260,11 +323,40 @@ public class UIPanel : MonoBehaviour
 		mCols.Clear();
 	}
 
+#if UNITY_EDITOR
+
 	/// <summary>
-	/// Find a UIPanel responsible for handling the specified transform.
+	/// Draw a visible pink outline for the clipped area.
 	/// </summary>
 
-	static public UIPanel Find (Transform trans)
+	void OnDrawGizmos ()
+	{
+		if (showGizmos && isClipped)
+		{
+			Vector3 bl = new Vector3(mClip.xMin, mClip.yMin, 0f);
+			Vector3 tr = new Vector3(mClip.xMax, mClip.yMax, 0f);
+
+			Vector3 pos = (bl + tr) * 0.5f;
+			Vector3 size = new Vector3(tr.x - bl.x, tr.y - bl.y, 0f);
+
+			Gizmos.matrix = transform.localToWorldMatrix;
+			Gizmos.color = Color.magenta;
+			Gizmos.DrawWireCube(pos, size);
+		}
+	}
+#endif
+
+	/// <summary>
+	/// Find the UIPanel responsible for handling the specified transform, creating a new one if necessary.
+	/// </summary>
+
+	static public UIPanel Find (Transform trans) { return Find(trans, true); }
+
+	/// <summary>
+	/// Find the UIPanel responsible for handling the specified transform.
+	/// </summary>
+
+	static public UIPanel Find (Transform trans, bool createIfMissing)
 	{
 		UIPanel panel = null;
 
@@ -276,10 +368,9 @@ public class UIPanel : MonoBehaviour
 			trans = trans.parent;
 		}
 
-		if (panel == null)
+		if (createIfMissing && panel == null)
 		{
 			panel = trans.gameObject.AddComponent<UIPanel>();
-			//Debug.Log("Adding UIPanel for " + NGUITools.GetHierarchy(trans.gameObject));
 		}
 		return panel;
 	}

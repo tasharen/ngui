@@ -127,17 +127,25 @@ public class UISprite : UIWidget
 	{
 		get
 		{
+			if (mSprite == null && mAtlas != null && !string.IsNullOrEmpty(mSpriteName))
+			{
+				mSprite = mAtlas.GetSprite(mSpriteName);
+			}
+
 			Vector2 v = Vector2.zero;
-			Pivot pv = pivot;
 
-			if (pv == Pivot.Top || pv == Pivot.Center || pv == Pivot.Bottom) v.x = (-1f - mSprite.paddingRight + mSprite.paddingLeft) * 0.5f;
-			else if (pv == Pivot.TopRight || pv == Pivot.Right || pv == Pivot.BottomRight) v.x = -1f - mSprite.paddingRight;
-			else v.x = mSprite.paddingLeft;
+			if (mSprite != null)
+			{
+				Pivot pv = pivot;
 
-			if (pv == Pivot.Left || pv == Pivot.Center || pv == Pivot.Right) v.y = (1f + mSprite.paddingBottom - mSprite.paddingTop) * 0.5f;
-			else if (pv == Pivot.BottomLeft || pv == Pivot.Bottom || pv == Pivot.BottomRight) v.y = 1f + mSprite.paddingBottom;
-			else v.y = -mSprite.paddingTop;
+				if (pv == Pivot.Top || pv == Pivot.Center || pv == Pivot.Bottom) v.x = (-1f - mSprite.paddingRight + mSprite.paddingLeft) * 0.5f;
+				else if (pv == Pivot.TopRight || pv == Pivot.Right || pv == Pivot.BottomRight) v.x = -1f - mSprite.paddingRight;
+				else v.x = mSprite.paddingLeft;
 
+				if (pv == Pivot.Left || pv == Pivot.Center || pv == Pivot.Right) v.y = (1f + mSprite.paddingBottom - mSprite.paddingTop) * 0.5f;
+				else if (pv == Pivot.BottomLeft || pv == Pivot.Bottom || pv == Pivot.BottomRight) v.y = 1f + mSprite.paddingBottom;
+				else v.y = -mSprite.paddingTop;
+			}
 			return v;
 		}
 	}

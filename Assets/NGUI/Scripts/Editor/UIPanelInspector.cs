@@ -33,9 +33,17 @@ public class UIPanelInspector : Editor
 			EditorUtility.SetDirty(panel);
 		}
 
-		panel.hidden = EditorGUILayout.Toggle("Hidden", panel.hidden);
+		panel.debug = EditorGUILayout.Toggle("Debug", panel.debug);
 		EditorGUILayout.LabelField("Widgets", panel.widgets.Count.ToString());
 		EditorGUILayout.LabelField("Draw Calls", drawcalls.Count.ToString());
+
+		Rect rect = EditorGUILayout.RectField("Clipping", panel.clippingRect);
+
+		if (rect != panel.clippingRect)
+		{
+			panel.clippingRect = rect;
+			EditorUtility.SetDirty(panel);
+		}
 
 		foreach (UIDrawCall dc in drawcalls)
 		{

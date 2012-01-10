@@ -47,11 +47,11 @@ Shader "Transparent/Refractive"
 			sampler2D _BumpMap;
 			sampler2D _Mask;
 
-			float4 _Color;
-			float4 _Specular;
-			float4 _GrabTexture_TexelSize;
-			float _Focus;
-			float _Shininess;
+			fixed4 _Color;
+			fixed4 _Specular;
+			half4 _GrabTexture_TexelSize;
+			half _Focus;
+			half _Shininess;
 
 			struct Input
 			{
