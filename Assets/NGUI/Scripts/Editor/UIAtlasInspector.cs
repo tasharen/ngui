@@ -48,8 +48,9 @@ public class UIAtlasInspector : Editor
 		{
 			if (lbl.font != null && lbl.font.atlas == mAtlas)
 			{
-				lbl.font.atlas = null;
-				lbl.font.atlas = mAtlas;
+				UIFont font = lbl.font;
+				lbl.font = null;
+				lbl.font = font;
 				EditorUtility.SetDirty(lbl);
 			}
 		}
@@ -81,8 +82,9 @@ public class UIAtlasInspector : Editor
 		{
 			if (lbl.font != null && lbl.font.atlas == mAtlas && lbl.font.spriteName == mSprite.name)
 			{
-				lbl.font.atlas = null;
-				lbl.font.atlas = mAtlas;
+				UIFont font = lbl.font;
+				lbl.font = null;
+				lbl.font = font;
 				EditorUtility.SetDirty(lbl);
 			}
 		}

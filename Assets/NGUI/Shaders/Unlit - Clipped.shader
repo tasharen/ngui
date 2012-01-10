@@ -66,9 +66,22 @@ Shader "Unlit/Clipped"
 			fixed4 frag (v2f IN) : COLOR
 			{
 				float2 factor = abs(IN.worldPos.xy - _Range.xy) / _Range.zw;
-				clip(1.0 - max(factor.x, factor.y));
+				float val = 1.0 - max(factor.x, factor.y);
+				
+				// Method 1: clip() function
+				//clip(val);
 
 				fixed4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
+
+				// Method 2: 'if' statement
+				if (val < 0.0) col.a = 0.0;
+
+				// Method 3: no 'if' statement
+				//col.a *= ceil(clamp(val, 0.0, 1.0));
+
+				// You can also make it fade out smoothly, like so:
+				//col.a *= clamp(val * 20.0, 0.0, 1.0);
+
 				return col * _Color;
 			}
 			ENDCG

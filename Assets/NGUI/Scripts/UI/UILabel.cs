@@ -49,6 +49,7 @@ public class UILabel : UIWidget
 				material = (mFont != null) ? mFont.material : null;
 				mChanged = true;
 				mShouldBeProcessed = true;
+				MarkAsChanged();
 			}
 		}
 	}
@@ -307,5 +308,6 @@ public class UILabel : UIWidget
 #endif	
 		// Print the text into the buffers
 		mFont.Print(processedText, color, verts, uvs, cols, mEncoding);
+		Debug.Log(font.name + " " + material.name);
 	}
 }
