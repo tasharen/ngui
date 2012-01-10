@@ -41,51 +41,6 @@ public class UIPanelInspector : Editor
 
 		if (panel.clipping != clipping)
 		{
-			// Automatically switch shaders on the material to something that supports or disables clipping
-			foreach (UIDrawCall dc in panel.drawCalls)
-			{
-				Material mat = dc.material;
-				
-				if (mat != null && mat.shader != null)
-				{
-					bool isClipped = mat.shader.name.Contains(" (Clipped)");
-
-					if (isClipped && clipping == UIDrawCall.Clipping.None)
-					{
-						// Try to find the non-clipped version of this shader
-						UIPanel[] panels = Resources.FindObjectsOfTypeAll(typeof(UIPanel)) as UIPanel[];
-
-						// Only swap shaders back to non-clipped version if this is the only panel in the scene.
-						// Reason being, another panel can still be clipped, and can still use the same atlas,
-						// and we don't want to mess everything up for it.
-
-						if (panels.Length == 1)
-						{
-							string name = mat.shader.name.Replace(" (Clipped)", "");
-							Shader shader = Shader.Find(name);
-							if (shader != null) mat.shader = shader;
-						}
-					}
-					else if (!isClipped && clipping != UIDrawCall.Clipping.None)
-					{
-						// Try to find the clipped version of this shader
-						Shader shader = Shader.Find(mat.shader.name += " (Clipped)");
-
-						if (shader != null)
-						{
-							mat.shader = shader;
-						}
-						else if (!mat.HasProperty("_ClipRange"))
-						{
-							// If this warning gets triggered, it means you've tried to enable clipping with a shader
-							// that has not been set up to use it. Consider switching your material to use the
-							// "Unlit/Transparent Colored" shader or its clipped counterpart, "Unlit/Transparent Colored (Clipped)".
-							Debug.LogWarning("Shader '" + mat.shader.name + "' used by material '" + mat.name + "' does not support clipping");
-						}
-					}
-				}
-			}
-
 			panel.clipping = clipping;
 			EditorUtility.SetDirty(panel);
 		}

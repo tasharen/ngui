@@ -47,6 +47,7 @@ public class UIPanel : MonoBehaviour
 	List<Color> mCols = new List<Color>();
 
 	Transform mTrans;
+	bool mUpdateShaders = true;
 
 #if UNITY_EDITOR
 	// Screen size, saved for gizmos, since Screen.width and Screen.height returns the Scene view's dimensions in OnDrawGismos.
@@ -86,7 +87,22 @@ public class UIPanel : MonoBehaviour
 	/// Clipping method used by all draw calls.
 	/// </summary>
 
-	public UIDrawCall.Clipping clipping { get { return mClipping; } set { if (mClipping != value) { mClipping = value; UpdateClippingRect(); } } }
+	public UIDrawCall.Clipping clipping
+	{
+		get
+		{
+			return mClipping;
+		}
+		set
+		{
+			if (mClipping != value)
+			{
+				UpdateShaders(value);
+				mClipping = value;
+				UpdateClippingRect();
+			}
+		}
+	}
 
 	/// <summary>
 	/// Rectangle used for clipping (used with a valid shader)
@@ -265,6 +281,9 @@ public class UIPanel : MonoBehaviour
 
 	public void LateUpdate ()
 	{
+		// Update the shaders if needed
+		if (mUpdateShaders) UpdateShaders(mClipping);
+
 		// Update all widgets
 		for (int i = mWidgets.Count; i > 0; )
 		{
@@ -383,6 +402,59 @@ public class UIPanel : MonoBehaviour
 		mTans.Clear();
 		mUvs.Clear();
 		mCols.Clear();
+	}
+
+	/// <summary>
+	/// Switch the shaders used by this panel to something more appropriate for the specified clipping
+	/// </summary>
+
+	void UpdateShaders (UIDrawCall.Clipping clip)
+	{
+		mUpdateShaders = false;
+
+		foreach (UIDrawCall dc in drawCalls)
+		{
+			Material mat = dc.material;
+
+			if (mat != null && mat.shader != null)
+			{
+				bool isClipped = mat.shader.name.Contains(" (Clipped)");
+
+				if (isClipped && clip == UIDrawCall.Clipping.None)
+				{
+					// Try to find the non-clipped version of this shader
+					UIPanel[] panels = Resources.FindObjectsOfTypeAll(typeof(UIPanel)) as UIPanel[];
+
+					// Only swap shaders back to non-clipped version if this is the only panel in the scene.
+					// Reason being, another panel can still be clipped, and can still use the same atlas,
+					// and we don't want to mess everything up for it.
+
+					if (panels.Length == 1)
+					{
+						string name = mat.shader.name.Replace(" (Clipped)", "");
+						Shader shader = Shader.Find(name);
+						if (shader != null) mat.shader = shader;
+					}
+				}
+				else if (!isClipped && clip != UIDrawCall.Clipping.None)
+				{
+					// Try to find the clipped version of this shader
+					Shader shader = Shader.Find(mat.shader.name += " (Clipped)");
+
+					if (shader != null)
+					{
+						mat.shader = shader;
+					}
+					else if (!mat.HasProperty("_ClipRange"))
+					{
+						// If this warning gets triggered, it means you've tried to enable clipping with a shader
+						// that has not been set up to use it. Consider switching your material to use the
+						// "Unlit/Transparent Colored" shader or its clipped counterpart, "Unlit/Transparent Colored (Clipped)".
+						Debug.LogWarning("Shader '" + mat.shader.name + "' used by material '" + mat.name + "' does not support clipping");
+					}
+				}
+			}
+		}
 	}
 
 	/// <summary>
