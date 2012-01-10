@@ -9,11 +9,6 @@ public abstract class UISend : MonoBehaviour
 	public GameObject target;
 	public bool includeChildren = false;
 
-	protected void Send (int state)
-	{
-		Send("OnState", state);
-	}
-
 	protected void Send (string funcName, int state)
 	{
 		GameObject go = (target != null) ? target : gameObject;
@@ -31,5 +26,10 @@ public abstract class UISend : MonoBehaviour
 		{
 			go.SendMessage(funcName, state, SendMessageOptions.DontRequireReceiver);
 		}
+	}
+
+	protected void Send (int state)
+	{
+		Send("OnState", state);
 	}
 }

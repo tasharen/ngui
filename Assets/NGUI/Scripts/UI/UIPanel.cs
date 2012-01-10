@@ -18,8 +18,17 @@ public class UIPanel : MonoBehaviour
 	// Whether generated geometry is shown or hidden
 	[SerializeField] bool mDebug = false;
 
+#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
 	// Clipping rectangle
-	[SerializeField] Rect mClip = new Rect();
+	public UIDrawCall.Clipping mClipping = UIDrawCall.Clipping.None;
+	public Vector4 mClipRange = Vector4.zero;
+	public Vector2 mClipSoftness = new Vector2(40f, 40f);
+#else
+	// Clipping rectangle
+	[SerializeField] UIDrawCall.Clipping mClipping = UIDrawCall.Clipping.None;
+	[SerializeField] Vector4 mClipRange = Vector4.zero;
+	[SerializeField] Vector2 mClipSoftness = new Vector2(40f, 40f);
+#endif
 
 	// List of all widgets managed by this panel
 	List<UIWidget> mWidgets = new List<UIWidget>();
@@ -38,6 +47,11 @@ public class UIPanel : MonoBehaviour
 	List<Color> mCols = new List<Color>();
 
 	Transform mTrans;
+
+#if UNITY_EDITOR
+	// Screen size, saved for gizmos, since Screen.width and Screen.height returns the Scene view's dimensions in OnDrawGismos.
+	Vector2 mScreenSize = Vector2.one;
+#endif
 
 	/// <summary>
 	/// Whether the panel's generated geometry will be hidden or not.
@@ -69,30 +83,36 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Whether the UIPanel has a clipping area.
+	/// Clipping method used by all draw calls.
 	/// </summary>
 
-	public bool isClipped { get { return mClip.width > 0f && mClip.height > 0f; } }
+	public UIDrawCall.Clipping clipping { get { return mClipping; } set { if (mClipping != value) { mClipping = value; UpdateClippingRect(); } } }
 
 	/// <summary>
 	/// Rectangle used for clipping (used with a valid shader)
 	/// </summary>
 
-	public Rect clippingRect
+	public Vector4 clipRange
 	{
 		get
 		{
-			return mClip;
+			return mClipRange;
 		}
 		set
 		{
-			if (value.width >= 0f && value.height >= 0f && mClip != value)
+			if (mClipRange != value)
 			{
-				mClip = value;
+				mClipRange = value;
 				UpdateClippingRect();
 			}
 		}
 	}
+
+	/// <summary>
+	/// Clipping softness is used if the clipped style is set to "Soft".
+	/// </summary>
+
+	public Vector2 clipSoftness { get { return mClipSoftness; } set { if (mClipSoftness != value) { mClipSoftness = value; UpdateClippingRect(); } } }
 
 	/// <summary>
 	/// Widgets managed by this panel.
@@ -120,7 +140,6 @@ public class UIPanel : MonoBehaviour
 	/// <summary>
 	/// Helper function that marks the specified material as having changed so its mesh is rebuilt next frame.
 	/// </summary>
-	/// <param name="mat"></param>
 
 	void MarkAsChanged (Material mat) { if (!mChanged.Contains(mat)) mChanged.Add(mat); }
 
@@ -130,19 +149,18 @@ public class UIPanel : MonoBehaviour
 
 	void UpdateClippingRect ()
 	{
-		Vector4 range;
+		Vector4 range = Vector4.zero;
 
 		if (mTrans == null) mTrans = transform;
 		Vector3 scale = mTrans.lossyScale;
 
-		if (isClipped)
+		if (mClipping != UIDrawCall.Clipping.None)
 		{
-			range = new Vector4(mClip.xMin, mClip.yMin, mClip.width * 0.5f, mClip.height * 0.5f);
+			range = new Vector4(mClipRange.x, mClipRange.y, mClipRange.z * 0.5f, mClipRange.w * 0.5f);
 		}
-		else
-		{
-			range = new Vector4(0f, 0f, Screen.width * 0.5f, Screen.height * 0.5f);
-		}
+
+		if (range.z == 0f) range.z = Screen.width * 0.5f;
+		if (range.w == 0f) range.w = Screen.height * 0.5f;
 
 		RuntimePlatform platform = Application.platform;
 
@@ -159,12 +177,15 @@ public class UIPanel : MonoBehaviour
 		range.z *= scale.x;
 		range.w *= scale.y;
 
+		Vector2 softness = mClipSoftness;
+		softness.x *= scale.x;
+		softness.y *= scale.y;
+
 		foreach (UIDrawCall dc in mDrawCalls)
 		{
-			if (dc.material != null && dc.material.shader != null && dc.material.HasProperty("_Range"))
-			{
-				dc.material.SetVector("_Range", range);
-			}
+			dc.clipping = mClipping;
+			dc.clipRange = range;
+			dc.clipSoftness = softness;
 		}
 	}
 
@@ -265,7 +286,33 @@ public class UIPanel : MonoBehaviour
 
 		// Update the clipping rects
 		UpdateClippingRect();
+
+#if UNITY_EDITOR
+		mScreenSize = new Vector2(Screen.width, Screen.height);
+#endif
 	}
+
+#if UNITY_EDITOR
+
+	/// <summary>
+	/// Draw a visible pink outline for the clipped area.
+	/// </summary>
+
+	void OnDrawGizmos ()
+	{
+		if (showGizmos && mClipping != UIDrawCall.Clipping.None)
+		{
+			Vector2 size = new Vector2(mClipRange.z, mClipRange.w);
+
+			if (size.x == 0f) size.x = mScreenSize.x;
+			if (size.y == 0f) size.y = mScreenSize.y;
+
+			Gizmos.matrix = transform.localToWorldMatrix;
+			Gizmos.color = Color.magenta;
+			Gizmos.DrawWireCube(new Vector2(mClipRange.x, mClipRange.y), size);
+		}
+	}
+#endif
 
 	/// <summary>
 	/// Set the draw call's geometry responsible for the specified material.
@@ -337,23 +384,6 @@ public class UIPanel : MonoBehaviour
 		mUvs.Clear();
 		mCols.Clear();
 	}
-
-#if UNITY_EDITOR
-
-	/// <summary>
-	/// Draw a visible pink outline for the clipped area.
-	/// </summary>
-
-	void OnDrawGizmos ()
-	{
-		if (showGizmos && isClipped)
-		{
-			Gizmos.matrix = transform.localToWorldMatrix;
-			Gizmos.color = Color.magenta;
-			Gizmos.DrawWireCube(new Vector2(mClip.xMin, mClip.xMin), new Vector2(mClip.width, mClip.height));
-		}
-	}
-#endif
 
 	/// <summary>
 	/// Find the UIPanel responsible for handling the specified transform, creating a new one if necessary.

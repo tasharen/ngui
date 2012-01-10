@@ -9,10 +9,21 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/Internal/Draw Call")]
 public class UIDrawCall : MonoBehaviour
 {
-	protected Material		mMat;		// Material used by this screen
-	protected Mesh			mMesh;		// Generated mesh
-	protected MeshFilter	mFilter;	// Mesh filter for this draw call
-	protected MeshRenderer	mRen;		// Mesh renderer for this screen
+	public enum Clipping
+	{
+		None,
+		HardClip,	// Uses the hardware clip() function -- may be slow on some mobile devices
+		HardAlpha,	// Adjust the alpha, compatible with all devices
+		SoftAlpha,	// Alpha-based clipping with a softened edge
+	}
+
+	Material		mMat;		// Material used by this screen
+	Mesh			mMesh;		// Generated mesh
+	MeshFilter		mFilter;	// Mesh filter for this draw call
+	MeshRenderer	mRen;		// Mesh renderer for this screen
+	Clipping		mClipping;	// Clipping mode
+	Vector4			mClipRange;	// Clipping, if used
+	Vector2			mClipSoft;	// Clipping softness
 
 	/// <summary>
 	/// Material used by this screen.
@@ -25,6 +36,90 @@ public class UIDrawCall : MonoBehaviour
 	/// </summary>
 
 	public int triangles { get { return mMesh.vertexCount >> 1; } }
+
+	/// <summary>
+	/// Clipping used by the draw call
+	/// </summary>
+
+	public Clipping clipping { get { return mClipping; } set { mClipping = value; } }
+
+	/// <summary>
+	/// Clip range set by the panel -- used with a shader that has the "_ClipRange" property.
+	/// </summary>
+
+	public Vector4 clipRange { get { return mClipRange; } set { mClipRange = value; } }
+
+	/// <summary>
+	/// Clipping softness factor, if soft clipping is used.
+	/// </summary>
+
+	public Vector2 clipSoftness { get { return mClipSoft; } set { mClipSoft = value; } }
+
+	/// <summary>
+	/// Called just before the draw call gets rendered -- sets the clip range.
+	/// This section only applies to Clipped series of shaders, such as "Unlit/Clipped Colored".
+	/// </summary>
+
+	void OnWillRenderObject ()
+	{
+		if (mMat != null && mMat.shader != null)
+		{
+			/*bool canClip = mMat.shader.name.Contains("(Clipped)");
+			bool shouldClip = (mClipping != Clipping.None);
+
+			// Only switch shaders in the editor
+			if (canClip != shouldClip && Application.isPlaying)
+			{
+				if (canClip)
+				{
+					string name = mMat.shader.name;
+					name = name.Replace(" (Clipped)", "");
+
+					Shader shader = Shader.Find(name);
+					if (shader != null) mMat.shader = shader;
+				}
+			}*/
+
+			Vector2 sharpness = new Vector2(1000.0f, 1000.0f);
+			if (mClipSoft.x > 0f) sharpness.x = mClipRange.z / mClipSoft.x;
+			if (mClipSoft.y > 0f) sharpness.y = mClipRange.w / mClipSoft.y;
+
+			switch (mClipping)
+			{
+				case Clipping.HardAlpha:
+				{
+					Shader.EnableKeyword("CLIP_METHOD_ALPHA");
+					Shader.DisableKeyword("CLIP_METHOD_HARD");
+					Shader.DisableKeyword("CLIP_METHOD_SOFT");
+					break;
+				}
+				case Clipping.HardClip:
+				{
+					Shader.DisableKeyword("CLIP_METHOD_ALPHA");
+					Shader.EnableKeyword("CLIP_METHOD_HARD");
+					Shader.DisableKeyword("CLIP_METHOD_SOFT");
+					break;
+				}
+				case Clipping.SoftAlpha:
+				{
+					Shader.DisableKeyword("CLIP_METHOD_ALPHA");
+					Shader.DisableKeyword("CLIP_METHOD_HARD");
+					Shader.EnableKeyword("CLIP_METHOD_SOFT");
+					Shader.SetGlobalVector("_ClipSharpness", sharpness);
+					break;
+				}
+				default:
+				{
+					// TODO: Switch to another shader
+					Shader.EnableKeyword("CLIP_METHOD_ALPHA");
+					Shader.DisableKeyword("CLIP_METHOD_HARD");
+					Shader.DisableKeyword("CLIP_METHOD_SOFT");
+					break;
+				}
+			}
+			Shader.SetGlobalVector("_ClipRange", mClipRange);
+		}
+	}
 
 	/// <summary>
 	/// Cleanup.

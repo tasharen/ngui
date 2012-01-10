@@ -308,6 +308,5 @@ public class UILabel : UIWidget
 #endif	
 		// Print the text into the buffers
 		mFont.Print(processedText, color, verts, uvs, cols, mEncoding);
-		Debug.Log(font.name + " " + material.name);
 	}
 }
