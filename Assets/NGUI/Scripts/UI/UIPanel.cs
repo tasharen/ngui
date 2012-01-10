@@ -348,15 +348,9 @@ public class UIPanel : MonoBehaviour
 	{
 		if (showGizmos && isClipped)
 		{
-			Vector3 bl = new Vector3(mClip.xMin, mClip.yMin, 0f);
-			Vector3 tr = new Vector3(mClip.xMax, mClip.yMax, 0f);
-
-			Vector3 pos = (bl + tr) * 0.5f;
-			Vector3 size = new Vector3(tr.x - bl.x, tr.y - bl.y, 0f);
-
 			Gizmos.matrix = transform.localToWorldMatrix;
 			Gizmos.color = Color.magenta;
-			Gizmos.DrawWireCube(pos, size);
+			Gizmos.DrawWireCube(new Vector2(mClip.xMin, mClip.xMin), new Vector2(mClip.width, mClip.height));
 		}
 	}
 #endif

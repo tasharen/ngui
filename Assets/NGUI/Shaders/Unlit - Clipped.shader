@@ -65,18 +65,8 @@ Shader "Unlit/Clipped"
 
 			fixed4 frag (v2f IN) : COLOR
 			{
-				//const float2 zero = float2(0.0);
-				//const float2 one = float2(1.0);
-
 				float2 factor = abs(IN.worldPos.xy - _Range.xy) / _Range.zw;
-				//factor = clamp(factor, zero, one);
-				//float contrib = 1.0 - max(factor.x, factor.y);
-
-				//if (contrib < 0.001) discard;
-
 				clip(1.0 - max(factor.x, factor.y));
-
-				//if (IN.worldPos.x < 0.0) discard;
 
 				fixed4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
 				return col * _Color;
