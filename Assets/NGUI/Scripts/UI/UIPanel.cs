@@ -15,8 +15,11 @@ public class UIPanel : MonoBehaviour
 	// Whether selectable gizmos will be shown for widgets under this panel
 	public bool showGizmos = true;
 
+	// Whether generated geometry is shown or hidden
+	[SerializeField] bool mDebug = false;
+
 	// Clipping rectangle
-	Rect mClip = new Rect();
+	[SerializeField] Rect mClip = new Rect();
 
 	// List of all widgets managed by this panel
 	List<UIWidget> mWidgets = new List<UIWidget>();
@@ -33,9 +36,6 @@ public class UIPanel : MonoBehaviour
 	List<Vector4> mTans = new List<Vector4>();
 	List<Vector2> mUvs = new List<Vector2>();
 	List<Color> mCols = new List<Color>();
-
-	// Whether generated geometry is shown or hidden
-	[SerializeField] bool mDebug = false;
 
 	Transform mTrans;
 
@@ -130,25 +130,40 @@ public class UIPanel : MonoBehaviour
 
 	void UpdateClippingRect ()
 	{
+		Vector4 range;
+
 		if (mTrans == null) mTrans = transform;
 		Vector3 scale = mTrans.lossyScale;
 
-		Vector4 clip = new Vector4(
-					(mClip.xMax + mClip.xMin) * 0.5f,
-					(mClip.yMax + mClip.yMin) * 0.5f,
-					(mClip.xMax - mClip.xMin) * 0.5f,
-					(mClip.yMax - mClip.yMin) * 0.5f);
+		if (isClipped)
+		{
+			range = new Vector4(mClip.xMin, mClip.yMin, mClip.width * 0.5f, mClip.height * 0.5f);
+		}
+		else
+		{
+			range = new Vector4(0f, 0f, Screen.width * 0.5f, Screen.height * 0.5f);
+		}
 
-		clip.x *= scale.x;
-		clip.y *= scale.y;
-		clip.z *= scale.x;
-		clip.w *= scale.y;
+		RuntimePlatform platform = Application.platform;
+
+		if (platform == RuntimePlatform.WindowsPlayer ||
+			platform == RuntimePlatform.WindowsWebPlayer ||
+			platform == RuntimePlatform.WindowsEditor)
+		{
+			range.x -= 0.5f;
+			range.y += 0.5f;
+		}
+
+		range.x *= scale.x;
+		range.y *= scale.y;
+		range.z *= scale.x;
+		range.w *= scale.y;
 
 		foreach (UIDrawCall dc in mDrawCalls)
 		{
 			if (dc.material != null && dc.material.shader != null && dc.material.HasProperty("_Range"))
 			{
-				dc.material.SetVector("_Range", clip);
+				dc.material.SetVector("_Range", range);
 			}
 		}
 	}
