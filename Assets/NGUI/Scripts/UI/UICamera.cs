@@ -187,6 +187,7 @@ public class UICamera : MonoBehaviour
 			// Raycast into the screen
 			if (Physics.Raycast(ray, out hit, cam.farClipPlane - cam.nearClipPlane, mouse.cachedCamera.cullingMask))
 			{
+				lastCamera = cam;
 				return true;
 			}
 		}
@@ -264,8 +265,6 @@ public class UICamera : MonoBehaviour
 	{
 		// Only the first UI layer should be processing events
 		if (!Application.isPlaying || !handlesEvents) return;
-
-		lastCamera = mCam;
 
 		if (mUseMouseInput)
 		{
