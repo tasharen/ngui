@@ -16,7 +16,7 @@ public class UIGrowOnHover : MonoBehaviour
 	void Awake ()
 	{
 		mBaseScale = transform.localScale;
-		mTargetScale = NGUITools.Multiply(mBaseScale, amount);
+		mTargetScale = Vector3.Scale(mBaseScale, amount);
 	}
 
 	void OnHover (bool isOver)

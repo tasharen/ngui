@@ -13,6 +13,7 @@ public class UIDragObject : MonoBehaviour
 	/// </summary>
 
 	public Transform target;
+	public Vector3 scale = Vector3.one;
 
 	Plane mPlane;
 	Vector3 mLastPos;
@@ -45,7 +46,15 @@ public class UIDragObject : MonoBehaviour
 			if (mPlane.Raycast(ray, out dist))
 			{
 				Vector3 currentPos = ray.GetPoint(dist);
-				target.position += currentPos - mLastPos;
+				Vector3 offset = currentPos - mLastPos;
+
+				if (offset.x != 1f || offset.y != 1f)
+				{
+					offset = target.InverseTransformDirection(offset);
+					offset.Scale(scale);
+					offset = target.TransformDirection(offset);
+				}
+				target.position += offset;
 				mLastPos = currentPos;
 			}
 		}

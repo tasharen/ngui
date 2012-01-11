@@ -74,7 +74,7 @@ public class UIPanelInspector : Editor
 				EditorUtility.SetDirty(panel);
 			}
 
-			if (panel.clipping == UIDrawCall.Clipping.SoftAlpha)
+			if (panel.clipping == UIDrawCall.Clipping.SoftClip)
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Space(80f);

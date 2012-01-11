@@ -16,7 +16,7 @@ public class UIGrowOnPress : MonoBehaviour
 	void Start ()
 	{
 		mBaseScale = transform.localScale;
-		mTargetScale = NGUITools.Multiply(mBaseScale, amount);
+		mTargetScale = Vector3.Scale(mBaseScale, amount);
 	}
 
 	void OnPress (bool isOver)

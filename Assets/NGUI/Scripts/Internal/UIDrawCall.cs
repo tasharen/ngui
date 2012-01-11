@@ -13,8 +13,8 @@ public class UIDrawCall : MonoBehaviour
 	{
 		None,
 		HardClip,	// Uses the hardware clip() function -- may be slow on some mobile devices
-		HardAlpha,	// Adjust the alpha, compatible with all devices
-		SoftAlpha,	// Alpha-based clipping with a softened edge
+		AlphaClip,	// Adjust the alpha, compatible with all devices
+		SoftClip,	// Alpha-based clipping with a softened edge
 	}
 
 	Material		mMat;		// Material used by this screen
@@ -24,6 +24,8 @@ public class UIDrawCall : MonoBehaviour
 	Clipping		mClipping;	// Clipping mode
 	Vector4			mClipRange;	// Clipping, if used
 	Vector2			mClipSoft;	// Clipping softness
+	Material		mInst;		// Instantiated material, if necessary
+	bool			mReset		= true;
 
 	/// <summary>
 	/// Material used by this screen.
@@ -41,7 +43,7 @@ public class UIDrawCall : MonoBehaviour
 	/// Clipping used by the draw call
 	/// </summary>
 
-	public Clipping clipping { get { return mClipping; } set { mClipping = value; } }
+	public Clipping clipping { get { return mClipping; } set { if (mClipping != value) { mClipping = value; mReset = true; } } }
 
 	/// <summary>
 	/// Clip range set by the panel -- used with a shader that has the "_ClipRange" property.
@@ -56,68 +58,77 @@ public class UIDrawCall : MonoBehaviour
 	public Vector2 clipSoftness { get { return mClipSoft; } set { mClipSoft = value; } }
 
 	/// <summary>
-	/// Called just before the draw call gets rendered -- sets the clip range.
-	/// This section only applies to Clipped series of shaders, such as "Unlit/Clipped Colored".
+	/// Convenience function that ensures that a custom material has been created.
+	/// </summary>
+
+	Material customMaterial { get { if (mInst == null) { mInst = new Material(mMat); mRen.sharedMaterial = mInst; } return mInst; } }
+
+	/// <summary>
+	/// This function is called when it's clear that the object will be rendered.
+	/// We want to set the shader used by the material, creating a copy of the material in the process.
+	/// We also want to update the material's properties before it's actually used.
 	/// </summary>
 
 	void OnWillRenderObject ()
 	{
-		if (mMat != null && mMat.shader != null)
+		if (mReset)
 		{
-			/*bool canClip = mMat.shader.name.Contains("(Clipped)");
-			bool shouldClip = (mClipping != Clipping.None);
+			mReset = false;
 
-			// Only switch shaders in the editor
-			if (canClip != shouldClip && Application.isPlaying)
+			if (mMat != null && mMat.shader != null)
 			{
-				if (canClip)
-				{
-					string name = mMat.shader.name;
-					name = name.Replace(" (Clipped)", "");
+				bool useClipping = (mClipping != Clipping.None);
 
-					Shader shader = Shader.Find(name);
-					if (shader != null) mMat.shader = shader;
-				}
-			}*/
+				// If we should be using clipping we should check to see if we can automatically locate the shader
+				if (useClipping)
+				{
+					const string hard	= " (HardClip)";
+					const string alpha	= " (AlphaClip)";
+					const string soft	= " (SoftClip)";
 
-			Vector2 sharpness = new Vector2(1000.0f, 1000.0f);
-			if (mClipSoft.x > 0f) sharpness.x = mClipRange.z / mClipSoft.x;
-			if (mClipSoft.y > 0f) sharpness.y = mClipRange.w / mClipSoft.y;
+					// Figure out the normal shader's name
+					string shaderName = mMat.shader.name;
+					shaderName = shaderName.Replace(hard, "");
+					shaderName = shaderName.Replace(alpha, "");
+					shaderName = shaderName.Replace(soft, "");
 
-			switch (mClipping)
-			{
-				case Clipping.HardAlpha:
-				{
-					Shader.EnableKeyword("CLIP_METHOD_ALPHA");
-					Shader.DisableKeyword("CLIP_METHOD_HARD");
-					Shader.DisableKeyword("CLIP_METHOD_SOFT");
-					break;
+					Shader shader = null;
+
+					// Try to find the new shader
+					if		(mClipping == Clipping.HardClip)	shader = Shader.Find(shaderName + hard);
+					else if (mClipping == Clipping.AlphaClip)	shader = Shader.Find(shaderName + alpha);
+					else if (mClipping == Clipping.SoftClip)	shader = Shader.Find(shaderName + soft);
+
+					// If there is a valid shader, assign it to the custom material
+					if (shader != null) customMaterial.shader = shader;
+					else useClipping = false;
 				}
-				case Clipping.HardClip:
+
+				// If we shouldn't be using clipping, revert back to the original material
+				if (!useClipping)
 				{
-					Shader.DisableKeyword("CLIP_METHOD_ALPHA");
-					Shader.EnableKeyword("CLIP_METHOD_HARD");
-					Shader.DisableKeyword("CLIP_METHOD_SOFT");
-					break;
-				}
-				case Clipping.SoftAlpha:
-				{
-					Shader.DisableKeyword("CLIP_METHOD_ALPHA");
-					Shader.DisableKeyword("CLIP_METHOD_HARD");
-					Shader.EnableKeyword("CLIP_METHOD_SOFT");
-					Shader.SetGlobalVector("_ClipSharpness", sharpness);
-					break;
-				}
-				default:
-				{
-					// TODO: Switch to another shader
-					Shader.EnableKeyword("CLIP_METHOD_ALPHA");
-					Shader.DisableKeyword("CLIP_METHOD_HARD");
-					Shader.DisableKeyword("CLIP_METHOD_SOFT");
-					break;
+					mRen.sharedMaterial = mMat;
+
+					if (mInst != null)
+					{
+						DestroyImmediate(mInst);
+						mInst = null;
+					}
 				}
 			}
-			Shader.SetGlobalVector("_ClipRange", mClipRange);
+		}
+
+		if (mInst != null)
+		{
+			if (mInst.HasProperty("_ClipRange")) mInst.SetVector("_ClipRange", mClipRange);
+
+			if (mInst.HasProperty("_ClipSharpness"))
+			{
+				Vector2 sharpness = new Vector2(1000.0f, 1000.0f);
+				if (mClipSoft.x > 0f) sharpness.x = mClipRange.z / mClipSoft.x;
+				if (mClipSoft.y > 0f) sharpness.y = mClipRange.w / mClipSoft.y;
+				mInst.SetVector("_ClipSharpness", sharpness);
+			}
 		}
 	}
 
@@ -125,7 +136,11 @@ public class UIDrawCall : MonoBehaviour
 	/// Cleanup.
 	/// </summary>
 
-	void OnDestroy () { if (mMesh != null) { DestroyImmediate(mMesh); } }
+	void OnDestroy ()
+	{
+		if (mMesh != null) DestroyImmediate(mMesh);
+		if (mInst != null) DestroyImmediate(mInst);
+	}
 
 	/// <summary>
 	/// Set the draw call's geometry.

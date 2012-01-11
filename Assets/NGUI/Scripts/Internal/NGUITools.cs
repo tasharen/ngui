@@ -366,23 +366,8 @@ static public class NGUITools
 	}
 
 	/// <summary>
-	/// Since Unity doesn't have a Vector*Vector function...
-	/// </summary>
-
-	static public Vector3 Multiply (Vector3 a, Vector3 b)
-	{
-		Vector3 v = a;
-		v.x *= b.x;
-		v.y *= b.y;
-		v.z *= b.z;
-		return v;
-	}
-
-	/// <summary>
 	/// Calculate the combined bounds of the widgets attached to the specified game object or its children.
 	/// </summary>
-	/// <param name="go"></param>
-	/// <returns></returns>
 
 	static public Bounds CalculateWidgetBounds (GameObject go)
 	{

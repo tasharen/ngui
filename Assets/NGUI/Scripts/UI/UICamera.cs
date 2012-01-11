@@ -56,10 +56,16 @@ public class UICamera : MonoBehaviour
 	static public RaycastHit lastHit;
 
 	/// <summary>
-	/// Last mouse or touch position prior to sending out the event in screen coordinates.
+	/// Last mouse or touch position in screen coordinates prior to sending out the event.
 	/// </summary>
 
 	static public Vector3 lastTouchPosition;
+
+	/// <summary>
+	/// ID of the touch or mouse operation prior to sending out the event. Mouse ID is '-1'.
+	/// </summary>
+
+	static public int lastTouchID = -1;
 
 	// List of all active cameras in the scene
 	static List<UICamera> mList = new List<UICamera>();
@@ -272,6 +278,7 @@ public class UICamera : MonoBehaviour
 			Vector3 pos = Input.mousePosition;
 			mMouse.delta = pos - mMouse.pos;
 			lastTouchPosition = pos;
+			lastTouchID = -1;
 
 			if (mMouse.pos != pos)
 			{
@@ -289,7 +296,8 @@ public class UICamera : MonoBehaviour
 		{
 			foreach (Touch input in Input.touches)
 			{
-				MouseOrTouch touch = GetTouch(input.fingerId);
+				lastTouchID = input.fingerId;
+				MouseOrTouch touch = GetTouch(lastTouchID);
 
 				bool pressed = (input.phase == TouchPhase.Began);
 				bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
@@ -308,7 +316,7 @@ public class UICamera : MonoBehaviour
 				ProcessTouch(touch, pressed, unpressed);
 
 				// If the touch has ended, remove it from the list
-				if (unpressed) RemoveTouch(input.fingerId);
+				if (unpressed) RemoveTouch(lastTouchID);
 			}
 		}
 

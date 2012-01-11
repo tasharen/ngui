@@ -45,7 +45,7 @@ public class UIGrid : MonoBehaviour
 		{
 			Transform t = myTrans.GetChild(i);
 
-			t.localPosition = arrangement == Arrangement.Horizontal ?
+			t.localPosition = (arrangement == Arrangement.Horizontal) ?
 				new Vector3(cellWidth * x, -cellHeight * y, 0f) :
 				new Vector3(cellWidth * y, -cellHeight * x, 0f);
 
