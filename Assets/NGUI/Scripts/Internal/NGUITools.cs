@@ -366,15 +366,15 @@ static public class NGUITools
 	}
 
 	/// <summary>
-	/// Calculate the combined bounds of the widgets attached to the specified game object or its children.
+	/// Calculate the combined bounds of all widgets attached to the specified game object or its children (in world space).
 	/// </summary>
 
-	static public Bounds CalculateWidgetBounds (GameObject go)
+	static public Bounds CalculateWidgetWorldBounds (GameObject go)
 	{
 		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>() as UIWidget[];
 
-		Matrix4x4 mat = go.transform.worldToLocalMatrix;
-		Bounds b = new Bounds(Vector3.zero, Vector3.zero);
+		Bounds b = new Bounds(go.transform.position, Vector3.zero);
+		bool first = true;
 
 		foreach (UIWidget w in widgets)
 		{
@@ -384,10 +384,64 @@ static public class NGUITools
 			float y = (offset.y - 0.5f) * size.y;
 			size *= 0.5f;
 
-			b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x - size.x, y - size.y, 0f))));
-			b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x - size.x, y + size.y, 0f))));
-			b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x + size.x, y - size.y, 0f))));
-			b.Encapsulate(mat.MultiplyPoint(w.transform.TransformPoint(new Vector3(x + size.x, y + size.y, 0f))));
+			Transform wt = w.cachedTransform;
+			Vector3 v0 = wt.TransformPoint(new Vector3(x - size.x, y - size.y, 0f));
+
+			// 'Bounds' can never start off with nothing, apparently, and including the origin point is wrong.
+			if (first)
+			{
+				first = false;
+				b = new Bounds(v0, Vector3.zero);
+			}
+			else
+			{
+				b.Encapsulate(v0);
+			}
+
+			b.Encapsulate(wt.TransformPoint(new Vector3(x - size.x, y + size.y, 0f)));
+			b.Encapsulate(wt.TransformPoint(new Vector3(x + size.x, y - size.y, 0f)));
+			b.Encapsulate(wt.TransformPoint(new Vector3(x + size.x, y + size.y, 0f)));
+		}
+		return b;
+	}
+
+	/// <summary>
+	/// Calculate the combined bounds of all widgets attached to the specified game object or its children (in relative-to-object space).
+	/// </summary>
+
+	static public Bounds CalculateWidgetRelativeBounds (GameObject go)
+	{
+		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>() as UIWidget[];
+
+		Matrix4x4 toLocal = go.transform.worldToLocalMatrix;
+		Bounds b = new Bounds(Vector3.zero, Vector3.zero);
+		bool first = true;
+
+		foreach (UIWidget w in widgets)
+		{
+			Vector2 size = w.visibleSize;
+			Vector2 offset = w.pivotOffset;
+			float x = (offset.x + 0.5f) * size.x;
+			float y = (offset.y - 0.5f) * size.y;
+			size *= 0.5f;
+
+			// Transform the coordinates from relative-to-widget to world space, then make them relative to game object
+			Transform toWorld = w.cachedTransform;
+			Vector3 v0 = toLocal.MultiplyPoint(toWorld.TransformPoint(new Vector3(x - size.x, y - size.y, 0f)));
+
+			if (first)
+			{
+				first = false;
+				b = new Bounds(v0, Vector3.zero);
+			}
+			else
+			{
+				b.Encapsulate(v0);
+			}
+
+			b.Encapsulate(toLocal.MultiplyPoint(toWorld.TransformPoint(new Vector3(x - size.x, y + size.y, 0f))));
+			b.Encapsulate(toLocal.MultiplyPoint(toWorld.TransformPoint(new Vector3(x + size.x, y - size.y, 0f))));
+			b.Encapsulate(toLocal.MultiplyPoint(toWorld.TransformPoint(new Vector3(x + size.x, y + size.y, 0f))));
 		}
 		return b;
 	}
@@ -411,7 +465,7 @@ static public class NGUITools
 			box = go.AddComponent<BoxCollider>();
 		}
 
-		Bounds b = CalculateWidgetBounds(go);
+		Bounds b = CalculateWidgetRelativeBounds(go);
 		box.isTrigger = true;
 		box.center = b.center;
 		box.size = b.size; // Need 3D colliders? Try this: new Vector3(b.size.x, b.size.y, Mathf.Max(1f, b.size.z));

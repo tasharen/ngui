@@ -308,7 +308,7 @@ public abstract class UIWidget : MonoBehaviour
 
 			// Draw the gizmo
 			Gizmos.matrix = mat * local;
-			Gizmos.color = (UnityEditor.Selection.activeGameObject == gameObject) ? Color.green : outline;
+			Gizmos.color = (UnityEditor.Selection.activeGameObject == gameObject) ? new Color(0f, 0.75f, 1f) : outline;
 			Gizmos.DrawWireCube(pos, size);
 			Gizmos.color = Color.clear;
 			Gizmos.DrawCube(pos, size);
