@@ -49,7 +49,19 @@ public class UIDragCamera : MonoBehaviour
 	{
 		if (rootForBounds != null)
 		{
-			Bounds bounds = NGUITools.CalculateWidgetBounds(rootForBounds.gameObject);
+			Bounds bounds = new Bounds();
+			
+			// TODO: This doesn't give expected results
+			//bounds = NGUITools.CalculateWidgetBounds(rootForBounds.gameObject);
+			//Debug.Log(bounds);
+
+			Collider[] cols = rootForBounds.GetComponentsInChildren<Collider>();
+
+			if (cols.Length > 0)
+			{
+				bounds = cols[0].bounds;
+				foreach (Collider c in cols) bounds.Encapsulate(c.bounds);
+			}
 
 			Vector3 pos = target.position;
 			Vector3 min = bounds.min;
