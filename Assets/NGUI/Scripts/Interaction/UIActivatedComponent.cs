@@ -13,6 +13,6 @@ public class UIActivatedComponent : MonoBehaviour
 
 	void OnActivate (bool isActive)
 	{
-		if (target != null) target.enabled = inverse ? !isActive : isActive;
+		if (enabled && target != null) target.enabled = inverse ? !isActive : isActive;
 	}
 }

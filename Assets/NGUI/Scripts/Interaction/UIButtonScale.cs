@@ -9,7 +9,7 @@ public class UIButtonScale : MonoBehaviour
 {
 	public Transform tweenTarget;
 	public Vector3 hover = new Vector3(1.1f, 1.1f, 1.1f);
-	public Vector3 pressed = new Vector3(1.1f, 1.1f, 1.1f);
+	public Vector3 pressed = new Vector3(1.05f, 1.05f, 1.05f);
 	public float duration = 0.2f;
 
 	Vector3 mScale;
@@ -22,11 +22,11 @@ public class UIButtonScale : MonoBehaviour
 
 	void OnPress (bool isPressed)
 	{
-		TweenScale.Begin(tweenTarget.gameObject, duration, isPressed ? Vector3.Scale(mScale, pressed) : mScale).method = Tweener.Method.EaseInOut;
+		if (enabled) TweenScale.Begin(tweenTarget.gameObject, duration, isPressed ? Vector3.Scale(mScale, pressed) : mScale).method = Tweener.Method.EaseInOut;
 	}
 
 	void OnHover (bool isOver)
 	{
-		TweenScale.Begin(tweenTarget.gameObject, duration, isOver ? Vector3.Scale(mScale, hover) : mScale).method = Tweener.Method.EaseInOut;
+		if (enabled) TweenScale.Begin(tweenTarget.gameObject, duration, isOver ? Vector3.Scale(mScale, hover) : mScale).method = Tweener.Method.EaseInOut;
 	}
 }

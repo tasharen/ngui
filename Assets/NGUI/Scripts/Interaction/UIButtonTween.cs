@@ -7,41 +7,64 @@
 [AddComponentMenu("NGUI/Interaction/Button Tween")]
 public class UIButtonTween : MonoBehaviour
 {
-	public GameObject onHover;
-	public GameObject onPress;
-	public GameObject onClick;
-	public bool toggleOnClick = false;
-	public bool inReverse = false;
+	public enum Trigger
+	{
+		OnClick,
+		OnHover,
+		OnPress,
+	}
+
+	public enum Direction
+	{
+		Forward,
+		Reverse,
+		Toggle,
+	}
+
+	public GameObject tweenTarget;
+	public Trigger trigger = Trigger.OnClick;
+	public Direction direction = Direction.Forward;
+	public bool includeChildren = false;
+
+	void Start () { if (tweenTarget == null) tweenTarget = gameObject; }
+
+	void Activate (bool forward)
+	{
+		GameObject go = (tweenTarget == null) ? gameObject : tweenTarget;
+		Tweener[] tween = includeChildren ? go.GetComponentsInChildren<Tweener>() : go.GetComponents<Tweener>();
+
+		if (direction == Direction.Toggle)
+		{
+			foreach (Tweener tw in tween) tw.Toggle();
+		}
+		else
+		{
+			if (direction == Direction.Reverse) forward = !forward;
+			foreach (Tweener tw in tween) tw.Activate(forward);
+		}
+	}
 
 	void OnHover (bool isOver)
 	{
-		if (onHover != null)
+		if (enabled && trigger == Trigger.OnHover)
 		{
-			Tweener[] tween = onHover.GetComponents<Tweener>();
-			foreach (Tweener tw in tween) tw.Activate(!isOver);
+			Activate(isOver);
 		}
 	}
 
 	void OnPress (bool isPressed)
 	{
-		if (onPress != null)
+		if (enabled && trigger == Trigger.OnPress)
 		{
-			Tweener[] tween = onPress.GetComponents<Tweener>();
-			foreach (Tweener tw in tween) tw.Activate(!isPressed);
+			Activate(isPressed);
 		}
 	}
 
 	void OnClick ()
 	{
-		if (onClick != null)
+		if (enabled && trigger == Trigger.OnClick)
 		{
-			Tweener[] tween = onClick.GetComponents<Tweener>();
-
-			foreach (Tweener tw in tween)
-			{
-				if (toggleOnClick) tw.Toggle();
-				else tw.Activate(inReverse);
-			}
+			Activate(true);
 		}
 	}
 }

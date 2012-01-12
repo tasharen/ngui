@@ -7,25 +7,40 @@
 [AddComponentMenu("NGUI/Interaction/Button Sound")]
 public class UIButtonSound : MonoBehaviour
 {
-	public AudioClip onHoverOver;
-	public AudioClip onHoverOut;
-	public AudioClip onPressed;
-	public AudioClip onUnpressed;
-	public AudioClip onClick;
+	public enum Trigger
+	{
+		OnClick,
+		OnMouseOver,
+		OnMouseOut,
+		OnPress,
+		OnRelease,
+	}
+
+	public AudioClip audioClip;
+	public Trigger trigger = Trigger.OnClick;
 	public float volume = 1f;
 
 	void OnHover (bool isOver)
 	{
-		NGUITools.PlaySound(isOver ? onHoverOver : onHoverOut, volume);
+		if (enabled && ((isOver && trigger == Trigger.OnMouseOver) || (!isOver && trigger == Trigger.OnMouseOut)))
+		{
+			NGUITools.PlaySound(audioClip, volume);
+		}
 	}
 
 	void OnPress (bool isPressed)
 	{
-		NGUITools.PlaySound(isPressed ? onPressed : onUnpressed, volume);
+		if (enabled && ((isPressed && trigger == Trigger.OnPress) || (!isPressed && trigger == Trigger.OnRelease)))
+		{
+			NGUITools.PlaySound(audioClip, volume);
+		}
 	}
 
 	void OnClick ()
 	{
-		NGUITools.PlaySound(onClick, volume);
+		if (enabled && trigger == Trigger.OnClick)
+		{
+			NGUITools.PlaySound(audioClip, volume);
+		}
 	}
 }

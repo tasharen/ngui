@@ -41,6 +41,7 @@ public class UICheckbox : MonoBehaviour
 	void Start ()
 	{
 		mTrans = transform;
+		if (eventReceiver == null) eventReceiver = gameObject;
 		Set(startsChecked);
 	}
 
@@ -48,7 +49,7 @@ public class UICheckbox : MonoBehaviour
 	/// Check or uncheck on click.
 	/// </summary>
 
-	void OnClick () { isChecked = !isChecked; }
+	void OnClick () { if (enabled) isChecked = !isChecked; }
 
 	/// <summary>
 	/// Fade out or fade in the checkmark and notify the target of OnChecked event.
@@ -75,7 +76,6 @@ public class UICheckbox : MonoBehaviour
 		}
 
 		// Send out the event notification
-		GameObject go = (eventReceiver == null ? gameObject : eventReceiver);
-		go.SendMessage("OnActivate", mChecked, SendMessageOptions.DontRequireReceiver);
+		if (eventReceiver != null) eventReceiver.SendMessage("OnActivate", mChecked, SendMessageOptions.DontRequireReceiver);
 	}
 }

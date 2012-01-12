@@ -115,10 +115,10 @@ public abstract class Tweener : MonoBehaviour
 	/// Manually activate the tweening process, reversing it if necessary.
 	/// </summary>
 
-	public void Activate (bool inReverse)
+	public void Activate (bool forward)
 	{
 		mAmountPerDelta = Mathf.Abs(amountPerDelta);
-		if (inReverse) mAmountPerDelta = -mAmountPerDelta;
+		if (!forward) mAmountPerDelta = -mAmountPerDelta;
 		enabled = true;
 	}
 

@@ -3,6 +3,4 @@ guid: 7d44bc69c2ca5f943b845318866dc1bd
 MonoImporter:
   importerVersion: 1
   defaultReferences:
-    onHover: {}
-    onPress: {}
-    onClick: {fileID: 8300000, guid: b5083cfe83bb875479bd797c61594131, type: 1}
+    audioClip: {fileID: 8300000, guid: b5083cfe83bb875479bd797c61594131, type: 1}

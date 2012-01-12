@@ -25,7 +25,7 @@ public class UIButtonColor : MonoBehaviour
 		}
 		else
 		{
-			Renderer ren = renderer;
+			Renderer ren = tweenTarget.renderer;
 
 			if (ren != null)
 			{
@@ -33,7 +33,7 @@ public class UIButtonColor : MonoBehaviour
 			}
 			else
 			{
-				Light lt = light;
+				Light lt = tweenTarget.light;
 
 				if (lt != null)
 				{
@@ -41,7 +41,7 @@ public class UIButtonColor : MonoBehaviour
 				}
 				else
 				{
-					Debug.Log(NGUITools.GetHierarchy(gameObject) + " has nothing for UIButtonColor to color");
+					Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " has nothing for UIButtonColor to color");
 					enabled = false;
 				}
 			}
@@ -50,11 +50,11 @@ public class UIButtonColor : MonoBehaviour
 
 	void OnPress (bool isPressed)
 	{
-		TweenColor.Begin(tweenTarget, duration, isPressed ? pressed : mColor);
+		if (enabled) TweenColor.Begin(tweenTarget, duration, isPressed ? pressed : mColor);
 	}
 
 	void OnHover (bool isOver)
 	{
-		TweenColor.Begin(tweenTarget, duration, isOver ? hover : mColor);
+		if (enabled) TweenColor.Begin(tweenTarget, duration, isOver ? hover : mColor);
 	}
 }
