@@ -79,7 +79,6 @@ public class UIFontInspector : Editor
 					Undo.RegisterUndo(mFont, "Font Sprite");
 					mFont.spriteName = spriteName;
 					EditorUtility.SetDirty(mFont);
-					MarkAsChanged();
 				}
 			}
 			else

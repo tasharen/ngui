@@ -7,7 +7,7 @@
 [AddComponentMenu("NGUI/Interaction/Button Offset")]
 public class UIButtonOffset : MonoBehaviour
 {
-	public Transform target;
+	public Transform tweenTarget;
 	public Vector3 hover = Vector3.zero;
 	public Vector3 pressed = new Vector3(2f, -2f);
 	public float duration = 0.2f;
@@ -16,17 +16,17 @@ public class UIButtonOffset : MonoBehaviour
 
 	void Start ()
 	{
-		if (target == null) target = transform;
-		mPos = target.localPosition;
+		if (tweenTarget == null) tweenTarget = transform;
+		mPos = tweenTarget.localPosition;
 	}
 
 	void OnPress (bool isPressed)
 	{
-		TweenPosition.Begin(target.gameObject, duration, isPressed ? mPos + pressed : mPos).method = Tweener.Method.EaseInOut;
+		TweenPosition.Begin(tweenTarget.gameObject, duration, isPressed ? mPos + pressed : mPos).method = Tweener.Method.EaseInOut;
 	}
 
 	void OnHover (bool isOver)
 	{
-		TweenPosition.Begin(target.gameObject, duration, isOver ? mPos + hover : mPos).method = Tweener.Method.EaseInOut;
+		TweenPosition.Begin(tweenTarget.gameObject, duration, isOver ? mPos + hover : mPos).method = Tweener.Method.EaseInOut;
 	}
 }

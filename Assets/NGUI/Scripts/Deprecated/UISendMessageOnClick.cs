@@ -7,7 +7,7 @@
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/Interaction/Send Message (OnClick)")]
+[AddComponentMenu("NGUI/Deprecated/Send Message (OnClick)")]
 public class UISendMessageOnClick : MonoBehaviour
 {
 	public GameObject target;

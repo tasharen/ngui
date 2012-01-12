@@ -1,18 +1,23 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Simple checkbox functionality.
+/// Simple checkbox functionality. If 'option' is enabled, checking this checkbox will uncheck all other checkboxes with the same parent.
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Checkbox")]
 public class UICheckbox : MonoBehaviour
 {
 	public UISprite checkedSprite;
+	public GameObject eventReceiver;
 	public bool startsChecked = true;
-
-	public MonoBehaviour[] controlledComponents;
+	public bool option = false;
 
 	bool mChecked = true;
+	Transform mTrans;
+
+	/// <summary>
+	/// Whether the checkbox is checked.
+	/// </summary>
 
 	public bool isChecked
 	{
@@ -22,35 +27,55 @@ public class UICheckbox : MonoBehaviour
 		}
 		set
 		{
-			if (mChecked != value)
+			if (mChecked != value && (!option || value))
 			{
-				mChecked = value;
-				UpdateComponents();
+				Set(value);
 			}
 		}
 	}
+
+	/// <summary>
+	/// Activate the initial state.
+	/// </summary>
 
 	void Start ()
 	{
-		mChecked = startsChecked;
-		UpdateComponents();
+		mTrans = transform;
+		Set(startsChecked);
 	}
+
+	/// <summary>
+	/// Check or uncheck on click.
+	/// </summary>
 
 	void OnClick () { isChecked = !isChecked; }
 
-	void UpdateComponents ()
+	/// <summary>
+	/// Fade out or fade in the checkmark and notify the target of OnChecked event.
+	/// </summary>
+
+	void Set (bool state)
 	{
-		if (checkedSprite != null)
+		// Uncheck all other checkboxes
+		if (option && state)
 		{
-			TweenColor.Begin(checkedSprite.gameObject, 0.2f, mChecked ? Color.white : Color.black);
+			UICheckbox[] cbs = mTrans.parent.GetComponentsInChildren<UICheckbox>();
+			foreach (UICheckbox cb in cbs) if (cb != this) cb.Set(false);
 		}
 
-		if (controlledComponents != null)
+		// Remember the state
+		mChecked = state;
+
+		// Tween the color of the checkmark
+		if (checkedSprite != null)
 		{
-			foreach (MonoBehaviour mb in controlledComponents)
-			{
-				mb.enabled = mChecked;
-			}
+			Color c = checkedSprite.color;
+			c.a = mChecked ? 1f : 0f;
+			TweenColor.Begin(checkedSprite.gameObject, 0.2f, c);
 		}
+
+		// Send out the event notification
+		GameObject go = (eventReceiver == null ? gameObject : eventReceiver);
+		go.SendMessage("OnActivate", mChecked, SendMessageOptions.DontRequireReceiver);
 	}
 }

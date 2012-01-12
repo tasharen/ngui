@@ -210,16 +210,14 @@ public class UIFont : MonoBehaviour
 
 	public void Refresh ()
 	{
-		if (!Application.isPlaying)
-		{
-			UILabel[] labels = (UILabel[])Object.FindSceneObjectsOfType(typeof(UILabel));
+		UILabel[] labels = (UILabel[])Object.FindSceneObjectsOfType(typeof(UILabel));
 
-			foreach (UILabel lbl in labels)
+		foreach (UILabel lbl in labels)
+		{
+			if (lbl.font == this)
 			{
-				if (lbl.font == this)
-				{
-					lbl.MarkAsChanged();
-				}
+				lbl.font = null;
+				lbl.font = this;
 			}
 		}
 	}
@@ -360,7 +358,7 @@ public class UIFont : MonoBehaviour
 			int lineHeight = (mFont.charSize + mSpacingY);
 			Vector3 v0 = Vector3.zero, v1 = Vector3.zero;
 			Vector2 u0 = Vector2.zero, u1 = Vector2.zero;
-			float invX = mUVRect.width / mFont.texWidth;
+			float invX = uvRect.width / mFont.texWidth;
 			float invY = mUVRect.height / mFont.texHeight;
 
 			for (int i = 0, imax = text.Length; i < imax; ++i)

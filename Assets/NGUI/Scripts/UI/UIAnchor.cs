@@ -26,6 +26,7 @@ public class UIAnchor : MonoBehaviour
 	public Side side = Side.Center;
 	public bool halfPixelOffset = true;
 	public bool stretchToFill = false;
+	public float depthOffset = 0f;
 
 	Transform mTrans;
 	bool mIsWindows = false;
@@ -91,9 +92,11 @@ public class UIAnchor : MonoBehaviour
 				}
 			}
 
+			v.z = (mTrans.TransformPoint(Vector3.forward * depthOffset) - mTrans.TransformPoint(Vector3.zero)).magnitude;
+
 			if (uiCamera.orthographic)
 			{
-				v.z = (uiCamera.nearClipPlane + uiCamera.farClipPlane) * 0.5f;
+				v.z += (uiCamera.nearClipPlane + uiCamera.farClipPlane) * 0.5f;
 
 				if (halfPixelOffset && mIsWindows)
 				{

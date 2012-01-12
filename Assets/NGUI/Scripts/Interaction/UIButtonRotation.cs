@@ -7,7 +7,7 @@
 [AddComponentMenu("NGUI/Interaction/Button Rotation")]
 public class UIButtonRotation : MonoBehaviour
 {
-	public Transform target;
+	public Transform tweenTarget;
 	public Vector3 hover = Vector3.zero;
 	public Vector3 pressed = Vector3.zero;
 	public float duration = 0.2f;
@@ -16,17 +16,17 @@ public class UIButtonRotation : MonoBehaviour
 
 	void Start ()
 	{
-		if (target == null) target = transform;
-		mRot = target.localRotation;
+		if (tweenTarget == null) tweenTarget = transform;
+		mRot = tweenTarget.localRotation;
 	}
 
 	void OnPress (bool isPressed)
 	{
-		TweenRotation.Begin(target.gameObject, duration, isPressed ? mRot * Quaternion.Euler(pressed) : mRot).method = Tweener.Method.EaseInOut;
+		TweenRotation.Begin(tweenTarget.gameObject, duration, isPressed ? mRot * Quaternion.Euler(pressed) : mRot).method = Tweener.Method.EaseInOut;
 	}
 
 	void OnHover (bool isOver)
 	{
-		TweenRotation.Begin(target.gameObject, duration, isOver ? mRot * Quaternion.Euler(hover) : mRot).method = Tweener.Method.EaseInOut;
+		TweenRotation.Begin(tweenTarget.gameObject, duration, isOver ? mRot * Quaternion.Euler(hover) : mRot).method = Tweener.Method.EaseInOut;
 	}
 }

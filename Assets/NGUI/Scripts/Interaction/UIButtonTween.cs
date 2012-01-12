@@ -11,6 +11,7 @@ public class UIButtonTween : MonoBehaviour
 	public GameObject onPress;
 	public GameObject onClick;
 	public bool toggleOnClick = false;
+	public bool inReverse = false;
 
 	void OnHover (bool isOver)
 	{
@@ -39,7 +40,7 @@ public class UIButtonTween : MonoBehaviour
 			foreach (Tweener tw in tween)
 			{
 				if (toggleOnClick) tw.Toggle();
-				else tw.Activate(false);
+				else tw.Activate(inReverse);
 			}
 		}
 	}

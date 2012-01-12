@@ -7,7 +7,7 @@
 [AddComponentMenu("NGUI/Interaction/Button Scale")]
 public class UIButtonScale : MonoBehaviour
 {
-	public Transform target;
+	public Transform tweenTarget;
 	public Vector3 hover = new Vector3(1.1f, 1.1f, 1.1f);
 	public Vector3 pressed = new Vector3(1.1f, 1.1f, 1.1f);
 	public float duration = 0.2f;
@@ -16,17 +16,17 @@ public class UIButtonScale : MonoBehaviour
 
 	void Start ()
 	{
-		if (target == null) target = transform;
-		mScale = target.localScale;
+		if (tweenTarget == null) tweenTarget = transform;
+		mScale = tweenTarget.localScale;
 	}
 
 	void OnPress (bool isPressed)
 	{
-		TweenScale.Begin(target.gameObject, duration, isPressed ? Vector3.Scale(mScale, pressed) : mScale).method = Tweener.Method.EaseInOut;
+		TweenScale.Begin(tweenTarget.gameObject, duration, isPressed ? Vector3.Scale(mScale, pressed) : mScale).method = Tweener.Method.EaseInOut;
 	}
 
 	void OnHover (bool isOver)
 	{
-		TweenScale.Begin(target.gameObject, duration, isOver ? Vector3.Scale(mScale, hover) : mScale).method = Tweener.Method.EaseInOut;
+		TweenScale.Begin(tweenTarget.gameObject, duration, isOver ? Vector3.Scale(mScale, hover) : mScale).method = Tweener.Method.EaseInOut;
 	}
 }
