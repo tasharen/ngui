@@ -369,11 +369,11 @@ static public class NGUITools
 	/// Calculate the combined bounds of all widgets attached to the specified game object or its children (in world space).
 	/// </summary>
 
-	static public Bounds CalculateWidgetWorldBounds (GameObject go)
+	static public Bounds CalculateAbsoluteWidgetBounds (Transform trans)
 	{
-		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>() as UIWidget[];
+		UIWidget[] widgets = trans.GetComponentsInChildren<UIWidget>() as UIWidget[];
 
-		Bounds b = new Bounds(go.transform.position, Vector3.zero);
+		Bounds b = new Bounds(trans.transform.position, Vector3.zero);
 		bool first = true;
 
 		foreach (UIWidget w in widgets)
@@ -409,11 +409,11 @@ static public class NGUITools
 	/// Calculate the combined bounds of all widgets attached to the specified game object or its children (in relative-to-object space).
 	/// </summary>
 
-	static public Bounds CalculateWidgetRelativeBounds (GameObject go)
+	static public Bounds CalculateRelativeWidgetBounds (Transform root, Transform child)
 	{
-		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>() as UIWidget[];
+		UIWidget[] widgets = child.GetComponentsInChildren<UIWidget>() as UIWidget[];
 
-		Matrix4x4 toLocal = go.transform.worldToLocalMatrix;
+		Matrix4x4 toLocal = root.worldToLocalMatrix;
 		Bounds b = new Bounds(Vector3.zero, Vector3.zero);
 		bool first = true;
 
@@ -447,6 +447,15 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Calculate the combined bounds of all widgets attached to the specified game object or its children (in relative-to-object space).
+	/// </summary>
+
+	static public Bounds CalculateRelativeWidgetBounds (Transform trans)
+	{
+		return CalculateRelativeWidgetBounds(trans, trans);
+	}
+
+	/// <summary>
 	/// Add a collider to the game object containing one or more widgets.
 	/// </summary>
 
@@ -465,7 +474,7 @@ static public class NGUITools
 			box = go.AddComponent<BoxCollider>();
 		}
 
-		Bounds b = CalculateWidgetRelativeBounds(go);
+		Bounds b = CalculateRelativeWidgetBounds(go.transform);
 		box.isTrigger = true;
 		box.center = b.center;
 		box.size = b.size; // Need 3D colliders? Try this: new Vector3(b.size.x, b.size.y, Mathf.Max(1f, b.size.z));
@@ -496,5 +505,42 @@ static public class NGUITools
 				lbl.font.atlas = after;
 			}
 		}
+	}
+
+	/// <summary>
+	/// Constrain 'rect' to be within 'area' as much as possible, returning the Vector2 offset necessary for this to happen.
+	/// This function is useful when trying to restrict one area (window) to always be within another (viewport).
+	/// </summary>
+
+	static public Vector2 ConstrainRect (Vector2 minRect, Vector2 maxRect, Vector2 minArea, Vector2 maxArea)
+	{
+		Vector2 offset = Vector2.zero;
+
+		float contentX = maxRect.x - minRect.x;
+		float contentY = maxRect.y - minRect.y;
+
+		float areaX = maxArea.x - minArea.x;
+		float areaY = maxArea.y - minArea.y;
+
+		if (contentX > areaX)
+		{
+			float diff = contentX - areaX;
+			minArea.x -= diff;
+			maxArea.x += diff;
+		}
+
+		if (contentY > areaY)
+		{
+			float diff = contentY - areaY;
+			minArea.y -= diff;
+			maxArea.y += diff;
+		}
+
+		if (minRect.x < minArea.x) offset.x += minArea.x - minRect.x;
+		if (maxRect.x > maxArea.x) offset.x -= maxRect.x - maxArea.x;
+		if (minRect.y < minArea.y) offset.y += minArea.y - minRect.y;
+		if (maxRect.y > maxArea.y) offset.y -= maxRect.y - maxArea.y;
+		
+		return offset;
 	}
 }

@@ -4,7 +4,6 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 	{
 		_MainTex ("Base (RGB), Alpha (A)", 2D) = "white" {}
 		_Color ("Tint Color", Color) = (1,1,1,1)
-		_ClipRange ("Clip Range", Vector) = (0,0,1000,1000)
 	}
 
 	SubShader
@@ -37,6 +36,7 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 			float4 _MainTex_ST;
 			fixed4 _Color;
 			float4 _ClipRange = float4(0.0, 0.0, 1000.0, 1000.0);
+			float4x4 _ClipMatrix;
 
 			struct appdata_t
 			{
@@ -56,7 +56,7 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 			v2f vert (appdata_t v)
 			{
 				v2f o;
-				o.worldPos = v.vertex;
+				o.worldPos = mul(_ClipMatrix, v.vertex);
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.color = v.color;
 				o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);

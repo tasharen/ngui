@@ -166,7 +166,6 @@ public class UIPanel : MonoBehaviour
 		Vector4 range = Vector4.zero;
 
 		if (mTrans == null) mTrans = transform;
-		Vector3 scale = mTrans.lossyScale;
 
 		if (mClipping != UIDrawCall.Clipping.None)
 		{
@@ -186,20 +185,14 @@ public class UIPanel : MonoBehaviour
 			range.y += 0.5f;
 		}
 
-		range.x *= scale.x;
-		range.y *= scale.y;
-		range.z *= scale.x;
-		range.w *= scale.y;
-
-		Vector2 softness = mClipSoftness;
-		softness.x *= scale.x;
-		softness.y *= scale.y;
+		Matrix4x4 mat = mTrans.worldToLocalMatrix;
 
 		foreach (UIDrawCall dc in mDrawCalls)
 		{
 			dc.clipping = mClipping;
 			dc.clipRange = range;
-			dc.clipSoftness = softness;
+			dc.clipSoftness = mClipSoftness;
+			dc.clipMat = mat;
 		}
 	}
 

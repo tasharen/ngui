@@ -29,8 +29,8 @@ public class UIStateRotations : MonoBehaviour
 
 			TweenRotation tc = Tweener.Begin<TweenRotation>(gameObject, duration);
 			tc.method = Tweener.Method.EaseInOut;
-			tc.from = mTrans.localRotation;
-			tc.to = Quaternion.Euler(rotations[index]);
+			tc.from = mTrans.localRotation.eulerAngles;
+			tc.to = rotations[index];
 		}
 	}
 }

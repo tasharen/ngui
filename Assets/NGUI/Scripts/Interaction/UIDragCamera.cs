@@ -50,7 +50,7 @@ public class UIDragCamera : MonoBehaviour
 		if (rootForBounds != null)
 		{
 			// Calculate the bounds of all widgets under this game object
-			Bounds bounds = NGUITools.CalculateWidgetWorldBounds(rootForBounds.gameObject);
+			Bounds bounds = NGUITools.CalculateAbsoluteWidgetBounds(rootForBounds);
 
 			// Include the bounds of all colliders as well
 			Collider[] cols = rootForBounds.GetComponentsInChildren<Collider>();

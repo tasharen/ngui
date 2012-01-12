@@ -4,9 +4,7 @@ Shader "Unlit/Transparent Colored (SoftClip)"
 	{
 		_MainTex ("Base (RGB), Alpha (A)", 2D) = "white" {}
 		_Color ("Tint Color", Color) = (1,1,1,1)
-		_ClipRange ("Clip Range", Vector) = (0,0,1000,1000)
-		_ClipSharpness ("Clip Sharpness", Vector) = (1,1,1,1)
-	}
+}
 
 	SubShader
 	{
@@ -39,6 +37,7 @@ Shader "Unlit/Transparent Colored (SoftClip)"
 			fixed4 _Color;
 			float4 _ClipRange = float4(0.0, 0.0, 1000.0, 1000.0);
 			float2 _ClipSharpness = float2(20.0, 20.0);
+			float4x4 _ClipMatrix;
 
 			struct appdata_t
 			{
@@ -58,7 +57,7 @@ Shader "Unlit/Transparent Colored (SoftClip)"
 			v2f vert (appdata_t v)
 			{
 				v2f o;
-				o.worldPos = v.vertex;
+				o.worldPos = mul(_ClipMatrix, v.vertex);
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.color = v.color;
 				o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
@@ -69,7 +68,7 @@ Shader "Unlit/Transparent Colored (SoftClip)"
 			{
 				// Sample the texture
 				fixed4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
-				
+
 				float2 factor = abs(IN.worldPos.xy - _ClipRange.xy) / _ClipRange.zw;
 				factor = float2(1.0) - factor;
 				factor *= _ClipSharpness;

@@ -34,20 +34,30 @@ public abstract class Tweener : MonoBehaviour
 	float mFactor = 0f;
 
 	/// <summary>
+	/// Amount advanced per delta time.
+	/// </summary>
+
+	float amountPerDelta
+	{
+		get
+		{
+			if (mDuration != duration)
+			{
+				mDuration = duration;
+				mAmountPerDelta = Mathf.Abs((duration > 0f) ? 1f / duration : 1000f);
+			}
+			return mAmountPerDelta;
+		}
+	}
+
+	/// <summary>
 	/// Update the tweening factor and call the virtual update function.
 	/// </summary>
 
 	void Update ()
 	{
-		// Calculate the delta-per-time
-		if (mDuration != duration)
-		{
-			mDuration = duration;
-			mAmountPerDelta = Mathf.Abs((duration > 0f) ? 1f / duration : 1000f);
-		}
-
 		// Advance the sampling factor
-		mFactor += mAmountPerDelta * Time.deltaTime;
+		mFactor += amountPerDelta * Time.deltaTime;
 
 		// Loop style simply resets the play factor after it exceeds 1.
 		if (style == Style.Loop)
@@ -94,7 +104,39 @@ public abstract class Tweener : MonoBehaviour
 		OnUpdate(val);
 
 		// If the factor goes out of range and this is a one-time tweening operation, disable the script
-		if (style == Style.Once && mFactor > 1f || mFactor < 0f) enabled = false;
+		if (style == Style.Once && mFactor > 1f || mFactor < 0f)
+		{
+			mFactor = Mathf.Clamp01(mFactor);
+			enabled = false;
+		}
+	}
+
+	/// <summary>
+	/// Manually activate the tweening process, reversing it if necessary.
+	/// </summary>
+
+	public void Activate (bool inReverse)
+	{
+		mAmountPerDelta = Mathf.Abs(amountPerDelta);
+		if (inReverse) mAmountPerDelta = -mAmountPerDelta;
+		enabled = true;
+	}
+
+	/// <summary>
+	/// Manually start the tweening process, reversing its direction.
+	/// </summary>
+
+	public void Toggle ()
+	{
+		if (mFactor > 0f)
+		{
+			mAmountPerDelta = -amountPerDelta;
+		}
+		else
+		{
+			mAmountPerDelta = Mathf.Abs(amountPerDelta);
+		}
+		enabled = true;
 	}
 
 	/// <summary>
