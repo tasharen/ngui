@@ -52,9 +52,9 @@ public class UIAtlas : MonoBehaviour
 
 	// Currently active set of coordinates
 #if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
-	[SerializeField] Coordinates mCoordinates = Coordinates.Pixels;
-#else
 	public Coordinates mCoordinates = Coordinates.Pixels;
+#else
+	[SerializeField] Coordinates mCoordinates = Coordinates.Pixels;
 #endif
 
 	/// <summary>

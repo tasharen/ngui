@@ -38,6 +38,7 @@ Version History
 
 1.30:
 - NEW: UIPanels can now specify a clipping area that's to be used with a new Clipped series of shaders.
+- NEW: UIFilledSprite, best used for progress bars, sliders, etc.
 
 1.28:
 - NEW: Added a simple tweener and a set of tweening scripts (position, rotation, scale, and color).

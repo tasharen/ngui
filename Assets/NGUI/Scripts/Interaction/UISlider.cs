@@ -24,6 +24,7 @@ public class UISlider : MonoBehaviour
 	BoxCollider mCol;
 	Transform mTrans;
 	Transform mForeTrans;
+	UIFilledSprite mSprite;
 
 	/// <summary>
 	/// Change the slider's value.
@@ -60,6 +61,7 @@ public class UISlider : MonoBehaviour
 		}
 		else
 		{
+			mSprite = foreground.GetComponent<UIFilledSprite>();
 			mForeTrans = foreground.transform;
 			mScale = foreground.localScale;
 			mCol = collider as BoxCollider;
@@ -122,9 +124,16 @@ public class UISlider : MonoBehaviour
 
 	void UpdateSlider ()
 	{
-		Vector3 scale = mScale;
-		if (direction == Direction.Horizontal) scale.x *= mValue;
-		else scale.y *= mValue;
-		mForeTrans.localScale = scale;
+		if (mSprite != null)
+		{
+			mSprite.fillAmount = mValue;
+		}
+		else
+		{
+			Vector3 scale = mScale;
+			if (direction == Direction.Horizontal) scale.x *= mValue;
+			else scale.y *= mValue;
+			mForeTrans.localScale = scale;
+		}
 	}
 }
