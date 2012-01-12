@@ -47,26 +47,29 @@ public class UISprite : UIWidget
 		{
 			if (mAtlas != value)
 			{
+				bool resize = false;
 				mLastAtlas = value;
 				mAtlas = value;
 
 				// Update the material
 				material = (mAtlas != null) ? mAtlas.material : null;
 
-				// Re-link the sprite
+				// Automatically choose the first sprite
 				if (string.IsNullOrEmpty(mSpriteName))
 				{
 					if (mAtlas != null && mAtlas.sprites.Count > 0)
 					{
 						mSprite = mAtlas.sprites[0];
 						mSpriteName = mSprite.name;
+						resize = true;
 					}
 				}
 
+				// Re-link the sprite
 				if (!string.IsNullOrEmpty(mSpriteName))
 				{
 					// We don't want to resize the sprite on atlas change
-					mAutoResize = false;
+					mAutoResize = resize;
 					string sprite = mSpriteName;
 					mSpriteName = "";
 					spriteName = sprite;

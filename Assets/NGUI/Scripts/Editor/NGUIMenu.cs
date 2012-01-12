@@ -45,6 +45,15 @@ static public class NGUIMenu
 		}
 	}
 
+	[MenuItem("NGUI/Add Filled Sprite")]
+	static void AddCutSprite ()
+	{
+		if (PrefabCheck())
+		{
+			AddWidget<UIFilledSprite>().SetToLastValues();
+		}
+	}
+
 	[MenuItem("NGUI/Add Texture (no atlas)")]
 	static void AddTexture ()
 	{
