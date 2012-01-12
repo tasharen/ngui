@@ -20,7 +20,9 @@ public class UISpriteInspector : UIWidgetInspector
 		if (mSprite != null)
 		{
 			Undo.RegisterUndo(mSprite, "Atlas Selection");
+			bool resize = (mSprite.atlas == null);
 			mSprite.atlas = obj as UIAtlas;
+			if (resize) mSprite.MakePixelPerfect();
 			EditorUtility.SetDirty(mSprite.gameObject);
 		}
 	}
@@ -75,6 +77,7 @@ public class UISpriteInspector : UIWidgetInspector
 		{
 			Undo.RegisterUndo(mSprite, "Sprite Change");
 			mSprite.spriteName = spriteName;
+			mSprite.MakePixelPerfect();
 			EditorUtility.SetDirty(mSprite.gameObject);
 		}
 		return true;

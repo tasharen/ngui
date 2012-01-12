@@ -12,7 +12,6 @@ public class UISprite : UIWidget
 	// Last used values, here for convenience
 	static UIAtlas mLastAtlas;
 	static string mLastSprite = "";
-	static bool mAutoResize = true;
 
 	// Cached and saved values
 #if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
@@ -47,7 +46,6 @@ public class UISprite : UIWidget
 		{
 			if (mAtlas != value)
 			{
-				bool resize = false;
 				mLastAtlas = value;
 				mAtlas = value;
 
@@ -61,21 +59,17 @@ public class UISprite : UIWidget
 					{
 						mSprite = mAtlas.sprites[0];
 						mSpriteName = mSprite.name;
-						resize = true;
 					}
 				}
 
 				// Re-link the sprite
 				if (!string.IsNullOrEmpty(mSpriteName))
 				{
-					// We don't want to resize the sprite on atlas change
-					mAutoResize = resize;
 					string sprite = mSpriteName;
 					mSpriteName = "";
 					spriteName = sprite;
 					mChanged = true;
 					UpdateUVs();
-					mAutoResize = true;
 				}
 			}
 		}
@@ -93,8 +87,6 @@ public class UISprite : UIWidget
 		}
 		set
 		{
-			bool noSprite = string.IsNullOrEmpty(mSpriteName);
-
 			if (string.IsNullOrEmpty(value))
 			{
 				// If the sprite name hasn't been set yet, no need to do anything
@@ -105,19 +97,14 @@ public class UISprite : UIWidget
 				mSprite = null;
 				mChanged = true;
 			}
-			else if (noSprite || mSpriteName != value)
+			else if (mSpriteName != value)
 			{
 				// If the sprite name changes, the sprite reference should also be updated
 				mLastSprite = value;
 				mSpriteName = value;
 				mSprite = (mAtlas != null) ? mAtlas.GetSprite(mSpriteName) : null;
 				mChanged = true;
-
-				if (mSprite != null)
-				{
-					UpdateUVs();
-					if (noSprite && mAutoResize) MakePixelPerfect();
-				}
+				if (mSprite != null) UpdateUVs();
 			}
 		}
 	}

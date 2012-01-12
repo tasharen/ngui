@@ -21,7 +21,9 @@ public class UILabelInspector : UIWidgetInspector
 
 		if (mLabel != null)
 		{
+			bool resize = (mLabel.font == null);
 			mLabel.font = obj as UIFont;
+			if (resize) mLabel.MakePixelPerfect();
 			EditorUtility.SetDirty(mLabel.gameObject);
 		}
 	}
