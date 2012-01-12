@@ -508,6 +508,23 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Want to swap a low-res font for a hi-res one? This is the way.
+	/// </summary>
+
+	static public void ReplaceFont (UIFont before, UIFont after)
+	{
+		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+
+		foreach (UILabel lbl in labels)
+		{
+			if (lbl.font == before)
+			{
+				lbl.font = after;
+			}
+		}
+	}
+
+	/// <summary>
 	/// Constrain 'rect' to be within 'area' as much as possible, returning the Vector2 offset necessary for this to happen.
 	/// This function is useful when trying to restrict one area (window) to always be within another (viewport).
 	/// </summary>

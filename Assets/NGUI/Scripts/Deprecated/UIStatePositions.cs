@@ -2,10 +2,11 @@
 
 /// <summary>
 /// Changes the position of the widget based on whether the current state matches the active state.
-/// Tip: Use UISendState to change the state of a remote object that has UIStatePosition attached.
+/// DEPRECATED: This script has been deprecated as of version 1.30.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/State Positions")]
+[ExecuteInEditMode]
+[AddComponentMenu("NGUI/Deprecated/State Positions")]
 public class UIStatePositions : MonoBehaviour
 {
 	public int currentState = 0;
@@ -17,6 +18,8 @@ public class UIStatePositions : MonoBehaviour
 	void Start ()
 	{
 		mTrans = transform;
+		Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " uses a deprecated script: " + GetType() +
+			"\nConsider switching to TweenPosition instead.");
 	}
 
 	void OnState (int state)

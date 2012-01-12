@@ -5,8 +5,9 @@
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Checkbox")]
-public class UICheckbox : UISend
+public class UICheckbox : MonoBehaviour
 {
+	public UISprite checkedSprite;
 	public bool startsChecked = true;
 
 	public MonoBehaviour[] controlledComponents;
@@ -24,7 +25,6 @@ public class UICheckbox : UISend
 			if (mChecked != value)
 			{
 				mChecked = value;
-				Send(mChecked ? 1 : 0);
 				UpdateComponents();
 			}
 		}
@@ -33,7 +33,6 @@ public class UICheckbox : UISend
 	void Start ()
 	{
 		mChecked = startsChecked;
-		Send(mChecked ? 1 : 0);
 		UpdateComponents();
 	}
 
@@ -41,6 +40,11 @@ public class UICheckbox : UISend
 
 	void UpdateComponents ()
 	{
+		if (checkedSprite != null)
+		{
+			TweenColor.Begin(checkedSprite.gameObject, 0.2f, mChecked ? Color.white : Color.black);
+		}
+
 		if (controlledComponents != null)
 		{
 			foreach (MonoBehaviour mb in controlledComponents)

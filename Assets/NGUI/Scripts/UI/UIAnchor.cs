@@ -53,6 +53,8 @@ public class UIAnchor : MonoBehaviour
 	{
 		if (uiCamera != null)
 		{
+			if (stretchToFill) side = Side.TopLeft;
+
 			Vector3 v = Vector3.zero;
 
 			if (side == Side.Center)
@@ -89,10 +91,15 @@ public class UIAnchor : MonoBehaviour
 				}
 			}
 
-			if (halfPixelOffset && mIsWindows && uiCamera.orthographic)
+			if (uiCamera.orthographic)
 			{
-				v.x -= 0.5f;
-				v.y += 0.5f;
+				v.z = (uiCamera.nearClipPlane + uiCamera.farClipPlane) * 0.5f;
+
+				if (halfPixelOffset && mIsWindows)
+				{
+					v.x -= 0.5f;
+					v.y += 0.5f;
+				}
 			}
 
 			Vector3 newPos = uiCamera.ScreenToWorldPoint(v);
@@ -101,7 +108,7 @@ public class UIAnchor : MonoBehaviour
 			// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
 			if (newPos != currPos) mTrans.position = newPos;
 
-			if (stretchToFill && side == Side.TopLeft)
+			if (stretchToFill)
 			{
 				Vector3 localPos = mTrans.localPosition;
 				Vector3 localScale = new Vector3(Mathf.Abs(localPos.x) * 2f, Mathf.Abs(localPos.y) * 2f, 1f);

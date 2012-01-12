@@ -3,13 +3,21 @@
 /// <summary>
 /// Calls "OnState" function on all of the scripts attached to the specified
 /// target when the script receives OnPress message from UICamera.
+/// DEPRECATED: This script has been deprecated as of version 1.30.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/Send State (OnPress)")]
+[ExecuteInEditMode]
+[AddComponentMenu("NGUI/Deprecated/Send State (OnPress)")]
 public class UISendStateOnPress : UISend
 {
 	public int normalState	= 0;
 	public int pressedState = 1;
+
+	void Start ()
+	{
+		Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " uses a deprecated script: " + GetType() +
+			"\nConsider switching to UIButtonScale, UIButtonColor, UIButtonOffset or UIButtonTween instead.");
+	}
 
 	void OnPress (bool pressed)
 	{

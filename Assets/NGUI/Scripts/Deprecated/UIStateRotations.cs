@@ -2,10 +2,11 @@
 
 /// <summary>
 /// Changes the rotation of the widget based on whether the current state matches the active state.
-/// Tip: Use UISendState to change the state of a remote object that has UIStateRotation attached.
+/// DEPRECATED: This script has been deprecated as of version 1.30.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/State Rotations")]
+[ExecuteInEditMode]
+[AddComponentMenu("NGUI/Deprecated/State Rotations")]
 public class UIStateRotations : MonoBehaviour
 {
 	public int currentState = 0;
@@ -17,6 +18,8 @@ public class UIStateRotations : MonoBehaviour
 	void Start ()
 	{
 		mTrans = transform;
+		Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " uses a deprecated script: " + GetType() +
+			"\nConsider switching to TweenRotation instead.");
 	}
 
 	void OnState (int state)

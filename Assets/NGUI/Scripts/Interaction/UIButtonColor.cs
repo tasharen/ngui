@@ -10,6 +10,7 @@ public class UIButtonColor : MonoBehaviour
 	public Transform target;
 	public Color hover = new Color(0.8f, 1f, 0.6f, 1f);
 	public Color pressed = Color.grey;
+	public float duration = 0.2f;
 
 	Color mColor;
 
@@ -49,11 +50,11 @@ public class UIButtonColor : MonoBehaviour
 
 	void OnPress (bool isPressed)
 	{
-		TweenColor.Begin(target.gameObject, 0.2f, isPressed ? pressed : mColor);
+		TweenColor.Begin(target.gameObject, duration, isPressed ? pressed : mColor);
 	}
 
 	void OnHover (bool isOver)
 	{
-		TweenColor.Begin(target.gameObject, 0.2f, isOver ? hover : mColor);
+		TweenColor.Begin(target.gameObject, duration, isOver ? hover : mColor);
 	}
 }

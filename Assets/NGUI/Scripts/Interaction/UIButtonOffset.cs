@@ -10,6 +10,7 @@ public class UIButtonOffset : MonoBehaviour
 	public Transform target;
 	public Vector3 hover = Vector3.zero;
 	public Vector3 pressed = new Vector3(2f, -2f);
+	public float duration = 0.2f;
 
 	Vector3 mPos;
 
@@ -21,11 +22,11 @@ public class UIButtonOffset : MonoBehaviour
 
 	void OnPress (bool isPressed)
 	{
-		TweenPosition.Begin(target.gameObject, 0.2f, isPressed ? mPos + pressed : mPos);
+		TweenPosition.Begin(target.gameObject, duration, isPressed ? mPos + pressed : mPos).method = Tweener.Method.EaseInOut;
 	}
 
 	void OnHover (bool isOver)
 	{
-		TweenPosition.Begin(target.gameObject, 0.2f, isOver ? mPos + hover : mPos);
+		TweenPosition.Begin(target.gameObject, duration, isOver ? mPos + hover : mPos).method = Tweener.Method.EaseInOut;
 	}
 }

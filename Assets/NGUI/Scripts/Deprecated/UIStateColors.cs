@@ -2,14 +2,22 @@
 
 /// <summary>
 /// Changes the color of the widget, renderer or light based on the currently active state.
+/// DEPRECATED: This script has been deprecated as of version 1.30.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/State Colors")]
+[ExecuteInEditMode]
+[AddComponentMenu("NGUI/Deprecated/State Colors")]
 public class UIStateColors : MonoBehaviour
 {
 	public int currentState = 0;
 	public float duration = 0.2f;
 	public Color[] colors;
+
+	void Start ()
+	{
+		Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " uses a deprecated script: " + GetType() +
+			"\nYou can remove this script by using UIButtonColors on your button instead.");
+	}
 
 	void OnState (int state)
 	{
