@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.30
+                Version 1.30c
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -47,6 +47,7 @@ Version History
 - NEW: Example 0 (Anchor) has been redone.
 - NEW: Most tutorials and examples now explain what they do inside them.
 - NEW: Added a variety of new interaction scripts replacing State scripts (UIButton series for example).
+- NEW: Added a Drag Effect parameter to UIDragObject with options to add momentum and spring effects.
 - FIX: UICamera.lastCamera was not pointing to the correct camera with multi-camera setups (thanks LKIM).
 - FIX: UIAnchor now positions objects in the center of the ortho camera rather than at depth of 0.
 - FIX: Various usability improvements.

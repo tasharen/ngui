@@ -39,10 +39,12 @@ public class UIDragObject : MonoBehaviour
 
 		if (pressed)
 		{
+			mMomentum = Vector3.zero;
+
 			if (target != null)
 			{
-				TweenPosition tp = target.GetComponent<TweenPosition>();
-				if (tp != null) tp.enabled = false;
+				SpringPosition sp = target.GetComponent<SpringPosition>();
+				if (sp != null) sp.enabled = false;
 				mLastPos = UICamera.lastHit.point;
 				Transform trans = UICamera.lastCamera.transform;
 				mPlane = new Plane(trans.rotation * Vector3.back, mLastPos);
@@ -83,9 +85,10 @@ public class UIDragObject : MonoBehaviour
 					offset = target.TransformDirection(offset);
 				}
 
-				mMomentum = offset;
+				mMomentum = Vector3.Lerp(mMomentum, offset, 0.5f);
+
 				target.position += offset;
-				if (dragEffect != DragEffect.MomentumAndSpring) ConstrainToBounds(true);
+				if (dragEffect != DragEffect.MomentumAndSpring && ConstrainToBounds(true)) mMomentum = Vector3.zero;
 				mLastPos = currentPos;
 			}
 		}
@@ -123,15 +126,13 @@ public class UIDragObject : MonoBehaviour
 
 			if (offset.magnitude > 0f)
 			{
-				mMomentum = Vector3.zero;
-
 				if (immediate)
 				{
 					target.localPosition += offset;
 				}
 				else
 				{
-					TweenPosition.Begin(target.gameObject, 0.25f, target.localPosition + offset).method = Tweener.Method.EaseOut;
+					SpringPosition.Begin(target.gameObject, target.localPosition + offset, 13f);
 				}
 				return true;
 			}
@@ -145,10 +146,10 @@ public class UIDragObject : MonoBehaviour
 
 	void Update ()
 	{
-		if (dragEffect != DragEffect.None && !mPressed && target != null && mMomentum.magnitude > 0.001f)
+		if (dragEffect != DragEffect.None && !mPressed && target != null && mMomentum.magnitude > 0.005f)
 		{
 			target.position += mMomentum;
-			mMomentum = Vector3.Lerp(mMomentum, Vector3.zero, Time.deltaTime * 8f);
+			mMomentum = Vector3.Lerp(mMomentum, Vector3.zero, Time.deltaTime * 9f);
 			ConstrainToBounds(false);
 		}
 	}
