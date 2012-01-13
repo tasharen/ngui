@@ -15,7 +15,7 @@ public class UISendStateOnClick : UISend
 	void Start ()
 	{
 		Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " uses a deprecated script: " + GetType() +
-			"\nConsider switching to UIButtonScale, UIButtonColor, UIButtonOffset or UIButtonTween instead.");
+			"\nConsider switching to UIButtonScale, UIButtonColor, UIButtonOffset or UIButtonTween instead.", this);
 	}
 
 	void OnClick ()

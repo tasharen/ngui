@@ -19,7 +19,7 @@ public class UIStatePositions : MonoBehaviour
 	{
 		mTrans = transform;
 		Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " uses a deprecated script: " + GetType() +
-			"\nConsider switching to TweenPosition instead.");
+			"\nConsider switching to TweenPosition instead.", this);
 	}
 
 	void OnState (int state)

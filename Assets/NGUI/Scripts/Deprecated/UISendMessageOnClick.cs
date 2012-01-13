@@ -17,7 +17,7 @@ public class UISendMessageOnClick : MonoBehaviour
 	void Start ()
 	{
 		Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " uses a deprecated script: " + GetType() +
-			"\nConsider switching to UIButtonTween instead.");
+			"\nConsider switching to UIButtonTween instead.", this);
 	}
 
 	void OnClick ()

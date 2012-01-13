@@ -16,7 +16,7 @@ public class UIStateColors : MonoBehaviour
 	void Start ()
 	{
 		Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " uses a deprecated script: " + GetType() +
-			"\nYou can remove this script by using UIButtonColors on your button instead.");
+			"\nYou can remove this script by using UIButtonColors on your button instead.", this);
 	}
 
 	void OnState (int state)

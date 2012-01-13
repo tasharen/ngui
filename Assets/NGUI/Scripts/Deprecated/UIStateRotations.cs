@@ -19,7 +19,7 @@ public class UIStateRotations : MonoBehaviour
 	{
 		mTrans = transform;
 		Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " uses a deprecated script: " + GetType() +
-			"\nConsider switching to TweenRotation instead.");
+			"\nConsider switching to TweenRotation instead.", this);
 	}
 
 	void OnState (int state)
