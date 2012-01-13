@@ -37,8 +37,17 @@ Version History
 ---------------
 
 1.30:
-- NEW: UIPanels can now specify a clipping area that's to be used with a new Clipped series of shaders.
-- NEW: UIFilledSprite, best used for progress bars, sliders, etc.
+- NEW: UIPanels can now specify a clipping area (everything outside this area will not be visible).
+- NEW: UIFilledSprite, best used for progress bars, sliders, etc (thanks nsxdavid).
+- NEW: UISpriteAnimation for some simple sprite animation (attach to a sprite).
+- NEW: UIAnchor can now specify depth offset to be used with perspective cameras.
+- NEW: UIDragObject can now restrict dragging of objects to be within the panel's clipping bounds.
+- NEW: Example 7 showing how to use the clipping feature.
+- NEW: Example 0 (Anchor) has been redone.
+- NEW: Most tutorials and examples now explain what they do inside them.
+- FIX: UICamera.lastCamera was not pointing to the correct camera with multi-camera setups (thanks LKIM).
+- FIX: UIAnchor now positions objects in the center of the ortho camera rather than at depth of 0.
+- FIX: Various usability improvements.
 
 1.28:
 - NEW: Added a simple tweener and a set of tweening scripts (position, rotation, scale, and color).
