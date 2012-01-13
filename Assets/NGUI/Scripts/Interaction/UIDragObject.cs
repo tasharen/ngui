@@ -7,6 +7,13 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Drag Object")]
 public class UIDragObject : MonoBehaviour
 {
+	public enum DragEffect
+	{
+		None,
+		Momentum,
+		MomentumAndSpring,
+	}
+
 	/// <summary>
 	/// Target object that will be dragged.
 	/// </summary>
@@ -14,10 +21,13 @@ public class UIDragObject : MonoBehaviour
 	public Transform target;
 	public Vector3 scale = Vector3.one;
 	public bool restrictWithinPanel = false;
+	public DragEffect dragEffect = DragEffect.MomentumAndSpring;
 
 	Plane mPlane;
 	Vector3 mLastPos;
 	UIPanel mPanel;
+	bool mPressed = false;
+	Vector3 mMomentum = Vector3.zero;
 
 	/// <summary>
 	/// Create a plane on which we will be performing the dragging.
@@ -25,11 +35,22 @@ public class UIDragObject : MonoBehaviour
 
 	void OnPress (bool pressed)
 	{
-		if (pressed && target != null)
+		mPressed = pressed;
+
+		if (pressed)
 		{
-			mLastPos = UICamera.lastHit.point;
-			Transform trans = UICamera.lastCamera.transform;
-			mPlane = new Plane(trans.rotation * Vector3.back, mLastPos);
+			if (target != null)
+			{
+				TweenPosition tp = target.GetComponent<TweenPosition>();
+				if (tp != null) tp.enabled = false;
+				mLastPos = UICamera.lastHit.point;
+				Transform trans = UICamera.lastCamera.transform;
+				mPlane = new Plane(trans.rotation * Vector3.back, mLastPos);
+			}
+		}
+		else if (dragEffect == DragEffect.MomentumAndSpring)
+		{
+			ConstrainToBounds(false);
 		}
 	}
 
@@ -55,34 +76,80 @@ public class UIDragObject : MonoBehaviour
 				Vector3 currentPos = ray.GetPoint(dist);
 				Vector3 offset = currentPos - mLastPos;
 
-				if (offset.x != 1f || offset.y != 1f)
+				if (offset.x != 0f || offset.y != 0f)
 				{
 					offset = target.InverseTransformDirection(offset);
 					offset.Scale(scale);
 					offset = target.TransformDirection(offset);
 				}
 
+				mMomentum = offset;
 				target.position += offset;
-
-				if (restrictWithinPanel && mPanel != null && mPanel.clipping != UIDrawCall.Clipping.None)
-				{
-					Bounds bounds = NGUITools.CalculateRelativeWidgetBounds(mPanel.transform, target);
-					Vector4 range = mPanel.clipRange;
-
-					float offsetX = range.z * 0.5f;
-					float offsetY = range.w * 0.5f;
-
-					Vector2 minRect = new Vector2(bounds.min.x, bounds.min.y);
-					Vector2 maxRect = new Vector2(bounds.max.x, bounds.max.y);
-					Vector2 minArea = new Vector2(range.x - offsetX, range.y - offsetY);
-					Vector2 maxArea = new Vector2(range.x + offsetX, range.y + offsetY);
-
-					offset = NGUITools.ConstrainRect(minRect, maxRect, minArea, maxArea);
-
-					target.localPosition += offset;
-				}
+				if (dragEffect != DragEffect.MomentumAndSpring) ConstrainToBounds(true);
 				mLastPos = currentPos;
 			}
+		}
+	}
+
+	/// <summary>
+	/// Calculate the offset needed to be constrained within the panel's bounds.
+	/// </summary>
+
+	Vector3 CalculateConstrainOffset ()
+	{
+		Bounds bounds = NGUITools.CalculateRelativeWidgetBounds(mPanel.transform, target);
+		Vector4 range = mPanel.clipRange;
+
+		float offsetX = range.z * 0.5f;
+		float offsetY = range.w * 0.5f;
+
+		Vector2 minRect = new Vector2(bounds.min.x, bounds.min.y);
+		Vector2 maxRect = new Vector2(bounds.max.x, bounds.max.y);
+		Vector2 minArea = new Vector2(range.x - offsetX, range.y - offsetY);
+		Vector2 maxArea = new Vector2(range.x + offsetX, range.y + offsetY);
+
+		return NGUITools.ConstrainRect(minRect, maxRect, minArea, maxArea);
+	}
+
+	/// <summary>
+	/// Constrain the current target position to be within panel bounds.
+	/// </summary>
+
+	bool ConstrainToBounds (bool immediate)
+	{
+		if (mPanel != null && restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None)
+		{
+			Vector3 offset = CalculateConstrainOffset();
+
+			if (offset.magnitude > 0f)
+			{
+				mMomentum = Vector3.zero;
+
+				if (immediate)
+				{
+					target.localPosition += offset;
+				}
+				else
+				{
+					TweenPosition.Begin(target.gameObject, 0.25f, target.localPosition + offset).method = Tweener.Method.EaseOut;
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Apply the dragging momentum.
+	/// </summary>
+
+	void Update ()
+	{
+		if (dragEffect != DragEffect.None && !mPressed && target != null && mMomentum.magnitude > 0.001f)
+		{
+			target.position += mMomentum;
+			mMomentum = Vector3.Lerp(mMomentum, Vector3.zero, Time.deltaTime * 8f);
+			ConstrainToBounds(false);
 		}
 	}
 }
