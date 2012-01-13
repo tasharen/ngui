@@ -7,7 +7,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/Sprite (Cut)")]
+[AddComponentMenu("NGUI/UI/Sprite (Filled)")]
 public class UIFilledSprite : UISprite
 {
 	public enum FillDirection

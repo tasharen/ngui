@@ -46,7 +46,7 @@ static public class NGUIMenu
 	}
 
 	[MenuItem("NGUI/Add Filled Sprite")]
-	static void AddCutSprite ()
+	static void AddFilledSprite ()
 	{
 		if (PrefabCheck())
 		{
