@@ -42,12 +42,15 @@ Version History
 - NEW: UISpriteAnimation for some simple sprite animation (attach to a sprite).
 - NEW: UIAnchor can now specify depth offset to be used with perspective cameras.
 - NEW: UIDragObject can now restrict dragging of objects to be within the panel's clipping bounds.
+- NEW: UICheckbox now has an "option" field that lets you create option button groups (Tutorial 11).
 - NEW: Example 7 showing how to use the clipping feature.
 - NEW: Example 0 (Anchor) has been redone.
 - NEW: Most tutorials and examples now explain what they do inside them.
+- NEW: Added a variety of new interaction scripts replacing State scripts (UIButton series for example).
 - FIX: UICamera.lastCamera was not pointing to the correct camera with multi-camera setups (thanks LKIM).
 - FIX: UIAnchor now positions objects in the center of the ortho camera rather than at depth of 0.
 - FIX: Various usability improvements.
+- OLD: 'State' series of scripts have all been deprecated.
 
 1.28:
 - NEW: Added a simple tweener and a set of tweening scripts (position, rotation, scale, and color).
