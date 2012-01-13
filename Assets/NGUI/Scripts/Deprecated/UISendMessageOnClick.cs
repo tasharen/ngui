@@ -14,28 +14,17 @@ public class UISendMessageOnClick : MonoBehaviour
 	public bool includeChildren = false;
 	public string functionName = "OnSendMessage";
 
-	void Start ()
+	void Awake ()
 	{
 		Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " uses a deprecated script: " + GetType() +
-			"\nConsider switching to UIButtonTween instead.", this);
-	}
+			"\nUpgrading to UIButtonMessage.", this);
 
-	void OnClick ()
-	{
-		GameObject go = (target != null) ? target : gameObject;
+		UIButtonMessage bm = gameObject.AddComponent<UIButtonMessage>();
+		bm.functionName = functionName;
+		bm.target = target;
+		bm.trigger = UIButtonMessage.Trigger.OnClick;
+		bm.includeChildren = includeChildren;
 
-		if (includeChildren)
-		{
-			Transform[] transforms = go.GetComponentsInChildren<Transform>();
-
-			foreach (Transform t in transforms)
-			{
-				t.gameObject.SendMessage(functionName, SendMessageOptions.DontRequireReceiver);
-			}
-		}
-		else
-		{
-			go.SendMessage(functionName, SendMessageOptions.DontRequireReceiver);
-		}
+		DestroyImmediate(this);
 	}
 }

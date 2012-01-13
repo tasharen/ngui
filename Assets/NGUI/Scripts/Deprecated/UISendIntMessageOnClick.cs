@@ -15,7 +15,7 @@ public class UISendIntMessageOnClick : UISend
 	void Start ()
 	{
 		Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " uses a deprecated script: " + GetType() +
-			"\nConsider using UIButtonTween instead.", this);
+			"\nConsider using UIButtonMessage or UIButtonTween instead.", this);
 	}
 
 	void OnClick ()
