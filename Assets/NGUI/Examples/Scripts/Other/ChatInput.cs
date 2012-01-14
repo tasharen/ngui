@@ -9,6 +9,7 @@ using UnityEngine;
 public class ChatInput : MonoBehaviour
 {
 	public UITextList textList;
+	public bool fillWithDummyData = false;
 
 	UIInput mInput;
 	bool mIgnoreNextEnter = false;
@@ -21,7 +22,7 @@ public class ChatInput : MonoBehaviour
 	{
 		mInput = GetComponent<UIInput>();
 
-		if (textList != null)
+		if (fillWithDummyData && textList != null)
 		{
 			for (int i = 0; i < 30; ++i)
 			{

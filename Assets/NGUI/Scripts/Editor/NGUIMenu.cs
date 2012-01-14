@@ -75,6 +75,16 @@ static public class NGUIMenu
 	}
 
 	/// <summary>
+	/// Add a menu option to display this wizard.
+	/// </summary>
+
+	[MenuItem("NGUI/Panel Tool #&p")]
+	static void OpenWizard ()
+	{
+		ScriptableWizard.DisplayWizard<UIPanelWizard>("Panel Tool");
+	}
+
+	/// <summary>
 	/// Add a new widget of specified type.
 	/// </summary>
 

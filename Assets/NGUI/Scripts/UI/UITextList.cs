@@ -20,6 +20,7 @@ public class UITextList : MonoBehaviour
 	public float maxWidth = 0f;
 	public float maxHeight = 0f;
 	public int maxEntries = 50;
+	public bool supportScrollWheel = true;
 
 	// Text list is made up of paragraphs
 	class Paragraph
@@ -33,6 +34,20 @@ public class UITextList : MonoBehaviour
 	float mScroll = 0f;
 	bool mSelected = false;
 	int mTotalLines = 0;
+
+	/// <summary>
+	/// Allow scrolling of the text list.
+	/// </summary>
+
+	public void Scroll (float val)
+	{
+		if (val != 0f)
+		{
+			val *= (style == Style.Chat) ? 10f : -10f;
+			mScroll = Mathf.Max(0f, mScroll + val);
+			UpdateVisibleText();
+		}
+	}
 
 	/// <summary>
 	/// Add a new paragraph.
@@ -98,29 +113,13 @@ public class UITextList : MonoBehaviour
 	/// Scrolling support.
 	/// </summary>
 
-	void Update ()
-	{
-		if (mSelected)
-		{
-			float scroll = Input.GetAxis("Mouse ScrollWheel");
-			
-			if (scroll != 0f)
-			{
-				scroll *= (style == Style.Chat) ? 10f : -10f;
-				mScroll = Mathf.Max(0f, mScroll + scroll);
-				UpdateVisibleText();
-			}
-		}
-	}
+	void Update () { if (mSelected && supportScrollWheel) Scroll(Input.GetAxis("Mouse ScrollWheel")); }
 
 	/// <summary>
 	/// Remember whether the widget is selected.
 	/// </summary>
 
-	void OnSelect (bool selected)
-	{
-		mSelected = selected;
-	}
+	void OnSelect (bool selected) { mSelected = selected; }
 
 	/// <summary>
 	/// Refill the text label based on what's currently visible.
