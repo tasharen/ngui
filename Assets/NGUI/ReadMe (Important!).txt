@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.30g
+                Version 1.31
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -35,6 +35,10 @@ All can be found here: http://www.tasharen.com/?page_id=140
 ---------------
 Version History
 ---------------
+
+1.31:
+- NEW: Added a panel tool (NGUI menu -> Panel Tool) to aid with multi-panel development.
+- FIX: Variety of tweaks and minor enhancements, mainly related to examples.
 
 1.30:
 - NEW: UIPanels can now specify a clipping area (everything outside this area will not be visible).
