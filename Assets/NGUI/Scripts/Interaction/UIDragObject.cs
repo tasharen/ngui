@@ -90,6 +90,9 @@ public class UIDragObject : MonoBehaviour
 				target.position += offset;
 				if (dragEffect != DragEffect.MomentumAndSpring && ConstrainToBounds(true)) mMomentum = Vector3.zero;
 				mLastPos = currentPos;
+
+				SpringPosition sp = target.GetComponent<SpringPosition>();
+				if (sp != null) sp.enabled = false;
 			}
 		}
 	}
