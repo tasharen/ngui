@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// Panel wizard that allows enabling / disabling and selecting panels in the scene.
 /// </summary>
 
-public class UIPanelWizard : ScriptableWizard
+public class UIPanelTool : EditorWindow
 {
 	/// <summary>
 	/// Draw the custom wizard.

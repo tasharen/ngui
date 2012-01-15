@@ -81,7 +81,7 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Panel Tool #&p")]
 	static void OpenWizard ()
 	{
-		ScriptableWizard.DisplayWizard<UIPanelWizard>("Panel Tool");
+		EditorWindow.GetWindow<UIPanelTool>();
 	}
 
 	/// <summary>
