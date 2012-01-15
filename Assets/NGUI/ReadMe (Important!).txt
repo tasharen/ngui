@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.32b
+                Version 1.32c
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -39,6 +39,7 @@ Version History
 1.32:
 - NEW: Added a 'thumb' parameter to the UISlider.
 - NEW: Added UIForwardEvents script that can be used to forward events from one object to another.
+- NEW: Added the ability to enable and disable target game objects via UIButtonTween.
 - FIX: Input fields now support IME.
 
 1.31:

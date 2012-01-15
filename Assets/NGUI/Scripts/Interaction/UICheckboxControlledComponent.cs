@@ -5,8 +5,8 @@
 /// OnActivate event is sent out by the UICheckbox script.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/Activated Component")]
-public class UIActivatedComponent : MonoBehaviour
+[AddComponentMenu("NGUI/Interaction/Checkbox Controlled Component")]
+public class UICheckboxControlledComponent : MonoBehaviour
 {
 	public MonoBehaviour target;
 	public bool inverse = false;
