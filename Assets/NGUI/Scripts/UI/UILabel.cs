@@ -288,7 +288,7 @@ public class UILabel : UIWidget
 	/// Visible size of the widget in local coordinates.
 	/// </summary>
 
-	public override Vector2 visibleSize
+	public override Vector2 relativeSize
 	{
 		get
 		{

@@ -337,7 +337,7 @@ public class UIPanel : MonoBehaviour
 			w.OnFill(mVerts, mUvs, mCols);
 
 			Vector3 offset = w.pivotOffset;
-			Vector2 scale = w.visibleSize;
+			Vector2 scale = w.relativeSize;
 			offset.x *= scale.x;
 			offset.y *= scale.y;
 

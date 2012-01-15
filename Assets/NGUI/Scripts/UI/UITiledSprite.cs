@@ -45,7 +45,7 @@ public class UITiledSprite : UISprite
 			rect = NGUITools.ConvertToPixels(mOuter, tex.width, tex.height, true);
 		}
 
-		Vector2 scale = finalScale;
+		Vector2 scale = cachedTransform.localScale;
 		float width  = Mathf.Abs(rect.width / scale.x);
 		float height = Mathf.Abs(rect.height / scale.y);
 

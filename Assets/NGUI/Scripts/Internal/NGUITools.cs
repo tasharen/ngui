@@ -378,7 +378,7 @@ static public class NGUITools
 
 		foreach (UIWidget w in widgets)
 		{
-			Vector2 size = w.visibleSize;
+			Vector2 size = w.relativeSize;
 			Vector2 offset = w.pivotOffset;
 			float x = (offset.x + 0.5f) * size.x;
 			float y = (offset.y - 0.5f) * size.y;
@@ -419,7 +419,7 @@ static public class NGUITools
 
 		foreach (UIWidget w in widgets)
 		{
-			Vector2 size = w.visibleSize;
+			Vector2 size = w.relativeSize;
 			Vector2 offset = w.pivotOffset;
 			float x = (offset.x + 0.5f) * size.x;
 			float y = (offset.y - 0.5f) * size.y;

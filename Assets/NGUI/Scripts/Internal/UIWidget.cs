@@ -118,12 +118,6 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Return the widget's final scale.
-	/// </summary>
-
-	public Vector2 finalScale { get { Transform t = cachedTransform; return t.localScale; } }
-
-	/// <summary>
 	/// Returns the UI panel responsible for this widget.
 	/// </summary>
 
@@ -301,7 +295,7 @@ public abstract class UIWidget : MonoBehaviour
 			pos.z -= mDepth * 0.25f;
 
 			// Widget's local size
-			Vector2 size = visibleSize;
+			Vector2 size = relativeSize;
 			Vector2 offset = pivotOffset;
 			pos.x += (offset.x + 0.5f) * size.x;
 			pos.y += (offset.y - 0.5f) * size.y;
@@ -394,11 +388,18 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Visible size of the widget in relative coordinates. In most cases this can remain at (1, 1).
-	/// If you want to figure out the widget's size in pixels, multiply this value by localScale.xy.
+	/// Deprecated property.
 	/// </summary>
 
-	virtual public Vector2 visibleSize { get { return Vector2.one; } }
+	[System.Obsolete("Use 'relativeSize' instead")]
+	public Vector2 visibleSize { get { return relativeSize; } }
+
+	/// <summary>
+	/// Visible size of the widget in relative coordinates. In most cases this can remain at (1, 1).
+	/// If you want to figure out the widget's size in pixels, scale this value by cachedTransform.localScale.
+	/// </summary>
+
+	virtual public Vector2 relativeSize { get { return Vector2.one; } }
 
 	/// <summary>
 	/// Virtual Start() functionality for widgets.

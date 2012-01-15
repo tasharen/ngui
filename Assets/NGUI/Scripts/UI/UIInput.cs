@@ -95,6 +95,13 @@ public class UIInput : MonoBehaviour
 				{
 					label.text = mText + caratChar;
 					label.showLastPasswordChar = isSelected;
+
+					Input.imeCompositionMode = IMECompositionMode.On;
+					Transform t = label.cachedTransform;
+					Vector3 offset = label.pivotOffset;
+					offset.y += label.relativeSize.y;
+					offset = t.TransformPoint(offset);
+					Input.compositionCursorPos = UICamera.lastCamera.WorldToScreenPoint(offset);
 				}
 			}
 #if UNITY_IPHONE || UNITY_ANDROID
@@ -107,6 +114,7 @@ public class UIInput : MonoBehaviour
 			{
 				label.text = mText;
 				label.showLastPasswordChar = isSelected;
+				Input.imeCompositionMode = IMECompositionMode.Off;
 			}
 		}
 	}
