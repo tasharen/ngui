@@ -139,6 +139,14 @@ public class UIInput : MonoBehaviour
 			}
 		}
 	}
+#else
+	void Update ()
+	{
+		if (!string.IsNullOrEmpty(Input.compositionString))
+		{
+			UpdateLabel();
+		}
+	}
 #endif
 
 	/// <summary>
@@ -186,7 +194,7 @@ public class UIInput : MonoBehaviour
 	void UpdateLabel ()
 	{
 		if (maxChars > 0 && mText.Length > maxChars) mText = mText.Substring(0, maxChars);
-		label.text = selected ? (mText + caratChar) : mText;
+		label.text = selected ? (mText + Input.compositionString + caratChar) : mText;
 		label.showLastPasswordChar = selected;
 	}
 }
