@@ -39,6 +39,7 @@ Version History
 1.31:
 - NEW: Added a panel tool (NGUI menu -> Panel Tool) to aid with multi-panel development.
 - FIX: Variety of tweaks and minor enhancements, mainly related to examples.
+- FIX: UIDragObject had a rare bug with how items were springing back into place.
 
 1.30:
 - NEW: UIPanels can now specify a clipping area (everything outside this area will not be visible).
