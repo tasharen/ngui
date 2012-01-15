@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.31
+                Version 1.32
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -35,6 +35,10 @@ All can be found here: http://www.tasharen.com/?page_id=140
 ---------------
 Version History
 ---------------
+
+1.32:
+- NEW: Added a 'thumb' parameter to the UISlider.
+- NEW: Added UIForwardEvents script that can be used to forward events from one object to another.
 
 1.31:
 - NEW: Added a panel tool (NGUI menu -> Panel Tool) to aid with multi-panel development.

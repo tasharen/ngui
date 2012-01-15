@@ -1,0 +1,75 @@
+﻿using UnityEngine;
+
+/// <summary>
+/// This script can be used to forward events from one object to another.
+/// Example usage: Forwarding 'drag' event from the slider's thumb to the slider itself.
+/// </summary>
+
+[AddComponentMenu("NGUI/Interaction/Forward Events")]
+public class UIForwardEvents : MonoBehaviour
+{
+	public GameObject target;
+	public bool onHover  = false;
+	public bool onPress  = false;
+	public bool onClick  = false;
+	public bool onSelect = false;
+	public bool onDrag	 = false;
+	public bool onDrop	 = false;
+	public bool onInput  = false;
+
+	void OnHover (bool isOver)
+	{
+		if (onHover && target != null)
+		{
+			target.SendMessage("OnHover", isOver, SendMessageOptions.DontRequireReceiver);
+		}
+	}
+
+	void OnPress (bool pressed)
+	{
+		if (onPress && target != null)
+		{
+			target.SendMessage("OnPress", pressed, SendMessageOptions.DontRequireReceiver);
+		}
+	}
+	
+	void OnClick ()
+	{
+		if (onClick && target != null)
+		{
+			target.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
+		}
+	}
+
+	void OnSelect (bool selected)
+	{
+		if (onSelect && target != null)
+		{
+			target.SendMessage("OnSelect", selected, SendMessageOptions.DontRequireReceiver);
+		}
+	}
+
+	void OnDrag (Vector2 delta)
+	{
+		if (onDrag && target != null)
+		{
+			target.SendMessage("OnDrag", delta, SendMessageOptions.DontRequireReceiver);
+		}
+	}
+
+	void OnDrop (GameObject go)
+	{
+		if (onDrop && target != null)
+		{
+			target.SendMessage("OnDrop", go, SendMessageOptions.DontRequireReceiver);
+		}
+	}
+
+	void OnInput (string text)
+	{
+		if (onInput && target != null)
+		{
+			target.SendMessage("OnInput", text, SendMessageOptions.DontRequireReceiver);
+		}
+	}
+}

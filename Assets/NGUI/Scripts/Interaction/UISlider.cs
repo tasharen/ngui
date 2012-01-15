@@ -15,6 +15,7 @@ public class UISlider : MonoBehaviour
 	}
 
 	public Transform foreground;
+	public Transform thumb;
 
 	public Direction direction = Direction.Horizontal;
 	public float initialValue = 1f;
@@ -54,27 +55,39 @@ public class UISlider : MonoBehaviour
 
 	void Awake ()
 	{
-		if (foreground == null)
-		{
-			Debug.LogWarning("Expected to find an object to scale on " + NGUITools.GetHierarchy(gameObject));
-			Destroy(this);
-		}
-		else
+		mTrans = transform;
+		mCol = collider as BoxCollider;
+
+		if (foreground != null)
 		{
 			mSprite = foreground.GetComponent<UIFilledSprite>();
 			mForeTrans = foreground.transform;
 			mScale = foreground.localScale;
-			mCol = collider as BoxCollider;
-			mTrans = transform;
+		}
+		else if (mCol != null)
+		{
+			mScale = mCol.size;
+		}
+		else
+		{
+			Debug.LogWarning("UISlider expected to find a foreground object or a box collider to work with", this);
 		}
 	}
 
 	/// <summary>
-	/// Make the slider show the specified initial value.
+	/// We want to receive drag events from the thumb.
 	/// </summary>
 
 	void Start ()
 	{
+		if (thumb != null && thumb.collider != null)
+		{
+			UIForwardEvents fe = thumb.gameObject.AddComponent<UIForwardEvents>();
+			fe.target = gameObject;
+			fe.onPress = true;
+			fe.onDrag = true;
+		}
+
 		mValue = initialValue;
 		UpdateSlider();
 	}
@@ -98,9 +111,9 @@ public class UISlider : MonoBehaviour
 	void UpdateDrag ()
 	{
 		// Create a plane for the slider
-		if (mForeTrans == null) return;
+		if (mCol == null) return;
 		Ray ray = UICamera.lastCamera.ScreenPointToRay(UICamera.lastTouchPosition);
-		Plane plane = new Plane(mForeTrans.rotation * Vector3.back, mForeTrans.position);
+		Plane plane = new Plane(mTrans.rotation * Vector3.back, mTrans.position);
 
 		// If the ray doesn't hit the plane, do nothing
 		float dist;
@@ -124,16 +137,42 @@ public class UISlider : MonoBehaviour
 
 	void UpdateSlider ()
 	{
+		Vector3 scale = mScale;
+		if (direction == Direction.Horizontal) scale.x *= mValue;
+		else scale.y *= mValue;
+
 		if (mSprite != null)
 		{
 			mSprite.fillAmount = mValue;
 		}
-		else
+		else if (mForeTrans != null)
 		{
-			Vector3 scale = mScale;
-			if (direction == Direction.Horizontal) scale.x *= mValue;
-			else scale.y *= mValue;
 			mForeTrans.localScale = scale;
+		}
+
+		if (thumb != null)
+		{
+			Vector3 pos = thumb.localPosition;
+
+			if (mSprite != null)
+			{
+				switch (mSprite.fillDirection)
+				{
+					case UIFilledSprite.FillDirection.TowardRight:		pos.x = scale.x; break;
+					case UIFilledSprite.FillDirection.TowardTop:		pos.y = scale.y; break;
+					case UIFilledSprite.FillDirection.TowardLeft:		pos.x = mScale.x - scale.x; break;
+					case UIFilledSprite.FillDirection.TowardBottom:		pos.y = mScale.y - scale.y; break;
+				}
+			}
+			else if (direction == Direction.Horizontal)
+			{
+				pos.x = scale.x;
+			}
+			else
+			{
+				pos.y = scale.y;
+			}
+			thumb.localPosition = pos;
 		}
 	}
 }
