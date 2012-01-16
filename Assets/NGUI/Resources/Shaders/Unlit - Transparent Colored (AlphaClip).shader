@@ -10,7 +10,7 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 	{
 		Tags
 		{
-			"Queue" = "Transparent+1"
+			"Queue" = "Transparent"
 			"IgnoreProjector" = "True"
 			"RenderType" = "Transparent"
 		}

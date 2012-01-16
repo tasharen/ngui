@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.32c
+                Version 1.33
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -35,6 +35,14 @@ All can be found here: http://www.tasharen.com/?page_id=140
 ---------------
 Version History
 ---------------
+
+1.33:
+- NEW: UICheckbox now has a configurable function to call.
+- NEW: UIButtonPlayAnimations can be used to play animations via the new UIActiveAnimation.
+- NEW: Tweener now sends out notifications when it finishes.
+- NEW: Tweener now has a 'group' parameter that can be used to only enable/disable certain tweens on the same game object.
+- NEW: Example 1 has been adjusted to use the new play animation feature.
+- FIX: Shader fixes.
 
 1.32:
 - NEW: Added a 'thumb' parameter to the UISlider.

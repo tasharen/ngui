@@ -26,8 +26,30 @@ public abstract class Tweener : MonoBehaviour
 	/// </summary>
 
 	public Method method = Method.Linear;
+
+	/// <summary>
+	/// Does it play once? Does it loop?
+	/// </summary>
+
 	public Style style = Style.Once;
+
+	/// <summary>
+	/// How long is the duration of the tween?
+	/// </summary>
+
 	public float duration = 1f;
+
+	/// <summary>
+	/// Used by buttons and tween sequences. Group of '0' means not in a sequence.
+	/// </summary>
+
+	public int tweenGroup = 0;
+
+	/// <summary>
+	/// Name of the function to call when the tween finishes.
+	/// </summary>
+
+	public string callWhenFinished;
 
 	float mDuration = 0f;
 	float mAmountPerDelta = 1f;
@@ -104,9 +126,14 @@ public abstract class Tweener : MonoBehaviour
 		OnUpdate(val);
 
 		// If the factor goes out of range and this is a one-time tweening operation, disable the script
-		if (style == Style.Once && mFactor > 1f || mFactor < 0f)
+		if (style == Style.Once && (mFactor > 1f || mFactor < 0f))
 		{
 			mFactor = Mathf.Clamp01(mFactor);
+
+			// Notify listeners
+			SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
+
+			// Disable this script
 			enabled = false;
 		}
 	}

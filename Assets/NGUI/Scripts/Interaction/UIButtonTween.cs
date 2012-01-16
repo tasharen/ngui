@@ -22,6 +22,7 @@ public class UIButtonTween : MonoBehaviour
 	}
 
 	public GameObject tweenTarget;
+	public int tweenGroup = 0;
 	public Trigger trigger = Trigger.OnClick;
 	public Direction direction = Direction.Forward;
 	public bool enableIfDisabled = false;
@@ -31,33 +32,6 @@ public class UIButtonTween : MonoBehaviour
 	Tweener[] mTweens;
 
 	void Start () { if (tweenTarget == null) tweenTarget = gameObject; }
-
-	void Activate (bool forward)
-	{
-		GameObject go = (tweenTarget == null) ? gameObject : tweenTarget;
-
-		if (!go.active)
-		{
-			if (!enableIfDisabled) return;
-			go.SetActiveRecursively(true);
-		}
-
-		mTweens = includeChildren ? go.GetComponentsInChildren<Tweener>() : go.GetComponents<Tweener>();
-
-		if (mTweens.Length == 0)
-		{
-			if (disableWhenDone) tweenTarget.SetActiveRecursively(false);
-		}
-		else if (direction == Direction.Toggle)
-		{
-			foreach (Tweener tw in mTweens) tw.Toggle();
-		}
-		else
-		{
-			if (direction == Direction.Reverse) forward = !forward;
-			foreach (Tweener tw in mTweens) tw.Activate(forward);
-		}
-	}
 
 	void OnHover (bool isOver)
 	{
@@ -102,6 +76,51 @@ public class UIButtonTween : MonoBehaviour
 			{
 				tweenTarget.SetActiveRecursively(false);
 				mTweens = null;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Activate the tweeners.
+	/// </summary>
+
+	void Activate (bool forward)
+	{
+		GameObject go = (tweenTarget == null) ? gameObject : tweenTarget;
+
+		// If the object is disabled, don't do anything
+		if (!go.active && !enableIfDisabled) return;
+
+		// Gather the tweening components
+		mTweens = includeChildren ? go.GetComponentsInChildren<Tweener>() : go.GetComponents<Tweener>();
+
+		if (mTweens.Length == 0)
+		{
+			// No tweeners found -- should we disable the object?
+			if (disableWhenDone) tweenTarget.SetActiveRecursively(false);
+		}
+		else
+		{
+			bool activated = false;
+			if (direction == Direction.Reverse) forward = !forward;
+
+			// Run through all located tween components
+			foreach (Tweener tw in mTweens)
+			{
+				// If the tweener's group matches, we can work with it
+				if (tw.tweenGroup == tweenGroup)
+				{
+					// Ensure that the game objects are enabled
+					if (!activated && mTweens.Length > 0 && !go.active)
+					{
+						activated = true;
+						go.SetActiveRecursively(true);
+					}
+
+					// Toggle or activate the tween component
+					if (direction == Direction.Toggle) tw.Toggle();
+					else tw.Activate(forward);
+				}
 			}
 		}
 	}

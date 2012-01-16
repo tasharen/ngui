@@ -9,6 +9,7 @@ public class UICheckbox : MonoBehaviour
 {
 	public UISprite checkedSprite;
 	public GameObject eventReceiver;
+	public string functionName = "OnActivate";
 	public bool startsChecked = true;
 	public bool option = false;
 
@@ -76,6 +77,9 @@ public class UICheckbox : MonoBehaviour
 		}
 
 		// Send out the event notification
-		if (eventReceiver != null) eventReceiver.SendMessage("OnActivate", mChecked, SendMessageOptions.DontRequireReceiver);
+		if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+		{
+			eventReceiver.SendMessage(functionName, mChecked, SendMessageOptions.DontRequireReceiver);
+		}
 	}
 }
