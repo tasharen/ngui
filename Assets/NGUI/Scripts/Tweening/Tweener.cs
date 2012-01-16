@@ -131,7 +131,7 @@ public abstract class Tweener : MonoBehaviour
 			mFactor = Mathf.Clamp01(mFactor);
 
 			// Notify listeners
-			SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
+			if (!string.IsNullOrEmpty(callWhenFinished)) SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
 
 			// Disable this script
 			enabled = false;
