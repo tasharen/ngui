@@ -251,4 +251,48 @@ static public class NGUITools
 			}
 		}
 	}
+
+	#region Deprecated functions
+	[System.Obsolete("Use NGUIMath.HexToDecimal instead")]
+	static public int HexToDecimal (char ch) { return NGUIMath.HexToDecimal(ch); }
+
+	[System.Obsolete("Use NGUIMath.ColorToInt instead")]
+	static public int ColorToInt (Color c) { return NGUIMath.ColorToInt(c); }
+
+	[System.Obsolete("Use NGUIMath.IntToColor instead")]
+	static public Color IntToColor (int val) { return NGUIMath.IntToColor(val); }
+
+	[System.Obsolete("Use NGUIMath.HexToColor instead")]
+	static public Color HexToColor (uint val) { return NGUIMath.HexToColor(val); }
+
+	[System.Obsolete("Use NGUIMath.ConvertToTexCoords instead")]
+	static public Rect ConvertToTexCoords (Rect rect, int width, int height) { return NGUIMath.ConvertToTexCoords(rect, width, height); }
+
+	[System.Obsolete("Use NGUIMath.ConvertToPixels instead")]
+	static public Rect ConvertToPixels (Rect rect, int width, int height, bool round) { return NGUIMath.ConvertToPixels(rect, width, height, round); }
+
+	[System.Obsolete("Use NGUIMath.MakePixelPerfect instead")]
+	static public Rect MakePixelPerfect (Rect rect) { return NGUIMath.MakePixelPerfect(rect); }
+
+	[System.Obsolete("Use NGUIMath.MakePixelPerfect instead")]
+	static public Rect MakePixelPerfect (Rect rect, int width, int height) { return NGUIMath.MakePixelPerfect(rect, width, height); }
+
+	[System.Obsolete("Use NGUIMath.ApplyHalfPixelOffset instead")]
+	static public Vector3 ApplyHalfPixelOffset (Vector3 pos) { return NGUIMath.ApplyHalfPixelOffset(pos); }
+
+	[System.Obsolete("Use NGUIMath.ApplyHalfPixelOffset instead")]
+	static public Vector3 ApplyHalfPixelOffset (Vector3 pos, Vector3 scale) { return NGUIMath.ApplyHalfPixelOffset(pos, scale); }
+
+	[System.Obsolete("Use NGUIMath.ConstrainRect instead")]
+	static public Vector2 ConstrainRect (Vector2 minRect, Vector2 maxRect, Vector2 minArea, Vector2 maxArea) { return NGUIMath.ConstrainRect(minRect, maxRect, minArea, maxArea); }
+
+	[System.Obsolete("Use NGUIMath.CalculateAbsoluteWidgetBounds instead")]
+	static public Bounds CalculateAbsoluteWidgetBounds (Transform trans) { return NGUIMath.CalculateAbsoluteWidgetBounds(trans); }
+
+	[System.Obsolete("Use NGUIMath.CalculateRelativeWidgetBounds instead")]
+	static public Bounds CalculateRelativeWidgetBounds (Transform root, Transform child) { return NGUIMath.CalculateRelativeWidgetBounds(root, child); }
+
+	[System.Obsolete("Use NGUIMath.CalculateRelativeWidgetBounds instead")]
+	static public Bounds CalculateRelativeWidgetBounds (Transform trans) { return NGUIMath.CalculateRelativeWidgetBounds(trans); }
+	#endregion
 }

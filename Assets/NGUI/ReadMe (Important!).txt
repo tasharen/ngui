@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.33
+                Version 1.33b
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -44,6 +44,7 @@ Version History
 - NEW: Tweener now has a 'group' parameter that can be used to only enable/disable only certain tweens on the same object.
 - NEW: UIButtonTween has been changed to use more descriptive properties. Check your UIButtonTweens and update their properties after upgrading.
 - NEW: Examples 1, 5 and 6 have been adjusted to use the new features.
+- FIX: Scrolling speed should now be consistent even at low framerates.
 - FIX: Shader fixes.
 
 1.32:
