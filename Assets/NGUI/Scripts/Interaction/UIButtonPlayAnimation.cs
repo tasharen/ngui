@@ -83,7 +83,7 @@ public class UIButtonPlayAnimation : MonoBehaviour
 			int disableState = (disableWhenFinished == DisableCondition.DisableAfterForward) ? 1 :
 				((disableWhenFinished == DisableCondition.DisableAfterReverse) ? -1 : 0);
 
-			UIActiveAnimation anim = UIActiveAnimation.Play(target, clipName, dir,
+			ActiveAnimation anim = ActiveAnimation.Play(target, clipName, dir,
 				ifDisabledOnPlay == EnableCondition.EnableThenPlay, disableState);
 			if (anim != null) anim.callWhenFinished = callWhenFinished;
 		}

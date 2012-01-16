@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// Internal script used by  This script is attached to the animated object,
-/// and is used to store additional information about the animation process.
+/// Mainly an internal script used by UIButtonPlayAnimation, but can also be used to call
+/// the specified function on the game object after it finishes animating.
 /// </summary>
 
 [RequireComponent(typeof(Animation))]
 [AddComponentMenu("NGUI/Internal/Active Animation")]
-public class UIActiveAnimation : MonoBehaviour
+public class ActiveAnimation : MonoBehaviour
 {
 	/// <summary>
 	/// Function to call when the animation finishes playing.
@@ -94,7 +94,7 @@ public class UIActiveAnimation : MonoBehaviour
 	/// Play the specified animation on the specified object.
 	/// </summary>
 
-	static public UIActiveAnimation Play (Animation anim, string clipName, int playDirection, bool enableBeforePlay, int disableDirection)
+	static public ActiveAnimation Play (Animation anim, string clipName, int playDirection, bool enableBeforePlay, int disableDirection)
 	{
 		if (!anim.gameObject.active)
 		{
@@ -105,9 +105,9 @@ public class UIActiveAnimation : MonoBehaviour
 			anim.gameObject.SetActiveRecursively(true);
 		}
 
-		UIActiveAnimation aa = anim.GetComponent<UIActiveAnimation>();
+		ActiveAnimation aa = anim.GetComponent<ActiveAnimation>();
 		if (aa != null) aa.enabled = true;
-		else aa = anim.gameObject.AddComponent<UIActiveAnimation>();
+		else aa = anim.gameObject.AddComponent<ActiveAnimation>();
 		aa.mAnim = anim;
 		aa.mDisableDirection = disableDirection;
 		aa.Play(clipName, playDirection);
