@@ -330,13 +330,13 @@ public class UIAtlasInspector : Editor
 
 							if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 							{
-								corrected0 = NGUITools.MakePixelPerfect(corrected0);
-								corrected1 = NGUITools.MakePixelPerfect(corrected1);
+								corrected0 = NGUIMath.MakePixelPerfect(corrected0);
+								corrected1 = NGUIMath.MakePixelPerfect(corrected1);
 							}
 							else
 							{
-								corrected0 = NGUITools.MakePixelPerfect(corrected0, tex.width, tex.height);
-								corrected1 = NGUITools.MakePixelPerfect(corrected1, tex.width, tex.height);
+								corrected0 = NGUIMath.MakePixelPerfect(corrected0, tex.width, tex.height);
+								corrected1 = NGUIMath.MakePixelPerfect(corrected1, tex.width, tex.height);
 							}
 
 							if (corrected0 == mSprite.outer && corrected1 == mSprite.inner)
@@ -378,8 +378,8 @@ public class UIAtlasInspector : Editor
 
 						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 						{
-							uv0 = NGUITools.ConvertToTexCoords(uv0, tex.width, tex.height);
-							uv1 = NGUITools.ConvertToTexCoords(uv1, tex.width, tex.height);
+							uv0 = NGUIMath.ConvertToTexCoords(uv0, tex.width, tex.height);
+							uv1 = NGUIMath.ConvertToTexCoords(uv1, tex.width, tex.height);
 						}
 
 						// Draw the atlas

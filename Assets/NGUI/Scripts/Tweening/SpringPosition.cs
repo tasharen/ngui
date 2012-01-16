@@ -22,7 +22,7 @@ public class SpringPosition : MonoBehaviour
 	void Update ()
 	{
 		if (mThreshold == 0f) mThreshold = (target - mTrans.localPosition).magnitude * 0.005f;
-		mTrans.localPosition = Vector3.Lerp(mTrans.localPosition, target, Time.deltaTime * strength);
+		mTrans.localPosition = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, Time.deltaTime);
 		if (mThreshold >= (target - mTrans.localPosition).magnitude) enabled = false;
 	}
 

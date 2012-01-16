@@ -42,7 +42,7 @@ public class UITiledSprite : UISprite
 
 		if (atlas.coordinates == UIAtlas.Coordinates.TexCoords)
 		{
-			rect = NGUITools.ConvertToPixels(mOuter, tex.width, tex.height, true);
+			rect = NGUIMath.ConvertToPixels(mOuter, tex.width, tex.height, true);
 		}
 
 		Vector2 scale = cachedTransform.localScale;

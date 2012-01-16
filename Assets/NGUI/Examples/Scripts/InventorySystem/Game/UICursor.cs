@@ -61,7 +61,7 @@ public class UICursor : MonoBehaviour
 				// For pixel-perfect results
 				if (uiCamera.isOrthoGraphic)
 				{
-					mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(mTrans.localPosition, mTrans.localScale);
+					mTrans.localPosition = NGUIMath.ApplyHalfPixelOffset(mTrans.localPosition, mTrans.localScale);
 				}
 			}
 			else
@@ -69,7 +69,7 @@ public class UICursor : MonoBehaviour
 				// Simple calculation that assumes that the camera is of fixed size
 				pos.x -= Screen.width * 0.5f;
 				pos.y -= Screen.height * 0.5f;
-				mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(pos, mTrans.localScale);
+				mTrans.localPosition = NGUIMath.ApplyHalfPixelOffset(pos, mTrans.localScale);
 			}
 		}
 	}

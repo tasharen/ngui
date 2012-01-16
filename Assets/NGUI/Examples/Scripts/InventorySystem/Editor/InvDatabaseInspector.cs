@@ -227,7 +227,7 @@ public class InvDatabaseInspector : Editor
 
 								if (item.iconAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 								{
-									rect = NGUITools.ConvertToTexCoords(rect, tex.width, tex.height);
+									rect = NGUIMath.ConvertToTexCoords(rect, tex.width, tex.height);
 								}
 
 								GUILayout.Space(4f);

@@ -100,7 +100,7 @@ public class UIFontInspector : Editor
 					if (t != null)
 					{
 						// Pixels are easier to work with than UVs
-						Rect pixels = NGUITools.ConvertToPixels(mFont.uvRect, t.width, t.height, false);
+						Rect pixels = NGUIMath.ConvertToPixels(mFont.uvRect, t.width, t.height, false);
 
 						// Automatically set the width and height of the rectangle to be the original font texture's dimensions
 						if (resetWidthHeight)
@@ -119,7 +119,7 @@ public class UIFontInspector : Editor
 						{
 							GUILayout.Label("Correction", GUILayout.Width(75f));
 
-							Rect corrected = NGUITools.MakePixelPerfect(pixels);
+							Rect corrected = NGUIMath.MakePixelPerfect(pixels);
 
 							if (corrected == pixels)
 							{
@@ -136,7 +136,7 @@ public class UIFontInspector : Editor
 						GUILayout.EndHorizontal();
 
 						// Convert the pixel coordinates back to UV coordinates
-						Rect uvRect = NGUITools.ConvertToTexCoords(pixels, t.width, t.height);
+						Rect uvRect = NGUIMath.ConvertToTexCoords(pixels, t.width, t.height);
 
 						if (mFont.uvRect != uvRect)
 						{

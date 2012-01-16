@@ -40,8 +40,8 @@ public class UISlicedSprite : UISprite
 
 				if (atlas.coordinates == UIAtlas.Coordinates.Pixels)
 				{
-					mOuterUV = NGUITools.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
-					mInnerUV = NGUITools.ConvertToTexCoords(mInnerUV, tex.width, tex.height);
+					mOuterUV = NGUIMath.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
+					mInnerUV = NGUIMath.ConvertToTexCoords(mInnerUV, tex.width, tex.height);
 				}
 				mChanged = true;
 			}

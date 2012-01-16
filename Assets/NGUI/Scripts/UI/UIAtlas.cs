@@ -90,13 +90,13 @@ public class UIAtlas : MonoBehaviour
 				{
 					if (mCoordinates == Coordinates.TexCoords)
 					{
-						s.outer = NGUITools.ConvertToTexCoords(s.outer, tex.width, tex.height);
-						s.inner = NGUITools.ConvertToTexCoords(s.inner, tex.width, tex.height);
+						s.outer = NGUIMath.ConvertToTexCoords(s.outer, tex.width, tex.height);
+						s.inner = NGUIMath.ConvertToTexCoords(s.inner, tex.width, tex.height);
 					}
 					else
 					{
-						s.outer = NGUITools.ConvertToPixels(s.outer, tex.width, tex.height, true);
-						s.inner = NGUITools.ConvertToPixels(s.inner, tex.width, tex.height, true);
+						s.outer = NGUIMath.ConvertToPixels(s.outer, tex.width, tex.height, true);
+						s.inner = NGUIMath.ConvertToPixels(s.inner, tex.width, tex.height, true);
 					}
 				}
 			}

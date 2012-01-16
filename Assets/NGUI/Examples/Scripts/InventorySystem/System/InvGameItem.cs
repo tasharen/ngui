@@ -137,13 +137,13 @@ public class InvGameItem
 				case Quality.Damaged:	c = new Color(0.4f, 0.4f, 0.4f); break;
 				case Quality.Worn:		c = new Color(0.7f, 0.7f, 0.7f); break;
 				case Quality.Sturdy:	c = new Color(1.0f, 1.0f, 1.0f); break;
-				case Quality.Polished:	c = NGUITools.HexToColor(0xe0ffbeff); break;
-				case Quality.Improved:	c = NGUITools.HexToColor(0x93d749ff); break;
-				case Quality.Crafted:	c = NGUITools.HexToColor(0x4eff00ff); break;
-				case Quality.Superior:	c = NGUITools.HexToColor(0x00baffff); break;
-				case Quality.Enchanted: c = NGUITools.HexToColor(0x7376fdff); break;
-				case Quality.Epic:		c = NGUITools.HexToColor(0x9600ffff); break;
-				case Quality.Legendary: c = NGUITools.HexToColor(0xff9000ff); break;
+				case Quality.Polished:	c = NGUIMath.HexToColor(0xe0ffbeff); break;
+				case Quality.Improved:	c = NGUIMath.HexToColor(0x93d749ff); break;
+				case Quality.Crafted:	c = NGUIMath.HexToColor(0x4eff00ff); break;
+				case Quality.Superior:	c = NGUIMath.HexToColor(0x00baffff); break;
+				case Quality.Enchanted: c = NGUIMath.HexToColor(0x7376fdff); break;
+				case Quality.Epic:		c = NGUIMath.HexToColor(0x9600ffff); break;
+				case Quality.Legendary: c = NGUIMath.HexToColor(0xff9000ff); break;
 			}
 			return c;
 		}

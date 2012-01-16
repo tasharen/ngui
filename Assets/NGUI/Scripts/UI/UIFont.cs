@@ -129,7 +129,7 @@ public class UIFont : MonoBehaviour
 
 					if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 					{
-						mUVRect = NGUITools.ConvertToTexCoords(mUVRect, tex.width, tex.height);
+						mUVRect = NGUIMath.ConvertToTexCoords(mUVRect, tex.width, tex.height);
 					}
 
 					// Account for trimmed sprites

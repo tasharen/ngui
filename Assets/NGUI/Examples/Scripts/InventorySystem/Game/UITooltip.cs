@@ -60,7 +60,7 @@ public class UITooltip : MonoBehaviour
 
 				Vector3 size = Vector3.one * (1.5f - mCurrent * 0.5f);
 				Vector3 pos = Vector3.Lerp(mPos - offset, mPos, mCurrent);
-				pos = NGUITools.ApplyHalfPixelOffset(pos);
+				pos = NGUIMath.ApplyHalfPixelOffset(pos);
 
 				mTrans.localPosition = pos;
 				mTrans.localScale = size;
@@ -155,7 +155,7 @@ public class UITooltip : MonoBehaviour
 			}
 
 			// Set the final position
-			mTrans.localPosition = NGUITools.ApplyHalfPixelOffset(mPos);
+			mTrans.localPosition = NGUIMath.ApplyHalfPixelOffset(mPos);
 		}
 		else mTarget = 0f;
 	}

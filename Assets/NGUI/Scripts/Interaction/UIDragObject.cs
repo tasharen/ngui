@@ -103,7 +103,7 @@ public class UIDragObject : MonoBehaviour
 
 	Vector3 CalculateConstrainOffset ()
 	{
-		Bounds bounds = NGUITools.CalculateRelativeWidgetBounds(mPanel.transform, target);
+		Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.transform, target);
 		Vector4 range = mPanel.clipRange;
 
 		float offsetX = range.z * 0.5f;
@@ -114,7 +114,7 @@ public class UIDragObject : MonoBehaviour
 		Vector2 minArea = new Vector2(range.x - offsetX, range.y - offsetY);
 		Vector2 maxArea = new Vector2(range.x + offsetX, range.y + offsetY);
 
-		return NGUITools.ConstrainRect(minRect, maxRect, minArea, maxArea);
+		return NGUIMath.ConstrainRect(minRect, maxRect, minArea, maxArea);
 	}
 
 	/// <summary>
@@ -151,8 +151,7 @@ public class UIDragObject : MonoBehaviour
 	{
 		if (dragEffect != DragEffect.None && !mPressed && target != null && mMomentum.magnitude > 0.005f)
 		{
-			target.position += mMomentum;
-			mMomentum = Vector3.Lerp(mMomentum, Vector3.zero, Time.deltaTime * 9f);
+			target.position += NGUIMath.SpringDampen(ref mMomentum, 9f, Time.deltaTime);
 			ConstrainToBounds(false);
 		}
 	}
