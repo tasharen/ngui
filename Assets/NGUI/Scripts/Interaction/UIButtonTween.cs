@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using AnimationOrTween;
 
 /// <summary>
 /// Attaching this to an object lets you activate tweener components on other objects.
@@ -7,26 +8,12 @@
 [AddComponentMenu("NGUI/Interaction/Button Tween")]
 public class UIButtonTween : MonoBehaviour
 {
-	public enum Trigger
-	{
-		OnClick,
-		OnHover,
-		OnPress,
-	}
-
-	public enum Direction
-	{
-		Forward,
-		Reverse,
-		Toggle,
-	}
-
 	public GameObject tweenTarget;
 	public int tweenGroup = 0;
 	public Trigger trigger = Trigger.OnClick;
-	public Direction direction = Direction.Forward;
-	public bool enableIfDisabled = false;
-	public bool disableWhenDone = false;
+	public Direction playDirection = Direction.Forward;
+	public EnableCondition ifDisabledOnPlay = EnableCondition.DoNothing;
+	public DisableCondition disableWhenFinished = DisableCondition.DoNotDisable;
 	public bool includeChildren = false;
 
 	Tweener[] mTweens;
@@ -59,7 +46,7 @@ public class UIButtonTween : MonoBehaviour
 
 	void Update ()
 	{
-		if (disableWhenDone && mTweens != null)
+		if ((int)playDirection == (int)disableWhenFinished && mTweens != null)
 		{
 			bool isFinished = true;
 
@@ -89,7 +76,7 @@ public class UIButtonTween : MonoBehaviour
 		GameObject go = (tweenTarget == null) ? gameObject : tweenTarget;
 
 		// If the object is disabled, don't do anything
-		if (!go.active && !enableIfDisabled) return;
+		if (!go.active && ifDisabledOnPlay != EnableCondition.EnableThenPlay) return;
 
 		// Gather the tweening components
 		mTweens = includeChildren ? go.GetComponentsInChildren<Tweener>() : go.GetComponents<Tweener>();
@@ -97,12 +84,12 @@ public class UIButtonTween : MonoBehaviour
 		if (mTweens.Length == 0)
 		{
 			// No tweeners found -- should we disable the object?
-			if (disableWhenDone) tweenTarget.SetActiveRecursively(false);
+			if (disableWhenFinished != DisableCondition.DoNotDisable) tweenTarget.SetActiveRecursively(false);
 		}
 		else
 		{
 			bool activated = false;
-			if (direction == Direction.Reverse) forward = !forward;
+			if (playDirection == Direction.Reverse) forward = !forward;
 
 			// Run through all located tween components
 			foreach (Tweener tw in mTweens)
@@ -118,7 +105,7 @@ public class UIButtonTween : MonoBehaviour
 					}
 
 					// Toggle or activate the tween component
-					if (direction == Direction.Toggle) tw.Toggle();
+					if (playDirection == Direction.Toggle) tw.Toggle();
 					else tw.Activate(forward);
 				}
 			}

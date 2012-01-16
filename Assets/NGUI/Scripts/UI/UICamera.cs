@@ -114,9 +114,21 @@ public class UICamera : MonoBehaviour
 		{
 			if (mSel != value)
 			{
-				if (mSel != null) mSel.SendMessage("OnSelect", false, SendMessageOptions.DontRequireReceiver);
+				if (mSel != null)
+				{
+					UICamera uicam = FindCameraForLayer(mSel.layer);
+					if (uicam != null) lastCamera = uicam.mCam;
+					mSel.SendMessage("OnSelect", false, SendMessageOptions.DontRequireReceiver);
+				}
+
 				mSel = value;
-				if (mSel != null) mSel.SendMessage("OnSelect", true, SendMessageOptions.DontRequireReceiver);
+
+				if (mSel != null)
+				{
+					UICamera uicam = FindCameraForLayer(mSel.layer);
+					if (uicam != null) lastCamera = uicam.mCam;
+					mSel.SendMessage("OnSelect", true, SendMessageOptions.DontRequireReceiver);
+				}
 			}
 		}
 	}
@@ -192,6 +204,24 @@ public class UICamera : MonoBehaviour
 			}
 		}
 		return false;
+	}
+
+	/// <summary>
+	/// Find the camera responsible for handling events on objects of the specified layer.
+	/// </summary>
+
+	static public UICamera FindCameraForLayer (int layer)
+	{
+		int layerMask = 1 << layer;
+
+		foreach (UICamera cam in mList)
+		{
+			if ((cam.mCam != null) && (cam.mCam.cullingMask & layerMask) != 0)
+			{
+				return cam;
+			}
+		}
+		return null;
 	}
 
 	/// <summary>
@@ -377,11 +407,10 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Clear the selection
-		if ((mSel != null) && (pressed || Input.GetKeyDown(KeyCode.Escape)))
+		if (pressed || Input.GetKeyDown(KeyCode.Escape))
 		{
 			if (mTooltip != null) ShowTooltip(false);
-			mSel.SendMessage("OnSelect", false, SendMessageOptions.DontRequireReceiver);
-			mSel = null;
+			selectedObject = null;
 		}
 
 		// Send out the unpress message

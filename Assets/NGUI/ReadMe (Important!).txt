@@ -38,10 +38,12 @@ Version History
 
 1.33:
 - NEW: UICheckbox now has a configurable function to call.
-- NEW: UIButtonPlayAnimations can be used to play animations via the new UIActiveAnimation.
+- NEW: UICheckbox now has an animation parameter it can trigger when checked/unchecked.
+- NEW: You can now play remote animations via UIButtonPlayAnimations.
 - NEW: Tweener now sends out notifications when it finishes.
-- NEW: Tweener now has a 'group' parameter that can be used to only enable/disable certain tweens on the same game object.
-- NEW: Example 1 has been adjusted to use the new play animation feature.
+- NEW: Tweener now has a 'group' parameter that can be used to only enable/disable only certain tweens on the same object.
+- NEW: UIButtonTween has been changed to use more descriptive properties. Check your UIButtonTweens and update their properties after upgrading.
+- NEW: Examples 1, 5 and 6 have been adjusted to use the new features.
 - FIX: Shader fixes.
 
 1.32:

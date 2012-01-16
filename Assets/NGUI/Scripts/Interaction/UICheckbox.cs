@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using AnimationOrTween;
 
 /// <summary>
 /// Simple checkbox functionality. If 'option' is enabled, checking this checkbox will uncheck all other checkboxes with the same parent.
@@ -7,7 +8,8 @@
 [AddComponentMenu("NGUI/Interaction/Checkbox")]
 public class UICheckbox : MonoBehaviour
 {
-	public UISprite checkedSprite;
+	public UISprite checkSprite;
+	public Animation checkAnimation;
 	public GameObject eventReceiver;
 	public string functionName = "OnActivate";
 	public bool startsChecked = true;
@@ -69,17 +71,23 @@ public class UICheckbox : MonoBehaviour
 		mChecked = state;
 
 		// Tween the color of the checkmark
-		if (checkedSprite != null)
+		if (checkSprite != null)
 		{
-			Color c = checkedSprite.color;
+			Color c = checkSprite.color;
 			c.a = mChecked ? 1f : 0f;
-			TweenColor.Begin(checkedSprite.gameObject, 0.2f, c);
+			TweenColor.Begin(checkSprite.gameObject, 0.2f, c);
 		}
 
 		// Send out the event notification
 		if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
 		{
 			eventReceiver.SendMessage(functionName, mChecked, SendMessageOptions.DontRequireReceiver);
+		}
+
+		// Play the checkmark animation
+		if (checkAnimation != null)
+		{
+			ActiveAnimation.Play(checkAnimation, state ? Direction.Forward : Direction.Reverse);
 		}
 	}
 }

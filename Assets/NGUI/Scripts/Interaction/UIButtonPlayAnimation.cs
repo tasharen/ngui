@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using AnimationOrTween;
 
 /// <summary>
 /// Play the specified animation on click.
@@ -8,33 +9,6 @@
 [AddComponentMenu("NGUI/Interaction/Button Play Animation")]
 public class UIButtonPlayAnimation : MonoBehaviour
 {
-	public enum Trigger
-	{
-		OnClick,
-		OnHover,
-		OnPress,
-	}
-
-	public enum Direction
-	{
-		Forward,
-		Reverse,
-		Toggle,
-	}
-
-	public enum EnableCondition
-	{
-		DoNothing,
-		EnableThenPlay,
-	}
-
-	public enum DisableCondition
-	{
-		DoNotDisable,
-		DisableAfterForward,
-		DisableAfterReverse,
-	}
-
 	public Animation target;
 	public string clipName;
 	public Trigger trigger = Trigger.OnClick;
@@ -77,14 +51,8 @@ public class UIButtonPlayAnimation : MonoBehaviour
 	{
 		if (target != null)
 		{
-			int dir = (playDirection == Direction.Toggle) ? 0 : (forward ? 1 : -1);
-			if (playDirection == Direction.Reverse) dir = -dir;
-
-			int disableState = (disableWhenFinished == DisableCondition.DisableAfterForward) ? 1 :
-				((disableWhenFinished == DisableCondition.DisableAfterReverse) ? -1 : 0);
-
-			ActiveAnimation anim = ActiveAnimation.Play(target, clipName, dir,
-				ifDisabledOnPlay == EnableCondition.EnableThenPlay, disableState);
+			Direction dir = forward ? playDirection : ((Direction)(-(int)playDirection));
+			ActiveAnimation anim = ActiveAnimation.Play(target, clipName, dir, ifDisabledOnPlay, disableWhenFinished);
 			if (anim != null) anim.callWhenFinished = callWhenFinished;
 		}
 	}
