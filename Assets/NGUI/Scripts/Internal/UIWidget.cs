@@ -145,6 +145,7 @@ public abstract class UIWidget : MonoBehaviour
 		if (enabled && gameObject.active && !Application.isPlaying && mMat != null)
 		{
 			panel.AddWidget(this);
+			LayerCheck();
 			mPanel.LateUpdate();
 		}
 	}
@@ -159,7 +160,22 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			mPanel = UIPanel.Find(cachedTransform);
 			mPanel.AddWidget(this);
+			LayerCheck();
 			mChanged = true;
+		}
+	}
+
+	/// <summary>
+	/// Check to ensure that the widget resides on the same layer as its panel.
+	/// </summary>
+
+	void LayerCheck ()
+	{
+		if (mPanel != null && mPanel.gameObject.layer != gameObject.layer)
+		{
+			Debug.LogWarning("You place widgets on a layer different than the UIPanel that manages them.\n" +
+				"If you want to move widgets to a different layer, parent them to a new panel instead.", this);
+			gameObject.layer = mPanel.gameObject.layer;
 		}
 	}
 
@@ -229,6 +245,8 @@ public abstract class UIWidget : MonoBehaviour
 
 	void Update ()
 	{
+		LayerCheck();
+
 		if (mRecentlyEnabled)
 		{
 			mRecentlyEnabled = false;

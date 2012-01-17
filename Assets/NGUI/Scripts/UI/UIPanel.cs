@@ -47,6 +47,7 @@ public class UIPanel : MonoBehaviour
 	List<Color> mCols = new List<Color>();
 
 	Transform mTrans;
+	int mLayer = -1;
 
 #if UNITY_EDITOR
 	// Screen size, saved for gizmos, since Screen.width and Screen.height returns the Scene view's dimensions in OnDrawGismos.
@@ -150,6 +151,12 @@ public class UIPanel : MonoBehaviour
 			return mDrawCalls;
 		}
 	}
+
+	/// <summary>
+	/// Layer is used to ensure that if it changes, widgets get moved as well.
+	/// </summary>
+
+	void Awake () { mLayer = gameObject.layer; }
 
 	/// <summary>
 	/// Helper function that marks the specified material as having changed so its mesh is rebuilt next frame.
@@ -267,11 +274,37 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Helper function that recursively sets all childrens' game objects layers to the specified value, stopping when it hits another UIPanel.
+	/// </summary>
+
+	static void SetChildLayer (Transform t, int layer)
+	{
+		for (int i = 0; i < t.childCount; ++i)
+		{
+			Transform child = t.GetChild(i);
+			
+			if (child.GetComponent<UIPanel>() == null)
+			{
+				child.gameObject.layer = layer;
+				SetChildLayer(child, layer);
+			}
+		}
+	}
+
+	/// <summary>
 	/// Update all widgets and rebuild the draw calls if necessary.
 	/// </summary>
 
 	public void LateUpdate ()
 	{
+		// Always move widgets to the panel's layer
+		if (mLayer != gameObject.layer)
+		{
+			mLayer = gameObject.layer;
+			SetChildLayer(mTrans, mLayer);
+			foreach (UIDrawCall dc in drawCalls) dc.gameObject.layer = mLayer;
+		}
+
 		// Update all widgets
 		for (int i = mWidgets.Count; i > 0; )
 		{
@@ -417,6 +450,7 @@ public class UIPanel : MonoBehaviour
 		if (createIfMissing && panel == null)
 		{
 			panel = trans.gameObject.AddComponent<UIPanel>();
+			SetChildLayer(panel.mTrans, panel.gameObject.layer);
 		}
 		return panel;
 	}
