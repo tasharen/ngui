@@ -283,13 +283,6 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			Color outline = new Color(1f, 1f, 1f, 0.2f);
 
-			// Parent matrix
-			Transform parent = cachedTransform.parent;
-			Matrix4x4 mat = (parent != null) ? parent.localToWorldMatrix : Matrix4x4.identity;
-
-			// Local matrix
-			Matrix4x4 local = Matrix4x4.TRS(cachedTransform.localPosition, cachedTransform.localRotation, cachedTransform.localScale);
-
 			// Position should be offset by depth so selection works properly
 			Vector3 pos = Vector3.zero;
 			pos.z -= mDepth * 0.25f;
@@ -301,7 +294,7 @@ public abstract class UIWidget : MonoBehaviour
 			pos.y += (offset.y - 0.5f) * size.y;
 
 			// Draw the gizmo
-			Gizmos.matrix = mat * local;
+			Gizmos.matrix = cachedTransform.localToWorldMatrix;
 			Gizmos.color = (UnityEditor.Selection.activeGameObject == gameObject) ? new Color(0f, 0.75f, 1f) : outline;
 			Gizmos.DrawWireCube(pos, size);
 			Gizmos.color = Color.clear;
