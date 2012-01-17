@@ -92,7 +92,8 @@ public class UIAnchor : MonoBehaviour
 				}
 			}
 
-			v.z = (mTrans.TransformPoint(Vector3.forward * depthOffset) - mTrans.TransformPoint(Vector3.zero)).magnitude;
+			v.z = (mTrans.TransformPoint(Vector3.forward * depthOffset) -
+				mTrans.TransformPoint(Vector3.zero)).magnitude * Mathf.Sign(depthOffset);
 
 			if (uiCamera.orthographic)
 			{
