@@ -17,6 +17,7 @@ public class UIDrawCall : MonoBehaviour
 		SoftClip,	// Alpha-based clipping with a softened edge
 	}
 
+	Transform		mTrans;		// Cached transform
 	Material		mMat;		// Material used by this screen
 	Mesh			mMesh;		// Generated mesh
 	MeshFilter		mFilter;	// Mesh filter for this draw call
@@ -24,9 +25,14 @@ public class UIDrawCall : MonoBehaviour
 	Clipping		mClipping;	// Clipping mode
 	Vector4			mClipRange;	// Clipping, if used
 	Vector2			mClipSoft;	// Clipping softness
-	Matrix4x4		mClipMat;	// Matrix that transforms world coordinates to UIPanel's local space
 	Material		mInst;		// Instantiated material, if necessary
 	bool			mReset		= true;
+
+	/// <summary>
+	/// Transform is cached for speed and efficiency.
+	/// </summary>
+
+	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
 
 	/// <summary>
 	/// Material used by this screen.
@@ -57,12 +63,6 @@ public class UIDrawCall : MonoBehaviour
 	/// </summary>
 
 	public Vector2 clipSoftness { get { return mClipSoft; } set { mClipSoft = value; } }
-
-	/// <summary>
-	/// Matrix that transforms world coordinates to UIPanel's local space.
-	/// </summary>
-
-	public Matrix4x4 clipMat { get { return mClipMat; } set { mClipMat = value; } }
 
 	/// <summary>
 	/// Convenience function that ensures that a custom material has been created.
@@ -127,7 +127,6 @@ public class UIDrawCall : MonoBehaviour
 
 		if (mInst != null)
 		{
-			mInst.SetMatrix("_ClipMatrix", mClipMat);
 			mInst.SetVector("_ClipRange", mClipRange);
 
 			Vector2 sharpness = new Vector2(1000.0f, 1000.0f);

@@ -178,10 +178,12 @@ public class UIPanel : MonoBehaviour
 			if (mTrans == null) mTrans = transform;
 			mWorldToLocal = mTrans.worldToLocalMatrix;
 
-			Vector2 size = new Vector2(mClipRange.z * 0.5f, mClipRange.w * 0.5f);
+			Vector2 size = new Vector2(mClipRange.z, mClipRange.w);
 
-			if (size.x == 0f) size.x = Screen.width;
-			if (size.y == 0f) size.y = Screen.height;
+			if (mClipping == UIDrawCall.Clipping.None || size.x == 0f) size.x = Screen.width;
+			if (mClipping == UIDrawCall.Clipping.None || size.y == 0f) size.y = Screen.height;
+
+			size *= 0.5f;
 
 			mMin.x = mClipRange.x - size.x;
 			mMin.y = mClipRange.y - size.y;
@@ -190,10 +192,10 @@ public class UIPanel : MonoBehaviour
 		}
 
 		// Transform the specified points from world space to local space
-		a = mWorldToLocal.MultiplyPoint(a);
-		b = mWorldToLocal.MultiplyPoint(b);
-		c = mWorldToLocal.MultiplyPoint(c);
-		d = mWorldToLocal.MultiplyPoint(d);
+		a = mWorldToLocal.MultiplyPoint3x4(a);
+		b = mWorldToLocal.MultiplyPoint3x4(b);
+		c = mWorldToLocal.MultiplyPoint3x4(c);
+		d = mWorldToLocal.MultiplyPoint3x4(d);
 
 		mTemp[0] = a.x;
 		mTemp[1] = b.x;
@@ -291,14 +293,11 @@ public class UIPanel : MonoBehaviour
 			range.y += 0.5f;
 		}
 
-		Matrix4x4 mat = mTrans.worldToLocalMatrix;
-
 		foreach (UIDrawCall dc in mDrawCalls)
 		{
 			dc.clipping = mClipping;
 			dc.clipRange = range;
 			dc.clipSoftness = mClipSoftness;
-			dc.clipMat = mat;
 		}
 	}
 
@@ -446,6 +445,8 @@ public class UIPanel : MonoBehaviour
 
 	void Rebuild (Material mat)
 	{
+		Matrix4x4 worldToPanel = mTrans.worldToLocalMatrix;
+
 		foreach (UIWidget w in mWidgets)
 		{
 			int flag = w.visibleFlag;
@@ -468,18 +469,18 @@ public class UIPanel : MonoBehaviour
 			offset.x *= scale.x;
 			offset.y *= scale.y;
 
-			// Transform all vertices into world space
-			Transform t = w.cachedTransform;
+			// We want all vertices to be relative to the panel
+			Matrix4x4 widgetToPanel = worldToPanel * w.cachedTransform.localToWorldMatrix;
 
 			if (generateNormals)
 			{
-				Vector3 normal = t.TransformDirection(Vector3.back);
-				Vector3 tangent = t.TransformDirection(Vector3.right);
+				Vector3 normal  = widgetToPanel.MultiplyVector(Vector3.back);
+				Vector3 tangent = widgetToPanel.MultiplyVector(Vector3.right);
 				Vector4 tan4 = new Vector4(tangent.x, tangent.y, tangent.z, -1f);
 
 				for (int i = index, imax = mVerts.Count; i < imax; ++i)
 				{
-					mVerts[i] = t.TransformPoint(mVerts[i] + offset);
+					mVerts[i] = widgetToPanel.MultiplyPoint3x4(mVerts[i] + offset);
 					mNorms.Add(normal);
 					mTans.Add(tan4);
 				}
@@ -488,7 +489,7 @@ public class UIPanel : MonoBehaviour
 			{
 				for (int i = index, imax = mVerts.Count; i < imax; ++i)
 				{
-					mVerts[i] = t.TransformPoint(mVerts[i] + offset);
+					mVerts[i] = widgetToPanel.MultiplyPoint3x4(mVerts[i] + offset);
 				}
 			}
 		}
@@ -498,6 +499,13 @@ public class UIPanel : MonoBehaviour
 			// Rebuild the draw call's mesh
 			UIDrawCall dc = GetDrawCall(mat, true);
 			dc.Set(mVerts, generateNormals ? mNorms : null, generateNormals ? mTans : null, mUvs, mCols);
+
+			// Set the draw call's transform to match the panel's.
+			// Note that parenting directly to the panel causes unity to crash as soon as you hit Play.
+			Transform dt = dc.transform;
+			dt.position = mTrans.position;
+			dt.rotation = mTrans.rotation;
+			dt.localScale = mTrans.lossyScale;
 		}
 		else
 		{

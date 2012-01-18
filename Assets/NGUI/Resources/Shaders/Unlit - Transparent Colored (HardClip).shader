@@ -36,7 +36,6 @@ Shader "Unlit/Transparent Colored (HardClip)"
 			float4 _MainTex_ST;
 			fixed4 _Color;
 			float4 _ClipRange = float4(0.0, 0.0, 1000.0, 1000.0);
-			float4x4 _ClipMatrix;
 
 			struct appdata_t
 			{
@@ -56,7 +55,7 @@ Shader "Unlit/Transparent Colored (HardClip)"
 			v2f vert (appdata_t v)
 			{
 				v2f o;
-				o.worldPos = mul(_ClipMatrix, v.vertex);
+				o.worldPos = v.vertex;
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.color = v.color;
 				o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);

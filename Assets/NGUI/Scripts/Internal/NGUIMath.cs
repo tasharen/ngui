@@ -288,7 +288,7 @@ static public class NGUIMath
 
 			// Transform the coordinates from relative-to-widget to world space, then make them relative to game object
 			Transform toWorld = w.cachedTransform;
-			Vector3 v0 = toLocal.MultiplyPoint(toWorld.TransformPoint(new Vector3(x - size.x, y - size.y, 0f)));
+			Vector3 v0 = toLocal.MultiplyPoint3x4(toWorld.TransformPoint(new Vector3(x - size.x, y - size.y, 0f)));
 
 			if (first)
 			{
@@ -300,9 +300,9 @@ static public class NGUIMath
 				b.Encapsulate(v0);
 			}
 
-			b.Encapsulate(toLocal.MultiplyPoint(toWorld.TransformPoint(new Vector3(x - size.x, y + size.y, 0f))));
-			b.Encapsulate(toLocal.MultiplyPoint(toWorld.TransformPoint(new Vector3(x + size.x, y - size.y, 0f))));
-			b.Encapsulate(toLocal.MultiplyPoint(toWorld.TransformPoint(new Vector3(x + size.x, y + size.y, 0f))));
+			b.Encapsulate(toLocal.MultiplyPoint3x4(toWorld.TransformPoint(new Vector3(x - size.x, y + size.y, 0f))));
+			b.Encapsulate(toLocal.MultiplyPoint3x4(toWorld.TransformPoint(new Vector3(x + size.x, y - size.y, 0f))));
+			b.Encapsulate(toLocal.MultiplyPoint3x4(toWorld.TransformPoint(new Vector3(x + size.x, y + size.y, 0f))));
 		}
 		return b;
 	}
