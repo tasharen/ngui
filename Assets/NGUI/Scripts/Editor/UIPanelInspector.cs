@@ -25,17 +25,16 @@ public class UIPanelInspector : Editor
 			EditorUtility.SetDirty(panel);
 		}
 
-		bool gizmos = EditorGUILayout.Toggle("Gizmos", panel.showGizmos);
-
-		if (panel.showGizmos != gizmos)
-		{
-			panel.showGizmos = gizmos;
-			EditorUtility.SetDirty(panel);
-		}
-
-		panel.debug = EditorGUILayout.Toggle("Debug", panel.debug);
 		EditorGUILayout.LabelField("Widgets", panel.widgets.Count.ToString());
 		EditorGUILayout.LabelField("Draw Calls", drawcalls.Count.ToString());
+
+		UIPanel.DebugInfo di = (UIPanel.DebugInfo)EditorGUILayout.EnumPopup("Debug Info", panel.debugInfo);
+
+		if (panel.debugInfo != di)
+		{
+			panel.debugInfo = di;
+			EditorUtility.SetDirty(panel);
+		}
 
 		UIDrawCall.Clipping clipping = (UIDrawCall.Clipping)EditorGUILayout.EnumPopup("Clipping", panel.clipping);
 

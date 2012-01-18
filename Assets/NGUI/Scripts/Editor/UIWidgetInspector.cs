@@ -10,8 +10,8 @@ public class UIWidgetInspector : Editor
 {
 	protected UIWidget mWidget;
 	protected bool mRegisteredUndo = false;
-	protected bool mShowTexture = true;
-	protected bool mUseShader = false;
+	static protected bool mShowTexture = true;
+	static protected bool mUseShader = false;
 
 	bool mInitialized = false;
 	bool mHierarchyCheck = true;

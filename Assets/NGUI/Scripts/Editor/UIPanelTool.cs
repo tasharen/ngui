@@ -20,7 +20,7 @@ public class UIPanelTool : EditorWindow
 
 		if (panels.Length > 0)
 		{
-			DrawRow("Panel", "Widgets", "DCs", "Clip", null, false);
+			DrawRow(null, false);
 			GUITools.DrawSeparator();
 
 			UIPanel selectedPanel = null;
@@ -39,14 +39,7 @@ public class UIPanelTool : EditorWindow
 #else
 				PrefabType type = PrefabUtility.GetPrefabType(panel.gameObject);
 #endif
-				if (type != PrefabType.Prefab)
-				{
-					DrawRow(panel.name,
-						panel.widgets.Count.ToString(),
-						panel.drawCalls.Count.ToString(),
-						(panel.clipping != UIDrawCall.Clipping.None) ? "Yes" : "",
-						panel, panel == selectedPanel);
-				}
+				if (type != PrefabType.Prefab) DrawRow(panel, panel == selectedPanel);
 			}
 		}
 		else
@@ -59,28 +52,75 @@ public class UIPanelTool : EditorWindow
 	/// Helper function used to print things in columns.
 	/// </summary>
 
-	void DrawRow (string a, string b, string c, string d, UIPanel panel, bool highlight)
+	void DrawRow (UIPanel panel, bool highlight)
 	{
+		string panelName, widgetCount, drawCalls, clipping;
+
+		if (panel != null)
+		{
+			panelName = panel.name;
+			widgetCount = panel.widgets.Count.ToString();
+			drawCalls = panel.drawCalls.Count.ToString();
+			clipping = (panel.clipping != UIDrawCall.Clipping.None) ? "Yes" : "";
+		}
+		else
+		{
+			panelName = "Panel";
+			widgetCount = "Widgets";
+			drawCalls = "DCs";
+			clipping = "Clip";
+		}
+
 		GUILayout.BeginHorizontal();
 		{
 			bool disabled = (panel != null && !panel.gameObject.active);
 
+			GUI.color = Color.white;
+
+			if (panel != null)
+			{
+				if (panel.gameObject.active != EditorGUILayout.Toggle(panel.gameObject.active, GUILayout.Width(20f)))
+				{
+					panel.gameObject.SetActiveRecursively(!panel.gameObject.active);
+					EditorUtility.SetDirty(panel.gameObject);
+				}
+			}
+			else
+			{
+				GUILayout.Space(30f);
+			}
+
 			if (disabled)
 			{
 				GUI.color = highlight ? new Color(0f, 0.5f, 0.8f) : Color.grey;
-				GUILayout.Label(a, GUILayout.MinWidth(100f));
 			}
 			else
 			{
 				GUI.color = highlight ? new Color(0f, 0.8f, 1f) : Color.white;
-				GUILayout.Label(a, GUILayout.MinWidth(100f));
 			}
-			
-			GUILayout.Label(b, GUILayout.Width(50f));
-			GUILayout.Label(c, GUILayout.Width(30f));
-			GUILayout.Label(d, GUILayout.Width(40f));
+
+			GUILayout.Label(panelName, GUILayout.MinWidth(100f));
+			GUILayout.Label(widgetCount, GUILayout.Width(50f));
+			GUILayout.Label(drawCalls, GUILayout.Width(30f));
+			GUILayout.Label(clipping, GUILayout.Width(40f));
 
 			GUI.color = disabled ? new Color(0.7f, 0.7f, 0.7f) : Color.white;
+
+			if (panel != null)
+			{
+				bool debug = (panel.debugInfo == UIPanel.DebugInfo.Geometry);
+
+				if (debug != EditorGUILayout.Toggle(debug, GUILayout.Width(20f)))
+				{
+					// debug != value, so it's currently inverse
+					panel.debugInfo = debug ? UIPanel.DebugInfo.Gizmos : UIPanel.DebugInfo.Geometry;
+					EditorUtility.SetDirty(panel);
+				}
+			}
+			else
+			{
+				GUILayout.Label("DB", GUILayout.Width(20f));
+			}
 
 			if (panel)
 			{
@@ -89,17 +129,10 @@ public class UIPanelTool : EditorWindow
 					Selection.activeGameObject = panel.gameObject;
 					EditorUtility.SetDirty(panel.gameObject);
 				}
-
-				if (GUILayout.Button(panel.gameObject.active ? "Deactivate" : "Activate", GUILayout.Width(80f)))
-				{
-					panel.gameObject.SetActiveRecursively(!panel.gameObject.active);
-					EditorUtility.SetDirty(panel.gameObject);
-				}
 			}
 			else
 			{
-				// Even though its 50+80... here it needs to be 10 more to align properly
-				GUILayout.Space(140f);
+				GUILayout.Space(60f);
 			}
 		}
 		GUILayout.EndHorizontal();

@@ -33,9 +33,6 @@ public abstract class UIWidget : MonoBehaviour
 	[SerializeField] int mDepth = 0;
 #endif
 
-	// DEPRECATED: no longer used (will be removed)
-	[SerializeField] bool mCentered = true;
-
 	Transform mTrans;
 	Texture2D mTex;
 	UIPanel mPanel;
@@ -47,6 +44,7 @@ public abstract class UIWidget : MonoBehaviour
 	Vector3 mPos;
 	Quaternion mRot;
 	Vector3 mScale;
+	int mVisibleFlag = -1;
 
 	/// <summary>
 	/// Color used by the widget.
@@ -124,6 +122,12 @@ public abstract class UIWidget : MonoBehaviour
 	public UIPanel panel { get { CreatePanel(); return mPanel; } }
 
 	/// <summary>
+	/// Flag set by the UIPanel and used in optimization checks.
+	/// </summary>
+
+	public int visibleFlag { get { return mVisibleFlag; } set { mVisibleFlag = value; } }
+
+	/// <summary>
 	/// Static widget comparison function used for Z-sorting.
 	/// </summary>
 
@@ -159,8 +163,8 @@ public abstract class UIWidget : MonoBehaviour
 		if (mPanel == null && mMat != null)
 		{
 			mPanel = UIPanel.Find(cachedTransform);
-			mPanel.AddWidget(this);
 			LayerCheck();
+			mPanel.AddWidget(this);
 			mChanged = true;
 		}
 	}
@@ -211,12 +215,10 @@ public abstract class UIWidget : MonoBehaviour
 
 	void Start ()
 	{
-		// DEPRECATED: Support for loading older scenes before Pivot was introduced (will be removed)
-		if (!mCentered) { mCentered = true; mPivot = Pivot.TopLeft; }
 		mStarted = true;
 		if (mDepth == 0) mDepth = CalculateDepth();
-		if (mMat != null) panel.AddWidget(this);
 		OnStart();
+		if (mMat != null) panel.AddWidget(this);
 	}
 
 	bool mRecentlyEnabled = false;
@@ -227,8 +229,6 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnEnable ()
 	{
-		// DEPRECATED: Support for loading older scenes before Pivot was introduced (will be removed)
-		if (!mCentered) { mCentered = true; mPivot = Pivot.TopLeft; }
 		mChanged = true;
 		if (mTrans == null) mTrans = transform;
 		if (mMat != null)
@@ -297,11 +297,11 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-		if (mPanel != null && mPanel.showGizmos)
+		if (visibleFlag != 0 && mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos)
 		{
 			Color outline = new Color(1f, 1f, 1f, 0.2f);
 
-			// Position should be offset by depth so selection works properly
+			// Position should be offset by depth so that the selection works properly
 			Vector3 pos = Vector3.zero;
 			pos.z -= mDepth * 0.25f;
 

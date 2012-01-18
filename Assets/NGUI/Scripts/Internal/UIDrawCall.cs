@@ -186,25 +186,33 @@ public class UIDrawCall : MonoBehaviour
 				mRen.sharedMaterial = mMat;
 			}
 
-			if (mMesh == null)
+			if (verts.Count < 65000)
 			{
-				mMesh = new Mesh();
-				mMesh.name = "UIDrawCall for " + mMat.name;
+				if (mMesh == null)
+				{
+					mMesh = new Mesh();
+					mMesh.name = "UIDrawCall for " + mMat.name;
+				}
+				else
+				{
+					mMesh.Clear();
+				}
+
+				// Set the mesh values
+				mMesh.vertices = verts.ToArray();
+				if (norms != null) mMesh.normals = norms.ToArray();
+				if (tans != null) mMesh.tangents = tans.ToArray();
+				mMesh.uv = uvs.ToArray();
+				mMesh.colors = cols.ToArray();
+				mMesh.triangles = indices;
+				mMesh.RecalculateBounds();
+				mFilter.mesh = mMesh;
 			}
 			else
 			{
-				mMesh.Clear();
+				if (mMesh != null) mMesh.Clear();
+				Debug.LogError("Too many vertices on one panel: " + verts.Count);
 			}
-
-			// Set the mesh values
-			mMesh.vertices = verts.ToArray();
-			if (norms != null) mMesh.normals = norms.ToArray();
-			if (tans != null) mMesh.tangents = tans.ToArray();
-			mMesh.uv = uvs.ToArray();
-			mMesh.colors = cols.ToArray();
-			mMesh.triangles = indices;
-			mMesh.RecalculateBounds();
-			mFilter.mesh = mMesh;
 		}
 		else
 		{

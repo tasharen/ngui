@@ -9,14 +9,18 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Panel")]
 public class UIPanel : MonoBehaviour
 {
+	public enum DebugInfo
+	{
+		None,
+		Gizmos,
+		Geometry,
+	}
+
 	// Whether normals and tangents will be generated for all meshes
 	public bool generateNormals = false;
 
-	// Whether selectable gizmos will be shown for widgets under this panel
-	public bool showGizmos = true;
-
 	// Whether generated geometry is shown or hidden
-	[SerializeField] bool mDebug = false;
+	[SerializeField] DebugInfo mDebugInfo = DebugInfo.Gizmos;
 
 #if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
 	// Clipping rectangle
@@ -49,6 +53,14 @@ public class UIPanel : MonoBehaviour
 	Transform mTrans;
 	int mLayer = -1;
 
+	float mMatrixTime = 0f;
+	Matrix4x4 mWorldToLocal = Matrix4x4.identity;
+
+	// Values used for visibility checks
+	static float[] mTemp = new float[4];
+	Vector2 mMin = Vector2.zero;
+	Vector2 mMax = Vector2.zero;
+
 #if UNITY_EDITOR
 	// Screen size, saved for gizmos, since Screen.width and Screen.height returns the Scene view's dimensions in OnDrawGismos.
 	Vector2 mScreenSize = Vector2.one;
@@ -58,19 +70,19 @@ public class UIPanel : MonoBehaviour
 	/// Whether the panel's generated geometry will be hidden or not.
 	/// </summary>
 
-	public bool debug
+	public DebugInfo debugInfo
 	{
 		get
 		{
-			return mDebug;
+			return mDebugInfo;
 		}
 		set
 		{
-			if (mDebug != value)
+			if (mDebugInfo != value)
 			{
-				mDebug = value;
+				mDebugInfo = value;
 				List<UIDrawCall> list = drawCalls;
-				HideFlags flags = mDebug ? HideFlags.DontSave | HideFlags.NotEditable : HideFlags.HideAndDontSave;
+				HideFlags flags = (mDebugInfo == DebugInfo.Geometry) ? HideFlags.DontSave | HideFlags.NotEditable : HideFlags.HideAndDontSave;
 
 				foreach (UIDrawCall dc in list)
 				{
@@ -153,16 +165,103 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Layer is used to ensure that if it changes, widgets get moved as well.
+	/// Returns whether the specified rectangle is visible by the panel. The coordinates must be in world space.
 	/// </summary>
 
-	void Awake () { mLayer = gameObject.layer; }
+	bool IsVisible (Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+	{
+		float time = Time.time;
+
+		if (time == 0f || mMatrixTime != time)
+		{
+			mMatrixTime = time;
+			if (mTrans == null) mTrans = transform;
+			mWorldToLocal = mTrans.worldToLocalMatrix;
+
+			Vector2 size = new Vector2(mClipRange.z * 0.5f, mClipRange.w * 0.5f);
+
+			if (size.x == 0f) size.x = Screen.width;
+			if (size.y == 0f) size.y = Screen.height;
+
+			mMin.x = mClipRange.x - size.x;
+			mMin.y = mClipRange.y - size.y;
+			mMax.x = mClipRange.x + size.x;
+			mMax.y = mClipRange.y + size.y;
+		}
+
+		// Transform the specified points from world space to local space
+		a = mWorldToLocal.MultiplyPoint(a);
+		b = mWorldToLocal.MultiplyPoint(b);
+		c = mWorldToLocal.MultiplyPoint(c);
+		d = mWorldToLocal.MultiplyPoint(d);
+
+		mTemp[0] = a.x;
+		mTemp[1] = b.x;
+		mTemp[2] = c.x;
+		mTemp[3] = d.x;
+
+		float minX = Mathf.Min(mTemp);
+		float maxX = Mathf.Max(mTemp);
+
+		mTemp[0] = a.y;
+		mTemp[1] = b.y;
+		mTemp[2] = c.y;
+		mTemp[3] = d.y;
+
+		float minY = Mathf.Min(mTemp);
+		float maxY = Mathf.Max(mTemp);
+
+		if (maxX < mMin.x) return false;
+		if (maxY < mMin.y) return false;
+		if (minX > mMax.x) return false;
+		if (minY > mMax.y) return false;
+		return true;
+	}
+
+	/// <summary>
+	/// Returns whether the specified widget is visible by the panel.
+	/// </summary>
+
+	public bool IsVisible (UIWidget w)
+	{
+		Transform wt = w.cachedTransform;
+		Vector2 size = w.relativeSize;
+		Vector2 a = Vector2.Scale(w.pivotOffset, size);
+		Vector2 b = a;
+
+		a.x += size.x;
+		a.y -= size.y;
+
+		// Transform coordinates into world space
+		Vector2 v0 = wt.TransformPoint(a);
+		Vector2 v1 = wt.TransformPoint(new Vector2(a.x, b.y));
+		Vector2 v2 = wt.TransformPoint(new Vector2(b.x, a.y));
+		Vector2 v3 = wt.TransformPoint(b);
+		return IsVisible(v0, v1, v2, v3);
+	}
 
 	/// <summary>
 	/// Helper function that marks the specified material as having changed so its mesh is rebuilt next frame.
 	/// </summary>
 
 	void MarkAsChanged (Material mat) { if (!mChanged.Contains(mat)) mChanged.Add(mat); }
+
+	/// <summary>
+	/// If the widget is visible, mark the material queue as having changed.
+	/// </summary>
+
+	void MarkAsChanged (UIWidget w)
+	{
+		bool isVisible = IsVisible(w);
+
+		// Only mark the list as changed if the widget is or was visible
+		if (isVisible || w.visibleFlag != 0)
+		{
+			w.visibleFlag = isVisible ? 1 : 0;
+			Material mat = w.material;
+			if (!mChanged.Contains(mat)) mChanged.Add(mat);
+		}
+	}
 
 	/// <summary>
 	/// Update the clipping rect in the shaders.
@@ -213,14 +312,14 @@ public class UIPanel : MonoBehaviour
 		Material mat = w.material;
 		if (mat == null) return;
 		mWidgets.Add(w);
-		MarkAsChanged(w.material);
+		if (!mChanged.Contains(w.material)) mChanged.Add(w.material);
 	}
 
 	/// <summary>
 	/// Remove the specified widget from the managed list.
 	/// </summary>
 
-	public void RemoveWidget (UIWidget w) { if (w != null && mWidgets.Remove(w)) MarkAsChanged(w.material); }
+	public void RemoveWidget (UIWidget w) { if (w != null && mWidgets.Remove(w)) MarkAsChanged(w); }
 
 	/// <summary>
 	/// Get or create a UIScreen responsible for drawing the widgets using the specified material.
@@ -237,12 +336,11 @@ public class UIPanel : MonoBehaviour
 #if UNITY_EDITOR
 			// If we're in the editor, create the game object with hide flags set right away
 			GameObject go = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags("_UIDrawCall [" + mat.name + "]",
-				mDebug ? HideFlags.DontSave | HideFlags.NotEditable : HideFlags.HideAndDontSave);
+				(mDebugInfo == DebugInfo.Geometry) ? HideFlags.DontSave | HideFlags.NotEditable : HideFlags.HideAndDontSave);
 #else
 			GameObject go = new GameObject("_UIDrawCall [" + mat.name + "]");
 			go.hideFlags = HideFlags.HideAndDontSave;
 #endif
-
 			go.layer = gameObject.layer;
 			sc = go.AddComponent<UIDrawCall>();
 			sc.material = mat;
@@ -251,6 +349,12 @@ public class UIPanel : MonoBehaviour
 		}
 		return sc;
 	}
+
+	/// <summary>
+	/// Layer is used to ensure that if it changes, widgets get moved as well.
+	/// </summary>
+
+	void Awake () { mLayer = gameObject.layer; }
 
 	/// <summary>
 	/// Mark all widgets as having been changed so the draw calls get re-created.
@@ -274,24 +378,6 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Helper function that recursively sets all childrens' game objects layers to the specified value, stopping when it hits another UIPanel.
-	/// </summary>
-
-	static void SetChildLayer (Transform t, int layer)
-	{
-		for (int i = 0; i < t.childCount; ++i)
-		{
-			Transform child = t.GetChild(i);
-			
-			if (child.GetComponent<UIPanel>() == null)
-			{
-				child.gameObject.layer = layer;
-				SetChildLayer(child, layer);
-			}
-		}
-	}
-
-	/// <summary>
 	/// Update all widgets and rebuild the draw calls if necessary.
 	/// </summary>
 
@@ -310,7 +396,7 @@ public class UIPanel : MonoBehaviour
 		{
 			UIWidget w = mWidgets[--i];
 			if (w == null) mWidgets.RemoveAt(i);
-			else if (w.PanelUpdate()) MarkAsChanged(w.material);
+			else if (w.PanelUpdate()) MarkAsChanged(w);
 		}
 
 		// If something has changed we have more work to be done
@@ -340,7 +426,7 @@ public class UIPanel : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-		if (showGizmos && mClipping != UIDrawCall.Clipping.None)
+		if (mDebugInfo == DebugInfo.Gizmos && mClipping != UIDrawCall.Clipping.None)
 		{
 			Vector2 size = new Vector2(mClipRange.z, mClipRange.w);
 
@@ -362,7 +448,15 @@ public class UIPanel : MonoBehaviour
 	{
 		foreach (UIWidget w in mWidgets)
 		{
-			if (w.material != mat || w.color.a < 0.001f) continue;
+			int flag = w.visibleFlag;
+
+			if (flag == -1)
+			{
+				flag = IsVisible(w) ? 1 : 0;
+				w.visibleFlag = flag;
+			}
+
+			if (flag == 0 || w.material != mat || w.color.a < 0.001f) continue;
 			if (!w.enabled || !w.gameObject.active) continue;
 			int index = mVerts.Count;
 
@@ -423,6 +517,24 @@ public class UIPanel : MonoBehaviour
 		mTans.Clear();
 		mUvs.Clear();
 		mCols.Clear();
+	}
+
+	/// <summary>
+	/// Helper function that recursively sets all childrens' game objects layers to the specified value, stopping when it hits another UIPanel.
+	/// </summary>
+
+	static void SetChildLayer (Transform t, int layer)
+	{
+		for (int i = 0; i < t.childCount; ++i)
+		{
+			Transform child = t.GetChild(i);
+
+			if (child.GetComponent<UIPanel>() == null)
+			{
+				child.gameObject.layer = layer;
+				SetChildLayer(child, layer);
+			}
+		}
 	}
 
 	/// <summary>

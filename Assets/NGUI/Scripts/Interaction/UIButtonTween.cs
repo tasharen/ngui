@@ -46,7 +46,7 @@ public class UIButtonTween : MonoBehaviour
 
 	void Update ()
 	{
-		if ((int)playDirection == (int)disableWhenFinished && mTweens != null)
+		if (disableWhenFinished != DisableCondition.DoNotDisable && (int)playDirection == (int)disableWhenFinished && mTweens != null)
 		{
 			bool isFinished = true;
 
