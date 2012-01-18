@@ -9,6 +9,12 @@ using System.Collections.Generic;
 public class UIPanelTool : EditorWindow
 {
 	/// <summary>
+	/// Refresh the window on selection.
+	/// </summary>
+
+	void OnSelectionChange () { Repaint(); }
+
+	/// <summary>
 	/// Draw the custom wizard.
 	/// </summary>
 
