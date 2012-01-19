@@ -24,7 +24,7 @@ public class UIButtonTween : MonoBehaviour
 	{
 		if (enabled && trigger == Trigger.OnHover)
 		{
-			Activate(isOver);
+			Play(isOver);
 		}
 	}
 
@@ -32,7 +32,7 @@ public class UIButtonTween : MonoBehaviour
 	{
 		if (enabled && trigger == Trigger.OnPress)
 		{
-			Activate(isPressed);
+			Play(isPressed);
 		}
 	}
 
@@ -40,7 +40,7 @@ public class UIButtonTween : MonoBehaviour
 	{
 		if (enabled && trigger == Trigger.OnClick)
 		{
-			Activate(true);
+			Play(true);
 		}
 	}
 
@@ -71,12 +71,18 @@ public class UIButtonTween : MonoBehaviour
 	/// Activate the tweeners.
 	/// </summary>
 
-	void Activate (bool forward)
+	void Play (bool forward)
 	{
 		GameObject go = (tweenTarget == null) ? gameObject : tweenTarget;
 
-		// If the object is disabled, don't do anything
-		if (!go.active && ifDisabledOnPlay != EnableCondition.EnableThenPlay) return;
+		if (!go.active)
+		{
+			// If the object is disabled, don't do anything
+			if (ifDisabledOnPlay != EnableCondition.EnableThenPlay) return;
+
+			// Enable the game object before tweening it
+			go.SetActiveRecursively(true);
+		}
 
 		// Gather the tweening components
 		mTweens = includeChildren ? go.GetComponentsInChildren<Tweener>() : go.GetComponents<Tweener>();
@@ -98,7 +104,7 @@ public class UIButtonTween : MonoBehaviour
 				if (tw.tweenGroup == tweenGroup)
 				{
 					// Ensure that the game objects are enabled
-					if (!activated && mTweens.Length > 0 && !go.active)
+					if (!activated && !go.active)
 					{
 						activated = true;
 						go.SetActiveRecursively(true);
@@ -106,7 +112,7 @@ public class UIButtonTween : MonoBehaviour
 
 					// Toggle or activate the tween component
 					if (playDirection == Direction.Toggle) tw.Toggle();
-					else tw.Activate(forward);
+					else tw.Play(forward);
 				}
 			}
 		}

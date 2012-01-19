@@ -19,6 +19,8 @@ public class UISlider : MonoBehaviour
 
 	public Direction direction = Direction.Horizontal;
 	public float initialValue = 1f;
+	public GameObject eventReceiver;
+	public string functionName = "OnSliderChange";
 
 	float mValue = 1f;
 	Vector3 mScale = Vector3.one;
@@ -173,6 +175,11 @@ public class UISlider : MonoBehaviour
 				pos.y = scale.y;
 			}
 			thumb.localPosition = pos;
+		}
+
+		if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+		{
+			eventReceiver.SendMessage(functionName, mValue, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 }

@@ -62,7 +62,7 @@ public class UIPanel : MonoBehaviour
 	Vector2 mMax = Vector2.zero;
 
 #if UNITY_EDITOR
-	// Screen size, saved for gizmos, since Screen.width and Screen.height returns the Scene view's dimensions in OnDrawGismos.
+	// Screen size, saved for gizmos, since Screen.width and Screen.height returns the Scene view's dimensions in OnDrawGizmos.
 	Vector2 mScreenSize = Vector2.one;
 #endif
 
@@ -110,7 +110,7 @@ public class UIPanel : MonoBehaviour
 			if (mClipping != value)
 			{
 				mClipping = value;
-				UpdateClippingRect();
+				UpdateDrawcalls();
 			}
 		}
 	}
@@ -130,7 +130,7 @@ public class UIPanel : MonoBehaviour
 			if (mClipRange != value)
 			{
 				mClipRange = value;
-				UpdateClippingRect();
+				UpdateDrawcalls();
 			}
 		}
 	}
@@ -139,7 +139,7 @@ public class UIPanel : MonoBehaviour
 	/// Clipping softness is used if the clipped style is set to "Soft".
 	/// </summary>
 
-	public Vector2 clipSoftness { get { return mClipSoftness; } set { if (mClipSoftness != value) { mClipSoftness = value; UpdateClippingRect(); } } }
+	public Vector2 clipSoftness { get { return mClipSoftness; } set { if (mClipSoftness != value) { mClipSoftness = value; UpdateDrawcalls(); } } }
 
 	/// <summary>
 	/// Widgets managed by this panel.
@@ -266,10 +266,10 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Update the clipping rect in the shaders.
+	/// Update the clipping rect in the shaders and draw calls' positions.
 	/// </summary>
 
-	void UpdateClippingRect ()
+	void UpdateDrawcalls ()
 	{
 		Vector4 range = Vector4.zero;
 
@@ -298,6 +298,54 @@ public class UIPanel : MonoBehaviour
 			dc.clipping = mClipping;
 			dc.clipRange = range;
 			dc.clipSoftness = mClipSoftness;
+
+			// Set the draw call's transform to match the panel's.
+			// Note that parenting directly to the panel causes unity to crash as soon as you hit Play.
+			Transform dt = dc.transform;
+			dt.position = mTrans.position;
+			dt.rotation = mTrans.rotation;
+			dt.localScale = mTrans.lossyScale;
+		}
+	}
+
+	// TODO: Move this
+	Dictionary<Transform, UINode> mChildren = new Dictionary<Transform, UINode>();
+
+	/// <summary>
+	/// Add the specified transform to the managed list.
+	/// </summary>
+
+	UINode AddTransform (Transform t)
+	{
+		UINode val = null;
+
+		if (t != mTrans && !mChildren.TryGetValue(t, out val))
+		{
+			val = new UINode(t);
+			mChildren.Add(t, val);
+
+			// Keep adding transforms all the way up to the panel
+			Transform parent = t.parent;
+			if (parent != null) AddTransform(parent);
+		}
+		return val;
+	}
+
+	/// <summary>
+	/// Remove the specified transform from the managed list.
+	/// </summary>
+
+	void RemoveTransform (Transform t)
+	{
+		if (mChildren.Remove(t))
+		{
+			Transform parent = t.parent;
+
+			// Remove the parent as well if it has no widgets to manage
+			if (parent != null && parent.GetComponentInChildren<UIWidget>() == null)
+			{
+				RemoveTransform(parent);
+			}
 		}
 	}
 
@@ -311,6 +359,8 @@ public class UIPanel : MonoBehaviour
 		Material mat = w.material;
 		if (mat == null) return;
 		mWidgets.Add(w);
+		UINode ch = AddTransform(w.cachedTransform);
+		if (ch != null) ch.widget = w;
 		if (!mChanged.Contains(w.material)) mChanged.Add(w.material);
 	}
 
@@ -318,7 +368,32 @@ public class UIPanel : MonoBehaviour
 	/// Remove the specified widget from the managed list.
 	/// </summary>
 
-	public void RemoveWidget (UIWidget w) { if (w != null && mWidgets.Remove(w)) MarkAsChanged(w); }
+	public void RemoveWidget (UIWidget w)
+	{
+		if (w != null && mWidgets.Remove(w))
+		{
+			UINode pc;
+			
+			// Get the managed transform node
+			if (mChildren.TryGetValue(w.cachedTransform, out pc))
+			{
+				// Add the widget's material to the list of changed materials
+				if (pc.visibleFlag == 1 && !mChanged.Contains(w.material)) mChanged.Add(w.material);
+
+				// Remove this transform from the managed list
+				RemoveTransform(w.cachedTransform);
+			}
+			else
+			{
+				Debug.LogWarning("This is unexpected... widget's transform is not managed?", w);
+			}
+		}
+	}
+
+	void OnGUI ()
+	{
+		GUI.Label(new Rect(5f, 5f - mTrans.localPosition.z * 30f, 200f, 20f), name + ": " + mChildren.Count);
+	}
 
 	/// <summary>
 	/// Get or create a UIScreen responsible for drawing the widgets using the specified material.
@@ -376,12 +451,103 @@ public class UIPanel : MonoBehaviour
 		mChanged.Clear();
 	}
 
+	// Temporary list used in GetChangeFlag()
+	static List<UINode> mHierarchy = new List<UINode>();
+
+	/// <summary>
+	/// Convenience function that figures out the panel's correct change flag by searching the parents.
+	/// </summary>
+
+	int GetChangeFlag (UINode start)
+	{
+		int flag = start.changeFlag;
+
+		if (flag == -1)
+		{
+			Transform trans = start.trans.parent;
+			UINode sub;
+
+			// Keep going until we find a set flag
+			for (;;)
+			{
+				// Check the parent's flag
+				if (mChildren.TryGetValue(trans, out sub))
+				{
+					flag = sub.changeFlag;
+					trans = trans.parent;
+
+					// If the flag hasn't been set either, add this child to the hierarchy
+					if (flag == -1) mHierarchy.Add(sub);
+					else break;
+				}
+				else
+				{
+					flag = 0;
+					break;
+				}
+			}
+
+			// Update the parent flags
+			foreach (UINode pc in mHierarchy) pc.changeFlag = flag;
+			mHierarchy.Clear();
+		}
+		return flag;
+	}
+
 	/// <summary>
 	/// Update all widgets and rebuild the draw calls if necessary.
 	/// </summary>
 
 	public void LateUpdate ()
 	{
+		bool change = false;
+
+		// Check to see if something has changed
+		foreach (KeyValuePair<Transform, UINode> child in mChildren)
+		{
+			UINode pc = child.Value;
+
+			if (pc.HasChanged())
+			{
+				Debug.Log("Changed: " + pc.trans.name);
+				pc.changeFlag = 1;
+				change = true;
+			}
+			else pc.changeFlag = -1;
+		}
+
+		// If something has changed, propagate the changes *down* the tree hierarchy (to children).
+		// An alternative (but slower) approach would be to do a pc.trans.GetComponentsInChildren<UIWidget>()
+		// in the loop above, and mark each one as dirty.
+
+		if (change)
+		{
+			foreach (KeyValuePair<Transform, UINode> child in mChildren)
+			{
+				UINode pc = child.Value;
+
+				if (pc.widget != null)
+				{
+					// If the change flag has not yet been determined...
+					if (pc.changeFlag == -1) pc.changeFlag = GetChangeFlag(pc);
+
+					// Is the widget visible?
+					int visibleFlag = IsVisible(pc.widget) ? 1 : 0;
+
+					// If the widget is visible (or the flag hasn't been set yet)
+					if (visibleFlag == 1 || pc.visibleFlag != 0)
+					{
+						// Update the visibility flag
+						pc.visibleFlag = visibleFlag;
+						Material mat = pc.widget.material;
+
+						// Add this material to the list of changed materials
+						if (!mChanged.Contains(mat)) mChanged.Add(mat);
+					}
+				}
+			}
+		}
+
 		// Always move widgets to the panel's layer
 		if (mLayer != gameObject.layer)
 		{
@@ -391,11 +557,14 @@ public class UIPanel : MonoBehaviour
 		}
 
 		// Update all widgets
-		for (int i = mWidgets.Count; i > 0; )
+		if (mWidgets.Count > 0)
 		{
-			UIWidget w = mWidgets[--i];
-			if (w == null) mWidgets.RemoveAt(i);
-			else if (w.PanelUpdate()) MarkAsChanged(w);
+			for (int i = mWidgets.Count; i > 0; )
+			{
+				UIWidget w = mWidgets[--i];
+				if (w == null) mWidgets.RemoveAt(i);
+				else if (w.PanelUpdate()) MarkAsChanged(w);
+			}
 		}
 
 		// If something has changed we have more work to be done
@@ -403,14 +572,18 @@ public class UIPanel : MonoBehaviour
 		{
 			// Sort all widgets based on their depth
 			mWidgets.Sort(UIWidget.CompareFunc);
-			foreach (Material mat in mChanged) Rebuild(mat);
+			foreach (Material mat in mChanged)
+			{
+				Debug.Log("Rebuilding " + mat.name);
+				Rebuild(mat);
+			}
 
 			// Run through all the materials that have been marked as changed and rebuild them
 			mChanged.Clear();
 		}
 
 		// Update the clipping rects
-		UpdateClippingRect();
+		UpdateDrawcalls();
 
 #if UNITY_EDITOR
 		mScreenSize = new Vector2(Screen.width, Screen.height);
@@ -499,13 +672,6 @@ public class UIPanel : MonoBehaviour
 			// Rebuild the draw call's mesh
 			UIDrawCall dc = GetDrawCall(mat, true);
 			dc.Set(mVerts, generateNormals ? mNorms : null, generateNormals ? mTans : null, mUvs, mCols);
-
-			// Set the draw call's transform to match the panel's.
-			// Note that parenting directly to the panel causes unity to crash as soon as you hit Play.
-			Transform dt = dc.transform;
-			dt.position = mTrans.position;
-			dt.rotation = mTrans.rotation;
-			dt.localScale = mTrans.lossyScale;
 		}
 		else
 		{

@@ -142,12 +142,18 @@ public abstract class Tweener : MonoBehaviour
 	/// Manually activate the tweening process, reversing it if necessary.
 	/// </summary>
 
-	public void Activate (bool forward)
+	public void Play (bool forward)
 	{
 		mAmountPerDelta = Mathf.Abs(amountPerDelta);
 		if (!forward) mAmountPerDelta = -mAmountPerDelta;
 		enabled = true;
 	}
+
+	/// <summary>
+	/// Manually reset the tweener's state to the beginning.
+	/// </summary>
+
+	public void Reset() { mFactor = (mAmountPerDelta < 0f) ? 1f : 0f; }
 
 	/// <summary>
 	/// Manually start the tweening process, reversing its direction.

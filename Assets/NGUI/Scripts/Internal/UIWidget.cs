@@ -41,9 +41,9 @@ public abstract class UIWidget : MonoBehaviour
 	protected bool mPlayMode = true;
 
 	bool mStarted = false;
-	Vector3 mPos;
-	Quaternion mRot;
-	Vector3 mScale;
+	Vector3 mDiffPos;
+	Quaternion mDiffRot;
+	Vector3 mDiffScale;
 	int mVisibleFlag = -1;
 
 	/// <summary>
@@ -207,7 +207,19 @@ public abstract class UIWidget : MonoBehaviour
 	/// Cache the transform.
 	/// </summary>
 
-	void Awake () { mPlayMode = Application.isPlaying; }
+	void Awake ()
+	{
+		if (GetComponents<UIWidget>().Length > 1)
+		{
+			Debug.LogError("Can't have more than one widget on the same game object.\nDestroying the second one.", this);
+			if (Application.isPlaying) DestroyImmediate(this);
+			else Destroy(this);
+		}
+		else
+		{
+			mPlayMode = Application.isPlaying;
+		}
+	}
 
 	/// <summary>
 	/// Calculate depth automatically.
@@ -328,33 +340,7 @@ public abstract class UIWidget : MonoBehaviour
 	public bool PanelUpdate ()
 	{
 		if (material == null) return false;
-
-		Transform t = cachedTransform;
-
 		bool retVal = OnUpdate() | mChanged;
-
-		if (retVal)
-		{
-			// If something has changed, simply update the cached values
-			mPos = t.position;
-			mRot = t.rotation;
-			mScale = t.lossyScale;
-		}
-		else
-		{
-			Vector3 pos = t.position;
-			Quaternion rot = t.rotation;
-			Vector3 scale = t.lossyScale;
-
-			// Check to see if the position, rotation or scale has changed
-			if (mPos != pos || mRot != rot || mScale != scale)
-			{
-				mPos = pos;
-				mRot = rot;
-				mScale = scale;
-				retVal = true;
-			}
-		}
 		mChanged = false;
 		return retVal;
 	}
