@@ -179,30 +179,14 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Update the world-to-local transform matrix as well as clipping bounds.
+	/// Helper function to retrieve the node of the specified transform.
 	/// </summary>
 
-	void UpdateTransformMatrix ()
+	UINode GetNode (Transform t)
 	{
-		float time = Time.time;
-
-		if (time == 0f || mMatrixTime != time)
-		{
-			mMatrixTime = time;
-			mWorldToLocal = cachedTransform.worldToLocalMatrix;
-
-			Vector2 size = new Vector2(mClipRange.z, mClipRange.w);
-
-			if (mClipping == UIDrawCall.Clipping.None || size.x == 0f) size.x = Screen.width;
-			if (mClipping == UIDrawCall.Clipping.None || size.y == 0f) size.y = Screen.height;
-
-			size *= 0.5f;
-
-			mMin.x = mClipRange.x - size.x;
-			mMin.y = mClipRange.y - size.y;
-			mMax.x = mClipRange.x + size.x;
-			mMax.y = mClipRange.y + size.y;
-		}
+		UINode node = null;
+		if (t != null) mChildren.TryGetValue(t, out node);
+		return node;
 	}
 
 	/// <summary>
@@ -277,49 +261,6 @@ public class UIPanel : MonoBehaviour
 	/// </summary>
 
 	public void MarkMaterialAsChanged (Material mat) { if (mat != null && !mChanged.Contains(mat)) mChanged.Add(mat); }
-
-	/// <summary>
-	/// Update the clipping rect in the shaders and draw calls' positions.
-	/// </summary>
-
-	void UpdateDrawcalls ()
-	{
-		Vector4 range = Vector4.zero;
-
-		if (mClipping != UIDrawCall.Clipping.None)
-		{
-			range = new Vector4(mClipRange.x, mClipRange.y, mClipRange.z * 0.5f, mClipRange.w * 0.5f);
-		}
-
-		if (range.z == 0f) range.z = Screen.width * 0.5f;
-		if (range.w == 0f) range.w = Screen.height * 0.5f;
-
-		RuntimePlatform platform = Application.platform;
-
-		if (platform == RuntimePlatform.WindowsPlayer ||
-			platform == RuntimePlatform.WindowsWebPlayer ||
-			platform == RuntimePlatform.WindowsEditor)
-		{
-			range.x -= 0.5f;
-			range.y += 0.5f;
-		}
-
-		Transform t = cachedTransform;
-
-		foreach (UIDrawCall dc in mDrawCalls)
-		{
-			dc.clipping = mClipping;
-			dc.clipRange = range;
-			dc.clipSoftness = mClipSoftness;
-
-			// Set the draw call's transform to match the panel's.
-			// Note that parenting directly to the panel causes unity to crash as soon as you hit Play.
-			Transform dt = dc.transform;
-			dt.position = t.position;
-			dt.rotation = t.rotation;
-			dt.localScale = t.lossyScale;
-		}
-	}
 
 	/// <summary>
 	/// Add the specified transform to the managed list.
@@ -514,24 +455,38 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Helper function to retrieve the node of the specified transform.
+	/// Update the world-to-local transform matrix as well as clipping bounds.
 	/// </summary>
 
-	UINode GetNode (Transform t)
+	void UpdateTransformMatrix ()
 	{
-		UINode node = null;
-		if (t != null) mChildren.TryGetValue(t, out node);
-		return node;
+		float time = Time.time;
+
+		if (time == 0f || mMatrixTime != time)
+		{
+			mMatrixTime = time;
+			mWorldToLocal = cachedTransform.worldToLocalMatrix;
+
+			Vector2 size = new Vector2(mClipRange.z, mClipRange.w);
+
+			if (mClipping == UIDrawCall.Clipping.None || size.x == 0f) size.x = Screen.width;
+			if (mClipping == UIDrawCall.Clipping.None || size.y == 0f) size.y = Screen.height;
+
+			size *= 0.5f;
+
+			mMin.x = mClipRange.x - size.x;
+			mMin.y = mClipRange.y - size.y;
+			mMax.x = mClipRange.x + size.x;
+			mMax.y = mClipRange.y + size.y;
+		}
 	}
 
 	/// <summary>
-	/// Update all widgets and rebuild the draw calls if necessary.
+	/// Run through all managed transforms and see if they've changed.
 	/// </summary>
 
-	public void LateUpdate ()
+	void UpdateTransforms ()
 	{
-		UpdateTransformMatrix();
-
 		bool transformsChanged = false;
 
 		// Check to see if something has changed
@@ -545,13 +500,13 @@ public class UIPanel : MonoBehaviour
 			}
 			else if (pc.HasChanged())
 			{
-				//Debug.Log("Changed: " + pc.trans.name);
 				pc.changeFlag = 1;
 				transformsChanged = true;
 			}
 			else pc.changeFlag = -1;
 		}
 
+		// Clean up deleted transforms
 		foreach (Transform rem in mRemoved) mChildren.Remove(rem);
 		mRemoved.Clear();
 
@@ -559,7 +514,7 @@ public class UIPanel : MonoBehaviour
 		// An alternative (but slower) approach would be to do a pc.trans.GetComponentsInChildren<UIWidget>()
 		// in the loop above, and mark each one as dirty.
 
-		if (mRebuildAll || transformsChanged)
+		if (transformsChanged || mRebuildAll)
 		{
 			foreach (KeyValuePair<Transform, UINode> child in mChildren)
 			{
@@ -578,8 +533,6 @@ public class UIPanel : MonoBehaviour
 						// If the widget is visible (or the flag hasn't been set yet)
 						if (visibleFlag == 1 || pc.visibleFlag != 0)
 						{
-							//Debug.Log("Marking: " + pc.trans.name);
-
 							// Update the visibility flag
 							pc.visibleFlag = visibleFlag;
 							Material mat = pc.widget.material;
@@ -591,16 +544,14 @@ public class UIPanel : MonoBehaviour
 				}
 			}
 		}
+	}
 
-		// Always move widgets to the panel's layer
-		if (mLayer != gameObject.layer)
-		{
-			mLayer = gameObject.layer;
-			SetChildLayer(cachedTransform, mLayer);
-			foreach (UIDrawCall dc in drawCalls) dc.gameObject.layer = mLayer;
-		}
+	/// <summary>
+	/// Update all widgets and rebuild their geometry if necessary.
+	/// </summary>
 
-		// Update all widgets and rebuild their geometry if necessary
+	void UpdateWidgets ()
+	{
 		foreach (KeyValuePair<Transform, UINode> c in mChildren)
 		{
 			UINode pc = c.Value;
@@ -610,8 +561,6 @@ public class UIPanel : MonoBehaviour
 			{
 				if (pc.widget.PanelUpdate() || pc.verts == null || pc.verts.Count == 0)
 				{
-					//Debug.Log("Rebuilding " + pc.trans.name);
-
 					// Rebuild the widget's geometry
 					Vector3 offset = pc.widget.pivotOffset;
 					Vector2 scale = pc.widget.relativeSize;
@@ -625,54 +574,54 @@ public class UIPanel : MonoBehaviour
 
 				if (pc.verts.Count > 0 && (pc.changeFlag == 1 || pc.rtpVerts == null || pc.rtpVerts.Count != pc.verts.Count))
 				{
-					//Debug.Log("Transforming " + pc.trans.name);
 					pc.TransformVerts(mWorldToLocal * pc.trans.localToWorldMatrix, generateNormals);
 				}
 			}
 		}
-
-		// If the depth has changed, we need to re-sort the widgets
-		if (mDepthChanged)
-		{
-			mDepthChanged = false;
-			mWidgets.Sort(UIWidget.CompareFunc);
-			//Debug.Log("Sorted");
-		}
-
-		// Fill the draw calls for all of the changed materials
-		foreach (Material mat in mChanged) Fill(mat);
-
-		// Update the clipping rects
-		UpdateDrawcalls();
-		mChanged.Clear();
-		mRebuildAll = false;
-
-#if UNITY_EDITOR
-		mScreenSize = new Vector2(Screen.width, Screen.height);
-#endif
 	}
-
-#if UNITY_EDITOR
 
 	/// <summary>
-	/// Draw a visible pink outline for the clipped area.
+	/// Update the clipping rect in the shaders and draw calls' positions.
 	/// </summary>
 
-	void OnDrawGizmos ()
+	void UpdateDrawcalls ()
 	{
-		if (mDebugInfo == DebugInfo.Gizmos && mClipping != UIDrawCall.Clipping.None)
+		Vector4 range = Vector4.zero;
+
+		if (mClipping != UIDrawCall.Clipping.None)
 		{
-			Vector2 size = new Vector2(mClipRange.z, mClipRange.w);
+			range = new Vector4(mClipRange.x, mClipRange.y, mClipRange.z * 0.5f, mClipRange.w * 0.5f);
+		}
 
-			if (size.x == 0f) size.x = mScreenSize.x;
-			if (size.y == 0f) size.y = mScreenSize.y;
+		if (range.z == 0f) range.z = Screen.width * 0.5f;
+		if (range.w == 0f) range.w = Screen.height * 0.5f;
 
-			Gizmos.matrix = transform.localToWorldMatrix;
-			Gizmos.color = Color.magenta;
-			Gizmos.DrawWireCube(new Vector2(mClipRange.x, mClipRange.y), size);
+		RuntimePlatform platform = Application.platform;
+
+		if (platform == RuntimePlatform.WindowsPlayer ||
+			platform == RuntimePlatform.WindowsWebPlayer ||
+			platform == RuntimePlatform.WindowsEditor)
+		{
+			range.x -= 0.5f;
+			range.y += 0.5f;
+		}
+
+		Transform t = cachedTransform;
+
+		foreach (UIDrawCall dc in mDrawCalls)
+		{
+			dc.clipping = mClipping;
+			dc.clipRange = range;
+			dc.clipSoftness = mClipSoftness;
+
+			// Set the draw call's transform to match the panel's.
+			// Note that parenting directly to the panel causes unity to crash as soon as you hit Play.
+			Transform dt = dc.transform;
+			dt.position = t.position;
+			dt.rotation = t.rotation;
+			dt.localScale = t.lossyScale;
 		}
 	}
-#endif
 
 	/// <summary>
 	/// Set the draw call's geometry responsible for the specified material.
@@ -727,6 +676,65 @@ public class UIPanel : MonoBehaviour
 		mUvs.Clear();
 		mCols.Clear();
 	}
+
+	/// <summary>
+	/// Update all widgets and rebuild the draw calls if necessary.
+	/// </summary>
+
+	public void LateUpdate ()
+	{
+		UpdateTransformMatrix();
+		UpdateTransforms();
+
+		// Always move widgets to the panel's layer
+		if (mLayer != gameObject.layer)
+		{
+			mLayer = gameObject.layer;
+			SetChildLayer(cachedTransform, mLayer);
+			foreach (UIDrawCall dc in drawCalls) dc.gameObject.layer = mLayer;
+		}
+
+		UpdateWidgets();
+
+		// If the depth has changed, we need to re-sort the widgets
+		if (mDepthChanged)
+		{
+			mDepthChanged = false;
+			mWidgets.Sort(UIWidget.CompareFunc);
+		}
+
+		// Fill the draw calls for all of the changed materials
+		foreach (Material mat in mChanged) Fill(mat);
+
+		// Update the clipping rects
+		UpdateDrawcalls();
+		mChanged.Clear();
+		mRebuildAll = false;
+#if UNITY_EDITOR
+		mScreenSize = new Vector2(Screen.width, Screen.height);
+	}
+
+	/// <summary>
+	/// Draw a visible pink outline for the clipped area.
+	/// </summary>
+
+	void OnDrawGizmos ()
+	{
+		if (mDebugInfo == DebugInfo.Gizmos && mClipping != UIDrawCall.Clipping.None)
+		{
+			Vector2 size = new Vector2(mClipRange.z, mClipRange.w);
+
+			if (size.x == 0f) size.x = mScreenSize.x;
+			if (size.y == 0f) size.y = mScreenSize.y;
+
+			Gizmos.matrix = transform.localToWorldMatrix;
+			Gizmos.color = Color.magenta;
+			Gizmos.DrawWireCube(new Vector2(mClipRange.x, mClipRange.y), size);
+		}
+	}
+#else
+	}
+#endif
 
 	/// <summary>
 	/// Helper function that recursively sets all childrens' game objects layers to the specified value, stopping when it hits another UIPanel.

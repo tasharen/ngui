@@ -254,7 +254,7 @@ public abstract class UIWidget : MonoBehaviour
 		if (mPanel == null) CreatePanel();
 		
 		// Automatically reset the Z scaling component back to 1 as it's not used
-		Vector3 scale = mTrans.localScale;
+		Vector3 scale = cachedTransform.localScale;
 
 		if (scale.z != 1f)
 		{
