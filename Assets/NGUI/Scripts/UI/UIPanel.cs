@@ -34,6 +34,9 @@ public class UIPanel : MonoBehaviour
 	[SerializeField] Vector2 mClipSoftness = new Vector2(40f, 40f);
 #endif
 
+	// List of managed transforms
+	Dictionary<Transform, UINode> mChildren = new Dictionary<Transform, UINode>();
+
 	// List of all widgets managed by this panel
 	List<UIWidget> mWidgets = new List<UIWidget>();
 
@@ -52,6 +55,8 @@ public class UIPanel : MonoBehaviour
 
 	Transform mTrans;
 	int mLayer = -1;
+	bool mDepthChanged = false;
+	bool mRebuildAll = false;
 
 	float mMatrixTime = 0f;
 	Matrix4x4 mWorldToLocal = Matrix4x4.identity;
@@ -61,10 +66,19 @@ public class UIPanel : MonoBehaviour
 	Vector2 mMin = Vector2.zero;
 	Vector2 mMax = Vector2.zero;
 
+	// When traversing through the child dictionary, deleted values are stored here
+	static List<Transform> mRemoved = new List<Transform>();
+
 #if UNITY_EDITOR
 	// Screen size, saved for gizmos, since Screen.width and Screen.height returns the Scene view's dimensions in OnDrawGizmos.
 	Vector2 mScreenSize = Vector2.one;
 #endif
+
+	/// <summary>
+	/// Cached for speed.
+	/// </summary>
+
+	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
 
 	/// <summary>
 	/// Whether the panel's generated geometry will be hidden or not.
@@ -165,18 +179,17 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Returns whether the specified rectangle is visible by the panel. The coordinates must be in world space.
+	/// Update the world-to-local transform matrix as well as clipping bounds.
 	/// </summary>
 
-	bool IsVisible (Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+	void UpdateTransformMatrix ()
 	{
 		float time = Time.time;
 
 		if (time == 0f || mMatrixTime != time)
 		{
 			mMatrixTime = time;
-			if (mTrans == null) mTrans = transform;
-			mWorldToLocal = mTrans.worldToLocalMatrix;
+			mWorldToLocal = cachedTransform.worldToLocalMatrix;
 
 			Vector2 size = new Vector2(mClipRange.z, mClipRange.w);
 
@@ -190,6 +203,15 @@ public class UIPanel : MonoBehaviour
 			mMax.x = mClipRange.x + size.x;
 			mMax.y = mClipRange.y + size.y;
 		}
+	}
+
+	/// <summary>
+	/// Returns whether the specified rectangle is visible by the panel. The coordinates must be in world space.
+	/// </summary>
+
+	bool IsVisible (Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+	{
+		UpdateTransformMatrix();
 
 		// Transform the specified points from world space to local space
 		a = mWorldToLocal.MultiplyPoint3x4(a);
@@ -226,6 +248,8 @@ public class UIPanel : MonoBehaviour
 
 	public bool IsVisible (UIWidget w)
 	{
+		if (!w.enabled || !w.gameObject.active || w.color.a < 0.001f) return false;
+
 		Transform wt = w.cachedTransform;
 		Vector2 size = w.relativeSize;
 		Vector2 a = Vector2.Scale(w.pivotOffset, size);
@@ -243,27 +267,16 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Called by widgets when their depth changes.
+	/// </summary>
+
+	public void MarkDepthAsChanged () { mDepthChanged = true; }
+
+	/// <summary>
 	/// Helper function that marks the specified material as having changed so its mesh is rebuilt next frame.
 	/// </summary>
 
-	void MarkAsChanged (Material mat) { if (!mChanged.Contains(mat)) mChanged.Add(mat); }
-
-	/// <summary>
-	/// If the widget is visible, mark the material queue as having changed.
-	/// </summary>
-
-	void MarkAsChanged (UIWidget w)
-	{
-		bool isVisible = IsVisible(w);
-
-		// Only mark the list as changed if the widget is or was visible
-		if (isVisible || w.visibleFlag != 0)
-		{
-			w.visibleFlag = isVisible ? 1 : 0;
-			Material mat = w.material;
-			if (!mChanged.Contains(mat)) mChanged.Add(mat);
-		}
-	}
+	public void MarkMaterialAsChanged (Material mat) { if (mat != null && !mChanged.Contains(mat)) mChanged.Add(mat); }
 
 	/// <summary>
 	/// Update the clipping rect in the shaders and draw calls' positions.
@@ -272,8 +285,6 @@ public class UIPanel : MonoBehaviour
 	void UpdateDrawcalls ()
 	{
 		Vector4 range = Vector4.zero;
-
-		if (mTrans == null) mTrans = transform;
 
 		if (mClipping != UIDrawCall.Clipping.None)
 		{
@@ -293,6 +304,8 @@ public class UIPanel : MonoBehaviour
 			range.y += 0.5f;
 		}
 
+		Transform t = cachedTransform;
+
 		foreach (UIDrawCall dc in mDrawCalls)
 		{
 			dc.clipping = mClipping;
@@ -302,14 +315,11 @@ public class UIPanel : MonoBehaviour
 			// Set the draw call's transform to match the panel's.
 			// Note that parenting directly to the panel causes unity to crash as soon as you hit Play.
 			Transform dt = dc.transform;
-			dt.position = mTrans.position;
-			dt.rotation = mTrans.rotation;
-			dt.localScale = mTrans.lossyScale;
+			dt.position = t.position;
+			dt.rotation = t.rotation;
+			dt.localScale = t.lossyScale;
 		}
 	}
-
-	// TODO: Move this
-	Dictionary<Transform, UINode> mChildren = new Dictionary<Transform, UINode>();
 
 	/// <summary>
 	/// Add the specified transform to the managed list.
@@ -317,18 +327,28 @@ public class UIPanel : MonoBehaviour
 
 	UINode AddTransform (Transform t)
 	{
-		UINode val = null;
+		UINode node = null;
+		UINode retVal = null;
 
-		if (t != mTrans && !mChildren.TryGetValue(t, out val))
+		// Add transforms all the way up to the panel
+		while (t != null && t != cachedTransform)
 		{
-			val = new UINode(t);
-			mChildren.Add(t, val);
-
-			// Keep adding transforms all the way up to the panel
-			Transform parent = t.parent;
-			if (parent != null) AddTransform(parent);
+			// If the node is already managed, we're done
+			if (mChildren.TryGetValue(t, out node))
+			{
+				if (retVal == null) retVal = node;
+				break;
+			}
+			else
+			{
+				// The node is not yet managed -- add it to the list
+				node = new UINode(t);
+				if (retVal == null) retVal = node;
+				mChildren.Add(t, node);
+				t = t.parent;
+			}
 		}
-		return val;
+		return retVal;
 	}
 
 	/// <summary>
@@ -337,14 +357,12 @@ public class UIPanel : MonoBehaviour
 
 	void RemoveTransform (Transform t)
 	{
-		if (mChildren.Remove(t))
+		if (t != null)
 		{
-			Transform parent = t.parent;
-
-			// Remove the parent as well if it has no widgets to manage
-			if (parent != null && parent.GetComponentInChildren<UIWidget>() == null)
+			while (mChildren.Remove(t))
 			{
-				RemoveTransform(parent);
+				t = t.parent;
+				if (t == null || t == cachedTransform || t.GetComponentInChildren<UIWidget>() != null) break;
 			}
 		}
 	}
@@ -355,13 +373,18 @@ public class UIPanel : MonoBehaviour
 
 	public void AddWidget (UIWidget w)
 	{
-		if (w == null || mWidgets.Contains(w)) return;
-		Material mat = w.material;
-		if (mat == null) return;
-		mWidgets.Add(w);
-		UINode ch = AddTransform(w.cachedTransform);
-		if (ch != null) ch.widget = w;
-		if (!mChanged.Contains(w.material)) mChanged.Add(w.material);
+		if (w != null)
+		{
+			UINode node = AddTransform(w.cachedTransform);
+			node.widget = w;
+
+			if (!mWidgets.Contains(w))
+			{
+				mWidgets.Add(w);
+				if (!mChanged.Contains(w.material)) mChanged.Add(w.material);
+				mDepthChanged = true;
+			}
+		}
 	}
 
 	/// <summary>
@@ -370,29 +393,21 @@ public class UIPanel : MonoBehaviour
 
 	public void RemoveWidget (UIWidget w)
 	{
-		if (w != null && mWidgets.Remove(w))
+		if (w != null)
 		{
-			UINode pc;
-			
-			// Get the managed transform node
-			if (mChildren.TryGetValue(w.cachedTransform, out pc))
+			// Do we have this node? Mark the widget's material as having been changed
+			UINode pc = GetNode(w.cachedTransform);
+
+			if (pc != null)
 			{
-				// Add the widget's material to the list of changed materials
+				// Mark the material as having been changed
 				if (pc.visibleFlag == 1 && !mChanged.Contains(w.material)) mChanged.Add(w.material);
 
-				// Remove this transform from the managed list
+				// Remove this transform
 				RemoveTransform(w.cachedTransform);
 			}
-			else
-			{
-				Debug.LogWarning("This is unexpected... widget's transform is not managed?", w);
-			}
+			mWidgets.Remove(w);
 		}
-	}
-
-	void OnGUI ()
-	{
-		GUI.Label(new Rect(5f, 5f - mTrans.localPosition.z * 30f, 200f, 20f), name + ": " + mChildren.Count);
 	}
 
 	/// <summary>
@@ -418,7 +433,6 @@ public class UIPanel : MonoBehaviour
 			go.layer = gameObject.layer;
 			sc = go.AddComponent<UIDrawCall>();
 			sc.material = mat;
-
 			mDrawCalls.Add(sc);
 		}
 		return sc;
@@ -434,7 +448,11 @@ public class UIPanel : MonoBehaviour
 	/// Mark all widgets as having been changed so the draw calls get re-created.
 	/// </summary>
 
-	void OnEnable () { foreach (UIWidget w in mWidgets) MarkAsChanged(w.material); }
+	void OnEnable ()
+	{
+		foreach (UIWidget w in mWidgets) AddWidget(w);
+		mRebuildAll = true;
+	}
 
 	/// <summary>
 	/// Destroy all draw calls we've created when this script gets disabled.
@@ -449,6 +467,7 @@ public class UIPanel : MonoBehaviour
 		}
 		mDrawCalls.Clear();
 		mChanged.Clear();
+		mChildren.Clear();
 	}
 
 	// Temporary list used in GetChangeFlag()
@@ -495,32 +514,52 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Helper function to retrieve the node of the specified transform.
+	/// </summary>
+
+	UINode GetNode (Transform t)
+	{
+		UINode node = null;
+		if (t != null) mChildren.TryGetValue(t, out node);
+		return node;
+	}
+
+	/// <summary>
 	/// Update all widgets and rebuild the draw calls if necessary.
 	/// </summary>
 
 	public void LateUpdate ()
 	{
-		bool change = false;
+		UpdateTransformMatrix();
+
+		bool transformsChanged = false;
 
 		// Check to see if something has changed
 		foreach (KeyValuePair<Transform, UINode> child in mChildren)
 		{
 			UINode pc = child.Value;
 
-			if (pc.HasChanged())
+			if (pc.trans == null)
 			{
-				Debug.Log("Changed: " + pc.trans.name);
+				mRemoved.Add(pc.trans);
+			}
+			else if (pc.HasChanged())
+			{
+				//Debug.Log("Changed: " + pc.trans.name);
 				pc.changeFlag = 1;
-				change = true;
+				transformsChanged = true;
 			}
 			else pc.changeFlag = -1;
 		}
+
+		foreach (Transform rem in mRemoved) mChildren.Remove(rem);
+		mRemoved.Clear();
 
 		// If something has changed, propagate the changes *down* the tree hierarchy (to children).
 		// An alternative (but slower) approach would be to do a pc.trans.GetComponentsInChildren<UIWidget>()
 		// in the loop above, and mark each one as dirty.
 
-		if (change)
+		if (mRebuildAll || transformsChanged)
 		{
 			foreach (KeyValuePair<Transform, UINode> child in mChildren)
 			{
@@ -531,18 +570,23 @@ public class UIPanel : MonoBehaviour
 					// If the change flag has not yet been determined...
 					if (pc.changeFlag == -1) pc.changeFlag = GetChangeFlag(pc);
 
-					// Is the widget visible?
-					int visibleFlag = IsVisible(pc.widget) ? 1 : 0;
-
-					// If the widget is visible (or the flag hasn't been set yet)
-					if (visibleFlag == 1 || pc.visibleFlag != 0)
+					if (pc.changeFlag == 1)
 					{
-						// Update the visibility flag
-						pc.visibleFlag = visibleFlag;
-						Material mat = pc.widget.material;
+						// Is the widget visible?
+						int visibleFlag = IsVisible(pc.widget) ? 1 : 0;
 
-						// Add this material to the list of changed materials
-						if (!mChanged.Contains(mat)) mChanged.Add(mat);
+						// If the widget is visible (or the flag hasn't been set yet)
+						if (visibleFlag == 1 || pc.visibleFlag != 0)
+						{
+							//Debug.Log("Marking: " + pc.trans.name);
+
+							// Update the visibility flag
+							pc.visibleFlag = visibleFlag;
+							Material mat = pc.widget.material;
+
+							// Add this material to the list of changed materials
+							if (!mChanged.Contains(mat)) mChanged.Add(mat);
+						}
 					}
 				}
 			}
@@ -552,38 +596,56 @@ public class UIPanel : MonoBehaviour
 		if (mLayer != gameObject.layer)
 		{
 			mLayer = gameObject.layer;
-			SetChildLayer(mTrans, mLayer);
+			SetChildLayer(cachedTransform, mLayer);
 			foreach (UIDrawCall dc in drawCalls) dc.gameObject.layer = mLayer;
 		}
 
-		// Update all widgets
-		if (mWidgets.Count > 0)
+		// Update all widgets and rebuild their geometry if necessary
+		foreach (KeyValuePair<Transform, UINode> c in mChildren)
 		{
-			for (int i = mWidgets.Count; i > 0; )
+			UINode pc = c.Value;
+
+			// If the widget is visible, update it
+			if (pc.visibleFlag == 1 && pc.widget != null)
 			{
-				UIWidget w = mWidgets[--i];
-				if (w == null) mWidgets.RemoveAt(i);
-				else if (w.PanelUpdate()) MarkAsChanged(w);
+				if (pc.widget.PanelUpdate() || pc.verts == null || pc.verts.Count == 0)
+				{
+					//Debug.Log("Rebuilding " + pc.trans.name);
+
+					// Rebuild the widget's geometry
+					Vector3 offset = pc.widget.pivotOffset;
+					Vector2 scale = pc.widget.relativeSize;
+					offset.x *= scale.x;
+					offset.y *= scale.y;
+					pc.Rebuild(offset);
+
+					// We will need to refill this buffer
+					if (!mChanged.Contains(pc.widget.material)) mChanged.Add(pc.widget.material);
+				}
+
+				if (pc.verts.Count > 0 && (pc.changeFlag == 1 || pc.rtpVerts == null || pc.rtpVerts.Count != pc.verts.Count))
+				{
+					//Debug.Log("Transforming " + pc.trans.name);
+					pc.TransformVerts(mWorldToLocal * pc.trans.localToWorldMatrix, generateNormals);
+				}
 			}
 		}
 
-		// If something has changed we have more work to be done
-		if (mChanged.Count > 0)
+		// If the depth has changed, we need to re-sort the widgets
+		if (mDepthChanged)
 		{
-			// Sort all widgets based on their depth
+			mDepthChanged = false;
 			mWidgets.Sort(UIWidget.CompareFunc);
-			foreach (Material mat in mChanged)
-			{
-				Debug.Log("Rebuilding " + mat.name);
-				Rebuild(mat);
-			}
-
-			// Run through all the materials that have been marked as changed and rebuild them
-			mChanged.Clear();
+			//Debug.Log("Sorted");
 		}
+
+		// Fill the draw calls for all of the changed materials
+		foreach (Material mat in mChanged) Fill(mat);
 
 		// Update the clipping rects
 		UpdateDrawcalls();
+		mChanged.Clear();
+		mRebuildAll = false;
 
 #if UNITY_EDITOR
 		mScreenSize = new Vector2(Screen.width, Screen.height);
@@ -616,53 +678,26 @@ public class UIPanel : MonoBehaviour
 	/// Set the draw call's geometry responsible for the specified material.
 	/// </summary>
 
-	void Rebuild (Material mat)
+	void Fill (Material mat)
 	{
-		Matrix4x4 worldToPanel = mTrans.worldToLocalMatrix;
+		// Cleanup deleted widgets
+		for (int i = mWidgets.Count; i > 0; ) if (mWidgets[--i] == null) mWidgets.RemoveAt(i);
 
+		// Fill the buffers for the specified material
 		foreach (UIWidget w in mWidgets)
 		{
-			int flag = w.visibleFlag;
-
-			if (flag == -1)
+			if (w.visibleFlag == 1 && w.material == mat)
 			{
-				flag = IsVisible(w) ? 1 : 0;
-				w.visibleFlag = flag;
-			}
+				UINode node = GetNode(w.cachedTransform);
 
-			if (flag == 0 || w.material != mat || w.color.a < 0.001f) continue;
-			if (!w.enabled || !w.gameObject.active) continue;
-			int index = mVerts.Count;
-
-			// Fill the geometry
-			w.OnFill(mVerts, mUvs, mCols);
-
-			Vector3 offset = w.pivotOffset;
-			Vector2 scale = w.relativeSize;
-			offset.x *= scale.x;
-			offset.y *= scale.y;
-
-			// We want all vertices to be relative to the panel
-			Matrix4x4 widgetToPanel = worldToPanel * w.cachedTransform.localToWorldMatrix;
-
-			if (generateNormals)
-			{
-				Vector3 normal  = widgetToPanel.MultiplyVector(Vector3.back);
-				Vector3 tangent = widgetToPanel.MultiplyVector(Vector3.right);
-				Vector4 tan4 = new Vector4(tangent.x, tangent.y, tangent.z, -1f);
-
-				for (int i = index, imax = mVerts.Count; i < imax; ++i)
+				if (node != null)
 				{
-					mVerts[i] = widgetToPanel.MultiplyPoint3x4(mVerts[i] + offset);
-					mNorms.Add(normal);
-					mTans.Add(tan4);
+					if (generateNormals) node.Fill(mVerts, mUvs, mCols, mNorms, mTans);
+					else node.Fill(mVerts, mUvs, mCols, null, null);
 				}
-			}
-			else
-			{
-				for (int i = index, imax = mVerts.Count; i < imax; ++i)
+				else
 				{
-					mVerts[i] = widgetToPanel.MultiplyPoint3x4(mVerts[i] + offset);
+					Debug.LogError("No transform found for " + NGUITools.GetHierarchy(w.gameObject));
 				}
 			}
 		}
@@ -736,7 +771,7 @@ public class UIPanel : MonoBehaviour
 		if (createIfMissing && panel == null)
 		{
 			panel = trans.gameObject.AddComponent<UIPanel>();
-			SetChildLayer(panel.mTrans, panel.gameObject.layer);
+			SetChildLayer(panel.cachedTransform, panel.gameObject.layer);
 		}
 		return panel;
 	}

@@ -40,7 +40,6 @@ public abstract class UIWidget : MonoBehaviour
 	protected bool mChanged = true;
 	protected bool mPlayMode = true;
 
-	bool mStarted = false;
 	Vector3 mDiffPos;
 	Quaternion mDiffRot;
 	Vector3 mDiffScale;
@@ -62,7 +61,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Depth controls the rendering order -- lowest to highest.
 	/// </summary>
 
-	public int depth { get { return mDepth; } set { if (mDepth != value) { mDepth = value; mChanged = true; } } }
+	public int depth { get { return mDepth; } set { if (mDepth != value) { mDepth = value; if (mPanel != null) mPanel.MarkDepthAsChanged(); } } }
 
 	/// <summary>
 	/// Transform gets cached for speed.
@@ -222,32 +221,24 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Calculate depth automatically.
-	/// </summary>
-
-	void Start ()
-	{
-		mStarted = true;
-		if (mDepth == 0) mDepth = CalculateDepth();
-		OnStart();
-		if (mMat != null) panel.AddWidget(this);
-	}
-
-	bool mRecentlyEnabled = false;
-
-	/// <summary>
-	/// Mark the widget as having been changed so it gets rebuilt.
+	/// Mark the widget and the panel as having been changed.
 	/// </summary>
 
 	void OnEnable ()
 	{
 		mChanged = true;
-		if (mTrans == null) mTrans = transform;
-		if (mMat != null)
-		{
-			if (mStarted && mMat != null) panel.AddWidget(this);
-			else mRecentlyEnabled = true;
-		}
+		if (mPanel != null && mMat != null) mPanel.MarkMaterialAsChanged(mMat);
+	}
+
+	/// <summary>
+	/// Set the depth, call the virtual start function, and sure we have a panel to work with.
+	/// </summary>
+
+	void Start ()
+	{
+		if (mDepth == 0) mDepth = CalculateDepth();
+		OnStart();
+		CreatePanel();
 	}
 
 	/// <summary>
@@ -259,11 +250,8 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		LayerCheck();
 
-		if (mRecentlyEnabled)
-		{
-			mRecentlyEnabled = false;
-			if (mMat != null) panel.AddWidget(this);
-		}
+		// Ensure we have a panel to work with by now
+		if (mPanel == null) CreatePanel();
 		
 		// Automatically reset the Z scaling component back to 1 as it's not used
 		Vector3 scale = mTrans.localScale;
@@ -276,17 +264,10 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Unregister this widget.
+	/// Don't store any references to the panel.
 	/// </summary>
 
-	void OnDisable ()
-	{
-		if (mPanel != null)
-		{
-			mPanel.RemoveWidget(this);
-			mPanel = null;
-		}
-	}
+	void OnDisable () { if (mPanel != null && mMat != null) mPanel.MarkMaterialAsChanged(mMat); mPanel = null; }
 
 	/// <summary>
 	/// Unregister this widget.

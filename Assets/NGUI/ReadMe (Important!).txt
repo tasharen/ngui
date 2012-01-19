@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.33c
+                Version 1.40
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -35,6 +35,9 @@ All can be found here: http://www.tasharen.com/?page_id=140
 ---------------
 Version History
 ---------------
+
+1.40:
+- FIX: Major performance improvements. The way the geometry was being created has been completely redone.
 
 1.33:
 - NEW: UICheckbox now has a configurable function to call.
