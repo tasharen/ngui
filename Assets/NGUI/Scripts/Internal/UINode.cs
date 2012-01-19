@@ -86,9 +86,10 @@ public class UINode
 
 	public void Rebuild (Vector3 pivotOffset)
 	{
-		if (verts != null) verts.Clear();
-		if (uvs	  != null) uvs.Clear();
-		if (cols  != null) cols.Clear();
+		if (verts	 != null) verts.Clear();
+		if (uvs		 != null) uvs.Clear();
+		if (cols	 != null) cols.Clear();
+		if (rtpVerts != null) rtpVerts.Clear();
 
 		// The widget must be enabled, active, visible, and have a texture
 		if (widget.mainTexture != null &&
