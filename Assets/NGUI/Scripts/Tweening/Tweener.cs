@@ -149,6 +149,9 @@ public abstract class Tweener : MonoBehaviour
 		enabled = true;
 	}
 
+	[System.Obsolete("Use Tweener.Play instead")]
+	public void Animate (bool forward) { Play(forward); }
+
 	/// <summary>
 	/// Manually reset the tweener's state to the beginning.
 	/// </summary>
