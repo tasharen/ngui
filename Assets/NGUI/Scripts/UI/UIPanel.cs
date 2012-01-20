@@ -54,6 +54,7 @@ public class UIPanel : MonoBehaviour
 	List<Color> mCols = new List<Color>();
 
 	Transform mTrans;
+	Camera mCam;
 	int mLayer = -1;
 	bool mDepthChanged = false;
 	bool mRebuildAll = false;
@@ -234,6 +235,9 @@ public class UIPanel : MonoBehaviour
 	{
 		if (!w.enabled || !w.gameObject.active || w.mainTexture == null || w.color.a < 0.001f) return false;
 
+		// No clipping? No point in checking.
+		if (mClipping == UIDrawCall.Clipping.None) return true;
+
 		Vector2 size = w.relativeSize;
 		Vector2 a = Vector2.Scale(w.pivotOffset, size);
 		Vector2 b = a;
@@ -392,7 +396,11 @@ public class UIPanel : MonoBehaviour
 	/// Layer is used to ensure that if it changes, widgets get moved as well.
 	/// </summary>
 
-	void Awake () { mLayer = gameObject.layer; }
+	void Start ()
+	{
+		mLayer = gameObject.layer;
+		mCam = NGUITools.FindCameraForLayer(mLayer);
+	}
 
 	/// <summary>
 	/// Mark all widgets as having been changed so the draw calls get re-created.
@@ -476,17 +484,20 @@ public class UIPanel : MonoBehaviour
 			mMatrixTime = time;
 			mWorldToLocal = cachedTransform.worldToLocalMatrix;
 
-			Vector2 size = new Vector2(mClipRange.z, mClipRange.w);
+			if (mClipping != UIDrawCall.Clipping.None)
+			{
+				Vector2 size = new Vector2(mClipRange.z, mClipRange.w);
 
-			if (mClipping == UIDrawCall.Clipping.None || size.x == 0f) size.x = Screen.width;
-			if (mClipping == UIDrawCall.Clipping.None || size.y == 0f) size.y = Screen.height;
+				if (size.x == 0f) size.x = (mCam == null) ? Screen.width  : mCam.pixelWidth;
+				if (size.y == 0f) size.y = (mCam == null) ? Screen.height : mCam.pixelHeight;
 
-			size *= 0.5f;
+				size *= 0.5f;
 
-			mMin.x = mClipRange.x - size.x;
-			mMin.y = mClipRange.y - size.y;
-			mMax.x = mClipRange.x + size.x;
-			mMax.y = mClipRange.y + size.y;
+				mMin.x = mClipRange.x - size.x;
+				mMin.y = mClipRange.y - size.y;
+				mMax.x = mClipRange.x + size.x;
+				mMax.y = mClipRange.y + size.y;
+			}
 		}
 	}
 
@@ -701,6 +712,7 @@ public class UIPanel : MonoBehaviour
 		if (mLayer != gameObject.layer)
 		{
 			mLayer = gameObject.layer;
+			mCam = NGUITools.FindCameraForLayer(mLayer);
 			SetChildLayer(cachedTransform, mLayer);
 			foreach (UIDrawCall dc in drawCalls) dc.gameObject.layer = mLayer;
 		}
