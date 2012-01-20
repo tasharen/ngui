@@ -74,7 +74,7 @@ public class UIFont : MonoBehaviour
 				if (value == null)
 				{
 					if (mAtlas != null) mMat = mAtlas.material;
-					if (mSprite != null) mUVRect = uvRect;
+					if (sprite != null) mUVRect = uvRect;
 				}
 
 				mSprite = null;
