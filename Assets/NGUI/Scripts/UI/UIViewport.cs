@@ -22,7 +22,7 @@ public class UIViewport : MonoBehaviour
 		if (sourceCamera == null) sourceCamera = Camera.main;
 	}
 
-	void Update ()
+	void LateUpdate ()
 	{
 		if (topLeft != null && bottomRight != null)
 		{
