@@ -234,7 +234,6 @@ public class UIPanel : MonoBehaviour
 	{
 		if (!w.enabled || !w.gameObject.active || w.mainTexture == null || w.color.a < 0.001f) return false;
 
-		Transform wt = w.cachedTransform;
 		Vector2 size = w.relativeSize;
 		Vector2 a = Vector2.Scale(w.pivotOffset, size);
 		Vector2 b = a;
@@ -243,6 +242,7 @@ public class UIPanel : MonoBehaviour
 		a.y -= size.y;
 
 		// Transform coordinates into world space
+		Transform wt = w.cachedTransform;
 		Vector2 v0 = wt.TransformPoint(a);
 		Vector2 v1 = wt.TransformPoint(new Vector2(a.x, b.y));
 		Vector2 v2 = wt.TransformPoint(new Vector2(b.x, a.y));
