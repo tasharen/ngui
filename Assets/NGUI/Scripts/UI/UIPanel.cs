@@ -193,7 +193,7 @@ public class UIPanel : MonoBehaviour
 	/// Returns whether the specified rectangle is visible by the panel. The coordinates must be in world space.
 	/// </summary>
 
-	bool IsVisible (Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+	bool IsVisible (Vector3 a, Vector3 b, Vector3 c, Vector3 d)
 	{
 		UpdateTransformMatrix();
 
@@ -243,10 +243,10 @@ public class UIPanel : MonoBehaviour
 
 		// Transform coordinates into world space
 		Transform wt = w.cachedTransform;
-		Vector2 v0 = wt.TransformPoint(a);
-		Vector2 v1 = wt.TransformPoint(new Vector2(a.x, b.y));
-		Vector2 v2 = wt.TransformPoint(new Vector2(b.x, a.y));
-		Vector2 v3 = wt.TransformPoint(b);
+		Vector3 v0 = wt.TransformPoint(a);
+		Vector3 v1 = wt.TransformPoint(new Vector2(a.x, b.y));
+		Vector3 v2 = wt.TransformPoint(new Vector2(b.x, a.y));
+		Vector3 v3 = wt.TransformPoint(b);
 		return IsVisible(v0, v1, v2, v3);
 	}
 
