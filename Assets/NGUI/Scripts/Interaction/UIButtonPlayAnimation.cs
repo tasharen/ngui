@@ -51,7 +51,8 @@ public class UIButtonPlayAnimation : MonoBehaviour
 	{
 		if (target != null)
 		{
-			Direction dir = forward ? playDirection : ((Direction)(-(int)playDirection));
+			int pd = -(int)playDirection;
+			Direction dir = forward ? playDirection : ((Direction)pd);
 			ActiveAnimation anim = ActiveAnimation.Play(target, clipName, dir, ifDisabledOnPlay, disableWhenFinished);
 			if (anim != null) anim.callWhenFinished = callWhenFinished;
 		}
