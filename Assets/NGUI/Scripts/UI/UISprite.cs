@@ -63,7 +63,7 @@ public class UISprite : UIWidget
 				{
 					if (mAtlas != null && mAtlas.sprites.Count > 0)
 					{
-						mSprite = mAtlas.sprites[0];
+						sprite = mAtlas.sprites[0];
 						mSpriteName = mSprite.name;
 					}
 				}
@@ -100,7 +100,7 @@ public class UISprite : UIWidget
 
 				// Clear the sprite name and the sprite reference
 				mSpriteName = "";
-				mSprite = null;
+				sprite = null;
 				mChanged = true;
 			}
 			else if (mSpriteName != value)
@@ -108,7 +108,7 @@ public class UISprite : UIWidget
 				// If the sprite name changes, the sprite reference should also be updated
 				mLastSprite = value;
 				mSpriteName = value;
-				mSprite = (mAtlas != null) ? mAtlas.GetSprite(mSpriteName) : null;
+				sprite = (mAtlas != null) ? mAtlas.GetSprite(mSpriteName) : null;
 				mChanged = true;
 				if (mSprite != null) UpdateUVs();
 			}
@@ -143,7 +143,7 @@ public class UISprite : UIWidget
 		{
 			if (sprite == null && mAtlas != null && !string.IsNullOrEmpty(mSpriteName))
 			{
-				mSprite = mAtlas.GetSprite(mSpriteName);
+				sprite = mAtlas.GetSprite(mSpriteName);
 			}
 
 			Vector2 v = Vector2.zero;
@@ -232,7 +232,7 @@ public class UISprite : UIWidget
 		if (mAtlas != null)
 		{
 			if (material == null) material = mAtlas.material;
-			if (sprite == null) mSprite = string.IsNullOrEmpty(mSpriteName) ? null : mAtlas.GetSprite(mSpriteName);
+			if (sprite == null) sprite = string.IsNullOrEmpty(mSpriteName) ? null : mAtlas.GetSprite(mSpriteName);
 		}
 	}
 
