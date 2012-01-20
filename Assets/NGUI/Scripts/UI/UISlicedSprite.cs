@@ -26,7 +26,7 @@ public class UISlicedSprite : UISprite
 	{
 		Init();
 
-		if (mSprite != null && (mInner != mSprite.inner || mOuter != mSprite.outer))
+		if (sprite != null && (mInner != mSprite.inner || mOuter != mSprite.outer))
 		{
 			Texture2D tex = mainTexture;
 

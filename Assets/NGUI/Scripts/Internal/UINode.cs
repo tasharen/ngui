@@ -64,7 +64,7 @@ public class UINode
 
 	public bool HasChanged ()
 	{
-		bool isActive = trans.gameObject.active && (widget == null || widget.enabled);
+		bool isActive = trans.gameObject.active && (widget == null || (widget.enabled && widget.color.a > 0.001f));
 
 		if (lastActive != isActive || (isActive &&
 			(lastPos != trans.localPosition ||
@@ -86,26 +86,22 @@ public class UINode
 
 	public void Rebuild (Vector3 pivotOffset)
 	{
+		// Cleanup
 		if (verts	 != null) verts.Clear();
 		if (uvs		 != null) uvs.Clear();
 		if (cols	 != null) cols.Clear();
 		if (rtpVerts != null) rtpVerts.Clear();
 
-		// The widget must be enabled, active, visible, and have a texture
-		if (widget.mainTexture != null &&
-			widget.color.a > 0.001f)
-		{
-			// Ensure we have buffers to work with
-			if (verts	== null) verts	= new List<Vector3>();
-			if (uvs		== null) uvs	= new List<Vector2>();
-			if (cols	== null) cols	= new List<Color>();
+		// Ensure we have buffers to work with
+		if (verts	== null) verts	= new List<Vector3>();
+		if (uvs		== null) uvs	= new List<Vector2>();
+		if (cols	== null) cols	= new List<Color>();
 
-			// Fill the buffers
-			widget.OnFill(verts, uvs, cols);
+		// Fill the buffers
+		widget.OnFill(verts, uvs, cols);
 
-			// Append the offset
-			for (int i = 0, imax = verts.Count; i < imax; ++i) verts[i] += pivotOffset;
-		}
+		// Append the offset
+		for (int i = 0, imax = verts.Count; i < imax; ++i) verts[i] += pivotOffset;
 	}
 
 	/// <summary>

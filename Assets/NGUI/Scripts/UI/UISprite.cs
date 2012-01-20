@@ -26,6 +26,12 @@ public class UISprite : UIWidget
 	protected Rect mOuter;
 	protected Rect mOuterUV;
 
+	// BUG: There is a bug in Unity 3.4.2 and all the way up to 3.5 b7 -- when instantiating from prefabs,
+	// for some strange reason classes get initialized with default values. So for example, 'mSprite' above
+	// gets initialized as if it was created with 'new UIAtlas.Sprite()' instead of 'null'. Fun, huh?
+
+	bool mSpriteSet = false;
+
 	/// <summary>
 	/// Outer set of UV coordinates.
 	/// </summary>
@@ -110,6 +116,24 @@ public class UISprite : UIWidget
 	}
 
 	/// <summary>
+	/// Get the sprite used by the atlas. Work-around for a bug in Unity.
+	/// </summary>
+
+	protected UIAtlas.Sprite sprite
+	{
+		get
+		{
+			if (!mSpriteSet) mSprite = null;
+			return mSprite;
+		}
+		set
+		{
+			mSprite = value;
+			mSpriteSet = true;
+		}
+	}
+
+	/// <summary>
 	/// Helper function that calculates the relative offset based on the current pivot.
 	/// </summary>
 
@@ -117,7 +141,7 @@ public class UISprite : UIWidget
 	{
 		get
 		{
-			if (mSprite == null && mAtlas != null && !string.IsNullOrEmpty(mSpriteName))
+			if (sprite == null && mAtlas != null && !string.IsNullOrEmpty(mSpriteName))
 			{
 				mSprite = mAtlas.GetSprite(mSpriteName);
 			}
@@ -148,7 +172,7 @@ public class UISprite : UIWidget
 	{
 		Init();
 
-		if (mSprite != null && mOuter != mSprite.outer)
+		if (sprite != null && mOuter != mSprite.outer)
 		{
 			Texture2D tex = mainTexture;
 
@@ -208,7 +232,7 @@ public class UISprite : UIWidget
 		if (mAtlas != null)
 		{
 			if (material == null) material = mAtlas.material;
-			if (mSprite == null) mSprite = string.IsNullOrEmpty(mSpriteName) ? null : mAtlas.GetSprite(mSpriteName);
+			if (sprite == null) mSprite = string.IsNullOrEmpty(mSpriteName) ? null : mAtlas.GetSprite(mSpriteName);
 		}
 	}
 

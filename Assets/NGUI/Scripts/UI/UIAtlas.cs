@@ -12,7 +12,7 @@ public class UIAtlas : MonoBehaviour
 	[System.Serializable]
 	public class Sprite
 	{
-		public string name;
+		public string name = "Unity Bug";
 		public Rect outer = new Rect(0f, 0f, 1f, 1f);
 		public Rect inner = new Rect(0f, 0f, 1f, 1f);
 

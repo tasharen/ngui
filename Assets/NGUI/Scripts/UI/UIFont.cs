@@ -28,7 +28,13 @@ public class UIFont : MonoBehaviour
 #endif
 
 	// Cached value
-	UIAtlas.Sprite mSprite;
+	UIAtlas.Sprite mSprite = null;
+
+	// BUG: There is a bug in Unity 3.4.2 and all the way up to 3.5 b7 -- when instantiating from prefabs,
+	// for some strange reason classes get initialized with default values. So for example, 'mSprite' above
+	// gets initialized as if it was created with 'new UIAtlas.Sprite()' instead of 'null'. Fun, huh?
+
+	bool mSpriteSet = false;
 
 	// I'd use a Stack here, but then Flash export wouldn't work as it doesn't support it
 	List<Color> mColors = new List<Color>();
@@ -147,7 +153,7 @@ public class UIFont : MonoBehaviour
 		}
 		set
 		{
-			if (mSprite == null && mUVRect != value)
+			if (sprite == null && mUVRect != value)
 			{
 				mUVRect = value;
 				Refresh();
@@ -183,21 +189,21 @@ public class UIFont : MonoBehaviour
 	/// Retrieves the sprite used by the font, if any.
 	/// </summary>
 
-	UIAtlas.Sprite sprite
+	public UIAtlas.Sprite sprite
 	{
 		get
 		{
-			if (mSprite == null)
+			if (!mSpriteSet) mSprite = null;
+
+			if (mSprite == null && mAtlas != null && !string.IsNullOrEmpty(mSpriteName))
 			{
-				if (mAtlas != null && !string.IsNullOrEmpty(mSpriteName))
+				mSprite = mAtlas.GetSprite(mSpriteName);
+				mSpriteSet = true;
+
+				if (mSprite == null)
 				{
-					mSprite = mAtlas.GetSprite(mSpriteName);
-					
-					if (mSprite == null)
-					{
-						Debug.LogError("Can't find the sprite '" + mSpriteName + "' in UIAtlas on " + NGUITools.GetHierarchy(mAtlas.gameObject));
-						mSpriteName = null;
-					}
+					Debug.LogError("Can't find the sprite '" + mSpriteName + "' in UIAtlas on " + NGUITools.GetHierarchy(mAtlas.gameObject));
+					mSpriteName = null;
 				}
 			}
 			return mSprite;

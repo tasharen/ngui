@@ -232,7 +232,7 @@ public class UIPanel : MonoBehaviour
 
 	public bool IsVisible (UIWidget w)
 	{
-		if (!w.enabled || !w.gameObject.active || w.color.a < 0.001f) return false;
+		if (!w.enabled || !w.gameObject.active || w.mainTexture == null || w.color.a < 0.001f) return false;
 
 		Transform wt = w.cachedTransform;
 		Vector2 size = w.relativeSize;
@@ -317,13 +317,22 @@ public class UIPanel : MonoBehaviour
 		if (w != null)
 		{
 			UINode node = AddTransform(w.cachedTransform);
-			node.widget = w;
 
-			if (!mWidgets.Contains(w))
+			if (node != null)
 			{
-				mWidgets.Add(w);
-				if (!mChanged.Contains(w.material)) mChanged.Add(w.material);
-				mDepthChanged = true;
+				node.widget = w;
+
+				if (!mWidgets.Contains(w))
+				{
+					mWidgets.Add(w);
+					if (!mChanged.Contains(w.material)) mChanged.Add(w.material);
+					mDepthChanged = true;
+				}
+			}
+			else
+			{
+				Debug.LogError("Unable to find an appropriate root to add the widget.\n" +
+					"Please make sure that there is at least one game object above this widget!", this);
 			}
 		}
 	}
@@ -572,7 +581,9 @@ public class UIPanel : MonoBehaviour
 					if (!mChanged.Contains(pc.widget.material)) mChanged.Add(pc.widget.material);
 				}
 
-				if (pc.verts.Count > 0 && (pc.changeFlag == 1 || pc.rtpVerts == null || pc.rtpVerts.Count != pc.verts.Count))
+				// If we have vertices to work with, transform them
+				if ((pc.verts != null && pc.verts.Count > 0) &&
+					(pc.changeFlag == 1 || pc.rtpVerts == null || pc.rtpVerts.Count != pc.verts.Count))
 				{
 					pc.TransformVerts(mWorldToLocal * pc.trans.localToWorldMatrix, generateNormals);
 				}
@@ -755,12 +766,6 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Find the UIPanel responsible for handling the specified transform, creating a new one if necessary.
-	/// </summary>
-
-	static public UIPanel Find (Transform trans) { return Find(trans, true); }
-
-	/// <summary>
 	/// Find the UIPanel responsible for handling the specified transform.
 	/// </summary>
 
@@ -783,4 +788,10 @@ public class UIPanel : MonoBehaviour
 		}
 		return panel;
 	}
+
+	/// <summary>
+	/// Find the UIPanel responsible for handling the specified transform, creating a new one if necessary.
+	/// </summary>
+
+	static public UIPanel Find (Transform trans) { return Find(trans, true); }
 }

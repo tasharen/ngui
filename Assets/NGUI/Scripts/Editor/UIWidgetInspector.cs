@@ -38,29 +38,42 @@ public class UIWidgetInspector : Editor
 		EditorGUIUtility.LookLikeControls(80f);
 		mWidget = target as UIWidget;
 
-		if (!mInitialized)
+#if UNITY_3_4
+		PrefabType type = EditorUtility.GetPrefabType(mWidget.gameObject);
+#else
+		PrefabType type = PrefabUtility.GetPrefabType(mWidget.gameObject);
+#endif
+
+		if (type == PrefabType.Prefab)
 		{
-			mInitialized = true;
-			OnInit();
+			GUILayout.Label("Drag this widget into the scene to modify it.");
 		}
-
-		GUITools.DrawSeparator();
-
-		// Check the hierarchy to ensure that this widget is not parented to another widget
-		if (mHierarchyCheck) CheckHierarchy();
-
-		// This flag gets set to 'true' if RegisterUndo() gets called
-		mRegisteredUndo = false;
-
-		// Check to see if we can draw the widget's default properties to begin with
-		if (OnDrawProperties())
+		else
 		{
-			// Draw all common properties next
-			DrawCommonProperties();
-		}
+			if (!mInitialized)
+			{
+				mInitialized = true;
+				OnInit();
+			}
 
-		// Update the widget's properties if something has changed
-		if (mRegisteredUndo) mWidget.MarkAsChanged();
+			GUITools.DrawSeparator();
+
+			// Check the hierarchy to ensure that this widget is not parented to another widget
+			if (mHierarchyCheck) CheckHierarchy();
+
+			// This flag gets set to 'true' if RegisterUndo() gets called
+			mRegisteredUndo = false;
+
+			// Check to see if we can draw the widget's default properties to begin with
+			if (OnDrawProperties())
+			{
+				// Draw all common properties next
+				DrawCommonProperties();
+			}
+
+			// Update the widget's properties if something has changed
+			if (mRegisteredUndo) mWidget.MarkAsChanged();
+		}
 	}
 
 	/// <summary>
