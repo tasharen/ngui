@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-public class SelectionTools
+public class NGUISelectionTools
 {
 	[MenuItem("GameObject/Selection/Force Delete")]
 	static void ForceDelete()
@@ -35,7 +35,7 @@ public class SelectionTools
 		}
 	}
 	
-	[MenuItem("GameObject/Selection/Clear Local Transform #&c")]
+	[MenuItem("GameObject/Selection/Clear Local Transform")]
 	static void ClearLocalTransform()
 	{
 		if (HasValidTransform())

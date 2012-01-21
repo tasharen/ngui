@@ -72,22 +72,23 @@ public class UIPanelTool : EditorWindow
 		else
 		{
 			panelName = "Panel";
-			widgetCount = "Widgets";
-			drawCalls = "DCs";
+			widgetCount = "WG";
+			drawCalls = "DC";
 			clipping = "Clip";
 		}
 
 		GUILayout.BeginHorizontal();
 		{
-			bool disabled = (panel != null && !panel.gameObject.active);
+			bool enabled = (panel == null || (panel.enabled && panel.gameObject.active));
 
 			GUI.color = Color.white;
 
 			if (panel != null)
 			{
-				if (panel.gameObject.active != EditorGUILayout.Toggle(panel.gameObject.active, GUILayout.Width(20f)))
+				if (enabled != EditorGUILayout.Toggle(enabled, GUILayout.Width(20f)))
 				{
-					panel.gameObject.SetActiveRecursively(!panel.gameObject.active);
+					panel.gameObject.SetActiveRecursively(!enabled);
+					if (enabled) panel.enabled = true;
 					EditorUtility.SetDirty(panel.gameObject);
 				}
 			}
@@ -96,21 +97,22 @@ public class UIPanelTool : EditorWindow
 				GUILayout.Space(30f);
 			}
 
-			if (disabled)
+			if (enabled)
 			{
-				GUI.color = highlight ? new Color(0f, 0.5f, 0.8f) : Color.grey;
+				GUI.color = highlight ? new Color(0f, 0.8f, 1f) : Color.white; 
 			}
 			else
 			{
-				GUI.color = highlight ? new Color(0f, 0.8f, 1f) : Color.white;
+				GUI.color = highlight ? new Color(0f, 0.5f, 0.8f) : Color.grey;
 			}
 
 			GUILayout.Label(panelName, GUILayout.MinWidth(100f));
-			GUILayout.Label(widgetCount, GUILayout.Width(50f));
+			GUILayout.Label(panel == null ? "Layer" : LayerMask.LayerToName(panel.gameObject.layer), GUILayout.Width(70f));
+			GUILayout.Label(widgetCount, GUILayout.Width(30f));
 			GUILayout.Label(drawCalls, GUILayout.Width(30f));
-			GUILayout.Label(clipping, GUILayout.Width(40f));
+			GUILayout.Label(clipping, GUILayout.Width(30f));
 
-			GUI.color = disabled ? new Color(0.7f, 0.7f, 0.7f) : Color.white;
+			GUI.color = enabled ? Color.white : new Color(0.7f, 0.7f, 0.7f);
 
 			if (panel != null)
 			{
@@ -122,14 +124,7 @@ public class UIPanelTool : EditorWindow
 					panel.debugInfo = debug ? UIPanel.DebugInfo.Gizmos : UIPanel.DebugInfo.Geometry;
 					EditorUtility.SetDirty(panel);
 				}
-			}
-			else
-			{
-				GUILayout.Label("DB", GUILayout.Width(20f));
-			}
 
-			if (panel)
-			{
 				if (GUILayout.Button("Select", GUILayout.Width(50f)))
 				{
 					Selection.activeGameObject = panel.gameObject;
@@ -138,7 +133,7 @@ public class UIPanelTool : EditorWindow
 			}
 			else
 			{
-				GUILayout.Space(60f);
+				GUILayout.Label("Debug", GUILayout.Width(80f));
 			}
 		}
 		GUILayout.EndHorizontal();

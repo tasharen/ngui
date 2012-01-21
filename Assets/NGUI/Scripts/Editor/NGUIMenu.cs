@@ -18,8 +18,14 @@ static public class NGUIMenu
 		string s = typeof(T).ToString();
 		if (s.StartsWith("UI")) s = s.Substring(2);
 		else if (s.StartsWith("UnityEngine.")) s = s.Substring(12);
+
 		GameObject go = new GameObject(s);
-		if (parent != null) go.transform.parent = parent.transform;
+
+		if (parent != null)
+		{
+			go.transform.parent = parent.transform;
+			go.layer = parent.layer;
+		}
 		return go.AddComponent<T>();
 	}
 
@@ -179,7 +185,7 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Create New UI")]
 	static void CreateNewUI ()
 	{
-		Undo.RegisterSceneUndo("Create New UI");
+		/*Undo.RegisterSceneUndo("Create New UI");
 
 		// Figure out the depth of the highest camera
 		float depth = -1f;
@@ -200,9 +206,24 @@ static public class NGUIMenu
 			}
 		}
 
+		// Find the first unused layer
+		int layer = 0;
+
+		if (mask != 0 && mask != ~0)
+		{
+			Debug.Log(mask);
+			while ((mask & 1) == 1 && layer < 32)
+			{
+				++layer;
+				mask >>= 1;
+			}
+			Debug.Log(mask + " " + layer);
+		}
+
 		// Orthographic root for the UI
 		GameObject root = new GameObject("UI Root");
 		root.AddComponent<UIOrthoRoot>();
+		root.layer = layer;
 
 		// Camera and UICamera for this UI
 		Camera cam = AddChild<Camera>(root);
@@ -212,7 +233,7 @@ static public class NGUIMenu
 		cam.farClipPlane = 10f;
 		cam.depth = depth + 1;
 		cam.backgroundColor = Color.grey;
-		cam.cullingMask = ~mask;
+		cam.cullingMask = (mask == ~0) ? 0 : (1 << layer);
 
 		// We don't want to clear color if this is not the first camera
 		if (cameras.Length > 0) cam.clearFlags = clearColor ? CameraClearFlags.Skybox : CameraClearFlags.Depth;
@@ -239,16 +260,18 @@ static public class NGUIMenu
 		else
 		{
 			Selection.activeGameObject = panel.gameObject;
-		}
+		}*/
 	}
 
-	/// <summary>
-	/// Add a menu option to display this wizard.
-	/// </summary>
-
 	[MenuItem("NGUI/Panel Tool #&p")]
-	static void OpenWizard ()
+	static void OpenPanelWizard ()
 	{
 		EditorWindow.GetWindow<UIPanelTool>();
+	}
+
+	[MenuItem("NGUI/Camera Tool #&c")]
+	static void OpenCameraWizard ()
+	{
+		EditorWindow.GetWindow<UICameraTool>();
 	}
 }

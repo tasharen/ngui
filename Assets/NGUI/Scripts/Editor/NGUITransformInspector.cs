@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(Transform))]
-public class TransformInspector : Editor
+public class NGUITransformInspector : Editor
 {
 	/// <summary>
 	/// Draw the inspector widget.
