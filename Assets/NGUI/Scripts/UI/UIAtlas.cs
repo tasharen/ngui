@@ -131,7 +131,7 @@ public class UIAtlas : MonoBehaviour
 	/// Convenience function that retrieves a list of all sprite names.
 	/// </summary>
 
-	public List<string> GetListOfSprites ()
+	virtual public List<string> GetListOfSprites ()
 	{
 		List<string> list = new List<string>();
 		foreach (Sprite s in sprites) if (s != null && !string.IsNullOrEmpty(s.name)) list.Add(s.name);
