@@ -10,6 +10,23 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Sprite (Tiled)")]
 public class UITiledSprite : UISprite
 {
+	Vector3 mScale = Vector3.one;
+
+	/// <summary>
+	/// Update the texture UVs used by the widget.
+	/// </summary>
+
+	override protected void UpdateUVs ()
+	{
+		base.UpdateUVs();
+		
+		if (cachedTransform.localScale != mScale)
+		{
+			mScale = cachedTransform.localScale;
+			mChanged = true;
+		}
+	}
+
 	/// <summary>
 	/// Tiled sprite shouldn't inherit the sprite's changes to this function.
 	/// </summary>
