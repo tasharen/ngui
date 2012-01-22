@@ -3,7 +3,6 @@ Shader "Unlit/Transparent Colored Overlay"
 	Properties
 	{
 		_MainTex ("Base (RGB) Trans (A)", 2D) = "white" {}
-		_Color ("Tint Color", Color) = (1,1,1,1)
 	}
 	
 	SubShader
@@ -31,12 +30,6 @@ Shader "Unlit/Transparent Colored Overlay"
 			SetTexture [_MainTex]
 			{
 				Combine Texture * Primary
-			}
-			
-			SetTexture [_MainTex]
-			{
-				ConstantColor [_Color]
-				Combine Previous * Constant
 			}
 		}
 	}

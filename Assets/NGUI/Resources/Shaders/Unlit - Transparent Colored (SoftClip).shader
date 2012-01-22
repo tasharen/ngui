@@ -3,8 +3,7 @@ Shader "Unlit/Transparent Colored (SoftClip)"
 	Properties
 	{
 		_MainTex ("Base (RGB), Alpha (A)", 2D) = "white" {}
-		_Color ("Tint Color", Color) = (1,1,1,1)
-}
+	}
 
 	SubShader
 	{
@@ -34,7 +33,6 @@ Shader "Unlit/Transparent Colored (SoftClip)"
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
-			fixed4 _Color;
 			float4 _ClipRange = float4(0.0, 0.0, 1000.0, 1000.0);
 			float2 _ClipSharpness = float2(20.0, 20.0);
 
@@ -73,7 +71,7 @@ Shader "Unlit/Transparent Colored (SoftClip)"
 				factor *= _ClipSharpness;
 				col.a *= clamp( min(factor.x, factor.y), 0.0, 1.0);
 
-				return col * _Color;
+				return col;
 			}
 			ENDCG
 		}
@@ -104,12 +102,6 @@ Shader "Unlit/Transparent Colored (SoftClip)"
 			SetTexture [_MainTex]
 			{
 				Combine Texture * Primary
-			}
-			
-			SetTexture [_MainTex]
-			{
-				ConstantColor [_Color]
-				Combine Previous * Constant
 			}
 		}
 	}

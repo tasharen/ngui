@@ -3,7 +3,6 @@ Shader "Unlit/Transparent Colored (HardClip)"
 	Properties
 	{
 		_MainTex ("Base (RGB), Alpha (A)", 2D) = "white" {}
-		_Color ("Tint Color", Color) = (1,1,1,1)
 	}
 
 	SubShader
@@ -34,7 +33,6 @@ Shader "Unlit/Transparent Colored (HardClip)"
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
-			fixed4 _Color;
 			float4 _ClipRange = float4(0.0, 0.0, 1000.0, 1000.0);
 
 			struct appdata_t
@@ -66,8 +64,7 @@ Shader "Unlit/Transparent Colored (HardClip)"
 			{
 				float2 factor = abs(IN.worldPos.xy - _ClipRange.xy) / _ClipRange.zw;
 				clip(1.0 - max(factor.x, factor.y));
-				fixed4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
-				return col * _Color;
+				return tex2D(_MainTex, IN.texcoord) * IN.color;
 			}
 			ENDCG
 		}
@@ -98,12 +95,6 @@ Shader "Unlit/Transparent Colored (HardClip)"
 			SetTexture [_MainTex]
 			{
 				Combine Texture * Primary
-			}
-			
-			SetTexture [_MainTex]
-			{
-				ConstantColor [_Color]
-				Combine Previous * Constant
 			}
 		}
 	}

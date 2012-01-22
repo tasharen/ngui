@@ -3,7 +3,6 @@ Shader "Unlit/Transparent Colored"
 	Properties
 	{
 		_MainTex ("Base (RGB), Alpha (A)", 2D) = "white" {}
-		_Color ("Tint Color", Color) = (1,1,1,1)
 	}
 	
 	SubShader
@@ -23,7 +22,7 @@ Shader "Unlit/Transparent Colored"
 		ColorMask RGB
 		AlphaTest Greater .01
 		Blend SrcAlpha OneMinusSrcAlpha
-		
+
 		Pass
 		{
 			ColorMaterial AmbientAndDiffuse
@@ -31,12 +30,6 @@ Shader "Unlit/Transparent Colored"
 			SetTexture [_MainTex]
 			{
 				Combine Texture * Primary
-			}
-			
-			SetTexture [_MainTex]
-			{
-				ConstantColor [_Color]
-				Combine Previous * Constant
 			}
 		}
 	}

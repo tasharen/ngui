@@ -143,10 +143,27 @@ public class UIFont : MonoBehaviour
 					{
 						Rect rect = mUVRect;
 						mUVRect.xMin = rect.xMin - mSprite.paddingLeft * rect.width;
-						mUVRect.xMax = rect.xMax + mSprite.paddingRight * rect.width;
 						mUVRect.yMin = rect.yMin - mSprite.paddingBottom * rect.height;
+						mUVRect.xMax = rect.xMax + mSprite.paddingRight * rect.width;
 						mUVRect.yMax = rect.yMax + mSprite.paddingTop * rect.height;
 					}
+
+#if UNITY_EDITOR
+					// The font should always use the original texture size
+					if (mFont != null)
+					{
+						float tw = (float)mFont.texWidth / tex.width;
+						float th = (float)mFont.texHeight / tex.height;
+
+						if (tw != mUVRect.width || th != mUVRect.height)
+						{
+							Debug.LogWarning("Font sprite size doesn't match the expected font texture size.\n" +
+								"Did you use the 'inner padding' setting on the Texture Packer? It must remain at '0'.", this);
+							mUVRect.width = tw;
+							mUVRect.height = th;
+						}
+					}
+#endif
 				}
 			}
 			return mUVRect;

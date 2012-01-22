@@ -3,7 +3,6 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 	Properties
 	{
 		_MainTex ("Base (RGB), Alpha (A)", 2D) = "white" {}
-		_Color ("Tint Color", Color) = (1,1,1,1)
 	}
 
 	SubShader
@@ -34,7 +33,6 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
-			fixed4 _Color;
 			float4 _ClipRange = float4(0.0, 0.0, 1000.0, 1000.0);
 
 			struct appdata_t
@@ -76,7 +74,7 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 				// Option 2: no 'if' statement -- may be faster on some devices
 				//col.a *= ceil(clamp(val, 0.0, 1.0));
 
-				return col * _Color;
+				return col;
 			}
 			ENDCG
 		}
@@ -107,12 +105,6 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 			SetTexture [_MainTex]
 			{
 				Combine Texture * Primary
-			}
-			
-			SetTexture [_MainTex]
-			{
-				ConstantColor [_Color]
-				Combine Previous * Constant
 			}
 		}
 	}
