@@ -71,7 +71,7 @@ public class UIPanelTool : EditorWindow
 		}
 		else
 		{
-			panelName = "Panel";
+			panelName = "Panel's Name";
 			widgetCount = "WG";
 			drawCalls = "DC";
 			clipping = "Clip";

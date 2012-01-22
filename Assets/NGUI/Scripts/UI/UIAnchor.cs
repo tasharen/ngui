@@ -56,39 +56,39 @@ public class UIAnchor : MonoBehaviour
 		{
 			if (stretchToFill) side = Side.TopLeft;
 
-			Vector3 v = Vector3.zero;
+			Vector3 v = new Vector3(Screen.width, Screen.height, 0f);
 
 			if (side == Side.Center)
 			{
-				v.x += Screen.width * uiCamera.rect.width * 0.5f;
-				v.y += (Screen.height - v.y) * uiCamera.rect.height * 0.5f;
+				v.x *= uiCamera.rect.width * 0.5f;
+				v.y *= uiCamera.rect.height * 0.5f;
 			}
 			else
 			{
 				if (side == Side.Right || side == Side.TopRight || side == Side.BottomRight)
 				{
-					v.x = Screen.width * uiCamera.rect.xMax;
+					v.x *= uiCamera.rect.xMax;
 				}
 				else if (side == Side.Top || side == Side.Center || side == Side.Bottom)
 				{
-					v.x = Screen.width * (uiCamera.rect.xMax - uiCamera.rect.xMin) * 0.5f;
+					v.x *= (uiCamera.rect.xMax - uiCamera.rect.xMin) * 0.5f;
 				}
 				else
 				{
-					v.x = Screen.width * uiCamera.rect.xMin;
+					v.x *= uiCamera.rect.xMin;
 				}
 
 				if (side == Side.Top || side == Side.TopRight || side == Side.TopLeft)
 				{
-					v.y = (Screen.height - v.y) * uiCamera.rect.yMax;
+					v.y *= uiCamera.rect.yMax;
 				}
 				else if (side == Side.Left || side == Side.Center || side == Side.Right)
 				{
-					v.y = (Screen.height - v.y) * (uiCamera.rect.yMax - uiCamera.rect.yMin) * 0.5f;
+					v.y *= (uiCamera.rect.yMax - uiCamera.rect.yMin) * 0.5f;
 				}
 				else
 				{
-					v.y = (Screen.height - v.y) * uiCamera.rect.yMin;
+					v.y *= uiCamera.rect.yMin;
 				}
 			}
 

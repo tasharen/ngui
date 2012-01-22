@@ -211,7 +211,7 @@ public class UICameraTool : EditorWindow
 				GUI.color = highlight ? new Color(0f, 0.5f, 0.8f) : Color.grey;
 			}
 
-			GUILayout.Label(cam == null ? "Camera" : cam.name + (cam.orthographic ? " (2D)" : " (3D)"), GUILayout.MinWidth(100f));
+			GUILayout.Label(cam == null ? "Camera's Name" : cam.name + (cam.orthographic ? " (2D)" : " (3D)"), GUILayout.MinWidth(100f));
 			GUILayout.Label(cam == null ? "Layer" : LayerMask.LayerToName(cam.gameObject.layer), GUILayout.Width(70f));
 
 			GUI.color = enabled ? Color.white : new Color(0.7f, 0.7f, 0.7f);

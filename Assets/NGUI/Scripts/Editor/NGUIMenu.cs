@@ -10,26 +10,6 @@ using System.Collections.Generic;
 static public class NGUIMenu
 {
 	/// <summary>
-	/// Add a child object to the specified parent and attaches the specified script to it.
-	/// </summary>
-
-	static public T AddChild<T> (GameObject parent) where T : Component
-	{
-		string s = typeof(T).ToString();
-		if (s.StartsWith("UI")) s = s.Substring(2);
-		else if (s.StartsWith("UnityEngine.")) s = s.Substring(12);
-
-		GameObject go = new GameObject(s);
-
-		if (parent != null)
-		{
-			go.transform.parent = parent.transform;
-			go.layer = parent.layer;
-		}
-		return go.AddComponent<T>();
-	}
-
-	/// <summary>
 	/// Helper function that returns the selected root object.
 	/// </summary>
 	/// <returns></returns>
@@ -38,7 +18,26 @@ static public class NGUIMenu
 	{
 		GameObject go = Selection.activeGameObject;
 
-		if (go != null)
+		// No selection? Try to find the root automatically
+		if (go == null)
+		{
+			UIPanel[] panels = Resources.FindObjectsOfTypeAll(typeof(UIPanel)) as UIPanel[];
+
+			foreach (UIPanel p in panels)
+			{
+				if (UICreateTool.IsPrefab(p.gameObject)) continue;
+				go = p.gameObject;
+				break;
+			}
+		}
+
+		if (go == null)
+		{
+			// Still nothing? This means we don't have a UI in the scene. Let's create one.
+			Debug.Log("No UI found. You can create a new one easily by using the UI creation wizard.\nOpening it for your convenience.");
+			CreateNewUI();
+		}
+		else
 		{
 			Transform t = go.transform;
 
@@ -66,6 +65,7 @@ static public class NGUIMenu
 	static bool PrefabCheck ()
 	{
 		GameObject root = SelectedRoot();
+		if (root == null) return false;
 
 		if (root.transform != null)
 		{
@@ -99,10 +99,10 @@ static public class NGUIMenu
 		foreach (UIWidget w in widgets) depth = Mathf.Max(depth, w.depth);
 
 		// Make this action undoable
-		Undo.RegisterSceneUndo("Add " + typeof(T).ToString());
+		Undo.RegisterSceneUndo("Add a child " + typeof(T).ToString());
 
 		// Create the widget and place it above other widgets
-		T widget = AddChild<T>(go);
+		T widget = UICreateTool.AddChild<T>(go);
 		widget.depth = depth + 1;
 
 		// Clear the local transform
@@ -117,7 +117,7 @@ static public class NGUIMenu
 		return widget;
 	}
 
-	[MenuItem("NGUI/Add Collider")]
+	[MenuItem("NGUI/Attach a Collider")]
 	static void AddCollider ()
 	{
 		if (PrefabCheck())
@@ -128,7 +128,29 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Add Label")]
+	[MenuItem("NGUI/Add a Panel")]
+	static void AddPanel ()
+	{
+		if (PrefabCheck())
+		{
+			GameObject go = Selection.activeGameObject;
+			Undo.RegisterUndo(go, "Add a child UI Panel");
+
+			GameObject child = new GameObject(UICreateTool.GetName<UIPanel>());
+			child.layer = go.layer;
+
+			Transform ct = child.transform;
+			ct.parent = go.transform;
+			ct.localPosition = Vector3.zero;
+			ct.localRotation = Quaternion.identity;
+			ct.localScale = Vector3.one;
+
+			child.AddComponent<UIPanel>();
+			Selection.activeGameObject = child;
+		}
+	}
+
+	[MenuItem("NGUI/Add a Label")]
 	static void AddLabel ()
 	{
 		if (PrefabCheck())
@@ -137,7 +159,7 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Add Sprite")]
+	[MenuItem("NGUI/Add a Sprite")]
 	static void AddSprite ()
 	{
 		if (PrefabCheck())
@@ -146,7 +168,7 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Add Sliced Sprite")]
+	[MenuItem("NGUI/Add a Sliced Sprite")]
 	static void AddSlicedSprite ()
 	{
 		if (PrefabCheck())
@@ -154,8 +176,8 @@ static public class NGUIMenu
 			AddWidget<UISlicedSprite>().SetToLastValues();
 		}
 	}
-	
-	[MenuItem("NGUI/Add Tiled Sprite")]
+
+	[MenuItem("NGUI/Add a Tiled Sprite")]
 	static void AddTiledSprite ()
 	{
 		if (PrefabCheck())
@@ -164,7 +186,7 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Add Filled Sprite")]
+	[MenuItem("NGUI/Add a Filled Sprite")]
 	static void AddFilledSprite ()
 	{
 		if (PrefabCheck())
@@ -173,7 +195,7 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Add Texture (no atlas)")]
+	[MenuItem("NGUI/Add a Texture (no atlas)")]
 	static void AddTexture ()
 	{
 		if (PrefabCheck())
@@ -182,85 +204,10 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Create New UI")]
+	[MenuItem("NGUI/Create a New UI")]
 	static void CreateNewUI ()
 	{
-		/*Undo.RegisterSceneUndo("Create New UI");
-
-		// Figure out the depth of the highest camera
-		float depth = -1f;
-		bool clearColor = true;
-		bool audioListener = true;
-		int mask = 0;
-		Camera[] cameras = Resources.FindObjectsOfTypeAll(typeof(Camera)) as Camera[];
-
-		foreach (Camera c in cameras)
-		{
-			depth = Mathf.Max(depth, c.depth);
-
-			if (c.enabled && c.gameObject.active)
-			{
-				mask |= c.cullingMask;
-				clearColor = false;
-				if (c.GetComponent<AudioListener>() != null) audioListener = false;
-			}
-		}
-
-		// Find the first unused layer
-		int layer = 0;
-
-		if (mask != 0 && mask != ~0)
-		{
-			Debug.Log(mask);
-			while ((mask & 1) == 1 && layer < 32)
-			{
-				++layer;
-				mask >>= 1;
-			}
-			Debug.Log(mask + " " + layer);
-		}
-
-		// Orthographic root for the UI
-		GameObject root = new GameObject("UI Root");
-		root.AddComponent<UIOrthoRoot>();
-		root.layer = layer;
-
-		// Camera and UICamera for this UI
-		Camera cam = AddChild<Camera>(root);
-		cam.orthographicSize = 1f;
-		cam.orthographic = true;
-		cam.nearClipPlane = -10f;
-		cam.farClipPlane = 10f;
-		cam.depth = depth + 1;
-		cam.backgroundColor = Color.grey;
-		cam.cullingMask = (mask == ~0) ? 0 : (1 << layer);
-
-		// We don't want to clear color if this is not the first camera
-		if (cameras.Length > 0) cam.clearFlags = clearColor ? CameraClearFlags.Skybox : CameraClearFlags.Depth;
-
-		// Add an audio listener if we need one
-		if (audioListener) cam.gameObject.AddComponent<AudioListener>();
-
-		// Add a UI Camera for event handling
-		cam.gameObject.AddComponent<UICamera>();
-
-		// Center-anchored point with a half-pixel offset for crisp UIs
-		UIAnchor anchor = AddChild<UIAnchor>(root);
-		anchor.uiCamera = cam;
-
-		// And finally -- the first UI panel
-		UIPanel panel = AddChild<UIPanel>(anchor.gameObject);
-
-		if (cam.cullingMask == 0)
-		{
-			Debug.LogWarning("You already have cameras in the scene that draw every single layer.\n" +
-				"Please clarify which layer the UI camera should use.", cam);
-			Selection.activeGameObject = cam.gameObject;
-		}
-		else
-		{
-			Selection.activeGameObject = panel.gameObject;
-		}*/
+		EditorWindow.GetWindow<UICreateTool>();
 	}
 
 	[MenuItem("NGUI/Panel Tool #&p")]
