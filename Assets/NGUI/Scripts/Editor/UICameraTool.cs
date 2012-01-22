@@ -150,23 +150,26 @@ public class UICameraTool : EditorWindow
 		EditorGUIUtility.LookLikeControls(80f);
 
 		Camera[] cams = Resources.FindObjectsOfTypeAll(typeof(Camera)) as Camera[];
+		List<Camera> list = new List<Camera>();
+		
+		foreach (Camera c in cams)
+		{
+			if (c.name != "SceneCamera" && c.name != "Preview Camera")
+			{
+#if UNITY_3_4
+				PrefabType type = EditorUtility.GetPrefabType(c.gameObject);
+#else
+				PrefabType type = PrefabUtility.GetPrefabType(c.gameObject);
+#endif
+				if (type != PrefabType.Prefab) list.Add(c);
+			}
+		}
 
-		if (cams.Length > 0)
+		if (list.Count > 0)
 		{
 			DrawRow(null);
 			GUITools.DrawSeparator();
-
-			foreach (Camera cam in cams)
-			{
-				// Unity scene view or preview cameras should not be modified
-				if (cam.name == "SceneCamera" || cam.name == "Preview Camera") continue;
-#if UNITY_3_4
-				PrefabType type = EditorUtility.GetPrefabType(cam.gameObject);
-#else
-				PrefabType type = PrefabUtility.GetPrefabType(cam.gameObject);
-#endif
-				if (type != PrefabType.Prefab) DrawRow(cam);
-			}
+			foreach (Camera cam in list) DrawRow(cam);
 		}
 		else
 		{

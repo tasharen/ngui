@@ -112,13 +112,15 @@ public class UICreateTool : EditorWindow
 		if (camType == CameraType.Simple2D)
 		{
 			root = new GameObject("UI Root (2D)");
-			root.AddComponent<UIOrthoRoot>();
 		}
 		else
 		{
 			root = new GameObject((camType == CameraType.Advanced3D) ? "UI Root (3D)" : "UI Root");
 			root.transform.localScale = new Vector3(0.0025f, 0.0025f, 0.0025f);
 		}
+
+		// Each UI should start off with a root
+		root.AddComponent<UIRoot>();
 
 		// Assign the layer to be used by everything
 		root.layer = layer;
@@ -167,8 +169,8 @@ public class UICreateTool : EditorWindow
 			{
 				cam.orthographicSize = 1f;
 				cam.orthographic = true;
-				cam.nearClipPlane = -10f;
-				cam.farClipPlane = 10f;
+				cam.nearClipPlane = -2f;
+				cam.farClipPlane = 2f;
 			}
 			else
 			{

@@ -9,6 +9,28 @@ using UnityEditor;
 public class UISlicedSpriteInspector : UISpriteInspector
 {
 	/// <summary>
+	/// Draw the atlas and sprite selection fields.
+	/// </summary>
+
+	override protected bool OnDrawProperties ()
+	{
+		if (base.OnDrawProperties())
+		{
+			UISlicedSprite sp = mSprite as UISlicedSprite;
+			bool fill = EditorGUILayout.Toggle("Fill Center", sp.fillCenter);
+
+			if (sp.fillCenter != fill)
+			{
+				Undo.RegisterUndo(sp, "Sprite Change");
+				sp.fillCenter = fill;
+				EditorUtility.SetDirty(sp.gameObject);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/// <summary>
 	/// Any and all derived functionality.
 	/// </summary>
 

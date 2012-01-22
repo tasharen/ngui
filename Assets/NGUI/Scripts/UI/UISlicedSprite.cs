@@ -9,14 +9,26 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Sprite (Sliced)")]
 public class UISlicedSprite : UISprite
 {
-	protected Rect mInner;
-	protected Rect mInnerUV;
+#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
+	public bool mFillCenter = true;
+#else
+	[SerializeField] bool mFillCenter = true;
+#endif
+
+	Rect mInner;
+	Rect mInnerUV;
 
 	/// <summary>
 	/// Inner set of UV coordinates.
 	/// </summary>
 
 	public Rect innerUV { get { UpdateUVs(); return mInnerUV; } }
+
+	/// <summary>
+	/// Whether the center part of the sprite will be filled or not. Turn it off if you want only to borders to show up.
+	/// </summary>
+
+	public bool fillCenter { get { return mFillCenter; } set { if (mFillCenter != value) { mFillCenter = value; MarkAsChanged(); } } }
 
 	/// <summary>
 	/// Update the texture UVs used by the widget.
@@ -152,6 +164,8 @@ public class UISlicedSprite : UISprite
 
 			for (int y = 0; y < 3; ++y)
 			{
+				if (!mFillCenter && x == 1 && y == 1) continue;
+
 				int y2 = y + 1;
 
 				verts.Add(new Vector3(v[x2].x, v[y].y, 0f));

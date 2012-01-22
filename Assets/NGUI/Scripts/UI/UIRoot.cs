@@ -6,9 +6,12 @@
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/Ortho Root")]
-public class UIOrthoRoot : MonoBehaviour
+[AddComponentMenu("NGUI/UI/Root")]
+public class UIRoot : MonoBehaviour
 {
+	public bool automatic = true;
+	public int manualHeight = 800;
+
 	Transform mTrans;
 
 	void Start ()
@@ -19,7 +22,7 @@ public class UIOrthoRoot : MonoBehaviour
 		
 		if (oc != null)
 		{
-			Debug.LogWarning("UIOrthoRoot should not be active at the same time as UIOrthoCamera. Disabling UIOrthoCamera.", oc);
+			Debug.LogWarning("UIRoot should not be active at the same time as UIOrthoCamera. Disabling UIOrthoCamera.", oc);
 			Camera cam = oc.gameObject.GetComponent<Camera>();
 			oc.enabled = false;
 			if (cam != null) cam.orthographicSize = 1f;
@@ -28,7 +31,9 @@ public class UIOrthoRoot : MonoBehaviour
 
 	void Update ()
 	{
-		float size = 2f / Screen.height;
+		manualHeight = Mathf.Max(2, automatic ? Screen.height : manualHeight);
+
+		float size = 2f / manualHeight;
 		Vector3 ls = mTrans.localScale;
 
 		if (!Mathf.Approximately(ls.x, size) ||
