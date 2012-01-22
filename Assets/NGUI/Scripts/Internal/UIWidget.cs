@@ -61,7 +61,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Depth controls the rendering order -- lowest to highest.
 	/// </summary>
 
-	public int depth { get { return mDepth; } set { if (mDepth != value) { mDepth = value; if (mPanel != null) mPanel.MarkDepthAsChanged(); } } }
+	public int depth { get { return mDepth; } set { if (mDepth != value) { mDepth = value; if (mPanel != null) mPanel.MarkDepthAsChanged(material); } } }
 
 	/// <summary>
 	/// Transform gets cached for speed.

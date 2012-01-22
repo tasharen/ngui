@@ -17,6 +17,7 @@ public class UISlicedSprite : UISprite
 
 	Rect mInner;
 	Rect mInnerUV;
+	Vector3 mScale = Vector3.one;
 
 	/// <summary>
 	/// Inner set of UV coordinates.
@@ -38,14 +39,15 @@ public class UISlicedSprite : UISprite
 	{
 		Init();
 
-		if (sprite != null && (mInner != mSprite.inner || mOuter != mSprite.outer))
-		{
-			Texture2D tex = mainTexture;
+		Texture2D tex = mainTexture;
 
-			if (tex != null)
+		if (tex != null && sprite != null)
+		{
+			if (mInner != mSprite.inner || mOuter != mSprite.outer || cachedTransform.localScale != mScale)
 			{
 				mInner = mSprite.inner;
 				mOuter = mSprite.outer;
+				mScale = cachedTransform.localScale;
 
 				mInnerUV = mInner;
 				mOuterUV = mOuter;

@@ -258,7 +258,7 @@ public class UIPanel : MonoBehaviour
 	/// Called by widgets when their depth changes.
 	/// </summary>
 
-	public void MarkDepthAsChanged () { mDepthChanged = true; }
+	public void MarkDepthAsChanged (Material mat) { mDepthChanged = true; if (mat != null && !mChanged.Contains(mat)) mChanged.Add(mat); }
 
 	/// <summary>
 	/// Helper function that marks the specified material as having changed so its mesh is rebuilt next frame.

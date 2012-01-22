@@ -189,23 +189,26 @@ static public class NGUITools
 
 	static public void AddWidgetCollider (GameObject go)
 	{
-		Collider col = go.GetComponent<Collider>();
-		BoxCollider box = col as BoxCollider;
-
-		if (box == null)
+		if (go != null)
 		{
-			if (col != null)
-			{
-				if (Application.isPlaying) GameObject.Destroy(col);
-				else GameObject.DestroyImmediate(col);
-			}
-			box = go.AddComponent<BoxCollider>();
-		}
+			Collider col = go.GetComponent<Collider>();
+			BoxCollider box = col as BoxCollider;
 
-		Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform);
-		box.isTrigger = true;
-		box.center = b.center;
-		box.size = b.size; // Need 3D colliders? Try this: new Vector3(b.size.x, b.size.y, Mathf.Max(1f, b.size.z));
+			if (box == null)
+			{
+				if (col != null)
+				{
+					if (Application.isPlaying) GameObject.Destroy(col);
+					else GameObject.DestroyImmediate(col);
+				}
+				box = go.AddComponent<BoxCollider>();
+			}
+
+			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform);
+			box.isTrigger = true;
+			box.center = b.center;
+			box.size = b.size; // Need 3D colliders? Try this: new Vector3(b.size.x, b.size.y, Mathf.Max(1f, b.size.z));
+		}
 	}
 
 	/// <summary>

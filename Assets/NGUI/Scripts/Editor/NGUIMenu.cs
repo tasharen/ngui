@@ -123,8 +123,16 @@ static public class NGUIMenu
 		if (PrefabCheck())
 		{
 			GameObject go = Selection.activeGameObject;
-			Undo.RegisterUndo(go, "Widget Collider");
-			NGUITools.AddWidgetCollider(go);
+
+			if (go != null)
+			{
+				Undo.RegisterUndo(go, "Widget Collider");
+				NGUITools.AddWidgetCollider(go);
+			}
+			else
+			{
+				Debug.Log("You must select a game object first, such as your button.");
+			}
 		}
 	}
 
