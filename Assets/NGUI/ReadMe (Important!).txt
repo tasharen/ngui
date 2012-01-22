@@ -37,7 +37,14 @@ Version History
 ---------------
 
 1.41:
-- Release notes coming soon.
+- NEW: Added a new tool: Camera Tool. It can be used to get a bird's eye view of your cameras and determine what draws the selected object.
+- NEW: Added a new tool: Create New UI. You can use it to create an entire UI hierarchy for 2D or 3D layouts with one click of a button.
+- NEW: Added a new script: UIRoot. It can be used to scale the root of your UI by 2/ScreenHeight (the opposite of UIOrthoCamera).
+- NEW: The NGUI menu has been enhanced. When adding widgets, it will intelligently determine where to add them best.
+- NEW: Sliced sprites now have an option to not draw the center, in case you only want the border.
+- FIX: Scaling the sliced sprite will now correctly update it again.
+- FIX: Changing the depth of the widgets will now correctly update them again.
+- FIX: The unnecessary color parameter specified on the material has been removed from the shaders.
 
 1.40:
 - NEW: Major performance improvements. The way the geometry was being created has been completely redone.
