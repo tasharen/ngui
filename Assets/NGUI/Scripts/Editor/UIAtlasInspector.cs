@@ -115,7 +115,7 @@ public class UIAtlasInspector : Editor
 
 		if (!mConfirmDelete)
 		{
-			GUITools.DrawSeparator();
+			NGUIEditorTools.DrawSeparator();
 			Material mat = EditorGUILayout.ObjectField("Material", mAtlas.material, typeof(Material), false) as Material;
 
 			if (mAtlas.material != mat)
@@ -165,9 +165,9 @@ public class UIAtlasInspector : Editor
 				if (mSprite != null)
 				{
 					// Show the confirmation dialog
-					GUITools.DrawSeparator();
+					NGUIEditorTools.DrawSeparator();
 					GUILayout.Label("Are you sure you want to delete '" + mSprite.name + "'?");
-					GUITools.DrawSeparator();
+					NGUIEditorTools.DrawSeparator();
 
 					GUILayout.BeginHorizontal();
 					{
@@ -228,7 +228,7 @@ public class UIAtlasInspector : Editor
 
 				if (!mConfirmDelete && mSprite != null)
 				{
-					GUITools.DrawSeparator();
+					NGUIEditorTools.DrawSeparator();
 
 					string spriteName = UISpriteInspector.SpriteField(mAtlas, mSprite.name);
 
@@ -385,11 +385,11 @@ public class UIAtlasInspector : Editor
 						// Draw the atlas
 						EditorGUILayout.Separator();
 						Material m = mUseShader ? mAtlas.material : null;
-						Rect rect = (mView == View.Atlas) ? GUITools.DrawAtlas(tex, m) : GUITools.DrawSprite(tex, uv0, m);
+						Rect rect = (mView == View.Atlas) ? NGUIEditorTools.DrawAtlas(tex, m) : NGUIEditorTools.DrawSprite(tex, uv0, m);
 
 						// Draw the sprite outline
-						GUITools.DrawOutline(rect, uv1, blue);
-						GUITools.DrawOutline(rect, uv0, green);
+						NGUIEditorTools.DrawOutline(rect, uv1, blue);
+						NGUIEditorTools.DrawOutline(rect, uv0, green);
 
 						EditorGUILayout.Separator();
 					}

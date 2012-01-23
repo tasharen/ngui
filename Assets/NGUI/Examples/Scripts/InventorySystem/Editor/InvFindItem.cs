@@ -39,7 +39,7 @@ public class InvFindItem : ScriptableWizard
 	{
 		EditorGUIUtility.LookLikeControls(80f);
 		string newItemName = EditorGUILayout.TextField("Search for:", mItemName);
-		GUITools.DrawSeparator();
+		NGUIEditorTools.DrawSeparator();
 
 		if (GUI.changed || newItemName != mItemName)
 		{
@@ -65,7 +65,7 @@ public class InvFindItem : ScriptableWizard
 		else
 		{
 			Print3("Item ID", "Item Name", "Path", false);
-			GUITools.DrawSeparator();
+			NGUIEditorTools.DrawSeparator();
 
 			foreach (FindResult fr in mResults)
 			{

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// UI Creation Wizard
 /// </summary>
 
-public class UICreateTool : EditorWindow
+public class UICreateNewUIWizard : EditorWindow
 {
 	public enum CameraType
 	{
@@ -17,52 +17,6 @@ public class UICreateTool : EditorWindow
 
 	static public int layer = 0;
 	static CameraType camType = CameraType.Simple2D;
-
-	/// <summary>
-	/// Helper function that returns the string name of the type.
-	/// </summary>
-
-	static public string GetName<T> () where T : Component
-	{
-		string s = typeof(T).ToString();
-		if (s.StartsWith("UI")) s = s.Substring(2);
-		else if (s.StartsWith("UnityEngine.")) s = s.Substring(12);
-		return s;
-	}
-
-	/// <summary>
-	/// Add a child object to the specified parent and attaches the specified script to it.
-	/// </summary>
-
-	static public T AddChild<T> (GameObject parent) where T : Component
-	{
-		GameObject go = new GameObject(GetName<T>());
-
-		if (parent != null)
-		{
-			Transform t = go.transform;
-			t.parent = parent.transform;
-			t.localPosition = Vector3.zero;
-			t.localRotation = Quaternion.identity;
-			t.localScale = Vector3.one;
-			go.layer = parent.layer;
-		}
-		return go.AddComponent<T>();
-	}
-
-	/// <summary>
-	/// Convenience function that determines if the specified object is a prefab.
-	/// </summary>
-
-	static public bool IsPrefab (GameObject go)
-	{
-#if UNITY_3_4
-		PrefabType type = EditorUtility.GetPrefabType(go);
-#else
-		PrefabType type = PrefabUtility.GetPrefabType(go);
-#endif
-		return (type != PrefabType.None);
-	}
 
 	/// <summary>
 	/// Refresh the window on selection.
@@ -79,7 +33,7 @@ public class UICreateTool : EditorWindow
 		EditorGUIUtility.LookLikeControls(80f);
 
 		GUILayout.Label("Create a new UI with the following parameters:");
-		GUITools.DrawSeparator();
+		NGUIEditorTools.DrawSeparator();
 
 		GUILayout.BeginHorizontal();
 		layer = EditorGUILayout.LayerField("Layer", layer, GUILayout.Width(200f));
@@ -93,7 +47,7 @@ public class UICreateTool : EditorWindow
 		GUILayout.Label("Should this UI have a camera?");
 		GUILayout.EndHorizontal();
 
-		GUITools.DrawSeparator();
+		NGUIEditorTools.DrawSeparator();
 		GUILayout.BeginHorizontal();
 		EditorGUILayout.PrefixLabel("When ready,");
 		bool create = GUILayout.Button("Create Your UI", GUILayout.Width(120f));
@@ -129,7 +83,7 @@ public class UICreateTool : EditorWindow
 		if (camType == CameraType.None)
 		{
 			// No camera requested -- simply add a panel
-			UIPanel panel = AddChild<UIPanel>(root.gameObject);
+			UIPanel panel = NGUITools.AddChild<UIPanel>(root.gameObject);
 			Selection.activeGameObject = panel.gameObject;
 		}
 		else
@@ -142,7 +96,7 @@ public class UICreateTool : EditorWindow
 
 			foreach (Camera c in cameras)
 			{
-				if (IsPrefab(c.gameObject)) continue;
+				if (ComponentSelector.IsPrefab(c.gameObject)) continue;
 				if (c.name == "Preview Camera") continue;
 				if (c.name == "SceneCamera") continue;
 
@@ -160,7 +114,7 @@ public class UICreateTool : EditorWindow
 			}
 
 			// Camera and UICamera for this UI
-			Camera cam = AddChild<Camera>(root);
+			Camera cam = NGUITools.AddChild<Camera>(root);
 			cam.depth = depth + 1;
 			cam.backgroundColor = Color.grey;
 			cam.cullingMask = mask;
@@ -189,14 +143,14 @@ public class UICreateTool : EditorWindow
 			cam.gameObject.AddComponent<UICamera>();
 
 			// Anchor is useful to have
-			UIAnchor anchor = AddChild<UIAnchor>(cam.gameObject);
+			UIAnchor anchor = NGUITools.AddChild<UIAnchor>(cam.gameObject);
 			anchor.uiCamera = cam;
 
 			// Since the camera was brought back 700 units above, we should bring the anchor forward 700 to compensate
 			if (camType == CameraType.Advanced3D) anchor.depthOffset = 700f;
 
 			// And finally -- the first UI panel
-			UIPanel panel = AddChild<UIPanel>(anchor.gameObject);
+			UIPanel panel = NGUITools.AddChild<UIPanel>(anchor.gameObject);
 			Selection.activeGameObject = panel.gameObject;
 		}
 	}

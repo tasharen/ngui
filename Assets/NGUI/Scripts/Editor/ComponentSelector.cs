@@ -16,17 +16,31 @@ public class ComponentSelector : ScriptableWizard
 	MonoBehaviour[] mObjects;
 
 	/// <summary>
+	/// Convenience function that determines if the specified object is a prefab.
+	/// </summary>
+
+	static public bool IsPrefab (GameObject go)
+	{
+#if UNITY_3_4
+		PrefabType type = EditorUtility.GetPrefabType(go);
+#else
+		PrefabType type = PrefabUtility.GetPrefabType(go);
+#endif
+		return (type != PrefabType.None);
+	}
+
+	/// <summary>
 	/// Draw a button + object selection combo filtering specified types.
 	/// </summary>
 
-	static public T Draw<T> (T obj, OnSelectionCallback cb) where T : MonoBehaviour
+	static public void Draw<T> (T obj, OnSelectionCallback cb, params GUILayoutOption[] options) where T : MonoBehaviour
 	{
 		GUILayout.BeginHorizontal();
-		bool show = GUILayout.Button(typeof(T).ToString(), GUILayout.Width(76f));
-		T o = EditorGUILayout.ObjectField(obj, typeof(T), false) as T;
+		bool show = GUILayout.Button(NGUITools.GetName<T>(), GUILayout.Width(76f));
+		T o = EditorGUILayout.ObjectField(obj, typeof(T), false, options) as T;
 		GUILayout.EndHorizontal();
 		if (show) Show<T>(cb);
-		return o;
+		else if (o != obj) cb(o);
 	}
 
 	/// <summary>
@@ -52,12 +66,12 @@ public class ComponentSelector : ScriptableWizard
 
 		if (mObjects.Length == 0)
 		{
-			GUILayout.Label("No " + mType.ToString() + " components found");
+			GUILayout.Label("No recently used " + mType.ToString() + " components found.\nTry drag & dropping one instead.");
 		}
 		else
 		{
 			GUILayout.Label("List of recently used components:");
-			GUITools.DrawSeparator();
+			NGUIEditorTools.DrawSeparator();
 
 			MonoBehaviour sel = null;
 
@@ -87,13 +101,7 @@ public class ComponentSelector : ScriptableWizard
 
 		GUILayout.BeginHorizontal();
 		{
-#if UNITY_3_4
-			PrefabType type = EditorUtility.GetPrefabType(mb.gameObject);
-#else
-			PrefabType type = PrefabUtility.GetPrefabType(mb.gameObject);
-#endif
-
-			if (type == PrefabType.Prefab)
+			if (IsPrefab(mb.gameObject))
 			{
 				GUILayout.Label("Prefab", GUILayout.Width(80f));
 			}

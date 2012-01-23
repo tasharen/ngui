@@ -36,7 +36,7 @@ public class InvDatabaseInspector : Editor
 	{
 		EditorGUIUtility.LookLikeControls(80f);
 		InvDatabase db = target as InvDatabase;
-		GUITools.DrawSeparator();
+		NGUIEditorTools.DrawSeparator();
 
 		InvBaseItem item = null;
 
@@ -54,7 +54,7 @@ public class InvDatabaseInspector : Editor
 		{
 			// Show the confirmation dialog
 			GUILayout.Label("Are you sure you want to delete '" + item.name + "'?");
-			GUITools.DrawSeparator();
+			NGUIEditorTools.DrawSeparator();
 
 			GUILayout.BeginHorizontal();
 			{
@@ -138,7 +138,7 @@ public class InvDatabaseInspector : Editor
 
 			if (item != null)
 			{
-				GUITools.DrawSeparator();
+				NGUIEditorTools.DrawSeparator();
 
 				// Navigation section
 				GUILayout.BeginHorizontal();
@@ -154,7 +154,7 @@ public class InvDatabaseInspector : Editor
 				}
 				GUILayout.EndHorizontal();
 
-				GUITools.DrawSeparator();
+				NGUIEditorTools.DrawSeparator();
 
 				// Item name and delete item button
 				GUILayout.BeginHorizontal();
@@ -234,7 +234,7 @@ public class InvDatabaseInspector : Editor
 								GUILayout.BeginHorizontal();
 								{
 									GUILayout.Space(Screen.width - iconSize);
-									GUITools.DrawSprite(tex, rect, null);
+									NGUIEditorTools.DrawSprite(tex, rect, null);
 								}
 								GUILayout.EndHorizontal();
 
@@ -272,7 +272,7 @@ public class InvDatabaseInspector : Editor
 				}
 
 				// Item stats
-				GUITools.DrawSeparator();
+				NGUIEditorTools.DrawSeparator();
 
 				if (item.stats != null)
 				{

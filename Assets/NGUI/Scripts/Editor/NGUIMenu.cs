@@ -10,120 +10,28 @@ using System.Collections.Generic;
 static public class NGUIMenu
 {
 	/// <summary>
-	/// Helper function that returns the selected root object.
+	/// Same as SelectedRoot(), but with a log message if nothing was found.
 	/// </summary>
-	/// <returns></returns>
 
 	static public GameObject SelectedRoot ()
 	{
-		GameObject go = Selection.activeGameObject;
-
-		// No selection? Try to find the root automatically
-		if (go == null)
-		{
-			UIPanel[] panels = Resources.FindObjectsOfTypeAll(typeof(UIPanel)) as UIPanel[];
-
-			foreach (UIPanel p in panels)
-			{
-				if (UICreateTool.IsPrefab(p.gameObject)) continue;
-				go = p.gameObject;
-				break;
-			}
-		}
+		GameObject go = NGUIEditorTools.SelectedRoot();
 
 		if (go == null)
 		{
-			// Still nothing? This means we don't have a UI in the scene. Let's create one.
 			Debug.Log("No UI found. You can create a new one easily by using the UI creation wizard.\nOpening it for your convenience.");
-			CreateNewUI();
-		}
-		else
-		{
-			Transform t = go.transform;
-
-			// Find the first uniformly scaled object
-			while (!Mathf.Approximately(t.localScale.x, t.localScale.y) ||
-				   !Mathf.Approximately(t.localScale.x, t.localScale.z))
-			{
-				t = t.parent;
-
-				if (t == null)
-				{
-					Debug.LogWarning("You must select a uniformly scaled object first.");
-					return null;
-				}
-				else go = t.gameObject;
-			}
+			CreateUIWizard();
 		}
 		return go;
 	}
 
-	/// <summary>
-	/// Helper function that checks to see if a prefab is currently selected.
-	/// </summary>
-
-	static bool PrefabCheck ()
-	{
-		GameObject root = SelectedRoot();
-		if (root == null) return false;
-
-		if (root.transform != null)
-		{
-			// Check if the selected object is a prefab instance and display a warning
-#if UNITY_3_4
-			PrefabType type = EditorUtility.GetPrefabType(root);
-#else
-			PrefabType type = PrefabUtility.GetPrefabType(root);
-#endif
-
-			if (type == PrefabType.PrefabInstance)
-			{
-				return EditorUtility.DisplayDialog("Losing prefab",
-					"This action will lose the prefab connection. Are you sure you wish to continue?",
-					"Continue", "Cancel");
-			}
-		}
-		return true;
-	}
-
-	/// <summary>
-	/// Add a new widget of specified type.
-	/// </summary>
-
-	static public T AddWidget<T> () where T : UIWidget
-	{
-		GameObject go = SelectedRoot();
-
-		int depth = 1;
-		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
-		foreach (UIWidget w in widgets) depth = Mathf.Max(depth, w.depth);
-
-		// Make this action undoable
-		Undo.RegisterSceneUndo("Add a child " + typeof(T).ToString());
-
-		// Create the widget and place it above other widgets
-		T widget = UICreateTool.AddChild<T>(go);
-		widget.depth = depth + 1;
-
-		// Clear the local transform
-		Transform t = widget.transform;
-		t.localPosition = Vector3.zero;
-		t.localRotation = Quaternion.identity;
-		t.localScale = new Vector3(100f, 100f, 1f);
-		widget.gameObject.layer = go.layer;
-
-		// Select our newly created GameObject
-		Selection.activeGameObject = widget.gameObject;
-		return widget;
-	}
-
 	[MenuItem("NGUI/Attach a Collider")]
-	static void AddCollider ()
+	static public void AddCollider ()
 	{
-		if (PrefabCheck())
-		{
-			GameObject go = Selection.activeGameObject;
+		GameObject go = Selection.activeGameObject;
 
+		if (NGUIEditorTools.WillLosePrefab(go))
+		{
 			if (go != null)
 			{
 				Undo.RegisterUndo(go, "Widget Collider");
@@ -136,15 +44,16 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Add a Panel")]
-	static void AddPanel ()
+	[MenuItem("NGUI/Create a Panel")]
+	static public void AddPanel ()
 	{
-		if (PrefabCheck())
+		GameObject go = SelectedRoot();
+
+		if (NGUIEditorTools.WillLosePrefab(go))
 		{
-			GameObject go = Selection.activeGameObject;
 			Undo.RegisterUndo(go, "Add a child UI Panel");
 
-			GameObject child = new GameObject(UICreateTool.GetName<UIPanel>());
+			GameObject child = new GameObject(NGUITools.GetName<UIPanel>());
 			child.layer = go.layer;
 
 			Transform ct = child.transform;
@@ -158,75 +67,27 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Add a Label")]
-	static void AddLabel ()
+	[MenuItem("NGUI/Create a Widget")]
+	static public void CreateWidgetWizard ()
 	{
-		if (PrefabCheck())
-		{
-			AddWidget<UILabel>().SetToLastValues();
-		}
-	}
-
-	[MenuItem("NGUI/Add a Sprite")]
-	static void AddSprite ()
-	{
-		if (PrefabCheck())
-		{
-			AddWidget<UISprite>().SetToLastValues();
-		}
-	}
-
-	[MenuItem("NGUI/Add a Sliced Sprite")]
-	static void AddSlicedSprite ()
-	{
-		if (PrefabCheck())
-		{
-			AddWidget<UISlicedSprite>().SetToLastValues();
-		}
-	}
-
-	[MenuItem("NGUI/Add a Tiled Sprite")]
-	static void AddTiledSprite ()
-	{
-		if (PrefabCheck())
-		{
-			AddWidget<UITiledSprite>().SetToLastValues();
-		}
-	}
-
-	[MenuItem("NGUI/Add a Filled Sprite")]
-	static void AddFilledSprite ()
-	{
-		if (PrefabCheck())
-		{
-			AddWidget<UIFilledSprite>().SetToLastValues();
-		}
-	}
-
-	[MenuItem("NGUI/Add a Texture (no atlas)")]
-	static void AddTexture ()
-	{
-		if (PrefabCheck())
-		{
-			AddWidget<UITexture>();
-		}
+		EditorWindow.GetWindow<UICreateWidgetWizard>(false, "Widget Tool", true);
 	}
 
 	[MenuItem("NGUI/Create a New UI")]
-	static void CreateNewUI ()
+	static public void CreateUIWizard ()
 	{
-		EditorWindow.GetWindow<UICreateTool>();
+		EditorWindow.GetWindow<UICreateNewUIWizard>(false, "UI Tool", true);
 	}
 
 	[MenuItem("NGUI/Panel Tool #&p")]
-	static void OpenPanelWizard ()
+	static public void OpenPanelWizard ()
 	{
-		EditorWindow.GetWindow<UIPanelTool>();
+		EditorWindow.GetWindow<UIPanelTool>(false, "Panel Tool", true);
 	}
 
 	[MenuItem("NGUI/Camera Tool #&c")]
-	static void OpenCameraWizard ()
+	static public void OpenCameraWizard ()
 	{
-		EditorWindow.GetWindow<UICameraTool>();
+		EditorWindow.GetWindow<UICameraTool>(false, "Camera Tool", true);
 	}
 }

@@ -1,13 +1,16 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
-/// Helper class using Unity's GUI functionality. Meant to be used by inspector tools.
+/// Tools for the editor
 /// </summary>
 
-static public class GUITools
+public class NGUIEditorTools
 {
 	static Texture2D mWhiteTex;
 	static Texture2D mCheckerTex;
+	static Texture2D mGradientTex;
 
 	/// <summary>
 	/// Returns a blank usable 1x1 white texture.
@@ -32,6 +35,19 @@ static public class GUITools
 		{
 			if (mCheckerTex == null) mCheckerTex = CreateCheckerTex();
 			return mCheckerTex;
+		}
+	}
+
+	/// <summary>
+	/// Gradient texture is used for title bars / headers.
+	/// </summary>
+
+	static public Texture2D gradientTexture
+	{
+		get
+		{
+			if (mGradientTex == null) mGradientTex = CreateGradientTex();
+			return mGradientTex;
 		}
 	}
 
@@ -61,13 +77,37 @@ static public class GUITools
 		Color c0 = new Color(0.1f, 0.1f, 0.1f, 0.5f);
 		Color c1 = new Color(0.2f, 0.2f, 0.2f, 0.5f);
 
-		for (int y = 0; y < 8;  ++y) for (int x = 0; x < 8; ++x) tex.SetPixel(x, y, c1);
-		for (int y = 8; y < 16; ++y) for (int x = 0; x < 8; ++x) tex.SetPixel(x, y, c0);
+		for (int y = 0; y < 8;  ++y) for (int x = 0; x < 8;  ++x) tex.SetPixel(x, y, c1);
+		for (int y = 8; y < 16; ++y) for (int x = 0; x < 8;  ++x) tex.SetPixel(x, y, c0);
 		for (int y = 0; y < 8;  ++y) for (int x = 8; x < 16; ++x) tex.SetPixel(x, y, c0);
 		for (int y = 8; y < 16; ++y) for (int x = 8; x < 16; ++x) tex.SetPixel(x, y, c1);
 
 		tex.Apply();
 		tex.filterMode = FilterMode.Point;
+		return tex;
+	}
+
+	/// <summary>
+	/// Create a gradient texture
+	/// </summary>
+
+	static Texture2D CreateGradientTex ()
+	{
+		Texture2D tex = new Texture2D(1, 16);
+		tex.name = "[Generated] Checker Texture";
+
+		Color c0 = new Color(0f, 0f, 0f, 0f);
+		Color c1 = new Color(0f, 0f, 0f, 0.4f);
+
+		for (int i = 0; i < 16; ++i)
+		{
+			float f = Mathf.Abs((i / 15f) * 2f - 1f);
+			f *= f;
+			tex.SetPixel(0, i, Color.Lerp(c0, c1, f));
+		}
+
+		tex.Apply();
+		tex.filterMode = FilterMode.Bilinear;
 		return tex;
 	}
 
@@ -203,7 +243,7 @@ static public class GUITools
 			{
 				// We need to calculate where to begin and how to stretch the texture
 				// for it to appear properly scaled in the rectangle
-				float scaleX = rect.width  / (sprite.width  + paddingX);
+				float scaleX = rect.width / (sprite.width + paddingX);
 				float scaleY = rect.height / (sprite.height + paddingY);
 				float ox = scaleX * (sprite.x - paddingX * 0.5f);
 				float oy = scaleY * (1f - (sprite.yMax + paddingY * 0.5f));
@@ -234,7 +274,7 @@ static public class GUITools
 	/// Draw a visible separator in addition to adding some padding.
 	/// </summary>
 
-	static public void DrawSeparator()
+	static public void DrawSeparator ()
 	{
 		GUILayout.Space(12f);
 
@@ -248,5 +288,98 @@ static public class GUITools
 			GUI.DrawTexture(new Rect(0f, rect.yMin + 9f, Screen.width, 1f), tex);
 			GUI.color = Color.white;
 		}
+	}
+
+	/// <summary>
+	/// Draw a distinctly different looking header label
+	/// </summary>
+
+	static public Rect DrawHeader (string text)
+	{
+		GUILayout.Space(28f);
+		Rect rect = GUILayoutUtility.GetLastRect();
+		rect.yMin += 5f;
+		rect.yMax -= 4f;
+		rect.width = Screen.width;
+
+		if (Event.current.type == EventType.Repaint)
+		{
+			GUI.DrawTexture(new Rect(0f, rect.yMin, Screen.width, rect.yMax - rect.yMin), gradientTexture);
+			GUI.color = new Color(0f, 0f, 0f, 0.25f);
+			GUI.DrawTexture(new Rect(0f, rect.yMin, Screen.width, 1f), blankTexture);
+			GUI.DrawTexture(new Rect(0f, rect.yMax - 1, Screen.width, 1f), blankTexture);
+			GUI.color = Color.white;
+			GUI.Label(new Rect(rect.x + 4f, rect.y, rect.width - 4, rect.height), text, EditorStyles.boldLabel);
+		}
+		return rect;
+	}
+
+	/// <summary>
+	/// Helper function that returns the selected root object.
+	/// </summary>
+
+	static public GameObject SelectedRoot ()
+	{
+		GameObject go = Selection.activeGameObject;
+
+		// No selection? Try to find the root automatically
+		if (go == null)
+		{
+			UIPanel[] panels = Resources.FindObjectsOfTypeAll(typeof(UIPanel)) as UIPanel[];
+
+			foreach (UIPanel p in panels)
+			{
+				if (ComponentSelector.IsPrefab(p.gameObject)) continue;
+				go = p.gameObject;
+				break;
+			}
+		}
+
+		// Now find the first uniformly scaled object
+		if (go != null)
+		{
+			Transform t = go.transform;
+
+			// Find the first uniformly scaled object
+			while (!Mathf.Approximately(t.localScale.x, t.localScale.y) ||
+				   !Mathf.Approximately(t.localScale.x, t.localScale.z))
+			{
+				t = t.parent;
+
+				if (t == null)
+				{
+					Debug.LogWarning("You must select a uniformly scaled object first.");
+					return null;
+				}
+				else go = t.gameObject;
+			}
+		}
+		return go;
+	}
+
+	/// <summary>
+	/// Helper function that checks to see if this action would break the prefab connection.
+	/// </summary>
+
+	static public bool WillLosePrefab (GameObject root)
+	{
+		if (root == null) return false;
+
+		if (root.transform != null)
+		{
+			// Check if the selected object is a prefab instance and display a warning
+#if UNITY_3_4
+			PrefabType type = EditorUtility.GetPrefabType(root);
+#else
+			PrefabType type = PrefabUtility.GetPrefabType(root);
+#endif
+			if (type == PrefabType.PrefabInstance)
+			{
+				return EditorUtility.DisplayDialog("Losing prefab",
+					"This action will lose the prefab connection. Are you sure you wish to continue?",
+					"Continue", "Cancel");
+			}
+		}
+		return true;
 	}
 }

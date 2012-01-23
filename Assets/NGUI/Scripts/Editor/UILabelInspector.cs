@@ -33,8 +33,7 @@ public class UILabelInspector : UIWidgetInspector
 	override protected bool OnDrawProperties ()
 	{
 		mLabel = mWidget as UILabel;
-		UIFont font = ComponentSelector.Draw<UIFont>(mLabel.font, OnSelectFont);
-		if (font != mLabel.font) OnSelectFont(font);
+		ComponentSelector.Draw<UIFont>(mLabel.font, OnSelectFont);
 		if (mLabel.font == null) return false;
 
 		string text = EditorGUILayout.TextArea(mLabel.text, GUILayout.Height(100f));
@@ -70,7 +69,7 @@ public class UILabelInspector : UIWidgetInspector
 		{
 			// Draw the atlas
 			EditorGUILayout.Separator();
-			GUITools.DrawSprite(tex, mLabel.font.uvRect, mUseShader ? mLabel.font.material : null);
+			NGUIEditorTools.DrawSprite(tex, mLabel.font.uvRect, mUseShader ? mLabel.font.material : null);
 
 			// Sprite size label
 			Rect rect = GUILayoutUtility.GetRect(Screen.width, 18f);

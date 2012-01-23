@@ -47,7 +47,7 @@ public class UIFontInspector : Editor
 	override public void OnInspectorGUI ()
 	{
 		EditorGUIUtility.LookLikeControls(80f);
-		GUITools.DrawSeparator();
+		NGUIEditorTools.DrawSeparator();
 
 		mFont = target as UIFont;
 		TextAsset data = EditorGUILayout.ObjectField("Import Font", null, typeof(TextAsset), false) as TextAsset;
@@ -67,12 +67,11 @@ public class UIFontInspector : Editor
 		if (mFont.bmFont.isValid)
 		{
 			Color green = new Color(0.4f, 1f, 0f, 1f);
-			UIAtlas atlas = ComponentSelector.Draw<UIAtlas>(mFont.atlas, OnSelectAtlas);
-			if (mFont.atlas != atlas) OnSelectAtlas(atlas);
+			ComponentSelector.Draw<UIAtlas>(mFont.atlas, OnSelectAtlas);
 
 			if (mFont.atlas != null)
 			{
-				string spriteName = UISlicedSpriteInspector.SpriteField(atlas, mFont.spriteName);
+				string spriteName = UISlicedSpriteInspector.SpriteField(mFont.atlas, mFont.spriteName);
 
 				if (mFont.spriteName != spriteName)
 				{
@@ -199,8 +198,8 @@ public class UIFontInspector : Editor
 					// Draw the atlas
 					EditorGUILayout.Separator();
 					Material m = mUseShader ? mFont.material : null;
-					Rect rect = (mView == View.Atlas) ? GUITools.DrawAtlas(tex, m) : GUITools.DrawSprite(tex, mFont.uvRect, m);
-					GUITools.DrawOutline(rect, mFont.uvRect, green);
+					Rect rect = (mView == View.Atlas) ? NGUIEditorTools.DrawAtlas(tex, m) : NGUIEditorTools.DrawSprite(tex, mFont.uvRect, m);
+					NGUIEditorTools.DrawOutline(rect, mFont.uvRect, green);
 
 					rect = GUILayoutUtility.GetRect(Screen.width, 18f);
 					EditorGUI.DropShadowLabel(rect, "Font Size: " + mFont.size);

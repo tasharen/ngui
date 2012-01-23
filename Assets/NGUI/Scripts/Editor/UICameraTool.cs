@@ -168,7 +168,7 @@ public class UICameraTool : EditorWindow
 		if (list.Count > 0)
 		{
 			DrawRow(null);
-			GUITools.DrawSeparator();
+			NGUIEditorTools.DrawSeparator();
 			foreach (Camera cam in list) DrawRow(cam);
 		}
 		else

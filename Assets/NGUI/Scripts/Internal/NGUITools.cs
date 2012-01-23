@@ -204,10 +204,12 @@ static public class NGUITools
 				box = go.AddComponent<BoxCollider>();
 			}
 
+			int depth = NGUITools.CalculateNextDepth(go);
+
 			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform);
 			box.isTrigger = true;
-			box.center = b.center;
-			box.size = b.size; // Need 3D colliders? Try this: new Vector3(b.size.x, b.size.y, Mathf.Max(1f, b.size.z));
+			box.center = b.center + Vector3.back * (depth * 0.25f);
+			box.size = new Vector3(b.size.x, b.size.y, 0f);
 		}
 	}
 
@@ -253,6 +255,82 @@ static public class NGUITools
 				lbl.font = after;
 			}
 		}
+	}
+
+	/// <summary>
+	/// Helper function that returns the string name of the type.
+	/// </summary>
+
+	static public string GetName<T> () where T : Component
+	{
+		string s = typeof(T).ToString();
+		if (s.StartsWith("UI")) s = s.Substring(2);
+		else if (s.StartsWith("UnityEngine.")) s = s.Substring(12);
+		return s;
+	}
+
+	/// <summary>
+	/// Add a new child game object.
+	/// </summary>
+
+	static public GameObject AddChild (GameObject parent)
+	{
+		GameObject go = new GameObject();
+
+		if (parent != null)
+		{
+			Transform t = go.transform;
+			t.parent = parent.transform;
+			t.localPosition = Vector3.zero;
+			t.localRotation = Quaternion.identity;
+			t.localScale = Vector3.one;
+			go.layer = parent.layer;
+		}
+		return go;
+	}
+
+	/// <summary>
+	/// Gathers all widgets and calculates the depth for the next widget.
+	/// </summary>
+
+	static public int CalculateNextDepth (GameObject go)
+	{
+		int depth = -1;
+		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
+		foreach (UIWidget w in widgets) depth = Mathf.Max(depth, w.depth);
+		return depth + 1;
+	}
+
+	/// <summary>
+	/// Add a child object to the specified parent and attaches the specified script to it.
+	/// </summary>
+
+	static public T AddChild<T> (GameObject parent) where T : Component
+	{
+		GameObject go = AddChild(parent);
+		go.name = GetName<T>();
+		return go.AddComponent<T>();
+	}
+
+	/// <summary>
+	/// Add a new widget of specified type.
+	/// </summary>
+
+	static public T AddWidget<T> (GameObject go) where T : UIWidget
+	{
+		int depth = CalculateNextDepth(go);
+
+		// Create the widget and place it above other widgets
+		T widget = AddChild<T>(go);
+		widget.depth = depth;
+
+		// Clear the local transform
+		Transform t = widget.transform;
+		t.localPosition = Vector3.zero;
+		t.localRotation = Quaternion.identity;
+		t.localScale = new Vector3(100f, 100f, 1f);
+		widget.gameObject.layer = go.layer;
+		return widget;
 	}
 
 	#region Deprecated functions

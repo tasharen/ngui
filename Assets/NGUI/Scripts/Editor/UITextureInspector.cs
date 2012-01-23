@@ -30,7 +30,7 @@ public class UITextureInspector : UIWidgetInspector
 		{
 			// Draw the atlas
 			EditorGUILayout.Separator();
-			GUITools.DrawSprite(tex, new Rect(0f, 0f, 1f, 1f), null);
+			NGUIEditorTools.DrawSprite(tex, new Rect(0f, 0f, 1f, 1f), null);
 
 			// Sprite size label
 			Rect rect = GUILayoutUtility.GetRect(Screen.width, 18f);

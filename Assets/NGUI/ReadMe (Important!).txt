@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.41
+                Version 1.42
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -36,13 +36,21 @@ All can be found here: http://www.tasharen.com/?page_id=140
 Version History
 ---------------
 
+1.42:
+- NEW: Added a new tool: Widget Creation Wizard. It replaces all "Add" functions in NGUI menu.
+- NEW: Added new templates to the Widget Wizard: Button, Checkbox, Progress Bar, Slider.
+- NEW: When adding widgets via the wizard, widget depth is now chosen automatically so that each new widget appears on top.
+- NEW: AddWidget<> functionality is now exposed to runtime scripts (found in NGUITools).
+- FIX: Widget colliders of widgets layed on top of each other are now offset by wiget's depth.
+- FIX: Several minor bug fixes.
+
 1.41:
 - NEW: Added a new tool: Camera Tool. It can be used to get a bird's eye view of your cameras and determine what draws the selected object.
 - NEW: Added a new tool: Create New UI. You can use it to create an entire UI hierarchy for 2D or 3D layouts with one click of a button.
 - NEW: Added a new script: UIRoot. It can be used to scale the root of your UI by 2/ScreenHeight (the opposite of UIOrthoCamera).
 - NEW: The NGUI menu has been enhanced. When adding widgets, it will intelligently determine where to add them best.
 - NEW: Sliced sprites now have an option to not draw the center, in case you only want the border.
-- FIX: Scaling the sliced sprite will now correctly update it again.
+- FIX: Scaling sliced sprites and tiled sprites will now correctly update them again.
 - FIX: Changing the depth of the widgets will now correctly update them again.
 - FIX: The unnecessary color parameter specified on the material has been removed from the shaders.
 

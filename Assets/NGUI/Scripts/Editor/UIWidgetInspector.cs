@@ -56,7 +56,7 @@ public class UIWidgetInspector : Editor
 				OnInit();
 			}
 
-			GUITools.DrawSeparator();
+			NGUIEditorTools.DrawSeparator();
 
 			// Check the hierarchy to ensure that this widget is not parented to another widget
 			if (mHierarchyCheck) CheckHierarchy();
@@ -82,7 +82,7 @@ public class UIWidgetInspector : Editor
 
 	protected void DrawCommonProperties ()
 	{
-		GUITools.DrawSeparator();
+		NGUIEditorTools.DrawSeparator();
 
 		// Depth navigation
 		GUILayout.BeginHorizontal();
@@ -191,7 +191,7 @@ public class UIWidgetInspector : Editor
 
 				// You can change it to this, solving the problem:
 
-				// GameObject
+				// GameObject (scale 1, 1, 1)
 				//  |
 				//  +- Widget #1
 				//  |

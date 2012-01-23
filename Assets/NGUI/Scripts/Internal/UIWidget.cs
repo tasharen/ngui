@@ -183,26 +183,6 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Helper function that automatically calculates depth of this widget based on the hierarchy.
-	/// </summary>
-
-	int CalculateDepth ()
-	{
-		Transform t = transform;
-		int val = 0;
-
-		for (;;)
-		{
-			t = t.parent;
-			if (t == null) break;
-			++val;
-			UIWidget w = t.GetComponent<UIWidget>();
-			if (w != null) return w.depth + val;
-		}
-		return val;
-	}
-
-	/// <summary>
 	/// Cache the transform.
 	/// </summary>
 
@@ -236,7 +216,6 @@ public abstract class UIWidget : MonoBehaviour
 
 	void Start ()
 	{
-		if (mDepth == 0) mDepth = CalculateDepth();
 		OnStart();
 		CreatePanel();
 	}

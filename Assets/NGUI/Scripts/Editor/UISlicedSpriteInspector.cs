@@ -43,11 +43,11 @@ public class UISlicedSpriteInspector : UISpriteInspector
 		{
 			// Draw the atlas
 			EditorGUILayout.Separator();
-			Rect rect = GUITools.DrawSprite(tex, sprite.outerUV, mUseShader ? mSprite.atlas.material : null);
+			Rect rect = NGUIEditorTools.DrawSprite(tex, sprite.outerUV, mUseShader ? mSprite.atlas.material : null);
 
 			// Draw the selection
-			GUITools.DrawOutline(rect, sprite.innerUV, new Color(0f, 0.7f, 1f, 1f));
-			GUITools.DrawOutline(rect, sprite.outerUV, new Color(0.4f, 1f, 0f, 1f));
+			NGUIEditorTools.DrawOutline(rect, sprite.innerUV, new Color(0f, 0.7f, 1f, 1f));
+			NGUIEditorTools.DrawOutline(rect, sprite.outerUV, new Color(0.4f, 1f, 0f, 1f));
 
 			// Sprite size label
 			string text = "Sprite Size: ";

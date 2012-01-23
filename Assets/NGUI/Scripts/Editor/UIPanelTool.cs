@@ -27,7 +27,7 @@ public class UIPanelTool : EditorWindow
 		if (panels.Length > 0)
 		{
 			DrawRow(null, false);
-			GUITools.DrawSeparator();
+			NGUIEditorTools.DrawSeparator();
 
 			UIPanel selectedPanel = null;
 			Transform t = Selection.activeTransform;

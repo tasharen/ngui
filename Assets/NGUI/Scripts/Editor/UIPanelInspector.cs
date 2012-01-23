@@ -15,7 +15,7 @@ public class UIPanelInspector : Editor
 		List<UIDrawCall> drawcalls = panel.drawCalls;
 		EditorGUIUtility.LookLikeControls(80f);
 
-		GUITools.DrawSeparator();
+		NGUIEditorTools.DrawSeparator();
 
 		bool norms = EditorGUILayout.Toggle("Normals", panel.generateNormals);
 
@@ -94,7 +94,7 @@ public class UIPanelInspector : Editor
 
 		foreach (UIDrawCall dc in drawcalls)
 		{
-			GUITools.DrawSeparator();
+			NGUIEditorTools.DrawSeparator();
 			EditorGUILayout.ObjectField("Material", dc.material, typeof(Material), false);
 			EditorGUILayout.LabelField("Triangles", dc.triangles.ToString());
 		}

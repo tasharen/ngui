@@ -9,10 +9,6 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Sprite (Basic)")]
 public class UISprite : UIWidget
 {
-	// Last used values, here for convenience
-	static UIAtlas mLastAtlas;
-	static string mLastSprite = "";
-
 	// Cached and saved values
 #if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
 	public UIAtlas mAtlas;
@@ -52,7 +48,6 @@ public class UISprite : UIWidget
 		{
 			if (mAtlas != value)
 			{
-				mLastAtlas = value;
 				mAtlas = value;
 
 				// Update the material
@@ -106,7 +101,6 @@ public class UISprite : UIWidget
 			else if (mSpriteName != value)
 			{
 				// If the sprite name changes, the sprite reference should also be updated
-				mLastSprite = value;
 				mSpriteName = value;
 				sprite = (mAtlas != null) ? mAtlas.GetSprite(mSpriteName) : null;
 				mChanged = true;
@@ -208,17 +202,6 @@ public class UISprite : UIWidget
 			cachedTransform.localScale = scale;
 		}
 		base.MakePixelPerfect();
-	}
-
-	/// <summary>
-	/// Convenience function used by NGUIMenu.
-	/// </summary>
-
-	public void SetToLastValues ()
-	{
-		atlas = mLastAtlas;
-		spriteName = mLastSprite;
-		MakePixelPerfect();
 	}
 
 	/// <summary>

@@ -5,9 +5,6 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Label")]
 public class UILabel : UIWidget
 {
-	// Last used value, here for convenience (auto-set when a new label gets added via NGUI's menu)
-	static UIFont mLastFont;
-
 #if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
 	public UIFont mFont;
 	public string mText = "";
@@ -44,7 +41,6 @@ public class UILabel : UIWidget
 		{
 			if (mFont != value)
 			{
-				mLastFont = value;
 				mFont = value;
 				material = (mFont != null) ? mFont.material : null;
 				mChanged = true;
@@ -238,17 +234,6 @@ public class UILabel : UIWidget
 			}
 			return mProcessedText;
 		}
-	}
-
-	/// <summary>
-	/// Convenience function used by NGUIMenu.
-	/// </summary>
-
-	public void SetToLastValues ()
-	{
-		font = mLastFont;
-		text = "Text";
-		MakePixelPerfect();
 	}
 
 	/// <summary>

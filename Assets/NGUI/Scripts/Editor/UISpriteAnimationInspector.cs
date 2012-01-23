@@ -14,7 +14,7 @@ public class UISpriteAnimationInspector : Editor
 
 	public override void OnInspectorGUI ()
 	{
-		GUITools.DrawSeparator();
+		NGUIEditorTools.DrawSeparator();
 		EditorGUIUtility.LookLikeControls(80f);
 		UISpriteAnimation anim = target as UISpriteAnimation;
 
