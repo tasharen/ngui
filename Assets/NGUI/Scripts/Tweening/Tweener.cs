@@ -46,6 +46,12 @@ public abstract class Tweener : MonoBehaviour
 	public int tweenGroup = 0;
 
 	/// <summary>
+	/// Target used with 'callWhenFinished', or this game object if none was specified.
+	/// </summary>
+
+	public GameObject eventReceiver;
+
+	/// <summary>
 	/// Name of the function to call when the tween finishes.
 	/// </summary>
 
@@ -130,11 +136,23 @@ public abstract class Tweener : MonoBehaviour
 		{
 			mFactor = Mathf.Clamp01(mFactor);
 
-			// Notify listeners
-			if (!string.IsNullOrEmpty(callWhenFinished)) SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
+			if (string.IsNullOrEmpty(callWhenFinished))
+			{
+				enabled = false;
+			}
+			else
+			{
+				// Notify the event listener target
+				GameObject go = eventReceiver;
+				if (go == null) go = gameObject;
+				go.SendMessage(callWhenFinished, this, SendMessageOptions.DontRequireReceiver);
 
-			// Disable this script
-			enabled = false;
+				// Disable this script unless the SendMessage function above changed something
+				if (mFactor == 1f && mAmountPerDelta > 0f || mFactor == 0f && mAmountPerDelta < 0f)
+				{
+					enabled = false;
+				}
+			}
 		}
 	}
 

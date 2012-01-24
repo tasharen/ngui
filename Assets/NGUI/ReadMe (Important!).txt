@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.42b
+                Version 1.43
     http://www.tasharen.com/?page_id=140
             support@tasharen.com
 ----------------------------------------------
@@ -35,6 +35,15 @@ All can be found here: http://www.tasharen.com/?page_id=140
 ---------------
 Version History
 ---------------
+
+1.43:
+- NEW: Added the Input template to the Widget Tool.
+- NEW: UIButtonMessage will now pass the button's game object as an optional parameter.
+- NEW: Tweener will now pass itself as a parameter to the callWhenFinished function.
+- NEW: Tweener now has an 'eventReceiver' parameter you can set for the 'callWhenFinished' function.
+- FIX: Tweener will no longer disable itself if one of OnFinished SendMessage callbacks reset it.
+- FIX: Updated all tutorials to use 1.42+ functionality.
+- FIX: Slider will now correctly mark its foreground widget as having changed on value change.
 
 1.42:
 - NEW: Added a new tool: Widget Creation Wizard. It replaces all "Add" functions in NGUI menu.

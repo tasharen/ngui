@@ -20,6 +20,7 @@ public class UICreateWidgetWizard : EditorWindow
 		Checkbox,
 		ProgressBar,
 		Slider,
+		Input,
 	}
 
 	static UIAtlas mAtlas;
@@ -35,6 +36,7 @@ public class UICreateWidgetWizard : EditorWindow
 	static string mSliderTB = "";
 	static string mCheckBG = "";
 	static string mCheck = "";
+	static string mInputBG = "";
 	static bool mLoaded = false;
 
 	/// <summary>
@@ -80,6 +82,7 @@ public class UICreateWidgetWizard : EditorWindow
 		SaveString("NGUI SliderBG", mSliderBG);
 		SaveString("NGUI SliderFG", mSliderFG);
 		SaveString("NGUI SliderTB", mSliderTB);
+		SaveString("NGUI InputBG", mInputBG);
 
 		PlayerPrefs.Save();
 	}
@@ -109,6 +112,7 @@ public class UICreateWidgetWizard : EditorWindow
 		mSliderBG	= LoadString("NGUI SliderBG");
 		mSliderFG	= LoadString("NGUI SliderFG");
 		mSliderTB	= LoadString("NGUI SliderTB");
+		mInputBG	= LoadString("NGUI InputBG");
 	}
 
 	/// <summary>
@@ -455,6 +459,60 @@ public class UICreateWidgetWizard : EditorWindow
 	}
 
 	/// <summary>
+	/// Input field creation function.
+	/// </summary>
+
+	void CreateInput (GameObject go)
+	{
+		if (mAtlas != null)
+		{
+			GUILayout.BeginHorizontal();
+			string bg = UISpriteInspector.SpriteField(mAtlas, "Background", mInputBG, GUILayout.Width(200f));
+			GUILayout.Space(20f);
+			GUILayout.Label("Sliced Sprite for the background");
+			GUILayout.EndHorizontal();
+			if (mInputBG != bg) { mInputBG = bg; Save(); }
+		}
+
+		if (ShouldCreate(go, mAtlas != null && mFont != null))
+		{
+			int depth = NGUITools.CalculateNextDepth(go);
+			go = NGUITools.AddChild(go);
+			go.name = "Input";
+
+			float padding = 3f;
+
+			UISlicedSprite bg = NGUITools.AddWidget<UISlicedSprite>(go);
+			bg.depth = depth;
+			bg.atlas = mAtlas;
+			bg.spriteName = mInputBG;
+			bg.pivot = UIWidget.Pivot.Left;
+			bg.transform.localScale = new Vector3(400f, mFont.size + padding * 2f, 1f);
+			bg.MakePixelPerfect();
+
+			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
+			lbl.font = mFont;
+			lbl.pivot = UIWidget.Pivot.Left;
+			lbl.transform.localPosition = new Vector3(padding, 0f, 0f);
+			lbl.multiLine = false;
+			lbl.supportEncoding = false;
+			lbl.lineWidth = 400f - padding * 2f;
+			lbl.text = "You can type here";
+			lbl.MakePixelPerfect();
+
+			// Add a collider to the background
+			NGUITools.AddWidgetCollider(bg.gameObject);
+
+			// Add an input script to the background and have it point to the label
+			UIInput input = bg.gameObject.AddComponent<UIInput>();
+			input.label = lbl;
+
+			// Update the selection
+			Selection.activeGameObject = go;
+		}
+	}
+
+	/// <summary>
 	/// Repaint the window on selection.
 	/// </summary>
 
@@ -518,6 +576,7 @@ public class UICreateWidgetWizard : EditorWindow
 				case WidgetType.Checkbox:		CreateCheckbox(go); break;
 				case WidgetType.ProgressBar:	CreateSlider(go, false); break;
 				case WidgetType.Slider:			CreateSlider(go, true); break;
+				case WidgetType.Input:			CreateInput(go); break;
 			}
 		}
 	}
