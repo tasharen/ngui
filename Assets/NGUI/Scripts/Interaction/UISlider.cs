@@ -27,6 +27,7 @@ public class UISlider : MonoBehaviour
 	BoxCollider mCol;
 	Transform mTrans;
 	Transform mForeTrans;
+	UIWidget mWidget;
 	UIFilledSprite mSprite;
 
 	/// <summary>
@@ -62,7 +63,8 @@ public class UISlider : MonoBehaviour
 
 		if (foreground != null)
 		{
-			mSprite = foreground.GetComponent<UIFilledSprite>();
+			mWidget = foreground.GetComponent<UIWidget>();
+			mSprite = (mWidget != null) ? mWidget as UIFilledSprite : null;
 			mForeTrans = foreground.transform;
 			mScale = foreground.localScale;
 		}
@@ -154,6 +156,7 @@ public class UISlider : MonoBehaviour
 		else if (mForeTrans != null)
 		{
 			mForeTrans.localScale = scale;
+			if (mWidget != null) mWidget.MarkAsChanged();
 		}
 
 		if (thumb != null)

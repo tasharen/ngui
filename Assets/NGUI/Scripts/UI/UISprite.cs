@@ -162,7 +162,7 @@ public class UISprite : UIWidget
 	/// Update the texture UVs used by the widget.
 	/// </summary>
 
-	virtual protected void UpdateUVs()
+	virtual public void UpdateUVs()
 	{
 		Init();
 

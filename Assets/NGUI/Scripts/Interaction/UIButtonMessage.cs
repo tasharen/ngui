@@ -49,12 +49,12 @@ public class UIButtonMessage : MonoBehaviour
 
 			foreach (Transform t in transforms)
 			{
-				t.gameObject.SendMessage(functionName, SendMessageOptions.DontRequireReceiver);
+				t.gameObject.SendMessage(functionName, gameObject, SendMessageOptions.DontRequireReceiver);
 			}
 		}
 		else
 		{
-			target.SendMessage(functionName, SendMessageOptions.DontRequireReceiver);
+			target.SendMessage(functionName, gameObject, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 }

@@ -35,7 +35,7 @@ public class UISlicedSprite : UISprite
 	/// Update the texture UVs used by the widget.
 	/// </summary>
 
-	override protected void UpdateUVs()
+	override public void UpdateUVs()
 	{
 		Init();
 

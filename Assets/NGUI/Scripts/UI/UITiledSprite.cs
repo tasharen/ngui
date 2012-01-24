@@ -16,7 +16,7 @@ public class UITiledSprite : UISprite
 	/// Update the texture UVs used by the widget.
 	/// </summary>
 
-	override protected void UpdateUVs ()
+	override public void UpdateUVs ()
 	{
 		base.UpdateUVs();
 		
