@@ -88,7 +88,7 @@ public class UIPanelTool : EditorWindow
 				if (enabled != EditorGUILayout.Toggle(enabled, GUILayout.Width(20f)))
 				{
 					panel.gameObject.SetActiveRecursively(!enabled);
-					if (enabled) panel.enabled = true;
+					if (!enabled) panel.enabled = true;
 					EditorUtility.SetDirty(panel.gameObject);
 				}
 			}

@@ -47,13 +47,13 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 				float4 vertex : POSITION;
 				fixed4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
-				float4 worldPos : TEXCOORD1;
+				float2 worldPos : TEXCOORD1;
 			};
 
 			v2f vert (appdata_t v)
 			{
 				v2f o;
-				o.worldPos = v.vertex;
+				o.worldPos = v.vertex.xy;
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.color = v.color;
 				o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
@@ -62,7 +62,7 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 
 			fixed4 frag (v2f IN) : COLOR
 			{
-				float2 factor = abs(IN.worldPos.xy - _ClipRange.xy) / _ClipRange.zw;
+				float2 factor = abs(IN.worldPos - _ClipRange.xy) / _ClipRange.zw;
 
 				// Sample the texture
 				fixed4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
