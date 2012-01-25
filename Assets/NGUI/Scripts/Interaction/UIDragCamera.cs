@@ -65,7 +65,7 @@ public class UIDragCamera : MonoBehaviour
 			if (cam != null)
 			{
 				Vector3 bottomLeft = new Vector3(cam.rect.xMin * Screen.width, cam.rect.yMin * Screen.height, 0f);
-				Vector3 topRight = new Vector3(cam.rect.xMax * Screen.width, cam.rect.yMax * Screen.height, 0f);
+				Vector3 topRight   = new Vector3(cam.rect.xMax * Screen.width, cam.rect.yMax * Screen.height, 0f);
 
 				bottomLeft = cam.ScreenToWorldPoint(bottomLeft);
 				topRight = cam.ScreenToWorldPoint(topRight);

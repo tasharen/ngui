@@ -1,8 +1,8 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.43b
-    http://www.tasharen.com/?page_id=140
+                Version 1.44
+    http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
 
@@ -11,30 +11,44 @@ Thank you for buying NGUI!
 If you have any questions, suggestions, comments or feature requests, please don't hesitate to
 email support@tasharen.com, PM 'ArenMook' on the Unity forums, or add 'arenmook' to Skype.
 
+--------------------
+ How To Update NGUI
+--------------------
+
+If you have the Professional Edition of NGUI that comes with SVN access, simply SVN Update.
+
+If you have a regular copy of NGUI:
+
+1. Create a brand new Unity project.
+2. Import the latest NGUI package into this project.
+3. Delete the NGUI folder and all of its contents from your old project using Explorer (on Windows) or Finder (if you’re on the Mac).
+4. Copy the NGUI folder from the new project into the old project.
+5. Open your old project with Unity - it should now be up to date.
+
 ------------------------------------
 ****** !!! IMPORTANT NOTE !!! ******
 ------------------------------------
 
-If you are importing examples, since Unity project settings don't seem to get included in the package, you have to
-do either of the two steps in order to get some examples to work properly:
+If you are importing NGUI from a unity package, you will need to perform the following step
+in order to get the 2D and 3D layer names to show up in-game:
 
-1. If it's a clean project, simply extract the contents of the LibraryAssets.zip file
-   into the Library folder (Unity 3.4) or the ProjectSettings folder (Unity 3.5+), overwriting what's there.
-2. Alternatively, or if it's an existing project, add 2 new layers: "2D UI" and "3D UI", without quotes.
-   Not sure how? Select any game object, top right has a drop-down called "Layer", and it's likely set to
-   "Default". Expand it, click "Add Layer", and add the 2 layers by typing them in the User Layer 8 and 9 fields.
+If it's a clean project, simply extract the contents of the LibraryAssets.zip file into the Library
+folder (Unity 3.4) or the ProjectSettings folder (Unity 3.5+), overwriting what's there.
    
 If you are not importing examples, you can ignore this part.
 
--------------------------------------
-Support, documentation, and tutorials
--------------------------------------
+---------------------------------------
+ Support, documentation, and tutorials
+---------------------------------------
 
-All can be found here: http://www.tasharen.com/?page_id=140
+All can be found here: http://www.tasharen.com/?page_id=197
 
----------------
-Version History
----------------
+-----------------
+ Version History
+-----------------
+
+1.44:
+- NEW: UIGrid can now automatically sort its children by name before positioning them.
 
 1.43:
 - NEW: Added the Input template to the Widget Tool.

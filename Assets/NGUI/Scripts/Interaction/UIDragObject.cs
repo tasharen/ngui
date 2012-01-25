@@ -22,12 +22,14 @@ public class UIDragObject : MonoBehaviour
 	public Vector3 scale = Vector3.one;
 	public bool restrictWithinPanel = false;
 	public DragEffect dragEffect = DragEffect.MomentumAndSpring;
+	public float momentumAmount = 35f;
 
 	Plane mPlane;
 	Vector3 mLastPos;
 	UIPanel mPanel;
 	bool mPressed = false;
 	Vector3 mMomentum = Vector3.zero;
+	Bounds mBounds;
 
 	/// <summary>
 	/// Create a plane on which we will be performing the dragging.
@@ -35,24 +37,40 @@ public class UIDragObject : MonoBehaviour
 
 	void OnPress (bool pressed)
 	{
-		mPressed = pressed;
-
-		if (pressed)
+		if (target != null)
 		{
-			mMomentum = Vector3.zero;
+			mPressed = pressed;
 
-			if (target != null)
+			if (pressed)
 			{
+				// Find the panel automatically
+				if (restrictWithinPanel && mPanel == null)
+				{
+					mPanel = (target != null) ? UIPanel.Find(target.transform, false) : null;
+					if (mPanel == null) restrictWithinPanel = false;
+				}
+
+				// Calculate the bounds
+				if (restrictWithinPanel) mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.transform, target);
+
+				// Remove all momentum on press
+				mMomentum = Vector3.zero;
+
+				// Disable the spring movement
 				SpringPosition sp = target.GetComponent<SpringPosition>();
 				if (sp != null) sp.enabled = false;
+
+				// Remember the hit position
 				mLastPos = UICamera.lastHit.point;
+
+				// Create the plane to drag along
 				Transform trans = UICamera.lastCamera.transform;
 				mPlane = new Plane(trans.rotation * Vector3.back, mLastPos);
 			}
-		}
-		else if (dragEffect == DragEffect.MomentumAndSpring)
-		{
-			ConstrainToBounds(false);
+			else if (restrictWithinPanel && dragEffect == DragEffect.MomentumAndSpring)
+			{
+				ConstrainToBounds(false);
+			}
 		}
 	}
 
@@ -62,12 +80,6 @@ public class UIDragObject : MonoBehaviour
 
 	void OnDrag (Vector2 delta)
 	{
-		if (restrictWithinPanel && mPanel == null)
-		{
-			mPanel = (target != null) ? UIPanel.Find(target.transform, false) : null;
-			if (mPanel == null) restrictWithinPanel = false;
-		}
-
 		if (target != null)
 		{
 			Ray ray = UICamera.lastCamera.ScreenPointToRay(UICamera.lastTouchPosition);
@@ -77,6 +89,7 @@ public class UIDragObject : MonoBehaviour
 			{
 				Vector3 currentPos = ray.GetPoint(dist);
 				Vector3 offset = currentPos - mLastPos;
+				mLastPos = currentPos;
 
 				if (offset.x != 0f || offset.y != 0f)
 				{
@@ -85,14 +98,25 @@ public class UIDragObject : MonoBehaviour
 					offset = target.TransformDirection(offset);
 				}
 
-				mMomentum = Vector3.Lerp(mMomentum, offset, 0.5f);
+				// Adjust the momentum
+				mMomentum = Vector3.Lerp(mMomentum, offset * (Time.deltaTime * momentumAmount), 0.5f);
 
-				target.position += offset;
-				if (dragEffect != DragEffect.MomentumAndSpring && ConstrainToBounds(true)) mMomentum = Vector3.zero;
-				mLastPos = currentPos;
+				// We want to constrain the UI to be within bounds
+				if (restrictWithinPanel)
+				{
+					// Adjust the position and bounds
+					Vector3 localPos = target.localPosition;
+					target.position += offset;
+					mBounds.center = mBounds.center + (target.localPosition - localPos);
 
-				SpringPosition sp = target.GetComponent<SpringPosition>();
-				if (sp != null) sp.enabled = false;
+					// Constrain the UI to the bounds, and if done so, eliminate the momentum
+					if (dragEffect != DragEffect.MomentumAndSpring && ConstrainToBounds(true)) mMomentum = Vector3.zero;
+				}
+				else
+				{
+					// Adjust the position
+					target.position += offset;
+				}
 			}
 		}
 	}
@@ -103,14 +127,13 @@ public class UIDragObject : MonoBehaviour
 
 	Vector3 CalculateConstrainOffset ()
 	{
-		Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.transform, target);
 		Vector4 range = mPanel.clipRange;
 
 		float offsetX = range.z * 0.5f;
 		float offsetY = range.w * 0.5f;
 
-		Vector2 minRect = new Vector2(bounds.min.x, bounds.min.y);
-		Vector2 maxRect = new Vector2(bounds.max.x, bounds.max.y);
+		Vector2 minRect = new Vector2(mBounds.min.x, mBounds.min.y);
+		Vector2 maxRect = new Vector2(mBounds.max.x, mBounds.max.y);
 		Vector2 minArea = new Vector2(range.x - offsetX, range.y - offsetY);
 		Vector2 maxArea = new Vector2(range.x + offsetX, range.y + offsetY);
 
@@ -132,6 +155,7 @@ public class UIDragObject : MonoBehaviour
 				if (immediate)
 				{
 					target.localPosition += offset;
+					mBounds.center += offset;
 				}
 				else
 				{
@@ -149,9 +173,17 @@ public class UIDragObject : MonoBehaviour
 
 	void Update ()
 	{
-		if (dragEffect != DragEffect.None && !mPressed && target != null && mMomentum.magnitude > 0.005f)
+		if (mPressed)
 		{
+			// Disable the spring movement
+			SpringPosition sp = target.GetComponent<SpringPosition>();
+			if (sp != null) sp.enabled = false;
+		}
+		else if (dragEffect != DragEffect.None && target != null && mMomentum.magnitude > 0.005f)
+		{
+			// Apply the momentum
 			target.position += NGUIMath.SpringDampen(ref mMomentum, 9f, Time.deltaTime);
+			mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.transform, target);
 			ConstrainToBounds(false);
 		}
 	}
