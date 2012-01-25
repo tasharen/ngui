@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// All children added to the game object with this script will be repositioned to be on a grid of specified dimensions.
@@ -15,10 +16,11 @@ public class UIGrid : MonoBehaviour
 	}
 
 	public Arrangement arrangement = Arrangement.Horizontal;
-	public int maxRows = 0;
+	public int maxPerLine = 0;
 	public float cellWidth = 200f;
 	public float cellHeight = 200f;
 	public bool repositionNow = false;
+	public bool sorted = false;
 
 	void Start ()
 	{
@@ -34,6 +36,8 @@ public class UIGrid : MonoBehaviour
 		}
 	}
 
+	static int SortByName (Transform a, Transform b) { return string.Compare(a.name, b.name); }
+
 	public void Reposition ()
 	{
 		Transform myTrans = transform;
@@ -41,18 +45,41 @@ public class UIGrid : MonoBehaviour
 		int x = 0;
 		int y = 0;
 
-		for (int i = 0; i < myTrans.childCount; ++i)
+		if (sorted)
 		{
-			Transform t = myTrans.GetChild(i);
+			List<Transform> list = new List<Transform>();
 
-			t.localPosition = (arrangement == Arrangement.Horizontal) ?
-				new Vector3(cellWidth * x, -cellHeight * y, 0f) :
-				new Vector3(cellWidth * y, -cellHeight * x, 0f);
+			for (int i = 0; i < myTrans.childCount; ++i) list.Add(myTrans.GetChild(i));
+			list.Sort(SortByName);
 
-			if (x++ >= maxRows && maxRows > 0)
+			foreach (Transform t in list)
 			{
-				x = 0;
-				++y;
+				t.localPosition = (arrangement == Arrangement.Horizontal) ?
+					new Vector3(cellWidth * x, -cellHeight * y, 0f) :
+					new Vector3(cellWidth * y, -cellHeight * x, 0f);
+
+				if (++x >= maxPerLine && maxPerLine > 0)
+				{
+					x = 0;
+					++y;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < myTrans.childCount; ++i)
+			{
+				Transform t = myTrans.GetChild(i);
+
+				t.localPosition = (arrangement == Arrangement.Horizontal) ?
+					new Vector3(cellWidth * x, -cellHeight * y, 0f) :
+					new Vector3(cellWidth * y, -cellHeight * x, 0f);
+
+				if (++x >= maxPerLine && maxPerLine > 0)
+				{
+					x = 0;
+					++y;
+				}
 			}
 		}
 	}
