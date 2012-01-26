@@ -296,8 +296,23 @@ public class UILabel : UIWidget
 #if !UNITY_FLASH
 		// Unity 3.5b6 is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
 		if (mFont == null) return;
-#endif	
+#endif
+		Pivot p = pivot;
+
 		// Print the text into the buffers
-		mFont.Print(processedText, color, verts, uvs, cols, mEncoding);
+		if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)
+		{
+			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, UIFont.Alignment.Left, 0);
+		}
+		else if (p == Pivot.Right || p == Pivot.TopRight || p == Pivot.BottomRight)
+		{
+			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, UIFont.Alignment.Right,
+				Mathf.RoundToInt((lineWidth > 0f) ? lineWidth : relativeSize.x * mFont.size));
+		}
+		else
+		{
+			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, UIFont.Alignment.Center,
+				Mathf.RoundToInt((lineWidth > 0f) ? lineWidth : relativeSize.x * mFont.size));
+		}
 	}
 }

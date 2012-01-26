@@ -9,6 +9,13 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Font")]
 public class UIFont : MonoBehaviour
 {
+	public enum Alignment
+	{
+		Left,
+		Center,
+		Right,
+	}
+
 #if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
 	public Material mMat;
 	public Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
@@ -354,10 +361,34 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Print the specified text into the buffers.
+	/// Align the vertices to be right or center-aligned given the specified line width.
 	/// </summary>
 
-	public void Print (string text, Color color, List<Vector3> verts, List<Vector2> uvs, List<Color> cols, bool encoding)
+	void Align (List<Vector3> verts, int indexOffset, Alignment alignment, int x, int lineWidth)
+	{
+		if (alignment != Alignment.Left && mFont.charSize > 0)
+		{
+			float offset = (alignment == Alignment.Right) ? lineWidth - x : (lineWidth - x) * 0.5f;
+			if (offset < 0f) offset = 0f;
+			offset /= mFont.charSize;
+
+			Vector3 temp;
+			for (int i = indexOffset, imax = verts.Count; i < imax; ++i)
+			{
+				temp = verts[i];
+				temp.x += offset;
+				verts[i] = temp;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Print the specified text into the buffers.
+	/// Note: 'lineWidth' parameter should be in pixels.
+	/// </summary>
+
+	public void Print (string text, Color color, List<Vector3> verts, List<Vector2> uvs, List<Color> cols,
+		bool encoding, Alignment alignment, int lineWidth)
 	{
 		if (mFont != null && text != null)
 		{
@@ -372,6 +403,7 @@ public class UIFont : MonoBehaviour
 
 			Vector2 scale = mFont.charSize > 0 ? new Vector2(1f / mFont.charSize, 1f / mFont.charSize) : Vector2.one;
 
+			int indexOffset = verts.Count;
 			int maxX = 0;
 			int x = 0;
 			int y = 0;
@@ -389,6 +421,13 @@ public class UIFont : MonoBehaviour
 				if (c == '\n' || (encoding && (c == '\\') && (i + 1 < imax) && (text[i + 1] == 'n')))
 				{
 					if (x > maxX) maxX = x;
+
+					if (alignment != Alignment.Left)
+					{
+						Align(verts, indexOffset, alignment, x, lineWidth);
+						indexOffset = verts.Count;
+					}
+
 					x = 0;
 					y += lineHeight;
 					prev = 0;
@@ -450,6 +489,12 @@ public class UIFont : MonoBehaviour
 					x += mSpacingX + glyph.advance;
 					prev = c;
 				}
+			}
+
+			if (alignment != Alignment.Left && indexOffset < verts.Count)
+			{
+				Align(verts, indexOffset, alignment, x, lineWidth);
+				indexOffset = verts.Count;
 			}
 		}
 	}
