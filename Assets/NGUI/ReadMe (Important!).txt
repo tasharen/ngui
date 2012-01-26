@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.44
+                Version 1.45
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -46,6 +46,15 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.45:
+- NEW: Text labels will center or right-align their text if such pivot was used.
+- NEW: Added an inspector class for the UIImageButton.
+- NEW: UIGrid now has the ability to skip deactivated game objects.
+- NEW: Font sprite is now imported when the font's data is imported, and will now be automatically selected from the atlas on import.
+- FIX: Making widgets pixel-perfect will now make them look crisp even if their dimensions are not even (ex: 17x17 instead of 18x18).
+- FIX: Component Selector will now only show actual prefabs as recommended selections. Prefab instances aren't.
+- FIX: BMFontReader was not parsing lines quite right...
 
 1.44:
 - NEW: UIGrid can now automatically sort its children by name before positioning them.
