@@ -19,11 +19,19 @@ public class UIImageButton : MonoBehaviour
 
 	void OnHover (bool isOver)
 	{
-		if (target != null) target.spriteName = isOver ? hoverSprite : normalSprite;
+		if (target != null)
+		{
+			target.spriteName = isOver ? hoverSprite : normalSprite;
+			target.MakePixelPerfect();
+		}
 	}
 
 	void OnPress (bool pressed)
 	{
-		if (target != null) target.spriteName = pressed ? pressedSprite : normalSprite;
+		if (target != null)
+		{
+			target.spriteName = pressed ? pressedSprite : normalSprite;
+			target.MakePixelPerfect();
+		}
 	}
 }

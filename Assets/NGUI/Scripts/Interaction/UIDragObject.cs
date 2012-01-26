@@ -159,7 +159,7 @@ public class UIDragObject : MonoBehaviour
 				}
 				else
 				{
-					SpringPosition.Begin(target.gameObject, target.localPosition + offset, 13f);
+					SpringPosition.Begin(target.gameObject, target.localPosition + offset, 13f).worldSpace = false;
 				}
 				return true;
 			}

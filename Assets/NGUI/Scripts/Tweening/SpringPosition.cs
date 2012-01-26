@@ -9,6 +9,7 @@ public class SpringPosition : MonoBehaviour
 {
 	public Vector3 target = Vector3.zero;
 	public float strength = 10f;
+	public bool worldSpace = false;
 
 	Transform mTrans;
 	float mThreshold = 0f;
@@ -21,9 +22,18 @@ public class SpringPosition : MonoBehaviour
 
 	void Update ()
 	{
-		if (mThreshold == 0f) mThreshold = (target - mTrans.localPosition).magnitude * 0.005f;
-		mTrans.localPosition = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, Time.deltaTime);
-		if (mThreshold >= (target - mTrans.localPosition).magnitude) enabled = false;
+		if (worldSpace)
+		{
+			if (mThreshold == 0f) mThreshold = (target - mTrans.position).magnitude * 0.005f;
+			mTrans.position = NGUIMath.SpringLerp(mTrans.position, target, strength, Time.deltaTime);
+			if (mThreshold >= (target - mTrans.position).magnitude) enabled = false;
+		}
+		else
+		{
+			if (mThreshold == 0f) mThreshold = (target - mTrans.localPosition).magnitude * 0.005f;
+			mTrans.localPosition = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, Time.deltaTime);
+			if (mThreshold >= (target - mTrans.localPosition).magnitude) enabled = false;
+		}
 	}
 
 	/// <summary>
@@ -36,8 +46,12 @@ public class SpringPosition : MonoBehaviour
 		if (sp == null) sp = go.AddComponent<SpringPosition>();
 		sp.target = pos;
 		sp.strength = strength;
-		sp.mThreshold = 0f;
-		sp.enabled = true;
+
+		if (!sp.enabled)
+		{
+			sp.mThreshold = 0f;
+			sp.enabled = true;
+		}
 		return sp;
 	}
 }

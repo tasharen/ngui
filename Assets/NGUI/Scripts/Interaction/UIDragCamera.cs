@@ -11,7 +11,7 @@ public class UIDragCamera : MonoBehaviour
 	/// Target object that will be dragged.
 	/// </summary>
 
-	public Transform target;
+	public Camera target;
 
 	/// <summary>
 	/// Root object that will be used for drag-limiting bounds.
@@ -26,6 +26,62 @@ public class UIDragCamera : MonoBehaviour
 	public Vector2 scale = Vector2.one;
 
 	/// <summary>
+	/// Effect to apply when dragging.
+	/// </summary>
+
+	public UIDragObject.DragEffect dragEffect = UIDragObject.DragEffect.MomentumAndSpring;
+
+	/// <summary>
+	/// How much momentum gets applied when the press is released after dragging.
+	/// </summary>
+
+	public float momentumAmount = 35f;
+
+	Transform mTrans;
+	bool mPressed = false;
+	Vector3 mMomentum = Vector3.zero;
+	Bounds mBounds;
+
+	/// <summary>
+	/// Cache the transform.
+	/// </summary>
+
+	void Start ()
+	{
+		if (target != null) mTrans = target.transform;
+		else enabled = false;
+	}
+
+	/// <summary>
+	/// Calculate the bounds of all widgets under this game object.
+	/// </summary>
+
+	void OnPress (bool isPressed)
+	{
+		if (rootForBounds != null)
+		{
+			mPressed = isPressed;
+
+			if (isPressed)
+			{
+				// Update the bounds
+				mBounds = NGUIMath.CalculateAbsoluteWidgetBounds(rootForBounds);
+
+				// Remove all momentum on press
+				mMomentum = Vector3.zero;
+
+				// Disable the spring movement
+				SpringPosition sp = target.GetComponent<SpringPosition>();
+				if (sp != null) sp.enabled = false;
+			}
+			else if (dragEffect == UIDragObject.DragEffect.MomentumAndSpring)
+			{
+				ConstrainToBounds(false);
+			}
+		}
+	}
+
+	/// <summary>
 	/// Drag event receiver.
 	/// </summary>
 
@@ -33,81 +89,81 @@ public class UIDragCamera : MonoBehaviour
 	{
 		if (target != null)
 		{
-			// Adjust the position
-			target.position += new Vector3(delta.x * scale.x, delta.y * scale.y, 0f);
+			Vector3 offset = Vector3.Scale((Vector3)delta, -scale);
+			mTrans.localPosition += offset;
 
-			// Limit the movement to be within the target's bounds
-			if (rootForBounds != null) UpdateTargetPosition();
+			// Adjust the momentum
+			mMomentum = Vector3.Lerp(mMomentum, offset * (Time.deltaTime * momentumAmount), 0.5f);
+
+			// Constrain the UI to the bounds, and if done so, eliminate the momentum
+			if (dragEffect != UIDragObject.DragEffect.MomentumAndSpring && ConstrainToBounds(true)) mMomentum = Vector3.zero;
 		}
 	}
 
 	/// <summary>
-	/// Update the target's position, limiting it to be within the root's bounds.
+	/// Calculate the offset needed to be constrained within the panel's bounds.
 	/// </summary>
 
-	public void UpdateTargetPosition ()
+	Vector3 CalculateConstrainOffset ()
 	{
-		if (rootForBounds != null)
+		if (target == null || rootForBounds == null) return Vector3.zero;
+
+		Vector3 bottomLeft = new Vector3(target.rect.xMin * Screen.width, target.rect.yMin * Screen.height, 0f);
+		Vector3 topRight   = new Vector3(target.rect.xMax * Screen.width, target.rect.yMax * Screen.height, 0f);
+
+		bottomLeft = target.ScreenToWorldPoint(bottomLeft);
+		topRight = target.ScreenToWorldPoint(topRight);
+
+		Vector2 minRect = new Vector2(mBounds.min.x, mBounds.min.y);
+		Vector2 maxRect = new Vector2(mBounds.max.x, mBounds.max.y);
+
+		return NGUIMath.ConstrainRect(minRect, maxRect, bottomLeft, topRight);
+	}
+
+	/// <summary>
+	/// Constrain the current camera's position to be within the viewable area's bounds.
+	/// </summary>
+
+	bool ConstrainToBounds (bool immediate)
+	{
+		if (mTrans != null && rootForBounds != null)
 		{
-			// Calculate the bounds of all widgets under this game object
-			Bounds bounds = NGUIMath.CalculateAbsoluteWidgetBounds(rootForBounds);
+			Vector3 offset = CalculateConstrainOffset();
 
-			// Include the bounds of all colliders as well
-			Collider[] cols = rootForBounds.GetComponentsInChildren<Collider>();
-			foreach (Collider c in cols) bounds.Encapsulate(c.bounds);
-
-			Vector3 pos = target.position;
-			Vector3 min = bounds.min;
-			Vector3 max = bounds.max;
-
-			Camera cam = target.GetComponent<Camera>();
-
-			if (cam != null)
+			if (offset.magnitude > 0f)
 			{
-				Vector3 bottomLeft = new Vector3(cam.rect.xMin * Screen.width, cam.rect.yMin * Screen.height, 0f);
-				Vector3 topRight   = new Vector3(cam.rect.xMax * Screen.width, cam.rect.yMax * Screen.height, 0f);
-
-				bottomLeft = cam.ScreenToWorldPoint(bottomLeft);
-				topRight = cam.ScreenToWorldPoint(topRight);
-
-				float width = topRight.x - bottomLeft.x;
-				float height = topRight.y - bottomLeft.y;
-				float halfWidth = width * 0.5f;
-				float halfHeight = height * 0.5f;
-
-				Vector3 min0 = min;
-				Vector3 min1 = min;
-				Vector3 max0 = max;
-				Vector3 max1 = max;
-
-				min0.x += halfWidth;
-				max0.x -= halfWidth;
-
-				min0.y += halfHeight;
-				max0.y -= halfHeight;
-
-				float xSize = (max.x - min.x);
-				float ySize = (max.y - min.y);
-
-				min1.x -= halfWidth - xSize;
-				max1.x += halfWidth - xSize;
-
-				min1.y -= halfHeight - ySize;
-				max1.y += halfHeight - ySize;
-
-				min.x = Mathf.Min(min0.x, min1.x);
-				min.y = Mathf.Min(min0.y, min1.y);
-				max.x = Mathf.Max(max0.x, max1.x);
-				max.y = Mathf.Max(max0.y, max1.y);
+				if (immediate)
+				{
+					mTrans.position -= offset;
+				}
+				else
+				{
+					SpringPosition.Begin(target.gameObject, mTrans.position - offset, 13f).worldSpace = true;
+				}
+				return true;
 			}
+		}
+		return false;
+	}
 
-			if (max.x < min.x) pos.x = bounds.center.x;
-			else pos.x = Mathf.Clamp(pos.x, min.x, max.x);
+	/// <summary>
+	/// Apply the dragging momentum.
+	/// </summary>
 
-			if (max.y < min.y) pos.y = bounds.center.y;
-			else pos.y = Mathf.Clamp(pos.y, min.y, max.y);
-
-			target.position = pos;
+	void Update ()
+	{
+		if (mPressed)
+		{
+			// Disable the spring movement
+			SpringPosition sp = target.GetComponent<SpringPosition>();
+			if (sp != null) sp.enabled = false;
+		}
+		else if (dragEffect != UIDragObject.DragEffect.None && target != null && mMomentum.magnitude > 0.005f)
+		{
+			// Apply the momentum
+			mTrans.localPosition += NGUIMath.SpringDampen(ref mMomentum, 9f, Time.deltaTime);
+			mBounds = NGUIMath.CalculateAbsoluteWidgetBounds(rootForBounds);
+			ConstrainToBounds(false);
 		}
 	}
 }

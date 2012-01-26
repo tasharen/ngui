@@ -28,6 +28,8 @@ public class UICamera : MonoBehaviour
 		public Vector2 delta;		// Delta since last update
 		public Vector2 totalDelta;	// Delta since the event started being tracked
 
+		public Camera pressedCam;		// Camera that the OnPress(true) was fired with
+
 		public GameObject current;	// The current game object under the touch or mouse
 		public GameObject hover;	// The last game object to receive OnHover
 		public GameObject pressed;	// The last game object to receive OnPress
@@ -117,8 +119,12 @@ public class UICamera : MonoBehaviour
 				if (mSel != null)
 				{
 					UICamera uicam = FindCameraForLayer(mSel.layer);
-					if (uicam != null) lastCamera = uicam.mCam;
-					mSel.SendMessage("OnSelect", false, SendMessageOptions.DontRequireReceiver);
+					
+					if (uicam != null)
+					{
+						lastCamera = uicam.mCam;
+						mSel.SendMessage("OnSelect", false, SendMessageOptions.DontRequireReceiver);
+					}
 				}
 
 				mSel = value;
@@ -126,8 +132,12 @@ public class UICamera : MonoBehaviour
 				if (mSel != null)
 				{
 					UICamera uicam = FindCameraForLayer(mSel.layer);
-					if (uicam != null) lastCamera = uicam.mCam;
-					mSel.SendMessage("OnSelect", true, SendMessageOptions.DontRequireReceiver);
+
+					if (uicam != null)
+					{
+						lastCamera = uicam.mCam;
+						mSel.SendMessage("OnSelect", true, SendMessageOptions.DontRequireReceiver);
+					}
 				}
 			}
 		}
@@ -181,27 +191,23 @@ public class UICamera : MonoBehaviour
 
 	static bool Raycast (Vector3 inPos, ref RaycastHit hit)
 	{
-		foreach (UICamera mouse in mList)
+		foreach (UICamera cam in mList)
 		{
 			// Skip inactive scripts
-			if (!mouse.enabled || !mouse.gameObject.active) continue;
+			if (!cam.enabled || !cam.gameObject.active) continue;
 
 			// Convert to view space
-			Camera cam = mouse.cachedCamera;
-			Vector3 pos = cam.ScreenToViewportPoint(inPos);
+			lastCamera = cam.cachedCamera;
+			Vector3 pos = lastCamera.ScreenToViewportPoint(inPos);
 
 			// If it's outside the camera's viewport, do nothing
 			if (pos.x < 0f || pos.x > 1f || pos.y < 0f || pos.y > 1f) continue;
 
 			// Cast a ray into the screen
-			Ray ray = cam.ScreenPointToRay(inPos);
+			Ray ray = lastCamera.ScreenPointToRay(inPos);
 
 			// Raycast into the screen
-			if (Physics.Raycast(ray, out hit, cam.farClipPlane - cam.nearClipPlane, mouse.cachedCamera.cullingMask))
-			{
-				lastCamera = cam;
-				return true;
-			}
+			if (Physics.Raycast(ray, out hit, lastCamera.farClipPlane - lastCamera.nearClipPlane, lastCamera.cullingMask)) return true;
 		}
 		return false;
 	}
@@ -298,22 +304,28 @@ public class UICamera : MonoBehaviour
 
 		if (mUseMouseInput)
 		{
-			// We still want to update what's under the mouse even if the game is paused
-			if (Time.timeScale == 0f) mMouse.current = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : null;
-
 			bool pressed = Input.GetMouseButtonDown(0);
 			bool unpressed = Input.GetMouseButtonUp(0);
 
-			Vector3 pos = Input.mousePosition;
-			mMouse.delta = pos - mMouse.pos;
-			lastTouchPosition = pos;
 			lastTouchID = -1;
+			lastTouchPosition = Input.mousePosition;
+			mMouse.delta = lastTouchPosition - mMouse.pos;
 
-			if (mMouse.pos != pos)
+			// We still want to update what's under the mouse even if the game is paused
+			if (pressed || unpressed || Time.timeScale == 0f)
+			{
+				mMouse.current = Raycast(lastTouchPosition, ref lastHit) ? lastHit.collider.gameObject : null;
+			}
+
+			// We don't want to update the last camera while there is a touch happening
+			if (pressed) mMouse.pressedCam = lastCamera;
+			else if (mMouse.pressed != null) lastCamera = mMouse.pressedCam;
+
+			if (mMouse.pos != lastTouchPosition)
 			{
 				if (mTooltipTime != 0f) mTooltipTime = Time.time + tooltipDelay;
 				else if (mTooltip != null) ShowTooltip(false);
-				mMouse.pos = pos;
+				mMouse.pos = lastTouchPosition;
 			}
 
 			// Process the mouse events
@@ -340,6 +352,10 @@ public class UICamera : MonoBehaviour
 				{
 					touch.current = Raycast(input.position, ref lastHit) ? lastHit.collider.gameObject : null;
 				}
+
+				// We don't want to update the last camera while there is a touch happening
+				if (pressed) touch.pressedCam = lastCamera;
+				else if (touch.pressed != null) lastCamera = mMouse.pressedCam;
 
 				// Process the events from this touch
 				ProcessTouch(touch, pressed, unpressed);
