@@ -26,7 +26,7 @@ public class ComponentSelector : ScriptableWizard
 #else
 		PrefabType type = PrefabUtility.GetPrefabType(go);
 #endif
-		return (type != PrefabType.None);
+		return (type == PrefabType.Prefab);
 	}
 
 	/// <summary>

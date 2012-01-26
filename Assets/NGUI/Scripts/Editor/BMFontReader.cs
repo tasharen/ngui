@@ -10,19 +10,28 @@ using System.Text;
 public static class BMFontReader
 {
 	/// <summary>
-	/// Helper function that retrieves the value of the key=value pair.
+	/// Helper function that retrieves the string value of the key=value pair.
 	/// </summary>
 
-	static int GetValue (string s)
+	static string GetString (string s)
 	{
 		int idx = s.IndexOf('=');
-		if (idx == -1) return 0;
-		int val = 0;
+		return (idx == -1) ? "" : s.Substring(idx + 1);
+	}
 
-		// This would be a lot more elegant, but Flash export doesn't support it :(
-		//int.TryParse(s.Substring(idx + 1), out val);
-		try { val = int.Parse(s.Substring(idx + 1)); }
-		catch (System.Exception) { }
+	/// <summary>
+	/// Helper function that retrieves the integer value of the key=value pair.
+	/// </summary>
+
+	static int GetInt (string s)
+	{
+		int val = 0;
+		string text = GetString(s);
+#if UNITY_FLASH
+		try { val = int.Parse(text); } catch (System.Exception) { }
+#else
+		int.TryParse(text, out val);
+#endif
 		return val;
 	}
 
@@ -51,7 +60,7 @@ public static class BMFontReader
 					if (ch != '\n' && ch != '\r') continue;
 				}
 
-				string line = Encoding.UTF8.GetString(buffer, offset, end - (end < max ? offset - 1 : offset));
+				string line = Encoding.UTF8.GetString(buffer, offset, end - offset - 1);
 				offset = end;
 				return line;
 			}
@@ -86,18 +95,18 @@ public static class BMFontReader
 
 					if (split.Length > 8)
 					{
-						int id = GetValue(split[1]);
+						int id = GetInt(split[1]);
 						BMGlyph glyph = font.GetGlyph(id, true);
 
 						if (glyph != null)
 						{
-							glyph.x			= GetValue(split[2]);
-							glyph.y			= GetValue(split[3]);
-							glyph.width		= GetValue(split[4]);
-							glyph.height	= GetValue(split[5]);
-							glyph.offsetX	= GetValue(split[6]);
-							glyph.offsetY	= GetValue(split[7]);
-							glyph.advance	= GetValue(split[8]);
+							glyph.x			= GetInt(split[2]);
+							glyph.y			= GetInt(split[3]);
+							glyph.width		= GetInt(split[4]);
+							glyph.height	= GetInt(split[5]);
+							glyph.offsetX	= GetInt(split[6]);
+							glyph.offsetY	= GetInt(split[7]);
+							glyph.advance	= GetInt(split[8]);
 						}
 						else Debug.Log("Char: " + split[1] + " (" + id + ") is NULL");
 					}
@@ -115,9 +124,9 @@ public static class BMFontReader
 
 					if (split.Length > 3)
 					{
-						int first  = GetValue(split[1]);
-						int second = GetValue(split[2]);
-						int amount = GetValue(split[3]);
+						int first  = GetInt(split[1]);
+						int second = GetInt(split[2]);
+						int amount = GetInt(split[3]);
 
 						BMGlyph glyph = font.GetGlyph(second, true);
 						if (glyph != null) glyph.SetKerning(first, amount);
@@ -136,12 +145,12 @@ public static class BMFontReader
 
 					if (split.Length > 5)
 					{
-						font.charSize	= GetValue(split[1]);
-						font.baseOffset = GetValue(split[2]);
-						font.texWidth	= GetValue(split[3]);
-						font.texHeight	= GetValue(split[4]);
+						font.charSize	= GetInt(split[1]);
+						font.baseOffset = GetInt(split[2]);
+						font.texWidth	= GetInt(split[3]);
+						font.texHeight	= GetInt(split[4]);
 
-						int pages = GetValue(split[5]);
+						int pages = GetInt(split[5]);
 
 						if (pages != 1)
 						{
@@ -154,6 +163,16 @@ public static class BMFontReader
 						Debug.LogError("Unexpected number of entries for the 'common' field (" +
 							name + ", " + split.Length + "):\n" + line);
 						break;
+					}
+				}
+				else if (split[0] == "page")
+				{
+					// Expected data style:
+					// page id=0 file="textureName.png"
+
+					if (split.Length > 2)
+					{
+						font.spriteName = GetString(split[2]).Replace("\"", "");
 					}
 				}
 			}

@@ -16,7 +16,6 @@ public class UIFont : MonoBehaviour
 	public int mSpacingX = 0;
 	public int mSpacingY = 0;
 	public UIAtlas mAtlas;
-	public string mSpriteName = "";
 #else
 	[SerializeField] Material mMat;
 	[SerializeField] Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
@@ -24,7 +23,6 @@ public class UIFont : MonoBehaviour
 	[SerializeField] int mSpacingX = 0;
 	[SerializeField] int mSpacingY = 0;
 	[SerializeField] UIAtlas mAtlas;
-	[SerializeField] string mSpriteName = "";
 #endif
 
 	// Cached value
@@ -77,7 +75,6 @@ public class UIFont : MonoBehaviour
 					if (sprite != null) mUVRect = uvRect;
 				}
 
-				mSprite = null;
 				mAtlas = value;
 				Refresh();
 			}
@@ -182,7 +179,7 @@ public class UIFont : MonoBehaviour
 	/// Sprite used by the font, if any.
 	/// </summary>
 
-	public string spriteName { get { return mSpriteName; } set { if (mSpriteName != value) { mSpriteName = value; mSprite = null; Refresh(); } } }
+	public string spriteName { get { return mFont.spriteName; } set { if (mFont.spriteName != value) { mFont.spriteName = value; Refresh(); } } }
 
 	/// <summary>
 	/// Horizontal spacing applies to characters. If positive, it will add extra spacing between characters. If negative, it will make them be closer together.
@@ -212,15 +209,15 @@ public class UIFont : MonoBehaviour
 		{
 			if (!mSpriteSet) mSprite = null;
 
-			if (mSprite == null && mAtlas != null && !string.IsNullOrEmpty(mSpriteName))
+			if (mSprite == null && mAtlas != null && !string.IsNullOrEmpty(mFont.spriteName))
 			{
-				mSprite = mAtlas.GetSprite(mSpriteName);
+				mSprite = mAtlas.GetSprite(mFont.spriteName);
 				mSpriteSet = true;
 
 				if (mSprite == null)
 				{
-					Debug.LogError("Can't find the sprite '" + mSpriteName + "' in UIAtlas on " + NGUITools.GetHierarchy(mAtlas.gameObject));
-					mSpriteName = null;
+					Debug.LogError("Can't find the sprite '" + mFont.spriteName + "' in UIAtlas on " + NGUITools.GetHierarchy(mAtlas.gameObject));
+					mFont.spriteName = null;
 				}
 			}
 			return mSprite;
@@ -233,6 +230,7 @@ public class UIFont : MonoBehaviour
 
 	public void Refresh ()
 	{
+		mSprite = null;
 		UILabel[] labels = (UILabel[])Object.FindSceneObjectsOfType(typeof(UILabel));
 
 		foreach (UILabel lbl in labels)

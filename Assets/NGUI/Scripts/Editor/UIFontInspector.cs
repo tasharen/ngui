@@ -50,26 +50,12 @@ public class UIFontInspector : Editor
 		NGUIEditorTools.DrawSeparator();
 
 		mFont = target as UIFont;
-		TextAsset data = EditorGUILayout.ObjectField("Import Font", null, typeof(TextAsset), false) as TextAsset;
 
-		bool resetWidthHeight = false;
+		ComponentSelector.Draw<UIAtlas>(mFont.atlas, OnSelectAtlas);
 
-		if (data != null)
+		if (mFont.atlas != null)
 		{
-			Undo.RegisterUndo(mFont, "Import Font Data");
-			BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), data.bytes);
-			mFont.Refresh();
-			resetWidthHeight = true;
-			EditorUtility.SetDirty(mFont);
-			Debug.Log("Imported " + mFont.bmFont.glyphCount + " characters");
-		}
-
-		if (mFont.bmFont.isValid)
-		{
-			Color green = new Color(0.4f, 1f, 0f, 1f);
-			ComponentSelector.Draw<UIAtlas>(mFont.atlas, OnSelectAtlas);
-
-			if (mFont.atlas != null)
+			if (mFont.bmFont.isValid)
 			{
 				string spriteName = UISlicedSpriteInspector.SpriteField(mFont.atlas, mFont.spriteName);
 
@@ -80,77 +66,93 @@ public class UIFontInspector : Editor
 					EditorUtility.SetDirty(mFont);
 				}
 			}
-			else
+		}
+		else
+		{
+			// No atlas specified -- set the material and texture rectangle directly
+			Material mat = EditorGUILayout.ObjectField("Material", mFont.material, typeof(Material), false) as Material;
+
+			if (mFont.material != mat)
 			{
-				// No atlas specified -- set the material and texture rectangle directly
-				Material mat = EditorGUILayout.ObjectField("Material", mFont.material, typeof(Material), false) as Material;
-
-				if (mFont.material != mat)
-				{
-					Undo.RegisterUndo(mFont, "Font Material");
-					mFont.material = mat;
-					EditorUtility.SetDirty(mFont);
-				}
-
-				if (mat != null)
-				{
-					Texture2D t = mFont.texture;
-
-					if (t != null)
-					{
-						// Pixels are easier to work with than UVs
-						Rect pixels = NGUIMath.ConvertToPixels(mFont.uvRect, t.width, t.height, false);
-
-						// Automatically set the width and height of the rectangle to be the original font texture's dimensions
-						if (resetWidthHeight)
-						{
-							pixels.width = mFont.texWidth;
-							pixels.height = mFont.texHeight;
-						}
-
-						// Font sprite rectangle
-						GUI.backgroundColor = green;
-						pixels = EditorGUILayout.RectField("Pixel Rect", pixels);
-						GUI.backgroundColor = Color.white;
-
-						// Create a button that can make the coordinates pixel-perfect on click
-						GUILayout.BeginHorizontal();
-						{
-							GUILayout.Label("Correction", GUILayout.Width(75f));
-
-							Rect corrected = NGUIMath.MakePixelPerfect(pixels);
-
-							if (corrected == pixels)
-							{
-								GUI.color = Color.grey;
-								GUILayout.Button("Make Pixel-Perfect");
-								GUI.color = Color.white;
-							}
-							else if (GUILayout.Button("Make Pixel-Perfect"))
-							{
-								pixels = corrected;
-								GUI.changed = true;
-							}
-						}
-						GUILayout.EndHorizontal();
-
-						// Convert the pixel coordinates back to UV coordinates
-						Rect uvRect = NGUIMath.ConvertToTexCoords(pixels, t.width, t.height);
-
-						if (mFont.uvRect != uvRect)
-						{
-							Undo.RegisterUndo(mFont, "Font Pixel Rect");
-							mFont.uvRect = uvRect;
-							EditorUtility.SetDirty(mFont);
-						}
-					}
-				}
+				Undo.RegisterUndo(mFont, "Font Material");
+				mFont.material = mat;
+				EditorUtility.SetDirty(mFont);
 			}
+		}
 
+		bool resetWidthHeight = false;
+
+		if (mFont.atlas != null || mFont.material != null)
+		{
+			TextAsset data = EditorGUILayout.ObjectField("Import Font", null, typeof(TextAsset), false) as TextAsset;
+
+			if (data != null)
+			{
+				Undo.RegisterUndo(mFont, "Import Font Data");
+				BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), data.bytes);
+				mFont.Refresh();
+				resetWidthHeight = true;
+				EditorUtility.SetDirty(mFont);
+				Debug.Log("Imported " + mFont.bmFont.glyphCount + " characters");
+			}
+		}
+
+		if (mFont.bmFont.isValid)
+		{
+			Color green = new Color(0.4f, 1f, 0f, 1f);
 			Texture2D tex = mFont.texture;
 
 			if (tex != null)
 			{
+				if (mFont.atlas == null)
+				{
+					// Pixels are easier to work with than UVs
+					Rect pixels = NGUIMath.ConvertToPixels(mFont.uvRect, tex.width, tex.height, false);
+
+					// Automatically set the width and height of the rectangle to be the original font texture's dimensions
+					if (resetWidthHeight)
+					{
+						pixels.width = mFont.texWidth;
+						pixels.height = mFont.texHeight;
+					}
+
+					// Font sprite rectangle
+					GUI.backgroundColor = green;
+					pixels = EditorGUILayout.RectField("Pixel Rect", pixels);
+					GUI.backgroundColor = Color.white;
+
+					// Create a button that can make the coordinates pixel-perfect on click
+					GUILayout.BeginHorizontal();
+					{
+						GUILayout.Label("Correction", GUILayout.Width(75f));
+
+						Rect corrected = NGUIMath.MakePixelPerfect(pixels);
+
+						if (corrected == pixels)
+						{
+							GUI.color = Color.grey;
+							GUILayout.Button("Make Pixel-Perfect");
+							GUI.color = Color.white;
+						}
+						else if (GUILayout.Button("Make Pixel-Perfect"))
+						{
+							pixels = corrected;
+							GUI.changed = true;
+						}
+					}
+					GUILayout.EndHorizontal();
+
+					// Convert the pixel coordinates back to UV coordinates
+					Rect uvRect = NGUIMath.ConvertToTexCoords(pixels, tex.width, tex.height);
+
+					if (mFont.uvRect != uvRect)
+					{
+						Undo.RegisterUndo(mFont, "Font Pixel Rect");
+						mFont.uvRect = uvRect;
+						EditorUtility.SetDirty(mFont);
+					}
+				}
+
 				// Font spacing
 				GUILayout.BeginHorizontal();
 				{

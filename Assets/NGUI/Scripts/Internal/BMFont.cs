@@ -13,20 +13,23 @@ public class BMFont
 	public int mBase = 0;	// Offset from the top of the line to the base of each character
 	public int mWidth = 0;	// Original width of the texture
 	public int mHeight = 0;	// Original height of the texture
+	public string mSpriteName;
 #else
 	[SerializeField] BMGlyph[] mGlyphs = null;
 	[SerializeField] int mSize = 0;		// How much to move the cursor when moving to the next line
 	[SerializeField] int mBase = 0;		// Offset from the top of the line to the base of each character
 	[SerializeField] int mWidth = 0;	// Original width of the texture
 	[SerializeField] int mHeight = 0;	// Original height of the texture
+	[SerializeField] string mSpriteName;
 #endif
 
-	public bool isValid		{ get { return mGlyphs != null && mGlyphs.Length > 0; } }
-	public int charSize		{ get { return mSize; } set { mSize = value; } }
-	public int baseOffset	{ get { return mBase; } set { mBase = value; } }
-	public int texWidth		{ get { return mWidth; } set { mWidth = value; } }
-	public int texHeight	{ get { return mHeight; } set { mHeight = value; } }
-	public int glyphCount	{ get { return mGlyphs == null ? 0 : mGlyphs.Length; } }
+	public bool isValid			{ get { return mGlyphs != null && mGlyphs.Length > 0; } }
+	public int charSize			{ get { return mSize; } set { mSize = value; } }
+	public int baseOffset		{ get { return mBase; } set { mBase = value; } }
+	public int texWidth			{ get { return mWidth; } set { mWidth = value; } }
+	public int texHeight		{ get { return mHeight; } set { mHeight = value; } }
+	public int glyphCount		{ get { return mGlyphs == null ? 0 : mGlyphs.Length; } }
+	public string spriteName	{ get { return mSpriteName; } set { mSpriteName = value; } }
 
 	/// <summary>
 	/// Helper function that calculates the ideal size of the array given an index.
