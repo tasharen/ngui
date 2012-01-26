@@ -17,6 +17,7 @@ public class UICreateWidgetWizard : EditorWindow
 		FilledSprite,
 		SimpleTexture,
 		Button,
+		ImageButton,
 		Checkbox,
 		ProgressBar,
 		Slider,
@@ -31,6 +32,9 @@ public class UICreateWidgetWizard : EditorWindow
 	static string mTiled = "";
 	static string mFilled = "";
 	static string mButton = "";
+	static string mImage0 = "";
+	static string mImage1 = "";
+	static string mImage2 = "";
 	static string mSliderBG = "";
 	static string mSliderFG = "";
 	static string mSliderTB = "";
@@ -77,6 +81,9 @@ public class UICreateWidgetWizard : EditorWindow
 		SaveString("NGUI Tiled", mTiled);
 		SaveString("NGUI Filled", mFilled);
 		SaveString("NGUI Button", mButton);
+		SaveString("NGUI Image 0", mImage0);
+		SaveString("NGUI Image 1", mImage1);
+		SaveString("NGUI Image 2", mImage2);
 		SaveString("NGUI CheckBG", mCheckBG);
 		SaveString("NGUI Check", mCheck);
 		SaveString("NGUI SliderBG", mSliderBG);
@@ -107,6 +114,9 @@ public class UICreateWidgetWizard : EditorWindow
 		mTiled		= LoadString("NGUI Tiled");
 		mFilled		= LoadString("NGUI Filled");
 		mButton		= LoadString("NGUI Button");
+		mImage0		= LoadString("NGUI Image 0");
+		mImage1		= LoadString("NGUI Image 1");
+		mImage2		= LoadString("NGUI Image 2");
 		mCheckBG	= LoadString("NGUI CheckBG");
 		mCheck		= LoadString("NGUI Check");
 		mSliderBG	= LoadString("NGUI SliderBG");
@@ -276,6 +286,74 @@ public class UICreateWidgetWizard : EditorWindow
 			go.AddComponent<UIButtonColor>().tweenTarget = bg.gameObject;
 			go.AddComponent<UIButtonScale>();
 			go.AddComponent<UIButtonOffset>();
+			go.AddComponent<UIButtonSound>();
+
+			Selection.activeGameObject = go;
+		}
+	}
+
+	/// <summary>
+	/// Button creation function.
+	/// </summary>
+
+	void CreateImageButton (GameObject go)
+	{
+		if (mAtlas != null)
+		{
+			GUILayout.BeginHorizontal();
+			string bg = UISpriteInspector.SpriteField(mAtlas, "Normal", mImage0, GUILayout.Width(200f));
+			GUILayout.Space(20f);
+			GUILayout.Label("Normal state sprite");
+			GUILayout.EndHorizontal();
+			if (mImage0 != bg) { mImage0 = bg; Save(); }
+
+			GUILayout.BeginHorizontal();
+			bg = UISpriteInspector.SpriteField(mAtlas, "Hover", mImage1, GUILayout.Width(200f));
+			GUILayout.Space(20f);
+			GUILayout.Label("Hover state sprite");
+			GUILayout.EndHorizontal();
+			if (mImage1 != bg) { mImage1 = bg; Save(); }
+
+			GUILayout.BeginHorizontal();
+			bg = UISpriteInspector.SpriteField(mAtlas, "Pressed", mImage2, GUILayout.Width(200f));
+			GUILayout.Space(20f);
+			GUILayout.Label("Pressed state sprite");
+			GUILayout.EndHorizontal();
+			if (mImage2 != bg) { mImage2 = bg; Save(); }
+		}
+
+		if (ShouldCreate(go, mAtlas != null))
+		{
+			int depth = NGUITools.CalculateNextDepth(go);
+			go = NGUITools.AddChild(go);
+			go.name = "Image Button";
+
+			UIAtlas.Sprite sp = mAtlas.GetSprite(mImage0);
+			UISprite sprite = (sp.inner == sp.outer) ? NGUITools.AddWidget<UISprite>(go) :
+				(UISprite)NGUITools.AddWidget<UISlicedSprite>(go);
+
+			sprite.depth = depth;
+			sprite.atlas = mAtlas;
+			sprite.spriteName = mImage0;
+			sprite.transform.localScale = new Vector3(150f, 40f, 1f);
+			sprite.MakePixelPerfect();
+
+			if (mFont != null)
+			{
+				UILabel lbl = NGUITools.AddWidget<UILabel>(go);
+				lbl.font = mFont;
+				lbl.text = go.name;
+				lbl.MakePixelPerfect();
+			}
+
+			// Add a collider
+			NGUITools.AddWidgetCollider(go);
+
+			// Add the scripts
+			UIImageButton ib = go.AddComponent<UIImageButton>();
+			ib.normalSprite  = mImage0;
+			ib.hoverSprite	 = mImage1;
+			ib.pressedSprite = mImage2;
 			go.AddComponent<UIButtonSound>();
 
 			Selection.activeGameObject = go;
@@ -573,6 +651,7 @@ public class UICreateWidgetWizard : EditorWindow
 				case WidgetType.FilledSprite:	CreateSprite<UIFilledSprite>(go, ref mFilled); break;
 				case WidgetType.SimpleTexture:	CreateSimpleTexture(go); break;
 				case WidgetType.Button:			CreateButton(go); break;
+				case WidgetType.ImageButton:	CreateImageButton(go); break;
 				case WidgetType.Checkbox:		CreateCheckbox(go); break;
 				case WidgetType.ProgressBar:	CreateSlider(go, false); break;
 				case WidgetType.Slider:			CreateSlider(go, true); break;

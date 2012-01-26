@@ -49,6 +49,12 @@ All can be found here: http://www.tasharen.com/?page_id=197
 
 1.44:
 - NEW: UIGrid can now automatically sort its children by name before positioning them.
+- NEW: Added momentum and drag to UIDragCamera.
+- NEW: Added the Image Button template to the Widget Tool.
+- FIX: SpringPosition will now disable itself properly.
+- FIX: UIImageButton will now make itself pixel-perfect after switching the sprites.
+- FIX: UICamera will now always set the 'lastCamera' to be the camera that received the pressed event while the touch is held.
+- FIX: UIDragObject will now drag tilted objects (windows) with a more expected result.
 
 1.43:
 - NEW: Added the Input template to the Widget Tool.

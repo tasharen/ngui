@@ -65,7 +65,7 @@ public class UIDragObject : MonoBehaviour
 
 				// Create the plane to drag along
 				Transform trans = UICamera.lastCamera.transform;
-				mPlane = new Plane(trans.rotation * Vector3.back, mLastPos);
+				mPlane = new Plane((mPanel != null ? mPanel.cachedTransform.rotation : trans.rotation) * Vector3.back, mLastPos);
 			}
 			else if (restrictWithinPanel && dragEffect == DragEffect.MomentumAndSpring)
 			{
