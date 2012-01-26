@@ -351,6 +351,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 			// Add the scripts
 			UIImageButton ib = go.AddComponent<UIImageButton>();
+			ib.target		 = sprite;
 			ib.normalSprite  = mImage0;
 			ib.hoverSprite	 = mImage1;
 			ib.pressedSprite = mImage2;

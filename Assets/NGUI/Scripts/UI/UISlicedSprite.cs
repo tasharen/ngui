@@ -75,8 +75,8 @@ public class UISlicedSprite : UISprite
 		cachedTransform.localPosition = pos;
 
 		Vector3 scale = cachedTransform.localScale;
-		scale.x = Mathf.RoundToInt(scale.x);
-		scale.y = Mathf.RoundToInt(scale.y);
+		scale.x = Mathf.RoundToInt(scale.x * 0.5f) << 1;
+		scale.y = Mathf.RoundToInt(scale.y * 0.5f) << 1;
 		scale.z = 1f;
 		cachedTransform.localScale = scale;
 	}

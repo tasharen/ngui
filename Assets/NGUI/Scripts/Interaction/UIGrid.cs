@@ -21,6 +21,7 @@ public class UIGrid : MonoBehaviour
 	public float cellHeight = 200f;
 	public bool repositionNow = false;
 	public bool sorted = false;
+	public bool hideInactive = true;
 
 	void Start ()
 	{
@@ -36,7 +37,7 @@ public class UIGrid : MonoBehaviour
 		}
 	}
 
-	static int SortByName (Transform a, Transform b) { return string.Compare(a.name, b.name); }
+	static public int SortByName (Transform a, Transform b) { return string.Compare(a.name, b.name); }
 
 	public void Reposition ()
 	{
@@ -54,6 +55,8 @@ public class UIGrid : MonoBehaviour
 
 			foreach (Transform t in list)
 			{
+				if (!t.gameObject.active && hideInactive) continue;
+
 				t.localPosition = (arrangement == Arrangement.Horizontal) ?
 					new Vector3(cellWidth * x, -cellHeight * y, 0f) :
 					new Vector3(cellWidth * y, -cellHeight * x, 0f);
@@ -70,6 +73,8 @@ public class UIGrid : MonoBehaviour
 			for (int i = 0; i < myTrans.childCount; ++i)
 			{
 				Transform t = myTrans.GetChild(i);
+
+				if (!t.gameObject.active && hideInactive) continue;
 
 				t.localPosition = (arrangement == Arrangement.Horizontal) ?
 					new Vector3(cellWidth * x, -cellHeight * y, 0f) :

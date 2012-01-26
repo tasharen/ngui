@@ -258,6 +258,12 @@ public class UILabel : UIWidget
 			pos.x = Mathf.RoundToInt(pos.x);
 			pos.y = Mathf.RoundToInt(pos.y);
 			pos.z = Mathf.RoundToInt(pos.z);
+
+			if (mFont.size % 2 == 1)
+			{
+				if (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom) pos.x += 0.5f;
+				if (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right) pos.y -= 0.5f;
+			}
 			cachedTransform.localPosition = pos;
 
 			Vector3 scale = cachedTransform.localScale;

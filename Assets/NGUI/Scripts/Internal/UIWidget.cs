@@ -55,7 +55,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Set or get the value that specifies where the widget's pivot point should be.
 	/// </summary>
 
-	public Pivot pivot { get { return mPivot; } set { if (mPivot != value) { mPivot = value; mChanged = true; } } }
+	public Pivot pivot { get { return mPivot; } set { if (mPivot != value) { mPivot = value; mChanged = true; MakePixelPerfect(); } } }
 	
 	/// <summary>
 	/// Depth controls the rendering order -- lowest to highest.
@@ -315,12 +315,20 @@ public abstract class UIWidget : MonoBehaviour
 		pos.x = Mathf.RoundToInt(pos.x);
 		pos.y = Mathf.RoundToInt(pos.y);
 		pos.z = Mathf.RoundToInt(pos.z);
-		cachedTransform.localPosition = pos;
 
 		Vector3 scale = cachedTransform.localScale;
-		scale.x = Mathf.RoundToInt(scale.x);
-		scale.y = Mathf.RoundToInt(scale.y);
+
+		int width  = Mathf.RoundToInt(scale.x);
+		int height = Mathf.RoundToInt(scale.y);
+
+		scale.x = width;
+		scale.y = height;
 		scale.z = 1f;
+
+		if (width  % 2 == 1 && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
+		if (height % 2 == 1 && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y -= 0.5f;
+
+		cachedTransform.localPosition = pos;
 		cachedTransform.localScale = scale;
 	}
 
