@@ -117,10 +117,9 @@ public class UISlider : MonoBehaviour
 		// Create a plane for the slider
 		if (mCol == null) return;
 
-		// Use the last hit collider's position, or if none found -- the slider's transform position for plane's origin
-		Vector3 pos = (UICamera.lastHit.collider != null) ? UICamera.lastHit.collider.transform.position : mTrans.position;
+		// Create a ray and a plane
 		Ray ray = UICamera.lastCamera.ScreenPointToRay(UICamera.lastTouchPosition);
-		Plane plane = new Plane(mTrans.rotation * Vector3.back, pos);
+		Plane plane = new Plane(mTrans.rotation * Vector3.back, mTrans.position);
 
 		// If the ray doesn't hit the plane, do nothing
 		float dist;

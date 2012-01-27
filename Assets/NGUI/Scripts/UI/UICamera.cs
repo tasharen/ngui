@@ -355,7 +355,7 @@ public class UICamera : MonoBehaviour
 
 				// We don't want to update the last camera while there is a touch happening
 				if (pressed) touch.pressedCam = lastCamera;
-				else if (touch.pressed != null) lastCamera = mMouse.pressedCam;
+				else if (touch.pressed != null) lastCamera = touch.pressedCam;
 
 				// Process the events from this touch
 				ProcessTouch(touch, pressed, unpressed);
