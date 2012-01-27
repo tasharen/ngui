@@ -222,7 +222,7 @@ public class UICamera : MonoBehaviour
 
 		foreach (UICamera cam in mList)
 		{
-			if ((cam.mCam != null) && (cam.mCam.cullingMask & layerMask) != 0)
+			if ((cam.cachedCamera != null) && (cam.mCam.cullingMask & layerMask) != 0)
 			{
 				return cam;
 			}
@@ -259,7 +259,7 @@ public class UICamera : MonoBehaviour
 	/// Add this camera to the list.
 	/// </summary>
 
-	void Start ()
+	void Awake ()
 	{
 		// We should be using only touch-based input on Android and iOS-based devices.
 		mUseMouseInput = Application.platform != RuntimePlatform.Android &&
