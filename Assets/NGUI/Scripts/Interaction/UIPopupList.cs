@@ -328,6 +328,11 @@ public class UIPopupList : MonoBehaviour
 			background.depth = background.depth + 1000;
 			background.color = backgroundColor;
 
+			// Add a sprite used for the selection
+			mHighlight = NGUITools.AddSprite(mChild, atlas, highlightSprite);
+			mHighlight.pivot = UIWidget.Pivot.TopLeft;
+			mHighlight.color = highlightColor;
+
 			float x = 0f, y = -padding.y;
 			List<UILabel> labels = new List<UILabel>();
 
@@ -349,11 +354,6 @@ public class UIPopupList : MonoBehaviour
 
 			// The triggering widget's width should be the minimum allowed width
 			x = Mathf.Max(x, bounds.size.x - padding.x * 2f);
-
-			// Add a sprite used for the selection
-			mHighlight = NGUITools.AddSprite(mChild, atlas, highlightSprite);
-			mHighlight.pivot = UIWidget.Pivot.TopLeft;
-			mHighlight.color = highlightColor;
 
 			// Run through all labels and add event listeners
 			foreach (UILabel lbl in labels)
