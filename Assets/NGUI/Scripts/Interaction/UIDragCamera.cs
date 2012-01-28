@@ -48,6 +48,8 @@ public class UIDragCamera : MonoBehaviour
 
 	void Start ()
 	{
+		// Before 1.44 'target' was a transform
+		if (((Component)target) is Transform) target = target.camera;
 		if (target != null) mTrans = target.transform;
 		else enabled = false;
 	}

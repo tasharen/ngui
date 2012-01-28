@@ -34,30 +34,7 @@ public class UISpriteInspector : UIWidgetInspector
 	static public string SpriteField (UIAtlas atlas, string field, string name, params GUILayoutOption[] options)
 	{
 		List<string> sprites = atlas.GetListOfSprites();
-
-		if (sprites != null && sprites.Count > 0)
-		{
-			int index = 0;
-			if (string.IsNullOrEmpty(name)) name = sprites[0];
-
-			// We need to find the sprite in order to have it selected
-			if (!string.IsNullOrEmpty(name))
-			{
-				for (int i = 0; i < sprites.Count; ++i)
-				{
-					if (name.Equals(sprites[i], System.StringComparison.OrdinalIgnoreCase))
-					{
-						index = i;
-						break;
-					}
-				}
-			}
-
-			// Draw the sprite selection popup
-			index = EditorGUILayout.Popup(field, index, sprites.ToArray(), options);
-			return atlas.GetSprite(sprites[index]).name;
-		}
-		return null;
+		return (sprites != null && sprites.Count > 0) ? NGUIEditorTools.DrawList(field, sprites.ToArray(), name, options) : null;
 	}
 
 	/// <summary>

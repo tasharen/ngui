@@ -315,6 +315,37 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
+	/// Convenience function that displays a list of sprites and returns the selected value.
+	/// </summary>
+
+	static public string DrawList (string field, string[] list, string selection, params GUILayoutOption[] options)
+	{
+		if (list != null && list.Length > 0)
+		{
+			int index = 0;
+			if (string.IsNullOrEmpty(selection)) selection = list[0];
+
+			// We need to find the sprite in order to have it selected
+			if (!string.IsNullOrEmpty(selection))
+			{
+				for (int i = 0; i < list.Length; ++i)
+				{
+					if (selection.Equals(list[i], System.StringComparison.OrdinalIgnoreCase))
+					{
+						index = i;
+						break;
+					}
+				}
+			}
+
+			// Draw the sprite selection popup
+			index = EditorGUILayout.Popup(field, index, list, options);
+			return list[index];
+		}
+		return null;
+	}
+
+	/// <summary>
 	/// Helper function that returns the selected root object.
 	/// </summary>
 

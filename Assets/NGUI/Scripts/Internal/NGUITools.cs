@@ -333,6 +333,20 @@ static public class NGUITools
 		return widget;
 	}
 
+	/// <summary>
+	/// Add a sprite appropriate for the specified atlas sprite.
+	/// It will be a UISlicedSprite if the sprite has an inner rect, and a regular sprite otherwise.
+	/// </summary>
+
+	static public UISprite AddSprite (GameObject go, UIAtlas atlas, string spriteName)
+	{
+		UIAtlas.Sprite sp = (atlas != null) ? atlas.GetSprite(spriteName) : null;
+		UISprite sprite = (sp == null || sp.inner == sp.outer) ? AddWidget<UISprite>(go) : (UISprite)AddWidget<UISlicedSprite>(go);
+		sprite.atlas = atlas;
+		sprite.spriteName = spriteName;
+		return sprite;
+	}
+
 	#region Deprecated functions
 	[System.Obsolete("Use NGUIMath.HexToDecimal instead")]
 	static public int HexToDecimal (char ch) { return NGUIMath.HexToDecimal(ch); }

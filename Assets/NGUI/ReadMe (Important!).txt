@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.45c
+                Version 1.46
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -46,6 +46,11 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.46:
+- NEW: Added a new class (UIEventListener) that can be used to easily register event listener delegates via code without the need to create MonoBehaviours.
+- NEW: Added a UIPopupList class that can be used to create drop-down lists and menus.
+- NEW: Added the Popup List and Popup Menu templates to the Widget Wizard.
 
 1.45:
 - NEW: Text labels will center or right-align their text if such pivot was used.

@@ -22,6 +22,8 @@ public class UICreateWidgetWizard : EditorWindow
 		ProgressBar,
 		Slider,
 		Input,
+		PopupList,
+		PopupMenu,
 	}
 
 	static UIAtlas mAtlas;
@@ -41,6 +43,9 @@ public class UICreateWidgetWizard : EditorWindow
 	static string mCheckBG = "";
 	static string mCheck = "";
 	static string mInputBG = "";
+	static string mListFG = "";
+	static string mListBG = "";
+	static string mListHL = "";
 	static bool mLoaded = false;
 
 	/// <summary>
@@ -90,6 +95,9 @@ public class UICreateWidgetWizard : EditorWindow
 		SaveString("NGUI SliderFG", mSliderFG);
 		SaveString("NGUI SliderTB", mSliderTB);
 		SaveString("NGUI InputBG", mInputBG);
+		SaveString("NGUI ListFG", mListFG);
+		SaveString("NGUI ListBG", mListBG);
+		SaveString("NGUI ListHL", mListHL);
 
 		PlayerPrefs.Save();
 	}
@@ -123,6 +131,9 @@ public class UICreateWidgetWizard : EditorWindow
 		mSliderFG	= LoadString("NGUI SliderFG");
 		mSliderTB	= LoadString("NGUI SliderTB");
 		mInputBG	= LoadString("NGUI InputBG");
+		mListFG		= LoadString("NGUI ListFG");
+		mListBG		= LoadString("NGUI ListBG");
+		mListHL		= LoadString("NGUI ListHL");
 	}
 
 	/// <summary>
@@ -592,6 +603,82 @@ public class UICreateWidgetWizard : EditorWindow
 	}
 
 	/// <summary>
+	/// Create a popup list or a menu.
+	/// </summary>
+
+	void CreatePopup (GameObject go, bool isDropDown)
+	{
+		if (mAtlas != null)
+		{
+			GUILayout.BeginHorizontal();
+			string sprite = UISpriteInspector.SpriteField(mAtlas, "Foreground", mListFG, GUILayout.Width(200f));
+			GUILayout.Space(20f);
+			GUILayout.Label("Foreground sprite (shown on the button)");
+			GUILayout.EndHorizontal();
+			if (mListFG != sprite) { mListFG = sprite; Save(); }
+
+			GUILayout.BeginHorizontal();
+			sprite = UISpriteInspector.SpriteField(mAtlas, "Background", mListBG, GUILayout.Width(200f));
+			GUILayout.Space(20f);
+			GUILayout.Label("Background sprite (envelops the options)");
+			GUILayout.EndHorizontal();
+			if (mListBG != sprite) { mListBG = sprite; Save(); }
+
+			GUILayout.BeginHorizontal();
+			sprite = UISpriteInspector.SpriteField(mAtlas, "Highlight", mListHL, GUILayout.Width(200f));
+			GUILayout.Space(20f);
+			GUILayout.Label("Sprite used to highlight the selected option");
+			GUILayout.EndHorizontal();
+			if (mListHL != sprite) { mListHL = sprite; Save(); }
+		}
+
+		if (ShouldCreate(go, mAtlas != null && mFont != null))
+		{
+			int depth = NGUITools.CalculateNextDepth(go);
+			go = NGUITools.AddChild(go);
+			go.name = isDropDown ? "Popup List" : "Popup Menu";
+
+			// Background sprite
+			UISprite sprite = NGUITools.AddSprite(go, mAtlas, mListFG);
+			sprite.depth = depth;
+			sprite.atlas = mAtlas;
+			sprite.transform.localScale = new Vector3(150f, 34f, 1f);
+			sprite.pivot = UIWidget.Pivot.Left;
+			sprite.MakePixelPerfect();
+
+			UIAtlas.Sprite sp = mAtlas.GetSprite(mListFG);
+			float padding = Mathf.Max(4f, sp.inner.xMin - sp.outer.xMin);
+
+			// Text label
+			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
+			lbl.font = mFont;
+			lbl.text = go.name;
+			lbl.pivot = UIWidget.Pivot.Left;
+			lbl.cachedTransform.localPosition = new Vector3(padding, 0f, 0f);
+			lbl.MakePixelPerfect();
+
+			// Add a collider
+			NGUITools.AddWidgetCollider(go);
+
+			// Add the popup list
+			UIPopupList list = go.AddComponent<UIPopupList>();
+			list.atlas = mAtlas;
+			list.font = mFont;
+			list.backgroundSprite = mListBG;
+			list.highlightSprite = mListHL;
+			list.padding = new Vector2(padding, Mathf.RoundToInt(padding * 0.5f));
+			if (isDropDown) list.textLabel = lbl;
+			for (int i = 0; i < 5; ++i) list.items.Add(isDropDown ? ("List Option " + i) : ("Menu Option " + i));
+
+			// Add the scripts
+			go.AddComponent<UIButtonColor>().tweenTarget = sprite.gameObject;
+			go.AddComponent<UIButtonSound>();
+
+			Selection.activeGameObject = go;
+		}
+	}
+
+	/// <summary>
 	/// Repaint the window on selection.
 	/// </summary>
 
@@ -657,6 +744,8 @@ public class UICreateWidgetWizard : EditorWindow
 				case WidgetType.ProgressBar:	CreateSlider(go, false); break;
 				case WidgetType.Slider:			CreateSlider(go, true); break;
 				case WidgetType.Input:			CreateInput(go); break;
+				case WidgetType.PopupList:		CreatePopup(go, true); break;
+				case WidgetType.PopupMenu:		CreatePopup(go, false); break;
 			}
 		}
 	}

@@ -423,7 +423,7 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Clear the selection
-		if (pressed || Input.GetKeyDown(KeyCode.Escape))
+		if ((pressed && touch.pressed != mSel) || Input.GetKeyDown(KeyCode.Escape))
 		{
 			if (mTooltip != null) ShowTooltip(false);
 			selectedObject = null;
@@ -441,8 +441,15 @@ public class UICamera : MonoBehaviour
 				// If the button/touch was released on the same object, consider it a click and select it
 				if (touch.pressed == touch.current)
 				{
-					mSel = touch.pressed;
-					touch.pressed.SendMessage("OnSelect", true, SendMessageOptions.DontRequireReceiver);
+					if (touch.pressed != mSel)
+					{
+						mSel = touch.pressed;
+						touch.pressed.SendMessage("OnSelect", true, SendMessageOptions.DontRequireReceiver);
+					}
+					else
+					{
+						mSel = touch.pressed;
+					}
 					if (touch.considerForClick) touch.pressed.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
 				}
 				else // The button/touch was released on a different object
