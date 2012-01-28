@@ -21,6 +21,7 @@ public class UISlider : MonoBehaviour
 	public float initialValue = 1f;
 	public GameObject eventReceiver;
 	public string functionName = "OnSliderChange";
+	public int numberOfSteps = 0;
 
 	float mValue = 1f;
 	Vector3 mScale = Vector3.one;
@@ -43,6 +44,7 @@ public class UISlider : MonoBehaviour
 		set
 		{
 			float val = Mathf.Clamp01(value);
+			if (numberOfSteps > 1) val = Mathf.Round(val * (numberOfSteps - 1)) / (numberOfSteps - 1);
 
 			if (mValue != val)
 			{
