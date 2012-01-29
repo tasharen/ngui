@@ -28,7 +28,7 @@ public class UISpriteAnimationInspector : Editor
 			EditorUtility.SetDirty(anim);
 		}
 
-		string namePrefix = EditorGUILayout.TextField("Name Prefix", anim.namePrefix);
+		string namePrefix = EditorGUILayout.TextField("Name Prefix", (anim.namePrefix != null) ? anim.namePrefix : "");
 
 		if (anim.namePrefix != namePrefix)
 		{
