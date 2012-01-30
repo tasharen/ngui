@@ -48,7 +48,6 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
 
 1.48:
-- NEW: Widget's depth Back and Forward buttons will now swap depth rather than just set it.
 - FIX: UITextList will now handle resized text labels correctly.
 
 1.47:

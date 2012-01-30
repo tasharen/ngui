@@ -357,6 +357,27 @@ static public class NGUITools
 		return sprite;
 	}
 
+	/// <summary>
+	/// Finds the specified component on the game object or one of its parents.
+	/// </summary>
+
+	static public T FindInChildren<T> (GameObject go) where T : Component
+	{
+		T comp = go.GetComponent<T>();
+
+		if (comp == null)
+		{
+			Transform t = go.transform.parent;
+
+			while (t != null && comp == null)
+			{
+				comp = t.gameObject.GetComponent<T>();
+				t = t.parent;
+			}
+		}
+		return comp;
+	}
+
 	#region Deprecated functions
 	[System.Obsolete("Use NGUIMath.HexToDecimal instead")]
 	static public int HexToDecimal (char ch) { return NGUIMath.HexToDecimal(ch); }
