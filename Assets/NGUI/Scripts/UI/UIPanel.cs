@@ -255,65 +255,17 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Called by widgets when their depth changes.
-	/// </summary>
-
-	public void MarkDepthAsChanged (UIWidget w)
-	{
-		Material mat = w.material;
-
-		if (mat != null)
-		{
-			mDepthChanged = true;
-			if (mat != null && !mChanged.Contains(mat)) mChanged.Add(mat);
-
-			// NOTE: Experimental code that swaps depth layers and updates the colliders on depth change.
-			/*BoxCollider bc = NGUITools.FindInChildren<BoxCollider>(w.gameObject);
-
-			if (bc != null)
-			{
-				NGUITools.AddWidgetCollider(bc.gameObject);
-#if UNITY_EDITOR
-				UnityEditor.EditorUtility.SetDirty(bc.gameObject);
-#endif
-			}*/
-		}
-	}
-
-	/// <summary>
 	/// Helper function that marks the specified material as having changed so its mesh is rebuilt next frame.
 	/// </summary>
 
-	public void MarkMaterialAsChanged (Material mat) { if (mat != null && !mChanged.Contains(mat)) mChanged.Add(mat); }
-
-	/// <summary>
-	/// Swaps the depth of widgets from A to B, and vice versa.
-	/// </summary>
-
-	/*public void SwapDepth (int a, int b)
+	public void MarkMaterialAsChanged (Material mat, bool sort)
 	{
-		List<BoxCollider> cols = new List<BoxCollider>();
-
-		foreach (UIWidget w in mWidgets)
+		if (mat != null)
 		{
-			if (w.depth == a) w.depth = b;
-			else if (w.depth == b) w.depth = a;
-			else continue;
-
-			mDepthChanged = true;
-			if (w.material != null && !mChanged.Contains(w.material)) mChanged.Add(w.material);
-
-			BoxCollider bc = NGUITools.FindInChildren<BoxCollider>(w.gameObject);
-			if (bc != null && !cols.Contains(bc)) cols.Add(bc);
-
-#if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(w.gameObject);
-#endif
+			if (sort) mDepthChanged = true;
+			if (!mChanged.Contains(mat)) mChanged.Add(mat);
 		}
-
-		// Update the colliders now that the depth has changed
-		foreach (BoxCollider bc in cols) NGUITools.AddWidgetCollider(bc.gameObject);
-	}*/
+	}
 
 	/// <summary>
 	/// Add the specified transform to the managed list.

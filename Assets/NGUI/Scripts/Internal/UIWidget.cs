@@ -61,7 +61,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Depth controls the rendering order -- lowest to highest.
 	/// </summary>
 
-	public int depth { get { return mDepth; } set { if (mDepth != value) { mDepth = value; if (mPanel != null) mPanel.MarkDepthAsChanged(this); } } }
+	public int depth { get { return mDepth; } set { if (mDepth != value) { mDepth = value; if (mPanel != null) mPanel.MarkMaterialAsChanged(mMat, true); } } }
 
 	/// <summary>
 	/// Transform gets cached for speed.
@@ -207,7 +207,7 @@ public abstract class UIWidget : MonoBehaviour
 	void OnEnable ()
 	{
 		mChanged = true;
-		if (mPanel != null && mMat != null) mPanel.MarkMaterialAsChanged(mMat);
+		if (mPanel != null && mMat != null) mPanel.MarkMaterialAsChanged(mMat, false);
 	}
 
 	/// <summary>
@@ -246,7 +246,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Don't store any references to the panel.
 	/// </summary>
 
-	void OnDisable () { if (mPanel != null && mMat != null) mPanel.MarkMaterialAsChanged(mMat); mPanel = null; }
+	void OnDisable () { if (mPanel != null && mMat != null) mPanel.MarkMaterialAsChanged(mMat, false); mPanel = null; }
 
 	/// <summary>
 	/// Unregister this widget.
