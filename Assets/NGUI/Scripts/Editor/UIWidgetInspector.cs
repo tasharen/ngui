@@ -89,16 +89,25 @@ public class UIWidgetInspector : Editor
 		{
 			EditorGUILayout.PrefixLabel("Depth");
 
-			int depth = mWidget.depth;
-			if (GUILayout.Button("Back")) --depth;
-			depth = EditorGUILayout.IntField(depth, GUILayout.Width(40f));
-			if (GUILayout.Button("Forward")) ++depth;
+			if (GUILayout.Button("Back"))
+			{
+				Undo.RegisterSceneUndo("Depth Change");
+				mWidget.panel.SwapDepth(mWidget.depth, mWidget.depth - 1);
+			}
+			
+			int depth = EditorGUILayout.IntField(mWidget.depth, GUILayout.Width(40f));
 
 			if (mWidget.depth != depth)
 			{
 				Undo.RegisterUndo(mWidget, "Depth Change");
 				mWidget.depth = depth;
 				EditorUtility.SetDirty(mWidget.gameObject);
+			}
+
+			if (GUILayout.Button("Forward"))
+			{
+				Undo.RegisterSceneUndo("Depth Change");
+				mWidget.panel.SwapDepth(mWidget.depth, mWidget.depth + 1);
 			}
 		}
 		GUILayout.EndHorizontal();

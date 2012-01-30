@@ -267,6 +267,25 @@ public class UIPanel : MonoBehaviour
 	public void MarkMaterialAsChanged (Material mat) { if (mat != null && !mChanged.Contains(mat)) mChanged.Add(mat); }
 
 	/// <summary>
+	/// Swaps the depth of widgets from A to B, and vice versa.
+	/// </summary>
+
+	public void SwapDepth (int a, int b)
+	{
+		foreach (UIWidget w in mWidgets)
+		{
+			if (w.depth == a) w.depth = b;
+			else if (w.depth == b) w.depth = a;
+			else continue;
+
+			MarkDepthAsChanged(w.material);
+#if UNITY_EDITOR
+			UnityEditor.EditorUtility.SetDirty(w.gameObject);
+#endif
+		}
+	}
+
+	/// <summary>
 	/// Add the specified transform to the managed list.
 	/// </summary>
 

@@ -134,7 +134,7 @@ public class UITextList : MonoBehaviour
 			if (font != null)
 			{
 				int lines = 0;
-				int maxLines = maxHeight > 0 ? Mathf.FloorToInt(maxHeight / font.size) : 100000;
+				int maxLines = maxHeight > 0 ? Mathf.FloorToInt(maxHeight / textLabel.cachedTransform.localScale.y) : 100000;
 				int offset = Mathf.RoundToInt(mScroll);
 
 				// Don't let scrolling to exceed the visible number of lines
