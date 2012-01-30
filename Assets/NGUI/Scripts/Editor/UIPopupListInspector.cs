@@ -87,14 +87,20 @@ public class UIPopupListInspector : Editor
 				mList.selection = sel;
 			}
 
+			float ts = EditorGUILayout.FloatField("Text Scale", mList.textScale);
 			Color tc = EditorGUILayout.ColorField("Text Color", mList.textColor);
 			Color bc = EditorGUILayout.ColorField("Background", mList.backgroundColor);
 			Color hc = EditorGUILayout.ColorField("Highlight", mList.highlightColor);
 			bool isAnimated = EditorGUILayout.Toggle("Animated", mList.isAnimated);
 
-			if (mList.textColor != tc || mList.highlightColor != hc || mList.backgroundColor != bc || mList.isAnimated != isAnimated)
+			if (mList.textScale != ts ||
+				mList.textColor != tc ||
+				mList.highlightColor != hc ||
+				mList.backgroundColor != bc ||
+				mList.isAnimated != isAnimated)
 			{
 				Undo.RegisterUndo(mList, "Popup List Change");
+				mList.textScale = ts;
 				mList.textColor = tc;
 				mList.backgroundColor = bc;
 				mList.highlightColor = hc;

@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.46
+                Version 1.47
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -46,6 +46,15 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.47:
+- NEW: Added a new example (8) showing how to create a simple menu system.
+- NEW: Added an example script that adds a typewriter effect to labels.
+- NEW: Added a 'text scale' property to the UIPopupList.
+- FIX: UIPopupList will now choose a more appropriate depth rather than just a high number.
+- FIX: UIPopupList labels' colliders will now be properly positioned on the Z.
+- FIX: Fix for UISpriteAnimationInspector not handling null strings.
+- FIX: Several minor fixes for rare issues (such as playing a sound with no audio listener or main camera in the scene).
 
 1.46:
 - NEW: Added a new class (UIEventListener) that can be used to easily register event listener delegates via code without the need to create MonoBehaviours.

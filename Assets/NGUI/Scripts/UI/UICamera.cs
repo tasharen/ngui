@@ -222,10 +222,8 @@ public class UICamera : MonoBehaviour
 
 		foreach (UICamera cam in mList)
 		{
-			if ((cam.cachedCamera != null) && (cam.mCam.cullingMask & layerMask) != 0)
-			{
-				return cam;
-			}
+			Camera uc = cam.cachedCamera;
+			if ((uc != null) && (uc.cullingMask & layerMask) != 0) return cam;
 		}
 		return null;
 	}

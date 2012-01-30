@@ -67,6 +67,12 @@ public class UIPopupList : MonoBehaviour
 	public Vector2 padding = new Vector3(4f, 4f);
 
 	/// <summary>
+	/// Scaling factor applied to labels within the drop-down menu.
+	/// </summary>
+
+	public float textScale = 1f;
+
+	/// <summary>
 	/// Color tint applied to labels inside the list.
 	/// </summary>
 
@@ -275,7 +281,7 @@ public class UIPopupList : MonoBehaviour
 	{
 		GameObject go = widget.gameObject;
 		Transform t = widget.cachedTransform;
-		float minSize = font.size + padding.y * 2f;
+		float minSize = font.size * textScale + padding.y * 2f;
 
 		Vector3 scale = t.localScale;
 		t.localScale = new Vector3(scale.x, minSize, scale.z);
@@ -325,7 +331,7 @@ public class UIPopupList : MonoBehaviour
 			// Add a sprite for the background
 			UISprite background = NGUITools.AddSprite(mChild, atlas, backgroundSprite);
 			background.pivot = UIWidget.Pivot.TopLeft;
-			background.depth = background.depth + 1000;
+			background.depth = NGUITools.CalculateNextDepth(mPanel.gameObject);
 			background.color = backgroundColor;
 
 			// Add a sprite used for the selection
@@ -333,6 +339,7 @@ public class UIPopupList : MonoBehaviour
 			mHighlight.pivot = UIWidget.Pivot.TopLeft;
 			mHighlight.color = highlightColor;
 
+			float fontScale = font.size * textScale;
 			float x = 0f, y = -padding.y;
 			List<UILabel> labels = new List<UILabel>();
 
@@ -346,10 +353,16 @@ public class UIPopupList : MonoBehaviour
 				lbl.color = textColor;
 				lbl.cachedTransform.localPosition = new Vector3(padding.x, y, 0f);
 				lbl.MakePixelPerfect();
+
+				if (textScale != 1f)
+				{
+					Vector3 scale = lbl.cachedTransform.localScale;
+					lbl.cachedTransform.localScale = scale * textScale;
+				}
 				labels.Add(lbl);
 
-				y -= font.size;
-				x = Mathf.Max(x, lbl.relativeSize.x * lbl.font.size);
+				y -= fontScale;
+				x = Mathf.Max(x, lbl.relativeSize.x * fontScale);
 			}
 
 			// The triggering widget's width should be the minimum allowed width
@@ -358,10 +371,9 @@ public class UIPopupList : MonoBehaviour
 			// Run through all labels and add event listeners
 			foreach (UILabel lbl in labels)
 			{
-				BoxCollider bc = lbl.gameObject.AddComponent<BoxCollider>();
-				bc.isTrigger = true;
-				bc.center = new Vector3((x * 0.5f) / lbl.font.size, -0.5f, 0f);
-				bc.size = new Vector3(x / lbl.font.size, 1f, 1f);
+				BoxCollider bc = NGUITools.AddWidgetCollider(lbl.gameObject);
+				bc.center = new Vector3((x * 0.5f) / fontScale, -0.5f, bc.center.z);
+				bc.size = new Vector3(x / fontScale, 1f, 1f);
 
 				UIEventListener listener = UIEventListener.Add(lbl.gameObject);
 				listener.onHover = OnItemHover;
@@ -378,7 +390,7 @@ public class UIPopupList : MonoBehaviour
 			background.cachedTransform.localScale = new Vector3(x, -y, 1f);
 
 			// Scale the highlight sprite to envelop a single item
-			mHighlight.cachedTransform.localScale = new Vector3(x, font.size + padding.y * 2f, 1f);
+			mHighlight.cachedTransform.localScale = new Vector3(x, fontScale + padding.y * 2f, 1f);
 
 			bool placeAbove = (position == Position.Above);
 
@@ -396,7 +408,7 @@ public class UIPopupList : MonoBehaviour
 			// If the list should be animated, let's animate it by expanding it
 			if (isAnimated)
 			{
-				float bottom = y + font.size;
+				float bottom = y + fontScale;
 				Animate(mHighlight, placeAbove, bottom);
 				foreach (UILabel lbl in labels) Animate(lbl, placeAbove, bottom);
 				AnimateColor(background);

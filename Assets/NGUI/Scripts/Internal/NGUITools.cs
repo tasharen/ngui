@@ -32,13 +32,21 @@ static public class NGUITools
 			if (mListener == null)
 			{
 				mListener = GameObject.FindObjectOfType(typeof(AudioListener)) as AudioListener;
-				if (mListener == null) mListener = Camera.main.gameObject.AddComponent<AudioListener>();
+
+				if (mListener == null)
+				{
+					Camera cam = Camera.main;
+					if (cam == null) cam = GameObject.FindObjectOfType(typeof(Camera)) as Camera;
+					if (cam != null) mListener = cam.gameObject.AddComponent<AudioListener>();
+				}
 			}
 
-			AudioSource source = mListener.audio;
-			if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
-
-			source.PlayOneShot(clip, volume);
+			if (mListener != null)
+			{
+				AudioSource source = mListener.audio;
+				if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
+				source.PlayOneShot(clip, volume);
+			}
 		}
 	}
 
@@ -187,7 +195,7 @@ static public class NGUITools
 	/// Add a collider to the game object containing one or more widgets.
 	/// </summary>
 
-	static public void AddWidgetCollider (GameObject go)
+	static public BoxCollider AddWidgetCollider (GameObject go)
 	{
 		if (go != null)
 		{
@@ -210,7 +218,9 @@ static public class NGUITools
 			box.isTrigger = true;
 			box.center = b.center + Vector3.back * (depth * 0.25f);
 			box.size = new Vector3(b.size.x, b.size.y, 0f);
+			return box;
 		}
+		return null;
 	}
 
 	/// <summary>
