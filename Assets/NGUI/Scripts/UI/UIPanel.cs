@@ -410,7 +410,6 @@ public class UIPanel : MonoBehaviour
 
 	void OnEnable ()
 	{
-		UIUpdater.Add(this);
 		foreach (UIWidget w in mWidgets) AddWidget(w);
 		mRebuildAll = true;
 	}
@@ -421,7 +420,6 @@ public class UIPanel : MonoBehaviour
 
 	void OnDisable ()
 	{
-		UIUpdater.Remove(this);
 		for (int i = mDrawCalls.Count; i > 0; )
 		{
 			UIDrawCall dc = mDrawCalls[--i];
@@ -728,7 +726,7 @@ public class UIPanel : MonoBehaviour
 	/// Update all widgets and rebuild the draw calls if necessary.
 	/// </summary>
 
-	public void CustomLateUpdate ()
+	void LateUpdate ()
 	{
 		UpdateTransformMatrix();
 		UpdateTransforms();

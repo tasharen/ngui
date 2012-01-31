@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.47
+                Version 1.48
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -49,6 +49,8 @@ All can be found here: http://www.tasharen.com/?page_id=197
 
 1.48:
 - FIX: UITextList will now handle resized text labels correctly.
+- FIX: Parenting and reparenting widgets will now cause their panel to get updated correctly.
+- FIX: Eliminated one potential cause of widgets trying to update before being parented.
 
 1.47:
 - NEW: Added a new example (8) showing how to create a simple menu system.
