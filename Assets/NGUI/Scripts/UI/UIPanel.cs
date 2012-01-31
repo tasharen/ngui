@@ -516,18 +516,18 @@ public class UIPanel : MonoBehaviour
 		// Check to see if something has changed
 		foreach (KeyValuePair<Transform, UINode> child in mChildren)
 		{
-			UINode pc = child.Value;
+			UINode node = child.Value;
 
-			if (pc.trans == null)
+			if (node.trans == null)
 			{
-				mRemoved.Add(pc.trans);
+				mRemoved.Add(node.trans);
 				continue;
 			}
 			
 			// If the node's parent has changed...
-			if (pc.trans.parent != pc.parent)
+			if (node.trans.parent != node.parent)
 			{
-				Transform parent = pc.trans.parent;
+				Transform parent = node.trans.parent;
 
 				if (parent != null)
 				{
@@ -538,20 +538,20 @@ public class UIPanel : MonoBehaviour
 					if (panel != this)
 					{
 						// Remove this transform from the managed list
-						mRemoved.Add(pc.trans);
+						mRemoved.Add(node.trans);
 
 						// If there is a widget present
-						if (pc.widget != null)
+						if (node.widget != null)
 						{
 							// Mark the material as having changed and remove the widget from the managed list
-							MarkMaterialAsChanged(pc.widget.material, false);
-							mWidgets.Remove(pc.widget);
+							MarkMaterialAsChanged(node.widget.material, false);
+							mWidgets.Remove(node.widget);
 
 							// Add this widget to the other panel
 							if (panel != null)
 							{
-								pc.widget.panel = null;
-								pc.widget.MarkAsChanged();
+								node.widget.panel = null;
+								node.widget.MarkAsChanged();
 							}
 						}
 						continue;
@@ -559,12 +559,12 @@ public class UIPanel : MonoBehaviour
 				}
 			}
 			
-			if (pc.HasChanged())
+			if (node.HasChanged())
 			{
-				pc.changeFlag = 1;
+				node.changeFlag = 1;
 				transformsChanged = true;
 			}
-			else pc.changeFlag = -1;
+			else node.changeFlag = -1;
 		}
 
 		// Clean up deleted transforms
