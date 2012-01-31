@@ -148,12 +148,14 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		mChanged = true;
 
-		if (enabled && gameObject.active && !Application.isPlaying && mMat != null)
+		// If we're in the editor, update the panel right away so its geometry gets updated.
+		if (mPanel != null && enabled && gameObject.active && !Application.isPlaying && mMat != null)
 		{
-			panel.AddWidget(this);
-			LayerCheck();
+			mPanel.AddWidget(this);
+			CheckLayer();
 #if UNITY_EDITOR
-			mPanel.CustomLateUpdate();
+			// Mark the panel as dirty so it gets updated
+			UnityEditor.EditorUtility.SetDirty(mPanel.gameObject);
 #endif
 		}
 	}
@@ -167,7 +169,7 @@ public abstract class UIWidget : MonoBehaviour
 		if (mPanel == null && mMat != null)
 		{
 			mPanel = UIPanel.Find(cachedTransform);
-			LayerCheck();
+			CheckLayer();
 			mPanel.AddWidget(this);
 			mChanged = true;
 		}
@@ -177,13 +179,42 @@ public abstract class UIWidget : MonoBehaviour
 	/// Check to ensure that the widget resides on the same layer as its panel.
 	/// </summary>
 
-	void LayerCheck ()
+	void CheckLayer ()
 	{
 		if (mPanel != null && mPanel.gameObject.layer != gameObject.layer)
 		{
 			Debug.LogWarning("You can't place widgets on a layer different than the UIPanel that manages them.\n" +
 				"If you want to move widgets to a different layer, parent them to a new panel instead.", this);
 			gameObject.layer = mPanel.gameObject.layer;
+		}
+	}
+
+	/// <summary>
+	/// Checks to ensure that the widget is still parented to the right panel.
+	/// </summary>
+
+	void CheckParent ()
+	{
+		if (mPanel != null)
+		{
+			// This code allows drag & dropping of widgets onto different panels in the editor.
+			bool valid = false;
+			Transform t = cachedTransform.parent;
+
+			// Run through the parents and see if this widget is still parented to the transform
+			while (!valid && t != null)
+			{
+				valid = (t == mPanel.cachedTransform);
+				t = t.parent;
+			}
+
+			// This widget is no longer parented to the same panel. Remove it and re-add it to a new one.
+			if (!valid)
+			{
+				mPanel.RemoveWidget(this);
+				mPanel = null;
+				CreatePanel();
+			}
 		}
 	}
 
@@ -213,6 +244,7 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		mChanged = true;
 		if (mPanel != null && mMat != null) mPanel.MarkMaterialAsChanged(mMat, false);
+		//UIUpdater.Add(this);
 	}
 
 	/// <summary>
@@ -226,16 +258,20 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Ensure that this widget has been added to a panel. It's a work-around for the problem of
-	/// Unity calling OnEnable prior to parenting objects after Copy/Paste.
+	/// Ensure that we have a panel to work with. The reason the panel isn't added in OnEnable()
+	/// is because OnEnable() is called right after Awake(), which is a problem when the widget
+	/// is brought in on a prefab object as it happens before it gets parented.
 	/// </summary>
 
 	void Update ()
 	{
-		LayerCheck();
+		CheckLayer();
 
 		// Ensure we have a panel to work with by now
 		if (mPanel == null) CreatePanel();
+#if UNITY_EDITOR
+		else CheckParent();
+#endif
 		
 		// Automatically reset the Z scaling component back to 1 as it's not used
 		Vector3 scale = cachedTransform.localScale;
@@ -251,7 +287,11 @@ public abstract class UIWidget : MonoBehaviour
 	/// Don't store any references to the panel.
 	/// </summary>
 
-	void OnDisable () { if (mPanel != null && mMat != null) mPanel.MarkMaterialAsChanged(mMat, false); mPanel = null; }
+	void OnDisable ()
+	{
+		if (mPanel != null && mMat != null) mPanel.MarkMaterialAsChanged(mMat, false); mPanel = null;
+		//UIUpdater.Remove(this);
+	}
 
 	/// <summary>
 	/// Unregister this widget.

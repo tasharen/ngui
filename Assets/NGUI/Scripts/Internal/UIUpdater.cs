@@ -19,6 +19,17 @@ public class UIUpdater : MonoBehaviour
 
 	/*void Update ()
 	{
+		for (int i = mWidgets.Count; i > 0; )
+		{
+			UIWidget widget = mWidgets[--i];
+
+			if (widget != null)
+			{
+				if (widget.enabled && widget.gameObject.active) widget.CustomUpdate();
+			}
+			else mWidgets.RemoveAt(i);
+		}
+
 		for (int i = mPanels.Count; i > 0; )
 		{
 			UIPanel panel = mPanels[--i];
@@ -50,7 +61,7 @@ public class UIUpdater : MonoBehaviour
 
 				if (widget != null)
 				{
-					if (widget.enabled && widget.gameObject.active) widget.UIUpdate();
+					if (widget.enabled && widget.gameObject.active) widget.CustomLateUpdate();
 				}
 				else mWidgets.RemoveAt(i);
 			}*/
