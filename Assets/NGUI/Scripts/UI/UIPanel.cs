@@ -290,7 +290,6 @@ public class UIPanel : MonoBehaviour
 				// The node is not yet managed -- add it to the list
 				node = new UINode(t);
 				if (retVal == null) retVal = node;
-				node.parent = t.parent;
 				mChildren.Add(t, node);
 				t = t.parent;
 			}
@@ -520,41 +519,6 @@ public class UIPanel : MonoBehaviour
 			{
 				mRemoved.Add(node.trans);
 				continue;
-			}
-			
-			// If the node's parent has changed...
-			if (node.trans.parent != node.parent)
-			{
-				Transform parent = node.trans.parent;
-
-				if (parent != null)
-				{
-					// Find the panel responsible for this new parent
-					UIPanel panel = NGUITools.FindInChildren<UIPanel>(parent.gameObject);
-
-					// If the panel has changed...
-					if (panel != this)
-					{
-						// Remove this transform from the managed list
-						mRemoved.Add(node.trans);
-
-						// If there is a widget present
-						if (node.widget != null)
-						{
-							// Mark the material as having changed and remove the widget from the managed list
-							MarkMaterialAsChanged(node.widget.material, false);
-							mWidgets.Remove(node.widget);
-
-							// Add this widget to the other panel
-							if (panel != null)
-							{
-								node.widget.panel = null;
-								node.widget.MarkAsChanged();
-							}
-						}
-						continue;
-					}
-				}
 			}
 			
 			if (node.HasChanged())

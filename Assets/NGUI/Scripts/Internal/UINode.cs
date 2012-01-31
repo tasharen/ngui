@@ -12,7 +12,6 @@ public class UINode
 	int mVisibleFlag = -1;
 
 	public Transform trans;			// Managed transform
-	public Transform parent;		// Transform's parent, cached to see if it changes
 	public UIWidget widget;			// Widget on this transform, if any
 
 	public bool lastActive = false;	// Last active state
