@@ -85,7 +85,7 @@ public class UISlicedSprite : UISprite
 	/// Draw the widget.
 	/// </summary>
 
-	override public void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
+	override public void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
 	{
 		if (mOuterUV == mInnerUV)
 		{

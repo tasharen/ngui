@@ -293,7 +293,7 @@ public class UILabel : UIWidget
 	/// Draw the label.
 	/// </summary>
 
-	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
+	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
 	{
 #if !UNITY_FLASH
 		// Unity 3.5b6 is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel

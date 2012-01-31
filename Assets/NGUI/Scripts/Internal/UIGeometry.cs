@@ -17,23 +17,23 @@ public class UIGeometry
 	/// <summary>
 	/// Widget's vertices (before they get transformed).
 	/// </summary>
- 
-	public List<Vector3> verts = new List<Vector3>();
+
+	public BetterList<Vector3> verts = new BetterList<Vector3>();
 
 	/// <summary>
 	/// Widget's texture coordinates for the geometry's vertices.
 	/// </summary>
 
-	public List<Vector2> uvs = new List<Vector2>();
+	public BetterList<Vector2> uvs = new BetterList<Vector2>();
 
 	/// <summary>
 	/// Array of colors for the geometry's vertices.
 	/// </summary>
 
-	public List<Color> cols = new List<Color>();
+	public BetterList<Color> cols = new BetterList<Color>();
 
 	// Relative-to-panel vertices, normal, and tangent
-	List<Vector3> mRtpVerts = new List<Vector3>();
+	BetterList<Vector3> mRtpVerts = new BetterList<Vector3>();
 	Vector3 mRtpNormal;
 	Vector4 mRtpTan;
 
@@ -41,13 +41,13 @@ public class UIGeometry
 	/// Whether the geometry contains usable vertices.
 	/// </summary>
 
-	public bool hasVertices { get { return (verts.Count > 0); } }
+	public bool hasVertices { get { return (verts.size > 0); } }
 
 	/// <summary>
 	/// Whether the geometry has usable transformed vertex data.
 	/// </summary>
 
-	public bool hasTransformed { get { return (mRtpVerts != null) && (mRtpVerts.Count > 0) && (mRtpVerts.Count == verts.Count); } }
+	public bool hasTransformed { get { return (mRtpVerts != null) && (mRtpVerts.size > 0) && (mRtpVerts.size == verts.size); } }
 
 	/// <summary>
 	/// Step 1: Prepare to fill the buffers -- make them clean and valid.
@@ -66,7 +66,7 @@ public class UIGeometry
 
 	public void ApplyOffset (Vector3 pivotOffset)
 	{
-		for (int i = 0, imax = verts.Count; i < imax; ++i) verts[i] += pivotOffset;
+		for (int i = 0; i < verts.size; ++i) verts.buffer[i] += pivotOffset;
 	}
 
 	/// <summary>
@@ -75,20 +75,10 @@ public class UIGeometry
 
 	public void ApplyTransform (Matrix4x4 widgetToPanel, bool normals)
 	{
-		if (verts.Count > 0)
+		if (verts.size > 0)
 		{
-			if (mRtpVerts.Count == verts.Count)
-			{
-				// The arrays have the same size -- simply overwrite the values.
-				for (int i = 0, imax = verts.Count; i < imax; ++i)
-					mRtpVerts[i] = widgetToPanel.MultiplyPoint3x4(verts[i]);
-			}
-			else
-			{
-				// The arrays are of different size -- fill from the beginning
-				mRtpVerts.Clear();
-				foreach (Vector3 v in verts) mRtpVerts.Add(widgetToPanel.MultiplyPoint3x4(v));
-			}
+			mRtpVerts.Clear();
+			foreach (Vector3 v in verts) mRtpVerts.Add(widgetToPanel.MultiplyPoint3x4(v));
 
 			// Calculate the widget's normal and tangent
 			mRtpNormal = widgetToPanel.MultiplyVector(Vector3.back).normalized;
@@ -102,26 +92,26 @@ public class UIGeometry
 	/// Step 4: Fill the specified buffer using the transformed values.
 	/// </summary>
 
-	public void WriteToBuffers (List<Vector3> v, List<Vector2> u, List<Color> c, List<Vector3> n, List<Vector4> t)
+	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color> c, BetterList<Vector3> n, BetterList<Vector4> t)
 	{
-		if (mRtpVerts != null && mRtpVerts.Count > 0)
+		if (mRtpVerts != null && mRtpVerts.size > 0)
 		{
 			if (n == null)
 			{
-				for (int i = 0, imax = mRtpVerts.Count; i < imax; ++i)
+				for (int i = 0; i < mRtpVerts.size; ++i)
 				{
-					v.Add(mRtpVerts[i]);
-					u.Add(uvs[i]);
-					c.Add(cols[i]);
+					v.Add(mRtpVerts.buffer[i]);
+					u.Add(uvs.buffer[i]);
+					c.Add(cols.buffer[i]);
 				}
 			}
 			else
 			{
-				for (int i = 0, imax = mRtpVerts.Count; i < imax; ++i)
+				for (int i = 0; i < mRtpVerts.size; ++i)
 				{
-					v.Add(mRtpVerts[i]);
-					u.Add(uvs[i]);
-					c.Add(cols[i]);
+					v.Add(mRtpVerts.buffer[i]);
+					u.Add(uvs.buffer[i]);
+					c.Add(cols.buffer[i]);
 					n.Add(mRtpNormal);
 					t.Add(mRtpTan);
 				}

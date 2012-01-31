@@ -27,6 +27,7 @@ public class UIDrawCall : MonoBehaviour
 	Vector2			mClipSoft;	// Clipping softness
 	Material		mInst;		// Instantiated material, if necessary
 	bool			mReset		= true;
+	int[]			mIndices;	// Cached indices
 
 	/// <summary>
 	/// Transform is cached for speed and efficiency.
@@ -150,28 +151,33 @@ public class UIDrawCall : MonoBehaviour
 	/// Set the draw call's geometry.
 	/// </summary>
 
-	public void Set (List<Vector3> verts, List<Vector3> norms, List<Vector4> tans, List<Vector2> uvs, List<Color> cols)
+	public void Set (BetterList<Vector3> verts, BetterList<Vector3> norms, BetterList<Vector4> tans, BetterList<Vector2> uvs, BetterList<Color> cols)
 	{
-		int count = verts.Count;
+		int count = verts.size;
 
 		// Safety check to ensure we get valid values
-		if (count > 0 && (count == uvs.Count && count == cols.Count) && (count % 4) == 0)
+		if (count > 0 && (count == uvs.size && count == cols.size) && (count % 4) == 0)
 		{
 			int index = 0;
 
 			// It takes 6 indices to draw a quad of 4 vertices
-			int[] indices = new int[(count >> 1) * 3];
+			int indexCount = (count >> 1) * 3;
 
 			// Populate the index buffer
-			for (int i = 0; i < count; i += 4)
+			if (mIndices == null || mIndices.Length != indexCount)
 			{
-				indices[index++] = i;
-				indices[index++] = i + 1;
-				indices[index++] = i + 2;
+				mIndices = new int[indexCount];
 
-				indices[index++] = i + 2;
-				indices[index++] = i + 3;
-				indices[index++] = i;
+				for (int i = 0; i < count; i += 4)
+				{
+					mIndices[index++] = i;
+					mIndices[index++] = i + 1;
+					mIndices[index++] = i + 2;
+
+					mIndices[index++] = i + 2;
+					mIndices[index++] = i + 3;
+					mIndices[index++] = i;
+				}
 			}
 
 			// Cache all components
@@ -185,7 +191,7 @@ public class UIDrawCall : MonoBehaviour
 				mRen.sharedMaterial = mMat;
 			}
 
-			if (verts.Count < 65000)
+			if (verts.size < 65000)
 			{
 				if (mMesh == null)
 				{
@@ -203,14 +209,14 @@ public class UIDrawCall : MonoBehaviour
 				if (tans != null) mMesh.tangents = tans.ToArray();
 				mMesh.uv = uvs.ToArray();
 				mMesh.colors = cols.ToArray();
-				mMesh.triangles = indices;
+				mMesh.triangles = mIndices;
 				mMesh.RecalculateBounds();
 				mFilter.mesh = mMesh;
 			}
 			else
 			{
 				if (mMesh != null) mMesh.Clear();
-				Debug.LogError("Too many vertices on one panel: " + verts.Count);
+				Debug.LogError("Too many vertices on one panel: " + verts.size);
 			}
 		}
 		else

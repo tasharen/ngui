@@ -372,7 +372,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Append the local geometry buffers to the specified ones.
 	/// </summary>
 
-	public void WriteToBuffers (List<Vector3> v, List<Vector2> u, List<Color> c, List<Vector3> n, List<Vector4> t)
+	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color> c, BetterList<Vector3> n, BetterList<Vector4> t)
 	{
 		mGeom.WriteToBuffers(v, u, c, n, t);
 	}
@@ -454,5 +454,5 @@ public abstract class UIWidget : MonoBehaviour
 	/// Virtual function called by the UIPanel that fills the buffers.
 	/// </summary>
 
-	virtual public void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols) { }
+	virtual public void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols) { }
 }

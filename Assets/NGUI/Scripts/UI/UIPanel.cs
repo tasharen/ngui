@@ -47,11 +47,11 @@ public class UIPanel : MonoBehaviour
 	List<UIDrawCall> mDrawCalls = new List<UIDrawCall>();
 
 	// Cached in order to reduce memory allocations
-	List<Vector3> mVerts = new List<Vector3>();
-	List<Vector3> mNorms = new List<Vector3>();
-	List<Vector4> mTans = new List<Vector4>();
-	List<Vector2> mUvs = new List<Vector2>();
-	List<Color> mCols = new List<Color>();
+	BetterList<Vector3> mVerts = new BetterList<Vector3>();
+	BetterList<Vector3> mNorms = new BetterList<Vector3>();
+	BetterList<Vector4> mTans = new BetterList<Vector4>();
+	BetterList<Vector2> mUvs = new BetterList<Vector2>();
+	BetterList<Color> mCols = new BetterList<Color>();
 
 	Transform mTrans;
 	Camera mCam;
@@ -660,7 +660,7 @@ public class UIPanel : MonoBehaviour
 			}
 		}
 
-		if (mVerts.Count > 0)
+		if (mVerts.size > 0)
 		{
 			// Rebuild the draw call's mesh
 			UIDrawCall dc = GetDrawCall(mat, true);

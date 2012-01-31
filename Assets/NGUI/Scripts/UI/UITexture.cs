@@ -34,7 +34,7 @@ public class UITexture : UIWidget
 	/// Virtual function called by the UIScreen that fills the buffers.
 	/// </summary>
 
-	override public void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
+	override public void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
 	{
 		verts.Add(new Vector3(1f,  0f, 0f));
 		verts.Add(new Vector3(1f, -1f, 0f));

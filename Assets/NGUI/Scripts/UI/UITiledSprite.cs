@@ -50,7 +50,7 @@ public class UITiledSprite : UISprite
 	/// Fill the draw buffers.
 	/// </summary>
 
-	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
+	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
 	{
 		Texture tex = material.mainTexture;
 		if (tex == null) return;

@@ -364,7 +364,7 @@ public class UIFont : MonoBehaviour
 	/// Align the vertices to be right or center-aligned given the specified line width.
 	/// </summary>
 
-	void Align (List<Vector3> verts, int indexOffset, Alignment alignment, int x, int lineWidth)
+	void Align (BetterList<Vector3> verts, int indexOffset, Alignment alignment, int x, int lineWidth)
 	{
 		if (alignment != Alignment.Left && mFont.charSize > 0)
 		{
@@ -373,11 +373,11 @@ public class UIFont : MonoBehaviour
 			offset /= mFont.charSize;
 
 			Vector3 temp;
-			for (int i = indexOffset, imax = verts.Count; i < imax; ++i)
+			for (int i = indexOffset; i < verts.size; ++i)
 			{
-				temp = verts[i];
+				temp = verts.buffer[i];
 				temp.x += offset;
-				verts[i] = temp;
+				verts.buffer[i] = temp;
 			}
 		}
 	}
@@ -387,7 +387,7 @@ public class UIFont : MonoBehaviour
 	/// Note: 'lineWidth' parameter should be in pixels.
 	/// </summary>
 
-	public void Print (string text, Color color, List<Vector3> verts, List<Vector2> uvs, List<Color> cols,
+	public void Print (string text, Color color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols,
 		bool encoding, Alignment alignment, int lineWidth)
 	{
 		if (mFont != null && text != null)
@@ -403,7 +403,7 @@ public class UIFont : MonoBehaviour
 
 			Vector2 scale = mFont.charSize > 0 ? new Vector2(1f / mFont.charSize, 1f / mFont.charSize) : Vector2.one;
 
-			int indexOffset = verts.Count;
+			int indexOffset = verts.size;
 			int maxX = 0;
 			int x = 0;
 			int y = 0;
@@ -425,7 +425,7 @@ public class UIFont : MonoBehaviour
 					if (alignment != Alignment.Left)
 					{
 						Align(verts, indexOffset, alignment, x, lineWidth);
-						indexOffset = verts.Count;
+						indexOffset = verts.size;
 					}
 
 					x = 0;
@@ -491,10 +491,10 @@ public class UIFont : MonoBehaviour
 				}
 			}
 
-			if (alignment != Alignment.Left && indexOffset < verts.Count)
+			if (alignment != Alignment.Left && indexOffset < verts.size)
 			{
 				Align(verts, indexOffset, alignment, x, lineWidth);
-				indexOffset = verts.Count;
+				indexOffset = verts.size;
 			}
 		}
 	}
