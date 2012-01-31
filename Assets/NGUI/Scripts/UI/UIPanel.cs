@@ -68,7 +68,7 @@ public class UIPanel : MonoBehaviour
 	Vector2 mMax = Vector2.zero;
 
 	// When traversing through the child dictionary, deleted values are stored here
-	static List<Transform> mRemoved = new List<Transform>();
+	List<Transform> mRemoved = new List<Transform>();
 
 #if UNITY_EDITOR
 	// Screen size, saved for gizmos, since Screen.width and Screen.height returns the Scene view's dimensions in OnDrawGizmos.
@@ -290,6 +290,7 @@ public class UIPanel : MonoBehaviour
 				// The node is not yet managed -- add it to the list
 				node = new UINode(t);
 				if (retVal == null) retVal = node;
+				node.parent = t.parent;
 				mChildren.Add(t, node);
 				t = t.parent;
 			}
@@ -305,6 +306,8 @@ public class UIPanel : MonoBehaviour
 	{
 		if (t != null)
 		{
+			Debug.Log("Removing " + NGUITools.GetHierarchy(t.gameObject), this);
+
 			while (mChildren.Remove(t))
 			{
 				t = t.parent;
@@ -518,8 +521,45 @@ public class UIPanel : MonoBehaviour
 			if (pc.trans == null)
 			{
 				mRemoved.Add(pc.trans);
+				continue;
 			}
-			else if (pc.HasChanged())
+			
+			// If the node's parent has changed...
+			if (pc.trans.parent != pc.parent)
+			{
+				Transform parent = pc.trans.parent;
+
+				if (parent != null)
+				{
+					// Find the panel responsible for this new parent
+					UIPanel panel = NGUITools.FindInChildren<UIPanel>(parent.gameObject);
+
+					// If the panel has changed...
+					if (panel != this)
+					{
+						// Remove this transform from the managed list
+						mRemoved.Add(pc.trans);
+
+						// If there is a widget present
+						if (pc.widget != null)
+						{
+							// Mark the material as having changed and remove the widget from the managed list
+							MarkMaterialAsChanged(pc.widget.material, false);
+							mWidgets.Remove(pc.widget);
+
+							// Add this widget to the other panel
+							if (panel != null)
+							{
+								pc.widget.panel = null;
+								pc.widget.MarkAsChanged();
+							}
+						}
+						continue;
+					}
+				}
+			}
+			
+			if (pc.HasChanged())
 			{
 				pc.changeFlag = 1;
 				transformsChanged = true;
@@ -669,7 +709,7 @@ public class UIPanel : MonoBehaviour
 				}
 				else
 				{
-					Debug.LogError("No transform found for " + NGUITools.GetHierarchy(w.gameObject));
+					Debug.LogError("No transform found for " + NGUITools.GetHierarchy(w.gameObject), this);
 				}
 			}
 		}

@@ -118,7 +118,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Returns the UI panel responsible for this widget.
 	/// </summary>
 
-	public UIPanel panel { get { CreatePanel(); return mPanel; } }
+	public UIPanel panel { get { CreatePanel(); return mPanel; } set { mPanel = value; } }
 
 	/// <summary>
 	/// Flag set by the UIPanel and used in optimization checks.
@@ -149,7 +149,9 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			panel.AddWidget(this);
 			LayerCheck();
+#if UNITY_EDITOR
 			mPanel.LateUpdate();
+#endif
 		}
 	}
 
