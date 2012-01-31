@@ -45,6 +45,9 @@ public abstract class UIWidget : MonoBehaviour
 	Vector3 mDiffScale;
 	int mVisibleFlag = -1;
 
+	// Widget's generated geometry
+	UIGeometry mGeom = new UIGeometry();
+
 	/// <summary>
 	/// Color used by the widget.
 	/// </summary>
@@ -150,7 +153,7 @@ public abstract class UIWidget : MonoBehaviour
 			panel.AddWidget(this);
 			LayerCheck();
 #if UNITY_EDITOR
-			mPanel.LateUpdate();
+			mPanel.CustomLateUpdate();
 #endif
 		}
 	}
@@ -296,15 +299,42 @@ public abstract class UIWidget : MonoBehaviour
 #endif
 
 	/// <summary>
-	/// Update the widget.
+	/// Update the widget and fill its geometry if necessary. Returns whether something was changed.
 	/// </summary>
 
-	public bool PanelUpdate ()
+	public bool UpdateGeometry (ref Matrix4x4 worldToPanel, bool parentMoved, bool generateNormals)
 	{
 		if (material == null) return false;
 		bool retVal = OnUpdate() | mChanged;
 		mChanged = false;
-		return retVal;
+
+		if (retVal || !mGeom.hasVertices)
+		{
+			Vector3 offset = pivotOffset;
+			Vector2 scale = relativeSize;
+			offset.x *= scale.x;
+			offset.y *= scale.y;
+
+			mGeom.Clear();
+			OnFill(mGeom.verts, mGeom.uvs, mGeom.cols);
+			mGeom.ApplyOffset(offset);
+			mGeom.ApplyTransform(worldToPanel * cachedTransform.localToWorldMatrix, generateNormals);
+			return true;
+		}
+		else if (mGeom.hasVertices && parentMoved)
+		{
+			mGeom.ApplyTransform(worldToPanel * cachedTransform.localToWorldMatrix, generateNormals);
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Append the local geometry buffers to the specified ones.
+	/// </summary>
+
+	public void WriteToBuffers (List<Vector3> v, List<Vector2> u, List<Color> c, List<Vector3> n, List<Vector4> t)
+	{
+		mGeom.WriteToBuffers(v, u, c, n, t);
 	}
 
 	/// <summary>

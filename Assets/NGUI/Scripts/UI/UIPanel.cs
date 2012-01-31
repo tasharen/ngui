@@ -306,8 +306,6 @@ public class UIPanel : MonoBehaviour
 	{
 		if (t != null)
 		{
-			Debug.Log("Removing " + NGUITools.GetHierarchy(t.gameObject), this);
-
 			while (mChildren.Remove(t))
 			{
 				t = t.parent;
@@ -412,6 +410,7 @@ public class UIPanel : MonoBehaviour
 
 	void OnEnable ()
 	{
+		UIUpdater.Add(this);
 		foreach (UIWidget w in mWidgets) AddWidget(w);
 		mRebuildAll = true;
 	}
@@ -422,6 +421,7 @@ public class UIPanel : MonoBehaviour
 
 	void OnDisable ()
 	{
+		UIUpdater.Remove(this);
 		for (int i = mDrawCalls.Count; i > 0; )
 		{
 			UIDrawCall dc = mDrawCalls[--i];
@@ -616,29 +616,13 @@ public class UIPanel : MonoBehaviour
 		foreach (KeyValuePair<Transform, UINode> c in mChildren)
 		{
 			UINode pc = c.Value;
+			UIWidget w = pc.widget;
 
 			// If the widget is visible, update it
-			if (pc.visibleFlag == 1 && pc.widget != null)
+			if (pc.visibleFlag == 1 && w != null && w.UpdateGeometry(ref mWorldToLocal, (pc.changeFlag == 1), generateNormals))
 			{
-				if (pc.widget.PanelUpdate() || pc.verts == null || pc.verts.Count == 0)
-				{
-					// Rebuild the widget's geometry
-					Vector3 offset = pc.widget.pivotOffset;
-					Vector2 scale = pc.widget.relativeSize;
-					offset.x *= scale.x;
-					offset.y *= scale.y;
-					pc.Rebuild(offset);
-
-					// We will need to refill this buffer
-					if (!mChanged.Contains(pc.widget.material)) mChanged.Add(pc.widget.material);
-				}
-
-				// If we have vertices to work with, transform them
-				if ((pc.verts != null && pc.verts.Count > 0) &&
-					(pc.changeFlag == 1 || pc.rtpVerts == null || pc.rtpVerts.Count != pc.verts.Count))
-				{
-					pc.TransformVerts(mWorldToLocal * pc.trans.localToWorldMatrix, generateNormals);
-				}
+				// We will need to refill this buffer
+				if (!mChanged.Contains(w.material)) mChanged.Add(w.material);
 			}
 		}
 	}
@@ -704,8 +688,8 @@ public class UIPanel : MonoBehaviour
 
 				if (node != null)
 				{
-					if (generateNormals) node.Fill(mVerts, mUvs, mCols, mNorms, mTans);
-					else node.Fill(mVerts, mUvs, mCols, null, null);
+					if (generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
+					else w.WriteToBuffers(mVerts, mUvs, mCols, null, null);
 				}
 				else
 				{
@@ -744,7 +728,7 @@ public class UIPanel : MonoBehaviour
 	/// Update all widgets and rebuild the draw calls if necessary.
 	/// </summary>
 
-	public void LateUpdate ()
+	public void CustomLateUpdate ()
 	{
 		UpdateTransformMatrix();
 		UpdateTransforms();
