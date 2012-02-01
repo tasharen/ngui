@@ -320,12 +320,12 @@ public class UIFont : MonoBehaviour
 
 	public string WrapText (string text, float maxWidth, bool multiline, bool encoding)
 	{
-		StringBuilder sb = new StringBuilder();
-
 		// Width of the line in pixels
 		int lineWidth = Mathf.RoundToInt(maxWidth * size);
-		int textLength = text.Length;
+		if (lineWidth < 1) return text;
 
+		StringBuilder sb = new StringBuilder();
+		int textLength = text.Length;
 		int remainingWidth = lineWidth;
 		int previousChar = 0;
 		int start = 0;
@@ -340,6 +340,7 @@ public class UIFont : MonoBehaviour
 			// New line character -- start a new line
 			if (ch == '\n')
 			{
+				if (!multiline) break;
 				remainingWidth = lineWidth;
 
 				// Add the previous word to the final string

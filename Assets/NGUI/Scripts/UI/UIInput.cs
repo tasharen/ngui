@@ -12,6 +12,7 @@ public class UIInput : MonoBehaviour
 	public string caratChar = "|";
 
 	string mText = "";
+	string mLastIME = "";
 
 #if UNITY_IPHONE || UNITY_ANDROID
 	iPhoneKeyboard mKeyboard;
@@ -93,15 +94,13 @@ public class UIInput : MonoBehaviour
 				else
 #endif
 				{
-					label.text = mText + caratChar;
-					label.showLastPasswordChar = isSelected;
-
 					Input.imeCompositionMode = IMECompositionMode.On;
 					Transform t = label.cachedTransform;
 					Vector3 offset = label.pivotOffset;
 					offset.y += label.relativeSize.y;
 					offset = t.TransformPoint(offset);
 					Input.compositionCursorPos = UICamera.lastCamera.WorldToScreenPoint(offset);
+					UpdateLabel();
 				}
 			}
 #if UNITY_IPHONE || UNITY_ANDROID
@@ -128,8 +127,13 @@ public class UIInput : MonoBehaviour
 	{
 		if (mKeyboard != null)
 		{
-			mText = mKeyboard.text;
-			UpdateLabel();
+			string text = mKeyboard.text;
+
+			if (mText != text)
+			{
+				mText = text;
+				UpdateLabel();
+			}
 
 			if (mKeyboard.done)
 			{
@@ -142,8 +146,9 @@ public class UIInput : MonoBehaviour
 #else
 	void Update ()
 	{
-		if (!string.IsNullOrEmpty(Input.compositionString))
+		if (mLastIME != Input.compositionString)
 		{
+			mLastIME = Input.compositionString;
 			UpdateLabel();
 		}
 	}
@@ -194,7 +199,24 @@ public class UIInput : MonoBehaviour
 	void UpdateLabel ()
 	{
 		if (maxChars > 0 && mText.Length > maxChars) mText = mText.Substring(0, maxChars);
-		label.text = selected ? (mText + Input.compositionString + caratChar) : mText;
-		label.showLastPasswordChar = selected;
+
+		if (label.font != null)
+		{
+			// Start with the text and append the IME composition and carat chars
+			string processed = selected ? (mText + Input.compositionString + caratChar) : mText;
+
+			// Now wrap this text using the specified line width
+			processed = label.font.WrapText(processed, label.lineWidth / label.cachedTransform.localScale.x, true, false);
+
+			// Split it up into lines
+			string[] lines = processed.Split(new char[] { '\n' });
+
+			// Only the last line should be visible
+			processed = (lines.Length > 0) ? lines[lines.Length - 1] : "";
+
+			// Update the label's visible text
+			label.text = processed;
+			label.showLastPasswordChar = selected;
+		}
 	}
 }

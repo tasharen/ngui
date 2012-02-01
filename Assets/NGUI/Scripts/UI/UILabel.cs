@@ -283,8 +283,9 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			Vector3 size = (mFont != null) ? mFont.CalculatePrintedSize(processedText, mEncoding) : Vector2.zero;
-			if (mFont.size > 0) size.x = Mathf.Max(size.x, lineWidth / mFont.size);
+			Vector3 size = (mFont != null) ? mFont.CalculatePrintedSize(processedText, mEncoding) : Vector2.one;
+			size.x = Mathf.Max(size.x, (mFont != null && mFont.size > 0) ? lineWidth / mFont.size : 1f);
+			size.y = Mathf.Max(size.y, 1f);
 			return size;
 		}
 	}
