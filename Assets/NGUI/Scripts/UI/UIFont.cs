@@ -251,61 +251,7 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Text wrapping functionality.
-	/// </summary>
-
-	public string WrapText (string text, float maxWidth, bool multiline, bool encoding)
-	{
-		string newText = "";
-		float widthOfSpace = CalculatePrintedSize(" ", false).x;
-		bool addNewLine = false;
-
-		// Break the text into lines
-		string[] lines = text.Split(new char[] { '\n' });
-
-		// Run through each line
-		foreach (string line in lines)
-		{
-			if (addNewLine) newText += "\n";
-
-			// Break lines into words
-			string[] words = line.Split(new char[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
-			float spaceLeft = maxWidth;
-
-			foreach (string word in words)
-			{
-				float width = CalculatePrintedSize(word, encoding).x;
-
-				// If this is not a brand-new line, we'll need to append a space as well
-				if (spaceLeft != maxWidth) spaceLeft -= widthOfSpace;
-
-				if (width < spaceLeft)
-				{
-					// Append the word
-					if (spaceLeft != maxWidth) newText += " ";
-					newText += word;
-					spaceLeft -= width;
-				}
-				else
-				{
-					// If multi-line is not supported, we're done
-					if (!multiline) return newText;
-
-					// Insert line break before word.
-					newText += "\n" + word;
-
-					// Reset space left on line
-					spaceLeft = maxWidth - width;
-				}
-			}
-			addNewLine = true;
-			if (!multiline) break;
-		}
-		return newText;
-	}
-
-	/// <summary>
-	/// Get the printed size of the specified string.
+	/// Get the printed size of the specified string. The returned value is in local coordinates. Multiply by transform's scale to get pixels.
 	/// </summary>
 
 	public Vector2 CalculatePrintedSize (string text, bool encoding)
@@ -315,8 +261,6 @@ public class UIFont : MonoBehaviour
 		if (mFont != null && mFont.isValid && !string.IsNullOrEmpty(text))
 		{
 			if (encoding) text = NGUITools.StripSymbols(text);
-
-			Vector2 scale = mFont.charSize > 0 ? new Vector2(1f / mFont.charSize, 1f / mFont.charSize) : Vector2.one;
 
 			int maxX = 0;
 			int x = 0;
@@ -328,21 +272,18 @@ public class UIFont : MonoBehaviour
 			{
 				char c = text[i];
 
-				if (c == '\n' || (encoding && (c == '\\') && (i + 1 < imax) && (text[i + 1] == 'n')))
+				// Start a new line
+				if (c == '\n')
 				{
 					if (x > maxX) maxX = x;
 					x = 0;
 					y += lineHeight;
 					prev = 0;
-					if (c != '\n') ++i;
 					continue;
 				}
 
-				if (c < ' ')
-				{
-					prev = 0;
-					continue;
-				}
+				// Skip invalid characters
+				if (c < ' ') { prev = 0; continue; }
 
 				BMGlyph glyph = mFont.GetGlyph(c);
 
@@ -353,11 +294,132 @@ public class UIFont : MonoBehaviour
 				}
 			}
 
-			if (x > maxX) maxX = x;
-			v.x = scale.x * maxX;
-			v.y = scale.y * (y + lineHeight);
+			// Convert from pixel coordinates to local coordinates
+			float scale = (mFont.charSize > 0) ? 1f / mFont.charSize : 1f;
+			v.x = scale * ((x > maxX) ? x : maxX);
+			v.y = scale * (y + lineHeight);
 		}
 		return v;
+	}
+
+	/// <summary>
+	/// How fail is C#? You can't even modify a string like so: s[i] = '\n'. Sigh. Epic fail.
+	/// </summary>
+
+	static void EndLine (ref string s)
+	{
+		int i = s.Length - 1;
+		if (i > 0 && s[i] == ' ') s = s.Substring(0, i);
+		s += '\n';
+	}
+
+	/// <summary>
+	/// Text wrapping functionality. The 'maxWidth' should be in local coordinates (take pixels and divide them by transform's scale).
+	/// </summary>
+
+	public string WrapText (string text, float maxWidth, bool multiline, bool encoding)
+	{
+		// Width of the line in pixels
+		int lineWidth = Mathf.RoundToInt(maxWidth * size);
+		int textLength = text.Length;
+
+		int remainingWidth = lineWidth;
+		string final = "";
+		int previousChar = 0;
+		int start = 0;
+		int offset = 0;
+		bool lineIsEmpty = true;
+
+		// Run through all characters
+		for (; offset < textLength; ++offset)
+		{
+			char ch = text[offset];
+
+			// New line character -- start a new line
+			if (ch == '\n')
+			{
+				remainingWidth = lineWidth;
+
+				// Add the previous word to the final string
+				if (start < offset) final += text.Substring(start, offset - start + 1);
+				else final += ch;
+
+				lineIsEmpty = true;
+				start = offset + 1;
+				previousChar = 0;
+				continue;
+			}
+
+			// If this marks the end of a word, add it to the final string.
+			if (ch == ' ' && previousChar != ' ' && start < offset)
+			{
+				final += text.Substring(start, offset - start + 1);
+				lineIsEmpty = false;
+				start = offset + 1;
+				previousChar = ch;
+			}
+
+			// When encoded symbols such as [RrGgBb] or [-] are encountered, skip past them
+			if (encoding && ch == '[')
+			{
+				if (offset + 2 < textLength)
+				{
+					if (text[offset + 1] == '-' && text[offset + 2] == ']')
+					{
+						offset += 2;
+						continue;
+					}
+					else if (offset + 7 < textLength && text[offset + 7] == ']')
+					{
+						offset += 7;
+						continue;
+					}
+				}
+			}
+
+			BMGlyph glyph = mFont.GetGlyph(ch);
+
+			if (glyph != null)
+			{
+				int charSize = mSpacingX + ((previousChar != 0) ? glyph.advance + glyph.GetKerning(previousChar) : glyph.advance);
+
+				remainingWidth -= charSize;
+
+				// Doesn't fit?
+				if (remainingWidth < 0)
+				{
+					if (lineIsEmpty)
+					{
+						// This is the first word on the line -- add it up to the character that fits
+						final += text.Substring(start, offset - start);
+						EndLine(ref final);
+					}
+					else
+					{
+						// Revert the position to the beginning of the word and reset the line
+						lineIsEmpty = true;
+						offset = start - 1;
+						remainingWidth = lineWidth;
+						previousChar = 0;
+						EndLine(ref final);
+						continue;
+					}
+
+					// Start a brand-new line
+					lineIsEmpty = true;
+					start = (ch == ' ') ? offset + 1 : offset;
+					remainingWidth = lineWidth;
+					previousChar = 0;
+				}
+				else
+				{
+					previousChar = ch;
+				}
+			}
+		}
+
+		if (start < offset) final += text.Substring(start, offset - start);
+		return final;
 	}
 
 	/// <summary>
@@ -418,7 +480,7 @@ public class UIFont : MonoBehaviour
 			{
 				char c = text[i];
 
-				if (c == '\n' || (encoding && (c == '\\') && (i + 1 < imax) && (text[i + 1] == 'n')))
+				if (c == '\n')
 				{
 					if (x > maxX) maxX = x;
 
@@ -431,7 +493,6 @@ public class UIFont : MonoBehaviour
 					x = 0;
 					y += lineHeight;
 					prev = 0;
-					if (c != '\n') ++i;
 					continue;
 				}
 

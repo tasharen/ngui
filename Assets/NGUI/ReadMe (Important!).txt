@@ -48,6 +48,8 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
 
 1.48:
+- NEW: Added a new container class -- BetterList<>. It replaced the generic List<> in many cases, eliminating GC spikes.
+- FIX: Various performance-related optimizations.
 - FIX: UITextList will now handle resized text labels correctly.
 - FIX: Parenting and reparenting widgets will now cause their panel to get updated correctly.
 - FIX: Eliminated one potential cause of widgets trying to update before being parented.
