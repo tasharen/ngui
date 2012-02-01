@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Text;
 
 /// <summary>
 /// UIFont contains everything needed to be able to print text.
@@ -303,14 +304,14 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
-	/// How fail is C#? You can't even modify a string like so: s[i] = '\n'. Sigh. Epic fail.
+	/// Convenience function that ends the line by either appending a new line character or replacing a space with one.
 	/// </summary>
 
-	static void EndLine (ref string s)
+	static void EndLine (ref StringBuilder s)
 	{
 		int i = s.Length - 1;
-		if (i > 0 && s[i] == ' ') s = s.Substring(0, i);
-		s += '\n';
+		if (i > 0 && s[i] == ' ') s[i] = '\n';
+		else s.Append('\n');
 	}
 
 	/// <summary>
@@ -319,12 +320,13 @@ public class UIFont : MonoBehaviour
 
 	public string WrapText (string text, float maxWidth, bool multiline, bool encoding)
 	{
+		StringBuilder sb = new StringBuilder();
+
 		// Width of the line in pixels
 		int lineWidth = Mathf.RoundToInt(maxWidth * size);
 		int textLength = text.Length;
 
 		int remainingWidth = lineWidth;
-		string final = "";
 		int previousChar = 0;
 		int start = 0;
 		int offset = 0;
@@ -341,8 +343,8 @@ public class UIFont : MonoBehaviour
 				remainingWidth = lineWidth;
 
 				// Add the previous word to the final string
-				if (start < offset) final += text.Substring(start, offset - start + 1);
-				else final += ch;
+				if (start < offset) sb.Append(text.Substring(start, offset - start + 1));
+				else sb.Append(ch);
 
 				lineIsEmpty = true;
 				start = offset + 1;
@@ -353,7 +355,7 @@ public class UIFont : MonoBehaviour
 			// If this marks the end of a word, add it to the final string.
 			if (ch == ' ' && previousChar != ' ' && start < offset)
 			{
-				final += text.Substring(start, offset - start + 1);
+				sb.Append(text.Substring(start, offset - start + 1));
 				lineIsEmpty = false;
 				start = offset + 1;
 				previousChar = ch;
@@ -391,8 +393,8 @@ public class UIFont : MonoBehaviour
 					if (lineIsEmpty)
 					{
 						// This is the first word on the line -- add it up to the character that fits
-						final += text.Substring(start, offset - start);
-						EndLine(ref final);
+						sb.Append(text.Substring(start, offset - start));
+						EndLine(ref sb);
 					}
 					else
 					{
@@ -401,7 +403,7 @@ public class UIFont : MonoBehaviour
 						offset = start - 1;
 						remainingWidth = lineWidth;
 						previousChar = 0;
-						EndLine(ref final);
+						EndLine(ref sb);
 						continue;
 					}
 
@@ -418,8 +420,8 @@ public class UIFont : MonoBehaviour
 			}
 		}
 
-		if (start < offset) final += text.Substring(start, offset - start);
-		return final;
+		if (start < offset) sb.Append(text.Substring(start, offset - start));
+		return sb.ToString();
 	}
 
 	/// <summary>
