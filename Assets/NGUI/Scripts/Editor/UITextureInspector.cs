@@ -24,7 +24,7 @@ public class UITextureInspector : UIWidgetInspector
 
 	override protected void OnDrawTexture ()
 	{
-		Texture2D tex = mWidget.mainTexture;
+		Texture2D tex = mWidget.mainTexture as Texture2D;
 
 		if (tex != null)
 		{

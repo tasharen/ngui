@@ -37,7 +37,7 @@ public class UISlicedSpriteInspector : UISpriteInspector
 	protected override void OnDrawTexture ()
 	{
 		UISlicedSprite sprite = mWidget as UISlicedSprite;
-		Texture2D tex = sprite.mainTexture;
+		Texture2D tex = sprite.mainTexture as Texture2D;
 
 		if (tex != null)
 		{

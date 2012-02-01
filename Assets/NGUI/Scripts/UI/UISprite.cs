@@ -168,7 +168,7 @@ public class UISprite : UIWidget
 
 		if (sprite != null && mOuter != mSprite.outer)
 		{
-			Texture2D tex = mainTexture;
+			Texture tex = mainTexture;
 
 			if (tex != null)
 			{
@@ -190,7 +190,7 @@ public class UISprite : UIWidget
 
 	override public void MakePixelPerfect ()
 	{
-		Texture2D tex = mainTexture;
+		Texture tex = mainTexture;
 
 		if (tex != null)
 		{

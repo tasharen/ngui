@@ -39,7 +39,7 @@ public class UISlicedSprite : UISprite
 	{
 		Init();
 
-		Texture2D tex = mainTexture;
+		Texture tex = mainTexture;
 
 		if (tex != null && sprite != null)
 		{

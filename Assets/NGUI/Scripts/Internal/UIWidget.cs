@@ -34,7 +34,7 @@ public abstract class UIWidget : MonoBehaviour
 #endif
 
 	Transform mTrans;
-	Texture2D mTex;
+	Texture mTex;
 	UIPanel mPanel;
 
 	protected bool mChanged = true;
@@ -93,7 +93,7 @@ public abstract class UIWidget : MonoBehaviour
 				}
 				
 				mMat = value;
-				mTex = (mMat != null) ? mMat.mainTexture as Texture2D : null;
+				mTex = (mMat != null) ? mMat.mainTexture : null;
 
 				CreatePanel();
 			}
@@ -104,14 +104,14 @@ public abstract class UIWidget : MonoBehaviour
 	/// Returns the texture used to draw this widget.
 	/// </summary>
 
-	public Texture2D mainTexture
+	public Texture mainTexture
 	{
 		get
 		{
 			if (mTex == null)
 			{
 				Material mat = material;
-				if (mat != null) mTex = mat.mainTexture as Texture2D;
+				if (mat != null) mTex = mat.mainTexture;
 			}
 			return mTex;
 		}

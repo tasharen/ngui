@@ -63,7 +63,7 @@ public class UILabelInspector : UIWidgetInspector
 
 	override protected void OnDrawTexture ()
 	{
-		Texture2D tex = mLabel.mainTexture;
+		Texture2D tex = mLabel.mainTexture as Texture2D;
 
 		if (tex != null)
 		{

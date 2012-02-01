@@ -17,7 +17,7 @@ public class UITexture : UIWidget
 
 	override public void MakePixelPerfect ()
 	{
-		Texture2D tex = mainTexture;
+		Texture tex = mainTexture;
 
 		if (tex != null)
 		{

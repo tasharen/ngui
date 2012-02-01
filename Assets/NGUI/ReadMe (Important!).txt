@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.48
+                Version 1.49
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -46,6 +46,12 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.49:
+- NEW: UIWidgets now work with Textures rather than Texture2D, making it possible to use render textures if desired.
+- FIX: Rewrote the UIFont's WrapText function. It now supports wrapping of long lines properly.
+- FIX: Input fields are now multi-line, and will now show the last line when typing past the label's width.
+- FIX: Input fields will now update less frequently when IME or iOS/Android keyboard is used.
 
 1.48:
 - NEW: Added a new container class -- BetterList<>. It replaced the generic List<> in many cases, eliminating GC spikes.
