@@ -394,6 +394,7 @@ public class UIFont : MonoBehaviour
 					{
 						// This is the first word on the line -- add it up to the character that fits
 						sb.Append(text.Substring(start, offset - start));
+						if (!multiline) break;
 						EndLine(ref sb);
 					}
 					else
@@ -403,6 +404,7 @@ public class UIFont : MonoBehaviour
 						offset = start - 1;
 						remainingWidth = lineWidth;
 						previousChar = 0;
+						if (!multiline) break;
 						EndLine(ref sb);
 						continue;
 					}
