@@ -23,17 +23,17 @@ public class UITextList : MonoBehaviour
 	public bool supportScrollWheel = true;
 
 	// Text list is made up of paragraphs
-	class Paragraph
+	protected class Paragraph
 	{
 		public string text;		// Original text
 		public string[] lines;	// Split lines
 	}
 
-	char[] mSeparator = new char[] { '\n' };
-	List<Paragraph> mParagraphs = new List<Paragraph>();
-	float mScroll = 0f;
-	bool mSelected = false;
-	int mTotalLines = 0;
+	protected char[] mSeparator = new char[] { '\n' };
+	protected List<Paragraph> mParagraphs = new List<Paragraph>();
+	protected float mScroll = 0f;
+	protected bool mSelected = false;
+	protected int mTotalLines = 0;
 
 	/// <summary>
 	/// Allow scrolling of the text list.
@@ -59,7 +59,7 @@ public class UITextList : MonoBehaviour
 	/// Add a new paragraph.
 	/// </summary>
 
-	void Add (string text, bool updateVisible)
+	protected void Add (string text, bool updateVisible)
 	{
 		Paragraph ce = null;
 
@@ -125,7 +125,7 @@ public class UITextList : MonoBehaviour
 	/// Refill the text label based on what's currently visible.
 	/// </summary>
 
-	void UpdateVisibleText ()
+	protected void UpdateVisibleText ()
 	{
 		if (textLabel != null)
 		{
