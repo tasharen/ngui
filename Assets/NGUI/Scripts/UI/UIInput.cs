@@ -15,7 +15,11 @@ public class UIInput : MonoBehaviour
 	string mLastIME = "";
 
 #if UNITY_IPHONE || UNITY_ANDROID
+#if UNITY_3_5
+	TouchScreenKeyboard mKeyboard;
+#else
 	iPhoneKeyboard mKeyboard;
+#endif
 #endif
 
 	/// <summary>
@@ -89,7 +93,11 @@ public class UIInput : MonoBehaviour
 				if (Application.platform == RuntimePlatform.IPhonePlayer ||
 					Application.platform == RuntimePlatform.Android)
 				{
+#if UNITY_3_5
+					mKeyboard = TouchScreenKeyboard.Open(mText);
+#else
 					mKeyboard = iPhoneKeyboard.Open(mText);
+#endif
 				}
 				else
 #endif

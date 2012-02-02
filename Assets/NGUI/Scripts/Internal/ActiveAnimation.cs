@@ -136,4 +136,23 @@ public class ActiveAnimation : MonoBehaviour
 	{
 		return Play(anim, null, playDirection, EnableCondition.DoNothing, DisableCondition.DoNotDisable);
 	}
+
+	/// <summary>
+	/// Manually reset the active animation to the beginning.
+	/// </summary>
+
+	static public void Reset (Animation anim)
+	{
+		if (anim.isPlaying)
+		{
+			AnimationClip clip = anim.clip;
+
+			if (clip != null)
+			{
+				anim.Stop();
+				ActiveAnimation aa = anim.gameObject.GetComponent<ActiveAnimation>();
+				if (aa != null)	Play(anim, clip.name, aa.mLastDirection);
+			}
+		}
+	}
 }
