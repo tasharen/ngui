@@ -537,15 +537,15 @@ public class UIFont : MonoBehaviour
 					u1.x = u0.x + invX * glyph.width;
 					u1.y = u0.y - invY * glyph.height;
 
-					verts.Add(new Vector3(v1.x, v0.y, 0f));
-					verts.Add(v1);
-					verts.Add(new Vector3(v0.x, v1.y, 0f));
-					verts.Add(v0);
+					verts.Add(new Vector3(v1.x, v0.y));
+					verts.Add(new Vector3(v1.x, v1.y));
+					verts.Add(new Vector3(v0.x, v1.y));
+					verts.Add(new Vector3(v0.x, v0.y));
 
 					uvs.Add(new Vector2(u1.x, u0.y));
-					uvs.Add(u1);
+					uvs.Add(new Vector2(u1.x, u1.y));
 					uvs.Add(new Vector2(u0.x, u1.y));
-					uvs.Add(u0);
+					uvs.Add(new Vector2(u0.x, u0.y));
 
 					cols.Add(color);
 					cols.Add(color);
