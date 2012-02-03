@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.50
+                Version 1.50d
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -55,6 +55,7 @@ All can be found here: http://www.tasharen.com/?page_id=197
 - FIX: Typewriter effect script will now pre-wrap text before printing it.
 - FIX: NGUIEditorTools.SelectedRoot() no longer considers prefabs to be valid.
 - FIX: TexturePacker import will automatically strip out the ".png" extension from script names.
+- FIX: Tested and working with the Flash export as of 3.5.0 f3.
 
 1.49:
 - NEW: UIWidgets now work with Textures rather than Texture2D, making it possible to use render textures if desired.
