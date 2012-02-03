@@ -90,4 +90,10 @@ static public class NGUIMenu
 	{
 		EditorWindow.GetWindow<UICameraTool>(false, "Camera Tool", true);
 	}
+
+	[MenuItem("NGUI/Atlas Maker #&m")]
+	static public void OpenAtlasMaker ()
+	{
+		EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true);
+	}
 }

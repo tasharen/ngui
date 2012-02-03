@@ -218,7 +218,7 @@ public class UIAtlasInspector : Editor
 					// Show the delete button
 					GUI.backgroundColor = Color.red;
 
-					if (GUILayout.Button("Delete", GUILayout.Width(55f)))
+					if (mSprite != null && GUILayout.Button("Delete", GUILayout.Width(55f)))
 					{
 						mConfirmDelete = true;
 					}
@@ -236,6 +236,8 @@ public class UIAtlasInspector : Editor
 					{
 						mSprite = mAtlas.GetSprite(spriteName);
 					}
+
+					if (mSprite == null) return;
 
 					string name = mSprite.name;
 

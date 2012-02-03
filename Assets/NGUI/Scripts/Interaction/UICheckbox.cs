@@ -22,20 +22,7 @@ public class UICheckbox : MonoBehaviour
 	/// Whether the checkbox is checked.
 	/// </summary>
 
-	public bool isChecked
-	{
-		get
-		{
-			return mChecked;
-		}
-		set
-		{
-			if (mChecked != value && (!option || value))
-			{
-				Set(value);
-			}
-		}
-	}
+	public bool isChecked { get { return mChecked; } set { if (!option || value) Set(value); } }
 
 	/// <summary>
 	/// Activate the initial state.
@@ -45,6 +32,7 @@ public class UICheckbox : MonoBehaviour
 	{
 		mTrans = transform;
 		if (eventReceiver == null) eventReceiver = gameObject;
+		mChecked = !startsChecked;
 		Set(startsChecked);
 	}
 
@@ -60,34 +48,37 @@ public class UICheckbox : MonoBehaviour
 
 	void Set (bool state)
 	{
-		// Uncheck all other checkboxes
-		if (option && state)
+		if (mChecked != state)
 		{
-			UICheckbox[] cbs = mTrans.parent.GetComponentsInChildren<UICheckbox>();
-			foreach (UICheckbox cb in cbs) if (cb != this) cb.Set(false);
-		}
+			// Uncheck all other checkboxes
+			if (option && state)
+			{
+				UICheckbox[] cbs = mTrans.parent.GetComponentsInChildren<UICheckbox>();
+				foreach (UICheckbox cb in cbs) if (cb != this) cb.Set(false);
+			}
 
-		// Remember the state
-		mChecked = state;
+			// Remember the state
+			mChecked = state;
 
-		// Tween the color of the checkmark
-		if (checkSprite != null)
-		{
-			Color c = checkSprite.color;
-			c.a = mChecked ? 1f : 0f;
-			TweenColor.Begin(checkSprite.gameObject, 0.2f, c);
-		}
+			// Tween the color of the checkmark
+			if (checkSprite != null)
+			{
+				Color c = checkSprite.color;
+				c.a = mChecked ? 1f : 0f;
+				TweenColor.Begin(checkSprite.gameObject, 0.2f, c);
+			}
 
-		// Send out the event notification
-		if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
-		{
-			eventReceiver.SendMessage(functionName, mChecked, SendMessageOptions.DontRequireReceiver);
-		}
+			// Send out the event notification
+			if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+			{
+				eventReceiver.SendMessage(functionName, mChecked, SendMessageOptions.DontRequireReceiver);
+			}
 
-		// Play the checkmark animation
-		if (checkAnimation != null)
-		{
-			ActiveAnimation.Play(checkAnimation, state ? Direction.Forward : Direction.Reverse);
+			// Play the checkmark animation
+			if (checkAnimation != null)
+			{
+				ActiveAnimation.Play(checkAnimation, state ? Direction.Forward : Direction.Reverse);
+			}
 		}
 	}
 }
