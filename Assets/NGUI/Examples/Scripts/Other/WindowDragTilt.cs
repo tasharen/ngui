@@ -17,7 +17,7 @@ public class WindowDragTilt : MonoBehaviour
 
 	void Start ()
 	{
-		UpdateManager.AddCoroutine(updateOrder, CoroutineUpdate);
+		UpdateManager.AddCoroutine(this, updateOrder, CoroutineUpdate);
 	}
 
 	void OnEnable ()

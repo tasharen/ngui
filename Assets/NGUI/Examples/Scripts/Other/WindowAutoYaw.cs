@@ -23,7 +23,7 @@ public class WindowAutoYaw : MonoBehaviour
 	{
 		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
 		mTrans = transform;
-		UpdateManager.AddCoroutine(updateOrder, CoroutineUpdate);
+		UpdateManager.AddCoroutine(this, updateOrder, CoroutineUpdate);
 	}
 
 	void CoroutineUpdate (float delta)

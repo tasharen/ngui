@@ -365,7 +365,7 @@ static public class NGUITools
 
 	static public T FindInChildren<T> (GameObject go) where T : Component
 	{
-		T comp = go.GetComponent<T>();
+		object comp = go.GetComponent<T>();
 
 		if (comp == null)
 		{
@@ -377,7 +377,7 @@ static public class NGUITools
 				t = t.parent;
 			}
 		}
-		return comp;
+		return (T)comp;
 	}
 
 	/// <summary>

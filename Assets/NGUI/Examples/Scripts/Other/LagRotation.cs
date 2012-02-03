@@ -20,8 +20,8 @@ public class LagRotation : MonoBehaviour
 		mTrans = transform;
 		mRelative = mTrans.localRotation;
 		mAbsolute = mTrans.rotation;
-		if (ignoreTimeScale) UpdateManager.AddCoroutine(updateOrder, CoroutineUpdate);
-		else UpdateManager.AddLateUpdate(updateOrder, CoroutineUpdate);
+		if (ignoreTimeScale) UpdateManager.AddCoroutine(this, updateOrder, CoroutineUpdate);
+		else UpdateManager.AddLateUpdate(this, updateOrder, CoroutineUpdate);
 	}
 
 	void CoroutineUpdate (float delta)

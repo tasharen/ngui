@@ -26,7 +26,12 @@ public class UpdateManager : MonoBehaviour
 		public float time;
 	}
 
-	static int Compare (UpdateEntry a, UpdateEntry b) { return b.index.CompareTo(a.index); }
+	static int Compare (UpdateEntry a, UpdateEntry b)
+	{
+		if (a.index < b.index) return 1;
+		if (a.index > b.index) return 1;
+		return 0;
+	}
 
 	static UpdateManager mInst;
 	List<UpdateEntry> mOnUpdate = new List<UpdateEntry>();
@@ -63,13 +68,6 @@ public class UpdateManager : MonoBehaviour
 		for (int i = list.Count; i > 0; )
 		{
 			UpdateEntry ent = list[--i];
-
-			// No function or target has been destroyed -- remove this entry
-			if (ent.func == null || ent.func.Target == null)
-			{
-				list.RemoveAt(i);
-				continue;
-			}
 
 			// If it's a monobehaviour we need to do additional checks
 			if (ent.isMonoBehaviour)
@@ -182,17 +180,23 @@ public class UpdateManager : MonoBehaviour
 
 	/// <summary>
 	/// Generic add function.
+	/// Technically 'mb' is not necessary as it can be retrieved by calling 'func.Target as MonoBehaviour'.
+	/// Unfortunately Flash export fails to compile with that, claiming the following:
+	/// "Error: Access of possibly undefined property Target through a reference with static type Function."
 	/// </summary>
 
-	void Add (int updateOrder, OnUpdate func, List<UpdateEntry> list)
+	void Add (MonoBehaviour mb, int updateOrder, OnUpdate func, List<UpdateEntry> list)
 	{
+#if !UNITY_FLASH
+		// Flash export fails at life.
 		foreach (UpdateEntry ent in list) if (ent.func == func) return;
+#endif
 
 		UpdateEntry item = new UpdateEntry();
 		item.index = updateOrder;
 		item.func = func;
-		item.mb = func.Target as MonoBehaviour;
-		item.isMonoBehaviour = (item.mb != null);
+		item.mb = mb;
+		item.isMonoBehaviour = (mb != null);
 
 		list.Add(item);
 		if (updateOrder != 0) list.Sort(Compare);
@@ -202,19 +206,19 @@ public class UpdateManager : MonoBehaviour
 	/// Add a new update function with the specified update order.
 	/// </summary>
 
-	static public void AddUpdate (int updateOrder, OnUpdate func) { CreateInstance(); mInst.Add(updateOrder, func, mInst.mOnUpdate); }
+	static public void AddUpdate (MonoBehaviour mb, int updateOrder, OnUpdate func) { CreateInstance(); mInst.Add(mb, updateOrder, func, mInst.mOnUpdate); }
 
 	/// <summary>
 	/// Add a new late update function with the specified update order.
 	/// </summary>
 
-	static public void AddLateUpdate (int updateOrder, OnUpdate func) { CreateInstance(); mInst.Add(updateOrder, func, mInst.mOnLate); }
+	static public void AddLateUpdate (MonoBehaviour mb, int updateOrder, OnUpdate func) { CreateInstance(); mInst.Add(mb, updateOrder, func, mInst.mOnLate); }
 
 	/// <summary>
 	/// Add a new coroutine update function with the specified update order.
 	/// </summary>
 
-	static public void AddCoroutine (int updateOrder, OnUpdate func) { CreateInstance(); mInst.Add(updateOrder, func, mInst.mOnCoro); }
+	static public void AddCoroutine (MonoBehaviour mb, int updateOrder, OnUpdate func) { CreateInstance(); mInst.Add(mb, updateOrder, func, mInst.mOnCoro); }
 
 	/// <summary>
 	/// Destroy the object after the specified delay in seconds.

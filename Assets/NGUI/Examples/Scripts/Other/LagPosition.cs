@@ -19,8 +19,8 @@ public class LagPosition : MonoBehaviour
 	{
 		mTrans = transform;
 		mRelative = mTrans.localPosition;
-		if (ignoreTimeScale) UpdateManager.AddCoroutine(updateOrder, CoroutineUpdate);
-		else UpdateManager.AddLateUpdate(updateOrder, CoroutineUpdate);
+		if (ignoreTimeScale) UpdateManager.AddCoroutine(this, updateOrder, CoroutineUpdate);
+		else UpdateManager.AddLateUpdate(this, updateOrder, CoroutineUpdate);
 	}
 
 	void OnEnable()
