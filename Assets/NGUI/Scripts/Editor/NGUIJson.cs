@@ -67,8 +67,21 @@ public class NGUIJson
 			UIAtlas.Sprite newSprite = new UIAtlas.Sprite();
 			newSprite.name = item.Key.ToString();
 
-			// Get rid of the extension
-			newSprite.name.Replace(".png", "");
+			bool exists = false;
+
+			// Check to see if this sprite exists
+			foreach (UIAtlas.Sprite oldSprite in oldSprites)
+			{
+				if (oldSprite.name.Equals(newSprite.name, StringComparison.OrdinalIgnoreCase))
+				{
+					exists = true;
+					break;
+				}
+			}
+
+			// Get rid of the extension if the sprite doesn't exist
+			// The extension is kept for backwards compatibility so it's still possible to update older atlases.
+			if (!exists) newSprite.name = newSprite.name.Replace(".png", "");
 
 			// Extract the info we need from the TexturePacker json file, mainly uvRect and size
 			Hashtable table = (Hashtable)item.Value;
