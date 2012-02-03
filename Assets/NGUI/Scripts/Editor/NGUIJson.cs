@@ -67,6 +67,9 @@ public class NGUIJson
 			UIAtlas.Sprite newSprite = new UIAtlas.Sprite();
 			newSprite.name = item.Key.ToString();
 
+			// Get rid of the extension
+			newSprite.name.Replace(".png", "");
+
 			// Extract the info we need from the TexturePacker json file, mainly uvRect and size
 			Hashtable table = (Hashtable)item.Value;
 			Hashtable frame = (Hashtable)table["frame"];
@@ -98,7 +101,6 @@ public class NGUIJson
 			if (spriteSize != null && sourceSize != null)
 			{
 				// TODO: Account for rotated sprites
-				// TODO: Fonts should take padding into account as well -- by using the original texture's dimensions in new texture's space
 				if (frameW > 0)
 				{
 					float spriteX = int.Parse(spriteSize["x"].ToString());

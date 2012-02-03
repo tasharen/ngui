@@ -132,7 +132,7 @@ public class UIFont : MonoBehaviour
 		{
 			if (mAtlas != null && sprite != null)
 			{
-				Texture2D tex = mAtlas.texture;
+				Texture tex = mAtlas.texture;
 
 				if (tex != null)
 				{

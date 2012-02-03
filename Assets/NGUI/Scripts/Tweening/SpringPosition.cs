@@ -5,14 +5,20 @@
 /// </summary>
 
 [AddComponentMenu("NGUI/Tween/Spring Position")]
-public class SpringPosition : MonoBehaviour
+public class SpringPosition : IgnoreTimeScale
 {
+	public int updateOrder = 0;
 	public Vector3 target = Vector3.zero;
 	public float strength = 10f;
 	public bool worldSpace = false;
+	public bool ignoreTimeScale = false;
 
 	Transform mTrans;
 	float mThreshold = 0f;
+
+	/// <summary>
+	/// Cache the transform.
+	/// </summary>
 
 	void Start () { mTrans = transform; }
 
@@ -22,16 +28,18 @@ public class SpringPosition : MonoBehaviour
 
 	void Update ()
 	{
+		float delta = ignoreTimeScale ? UpdateRealTimeDelta() : Time.deltaTime;
+
 		if (worldSpace)
 		{
 			if (mThreshold == 0f) mThreshold = (target - mTrans.position).magnitude * 0.005f;
-			mTrans.position = NGUIMath.SpringLerp(mTrans.position, target, strength, Time.deltaTime);
+			mTrans.position = NGUIMath.SpringLerp(mTrans.position, target, strength, delta);
 			if (mThreshold >= (target - mTrans.position).magnitude) enabled = false;
 		}
 		else
 		{
 			if (mThreshold == 0f) mThreshold = (target - mTrans.localPosition).magnitude * 0.005f;
-			mTrans.localPosition = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, Time.deltaTime);
+			mTrans.localPosition = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, delta);
 			if (mThreshold >= (target - mTrans.localPosition).magnitude) enabled = false;
 		}
 	}

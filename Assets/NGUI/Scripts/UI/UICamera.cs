@@ -321,7 +321,7 @@ public class UICamera : MonoBehaviour
 
 			if (mMouse.pos != lastTouchPosition)
 			{
-				if (mTooltipTime != 0f) mTooltipTime = Time.time + tooltipDelay;
+				if (mTooltipTime != 0f) mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
 				else if (mTooltip != null) ShowTooltip(false);
 				mMouse.pos = lastTouchPosition;
 			}
@@ -379,7 +379,7 @@ public class UICamera : MonoBehaviour
 		}
 
 		// If it's time to show a tooltip, inform the object we're hovering over
-		if (mUseMouseInput && mMouse.hover != null && mTooltipTime != 0f && mTooltipTime < Time.time)
+		if (mUseMouseInput && mMouse.hover != null && mTooltipTime != 0f && mTooltipTime < Time.realtimeSinceStartup)
 		{
 			mTooltip = mMouse.hover;
 			ShowTooltip(true);
@@ -466,7 +466,7 @@ public class UICamera : MonoBehaviour
 		// Send out a hover(true) message last
 		if (mUseMouseInput && touch.pressed == null && touch.hover != touch.current)
 		{
-			mTooltipTime = Time.time + tooltipDelay;
+			mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
 			touch.hover = touch.current;
 			if (touch.hover != null) touch.hover.SendMessage("OnHover", true, SendMessageOptions.DontRequireReceiver);
 		}

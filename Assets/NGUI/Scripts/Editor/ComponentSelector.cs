@@ -47,7 +47,7 @@ public class ComponentSelector : ScriptableWizard
 	/// Show the selection wizard.
 	/// </summary>
 
-	static public void Show<T> (OnSelectionCallback cb) where T : MonoBehaviour
+	static void Show<T> (OnSelectionCallback cb) where T : MonoBehaviour
 	{
 		System.Type type = typeof(T);
 		ComponentSelector comp = ScriptableWizard.DisplayWizard<ComponentSelector>("Select " + type.ToString());

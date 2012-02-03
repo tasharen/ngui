@@ -8,11 +8,17 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Examples/Window Drag Tilt")]
 public class WindowDragTilt : MonoBehaviour
 {
+	public int updateOrder = 0;
 	public float tiltAmount = 100f;
 	public bool smoothen = true;
 
 	Vector3 mLastPos;
 	Transform mTrans;
+
+	void Start ()
+	{
+		UpdateManager.AddCoroutine(updateOrder, CoroutineUpdate);
+	}
 
 	void OnEnable ()
 	{
@@ -20,11 +26,11 @@ public class WindowDragTilt : MonoBehaviour
 		mLastPos = mTrans.position;
 	}
 
-	void Update ()
+	void CoroutineUpdate (float delta)
 	{
-		Vector3 delta = mTrans.position - mLastPos;
+		Vector3 deltaPos = mTrans.position - mLastPos;
 		mLastPos = mTrans.position;
-		Quaternion targetRot = Quaternion.Euler(0f, 0f, -delta.x * tiltAmount);
-		mTrans.localRotation = smoothen ? Quaternion.Slerp(mTrans.localRotation, targetRot, Time.deltaTime * 10f) : targetRot;
+		Quaternion targetRot = Quaternion.Euler(0f, 0f, -deltaPos.x * tiltAmount);
+		mTrans.localRotation = smoothen ? Quaternion.Slerp(mTrans.localRotation, targetRot, delta * 10f) : targetRot;
 	}
 }

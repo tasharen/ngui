@@ -5,7 +5,7 @@
 /// </summary>
 
 [AddComponentMenu("NGUI/Examples/Pan With Mouse")]
-public class PanWithMouse : MonoBehaviour
+public class PanWithMouse : IgnoreTimeScale
 {
 	public Vector2 degrees = new Vector2(5f, 3f);
 	public float range = 1f;
@@ -22,6 +22,7 @@ public class PanWithMouse : MonoBehaviour
 
 	void Update ()
 	{
+		float delta = UpdateRealTimeDelta();
 		Vector3 pos = Input.mousePosition;
 
 		float halfWidth = Screen.width * 0.5f;
@@ -29,7 +30,7 @@ public class PanWithMouse : MonoBehaviour
 		if (range < 0.1f) range = 0.1f;
 		float x = Mathf.Clamp((pos.x - halfWidth) / halfWidth / range, -1f, 1f);
 		float y = Mathf.Clamp((pos.y - halfHeight) / halfHeight / range, -1f, 1f);
-		mRot = Vector2.Lerp(mRot, new Vector2(x, y), Time.deltaTime * 5f);
+		mRot = Vector2.Lerp(mRot, new Vector2(x, y), delta * 5f);
 
 		mTrans.localRotation = mStart * Quaternion.Euler(-mRot.y * degrees.y, mRot.x * degrees.x, 0f);
 	}

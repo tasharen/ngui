@@ -478,7 +478,7 @@ public class UIPanel : MonoBehaviour
 
 	void UpdateTransformMatrix ()
 	{
-		float time = Time.time;
+		float time = Time.realtimeSinceStartup;
 
 		if (time == 0f || mMatrixTime != time)
 		{
@@ -687,7 +687,7 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Update all widgets and rebuild the draw calls if necessary.
+	/// Main update function
 	/// </summary>
 
 	void LateUpdate ()
@@ -720,9 +720,13 @@ public class UIPanel : MonoBehaviour
 		UpdateDrawcalls();
 		mChanged.Clear();
 		mRebuildAll = false;
+
 #if UNITY_EDITOR
 		mScreenSize = new Vector2(Screen.width, Screen.height);
+#endif
 	}
+
+#if UNITY_EDITOR
 
 	/// <summary>
 	/// Draw a visible pink outline for the clipped area.
@@ -741,8 +745,6 @@ public class UIPanel : MonoBehaviour
 			Gizmos.color = Color.magenta;
 			Gizmos.DrawWireCube(new Vector2(mClipRange.x, mClipRange.y), size);
 		}
-	}
-#else
 	}
 #endif
 

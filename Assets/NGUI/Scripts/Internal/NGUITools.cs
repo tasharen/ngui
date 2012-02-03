@@ -14,13 +14,13 @@ static public class NGUITools
 	/// Play the specified audio clip.
 	/// </summary>
 
-	static public void PlaySound (AudioClip clip) { PlaySound(clip, 1f); }
+	static public AudioSource PlaySound (AudioClip clip) { return PlaySound(clip, 1f); }
 
 	/// <summary>
 	/// Play the specified audio clip with the specified volume.
 	/// </summary>
 
-	static public void PlaySound (AudioClip clip, float volume)
+	static public AudioSource PlaySound (AudioClip clip, float volume)
 	{
 #if UNITY_3_4
 		if (clip != null)
@@ -46,8 +46,10 @@ static public class NGUITools
 				AudioSource source = mListener.audio;
 				if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
 				source.PlayOneShot(clip, volume);
+				return source;
 			}
 		}
+		return null;
 	}
 
 	/// <summary>
@@ -376,6 +378,16 @@ static public class NGUITools
 			}
 		}
 		return comp;
+	}
+
+	/// <summary>
+	/// Destroy the specified object, immediately if in edit mode.
+	/// </summary>
+
+	static public void Destroy (UnityEngine.Object obj)
+	{
+		if (Application.isPlaying) UnityEngine.Object.Destroy(obj);
+		else UnityEngine.Object.DestroyImmediate(obj);
 	}
 
 	#region Deprecated functions

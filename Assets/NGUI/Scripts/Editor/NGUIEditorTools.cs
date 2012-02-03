@@ -353,6 +353,17 @@ public class NGUIEditorTools
 	{
 		GameObject go = Selection.activeGameObject;
 
+		// Use the current selection, as long as it's not a prefab
+		if (go != null)
+		{
+#if UNITY_3_4
+			PrefabType type = EditorUtility.GetPrefabType(go);
+#else
+			PrefabType type = PrefabUtility.GetPrefabType(go);
+#endif
+			if (type != PrefabType.None) go = null;
+		}
+
 		// No selection? Try to find the root automatically
 		if (go == null)
 		{

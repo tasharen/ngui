@@ -237,7 +237,10 @@ public class UIPopupList : MonoBehaviour
 					c.a = 0f;
 					TweenColor.Begin(w.gameObject, animSpeed, c).method = Tweener.Method.EaseOut;
 				}
-				GameObject.Destroy(mChild, animSpeed);
+
+				Collider[] cols = mChild.GetComponentsInChildren<Collider>();
+				foreach (Collider col in cols) col.enabled = false;
+				UpdateManager.AddDestroy(mChild, animSpeed);
 			}
 			else
 			{

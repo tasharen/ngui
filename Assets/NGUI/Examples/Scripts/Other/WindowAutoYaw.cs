@@ -8,22 +8,25 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Examples/Window Auto-Yaw")]
 public class WindowAutoYaw : MonoBehaviour
 {
+	public int updateOrder = 0;
 	public Camera uiCamera;
 	public float yawAmount = 20f;
 
 	Transform mTrans;
 
-	void Start ()
-	{
-		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
-		mTrans = transform;
-	}
 	void OnDisable ()
 	{
 		mTrans.localRotation = Quaternion.identity;
 	}
 
-	void Update ()
+	void Start ()
+	{
+		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
+		mTrans = transform;
+		UpdateManager.AddCoroutine(updateOrder, CoroutineUpdate);
+	}
+
+	void CoroutineUpdate (float delta)
 	{
 		if (uiCamera != null)
 		{

@@ -61,7 +61,7 @@ public class UIAtlas : MonoBehaviour
 	/// Texture used by the atlas.
 	/// </summary>
 
-	public Texture2D texture { get { return material != null ? material.mainTexture as Texture2D : null; } }
+	public Texture texture { get { return material != null ? material.mainTexture as Texture : null; } }
 
 	/// <summary>
 	/// Allows switching of the coordinate system from pixel coordinates to texture coordinates.

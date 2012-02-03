@@ -1,11 +1,12 @@
 using UnityEngine;
+using System.Collections;
 
 /// <summary>
 /// Allows dragging of the specified target object by mouse or touch, optionally limiting it to be within the UIPanel's clipped rectangle.
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Drag Object")]
-public class UIDragObject : MonoBehaviour
+public class UIDragObject : IgnoreTimeScale
 {
 	public enum DragEffect
 	{
@@ -32,6 +33,16 @@ public class UIDragObject : MonoBehaviour
 	Bounds mBounds;
 
 	/// <summary>
+	/// Find the panel responsible for this object.
+	/// </summary>
+
+	void FindPanel ()
+	{
+		mPanel = (target != null) ? UIPanel.Find(target.transform, false) : null;
+		if (mPanel == null) restrictWithinPanel = false;
+	}
+
+	/// <summary>
 	/// Create a plane on which we will be performing the dragging.
 	/// </summary>
 
@@ -43,12 +54,7 @@ public class UIDragObject : MonoBehaviour
 
 			if (pressed)
 			{
-				// Find the panel automatically
-				if (restrictWithinPanel && mPanel == null)
-				{
-					mPanel = (target != null) ? UIPanel.Find(target.transform, false) : null;
-					if (mPanel == null) restrictWithinPanel = false;
-				}
+				if (restrictWithinPanel && mPanel == null) FindPanel();
 
 				// Calculate the bounds
 				if (restrictWithinPanel) mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.transform, target);
@@ -99,7 +105,7 @@ public class UIDragObject : MonoBehaviour
 				}
 
 				// Adjust the momentum
-				mMomentum = Vector3.Lerp(mMomentum, offset * (Time.deltaTime * momentumAmount), 0.5f);
+				mMomentum = Vector3.Lerp(mMomentum, offset * (realTimeDelta * momentumAmount), 0.5f);
 
 				// We want to constrain the UI to be within bounds
 				if (restrictWithinPanel)
@@ -159,7 +165,9 @@ public class UIDragObject : MonoBehaviour
 				}
 				else
 				{
-					SpringPosition.Begin(target.gameObject, target.localPosition + offset, 13f).worldSpace = false;
+					SpringPosition sp = SpringPosition.Begin(target.gameObject, target.localPosition + offset, 13f);
+					sp.ignoreTimeScale = true;
+					sp.worldSpace = false;
 				}
 				return true;
 			}
@@ -171,8 +179,10 @@ public class UIDragObject : MonoBehaviour
 	/// Apply the dragging momentum.
 	/// </summary>
 
-	void Update ()
+	void LateUpdate ()
 	{
+		float delta = UpdateRealTimeDelta();
+
 		if (mPressed)
 		{
 			// Disable the spring movement
@@ -182,9 +192,14 @@ public class UIDragObject : MonoBehaviour
 		else if (dragEffect != DragEffect.None && target != null && mMomentum.magnitude > 0.005f)
 		{
 			// Apply the momentum
-			target.position += NGUIMath.SpringDampen(ref mMomentum, 9f, Time.deltaTime);
-			mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.transform, target);
-			ConstrainToBounds(false);
+			if (mPanel == null) FindPanel();
+
+			if (mPanel != null)
+			{
+				target.position += NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
+				mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.transform, target);
+				ConstrainToBounds(false);
+			}
 		}
 	}
 }

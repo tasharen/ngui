@@ -7,7 +7,9 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Examples/Lag Position")]
 public class LagPosition : MonoBehaviour
 {
+	public int updateOrder = 0;
 	public Vector3 speed = new Vector3(10f, 10f, 10f);
+	public bool ignoreTimeScale = false;
 	
 	Transform mTrans;
 	Vector3 mRelative;
@@ -17,6 +19,8 @@ public class LagPosition : MonoBehaviour
 	{
 		mTrans = transform;
 		mRelative = mTrans.localPosition;
+		if (ignoreTimeScale) UpdateManager.AddCoroutine(updateOrder, CoroutineUpdate);
+		else UpdateManager.AddLateUpdate(updateOrder, CoroutineUpdate);
 	}
 
 	void OnEnable()
@@ -24,14 +28,13 @@ public class LagPosition : MonoBehaviour
 		mTrans = transform;
 		mAbsolute = mTrans.position;
 	}
-	
-	void LateUpdate()
+
+	void CoroutineUpdate (float delta)
 	{
 		Transform parent = mTrans.parent;
 		
 		if (parent != null)
 		{
-			float delta = Time.deltaTime;
 			Vector3 target = parent.position + parent.rotation * mRelative;
 			mAbsolute.x = Mathf.Lerp(mAbsolute.x, target.x, Mathf.Clamp01(delta * speed.x));
 			mAbsolute.y = Mathf.Lerp(mAbsolute.y, target.y, Mathf.Clamp01(delta * speed.y));

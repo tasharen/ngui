@@ -5,7 +5,7 @@
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Drag Camera")]
-public class UIDragCamera : MonoBehaviour
+public class UIDragCamera : IgnoreTimeScale
 {
 	/// <summary>
 	/// Target object that will be dragged.
@@ -95,7 +95,7 @@ public class UIDragCamera : MonoBehaviour
 			mTrans.localPosition += offset;
 
 			// Adjust the momentum
-			mMomentum = Vector3.Lerp(mMomentum, offset * (Time.deltaTime * momentumAmount), 0.5f);
+			mMomentum = Vector3.Lerp(mMomentum, offset * (realTimeDelta * momentumAmount), 0.5f);
 
 			// Constrain the UI to the bounds, and if done so, eliminate the momentum
 			if (dragEffect != UIDragObject.DragEffect.MomentumAndSpring && ConstrainToBounds(true)) mMomentum = Vector3.zero;
@@ -140,7 +140,9 @@ public class UIDragCamera : MonoBehaviour
 				}
 				else
 				{
-					SpringPosition.Begin(target.gameObject, mTrans.position - offset, 13f).worldSpace = true;
+					SpringPosition sp = SpringPosition.Begin(target.gameObject, mTrans.position - offset, 13f);
+					sp.ignoreTimeScale = true;
+					sp.worldSpace = true;
 				}
 				return true;
 			}
@@ -154,6 +156,8 @@ public class UIDragCamera : MonoBehaviour
 
 	void Update ()
 	{
+		float delta = UpdateRealTimeDelta();
+
 		if (mPressed)
 		{
 			// Disable the spring movement
@@ -163,7 +167,7 @@ public class UIDragCamera : MonoBehaviour
 		else if (dragEffect != UIDragObject.DragEffect.None && target != null && mMomentum.magnitude > 0.005f)
 		{
 			// Apply the momentum
-			mTrans.localPosition += NGUIMath.SpringDampen(ref mMomentum, 9f, Time.deltaTime);
+			mTrans.localPosition += NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
 			mBounds = NGUIMath.CalculateAbsoluteWidgetBounds(rootForBounds);
 			ConstrainToBounds(false);
 		}

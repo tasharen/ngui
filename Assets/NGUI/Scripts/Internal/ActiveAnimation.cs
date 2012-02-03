@@ -8,7 +8,7 @@ using AnimationOrTween;
 
 [RequireComponent(typeof(Animation))]
 [AddComponentMenu("NGUI/Internal/Active Animation")]
-public class ActiveAnimation : MonoBehaviour
+public class ActiveAnimation : IgnoreTimeScale
 {
 	/// <summary>
 	/// Function to call when the animation finishes playing.
@@ -27,9 +27,34 @@ public class ActiveAnimation : MonoBehaviour
 
 	void Update ()
 	{
+		float delta = UpdateRealTimeDelta();
+
 		if (mAnim != null)
 		{
-			if (mAnim.isPlaying) return;
+			bool isPlaying = false;
+
+			foreach (AnimationState state in mAnim)
+			{
+				float movement = state.speed * delta;
+				state.time += movement;
+
+				if (movement < 0f)
+				{
+					if (state.time > 0f) isPlaying = true;
+					else state.time = 0f;
+				}
+				else
+				{
+					if (state.time < state.length) isPlaying = true;
+					else state.time = state.length;
+				}
+			}
+
+			mAnim.enabled = true;
+			mAnim.Sample();
+			mAnim.enabled = false;
+
+			if (isPlaying) return;
 
 			if (mNotify)
 			{
@@ -55,6 +80,9 @@ public class ActiveAnimation : MonoBehaviour
 	{
 		if (mAnim != null)
 		{
+			// We will sample the animation manually so that it works when time is paused
+			mAnim.enabled = false;
+
 			// Determine the play direction
 			if (playDirection == Direction.Toggle)
 			{
@@ -66,11 +94,14 @@ public class ActiveAnimation : MonoBehaviour
 			{
 				bool noName = string.IsNullOrEmpty(clipName);
 
-				// If this animation is not already playing, play it
-				if ((noName && !mAnim.isPlaying) || (!noName && !mAnim.IsPlaying(clipName)))
+				// Play the animation if it's not already playing
+				if (noName)
 				{
-					if (noName) mAnim.Play();
-					else mAnim.CrossFade(clipName);
+					if (!mAnim.isPlaying) mAnim.Play();
+				}
+				else if (!mAnim.IsPlaying(clipName))
+				{
+					mAnim.Play(clipName);
 				}
 
 				// Update the animation speed based on direction -- forward or back

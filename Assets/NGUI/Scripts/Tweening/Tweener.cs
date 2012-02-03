@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 /// <summary>
 /// Base class for all tweening operations.
 /// </summary>
 
-public abstract class Tweener : MonoBehaviour
+public abstract class Tweener : IgnoreTimeScale
 {
 	public enum Method
 	{
@@ -84,8 +85,10 @@ public abstract class Tweener : MonoBehaviour
 
 	void Update ()
 	{
+		float delta = UpdateRealTimeDelta();
+
 		// Advance the sampling factor
-		mFactor += amountPerDelta * Time.deltaTime;
+		mFactor += amountPerDelta * delta;
 
 		// Loop style simply resets the play factor after it exceeds 1.
 		if (style == Style.Loop)

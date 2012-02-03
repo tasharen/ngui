@@ -7,8 +7,9 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Examples/Lag Rotation")]
 public class LagRotation : MonoBehaviour
 {
-	public int level = 0;
+	public int updateOrder = 0;
 	public float speed = 10f;
+	public bool ignoreTimeScale = false;
 	
 	Transform mTrans;
 	Quaternion mRelative;
@@ -19,15 +20,17 @@ public class LagRotation : MonoBehaviour
 		mTrans = transform;
 		mRelative = mTrans.localRotation;
 		mAbsolute = mTrans.rotation;
+		if (ignoreTimeScale) UpdateManager.AddCoroutine(updateOrder, CoroutineUpdate);
+		else UpdateManager.AddLateUpdate(updateOrder, CoroutineUpdate);
 	}
 
-	void LateUpdate()
+	void CoroutineUpdate (float delta)
 	{
 		Transform parent = mTrans.parent;
 		
 		if (parent != null)
 		{
-			mAbsolute = Quaternion.Slerp(mAbsolute, parent.rotation * mRelative, Time.deltaTime * speed);
+			mAbsolute = Quaternion.Slerp(mAbsolute, parent.rotation * mRelative, delta * speed);
 			mTrans.rotation = mAbsolute;
 		}
 	}

@@ -244,7 +244,6 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		mChanged = true;
 		if (mPanel != null && mMat != null) mPanel.MarkMaterialAsChanged(mMat, false);
-		//UIUpdater.Add(this);
 	}
 
 	/// <summary>
@@ -290,7 +289,6 @@ public abstract class UIWidget : MonoBehaviour
 	void OnDisable ()
 	{
 		if (mPanel != null && mMat != null) mPanel.MarkMaterialAsChanged(mMat, false); mPanel = null;
-		//UIUpdater.Remove(this);
 	}
 
 	/// <summary>
