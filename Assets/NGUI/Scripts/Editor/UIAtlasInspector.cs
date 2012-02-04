@@ -92,7 +92,7 @@ public class UIAtlasInspector : Editor
 				// Ensure that this atlas has valid import settings
 				if (mAtlas.texture != null) NGUIEditorTools.ImportTexture(mAtlas.texture, false, false);
 
-				NGUIEditorTools.MarkAtlasAsDirty(mAtlas);
+				mAtlas.MarkAsDirty();
 				mConfirmDelete = false;
 			}
 
@@ -109,7 +109,7 @@ public class UIAtlasInspector : Editor
 					NGUIJson.LoadSpriteData(mAtlas, ta);
 					mRegisteredUndo = true;
 					if (mSprite != null) mSprite = mAtlas.GetSprite(mSprite.name);
-					NGUIEditorTools.MarkAtlasAsDirty(mAtlas);
+					mAtlas.MarkAsDirty();
 				}
 				
 				UIAtlas.Coordinates coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", mAtlas.coordinates);

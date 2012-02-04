@@ -341,7 +341,7 @@ public class UIAtlasMaker : EditorWindow
 
 		// The material used by the atlas should now use the new texture
 		atlas.material.mainTexture = newAtlasTexture;
-		NGUIEditorTools.MarkAtlasAsDirty(atlas);
+		atlas.MarkAsDirty();
 	}
 
 	/// <summary>

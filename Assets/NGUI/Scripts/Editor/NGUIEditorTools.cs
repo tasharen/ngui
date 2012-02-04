@@ -353,16 +353,8 @@ public class NGUIEditorTools
 	{
 		GameObject go = Selection.activeGameObject;
 
-		// Use the current selection, as long as it's not a prefab
-		if (go != null)
-		{
-#if UNITY_3_4
-			PrefabType type = EditorUtility.GetPrefabType(go);
-#else
-			PrefabType type = PrefabUtility.GetPrefabType(go);
-#endif
-			if (type != PrefabType.None) go = null;
-		}
+		// Only use active objects
+		if (go != null && !go.active) go = null;
 
 		// No selection? Try to find the root automatically
 		if (go == null)
@@ -371,7 +363,7 @@ public class NGUIEditorTools
 
 			foreach (UIPanel p in panels)
 			{
-				if (ComponentSelector.IsPrefab(p.gameObject)) continue;
+				if (!p.gameObject.active) continue;
 				go = p.gameObject;
 				break;
 			}
@@ -397,6 +389,20 @@ public class NGUIEditorTools
 			}
 		}
 		return go;
+	}
+
+	/// <summary>
+	/// Helper function that returns 'true' if the specified game object is a part of a prefab.
+	/// </summary>
+
+	static public bool IsPrefab (GameObject go)
+	{
+#if UNITY_3_4
+		UnityEditor.PrefabType type = UnityEditor.EditorUtility.GetPrefabType(go);
+#else
+		UnityEditor.PrefabType type = UnityEditor.PrefabUtility.GetPrefabType(go);
+#endif
+		return (type == UnityEditor.PrefabType.Prefab || type == UnityEditor.PrefabType.ModelPrefab);
 	}
 
 	/// <summary>
@@ -536,39 +542,5 @@ public class NGUIEditorTools
 			}
 		}
 		return path;
-	}
-
-	/// <summary>
-	/// Convenience function -- mark all widgets using the atlas as changed.
-	/// </summary>
-
-	static public void MarkAtlasAsDirty (UIAtlas atlas)
-	{
-		if (atlas == null) return;
-
-		UISprite[] sprites = Resources.FindObjectsOfTypeAll(typeof(UISprite)) as UISprite[];
-
-		foreach (UISprite sp in sprites)
-		{
-			if (sp.atlas == atlas)
-			{
-				sp.atlas = null;
-				sp.atlas = atlas;
-				EditorUtility.SetDirty(sp);
-			}
-		}
-
-		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
-
-		foreach (UILabel lbl in labels)
-		{
-			if (lbl.font != null && lbl.font.atlas == atlas)
-			{
-				UIFont font = lbl.font;
-				lbl.font = null;
-				lbl.font = font;
-				EditorUtility.SetDirty(lbl);
-			}
-		}
 	}
 }

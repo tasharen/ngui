@@ -138,4 +138,40 @@ public class UIAtlas : MonoBehaviour
 		list.Sort();
 		return list;
 	}
+
+	/// <summary>
+	/// Mark all widgets associated with this atlas as having changed.
+	/// </summary>
+
+	public void MarkAsDirty ()
+	{
+		UISprite[] sprites = Resources.FindObjectsOfTypeAll(typeof(UISprite)) as UISprite[];
+
+		foreach (UISprite sp in sprites)
+		{
+			if (sp.atlas == this)
+			{
+				sp.atlas = null;
+				sp.atlas = this;
+#if UNITY_EDITOR
+				UnityEditor.EditorUtility.SetDirty(sp);
+#endif
+			}
+		}
+
+		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+
+		foreach (UILabel lbl in labels)
+		{
+			if (lbl.font != null && lbl.font.atlas == this)
+			{
+				UIFont font = lbl.font;
+				lbl.font = null;
+				lbl.font = font;
+#if UNITY_EDITOR
+				UnityEditor.EditorUtility.SetDirty(lbl);
+#endif
+			}
+		}
+	}
 }

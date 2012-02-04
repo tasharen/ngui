@@ -16,20 +16,6 @@ public class ComponentSelector : ScriptableWizard
 	MonoBehaviour[] mObjects;
 
 	/// <summary>
-	/// Convenience function that determines if the specified object is a prefab.
-	/// </summary>
-
-	static public bool IsPrefab (GameObject go)
-	{
-#if UNITY_3_4
-		PrefabType type = EditorUtility.GetPrefabType(go);
-#else
-		PrefabType type = PrefabUtility.GetPrefabType(go);
-#endif
-		return (type == PrefabType.Prefab);
-	}
-
-	/// <summary>
 	/// Draw a button + object selection combo filtering specified types.
 	/// </summary>
 
@@ -101,7 +87,7 @@ public class ComponentSelector : ScriptableWizard
 
 		GUILayout.BeginHorizontal();
 		{
-			if (IsPrefab(mb.gameObject))
+			if (NGUIEditorTools.IsPrefab(mb.gameObject))
 			{
 				GUILayout.Label("Prefab", GUILayout.Width(80f));
 			}

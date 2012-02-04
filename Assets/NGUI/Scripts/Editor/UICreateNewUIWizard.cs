@@ -96,7 +96,7 @@ public class UICreateNewUIWizard : EditorWindow
 
 			foreach (Camera c in cameras)
 			{
-				if (ComponentSelector.IsPrefab(c.gameObject)) continue;
+				if (!c.gameObject.active) continue;
 				if (c.name == "Preview Camera") continue;
 				if (c.name == "SceneCamera") continue;
 
