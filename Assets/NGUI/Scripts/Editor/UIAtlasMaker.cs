@@ -10,9 +10,12 @@ public class UIAtlasMaker : EditorWindow
 {
 	class SpriteEntry
 	{
-		public Texture2D tex;					// Sprite texture -- original texture or a temporary texture
-		public Rect rect;						// Sprite's outer rectangle within the generated texture atlas
-		public Vector2 pivot = Vector2.zero;	// Sprite's pivot offset (if the sprite was trimmed)
+		public Texture2D tex;	// Sprite texture -- original texture or a temporary texture
+		public Rect rect;		// Sprite's outer rectangle within the generated texture atlas
+		public int minX = 0;	// Padding, if any (set if the sprite is trimmed)
+		public int maxX = 0;
+		public int minY = 0;
+		public int maxY = 0;
 		public bool temporaryTexture = false;	// Whether the texture is temporary and should be deleted
 	}
 
@@ -170,15 +173,6 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
-	/// Update the sprites within the texture atlas, preserving the sprites that have not been selected.
-	/// </summary>
-
-	void UpdateAtlas (List<Texture> textures)
-	{
-		Debug.Log("TODO");
-	}
-
-	/// <summary>
 	/// Load the specified list of textures as Texture2Ds, fixing their import properties as necessary.
 	/// </summary>
 
@@ -195,41 +189,17 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
-	/// Calculate the new inner rect, given the old inner rect, as well as the before and after outer rects.
-	/// </summary>
-
-	static Rect UpdateInnerRect (Rect inner, Rect outerBefore, Rect outerNow)
-	{
-		float offsetX = inner.xMin - outerBefore.xMin;
-		float offsetY = inner.yMin - outerBefore.yMin;
-		float sizeX = inner.width;
-		float sizeY = inner.height;
-
-		if (Mathf.Approximately(outerNow.width, outerBefore.width))
-		{
-			// The sprite has not been rotated or it's a square
-			return new Rect(outerNow.xMin + offsetX, outerNow.yMin + offsetY, sizeX, sizeY);
-		}
-		else if (Mathf.Approximately(outerNow.width, outerBefore.height))
-		{
-			// The sprite was rotated since the last time it was imported
-			return new Rect(outerNow.xMin + offsetY, outerNow.yMin + offsetX, sizeY, sizeX);
-		}
-		return outerNow;
-	}
-
-	/// <summary>
 	/// Add a new sprite to the atlas, given the texture it's coming from and the packed rect within the atlas.
 	/// </summary>
 
-	static UIAtlas.Sprite AddSprite (List<UIAtlas.Sprite> sprites, Texture2D tex, Rect rect)
+	static UIAtlas.Sprite AddSprite (List<UIAtlas.Sprite> sprites, SpriteEntry se)
 	{
 		UIAtlas.Sprite sprite = null;
 
 		// See if this sprite already exists
 		foreach (UIAtlas.Sprite sp in sprites)
 		{
-			if (sp.name == tex.name)
+			if (sp.name == se.tex.name)
 			{
 				sprite = sp;
 				break;
@@ -238,17 +208,36 @@ public class UIAtlasMaker : EditorWindow
 
 		if (sprite != null)
 		{
-			sprite.inner = UpdateInnerRect(sprite.inner, sprite.outer, rect);
-			sprite.outer = rect;
+			float x0 = sprite.inner.xMin - sprite.outer.xMin;
+			float y0 = sprite.inner.yMin - sprite.outer.yMin;
+			float x1 = sprite.outer.xMax - sprite.inner.xMax;
+			float y1 = sprite.outer.yMax - sprite.inner.yMax;
+
+			sprite.outer = se.rect;
+			sprite.inner = se.rect;
+
+			sprite.inner.xMin = Mathf.Max(sprite.inner.xMin + x0, sprite.outer.xMin);
+			sprite.inner.yMin = Mathf.Max(sprite.inner.yMin + y0, sprite.outer.yMin);
+			sprite.inner.xMax = Mathf.Min(sprite.inner.xMax - x1, sprite.outer.xMax);
+			sprite.inner.yMax = Mathf.Min(sprite.inner.yMax - y1, sprite.outer.yMax);
 		}
 		else
 		{
 			sprite = new UIAtlas.Sprite();
-			sprite.name = tex.name;
-			sprite.outer = rect;
-			sprite.inner = rect;
+			sprite.name = se.tex.name;
+			sprite.outer = se.rect;
+			sprite.inner = se.rect;
 			sprites.Add(sprite);
 		}
+
+		float width  = Mathf.Max(1f, sprite.outer.width);
+		float height = Mathf.Max(1f, sprite.outer.height);
+
+		// Sprite's padding values are relative to width and height
+		sprite.paddingLeft	 = se.minX / width;
+		sprite.paddingRight  = se.maxX / width;
+		sprite.paddingTop	 = se.maxY / height;
+		sprite.paddingBottom = se.minY / height;
 		return sprite;
 	}
 
@@ -262,14 +251,76 @@ public class UIAtlasMaker : EditorWindow
 
 		foreach (Texture tex in textures)
 		{
-			Texture2D t2 = NGUIEditorTools.ImportTexture(tex, true, false);
-			if (t2 == null) continue;
+			Texture2D oldTex = NGUIEditorTools.ImportTexture(tex, true, false);
+			if (oldTex == null) continue;
 
-			SpriteEntry sprite = new SpriteEntry();
-			sprite.tex = t2;
-			sprite.temporaryTexture = false;
-			sprite.rect = new Rect(0f, 0f, t2.width, t2.height);
-			list.Add(sprite);
+			Color32[] pixels = oldTex.GetPixels32();
+
+			int xmin = oldTex.width;
+			int xmax = 0;
+			int ymin = oldTex.height;
+			int ymax = 0;
+			int oldWidth = oldTex.width;
+			int oldHeight = oldTex.height;
+
+			for (int y = 0, yw = oldHeight; y < yw; ++y)
+			{
+				for (int x = 0, xw = oldWidth; x < xw; ++x)
+				{
+					Color32 c = pixels[y * xw + x];
+					
+					if (c.a != 0)
+					{
+						if (y < ymin) ymin = y;
+						if (y > ymax) ymax = y;
+						if (x < xmin) xmin = x;
+						if (x > xmax) xmax = x;
+					}
+				}
+			}
+
+			int newWidth  = (xmax - xmin) + 1;
+			int newHeight = (ymax - ymin) + 1;
+
+			if (newWidth > 0 && newHeight > 0)
+			{
+				SpriteEntry sprite = new SpriteEntry();
+				sprite.rect = new Rect(0f, 0f, oldTex.width, oldTex.height);
+
+				if (newWidth == oldWidth && newHeight == oldHeight)
+				{
+					sprite.tex = oldTex;
+					sprite.temporaryTexture = false;
+				}
+				else
+				{
+					Color32[] newPixels = new Color32[newWidth * newHeight];
+
+					for (int y = 0; y < newHeight; ++y)
+					{
+						for (int x = 0; x < newWidth; ++x)
+						{
+							int newIndex = y * newWidth + x;
+							int oldIndex = (ymin + y) * oldWidth + (xmin + x);
+							newPixels[newIndex] = pixels[oldIndex];
+						}
+					}
+
+					// Create a new texture
+					sprite.temporaryTexture = true;
+					sprite.tex = new Texture2D(newWidth, newHeight);
+					sprite.tex.name = oldTex.name;
+					sprite.tex.SetPixels32(newPixels);
+
+					// Remember the padding offset
+					sprite.minX = xmin;
+					sprite.maxX = oldWidth - newWidth - xmin;
+					sprite.minY = ymin;
+					sprite.maxY = oldHeight - newHeight - ymin;
+				}
+
+				list.Add(sprite);
+			}
 		}
 		return list;
 	}
@@ -278,7 +329,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Release all temporary textures created for the sprites.
 	/// </summary>
 
-	void ReleaseSprites (List<SpriteEntry> sprites)
+	static void ReleaseSprites (List<SpriteEntry> sprites)
 	{
 		foreach (SpriteEntry se in sprites)
 		{
@@ -328,7 +379,7 @@ public class UIAtlasMaker : EditorWindow
 		for (int i = 0; i < sprites.Count; ++i)
 		{
 			SpriteEntry se = sprites[i];
-			UIAtlas.Sprite sprite = AddSprite(spriteList, se.tex, se.rect);
+			UIAtlas.Sprite sprite = AddSprite(spriteList, se);
 			kept.Add(sprite);
 		}
 
@@ -383,5 +434,14 @@ public class UIAtlasMaker : EditorWindow
 
 		// Release the temporary textures
 		ReleaseSprites(sprites);
+	}
+
+	/// <summary>
+	/// Update the sprites within the texture atlas, preserving the sprites that have not been selected.
+	/// </summary>
+
+	void UpdateAtlas (List<Texture> textures)
+	{
+		Debug.Log("TODO");
 	}
 }
