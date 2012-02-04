@@ -5,7 +5,7 @@
 /// </summary>
 
 [AddComponentMenu("NGUI/Tween/Scale")]
-public class TweenScale : Tweener
+public class TweenScale : NTweener
 {
 	public Vector3 from;
 	public Vector3 to;
@@ -24,7 +24,7 @@ public class TweenScale : Tweener
 
 	static public TweenScale Begin (GameObject go, float duration, Vector3 scale)
 	{
-		TweenScale comp = Tweener.Begin<TweenScale>(go, duration);
+		TweenScale comp = NTweener.Begin<TweenScale>(go, duration);
 		comp.from = comp.scale;
 		comp.to = scale;
 		return comp;

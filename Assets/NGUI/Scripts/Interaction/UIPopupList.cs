@@ -177,7 +177,7 @@ public class UIPopupList : MonoBehaviour
 			}
 			else
 			{
-				TweenPosition.Begin(mHighlight.gameObject, 0.1f, pos).method = Tweener.Method.EaseOut;
+				TweenPosition.Begin(mHighlight.gameObject, 0.1f, pos).method = NTweener.Method.EaseOut;
 			}
 		}
 	}
@@ -235,7 +235,7 @@ public class UIPopupList : MonoBehaviour
 				{
 					Color c = w.color;
 					c.a = 0f;
-					TweenColor.Begin(w.gameObject, animSpeed, c).method = Tweener.Method.EaseOut;
+					TweenColor.Begin(w.gameObject, animSpeed, c).method = NTweener.Method.EaseOut;
 				}
 
 				Collider[] cols = mChild.GetComponentsInChildren<Collider>();
@@ -258,7 +258,7 @@ public class UIPopupList : MonoBehaviour
 	{
 		Color c = widget.color;
 		widget.color = new Color(c.r, c.g, c.b, 0f);
-		TweenColor.Begin(widget.gameObject, animSpeed, c).method = Tweener.Method.EaseOut;
+		TweenColor.Begin(widget.gameObject, animSpeed, c).method = NTweener.Method.EaseOut;
 	}
 
 	/// <summary>
@@ -273,7 +273,7 @@ public class UIPopupList : MonoBehaviour
 		widget.cachedTransform.localPosition = start;
 
 		GameObject go = widget.gameObject;
-		TweenPosition.Begin(go, animSpeed, target).method = Tweener.Method.EaseOut;
+		TweenPosition.Begin(go, animSpeed, target).method = NTweener.Method.EaseOut;
 	}
 
 	/// <summary>
@@ -288,13 +288,13 @@ public class UIPopupList : MonoBehaviour
 
 		Vector3 scale = t.localScale;
 		t.localScale = new Vector3(scale.x, minSize, scale.z);
-		TweenScale.Begin(go, animSpeed, scale).method = Tweener.Method.EaseOut;
+		TweenScale.Begin(go, animSpeed, scale).method = NTweener.Method.EaseOut;
 
 		if (placeAbove)
 		{
 			Vector3 pos = t.localPosition;
 			t.localPosition = new Vector3(pos.x, pos.y - scale.y + minSize, pos.z);
-			TweenPosition.Begin(go, animSpeed, pos).method = Tweener.Method.EaseOut;
+			TweenPosition.Begin(go, animSpeed, pos).method = NTweener.Method.EaseOut;
 		}
 	}
 

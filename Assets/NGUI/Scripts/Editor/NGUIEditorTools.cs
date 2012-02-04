@@ -526,21 +526,23 @@ public class NGUIEditorTools
 	static public string GetSaveableTexturePath (UIAtlas atlas)
 	{
 		// Path where the texture atlas will be saved
-		string path = "Assets/" + atlas.name + ".png";
+		string path = "";
 
 		// If the atlas already has a texture, overwrite its texture
 		if (atlas.texture != null)
 		{
-			Undo.RegisterUndo(atlas.texture, "Replace Atlas");
+			path = AssetDatabase.GetAssetPath(atlas.texture.GetInstanceID());
 
-			string assetPath = AssetDatabase.GetAssetPath(atlas.texture.GetInstanceID());
-
-			if (!string.IsNullOrEmpty(assetPath))
+			if (!string.IsNullOrEmpty(path))
 			{
-				int dot = assetPath.LastIndexOf('.');
-				path = assetPath.Substring(0, dot) + ".png";
+				int dot = path.LastIndexOf('.');
+				return path.Substring(0, dot) + ".png";
 			}
 		}
+
+		// No texture to use -- figure out a name using the atlas
+		path = AssetDatabase.GetAssetPath(atlas.GetInstanceID());
+		path = string.IsNullOrEmpty(path) ? "Assets/" + atlas.name + ".png" : path.Replace(".prefab", ".png");
 		return path;
 	}
 }

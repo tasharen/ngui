@@ -368,6 +368,8 @@ public class UIAtlasMaker : EditorWindow
 
 	static void ReplaceAtlas (UIAtlas atlas, List<SpriteEntry> sprites, Texture2D newAtlasTexture)
 	{
+		Undo.RegisterUndo(atlas.texture, "Replace Atlas");
+
 		// Get the list of sprites we'll be updating
 		List<UIAtlas.Sprite> spriteList = atlas.sprites;
 		List<UIAtlas.Sprite> kept = new List<UIAtlas.Sprite>();
@@ -421,15 +423,21 @@ public class UIAtlasMaker : EditorWindow
 			bytes = null;
 
 			// Load the texture we just saved as a Texture2D
+			AssetDatabase.Refresh();
 			atlasTexture = NGUIEditorTools.ImportTexture(path, false, true);
 			if (atlasTexture == null) { Debug.LogError("Failed to load the created atlas saved as " + path); return; }
 
 			// Replace the sprites within the atlas and change its texture
 			ReplaceAtlas(mAtlas, sprites, atlasTexture);
 
-			// Select the newly created atlas texture
-			Debug.Log(sprites.Count + " textures were packed into a " + atlasTexture.width + "x" + atlasTexture.height + " atlas, saved as " + path);
-			Selection.activeObject = atlasTexture;
+			// Bring up a confirmation dialog
+			int result = EditorUtility.DisplayDialogComplex("Atlas Creation Result",
+				sprites.Count + " textures were packed into a " + atlasTexture.width + "x" + atlasTexture.height + " atlas, saved as " + path,
+				"OK", "Select the Atlas", "Select the Texture");
+
+			// Select the object or the atlas if requested
+			if		(result == 1) Selection.activeObject = mAtlas.gameObject;
+			else if (result == 2) Selection.activeObject = atlasTexture;
 		}
 
 		// Release the temporary textures

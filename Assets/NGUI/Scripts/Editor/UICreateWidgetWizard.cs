@@ -219,8 +219,12 @@ public class UICreateWidgetWizard : EditorWindow
 		{
 			GUILayout.BeginHorizontal();
 			string sp = UISpriteInspector.SpriteField(mAtlas, "Sprite", field, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Sprite that will be created");
+
+			if (!string.IsNullOrEmpty(sp))
+			{
+				GUILayout.Space(20f);
+				GUILayout.Label("Sprite that will be created");
+			}
 			GUILayout.EndHorizontal();
 
 			if (sp != field)

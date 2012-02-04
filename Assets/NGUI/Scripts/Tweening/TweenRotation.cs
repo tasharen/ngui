@@ -5,7 +5,7 @@
 /// </summary>
 
 [AddComponentMenu("NGUI/Tween/Rotation")]
-public class TweenRotation : Tweener
+public class TweenRotation : NTweener
 {
 	public Vector3 from;
 	public Vector3 to;
@@ -27,7 +27,7 @@ public class TweenRotation : Tweener
 
 	static public TweenRotation Begin (GameObject go, float duration, Quaternion rot)
 	{
-		TweenRotation comp = Tweener.Begin<TweenRotation>(go, duration);
+		TweenRotation comp = NTweener.Begin<TweenRotation>(go, duration);
 		comp.from = comp.rotation.eulerAngles;
 		comp.to = rot.eulerAngles;
 		return comp;
