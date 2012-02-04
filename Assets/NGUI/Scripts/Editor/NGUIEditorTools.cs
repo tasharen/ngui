@@ -512,4 +512,63 @@ public class NGUIEditorTools
 		}
 		return null;
 	}
+
+	/// <summary>
+	/// Figures out the saveable filename for the texture of the specified atlas.
+	/// </summary>
+
+	static public string GetSaveableTexturePath (UIAtlas atlas)
+	{
+		// Path where the texture atlas will be saved
+		string path = "Assets/" + atlas.name + ".png";
+
+		// If the atlas already has a texture, overwrite its texture
+		if (atlas.texture != null)
+		{
+			Undo.RegisterUndo(atlas.texture, "Replace Atlas");
+
+			string assetPath = AssetDatabase.GetAssetPath(atlas.texture.GetInstanceID());
+
+			if (!string.IsNullOrEmpty(assetPath))
+			{
+				int dot = assetPath.LastIndexOf('.');
+				path = assetPath.Substring(0, dot) + ".png";
+			}
+		}
+		return path;
+	}
+
+	/// <summary>
+	/// Convenience function -- mark all widgets using the atlas as changed.
+	/// </summary>
+
+	static public void MarkAtlasAsDirty (UIAtlas atlas)
+	{
+		if (atlas == null) return;
+
+		UISprite[] sprites = Resources.FindObjectsOfTypeAll(typeof(UISprite)) as UISprite[];
+
+		foreach (UISprite sp in sprites)
+		{
+			if (sp.atlas == atlas)
+			{
+				sp.atlas = null;
+				sp.atlas = atlas;
+				EditorUtility.SetDirty(sp);
+			}
+		}
+
+		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+
+		foreach (UILabel lbl in labels)
+		{
+			if (lbl.font != null && lbl.font.atlas == atlas)
+			{
+				UIFont font = lbl.font;
+				lbl.font = null;
+				lbl.font = font;
+				EditorUtility.SetDirty(lbl);
+			}
+		}
+	}
 }

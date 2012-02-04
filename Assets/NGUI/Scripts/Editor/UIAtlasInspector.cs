@@ -23,40 +23,6 @@ public class UIAtlasInspector : Editor
 	UIAtlas.Sprite mSprite;
 
 	/// <summary>
-	/// Convenience function -- mark all widgets using the atlas as changed.
-	/// </summary>
-
-	void MarkAtlasAsDirty ()
-	{
-		if (mAtlas == null) return;
-
-		UISprite[] sprites = Resources.FindObjectsOfTypeAll(typeof(UISprite)) as UISprite[];
-
-		foreach (UISprite sp in sprites)
-		{
-			if (sp.atlas == mAtlas)
-			{
-				sp.atlas = null;
-				sp.atlas = mAtlas;
-				EditorUtility.SetDirty(sp);
-			}
-		}
-
-		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
-
-		foreach (UILabel lbl in labels)
-		{
-			if (lbl.font != null && lbl.font.atlas == mAtlas)
-			{
-				UIFont font = lbl.font;
-				lbl.font = null;
-				lbl.font = font;
-				EditorUtility.SetDirty(lbl);
-			}
-		}
-	}
-
-	/// <summary>
 	/// Convenience function -- mark all widgets using the sprite as changed.
 	/// </summary>
 
@@ -126,7 +92,7 @@ public class UIAtlasInspector : Editor
 				// Ensure that this atlas has valid import settings
 				if (mAtlas.texture != null) NGUIEditorTools.ImportTexture(mAtlas.texture, false, false);
 
-				MarkAtlasAsDirty();
+				NGUIEditorTools.MarkAtlasAsDirty(mAtlas);
 				mConfirmDelete = false;
 			}
 
@@ -143,7 +109,7 @@ public class UIAtlasInspector : Editor
 					NGUIJson.LoadSpriteData(mAtlas, ta);
 					mRegisteredUndo = true;
 					if (mSprite != null) mSprite = mAtlas.GetSprite(mSprite.name);
-					MarkAtlasAsDirty();
+					NGUIEditorTools.MarkAtlasAsDirty(mAtlas);
 				}
 				
 				UIAtlas.Coordinates coords = (UIAtlas.Coordinates)EditorGUILayout.EnumPopup("Coordinates", mAtlas.coordinates);
