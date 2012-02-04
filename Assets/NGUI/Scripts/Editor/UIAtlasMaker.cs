@@ -20,6 +20,7 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	UIAtlas mAtlas;
+	Vector2 mScroll = Vector2.zero;
 
 	void OnSelectAtlas (MonoBehaviour obj)
 	{
@@ -140,6 +141,8 @@ public class UIAtlasMaker : EditorWindow
 
 			Dictionary<string, int> spriteList = GetSpriteList(textures);
 
+			mScroll = GUILayout.BeginScrollView(mScroll);
+
 			int index = 0;
 			foreach (KeyValuePair<string, int> iter in spriteList)
 			{
@@ -165,6 +168,7 @@ public class UIAtlasMaker : EditorWindow
 				Rect rect = GUILayoutUtility.GetLastRect();
 				GUI.Box(rect, "");
 			}
+			GUILayout.EndScrollView();
 
 			if (update) UpdateAtlas(textures);
 			else if (replace) ReplaceAtlas(textures);
