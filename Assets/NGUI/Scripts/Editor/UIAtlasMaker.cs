@@ -138,6 +138,7 @@ public class UIAtlasMaker : EditorWindow
 			}
 
 			NGUIEditorTools.DrawHeader("Sprites");
+			GUILayout.Space(-7f);
 
 			Dictionary<string, int> spriteList = GetSpriteList(textures);
 
