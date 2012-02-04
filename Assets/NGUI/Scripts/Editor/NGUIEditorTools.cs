@@ -424,4 +424,92 @@ public class NGUIEditorTools
 		}
 		return true;
 	}
+
+	/// <summary>
+	/// Change the import settings of the specified texture asset, making it readable.
+	/// </summary>
+
+	static bool MakeTextureReadable (string path, bool force)
+	{
+		if (string.IsNullOrEmpty(path)) return false;
+		TextureImporter ti = AssetImporter.GetAtPath(path) as TextureImporter;
+		if (ti == null) return false;
+
+		if (force ||
+			ti.mipmapEnabled ||
+			!ti.isReadable ||
+			ti.maxTextureSize < 4096 ||
+			ti.filterMode != FilterMode.Point ||
+			ti.wrapMode != TextureWrapMode.Clamp ||
+			ti.npotScale != TextureImporterNPOTScale.None)
+		{
+			ti.mipmapEnabled = false;
+			ti.isReadable = true;
+			ti.maxTextureSize = 4096;
+			ti.textureFormat = TextureImporterFormat.ARGB32;
+			ti.filterMode = FilterMode.Point;
+			ti.wrapMode = TextureWrapMode.Clamp;
+			ti.npotScale = TextureImporterNPOTScale.None;
+			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+		}
+		return true;
+	}
+
+	/// <summary>
+	/// Change the import settings of the specified texture asset, making it suitable to be used as a texture atlas.
+	/// </summary>
+
+	static bool MakeTextureAnAtlas (string path, bool force)
+	{
+		if (string.IsNullOrEmpty(path)) return false;
+		TextureImporter ti = AssetImporter.GetAtPath(path) as TextureImporter;
+		if (ti == null) return false;
+
+		if (force ||
+			ti.isReadable ||
+			ti.maxTextureSize < 4096 ||
+			ti.wrapMode != TextureWrapMode.Clamp ||
+			ti.npotScale != TextureImporterNPOTScale.ToNearest)
+		{
+			ti.mipmapEnabled = true;
+			ti.isReadable = false;
+			ti.maxTextureSize = 4096;
+			ti.textureFormat = TextureImporterFormat.ARGB32;
+			ti.filterMode = FilterMode.Trilinear;
+			ti.anisoLevel = 4;
+			ti.wrapMode = TextureWrapMode.Clamp;
+			ti.npotScale = TextureImporterNPOTScale.ToNearest;
+			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+		}
+		return true;
+	}
+
+	/// <summary>
+	/// Fix the import settings for the specified texture, re-importing it if necessary.
+	/// </summary>
+
+	static public Texture2D ImportTexture (string path, bool forInput, bool force)
+	{
+		if (!string.IsNullOrEmpty(path))
+		{
+			if (forInput) { if (!MakeTextureReadable(path, force)) return null; }
+			else if (!MakeTextureAnAtlas(path, force)) return null;
+			return AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
+		}
+		return null;
+	}
+
+	/// <summary>
+	/// Fix the import settings for the specified texture, re-importing it if necessary.
+	/// </summary>
+
+	static public Texture2D ImportTexture (Texture tex, bool forInput, bool force)
+	{
+		if (tex != null)
+		{
+			string path = AssetDatabase.GetAssetPath(tex.GetInstanceID());
+			return ImportTexture(path, forInput, force);
+		}
+		return null;
+	}
 }

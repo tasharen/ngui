@@ -10,9 +10,12 @@ public class UIInput : MonoBehaviour
 	public UILabel label;
 	public int maxChars = 0;
 	public string caratChar = "|";
+	public Color activeColor = Color.white;
 
 	string mText = "";
 	string mLastIME = "";
+	string mDefaultText = "";
+	Color mDefaultColor = Color.white;
 
 #if UNITY_IPHONE || UNITY_ANDROID
 #if UNITY_3_5
@@ -67,15 +70,23 @@ public class UIInput : MonoBehaviour
 	/// Labels used for input shouldn't support color encoding.
 	/// </summary>
 
-	void Awake ()
+	protected void Init ()
 	{
 		if (label == null) label = GetComponentInChildren<UILabel>();
 		if (label != null)
 		{
+			mDefaultText = label.text;
+			mDefaultColor = label.color;
 			label.supportEncoding = false;
 			label.multiLine = false;
 		}
 	}
+
+	/// <summary>
+	/// Initialize everything on start.
+	/// </summary>
+
+	void Start () { Init(); }
 
 	/// <summary>
 	/// Selection event, sent by UICamera.
@@ -87,7 +98,8 @@ public class UIInput : MonoBehaviour
 		{
 			if (isSelected)
 			{
-				mText = label.text;
+				mText = (label.text == mDefaultText) ? "" : label.text;
+				label.color = activeColor;
 
 #if UNITY_IPHONE || UNITY_ANDROID
 				if (Application.platform == RuntimePlatform.IPhonePlayer ||
@@ -119,8 +131,14 @@ public class UIInput : MonoBehaviour
 #endif
 			else
 			{
-				label.text = mText;
-				label.showLastPasswordChar = isSelected;
+				if (string.IsNullOrEmpty(mText))
+				{
+					label.text = mDefaultText;
+					label.color = mDefaultColor;
+				}
+				else label.text = mText;
+
+				label.showLastPasswordChar = false;
 				Input.imeCompositionMode = IMECompositionMode.Off;
 			}
 		}

@@ -171,61 +171,6 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
-	/// Fix the import settings for the specified texture, re-importing it if necessary.
-	/// </summary>
-
-	Texture2D LoadTexture (string path, bool forInput, bool force)
-	{
-		if (!string.IsNullOrEmpty(path))
-		{
-			TextureImporter ti = AssetImporter.GetAtPath(path) as TextureImporter;
-			if (ti == null) return null;
-
-			if (forInput)
-			{
-				if (force ||
-					ti.mipmapEnabled ||
-					!ti.isReadable ||
-					ti.maxTextureSize < 4096 ||
-					ti.filterMode != FilterMode.Point ||
-					ti.wrapMode != TextureWrapMode.Clamp ||
-					ti.npotScale != TextureImporterNPOTScale.None)
-				{
-					ti.mipmapEnabled = false;
-					ti.isReadable = true;
-					ti.maxTextureSize = 4096;
-					ti.textureFormat = TextureImporterFormat.ARGB32;
-					ti.filterMode = FilterMode.Point;
-					ti.wrapMode = TextureWrapMode.Clamp;
-					ti.npotScale = TextureImporterNPOTScale.None;
-					AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-				}
-			}
-			else if (force || 
-				!ti.mipmapEnabled ||
-				ti.isReadable ||
-				ti.maxTextureSize < 4096 ||
-				ti.anisoLevel < 4 ||
-				ti.filterMode != FilterMode.Trilinear ||
-				ti.wrapMode != TextureWrapMode.Clamp ||
-				ti.npotScale != TextureImporterNPOTScale.ToNearest)
-			{
-				ti.mipmapEnabled = true;
-				ti.isReadable = false;
-				ti.maxTextureSize = 4096;
-				ti.textureFormat = TextureImporterFormat.ARGB32;
-				ti.filterMode = FilterMode.Trilinear;
-				ti.anisoLevel = 4;
-				ti.wrapMode = TextureWrapMode.Clamp;
-				ti.npotScale = TextureImporterNPOTScale.ToNearest;
-				AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-			}
-			return AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
-		}
-		return null;
-	}
-
-	/// <summary>
 	/// Load the specified list of textures as Texture2Ds, fixing their import properties as necessary.
 	/// </summary>
 
@@ -235,8 +180,7 @@ public class UIAtlasMaker : EditorWindow
 
 		foreach (Texture tex in textures)
 		{
-			string path = AssetDatabase.GetAssetPath(tex.GetInstanceID());
-			Texture2D t2 = LoadTexture(path, true, false);
+			Texture2D t2 = NGUIEditorTools.ImportTexture(tex, true, false);
 			if (t2 != null) list.Add(t2);
 		}
 		return list;
@@ -263,8 +207,6 @@ public class UIAtlasMaker : EditorWindow
 			// The sprite was rotated since the last time it was imported
 			return new Rect(outerNow.xMin + offsetY, outerNow.yMin + offsetX, sizeY, sizeX);
 		}
-
-		Debug.LogWarning("No match: " + inner + " " + outerBefore + " " + outerNow);
 		return outerNow;
 	}
 
@@ -324,9 +266,14 @@ public class UIAtlasMaker : EditorWindow
 			if (mAtlas.texture != null)
 			{
 				Undo.RegisterUndo(mAtlas.texture, "Replace Atlas");
-				path = AssetDatabase.GetAssetPath(mAtlas.texture.GetInstanceID());
-				int dot = path.LastIndexOf('.');
-				path = path.Substring(0, dot) + ".png";
+
+				string assetPath = AssetDatabase.GetAssetPath(mAtlas.texture.GetInstanceID());
+
+				if (!string.IsNullOrEmpty(assetPath))
+				{
+					int dot = assetPath.LastIndexOf('.');
+					path = assetPath.Substring(0, dot) + ".png";
+				}
 			}
 
 			// Create a new texture for the atlas
@@ -346,7 +293,7 @@ public class UIAtlasMaker : EditorWindow
 			bytes = null;
 
 			// Load the texture we just saved as a Texture2D
-			atlasTexture = LoadTexture(path, false, true);
+			atlasTexture = NGUIEditorTools.ImportTexture(path, false, true);
 
 			if (atlasTexture == null)
 			{

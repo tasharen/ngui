@@ -122,6 +122,10 @@ public class UIAtlasInspector : Editor
 			{
 				RegisterUndo();
 				mAtlas.material = mat;
+
+				// Ensure that this atlas has valid import settings
+				if (mAtlas.texture != null) NGUIEditorTools.ImportTexture(mAtlas.texture, false, false);
+
 				MarkAtlasAsDirty();
 				mConfirmDelete = false;
 			}
@@ -132,6 +136,9 @@ public class UIAtlasInspector : Editor
 
 				if (ta != null)
 				{
+					// Ensure that this atlas has valid import settings
+					if (mAtlas.texture != null) NGUIEditorTools.ImportTexture(mAtlas.texture, false, false);
+
 					Undo.RegisterUndo(mAtlas, "Import Sprites");
 					NGUIJson.LoadSpriteData(mAtlas, ta);
 					mRegisteredUndo = true;
