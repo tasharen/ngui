@@ -19,14 +19,23 @@ public class ComponentSelector : ScriptableWizard
 	/// Draw a button + object selection combo filtering specified types.
 	/// </summary>
 
-	static public void Draw<T> (T obj, OnSelectionCallback cb, params GUILayoutOption[] options) where T : MonoBehaviour
+	static public void Draw<T> (string buttonName, T obj, OnSelectionCallback cb, params GUILayoutOption[] options) where T : MonoBehaviour
 	{
 		GUILayout.BeginHorizontal();
-		bool show = GUILayout.Button(NGUITools.GetName<T>(), GUILayout.Width(76f));
+		bool show = GUILayout.Button(buttonName, GUILayout.Width(76f));
 		T o = EditorGUILayout.ObjectField(obj, typeof(T), false, options) as T;
 		GUILayout.EndHorizontal();
 		if (show) Show<T>(cb);
 		else if (o != obj) cb(o);
+	}
+
+	/// <summary>
+	/// Draw a button + object selection combo filtering specified types.
+	/// </summary>
+
+	static public void Draw<T> (T obj, OnSelectionCallback cb, params GUILayoutOption[] options) where T : MonoBehaviour
+	{
+		Draw<T>(NGUITools.GetName<T>(), obj, cb, options);
 	}
 
 	/// <summary>
@@ -87,7 +96,7 @@ public class ComponentSelector : ScriptableWizard
 
 		GUILayout.BeginHorizontal();
 		{
-			if (NGUIEditorTools.IsPrefab(mb.gameObject))
+			if (EditorUtility.IsPersistent(mb.gameObject))
 			{
 				GUILayout.Label("Prefab", GUILayout.Width(80f));
 			}

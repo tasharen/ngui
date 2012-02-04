@@ -210,7 +210,7 @@ public class UICreateWidgetWizard : EditorWindow
 	}
 
 	/// <summary>
-	/// Tiled Sprite creation function.
+	/// Sprite creation function.
 	/// </summary>
 
 	void CreateSprite<T> (GameObject go, ref string field) where T : UISprite
@@ -237,6 +237,7 @@ public class UICreateWidgetWizard : EditorWindow
 		if (ShouldCreate(go, mAtlas != null))
 		{
 			T sprite = NGUITools.AddWidget<T>(go);
+			sprite.name = sprite.name + " (" + field + ")";
 			sprite.atlas = mAtlas;
 			sprite.spriteName = field;
 			sprite.MakePixelPerfect();

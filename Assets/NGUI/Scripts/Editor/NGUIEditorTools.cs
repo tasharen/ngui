@@ -392,20 +392,6 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
-	/// Helper function that returns 'true' if the specified game object is a part of a prefab.
-	/// </summary>
-
-	static public bool IsPrefab (GameObject go)
-	{
-#if UNITY_3_4
-		UnityEditor.PrefabType type = UnityEditor.EditorUtility.GetPrefabType(go);
-#else
-		UnityEditor.PrefabType type = UnityEditor.PrefabUtility.GetPrefabType(go);
-#endif
-		return (type == UnityEditor.PrefabType.Prefab || type == UnityEditor.PrefabType.ModelPrefab);
-	}
-
-	/// <summary>
 	/// Helper function that checks to see if this action would break the prefab connection.
 	/// </summary>
 
