@@ -265,5 +265,11 @@ public class UICameraTool : EditorWindow
 			}
 		}
 		GUILayout.EndHorizontal();
+
+		if (cam != null)
+		{
+			Rect rect = GUILayoutUtility.GetLastRect();
+			GUI.Box(rect, "");
+		}
 	}
 }

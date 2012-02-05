@@ -70,6 +70,7 @@ public class UISprite : UIWidget
 					mSpriteName = "";
 					spriteName = sprite;
 					mChanged = true;
+					mOuter = new Rect();
 					UpdateUVs();
 				}
 			}

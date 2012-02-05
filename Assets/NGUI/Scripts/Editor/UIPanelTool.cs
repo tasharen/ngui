@@ -137,5 +137,11 @@ public class UIPanelTool : EditorWindow
 			}
 		}
 		GUILayout.EndHorizontal();
+
+		if (panel != null)
+		{
+			Rect rect = GUILayoutUtility.GetLastRect();
+			GUI.Box(rect, "");
+		}
 	}
 }

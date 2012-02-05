@@ -637,16 +637,18 @@ public class UIAtlasMaker : EditorWindow
 			{
 				if (mat != null)
 				{
-					EditorGUILayout.LabelField("Material", mat.name);
-					if (GUILayout.Button("Select", GUILayout.Width(60f))) Selection.activeObject = mat;
+					if (GUILayout.Button("Material", GUILayout.Width(76f))) Selection.activeObject = mat;
+					GUILayout.Label(" " + mat.name);
 				}
 				else
 				{
-					EditorGUILayout.LabelField("Material", "N/A");
 					GUI.color = Color.grey;
-					GUILayout.Button("Select", GUILayout.Width(60f));
+					GUILayout.Button("Material", GUILayout.Width(76f));
 					GUI.color = Color.white;
+					GUILayout.Label(" N/A");
 				}
+				Rect rect = GUILayoutUtility.GetLastRect();
+				GUI.Box(rect, "");
 			}
 			GUILayout.EndHorizontal();
 
@@ -655,16 +657,18 @@ public class UIAtlasMaker : EditorWindow
 			{
 				if (tex != null)
 				{
-					EditorGUILayout.LabelField("Texture", tex.width + "x" + tex.height);
-					if (GUILayout.Button("Select", GUILayout.Width(60f))) Selection.activeObject = tex;
+					if (GUILayout.Button("Texture", GUILayout.Width(76f))) Selection.activeObject = tex;
+					GUILayout.Label(" " + tex.width + "x" + tex.height);
 				}
 				else
 				{
-					EditorGUILayout.LabelField("Texture", "N/A");
 					GUI.color = Color.grey;
-					GUILayout.Button("Select", GUILayout.Width(60f));
+					GUILayout.Button("Texture", GUILayout.Width(76f));
 					GUI.color = Color.white;
+					GUILayout.Label(" N/A");
 				}
+				Rect rect = GUILayoutUtility.GetLastRect();
+				GUI.Box(rect, "");
 			}
 			GUILayout.EndHorizontal();
 
