@@ -1,0 +1,17 @@
+
+*.sln
+*.csproj
+/Temp
+/obj
+/Library/AnnotationManager
+/Library/assetDatabase3
+/Library/AssetImportState
+/Library/AssetServerCacheV3
+/Library/BuildPlayer.prefs
+/Library/FailedAssetImports.txt
+/Library/guidmapper
+/Library/ScriptMapper
+/Library/cache
+/Library/metadata
+/Library/previews
+/Library/ScriptAssemblies
