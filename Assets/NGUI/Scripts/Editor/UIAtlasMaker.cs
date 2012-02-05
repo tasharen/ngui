@@ -400,10 +400,10 @@ public class UIAtlasMaker : EditorWindow
 					sprite.tex.SetPixels32(newPixels);
 
 					// Min/max coordinates are in pixels
-					sprite.minX = Mathf.RoundToInt(asp.paddingLeft / newWidth);
-					sprite.maxX = Mathf.RoundToInt(asp.paddingRight / newWidth);
-					sprite.minY = Mathf.RoundToInt(asp.paddingBottom / newHeight);
-					sprite.maxY = Mathf.RoundToInt(asp.paddingTop / newHeight);
+					sprite.minX = Mathf.RoundToInt(asp.paddingLeft * newWidth);
+					sprite.maxX = Mathf.RoundToInt(asp.paddingRight * newWidth);
+					sprite.minY = Mathf.RoundToInt(asp.paddingBottom * newHeight);
+					sprite.maxY = Mathf.RoundToInt(asp.paddingTop * newHeight);
 
 					sprites.Add(sprite);
 				}
@@ -563,6 +563,7 @@ public class UIAtlasMaker : EditorWindow
 					// Select the atlas
 					go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
 					mAtlas = go.GetComponent<UIAtlas>();
+					Save();
 				}
 			}
 		}
