@@ -46,8 +46,7 @@ public class UISlicedSpriteInspector : UISpriteInspector
 			Rect rect = NGUIEditorTools.DrawSprite(tex, sprite.outerUV, mUseShader ? mSprite.atlas.material : null);
 
 			// Draw the selection
-			NGUIEditorTools.DrawOutline(rect, sprite.innerUV, new Color(0f, 0.7f, 1f, 1f));
-			NGUIEditorTools.DrawOutline(rect, sprite.outerUV, new Color(0.4f, 1f, 0f, 1f));
+			NGUIEditorTools.DrawOutline(rect, sprite.outerUV, sprite.innerUV);
 
 			// Sprite size label
 			string text = "Sprite Size: ";

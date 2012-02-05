@@ -172,6 +172,23 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
+	/// Draw a 9-sliced outline.
+	/// </summary>
+
+	static public void DrawOutline (Rect rect, Rect outer, Rect inner)
+	{
+		if (Event.current.type == EventType.Repaint)
+		{
+			Color blue = new Color(0f, 0.7f, 1f, 1f);
+			Color green = new Color(0.4f, 1f, 0f, 1f);
+
+			DrawOutline(rect, new Rect(outer.x, inner.y, outer.width, inner.height), blue);
+			DrawOutline(rect, new Rect(inner.x, outer.y, inner.width, outer.height), blue);
+			DrawOutline(rect, outer, green);
+		}
+	}
+
+	/// <summary>
 	/// Draw a checkered background for the specified texture.
 	/// </summary>
 

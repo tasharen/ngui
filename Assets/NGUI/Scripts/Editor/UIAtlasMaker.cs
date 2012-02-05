@@ -216,11 +216,9 @@ public class UIAtlasMaker : EditorWindow
 		{
 			if (textures.Count > 0)
 			{
-				//GUILayout.BeginHorizontal();
 				GUI.backgroundColor = Color.green;
 				update = GUILayout.Button("Add/Update");
 				GUI.backgroundColor = Color.white;
-				//GUILayout.EndHorizontal();
 			}
 			else
 			{
@@ -416,7 +414,6 @@ public class UIAtlasMaker : EditorWindow
 					sprite.minY = ymin;
 					sprite.maxY = oldHeight - newHeight - ymin;
 				}
-
 				list.Add(sprite);
 			}
 		}
@@ -530,7 +527,8 @@ public class UIAtlasMaker : EditorWindow
 
 			// Bring up a confirmation dialog
 			int result = EditorUtility.DisplayDialogComplex("Atlas Creation Result",
-				sprites.Count + " textures were packed into a " + atlasTexture.width + "x" + atlasTexture.height + " atlas, saved as " + path,
+				sprites.Count + " textures were packed into a " + atlasTexture.width +
+				"x" + atlasTexture.height + " atlas, saved as " + path,
 				"OK", "Select the Atlas", "Select the Texture");
 
 			// Select the object or the atlas if requested

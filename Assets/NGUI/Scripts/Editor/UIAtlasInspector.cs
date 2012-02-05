@@ -363,9 +363,7 @@ public class UIAtlasInspector : Editor
 						Rect rect = (mView == View.Atlas) ? NGUIEditorTools.DrawAtlas(tex, m) : NGUIEditorTools.DrawSprite(tex, uv0, m);
 
 						// Draw the sprite outline
-						NGUIEditorTools.DrawOutline(rect, uv1, blue);
-						NGUIEditorTools.DrawOutline(rect, uv0, green);
-
+						NGUIEditorTools.DrawOutline(rect, uv0, uv1);
 						EditorGUILayout.Separator();
 					}
 
