@@ -111,164 +111,6 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
-	/// Draw the UI for this tool.
-	/// </summary>
-
-	void OnGUI ()
-	{
-		if (mAtlas == null) Load();
-
-		bool create = false;
-		bool update = false;
-		bool replace = false;
-
-		string prefabPath = "";
-		string matPath = "";
-
-		// If we have an atlas to work with, see if we can figure out the path for it and its material
-		if (mAtlas != null && mAtlas.name == mAtlasName)
-		{
-			prefabPath = AssetDatabase.GetAssetPath(mAtlas.gameObject.GetInstanceID());
-			if (mAtlas.material != null) matPath = AssetDatabase.GetAssetPath(mAtlas.material.GetInstanceID());
-		}
-
-		// Assume default values if needed
-		if (string.IsNullOrEmpty(mAtlasName)) mAtlasName = "New Atlas";
-		if (string.IsNullOrEmpty(prefabPath)) prefabPath = "Assets/" + mAtlasName + ".prefab";
-		if (string.IsNullOrEmpty(matPath)) matPath = "Assets/" + mAtlasName + ".mat";
-
-		// Try to load the prefab
-		GameObject go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
-
-		EditorGUIUtility.LookLikeControls(80f);
-
-		GUILayout.Space(6f);
-		GUILayout.BeginHorizontal();
-
-		if (go == null)
-		{
-			GUI.backgroundColor = Color.green;
-			create = GUILayout.Button("Create", GUILayout.Width(76f));
-		}
-		else
-		{
-			GUI.backgroundColor = Color.red;
-			create = GUILayout.Button("Replace", GUILayout.Width(76f));
-		}
-
-		GUI.backgroundColor = Color.white;
-		string atlasName = GUILayout.TextField(mAtlasName);
-		GUILayout.EndHorizontal();
-
-		if (mAtlasName != atlasName)
-		{
-			mAtlasName = atlasName;
-			Save();
-		}
-
-		if (create)
-		{
-			// If the prefab already exists, confirm that we want to overwrite it
-			if (go == null || EditorUtility.DisplayDialog("Are you sure?", "This atlas already exists. Do you want to overwrite it?", "Yes", "No"))
-			{
-				replace = true;
-
-				// Try to load the material
-				Material mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
-
-				// If the material doesn't exist, create it
-				if (mat == null)
-				{
-					Shader shader = Shader.Find("Unlit/Transparent Colored");
-					mat = new Material(shader);
-
-					// Save the material
-					AssetDatabase.CreateAsset(mat, matPath);
-					AssetDatabase.Refresh();
-
-					// Load the material so it's usable
-					mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
-				}
-
-				// Create a new prefab for the atlas
-				Object prefab = EditorUtility.CreateEmptyPrefab(prefabPath);
-
-				// Create a new game object for the atlas
-				go = new GameObject(mAtlasName);
-				go.AddComponent<UIAtlas>().material = mat;
-
-				// Update the prefab
-				EditorUtility.ReplacePrefab(go, prefab);
-				DestroyImmediate(go);
-				AssetDatabase.Refresh();
-
-				// Select the atlas
-				go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
-				mAtlas = go.GetComponent<UIAtlas>();
-			}
-		}
-
-		ComponentSelector.Draw<UIAtlas>("...or select", mAtlas, OnSelectAtlas);
-
-		List<Texture> textures = GetSelectedTextures();
-
-		if (mAtlas != null)
-		{
-			if (textures.Count > 0)
-			{
-				GUI.backgroundColor = Color.green;
-				update = GUILayout.Button("Add/Update");
-				GUI.backgroundColor = Color.white;
-			}
-			else
-			{
-				GUILayout.Label("Select one or more textures to work with\nin the Project View window.");
-			}
-		}
-
-		Dictionary<string, int> spriteList = GetSpriteList(textures);
-
-		if (spriteList.Count > 0)
-		{
-			NGUIEditorTools.DrawHeader("Sprites");
-			GUILayout.Space(-7f);
-
-			mScroll = GUILayout.BeginScrollView(mScroll);
-
-			int index = 0;
-			foreach (KeyValuePair<string, int> iter in spriteList)
-			{
-				++index;
-				GUILayout.BeginHorizontal();
-				GUILayout.Label(index.ToString(), GUILayout.Width(24f));
-				GUILayout.Label(iter.Key);
-
-				if (iter.Value == 2)
-				{
-					GUI.color = Color.green;
-					GUILayout.Label("Add", GUILayout.Width(27f));
-					GUI.color = Color.white;
-				}
-				else if (iter.Value == 1)
-				{
-					GUI.color = Color.cyan;
-					GUILayout.Label("Update", GUILayout.Width(45f));
-					GUI.color = Color.white;
-				}
-
-				GUILayout.EndHorizontal();
-				Rect rect = GUILayoutUtility.GetLastRect();
-				GUI.Box(rect, "");
-			}
-			GUILayout.EndScrollView();
-
-			if (update) UpdateAtlas(textures);
-			else if (replace) ReplaceAtlas(textures);
-			return;
-		}
-	}
-
-	/// <summary>
 	/// Load the specified list of textures as Texture2Ds, fixing their import properties as necessary.
 	/// </summary>
 
@@ -463,8 +305,6 @@ public class UIAtlasMaker : EditorWindow
 
 	static void ReplaceAtlas (UIAtlas atlas, List<SpriteEntry> sprites, Texture2D newAtlasTexture)
 	{
-		Undo.RegisterUndo(atlas.texture, "Replace Atlas");
-
 		// Get the list of sprites we'll be updating
 		List<UIAtlas.Sprite> spriteList = atlas.sprites;
 		List<UIAtlas.Sprite> kept = new List<UIAtlas.Sprite>();
@@ -493,10 +333,92 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
-	/// Replace the contents of the atlas with the specified group of sprites.
+	/// Extract sprites from the atlas, adding them to the list.
 	/// </summary>
 
-	void ReplaceAtlas (List<Texture> textures)
+	static void ExtractSprites (UIAtlas atlas, List<SpriteEntry> sprites)
+	{
+		// Make the atlas texture readable
+		Texture2D atlasTex = NGUIEditorTools.ImportTexture(atlas.texture, true, false);
+
+		if (atlasTex != null)
+		{
+			atlas.coordinates = UIAtlas.Coordinates.Pixels;
+
+			Color32[] oldPixels = null;
+			int oldWidth = atlasTex.width;
+			int oldHeight = atlasTex.height;
+
+			foreach (UIAtlas.Sprite asp in atlas.sprites)
+			{
+				bool found = false;
+
+				foreach (SpriteEntry se in sprites)
+				{
+					if (asp.name == se.tex.name)
+					{
+						found = true;
+						break;
+					}
+				}
+
+				if (!found)
+				{
+					// Read the atlas
+					if (oldPixels == null) oldPixels = atlasTex.GetPixels32();
+
+					Rect rect = asp.outer;
+					rect.xMin = Mathf.Clamp(rect.xMin, 0f, oldWidth);
+					rect.yMin = Mathf.Clamp(rect.yMin, 0f, oldHeight);
+					rect.xMax = Mathf.Clamp(rect.xMax, 0f, oldWidth);
+					rect.yMax = Mathf.Clamp(rect.yMax, 0f, oldHeight);
+
+					int newWidth = Mathf.RoundToInt(rect.width);
+					int newHeight = Mathf.RoundToInt(rect.height);
+					if (newWidth == 0 || newHeight == 0) continue;
+
+					Color32[] newPixels = new Color32[newWidth * newHeight];
+					int xmin = Mathf.RoundToInt(rect.x);
+					int ymin = Mathf.RoundToInt(oldHeight - rect.yMax);
+
+					for (int y = 0; y < newHeight; ++y)
+					{
+						for (int x = 0; x < newWidth; ++x)
+						{
+							int newIndex = y * newWidth + x;
+							int oldIndex = (ymin + y) * oldWidth + (xmin + x);
+							newPixels[newIndex] = oldPixels[oldIndex];
+						}
+					}
+
+					// Create a new sprite
+					SpriteEntry sprite = new SpriteEntry();
+					sprite.temporaryTexture = true;
+					sprite.tex = new Texture2D(newWidth, newHeight);
+					sprite.tex.name = asp.name;
+					sprite.rect = new Rect(0f, 0f, newWidth, newHeight);
+					sprite.tex.SetPixels32(newPixels);
+
+					// Min/max coordinates are in pixels
+					sprite.minX = Mathf.RoundToInt(asp.paddingLeft / newWidth);
+					sprite.maxX = Mathf.RoundToInt(asp.paddingRight / newWidth);
+					sprite.minY = Mathf.RoundToInt(asp.paddingBottom / newHeight);
+					sprite.maxY = Mathf.RoundToInt(asp.paddingTop / newHeight);
+
+					sprites.Add(sprite);
+				}
+			}
+		}
+
+		// The atlas no longer needs to be readable
+		NGUIEditorTools.ImportTexture(atlas.texture, false, false);
+	}
+
+	/// <summary>
+	/// Update the sprites within the texture atlas, preserving the sprites that have not been selected.
+	/// </summary>
+
+	void UpdateAtlas (List<Texture> textures, bool keepSprites)
 	{
 		// Create a list of sprites using the collected textures
 		List<SpriteEntry> sprites = CreateSprites(textures);
@@ -504,8 +426,12 @@ public class UIAtlasMaker : EditorWindow
 		if (sprites.Count > 0)
 		{
 			// The ability to undo this action is always useful
-			Undo.RegisterUndo(mAtlas, "Replace Atlas");
-			Undo.RegisterUndo(mAtlas.material, "Replace Atlas");
+			Undo.RegisterUndo(mAtlas, "Update Atlas");
+			Undo.RegisterUndo(mAtlas.material, "Update Atlas");
+			Undo.RegisterUndo(mAtlas.texture, "Update Atlas");
+
+			// Extract sprites from the atlas, filling in the missing pieces
+			if (keepSprites) ExtractSprites(mAtlas, sprites);
 
 			// Create a new texture for the atlas, encode it into PNG format and destroy it
 			Texture2D atlasTexture = PackTextures(sprites);
@@ -532,7 +458,7 @@ public class UIAtlasMaker : EditorWindow
 				"OK", "Select the Atlas", "Select the Texture");
 
 			// Select the object or the atlas if requested
-			if		(result == 1) Selection.activeObject = mAtlas.gameObject;
+			if (result == 1) Selection.activeObject = mAtlas.gameObject;
 			else if (result == 2) Selection.activeObject = atlasTexture;
 		}
 
@@ -541,11 +467,163 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
-	/// Update the sprites within the texture atlas, preserving the sprites that have not been selected.
+	/// Draw the UI for this tool.
 	/// </summary>
 
-	void UpdateAtlas (List<Texture> textures)
+	void OnGUI ()
 	{
-		
+		if (mAtlas == null) Load();
+
+		bool create = false;
+		bool update = false;
+		bool replace = false;
+
+		string prefabPath = "";
+		string matPath = "";
+
+		// If we have an atlas to work with, see if we can figure out the path for it and its material
+		if (mAtlas != null && mAtlas.name == mAtlasName)
+		{
+			prefabPath = AssetDatabase.GetAssetPath(mAtlas.gameObject.GetInstanceID());
+			if (mAtlas.material != null) matPath = AssetDatabase.GetAssetPath(mAtlas.material.GetInstanceID());
+		}
+
+		// Assume default values if needed
+		if (string.IsNullOrEmpty(mAtlasName)) mAtlasName = "New Atlas";
+		if (string.IsNullOrEmpty(prefabPath)) prefabPath = "Assets/" + mAtlasName + ".prefab";
+		if (string.IsNullOrEmpty(matPath)) matPath = "Assets/" + mAtlasName + ".mat";
+
+		// Try to load the prefab
+		GameObject go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
+
+		EditorGUIUtility.LookLikeControls(80f);
+
+		GUILayout.Space(6f);
+		GUILayout.BeginHorizontal();
+
+		if (go == null)
+		{
+			GUI.backgroundColor = Color.green;
+			create = GUILayout.Button("Create", GUILayout.Width(76f));
+		}
+		else
+		{
+			GUI.backgroundColor = Color.red;
+			create = GUILayout.Button("Replace", GUILayout.Width(76f));
+		}
+
+		GUI.backgroundColor = Color.white;
+		string atlasName = GUILayout.TextField(mAtlasName);
+		GUILayout.EndHorizontal();
+
+		if (mAtlasName != atlasName)
+		{
+			mAtlasName = atlasName;
+			Save();
+		}
+
+		if (create)
+		{
+			// If the prefab already exists, confirm that we want to overwrite it
+			if (go == null || EditorUtility.DisplayDialog("Are you sure?", "This atlas already exists. Do you want to overwrite it?", "Yes", "No"))
+			{
+				replace = true;
+
+				// Try to load the material
+				Material mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
+
+				// If the material doesn't exist, create it
+				if (mat == null)
+				{
+					Shader shader = Shader.Find("Unlit/Transparent Colored");
+					mat = new Material(shader);
+
+					// Save the material
+					AssetDatabase.CreateAsset(mat, matPath);
+					AssetDatabase.Refresh();
+
+					// Load the material so it's usable
+					mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
+				}
+
+				if (go == null)
+				{
+					// Create a new prefab for the atlas
+					Object prefab = EditorUtility.CreateEmptyPrefab(prefabPath);
+
+					// Create a new game object for the atlas
+					go = new GameObject(mAtlasName);
+					go.AddComponent<UIAtlas>().material = mat;
+
+					// Update the prefab
+					EditorUtility.ReplacePrefab(go, prefab);
+					DestroyImmediate(go);
+					AssetDatabase.Refresh();
+
+					// Select the atlas
+					go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
+					mAtlas = go.GetComponent<UIAtlas>();
+				}
+			}
+		}
+
+		ComponentSelector.Draw<UIAtlas>("...or select", mAtlas, OnSelectAtlas);
+
+		List<Texture> textures = GetSelectedTextures();
+
+		if (mAtlas != null)
+		{
+			if (textures.Count > 0)
+			{
+				GUI.backgroundColor = Color.green;
+				update = GUILayout.Button("Add/Update");
+				GUI.backgroundColor = Color.white;
+			}
+			else
+			{
+				GUILayout.Label("Select one or more textures to work with\nin the Project View window.");
+			}
+		}
+
+		Dictionary<string, int> spriteList = GetSpriteList(textures);
+
+		if (spriteList.Count > 0)
+		{
+			NGUIEditorTools.DrawHeader("Sprites");
+			GUILayout.Space(-7f);
+
+			mScroll = GUILayout.BeginScrollView(mScroll);
+
+			int index = 0;
+			foreach (KeyValuePair<string, int> iter in spriteList)
+			{
+				++index;
+				GUILayout.BeginHorizontal();
+				GUILayout.Label(index.ToString(), GUILayout.Width(24f));
+				GUILayout.Label(iter.Key);
+
+				if (iter.Value == 2)
+				{
+					GUI.color = Color.green;
+					GUILayout.Label("Add", GUILayout.Width(27f));
+					GUI.color = Color.white;
+				}
+				else if (iter.Value == 1)
+				{
+					GUI.color = Color.cyan;
+					GUILayout.Label("Update", GUILayout.Width(45f));
+					GUI.color = Color.white;
+				}
+
+				GUILayout.EndHorizontal();
+				Rect rect = GUILayoutUtility.GetLastRect();
+				GUI.Box(rect, "");
+			}
+			GUILayout.EndScrollView();
+
+			if (update) UpdateAtlas(textures, true);
+			else if (replace) UpdateAtlas(textures, false);
+			return;
+		}
 	}
 }
