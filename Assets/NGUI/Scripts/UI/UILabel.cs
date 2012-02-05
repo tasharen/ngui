@@ -247,6 +247,33 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Same as MakePixelPerfect(), but only adjusts the position, not the scale.
+	/// </summary>
+
+	public void MakePositionPerfect ()
+	{
+		Vector3 scale = cachedTransform.localScale;
+
+		if (mFont.size == Mathf.RoundToInt(scale.x) && mFont.size == Mathf.RoundToInt(scale.y))
+		{
+			Vector2 actualSize = relativeSize * scale.x;
+
+			int x = Mathf.RoundToInt(actualSize.x);
+			int y = Mathf.RoundToInt(actualSize.y);
+
+			Vector3 pos = cachedTransform.localPosition;
+			pos.x = Mathf.RoundToInt(pos.x);
+			pos.y = Mathf.RoundToInt(pos.y);
+			pos.z = Mathf.RoundToInt(pos.z);
+
+			if ((x % 2 == 1) && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
+			if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y -= 0.5f;
+
+			if (cachedTransform.localPosition != pos) cachedTransform.localPosition = pos;
+		}
+	}
+
+	/// <summary>
 	/// Text is pixel-perfect when its scale matches the size.
 	/// </summary>
 
@@ -254,22 +281,25 @@ public class UILabel : UIWidget
 	{
 		if (mFont != null)
 		{
+			Vector3 scale = cachedTransform.localScale;
+			scale.x = mFont.size;
+			scale.y = scale.x;
+			scale.z = 1f;
+
+			Vector2 actualSize = relativeSize * scale.x;
+
+			int x = Mathf.RoundToInt(actualSize.x);
+			int y = Mathf.RoundToInt(actualSize.y);
+
 			Vector3 pos = cachedTransform.localPosition;
 			pos.x = Mathf.RoundToInt(pos.x);
 			pos.y = Mathf.RoundToInt(pos.y);
 			pos.z = Mathf.RoundToInt(pos.z);
 
-			if (mFont.size % 2 == 1)
-			{
-				if (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom) pos.x += 0.5f;
-				if (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right) pos.y -= 0.5f;
-			}
-			cachedTransform.localPosition = pos;
+			if ((x % 2 == 1) && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
+			if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y -= 0.5f;
 
-			Vector3 scale = cachedTransform.localScale;
-			scale.x = mFont.size;
-			scale.y = scale.x;
-			scale.z = 1f;
+			cachedTransform.localPosition = pos;
 			cachedTransform.localScale = scale;
 		}
 		else base.MakePixelPerfect();
@@ -300,6 +330,7 @@ public class UILabel : UIWidget
 		// Unity 3.5b6 is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
 		if (mFont == null) return;
 #endif
+		MakePositionPerfect();
 		Pivot p = pivot;
 
 		// Print the text into the buffers

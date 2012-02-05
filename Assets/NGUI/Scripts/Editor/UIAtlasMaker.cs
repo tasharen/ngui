@@ -24,6 +24,31 @@ public class UIAtlasMaker : EditorWindow
 	string mAtlasName = "New Atlas";
 	string mDelName = null;
 
+	/// <summary>
+	/// Save the atlas information to player prefs.
+	/// </summary>
+
+	void Save ()
+	{
+		PlayerPrefs.SetInt("NGUI Atlas", (mAtlas != null) ? mAtlas.GetInstanceID() : -1);
+		PlayerPrefs.SetString("NGUI Atlas Name", mAtlasName);
+	}
+
+	/// <summary>
+	/// Load the atlas information from player prefs.
+	/// </summary>
+
+	void Load ()
+	{
+		int atlasID = PlayerPrefs.GetInt("NGUI Atlas", -1);
+		if (atlasID != -1) mAtlas = EditorUtility.InstanceIDToObject(atlasID) as UIAtlas;
+		mAtlasName = PlayerPrefs.GetString("NGUI Atlas Name");
+	}
+
+	/// <summary>
+	/// Atlas selection callback.
+	/// </summary>
+
 	void OnSelectAtlas (MonoBehaviour obj)
 	{
 		UIAtlas a = obj as UIAtlas;
@@ -35,19 +60,6 @@ public class UIAtlasMaker : EditorWindow
 			Save();
 			Repaint();
 		}
-	}
-
-	void Save ()
-	{
-		PlayerPrefs.SetInt("NGUI Atlas", (mAtlas != null) ? mAtlas.GetInstanceID() : -1);
-		PlayerPrefs.SetString("NGUI Atlas Name", mAtlasName);
-	}
-
-	void Load ()
-	{
-		int atlasID = PlayerPrefs.GetInt("NGUI Atlas", -1);
-		if (atlasID != -1) mAtlas = EditorUtility.InstanceIDToObject(atlasID) as UIAtlas;
-		mAtlasName = PlayerPrefs.GetString("NGUI Atlas Name");
 	}
 
 	/// <summary>
@@ -463,28 +475,44 @@ public class UIAtlasMaker : EditorWindow
 	/// Update the sprite atlas, keeping only the sprites that are on the specified list.
 	/// </summary>
 
-	void UpdateAtlas (List<SpriteEntry> sprites)
+	static void UpdateAtlas (UIAtlas atlas, List<SpriteEntry> sprites)
 	{
 		if (sprites.Count > 0)
 		{
 			// Combine all sprites into a single texture and save it
-			UpdateTexture(mAtlas, sprites);
+			UpdateTexture(atlas, sprites);
 
 			// Get the path to the texture
-			NGUIEditorTools.GetSaveableTexturePath(mAtlas);
+			NGUIEditorTools.GetSaveableTexturePath(atlas);
 
 			// Replace the sprites within the atlas
-			ReplaceSprites(mAtlas, sprites);
+			ReplaceSprites(atlas, sprites);
 
 			// Release the temporary textures
 			ReleaseSprites(sprites);
 		}
 		else
 		{
-			mAtlas.sprites.Clear();
-			string path = NGUIEditorTools.GetSaveableTexturePath(mAtlas);
-			mAtlas.material.mainTexture = null;
+			atlas.sprites.Clear();
+			string path = NGUIEditorTools.GetSaveableTexturePath(atlas);
+			atlas.material.mainTexture = null;
 			if (!string.IsNullOrEmpty(path)) AssetDatabase.DeleteAsset(path);
+		}
+	}
+
+	/// <summary>
+	/// Add the specified texture to the atlas, or update an existing one.
+	/// </summary>
+
+	static public void AddOrUpdate (UIAtlas atlas, Texture2D tex)
+	{
+		if (atlas != null && tex != null)
+		{
+			List<Texture> textures = new List<Texture>();
+			textures.Add(tex);
+			List<SpriteEntry> sprites = CreateSprites(textures);
+			ExtractSprites(atlas, sprites);
+			UpdateAtlas(atlas, sprites);
 		}
 	}
 
@@ -512,11 +540,11 @@ public class UIAtlasMaker : EditorWindow
 			//Undo.RegisterUndo(mAtlas, "Update Atlas");
 
 			// Update the atlas
-			UpdateAtlas(sprites);
+			UpdateAtlas(mAtlas, sprites);
 		}
 		else if (!keepSprites)
 		{
-			UpdateAtlas(sprites);
+			UpdateAtlas(mAtlas, sprites);
 		}
 	}
 
@@ -757,7 +785,7 @@ public class UIAtlasMaker : EditorWindow
 						mAtlas.sprites.Remove(sp);
 						List<SpriteEntry> sprites = new List<SpriteEntry>();
 						ExtractSprites(mAtlas, sprites);
-						UpdateAtlas(sprites);
+						UpdateAtlas(mAtlas, sprites);
 						mDelName = null;
 						return;
 					}

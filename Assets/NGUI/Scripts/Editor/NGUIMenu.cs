@@ -91,6 +91,12 @@ static public class NGUIMenu
 		EditorWindow.GetWindow<UICameraTool>(false, "Camera Tool", true);
 	}
 
+	[MenuItem("NGUI/Font Maker")]
+	static public void OpenFontMaker ()
+	{
+		EditorWindow.GetWindow<UIFontMaker>(false, "Font Maker", true);
+	}
+
 	[MenuItem("NGUI/Atlas Maker #&m")]
 	static public void OpenAtlasMaker ()
 	{
