@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.50d
+                Version 1.60
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -46,6 +46,14 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.60:
+- NEW: Added a built-in atlas-making solution: Atlas Maker, making it possible to create atlases without leaving Unity.
+- NEW: Added a tool that makes creation of fonts easier: Font Maker. Works well with the Atlas Maker.
+- FIX: UIAtlasInspector will now always force the atlas texture to be of proper size whenever the material or texture packer import gets triggered.
+- FIX: Removed the work-around for Flash that disabled sound, seeing the bug has been since fixed.
+- FIX: Tweener has been renamed to NTweener to avoid name conflicts with HOTween.
+- FIX: An assortment of minor usability tweaks.
 
 1.50:
 - NEW: The UI is now timeScale-independent, letting you pause the game via Time.timeScale = 0.

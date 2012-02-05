@@ -91,7 +91,7 @@ static public class NGUIMenu
 		EditorWindow.GetWindow<UICameraTool>(false, "Camera Tool", true);
 	}
 
-	[MenuItem("NGUI/Font Maker")]
+	[MenuItem("NGUI/Font Maker #&f")]
 	static public void OpenFontMaker ()
 	{
 		EditorWindow.GetWindow<UIFontMaker>(false, "Font Maker", true);
