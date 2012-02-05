@@ -455,7 +455,7 @@ public class NGUIEditorTools
 			ti.mipmapEnabled = false;
 			ti.isReadable = true;
 			ti.maxTextureSize = 4096;
-			ti.textureFormat = TextureImporterFormat.ARGB32;
+			ti.textureFormat = TextureImporterFormat.RGBA32;
 			ti.filterMode = FilterMode.Point;
 			ti.wrapMode = TextureWrapMode.Clamp;
 			ti.npotScale = TextureImporterNPOTScale.None;
@@ -483,7 +483,7 @@ public class NGUIEditorTools
 			ti.mipmapEnabled = true;
 			ti.isReadable = false;
 			ti.maxTextureSize = 4096;
-			ti.textureFormat = TextureImporterFormat.ARGB32;
+			ti.textureFormat = TextureImporterFormat.RGBA32;
 			ti.filterMode = FilterMode.Trilinear;
 			ti.anisoLevel = 4;
 			ti.wrapMode = TextureWrapMode.Clamp;

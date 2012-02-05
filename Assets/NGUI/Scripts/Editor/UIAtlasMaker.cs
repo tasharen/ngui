@@ -267,6 +267,7 @@ public class UIAtlasMaker : EditorWindow
 					sprite.tex = new Texture2D(newWidth, newHeight);
 					sprite.tex.name = oldTex.name;
 					sprite.tex.SetPixels32(newPixels);
+					sprite.tex.Apply();
 
 					// Remember the padding offset
 					sprite.minX = xmin;
@@ -393,6 +394,7 @@ public class UIAtlasMaker : EditorWindow
 					sprite.tex.name = asp.name;
 					sprite.rect = new Rect(0f, 0f, newWidth, newHeight);
 					sprite.tex.SetPixels32(newPixels);
+					sprite.tex.Apply();
 
 					// Min/max coordinates are in pixels
 					sprite.minX = Mathf.RoundToInt(asp.paddingLeft * newWidth);
@@ -422,7 +424,7 @@ public class UIAtlasMaker : EditorWindow
 		if (tex == null)
 		{
 			// Create a new texture for the atlas
-			tex = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+			tex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
 
 			// Pack the sprites into this texture
 			PackTextures(tex, sprites);
@@ -512,6 +514,10 @@ public class UIAtlasMaker : EditorWindow
 			// Update the atlas
 			UpdateAtlas(sprites);
 		}
+		else if (!keepSprites)
+		{
+			UpdateAtlas(sprites);
+		}
 	}
 
 	/// <summary>
@@ -573,7 +579,8 @@ public class UIAtlasMaker : EditorWindow
 		if (create)
 		{
 			// If the prefab already exists, confirm that we want to overwrite it
-			if (go == null || EditorUtility.DisplayDialog("Are you sure?", "This atlas already exists. Do you want to overwrite it?", "Yes", "No"))
+			if (go == null || EditorUtility.DisplayDialog("Are you sure?", "Are you sure you want to replace the contents of the " +
+				mAtlasName + " atlas with the textures currently selected in the Project View? All other sprites will be deleted.", "Yes", "No"))
 			{
 				replace = true;
 
@@ -622,6 +629,45 @@ public class UIAtlasMaker : EditorWindow
 
 		if (mAtlas != null)
 		{
+			Material mat = mAtlas.material;
+			Texture tex = mAtlas.texture;
+
+			// Material information
+			GUILayout.BeginHorizontal();
+			{
+				if (mat != null)
+				{
+					EditorGUILayout.LabelField("Material", mat.name);
+					if (GUILayout.Button("Select", GUILayout.Width(60f))) Selection.activeObject = mat;
+				}
+				else
+				{
+					EditorGUILayout.LabelField("Material", "N/A");
+					GUI.color = Color.grey;
+					GUILayout.Button("Select", GUILayout.Width(60f));
+					GUI.color = Color.white;
+				}
+			}
+			GUILayout.EndHorizontal();
+
+			// Texture atlas information
+			GUILayout.BeginHorizontal();
+			{
+				if (tex != null)
+				{
+					EditorGUILayout.LabelField("Texture", tex.width + "x" + tex.height);
+					if (GUILayout.Button("Select", GUILayout.Width(60f))) Selection.activeObject = tex;
+				}
+				else
+				{
+					EditorGUILayout.LabelField("Texture", "N/A");
+					GUI.color = Color.grey;
+					GUILayout.Button("Select", GUILayout.Width(60f));
+					GUI.color = Color.white;
+				}
+			}
+			GUILayout.EndHorizontal();
+
 			if (textures.Count > 0)
 			{
 				GUI.backgroundColor = Color.green;
@@ -630,8 +676,14 @@ public class UIAtlasMaker : EditorWindow
 			}
 			else
 			{
+				NGUIEditorTools.DrawSeparator();
 				GUILayout.Label("You can reveal more options by selecting\none or more textures in the Project View\nwindow.");
 			}
+		}
+		else
+		{
+			NGUIEditorTools.DrawSeparator();
+			GUILayout.Label("You can create a new atlas by selecting\none or more textures in the Project View\nwindow, then clicking \"Create\".");
 		}
 
 		Dictionary<string, int> spriteList = GetSpriteList(textures);
