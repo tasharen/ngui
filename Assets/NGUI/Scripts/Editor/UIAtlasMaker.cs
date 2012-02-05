@@ -77,6 +77,39 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
+	/// Load the specified list of textures as Texture2Ds, fixing their import properties as necessary.
+	/// </summary>
+
+	static List<Texture2D> LoadTextures (List<Texture> textures)
+	{
+		List<Texture2D> list = new List<Texture2D>();
+
+		foreach (Texture tex in textures)
+		{
+			Texture2D t2 = NGUIEditorTools.ImportTexture(tex, true, false);
+			if (t2 != null) list.Add(t2);
+		}
+		return list;
+	}
+
+	/// <summary>
+	/// Pack all of the specified sprites into a single texture, updating the outer and inner rects of the sprites as needed.
+	/// </summary>
+
+	static void PackTextures (Texture2D tex, List<SpriteEntry> sprites)
+	{
+		Texture2D[] textures = new Texture2D[sprites.Count];
+		for (int i = 0; i < sprites.Count; ++i) textures[i] = sprites[i].tex;
+
+		Rect[] rects = tex.PackTextures(textures, 1, 4096);
+
+		for (int i = 0; i < sprites.Count; ++i)
+		{
+			sprites[i].rect = NGUIMath.ConvertToPixels(rects[i], tex.width, tex.height, true);
+		}
+	}
+
+	/// <summary>
 	/// Helper function that creates a single sprite list from both the atlas's sprites as well as selected textures.
 	/// Dictionary value meaning:
 	/// 0 = No change
@@ -108,22 +141,6 @@ public class UIAtlasMaker : EditorWindow
 			}
 		}
 		return spriteList;
-	}
-
-	/// <summary>
-	/// Load the specified list of textures as Texture2Ds, fixing their import properties as necessary.
-	/// </summary>
-
-	static List<Texture2D> LoadTextures (List<Texture> textures)
-	{
-		List<Texture2D> list = new List<Texture2D>();
-
-		foreach (Texture tex in textures)
-		{
-			Texture2D t2 = NGUIEditorTools.ImportTexture(tex, true, false);
-			if (t2 != null) list.Add(t2);
-		}
-		return list;
 	}
 
 	/// <summary>
@@ -280,30 +297,10 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
-	/// Pack all of the specified sprites into a single texture, updating the outer and inner rects of the sprites as needed.
+	/// Replace the sprites within the atlas.
 	/// </summary>
 
-	static Texture2D PackTextures (List<SpriteEntry> sprites)
-	{
-		Texture2D atlasTexture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
-
-		Texture2D[] textures = new Texture2D[sprites.Count];
-		for (int i = 0; i < sprites.Count; ++i) textures[i] = sprites[i].tex;
-
-		Rect[] rects = atlasTexture.PackTextures(textures, 1, 4096);
-
-		for (int i = 0; i < sprites.Count; ++i)
-		{
-			sprites[i].rect = NGUIMath.ConvertToPixels(rects[i], atlasTexture.width, atlasTexture.height, true);
-		}
-		return atlasTexture;
-	}
-
-	/// <summary>
-	/// Replace the sprites within the atlas and change the atlas texture to the specified one.
-	/// </summary>
-
-	static void ReplaceAtlas (UIAtlas atlas, List<SpriteEntry> sprites, Texture2D newAtlasTexture)
+	static void ReplaceSprites (UIAtlas atlas, List<SpriteEntry> sprites)
 	{
 		// Get the list of sprites we'll be updating
 		List<UIAtlas.Sprite> spriteList = atlas.sprites;
@@ -326,9 +323,6 @@ public class UIAtlasMaker : EditorWindow
 			UIAtlas.Sprite sp = spriteList[--i];
 			if (!kept.Contains(sp)) spriteList.RemoveAt(i);
 		}
-
-		// The material used by the atlas should now use the new texture
-		atlas.material.mainTexture = newAtlasTexture;
 		atlas.MarkAsDirty();
 	}
 
@@ -415,6 +409,54 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
+	/// Combine all sprites into a single texture and save it to disk.
+	/// </summary>
+
+	static Texture2D UpdateTexture (UIAtlas atlas, List<SpriteEntry> sprites)
+	{
+		// Get the texture for the atlas
+		Texture2D tex = atlas.texture as Texture2D;
+		string path = NGUIEditorTools.GetSaveableTexturePath(atlas);
+
+		if (tex == null)
+		{
+			// Create a new texture for the atlas
+			tex = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+
+			// Pack the sprites into this texture
+			PackTextures(tex, sprites);
+			byte[] bytes = tex.EncodeToPNG();
+
+			// Save the PNG data
+			System.IO.File.WriteAllBytes(path, bytes);
+			bytes = null;
+
+			// Load the texture we just saved as a Texture2D
+			AssetDatabase.Refresh();
+			path = NGUIEditorTools.GetSaveableTexturePath(atlas);
+			tex = NGUIEditorTools.ImportTexture(path, false, true);
+			if (tex == null) { Debug.LogError("Failed to load the created atlas saved as " + path); return null; }
+			else atlas.material.mainTexture = tex;
+		}
+		else
+		{
+			// Make the atlas readable so we can save it
+			NGUIEditorTools.ImportTexture(path, true, false);
+
+			// Pack all sprites into atlas texture
+			PackTextures(tex, sprites);
+			byte[] bytes = tex.EncodeToPNG();
+			System.IO.File.WriteAllBytes(path, bytes);
+			bytes = null;
+
+			// Reimport the atlas, making it no longer readable
+			AssetDatabase.Refresh();
+			NGUIEditorTools.ImportTexture(path, false, false);
+		}
+		return tex;
+	}
+
+	/// <summary>
 	/// Update the sprites within the texture atlas, preserving the sprites that have not been selected.
 	/// </summary>
 
@@ -426,40 +468,30 @@ public class UIAtlasMaker : EditorWindow
 		if (sprites.Count > 0)
 		{
 			// The ability to undo this action is always useful
+			if (mAtlas.texture != null) Undo.RegisterUndo(mAtlas.texture, "Update Atlas");
+			if (mAtlas.material != null) Undo.RegisterUndo(mAtlas.material, "Update Atlas");
 			Undo.RegisterUndo(mAtlas, "Update Atlas");
-			Undo.RegisterUndo(mAtlas.material, "Update Atlas");
-			Undo.RegisterUndo(mAtlas.texture, "Update Atlas");
 
 			// Extract sprites from the atlas, filling in the missing pieces
 			if (keepSprites) ExtractSprites(mAtlas, sprites);
 
-			// Create a new texture for the atlas, encode it into PNG format and destroy it
-			Texture2D atlasTexture = PackTextures(sprites);
-			byte[] bytes = atlasTexture.EncodeToPNG();
-			NGUITools.Destroy(atlasTexture);
+			// Combine all sprites into a single texture and save it
+			Texture2D tex = UpdateTexture(mAtlas, sprites);
 
-			// Save the PNG data
+			// Get the path to the texture
 			string path = NGUIEditorTools.GetSaveableTexturePath(mAtlas);
-			System.IO.File.WriteAllBytes(path, bytes);
-			bytes = null;
 
-			// Load the texture we just saved as a Texture2D
-			AssetDatabase.Refresh();
-			atlasTexture = NGUIEditorTools.ImportTexture(path, false, true);
-			if (atlasTexture == null) { Debug.LogError("Failed to load the created atlas saved as " + path); return; }
-
-			// Replace the sprites within the atlas and change its texture
-			ReplaceAtlas(mAtlas, sprites, atlasTexture);
+			// Replace the sprites within the atlas
+			ReplaceSprites(mAtlas, sprites);
 
 			// Bring up a confirmation dialog
 			int result = EditorUtility.DisplayDialogComplex("Atlas Creation Result",
-				sprites.Count + " textures were packed into a " + atlasTexture.width +
-				"x" + atlasTexture.height + " atlas, saved as " + path,
+				sprites.Count + " textures were packed into a " + tex.width + "x" + tex.height + " atlas, saved as " + path,
 				"OK", "Select the Atlas", "Select the Texture");
 
 			// Select the object or the atlas if requested
 			if (result == 1) Selection.activeObject = mAtlas.gameObject;
-			else if (result == 2) Selection.activeObject = atlasTexture;
+			else if (result == 2) Selection.activeObject = tex;
 		}
 
 		// Release the temporary textures
