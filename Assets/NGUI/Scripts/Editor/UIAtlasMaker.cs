@@ -22,6 +22,7 @@ public class UIAtlasMaker : EditorWindow
 	UIAtlas mAtlas;
 	Vector2 mScroll = Vector2.zero;
 	string mAtlasName = "New Atlas";
+	string mDelName = null;
 
 	void OnSelectAtlas (MonoBehaviour obj)
 	{
@@ -53,7 +54,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Refresh the window on selection.
 	/// </summary>
 
-	void OnSelectionChange () { Repaint(); }
+	void OnSelectionChange () { mDelName = null; Repaint(); }
 
 	/// <summary>
 	/// Helper function that retrieves the list of currently selected textures.
@@ -457,6 +458,35 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
+	/// Update the sprite atlas, keeping only the sprites that are on the specified list.
+	/// </summary>
+
+	void UpdateAtlas (List<SpriteEntry> sprites)
+	{
+		if (sprites.Count > 0)
+		{
+			// Combine all sprites into a single texture and save it
+			UpdateTexture(mAtlas, sprites);
+
+			// Get the path to the texture
+			NGUIEditorTools.GetSaveableTexturePath(mAtlas);
+
+			// Replace the sprites within the atlas
+			ReplaceSprites(mAtlas, sprites);
+
+			// Release the temporary textures
+			ReleaseSprites(sprites);
+		}
+		else
+		{
+			mAtlas.sprites.Clear();
+			string path = NGUIEditorTools.GetSaveableTexturePath(mAtlas);
+			mAtlas.material.mainTexture = null;
+			if (!string.IsNullOrEmpty(path)) AssetDatabase.DeleteAsset(path);
+		}
+	}
+
+	/// <summary>
 	/// Update the sprites within the texture atlas, preserving the sprites that have not been selected.
 	/// </summary>
 
@@ -467,6 +497,9 @@ public class UIAtlasMaker : EditorWindow
 
 		if (sprites.Count > 0)
 		{
+			// Extract sprites from the atlas, filling in the missing pieces
+			if (keepSprites) ExtractSprites(mAtlas, sprites);
+
 			// NOTE: It doesn't seem to be possible to undo writing to disk, and there also seems to be no way of
 			// detecting an Undo event. Without either of these it's not possible to restore the texture saved to disk,
 			// so the undo process doesn't work right. Because of this I'd rather disable it altogether until a solution is found.
@@ -476,30 +509,8 @@ public class UIAtlasMaker : EditorWindow
 			//if (mAtlas.material != null) Undo.RegisterUndo(mAtlas.material, "Update Atlas");
 			//Undo.RegisterUndo(mAtlas, "Update Atlas");
 
-			// Extract sprites from the atlas, filling in the missing pieces
-			if (keepSprites) ExtractSprites(mAtlas, sprites);
-
-			// Combine all sprites into a single texture and save it
-			Texture2D tex = UpdateTexture(mAtlas, sprites);
-
-			// Get the path to the texture
-			string path = NGUIEditorTools.GetSaveableTexturePath(mAtlas);
-
-			// Replace the sprites within the atlas
-			ReplaceSprites(mAtlas, sprites);
-
-			// Release the temporary textures
-			int count = sprites.Count;
-			ReleaseSprites(sprites);
-
-			// Bring up a confirmation dialog
-			int result = EditorUtility.DisplayDialogComplex("Atlas Creation Result",
-				count + " textures were packed into a " + tex.width + "x" + tex.height + " atlas, saved as " + path,
-				"OK", "Select the Atlas", "Select the Texture");
-
-			// Select the object or the atlas if requested
-			if (result == 1) Selection.activeObject = mAtlas.gameObject;
-			else if (result == 2) Selection.activeObject = tex;
+			// Update the atlas
+			UpdateAtlas(sprites);
 		}
 	}
 
@@ -614,12 +625,12 @@ public class UIAtlasMaker : EditorWindow
 			if (textures.Count > 0)
 			{
 				GUI.backgroundColor = Color.green;
-				update = GUILayout.Button("Add/Update");
+				update = GUILayout.Button("Add/Update All");
 				GUI.backgroundColor = Color.white;
 			}
 			else
 			{
-				GUILayout.Label("Select one or more textures to work with\nin the Project View window.");
+				GUILayout.Label("You can reveal more options by selecting\none or more textures in the Project View\nwindow.");
 			}
 		}
 
@@ -632,6 +643,7 @@ public class UIAtlasMaker : EditorWindow
 
 			mScroll = GUILayout.BeginScrollView(mScroll);
 
+			string delSprite = null;
 			int index = 0;
 			foreach (KeyValuePair<string, int> iter in spriteList)
 			{
@@ -652,6 +664,26 @@ public class UIAtlasMaker : EditorWindow
 					GUILayout.Label("Update", GUILayout.Width(45f));
 					GUI.color = Color.white;
 				}
+				else
+				{
+					if (string.IsNullOrEmpty(mDelName) || mDelName != iter.Key)
+					{
+						// If we have not yet selected a sprite for deletion, show a small "X" button
+						if (GUILayout.Button("X", GUILayout.Width(22f))) mDelName = iter.Key;
+					}
+					else
+					{
+						GUI.backgroundColor = Color.red;
+
+						if (GUILayout.Button("Delete", GUILayout.Width(60f)))
+						{
+							// Confirmation button clicked on -- delete this sprite
+							delSprite = iter.Key;
+							mDelName = null;
+						}
+						GUI.backgroundColor = Color.white;
+					}
+				}
 
 				GUILayout.EndHorizontal();
 				Rect rect = GUILayoutUtility.GetLastRect();
@@ -659,7 +691,23 @@ public class UIAtlasMaker : EditorWindow
 			}
 			GUILayout.EndScrollView();
 
-			if (update) UpdateAtlas(textures, true);
+			// If this sprite was marked for deletion, remove it from the atlas
+			if (!string.IsNullOrEmpty(delSprite))
+			{
+				foreach (UIAtlas.Sprite sp in mAtlas.sprites)
+				{
+					if (sp.name == delSprite)
+					{
+						mAtlas.sprites.Remove(sp);
+						List<SpriteEntry> sprites = new List<SpriteEntry>();
+						ExtractSprites(mAtlas, sprites);
+						UpdateAtlas(sprites);
+						mDelName = null;
+						return;
+					}
+				}
+			}
+			else if (update) UpdateAtlas(textures, true);
 			else if (replace) UpdateAtlas(textures, false);
 			return;
 		}
