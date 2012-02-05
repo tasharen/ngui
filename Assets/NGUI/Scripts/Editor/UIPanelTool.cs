@@ -8,6 +8,8 @@ using System.Collections.Generic;
 
 public class UIPanelTool : EditorWindow
 {
+	Vector2 mScroll = Vector2.zero;
+
 	/// <summary>
 	/// Refresh the window on selection.
 	/// </summary>
@@ -38,6 +40,8 @@ public class UIPanelTool : EditorWindow
 				t = t.parent;
 			}
 
+			mScroll = GUILayout.BeginScrollView(mScroll);
+
 			foreach (UIPanel panel in panels)
 			{
 #if UNITY_3_4
@@ -47,6 +51,7 @@ public class UIPanelTool : EditorWindow
 #endif
 				if (type != PrefabType.Prefab) DrawRow(panel, panel == selectedPanel);
 			}
+			GUILayout.EndScrollView();
 		}
 		else
 		{

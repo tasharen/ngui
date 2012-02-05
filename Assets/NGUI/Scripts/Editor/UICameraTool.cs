@@ -8,6 +8,8 @@ using System.Collections.Generic;
 
 public class UICameraTool : EditorWindow
 {
+	Vector2 mScroll = Vector2.zero;
+
 	/// <summary>
 	/// Layer mask field, originally from:
 	/// http://answers.unity3d.com/questions/60959/mask-field-in-the-editor.html
@@ -151,7 +153,7 @@ public class UICameraTool : EditorWindow
 
 		Camera[] cams = Resources.FindObjectsOfTypeAll(typeof(Camera)) as Camera[];
 		List<Camera> list = new List<Camera>();
-		
+
 		foreach (Camera c in cams)
 		{
 			if (c.name != "SceneCamera" && c.name != "Preview Camera")
@@ -169,7 +171,9 @@ public class UICameraTool : EditorWindow
 		{
 			DrawRow(null);
 			NGUIEditorTools.DrawSeparator();
+			mScroll = GUILayout.BeginScrollView(mScroll);
 			foreach (Camera cam in list) DrawRow(cam);
+			GUILayout.EndScrollView();
 		}
 		else
 		{
