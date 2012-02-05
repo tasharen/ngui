@@ -467,10 +467,14 @@ public class UIAtlasMaker : EditorWindow
 
 		if (sprites.Count > 0)
 		{
+			// NOTE: It doesn't seem to be possible to undo writing to disk, and there also seems to be no way of
+			// detecting an Undo event. Without either of these it's not possible to restore the texture saved to disk,
+			// so the undo process doesn't work right. Because of this I'd rather disable it altogether until a solution is found.
+
 			// The ability to undo this action is always useful
-			if (mAtlas.texture != null) Undo.RegisterUndo(mAtlas.texture, "Update Atlas");
-			if (mAtlas.material != null) Undo.RegisterUndo(mAtlas.material, "Update Atlas");
-			Undo.RegisterUndo(mAtlas, "Update Atlas");
+			//if (mAtlas.texture != null) Undo.RegisterUndo(mAtlas.texture, "Update Atlas");
+			//if (mAtlas.material != null) Undo.RegisterUndo(mAtlas.material, "Update Atlas");
+			//Undo.RegisterUndo(mAtlas, "Update Atlas");
 
 			// Extract sprites from the atlas, filling in the missing pieces
 			if (keepSprites) ExtractSprites(mAtlas, sprites);
@@ -484,18 +488,19 @@ public class UIAtlasMaker : EditorWindow
 			// Replace the sprites within the atlas
 			ReplaceSprites(mAtlas, sprites);
 
+			// Release the temporary textures
+			int count = sprites.Count;
+			ReleaseSprites(sprites);
+
 			// Bring up a confirmation dialog
 			int result = EditorUtility.DisplayDialogComplex("Atlas Creation Result",
-				sprites.Count + " textures were packed into a " + tex.width + "x" + tex.height + " atlas, saved as " + path,
+				count + " textures were packed into a " + tex.width + "x" + tex.height + " atlas, saved as " + path,
 				"OK", "Select the Atlas", "Select the Texture");
 
 			// Select the object or the atlas if requested
 			if (result == 1) Selection.activeObject = mAtlas.gameObject;
 			else if (result == 2) Selection.activeObject = tex;
 		}
-
-		// Release the temporary textures
-		ReleaseSprites(sprites);
 	}
 
 	/// <summary>
