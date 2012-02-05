@@ -212,8 +212,6 @@ public class UIAtlasInspector : Editor
 
 					if (mSprite == null) return;
 
-					string name = mSprite.name;
-
 					// Grab the sprite's inner and outer dimensions
 					Rect inner = mSprite.inner;
 					Rect outer = mSprite.outer;
@@ -222,7 +220,27 @@ public class UIAtlasInspector : Editor
 
 					if (tex != null)
 					{
-						name = EditorGUILayout.TextField("Edit Name", name);
+						string name = EditorGUILayout.TextField("Edit Name", mSprite.name);
+
+						if (mSprite.name != name && !string.IsNullOrEmpty(name))
+						{
+							bool found = false;
+
+							foreach (UIAtlas.Sprite sp in mAtlas.sprites)
+							{
+								if (sp.name == name)
+								{
+									found = true;
+									break;
+								}
+							}
+
+							if (!found)
+							{
+								RegisterUndo();
+								mSprite.name = name;
+							}
+						}
 
 						// Draw the inner and outer rectangle dimensions
 						GUI.backgroundColor = green;
@@ -370,7 +388,6 @@ public class UIAtlasInspector : Editor
 					if (GUI.changed)
 					{
 						RegisterUndo();
-						mSprite.name = name;
 						mSprite.outer = outer;
 						mSprite.inner = inner;
 						mConfirmDelete = false;
