@@ -691,7 +691,7 @@ public class UIAtlasMaker : EditorWindow
 					GUI.color = Color.grey;
 					GUILayout.Button("Texture", GUILayout.Width(76f));
 					GUI.color = Color.white;
-					GUILayout.Box(" N/A");
+					GUILayout.Label(" N/A");
 				}
 			}
 			GUILayout.EndHorizontal();
