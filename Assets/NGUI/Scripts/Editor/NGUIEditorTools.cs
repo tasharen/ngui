@@ -96,8 +96,8 @@ public class NGUIEditorTools
 		Texture2D tex = new Texture2D(1, 16);
 		tex.name = "[Generated] Checker Texture";
 
-		Color c0 = new Color(0f, 0f, 0f, 0f);
-		Color c1 = new Color(0f, 0f, 0f, 0.4f);
+		Color c0 = new Color(1f, 1f, 1f, 0f);
+		Color c1 = new Color(1f, 1f, 1f, 0.4f);
 
 		for (int i = 0; i < 16; ++i)
 		{
@@ -321,6 +321,7 @@ public class NGUIEditorTools
 
 		if (Event.current.type == EventType.Repaint)
 		{
+			GUI.color = Color.black;
 			GUI.DrawTexture(new Rect(0f, rect.yMin, Screen.width, rect.yMax - rect.yMin), gradientTexture);
 			GUI.color = new Color(0f, 0f, 0f, 0.25f);
 			GUI.DrawTexture(new Rect(0f, rect.yMin, Screen.width, 1f), blankTexture);
@@ -329,6 +330,26 @@ public class NGUIEditorTools
 			GUI.Label(new Rect(rect.x + 4f, rect.y, rect.width - 4, rect.height), text, EditorStyles.boldLabel);
 		}
 		return rect;
+	}
+
+	/// <summary>
+	/// Draw a simple box outline for the entire line.
+	/// </summary>
+
+	static public void HighlightLine (Color c)
+	{
+		Rect rect = GUILayoutUtility.GetRect(Screen.width - 10f, 22f);
+		GUILayout.Space(-23f);
+		c.a *= 0.3f;
+		GUI.color = c;
+		GUI.DrawTexture(rect, gradientTexture);
+		c.r *= 0.5f;
+		c.g *= 0.5f;
+		c.b *= 0.5f;
+		GUI.color = c;
+		GUI.DrawTexture(new Rect(rect.x, rect.y + 1f, rect.width, 1f), blankTexture);
+		GUI.DrawTexture(new Rect(rect.x, rect.y + rect.height - 1f, rect.width, 1f), blankTexture);
+		GUI.color = Color.white;
 	}
 
 	/// <summary>

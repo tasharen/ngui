@@ -675,8 +675,6 @@ public class UIAtlasMaker : EditorWindow
 					GUI.color = Color.white;
 					GUILayout.Label(" N/A");
 				}
-				Rect rect = GUILayoutUtility.GetLastRect();
-				GUI.Box(rect, "");
 			}
 			GUILayout.EndHorizontal();
 
@@ -693,10 +691,8 @@ public class UIAtlasMaker : EditorWindow
 					GUI.color = Color.grey;
 					GUILayout.Button("Texture", GUILayout.Width(76f));
 					GUI.color = Color.white;
-					GUILayout.Label(" N/A");
+					GUILayout.Box(" N/A");
 				}
-				Rect rect = GUILayoutUtility.GetLastRect();
-				GUI.Box(rect, "");
 			}
 			GUILayout.EndHorizontal();
 
@@ -732,6 +728,7 @@ public class UIAtlasMaker : EditorWindow
 			foreach (KeyValuePair<string, int> iter in spriteList)
 			{
 				++index;
+				NGUIEditorTools.HighlightLine(new Color(0.6f, 0.6f, 0.6f));
 				GUILayout.BeginHorizontal();
 				GUILayout.Label(index.ToString(), GUILayout.Width(24f));
 				GUILayout.Label(iter.Key);
@@ -768,10 +765,7 @@ public class UIAtlasMaker : EditorWindow
 						GUI.backgroundColor = Color.white;
 					}
 				}
-
 				GUILayout.EndHorizontal();
-				Rect rect = GUILayoutUtility.GetLastRect();
-				GUI.Box(rect, "");
 			}
 			GUILayout.EndScrollView();
 

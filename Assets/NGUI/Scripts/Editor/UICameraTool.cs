@@ -187,6 +187,8 @@ public class UICameraTool : EditorWindow
 
 	void DrawRow (Camera cam)
 	{
+		if (cam != null) NGUIEditorTools.HighlightLine(new Color(0.6f, 0.6f, 0.6f));
+
 		GUILayout.BeginHorizontal();
 		{
 			bool enabled = (cam == null || (cam.gameObject.active && cam.enabled));
@@ -269,11 +271,5 @@ public class UICameraTool : EditorWindow
 			}
 		}
 		GUILayout.EndHorizontal();
-
-		if (cam != null)
-		{
-			Rect rect = GUILayoutUtility.GetLastRect();
-			GUI.Box(rect, "");
-		}
 	}
 }

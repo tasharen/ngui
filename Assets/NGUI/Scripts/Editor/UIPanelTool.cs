@@ -82,10 +82,11 @@ public class UIPanelTool : EditorWindow
 			clipping = "Clip";
 		}
 
+		bool enabled = (panel == null || (panel.enabled && panel.gameObject.active));
+		if (panel != null) NGUIEditorTools.HighlightLine(enabled ? new Color(0.6f, 0.6f, 0.6f) : Color.black);
+
 		GUILayout.BeginHorizontal();
 		{
-			bool enabled = (panel == null || (panel.enabled && panel.gameObject.active));
-
 			GUI.color = Color.white;
 
 			if (panel != null)
@@ -142,11 +143,5 @@ public class UIPanelTool : EditorWindow
 			}
 		}
 		GUILayout.EndHorizontal();
-
-		if (panel != null)
-		{
-			Rect rect = GUILayoutUtility.GetLastRect();
-			GUI.Box(rect, "");
-		}
 	}
 }
