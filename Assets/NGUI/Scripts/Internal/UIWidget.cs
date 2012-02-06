@@ -166,7 +166,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	void CreatePanel ()
 	{
-		if (mPanel == null && mMat != null)
+		if (mPanel == null && mMat != null && enabled && gameObject.active)
 		{
 			mPanel = UIPanel.Find(cachedTransform);
 			CheckLayer();
