@@ -8,6 +8,8 @@ using AnimationOrTween;
 [AddComponentMenu("NGUI/Interaction/Checkbox")]
 public class UICheckbox : MonoBehaviour
 {
+	static public UICheckbox current;
+
 	public UISprite checkSprite;
 	public Animation checkAnimation;
 	public GameObject eventReceiver;
@@ -71,6 +73,7 @@ public class UICheckbox : MonoBehaviour
 			// Send out the event notification
 			if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
 			{
+				current = this;
 				eventReceiver.SendMessage(functionName, mChecked, SendMessageOptions.DontRequireReceiver);
 			}
 

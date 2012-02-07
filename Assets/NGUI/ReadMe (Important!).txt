@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.60c
+                Version 1.61
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -46,6 +46,10 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.61:
+- NEW: UICheckbox.current will hold the checkbox that triggered the 'functionName' function on the 'eventReceiver'.
+- FIX: UIPopupList will now place the created object onto a proper layer.
 
 1.60:
 - NEW: Added a built-in atlas-making solution: Atlas Maker, making it possible to create atlases without leaving Unity.
