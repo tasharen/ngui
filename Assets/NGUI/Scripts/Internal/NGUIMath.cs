@@ -9,6 +9,17 @@ using System.Collections.Generic;
 static public class NGUIMath
 {
 	/// <summary>
+	/// Ensure that the angle is within -180 to 180 range.
+	/// </summary>
+
+	static public float WrapAngle (float angle)
+	{
+		while (angle > 180f) angle -= 360f;
+		while (angle < -180f) angle += 360f;
+		return angle;
+	}
+
+	/// <summary>
 	/// Convert a hexadecimal character to its decimal value.
 	/// </summary>
 
@@ -345,6 +356,18 @@ static public class NGUIMath
 	}
 
 	/// <summary>
+	/// Vector2.Lerp(from, to, Time.deltaTime * strength) is not framerate-independent. This function is.
+	/// </summary>
+
+	static public Vector2 SpringLerp (Vector2 from, Vector2 to, float strength, float deltaTime)
+	{
+		float dampeningFactor = (1f - strength * 0.001f) / 60f;
+		int ms = Mathf.RoundToInt(deltaTime * 1000f);
+		for (int i = 0; i < ms; ++i) from = Vector2.Lerp(from, to, dampeningFactor);
+		return from;
+	}
+
+	/// <summary>
 	/// Vector3.Lerp(from, to, Time.deltaTime * strength) is not framerate-independent. This function is.
 	/// </summary>
 
@@ -353,6 +376,18 @@ static public class NGUIMath
 		float dampeningFactor = (1f - strength * 0.001f) / 60f;
 		int ms = Mathf.RoundToInt(deltaTime * 1000f);
 		for (int i = 0; i < ms; ++i) from = Vector3.Lerp(from, to, dampeningFactor);
+		return from;
+	}
+
+	/// <summary>
+	/// Quaternion.Slerp(from, to, Time.deltaTime * strength) is not framerate-independent. This function is.
+	/// </summary>
+
+	static public Quaternion SpringLerp (Quaternion from, Quaternion to, float strength, float deltaTime)
+	{
+		float dampeningFactor = (1f - strength * 0.001f) / 60f;
+		int ms = Mathf.RoundToInt(deltaTime * 1000f);
+		for (int i = 0; i < ms; ++i) from = Quaternion.Slerp(from, to, dampeningFactor);
 		return from;
 	}
 }

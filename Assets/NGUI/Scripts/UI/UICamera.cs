@@ -28,7 +28,7 @@ public class UICamera : MonoBehaviour
 		public Vector2 delta;		// Delta since last update
 		public Vector2 totalDelta;	// Delta since the event started being tracked
 
-		public Camera pressedCam;		// Camera that the OnPress(true) was fired with
+		public Camera pressedCam;	// Camera that the OnPress(true) was fired with
 
 		public GameObject current;	// The current game object under the touch or mouse
 		public GameObject hover;	// The last game object to receive OnHover
@@ -68,6 +68,12 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	static public int lastTouchID = -1;
+
+	/// <summary>
+	/// If events don't get handled, they will be forwarded to this game object.
+	/// </summary>
+
+	static public GameObject fallThrough;
 
 	// List of all active cameras in the scene
 	static List<UICamera> mList = new List<UICamera>();
@@ -287,7 +293,7 @@ public class UICamera : MonoBehaviour
 	{
 		if (Application.isPlaying && mUseMouseInput && handlesEvents)
 		{
-			mMouse.current = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : null;
+			mMouse.current = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
 		}
 	}
 
@@ -312,7 +318,7 @@ public class UICamera : MonoBehaviour
 			// We still want to update what's under the mouse even if the game is paused
 			if (pressed || unpressed || Time.timeScale == 0f)
 			{
-				mMouse.current = Raycast(lastTouchPosition, ref lastHit) ? lastHit.collider.gameObject : null;
+				mMouse.current = Raycast(lastTouchPosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
 			}
 
 			// We don't want to update the last camera while there is a touch happening
@@ -348,7 +354,7 @@ public class UICamera : MonoBehaviour
 				// Update the object under this touch
 				if (pressed || unpressed)
 				{
-					touch.current = Raycast(input.position, ref lastHit) ? lastHit.collider.gameObject : null;
+					touch.current = Raycast(input.position, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
 				}
 
 				// We don't want to update the last camera while there is a touch happening

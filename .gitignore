@@ -17,3 +17,5 @@
 /Library/ScriptAssemblies
 /Library/expandedItems
 *.suo
+/Assets/Test
+/Assets/Test.meta

@@ -173,6 +173,8 @@ public static class BMFontReader
 					if (split.Length > 2)
 					{
 						font.spriteName = GetString(split[2]).Replace("\"", "");
+						font.spriteName = font.spriteName.Replace(".png", "");
+						font.spriteName = font.spriteName.Replace(".tga", "");
 					}
 				}
 			}
