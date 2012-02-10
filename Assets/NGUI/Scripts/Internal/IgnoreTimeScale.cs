@@ -23,6 +23,12 @@ public class IgnoreTimeScale : MonoBehaviour
 	void OnEnable () { mTime = Time.realtimeSinceStartup; }
 
 	/// <summary>
+	/// Record the time on start.
+	/// </summary>
+
+	void Start () { mTime = Time.realtimeSinceStartup; }
+
+	/// <summary>
 	/// Update the 'realTimeDelta' parameter. Should be called once per frame.
 	/// </summary>
 
