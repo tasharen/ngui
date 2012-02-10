@@ -14,7 +14,7 @@ public class UIButtonRotation : MonoBehaviour
 
 	Quaternion mRot;
 
-	void Start ()
+	void Awake ()
 	{
 		if (tweenTarget == null) tweenTarget = transform;
 		mRot = tweenTarget.localRotation;

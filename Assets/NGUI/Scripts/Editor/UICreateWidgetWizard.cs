@@ -46,6 +46,7 @@ public class UICreateWidgetWizard : EditorWindow
 	static string mListFG = "";
 	static string mListBG = "";
 	static string mListHL = "";
+	static Color mColor = Color.white;
 	static bool mLoaded = false;
 
 	/// <summary>
@@ -80,6 +81,7 @@ public class UICreateWidgetWizard : EditorWindow
 		PlayerPrefs.SetInt("NGUI Widget Type", (int)mType);
 		PlayerPrefs.SetInt("NGUI Atlas", (mAtlas != null) ? mAtlas.GetInstanceID() : -1);
 		PlayerPrefs.SetInt("NGUI Font", (mFont != null) ? mFont.GetInstanceID() : -1);
+		PlayerPrefs.SetInt("NGUI Color", NGUIMath.ColorToInt(mColor));
 
 		SaveString("NGUI Sprite", mSprite);
 		SaveString("NGUI Sliced", mSliced);
@@ -116,6 +118,9 @@ public class UICreateWidgetWizard : EditorWindow
 
 		int fontID = PlayerPrefs.GetInt("NGUI Font", -1);
 		if (fontID != -1) mFont = EditorUtility.InstanceIDToObject(fontID) as UIFont;
+
+		int color = PlayerPrefs.GetInt("NGUI Color", -1);
+		if (color != -1) mColor = NGUIMath.IntToColor(color);
 
 		mSprite		= LoadString("NGUI Sprite");
 		mSliced		= LoadString("NGUI Sliced");
@@ -199,11 +204,23 @@ public class UICreateWidgetWizard : EditorWindow
 
 	void CreateLabel (GameObject go)
 	{
+		GUILayout.BeginHorizontal();
+		Color c = EditorGUILayout.ColorField("Color", mColor, GUILayout.Width(220f));
+		GUILayout.Label("Color tint the label will start with");
+		GUILayout.EndHorizontal();
+
+		if (mColor != c)
+		{
+			mColor = c;
+			Save();
+		}
+
 		if (ShouldCreate(go, mFont != null))
 		{
 			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
 			lbl.font = mFont;
 			lbl.text = "New Label";
+			lbl.color = mColor;
 			lbl.MakePixelPerfect();
 			Selection.activeGameObject = lbl.gameObject;
 		}

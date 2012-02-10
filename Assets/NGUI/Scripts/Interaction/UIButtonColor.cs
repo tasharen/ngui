@@ -14,7 +14,7 @@ public class UIButtonColor : MonoBehaviour
 
 	Color mColor;
 
-	void Start ()
+	void Awake ()
 	{
 		if (tweenTarget == null) tweenTarget = gameObject;
 		UIWidget widget = tweenTarget.GetComponent<UIWidget>();

@@ -14,7 +14,7 @@ public class UIButtonOffset : MonoBehaviour
 
 	Vector3 mPos;
 
-	void Start ()
+	void Awake ()
 	{
 		if (tweenTarget == null) tweenTarget = transform;
 		mPos = tweenTarget.localPosition;

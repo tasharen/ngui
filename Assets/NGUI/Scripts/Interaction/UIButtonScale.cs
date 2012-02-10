@@ -14,7 +14,7 @@ public class UIButtonScale : MonoBehaviour
 
 	Vector3 mScale;
 
-	void Start ()
+	void Awake ()
 	{
 		if (tweenTarget == null) tweenTarget = transform;
 		mScale = tweenTarget.localScale;
