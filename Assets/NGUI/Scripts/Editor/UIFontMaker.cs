@@ -160,7 +160,6 @@ public class UIFontMaker : EditorWindow
 			}
 
 			ComponentSelector.Draw<UIFont>("...or select", mFont, OnSelectFont);
-
 			ComponentSelector.Draw<UIAtlas>(mAtlas, OnSelectAtlas);
 		}
 		NGUIEditorTools.DrawSeparator();
@@ -261,10 +260,29 @@ public class UIFontMaker : EditorWindow
 		{
 			GameObject go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
 
+			bool create = false;
+
 			GUILayout.BeginHorizontal();
 			GUILayout.FlexibleSpace();
-			GUI.backgroundColor = Color.green;
-			bool create = GUILayout.Button(go == null ? "Create the Font" : "Update the Font", GUILayout.Width(120f));
+
+			if (go != null)
+			{
+				if (go.GetComponent<UIFont>() != null)
+				{
+					GUI.backgroundColor = Color.red;
+					create = GUILayout.Button("Replace the Font", GUILayout.Width(140f));
+				}
+				else
+				{
+					GUI.backgroundColor = Color.grey;
+					GUILayout.Button("Rename Your Font", GUILayout.Width(140f));
+				}
+			}
+			else
+			{
+				GUI.backgroundColor = Color.green;
+				create = GUILayout.Button("Create the Font", GUILayout.Width(140f));
+			}
 			GUI.backgroundColor = Color.white;
 			GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();

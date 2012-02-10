@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 /// <summary>
 /// All children added to the game object with this script will be repositioned to be on a grid of specified dimensions.
+/// If you want the cells to automatically set their scale based on the dimensions of their content, take a look at UITable.
 /// </summary>
 
 [ExecuteInEditMode]

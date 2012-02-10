@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.61
+                Version 1.62
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -46,6 +46,10 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.62:
+- NEW: Added a new class -- UITable -- that can be used to organize its children into rows/columns of variable size (think HTML table).
+- FIX: Font Maker will make it more obvious when you are going to overwrite a font.
 
 1.61:
 - NEW: UICheckbox.current will hold the checkbox that triggered the 'functionName' function on the 'eventReceiver'.

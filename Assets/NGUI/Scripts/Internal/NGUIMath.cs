@@ -356,6 +356,18 @@ static public class NGUIMath
 	}
 
 	/// <summary>
+	/// Mathf.Lerp(from, to, Time.deltaTime * strength) is not framerate-independent. This function is.
+	/// </summary>
+
+	static public float SpringLerp (float from, float to, float strength, float deltaTime)
+	{
+		float dampeningFactor = (1f - strength * 0.001f) / 60f;
+		int ms = Mathf.RoundToInt(deltaTime * 1000f);
+		for (int i = 0; i < ms; ++i) from = Mathf.Lerp(from, to, dampeningFactor);
+		return from;
+	}
+
+	/// <summary>
 	/// Vector2.Lerp(from, to, Time.deltaTime * strength) is not framerate-independent. This function is.
 	/// </summary>
 
@@ -389,5 +401,16 @@ static public class NGUIMath
 		int ms = Mathf.RoundToInt(deltaTime * 1000f);
 		for (int i = 0; i < ms; ++i) from = Quaternion.Slerp(from, to, dampeningFactor);
 		return from;
+	}
+
+	/// <summary>
+	/// Since there is no Mathf.RotateTowards...
+	/// </summary>
+
+	static public float RotateTowards (float from, float to, float maxAngle)
+	{
+		float diff = WrapAngle(to - from);
+		if (Mathf.Abs(diff) > maxAngle) diff = maxAngle * Mathf.Sign(diff);
+		return from + diff;
 	}
 }

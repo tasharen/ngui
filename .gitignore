@@ -19,3 +19,4 @@
 *.suo
 /Assets/Test
 /Assets/Test.meta
+*.unityproj
