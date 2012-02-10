@@ -50,6 +50,8 @@ All can be found here: http://www.tasharen.com/?page_id=197
 1.62:
 - NEW: Added a new class -- UITable -- that can be used to organize its children into rows/columns of variable size (think HTML table).
 - FIX: Font Maker will make it more obvious when you are going to overwrite a font.
+- FIX: Tweener will now set its timestamp on Start(), making tweens that start playing on Play behave correctly.
+- FIX: UISlicedSprite will now notice that its scale is changing and will rebuild its geometry properly.
 
 1.61:
 - NEW: UICheckbox.current will hold the checkbox that triggered the 'functionName' function on the 'eventReceiver'.

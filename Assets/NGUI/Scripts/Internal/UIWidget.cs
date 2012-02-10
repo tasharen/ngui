@@ -343,7 +343,7 @@ public abstract class UIWidget : MonoBehaviour
 	public bool UpdateGeometry (ref Matrix4x4 worldToPanel, bool parentMoved, bool generateNormals)
 	{
 		if (material == null) return false;
-		bool retVal = OnUpdate() | mChanged;
+		bool retVal = OnUpdate() || mChanged;
 		mChanged = false;
 
 		if (retVal || !mGeom.hasVertices)

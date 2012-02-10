@@ -238,7 +238,7 @@ public class UISprite : UIWidget
 
 	override public bool OnUpdate ()
 	{
-		if (!mPlayMode) UpdateUVs();
+		UpdateUVs();
 		return false;
 	}
 
