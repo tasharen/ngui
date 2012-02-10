@@ -578,6 +578,7 @@ public class UIAtlasMaker : EditorWindow
 
 		// Try to load the prefab
 		GameObject go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
+		if (mAtlas == null && go != null) mAtlas = go.GetComponent<UIAtlas>();
 
 		EditorGUIUtility.LookLikeControls(80f);
 
@@ -630,10 +631,10 @@ public class UIAtlasMaker : EditorWindow
 					mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
 				}
 
-				if (go == null)
+				if (mAtlas == null)
 				{
 					// Create a new prefab for the atlas
-					Object prefab = EditorUtility.CreateEmptyPrefab(prefabPath);
+					Object prefab = (go != null) ? go : EditorUtility.CreateEmptyPrefab(prefabPath);
 
 					// Create a new game object for the atlas
 					go = new GameObject(mAtlasName);
