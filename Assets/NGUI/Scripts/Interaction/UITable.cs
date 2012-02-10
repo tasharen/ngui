@@ -45,6 +45,9 @@ public class UITable : MonoBehaviour
 		foreach (Transform t in children)
 		{
 			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(t);
+			Vector3 scale = t.localScale;
+			b.min = Vector3.Scale(b.min, scale);
+			b.max = Vector3.Scale(b.max, scale);
 			bounds[y, x] = b;
 
 			boundsRows[x].Encapsulate(b);
