@@ -569,4 +569,23 @@ public class NGUIEditorTools
 		path = string.IsNullOrEmpty(path) ? "Assets/" + atlas.name + ".png" : path.Replace(".prefab", ".png");
 		return path;
 	}
+
+	/// <summary>
+	/// Helper function that returns the folder where the current selection resides.
+	/// </summary>
+
+	static public string GetSelectionFolder ()
+	{
+		if (Selection.activeObject != null)
+		{
+			string path = AssetDatabase.GetAssetPath(Selection.activeObject.GetInstanceID());
+
+			if (!string.IsNullOrEmpty(path))
+			{
+				int last = Mathf.Max(path.LastIndexOf('/'), path.LastIndexOf('\\'));
+				if (last > 0) return path.Substring(0, last + 1);
+			}
+		}
+		return "Assets/";
+	}
 }

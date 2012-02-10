@@ -573,8 +573,8 @@ public class UIAtlasMaker : EditorWindow
 
 		// Assume default values if needed
 		if (string.IsNullOrEmpty(mAtlasName)) mAtlasName = "New Atlas";
-		if (string.IsNullOrEmpty(prefabPath)) prefabPath = "Assets/" + mAtlasName + ".prefab";
-		if (string.IsNullOrEmpty(matPath)) matPath = "Assets/" + mAtlasName + ".mat";
+		if (string.IsNullOrEmpty(prefabPath)) prefabPath = NGUIEditorTools.GetSelectionFolder() + mAtlasName + ".prefab";
+		if (string.IsNullOrEmpty(matPath)) matPath = NGUIEditorTools.GetSelectionFolder() + mAtlasName + ".mat";
 
 		// Try to load the prefab
 		GameObject go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;

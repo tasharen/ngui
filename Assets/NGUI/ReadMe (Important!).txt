@@ -52,6 +52,7 @@ All can be found here: http://www.tasharen.com/?page_id=197
 - FIX: Font Maker will make it more obvious when you are going to overwrite a font.
 - FIX: Tweener will now set its timestamp on Start(), making tweens that start playing on Play behave correctly.
 - FIX: UISlicedSprite will now notice that its scale is changing and will rebuild its geometry properly.
+- FIX: Atlas and Font maker will now create new atlases and fonts in the same folder as the selected items.
 
 1.61:
 - NEW: UICheckbox.current will hold the checkbox that triggered the 'functionName' function on the 'eventReceiver'.

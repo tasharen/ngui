@@ -129,8 +129,8 @@ public class UIFontMaker : EditorWindow
 
 		// Assume default values if needed
 		if (string.IsNullOrEmpty(mFontName)) mFontName = "New Font";
-		if (string.IsNullOrEmpty(prefabPath)) prefabPath = "Assets/" + mFontName + ".prefab";
-		if (string.IsNullOrEmpty(matPath)) matPath = "Assets/" + mFontName + ".mat";
+		if (string.IsNullOrEmpty(prefabPath)) prefabPath = NGUIEditorTools.GetSelectionFolder() + mFontName + ".prefab";
+		if (string.IsNullOrEmpty(matPath)) matPath = NGUIEditorTools.GetSelectionFolder() + mFontName + ".mat";
 
 		EditorGUIUtility.LookLikeControls(80f);
 
