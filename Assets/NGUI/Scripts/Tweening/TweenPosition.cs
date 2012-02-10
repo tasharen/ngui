@@ -5,7 +5,7 @@
 /// </summary>
 
 [AddComponentMenu("NGUI/Tween/Position")]
-public class TweenPosition : NTweener
+public class TweenPosition : UITweener
 {
 	public Vector3 from;
 	public Vector3 to;
@@ -24,7 +24,7 @@ public class TweenPosition : NTweener
 
 	static public TweenPosition Begin (GameObject go, float duration, Vector3 pos)
 	{
-		TweenPosition comp = NTweener.Begin<TweenPosition>(go, duration);
+		TweenPosition comp = UITweener.Begin<TweenPosition>(go, duration);
 		comp.from = comp.position;
 		comp.to = pos;
 		return comp;

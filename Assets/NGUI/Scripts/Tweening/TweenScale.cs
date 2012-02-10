@@ -5,18 +5,28 @@
 /// </summary>
 
 [AddComponentMenu("NGUI/Tween/Scale")]
-public class TweenScale : NTweener
+public class TweenScale : UITweener
 {
 	public Vector3 from;
 	public Vector3 to;
+	public bool updateTable = false;
 
 	Transform mTrans;
+	UITable mTable;
 
 	public Vector3 scale { get { return mTrans.localScale; } set { mTrans.localScale = value; } }
 
-	void Awake () { mTrans = transform; }
+	void Awake ()
+	{
+		mTrans = transform;
+		if (updateTable) mTable = NGUITools.FindInChildren<UITable>(gameObject);
+	}
 
-	override protected void OnUpdate (float factor) { mTrans.localScale = from * (1f - factor) + to * factor; }
+	override protected void OnUpdate (float factor)
+	{
+		mTrans.localScale = from * (1f - factor) + to * factor;
+		if (mTable != null) mTable.repositionNow = true;
+	}
 
 	/// <summary>
 	/// Start the tweening operation.
@@ -24,7 +34,7 @@ public class TweenScale : NTweener
 
 	static public TweenScale Begin (GameObject go, float duration, Vector3 scale)
 	{
-		TweenScale comp = NTweener.Begin<TweenScale>(go, duration);
+		TweenScale comp = UITweener.Begin<TweenScale>(go, duration);
 		comp.from = comp.scale;
 		comp.to = scale;
 		return comp;

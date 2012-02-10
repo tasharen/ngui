@@ -32,6 +32,22 @@ public class UIAnchor : MonoBehaviour
 	bool mIsWindows = false;
 
 	/// <summary>
+	/// Change the associated widget to be top-left aligned.
+	/// </summary>
+
+	void ChangeWidgetPivot ()
+	{
+		UIWidget widget = GetComponent<UIWidget>();
+		if (widget != null) widget.pivot = UIWidget.Pivot.TopLeft;
+	}
+
+	/// <summary>
+	/// Automatically make the widget top-left aligned if we're stretching to fill.
+	/// </summary>
+
+	void Start () { if (stretchToFill) ChangeWidgetPivot(); }
+
+	/// <summary>
 	/// Automatically find the camera responsible for drawing the widgets under this object.
 	/// </summary>
 
@@ -54,7 +70,11 @@ public class UIAnchor : MonoBehaviour
 	{
 		if (uiCamera != null)
 		{
-			if (stretchToFill) side = Side.TopLeft;
+			if (stretchToFill)
+			{
+				side = Side.TopLeft;
+				if (!Application.isPlaying) ChangeWidgetPivot();
+			}
 
 			Vector3 v = new Vector3(Screen.width, Screen.height, 0f);
 

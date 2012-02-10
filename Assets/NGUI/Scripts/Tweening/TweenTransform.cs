@@ -5,7 +5,7 @@
 /// </summary>
 
 [AddComponentMenu("NGUI/Tween/Transform")]
-public class TweenTransform : NTweener
+public class TweenTransform : UITweener
 {
 	public Transform from;
 	public Transform to;
@@ -30,7 +30,7 @@ public class TweenTransform : NTweener
 
 	static public TweenTransform Begin (GameObject go, float duration, Transform from, Transform to)
 	{
-		TweenTransform comp = NTweener.Begin<TweenTransform>(go, duration);
+		TweenTransform comp = UITweener.Begin<TweenTransform>(go, duration);
 		comp.from = from;
 		comp.to = to;
 		return comp;

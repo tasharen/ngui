@@ -582,8 +582,9 @@ public class NGUIEditorTools
 
 			if (!string.IsNullOrEmpty(path))
 			{
-				int last = Mathf.Max(path.LastIndexOf('/'), path.LastIndexOf('\\'));
-				if (last > 0) return path.Substring(0, last + 1);
+				int dot = path.LastIndexOf('.');
+				int slash = Mathf.Max(path.LastIndexOf('/'), path.LastIndexOf('\\'));
+				if (slash > 0) return (dot > slash) ? path.Substring(0, slash + 1) : path + "/";
 			}
 		}
 		return "Assets/";

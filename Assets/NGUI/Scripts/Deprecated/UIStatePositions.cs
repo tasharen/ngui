@@ -30,8 +30,8 @@ public class UIStatePositions : MonoBehaviour
 			if (positions == null || positions.Length == 0) return;
 			int index = Mathf.Clamp(currentState, 0, positions.Length - 1);
 
-			TweenPosition tc = NTweener.Begin<TweenPosition>(gameObject, duration);
-			tc.method = NTweener.Method.EaseInOut;
+			TweenPosition tc = UITweener.Begin<TweenPosition>(gameObject, duration);
+			tc.method = UITweener.Method.EaseInOut;
 			tc.from = mTrans.localPosition;
 			tc.to = positions[index];
 		}

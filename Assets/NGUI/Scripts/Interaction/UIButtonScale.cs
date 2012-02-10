@@ -22,11 +22,11 @@ public class UIButtonScale : MonoBehaviour
 
 	void OnPress (bool isPressed)
 	{
-		if (enabled) TweenScale.Begin(tweenTarget.gameObject, duration, isPressed ? Vector3.Scale(mScale, pressed) : mScale).method = NTweener.Method.EaseInOut;
+		if (enabled) TweenScale.Begin(tweenTarget.gameObject, duration, isPressed ? Vector3.Scale(mScale, pressed) : mScale).method = UITweener.Method.EaseInOut;
 	}
 
 	void OnHover (bool isOver)
 	{
-		if (enabled) TweenScale.Begin(tweenTarget.gameObject, duration, isOver ? Vector3.Scale(mScale, hover) : mScale).method = NTweener.Method.EaseInOut;
+		if (enabled) TweenScale.Begin(tweenTarget.gameObject, duration, isOver ? Vector3.Scale(mScale, hover) : mScale).method = UITweener.Method.EaseInOut;
 	}
 }

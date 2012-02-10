@@ -22,11 +22,11 @@ public class UIButtonOffset : MonoBehaviour
 
 	void OnPress (bool isPressed)
 	{
-		if (enabled) TweenPosition.Begin(tweenTarget.gameObject, duration, isPressed ? mPos + pressed : mPos).method = NTweener.Method.EaseInOut;
+		if (enabled) TweenPosition.Begin(tweenTarget.gameObject, duration, isPressed ? mPos + pressed : mPos).method = UITweener.Method.EaseInOut;
 	}
 
 	void OnHover (bool isOver)
 	{
-		if (enabled) TweenPosition.Begin(tweenTarget.gameObject, duration, isOver ? mPos + hover : mPos).method = NTweener.Method.EaseInOut;
+		if (enabled) TweenPosition.Begin(tweenTarget.gameObject, duration, isOver ? mPos + hover : mPos).method = UITweener.Method.EaseInOut;
 	}
 }

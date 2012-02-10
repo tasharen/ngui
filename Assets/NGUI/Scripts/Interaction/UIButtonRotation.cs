@@ -22,11 +22,11 @@ public class UIButtonRotation : MonoBehaviour
 
 	void OnPress (bool isPressed)
 	{
-		if (enabled) TweenRotation.Begin(tweenTarget.gameObject, duration, isPressed ? mRot * Quaternion.Euler(pressed) : mRot).method = NTweener.Method.EaseInOut;
+		if (enabled) TweenRotation.Begin(tweenTarget.gameObject, duration, isPressed ? mRot * Quaternion.Euler(pressed) : mRot).method = UITweener.Method.EaseInOut;
 	}
 
 	void OnHover (bool isOver)
 	{
-		if (enabled) TweenRotation.Begin(tweenTarget.gameObject, duration, isOver ? mRot * Quaternion.Euler(hover) : mRot).method = NTweener.Method.EaseInOut;
+		if (enabled) TweenRotation.Begin(tweenTarget.gameObject, duration, isOver ? mRot * Quaternion.Euler(hover) : mRot).method = UITweener.Method.EaseInOut;
 	}
 }

@@ -16,7 +16,7 @@ public class UIButtonTween : MonoBehaviour
 	public DisableCondition disableWhenFinished = DisableCondition.DoNotDisable;
 	public bool includeChildren = false;
 
-	NTweener[] mTweens;
+	UITweener[] mTweens;
 
 	void Start () { if (tweenTarget == null) tweenTarget = gameObject; }
 
@@ -50,7 +50,7 @@ public class UIButtonTween : MonoBehaviour
 		{
 			bool isFinished = true;
 
-			foreach (NTweener tw in mTweens)
+			foreach (UITweener tw in mTweens)
 			{
 				if (tw.enabled)
 				{
@@ -85,7 +85,7 @@ public class UIButtonTween : MonoBehaviour
 		}
 
 		// Gather the tweening components
-		mTweens = includeChildren ? go.GetComponentsInChildren<NTweener>() : go.GetComponents<NTweener>();
+		mTweens = includeChildren ? go.GetComponentsInChildren<UITweener>() : go.GetComponents<UITweener>();
 
 		if (mTweens.Length == 0)
 		{
@@ -98,7 +98,7 @@ public class UIButtonTween : MonoBehaviour
 			if (playDirection == Direction.Reverse) forward = !forward;
 
 			// Run through all located tween components
-			foreach (NTweener tw in mTweens)
+			foreach (UITweener tw in mTweens)
 			{
 				// If the tweener's group matches, we can work with it
 				if (tw.tweenGroup == tweenGroup)

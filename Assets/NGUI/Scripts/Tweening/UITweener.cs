@@ -5,7 +5,7 @@ using System.Collections;
 /// Base class for all tweening operations.
 /// </summary>
 
-public abstract class NTweener : IgnoreTimeScale
+public abstract class UITweener : IgnoreTimeScale
 {
 	public enum Method
 	{
@@ -206,7 +206,7 @@ public abstract class NTweener : IgnoreTimeScale
 	/// Starts the tweening operation.
 	/// </summary>
 
-	static public T Begin<T> (GameObject go, float duration) where T : NTweener
+	static public T Begin<T> (GameObject go, float duration) where T : UITweener
 	{
 		T comp = go.GetComponent<T>();
 #if UNITY_FLASH

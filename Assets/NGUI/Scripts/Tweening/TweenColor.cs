@@ -5,7 +5,7 @@
 /// </summary>
 
 [AddComponentMenu("NGUI/Tween/Color")]
-public class TweenColor : NTweener
+public class TweenColor : UITweener
 {
 	public Color from = Color.white;
 	public Color to = Color.white;
@@ -65,7 +65,7 @@ public class TweenColor : NTweener
 
 	static public TweenColor Begin (GameObject go, float duration, Color color)
 	{
-		TweenColor comp = NTweener.Begin<TweenColor>(go, duration);
+		TweenColor comp = UITweener.Begin<TweenColor>(go, duration);
 		comp.from = comp.color;
 		comp.to = color;
 		return comp;

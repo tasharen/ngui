@@ -30,8 +30,8 @@ public class UIStateRotations : MonoBehaviour
 			if (rotations == null || rotations.Length == 0) return;
 			int index = Mathf.Clamp(currentState, 0, rotations.Length - 1);
 
-			TweenRotation tc = NTweener.Begin<TweenRotation>(gameObject, duration);
-			tc.method = NTweener.Method.EaseInOut;
+			TweenRotation tc = UITweener.Begin<TweenRotation>(gameObject, duration);
+			tc.method = UITweener.Method.EaseInOut;
 			tc.from = mTrans.localRotation.eulerAngles;
 			tc.to = rotations[index];
 		}
