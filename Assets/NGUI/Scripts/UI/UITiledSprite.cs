@@ -8,25 +8,8 @@ using System.Collections.Generic;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/Sprite (Tiled)")]
-public class UITiledSprite : UISprite
+public class UITiledSprite : UISlicedSprite
 {
-	Vector3 mScale = Vector3.one;
-
-	/// <summary>
-	/// Update the texture UVs used by the widget.
-	/// </summary>
-
-	override public void UpdateUVs ()
-	{
-		base.UpdateUVs();
-		
-		if (cachedTransform.localScale != mScale)
-		{
-			mScale = cachedTransform.localScale;
-			mChanged = true;
-		}
-	}
-
 	/// <summary>
 	/// Tiled sprite shouldn't inherit the sprite's changes to this function.
 	/// </summary>
@@ -55,11 +38,11 @@ public class UITiledSprite : UISprite
 		Texture tex = material.mainTexture;
 		if (tex == null) return;
 
-		Rect rect = mOuter;
+		Rect rect = mInner;
 
 		if (atlas.coordinates == UIAtlas.Coordinates.TexCoords)
 		{
-			rect = NGUIMath.ConvertToPixels(mOuter, tex.width, tex.height, true);
+			rect = NGUIMath.ConvertToPixels(rect, tex.width, tex.height, true);
 		}
 
 		Vector2 scale = cachedTransform.localScale;

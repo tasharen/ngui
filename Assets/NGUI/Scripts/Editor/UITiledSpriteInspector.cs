@@ -6,7 +6,7 @@ using UnityEditor;
 /// </summary>
 
 [CustomEditor(typeof(UITiledSprite))]
-public class UITiledSpriteInspector : UISpriteInspector
+public class UITiledSpriteInspector : UISlicedSpriteInspector
 {
 	// No need to change anything
 }

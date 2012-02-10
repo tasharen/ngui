@@ -15,9 +15,9 @@ public class UISlicedSprite : UISprite
 	[SerializeField] bool mFillCenter = true;
 #endif
 
-	Rect mInner;
-	Rect mInnerUV;
-	Vector3 mScale = Vector3.one;
+	protected Rect mInner;
+	protected Rect mInnerUV;
+	protected Vector3 mScale = Vector3.one;
 
 	/// <summary>
 	/// Inner set of UV coordinates.
