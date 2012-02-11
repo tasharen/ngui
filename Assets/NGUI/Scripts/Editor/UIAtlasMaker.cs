@@ -431,7 +431,7 @@ public class UIAtlasMaker : EditorWindow
 	{
 		// Get the texture for the atlas
 		Texture2D tex = atlas.texture as Texture2D;
-		string oldPath = AssetDatabase.GetAssetPath(tex.GetInstanceID());
+		string oldPath = (tex != null) ? AssetDatabase.GetAssetPath(tex.GetInstanceID()) : "";
 		string newPath = NGUIEditorTools.GetSaveableTexturePath(atlas);
 
 		if (tex == null || oldPath != newPath)
