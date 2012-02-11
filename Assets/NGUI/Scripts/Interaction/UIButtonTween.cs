@@ -12,6 +12,7 @@ public class UIButtonTween : MonoBehaviour
 	public int tweenGroup = 0;
 	public Trigger trigger = Trigger.OnClick;
 	public Direction playDirection = Direction.Forward;
+	public bool resetOnPlay = false;
 	public EnableCondition ifDisabledOnPlay = EnableCondition.DoNothing;
 	public DisableCondition disableWhenFinished = DisableCondition.DoNotDisable;
 	public bool includeChildren = false;
@@ -22,17 +23,27 @@ public class UIButtonTween : MonoBehaviour
 
 	void OnHover (bool isOver)
 	{
-		if (enabled && trigger == Trigger.OnHover)
+		if (enabled)
 		{
-			Play(isOver);
+			if (trigger == Trigger.OnHover ||
+				(trigger == Trigger.OnHoverTrue && isOver) ||
+				(trigger == Trigger.OnHoverFalse && !isOver))
+			{
+				Play(isOver);
+			}
 		}
 	}
 
 	void OnPress (bool isPressed)
 	{
-		if (enabled && trigger == Trigger.OnPress)
+		if (enabled)
 		{
-			Play(isPressed);
+			if (trigger == Trigger.OnPress ||
+				(trigger == Trigger.OnPressTrue && isPressed) ||
+				(trigger == Trigger.OnPressFalse && !isPressed))
+			{
+				Play(isPressed);
+			}
 		}
 	}
 
@@ -113,6 +124,7 @@ public class UIButtonTween : MonoBehaviour
 					// Toggle or activate the tween component
 					if (playDirection == Direction.Toggle) tw.Toggle();
 					else tw.Play(forward);
+					if (resetOnPlay) tw.Reset();
 				}
 			}
 		}

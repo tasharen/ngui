@@ -22,6 +22,22 @@ public class ActiveAnimation : IgnoreTimeScale
 	bool mNotify = false;
 
 	/// <summary>
+	/// Manually reset the active animation to the beginning.
+	/// </summary>
+
+	public void Reset ()
+	{
+		if (mAnim != null)
+		{
+			foreach (AnimationState state in mAnim)
+			{
+				if (mLastDirection == Direction.Reverse) state.time = state.length;
+				else if (mLastDirection == Direction.Forward) state.time = 0f;
+			}
+		}
+	}
+
+	/// <summary>
 	/// Notify the target when the animation finishes playing.
 	/// </summary>
 
@@ -89,39 +105,35 @@ public class ActiveAnimation : IgnoreTimeScale
 				playDirection = (mLastDirection != Direction.Forward) ? Direction.Forward : Direction.Reverse;
 			}
 
-			// Don't play the animation from start if we haven't returned it back to origin
-			if (mLastDirection != playDirection)
+			bool noName = string.IsNullOrEmpty(clipName);
+
+			// Play the animation if it's not already playing
+			if (noName)
 			{
-				bool noName = string.IsNullOrEmpty(clipName);
-
-				// Play the animation if it's not already playing
-				if (noName)
-				{
-					if (!mAnim.isPlaying) mAnim.Play();
-				}
-				else if (!mAnim.IsPlaying(clipName))
-				{
-					mAnim.Play(clipName);
-				}
-
-				// Update the animation speed based on direction -- forward or back
-				foreach (AnimationState state in mAnim)
-				{
-					if (string.IsNullOrEmpty(clipName) || state.name == clipName)
-					{
-						float speed = Mathf.Abs(state.speed);
-						state.speed = speed * (int)playDirection;
-
-						// Automatically start the animation from the end if it's playing in reverse
-						if (playDirection == Direction.Reverse && state.time == 0f) state.time = state.length;
-						else if (playDirection == Direction.Forward && state.time == state.length) state.time = 0f;
-					}
-				}
-
-				// Remember the direction for disable checks in Update() below
-				mLastDirection = playDirection;
-				mNotify = true;
+				if (!mAnim.isPlaying) mAnim.Play();
 			}
+			else if (!mAnim.IsPlaying(clipName))
+			{
+				mAnim.Play(clipName);
+			}
+
+			// Update the animation speed based on direction -- forward or back
+			foreach (AnimationState state in mAnim)
+			{
+				if (string.IsNullOrEmpty(clipName) || state.name == clipName)
+				{
+					float speed = Mathf.Abs(state.speed);
+					state.speed = speed * (int)playDirection;
+
+					// Automatically start the animation from the end if it's playing in reverse
+					if (playDirection == Direction.Reverse && state.time == 0f) state.time = state.length;
+					else if (playDirection == Direction.Forward && state.time == state.length) state.time = 0f;
+				}
+			}
+
+			// Remember the direction for disable checks in Update() below
+			mLastDirection = playDirection;
+			mNotify = true;
 		}
 	}
 
@@ -166,24 +178,5 @@ public class ActiveAnimation : IgnoreTimeScale
 	static public ActiveAnimation Play (Animation anim, Direction playDirection)
 	{
 		return Play(anim, null, playDirection, EnableCondition.DoNothing, DisableCondition.DoNotDisable);
-	}
-
-	/// <summary>
-	/// Manually reset the active animation to the beginning.
-	/// </summary>
-
-	static public void Reset (Animation anim)
-	{
-		if (anim.isPlaying)
-		{
-			AnimationClip clip = anim.clip;
-
-			if (clip != null)
-			{
-				anim.Stop();
-				ActiveAnimation aa = anim.gameObject.GetComponent<ActiveAnimation>();
-				if (aa != null)	Play(anim, clip.name, aa.mLastDirection);
-			}
-		}
 	}
 }

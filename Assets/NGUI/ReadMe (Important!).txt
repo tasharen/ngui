@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.62
+                Version 1.63
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -46,6 +46,11 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.63:
+- NEW: Added a logo to all examples with some additional shiny functionality.
+- FIX: Updating a texture atlas saved as a non-PNG image will now update the texture correctly.
+- FIX: Updating an atlas with a font sprite in it will now correctly mark all fonts using it as dirty.
 
 1.62:
 - NEW: Added a new class -- UITable -- that can be used to organize its children into rows/columns of variable size (think HTML table).

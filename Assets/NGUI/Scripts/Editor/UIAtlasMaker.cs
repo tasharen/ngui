@@ -431,9 +431,10 @@ public class UIAtlasMaker : EditorWindow
 	{
 		// Get the texture for the atlas
 		Texture2D tex = atlas.texture as Texture2D;
-		string path = NGUIEditorTools.GetSaveableTexturePath(atlas);
+		string oldPath = AssetDatabase.GetAssetPath(tex.GetInstanceID());
+		string newPath = NGUIEditorTools.GetSaveableTexturePath(atlas);
 
-		if (tex == null)
+		if (tex == null || oldPath != newPath)
 		{
 			// Create a new texture for the atlas
 			tex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
@@ -441,32 +442,31 @@ public class UIAtlasMaker : EditorWindow
 			// Pack the sprites into this texture
 			PackTextures(tex, sprites);
 			byte[] bytes = tex.EncodeToPNG();
-
-			// Save the PNG data
-			System.IO.File.WriteAllBytes(path, bytes);
+			System.IO.File.WriteAllBytes(newPath, bytes);
 			bytes = null;
 
 			// Load the texture we just saved as a Texture2D
 			AssetDatabase.Refresh();
-			path = NGUIEditorTools.GetSaveableTexturePath(atlas);
-			tex = NGUIEditorTools.ImportTexture(path, false, true);
-			if (tex == null) { Debug.LogError("Failed to load the created atlas saved as " + path); return null; }
+			tex = NGUIEditorTools.ImportTexture(newPath, false, true);
+
+			// Update the atlas texture
+			if (tex == null) Debug.LogError("Failed to load the created atlas saved as " + newPath);
 			else atlas.material.mainTexture = tex;
 		}
 		else
 		{
 			// Make the atlas readable so we can save it
-			NGUIEditorTools.ImportTexture(path, true, false);
+			tex = NGUIEditorTools.ImportTexture(oldPath, true, false);
 
 			// Pack all sprites into atlas texture
 			PackTextures(tex, sprites);
 			byte[] bytes = tex.EncodeToPNG();
-			System.IO.File.WriteAllBytes(path, bytes);
+			System.IO.File.WriteAllBytes(newPath, bytes);
 			bytes = null;
 
-			// Reimport the atlas, making it no longer readable
+			// Re-import the newly created texture, turning off the 'readable' flag
 			AssetDatabase.Refresh();
-			NGUIEditorTools.ImportTexture(path, false, false);
+			tex = NGUIEditorTools.ImportTexture(newPath, false, false);
 		}
 		return tex;
 	}
@@ -481,9 +481,6 @@ public class UIAtlasMaker : EditorWindow
 		{
 			// Combine all sprites into a single texture and save it
 			UpdateTexture(atlas, sprites);
-
-			// Get the path to the texture
-			NGUIEditorTools.GetSaveableTexturePath(atlas);
 
 			// Replace the sprites within the atlas
 			ReplaceSprites(atlas, sprites);

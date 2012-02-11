@@ -162,8 +162,8 @@ public class UIFont : MonoBehaviour
 
 						if (tw != mUVRect.width || th != mUVRect.height)
 						{
-							Debug.LogWarning("Font sprite size doesn't match the expected font texture size.\n" +
-								"Did you use the 'inner padding' setting on the Texture Packer? It must remain at '0'.", this);
+							//Debug.LogWarning("Font sprite size doesn't match the expected font texture size.\n" +
+							//	"Did you use the 'inner padding' setting on the Texture Packer? It must remain at '0'.", this);
 							mUVRect.width = tw;
 							mUVRect.height = th;
 						}

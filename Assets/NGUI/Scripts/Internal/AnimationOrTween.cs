@@ -7,6 +7,10 @@ namespace AnimationOrTween
 		OnClick,
 		OnHover,
 		OnPress,
+		OnHoverTrue,
+		OnHoverFalse,
+		OnPressTrue,
+		OnPressFalse,
 	}
 
 	public enum Direction

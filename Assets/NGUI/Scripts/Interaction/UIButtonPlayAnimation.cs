@@ -13,6 +13,7 @@ public class UIButtonPlayAnimation : MonoBehaviour
 	public string clipName;
 	public Trigger trigger = Trigger.OnClick;
 	public Direction playDirection = Direction.Forward;
+	public bool resetOnPlay = false;
 	public EnableCondition ifDisabledOnPlay = EnableCondition.DoNothing;
 	public DisableCondition disableWhenFinished = DisableCondition.DoNotDisable;
 	public string callWhenFinished;
@@ -21,17 +22,27 @@ public class UIButtonPlayAnimation : MonoBehaviour
 
 	void OnHover (bool isOver)
 	{
-		if (enabled && trigger == Trigger.OnHover)
+		if (enabled)
 		{
-			Activate(isOver);
+			if ( trigger == Trigger.OnHover ||
+				(trigger == Trigger.OnHoverTrue && isOver) ||
+				(trigger == Trigger.OnHoverFalse && !isOver))
+			{
+				Play(isOver);
+			}
 		}
 	}
 
 	void OnPress (bool isPressed)
 	{
-		if (enabled && trigger == Trigger.OnPress)
+		if (enabled)
 		{
-			Activate(isPressed);
+			if ( trigger == Trigger.OnPress ||
+				(trigger == Trigger.OnPressTrue && isPressed) ||
+				(trigger == Trigger.OnPressFalse && !isPressed))
+			{
+				Play(isPressed);
+			}
 		}
 	}
 
@@ -39,7 +50,7 @@ public class UIButtonPlayAnimation : MonoBehaviour
 	{
 		if (enabled && trigger == Trigger.OnClick)
 		{
-			Activate(true);
+			Play(true);
 		}
 	}
 
@@ -47,13 +58,14 @@ public class UIButtonPlayAnimation : MonoBehaviour
 	/// Activate the animation.
 	/// </summary>
 
-	void Activate (bool forward)
+	void Play (bool forward)
 	{
 		if (target != null)
 		{
 			int pd = -(int)playDirection;
 			Direction dir = forward ? playDirection : ((Direction)pd);
 			ActiveAnimation anim = ActiveAnimation.Play(target, clipName, dir, ifDisabledOnPlay, disableWhenFinished);
+			if (resetOnPlay) anim.Reset();
 			if (anim != null) anim.callWhenFinished = callWhenFinished;
 		}
 	}

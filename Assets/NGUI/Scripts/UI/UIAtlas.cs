@@ -159,6 +159,20 @@ public class UIAtlas : MonoBehaviour
 			}
 		}
 
+		UIFont[] fonts = Resources.FindObjectsOfTypeAll(typeof(UIFont)) as UIFont[];
+
+		foreach (UIFont font in fonts)
+		{
+			if (font.atlas == this)
+			{
+				font.atlas = null;
+				font.atlas = this;
+#if UNITY_EDITOR
+				UnityEditor.EditorUtility.SetDirty(font);
+#endif
+			}
+		}
+
 		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
 
 		foreach (UILabel lbl in labels)
