@@ -48,9 +48,16 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
 
 1.63:
-- NEW: Added a logo to all examples with some additional shiny functionality.
+- NEW: Added a logo to all examples with some additional shiny functionality (contributed by Hjupter Cerrud).
+- NEW: Label template in the Widget Tool now has a default color that will be applied to newly created labels.
+- NEW: Added an option to TweenScale to automatically notify the UITable of the change.
 - FIX: Updating a texture atlas saved as a non-PNG image will now update the texture correctly.
 - FIX: Updating an atlas with a font sprite in it will now correctly mark all fonts using it as dirty.
+- FIX: Fixed all remaining known issues with the Atlas Maker.
+- FIX: Tiled Sprite will now use an inner rect rather than outer rect, letting you add some padding.
+- FIX: UIButtonTween components will now set their target in Awake() rather than Start(), fixing a rare order-of-execution issue.
+- FIX: UITable will now consider the item's own local scale when calculating bounds.
+- DEL: "Deprecated" folder has been deleted.
 
 1.62:
 - NEW: Added a new class -- UITable -- that can be used to organize its children into rows/columns of variable size (think HTML table).
