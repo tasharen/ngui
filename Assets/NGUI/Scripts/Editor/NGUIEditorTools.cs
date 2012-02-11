@@ -338,7 +338,7 @@ public class NGUIEditorTools
 
 	static public void HighlightLine (Color c)
 	{
-		Rect rect = GUILayoutUtility.GetRect(Screen.width - 10f, 22f);
+		Rect rect = GUILayoutUtility.GetRect(Screen.width - 16f, 22f);
 		GUILayout.Space(-23f);
 		c.a *= 0.3f;
 		GUI.color = c;
