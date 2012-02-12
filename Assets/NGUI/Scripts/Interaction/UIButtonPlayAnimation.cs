@@ -18,8 +18,6 @@ public class UIButtonPlayAnimation : MonoBehaviour
 	public DisableCondition disableWhenFinished = DisableCondition.DoNotDisable;
 	public string callWhenFinished;
 
-	void Start () { if (target == null) target = GetComponentInChildren<Animation>(); }
-
 	void OnHover (bool isOver)
 	{
 		if (enabled)
@@ -60,6 +58,8 @@ public class UIButtonPlayAnimation : MonoBehaviour
 
 	void Play (bool forward)
 	{
+		if (target == null) target = GetComponentInChildren<Animation>();
+
 		if (target != null)
 		{
 			int pd = -(int)playDirection;

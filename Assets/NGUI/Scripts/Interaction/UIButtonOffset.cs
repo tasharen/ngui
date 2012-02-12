@@ -13,20 +13,30 @@ public class UIButtonOffset : MonoBehaviour
 	public float duration = 0.2f;
 
 	Vector3 mPos;
+	bool mInitDone = false;
 
-	void Awake ()
+	void Init ()
 	{
+		mInitDone = true;
 		if (tweenTarget == null) tweenTarget = transform;
 		mPos = tweenTarget.localPosition;
 	}
 
 	void OnPress (bool isPressed)
 	{
-		if (enabled) TweenPosition.Begin(tweenTarget.gameObject, duration, isPressed ? mPos + pressed : mPos).method = UITweener.Method.EaseInOut;
+		if (enabled)
+		{
+			if (!mInitDone) Init();
+			TweenPosition.Begin(tweenTarget.gameObject, duration, isPressed ? mPos + pressed : mPos).method = UITweener.Method.EaseInOut;
+		}
 	}
 
 	void OnHover (bool isOver)
 	{
-		if (enabled) TweenPosition.Begin(tweenTarget.gameObject, duration, isOver ? mPos + hover : mPos).method = UITweener.Method.EaseInOut;
+		if (enabled)
+		{
+			if (!mInitDone) Init();
+			TweenPosition.Begin(tweenTarget.gameObject, duration, isOver ? mPos + hover : mPos).method = UITweener.Method.EaseInOut;
+		}
 	}
 }

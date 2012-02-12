@@ -50,12 +50,18 @@ public class UIPanelTool : EditorWindow
 	}
 
 	/// <summary>
-	/// Retrieve a panel responsible for the specified widget.
+	/// Get a list of widgets managed by the specified transform's children.
 	/// </summary>
 
-	static UIPanel GetPanel (UIWidget widget)
+	static void GetWidgets (Transform t, List<UIWidget> widgets)
 	{
-		return (widget != null) ? NGUITools.FindInChildren<UIPanel>(widget.gameObject) : null;
+		for (int i = 0; i < t.childCount; ++i)
+		{
+			Transform child = t.GetChild(i);
+			UIWidget w = child.GetComponent<UIWidget>();
+			if (w != null) widgets.Add(w);
+			else if (child.GetComponent<UIPanel>() == null) GetWidgets(child, widgets);
+		}
 	}
 
 	/// <summary>
@@ -65,19 +71,7 @@ public class UIPanelTool : EditorWindow
 	static List<UIWidget> GetWidgets (UIPanel panel)
 	{
 		List<UIWidget> widgets = new List<UIWidget>();
-
-		if (panel != null)
-		{
-			UIWidget[] list = panel.GetComponentsInChildren<UIWidget>(true);
-
-			foreach (UIWidget w in list)
-			{
-				if (GetPanel(w) == panel)
-				{
-					widgets.Add(w);
-				}
-			}
-		}
+		if (panel != null) GetWidgets(panel.transform, widgets);
 		return widgets;
 	}
 
@@ -154,7 +148,7 @@ public class UIPanelTool : EditorWindow
 				{
 					foreach (UIWidget w in ent.widgets)
 					{
-						if (!w.enabled || !w.gameObject.active)
+						if (!w.gameObject.active)
 						{
 							allEnabled = false;
 							ent.widgetsEnabled = false;

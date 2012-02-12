@@ -13,9 +13,11 @@ public class UIButtonColor : MonoBehaviour
 	public float duration = 0.2f;
 
 	Color mColor;
+	bool mInitDone = false;
 
-	void Awake ()
+	void Init ()
 	{
+		mInitDone = true;
 		if (tweenTarget == null) tweenTarget = gameObject;
 		UIWidget widget = tweenTarget.GetComponent<UIWidget>();
 
@@ -50,11 +52,13 @@ public class UIButtonColor : MonoBehaviour
 
 	void OnPress (bool isPressed)
 	{
+		if (!mInitDone) Init();
 		if (enabled) TweenColor.Begin(tweenTarget, duration, isPressed ? pressed : mColor);
 	}
 
 	void OnHover (bool isOver)
 	{
+		if (!mInitDone) Init();
 		if (enabled) TweenColor.Begin(tweenTarget, duration, isOver ? hover : mColor);
 	}
 }

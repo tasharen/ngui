@@ -13,20 +13,30 @@ public class UIButtonScale : MonoBehaviour
 	public float duration = 0.2f;
 
 	Vector3 mScale;
+	bool mInitDone = false;
 
-	void Awake ()
+	void Init ()
 	{
+		mInitDone = true;
 		if (tweenTarget == null) tweenTarget = transform;
 		mScale = tweenTarget.localScale;
 	}
 
 	void OnPress (bool isPressed)
 	{
-		if (enabled) TweenScale.Begin(tweenTarget.gameObject, duration, isPressed ? Vector3.Scale(mScale, pressed) : mScale).method = UITweener.Method.EaseInOut;
+		if (enabled)
+		{
+			if (!mInitDone) Init();
+			TweenScale.Begin(tweenTarget.gameObject, duration, isPressed ? Vector3.Scale(mScale, pressed) : mScale).method = UITweener.Method.EaseInOut;
+		}
 	}
 
 	void OnHover (bool isOver)
 	{
-		if (enabled) TweenScale.Begin(tweenTarget.gameObject, duration, isOver ? Vector3.Scale(mScale, hover) : mScale).method = UITweener.Method.EaseInOut;
+		if (enabled)
+		{
+			if (!mInitDone) Init();
+			TweenScale.Begin(tweenTarget.gameObject, duration, isOver ? Vector3.Scale(mScale, hover) : mScale).method = UITweener.Method.EaseInOut;
+		}
 	}
 }

@@ -13,20 +13,30 @@ public class UIButtonRotation : MonoBehaviour
 	public float duration = 0.2f;
 
 	Quaternion mRot;
+	bool mInitDone = false;
 
-	void Awake ()
+	void Init ()
 	{
+		mInitDone = true;
 		if (tweenTarget == null) tweenTarget = transform;
 		mRot = tweenTarget.localRotation;
 	}
 
 	void OnPress (bool isPressed)
 	{
-		if (enabled) TweenRotation.Begin(tweenTarget.gameObject, duration, isPressed ? mRot * Quaternion.Euler(pressed) : mRot).method = UITweener.Method.EaseInOut;
+		if (enabled)
+		{
+			if (!mInitDone) Init();
+			TweenRotation.Begin(tweenTarget.gameObject, duration, isPressed ? mRot * Quaternion.Euler(pressed) : mRot).method = UITweener.Method.EaseInOut;
+		}
 	}
 
 	void OnHover (bool isOver)
 	{
-		if (enabled) TweenRotation.Begin(tweenTarget.gameObject, duration, isOver ? mRot * Quaternion.Euler(hover) : mRot).method = UITweener.Method.EaseInOut;
+		if (enabled)
+		{
+			if (!mInitDone) Init();
+			TweenRotation.Begin(tweenTarget.gameObject, duration, isOver ? mRot * Quaternion.Euler(hover) : mRot).method = UITweener.Method.EaseInOut;
+		}
 	}
 }
