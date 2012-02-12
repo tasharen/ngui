@@ -130,7 +130,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			if (mAtlas != null && sprite != null)
+			if (mAtlas != null && (mSprite == null && sprite != null))
 			{
 				Texture tex = mAtlas.texture;
 
@@ -152,7 +152,6 @@ public class UIFont : MonoBehaviour
 						mUVRect.xMax = rect.xMax + mSprite.paddingRight * rect.width;
 						mUVRect.yMax = rect.yMax + mSprite.paddingTop * rect.height;
 					}
-
 #if UNITY_EDITOR
 					// The font should always use the original texture size
 					if (mFont != null)
@@ -169,6 +168,8 @@ public class UIFont : MonoBehaviour
 						}
 					}
 #endif
+					// Trimmed sprite? Trim the glyphs
+					if (mSprite.hasPadding) Trim();
 				}
 			}
 			return mUVRect;
@@ -229,6 +230,33 @@ public class UIFont : MonoBehaviour
 				}
 			}
 			return mSprite;
+		}
+	}
+
+	/// <summary>
+	/// Trim the glyphs, making sure they never go past the trimmed texture bounds.
+	/// </summary>
+
+	void Trim ()
+	{
+		Texture tex = mAtlas.texture;
+
+		if (tex != null && mSprite != null)
+		{
+			Rect full = NGUIMath.ConvertToPixels(mUVRect, texture.width, texture.height, true);
+			Rect trimmed = (mAtlas.coordinates == UIAtlas.Coordinates.TexCoords) ?
+				NGUIMath.ConvertToPixels(mSprite.outer, tex.width, tex.height, true) : mSprite.outer;
+
+			int xMin = Mathf.RoundToInt(trimmed.xMin - full.xMin);
+			int yMin = Mathf.RoundToInt(trimmed.yMin - full.yMin);
+			int xMax = Mathf.RoundToInt(trimmed.xMax - full.xMin);
+			int yMax = Mathf.RoundToInt(trimmed.yMax - full.yMin);
+
+			for (int i = 0; i < mFont.glyphCount; ++i)
+			{
+				BMGlyph glyph = mFont.GetGlyph(i);
+				if (glyph != null) glyph.Trim(xMin, yMin, xMax, yMax);
+			}
 		}
 	}
 
@@ -525,7 +553,7 @@ public class UIFont : MonoBehaviour
 				{
 					if (prev != 0) x += glyph.GetKerning(prev);
 
-					v0.x = scale.x * (x + glyph.offsetX);
+					v0.x =  scale.x * (x + glyph.offsetX);
 					v0.y = -scale.y * (y + glyph.offsetY);
 
 					v1.x = v0.x + scale.x * glyph.width;

@@ -67,4 +67,33 @@ public class BMGlyph
 		ker.amount = amount;
 		kerning.Add(ker);
 	}
+
+	/// <summary>
+	/// Trim the glyph, given the specified minimum and maximum dimensions in pixels.
+	/// </summary>
+
+	public void Trim (int xMin, int yMin, int xMax, int yMax)
+	{
+		int x1 = x + width;
+		int y1 = y + height;
+
+		if (x < xMin)
+		{
+			int offset = xMin - x;
+			x += offset;
+			width -= offset;
+			offsetX += offset;
+		}
+
+		if (y < yMin)
+		{
+			int offset = yMin - y;
+			y += offset;
+			height -= offset;
+			offsetY += offset;
+		}
+
+		if (x1 > xMax) width  -= x1 - xMax;
+		if (y1 > yMax) height -= y1 - yMax;
+	}
 }
