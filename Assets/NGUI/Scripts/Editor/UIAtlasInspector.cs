@@ -128,11 +128,6 @@ public class UIAtlasInspector : Editor
 			Color blue = new Color(0f, 0.7f, 1f, 1f);
 			Color green = new Color(0.4f, 1f, 0f, 1f);
 
-			if (mSprite == null && mAtlas.sprites.Count > 0)
-			{
-				mSprite = mAtlas.sprites[0];
-			}
-
 			if (mConfirmDelete)
 			{
 				if (mSprite != null)
@@ -162,6 +157,13 @@ public class UIAtlasInspector : Editor
 			}
 			else
 			{
+				if (mSprite == null && mAtlas.sprites.Count > 0)
+				{
+					string spriteName = PlayerPrefs.GetString("NGUI Selected Sprite");
+					if (!string.IsNullOrEmpty(spriteName)) mSprite = mAtlas.GetSprite(spriteName);
+					if (mSprite == null) mSprite = mAtlas.sprites[0];
+				}
+
 				GUI.backgroundColor = Color.green;
 
 				GUILayout.BeginHorizontal();
@@ -208,18 +210,18 @@ public class UIAtlasInspector : Editor
 					if (spriteName != mSprite.name)
 					{
 						mSprite = mAtlas.GetSprite(spriteName);
+						PlayerPrefs.SetString("NGUI Selected Sprite", spriteName);
 					}
 
 					if (mSprite == null) return;
-
-					// Grab the sprite's inner and outer dimensions
-					Rect inner = mSprite.inner;
-					Rect outer = mSprite.outer;
 
 					Texture2D tex = mAtlas.material.mainTexture as Texture2D;
 
 					if (tex != null)
 					{
+						Rect inner = mSprite.inner;
+						Rect outer = mSprite.outer;
+
 						string name = EditorGUILayout.TextField("Edit Name", mSprite.name);
 
 						if (mSprite.name != name && !string.IsNullOrEmpty(name))
@@ -242,12 +244,35 @@ public class UIAtlasInspector : Editor
 							}
 						}
 
-						// Draw the inner and outer rectangle dimensions
-						GUI.backgroundColor = green;
-						outer = EditorGUILayout.RectField("Outer Rect", mSprite.outer);
-						GUI.backgroundColor = blue;
-						inner = EditorGUILayout.RectField("Inner Rect", mSprite.inner);
-						GUI.backgroundColor = Color.white;
+						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
+						{
+							GUI.backgroundColor = green;
+							outer = NGUIEditorTools.IntRect("Dimensions", mSprite.outer);
+
+							Vector4 border = new Vector4(
+								mSprite.inner.xMin - mSprite.outer.xMin,
+								mSprite.inner.yMin - mSprite.outer.yMin,
+								mSprite.outer.xMax - mSprite.inner.xMax,
+								mSprite.outer.yMax - mSprite.inner.yMax);
+
+							GUI.backgroundColor = blue;
+							border = NGUIEditorTools.IntPadding("Border", border);
+							GUI.backgroundColor = Color.white;
+
+							inner.xMin = mSprite.outer.xMin + border.x;
+							inner.yMin = mSprite.outer.yMin + border.y;
+							inner.xMax = mSprite.outer.xMax - border.z;
+							inner.yMax = mSprite.outer.yMax - border.w;
+						}
+						else
+						{
+							// Draw the inner and outer rectangle dimensions
+							GUI.backgroundColor = green;
+							outer = EditorGUILayout.RectField("Outer Rect", mSprite.outer);
+							GUI.backgroundColor = blue;
+							inner = EditorGUILayout.RectField("Inner Rect", mSprite.inner);
+							GUI.backgroundColor = Color.white;
+						}
 
 						if (outer.xMax < outer.xMin) outer.xMax = outer.xMin;
 						if (outer.yMax < outer.yMin) outer.yMax = outer.yMin;
@@ -272,80 +297,60 @@ public class UIAtlasInspector : Editor
 						// Padding is mainly meant to be used by the 'trimmed' feature of TexturePacker
 						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 						{
-							int l0 = Mathf.RoundToInt(mSprite.paddingLeft	* mSprite.outer.width);
-							int r0 = Mathf.RoundToInt(mSprite.paddingRight	* mSprite.outer.width);
-							int t0 = Mathf.RoundToInt(mSprite.paddingTop	* mSprite.outer.height);
-							int b0 = Mathf.RoundToInt(mSprite.paddingBottom * mSprite.outer.height);
+							int left	= Mathf.RoundToInt(mSprite.paddingLeft	 * mSprite.outer.width);
+							int right	= Mathf.RoundToInt(mSprite.paddingRight	 * mSprite.outer.width);
+							int top		= Mathf.RoundToInt(mSprite.paddingTop	 * mSprite.outer.height);
+							int bottom	= Mathf.RoundToInt(mSprite.paddingBottom * mSprite.outer.height);
 
-							int l1 = l0;
-							int r1 = r0;
-							int t1 = t0;
-							int b1 = b0;
+							NGUIEditorTools.IntVector a = NGUIEditorTools.IntPair("Padding", "Left", "Top", left, top);
+							NGUIEditorTools.IntVector b = NGUIEditorTools.IntPair(null, "Right", "Bottom", right, bottom);
 
-							GUILayout.BeginHorizontal();
-							{
-								GUILayout.Label("Padding");
-								GUILayout.Space(7f);
-								EditorGUIUtility.LookLikeControls(40f);
-								l1 = EditorGUILayout.IntField("Left", l0, GUILayout.MinWidth(40f));
-								r1 = EditorGUILayout.IntField("Right", r0, GUILayout.MinWidth(40f));
-							}
-							GUILayout.EndHorizontal();
-
-							GUILayout.BeginHorizontal();
-							{
-								GUILayout.Space(60f);
-								EditorGUIUtility.LookLikeControls(40f);
-								t1 = EditorGUILayout.IntField("Top", t0, GUILayout.MinWidth(40f));
-								b1 = EditorGUILayout.IntField("Btm.", b0, GUILayout.MinWidth(40f));
-							}
-							GUILayout.EndHorizontal();
-
-							if (l0 != l1 || r0 != r1 || t0 != t1 || b0 != b1)
+							if (a.x != left || a.y != top || b.x != right || b.y != bottom)
 							{
 								RegisterUndo();
-								mSprite.paddingLeft		= l1 / mSprite.outer.width;
-								mSprite.paddingRight	= r1 / mSprite.outer.width;
-								mSprite.paddingTop		= t1 / mSprite.outer.height;
-								mSprite.paddingBottom	= b1 / mSprite.outer.height;
+								mSprite.paddingLeft		= a.x / mSprite.outer.width;
+								mSprite.paddingTop		= a.y / mSprite.outer.width;
+								mSprite.paddingRight	= b.x / mSprite.outer.height;
+								mSprite.paddingBottom	= b.y / mSprite.outer.height;
 								MarkSpriteAsDirty();
 							}
-							EditorGUIUtility.LookLikeControls(80f);
 						}
-
-						// Create a button that can make the coordinates pixel-perfect on click
-						GUILayout.BeginHorizontal();
+						else
 						{
-							GUILayout.Label("Correction", GUILayout.Width(75f));
+							// Create a button that can make the coordinates pixel-perfect on click
+							GUILayout.BeginHorizontal();
+							{
+								GUILayout.Label("Correction", GUILayout.Width(75f));
 
-							Rect corrected0 = outer;
-							Rect corrected1 = inner;
+								Rect corrected0 = outer;
+								Rect corrected1 = inner;
 
-							if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
-							{
-								corrected0 = NGUIMath.MakePixelPerfect(corrected0);
-								corrected1 = NGUIMath.MakePixelPerfect(corrected1);
-							}
-							else
-							{
-								corrected0 = NGUIMath.MakePixelPerfect(corrected0, tex.width, tex.height);
-								corrected1 = NGUIMath.MakePixelPerfect(corrected1, tex.width, tex.height);
-							}
+								if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
+								{
+									corrected0 = NGUIMath.MakePixelPerfect(corrected0);
+									corrected1 = NGUIMath.MakePixelPerfect(corrected1);
+								}
+								else
+								{
+									corrected0 = NGUIMath.MakePixelPerfect(corrected0, tex.width, tex.height);
+									corrected1 = NGUIMath.MakePixelPerfect(corrected1, tex.width, tex.height);
+								}
 
-							if (corrected0 == mSprite.outer && corrected1 == mSprite.inner)
-							{
-								GUI.color = Color.grey;
-								GUILayout.Button("Make Pixel-Perfect");
-								GUI.color = Color.white;
+								if (corrected0 == mSprite.outer && corrected1 == mSprite.inner)
+								{
+									GUI.color = Color.grey;
+									GUILayout.Button("Make Pixel-Perfect");
+									GUI.color = Color.white;
+								}
+								else if (GUILayout.Button("Make Pixel-Perfect"))
+								{
+									outer = corrected0;
+									inner = corrected1;
+									GUI.changed = true;
+								}
 							}
-							else if (GUILayout.Button("Make Pixel-Perfect"))
-							{
-								outer = corrected0;
-								inner = corrected1;
-								GUI.changed = true;
-							}
+							GUILayout.EndHorizontal();
 						}
-						GUILayout.EndHorizontal();
 
 						GUILayout.BeginHorizontal();
 						{
@@ -366,6 +371,15 @@ public class UIAtlasInspector : Editor
 						}
 						GUILayout.EndHorizontal();
 
+						if (mSprite.outer != outer || mSprite.inner != inner)
+						{
+							RegisterUndo();
+							mSprite.outer = outer;
+							mSprite.inner = inner;
+							mConfirmDelete = false;
+							MarkSpriteAsDirty();
+						}
+
 						Rect uv0 = outer;
 						Rect uv1 = inner;
 
@@ -383,14 +397,6 @@ public class UIAtlasInspector : Editor
 						// Draw the sprite outline
 						NGUIEditorTools.DrawOutline(rect, uv0, uv1);
 						EditorGUILayout.Separator();
-					}
-
-					if (GUI.changed)
-					{
-						RegisterUndo();
-						mSprite.outer = outer;
-						mSprite.inner = inner;
-						mConfirmDelete = false;
 					}
 				}
 			}

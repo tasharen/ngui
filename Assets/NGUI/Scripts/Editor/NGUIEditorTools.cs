@@ -589,4 +589,77 @@ public class NGUIEditorTools
 		}
 		return "Assets/";
 	}
+
+	/// <summary>
+	/// Struct type for the integer vector field below.
+	/// </summary>
+
+	public struct IntVector
+	{
+		public int x;
+		public int y;
+	}
+
+	/// <summary>
+	/// Integer vector field.
+	/// </summary>
+
+	static public IntVector IntPair (string prefix, string leftCaption, string rightCaption, int x, int y)
+	{
+		GUILayout.BeginHorizontal();
+
+		if (string.IsNullOrEmpty(prefix))
+		{
+			GUILayout.Space(82f);
+		}
+		else
+		{
+			GUILayout.Label(prefix, GUILayout.Width(74f));
+		}
+
+		EditorGUIUtility.LookLikeControls(48f);
+
+		IntVector retVal;
+		retVal.x = EditorGUILayout.IntField(leftCaption, x, GUILayout.MinWidth(30f));
+		retVal.y = EditorGUILayout.IntField(rightCaption, y, GUILayout.MinWidth(30f));
+
+		EditorGUIUtility.LookLikeControls(80f);
+
+		GUILayout.EndHorizontal();
+		return retVal;
+	}
+
+	/// <summary>
+	/// Integer rectangle field.
+	/// </summary>
+
+	static public Rect IntRect (string prefix, Rect rect)
+	{
+		int left	= Mathf.RoundToInt(rect.xMin);
+		int top		= Mathf.RoundToInt(rect.yMin);
+		int width	= Mathf.RoundToInt(rect.width);
+		int height	= Mathf.RoundToInt(rect.height);
+
+		NGUIEditorTools.IntVector a = NGUIEditorTools.IntPair(prefix, "Left", "Top", left, top);
+		NGUIEditorTools.IntVector b = NGUIEditorTools.IntPair(null, "Width", "Height", width, height);
+
+		return new Rect(a.x, a.y, b.x, b.y);
+	}
+
+	/// <summary>
+	/// Integer vector field.
+	/// </summary>
+
+	static public Vector4 IntPadding (string prefix, Vector4 v)
+	{
+		int left	= Mathf.RoundToInt(v.x);
+		int top		= Mathf.RoundToInt(v.y);
+		int right	= Mathf.RoundToInt(v.z);
+		int bottom	= Mathf.RoundToInt(v.w);
+
+		NGUIEditorTools.IntVector a = NGUIEditorTools.IntPair(prefix, "Left", "Top", left, top);
+		NGUIEditorTools.IntVector b = NGUIEditorTools.IntPair(null, "Right", "Bottom", right, bottom);
+
+		return new Vector4(a.x, a.y, b.x, b.y);
+	}
 }
