@@ -39,6 +39,7 @@ public class UIPanelTool : EditorWindow
 
 		foreach (UIPanel panel in panels)
 		{
+			if (!panel.showInPanelTool) continue;
 #if UNITY_3_4
 			PrefabType type = EditorUtility.GetPrefabType(panel.gameObject);
 #else
@@ -76,7 +77,7 @@ public class UIPanelTool : EditorWindow
 	}
 
 	/// <summary>
-	/// Activate or deactivate the children of the specified transform recursively, stopping at nested panels.
+	/// Activate or deactivate the children of the specified transform recursively.
 	/// </summary>
 
 	static void SetActiveState (Transform t, bool state)
@@ -84,7 +85,7 @@ public class UIPanelTool : EditorWindow
 		for (int i = 0; i < t.childCount; ++i)
 		{
 			Transform child = t.GetChild(i);
-			if (child.GetComponent<UIPanel>() != null) continue;
+			//if (child.GetComponent<UIPanel>() != null) continue;
 
 			if (state)
 			{
@@ -101,7 +102,7 @@ public class UIPanelTool : EditorWindow
 	}
 
 	/// <summary>
-	/// Activate or deactivate the specified panel and all of its children, stopping at nested panels.
+	/// Activate or deactivate the specified panel and all of its children.
 	/// </summary>
 
 	static void SetActiveState (UIPanel panel, bool state)

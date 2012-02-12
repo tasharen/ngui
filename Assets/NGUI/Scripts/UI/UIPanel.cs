@@ -16,6 +16,9 @@ public class UIPanel : MonoBehaviour
 		Geometry,
 	}
 
+	// Whether this panel will show up in the panel tool (set this to 'false' for dynamically created temporary panels)
+	public bool showInPanelTool = true;
+
 	// Whether normals and tangents will be generated for all meshes
 	public bool generateNormals = false;
 

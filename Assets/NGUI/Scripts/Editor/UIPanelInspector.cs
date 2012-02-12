@@ -17,6 +17,13 @@ public class UIPanelInspector : Editor
 
 		NGUIEditorTools.DrawSeparator();
 
+		if (panel.showInPanelTool != EditorGUILayout.Toggle("Panel Tool", panel.showInPanelTool))
+		{
+			panel.showInPanelTool = !panel.showInPanelTool;
+			EditorUtility.SetDirty(panel);
+			EditorWindow.FocusWindowIfItsOpen<UIPanelTool>();
+		}
+
 		bool norms = EditorGUILayout.Toggle("Normals", panel.generateNormals);
 
 		if (panel.generateNormals != norms)
