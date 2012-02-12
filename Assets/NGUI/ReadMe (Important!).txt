@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.63
+                Version 1.64
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -46,6 +46,14 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.64:
+- NEW: Atlas inspector window now shows "Dimensions" and "Border" instead of "Outer" and "Inner" rects.
+- NEW: UIPanel now has an optional property: "showInPanelTool" that determines whether the panel will show up in the Panel Tool.
+- FIX: Trimmed sprite-using fonts will now correctly trim the glyphs.
+- FIX: The "inner rect" outline now uses a checker texture, making it visible regardless of sprite's color.
+- FIX: Selected sprite within the UIAtlas is now persistent.
+- FIX: Panel and Camera tools have been improved with additional functionality.
 
 1.63:
 - NEW: Added a logo to all examples with some additional shiny functionality (contributed by Hjupter Cerrud).
