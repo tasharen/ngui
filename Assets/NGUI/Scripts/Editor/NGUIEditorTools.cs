@@ -9,7 +9,8 @@ using System.Collections.Generic;
 public class NGUIEditorTools
 {
 	static Texture2D mWhiteTex;
-	static Texture2D mCheckerTex;
+	static Texture2D mBackdropTex;
+	static Texture2D mContrastTex;
 	static Texture2D mGradientTex;
 
 	/// <summary>
@@ -26,15 +27,32 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
-	/// Returns a usable texture that looks like a checker board.
+	/// Returns a usable texture that looks like a dark checker board.
 	/// </summary>
 
-	static public Texture2D checkerTexture
+	static public Texture2D backdropTexture
 	{
 		get
 		{
-			if (mCheckerTex == null) mCheckerTex = CreateCheckerTex();
-			return mCheckerTex;
+			if (mBackdropTex == null) mBackdropTex = CreateCheckerTex(
+				new Color(0.1f, 0.1f, 0.1f, 0.5f),
+				new Color(0.2f, 0.2f, 0.2f, 0.5f));
+			return mBackdropTex;
+		}
+	}
+
+	/// <summary>
+	/// Returns a usable texture that looks like a high-contrast checker board.
+	/// </summary>
+
+	static public Texture2D contrastTexture
+	{
+		get
+		{
+			if (mContrastTex == null) mContrastTex = CreateCheckerTex(
+				new Color(0f, 0.0f, 0f, 0.5f),
+				new Color(1f, 1f, 1f, 0.5f));
+			return mContrastTex;
 		}
 	}
 
@@ -69,13 +87,10 @@ public class NGUIEditorTools
 	/// Create a checker-background texture
 	/// </summary>
 
-	static Texture2D CreateCheckerTex ()
+	static Texture2D CreateCheckerTex (Color c0, Color c1)
 	{
 		Texture2D tex = new Texture2D(16, 16);
 		tex.name = "[Generated] Checker Texture";
-
-		Color c0 = new Color(0.1f, 0.1f, 0.1f, 0.5f);
-		Color c1 = new Color(0.2f, 0.2f, 0.2f, 0.5f);
 
 		for (int y = 0; y < 8;  ++y) for (int x = 0; x < 8;  ++x) tex.SetPixel(x, y, c1);
 		for (int y = 8; y < 16; ++y) for (int x = 0; x < 8;  ++x) tex.SetPixel(x, y, c0);
@@ -94,7 +109,7 @@ public class NGUIEditorTools
 	static Texture2D CreateGradientTex ()
 	{
 		Texture2D tex = new Texture2D(1, 16);
-		tex.name = "[Generated] Checker Texture";
+		tex.name = "[Generated] Gradient Texture";
 
 		Color c0 = new Color(1f, 1f, 1f, 0f);
 		Color c1 = new Color(1f, 1f, 1f, 0.4f);
@@ -137,16 +152,33 @@ public class NGUIEditorTools
 	/// Draw a single-pixel outline around the specified rectangle.
 	/// </summary>
 
+	static public void DrawOutline (Rect rect)
+	{
+		if (Event.current.type == EventType.Repaint)
+		{
+			Texture2D tex = contrastTexture;
+			GUI.color = Color.white;
+			DrawTiledTexture(new Rect(rect.xMin, rect.yMax, 1f, -rect.height), tex);
+			DrawTiledTexture(new Rect(rect.xMax, rect.yMax, 1f, -rect.height), tex);
+			DrawTiledTexture(new Rect(rect.xMin, rect.yMin, rect.width, 1f), tex);
+			DrawTiledTexture(new Rect(rect.xMin, rect.yMax, rect.width, 1f), tex);
+		}
+	}
+
+	/// <summary>
+	/// Draw a single-pixel outline around the specified rectangle.
+	/// </summary>
+
 	static public void DrawOutline (Rect rect, Color color)
 	{
 		if (Event.current.type == EventType.Repaint)
 		{
-			Texture2D blank = blankTexture;
+			Texture2D tex = blankTexture;
 			GUI.color = color;
-			GUI.DrawTexture(new Rect(rect.xMin, rect.yMin, 1f, rect.height), blank);
-			GUI.DrawTexture(new Rect(rect.xMax, rect.yMin, 1f, rect.height), blank);
-			GUI.DrawTexture(new Rect(rect.xMin, rect.yMin, rect.width, 1f), blank);
-			GUI.DrawTexture(new Rect(rect.xMin, rect.yMax, rect.width, 1f), blank);
+			GUI.DrawTexture(new Rect(rect.xMin, rect.yMin, 1f, rect.height), tex);
+			GUI.DrawTexture(new Rect(rect.xMax, rect.yMin, 1f, rect.height), tex);
+			GUI.DrawTexture(new Rect(rect.xMin, rect.yMin, rect.width, 1f), tex);
+			GUI.DrawTexture(new Rect(rect.xMin, rect.yMax, rect.width, 1f), tex);
 			GUI.color = Color.white;
 		}
 	}
@@ -172,6 +204,26 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
+	/// Draw a selection outline around the specified rectangle.
+	/// </summary>
+
+	static public void DrawOutline (Rect rect, Rect relative)
+	{
+		if (Event.current.type == EventType.Repaint)
+		{
+			// Calculate where the outer rectangle would be
+			float x = rect.xMin + rect.width * relative.xMin;
+			float y = rect.yMax - rect.height * relative.yMin;
+			float width = rect.width * relative.width;
+			float height = -rect.height * relative.height;
+			relative = new Rect(x, y, width, height);
+
+			// Draw the selection
+			DrawOutline(relative);
+		}
+	}
+
+	/// <summary>
 	/// Draw a 9-sliced outline.
 	/// </summary>
 
@@ -179,11 +231,10 @@ public class NGUIEditorTools
 	{
 		if (Event.current.type == EventType.Repaint)
 		{
-			Color blue = new Color(0f, 0.7f, 1f, 1f);
 			Color green = new Color(0.4f, 1f, 0f, 1f);
 
-			DrawOutline(rect, new Rect(outer.x, inner.y, outer.width, inner.height), blue);
-			DrawOutline(rect, new Rect(inner.x, outer.y, inner.width, outer.height), blue);
+			DrawOutline(rect, new Rect(outer.x, inner.y, outer.width, inner.height));
+			DrawOutline(rect, new Rect(inner.x, outer.y, inner.width, outer.height));
 			DrawOutline(rect, outer, green);
 		}
 	}
@@ -202,7 +253,7 @@ public class NGUIEditorTools
 		if (Event.current.type == EventType.Repaint)
 		{
 			Texture2D blank = blankTexture;
-			Texture2D check = checkerTexture;
+			Texture2D check = backdropTexture;
 
 			// Lines above and below the texture rectangle
 			GUI.color = new Color(0f, 0f, 0f, 0.2f);
