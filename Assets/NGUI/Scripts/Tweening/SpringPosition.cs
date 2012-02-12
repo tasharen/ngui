@@ -7,7 +7,6 @@
 [AddComponentMenu("NGUI/Tween/Spring Position")]
 public class SpringPosition : IgnoreTimeScale
 {
-	public int updateOrder = 0;
 	public Vector3 target = Vector3.zero;
 	public float strength = 10f;
 	public bool worldSpace = false;

@@ -381,11 +381,6 @@ public abstract class UIWidget : MonoBehaviour
 
 	virtual public void MakePixelPerfect ()
 	{
-		Vector3 pos = cachedTransform.localPosition;
-		pos.x = Mathf.RoundToInt(pos.x);
-		pos.y = Mathf.RoundToInt(pos.y);
-		pos.z = Mathf.RoundToInt(pos.z);
-
 		Vector3 scale = cachedTransform.localScale;
 
 		int width  = Mathf.RoundToInt(scale.x);
@@ -395,8 +390,26 @@ public abstract class UIWidget : MonoBehaviour
 		scale.y = height;
 		scale.z = 1f;
 
-		if (width  % 2 == 1 && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
-		if (height % 2 == 1 && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y -= 0.5f;
+		Vector3 pos = cachedTransform.localPosition;
+		pos.z = Mathf.RoundToInt(pos.z);
+
+		if (width % 2 == 1 && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom))
+		{
+			pos.x = Mathf.Floor(pos.x) + 0.5f;
+		}
+		else
+		{
+			pos.x = Mathf.Round(pos.x);
+		}
+
+		if (height % 2 == 1 && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right))
+		{
+			pos.y = Mathf.Ceil(pos.y) - 0.5f;
+		}
+		else
+		{
+			pos.y = Mathf.Round(pos.y);
+		}
 
 		cachedTransform.localPosition = pos;
 		cachedTransform.localScale = scale;

@@ -360,6 +360,7 @@ static public class NGUITools
 
 	static public T FindInChildren<T> (GameObject go) where T : Component
 	{
+		if (go == null) return null;
 		object comp = go.GetComponent<T>();
 
 		if (comp == null)

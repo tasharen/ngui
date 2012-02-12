@@ -8,6 +8,16 @@ using System.Collections.Generic;
 
 public class UIPanelTool : EditorWindow
 {
+	class Entry
+	{
+		public UIPanel panel;
+		public bool isEnabled = false;
+		public bool widgetsEnabled = false;
+		public List<UIWidget> widgets = new List<UIWidget>();
+	}
+
+	static int Compare (Entry a, Entry b) { return string.Compare(a.panel.name, b.panel.name); }
+
 	Vector2 mScroll = Vector2.zero;
 
 	/// <summary>
@@ -17,41 +27,174 @@ public class UIPanelTool : EditorWindow
 	void OnSelectionChange () { Repaint(); }
 
 	/// <summary>
+	/// Collect a list of panels.
+	/// </summary>
+
+	static List<UIPanel> GetListOfPanels ()
+	{
+		UIPanel[] panels = Resources.FindObjectsOfTypeAll(typeof(UIPanel)) as UIPanel[];
+		if (panels == null || panels.Length == 0) return null;
+
+		List<UIPanel> list = new List<UIPanel>();
+
+		foreach (UIPanel panel in panels)
+		{
+#if UNITY_3_4
+			PrefabType type = EditorUtility.GetPrefabType(panel.gameObject);
+#else
+			PrefabType type = PrefabUtility.GetPrefabType(panel.gameObject);
+#endif
+			if (type != PrefabType.Prefab) list.Add(panel);
+		}
+		return list;
+	}
+
+	/// <summary>
+	/// Retrieve a panel responsible for the specified widget.
+	/// </summary>
+
+	static UIPanel GetPanel (UIWidget widget)
+	{
+		return (widget != null) ? NGUITools.FindInChildren<UIPanel>(widget.gameObject) : null;
+	}
+
+	/// <summary>
+	/// Get a list of widgets managed by the specified panel.
+	/// </summary>
+
+	static List<UIWidget> GetWidgets (UIPanel panel)
+	{
+		List<UIWidget> widgets = new List<UIWidget>();
+
+		if (panel != null)
+		{
+			UIWidget[] list = panel.GetComponentsInChildren<UIWidget>(true);
+
+			foreach (UIWidget w in list)
+			{
+				if (GetPanel(w) == panel)
+				{
+					widgets.Add(w);
+				}
+			}
+		}
+		return widgets;
+	}
+
+	/// <summary>
+	/// Activate or deactivate the children of the specified transform recursively, stopping at nested panels.
+	/// </summary>
+
+	static void SetActiveState (Transform t, bool state)
+	{
+		for (int i = 0; i < t.childCount; ++i)
+		{
+			Transform child = t.GetChild(i);
+			if (child.GetComponent<UIPanel>() != null) continue;
+
+			if (state)
+			{
+				child.gameObject.active = true;
+				SetActiveState(child, true);
+			}
+			else
+			{
+				SetActiveState(child, false);
+				child.gameObject.active = false;
+			}
+			EditorUtility.SetDirty(child.gameObject);
+		}
+	}
+
+	/// <summary>
+	/// Activate or deactivate the specified panel and all of its children, stopping at nested panels.
+	/// </summary>
+
+	static void SetActiveState (UIPanel panel, bool state)
+	{
+		if (state)
+		{
+			panel.gameObject.active = true;
+			SetActiveState(panel.transform, true);
+		}
+		else
+		{
+			SetActiveState(panel.transform, false);
+			panel.gameObject.active = false;
+		}
+		EditorUtility.SetDirty(panel.gameObject);
+	}
+
+	/// <summary>
 	/// Draw the custom wizard.
 	/// </summary>
 
 	void OnGUI ()
 	{
-		EditorGUIUtility.LookLikeControls(80f);
+		List<UIPanel> panels = GetListOfPanels();
 
-		UIPanel[] panels = Resources.FindObjectsOfTypeAll(typeof(UIPanel)) as UIPanel[];
-
-		if (panels.Length > 0)
+		if (panels != null && panels.Count > 0)
 		{
-			DrawRow(null, false);
-			NGUIEditorTools.DrawSeparator();
+			UIPanel selectedPanel = NGUITools.FindInChildren<UIPanel>(Selection.activeGameObject);
 
-			UIPanel selectedPanel = null;
-			Transform t = Selection.activeTransform;
-
-			while (t != null && selectedPanel == null)
-			{
-				selectedPanel = t.GetComponent<UIPanel>();
-				t = t.parent;
-			}
-
-			mScroll = GUILayout.BeginScrollView(mScroll);
+			// First, collect a list of panels with their associated widgets
+			List<Entry> entries = new List<Entry>();
+			Entry selectedEntry = null;
+			bool allEnabled = true;
 
 			foreach (UIPanel panel in panels)
 			{
-#if UNITY_3_4
-				PrefabType type = EditorUtility.GetPrefabType(panel.gameObject);
-#else
-				PrefabType type = PrefabUtility.GetPrefabType(panel.gameObject);
-#endif
-				if (type != PrefabType.Prefab) DrawRow(panel, panel == selectedPanel);
+				Entry ent = new Entry();
+				ent.panel = panel;
+				ent.widgets = GetWidgets(panel);
+				ent.isEnabled = panel.enabled && panel.gameObject.active;
+				ent.widgetsEnabled = ent.isEnabled;
+
+				if (ent.widgetsEnabled)
+				{
+					foreach (UIWidget w in ent.widgets)
+					{
+						if (!w.enabled || !w.gameObject.active)
+						{
+							allEnabled = false;
+							ent.widgetsEnabled = false;
+							break;
+						}
+					}
+				}
+				else allEnabled = false;
+				entries.Add(ent);
+			}
+
+			// Sort the list alphabetically
+			entries.Sort(Compare);
+
+			EditorGUIUtility.LookLikeControls(80f);
+			bool showAll = DrawRow(null, null, allEnabled);
+			NGUIEditorTools.DrawSeparator();
+
+			mScroll = GUILayout.BeginScrollView(mScroll);
+
+			foreach (Entry ent in entries)
+			{
+				if (DrawRow(ent, selectedPanel, ent.widgetsEnabled))
+				{
+					selectedEntry = ent;
+				}
 			}
 			GUILayout.EndScrollView();
+
+			if (showAll)
+			{
+				foreach (Entry ent in entries)
+				{
+					SetActiveState(ent.panel, !allEnabled);
+				}
+			}
+			else if (selectedEntry != null)
+			{
+				SetActiveState(selectedEntry.panel, !selectedEntry.widgetsEnabled);
+			}
 		}
 		else
 		{
@@ -63,85 +206,79 @@ public class UIPanelTool : EditorWindow
 	/// Helper function used to print things in columns.
 	/// </summary>
 
-	void DrawRow (UIPanel panel, bool highlight)
+	bool DrawRow (Entry ent, UIPanel selected, bool isChecked)
 	{
-		string panelName, widgetCount, drawCalls, clipping;
+		bool retVal = false;
+		string panelName, layer, widgetCount, drawCalls, clipping;
 
-		if (panel != null)
+		if (ent != null)
 		{
-			panelName = panel.name;
-			widgetCount = panel.widgets.Count.ToString();
-			drawCalls = panel.drawCalls.Count.ToString();
-			clipping = (panel.clipping != UIDrawCall.Clipping.None) ? "Yes" : "";
+			panelName = ent.panel.name;
+			layer = LayerMask.LayerToName(ent.panel.gameObject.layer);
+			widgetCount = ent.widgets.Count.ToString();
+			drawCalls = ent.panel.drawCalls.Count.ToString();
+			clipping = (ent.panel.clipping != UIDrawCall.Clipping.None) ? "Yes" : "";
 		}
 		else
 		{
 			panelName = "Panel's Name";
+			layer = "Layer";
 			widgetCount = "WG";
 			drawCalls = "DC";
 			clipping = "Clip";
 		}
 
-		bool enabled = (panel == null || (panel.enabled && panel.gameObject.active));
-		if (panel != null) NGUIEditorTools.HighlightLine(enabled ? new Color(0.6f, 0.6f, 0.6f) : Color.black);
+		if (ent != null) NGUIEditorTools.HighlightLine(ent.isEnabled ? new Color(0.6f, 0.6f, 0.6f) : Color.black);
 
 		GUILayout.BeginHorizontal();
 		{
 			GUI.color = Color.white;
 
-			if (panel != null)
+			if (isChecked != EditorGUILayout.Toggle(isChecked, GUILayout.Width(20f))) retVal = true;
+
+			if (ent == null)
 			{
-				if (enabled != EditorGUILayout.Toggle(enabled, GUILayout.Width(20f)))
-				{
-					panel.gameObject.SetActiveRecursively(!enabled);
-					if (!enabled) panel.enabled = true;
-					EditorUtility.SetDirty(panel.gameObject);
-				}
+				GUI.contentColor = Color.white;
+			}
+			else if (ent.isEnabled)
+			{
+				GUI.contentColor = (ent.panel == selected) ? new Color(0f, 0.8f, 1f) : Color.white; 
 			}
 			else
 			{
-				GUILayout.Space(30f);
+				GUI.contentColor = (ent.panel == selected) ? new Color(0f, 0.5f, 0.8f) : Color.grey;
 			}
 
-			if (enabled)
-			{
-				GUI.color = highlight ? new Color(0f, 0.8f, 1f) : Color.white; 
-			}
-			else
-			{
-				GUI.color = highlight ? new Color(0f, 0.5f, 0.8f) : Color.grey;
-			}
-
-			GUILayout.Label(panelName, GUILayout.MinWidth(100f));
-			GUILayout.Label(panel == null ? "Layer" : LayerMask.LayerToName(panel.gameObject.layer), GUILayout.Width(70f));
+			if (GUILayout.Button(panelName, EditorStyles.structHeadingLabel, GUILayout.MinWidth(100f))) retVal = true;
+			GUILayout.Label(layer, GUILayout.Width(70f));
 			GUILayout.Label(widgetCount, GUILayout.Width(30f));
 			GUILayout.Label(drawCalls, GUILayout.Width(30f));
 			GUILayout.Label(clipping, GUILayout.Width(30f));
 
-			GUI.color = enabled ? Color.white : new Color(0.7f, 0.7f, 0.7f);
-
-			if (panel != null)
+			if (ent == null)
 			{
-				bool debug = (panel.debugInfo == UIPanel.DebugInfo.Geometry);
+				GUILayout.Label("Debug", GUILayout.Width(80f));
+			}
+			else
+			{
+				GUI.contentColor = ent.isEnabled ? Color.white : new Color(0.7f, 0.7f, 0.7f);
+				bool debug = (ent.panel.debugInfo == UIPanel.DebugInfo.Geometry);
 
 				if (debug != EditorGUILayout.Toggle(debug, GUILayout.Width(20f)))
 				{
 					// debug != value, so it's currently inverse
-					panel.debugInfo = debug ? UIPanel.DebugInfo.Gizmos : UIPanel.DebugInfo.Geometry;
-					EditorUtility.SetDirty(panel);
+					ent.panel.debugInfo = debug ? UIPanel.DebugInfo.Gizmos : UIPanel.DebugInfo.Geometry;
+					EditorUtility.SetDirty(ent.panel.gameObject);
 				}
 
 				if (GUILayout.Button("Select", GUILayout.Width(50f)))
 				{
-					Selection.activeGameObject = panel.gameObject;
-					EditorUtility.SetDirty(panel.gameObject);
+					Selection.activeGameObject = ent.panel.gameObject;
+					EditorUtility.SetDirty(ent.panel.gameObject);
 				}
-			}
-			else
-			{
-				GUILayout.Label("Debug", GUILayout.Width(80f));
 			}
 		}
 		GUILayout.EndHorizontal();
+		return retVal;
 	}
 }
