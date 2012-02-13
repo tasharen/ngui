@@ -130,7 +130,7 @@ public class UIPanelTool : EditorWindow
 
 		if (panels != null && panels.Count > 0)
 		{
-			UIPanel selectedPanel = NGUITools.FindInChildren<UIPanel>(Selection.activeGameObject);
+			UIPanel selectedPanel = NGUITools.FindInParents<UIPanel>(Selection.activeGameObject);
 
 			// First, collect a list of panels with their associated widgets
 			List<Entry> entries = new List<Entry>();

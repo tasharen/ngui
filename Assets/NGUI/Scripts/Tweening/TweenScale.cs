@@ -19,7 +19,7 @@ public class TweenScale : UITweener
 	void Awake ()
 	{
 		mTrans = transform;
-		if (updateTable) mTable = NGUITools.FindInChildren<UITable>(gameObject);
+		if (updateTable) mTable = NGUITools.FindInParents<UITable>(gameObject);
 	}
 
 	override protected void OnUpdate (float factor)
