@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.64
+                Version 1.65
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -46,6 +46,15 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.65:
+- NEW: Example 9: Quest Log shows how to make a fancy quest log.
+- NEW: Added a new feature to UIPanel -- the ability to write to depth before any geometry is drawn. This doubles the draw calls but saves fillrate.
+- NEW: Clicking on the items in the panel and camera tools will now select them instead of enable/disable them.
+- NEW: UITable can now automatically keep its contents within the parent panel's bounds.
+- NEW: New event type: OnScroll(float delta).
+- FIX: FindInChildren was not named properly. It's now FindInParents.
+- FIX: Eliminated all warnings on Unity 3.5.
 
 1.64:
 - NEW: Atlas inspector window now shows "Dimensions" and "Border" instead of "Outer" and "Inner" rects.
