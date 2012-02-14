@@ -21,6 +21,7 @@ public class UIDragObject : IgnoreTimeScale
 
 	public Transform target;
 	public Vector3 scale = Vector3.one;
+	public float scrollWheelFactor = 0f;
 	public bool restrictWithinPanel = false;
 	public DragEffect dragEffect = DragEffect.MomentumAndSpring;
 	public float momentumAmount = 35f;
@@ -30,6 +31,7 @@ public class UIDragObject : IgnoreTimeScale
 	UIPanel mPanel;
 	bool mPressed = false;
 	Vector3 mMomentum = Vector3.zero;
+	float mScroll = 0f;
 	Bounds mBounds;
 
 	/// <summary>
@@ -138,28 +140,50 @@ public class UIDragObject : IgnoreTimeScale
 	void LateUpdate ()
 	{
 		float delta = UpdateRealTimeDelta();
+		if (target == null) return;
 
 		if (mPressed)
 		{
 			// Disable the spring movement
 			SpringPosition sp = target.GetComponent<SpringPosition>();
 			if (sp != null) sp.enabled = false;
+			mScroll = 0f;
 		}
-		else if (dragEffect != DragEffect.None && target != null && mMomentum.magnitude > 0.005f)
+		else
 		{
-			// Apply the momentum
-			if (mPanel == null) FindPanel();
+			mMomentum += scale * (-mScroll * 0.05f);
+			mScroll = NGUIMath.SpringLerp(mScroll, 0f, 20f, delta);
 
-			if (mPanel != null)
+			if (dragEffect != DragEffect.None && mMomentum.magnitude > 0.0001f)
 			{
-				target.position += NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
+				// Apply the momentum
+				if (mPanel == null) FindPanel();
 
-				if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None)
+				if (mPanel != null)
 				{
-					mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.cachedTransform, target);
-					mPanel.ConstrainTargetToBounds(target, ref mBounds, false);
+					SpringPosition sp = target.GetComponent<SpringPosition>();
+					if (sp != null) sp.enabled = false;
+
+					target.position += NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
+
+					if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None)
+					{
+						mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.cachedTransform, target);
+						mPanel.ConstrainTargetToBounds(target, ref mBounds, false);
+					}
 				}
 			}
+			else mScroll = 0f;
 		}
+	}
+
+	/// <summary>
+	/// If the object should support the scroll wheel, do it.
+	/// </summary>
+
+	void OnScroll (float delta)
+	{
+		if (Mathf.Sign(mScroll) != Mathf.Sign(delta)) mScroll = 0f;
+		mScroll += delta * scrollWheelFactor;
 	}
 }

@@ -15,6 +15,7 @@ using System.Collections.Generic;
 /// - OnDrop (gameObject) is sent when the mouse or touch get released on a different collider than the one that was being dragged.
 /// - OnInput (text) is sent when typing after selecting a collider by clicking on it.
 /// - OnTooltip (show) is sent when the mouse hovers over a collider for some time without moving.
+/// - OnScroll (float delta) is sent out when the mouse scroll wheel is moved.
 /// </summary>
 
 [ExecuteInEditMode]
@@ -43,6 +44,12 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	public float tooltipDelay = 1f;
+
+	/// <summary>
+	/// Name of the axis used for scrolling.
+	/// </summary>
+
+	public string scrollAxisName = "Mouse ScrollWheel";
 
 	/// <summary>
 	/// Last camera active prior to sending out the event. This will always be the camera that actually sent out the event.
@@ -385,10 +392,16 @@ public class UICamera : MonoBehaviour
 		}
 
 		// If it's time to show a tooltip, inform the object we're hovering over
-		if (mUseMouseInput && mMouse.hover != null && mTooltipTime != 0f && mTooltipTime < Time.realtimeSinceStartup)
+		if (mUseMouseInput && mMouse.hover != null)
 		{
-			mTooltip = mMouse.hover;
-			ShowTooltip(true);
+			float scroll = Input.GetAxis(scrollAxisName);
+			if (scroll != 0f) mMouse.hover.SendMessage("OnScroll", scroll, SendMessageOptions.DontRequireReceiver);
+
+			if (mTooltipTime != 0f && mTooltipTime < Time.realtimeSinceStartup)
+			{
+				mTooltip = mMouse.hover;
+				ShowTooltip(true);
+			}
 		}
 	}
 

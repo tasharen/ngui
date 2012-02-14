@@ -36,20 +36,6 @@ public class UITextList : MonoBehaviour
 	protected int mTotalLines = 0;
 
 	/// <summary>
-	/// Allow scrolling of the text list.
-	/// </summary>
-
-	public void Scroll (float val)
-	{
-		if (val != 0f)
-		{
-			val *= (style == Style.Chat) ? 10f : -10f;
-			mScroll = Mathf.Max(0f, mScroll + val);
-			UpdateVisibleText();
-		}
-	}
-
-	/// <summary>
 	/// Add a new paragraph.
 	/// </summary>
 
@@ -110,12 +96,6 @@ public class UITextList : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Scrolling support.
-	/// </summary>
-
-	void Update () { if (mSelected && supportScrollWheel) Scroll(Input.GetAxis("Mouse ScrollWheel")); }
-
-	/// <summary>
 	/// Remember whether the widget is selected.
 	/// </summary>
 
@@ -171,6 +151,20 @@ public class UITextList : MonoBehaviour
 				}
 				textLabel.text = final;
 			}
+		}
+	}
+
+	/// <summary>
+	/// Allow scrolling of the text list.
+	/// </summary>
+
+	void OnScroll (float val)
+	{
+		if (mSelected && supportScrollWheel)
+		{
+			val *= (style == Style.Chat) ? 10f : -10f;
+			mScroll = Mathf.Max(0f, mScroll + val);
+			UpdateVisibleText();
 		}
 	}
 }

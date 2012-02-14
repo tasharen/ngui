@@ -22,7 +22,7 @@ Shader "Depth"
 			Blend Off
 			ColorMask 0
 			ZWrite On
-			ZTest LEqual
+			ZTest Less
 			AlphaTest Greater .99
 			ColorMaterial AmbientAndDiffuse
 			
