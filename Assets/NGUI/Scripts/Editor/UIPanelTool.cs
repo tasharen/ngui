@@ -244,7 +244,15 @@ public class UIPanelTool : EditorWindow
 				GUI.contentColor = (ent.panel == selected) ? new Color(0f, 0.5f, 0.8f) : Color.grey;
 			}
 
-			if (GUILayout.Button(panelName, EditorStyles.structHeadingLabel, GUILayout.MinWidth(100f))) retVal = true;
+			if (GUILayout.Button(panelName, EditorStyles.structHeadingLabel, GUILayout.MinWidth(100f)))
+			{
+				if (ent != null)
+				{
+					Selection.activeGameObject = ent.panel.gameObject;
+					EditorUtility.SetDirty(ent.panel.gameObject);
+				}
+			}
+
 			GUILayout.Label(layer, GUILayout.Width(70f));
 			GUILayout.Label(widgetCount, GUILayout.Width(30f));
 			GUILayout.Label(drawCalls, GUILayout.Width(30f));
@@ -252,23 +260,17 @@ public class UIPanelTool : EditorWindow
 
 			if (ent == null)
 			{
-				GUILayout.Label("Debug", GUILayout.Width(80f));
+				GUILayout.Label("Giz", GUILayout.Width(20f));
 			}
 			else
 			{
 				GUI.contentColor = ent.isEnabled ? Color.white : new Color(0.7f, 0.7f, 0.7f);
-				bool debug = (ent.panel.debugInfo == UIPanel.DebugInfo.Geometry);
+				bool debug = (ent.panel.debugInfo == UIPanel.DebugInfo.Gizmos);
 
 				if (debug != EditorGUILayout.Toggle(debug, GUILayout.Width(20f)))
 				{
 					// debug != value, so it's currently inverse
-					ent.panel.debugInfo = debug ? UIPanel.DebugInfo.Gizmos : UIPanel.DebugInfo.Geometry;
-					EditorUtility.SetDirty(ent.panel.gameObject);
-				}
-
-				if (GUILayout.Button("Select", GUILayout.Width(50f)))
-				{
-					Selection.activeGameObject = ent.panel.gameObject;
+					ent.panel.debugInfo = debug ? UIPanel.DebugInfo.None : UIPanel.DebugInfo.Gizmos;
 					EditorUtility.SetDirty(ent.panel.gameObject);
 				}
 			}

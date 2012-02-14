@@ -235,7 +235,7 @@ public class UICameraTool : EditorWindow
 
 			if (GUILayout.Button(camName, EditorStyles.structHeadingLabel, GUILayout.MinWidth(100f)) && cam != null)
 			{
-				cam.enabled = !enabled;
+				Selection.activeGameObject = cam.gameObject;
 				EditorUtility.SetDirty(cam.gameObject);
 			}
 			GUILayout.Label(camLayer, GUILayout.Width(70f));
@@ -272,19 +272,6 @@ public class UICameraTool : EditorWindow
 					cam.cullingMask = mask;
 					EditorUtility.SetDirty(cam.gameObject);
 				}
-			}
-
-			if (cam)
-			{
-				if (GUILayout.Button("Select", GUILayout.Width(50f)))
-				{
-					Selection.activeGameObject = cam.gameObject;
-					EditorUtility.SetDirty(cam.gameObject);
-				}
-			}
-			else
-			{
-				GUILayout.Space(60f);
 			}
 		}
 		GUILayout.EndHorizontal();
