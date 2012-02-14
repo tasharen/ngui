@@ -191,6 +191,7 @@ public class UIWidgetInspector : Editor
 	void CheckHierarchy()
 	{
 		mHierarchyCheck = false;
+		if (Application.isPlaying) return;
 		Transform trans = mWidget.transform.parent;
 		if (trans == null) return;
 		Vector3 scale = trans.lossyScale;

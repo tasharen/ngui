@@ -233,8 +233,11 @@ public class UIFontMaker : EditorWindow
 					if (go == null || go.GetComponent<UIFont>() == null)
 					{
 						// Create a new prefab for the atlas
+#if UNITY_3_4
 						Object prefab = EditorUtility.CreateEmptyPrefab(prefabPath);
-
+#else
+						Object prefab = PrefabUtility.CreateEmptyPrefab(prefabPath);
+#endif
 						// Create a new game object for the font
 						go = new GameObject(mFontName);
 						mFont = go.AddComponent<UIFont>();
@@ -297,8 +300,11 @@ public class UIFontMaker : EditorWindow
 					if (go == null || go.GetComponent<UIFont>() == null)
 					{
 						// Create a new prefab for the atlas
+#if UNITY_3_4
 						Object prefab = EditorUtility.CreateEmptyPrefab(prefabPath);
-
+#else
+						Object prefab = PrefabUtility.CreateEmptyPrefab(prefabPath);
+#endif
 						// Create a new game object for the font
 						go = new GameObject(mFontName);
 						mFont = go.AddComponent<UIFont>();

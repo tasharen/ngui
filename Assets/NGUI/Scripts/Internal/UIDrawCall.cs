@@ -17,17 +17,26 @@ public class UIDrawCall : MonoBehaviour
 		SoftClip,	// Alpha-based clipping with a softened edge
 	}
 
-	Transform		mTrans;		// Cached transform
-	Material		mMat;		// Material used by this screen
-	Mesh			mMesh;		// Generated mesh
-	MeshFilter		mFilter;	// Mesh filter for this draw call
-	MeshRenderer	mRen;		// Mesh renderer for this screen
-	Clipping		mClipping;	// Clipping mode
-	Vector4			mClipRange;	// Clipping, if used
-	Vector2			mClipSoft;	// Clipping softness
-	Material		mInst;		// Instantiated material, if necessary
-	bool			mReset		= true;
-	int[]			mIndices;	// Cached indices
+	Transform		mTrans;			// Cached transform
+	Material		mSharedMat;		// Material used by this screen
+	Mesh			mMesh;			// Generated mesh
+	MeshFilter		mFilter;		// Mesh filter for this draw call
+	MeshRenderer	mRen;			// Mesh renderer for this screen
+	Clipping		mClipping;		// Clipping mode
+	Vector4			mClipRange;		// Clipping, if used
+	Vector2			mClipSoft;		// Clipping softness
+	Material		mClippedMat;	// Instantiated material, if necessary
+	Material		mDepthMat;		// Depth-writing material, created if necessary
+	int[]			mIndices;		// Cached indices
+
+	bool mDepthPass = false;
+	bool mReset = true;
+
+	/// <summary>
+	/// Whether an additional pass will be created to render the geometry to the depth buffer first.
+	/// </summary>
+
+	public bool depthPass { get { return mDepthPass; } set { if (mDepthPass != value) { mDepthPass = value; mReset = true; } } }
 
 	/// <summary>
 	/// Transform is cached for speed and efficiency.
@@ -39,7 +48,7 @@ public class UIDrawCall : MonoBehaviour
 	/// Material used by this screen.
 	/// </summary>
 
-	public Material material { get { return mMat; } set { mMat = value; } }
+	public Material material { get { return mSharedMat; } set { mSharedMat = value; } }
 
 	/// <summary>
 	/// The number of triangles in this draw call.
@@ -66,85 +75,83 @@ public class UIDrawCall : MonoBehaviour
 	public Vector2 clipSoftness { get { return mClipSoft; } set { mClipSoft = value; } }
 
 	/// <summary>
-	/// Convenience function that ensures that a custom material has been created.
+	/// Update the renderer's materials.
 	/// </summary>
 
-	Material customMaterial { get { if (mInst == null) { mInst = new Material(mMat); mRen.sharedMaterial = mInst; } return mInst; } }
-
-	/// <summary>
-	/// This function is called when it's clear that the object will be rendered.
-	/// We want to set the shader used by the material, creating a copy of the material in the process.
-	/// We also want to update the material's properties before it's actually used.
-	/// </summary>
-
-	void OnWillRenderObject ()
+	void UpdateMaterials ()
 	{
-		if (mReset)
+		bool useClipping = (mClipping != Clipping.None);
+
+		// If clipping should be used, create the clipped material
+		if (useClipping)
 		{
-			mReset = false;
+			Shader shader = null;
 
-			if (mMat != null && mMat.shader != null)
+			if (mClipping != Clipping.None)
 			{
-				bool useClipping = (mClipping != Clipping.None);
+				const string hard	= " (HardClip)";
+				const string alpha	= " (AlphaClip)";
+				const string soft	= " (SoftClip)";
 
-				// If we should be using clipping we should check to see if we can automatically locate the shader
-				if (useClipping)
-				{
-					const string hard	= " (HardClip)";
-					const string alpha	= " (AlphaClip)";
-					const string soft	= " (SoftClip)";
+				// Figure out the normal shader's name
+				string shaderName = mSharedMat.shader.name;
+				shaderName = shaderName.Replace(hard, "");
+				shaderName = shaderName.Replace(alpha, "");
+				shaderName = shaderName.Replace(soft, "");
 
-					// Figure out the normal shader's name
-					string shaderName = mMat.shader.name;
-					shaderName = shaderName.Replace(hard, "");
-					shaderName = shaderName.Replace(alpha, "");
-					shaderName = shaderName.Replace(soft, "");
+				// Try to find the new shader
+				if (mClipping == Clipping.HardClip) shader = Shader.Find(shaderName + hard);
+				else if (mClipping == Clipping.AlphaClip) shader = Shader.Find(shaderName + alpha);
+				else if (mClipping == Clipping.SoftClip) shader = Shader.Find(shaderName + soft);
 
-					Shader shader = null;
+				// If there is a valid shader, assign it to the custom material
+				if (shader == null) mClipping = Clipping.None;
+			}
 
-					// Try to find the new shader
-					if		(mClipping == Clipping.HardClip)	shader = Shader.Find(shaderName + hard);
-					else if (mClipping == Clipping.AlphaClip)	shader = Shader.Find(shaderName + alpha);
-					else if (mClipping == Clipping.SoftClip)	shader = Shader.Find(shaderName + soft);
-
-					// If there is a valid shader, assign it to the custom material
-					if (shader != null) customMaterial.shader = shader;
-					else useClipping = false;
-				}
-
-				// If we shouldn't be using clipping, revert back to the original material
-				if (!useClipping)
-				{
-					mRen.sharedMaterial = mMat;
-
-					if (mInst != null)
-					{
-						DestroyImmediate(mInst);
-						mInst = null;
-					}
-				}
+			// If we found the shader, create a new material
+			if (shader != null)
+			{
+				mClippedMat = new Material(mSharedMat);
+				mClippedMat.shader = shader;
 			}
 		}
-
-		if (mInst != null)
+		else if (mClippedMat != null)
 		{
-			mInst.SetVector("_ClipRange", mClipRange);
-
-			Vector2 sharpness = new Vector2(1000.0f, 1000.0f);
-			if (mClipSoft.x > 0f) sharpness.x = mClipRange.z / mClipSoft.x;
-			if (mClipSoft.y > 0f) sharpness.y = mClipRange.w / mClipSoft.y;
-			mInst.SetVector("_ClipSharpness", sharpness);
+			NGUITools.Destroy(mClippedMat);
+			mClippedMat = null;
 		}
-	}
 
-	/// <summary>
-	/// Cleanup.
-	/// </summary>
+		// If depth pass should be used, create the depth material
+		if (mDepthPass)
+		{
+			if (mDepthMat == null)
+			{
+				Shader shader = Shader.Find("Depth");
+				mDepthMat = new Material(shader);
+				mDepthMat.mainTexture = mSharedMat.mainTexture;
+			}
+		}
+		else if (mDepthMat != null)
+		{
+			NGUITools.Destroy(mDepthMat);
+			mDepthMat = null;
+		}
 
-	void OnDestroy ()
-	{
-		if (mMesh != null) DestroyImmediate(mMesh);
-		if (mInst != null) DestroyImmediate(mInst);
+		// Determine which material should be used
+		Material mat = (mClippedMat != null) ? mClippedMat : mSharedMat;
+
+		if (mDepthMat != null)
+		{
+			// If we're already using this material, do nothing
+			if (mRen.sharedMaterials != null && mRen.sharedMaterials.Length == 2 && mRen.sharedMaterials[1] == mat) return;
+
+			// Set the double material
+			mRen.sharedMaterials = new Material[] { mDepthMat, mat };
+		}
+		else if (mRen.sharedMaterial != mat)
+		{
+			mRen.sharedMaterials = new Material[] { mat };
+		}
 	}
 
 	/// <summary>
@@ -188,7 +195,7 @@ public class UIDrawCall : MonoBehaviour
 			if (mRen == null)
 			{
 				mRen = gameObject.AddComponent<MeshRenderer>();
-				mRen.sharedMaterial = mMat;
+				UpdateMaterials();
 			}
 
 			if (verts.size < 65000)
@@ -196,7 +203,7 @@ public class UIDrawCall : MonoBehaviour
 				if (mMesh == null)
 				{
 					mMesh = new Mesh();
-					mMesh.name = "UIDrawCall for " + mMat.name;
+					mMesh.name = "UIDrawCall for " + mSharedMat.name;
 				}
 				else
 				{
@@ -224,5 +231,41 @@ public class UIDrawCall : MonoBehaviour
 			if (mMesh != null) mMesh.Clear();
 			Debug.LogError("UIWidgets must fill the buffer with 4 vertices per quad. Found " + count);
 		}
+	}
+
+	/// <summary>
+	/// This function is called when it's clear that the object will be rendered.
+	/// We want to set the shader used by the material, creating a copy of the material in the process.
+	/// We also want to update the material's properties before it's actually used.
+	/// </summary>
+
+	void OnWillRenderObject ()
+	{
+		if (mReset)
+		{
+			mReset = false;
+			UpdateMaterials();
+		}
+
+		if (mClippedMat != null)
+		{
+			mClippedMat.SetVector("_ClipRange", mClipRange);
+
+			Vector2 sharpness = new Vector2(1000.0f, 1000.0f);
+			if (mClipSoft.x > 0f) sharpness.x = mClipRange.z / mClipSoft.x;
+			if (mClipSoft.y > 0f) sharpness.y = mClipRange.w / mClipSoft.y;
+			mClippedMat.SetVector("_ClipSharpness", sharpness);
+		}
+	}
+
+	/// <summary>
+	/// Cleanup.
+	/// </summary>
+
+	void OnDestroy ()
+	{
+		if (mMesh != null) DestroyImmediate(mMesh);
+		if (mClippedMat != null) DestroyImmediate(mClippedMat);
+		if (mDepthMat != null) DestroyImmediate(mDepthMat);
 	}
 }

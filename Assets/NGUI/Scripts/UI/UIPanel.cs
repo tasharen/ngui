@@ -16,11 +16,25 @@ public class UIPanel : MonoBehaviour
 		Geometry,
 	}
 
-	// Whether this panel will show up in the panel tool (set this to 'false' for dynamically created temporary panels)
+	/// <summary>
+	/// Whether this panel will show up in the panel tool (set this to 'false' for dynamically created temporary panels)
+	/// </summary>
+
 	public bool showInPanelTool = true;
 
-	// Whether normals and tangents will be generated for all meshes
+	/// <summary>
+	/// Whether normals and tangents will be generated for all meshes
+	/// </summary>
+	
 	public bool generateNormals = false;
+
+	/// <summary>
+	/// Whether the panel will create an additional pass to write to depth.
+	/// Turning this on will double the number of draw calls, but will reduce fillrate.
+	/// In order to make the most out of this feature, move your widgets on the Z and minimize the amount of visible transparency.
+	/// </summary>
+
+	public bool depthPass = false;
 
 	// Whether generated geometry is shown or hidden
 	[SerializeField] DebugInfo mDebugInfo = DebugInfo.Gizmos;
@@ -596,7 +610,7 @@ public class UIPanel : MonoBehaviour
 	/// Update the clipping rect in the shaders and draw calls' positions.
 	/// </summary>
 
-	void UpdateDrawcalls ()
+	public void UpdateDrawcalls ()
 	{
 		Vector4 range = Vector4.zero;
 
@@ -625,6 +639,7 @@ public class UIPanel : MonoBehaviour
 			dc.clipping = mClipping;
 			dc.clipRange = range;
 			dc.clipSoftness = mClipSoftness;
+			dc.depthPass = depthPass;
 
 			// Set the draw call's transform to match the panel's.
 			// Note that parenting directly to the panel causes unity to crash as soon as you hit Play.
@@ -667,6 +682,7 @@ public class UIPanel : MonoBehaviour
 		{
 			// Rebuild the draw call's mesh
 			UIDrawCall dc = GetDrawCall(mat, true);
+			dc.depthPass = depthPass;
 			dc.Set(mVerts, generateNormals ? mNorms : null, generateNormals ? mTans : null, mUvs, mCols);
 		}
 		else
@@ -750,6 +766,66 @@ public class UIPanel : MonoBehaviour
 		}
 	}
 #endif
+
+	/// <summary>
+	/// Calculate the offset needed to be constrained within the panel's bounds.
+	/// </summary>
+
+	public Vector3 CalculateConstrainOffset (Vector2 min, Vector2 max)
+	{
+		float offsetX = clipRange.z * 0.5f;
+		float offsetY = clipRange.w * 0.5f;
+
+		Vector2 minRect = new Vector2(min.x, min.y);
+		Vector2 maxRect = new Vector2(max.x, max.y);
+		Vector2 minArea = new Vector2(clipRange.x - offsetX, clipRange.y - offsetY);
+		Vector2 maxArea = new Vector2(clipRange.x + offsetX, clipRange.y + offsetY);
+
+		minArea.x += clipSoftness.x;
+		minArea.y += clipSoftness.y;
+		maxArea.x -= clipSoftness.x;
+		maxArea.y -= clipSoftness.y;
+
+		return NGUIMath.ConstrainRect(minRect, maxRect, minArea, maxArea);
+	}
+
+	/// <summary>
+	/// Constrain the current target position to be within panel bounds.
+	/// </summary>
+
+	public bool ConstrainTargetToBounds (Transform target, ref Bounds targetBounds, bool immediate)
+	{
+		Vector3 offset = CalculateConstrainOffset(targetBounds.min, targetBounds.max);
+
+		if (offset.magnitude > 0f)
+		{
+			if (immediate)
+			{
+				target.localPosition += offset;
+				targetBounds.center += offset;
+				SpringPosition sp = target.GetComponent<SpringPosition>();
+				if (sp != null) sp.enabled = false;
+			}
+			else
+			{
+				SpringPosition sp = SpringPosition.Begin(target.gameObject, target.localPosition + offset, 13f);
+				sp.ignoreTimeScale = true;
+				sp.worldSpace = false;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Constrain the specified target to be within the panel's bounds.
+	/// </summary>
+
+	public bool ConstrainTargetToBounds (Transform target, bool immediate)
+	{
+		Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(cachedTransform, target);
+		return ConstrainTargetToBounds(target, ref bounds, immediate);
+	}
 
 	/// <summary>
 	/// Helper function that recursively sets all childrens' game objects layers to the specified value, stopping when it hits another UIPanel.

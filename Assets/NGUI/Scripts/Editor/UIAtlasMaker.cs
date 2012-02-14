@@ -631,8 +631,11 @@ public class UIAtlasMaker : EditorWindow
 				if (mAtlas == null)
 				{
 					// Create a new prefab for the atlas
-					Object prefab = (go != null) ? go : EditorUtility.CreateEmptyPrefab(prefabPath);
-
+#if UNITY_3_4
+					Object prefab = (go != null) ? go : EditorUtility.CreateEmptyPrefab(prefabPath); 
+#else
+					Object prefab = (go != null) ? go :	PrefabUtility.CreateEmptyPrefab(prefabPath);
+#endif
 					// Create a new game object for the atlas
 					go = new GameObject(mAtlasName);
 					go.AddComponent<UIAtlas>().material = mat;

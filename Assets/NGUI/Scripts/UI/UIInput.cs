@@ -13,16 +13,17 @@ public class UIInput : MonoBehaviour
 	public Color activeColor = Color.white;
 
 	string mText = "";
-	string mLastIME = "";
 	string mDefaultText = "";
 	Color mDefaultColor = Color.white;
 
 #if UNITY_IPHONE || UNITY_ANDROID
-#if UNITY_3_5
-	TouchScreenKeyboard mKeyboard;
-#else
+#if UNITY_3_4
 	iPhoneKeyboard mKeyboard;
+#else
+	TouchScreenKeyboard mKeyboard;
 #endif
+#else
+	string mLastIME = "";
 #endif
 
 	/// <summary>
@@ -105,10 +106,10 @@ public class UIInput : MonoBehaviour
 				if (Application.platform == RuntimePlatform.IPhonePlayer ||
 					Application.platform == RuntimePlatform.Android)
 				{
-#if UNITY_3_5
-					mKeyboard = TouchScreenKeyboard.Open(mText);
-#else
+#if UNITY_3_4
 					mKeyboard = iPhoneKeyboard.Open(mText);
+#else
+					mKeyboard = TouchScreenKeyboard.Open(mText);
 #endif
 				}
 				else

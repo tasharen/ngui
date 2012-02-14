@@ -1,3 +1,4 @@
+#if UNITY_3_4
 using UnityEngine;
 
 /// <summary>
@@ -54,3 +55,4 @@ public class EditorQualitySettings : MonoBehaviour
 		}
 	}
 }
+#endif

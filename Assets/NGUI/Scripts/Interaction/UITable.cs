@@ -13,9 +13,12 @@ public class UITable : MonoBehaviour
 {
 	public int columns = 0;
 	public Vector2 padding = Vector2.zero;
-	public bool repositionNow = false;
 	public bool sorted = false;
 	public bool hideInactive = true;
+	public bool repositionNow = false;
+	public bool keepWithinPanel = false;
+
+	UIPanel mPanel;
 
 	/// <summary>
 	/// Function that sorts items by name.
@@ -109,13 +112,18 @@ public class UITable : MonoBehaviour
 		}
 		if (sorted) children.Sort(SortByName);
 		if (children.Count > 0) RepositionVariableSize(children);
+		if (mPanel != null) mPanel.ConstrainTargetToBounds(myTrans, true);
 	}
 
 	/// <summary>
 	/// Position the grid's contents when the script starts.
 	/// </summary>
 
-	void Start () { Reposition(); }
+	void Start ()
+	{
+		if (keepWithinPanel) mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
+		Reposition();
+	}
 
 	/// <summary>
 	/// Is it time to reposition? Do so now.

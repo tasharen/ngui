@@ -29,6 +29,16 @@ public class UIPanelInspector : Editor
 		if (panel.generateNormals != norms)
 		{
 			panel.generateNormals = norms;
+			panel.UpdateDrawcalls();
+			EditorUtility.SetDirty(panel);
+		}
+
+		bool depth = EditorGUILayout.Toggle("Depth Pass", panel.depthPass);
+
+		if (panel.depthPass != depth)
+		{
+			panel.depthPass = depth;
+			panel.UpdateDrawcalls();
 			EditorUtility.SetDirty(panel);
 		}
 

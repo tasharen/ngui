@@ -57,7 +57,7 @@ public class UIDragObject : IgnoreTimeScale
 				if (restrictWithinPanel && mPanel == null) FindPanel();
 
 				// Calculate the bounds
-				if (restrictWithinPanel) mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.transform, target);
+				if (restrictWithinPanel) mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.cachedTransform, target);
 
 				// Remove all momentum on press
 				mMomentum = Vector3.zero;
@@ -73,9 +73,9 @@ public class UIDragObject : IgnoreTimeScale
 				Transform trans = UICamera.lastCamera.transform;
 				mPlane = new Plane((mPanel != null ? mPanel.cachedTransform.rotation : trans.rotation) * Vector3.back, mLastPos);
 			}
-			else if (restrictWithinPanel && dragEffect == DragEffect.MomentumAndSpring)
+			else if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None && dragEffect == DragEffect.MomentumAndSpring)
 			{
-				ConstrainToBounds(false);
+				mPanel.ConstrainTargetToBounds(target, ref mBounds, false);
 			}
 		}
 	}
@@ -116,7 +116,11 @@ public class UIDragObject : IgnoreTimeScale
 					mBounds.center = mBounds.center + (target.localPosition - localPos);
 
 					// Constrain the UI to the bounds, and if done so, eliminate the momentum
-					if (dragEffect != DragEffect.MomentumAndSpring && ConstrainToBounds(true)) mMomentum = Vector3.zero;
+					if (dragEffect != DragEffect.MomentumAndSpring && mPanel.clipping != UIDrawCall.Clipping.None &&
+						mPanel.ConstrainTargetToBounds(target, ref mBounds, true))
+					{
+						mMomentum = Vector3.zero;
+					}
 				}
 				else
 				{
@@ -125,54 +129,6 @@ public class UIDragObject : IgnoreTimeScale
 				}
 			}
 		}
-	}
-
-	/// <summary>
-	/// Calculate the offset needed to be constrained within the panel's bounds.
-	/// </summary>
-
-	Vector3 CalculateConstrainOffset ()
-	{
-		Vector4 range = mPanel.clipRange;
-
-		float offsetX = range.z * 0.5f;
-		float offsetY = range.w * 0.5f;
-
-		Vector2 minRect = new Vector2(mBounds.min.x, mBounds.min.y);
-		Vector2 maxRect = new Vector2(mBounds.max.x, mBounds.max.y);
-		Vector2 minArea = new Vector2(range.x - offsetX, range.y - offsetY);
-		Vector2 maxArea = new Vector2(range.x + offsetX, range.y + offsetY);
-
-		return NGUIMath.ConstrainRect(minRect, maxRect, minArea, maxArea);
-	}
-
-	/// <summary>
-	/// Constrain the current target position to be within panel bounds.
-	/// </summary>
-
-	bool ConstrainToBounds (bool immediate)
-	{
-		if (mPanel != null && restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None)
-		{
-			Vector3 offset = CalculateConstrainOffset();
-
-			if (offset.magnitude > 0f)
-			{
-				if (immediate)
-				{
-					target.localPosition += offset;
-					mBounds.center += offset;
-				}
-				else
-				{
-					SpringPosition sp = SpringPosition.Begin(target.gameObject, target.localPosition + offset, 13f);
-					sp.ignoreTimeScale = true;
-					sp.worldSpace = false;
-				}
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/// <summary>
@@ -197,8 +153,12 @@ public class UIDragObject : IgnoreTimeScale
 			if (mPanel != null)
 			{
 				target.position += NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
-				mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.transform, target);
-				ConstrainToBounds(false);
+
+				if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None)
+				{
+					mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.cachedTransform, target);
+					mPanel.ConstrainTargetToBounds(target, ref mBounds, false);
+				}
 			}
 		}
 	}

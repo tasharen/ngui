@@ -221,6 +221,7 @@ public class UIFont : MonoBehaviour
 			if (mSprite == null && mAtlas != null && !string.IsNullOrEmpty(mFont.spriteName))
 			{
 				mSprite = mAtlas.GetSprite(mFont.spriteName);
+				if (mSprite == null) mSprite = mAtlas.GetSprite(name);
 				mSpriteSet = true;
 
 				if (mSprite == null)

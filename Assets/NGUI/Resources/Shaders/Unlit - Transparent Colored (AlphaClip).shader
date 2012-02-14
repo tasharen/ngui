@@ -7,6 +7,8 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 
 	SubShader
 	{
+		LOD 200
+
 		Tags
 		{
 			"Queue" = "Transparent"
@@ -14,16 +16,16 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 			"RenderType" = "Transparent"
 		}
 
-		LOD 200
-		Cull Off
-		Lighting Off
-		ZWrite Off
-		Fog { Color (0,0,0,0) }
-		ColorMask RGB
-		Blend SrcAlpha OneMinusSrcAlpha
-		
 		Pass
 		{
+			Cull Off
+			Lighting Off
+			ZWrite Off
+			Offset -1, -1
+			Fog { Color (0,0,0,0) }
+			ColorMask RGB
+			Blend SrcAlpha OneMinusSrcAlpha
+		
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
