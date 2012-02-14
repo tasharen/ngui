@@ -244,7 +244,7 @@ public class UICameraTool : EditorWindow
 
 			if (cam == null)
 			{
-				GUILayout.Label("EV", GUILayout.Width(20f));
+				GUILayout.Label("EV", GUILayout.Width(26f));
 			}
 			else
 			{
