@@ -25,18 +25,6 @@ If you have a regular copy of NGUI:
 4. Copy the NGUI folder from the new project into the old project.
 5. Open your old project with Unity - it should now be up to date.
 
-------------------------------------
-****** !!! IMPORTANT NOTE !!! ******
-------------------------------------
-
-If you are importing NGUI from a unity package, you will need to perform the following step
-in order to get the 2D and 3D layer names to show up in-game:
-
-If it's a clean project, simply extract the contents of the LibraryAssets.zip file into the Library
-folder (Unity 3.4) or the ProjectSettings folder (Unity 3.5+), overwriting what's there.
-   
-If you are not importing examples, you can ignore this part.
-
 ---------------------------------------
  Support, documentation, and tutorials
 ---------------------------------------
