@@ -62,6 +62,7 @@ public class UISlider : MonoBehaviour
 	{
 		mTrans = transform;
 		mCol = collider as BoxCollider;
+		mValue = initialValue;
 
 		if (foreground != null)
 		{
@@ -93,8 +94,6 @@ public class UISlider : MonoBehaviour
 			fe.onPress = true;
 			fe.onDrag = true;
 		}
-
-		mValue = initialValue;
 		UpdateSlider();
 	}
 

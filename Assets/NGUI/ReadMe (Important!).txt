@@ -54,7 +54,7 @@ All can be found here: http://www.tasharen.com/?page_id=197
 - NEW: UITable can now automatically keep its contents within the parent panel's bounds.
 - NEW: New event type: OnScroll(float delta).
 - FIX: FindInChildren was not named properly. It's now FindInParents.
-- FIX: Eliminated all warnings on Unity 3.5.
+- FIX: Eliminated most warnings on Unity 3.5.
 
 1.64:
 - NEW: Atlas inspector window now shows "Dimensions" and "Border" instead of "Outer" and "Inner" rects.
