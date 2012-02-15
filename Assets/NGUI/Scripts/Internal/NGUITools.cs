@@ -94,11 +94,11 @@ static public class NGUITools
 
 	static public string EncodeColor (Color c)
 	{
-		int i = 0xFFFFFF & (NGUIMath.ColorToInt(c) >> 8);
 #if UNITY_FLASH
-		// int.ToString(format) doesn't seem to be supported on Flash as of 3.5 b6 -- it simply silently crashes
+		// int.ToString(format) doesn't seem to be supported on Flash as of 3.5.0 -- it simply silently crashes
 		return "FFFFFF";
 #else
+		int i = 0xFFFFFF & (NGUIMath.ColorToInt(c) >> 8);
 		return i.ToString("X6");
 #endif
 	}

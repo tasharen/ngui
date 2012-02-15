@@ -156,7 +156,7 @@ public class UICameraTool : EditorWindow
 
 		foreach (Camera c in cams)
 		{
-			if (c.name != "SceneCamera" && c.name != "Preview Camera")
+			if (c.gameObject.hideFlags == 0)
 			{
 #if UNITY_3_4
 				PrefabType type = EditorUtility.GetPrefabType(c.gameObject);
@@ -233,7 +233,11 @@ public class UICameraTool : EditorWindow
 				camLayer = LayerMask.LayerToName(cam.gameObject.layer);
 			}
 
+#if UNITY_3_4
 			if (GUILayout.Button(camName, EditorStyles.structHeadingLabel, GUILayout.MinWidth(100f)) && cam != null)
+#else
+			if (GUILayout.Button(camName, EditorStyles.label, GUILayout.MinWidth(100f)) && cam != null)
+#endif
 			{
 				Selection.activeGameObject = cam.gameObject;
 				EditorUtility.SetDirty(cam.gameObject);

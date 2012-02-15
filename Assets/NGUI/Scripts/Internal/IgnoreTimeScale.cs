@@ -35,7 +35,7 @@ public class IgnoreTimeScale : MonoBehaviour
 	protected float UpdateRealTimeDelta ()
 	{
 		float time = Time.realtimeSinceStartup;
-		mDelta = time - mTime;
+		mDelta = Mathf.Max(0f, time - mTime);
 		mTime = time;
 		return mDelta;
 	}

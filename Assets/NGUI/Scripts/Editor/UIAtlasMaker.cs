@@ -641,7 +641,11 @@ public class UIAtlasMaker : EditorWindow
 					go.AddComponent<UIAtlas>().material = mat;
 
 					// Update the prefab
+#if UNITY_3_4
 					EditorUtility.ReplacePrefab(go, prefab);
+#else
+					PrefabUtility.ReplacePrefab(go, prefab);
+#endif
 					DestroyImmediate(go);
 					AssetDatabase.Refresh();
 

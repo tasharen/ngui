@@ -245,7 +245,11 @@ public class UIFontMaker : EditorWindow
 						BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), mAsset.bytes);
 
 						// Update the prefab
+#if UNITY_3_4
 						EditorUtility.ReplacePrefab(go, prefab);
+#else
+						PrefabUtility.ReplacePrefab(go, prefab);
+#endif
 						DestroyImmediate(go);
 						AssetDatabase.Refresh();
 
@@ -313,7 +317,11 @@ public class UIFontMaker : EditorWindow
 						BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), mAsset.bytes);
 
 						// Update the prefab
+#if UNTIY_3_4
 						EditorUtility.ReplacePrefab(go, prefab);
+#else
+						PrefabUtility.ReplacePrefab(go, prefab);
+#endif
 						DestroyImmediate(go);
 						AssetDatabase.Refresh();
 

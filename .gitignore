@@ -22,3 +22,9 @@
 *.unityproj
 /Assets/Standard Assets
 /Assets/Standard Assets.meta
+*.pidb
+*.html
+*.swf
+*.userprefs
+*.swc
+*.js

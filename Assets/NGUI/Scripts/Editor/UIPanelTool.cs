@@ -244,7 +244,11 @@ public class UIPanelTool : EditorWindow
 				GUI.contentColor = (ent.panel == selected) ? new Color(0f, 0.5f, 0.8f) : Color.grey;
 			}
 
+#if UNITY_3_4
 			if (GUILayout.Button(panelName, EditorStyles.structHeadingLabel, GUILayout.MinWidth(100f)))
+#else
+			if (GUILayout.Button(panelName, EditorStyles.label, GUILayout.MinWidth(100f)))
+#endif
 			{
 				if (ent != null)
 				{

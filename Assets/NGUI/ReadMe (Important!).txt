@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.65
+                Version 1.66
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -46,6 +46,11 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.66:
+- NEW: Added a new script: ShaderQuality. It's used to automatically set shader level of detail as the quality level goes down.
+- FIX: All examples have been updated to run properly in Flash.
+- FIX: NGUI now has no warnings using Unity 3.5.0.
 
 1.65:
 - NEW: Example 9: Quest Log shows how to make a fancy quest log.

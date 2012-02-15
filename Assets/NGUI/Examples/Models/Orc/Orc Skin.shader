@@ -39,10 +39,10 @@ Shader "NGUI/Examples/Orc Skin"
 		#endif
 
 			// Phong shading model
-			half reflectiveFactor = max(0.0, dot(-viewDir, reflect(lightDir, nNormal)));
+			//half reflectiveFactor = max(0.0, dot(-viewDir, reflect(lightDir, nNormal)));
 
 			// Blinn-Phong shading model
-			//half reflectiveFactor = max(0.0, dot(nNormal, normalize(lightDir + viewDir)));
+			half reflectiveFactor = max(0.0, dot(nNormal, normalize(lightDir + viewDir)));
 
 			half diffuseFactor = max(0.0, dot(nNormal, lightDir));
 			half specularFactor = pow(reflectiveFactor, shininess) * s.Specular;
