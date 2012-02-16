@@ -28,4 +28,4 @@
 *.userprefs
 *.swc
 *.js
-/Library
+*.unitypackage
