@@ -8,41 +8,22 @@ using System.Collections.Generic;
 
 public class UIFontMaker : EditorWindow
 {
-	UIFont mFont;
-	UIAtlas mAtlas;
-	TextAsset mAsset;
-	Texture2D mTex;
-	string mFontName = "";
-
-	/// <summary>
-	/// Save the font information to player prefs.
-	/// </summary>
-
-	void Save ()
-	{
-		PlayerPrefs.SetInt("NGUI Font Asset", (mAsset != null) ? mAsset.GetInstanceID() : -1);
-		PlayerPrefs.SetInt("NGUI Font Texture", (mTex != null) ? mTex.GetInstanceID() : -1);
-		PlayerPrefs.SetInt("NGUI Font", (mFont != null) ? mFont.GetInstanceID() : -1);
-		PlayerPrefs.SetInt("NGUI Atlas", (mAtlas != null) ? mAtlas.GetInstanceID() : -1);
-		PlayerPrefs.SetString("NGUI Font Name", mFontName);
-	}
-
 	/// <summary>
 	/// Update all labels associated with this font.
 	/// </summary>
 
 	void MarkAsChanged ()
 	{
-		if (mFont != null)
+		if (UISettings.font != null)
 		{
 			UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
 
 			foreach (UILabel lbl in labels)
 			{
-				if (lbl.font == mFont)
+				if (lbl.font == UISettings.font)
 				{
 					lbl.font = null;
-					lbl.font = mFont;
+					lbl.font = UISettings.font;
 				}
 			}
 		}
@@ -54,15 +35,8 @@ public class UIFontMaker : EditorWindow
 
 	void OnSelectFont (MonoBehaviour obj)
 	{
-		UIFont a = obj as UIFont;
-
-		if (mFont != a)
-		{
-			mFont = a;
-			mFontName = (mFont != null) ? mFont.name : "New Font";
-			Save();
-			Repaint();
-		}
+		UISettings.font = obj as UIFont;
+		Repaint();
 	}
 
 	/// <summary>
@@ -71,14 +45,8 @@ public class UIFontMaker : EditorWindow
 
 	void OnSelectAtlas (MonoBehaviour obj)
 	{
-		UIAtlas a = obj as UIAtlas;
-
-		if (mAtlas != a)
-		{
-			mAtlas = a;
-			Save();
-			Repaint();
-		}
+		UISettings.atlas = obj as UIAtlas;
+		Repaint();
 	}
 
 	/// <summary>
@@ -93,79 +61,45 @@ public class UIFontMaker : EditorWindow
 
 	void OnGUI ()
 	{
-		if (mAsset == null)
-		{
-			int assetID = PlayerPrefs.GetInt("NGUI Font Asset", -1);
-			if (assetID != -1) mAsset = EditorUtility.InstanceIDToObject(assetID) as TextAsset;
-		}
-
-		if (mTex == null)
-		{
-			int assetID = PlayerPrefs.GetInt("NGUI Font Texture", -1);
-			if (assetID != -1) mTex = EditorUtility.InstanceIDToObject(assetID) as Texture2D;
-		}
-
-		if (mFont == null)
-		{
-			mFontName = PlayerPrefs.GetString("NGUI Font Name");
-			int fontID = PlayerPrefs.GetInt("NGUI Font", -1);
-			if (fontID != -1) mFont = EditorUtility.InstanceIDToObject(fontID) as UIFont;
-		}
-
-		if (mAtlas == null)
-		{
-			int atlasID = PlayerPrefs.GetInt("NGUI Atlas", -1);
-			if (atlasID != -1) mAtlas = EditorUtility.InstanceIDToObject(atlasID) as UIAtlas;
-		}
-
 		string prefabPath = "";
 		string matPath = "";
 
-		if (mFont != null && mFont.name == mFontName)
+		if (UISettings.font != null && UISettings.font.name == UISettings.fontName)
 		{
-			prefabPath = AssetDatabase.GetAssetPath(mFont.gameObject.GetInstanceID());
-			if (mFont.material != null) matPath = AssetDatabase.GetAssetPath(mFont.material.GetInstanceID());
+			prefabPath = AssetDatabase.GetAssetPath(UISettings.font.gameObject.GetInstanceID());
+			if (UISettings.font.material != null) matPath = AssetDatabase.GetAssetPath(UISettings.font.material.GetInstanceID());
 		}
 
 		// Assume default values if needed
-		if (string.IsNullOrEmpty(mFontName)) mFontName = "New Font";
-		if (string.IsNullOrEmpty(prefabPath)) prefabPath = NGUIEditorTools.GetSelectionFolder() + mFontName + ".prefab";
-		if (string.IsNullOrEmpty(matPath)) matPath = NGUIEditorTools.GetSelectionFolder() + mFontName + ".mat";
+		if (string.IsNullOrEmpty(UISettings.fontName)) UISettings.fontName = "New Font";
+		if (string.IsNullOrEmpty(prefabPath)) prefabPath = NGUIEditorTools.GetSelectionFolder() + UISettings.fontName + ".prefab";
+		if (string.IsNullOrEmpty(matPath)) matPath = NGUIEditorTools.GetSelectionFolder() + UISettings.fontName + ".mat";
 
 		EditorGUIUtility.LookLikeControls(80f);
 
 		NGUIEditorTools.DrawHeader("Input");
 
-		TextAsset asset = EditorGUILayout.ObjectField("Font Data", mAsset, typeof(TextAsset), false) as TextAsset;
-		if (mAsset != asset) { mAsset = asset; Save(); }
-
-		Texture2D tex = EditorGUILayout.ObjectField("Texture", mTex, typeof(Texture2D), false) as Texture2D;
-		if (mTex != tex) { mTex = tex; Save(); }
+		UISettings.fontData = EditorGUILayout.ObjectField("Font Data", UISettings.fontData, typeof(TextAsset), false) as TextAsset;
+		UISettings.fontTexture = EditorGUILayout.ObjectField("Texture", UISettings.fontTexture, typeof(Texture2D), false) as Texture2D;
 
 		// Draw the atlas selection only if we have the font data and texture specified, just to make it easier
-		if (mAsset != null && mTex != null)
+		if (UISettings.fontData != null && UISettings.fontTexture != null)
 		{
 			NGUIEditorTools.DrawHeader("Output");
 
 			GUILayout.BeginHorizontal();
 			GUILayout.Label("Font Name", GUILayout.Width(76f));
 			GUI.backgroundColor = Color.white;
-			string fontName = GUILayout.TextField(mFontName);
+			UISettings.fontName = GUILayout.TextField(UISettings.fontName);
 			GUILayout.EndHorizontal();
 
-			if (mFontName != fontName)
-			{
-				mFontName = fontName;
-				Save();
-			}
-
-			ComponentSelector.Draw<UIFont>("...or select", mFont, OnSelectFont);
-			ComponentSelector.Draw<UIAtlas>(mAtlas, OnSelectAtlas);
+			ComponentSelector.Draw<UIFont>("...or select", UISettings.font, OnSelectFont);
+			ComponentSelector.Draw<UIAtlas>(UISettings.atlas, OnSelectAtlas);
 		}
 		NGUIEditorTools.DrawSeparator();
 
 		// Helpful info
-		if (mAsset == null)
+		if (UISettings.fontData == null)
 		{
 			GUILayout.Label(
 				"The font creation mostly takes place outside\n" +
@@ -176,14 +110,14 @@ public class UIFontMaker : EditorWindow
 				"you that you will drag & drop into the\n" +
 				"field above.");
 		}
-		else if (mTex == null)
+		else if (UISettings.fontTexture == null)
 		{
 			GUILayout.Label(
 				"When exporting your font, you should get\n" +
 				"two files: the TXT, and the texture. Only\n" +
 				"one texture can be used per font.");
 		}
-		else if (mAtlas == null)
+		else if (UISettings.atlas == null)
 		{
 			GUILayout.Label(
 				"You can create a font that doesn't use a\n" +
@@ -209,7 +143,7 @@ public class UIFontMaker : EditorWindow
 				GameObject go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
 
 				if (go == null || EditorUtility.DisplayDialog("Are you sure?", "Are you sure you want to replace the contents of the " +
-					mFontName + " font with the currently selected values? This action can't be undone.", "Yes", "No"))
+					UISettings.fontName + " font with the currently selected values? This action can't be undone.", "Yes", "No"))
 				{
 					// Try to load the material
 					Material mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
@@ -228,7 +162,7 @@ public class UIFontMaker : EditorWindow
 						mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
 					}
 
-					mat.mainTexture = mTex;
+					mat.mainTexture = UISettings.fontTexture;
 
 					if (go == null || go.GetComponent<UIFont>() == null)
 					{
@@ -239,10 +173,10 @@ public class UIFontMaker : EditorWindow
 						Object prefab = PrefabUtility.CreateEmptyPrefab(prefabPath);
 #endif
 						// Create a new game object for the font
-						go = new GameObject(mFontName);
-						mFont = go.AddComponent<UIFont>();
-						mFont.material = mat;
-						BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), mAsset.bytes);
+						go = new GameObject(UISettings.fontName);
+						UISettings.font = go.AddComponent<UIFont>();
+						UISettings.font.material = mat;
+						BMFontReader.Load(UISettings.font.bmFont, NGUITools.GetHierarchy(UISettings.font.gameObject), UISettings.fontData.bytes);
 
 						// Update the prefab
 #if UNITY_3_4
@@ -257,8 +191,7 @@ public class UIFontMaker : EditorWindow
 						go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
 					}
 
-					mFont = go.GetComponent<UIFont>();
-					Save();
+					UISettings.font = go.GetComponent<UIFont>();
 					MarkAsChanged();
 				}
 			}
@@ -297,9 +230,9 @@ public class UIFontMaker : EditorWindow
 			if (create)
 			{
 				if (go == null || EditorUtility.DisplayDialog("Are you sure?", "Are you sure you want to replace the contents of the " +
-					mFontName + " font with the currently selected values? This action can't be undone.", "Yes", "No"))
+					UISettings.fontName + " font with the currently selected values? This action can't be undone.", "Yes", "No"))
 				{
-					UIAtlasMaker.AddOrUpdate(mAtlas, mTex);
+					UIAtlasMaker.AddOrUpdate(UISettings.atlas, UISettings.fontTexture);
 
 					if (go == null || go.GetComponent<UIFont>() == null)
 					{
@@ -310,11 +243,11 @@ public class UIFontMaker : EditorWindow
 						Object prefab = PrefabUtility.CreateEmptyPrefab(prefabPath);
 #endif
 						// Create a new game object for the font
-						go = new GameObject(mFontName);
-						mFont = go.AddComponent<UIFont>();
-						mFont.atlas = mAtlas;
-						mFont.spriteName = mTex.name;
-						BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), mAsset.bytes);
+						go = new GameObject(UISettings.fontName);
+						UISettings.font = go.AddComponent<UIFont>();
+						UISettings.font.atlas = UISettings.atlas;
+						UISettings.font.spriteName = UISettings.fontTexture.name;
+						BMFontReader.Load(UISettings.font.bmFont, NGUITools.GetHierarchy(UISettings.font.gameObject), UISettings.fontData.bytes);
 
 						// Update the prefab
 #if UNITY_3_4
@@ -328,11 +261,16 @@ public class UIFontMaker : EditorWindow
 						// Select the atlas
 						go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
 					}
+					else if (UISettings.fontData != null)
+					{
+						BMFontReader.Load(UISettings.font.bmFont, NGUITools.GetHierarchy(UISettings.font.gameObject), UISettings.fontData.bytes);
+						EditorUtility.SetDirty(UISettings.font);
+						UISettings.font.Refresh();
+					}
 
-					mFont = go.GetComponent<UIFont>();
-					mFont.spriteName = mTex.name;
-					mFont.atlas = mAtlas;
-					Save();
+					UISettings.font = go.GetComponent<UIFont>();
+					UISettings.font.spriteName = UISettings.fontTexture.name;
+					UISettings.font.atlas = UISettings.atlas;
 					MarkAsChanged();
 				}
 			}
