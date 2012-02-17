@@ -9,7 +9,6 @@ using UnityEditor;
 public class UIWidgetInspector : Editor
 {
 	protected UIWidget mWidget;
-	protected bool mRegisteredUndo = false;
 	static protected bool mShowTexture = true;
 	static protected bool mUseShader = false;
 
@@ -22,12 +21,7 @@ public class UIWidgetInspector : Editor
 
 	protected void RegisterUndo()
 	{
-		if (!mRegisteredUndo)
-		{
-			mRegisteredUndo = true;
-			NGUIEditorTools.RegisterUndo("Widget Change", mWidget);
-			mWidget.MarkAsChanged();
-		}
+		NGUIEditorTools.RegisterUndo("Widget Change", mWidget);
 	}
 
 	/// <summary>
@@ -39,38 +33,22 @@ public class UIWidgetInspector : Editor
 		EditorGUIUtility.LookLikeControls(80f);
 		mWidget = target as UIWidget;
 
-#if UNITY_3_4
-		PrefabType type = EditorUtility.GetPrefabType(mWidget.gameObject);
-#else
-		PrefabType type = PrefabUtility.GetPrefabType(mWidget.gameObject);
-#endif
-
-		if (type == PrefabType.Prefab)
+		if (!mInitialized)
 		{
-			GUILayout.Label("Drag this widget into the scene to modify it.");
+			mInitialized = true;
+			OnInit();
 		}
-		else
+
+		NGUIEditorTools.DrawSeparator();
+
+		// Check the hierarchy to ensure that this widget is not parented to another widget
+		if (mHierarchyCheck) CheckHierarchy();
+
+		// Check to see if we can draw the widget's default properties to begin with
+		if (OnDrawProperties())
 		{
-			if (!mInitialized)
-			{
-				mInitialized = true;
-				OnInit();
-			}
-
-			NGUIEditorTools.DrawSeparator();
-
-			// Check the hierarchy to ensure that this widget is not parented to another widget
-			if (mHierarchyCheck) CheckHierarchy();
-
-			// This flag gets set to 'true' if RegisterUndo() gets called
-			mRegisteredUndo = false;
-
-			// Check to see if we can draw the widget's default properties to begin with
-			if (OnDrawProperties())
-			{
-				// Draw all common properties next
-				DrawCommonProperties();
-			}
+			// Draw all common properties next
+			DrawCommonProperties();
 		}
 	}
 
@@ -80,25 +58,34 @@ public class UIWidgetInspector : Editor
 
 	protected void DrawCommonProperties ()
 	{
+#if UNITY_3_4
+		PrefabType type = EditorUtility.GetPrefabType(mWidget.gameObject);
+#else
+		PrefabType type = PrefabUtility.GetPrefabType(mWidget.gameObject);
+#endif
+
 		NGUIEditorTools.DrawSeparator();
 
 		// Depth navigation
-		GUILayout.BeginHorizontal();
+		if (type != PrefabType.Prefab)
 		{
-			EditorGUILayout.PrefixLabel("Depth");
-
-			int depth = mWidget.depth;
-			if (GUILayout.Button("Back")) --depth;
-			depth = EditorGUILayout.IntField(depth, GUILayout.Width(40f));
-			if (GUILayout.Button("Forward")) ++depth;
-
-			if (mWidget.depth != depth)
+			GUILayout.BeginHorizontal();
 			{
-				NGUIEditorTools.RegisterUndo("Depth Change", mWidget);
-				mWidget.depth = depth;
+				EditorGUILayout.PrefixLabel("Depth");
+
+				int depth = mWidget.depth;
+				if (GUILayout.Button("Back")) --depth;
+				depth = EditorGUILayout.IntField(depth, GUILayout.Width(40f));
+				if (GUILayout.Button("Forward")) ++depth;
+
+				if (mWidget.depth != depth)
+				{
+					NGUIEditorTools.RegisterUndo("Depth Change", mWidget);
+					mWidget.depth = depth;
+				}
 			}
+			GUILayout.EndHorizontal();
 		}
-		GUILayout.EndHorizontal();
 
 		Color color = EditorGUILayout.ColorField("Color Tint", mWidget.color);
 
@@ -108,17 +95,21 @@ public class UIWidgetInspector : Editor
 			mWidget.color = color;
 		}
 
-		GUILayout.BeginHorizontal();
+		// Depth navigation
+		if (type != PrefabType.Prefab)
 		{
-			EditorGUILayout.PrefixLabel("Correction");
-
-			if (GUILayout.Button("Make Pixel-Perfect"))
+			GUILayout.BeginHorizontal();
 			{
-				NGUIEditorTools.RegisterUndo("Make Pixel-Perfect", mWidget.transform);
-				mWidget.MakePixelPerfect();
+				EditorGUILayout.PrefixLabel("Correction");
+
+				if (GUILayout.Button("Make Pixel-Perfect"))
+				{
+					NGUIEditorTools.RegisterUndo("Make Pixel-Perfect", mWidget.transform);
+					mWidget.MakePixelPerfect();
+				}
 			}
+			GUILayout.EndHorizontal();
 		}
-		GUILayout.EndHorizontal();
 
 		UIWidget.Pivot pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", mWidget.pivot);
 

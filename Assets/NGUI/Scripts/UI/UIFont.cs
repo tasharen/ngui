@@ -411,11 +411,16 @@ public class UIFont : MonoBehaviour
 				// Doesn't fit?
 				if (remainingWidth < 0)
 				{
-					if (lineIsEmpty)
+					if (lineIsEmpty || !multiline)
 					{
 						// This is the first word on the line -- add it up to the character that fits
 						sb.Append(text.Substring(start, offset - start));
-						if (!multiline) break;
+
+						if (!multiline)
+						{
+							start = offset;
+							break;
+						}
 						EndLine(ref sb);
 					}
 					else
