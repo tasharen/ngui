@@ -19,7 +19,7 @@ public class UIWidgetInspector : Editor
 	/// Register an Undo command with the Unity editor.
 	/// </summary>
 
-	protected void RegisterUndo()
+	void RegisterUndo()
 	{
 		NGUIEditorTools.RegisterUndo("Widget Change", mWidget);
 	}

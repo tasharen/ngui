@@ -22,6 +22,7 @@ public class UISprite : UIWidget
 	// gets initialized as if it was created with 'new UIAtlas.Sprite()' instead of 'null'. Fun, huh?
 
 	bool mSpriteSet = false;
+	string mLastName = "";
 
 	/// <summary>
 	/// Outer set of UV coordinates.
@@ -233,6 +234,14 @@ public class UISprite : UIWidget
 
 	override public bool OnUpdate ()
 	{
+		if (mLastName != mSpriteName)
+		{
+			mSprite = null;
+			mChanged = true;
+			mLastName = mSpriteName;
+			UpdateUVs();
+			return true;
+		}
 		UpdateUVs();
 		return false;
 	}

@@ -414,7 +414,7 @@ public class UIFont : MonoBehaviour
 					if (lineIsEmpty || !multiline)
 					{
 						// This is the first word on the line -- add it up to the character that fits
-						sb.Append(text.Substring(start, offset - start));
+						sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
 
 						if (!multiline)
 						{

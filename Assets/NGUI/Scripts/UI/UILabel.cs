@@ -7,16 +7,65 @@ public class UILabel : UIWidget
 {
 	[SerializeField] UIFont mFont;
 	[SerializeField] string mText = "";
+	[SerializeField] int mMaxLineWidth = 0;
 	[SerializeField] bool mEncoding = true;
-	[SerializeField] float mLineWidth = 0;
 	[SerializeField] bool mMultiline = true;
 	[SerializeField] bool mPassword = false;
 	[SerializeField] bool mShowLastChar = false;
 
+	/// <summary>
+	/// Obsolete, do not use. Use 'mMaxLineWidth' instead.
+	/// </summary>
+
+	[SerializeField] float mLineWidth = 0;
+
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
+
+	// Cached values, used to determine if something has changed and thus must be updated
 	float mLastSize = 0f;
 	string mLastText = "";
+	int mLastWidth = 0;
+	bool mLastEncoding = true;
+	bool mLastMulti = true;
+	bool mLastPass = false;
+	bool mLastShow = false;
+
+	/// <summary>
+	/// Function used to determine if something has changed (and thus the geometry must be rebuilt)
+	/// </summary>
+
+	bool hasChanged
+	{
+		get
+		{
+			return mShouldBeProcessed ||
+				mLastText != text ||
+				mLastWidth != mMaxLineWidth ||
+				mLastEncoding != mEncoding ||
+				mLastMulti != mMultiline ||
+				mLastPass != mPassword ||
+				mLastShow != mShowLastChar;
+		}
+		set
+		{
+			if (value)
+			{
+				mChanged = true;
+				mShouldBeProcessed = true;
+			}
+			else
+			{
+				mShouldBeProcessed = false;
+				mLastText = text;
+				mLastWidth = mMaxLineWidth;
+				mLastEncoding = mEncoding;
+				mLastMulti = mMultiline;
+				mLastPass = mPassword;
+				mLastShow = mShowLastChar;
+			}
+		}
+	}
 
 	/// <summary>
 	/// Set the font used by this label.
@@ -35,7 +84,7 @@ public class UILabel : UIWidget
 				mFont = value;
 				material = (mFont != null) ? mFont.material : null;
 				mChanged = true;
-				mShouldBeProcessed = true;
+				hasChanged = true;
 				MarkAsChanged();
 			}
 		}
@@ -56,8 +105,7 @@ public class UILabel : UIWidget
 			if (value != null && mText != value)
 			{
 				mText = value;
-				mChanged = true;
-				mShouldBeProcessed = true;
+				hasChanged = true;
 			}
 		}
 	}
@@ -77,8 +125,7 @@ public class UILabel : UIWidget
 			if (mEncoding != value)
 			{
 				mEncoding = value;
-				mChanged = true;
-				mShouldBeProcessed = true;
+				hasChanged = true;
 				if (value) mPassword = false;
 			}
 		}
@@ -88,19 +135,18 @@ public class UILabel : UIWidget
 	/// Maximum width of the label in pixels.
 	/// </summary>
 
-	public float lineWidth
+	public int lineWidth
 	{
 		get
 		{
-			return mLineWidth;
+			return mMaxLineWidth;
 		}
 		set
 		{
-			if (mLineWidth != value)
+			if (mMaxLineWidth != value)
 			{
-				mLineWidth = value;
-				mChanged = true;
-				mShouldBeProcessed = true;
+				mMaxLineWidth = value;
+				hasChanged = true;
 			}
 		}
 	}
@@ -120,8 +166,7 @@ public class UILabel : UIWidget
 			if (mMultiline != value)
 			{
 				mMultiline = value;
-				mChanged = true;
-				mShouldBeProcessed = true;
+				hasChanged = true;
 				if (value) mPassword = false;
 			}
 		}
@@ -144,8 +189,7 @@ public class UILabel : UIWidget
 				mPassword = value;
 				mMultiline = false;
 				mEncoding = false;
-				mChanged = true;
-				mShouldBeProcessed = true;
+				hasChanged = true;
 			}
 		}
 	}
@@ -165,8 +209,7 @@ public class UILabel : UIWidget
 			if (mShowLastChar != value)
 			{
 				mShowLastChar = value;
-				mChanged = true;
-				mShouldBeProcessed = true;
+				hasChanged = true;
 			}
 		}
 	}
@@ -179,30 +222,23 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			if (!mShouldBeProcessed)
+			// If the height changes, we should re-process the text
+			if (!mShouldBeProcessed && mMaxLineWidth > 0f)
 			{
-				if (mLastText != mText)
-				{
-					mShouldBeProcessed = true;
-				}
-				else if (mLineWidth > 0f)
-				{
-					// If the height changes, we should re-process the text
-					float size = cachedTransform.localScale.y;
+				float size = cachedTransform.localScale.y;
 
-					if (mLastSize != size)
-					{
-						mLastSize = size;
-						mShouldBeProcessed = true;
-					}
+				if (mLastSize != size)
+				{
+					mLastSize = size;
+					mShouldBeProcessed = true;
 				}
 			}
 
 			// Process the text if necessary
-			if (mShouldBeProcessed)
+			if (hasChanged)
 			{
+				hasChanged = false;
 				mLastText = mText;
-				mShouldBeProcessed = false;
 				mProcessedText = mText.Replace("\\n", "\n");
 
 				if (mPassword)
@@ -222,9 +258,9 @@ public class UILabel : UIWidget
 					}
 					mProcessedText = hidden;
 				}
-				else if (mLineWidth > 0f)
+				else if (mMaxLineWidth > 0)
 				{
-					mProcessedText = mFont.WrapText(mProcessedText, mLineWidth / cachedTransform.localScale.y, mMultiline, mEncoding);
+					mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.y, mMultiline, mEncoding);
 				}
 				else if (!mMultiline)
 				{
@@ -236,12 +272,25 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Legacy functionality support.
+	/// </summary>
+
+	void Start ()
+	{
+		if (mLineWidth > 0f)
+		{
+			mMaxLineWidth = Mathf.RoundToInt(mLineWidth);
+			mLineWidth = 0f;
+		}
+	}
+
+	/// <summary>
 	/// UILabel needs additional processing when something changes.
 	/// </summary>
 
 	public override void MarkAsChanged ()
 	{
-		mShouldBeProcessed = true;
+		hasChanged = true;
 		base.MarkAsChanged();
 	}
 
@@ -337,12 +386,12 @@ public class UILabel : UIWidget
 		else if (p == Pivot.Right || p == Pivot.TopRight || p == Pivot.BottomRight)
 		{
 			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, UIFont.Alignment.Right,
-				Mathf.RoundToInt((lineWidth > 0f) ? lineWidth : relativeSize.x * mFont.size));
+				(lineWidth > 0) ? lineWidth : Mathf.RoundToInt(relativeSize.x * mFont.size));
 		}
 		else
 		{
 			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, UIFont.Alignment.Center,
-				Mathf.RoundToInt((lineWidth > 0f) ? lineWidth : relativeSize.x * mFont.size));
+				(lineWidth > 0) ? lineWidth : Mathf.RoundToInt(relativeSize.x * mFont.size));
 		}
 	}
 }

@@ -591,7 +591,7 @@ public class UICreateWidgetWizard : EditorWindow
 			lbl.transform.localPosition = new Vector3(padding, 0f, 0f);
 			lbl.multiLine = false;
 			lbl.supportEncoding = false;
-			lbl.lineWidth = 400f - padding * 2f;
+			lbl.lineWidth = Mathf.RoundToInt(400f - padding * 2f);
 			lbl.text = "You can type here";
 			lbl.MakePixelPerfect();
 

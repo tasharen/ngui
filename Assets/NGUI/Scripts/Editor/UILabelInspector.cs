@@ -12,6 +12,12 @@ public class UILabelInspector : UIWidgetInspector
 	UILabel mLabel;
 
 	/// <summary>
+	/// Register an Undo command with the Unity editor.
+	/// </summary>
+
+	void RegisterUndo () { NGUIEditorTools.RegisterUndo("Label Change", mLabel); }
+
+	/// <summary>
 	/// Font selection callback.
 	/// </summary>
 
@@ -39,7 +45,7 @@ public class UILabelInspector : UIWidgetInspector
 
 		GUILayout.BeginHorizontal();
 		{
-			float len = EditorGUILayout.FloatField("Line Width", mLabel.lineWidth, GUILayout.Width(120f));
+			int len = EditorGUILayout.IntField("Line Width", mLabel.lineWidth, GUILayout.Width(120f));
 			if (len != mLabel.lineWidth) { RegisterUndo(); mLabel.lineWidth = len; }
 
 			bool multi = EditorGUILayout.Toggle("Multi-line", mLabel.multiLine, GUILayout.Width(100f));

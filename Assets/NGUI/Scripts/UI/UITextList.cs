@@ -83,7 +83,7 @@ public class UITextList : MonoBehaviour
 	void Awake ()
 	{
 		if (textLabel == null) textLabel = GetComponentInChildren<UILabel>();
-		if (textLabel != null) textLabel.lineWidth = 0f;
+		if (textLabel != null) textLabel.lineWidth = 0;
 
 		Collider col = collider;
 
