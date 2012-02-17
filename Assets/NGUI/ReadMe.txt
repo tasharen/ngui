@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.66
+                Version 1.67
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,13 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.67:
+- FIX: Font Maker's Replace button will now re-import the data file.
+- FIX: Fixed all known issues with Undo functionality.
+- FIX: Fixed all known issues with prefabs (mainly 3.5.0-related)
+- FIX: Fixed clipping in Flash by adding a work-around for a bug in Flash export.
+- FIX: Removed 3.5b6 work-arounds for Flash as the bug has since been fixed.
 
 1.66:
 - NEW: Added a new script: ShaderQuality. It's used to automatically set shader level of detail as the quality level goes down.
