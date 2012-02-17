@@ -278,6 +278,15 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Whether the specified transform is being watched by the panel.
+	/// </summary>
+
+	public bool WatchesTransform (Transform t)
+	{
+		return t == cachedTransform || mChildren.ContainsKey(t);
+	}
+
+	/// <summary>
 	/// Add the specified transform to the managed list.
 	/// </summary>
 

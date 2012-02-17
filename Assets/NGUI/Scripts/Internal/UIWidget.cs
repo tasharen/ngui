@@ -191,13 +191,14 @@ public abstract class UIWidget : MonoBehaviour
 		if (mPanel != null)
 		{
 			// This code allows drag & dropping of widgets onto different panels in the editor.
-			bool valid = false;
+			bool valid = true;
 			Transform t = cachedTransform.parent;
 
 			// Run through the parents and see if this widget is still parented to the transform
-			while (!valid && t != null)
+			while (t != null)
 			{
-				valid = (t == mPanel.cachedTransform);
+				if (t == mPanel.cachedTransform) break;
+				if (!mPanel.WatchesTransform(t)) { valid = false; break; }
 				t = t.parent;
 			}
 
@@ -262,7 +263,7 @@ public abstract class UIWidget : MonoBehaviour
 		// Ensure we have a panel to work with by now
 		if (mPanel == null) CreatePanel();
 #if UNITY_EDITOR
-		else CheckParent();
+		else if (!Application.isPlaying) CheckParent();
 #endif
 		
 		// Automatically reset the Z scaling component back to 1 as it's not used
