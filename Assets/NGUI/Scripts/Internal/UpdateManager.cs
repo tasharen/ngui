@@ -135,6 +135,8 @@ public class UpdateManager : MonoBehaviour
 	{
 		float time = Time.realtimeSinceStartup;
 		float delta = time - mTime;
+		if (delta < 0.001f) return true;
+
 		mTime = time;
 
 		UpdateList(mOnCoro, delta);
