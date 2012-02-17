@@ -103,8 +103,8 @@ public class UISlicedSprite : UISprite
 		{
 			float borderLeft	= mInnerUV.xMin - mOuterUV.xMin;
 			float borderRight	= mOuterUV.xMax - mInnerUV.xMax;
-			float borderTop		= mOuterUV.yMin - mInnerUV.yMin;
-			float borderBottom	= mInnerUV.yMax - mOuterUV.yMax;
+			float borderTop		= mInnerUV.yMax - mOuterUV.yMax;
+			float borderBottom	= mOuterUV.yMin - mInnerUV.yMin;
 
 			Vector3 scale = cachedTransform.localScale;
 			scale.x = Mathf.Max(0f, scale.x);

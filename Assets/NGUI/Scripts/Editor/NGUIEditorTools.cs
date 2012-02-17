@@ -516,21 +516,26 @@ public class NGUIEditorTools
 		TextureImporter ti = AssetImporter.GetAtPath(path) as TextureImporter;
 		if (ti == null) return false;
 
+		TextureImporterSettings settings = new TextureImporterSettings();
+		ti.ReadTextureSettings(settings);
+
 		if (force ||
-			ti.mipmapEnabled ||
-			!ti.isReadable ||
-			ti.maxTextureSize < 4096 ||
-			ti.filterMode != FilterMode.Point ||
-			ti.wrapMode != TextureWrapMode.Clamp ||
-			ti.npotScale != TextureImporterNPOTScale.None)
+			settings.mipmapEnabled ||
+			!settings.readable ||
+			settings.maxTextureSize < 4096 ||
+			settings.filterMode != FilterMode.Point ||
+			settings.wrapMode != TextureWrapMode.Clamp ||
+			settings.npotScale != TextureImporterNPOTScale.None)
 		{
-			ti.mipmapEnabled = false;
-			ti.isReadable = true;
-			ti.maxTextureSize = 4096;
-			ti.textureFormat = TextureImporterFormat.RGBA32;
-			ti.filterMode = FilterMode.Point;
-			ti.wrapMode = TextureWrapMode.Clamp;
-			ti.npotScale = TextureImporterNPOTScale.None;
+			settings.mipmapEnabled = false;
+			settings.readable = true;
+			settings.maxTextureSize = 4096;
+			settings.textureFormat = TextureImporterFormat.RGBA32;
+			settings.filterMode = FilterMode.Point;
+			settings.wrapMode = TextureWrapMode.Clamp;
+			settings.npotScale = TextureImporterNPOTScale.None;
+			
+			ti.SetTextureSettings(settings);
 			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
 		}
 		return true;
@@ -546,20 +551,25 @@ public class NGUIEditorTools
 		TextureImporter ti = AssetImporter.GetAtPath(path) as TextureImporter;
 		if (ti == null) return false;
 
+		TextureImporterSettings settings = new TextureImporterSettings();
+		ti.ReadTextureSettings(settings);
+
 		if (force ||
-			ti.isReadable ||
-			ti.maxTextureSize < 4096 ||
-			ti.wrapMode != TextureWrapMode.Clamp ||
-			ti.npotScale != TextureImporterNPOTScale.ToNearest)
+			settings.readable ||
+			settings.maxTextureSize < 4096 ||
+			settings.wrapMode != TextureWrapMode.Clamp ||
+			settings.npotScale != TextureImporterNPOTScale.ToNearest)
 		{
-			ti.mipmapEnabled = true;
-			ti.isReadable = false;
-			ti.maxTextureSize = 4096;
-			ti.textureFormat = TextureImporterFormat.RGBA32;
-			ti.filterMode = FilterMode.Trilinear;
-			ti.anisoLevel = 4;
-			ti.wrapMode = TextureWrapMode.Clamp;
-			ti.npotScale = TextureImporterNPOTScale.ToNearest;
+			settings.mipmapEnabled = true;
+			settings.readable = false;
+			settings.maxTextureSize = 4096;
+			settings.textureFormat = TextureImporterFormat.RGBA32;
+			settings.filterMode = FilterMode.Trilinear;
+			settings.aniso = 4;
+			settings.wrapMode = TextureWrapMode.Clamp;
+			settings.npotScale = TextureImporterNPOTScale.ToNearest;
+			
+			ti.SetTextureSettings(settings);
 			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
 		}
 		return true;

@@ -257,14 +257,14 @@ public class UIPanelTool : EditorWindow
 				}
 			}
 
-			GUILayout.Label(layer, GUILayout.Width(70f));
+			GUILayout.Label(layer, GUILayout.Width(ent == null ? 65f : 70f));
 			GUILayout.Label(widgetCount, GUILayout.Width(30f));
 			GUILayout.Label(drawCalls, GUILayout.Width(30f));
 			GUILayout.Label(clipping, GUILayout.Width(30f));
 
 			if (ent == null)
 			{
-				GUILayout.Label("Giz", GUILayout.Width(20f));
+				GUILayout.Label("Giz", GUILayout.Width(24f));
 			}
 			else
 			{
