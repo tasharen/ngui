@@ -21,17 +21,10 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	// Cached and saved values
-#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
-	public Material mMat;
-	public Color mColor = Color.white;
-	public Pivot mPivot = Pivot.Center;
-	public int mDepth = 0;
-#else
 	[SerializeField] Material mMat;
 	[SerializeField] Color mColor = Color.white;
 	[SerializeField] Pivot mPivot = Pivot.Center;
 	[SerializeField] int mDepth = 0;
-#endif
 
 	Transform mTrans;
 	Texture mTex;

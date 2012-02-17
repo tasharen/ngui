@@ -19,7 +19,7 @@ Shader "Unlit/Masked Colored"
 		Cull Off
 		Lighting Off
 		ZWrite Off
-		Fog { Color (0,0,0,0) }
+		Fog { Mode Off }
 		ColorMask RGB
 		Blend Off
 		
@@ -82,7 +82,7 @@ Shader "Unlit/Masked Colored"
 		Cull Off
 		Lighting Off
 		ZWrite Off
-		Fog { Color (0,0,0,0) }
+		Fog { Mode Off }
 		ColorMask RGB
 		AlphaTest Greater .01
 		Blend Off

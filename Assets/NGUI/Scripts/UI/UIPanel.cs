@@ -39,17 +39,10 @@ public class UIPanel : MonoBehaviour
 	// Whether generated geometry is shown or hidden
 	[SerializeField] DebugInfo mDebugInfo = DebugInfo.Gizmos;
 
-#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
-	// Clipping rectangle
-	public UIDrawCall.Clipping mClipping = UIDrawCall.Clipping.None;
-	public Vector4 mClipRange = Vector4.zero;
-	public Vector2 mClipSoftness = new Vector2(40f, 40f);
-#else
 	// Clipping rectangle
 	[SerializeField] UIDrawCall.Clipping mClipping = UIDrawCall.Clipping.None;
 	[SerializeField] Vector4 mClipRange = Vector4.zero;
 	[SerializeField] Vector2 mClipSoftness = new Vector2(40f, 40f);
-#endif
 
 	// List of managed transforms
 	Dictionary<Transform, UINode> mChildren = new Dictionary<Transform, UINode>();

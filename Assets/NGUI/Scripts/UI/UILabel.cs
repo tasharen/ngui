@@ -5,15 +5,6 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Label")]
 public class UILabel : UIWidget
 {
-#if UNITY_FLASH
-	public UIFont mFont;
-	public string mText = "";
-	public bool mEncoding = true;
-	public float mLineWidth = 0;
-	public bool mMultiline = true;
-	public bool mPassword = false;
-	public bool mShowLastChar = false;
-#else
 	[SerializeField] UIFont mFont;
 	[SerializeField] string mText = "";
 	[SerializeField] bool mEncoding = true;
@@ -21,7 +12,7 @@ public class UILabel : UIWidget
 	[SerializeField] bool mMultiline = true;
 	[SerializeField] bool mPassword = false;
 	[SerializeField] bool mShowLastChar = false;
-#endif
+
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
 	float mLastSize = 0f;
@@ -188,19 +179,22 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			if (mLastText != mText)
+			if (!mShouldBeProcessed)
 			{
-				mShouldBeProcessed = true;
-			}
-			else if (mLineWidth > 0f)
-			{
-				// If the height changes, we should re-process the text
-				float size = cachedTransform.localScale.y;
-
-				if (mLastSize != size)
+				if (mLastText != mText)
 				{
-					mLastSize = size;
 					mShouldBeProcessed = true;
+				}
+				else if (mLineWidth > 0f)
+				{
+					// If the height changes, we should re-process the text
+					float size = cachedTransform.localScale.y;
+
+					if (mLastSize != size)
+					{
+						mLastSize = size;
+						mShouldBeProcessed = true;
+					}
 				}
 			}
 
@@ -331,10 +325,7 @@ public class UILabel : UIWidget
 
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
 	{
-#if !UNITY_FLASH
-		// Unity 3.5b6 is bugged as of 3.5b6 and evaluates null checks to 'true' after Application.LoadLevel
 		if (mFont == null) return;
-#endif
 		MakePositionPerfect();
 		Pivot p = pivot;
 

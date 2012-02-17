@@ -22,7 +22,7 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 			Lighting Off
 			ZWrite Off
 			Offset -1, -1
-			Fog { Color (0,0,0,0) }
+			Fog { Mode Off }
 			ColorMask RGB
 			Blend SrcAlpha OneMinusSrcAlpha
 		
@@ -95,7 +95,7 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 		Cull Off
 		Lighting Off
 		ZWrite Off
-		Fog { Color (0,0,0,0) }
+		Fog { Mode Off }
 		ColorMask RGB
 		AlphaTest Greater .01
 		Blend SrcAlpha OneMinusSrcAlpha

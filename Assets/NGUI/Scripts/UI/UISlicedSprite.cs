@@ -9,11 +9,7 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Sprite (Sliced)")]
 public class UISlicedSprite : UISprite
 {
-#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
-	public bool mFillCenter = true;
-#else
 	[SerializeField] bool mFillCenter = true;
-#endif
 
 	protected Rect mInner;
 	protected Rect mInnerUV;

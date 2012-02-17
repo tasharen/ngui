@@ -247,7 +247,7 @@ Shader "Transparent/Refractive"
 			Cull Off
 			Lighting Off
 			ZWrite Off
-			Fog { Color (0,0,0,0) }
+			Fog { Mode Off }
 			ColorMask RGB
 			AlphaTest Greater .01
 			Blend SrcAlpha OneMinusSrcAlpha

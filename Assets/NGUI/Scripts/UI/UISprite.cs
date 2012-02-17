@@ -10,13 +10,8 @@ using System.Collections.Generic;
 public class UISprite : UIWidget
 {
 	// Cached and saved values
-#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
-	public UIAtlas mAtlas;
-	public string mSpriteName;
-#else
 	[SerializeField] UIAtlas mAtlas;
 	[SerializeField] string mSpriteName;
-#endif
 
 	protected UIAtlas.Sprite mSprite;
 	protected Rect mOuter;

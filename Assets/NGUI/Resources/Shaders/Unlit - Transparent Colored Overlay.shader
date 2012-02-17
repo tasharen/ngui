@@ -22,7 +22,7 @@ Shader "Unlit/Transparent Colored Overlay"
 			Lighting Off
 			ZWrite Off
 			Offset -1, -1
-			Fog { Color (0,0,0,0) }
+			Fog { Mode Off }
 			ColorMask RGB
 			AlphaTest Greater .01
 			Blend SrcAlpha OneMinusSrcAlpha

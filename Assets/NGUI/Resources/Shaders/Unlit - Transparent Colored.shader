@@ -21,7 +21,7 @@ Shader "Unlit/Transparent Colored"
 			Cull Off
 			Lighting Off
 			ZWrite Off
-			Fog { Color (0,0,0,0) }
+			Fog { Mode Off }
 			Offset -1, -1
 			ColorMask RGB
 			AlphaTest Greater .01

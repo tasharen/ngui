@@ -17,21 +17,12 @@ public class UIFont : MonoBehaviour
 		Right,
 	}
 
-#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
-	public Material mMat;
-	public Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
-	public BMFont mFont = new BMFont();
-	public int mSpacingX = 0;
-	public int mSpacingY = 0;
-	public UIAtlas mAtlas;
-#else
 	[SerializeField] Material mMat;
 	[SerializeField] Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
 	[SerializeField] BMFont mFont = new BMFont();
 	[SerializeField] int mSpacingX = 0;
 	[SerializeField] int mSpacingY = 0;
 	[SerializeField] UIAtlas mAtlas;
-#endif
 
 	// Cached value
 	UIAtlas.Sprite mSprite = null;

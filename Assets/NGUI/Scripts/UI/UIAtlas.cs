@@ -51,11 +51,7 @@ public class UIAtlas : MonoBehaviour
 	public List<Sprite> sprites = new List<Sprite>();
 
 	// Currently active set of coordinates
-#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
-	public Coordinates mCoordinates = Coordinates.Pixels;
-#else
 	[SerializeField] Coordinates mCoordinates = Coordinates.Pixels;
-#endif
 
 	/// <summary>
 	/// Texture used by the atlas.

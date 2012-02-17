@@ -10,13 +10,8 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Sprite Animation")]
 public class UISpriteAnimation : MonoBehaviour
 {
-#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
-	public int mFPS = 30;
-	public string mPrefix = "";
-#else
 	[SerializeField] int mFPS = 30;
 	[SerializeField] string mPrefix = "";
-#endif
 
 	UISprite mSprite;
 	float mDelta = 0f;

@@ -108,12 +108,7 @@ public class UIPopupList : MonoBehaviour
 
 	public string functionName = "OnSelectionChange";
 
-#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
-	public string mSelectedItem;
-#else
 	[SerializeField] string mSelectedItem;
-#endif
-
 	UIPanel mPanel;
 	GameObject mChild;
 	UISprite mHighlight;

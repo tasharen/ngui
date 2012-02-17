@@ -18,13 +18,8 @@ public class UIFilledSprite : UISprite
 		TowardBottom,
 	}
 
-#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
-	public FillDirection mFillDirection = FillDirection.TowardRight;
-	public float mFillAmount = 1.0f;
-#else
 	[SerializeField] FillDirection mFillDirection = FillDirection.TowardRight;
 	[SerializeField] float mFillAmount = 1.0f;
-#endif
 
 	/// <summary>
 	/// Direction of the cut procedure.
