@@ -5,6 +5,7 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Label")]
 public class UILabel : UIWidget
 {
+#if UNITY_FLASH
 	public UIFont mFont;
 	public string mText = "";
 	public bool mEncoding = true;
@@ -12,10 +13,19 @@ public class UILabel : UIWidget
 	public bool mMultiline = true;
 	public bool mPassword = false;
 	public bool mShowLastChar = false;
-
+#else
+	[SerializeField] UIFont mFont;
+	[SerializeField] string mText = "";
+	[SerializeField] bool mEncoding = true;
+	[SerializeField] float mLineWidth = 0;
+	[SerializeField] bool mMultiline = true;
+	[SerializeField] bool mPassword = false;
+	[SerializeField] bool mShowLastChar = false;
+#endif
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
 	float mLastSize = 0f;
+	string mLastText = "";
 
 	/// <summary>
 	/// Set the font used by this label.
@@ -178,9 +188,13 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			// If the height changes, we should re-process the text
-			if (mLineWidth > 0f)
+			if (mLastText != mText)
 			{
+				mShouldBeProcessed = true;
+			}
+			else if (mLineWidth > 0f)
+			{
+				// If the height changes, we should re-process the text
 				float size = cachedTransform.localScale.y;
 
 				if (mLastSize != size)
@@ -193,6 +207,7 @@ public class UILabel : UIWidget
 			// Process the text if necessary
 			if (mShouldBeProcessed)
 			{
+				mLastText = mText;
 				mShouldBeProcessed = false;
 				mProcessedText = mText.Replace("\\n", "\n");
 
