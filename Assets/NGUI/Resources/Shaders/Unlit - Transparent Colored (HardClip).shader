@@ -35,7 +35,6 @@ Shader "Unlit/Transparent Colored (HardClip)"
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
-			float4 _ClipRange = float4(0.0, 0.0, 1000.0, 1000.0);
 
 			struct appdata_t
 			{
@@ -55,16 +54,16 @@ Shader "Unlit/Transparent Colored (HardClip)"
 			v2f vert (appdata_t v)
 			{
 				v2f o;
-				o.worldPos = v.vertex.xy;
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.color = v.color;
-				o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
+				o.texcoord = v.texcoord;
+				o.worldPos = TRANSFORM_TEX(v.vertex.xy, _MainTex);
 				return o;
 			}
 
 			fixed4 frag (v2f IN) : COLOR
 			{
-				float2 factor = abs(IN.worldPos - _ClipRange.xy) / _ClipRange.zw;
+				float2 factor = abs(IN.worldPos);
 				clip(1.0 - max(factor.x, factor.y));
 				return tex2D(_MainTex, IN.texcoord) * IN.color;
 			}

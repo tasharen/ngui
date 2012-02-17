@@ -249,7 +249,8 @@ public class UIDrawCall : MonoBehaviour
 
 		if (mClippedMat != null)
 		{
-			mClippedMat.SetVector("_ClipRange", mClipRange);
+			mClippedMat.mainTextureOffset = new Vector2(-mClipRange.x / mClipRange.z, -mClipRange.y / mClipRange.w);
+			mClippedMat.mainTextureScale = new Vector2(1f / mClipRange.z, 1f / mClipRange.w);
 
 			Vector2 sharpness = new Vector2(1000.0f, 1000.0f);
 			if (mClipSoft.x > 0f) sharpness.x = mClipRange.z / mClipSoft.x;
