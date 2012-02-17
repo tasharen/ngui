@@ -18,18 +18,16 @@ public class UIFilledSpriteInspector : UISpriteInspector
 
 		if (sprite.fillDirection != fillDirection)
 		{
-			Undo.RegisterUndo(mSprite, "Sprite Change");
+			NGUIEditorTools.RegisterUndo("Sprite Change", mSprite);
 			sprite.fillDirection = fillDirection;
-			EditorUtility.SetDirty(mSprite.gameObject);
 		}
 
 		float fillAmount = EditorGUILayout.FloatField("Fill Amount", sprite.fillAmount);
 
 		if (sprite.fillAmount != fillAmount)
 		{
-			Undo.RegisterUndo(mSprite, "Sprite Change");
+			NGUIEditorTools.RegisterUndo("Sprite Change", mSprite);
 			sprite.fillAmount = fillAmount;
-			EditorUtility.SetDirty(mSprite.gameObject);
 		}
 		return true;
 	}

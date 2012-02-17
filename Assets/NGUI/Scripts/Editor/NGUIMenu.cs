@@ -34,7 +34,7 @@ static public class NGUIMenu
 		{
 			if (go != null)
 			{
-				Undo.RegisterUndo(go, "Widget Collider");
+				NGUIEditorTools.RegisterUndo("Add Widget Collider", go);
 				NGUITools.AddWidgetCollider(go);
 			}
 			else
@@ -51,7 +51,7 @@ static public class NGUIMenu
 
 		if (NGUIEditorTools.WillLosePrefab(go))
 		{
-			Undo.RegisterUndo(go, "Add a child UI Panel");
+			NGUIEditorTools.RegisterUndo("Add a child UI Panel", go);
 
 			GameObject child = new GameObject(NGUITools.GetName<UIPanel>());
 			child.layer = go.layer;

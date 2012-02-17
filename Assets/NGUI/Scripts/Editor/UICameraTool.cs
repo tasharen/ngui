@@ -272,9 +272,8 @@ public class UICameraTool : EditorWindow
 
 				if (cam.cullingMask != mask)
 				{
-					Undo.RegisterUndo(cam, "Camera Mask Change");
+					NGUIEditorTools.RegisterUndo("Camera Mask Change", cam);
 					cam.cullingMask = mask;
-					EditorUtility.SetDirty(cam.gameObject);
 				}
 			}
 		}

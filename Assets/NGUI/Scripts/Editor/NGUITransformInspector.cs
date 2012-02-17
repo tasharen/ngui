@@ -22,7 +22,7 @@ public class NGUITransformInspector : Editor
 		{
 			if (DrawButton("P", "Reset Position", IsResetPositionValid(trans), 20f))
 			{
-				Undo.RegisterUndo(trans, "Reset Position");
+				NGUIEditorTools.RegisterUndo("Reset Position", trans);
 				trans.localPosition = Vector3.zero;
 			}
 			pos = DrawVector3(trans.localPosition);
@@ -34,7 +34,7 @@ public class NGUITransformInspector : Editor
 		{
 			if (DrawButton("R", "Reset Rotation", IsResetRotationValid(trans), 20f))
 			{
-				Undo.RegisterUndo(trans, "Reset Rotation");
+				NGUIEditorTools.RegisterUndo("Reset Rotation", trans);
 				trans.localEulerAngles = Vector3.zero;
 			}
 			rot = DrawVector3(trans.localEulerAngles);
@@ -46,7 +46,7 @@ public class NGUITransformInspector : Editor
 		{
 			if (DrawButton("S", "Reset Scale", IsResetScaleValid(trans), 20f))
 			{
-				Undo.RegisterUndo(trans, "Reset Scale");
+				NGUIEditorTools.RegisterUndo("Reset Scale", trans);
 				trans.localScale = Vector3.one;
 			}
 			scale = DrawVector3(trans.localScale);
@@ -56,7 +56,7 @@ public class NGUITransformInspector : Editor
 		// If something changes, set the transform values
 		if (GUI.changed)
 		{
-			Undo.RegisterUndo(trans, "Transform Change");
+			NGUIEditorTools.RegisterUndo("Transform Change", trans);
 			trans.localPosition		= Validate(pos);
 			trans.localEulerAngles	= Validate(rot);
 			trans.localScale		= Validate(scale);

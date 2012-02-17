@@ -533,9 +533,7 @@ public class UIAtlasMaker : EditorWindow
 			// so the undo process doesn't work right. Because of this I'd rather disable it altogether until a solution is found.
 
 			// The ability to undo this action is always useful
-			//if (mAtlas.texture != null) Undo.RegisterUndo(mAtlas.texture, "Update Atlas");
-			//if (mAtlas.material != null) Undo.RegisterUndo(mAtlas.material, "Update Atlas");
-			//Undo.RegisterUndo(mAtlas, "Update Atlas");
+			//NGUIEditorTools.RegisterUndo("Update Atlas", mAtlas, mAtlas.texture, mAtlas.material);
 
 			// Update the atlas
 			UpdateAtlas(mAtlas, sprites);

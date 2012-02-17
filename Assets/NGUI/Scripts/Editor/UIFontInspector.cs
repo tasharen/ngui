@@ -23,9 +23,8 @@ public class UIFontInspector : Editor
 	{
 		if (mFont != null)
 		{
-			Undo.RegisterUndo(mFont, "Font Atlas");
+			NGUIEditorTools.RegisterUndo("Font Atlas", mFont);
 			mFont.atlas = obj as UIAtlas;
-			EditorUtility.SetDirty(mFont);
 			MarkAsChanged();
 		}
 	}
@@ -61,9 +60,8 @@ public class UIFontInspector : Editor
 
 				if (mFont.spriteName != spriteName)
 				{
-					Undo.RegisterUndo(mFont, "Font Sprite");
+					NGUIEditorTools.RegisterUndo("Font Sprite", mFont);
 					mFont.spriteName = spriteName;
-					EditorUtility.SetDirty(mFont);
 				}
 			}
 		}
@@ -74,9 +72,8 @@ public class UIFontInspector : Editor
 
 			if (mFont.material != mat)
 			{
-				Undo.RegisterUndo(mFont, "Font Material");
+				NGUIEditorTools.RegisterUndo("Font Material", mFont);
 				mFont.material = mat;
-				EditorUtility.SetDirty(mFont);
 			}
 		}
 
@@ -88,11 +85,10 @@ public class UIFontInspector : Editor
 
 			if (data != null)
 			{
-				Undo.RegisterUndo(mFont, "Import Font Data");
+				NGUIEditorTools.RegisterUndo("Import Font Data", mFont);
 				BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), data.bytes);
 				mFont.Refresh();
 				resetWidthHeight = true;
-				EditorUtility.SetDirty(mFont);
 				Debug.Log("Imported " + mFont.bmFont.glyphCount + " characters");
 			}
 		}
@@ -147,9 +143,8 @@ public class UIFontInspector : Editor
 
 					if (mFont.uvRect != uvRect)
 					{
-						Undo.RegisterUndo(mFont, "Font Pixel Rect");
+						NGUIEditorTools.RegisterUndo("Font Pixel Rect", mFont);
 						mFont.uvRect = uvRect;
-						EditorUtility.SetDirty(mFont);
 					}
 				}
 
@@ -166,10 +161,9 @@ public class UIFontInspector : Editor
 
 					if (mFont.horizontalSpacing != x || mFont.verticalSpacing != y)
 					{
-						Undo.RegisterUndo(mFont, "Font Spacing");
+						NGUIEditorTools.RegisterUndo("Font Spacing", mFont);
 						mFont.horizontalSpacing = x;
 						mFont.verticalSpacing = y;
-						EditorUtility.SetDirty(mFont);
 					}
 				}
 				GUILayout.EndHorizontal();

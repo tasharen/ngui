@@ -25,7 +25,8 @@ public class UIWidgetInspector : Editor
 		if (!mRegisteredUndo)
 		{
 			mRegisteredUndo = true;
-			Undo.RegisterUndo(mWidget, "Widget Change");
+			NGUIEditorTools.RegisterUndo("Widget Change", mWidget);
+			mWidget.MarkAsChanged();
 		}
 	}
 
@@ -70,9 +71,6 @@ public class UIWidgetInspector : Editor
 				// Draw all common properties next
 				DrawCommonProperties();
 			}
-
-			// Update the widget's properties if something has changed
-			if (mRegisteredUndo) mWidget.MarkAsChanged();
 		}
 	}
 
@@ -96,32 +94,9 @@ public class UIWidgetInspector : Editor
 
 			if (mWidget.depth != depth)
 			{
-				Undo.RegisterUndo(mWidget, "Depth Change");
+				NGUIEditorTools.RegisterUndo("Depth Change", mWidget);
 				mWidget.depth = depth;
-				EditorUtility.SetDirty(mWidget.gameObject);
 			}
-
-			// NOTE: Experimental code that swaps depth layers and updates the colliders on depth change.
-			/*if (GUILayout.Button("Back"))
-			{
-				Undo.RegisterSceneUndo("Depth Change");
-				mWidget.panel.SwapDepth(mWidget.depth, mWidget.depth - 1);
-			}
-
-			int depth = EditorGUILayout.IntField(mWidget.depth, GUILayout.Width(40f));
-
-			if (mWidget.depth != depth)
-			{
-				Undo.RegisterSceneUndo("Depth Change");
-				mWidget.depth = depth;
-				EditorUtility.SetDirty(mWidget.gameObject);
-			}
-
-			if (GUILayout.Button("Forward"))
-			{
-				Undo.RegisterSceneUndo("Depth Change");
-				mWidget.panel.SwapDepth(mWidget.depth, mWidget.depth + 1);
-			}*/
 		}
 		GUILayout.EndHorizontal();
 
@@ -129,9 +104,8 @@ public class UIWidgetInspector : Editor
 
 		if (mWidget.color != color)
 		{
-			Undo.RegisterUndo(mWidget, "Color Change");
+			NGUIEditorTools.RegisterUndo("Color Change", mWidget);
 			mWidget.color = color;
-			EditorUtility.SetDirty(mWidget.gameObject);
 		}
 
 		GUILayout.BeginHorizontal();
@@ -140,9 +114,8 @@ public class UIWidgetInspector : Editor
 
 			if (GUILayout.Button("Make Pixel-Perfect"))
 			{
-				Undo.RegisterUndo(mWidget.transform, "Make Pixel-Perfect");
+				NGUIEditorTools.RegisterUndo("Make Pixel-Perfect", mWidget.transform);
 				mWidget.MakePixelPerfect();
-				EditorUtility.SetDirty(mWidget.transform);
 			}
 		}
 		GUILayout.EndHorizontal();
@@ -151,9 +124,8 @@ public class UIWidgetInspector : Editor
 
 		if (mWidget.pivot != pivot)
 		{
-			Undo.RegisterUndo(mWidget, "Pivot Change");
+			NGUIEditorTools.RegisterUndo("Pivot Change", mWidget);
 			mWidget.pivot = pivot;
-			EditorUtility.SetDirty(mWidget.gameObject);
 		}
 
 		if (mWidget.mainTexture != null)

@@ -40,9 +40,8 @@ public class NGUISelectionTools
 	{
 		if (HasValidTransform())
 		{
-			Undo.RegisterSceneUndo("Clear Local Transform");
-
 			Transform t = Selection.activeTransform;
+			NGUIEditorTools.RegisterUndo("Clear Local Transform", t);
 			t.localPosition = Vector3.zero;
 			t.localRotation = Quaternion.identity;
 			t.localScale = Vector3.one;
@@ -55,7 +54,7 @@ public class NGUISelectionTools
 		if (PrefabCheck())
 		{
 			// Make this action undoable
-			Undo.RegisterSceneUndo("Add New Child");
+			NGUIEditorTools.RegisterUndo("Add New Child");
 
 			// Create our new GameObject
 			GameObject newGameObject = new GameObject();

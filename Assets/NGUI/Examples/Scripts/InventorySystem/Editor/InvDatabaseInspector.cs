@@ -64,7 +64,7 @@ public class InvDatabaseInspector : Editor
 
 				if (GUILayout.Button("Delete"))
 				{
-					Undo.RegisterUndo(db, "Delete Inventory Item");
+					NGUIEditorTools.RegisterUndo("Delete Inventory Item", db);
 					db.items.RemoveAt(mIndex);
 					mConfirmDelete = false;
 				}
@@ -79,7 +79,7 @@ public class InvDatabaseInspector : Editor
 
 			if (atlas != db.iconAtlas)
 			{
-				Undo.RegisterUndo(db, "Databse Atlas change");
+				NGUIEditorTools.RegisterUndo("Databse Atlas change", db);
 				db.iconAtlas = atlas;
 				foreach (InvBaseItem i in db.items) i.iconAtlas = atlas;
 			}
@@ -89,7 +89,7 @@ public class InvDatabaseInspector : Editor
 
 			if (dbID != db.databaseID)
 			{
-				Undo.RegisterUndo(db, "Database ID change");
+				NGUIEditorTools.RegisterUndo("Database ID change", db);
 				db.databaseID = dbID;
 			}
 
@@ -98,7 +98,7 @@ public class InvDatabaseInspector : Editor
 
 			if (GUILayout.Button("New Item"))
 			{
-				Undo.RegisterUndo(db, "Add Inventory Item");
+				NGUIEditorTools.RegisterUndo("Add Inventory Item", db);
 
 				InvBaseItem bi = new InvBaseItem();
 				bi.iconAtlas = db.iconAtlas;
@@ -171,7 +171,7 @@ public class InvDatabaseInspector : Editor
 
 					if (!itemName.Equals(item.name))
 					{
-						Undo.RegisterUndo(db, "Rename Item");
+						NGUIEditorTools.RegisterUndo("Rename Item", db);
 						item.name = itemName;
 					}
 				}
@@ -295,13 +295,13 @@ public class InvDatabaseInspector : Editor
 							GUI.backgroundColor = Color.red;
 							if (GUILayout.Button("X", GUILayout.Width(20f)))
 							{
-								Undo.RegisterUndo(db, "Delete Item Stat");
+								NGUIEditorTools.RegisterUndo("Delete Item Stat", db);
 								item.stats.RemoveAt(i);
 								--i;
 							}
 							else if (iden != stat.id || amount != stat.amount || mod != stat.modifier)
 							{
-								Undo.RegisterUndo(db, "Item Stats");
+								NGUIEditorTools.RegisterUndo("Item Stats", db);
 								stat.id = iden;
 								stat.amount = amount;
 								stat.modifier = mod;
@@ -314,7 +314,7 @@ public class InvDatabaseInspector : Editor
 
 				if (GUILayout.Button("Add Stat", GUILayout.Width(80f)))
 				{
-					Undo.RegisterUndo(db, "Add Item Stat");
+					NGUIEditorTools.RegisterUndo("Add Item Stat", db);
 					InvStat stat = new InvStat();
 					stat.id = InvStat.Identifier.Armor;
 					item.stats.Add(stat);
@@ -329,7 +329,7 @@ public class InvDatabaseInspector : Editor
 					max		!= item.maxItemLevel ||
 					!iconName.Equals(item.iconName))
 				{
-					Undo.RegisterUndo(db, "Item Properties");
+					NGUIEditorTools.RegisterUndo("Item Properties", db);
 					item.description = itemDesc;
 					item.slot = slot;
 					item.attachment = go;

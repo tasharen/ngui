@@ -21,7 +21,7 @@ public class UISlicedSpriteInspector : UISpriteInspector
 
 			if (sp.fillCenter != fill)
 			{
-				Undo.RegisterUndo(sp, "Sprite Change");
+				NGUIEditorTools.RegisterUndo("Sprite Change", sp);
 				sp.fillCenter = fill;
 				EditorUtility.SetDirty(sp.gameObject);
 			}

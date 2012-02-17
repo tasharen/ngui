@@ -15,9 +15,8 @@ public class UITextureInspector : UIWidgetInspector
 
 		if (mWidget.material != mat)
 		{
-			Undo.RegisterUndo(mWidget, "Material Selection");
+			NGUIEditorTools.RegisterUndo("Material Selection", mWidget);
 			mWidget.material = mat;
-			EditorUtility.SetDirty(mWidget.gameObject);
 		}
 		return (mWidget.material != null);
 	}

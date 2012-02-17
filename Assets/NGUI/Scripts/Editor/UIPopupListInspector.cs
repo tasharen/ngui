@@ -11,15 +11,20 @@ public class UIPopupListInspector : Editor
 {
 	UIPopupList mList;
 
+	void RegisterUndo ()
+	{
+		NGUIEditorTools.RegisterUndo("Popup List Change", mList);
+	}
+
 	void OnSelectAtlas (MonoBehaviour obj)
 	{
-		Undo.RegisterUndo(mList, "Popup List Change");
+		RegisterUndo();
 		mList.atlas = obj as UIAtlas;
 	}
 	
 	void OnSelectFont (MonoBehaviour obj)
 	{
-		Undo.RegisterUndo(mList, "Popup List Change");
+		RegisterUndo();
 		mList.font = obj as UIFont;
 	}
 
@@ -35,7 +40,7 @@ public class UIPopupListInspector : Editor
 
 		if (mList.textLabel != lbl)
 		{
-			Undo.RegisterUndo(mList, "Popup List Change");
+			RegisterUndo();
 			mList.textLabel = lbl;
 			if (lbl != null) lbl.text = mList.selection;
 		}
@@ -47,7 +52,7 @@ public class UIPopupListInspector : Editor
 
 			if (mList.backgroundSprite != bg || mList.highlightSprite != hl)
 			{
-				Undo.RegisterUndo(mList, "Popup List Change");
+				RegisterUndo();
 				mList.backgroundSprite = bg;
 				mList.highlightSprite = hl;
 			}
@@ -68,7 +73,7 @@ public class UIPopupListInspector : Editor
 
 			if (modified != text)
 			{
-				Undo.RegisterUndo(mList, "Popup List Change");
+				RegisterUndo();
 				string[] split = modified.Split(new char[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
 				mList.items.Clear();
 				foreach (string s in split) mList.items.Add(s);
@@ -83,7 +88,7 @@ public class UIPopupListInspector : Editor
 
 			if (mList.selection != sel)
 			{
-				Undo.RegisterUndo(mList, "Popup List Change");
+				RegisterUndo();
 				mList.selection = sel;
 			}
 
@@ -99,7 +104,7 @@ public class UIPopupListInspector : Editor
 				mList.backgroundColor != bc ||
 				mList.isAnimated != isAnimated)
 			{
-				Undo.RegisterUndo(mList, "Popup List Change");
+				RegisterUndo();
 				mList.textScale = ts;
 				mList.textColor = tc;
 				mList.backgroundColor = bc;
@@ -120,7 +125,7 @@ public class UIPopupListInspector : Editor
 			
 			if (mList.padding != padding)
 			{
-				Undo.RegisterUndo(mList, "Popup List Change");
+				RegisterUndo();
 				mList.padding = padding;
 			}
 
@@ -133,7 +138,7 @@ public class UIPopupListInspector : Editor
 
 			if (mList.eventReceiver != go || mList.functionName != fn)
 			{
-				Undo.RegisterUndo(mList, "Popup List Change");
+				RegisterUndo();
 				mList.eventReceiver = go;
 				mList.functionName = fn;
 			}

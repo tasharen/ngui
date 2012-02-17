@@ -17,14 +17,12 @@ public class UILabelInspector : UIWidgetInspector
 
 	void OnSelectFont (MonoBehaviour obj)
 	{
-		Undo.RegisterUndo(mLabel, "Font Selection");
-
 		if (mLabel != null)
 		{
+			NGUIEditorTools.RegisterUndo("Font Selection", mLabel);
 			bool resize = (mLabel.font == null);
 			mLabel.font = obj as UIFont;
 			if (resize) mLabel.MakePixelPerfect();
-			EditorUtility.SetDirty(mLabel.gameObject);
 		}
 	}
 

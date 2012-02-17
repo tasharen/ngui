@@ -18,7 +18,6 @@ public class UIAtlasInspector : Editor
 	static bool mUseShader = false;
 
 	UIAtlas mAtlas;
-	bool mRegisteredUndo = false;
 	bool mConfirmDelete = false;
 	UIAtlas.Sprite mSprite;
 
@@ -57,25 +56,11 @@ public class UIAtlasInspector : Editor
 	}
 
 	/// <summary>
-	/// Register an Undo command with the Unity editor.
-	/// </summary>
-
-	protected void RegisterUndo ()
-	{
-		if (!mRegisteredUndo)
-		{
-			mRegisteredUndo = true;
-			Undo.RegisterUndo(mAtlas, "Atlas Change");
-		}
-	}
-
-	/// <summary>
 	/// Draw the inspector widget.
 	/// </summary>
 
 	public override void OnInspectorGUI ()
 	{
-		mRegisteredUndo = false;
 		EditorGUIUtility.LookLikeControls(80f);
 		mAtlas = target as UIAtlas;
 
@@ -86,7 +71,7 @@ public class UIAtlasInspector : Editor
 
 			if (mAtlas.material != mat)
 			{
-				RegisterUndo();
+				NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
 				mAtlas.material = mat;
 
 				// Ensure that this atlas has valid import settings
@@ -105,9 +90,8 @@ public class UIAtlasInspector : Editor
 					// Ensure that this atlas has valid import settings
 					if (mAtlas.texture != null) NGUIEditorTools.ImportTexture(mAtlas.texture, false, false);
 
-					Undo.RegisterUndo(mAtlas, "Import Sprites");
+					NGUIEditorTools.RegisterUndo("Import Sprites", mAtlas);
 					NGUIJson.LoadSpriteData(mAtlas, ta);
-					mRegisteredUndo = true;
 					if (mSprite != null) mSprite = mAtlas.GetSprite(mSprite.name);
 					mAtlas.MarkAsDirty();
 				}
@@ -116,7 +100,7 @@ public class UIAtlasInspector : Editor
 
 				if (coords != mAtlas.coordinates)
 				{
-					RegisterUndo();
+					NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
 					mAtlas.coordinates = coords;
 					mConfirmDelete = false;
 				}
@@ -145,7 +129,7 @@ public class UIAtlasInspector : Editor
 
 						if (GUILayout.Button("Delete"))
 						{
-							RegisterUndo();
+							NGUIEditorTools.RegisterUndo("Delete Sprite", mAtlas);
 							mAtlas.sprites.Remove(mSprite);
 							mConfirmDelete = false;
 						}
@@ -172,7 +156,7 @@ public class UIAtlasInspector : Editor
 
 					if (GUILayout.Button("New Sprite"))
 					{
-						RegisterUndo();
+						NGUIEditorTools.RegisterUndo("Add Sprite", mAtlas);
 						UIAtlas.Sprite newSprite = new UIAtlas.Sprite();
 
 						if (mSprite != null)
@@ -239,7 +223,7 @@ public class UIAtlasInspector : Editor
 
 							if (!found)
 							{
-								RegisterUndo();
+								NGUIEditorTools.RegisterUndo("Edit Sprite Name", mAtlas);
 								mSprite.name = name;
 							}
 						}
@@ -307,7 +291,7 @@ public class UIAtlasInspector : Editor
 
 							if (a.x != left || a.y != top || b.x != right || b.y != bottom)
 							{
-								RegisterUndo();
+								NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
 								mSprite.paddingLeft		= a.x / mSprite.outer.width;
 								mSprite.paddingTop		= a.y / mSprite.outer.width;
 								mSprite.paddingRight	= b.x / mSprite.outer.height;
@@ -373,7 +357,7 @@ public class UIAtlasInspector : Editor
 
 						if (mSprite.outer != outer || mSprite.inner != inner)
 						{
-							RegisterUndo();
+							NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
 							mSprite.outer = outer;
 							mSprite.inner = inner;
 							mConfirmDelete = false;
@@ -401,8 +385,5 @@ public class UIAtlasInspector : Editor
 				}
 			}
 		}
-
-		// If something changed, mark the atlas as dirty
-		if (mRegisteredUndo) EditorUtility.SetDirty(mAtlas);
 	}
 }

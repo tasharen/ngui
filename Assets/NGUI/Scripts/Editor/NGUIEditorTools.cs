@@ -713,4 +713,26 @@ public class NGUIEditorTools
 
 		return new Vector4(a.x, a.y, b.x, b.y);
 	}
+
+	/// <summary>
+	/// Create an undo point for the specified objects.
+	/// This action also marks the object as dirty so prefabs work correctly in 3.5.0 (work-around for a bug in Unity).
+	/// </summary>
+
+	static public void RegisterUndo (string name, params Object[] objects)
+	{
+		if (objects != null && objects.Length > 0)
+		{
+			foreach (Object obj in objects)
+			{
+				if (obj == null) continue;
+				Undo.RegisterUndo(obj, name);
+				EditorUtility.SetDirty(obj);
+			}
+		}
+		else
+		{
+			Undo.RegisterSceneUndo(name);
+		}
+	}
 }

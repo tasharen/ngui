@@ -85,7 +85,7 @@ public class UIPanelInspector : Editor
 
 			if (panel.clipRange != range)
 			{
-				Undo.RegisterUndo(panel, "Clipping Change");
+				NGUIEditorTools.RegisterUndo("Clipping Change", panel);
 				panel.clipRange = range;
 				EditorUtility.SetDirty(panel);
 			}
@@ -102,7 +102,7 @@ public class UIPanelInspector : Editor
 
 				if (panel.clipSoftness != soft)
 				{
-					Undo.RegisterUndo(panel, "Clipping Change");
+					NGUIEditorTools.RegisterUndo("Clipping Change", panel);
 					panel.clipSoftness = soft;
 					EditorUtility.SetDirty(panel);
 				}

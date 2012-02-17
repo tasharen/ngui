@@ -23,7 +23,7 @@ public class UISpriteAnimationInspector : Editor
 
 		if (anim.framesPerSecond != fps)
 		{
-			Undo.RegisterUndo(anim, "Sprite Animation Change");
+			NGUIEditorTools.RegisterUndo("Sprite Animation Change", anim);
 			anim.framesPerSecond = fps;
 			EditorUtility.SetDirty(anim);
 		}
@@ -32,7 +32,7 @@ public class UISpriteAnimationInspector : Editor
 
 		if (anim.namePrefix != namePrefix)
 		{
-			Undo.RegisterUndo(anim, "Sprite Animation Change");
+			NGUIEditorTools.RegisterUndo("Sprite Animation Change", anim);
 			anim.namePrefix = namePrefix;
 			EditorUtility.SetDirty(anim);
 		}

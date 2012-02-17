@@ -192,7 +192,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 		if (retVal && isValid)
 		{
-			Undo.RegisterSceneUndo("Add a Widget");
+			NGUIEditorTools.RegisterUndo("Add a Widget");
 			return true;
 		}
 		return false;

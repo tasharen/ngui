@@ -58,7 +58,7 @@ public class UICreateNewUIWizard : EditorWindow
 
 	void CreateNewUI ()
 	{
-		Undo.RegisterSceneUndo("Create New UI");
+		NGUIEditorTools.RegisterUndo("Create New UI");
 
 		// Root for the UI
 		GameObject root = null;

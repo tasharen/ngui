@@ -19,10 +19,9 @@ public class UIImageButtonInspector : Editor
 	{
 		if (mButton.target != null)
 		{
-			Undo.RegisterUndo(mButton.target, "Atlas Selection");
+			NGUIEditorTools.RegisterUndo("Atlas Selection", mButton.target);
 			mButton.target.atlas = obj as UIAtlas;
 			mButton.target.MakePixelPerfect();
-			EditorUtility.SetDirty(mButton.gameObject);
 		}
 	}
 
@@ -35,7 +34,7 @@ public class UIImageButtonInspector : Editor
 
 		if (mButton.target != sprite)
 		{
-			Undo.RegisterUndo(mButton, "Image Button Change");
+			NGUIEditorTools.RegisterUndo("Image Button Change", mButton);
 			mButton.target = sprite;
 			if (sprite != null) sprite.spriteName = mButton.normalSprite;
 		}
@@ -54,7 +53,7 @@ public class UIImageButtonInspector : Editor
 					mButton.hoverSprite != hover ||
 					mButton.pressedSprite != press)
 				{
-					Undo.RegisterSceneUndo("Image Button Change");
+					NGUIEditorTools.RegisterUndo("Image Button Change", mButton, mButton.gameObject, sprite);
 					mButton.normalSprite = normal;
 					mButton.hoverSprite = hover;
 					mButton.pressedSprite = press;

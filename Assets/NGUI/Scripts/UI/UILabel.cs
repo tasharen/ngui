@@ -5,7 +5,6 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Label")]
 public class UILabel : UIWidget
 {
-#if UNITY_FLASH // Unity 3.5b6 is bugged when SerializeField is mixed with prefabs (after LoadLevel)
 	public UIFont mFont;
 	public string mText = "";
 	public bool mEncoding = true;
@@ -13,15 +12,6 @@ public class UILabel : UIWidget
 	public bool mMultiline = true;
 	public bool mPassword = false;
 	public bool mShowLastChar = false;
-#else
-	[SerializeField] UIFont mFont;
-	[SerializeField] string mText = "";
-	[SerializeField] bool mEncoding = true;
-	[SerializeField] float mLineWidth = 0;
-	[SerializeField] bool mMultiline = true;
-	[SerializeField] bool mPassword = false;
-	[SerializeField] bool mShowLastChar = false;
-#endif
 
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
