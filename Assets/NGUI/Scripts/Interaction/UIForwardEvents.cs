@@ -3,6 +3,8 @@
 /// <summary>
 /// This script can be used to forward events from one object to another.
 /// Example usage: Forwarding 'drag' event from the slider's thumb to the slider itself.
+/// In most cases you should use UIEventListener script instead. For example:
+/// UIEventListener.Add(gameObject).onClick += MyClickFunction;
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Forward Events")]
@@ -16,6 +18,7 @@ public class UIForwardEvents : MonoBehaviour
 	public bool onDrag	 = false;
 	public bool onDrop	 = false;
 	public bool onInput  = false;
+	public bool onSubmit = false;
 
 	void OnHover (bool isOver)
 	{
@@ -70,6 +73,14 @@ public class UIForwardEvents : MonoBehaviour
 		if (onInput && target != null)
 		{
 			target.SendMessage("OnInput", text, SendMessageOptions.DontRequireReceiver);
+		}
+	}
+
+	void OnSubmit ()
+	{
+		if (onSubmit && target != null)
+		{
+			target.SendMessage("OnSubmit", SendMessageOptions.DontRequireReceiver);
 		}
 	}
 }

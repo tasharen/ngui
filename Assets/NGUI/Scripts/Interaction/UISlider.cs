@@ -72,10 +72,9 @@ public class UISlider : MonoBehaviour
 	{
 		if (Application.isPlaying && thumb != null && thumb.collider != null)
 		{
-			UIForwardEvents fe = thumb.gameObject.AddComponent<UIForwardEvents>();
-			fe.target = gameObject;
-			fe.onPress = true;
-			fe.onDrag = true;
+			UIEventListener listener = UIEventListener.Add(thumb.gameObject);
+			listener.onPress += OnPressThumb;
+			listener.onDrag += OnDragThumb;
 		}
 		Set(rawValue);
 	}
@@ -91,6 +90,18 @@ public class UISlider : MonoBehaviour
 	/// </summary>
 
 	void OnDrag (Vector2 delta) { UpdateDrag(); }
+
+	/// <summary>
+	/// Callback from the thumb.
+	/// </summary>
+
+	void OnPressThumb (GameObject go, bool pressed) { if (pressed) UpdateDrag(); }
+
+	/// <summary>
+	/// Callback from the thumb.
+	/// </summary>
+
+	void OnDragThumb (GameObject go, Vector2 delta) { UpdateDrag(); }
 
 	/// <summary>
 	/// Watch for slider value changes and adjust the visual sprite accordingly.
