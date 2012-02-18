@@ -43,6 +43,7 @@ All can be found here: http://www.tasharen.com/?page_id=197
 - FIX: Widgets will now ensure they're under the right panel after drag & drop in the editor.
 - FIX: It's now possible to visibly modify the value of the slider at edit mode.
 - FIX: Scaling labels now properly rebuilds them.
+- FIX: Scaling labels will no longer affect the widget bounds in odd ways.
 
 1.67:
 - FIX: Font Maker's Replace button will now re-import the data file.
