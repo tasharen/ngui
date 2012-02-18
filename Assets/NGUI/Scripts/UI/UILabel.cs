@@ -255,7 +255,7 @@ public class UILabel : UIWidget
 				}
 				else if (mMaxLineWidth > 0)
 				{
-					mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.y, mMultiline, mEncoding);
+					mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.x, mMultiline, mEncoding);
 				}
 				else if (!mMultiline)
 				{
@@ -275,7 +275,8 @@ public class UILabel : UIWidget
 		get
 		{
 			Vector3 size = (mFont != null) ? mFont.CalculatePrintedSize(processedText, mEncoding) : Vector2.one;
-			size.x = Mathf.Max(size.x, (mFont != null && mFont.size > 0) ? lineWidth / mFont.size : 1f);
+			float scale = cachedTransform.localScale.x;
+			size.x = Mathf.Max(size.x, (mFont != null && scale > 1f) ? lineWidth / scale : 1f);
 			size.y = Mathf.Max(size.y, 1f);
 			return size;
 		}
