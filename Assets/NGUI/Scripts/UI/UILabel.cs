@@ -272,10 +272,25 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Visible size of the widget in local coordinates.
+	/// </summary>
+
+	public override Vector2 relativeSize
+	{
+		get
+		{
+			Vector3 size = (mFont != null) ? mFont.CalculatePrintedSize(processedText, mEncoding) : Vector2.one;
+			size.x = Mathf.Max(size.x, (mFont != null && mFont.size > 0) ? lineWidth / mFont.size : 1f);
+			size.y = Mathf.Max(size.y, 1f);
+			return size;
+		}
+	}
+
+	/// <summary>
 	/// Legacy functionality support.
 	/// </summary>
 
-	void Start ()
+	protected override void OnStart ()
 	{
 		if (mLineWidth > 0f)
 		{
@@ -302,7 +317,8 @@ public class UILabel : UIWidget
 	{
 		Vector3 scale = cachedTransform.localScale;
 
-		if (mFont.size == Mathf.RoundToInt(scale.x) && mFont.size == Mathf.RoundToInt(scale.y))
+		if (mFont.size == Mathf.RoundToInt(scale.x) && mFont.size == Mathf.RoundToInt(scale.y) &&
+			cachedTransform.localRotation == Quaternion.identity)
 		{
 			Vector2 actualSize = relativeSize * scale.x;
 
@@ -344,28 +360,15 @@ public class UILabel : UIWidget
 			pos.y = Mathf.RoundToInt(pos.y);
 			pos.z = Mathf.RoundToInt(pos.z);
 
-			if ((x % 2 == 1) && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
-			if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y -= 0.5f;
-
+			if (cachedTransform.localRotation == Quaternion.identity)
+			{
+				if ((x % 2 == 1) && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
+				if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y -= 0.5f;
+			}
 			cachedTransform.localPosition = pos;
 			cachedTransform.localScale = scale;
 		}
 		else base.MakePixelPerfect();
-	}
-
-	/// <summary>
-	/// Visible size of the widget in local coordinates.
-	/// </summary>
-
-	public override Vector2 relativeSize
-	{
-		get
-		{
-			Vector3 size = (mFont != null) ? mFont.CalculatePrintedSize(processedText, mEncoding) : Vector2.one;
-			size.x = Mathf.Max(size.x, (mFont != null && mFont.size > 0) ? lineWidth / mFont.size : 1f);
-			size.y = Mathf.Max(size.y, 1f);
-			return size;
-		}
 	}
 
 	/// <summary>

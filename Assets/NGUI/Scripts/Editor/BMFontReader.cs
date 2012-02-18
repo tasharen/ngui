@@ -36,40 +36,6 @@ public static class BMFontReader
 	}
 
 	/// <summary>
-	/// MemoryStream.ReadLine has an interesting oddity: it doesn't always advance the stream's position by the correct amount:
-	/// http://social.msdn.microsoft.com/Forums/en-AU/Vsexpressvcs/thread/b8f7837b-e396-494e-88e1-30547fcf385f
-	/// Solution? Custom line reader with the added benefit of not having to use streams at all.
-	/// </summary>
-
-	static string ReadLine (byte[] buffer, ref int offset)
-	{
-		int max = buffer.Length;
-
-		// Skip empty characters
-		while (offset < max && buffer[offset] < 32) ++offset;
-
-		int end = offset;
-
-		if (end < max)
-		{
-			for (;;)
-			{
-				if (end < max)
-				{
-					int ch = buffer[end++];
-					if (ch != '\n' && ch != '\r') continue;
-				}
-
-				string line = Encoding.UTF8.GetString(buffer, offset, end - offset - 1);
-				offset = end;
-				return line;
-			}
-		}
-		offset = max;
-		return null;
-	}
-
-	/// <summary>
 	/// Reload the font data.
 	/// </summary>
 
@@ -79,12 +45,12 @@ public static class BMFontReader
 
 		if (bytes != null)
 		{
-			int offset = 0;
-			char[] separator = new char[1] { ' ' };
+			ByteReader reader = new ByteReader(bytes);
+			char[] separator = new char[] { ' ' };
 
-			while (offset < bytes.Length)
+			while (reader.canRead)
 			{
-				string line = ReadLine(bytes, ref offset);
+				string line = reader.ReadLine();
 				if (string.IsNullOrEmpty(line)) break;
 				string[] split = line.Split(separator, System.StringSplitOptions.RemoveEmptyEntries);
 
