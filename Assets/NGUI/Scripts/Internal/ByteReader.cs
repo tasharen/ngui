@@ -44,6 +44,7 @@ public class ByteReader
 					int ch = mBuffer[end++];
 					if (ch != '\n' && ch != '\r') continue;
 				}
+				else ++end;
 
 				string line = Encoding.UTF8.GetString(mBuffer, mOffset, end - mOffset - 1);
 				mOffset = end;

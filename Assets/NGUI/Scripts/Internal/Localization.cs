@@ -3,12 +3,16 @@ using System.Collections.Generic;
 
 /// <summary>
 /// Localization manager is able to parse localization information from text assets.
+/// Although a singleton, you will generally not access this class as such. Instead
+/// you should implement "void Localize (Localization loc)" functions in your classes.
+/// Take a look at UILocalize to see how it's used.
 /// </summary>
 
 [AddComponentMenu("NGUI/Internal/Localization")]
 public class Localization : MonoBehaviour
 {
 	static Localization mInst;
+	static public Localization instance { get { return mInst; } }
 
 	/// <summary>
 	/// Language the localization manager will start with.
@@ -26,21 +30,58 @@ public class Localization : MonoBehaviour
 	string mLanguage;
 
 	/// <summary>
-	/// Determine the starting language.
+	/// Name of the currently active language.
 	/// </summary>
 
-	void Awake ()
+	public string currentLanguage
 	{
-		if (mInst == null)
+		get
 		{
-			mInst = this;
-			
-			if (string.IsNullOrEmpty(startingLanguage))
+			if (string.IsNullOrEmpty(mLanguage))
 			{
-				startingLanguage = PlayerPrefs.GetString("Language");
+				currentLanguage = PlayerPrefs.GetString("Language");
+
+				if (string.IsNullOrEmpty(mLanguage))
+				{
+					currentLanguage = startingLanguage;
+
+					if (string.IsNullOrEmpty(mLanguage) && languages.Length > 0)
+					{
+						currentLanguage = languages[0].name;
+					}
+				}
+			}
+			return mLanguage;
+		}
+		set
+		{
+			if (languages != null && mLanguage != value)
+			{
+				if (string.IsNullOrEmpty(value))
+				{
+					mDictionary.Clear();
+				}
+				else
+				{
+					foreach (TextAsset asset in languages)
+					{
+						if (asset != null && asset.name == value)
+						{
+							Load(asset);
+							return;
+						}
+					}
+				}
+				PlayerPrefs.DeleteKey("Language");
 			}
 		}
 	}
+
+	/// <summary>
+	/// Determine the starting language.
+	/// </summary>
+
+	void Awake () { if (mInst == null) mInst = this; }
 
 	/// <summary>
 	/// Remove the instance reference.
@@ -58,60 +99,16 @@ public class Localization : MonoBehaviour
 		PlayerPrefs.SetString("Language", mLanguage);
 		ByteReader reader = new ByteReader(asset);
 		mDictionary = reader.ReadDictionary();
-		NGUITools.Broadcast("Localize");
-	}
-
-	/// <summary>
-	/// Name of the currently active language.
-	/// </summary>
-
-	static public string currentLanguage
-	{
-		get
-		{
-			return (mInst != null) ? mInst.mLanguage : null;
-		}
-		set
-		{
-			if (mInst != null && mInst.languages != null && mInst.mLanguage != value)
-			{
-				if (string.IsNullOrEmpty(value))
-				{
-					mInst.mDictionary.Clear();
-				}
-				else
-				{
-					foreach (TextAsset asset in mInst.languages)
-					{
-						if (asset != null && asset.name == value)
-						{
-							mInst.Load(asset);
-							return;
-						}
-					}
-				}
-				PlayerPrefs.DeleteKey("Language");
-				mInst.startingLanguage = null;
-			}
-		}
+		NGUITools.Broadcast("OnLocalize", this);
 	}
 
 	/// <summary>
 	/// Localize the specified value.
 	/// </summary>
 
-	static public string Get (string key)
+	public string Get (string key)
 	{
-		if (mInst == null) return key;
-
-		// If we haven't loaded a dictionary yet, see if we have something to load
-		if (mInst.mDictionary.Count == 0 && mInst.languages != null &&
-			!string.IsNullOrEmpty(mInst.startingLanguage))
-		{
-			// We have a starting language -- use it
-			currentLanguage = mInst.startingLanguage;
-		}
 		string val;
-		return (mInst.mDictionary.TryGetValue(key, out val)) ? val : key;
+		return (mDictionary.TryGetValue(key, out val)) ? val : key;
 	}
 }

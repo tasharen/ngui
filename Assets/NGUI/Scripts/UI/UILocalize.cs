@@ -14,28 +14,35 @@ public class UILocalize : MonoBehaviour
 
 	public string key;
 
+	string mLanguage;
+
 	/// <summary>
-	/// Perform the localization of the widget.
+	/// This function is called by the Localization manager via a broadcast SendMessage.
 	/// </summary>
 
-	public void Localize ()
+	void OnLocalize (Localization loc)
 	{
-		if (!string.IsNullOrEmpty(key))
+		if (mLanguage != loc.currentLanguage)
 		{
 			UIWidget w = GetComponent<UIWidget>();
 			UILabel lbl = w as UILabel;
 			UISprite sp = w as UISprite;
 
-			if (lbl != null)
-			{
-				lbl.text = Localization.Get(key);
-			}
-			else if (sp != null)
-			{
-				sp.spriteName = Localization.Get(key);
-			}
+			// If no localization key has been specified, use the label's text as the key
+			if (string.IsNullOrEmpty(mLanguage) && string.IsNullOrEmpty(key) && lbl != null) key = lbl.text;
+
+			// If we still don't have a key, use the widget's name
+			string val = string.IsNullOrEmpty(key) ? loc.Get(w.name) : loc.Get(key);
+			if (lbl != null) lbl.text = val;
+			else if (sp != null) sp.spriteName = val;
+
+			mLanguage = loc.currentLanguage;
 		}
 	}
 
-	void Start () { Localize(); }
+	/// <summary>
+	/// Localize the widget on start.
+	/// </summary>
+
+	void Start () { if (Localization.instance != null) OnLocalize(Localization.instance); }
 }

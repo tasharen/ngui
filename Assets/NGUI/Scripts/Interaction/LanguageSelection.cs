@@ -1,0 +1,43 @@
+using UnityEngine;
+using System.Collections.Generic;
+
+/// <summary>
+/// Turns the popup list it's attached to into a language selection list.
+/// </summary>
+
+[RequireComponent(typeof(UIPopupList))]
+[AddComponentMenu("NGUI/Interaction/Language Selection")]
+public class LanguageSelection : MonoBehaviour
+{
+	UIPopupList mList;
+
+	void Start ()
+	{
+		mList = GetComponent<UIPopupList>();
+		UpdateList();
+		mList.eventReceiver = gameObject;
+		mList.functionName = "OnLanguageSelection";
+	}
+
+	void UpdateList ()
+	{
+		if (Localization.instance != null)
+		{
+			mList.items.Clear();
+
+			foreach (TextAsset asset in Localization.instance.languages)
+			{
+				if (asset != null) mList.items.Add(asset.name);
+			}
+			mList.selection = Localization.instance.currentLanguage;
+		}
+	}
+
+	void OnLanguageSelection (string language)
+	{
+		if (Localization.instance != null)
+		{
+			Localization.instance.currentLanguage = language;
+		}
+	}
+}

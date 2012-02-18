@@ -4,6 +4,7 @@ using UnityEngine;
 /// Simple slider functionality.
 /// </summary>
 
+[ExecuteInEditMode]
 [RequireComponent(typeof(BoxCollider))]
 [AddComponentMenu("NGUI/Interaction/Slider")]
 public class UISlider : MonoBehaviour
@@ -18,13 +19,13 @@ public class UISlider : MonoBehaviour
 	public Transform thumb;
 
 	public Direction direction = Direction.Horizontal;
-	public float initialValue = 1f;
+	public float rawValue = 1f;
+	public Vector2 fullSize = Vector2.zero;
 	public GameObject eventReceiver;
 	public string functionName = "OnSliderChange";
 	public int numberOfSteps = 0;
 
-	float mValue = 1f;
-	Vector3 mScale = Vector3.one;
+	float mStepValue = 1f;
 	BoxCollider mCol;
 	Transform mTrans;
 	Transform mForeTrans;
@@ -32,27 +33,10 @@ public class UISlider : MonoBehaviour
 	UIFilledSprite mSprite;
 
 	/// <summary>
-	/// Change the slider's value.
+	/// Value of the slider. Will match 'rawValue' unless the slider has steps.
 	/// </summary>
 
-	public float sliderValue
-	{
-		get
-		{
-			return mValue;
-		}
-		set
-		{
-			float val = Mathf.Clamp01(value);
-			if (numberOfSteps > 1) val = Mathf.Round(val * (numberOfSteps - 1)) / (numberOfSteps - 1);
-
-			if (mValue != val)
-			{
-				mValue = val;
-				UpdateSlider();
-			}
-		}
-	}
+	public float sliderValue { get { return mStepValue; } set { Set(value); } }
 
 	/// <summary>
 	/// Ensure that we have a background and a foreground object to work with.
@@ -62,18 +46,17 @@ public class UISlider : MonoBehaviour
 	{
 		mTrans = transform;
 		mCol = collider as BoxCollider;
-		mValue = initialValue;
 
 		if (foreground != null)
 		{
 			mWidget = foreground.GetComponent<UIWidget>();
 			mSprite = (mWidget != null) ? mWidget as UIFilledSprite : null;
 			mForeTrans = foreground.transform;
-			mScale = foreground.localScale;
+			if (fullSize == Vector2.zero) fullSize = foreground.localScale;
 		}
 		else if (mCol != null)
 		{
-			mScale = mCol.size;
+			if (fullSize == Vector2.zero) fullSize = mCol.size;
 		}
 		else
 		{
@@ -87,14 +70,14 @@ public class UISlider : MonoBehaviour
 
 	void Start ()
 	{
-		if (thumb != null && thumb.collider != null)
+		if (Application.isPlaying && thumb != null && thumb.collider != null)
 		{
 			UIForwardEvents fe = thumb.gameObject.AddComponent<UIForwardEvents>();
 			fe.target = gameObject;
 			fe.onPress = true;
 			fe.onDrag = true;
 		}
-		UpdateSlider();
+		Set(rawValue);
 	}
 
 	/// <summary>
@@ -108,6 +91,12 @@ public class UISlider : MonoBehaviour
 	/// </summary>
 
 	void OnDrag (Vector2 delta) { UpdateDrag(); }
+
+	/// <summary>
+	/// Watch for slider value changes and adjust the visual sprite accordingly.
+	/// </summary>
+
+	void Update () { Set(rawValue); }
 
 	/// <summary>
 	/// Update the slider's position based on the mouse.
@@ -135,58 +124,72 @@ public class UISlider : MonoBehaviour
 		Vector3 dir = localCursor + localOffset;
 
 		// Update the slider
-		sliderValue = (direction == Direction.Horizontal) ? dir.x / mCol.size.x : dir.y / mCol.size.y;
+		Set( (direction == Direction.Horizontal) ? dir.x / mCol.size.x : dir.y / mCol.size.y );
 	}
 
 	/// <summary>
 	/// Update the visible slider.
 	/// </summary>
 
-	public void UpdateSlider ()
+	void Set (float input)
 	{
-		Vector3 scale = mScale;
+		// Clamp the input
+		float val = Mathf.Clamp01(input);
 
-		if (direction == Direction.Horizontal) scale.x *= mValue;
-		else scale.y *= mValue;
+		// Save the raw value
+		rawValue = val;
 
-		if (mSprite != null)
-		{
-			mSprite.fillAmount = mValue;
-		}
-		else if (mForeTrans != null)
-		{
-			mForeTrans.localScale = scale;
-			if (mWidget != null) mWidget.MarkAsChanged();
-		}
+		// Take steps into consideration
+		if (numberOfSteps > 1) val = Mathf.Round(val * (numberOfSteps - 1)) / (numberOfSteps - 1); ;
 
-		if (thumb != null)
+		// If the stepped value doesn't match the last one, it's time to update
+		if (mStepValue != val)
 		{
-			Vector3 pos = thumb.localPosition;
+			mStepValue = val;
+			Vector3 scale = fullSize;
+
+			if (direction == Direction.Horizontal) scale.x *= mStepValue;
+			else scale.y *= mStepValue;
 
 			if (mSprite != null)
 			{
-				switch (mSprite.fillDirection)
-				{
-					case UIFilledSprite.FillDirection.TowardRight:		pos.x = scale.x; break;
-					case UIFilledSprite.FillDirection.TowardTop:		pos.y = scale.y; break;
-					case UIFilledSprite.FillDirection.TowardLeft:		pos.x = mScale.x - scale.x; break;
-					case UIFilledSprite.FillDirection.TowardBottom:		pos.y = mScale.y - scale.y; break;
-				}
+				mSprite.fillAmount = mStepValue;
 			}
-			else if (direction == Direction.Horizontal)
+			else if (mForeTrans != null)
 			{
-				pos.x = scale.x;
+				mForeTrans.localScale = scale;
+				if (mWidget != null) mWidget.MarkAsChanged();
 			}
-			else
-			{
-				pos.y = scale.y;
-			}
-			thumb.localPosition = pos;
-		}
 
-		if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
-		{
-			eventReceiver.SendMessage(functionName, mValue, SendMessageOptions.DontRequireReceiver);
+			if (thumb != null)
+			{
+				Vector3 pos = thumb.localPosition;
+
+				if (mSprite != null)
+				{
+					switch (mSprite.fillDirection)
+					{
+						case UIFilledSprite.FillDirection.TowardRight:		pos.x = scale.x; break;
+						case UIFilledSprite.FillDirection.TowardTop:		pos.y = scale.y; break;
+						case UIFilledSprite.FillDirection.TowardLeft:		pos.x = fullSize.x - scale.x; break;
+						case UIFilledSprite.FillDirection.TowardBottom:		pos.y = fullSize.y - scale.y; break;
+					}
+				}
+				else if (direction == Direction.Horizontal)
+				{
+					pos.x = scale.x;
+				}
+				else
+				{
+					pos.y = scale.y;
+				}
+				thumb.localPosition = pos;
+			}
+
+			if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+			{
+				eventReceiver.SendMessage(functionName, mStepValue, SendMessageOptions.DontRequireReceiver);
+			}
 		}
 	}
 }

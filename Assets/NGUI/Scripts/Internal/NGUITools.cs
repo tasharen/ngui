@@ -397,6 +397,16 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Call the specified function on all objects in the scene.
+	/// </summary>
+
+	static public void Broadcast (string funcName, object param)
+	{
+		GameObject[] gos = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
+		foreach (GameObject go in gos) go.SendMessage(funcName, param, SendMessageOptions.DontRequireReceiver);
+	}
+
+	/// <summary>
 	/// Determines whether the 'parent' contains a 'child' in its hierarchy.
 	/// </summary>
 

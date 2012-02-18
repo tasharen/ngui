@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.67
+                Version 1.68
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,15 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.68:
+- NEW: Added a built-in Localization System.
+- NEW: Added a new example (10) - Localization.
+- FIX: Widgets can now be modified directly on prefabs.
+- FIX: Fixed the window stuttering in example 9 (when dragging it).
+- FIX: Widgets will now ensure they're under the right panel after drag & drop in the editor.
+- FIX: It's now possible to visibly modify the value of the slider at edit mode.
+- FIX: Scaling labels now properly rebuilds them.
 
 1.67:
 - FIX: Font Maker's Replace button will now re-import the data file.

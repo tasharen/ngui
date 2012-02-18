@@ -1,0 +1,6 @@
+Flag = Flag-US
+Language = English
+Info = Localization example
+Sound
+Music
+Desc = English localization

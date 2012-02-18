@@ -139,7 +139,7 @@ public class UIPopupList : MonoBehaviour
 
 				if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
 				{
-					eventReceiver.SendMessage(functionName, mSelectedItem);
+					eventReceiver.SendMessage(functionName, mSelectedItem, SendMessageOptions.DontRequireReceiver);
 				}
 			}
 		}

@@ -23,7 +23,7 @@ public class UILabel : UIWidget
 	string mProcessedText = null;
 
 	// Cached values, used to determine if something has changed and thus must be updated
-	float mLastSize = 0f;
+	Vector3 mLastScale = Vector3.one;
 	string mLastText = "";
 	int mLastWidth = 0;
 	bool mLastEncoding = true;
@@ -222,21 +222,16 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			// If the height changes, we should re-process the text
-			if (!mShouldBeProcessed && mMaxLineWidth > 0f)
+			if (mLastScale != cachedTransform.localScale)
 			{
-				float size = cachedTransform.localScale.y;
-
-				if (mLastSize != size)
-				{
-					mLastSize = size;
-					mShouldBeProcessed = true;
-				}
+				mLastScale = cachedTransform.localScale;
+				mShouldBeProcessed = true;
 			}
 
 			// Process the text if necessary
 			if (hasChanged)
 			{
+				mChanged = true;
 				hasChanged = false;
 				mLastText = mText;
 				mProcessedText = mText.Replace("\\n", "\n");
