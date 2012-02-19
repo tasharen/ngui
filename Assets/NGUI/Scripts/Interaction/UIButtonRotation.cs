@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿//----------------------------------------------
+//            NGUI: Next-Gen UI kit
+// Copyright © 2011-2012 Tasharen Entertainment
+//----------------------------------------------
+
+using UnityEngine;
 
 /// <summary>
 /// Simple example script of how a button can be rotated visibly when the mouse hovers over it or it gets pressed.

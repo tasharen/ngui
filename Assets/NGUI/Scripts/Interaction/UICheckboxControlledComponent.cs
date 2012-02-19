@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿//----------------------------------------------
+//            NGUI: Next-Gen UI kit
+// Copyright © 2011-2012 Tasharen Entertainment
+//----------------------------------------------
+
+using UnityEngine;
 
 /// <summary>
 /// Example script showing how to activate or deactivate a MonoBehaviour when OnActivate event is received.

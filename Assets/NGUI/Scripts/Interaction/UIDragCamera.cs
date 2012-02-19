@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿//----------------------------------------------
+//            NGUI: Next-Gen UI kit
+// Copyright © 2011-2012 Tasharen Entertainment
+//----------------------------------------------
+
+using UnityEngine;
 
 /// <summary>
 /// Allows dragging of the camera object and restricts camera's movement to be within bounds of the area created by the rootForBounds colliders.
