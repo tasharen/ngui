@@ -16,7 +16,6 @@ using System.Collections.Generic;
 /// - OnPress (isDown) is sent when a mouse button gets pressed on the collider.
 /// - OnSelect (selected) is sent when a mouse button is released on the same object as it was pressed on.
 /// - OnClick is sent with the same conditions as OnSelect, with the added check to see if the mouse has not moved much.
-/// - OnRightClick is sent when the object is right-clicked on.
 /// - OnDrag (delta) is sent when a mouse or touch gets pressed on a collider and starts dragging it.
 /// - OnDrop (gameObject) is sent when the mouse or touch get released on a different collider than the one that was being dragged.
 /// - OnInput (text) is sent when typing after selecting a collider by clicking on it.
@@ -41,7 +40,7 @@ public class UICamera : MonoBehaviour
 		public GameObject hover;	// The last game object to receive OnHover
 		public GameObject pressed;	// The last game object to receive OnPress
 
-		// 0 = Don't send a click event, 1 = OnClick, 2 = OnRightClick.
+		// 0 = Don't send a click event, 1 = OnClick(0), 2 = OnClick(1)
 		public int clickType = 0;
 	}
 
@@ -475,8 +474,7 @@ public class UICamera : MonoBehaviour
 					{
 						mSel = touch.pressed;
 					}
-					if (touch.clickType == 1) touch.pressed.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
-					else if (touch.clickType == 2) touch.pressed.SendMessage("OnRightClick", SendMessageOptions.DontRequireReceiver);
+					if (touch.clickType != 0) touch.pressed.SendMessage("OnClick", touch.clickType - 1, SendMessageOptions.DontRequireReceiver);
 				}
 				else // The button/touch was released on a different object
 				{
