@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.68b
+                Version 1.69
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -15,15 +15,12 @@ email support@tasharen.com, PM 'ArenMook' on the Unity forums, or add 'arenmook'
  How To Update NGUI
 --------------------
 
-If you have the Professional Edition of NGUI that comes with SVN access, simply SVN Update.
+If you have the Professional Edition of NGUI that comes with Git access, just pull the latest changes.
 
-If you have a regular copy of NGUI:
+If you have a Standard Edition:
 
-1. Create a brand new Unity project.
-2. Import the latest NGUI package into this project.
-3. Delete the NGUI folder and all of its contents from your old project using Explorer (on Windows) or Finder (if you’re on the Mac).
-4. Copy the NGUI folder from the new project into the old project.
-5. Open your old project with Unity - it should now be up to date.
+1. Delete the NGUI folder while inside Unity.
+2. Import NGUI from the updated Unity Package.
 
 ---------------------------------------
  Support, documentation, and tutorials
@@ -34,6 +31,9 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.69:
+- NEW: Added right-click support by simply adding an optional integer parameter to the OnClick event.
 
 1.68:
 - NEW: Added a built-in Localization System.
