@@ -16,6 +16,7 @@ using System.Collections.Generic;
 /// - OnPress (isDown) is sent when a mouse button gets pressed on the collider.
 /// - OnSelect (selected) is sent when a mouse button is released on the same object as it was pressed on.
 /// - OnClick is sent with the same conditions as OnSelect, with the added check to see if the mouse has not moved much.
+/// - OnRightClick is sent when the object is right-clicked on.
 /// - OnDrag (delta) is sent when a mouse or touch gets pressed on a collider and starts dragging it.
 /// - OnDrop (gameObject) is sent when the mouse or touch get released on a different collider than the one that was being dragged.
 /// - OnInput (text) is sent when typing after selecting a collider by clicking on it.
@@ -40,8 +41,8 @@ public class UICamera : MonoBehaviour
 		public GameObject hover;	// The last game object to receive OnHover
 		public GameObject pressed;	// The last game object to receive OnPress
 
-		// Whether the touch is currently being considered for click events
-		public bool considerForClick = false;
+		// 0 = Don't send a click event, 1 = OnClick, 2 = OnRightClick.
+		public int clickType = 0;
 	}
 
 	/// <summary>
@@ -320,8 +321,12 @@ public class UICamera : MonoBehaviour
 
 		if (mUseMouseInput)
 		{
-			bool pressed = Input.GetMouseButtonDown(0);
-			bool unpressed = Input.GetMouseButtonUp(0);
+			bool pressed0 = Input.GetMouseButtonDown(0);
+			bool unpressed0 = Input.GetMouseButtonUp(0);
+			bool pressed1 = Input.GetMouseButtonDown(1);
+			bool unpressed1 = Input.GetMouseButtonUp(1);
+			bool pressed = pressed0 || pressed1;
+			bool unpressed = unpressed0 || unpressed1;
 
 			lastTouchID = -1;
 			lastTouchPosition = Input.mousePosition;
@@ -334,7 +339,7 @@ public class UICamera : MonoBehaviour
 			}
 
 			// We don't want to update the last camera while there is a touch happening
-			if (pressed) mMouse.pressedCam = lastCamera;
+			if (pressed0) mMouse.pressedCam = lastCamera;
 			else if (mMouse.pressed != null) lastCamera = mMouse.pressedCam;
 
 			if (mMouse.pos != lastTouchPosition)
@@ -345,40 +350,38 @@ public class UICamera : MonoBehaviour
 			}
 
 			// Process the mouse events
-			ProcessTouch(mMouse, pressed, unpressed);
+			ProcessTouch(mMouse, pressed, unpressed, pressed1 || unpressed1 ? 2 : 1);
 		}
 
 		// Process touch input
-		if (Input.touchCount > 0)
+		for (int i = 0; i < Input.touchCount; ++i)
 		{
-			foreach (Touch input in Input.touches)
+			Touch input = Input.GetTouch(i);
+			lastTouchID = input.fingerId;
+			MouseOrTouch touch = GetTouch(lastTouchID);
+
+			bool pressed = (input.phase == TouchPhase.Began);
+			bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
+
+			touch.pos = input.position;
+			touch.delta = input.deltaPosition;
+			lastTouchPosition = touch.pos;
+
+			// Update the object under this touch
+			if (pressed || unpressed)
 			{
-				lastTouchID = input.fingerId;
-				MouseOrTouch touch = GetTouch(lastTouchID);
-
-				bool pressed = (input.phase == TouchPhase.Began);
-				bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
-
-				touch.pos = input.position;
-				touch.delta = input.deltaPosition;
-				lastTouchPosition = touch.pos;
-
-				// Update the object under this touch
-				if (pressed || unpressed)
-				{
-					touch.current = Raycast(input.position, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
-				}
-
-				// We don't want to update the last camera while there is a touch happening
-				if (pressed) touch.pressedCam = lastCamera;
-				else if (touch.pressed != null) lastCamera = touch.pressedCam;
-
-				// Process the events from this touch
-				ProcessTouch(touch, pressed, unpressed);
-
-				// If the touch has ended, remove it from the list
-				if (unpressed) RemoveTouch(lastTouchID);
+				touch.current = Raycast(input.position, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
 			}
+
+			// We don't want to update the last camera while there is a touch happening
+			if (pressed) touch.pressedCam = lastCamera;
+			else if (touch.pressed != null) lastCamera = touch.pressedCam;
+
+			// Process the events from this touch
+			ProcessTouch(touch, pressed, unpressed, 1);
+
+			// If the touch has ended, remove it from the list
+			if (unpressed) RemoveTouch(lastTouchID);
 		}
 
 		// Forward the input to the selected object
@@ -414,7 +417,7 @@ public class UICamera : MonoBehaviour
 	/// Process the events of the specified touch.
 	/// </summary>
 
-	void ProcessTouch (MouseOrTouch touch, bool pressed, bool unpressed)
+	void ProcessTouch (MouseOrTouch touch, bool pressed, bool unpressed, int clickType)
 	{
 		// If we're using the mouse for input, we should send out a hover(false) message first
 		if (mUseMouseInput && touch.pressed == null && touch.hover != touch.current && touch.hover != null)
@@ -431,7 +434,7 @@ public class UICamera : MonoBehaviour
 			touch.pressed.SendMessage("OnDrag", touch.delta, SendMessageOptions.DontRequireReceiver);
 
 			float threshold = (touch == mMouse) ? 5f : 30f;
-			if (touch.totalDelta.magnitude > threshold) touch.considerForClick = false;
+			if (touch.totalDelta.magnitude > threshold) touch.clickType = 0;
 		}
 
 		// Send out the press message
@@ -439,7 +442,7 @@ public class UICamera : MonoBehaviour
 		{
 			if (mTooltip != null) ShowTooltip(false);
 			touch.pressed = touch.current;
-			touch.considerForClick = true;
+			touch.clickType = clickType;
 			touch.totalDelta = Vector2.zero;
 			if (touch.pressed != null) touch.pressed.SendMessage("OnPress", true, SendMessageOptions.DontRequireReceiver);
 		}
@@ -472,7 +475,8 @@ public class UICamera : MonoBehaviour
 					{
 						mSel = touch.pressed;
 					}
-					if (touch.considerForClick) touch.pressed.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
+					if (touch.clickType == 1) touch.pressed.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
+					else if (touch.clickType == 2) touch.pressed.SendMessage("OnRightClick", SendMessageOptions.DontRequireReceiver);
 				}
 				else // The button/touch was released on a different object
 				{
