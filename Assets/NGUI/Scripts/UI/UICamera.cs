@@ -15,7 +15,7 @@ using System.Collections.Generic;
 /// - OnHover (isOver) is sent when the mouse hovers over a collider or moves away.
 /// - OnPress (isDown) is sent when a mouse button gets pressed on the collider.
 /// - OnSelect (selected) is sent when a mouse button is released on the same object as it was pressed on.
-/// - OnClick is sent with the same conditions as OnSelect, with the added check to see if the mouse has not moved much.
+/// - OnClick (int button) is sent with the same conditions as OnSelect, with the added check to see if the mouse has not moved much.
 /// - OnDrag (delta) is sent when a mouse or touch gets pressed on a collider and starts dragging it.
 /// - OnDrop (gameObject) is sent when the mouse or touch get released on a different collider than the one that was being dragged.
 /// - OnInput (text) is sent when typing after selecting a collider by clicking on it.
