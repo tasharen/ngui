@@ -45,6 +45,12 @@ public class UICamera : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Which layers will receive events.
+	/// </summary>
+
+	public LayerMask eventReceiverMask = -1;
+
+	/// <summary>
 	/// How long of a delay to expect before showing the tooltip.
 	/// </summary>
 
@@ -225,7 +231,8 @@ public class UICamera : MonoBehaviour
 			Ray ray = lastCamera.ScreenPointToRay(inPos);
 
 			// Raycast into the screen
-			if (Physics.Raycast(ray, out hit, lastCamera.farClipPlane - lastCamera.nearClipPlane, lastCamera.cullingMask)) return true;
+			int mask = lastCamera.cullingMask & (int)cam.eventReceiverMask;
+			if (Physics.Raycast(ray, out hit, lastCamera.farClipPlane - lastCamera.nearClipPlane, mask)) return true;
 		}
 		return false;
 	}
@@ -286,6 +293,9 @@ public class UICamera : MonoBehaviour
 		// Add this camera to the list
 		mList.Add(this);
 		mList.Sort(CompareFunc);
+
+		// If no event receiver mask was specified, use the camera's mask
+		if (eventReceiverMask == -1) eventReceiverMask = camera.cullingMask;
 	}
 
 	/// <summary>
