@@ -1,5 +1,7 @@
 ﻿Flag = Flag-FR
 Language = Français
+English = English
+French = Français
 Info = Par exemple la localisation
 Sound = Son
 Music = Musique

@@ -34,6 +34,8 @@ All can be found here: http://www.tasharen.com/?page_id=197
 
 1.69:
 - NEW: Added right-click support by simply adding an optional integer parameter to the OnClick event.
+- NEW: The contents of the UIPopupList can now be localized by enabling a checkbox on it.
+- NEW: You can now give the UIEventListener an optional parameter that you can retrieve later.
 
 1.68:
 - NEW: Added a built-in Localization System.

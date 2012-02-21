@@ -21,6 +21,8 @@ public class UIEventListener : MonoBehaviour
 	public delegate void StringDelegate (GameObject go, string text);
 	public delegate void ObjectDelegate (GameObject go, GameObject draggedObject);
 
+	public object parameter;
+
 	public VoidDelegate onSubmit;
 	public IntDelegate onClick;
 	public BoolDelegate onHover;

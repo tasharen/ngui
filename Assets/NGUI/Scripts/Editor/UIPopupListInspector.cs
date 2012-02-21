@@ -101,12 +101,17 @@ public class UIPopupListInspector : Editor
 			Color tc = EditorGUILayout.ColorField("Text Color", mList.textColor);
 			Color bc = EditorGUILayout.ColorField("Background", mList.backgroundColor);
 			Color hc = EditorGUILayout.ColorField("Highlight", mList.highlightColor);
+
+			GUILayout.BeginHorizontal();
+			bool isLocalized = EditorGUILayout.Toggle("Localized", mList.isLocalized, GUILayout.Width(100f));
 			bool isAnimated = EditorGUILayout.Toggle("Animated", mList.isAnimated);
+			GUILayout.EndHorizontal();
 
 			if (mList.textScale != ts ||
 				mList.textColor != tc ||
 				mList.highlightColor != hc ||
 				mList.backgroundColor != bc ||
+				mList.isLocalized != isLocalized ||
 				mList.isAnimated != isAnimated)
 			{
 				RegisterUndo();
@@ -114,6 +119,7 @@ public class UIPopupListInspector : Editor
 				mList.textColor = tc;
 				mList.backgroundColor = bc;
 				mList.highlightColor = hc;
+				mList.isLocalized = isLocalized;
 				mList.isAnimated = isAnimated;
 			}
 

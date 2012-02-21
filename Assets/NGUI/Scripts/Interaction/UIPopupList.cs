@@ -102,6 +102,12 @@ public class UIPopupList : MonoBehaviour
 	public bool isAnimated = true;
 
 	/// <summary>
+	/// Whether the popup list's values will be localized.
+	/// </summary>
+
+	public bool isLocalized = false;
+
+	/// <summary>
 	/// Target game object that will be notified when selection changes.
 	/// </summary>
 
@@ -136,7 +142,7 @@ public class UIPopupList : MonoBehaviour
 				
 				if (textLabel != null)
 				{
-					textLabel.text = value;
+					textLabel.text = (isLocalized && Localization.instance != null) ? Localization.instance.Get(value) : value;
 #if UNITY_EDITOR
 					UnityEditor.EditorUtility.SetDirty(textLabel.gameObject);
 #endif
@@ -151,14 +157,34 @@ public class UIPopupList : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Cache the components.
+	/// Send out the selection message on start.
 	/// </summary>
 
 	void Start ()
 	{
 		// Automatically choose the first item
-		if (items.Count > 0 && string.IsNullOrEmpty(mSelectedItem)) selection = items[0];
-		else if (textLabel != null) textLabel.text = mSelectedItem;
+		if (string.IsNullOrEmpty(mSelectedItem))
+		{
+			if (items.Count > 0) selection = items[0];
+		}
+		else
+		{
+			string s = mSelectedItem;
+			mSelectedItem = null;
+			selection = s;
+		}
+	}
+
+	/// <summary>
+	/// Localize the text label.
+	/// </summary>
+
+	void OnLocalize (Localization loc)
+	{
+		if (isLocalized && textLabel != null)
+		{
+			textLabel.text = loc.Get(mSelectedItem);
+		}
 	}
 
 	/// <summary>
@@ -203,9 +229,10 @@ public class UIPopupList : MonoBehaviour
 	{
 		if (isPressed)
 		{
+			UIEventListener listener = go.GetComponent<UIEventListener>();
 			UILabel lbl = go.GetComponent<UILabel>();
 			Highlight(lbl.cachedTransform, true);
-			selection = lbl.text;
+			selection = listener.parameter as string;
 
 			UIButtonSound[] sounds = GetComponents<UIButtonSound>();
 
@@ -354,7 +381,7 @@ public class UIPopupList : MonoBehaviour
 				UILabel lbl = NGUITools.AddWidget<UILabel>(mChild);
 				lbl.pivot = UIWidget.Pivot.TopLeft;
 				lbl.font = font;
-				lbl.text = s;
+				lbl.text = (isLocalized && Localization.instance != null) ? Localization.instance.Get(s) : s;
 				lbl.color = textColor;
 				lbl.cachedTransform.localPosition = new Vector3(padding.x, y, 0f);
 				lbl.MakePixelPerfect();
@@ -368,21 +395,23 @@ public class UIPopupList : MonoBehaviour
 
 				y -= fontScale;
 				x = Mathf.Max(x, lbl.relativeSize.x * fontScale);
+
+				// Add an event listener
+				UIEventListener listener = UIEventListener.Add(lbl.gameObject);
+				listener.onHover = OnItemHover;
+				listener.onPress = OnItemPress;
+				listener.parameter = s;
 			}
 
 			// The triggering widget's width should be the minimum allowed width
 			x = Mathf.Max(x, bounds.size.x - padding.x * 2f);
 
-			// Run through all labels and add event listeners
+			// Run through all labels and add colliders
 			foreach (UILabel lbl in labels)
 			{
 				BoxCollider bc = NGUITools.AddWidgetCollider(lbl.gameObject);
 				bc.center = new Vector3((x * 0.5f) / fontScale, -0.5f, bc.center.z);
 				bc.size = new Vector3(x / fontScale, 1f, 1f);
-
-				UIEventListener listener = UIEventListener.Add(lbl.gameObject);
-				listener.onHover = OnItemHover;
-				listener.onPress = OnItemPress;
 
 				// Move the selection here if this is the right label
 				if (mSelectedItem == lbl.text) Highlight(lbl.cachedTransform, true);

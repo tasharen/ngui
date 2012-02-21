@@ -1,5 +1,7 @@
 ﻿Flag = Flag-US
 Language = English
+English = English
+French = Français
 Info = Localization example
 Sound
 Music
