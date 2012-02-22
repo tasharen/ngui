@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.69
+                Version 1.70
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -31,6 +31,9 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.70:
+- NEW: Right click stuff has been replaced by just 'lastTouchID' with added support for the middle mouse button.
 
 1.69:
 - NEW: Added right-click support by simply adding an optional integer parameter to the OnClick event.
