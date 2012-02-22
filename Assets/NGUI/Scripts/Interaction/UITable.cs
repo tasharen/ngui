@@ -110,9 +110,11 @@ public class UITable : MonoBehaviour
 
 		for (int i = 0; i < myTrans.childCount; ++i)
 		{
-			if (!hideInactive || myTrans.gameObject.active)
+			Transform child = myTrans.GetChild(i);
+
+			if (!hideInactive || child.gameObject.active)
 			{
-				children.Add(myTrans.GetChild(i));
+				children.Add(child);
 			}
 		}
 		if (sorted) children.Sort(SortByName);
