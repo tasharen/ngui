@@ -55,7 +55,7 @@ public class UIDragObject : IgnoreTimeScale
 
 	void OnPress (bool pressed)
 	{
-		if (target != null)
+		if (enabled && gameObject.active && target != null)
 		{
 			mPressed = pressed;
 
@@ -93,7 +93,7 @@ public class UIDragObject : IgnoreTimeScale
 
 	void OnDrag (Vector2 delta)
 	{
-		if (target != null)
+		if (enabled && gameObject.active && target != null)
 		{
 			Ray ray = UICamera.lastCamera.ScreenPointToRay(UICamera.lastTouchPosition);
 			float dist = 0f;
@@ -188,7 +188,10 @@ public class UIDragObject : IgnoreTimeScale
 
 	void OnScroll (float delta)
 	{
-		if (Mathf.Sign(mScroll) != Mathf.Sign(delta)) mScroll = 0f;
-		mScroll += delta * scrollWheelFactor;
+		if (enabled && gameObject.active)
+		{
+			if (Mathf.Sign(mScroll) != Mathf.Sign(delta)) mScroll = 0f;
+			mScroll += delta * scrollWheelFactor;
+		}
 	}
 }
