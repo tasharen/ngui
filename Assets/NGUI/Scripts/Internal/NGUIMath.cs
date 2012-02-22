@@ -88,6 +88,22 @@ static public class NGUIMath
 	}
 
 	/// <summary>
+	/// Convert the specified integer to a human-readable string representing the binary value. Useful for debugging bytes.
+	/// </summary>
+
+	static public string IntToBinary (int val, int bits)
+	{
+		string final = "";
+
+		for (int i = bits; i > 0; )
+		{
+			if (i == 8 || i == 16 || i == 24) final += " ";
+			final += ((val & (1 << --i)) != 0) ? '1' : '0';
+		}
+		return final;
+	}
+
+	/// <summary>
 	/// Convenience conversion function, allowing hex format (0xRrGgBbAa).
 	/// </summary>
 
