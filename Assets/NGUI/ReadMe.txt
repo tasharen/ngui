@@ -34,6 +34,7 @@ All can be found here: http://www.tasharen.com/?page_id=197
 
 1.70:
 - NEW: Right click stuff has been replaced by just 'lastTouchID' with added support for the middle mouse button.
+- FIX: UTF8 encoding is not supported in Flash. Wrote my own binary parsing function to make Flash work.
 
 1.69:
 - NEW: Added right-click support by simply adding an optional integer parameter to the OnClick event.
