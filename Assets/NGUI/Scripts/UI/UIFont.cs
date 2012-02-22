@@ -427,24 +427,36 @@ public class UIFont : MonoBehaviour
 							break;
 						}
 						EndLine(ref sb);
+
+						// Start a brand-new line
+						lineIsEmpty = true;
+
+						if (ch == ' ')
+						{
+							start = offset + 1;
+							remainingWidth = lineWidth;
+						}
+						else
+						{
+							start = offset;
+							remainingWidth = lineWidth - charSize;
+						}
+						previousChar = 0;
 					}
 					else
 					{
+						// Skip all spaces before the word
+						while (start < textLength && text[start] == ' ') ++start;
+
 						// Revert the position to the beginning of the word and reset the line
 						lineIsEmpty = true;
-						offset = start - 1;
 						remainingWidth = lineWidth;
+						offset = start - 1;
 						previousChar = 0;
 						if (!multiline) break;
 						EndLine(ref sb);
 						continue;
 					}
-
-					// Start a brand-new line
-					lineIsEmpty = true;
-					start = (ch == ' ') ? offset + 1 : offset;
-					remainingWidth = lineWidth;
-					previousChar = 0;
 				}
 				else
 				{
@@ -555,33 +567,35 @@ public class UIFont : MonoBehaviour
 				{
 					if (prev != 0) x += glyph.GetKerning(prev);
 
-					v0.x =  scale.x * (x + glyph.offsetX);
-					v0.y = -scale.y * (y + glyph.offsetY);
+					if (c != ' ')
+					{
+						v0.x = scale.x * (x + glyph.offsetX);
+						v0.y = -scale.y * (y + glyph.offsetY);
 
-					v1.x = v0.x + scale.x * glyph.width;
-					v1.y = v0.y - scale.y * glyph.height;
+						v1.x = v0.x + scale.x * glyph.width;
+						v1.y = v0.y - scale.y * glyph.height;
 
-					u0.x = mUVRect.xMin + invX * glyph.x;
-					u0.y = mUVRect.yMax - invY * glyph.y;
+						u0.x = mUVRect.xMin + invX * glyph.x;
+						u0.y = mUVRect.yMax - invY * glyph.y;
 
-					u1.x = u0.x + invX * glyph.width;
-					u1.y = u0.y - invY * glyph.height;
+						u1.x = u0.x + invX * glyph.width;
+						u1.y = u0.y - invY * glyph.height;
 
-					verts.Add(new Vector3(v1.x, v0.y));
-					verts.Add(new Vector3(v1.x, v1.y));
-					verts.Add(new Vector3(v0.x, v1.y));
-					verts.Add(new Vector3(v0.x, v0.y));
+						verts.Add(new Vector3(v1.x, v0.y));
+						verts.Add(new Vector3(v1.x, v1.y));
+						verts.Add(new Vector3(v0.x, v1.y));
+						verts.Add(new Vector3(v0.x, v0.y));
 
-					uvs.Add(new Vector2(u1.x, u0.y));
-					uvs.Add(new Vector2(u1.x, u1.y));
-					uvs.Add(new Vector2(u0.x, u1.y));
-					uvs.Add(new Vector2(u0.x, u0.y));
+						uvs.Add(new Vector2(u1.x, u0.y));
+						uvs.Add(new Vector2(u1.x, u1.y));
+						uvs.Add(new Vector2(u0.x, u1.y));
+						uvs.Add(new Vector2(u0.x, u0.y));
 
-					cols.Add(color);
-					cols.Add(color);
-					cols.Add(color);
-					cols.Add(color);
-
+						cols.Add(color);
+						cols.Add(color);
+						cols.Add(color);
+						cols.Add(color);
+					}
 					x += mSpacingX + glyph.advance;
 					prev = c;
 				}

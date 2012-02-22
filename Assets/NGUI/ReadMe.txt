@@ -36,6 +36,9 @@ All can be found here: http://www.tasharen.com/?page_id=197
 - NEW: Right click stuff has been replaced by just 'lastTouchID' with added support for the middle mouse button.
 - NEW: UIDragCamera now has scrolling wheel support just like UIDragObject.
 - FIX: UTF8 encoding is not supported in Flash. Wrote my own binary parsing function to make Flash work.
+- FIX: UILabel will now align to right and center properly when not pixel-perfect.
+- FIX: UIFont.WrapText will now trim away space characters when word wrapping.
+- FIX: UIFont.Print will no longer draw spaces (padding will still be applied).
 
 1.69:
 - NEW: Added right-click support by simply adding an optional integer parameter to the OnClick event.

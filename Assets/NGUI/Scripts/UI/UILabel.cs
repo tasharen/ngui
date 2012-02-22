@@ -390,12 +390,16 @@ public class UILabel : UIWidget
 		else if (p == Pivot.Right || p == Pivot.TopRight || p == Pivot.BottomRight)
 		{
 			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, UIFont.Alignment.Right,
-				(lineWidth > 0) ? lineWidth : Mathf.RoundToInt(relativeSize.x * mFont.size));
+				(mMaxLineWidth > 0) ?
+				Mathf.RoundToInt(mMaxLineWidth / cachedTransform.localScale.x) :
+				Mathf.RoundToInt(relativeSize.x * mFont.size));
 		}
 		else
 		{
 			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, UIFont.Alignment.Center,
-				(lineWidth > 0) ? lineWidth : Mathf.RoundToInt(relativeSize.x * mFont.size));
+				(mMaxLineWidth > 0) ?
+				Mathf.RoundToInt(mMaxLineWidth / cachedTransform.localScale.x) :
+				Mathf.RoundToInt(relativeSize.x * mFont.size));
 		}
 	}
 }
