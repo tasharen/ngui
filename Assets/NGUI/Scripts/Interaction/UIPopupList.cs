@@ -401,6 +401,9 @@ public class UIPopupList : MonoBehaviour
 				listener.onHover = OnItemHover;
 				listener.onPress = OnItemPress;
 				listener.parameter = s;
+
+				// Move the selection here if this is the right label
+				if (mSelectedItem == s) Highlight(lbl.cachedTransform, true);
 			}
 
 			// The triggering widget's width should be the minimum allowed width
@@ -412,9 +415,6 @@ public class UIPopupList : MonoBehaviour
 				BoxCollider bc = NGUITools.AddWidgetCollider(lbl.gameObject);
 				bc.center = new Vector3((x * 0.5f) / fontScale, -0.5f, bc.center.z);
 				bc.size = new Vector3(x / fontScale, 1f, 1f);
-
-				// Move the selection here if this is the right label
-				if (mSelectedItem == lbl.text) Highlight(lbl.cachedTransform, true);
 			}
 
 			x += padding.x * 2f;

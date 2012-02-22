@@ -39,6 +39,7 @@ All can be found here: http://www.tasharen.com/?page_id=197
 - FIX: UILabel will now align to right and center properly when not pixel-perfect.
 - FIX: UIFont.WrapText will now trim away space characters when word wrapping.
 - FIX: UIFont.Print will no longer draw spaces (padding will still be applied).
+- FIX: UIPopupList will highlight the correct item even when localized.
 
 1.69:
 - NEW: Added right-click support by simply adding an optional integer parameter to the OnClick event.
