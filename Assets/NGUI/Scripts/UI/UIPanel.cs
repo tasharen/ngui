@@ -446,7 +446,7 @@ public class UIPanel : MonoBehaviour
 		for (int i = mDrawCalls.Count; i > 0; )
 		{
 			UIDrawCall dc = mDrawCalls[--i];
-			if (dc != null) DestroyImmediate(dc.gameObject);
+			if (dc != null) NGUITools.Destroy(dc.gameObject);
 		}
 		mDrawCalls.Clear();
 		mChanged.Clear();

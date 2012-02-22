@@ -31,6 +31,12 @@ public class UIDragCamera : IgnoreTimeScale
 	public Vector2 scale = Vector2.one;
 
 	/// <summary>
+	/// Effect the scroll wheel will have on the momentum.
+	/// </summary>
+
+	public float scrollWheelFactor = 0f;
+
+	/// <summary>
 	/// Effect to apply when dragging.
 	/// </summary>
 
@@ -46,6 +52,7 @@ public class UIDragCamera : IgnoreTimeScale
 	bool mPressed = false;
 	Vector3 mMomentum = Vector3.zero;
 	Bounds mBounds;
+	float mScroll = 0f;
 
 	/// <summary>
 	/// Cache the transform.
@@ -76,6 +83,7 @@ public class UIDragCamera : IgnoreTimeScale
 
 				// Remove all momentum on press
 				mMomentum = Vector3.zero;
+				mScroll = 0f;
 
 				// Disable the spring movement
 				SpringPosition sp = target.GetComponent<SpringPosition>();
@@ -103,7 +111,11 @@ public class UIDragCamera : IgnoreTimeScale
 			mMomentum = Vector3.Lerp(mMomentum, offset * (realTimeDelta * momentumAmount), 0.5f);
 
 			// Constrain the UI to the bounds, and if done so, eliminate the momentum
-			if (dragEffect != UIDragObject.DragEffect.MomentumAndSpring && ConstrainToBounds(true)) mMomentum = Vector3.zero;
+			if (dragEffect != UIDragObject.DragEffect.MomentumAndSpring && ConstrainToBounds(true))
+			{
+				mMomentum = Vector3.zero;
+				mScroll = 0f;
+			}
 		}
 	}
 
@@ -161,6 +173,7 @@ public class UIDragCamera : IgnoreTimeScale
 
 	void Update ()
 	{
+		if (target == null) return;
 		float delta = UpdateRealTimeDelta();
 
 		if (mPressed)
@@ -168,13 +181,39 @@ public class UIDragCamera : IgnoreTimeScale
 			// Disable the spring movement
 			SpringPosition sp = target.GetComponent<SpringPosition>();
 			if (sp != null) sp.enabled = false;
+			mScroll = 0f;
 		}
-		else if (dragEffect != UIDragObject.DragEffect.None && target != null && mMomentum.magnitude > 0.005f)
+		else
 		{
-			// Apply the momentum
-			mTrans.localPosition += NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
-			mBounds = NGUIMath.CalculateAbsoluteWidgetBounds(rootForBounds);
-			ConstrainToBounds(false);
+			mMomentum += (Vector3)scale * (mScroll * 20f);
+			mScroll = NGUIMath.SpringLerp(mScroll, 0f, 20f, delta);
+
+			if (mMomentum.magnitude > 0.01f)
+			{
+				// Apply the momentum
+				mTrans.localPosition += NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
+				mBounds = NGUIMath.CalculateAbsoluteWidgetBounds(rootForBounds);
+
+				if (!ConstrainToBounds(dragEffect == UIDragObject.DragEffect.None))
+				{
+					SpringPosition sp = target.GetComponent<SpringPosition>();
+					if (sp != null) sp.enabled = false;
+				}
+			}
+			else mScroll = 0f;
+		}
+	}
+	
+	/// <summary>
+	/// If the object should support the scroll wheel, do it.
+	/// </summary>
+
+	void OnScroll (float delta)
+	{
+		if (enabled && gameObject.active)
+		{
+			if (Mathf.Sign(mScroll) != Mathf.Sign(delta)) mScroll = 0f;
+			mScroll += delta * scrollWheelFactor;
 		}
 	}
 }

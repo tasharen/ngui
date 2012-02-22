@@ -25,10 +25,35 @@ public class UIDragObject : IgnoreTimeScale
 	/// </summary>
 
 	public Transform target;
+
+	/// <summary>
+	/// Scale value applied to the drag delta. Set X or Y to 0 to disallow dragging in that direction.
+	/// </summary>
+
 	public Vector3 scale = Vector3.one;
+
+	/// <summary>
+	/// Effect the scroll wheel will have on the momentum.
+	/// </summary>
+
 	public float scrollWheelFactor = 0f;
+
+	/// <summary>
+	/// Whether the dragging will be restricted to be within the parent panel's bounds.
+	/// </summary>
+
 	public bool restrictWithinPanel = false;
+
+	/// <summary>
+	/// Effect to apply when dragging.
+	/// </summary>
+
 	public DragEffect dragEffect = DragEffect.MomentumAndSpring;
+
+	/// <summary>
+	/// How much momentum gets applied when the press is released after dragging.
+	/// </summary>
+
 	public float momentumAmount = 35f;
 
 	Plane mPlane;
@@ -68,6 +93,7 @@ public class UIDragObject : IgnoreTimeScale
 
 				// Remove all momentum on press
 				mMomentum = Vector3.zero;
+				mScroll = 0f;
 
 				// Disable the spring movement
 				SpringPosition sp = target.GetComponent<SpringPosition>();
@@ -127,6 +153,7 @@ public class UIDragObject : IgnoreTimeScale
 						mPanel.ConstrainTargetToBounds(target, ref mBounds, true))
 					{
 						mMomentum = Vector3.zero;
+						mScroll = 0f;
 					}
 				}
 				else
@@ -159,22 +186,24 @@ public class UIDragObject : IgnoreTimeScale
 			mMomentum += scale * (-mScroll * 0.05f);
 			mScroll = NGUIMath.SpringLerp(mScroll, 0f, 20f, delta);
 
-			if (dragEffect != DragEffect.None && mMomentum.magnitude > 0.0001f)
+			if (mMomentum.magnitude > 0.0001f)
 			{
 				// Apply the momentum
 				if (mPanel == null) FindPanel();
 
 				if (mPanel != null)
 				{
-					SpringPosition sp = target.GetComponent<SpringPosition>();
-					if (sp != null) sp.enabled = false;
-
 					target.position += NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
 
 					if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None)
 					{
 						mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.cachedTransform, target);
-						mPanel.ConstrainTargetToBounds(target, ref mBounds, false);
+						
+						if (!mPanel.ConstrainTargetToBounds(target, ref mBounds, dragEffect == DragEffect.None))
+						{
+							SpringPosition sp = target.GetComponent<SpringPosition>();
+							if (sp != null) sp.enabled = false;
+						}
 					}
 				}
 			}
