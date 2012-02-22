@@ -41,11 +41,11 @@ public class UIForwardEvents : MonoBehaviour
 		}
 	}
 	
-	void OnClick (int button)
+	void OnClick ()
 	{
 		if (onClick && target != null)
 		{
-			target.SendMessage("OnClick", button, SendMessageOptions.DontRequireReceiver);
+			target.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
 		}
 	}
 

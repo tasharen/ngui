@@ -40,8 +40,7 @@ public class UICamera : MonoBehaviour
 		public GameObject hover;	// The last game object to receive OnHover
 		public GameObject pressed;	// The last game object to receive OnPress
 
-		// 0 = Don't send a click event, 1 = OnClick(0), 2 = OnClick(1)
-		public int clickType = 0;
+		public bool considerForClick = false;
 	}
 
 	/// <summary>
@@ -82,7 +81,7 @@ public class UICamera : MonoBehaviour
 	static public Vector3 lastTouchPosition;
 
 	/// <summary>
-	/// ID of the touch or mouse operation prior to sending out the event. Mouse ID is '-1'.
+	/// ID of the touch or mouse operation prior to sending out the event. Mouse ID is '-1' for left, '-2' for right mouse button, '-3' for middle.
 	/// </summary>
 
 	static public int lastTouchID = -1;
@@ -330,36 +329,35 @@ public class UICamera : MonoBehaviour
 
 		if (mUseMouseInput)
 		{
-			bool pressed0 = Input.GetMouseButtonDown(0);
-			bool unpressed0 = Input.GetMouseButtonUp(0);
-			bool pressed1 = Input.GetMouseButtonDown(1);
-			bool unpressed1 = Input.GetMouseButtonUp(1);
-			bool pressed = pressed0 || pressed1;
-			bool unpressed = unpressed0 || unpressed1;
-
-			lastTouchID = -1;
-			lastTouchPosition = Input.mousePosition;
-			mMouse.delta = lastTouchPosition - mMouse.pos;
-
-			// We still want to update what's under the mouse even if the game is paused
-			if (pressed || unpressed || Time.timeScale == 0f)
+			for (int i = 0; i < 3; ++i)
 			{
-				mMouse.current = Raycast(lastTouchPosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+				bool pressed = Input.GetMouseButtonDown(i);
+				bool unpressed = Input.GetMouseButtonUp(i);
+
+				lastTouchID = -1 - i;
+				lastTouchPosition = Input.mousePosition;
+				mMouse.delta = lastTouchPosition - mMouse.pos;
+
+				// We still want to update what's under the mouse even if the game is paused
+				if (pressed || unpressed || Time.timeScale == 0f)
+				{
+					mMouse.current = Raycast(lastTouchPosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+				}
+
+				// We don't want to update the last camera while there is a touch happening
+				if (pressed) mMouse.pressedCam = lastCamera;
+				else if (mMouse.pressed != null) lastCamera = mMouse.pressedCam;
+
+				if (mMouse.pos != lastTouchPosition)
+				{
+					if (mTooltipTime != 0f) mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
+					else if (mTooltip != null) ShowTooltip(false);
+					mMouse.pos = lastTouchPosition;
+				}
+
+				// Process the mouse events
+				ProcessTouch(mMouse, pressed, unpressed);
 			}
-
-			// We don't want to update the last camera while there is a touch happening
-			if (pressed0) mMouse.pressedCam = lastCamera;
-			else if (mMouse.pressed != null) lastCamera = mMouse.pressedCam;
-
-			if (mMouse.pos != lastTouchPosition)
-			{
-				if (mTooltipTime != 0f) mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
-				else if (mTooltip != null) ShowTooltip(false);
-				mMouse.pos = lastTouchPosition;
-			}
-
-			// Process the mouse events
-			ProcessTouch(mMouse, pressed, unpressed, pressed1 || unpressed1 ? 2 : 1);
 		}
 
 		// Process touch input
@@ -387,7 +385,7 @@ public class UICamera : MonoBehaviour
 			else if (touch.pressed != null) lastCamera = touch.pressedCam;
 
 			// Process the events from this touch
-			ProcessTouch(touch, pressed, unpressed, 1);
+			ProcessTouch(touch, pressed, unpressed);
 
 			// If the touch has ended, remove it from the list
 			if (unpressed) RemoveTouch(lastTouchID);
@@ -426,7 +424,7 @@ public class UICamera : MonoBehaviour
 	/// Process the events of the specified touch.
 	/// </summary>
 
-	void ProcessTouch (MouseOrTouch touch, bool pressed, bool unpressed, int clickType)
+	void ProcessTouch (MouseOrTouch touch, bool pressed, bool unpressed)
 	{
 		// If we're using the mouse for input, we should send out a hover(false) message first
 		if (mUseMouseInput && touch.pressed == null && touch.hover != touch.current && touch.hover != null)
@@ -443,7 +441,7 @@ public class UICamera : MonoBehaviour
 			touch.pressed.SendMessage("OnDrag", touch.delta, SendMessageOptions.DontRequireReceiver);
 
 			float threshold = (touch == mMouse) ? 5f : 30f;
-			if (touch.totalDelta.magnitude > threshold) touch.clickType = 0;
+			if (touch.totalDelta.magnitude > threshold) touch.considerForClick = false;
 		}
 
 		// Send out the press message
@@ -451,7 +449,7 @@ public class UICamera : MonoBehaviour
 		{
 			if (mTooltip != null) ShowTooltip(false);
 			touch.pressed = touch.current;
-			touch.clickType = clickType;
+			touch.considerForClick = true;
 			touch.totalDelta = Vector2.zero;
 			if (touch.pressed != null) touch.pressed.SendMessage("OnPress", true, SendMessageOptions.DontRequireReceiver);
 		}
@@ -484,7 +482,7 @@ public class UICamera : MonoBehaviour
 					{
 						mSel = touch.pressed;
 					}
-					if (touch.clickType != 0) touch.pressed.SendMessage("OnClick", touch.clickType - 1, SendMessageOptions.DontRequireReceiver);
+					if (touch.considerForClick) touch.pressed.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
 				}
 				else // The button/touch was released on a different object
 				{

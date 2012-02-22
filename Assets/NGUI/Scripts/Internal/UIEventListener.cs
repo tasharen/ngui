@@ -15,7 +15,6 @@ public class UIEventListener : MonoBehaviour
 {
 	public delegate void VoidDelegate (GameObject go);
 	public delegate void BoolDelegate (GameObject go, bool state);
-	public delegate void IntDelegate (GameObject go, int button);
 	public delegate void FloatDelegate (GameObject go, float delta);
 	public delegate void VectorDelegate (GameObject go, Vector2 delta);
 	public delegate void StringDelegate (GameObject go, string text);
@@ -24,7 +23,7 @@ public class UIEventListener : MonoBehaviour
 	public object parameter;
 
 	public VoidDelegate onSubmit;
-	public IntDelegate onClick;
+	public VoidDelegate onClick;
 	public BoolDelegate onHover;
 	public BoolDelegate onPress;
 	public BoolDelegate onSelect;
@@ -34,7 +33,7 @@ public class UIEventListener : MonoBehaviour
 	public StringDelegate onInput;
 
 	void OnSubmit ()				{ if (onSubmit != null) onSubmit(gameObject); }
-	void OnClick (int button)		{ if (onClick != null) onClick(gameObject, button); }
+	void OnClick ()					{ if (onClick != null) onClick(gameObject); }
 	void OnHover (bool isOver)		{ if (onHover != null) onHover(gameObject, isOver); }
 	void OnPress (bool isPressed)	{ if (onPress != null) onPress(gameObject, isPressed); }
 	void OnSelect (bool selected)	{ if (onSelect != null) onSelect(gameObject, selected); }
