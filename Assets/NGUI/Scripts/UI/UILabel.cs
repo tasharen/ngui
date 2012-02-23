@@ -327,8 +327,8 @@ public class UILabel : UIWidget
 			int y = Mathf.RoundToInt(actualSize.y);
 
 			Vector3 pos = cachedTransform.localPosition;
-			pos.x = Mathf.RoundToInt(pos.x);
-			pos.y = Mathf.RoundToInt(pos.y);
+			pos.x = Mathf.FloorToInt(pos.x);
+			pos.y = Mathf.CeilToInt(pos.y);
 			pos.z = Mathf.RoundToInt(pos.z);
 
 			if ((x % 2 == 1) && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
@@ -357,8 +357,8 @@ public class UILabel : UIWidget
 			int y = Mathf.RoundToInt(actualSize.y);
 
 			Vector3 pos = cachedTransform.localPosition;
-			pos.x = Mathf.RoundToInt(pos.x);
-			pos.y = Mathf.RoundToInt(pos.y);
+			pos.x = Mathf.FloorToInt(pos.x);
+			pos.y = Mathf.CeilToInt(pos.y);
 			pos.z = Mathf.RoundToInt(pos.z);
 
 			if (cachedTransform.localRotation == Quaternion.identity)

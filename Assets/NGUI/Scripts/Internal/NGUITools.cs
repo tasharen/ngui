@@ -387,8 +387,11 @@ static public class NGUITools
 
 	static public void Destroy (UnityEngine.Object obj)
 	{
-		if (Application.isPlaying) UnityEngine.Object.Destroy(obj);
-		else UnityEngine.Object.DestroyImmediate(obj);
+		if (obj != null)
+		{
+			if (Application.isPlaying) UnityEngine.Object.Destroy(obj);
+			else UnityEngine.Object.DestroyImmediate(obj);
+		}
 	}
 
 	/// <summary>

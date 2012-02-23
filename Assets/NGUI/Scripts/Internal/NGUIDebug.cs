@@ -18,7 +18,7 @@ public class NGUIDebug : MonoBehaviour
 	
 	static public void Log (string text)
 	{
-		Debug.Log(text);
+		//Debug.Log(text);
 
 		if (mLines.Count > 20) mLines.RemoveAt(0);
 		mLines.Add(text);
