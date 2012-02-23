@@ -377,14 +377,27 @@ static public class NGUIMath
 	}
 
 	/// <summary>
+	/// Calculate how much to interpolate by.
+	/// </summary>
+
+	static public float SpringLerp (float strength, float deltaTime)
+	{
+		int ms = Mathf.RoundToInt(deltaTime * 1000f);
+		deltaTime = 0.001f * strength;
+		float cumulative = 0f;
+		for (int i = 0; i < ms; ++i) cumulative = Mathf.Lerp(cumulative, 1f, deltaTime);
+		return cumulative;
+	}
+
+	/// <summary>
 	/// Mathf.Lerp(from, to, Time.deltaTime * strength) is not framerate-independent. This function is.
 	/// </summary>
 
 	static public float SpringLerp (float from, float to, float strength, float deltaTime)
 	{
-		float dampeningFactor = (1f - strength * 0.001f) / 60f;
 		int ms = Mathf.RoundToInt(deltaTime * 1000f);
-		for (int i = 0; i < ms; ++i) from = Mathf.Lerp(from, to, dampeningFactor);
+		deltaTime = 0.001f * strength;
+		for (int i = 0; i < ms; ++i) from = Mathf.Lerp(from, to, deltaTime);
 		return from;
 	}
 
@@ -394,10 +407,7 @@ static public class NGUIMath
 
 	static public Vector2 SpringLerp (Vector2 from, Vector2 to, float strength, float deltaTime)
 	{
-		float dampeningFactor = (1f - strength * 0.001f) / 60f;
-		int ms = Mathf.RoundToInt(deltaTime * 1000f);
-		for (int i = 0; i < ms; ++i) from = Vector2.Lerp(from, to, dampeningFactor);
-		return from;
+		return Vector2.Lerp(from, to, SpringLerp(strength, deltaTime));
 	}
 
 	/// <summary>
@@ -406,10 +416,7 @@ static public class NGUIMath
 
 	static public Vector3 SpringLerp (Vector3 from, Vector3 to, float strength, float deltaTime)
 	{
-		float dampeningFactor = (1f - strength * 0.001f) / 60f;
-		int ms = Mathf.RoundToInt(deltaTime * 1000f);
-		for (int i = 0; i < ms; ++i) from = Vector3.Lerp(from, to, dampeningFactor);
-		return from;
+		return Vector3.Lerp(from, to, SpringLerp(strength, deltaTime));
 	}
 
 	/// <summary>
@@ -418,10 +425,7 @@ static public class NGUIMath
 
 	static public Quaternion SpringLerp (Quaternion from, Quaternion to, float strength, float deltaTime)
 	{
-		float dampeningFactor = (1f - strength * 0.001f) / 60f;
-		int ms = Mathf.RoundToInt(deltaTime * 1000f);
-		for (int i = 0; i < ms; ++i) from = Quaternion.Slerp(from, to, dampeningFactor);
-		return from;
+		return Quaternion.Slerp(from, to, SpringLerp(strength, deltaTime));
 	}
 
 	/// <summary>
