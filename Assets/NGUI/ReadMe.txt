@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.70
+                Version 1.70b
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -41,6 +41,8 @@ All can be found here: http://www.tasharen.com/?page_id=197
 - FIX: UIFont.Print will no longer draw spaces (padding will still be applied).
 - FIX: UIPopupList will highlight the correct item even when localized.
 - FIX: UITable will now handle disabled children properly.
+- FIX: Fixed a crash on Unity 3.5.0 (sigh!).
+- FIX: Tweaked how pixel-perfect calculations work for labels.
 
 1.69:
 - NEW: Added right-click support by simply adding an optional integer parameter to the OnClick event.
