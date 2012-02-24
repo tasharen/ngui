@@ -10,6 +10,13 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Label")]
 public class UILabel : UIWidget
 {
+	public enum Effect
+	{
+		None,
+		Shadow,
+		Outline,
+	}
+
 	[SerializeField] UIFont mFont;
 	[SerializeField] string mText = "";
 	[SerializeField] int mMaxLineWidth = 0;
@@ -17,6 +24,8 @@ public class UILabel : UIWidget
 	[SerializeField] bool mMultiline = true;
 	[SerializeField] bool mPassword = false;
 	[SerializeField] bool mShowLastChar = false;
+	[SerializeField] Effect mEffectStyle = Effect.None;
+	[SerializeField] Color mEffectColor = Color.black;
 
 	/// <summary>
 	/// Obsolete, do not use. Use 'mMaxLineWidth' instead.
@@ -35,6 +44,8 @@ public class UILabel : UIWidget
 	bool mLastMulti = true;
 	bool mLastPass = false;
 	bool mLastShow = false;
+	Effect mLastEffect = Effect.None;
+	Color mLastColor = Color.black;
 
 	/// <summary>
 	/// Function used to determine if something has changed (and thus the geometry must be rebuilt)
@@ -50,7 +61,9 @@ public class UILabel : UIWidget
 				mLastEncoding != mEncoding ||
 				mLastMulti != mMultiline ||
 				mLastPass != mPassword ||
-				mLastShow != mShowLastChar;
+				mLastShow != mShowLastChar ||
+				mLastEffect != mEffectStyle ||
+				mLastColor != mEffectColor;
 		}
 		set
 		{
@@ -68,6 +81,8 @@ public class UILabel : UIWidget
 				mLastMulti = mMultiline;
 				mLastPass = mPassword;
 				mLastShow = mShowLastChar;
+				mLastEffect = mEffectStyle;
+				mLastColor = mEffectColor;
 			}
 		}
 	}
@@ -215,6 +230,46 @@ public class UILabel : UIWidget
 			{
 				mShowLastChar = value;
 				hasChanged = true;
+			}
+		}
+	}
+
+	/// <summary>
+	/// What effect is used by the label.
+	/// </summary>
+
+	public Effect effectStyle
+	{
+		get
+		{
+			return mEffectStyle;
+		}
+		set
+		{
+			if (mEffectStyle != value)
+			{
+				mEffectStyle = value;
+				hasChanged = true;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Color used by the effect, if it's enabled.
+	/// </summary>
+
+	public Color effectColor
+	{
+		get
+		{
+			return mEffectColor;
+		}
+		set
+		{
+			if (mEffectColor != value)
+			{
+				mEffectColor = value;
+				if (mEffectStyle != Effect.None) hasChanged = true;
 			}
 		}
 	}
@@ -373,6 +428,24 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Apply a shadow effect to the buffer.
+	/// </summary>
+
+	void ApplyShadow (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols, int start, int end, float x, float y)
+	{
+		for (int i = start; i < end; ++i)
+		{
+			verts.Add(verts.buffer[i]);
+			uvs.Add(uvs.buffer[i]);
+			cols.Add(cols.buffer[i]);
+
+			verts.buffer[i].x += x;
+			verts.buffer[i].y += y;
+			cols.buffer[i] = mEffectColor;
+		}
+	}
+
+	/// <summary>
 	/// Draw the label.
 	/// </summary>
 
@@ -381,6 +454,7 @@ public class UILabel : UIWidget
 		if (mFont == null) return;
 		MakePositionPerfect();
 		Pivot p = pivot;
+		int offset = verts.size;
 
 		// Print the text into the buffers
 		if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)
@@ -400,6 +474,40 @@ public class UILabel : UIWidget
 				(mMaxLineWidth > 0) ?
 				Mathf.RoundToInt(mMaxLineWidth / cachedTransform.localScale.x) :
 				Mathf.RoundToInt(relativeSize.x * mFont.size));
+		}
+
+		// Apply an effect if one was requested
+		if (effectStyle != Effect.None)
+		{
+			Vector3 scale = cachedTransform.localScale;
+			if (scale.x == 0f || scale.y == 0f) return;
+
+			int end = verts.size;
+			float x =  1f / scale.x;
+			float y = -1f / scale.y;
+
+			ApplyShadow(verts, uvs, cols, offset, end, x, y);
+
+			if (effectStyle == Effect.Outline)
+			{
+				x = -x;
+				offset = end;
+				end = verts.size;
+
+				ApplyShadow(verts, uvs, cols, offset, end, x, y);
+
+				y = -y;
+				offset = end;
+				end = verts.size;
+
+				ApplyShadow(verts, uvs, cols, offset, end, x, y);
+
+				x = -x;
+				offset = end;
+				end = verts.size;
+
+				ApplyShadow(verts, uvs, cols, offset, end, x, y);
+			}
 		}
 	}
 }

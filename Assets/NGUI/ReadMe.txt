@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.70b
+                Version 1.71
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -31,6 +31,9 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.71:
+- NEW: You can now add a colored shadow/bevel or an outline effect to your labels.
 
 1.70:
 - NEW: Right click stuff has been replaced by just 'lastTouchID' with added support for the middle mouse button.

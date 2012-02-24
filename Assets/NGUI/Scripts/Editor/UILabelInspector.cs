@@ -54,7 +54,7 @@ public class UILabelInspector : UIWidgetInspector
 			if (len != mLabel.lineWidth) { RegisterUndo(); mLabel.lineWidth = len; }
 
 			bool multi = EditorGUILayout.Toggle("Multi-line", mLabel.multiLine, GUILayout.Width(100f));
-			if (multi != mLabel.multiLine) { RegisterUndo(); mLabel.multiLine = multi; } 
+			if (multi != mLabel.multiLine) { RegisterUndo(); mLabel.multiLine = multi; }
 		}
 		GUILayout.EndHorizontal();
 
@@ -65,6 +65,19 @@ public class UILabelInspector : UIWidgetInspector
 
 			bool encoding = EditorGUILayout.Toggle("Encoding", mLabel.supportEncoding, GUILayout.Width(100f));
 			if (encoding != mLabel.supportEncoding) { RegisterUndo(); mLabel.supportEncoding = encoding; }
+		}
+		GUILayout.EndHorizontal();
+
+		GUILayout.BeginHorizontal();
+		{
+			UILabel.Effect effect = (UILabel.Effect)EditorGUILayout.EnumPopup("Effect", mLabel.effectStyle, GUILayout.Width(170f));
+			if (effect != mLabel.effectStyle) { RegisterUndo(); mLabel.effectStyle = effect; }
+
+			if (effect != UILabel.Effect.None)
+			{
+				Color c = EditorGUILayout.ColorField(mLabel.effectColor);
+				if (mLabel.effectColor != c) { RegisterUndo(); mLabel.effectColor = c; }
+			}
 		}
 		GUILayout.EndHorizontal();
 		return true;
