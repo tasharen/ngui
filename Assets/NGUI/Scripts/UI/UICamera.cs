@@ -601,9 +601,9 @@ public class UICamera : MonoBehaviour
 	void ProcessOthers ()
 	{
 		// Enter key and joystick button 1 keys are treated the same -- as a "click"
-		bool returnKeyDown	= (useKeyboard	 && Input.GetKeyDown(KeyCode.Return));
+		bool returnKeyDown	= (useKeyboard	 && (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space)));
 		bool buttonKeyDown	= (useController && Input.GetKeyDown(KeyCode.JoystickButton0));
-		bool returnKeyUp	= (useKeyboard	 && Input.GetKeyUp(KeyCode.Return));
+		bool returnKeyUp	= (useKeyboard	 && (Input.GetKeyUp(KeyCode.Return) || Input.GetKeyUp(KeyCode.Space)));
 		bool buttonKeyUp	= (useController && Input.GetKeyUp(KeyCode.JoystickButton0));
 
 		bool down	= returnKeyDown || buttonKeyDown;
