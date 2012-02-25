@@ -12,7 +12,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 [RequireComponent(typeof(BoxCollider))]
 [AddComponentMenu("NGUI/Interaction/Slider")]
-public class UISlider : MonoBehaviour
+public class UISlider : IgnoreTimeScale
 {
 	public enum Direction
 	{
@@ -112,7 +112,25 @@ public class UISlider : MonoBehaviour
 	/// Watch for slider value changes and adjust the visual sprite accordingly.
 	/// </summary>
 
-	void Update () { Set(rawValue); }
+	void Update ()
+	{
+		float delta = UpdateRealTimeDelta();
+
+		if (UICamera.selectedObject == gameObject)
+		{
+			if (direction == Direction.Horizontal)
+			{
+				float val = Input.GetAxis("Horizontal");
+				rawValue += val * delta;
+			}
+			else
+			{
+				float val = Input.GetAxis("Vertical");
+				rawValue += val * delta;
+			}
+		}
+		Set(rawValue);
+	}
 
 	/// <summary>
 	/// Update the slider's position based on the mouse.
@@ -121,7 +139,7 @@ public class UISlider : MonoBehaviour
 	void UpdateDrag ()
 	{
 		// Create a plane for the slider
-		if (mCol == null) return;
+		if (mCol == null || UICamera.lastCamera == null) return;
 
 		// Create a ray and a plane
 		Ray ray = UICamera.lastCamera.ScreenPointToRay(UICamera.lastTouchPosition);

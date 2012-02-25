@@ -125,6 +125,12 @@ public class UIPopupList : MonoBehaviour
 	UISprite mHighlight;
 
 	/// <summary>
+	/// Whether the popup list is currently open.
+	/// </summary>
+
+	public bool isOpen { get { return mChild != null; } }
+
+	/// <summary>
 	/// Current selection.
 	/// </summary>
 

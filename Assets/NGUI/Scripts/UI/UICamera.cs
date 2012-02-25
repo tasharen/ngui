@@ -43,25 +43,35 @@ public class UICamera : MonoBehaviour
 		public bool considerForClick = false;
 	}
 
-	public enum InputStyle
+	class Highlighted
 	{
-		Mouse,
-		Touch,
-		Keyboard,
-		Controller,
+		public GameObject go;
+		public int counter = 0;
 	}
 
 	/// <summary>
-	/// Specify what style of controls will be used.
+	/// Whether the mouse input is used.
 	/// </summary>
 
-	public InputStyle inputStyle = InputStyle.Mouse;
+	public bool useMouse = true;
 
 	/// <summary>
-	/// If set to 'true', the input style will be auto-adjusted based on the latest valid input source.
+	/// Whether the touch-based input is used.
 	/// </summary>
 
-	public bool inputIsFlexible = true;
+	public bool useTouch = true;
+
+	/// <summary>
+	/// Whether the keyboard events will be processed.
+	/// </summary>
+
+	public bool useKeyboard = true;
+
+	/// <summary>
+	/// Whether the joystick and controller events will be processed.
+	/// </summary>
+
+	public bool useController = true;
 
 	/// <summary>
 	/// Which layers will receive events.
@@ -113,13 +123,16 @@ public class UICamera : MonoBehaviour
 	static public GameObject fallThrough;
 
 	/// <summary>
-	/// Whether mouse hover events will be processed.
+	/// If set, this object will intercept all future keyboard and joystick events.
 	/// </summary>
 
-	static public bool allowHoverEvents = true;
+	static public GameObject keyEventInterceptor;
 
 	// List of all active cameras in the scene
 	static List<UICamera> mList = new List<UICamera>();
+
+	// List of currently highlighted items
+	static List<Highlighted> mHighlighted = new List<Highlighted>();
 
 	// Selected widget (for input)
 	static GameObject mSel = null;
@@ -127,19 +140,23 @@ public class UICamera : MonoBehaviour
 	// Mouse event
 	static MouseOrTouch mMouse = new MouseOrTouch();
 
+	// Joystick/controller/keyboard event
+	static MouseOrTouch mJoystick = new MouseOrTouch();
+
+	// Used to ensure that joystick-based controls don't trigger that often
+	static float mNextEvent = 0f;
+
 	// List of currently active touches
 	Dictionary<int, MouseOrTouch> mTouches = new Dictionary<int, MouseOrTouch>();
 
 	// Tooltip widget (mouse only)
 	GameObject mTooltip = null;
 
-	// Native method of input, determined at start
-	static InputStyle mNativeInput = InputStyle.Mouse;
-
 	// Mouse input is turned off on iOS
 	Camera mCam = null;
 	LayerMask mLayerMask;
 	float mTooltipTime = 0f;
+	bool mIsEditor = false;
 
 	/// <summary>
 	/// Helper function that determines if this script should be handling the events.
@@ -152,12 +169,6 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	public Camera cachedCamera { get { if (mCam == null) mCam = camera; return mCam; } }
-
-	/// <summary>
-	/// Native method of input for the current platform.
-	/// </summary>
-
-	static public InputStyle nativeInput { get { return mNativeInput; } }
 
 	/// <summary>
 	/// The object the mouse is hovering over. Results may be somewhat odd on touch-based devices.
@@ -187,6 +198,7 @@ public class UICamera : MonoBehaviour
 					{
 						lastCamera = uicam.mCam;
 						mSel.SendMessage("OnSelect", false, SendMessageOptions.DontRequireReceiver);
+						Highlight(mSel, false);
 					}
 				}
 
@@ -199,11 +211,25 @@ public class UICamera : MonoBehaviour
 					if (uicam != null)
 					{
 						lastCamera = uicam.mCam;
+						Highlight(mSel, true);
 						mSel.SendMessage("OnSelect", true, SendMessageOptions.DontRequireReceiver);
 					}
 				}
 			}
 		}
+	}
+
+	void OnGUI ()
+	{
+		foreach (Highlighted hl in mHighlighted)
+		{
+			if (hl != null) GUILayout.Label(hl.counter + ": " + (hl.go == null ? "<null>" : hl.go.name));
+		}
+	}
+
+	void OnApplicationQuit ()
+	{
+		mHighlighted.Clear();
 	}
 
 	/// <summary>
@@ -293,6 +319,86 @@ public class UICamera : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Using the keyboard will result in 1 or -1, depending on whether up or down keys have been pressed.
+	/// </summary>
+
+	static int GetDirection (KeyCode up0, KeyCode up1, KeyCode down0, KeyCode down1)
+	{
+		if (Input.GetKeyDown(up0) || Input.GetKeyDown(up1)) return 1;
+		if (Input.GetKeyDown(down0) || Input.GetKeyDown(down1)) return -1;
+		return 0;
+	}
+
+	/// <summary>
+	/// Using the joystick to move the UI results in 1 or -1 if the threshold has been passed, mimicking up/down keys.
+	/// </summary>
+
+	static int GetDirection (string axis)
+	{
+		float time = Time.realtimeSinceStartup;
+
+		if (mNextEvent < time)
+		{
+			float val = Input.GetAxis(axis);
+
+			if (val > 0.75f)
+			{
+				mNextEvent = time + 0.25f;
+				return 1;
+			}
+
+			if (val < -0.75f)
+			{
+				mNextEvent = time + 0.25f;
+				return -1;
+			}
+		}
+		return 0;
+	}
+
+	/// <summary>
+	/// Apply or remove highlighted (hovered) state from the specified object.
+	/// </summary>
+
+	static void Highlight (GameObject go, bool highlighted)
+	{
+		if (go != null)
+		{
+			for (int i = mHighlighted.Count; i > 0; )
+			{
+				Highlighted hl = mHighlighted[--i];
+
+				if (hl == null || hl.go == null)
+				{
+					mHighlighted.RemoveAt(i);
+				}
+				else if (hl.go == go)
+				{
+					if (highlighted)
+					{
+						++hl.counter;
+					}
+					else if (--hl.counter < 1)
+					{
+						mHighlighted.Remove(hl);
+						go.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
+					}
+					return;
+				}
+			}
+
+			if (highlighted)
+			{
+				Highlighted hl = new Highlighted();
+				hl.go = go;
+				hl.counter = 1;
+				mHighlighted.Add(hl);
+				go.SendMessage("OnHover", true, SendMessageOptions.DontRequireReceiver);
+			}
+		}
+	}
+
+	/// <summary>
 	/// Get or create a touch event.
 	/// </summary>
 
@@ -326,20 +432,24 @@ public class UICamera : MonoBehaviour
 		if (Application.platform == RuntimePlatform.Android ||
 			Application.platform == RuntimePlatform.IPhonePlayer)
 		{
-			mNativeInput = InputStyle.Touch;
+			useMouse = false;
+			useTouch = true;
+			useKeyboard = false;
+			useController = false;
 		}
 		else if (Application.platform == RuntimePlatform.PS3 ||
 				 Application.platform == RuntimePlatform.XBOX360)
 		{
-			mNativeInput = InputStyle.Controller;
+			useMouse = false;
+			useTouch = false;
+			useKeyboard = false;
+			useController = true;
 		}
-		else
+		else if (Application.platform == RuntimePlatform.WindowsEditor ||
+				 Application.platform == RuntimePlatform.OSXEditor)
 		{
-			mNativeInput = InputStyle.Mouse;
+			mIsEditor = true;
 		}
-
-		// If the input is flexible, use the native method
-		if (inputIsFlexible) inputStyle = mNativeInput;
 
 		// Save the starting mouse position
 		mMouse.pos = Input.mousePosition;
@@ -367,7 +477,7 @@ public class UICamera : MonoBehaviour
 
 	void FixedUpdate ()
 	{
-		if (Application.isPlaying && inputStyle == InputStyle.Mouse && handlesEvents)
+		if (useMouse && Application.isPlaying && handlesEvents)
 		{
 			mMouse.current = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
 		}
@@ -382,56 +492,89 @@ public class UICamera : MonoBehaviour
 		// Only the first UI layer should be processing events
 		if (!Application.isPlaying || !handlesEvents) return;
 
-		// Whether mouse events will be processed:
-		// 1. If mouse input is selected
-		// 2. If touch is selected, but we're on a mouse-based platform
-		// 3. If it's not a touch-based input, and the input is flexible
-
-		bool processMouse = (inputStyle == InputStyle.Mouse);
-		if (!processMouse) processMouse = (inputStyle == InputStyle.Touch && mNativeInput == InputStyle.Mouse);
-		if (!processMouse) processMouse = (inputStyle != InputStyle.Touch && inputIsFlexible);
-
-		if (processMouse)
-		{
-			for (int i = 0; i < 3; ++i)
-			{
-				bool pressed = Input.GetMouseButtonDown(i);
-				bool unpressed = Input.GetMouseButtonUp(i);
-
-				// Automatically assume mouse-based input
-				if (inputIsFlexible && pressed)
-				{
-					if (inputStyle != InputStyle.Touch) inputStyle = InputStyle.Mouse;
-					allowHoverEvents = true;
-				}
-
-				lastTouchID = -1 - i;
-				lastTouchPosition = Input.mousePosition;
-				mMouse.delta = lastTouchPosition - mMouse.pos;
-
-				// We still want to update what's under the mouse even if the game is paused
-				if (pressed || unpressed || Time.timeScale == 0f)
-				{
-					mMouse.current = Raycast(lastTouchPosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
-				}
-
-				// We don't want to update the last camera while there is a touch happening
-				if (pressed) mMouse.pressedCam = lastCamera;
-				else if (mMouse.pressed != null) lastCamera = mMouse.pressedCam;
-
-				if (mMouse.pos != lastTouchPosition)
-				{
-					if (mTooltipTime != 0f) mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
-					else if (mTooltip != null) ShowTooltip(false);
-					mMouse.pos = lastTouchPosition;
-				}
-
-				// Process the mouse events
-				ProcessTouch(mMouse, pressed, unpressed);
-			}
-		}
+		// Update mouse input
+		if (useMouse || (useTouch && mIsEditor)) ProcessMouse();
 
 		// Process touch input
+		if (useTouch) ProcessTouches();
+
+		// Clear the selection on escape
+		if (useKeyboard && mSel != null && Input.GetKeyDown(KeyCode.Escape)) selectedObject = null;
+
+		// Forward the input to the selected object
+		if (mSel != null)
+		{
+			string input = Input.inputString;
+
+			// Adding support for some macs only having the "Delete" key instead of "Backspace"
+			if (useKeyboard && Input.GetKeyDown(KeyCode.Delete)) input += "\b";
+
+			if (input.Length > 0)
+			{
+				if (mTooltip != null) ShowTooltip(false);
+				mSel.SendMessage("OnInput", input, SendMessageOptions.DontRequireReceiver);
+			}
+
+			// Update the keyboard and joystick events
+			ProcessOthers();
+		}
+
+		// If it's time to show a tooltip, inform the object we're hovering over
+		if (useMouse && mMouse.hover != null)
+		{
+			float scroll = Input.GetAxis(scrollAxisName);
+			if (scroll != 0f) mMouse.hover.SendMessage("OnScroll", scroll, SendMessageOptions.DontRequireReceiver);
+
+			if (mTooltipTime != 0f && mTooltipTime < Time.realtimeSinceStartup)
+			{
+				mTooltip = mMouse.hover;
+				ShowTooltip(true);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Update mouse input.
+	/// </summary>
+
+	void ProcessMouse ()
+	{
+		for (int i = 0; i < 3; ++i)
+		{
+			bool pressed = Input.GetMouseButtonDown(i);
+			bool unpressed = Input.GetMouseButtonUp(i);
+
+			lastTouchID = -1 - i;
+			lastTouchPosition = Input.mousePosition;
+			mMouse.delta = lastTouchPosition - mMouse.pos;
+
+			if (pressed || unpressed || Time.timeScale == 0f)
+			{
+				mMouse.current = Raycast(lastTouchPosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+			}
+
+			// We don't want to update the last camera while there is a touch happening
+			if (pressed) mMouse.pressedCam = lastCamera;
+			else if (mMouse.pressed != null) lastCamera = mMouse.pressedCam;
+
+			if (mMouse.pos != lastTouchPosition)
+			{
+				if (mTooltipTime != 0f) mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
+				else if (mTooltip != null) ShowTooltip(false);
+				mMouse.pos = lastTouchPosition;
+			}
+
+			// Process the mouse events
+			ProcessTouch(mMouse, pressed, unpressed);
+		}
+	}
+
+	/// <summary>
+	/// Update touch-based events.
+	/// </summary>
+
+	void ProcessTouches ()
+	{
 		for (int i = 0; i < Input.touchCount; ++i)
 		{
 			Touch input = Input.GetTouch(i);
@@ -440,9 +583,6 @@ public class UICamera : MonoBehaviour
 
 			bool pressed = (input.phase == TouchPhase.Began);
 			bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
-
-			// Automatically switch to the touch-based input
-			if (inputIsFlexible && pressed && inputStyle != InputStyle.Mouse) inputStyle = InputStyle.Touch;
 
 			touch.pos = input.position;
 			touch.delta = input.deltaPosition;
@@ -464,34 +604,52 @@ public class UICamera : MonoBehaviour
 			// If the touch has ended, remove it from the list
 			if (unpressed) RemoveTouch(lastTouchID);
 		}
+	}
 
-		// Forward the input to the selected object
-		if (mSel != null)
+	/// <summary>
+	/// Process keyboard and joystick events.
+	/// </summary>
+
+	void ProcessOthers ()
+	{
+		GameObject target = (keyEventInterceptor != null) ? keyEventInterceptor : mSel;
+
+		// Enter key and joystick button 1 keys are treated the same -- as a "click"
+		bool returnKeyDown	= (useKeyboard	 && Input.GetKeyDown(KeyCode.Return));
+		bool buttonKeyDown	= (useController && Input.GetKeyDown(KeyCode.JoystickButton0));
+		bool returnKeyUp	= (useKeyboard	 && Input.GetKeyUp(KeyCode.Return));
+		bool buttonKeyUp	= (useController && Input.GetKeyUp(KeyCode.JoystickButton0));
+
+		bool down	= returnKeyDown || buttonKeyDown;
+		bool up		= returnKeyUp || buttonKeyUp;
+
+		if (down || up)
 		{
-			string input = Input.inputString;
-
-			// Adding support for some macs only having the "Delete" key instead of "Backspace"
-			if (Input.GetKeyDown(KeyCode.Delete)) input += "\b";
-
-			if (input.Length > 0)
-			{
-				if (mTooltip != null) ShowTooltip(false);
-				mSel.SendMessage("OnInput", input, SendMessageOptions.DontRequireReceiver);
-			}
+			lastTouchID = -100;
+			mJoystick.hover = target;
+			mJoystick.current = target;
+			ProcessTouch(mJoystick, down, up);
 		}
 
-		// If it's time to show a tooltip, inform the object we're hovering over
-		if (inputStyle == InputStyle.Mouse && mMouse.hover != null)
-		{
-			float scroll = Input.GetAxis(scrollAxisName);
-			if (scroll != 0f) mMouse.hover.SendMessage("OnScroll", scroll, SendMessageOptions.DontRequireReceiver);
+		int vertical = 0;
+		int horizontal = 0;
 
-			if (mTooltipTime != 0f && mTooltipTime < Time.realtimeSinceStartup)
-			{
-				mTooltip = mMouse.hover;
-				ShowTooltip(true);
-			}
+		if (useKeyboard)
+		{
+			vertical += GetDirection(KeyCode.W, KeyCode.UpArrow, KeyCode.S, KeyCode.DownArrow);
+			horizontal += GetDirection(KeyCode.D, KeyCode.RightArrow, KeyCode.A, KeyCode.LeftArrow);
 		}
+
+		if (useController)
+		{
+			vertical += GetDirection("Vertical");
+			horizontal += GetDirection("Horizontal");
+		}
+
+		// Send out key notifications
+		if (vertical != 0) target.SendMessage("OnKey", vertical > 0 ? KeyCode.UpArrow : KeyCode.DownArrow, SendMessageOptions.DontRequireReceiver);
+		if (horizontal != 0) target.SendMessage("OnKey", horizontal > 0 ? KeyCode.RightArrow : KeyCode.LeftArrow, SendMessageOptions.DontRequireReceiver);
+		if (useKeyboard && Input.GetKeyDown(KeyCode.Tab)) target.SendMessage("OnKey", KeyCode.Tab, SendMessageOptions.DontRequireReceiver);
 	}
 
 	/// <summary>
@@ -501,10 +659,10 @@ public class UICamera : MonoBehaviour
 	void ProcessTouch (MouseOrTouch touch, bool pressed, bool unpressed)
 	{
 		// If we're using the mouse for input, we should send out a hover(false) message first
-		if (inputStyle == InputStyle.Mouse && allowHoverEvents && touch.pressed == null && touch.hover != touch.current && touch.hover != null)
+		if (touch.pressed == null && touch.hover != touch.current && touch.hover != null)
 		{
 			if (mTooltip != null) ShowTooltip(false);
-			touch.hover.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
+			Highlight(touch.hover, false);
 		}
 
 		// Send the drag notification, intentionally before the pressed object gets changed
@@ -526,13 +684,13 @@ public class UICamera : MonoBehaviour
 			touch.considerForClick = true;
 			touch.totalDelta = Vector2.zero;
 			if (touch.pressed != null) touch.pressed.SendMessage("OnPress", true, SendMessageOptions.DontRequireReceiver);
-		}
 
-		// Clear the selection
-		if ((pressed && touch.pressed != mSel) || Input.GetKeyDown(KeyCode.Escape))
-		{
-			if (mTooltip != null) ShowTooltip(false);
-			selectedObject = null;
+			// Clear the selection
+			if (touch.pressed != mSel)
+			{
+				if (mTooltip != null) ShowTooltip(false);
+				selectedObject = null;
+			}
 		}
 
 		// Send out the unpress message
@@ -543,6 +701,9 @@ public class UICamera : MonoBehaviour
 			if (touch.pressed != null)
 			{
 				touch.pressed.SendMessage("OnPress", false, SendMessageOptions.DontRequireReceiver);
+
+				// Send a hover message to the object, but don't add it to the list of hovered items as it's already present
+				if (touch.pressed == touch.hover) touch.pressed.SendMessage("OnHover", true, SendMessageOptions.DontRequireReceiver);
 
 				// If the button/touch was released on the same object, consider it a click and select it
 				if (touch.pressed == touch.current)
@@ -564,19 +725,18 @@ public class UICamera : MonoBehaviour
 					if (touch.current != null) touch.current.SendMessage("OnDrop", touch.pressed, SendMessageOptions.DontRequireReceiver);
 
 					// If we're using mouse-based input, send a hover notification
-					if (inputStyle == InputStyle.Mouse) touch.pressed.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
+					Highlight(touch.pressed, false);
 				}
 			}
 			touch.pressed = null;
-			touch.hover = null;
 		}
 
 		// Send out a hover(true) message last
-		if (inputStyle == InputStyle.Mouse && allowHoverEvents && touch.pressed == null && touch.hover != touch.current)
+		if (useMouse && touch.pressed == null && touch.hover != touch.current)
 		{
 			mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
 			touch.hover = touch.current;
-			if (touch.hover != null) touch.hover.SendMessage("OnHover", true, SendMessageOptions.DontRequireReceiver);
+			Highlight(touch.hover, true);
 		}
 	}
 
@@ -587,7 +747,7 @@ public class UICamera : MonoBehaviour
 	void ShowTooltip (bool val)
 	{
 		mTooltipTime = 0f;
-		mTooltip.SendMessage("OnTooltip", val, SendMessageOptions.DontRequireReceiver);
+		if (mTooltip != null) mTooltip.SendMessage("OnTooltip", val, SendMessageOptions.DontRequireReceiver);
 		if (!val) mTooltip = null;
 	}
 }
