@@ -26,30 +26,33 @@ public class UIButtonKeys : MonoBehaviour
 
 	void OnKey (KeyCode key)
 	{
-		switch (key)
+		if (enabled && gameObject.active)
 		{
-		case KeyCode.LeftArrow:
-			if (selectOnLeft != null) UICamera.selectedObject = selectOnLeft.gameObject;
-			break;
-		case KeyCode.RightArrow:
-			if (selectOnRight != null) UICamera.selectedObject = selectOnRight.gameObject;
-			break;
-		case KeyCode.UpArrow:
-			if (selectOnUp != null) UICamera.selectedObject = selectOnUp.gameObject;
-			break;
-		case KeyCode.DownArrow:
-			if (selectOnDown != null) UICamera.selectedObject = selectOnDown.gameObject;
-			break;
-		case KeyCode.Tab:
-			if (selectOnRight != null) UICamera.selectedObject = selectOnRight.gameObject;
-			else if (selectOnDown != null) UICamera.selectedObject = selectOnDown.gameObject;
-			break;
+			switch (key)
+			{
+			case KeyCode.LeftArrow:
+				if (selectOnLeft != null) UICamera.selectedObject = selectOnLeft.gameObject;
+				break;
+			case KeyCode.RightArrow:
+				if (selectOnRight != null) UICamera.selectedObject = selectOnRight.gameObject;
+				break;
+			case KeyCode.UpArrow:
+				if (selectOnUp != null) UICamera.selectedObject = selectOnUp.gameObject;
+				break;
+			case KeyCode.DownArrow:
+				if (selectOnDown != null) UICamera.selectedObject = selectOnDown.gameObject;
+				break;
+			case KeyCode.Tab:
+				if (selectOnRight != null) UICamera.selectedObject = selectOnRight.gameObject;
+				else if (selectOnDown != null) UICamera.selectedObject = selectOnDown.gameObject;
+				break;
+			}
 		}
 	}
 
 	void OnClick ()
 	{
-		if (selectOnClick != null)
+		if (enabled && gameObject.active && selectOnClick != null)
 		{
 			UICamera.selectedObject = selectOnClick.gameObject;
 		}

@@ -18,9 +18,10 @@ using System.Collections.Generic;
 /// - OnClick (int button) is sent with the same conditions as OnSelect, with the added check to see if the mouse has not moved much.
 /// - OnDrag (delta) is sent when a mouse or touch gets pressed on a collider and starts dragging it.
 /// - OnDrop (gameObject) is sent when the mouse or touch get released on a different collider than the one that was being dragged.
-/// - OnInput (text) is sent when typing after selecting a collider by clicking on it.
+/// - OnInput (text) is sent when typing (after selecting a collider by clicking on it).
 /// - OnTooltip (show) is sent when the mouse hovers over a collider for some time without moving.
 /// - OnScroll (float delta) is sent out when the mouse scroll wheel is moved.
+/// - OnKey (KeyCode key) is sent when keyboard or controller input is used.
 /// </summary>
 
 [ExecuteInEditMode]
@@ -122,12 +123,6 @@ public class UICamera : MonoBehaviour
 
 	static public GameObject fallThrough;
 
-	/// <summary>
-	/// If set, this object will intercept all future keyboard and joystick events.
-	/// </summary>
-
-	static public GameObject keyEventInterceptor;
-
 	// List of all active cameras in the scene
 	static List<UICamera> mList = new List<UICamera>();
 
@@ -219,18 +214,11 @@ public class UICamera : MonoBehaviour
 		}
 	}
 
-	void OnGUI ()
-	{
-		foreach (Highlighted hl in mHighlighted)
-		{
-			if (hl != null) GUILayout.Label(hl.counter + ": " + (hl.go == null ? "<null>" : hl.go.name));
-		}
-	}
+	/// <summary>
+	/// Clear the list on application quit (also when Play mode is exited)
+	/// </summary>
 
-	void OnApplicationQuit ()
-	{
-		mHighlighted.Clear();
-	}
+	void OnApplicationQuit () { mHighlighted.Clear(); }
 
 	/// <summary>
 	/// Convenience function that returns the main HUD camera.
@@ -612,8 +600,6 @@ public class UICamera : MonoBehaviour
 
 	void ProcessOthers ()
 	{
-		GameObject target = (keyEventInterceptor != null) ? keyEventInterceptor : mSel;
-
 		// Enter key and joystick button 1 keys are treated the same -- as a "click"
 		bool returnKeyDown	= (useKeyboard	 && Input.GetKeyDown(KeyCode.Return));
 		bool buttonKeyDown	= (useController && Input.GetKeyDown(KeyCode.JoystickButton0));
@@ -626,8 +612,8 @@ public class UICamera : MonoBehaviour
 		if (down || up)
 		{
 			lastTouchID = -100;
-			mJoystick.hover = target;
-			mJoystick.current = target;
+			mJoystick.hover = mSel;
+			mJoystick.current = mSel;
 			ProcessTouch(mJoystick, down, up);
 		}
 
@@ -647,9 +633,10 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Send out key notifications
-		if (vertical != 0) target.SendMessage("OnKey", vertical > 0 ? KeyCode.UpArrow : KeyCode.DownArrow, SendMessageOptions.DontRequireReceiver);
-		if (horizontal != 0) target.SendMessage("OnKey", horizontal > 0 ? KeyCode.RightArrow : KeyCode.LeftArrow, SendMessageOptions.DontRequireReceiver);
-		if (useKeyboard && Input.GetKeyDown(KeyCode.Tab)) target.SendMessage("OnKey", KeyCode.Tab, SendMessageOptions.DontRequireReceiver);
+		if (vertical != 0) mSel.SendMessage("OnKey", vertical > 0 ? KeyCode.UpArrow : KeyCode.DownArrow, SendMessageOptions.DontRequireReceiver);
+		if (horizontal != 0) mSel.SendMessage("OnKey", horizontal > 0 ? KeyCode.RightArrow : KeyCode.LeftArrow, SendMessageOptions.DontRequireReceiver);
+		if (useKeyboard && Input.GetKeyDown(KeyCode.Tab)) mSel.SendMessage("OnKey", KeyCode.Tab, SendMessageOptions.DontRequireReceiver);
+		if (useController && Input.GetKeyUp(KeyCode.JoystickButton1)) mSel.SendMessage("OnKey", KeyCode.Escape, SendMessageOptions.DontRequireReceiver);
 	}
 
 	/// <summary>

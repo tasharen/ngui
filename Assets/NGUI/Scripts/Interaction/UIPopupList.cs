@@ -123,6 +123,8 @@ public class UIPopupList : MonoBehaviour
 	UIPanel mPanel;
 	GameObject mChild;
 	UISprite mHighlight;
+	UILabel mHighlightedLabel = null;
+	List<UILabel> mLabelList = new List<UILabel>();
 
 	/// <summary>
 	/// Whether the popup list is currently open.
@@ -163,6 +165,24 @@ public class UIPopupList : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Whether the popup list will be handling keyboard, joystick and controller events.
+	/// </summary>
+
+	bool handleEvents
+	{
+		get
+		{
+			UIButtonKeys keys = GetComponent<UIButtonKeys>();
+			return (keys == null || !keys.enabled);
+		}
+		set
+		{
+			UIButtonKeys keys = GetComponent<UIButtonKeys>();
+			if (keys != null) keys.enabled = !value;
+		}
+	}
+
+	/// <summary>
 	/// Send out the selection message on start.
 	/// </summary>
 
@@ -197,11 +217,13 @@ public class UIPopupList : MonoBehaviour
 	/// Visibly highlight the specified transform by moving the highlight sprite to be over it.
 	/// </summary>
 
-	void Highlight (Transform t, bool instant)
+	void Highlight (UILabel lbl, bool instant)
 	{
 		if (mHighlight != null)
 		{
-			Vector3 pos = t.localPosition + new Vector3(-padding.x, padding.y, 0f);
+			mHighlightedLabel = lbl;
+
+			Vector3 pos = lbl.cachedTransform.localPosition + new Vector3(-padding.x, padding.y, 0f);
 
 			if (instant || !isAnimated)
 			{
@@ -223,7 +245,29 @@ public class UIPopupList : MonoBehaviour
 		if (isOver)
 		{
 			UILabel lbl = go.GetComponent<UILabel>();
-			Highlight(lbl.cachedTransform, false);
+			Highlight(lbl, false);
+		}
+	}
+
+	/// <summary>
+	/// Select the specified label.
+	/// </summary>
+
+	void Select (UILabel lbl, bool instant)
+	{
+		Highlight(lbl, instant);
+		
+		UIEventListener listener = lbl.gameObject.GetComponent<UIEventListener>();
+		selection = listener.parameter as string;
+
+		UIButtonSound[] sounds = GetComponents<UIButtonSound>();
+
+		foreach (UIButtonSound snd in sounds)
+		{
+			if (snd.trigger == UIButtonSound.Trigger.OnClick)
+			{
+				NGUITools.PlaySound(snd.audioClip, snd.volume);
+			}
 		}
 	}
 
@@ -231,23 +275,35 @@ public class UIPopupList : MonoBehaviour
 	/// Event function triggered when the drop-down list item gets clicked on.
 	/// </summary>
 
-	void OnItemPress (GameObject go, bool isPressed)
+	void OnItemPress (GameObject go, bool isPressed) { if (isPressed) Select(go.GetComponent<UILabel>(), true); }
+
+	/// <summary>
+	/// React to key-based input.
+	/// </summary>
+
+	void OnKey (KeyCode key)
 	{
-		if (isPressed)
+		if (enabled && gameObject.active && handleEvents)
 		{
-			UIEventListener listener = go.GetComponent<UIEventListener>();
-			UILabel lbl = go.GetComponent<UILabel>();
-			Highlight(lbl.cachedTransform, true);
-			selection = listener.parameter as string;
+			int index = mLabelList.IndexOf(mHighlightedLabel);
 
-			UIButtonSound[] sounds = GetComponents<UIButtonSound>();
-
-			foreach (UIButtonSound snd in sounds)
+			if (key == KeyCode.UpArrow)
 			{
-				if (snd.trigger == UIButtonSound.Trigger.OnClick)
+				if (index > 0)
 				{
-					NGUITools.PlaySound(snd.audioClip, snd.volume);
+					Select(mLabelList[--index], false);
 				}
+			}
+			else if (key == KeyCode.DownArrow)
+			{
+				if (index + 1 < mLabelList.Count)
+				{
+					Select(mLabelList[++index], false);
+				}
+			}
+			else if (key == KeyCode.Escape)
+			{
+				OnSelect(false);
 			}
 		}
 	}
@@ -260,6 +316,9 @@ public class UIPopupList : MonoBehaviour
 	{
 		if (!isSelected && mChild != null)
 		{
+			mLabelList.Clear();
+			handleEvents = false;
+
 			if (isAnimated)
 			{
 				UIWidget[] widgets = mChild.GetComponentsInChildren<UIWidget>();
@@ -349,6 +408,11 @@ public class UIPopupList : MonoBehaviour
 	{
 		if (mChild == null && atlas != null && font != null && items.Count > 1)
 		{
+			mLabelList.Clear();
+
+			// Disable the navigation script
+			handleEvents = true;
+
 			// Automatically locate the panel responsible for this object
 			if (mPanel == null) mPanel = UIPanel.Find(transform, true);
 
@@ -409,7 +473,10 @@ public class UIPopupList : MonoBehaviour
 				listener.parameter = s;
 
 				// Move the selection here if this is the right label
-				if (mSelectedItem == s) Highlight(lbl.cachedTransform, true);
+				if (mSelectedItem == s) Highlight(lbl, true);
+
+				// Add this label to the list
+				mLabelList.Add(lbl);
 			}
 
 			// The triggering widget's width should be the minimum allowed width

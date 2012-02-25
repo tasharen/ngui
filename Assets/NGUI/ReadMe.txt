@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.71
+                Version 1.80
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -32,8 +32,14 @@ All can be found here: http://www.tasharen.com/?page_id=197
  Version History
 -----------------
 
-1.71:
-- NEW: You can now add a colored shadow/bevel or an outline effect to your labels.
+1.80:
+- NEW: You can now add a colored shadow/bevel or an outline effect to your labels via a simple checkbox.
+- NEW: UICamera now has support for keyboard, joystick and controller input.
+- NEW: UICamera can now control what kind of events it will process (only touch, only keyboard, etc).
+- NEW: UISlider can now be adjusted via keyboard, joystick and controller input.
+- NEW: UIPopupList can now be interacted with using a keyboard or controller input.
+- NEW: Added a new script, UIButtonKeys that can be used to set up the UI for keyboard, joystick and controller input.
+- NEW: New Example 11 shows how to set up the UI to work with the new input types.
 
 1.70:
 - NEW: Right click stuff has been replaced by just 'lastTouchID' with added support for the middle mouse button.
