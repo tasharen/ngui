@@ -43,6 +43,26 @@ public class UICamera : MonoBehaviour
 		public bool considerForClick = false;
 	}
 
+	public enum InputStyle
+	{
+		Mouse,
+		Touch,
+		Keyboard,
+		Controller,
+	}
+
+	/// <summary>
+	/// Specify what style of controls will be used.
+	/// </summary>
+
+	public InputStyle inputStyle = InputStyle.Mouse;
+
+	/// <summary>
+	/// If set to 'true', the input style will be auto-adjusted based on the latest valid input source.
+	/// </summary>
+
+	public bool inputIsFlexible = true;
+
 	/// <summary>
 	/// Which layers will receive events.
 	/// </summary>
@@ -92,6 +112,12 @@ public class UICamera : MonoBehaviour
 
 	static public GameObject fallThrough;
 
+	/// <summary>
+	/// Whether mouse hover events will be processed.
+	/// </summary>
+
+	static public bool allowHoverEvents = true;
+
 	// List of all active cameras in the scene
 	static List<UICamera> mList = new List<UICamera>();
 
@@ -99,7 +125,7 @@ public class UICamera : MonoBehaviour
 	static GameObject mSel = null;
 
 	// Mouse event
-	MouseOrTouch mMouse = new MouseOrTouch();
+	static MouseOrTouch mMouse = new MouseOrTouch();
 
 	// List of currently active touches
 	Dictionary<int, MouseOrTouch> mTouches = new Dictionary<int, MouseOrTouch>();
@@ -107,8 +133,10 @@ public class UICamera : MonoBehaviour
 	// Tooltip widget (mouse only)
 	GameObject mTooltip = null;
 
+	// Native method of input, determined at start
+	static InputStyle mNativeInput = InputStyle.Mouse;
+
 	// Mouse input is turned off on iOS
-	bool mUseMouseInput = true;
 	Camera mCam = null;
 	LayerMask mLayerMask;
 	float mTooltipTime = 0f;
@@ -124,6 +152,18 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	public Camera cachedCamera { get { if (mCam == null) mCam = camera; return mCam; } }
+
+	/// <summary>
+	/// Native method of input for the current platform.
+	/// </summary>
+
+	static public InputStyle nativeInput { get { return mNativeInput; } }
+
+	/// <summary>
+	/// The object the mouse is hovering over. Results may be somewhat odd on touch-based devices.
+	/// </summary>
+
+	static public GameObject hoveredObject { get { return mMouse.current; } }
 
 	/// <summary>
 	/// Option to manually set the selected game object.
@@ -183,15 +223,15 @@ public class UICamera : MonoBehaviour
 	/// Event handler for all types of events.
 	/// </summary>
 
-	static UICamera eventHandler
+	static public UICamera eventHandler
 	{
 		get
 		{
-			foreach (UICamera mouse in mList)
+			foreach (UICamera cam in mList)
 			{
 				// Invalid or inactive entry -- keep going
-				if (mouse == null || !mouse.enabled || !mouse.gameObject.active) continue;
-				return mouse;
+				if (cam == null || !cam.enabled || !cam.gameObject.active) continue;
+				return cam;
 			}
 			return null;
 		}
@@ -283,11 +323,26 @@ public class UICamera : MonoBehaviour
 
 	void Awake ()
 	{
-		// We should be using only touch-based input on Android and iOS-based devices.
-		mUseMouseInput = Application.platform != RuntimePlatform.Android &&
-						 Application.platform != RuntimePlatform.IPhonePlayer;
+		if (Application.platform == RuntimePlatform.Android ||
+			Application.platform == RuntimePlatform.IPhonePlayer)
+		{
+			mNativeInput = InputStyle.Touch;
+		}
+		else if (Application.platform == RuntimePlatform.PS3 ||
+				 Application.platform == RuntimePlatform.XBOX360)
+		{
+			mNativeInput = InputStyle.Controller;
+		}
+		else
+		{
+			mNativeInput = InputStyle.Mouse;
+		}
 
-		if (mUseMouseInput) mMouse.pos = Input.mousePosition;
+		// If the input is flexible, use the native method
+		if (inputIsFlexible) inputStyle = mNativeInput;
+
+		// Save the starting mouse position
+		mMouse.pos = Input.mousePosition;
 
 		// Add this camera to the list
 		mList.Add(this);
@@ -312,7 +367,7 @@ public class UICamera : MonoBehaviour
 
 	void FixedUpdate ()
 	{
-		if (Application.isPlaying && mUseMouseInput && handlesEvents)
+		if (Application.isPlaying && inputStyle == InputStyle.Mouse && handlesEvents)
 		{
 			mMouse.current = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
 		}
@@ -327,12 +382,28 @@ public class UICamera : MonoBehaviour
 		// Only the first UI layer should be processing events
 		if (!Application.isPlaying || !handlesEvents) return;
 
-		if (mUseMouseInput)
+		// Whether mouse events will be processed:
+		// 1. If mouse input is selected
+		// 2. If touch is selected, but we're on a mouse-based platform
+		// 3. If it's not a touch-based input, and the input is flexible
+
+		bool processMouse = (inputStyle == InputStyle.Mouse);
+		if (!processMouse) processMouse = (inputStyle == InputStyle.Touch && mNativeInput == InputStyle.Mouse);
+		if (!processMouse) processMouse = (inputStyle != InputStyle.Touch && inputIsFlexible);
+
+		if (processMouse)
 		{
 			for (int i = 0; i < 3; ++i)
 			{
 				bool pressed = Input.GetMouseButtonDown(i);
 				bool unpressed = Input.GetMouseButtonUp(i);
+
+				// Automatically assume mouse-based input
+				if (inputIsFlexible && pressed)
+				{
+					if (inputStyle != InputStyle.Touch) inputStyle = InputStyle.Mouse;
+					allowHoverEvents = true;
+				}
 
 				lastTouchID = -1 - i;
 				lastTouchPosition = Input.mousePosition;
@@ -369,6 +440,9 @@ public class UICamera : MonoBehaviour
 
 			bool pressed = (input.phase == TouchPhase.Began);
 			bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
+
+			// Automatically switch to the touch-based input
+			if (inputIsFlexible && pressed && inputStyle != InputStyle.Mouse) inputStyle = InputStyle.Touch;
 
 			touch.pos = input.position;
 			touch.delta = input.deltaPosition;
@@ -407,7 +481,7 @@ public class UICamera : MonoBehaviour
 		}
 
 		// If it's time to show a tooltip, inform the object we're hovering over
-		if (mUseMouseInput && mMouse.hover != null)
+		if (inputStyle == InputStyle.Mouse && mMouse.hover != null)
 		{
 			float scroll = Input.GetAxis(scrollAxisName);
 			if (scroll != 0f) mMouse.hover.SendMessage("OnScroll", scroll, SendMessageOptions.DontRequireReceiver);
@@ -427,7 +501,7 @@ public class UICamera : MonoBehaviour
 	void ProcessTouch (MouseOrTouch touch, bool pressed, bool unpressed)
 	{
 		// If we're using the mouse for input, we should send out a hover(false) message first
-		if (mUseMouseInput && touch.pressed == null && touch.hover != touch.current && touch.hover != null)
+		if (inputStyle == InputStyle.Mouse && allowHoverEvents && touch.pressed == null && touch.hover != touch.current && touch.hover != null)
 		{
 			if (mTooltip != null) ShowTooltip(false);
 			touch.hover.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
@@ -490,7 +564,7 @@ public class UICamera : MonoBehaviour
 					if (touch.current != null) touch.current.SendMessage("OnDrop", touch.pressed, SendMessageOptions.DontRequireReceiver);
 
 					// If we're using mouse-based input, send a hover notification
-					if (mUseMouseInput) touch.pressed.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
+					if (inputStyle == InputStyle.Mouse) touch.pressed.SendMessage("OnHover", false, SendMessageOptions.DontRequireReceiver);
 				}
 			}
 			touch.pressed = null;
@@ -498,7 +572,7 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Send out a hover(true) message last
-		if (mUseMouseInput && touch.pressed == null && touch.hover != touch.current)
+		if (inputStyle == InputStyle.Mouse && allowHoverEvents && touch.pressed == null && touch.hover != touch.current)
 		{
 			mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
 			touch.hover = touch.current;
