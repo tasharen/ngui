@@ -84,7 +84,6 @@ public class UIInput : MonoBehaviour
 			mDefaultText = label.text;
 			mDefaultColor = label.color;
 			label.supportEncoding = false;
-			label.multiLine = false;
 		}
 	}
 
@@ -240,12 +239,14 @@ public class UIInput : MonoBehaviour
 			// Now wrap this text using the specified line width
 			processed = label.font.WrapText(processed, label.lineWidth / label.cachedTransform.localScale.x, true, false);
 
-			// Split it up into lines
-			string[] lines = processed.Split(new char[] { '\n' });
+			if (!label.multiLine)
+			{
+				// Split it up into lines
+				string[] lines = processed.Split(new char[] { '\n' });
 
-			// Only the last line should be visible
-			processed = (lines.Length > 0) ? lines[lines.Length - 1] : "";
-
+				// Only the last line should be visible
+				processed = (lines.Length > 0) ? lines[lines.Length - 1] : "";
+			}
 			// Update the label's visible text
 			label.text = processed;
 			label.showLastPasswordChar = selected;

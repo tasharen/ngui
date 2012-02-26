@@ -433,6 +433,9 @@ public class UILabel : UIWidget
 
 	void ApplyShadow (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols, int start, int end, float x, float y)
 	{
+		Color c = mEffectColor;
+		c.a *= color.a;
+
 		for (int i = start; i < end; ++i)
 		{
 			verts.Add(verts.buffer[i]);
@@ -441,7 +444,7 @@ public class UILabel : UIWidget
 
 			verts.buffer[i].x += x;
 			verts.buffer[i].y += y;
-			cols.buffer[i] = mEffectColor;
+			cols.buffer[i] = c;
 		}
 	}
 
@@ -464,15 +467,11 @@ public class UILabel : UIWidget
 		else if (p == Pivot.Right || p == Pivot.TopRight || p == Pivot.BottomRight)
 		{
 			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, UIFont.Alignment.Right,
-				(mMaxLineWidth > 0) ?
-				Mathf.RoundToInt(mMaxLineWidth / cachedTransform.localScale.x) :
 				Mathf.RoundToInt(relativeSize.x * mFont.size));
 		}
 		else
 		{
 			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, UIFont.Alignment.Center,
-				(mMaxLineWidth > 0) ?
-				Mathf.RoundToInt(mMaxLineWidth / cachedTransform.localScale.x) :
 				Mathf.RoundToInt(relativeSize.x * mFont.size));
 		}
 

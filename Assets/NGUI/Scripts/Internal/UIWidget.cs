@@ -56,7 +56,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Set or get the value that specifies where the widget's pivot point should be.
 	/// </summary>
 
-	public Pivot pivot { get { return mPivot; } set { if (mPivot != value) { mPivot = value; mChanged = true; MakePixelPerfect(); } } }
+	public Pivot pivot { get { return mPivot; } set { if (mPivot != value) { mPivot = value; mChanged = true; } } }
 	
 	/// <summary>
 	/// Depth controls the rendering order -- lowest to highest.

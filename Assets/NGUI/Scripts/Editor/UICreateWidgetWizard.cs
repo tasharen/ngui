@@ -529,6 +529,7 @@ public class UICreateWidgetWizard : EditorWindow
 			// Add the slider script
 			UISlider uiSlider = go.AddComponent<UISlider>();
 			uiSlider.foreground = front.transform;
+			uiSlider.fullSize = front.transform.localScale;
 
 			// Thumb sprite
 			if (slider)
@@ -551,6 +552,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 				uiSlider.thumb = thb.transform;
 			}
+			uiSlider.rawValue = 0.75f;
 
 			// Select the slider
 			Selection.activeGameObject = go;

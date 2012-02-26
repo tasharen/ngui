@@ -478,6 +478,7 @@ public class UIFont : MonoBehaviour
 		if (alignment != Alignment.Left && mFont.charSize > 0)
 		{
 			float offset = (alignment == Alignment.Right) ? lineWidth - x : (lineWidth - x) * 0.5f;
+			offset = Mathf.RoundToInt(offset);
 			if (offset < 0f) offset = 0f;
 			offset /= mFont.charSize;
 

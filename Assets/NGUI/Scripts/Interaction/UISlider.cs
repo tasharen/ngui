@@ -10,7 +10,6 @@ using UnityEngine;
 /// </summary>
 
 [ExecuteInEditMode]
-[RequireComponent(typeof(BoxCollider))]
 [AddComponentMenu("NGUI/Interaction/Slider")]
 public class UISlider : IgnoreTimeScale
 {
@@ -51,7 +50,14 @@ public class UISlider : IgnoreTimeScale
 	{
 		mTrans = transform;
 		mCol = collider as BoxCollider;
+	}
 
+	/// <summary>
+	/// We want to receive drag events from the thumb.
+	/// </summary>
+
+	void Start ()
+	{
 		if (foreground != null)
 		{
 			mWidget = foreground.GetComponent<UIWidget>();
@@ -67,14 +73,7 @@ public class UISlider : IgnoreTimeScale
 		{
 			Debug.LogWarning("UISlider expected to find a foreground object or a box collider to work with", this);
 		}
-	}
 
-	/// <summary>
-	/// We want to receive drag events from the thumb.
-	/// </summary>
-
-	void Start ()
-	{
 		if (Application.isPlaying && thumb != null && thumb.collider != null)
 		{
 			UIEventListener listener = UIEventListener.Add(thumb.gameObject);

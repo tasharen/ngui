@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.80
+                Version 1.81
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -31,6 +31,15 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.81:
+- NEW: UIInput can now be multi-line.
+- FIX: UILabel will now center-align properly again when a fixed line width was specified.
+- FIX: UILabel's effect (shadow, outline) will now be affected by the label's alpha.
+- FIX: UILabel's effect will now always be offset consistently, even if the scale changes.
+- FIX: Changing the widget's pivot will no longer cause it to become it pixel-perfect.
+- FIX: UISlider no longer requires a box collider.
+- FIX: Creating sliders via the wizard will now set their full size property.
 
 1.80:
 - NEW: You can now add a colored shadow/bevel or an outline effect to your labels via a simple checkbox.
