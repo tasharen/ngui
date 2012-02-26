@@ -143,7 +143,7 @@ public class UIDragCamera : IgnoreTimeScale
 	/// Constrain the current camera's position to be within the viewable area's bounds.
 	/// </summary>
 
-	bool ConstrainToBounds (bool immediate)
+	public bool ConstrainToBounds (bool immediate)
 	{
 		if (mTrans != null && rootForBounds != null)
 		{

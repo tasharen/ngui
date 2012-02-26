@@ -483,30 +483,26 @@ public class UILabel : UIWidget
 			if (scale.x == 0f || scale.y == 0f) return;
 
 			int end = verts.size;
-			float x =  1f / scale.x;
-			float y = -1f / scale.y;
+			float pixel =  1f / mFont.size;
 
-			ApplyShadow(verts, uvs, cols, offset, end, x, y);
+			ApplyShadow(verts, uvs, cols, offset, end, pixel, -pixel);
 
 			if (effectStyle == Effect.Outline)
 			{
-				x = -x;
 				offset = end;
 				end = verts.size;
 
-				ApplyShadow(verts, uvs, cols, offset, end, x, y);
+				ApplyShadow(verts, uvs, cols, offset, end, -pixel, pixel);
 
-				y = -y;
 				offset = end;
 				end = verts.size;
 
-				ApplyShadow(verts, uvs, cols, offset, end, x, y);
+				ApplyShadow(verts, uvs, cols, offset, end, pixel, pixel);
 
-				x = -x;
 				offset = end;
 				end = verts.size;
 
-				ApplyShadow(verts, uvs, cols, offset, end, x, y);
+				ApplyShadow(verts, uvs, cols, offset, end, -pixel, -pixel);
 			}
 		}
 	}
