@@ -108,27 +108,23 @@ public class UISlider : IgnoreTimeScale
 	void OnDragThumb (GameObject go, Vector2 delta) { UpdateDrag(); }
 
 	/// <summary>
-	/// Watch for slider value changes and adjust the visual sprite accordingly.
+	/// Watch for key events and adjust the value accordingly.
 	/// </summary>
 
-	void Update ()
+	void OnKey (KeyCode key)
 	{
-		float delta = UpdateRealTimeDelta();
+		float step = (numberOfSteps > 1f) ? 1f / (numberOfSteps - 1) : 0.125f;
 
-		if (UICamera.selectedObject == gameObject)
+		if (direction == Direction.Horizontal)
 		{
-			if (direction == Direction.Horizontal)
-			{
-				float val = Input.GetAxis("Horizontal");
-				rawValue += val * delta;
-			}
-			else
-			{
-				float val = Input.GetAxis("Vertical");
-				rawValue += val * delta;
-			}
+			if		(key == KeyCode.LeftArrow)	Set(rawValue - step);
+			else if (key == KeyCode.RightArrow) Set(rawValue + step);
 		}
-		Set(rawValue);
+		else
+		{
+			if		(key == KeyCode.DownArrow)	Set(rawValue - step);
+			else if (key == KeyCode.UpArrow)	Set(rawValue + step);
+		}
 	}
 
 	/// <summary>
