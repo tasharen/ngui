@@ -37,7 +37,7 @@ public class UILabelInspector : UIWidgetInspector
 		}
 	}
 
-	override protected void OnInit () { mShowTexture = false; }
+	override protected void OnInit () { mAllowPreview = false; }
 
 	override protected bool OnDrawProperties ()
 	{

@@ -21,6 +21,7 @@ public class UISettings
 	static Texture2D mFontTexture;
 	static string mFontName = "New Font";
 	static string mAtlasName = "New Atlas";
+	static bool mPreview = true;
 
 	static Object GetObject (string name)
 	{
@@ -37,6 +38,7 @@ public class UISettings
 		mFontTexture	= GetObject("NGUI Font Texture") as Texture2D;
 		mFont			= GetObject("NGUI Font") as UIFont;
 		mAtlas			= GetObject("NGUI Atlas") as UIAtlas;
+		mPreview		= PlayerPrefs.GetInt("NGUI Preview") == 0;
 	}
 
 	static void Save ()
@@ -47,6 +49,7 @@ public class UISettings
 		PlayerPrefs.SetInt("NGUI Font Texture", (mFontTexture != null) ? mFontTexture.GetInstanceID() : -1);
 		PlayerPrefs.SetInt("NGUI Font", (mFont != null) ? mFont.GetInstanceID() : -1);
 		PlayerPrefs.SetInt("NGUI Atlas", (mAtlas != null) ? mAtlas.GetInstanceID() : -1);
+		PlayerPrefs.SetInt("NGUI Preview", mPreview ? 0 : 1);
 	}
 
 	/// <summary>
@@ -116,4 +119,10 @@ public class UISettings
 	/// </summary>
 
 	static public string atlasName { get { if (!mLoaded) Load(); return mAtlasName; } set { if (mAtlasName != value) { mAtlasName = value; Save(); } } }
+
+	/// <summary>
+	/// Whether the texture preview will be shown.
+	/// </summary>
+
+	static public bool texturePreview { get { if (!mLoaded) Load(); return mPreview; } set { if (mPreview != value) { mPreview = value; Save(); } } }
 }

@@ -75,8 +75,17 @@ public class UIAtlasInspector : Editor
 
 	void OnSelectAtlas (MonoBehaviour obj)
 	{
-		mReplacement = obj as UIAtlas;
-		UnityEditor.EditorUtility.SetDirty(mAtlas);
+		if (mReplacement != obj)
+		{
+			mReplacement = obj as UIAtlas;
+
+			// Undo doesn't work correctly in this case... so I won't bother.
+			//NGUIEditorTools.RegisterUndo("Atlas Change");
+			//NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
+			mAtlas.replacement = mReplacement;
+			UnityEditor.EditorUtility.SetDirty(mAtlas);
+			if (mReplacement == null) mType = AtlasType.Normal;
+		}
 	}
 
 	/// <summary>
@@ -102,11 +111,7 @@ public class UIAtlasInspector : Editor
 		{
 			if (after == AtlasType.Normal)
 			{
-				NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
-				mReplacement = null;
-				mAtlas.replacement = null;
-				mType = AtlasType.Normal;
-				UnityEditor.EditorUtility.SetDirty(mAtlas);
+				OnSelectAtlas(null);
 			}
 			else
 			{

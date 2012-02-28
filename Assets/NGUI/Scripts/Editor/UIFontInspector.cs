@@ -36,7 +36,13 @@ public class UIFontInspector : Editor
 	void OnSelectFont (MonoBehaviour obj)
 	{
 		mReplacement = obj as UIFont;
+
+		// Undo doesn't work correctly in this case... so I won't bother.
+		//NGUIEditorTools.RegisterUndo("Font Change");
+		//NGUIEditorTools.RegisterUndo("Font Change", mFont);
+		mFont.replacement = mReplacement;
 		UnityEditor.EditorUtility.SetDirty(mFont);
+		if (mReplacement == null) mType = FontType.Normal;
 	}
 
 	void OnSelectAtlas (MonoBehaviour obj)
@@ -82,11 +88,7 @@ public class UIFontInspector : Editor
 		{
 			if (after == FontType.Normal)
 			{
-				NGUIEditorTools.RegisterUndo("Font Change", mFont);
-				mReplacement = null;
-				mFont.replacement = null;
-				mType = FontType.Normal;
-				UnityEditor.EditorUtility.SetDirty(mFont);
+				OnSelectFont(null);
 			}
 			else
 			{

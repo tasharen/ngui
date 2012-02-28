@@ -14,11 +14,11 @@ using UnityEditor;
 public class UIWidgetInspector : Editor
 {
 	protected UIWidget mWidget;
-	static protected bool mShowTexture = true;
 	static protected bool mUseShader = false;
 
 	bool mInitialized = false;
 	bool mHierarchyCheck = true;
+	protected bool mAllowPreview = true;
 
 	/// <summary>
 	/// Register an Undo command with the Unity editor.
@@ -124,13 +124,13 @@ public class UIWidgetInspector : Editor
 			mWidget.pivot = pivot;
 		}
 
-		if (mWidget.mainTexture != null)
+		if (mAllowPreview && mWidget.mainTexture != null)
 		{
 			GUILayout.BeginHorizontal();
 			{
-				mShowTexture = EditorGUILayout.Toggle("Preview", mShowTexture, GUILayout.Width(100f));
+				UISettings.texturePreview = EditorGUILayout.Toggle("Preview", UISettings.texturePreview, GUILayout.Width(100f));
 
-				if (mShowTexture)
+				/*if (UISettings.texturePreview)
 				{
 					if (mUseShader != EditorGUILayout.Toggle("Use Shader", mUseShader))
 					{
@@ -143,12 +143,12 @@ public class UIWidgetInspector : Editor
 								"Until it's fixed by Unity, your texture may spill onto the rest of the Unity's GUI while using this mode.");
 						}
 					}
-				}
+				}*/
 			}
 			GUILayout.EndHorizontal();
 
 			// Draw the texture last
-			if (mShowTexture) OnDrawTexture();
+			if (UISettings.texturePreview) OnDrawTexture();
 		}
 	}
 
