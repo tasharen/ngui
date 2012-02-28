@@ -51,6 +51,7 @@ public class UIAtlas : MonoBehaviour
 
 	/// <summary>
 	/// List of all sprites inside the atlas.
+	/// NOTE: Kept only for legacy functionality's sake. Do not access directly! Use 'spriteList' instead.
 	/// </summary>
 
 	public List<Sprite> sprites = new List<Sprite>();
@@ -59,10 +60,22 @@ public class UIAtlas : MonoBehaviour
 	[SerializeField] Coordinates mCoordinates = Coordinates.Pixels;
 
 	/// <summary>
+	/// Replacement atlas can be used to completely bypass this atlas, pulling the data from another one instead.
+	/// </summary>
+
+	[SerializeField] UIAtlas mReplacement;
+
+	/// <summary>
+	/// List of sprites within the atlas.
+	/// </summary>
+
+	public List<Sprite> spriteList { get { return (mReplacement != null) ? mReplacement.spriteList : sprites; } }
+
+	/// <summary>
 	/// Texture used by the atlas.
 	/// </summary>
 
-	public Texture texture { get { return material != null ? material.mainTexture as Texture : null; } }
+	public Texture texture { get { return (mReplacement != null) ? mReplacement.texture : (material != null ? material.mainTexture as Texture : null); } }
 
 	/// <summary>
 	/// Allows switching of the coordinate system from pixel coordinates to texture coordinates.
@@ -72,11 +85,15 @@ public class UIAtlas : MonoBehaviour
 	{
 		get
 		{
-			return mCoordinates;
+			return (mReplacement == null) ? mCoordinates : mReplacement.mCoordinates;
 		}
 		set
 		{
-			if (mCoordinates != value)
+			if (mReplacement != null)
+			{
+				mReplacement.coordinates = value;
+			}
+			else if (mCoordinates != value)
 			{
 				if (material == null || material.mainTexture == null)
 				{
@@ -105,12 +122,39 @@ public class UIAtlas : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Setting a replacement atlas value will cause everything using this atlas to use the replacement atlas instead.
+	/// Suggested use: set up all your widgets to use a dummy atlas that points to the real atlas. Switching that atlas
+	/// to another one (for example an HD atlas) is then a simple matter of setting this field on your dummy atlas.
+	/// </summary>
+
+	public UIAtlas replacement
+	{
+		get
+		{
+			return mReplacement;
+		}
+		set
+		{
+			if (mReplacement != value)
+			{
+				if (mReplacement != null) MarkAsDirty();
+				mReplacement = value;
+				if (mReplacement != null) MarkAsDirty();
+			}
+		}
+	}
+
+	/// <summary>
 	/// Convenience function that retrieves a sprite by name.
 	/// </summary>
 
 	public Sprite GetSprite (string name)
 	{
-		if (!string.IsNullOrEmpty(name))
+		if (mReplacement != null)
+		{
+			return mReplacement.GetSprite(name);
+		}
+		else if (!string.IsNullOrEmpty(name))
 		{
 			foreach (Sprite s in sprites)
 			{
@@ -132,12 +176,34 @@ public class UIAtlas : MonoBehaviour
 	/// Convenience function that retrieves a list of all sprite names.
 	/// </summary>
 
-	virtual public List<string> GetListOfSprites ()
+	public List<string> GetListOfSprites ()
 	{
+		if (mReplacement != null) return mReplacement.GetListOfSprites();
 		List<string> list = new List<string>();
 		foreach (Sprite s in sprites) if (s != null && !string.IsNullOrEmpty(s.name)) list.Add(s.name);
 		list.Sort();
 		return list;
+	}
+
+	/// <summary>
+	/// Helper function that determines whether the atlas uses the specified one, taking replacements into account.
+	/// </summary>
+
+	bool References (UIAtlas atlas)
+	{
+		if (atlas == null) return false;
+		if (atlas == this) return true;
+		return (mReplacement != null) ? mReplacement.References(atlas) : false;
+	}
+
+	/// <summary>
+	/// Helper function that determines whether the two atlases are related.
+	/// </summary>
+
+	static public bool CheckIfRelated (UIAtlas a, UIAtlas b)
+	{
+		if (a == null || b == null) return false;
+		return a == b || a.References(b) || b.References(a);
 	}
 
 	/// <summary>
@@ -146,11 +212,11 @@ public class UIAtlas : MonoBehaviour
 
 	public void MarkAsDirty ()
 	{
-		UISprite[] sprites = Resources.FindObjectsOfTypeAll(typeof(UISprite)) as UISprite[];
+		UISprite[] list = (UISprite[])GameObject.FindSceneObjectsOfType(typeof(UISprite));
 
-		foreach (UISprite sp in sprites)
+		foreach (UISprite sp in list)
 		{
-			if (sp.atlas == this)
+			if (CheckIfRelated(this, sp.atlas))
 			{
 				sp.atlas = null;
 				sp.atlas = this;
@@ -160,11 +226,11 @@ public class UIAtlas : MonoBehaviour
 			}
 		}
 
-		UIFont[] fonts = Resources.FindObjectsOfTypeAll(typeof(UIFont)) as UIFont[];
+		UIFont[] fonts = (UIFont[])GameObject.FindSceneObjectsOfType(typeof(UIFont));
 
 		foreach (UIFont font in fonts)
 		{
-			if (font.atlas == this)
+			if (CheckIfRelated(this, font.atlas))
 			{
 				font.atlas = null;
 				font.atlas = this;
@@ -174,11 +240,11 @@ public class UIAtlas : MonoBehaviour
 			}
 		}
 
-		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+		UILabel[] labels = (UILabel[])GameObject.FindSceneObjectsOfType(typeof(UILabel));
 
 		foreach (UILabel lbl in labels)
 		{
-			if (lbl.font != null && lbl.font.atlas == this)
+			if (lbl.font != null && CheckIfRelated(this, lbl.font.atlas))
 			{
 				UIFont font = lbl.font;
 				lbl.font = null;

@@ -342,20 +342,23 @@ public abstract class UIWidget : MonoBehaviour
 	public bool UpdateGeometry (ref Matrix4x4 worldToPanel, bool parentMoved, bool generateNormals)
 	{
 		if (material == null) return false;
-		bool retVal = OnUpdate() || mChanged;
-		mChanged = false;
 
-		if (retVal || !mGeom.hasVertices)
+		if (OnUpdate() || mChanged)
 		{
-			Vector3 offset = pivotOffset;
-			Vector2 scale = relativeSize;
-			offset.x *= scale.x;
-			offset.y *= scale.y;
-
+			mChanged = false;
 			mGeom.Clear();
 			OnFill(mGeom.verts, mGeom.uvs, mGeom.cols);
-			mGeom.ApplyOffset(offset);
-			mGeom.ApplyTransform(worldToPanel * cachedTransform.localToWorldMatrix, generateNormals);
+
+			if (mGeom.hasVertices)
+			{
+				Vector3 offset = pivotOffset;
+				Vector2 scale = relativeSize;
+				offset.x *= scale.x;
+				offset.y *= scale.y;
+
+				mGeom.ApplyOffset(offset);
+				mGeom.ApplyTransform(worldToPanel * cachedTransform.localToWorldMatrix, generateNormals);
+			}
 			return true;
 		}
 		else if (mGeom.hasVertices && parentMoved)

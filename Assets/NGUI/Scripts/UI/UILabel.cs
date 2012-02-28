@@ -334,7 +334,8 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			Vector3 size = (mFont != null) ? mFont.CalculatePrintedSize(processedText, mEncoding) : Vector2.one;
+			Vector3 size = (mFont != null && !string.IsNullOrEmpty(processedText)) ?
+				mFont.CalculatePrintedSize(mProcessedText, mEncoding) : Vector2.one;
 			float scale = cachedTransform.localScale.x;
 			size.x = Mathf.Max(size.x, (mFont != null && scale > 1f) ? lineWidth / scale : 1f);
 			size.y = Mathf.Max(size.y, 1f);

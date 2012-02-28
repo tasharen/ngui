@@ -37,7 +37,7 @@ public class UIPanelTool : EditorWindow
 
 	static List<UIPanel> GetListOfPanels ()
 	{
-		UIPanel[] panels = Resources.FindObjectsOfTypeAll(typeof(UIPanel)) as UIPanel[];
+		UIPanel[] panels = GameObject.FindSceneObjectsOfType(typeof(UIPanel)) as UIPanel[];
 		if (panels == null || panels.Length == 0) return null;
 
 		List<UIPanel> list = new List<UIPanel>();
@@ -45,12 +45,7 @@ public class UIPanelTool : EditorWindow
 		foreach (UIPanel panel in panels)
 		{
 			if (!panel.showInPanelTool) continue;
-#if UNITY_3_4
-			PrefabType type = EditorUtility.GetPrefabType(panel.gameObject);
-#else
-			PrefabType type = PrefabUtility.GetPrefabType(panel.gameObject);
-#endif
-			if (type != PrefabType.Prefab) list.Add(panel);
+			list.Add(panel);
 		}
 		return list;
 	}

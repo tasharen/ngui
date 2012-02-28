@@ -13,6 +13,8 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Slider")]
 public class UISlider : IgnoreTimeScale
 {
+	static public UISlider current;
+
 	public enum Direction
 	{
 		Horizontal,
@@ -156,6 +158,10 @@ public class UISlider : IgnoreTimeScale
 		Set( (direction == Direction.Horizontal) ? dir.x / mCol.size.x : dir.y / mCol.size.y );
 	}
 
+#if UNITY_EDITOR
+	void Update () { Set(rawValue); }
+#endif
+
 	/// <summary>
 	/// Update the visible slider.
 	/// </summary>
@@ -217,7 +223,9 @@ public class UISlider : IgnoreTimeScale
 
 			if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
 			{
+				current = this;
 				eventReceiver.SendMessage(functionName, mStepValue, SendMessageOptions.DontRequireReceiver);
+				current = null;
 			}
 		}
 	}

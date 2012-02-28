@@ -36,7 +36,7 @@ public class UIFontInspector : Editor
 
 	void MarkAsChanged ()
 	{
-		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+		UILabel[] labels = GameObject.FindSceneObjectsOfType(typeof(UILabel)) as UILabel[];
 
 		foreach (UILabel lbl in labels)
 		{
@@ -92,7 +92,7 @@ public class UIFontInspector : Editor
 			{
 				NGUIEditorTools.RegisterUndo("Import Font Data", mFont);
 				BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), data.bytes);
-				mFont.Refresh();
+				mFont.MarkAsDirty();
 				resetWidthHeight = true;
 				Debug.Log("Imported " + mFont.bmFont.glyphCount + " characters");
 			}

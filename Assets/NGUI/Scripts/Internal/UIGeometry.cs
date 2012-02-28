@@ -63,6 +63,7 @@ public class UIGeometry
 		verts.Clear();
 		uvs.Clear();
 		cols.Clear();
+		mRtpVerts.Clear();
 	}
 
 	/// <summary>

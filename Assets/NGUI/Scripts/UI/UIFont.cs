@@ -28,6 +28,7 @@ public class UIFont : MonoBehaviour
 	[SerializeField] int mSpacingX = 0;
 	[SerializeField] int mSpacingY = 0;
 	[SerializeField] UIAtlas mAtlas;
+	[SerializeField] UIFont mReplacement;
 
 	// Cached value
 	UIAtlas.Sprite mSprite = null;
@@ -45,19 +46,19 @@ public class UIFont : MonoBehaviour
 	/// Access to the BMFont class directly.
 	/// </summary>
 
-	public BMFont bmFont { get { return mFont; } }
+	public BMFont bmFont { get { return (mReplacement != null) ? mReplacement.bmFont : mFont; } }
 
 	/// <summary>
 	/// Original width of the font's texture in pixels.
 	/// </summary>
 
-	public int texWidth { get { return (mFont != null) ? mFont.texWidth : 1; } }
+	public int texWidth { get { return (mReplacement != null) ? mReplacement.texWidth : ((mFont != null) ? mFont.texWidth : 1); } }
 
 	/// <summary>
 	/// Original height of the font's texture in pixels.
 	/// </summary>
 
-	public int texHeight { get { return (mFont != null) ? mFont.texHeight : 1; } }
+	public int texHeight { get { return (mReplacement != null) ? mReplacement.texHeight : ((mFont != null) ? mFont.texHeight : 1); } }
 
 	/// <summary>
 	/// Atlas used by the font, if any.
@@ -67,11 +68,15 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			return mAtlas;
+			return (mReplacement != null) ? mReplacement.atlas : mAtlas;
 		}
 		set
 		{
-			if (mAtlas != value)
+			if (mReplacement != null)
+			{
+				mReplacement.atlas = value;
+			}
+			else if (mAtlas != value)
 			{
 				if (value == null)
 				{
@@ -80,7 +85,7 @@ public class UIFont : MonoBehaviour
 				}
 
 				mAtlas = value;
-				Refresh();
+				MarkAsDirty();
 			}
 		}
 	}
@@ -93,14 +98,19 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
+			if (mReplacement != null) return mReplacement.material;
 			return (mAtlas != null) ? mAtlas.material : mMat;
 		}
 		set
 		{
-			if (mAtlas == null && mMat != value)
+			if (mReplacement != null)
+			{
+				mReplacement.material = value;
+			}
+			else if (mAtlas == null && mMat != value)
 			{
 				mMat = value;
-				Refresh();
+				MarkAsDirty();
 			}
 		}
 	}
@@ -113,6 +123,7 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
+			if (mReplacement != null) return mReplacement.texture;
 			Material mat = material;
 			return (mat != null) ? mat.mainTexture as Texture2D : null;
 		}
@@ -126,6 +137,8 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
+			if (mReplacement != null) return mReplacement.uvRect;
+
 			if (mAtlas != null && (mSprite == null && sprite != null))
 			{
 				Texture tex = mAtlas.texture;
@@ -172,10 +185,14 @@ public class UIFont : MonoBehaviour
 		}
 		set
 		{
-			if (sprite == null && mUVRect != value)
+			if (mReplacement != null)
+			{
+				mReplacement.uvRect = value;
+			}
+			else if (sprite == null && mUVRect != value)
 			{
 				mUVRect = value;
-				Refresh();
+				MarkAsDirty();
 			}
 		}
 	}
@@ -184,25 +201,79 @@ public class UIFont : MonoBehaviour
 	/// Sprite used by the font, if any.
 	/// </summary>
 
-	public string spriteName { get { return mFont.spriteName; } set { if (mFont.spriteName != value) { mFont.spriteName = value; Refresh(); } } }
+	public string spriteName
+	{
+		get
+		{
+			return (mReplacement != null) ? mReplacement.spriteName : mFont.spriteName;
+		}
+		set
+		{
+			if (mReplacement != null)
+			{
+				mReplacement.spriteName = value;
+			}
+			else if (mFont.spriteName != value)
+			{
+				mFont.spriteName = value;
+				MarkAsDirty();
+			}
+		}
+	}
 
 	/// <summary>
 	/// Horizontal spacing applies to characters. If positive, it will add extra spacing between characters. If negative, it will make them be closer together.
 	/// </summary>
 
-	public int horizontalSpacing { get { return mSpacingX; } set { if (mSpacingX != value) { mSpacingX = value; Refresh(); } } }
+	public int horizontalSpacing
+	{
+		get
+		{
+			return (mReplacement != null) ? mReplacement.horizontalSpacing : mSpacingX;
+		}
+		set
+		{
+			if (mReplacement != null)
+			{
+				mReplacement.horizontalSpacing = value;
+			}
+			else if (mSpacingX != value)
+			{
+				mSpacingX = value;
+				MarkAsDirty();
+			}
+		}
+	}
 
 	/// <summary>
 	/// Vertical spacing applies to lines. If positive, it will add extra spacing between lines. If negative, it will make them be closer together.
 	/// </summary>
 
-	public int verticalSpacing { get { return mSpacingY; } set { if (mSpacingY != value) { mSpacingY = value; Refresh(); } } }
+	public int verticalSpacing
+	{
+		get
+		{
+			return (mReplacement != null) ? mReplacement.verticalSpacing : mSpacingY;
+		}
+		set
+		{
+			if (mReplacement != null)
+			{
+				mReplacement.verticalSpacing = value;
+			}
+			else if (mSpacingY != value)
+			{
+				mSpacingY = value;
+				MarkAsDirty();
+			}
+		}
+	}
 
 	/// <summary>
 	/// Pixel-perfect size of this font.
 	/// </summary>
 
-	public int size { get { return mFont.charSize; } }
+	public int size { get { return (mReplacement != null) ? mReplacement.size : mFont.charSize; } }
 
 	/// <summary>
 	/// Retrieves the sprite used by the font, if any.
@@ -212,6 +283,8 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
+			if (mReplacement != null) return mReplacement.sprite;
+
 			if (!mSpriteSet) mSprite = null;
 
 			if (mSprite == null && mAtlas != null && !string.IsNullOrEmpty(mFont.spriteName))
@@ -227,6 +300,29 @@ public class UIFont : MonoBehaviour
 				}
 			}
 			return mSprite;
+		}
+	}
+
+	/// <summary>
+	/// Setting a replacement atlas value will cause everything using this font to use the replacement font instead.
+	/// Suggested use: set up all your widgets to use a dummy font that points to the real font. Switching that font to
+	/// another one (for example an eastern language one) is then a simple matter of setting this field on your dummy font.
+	/// </summary>
+
+	public UIFont replacement
+	{
+		get
+		{
+			return mReplacement;
+		}
+		set
+		{
+			if (mReplacement != value)
+			{
+				if (mReplacement != null) MarkAsDirty();
+				mReplacement = value;
+				if (mReplacement != null) MarkAsDirty();
+			}
 		}
 	}
 
@@ -258,17 +354,38 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Helper function that determines whether the font uses the specified one, taking replacements into account.
+	/// </summary>
+
+	bool References (UIFont font)
+	{
+		if (font == null) return false;
+		if (font == this) return true;
+		return (mReplacement != null) ? mReplacement.References(font) : false;
+	}
+
+	/// <summary>
+	/// Helper function that determines whether the two atlases are related.
+	/// </summary>
+
+	static public bool CheckIfRelated (UIFont a, UIFont b)
+	{
+		if (a == null || b == null) return false;
+		return a == b || a.References(b) || b.References(a);
+	}
+
+	/// <summary>
 	/// Refresh all labels that use this font.
 	/// </summary>
 
-	public void Refresh ()
+	public void MarkAsDirty ()
 	{
 		mSprite = null;
 		UILabel[] labels = (UILabel[])Object.FindSceneObjectsOfType(typeof(UILabel));
 
 		foreach (UILabel lbl in labels)
 		{
-			if (lbl.font == this)
+			if (lbl.enabled && lbl.gameObject.active && CheckIfRelated(this, lbl.font))
 			{
 				lbl.font = null;
 				lbl.font = this;
@@ -282,6 +399,8 @@ public class UIFont : MonoBehaviour
 
 	public Vector2 CalculatePrintedSize (string text, bool encoding)
 	{
+		if (mReplacement != null) return mReplacement.CalculatePrintedSize(text, encoding);
+
 		Vector2 v = Vector2.zero;
 
 		if (mFont != null && mFont.isValid && !string.IsNullOrEmpty(text))
@@ -345,6 +464,8 @@ public class UIFont : MonoBehaviour
 
 	public string WrapText (string text, float maxWidth, bool multiline, bool encoding)
 	{
+		if (mReplacement != null) return mReplacement.WrapText(text, maxWidth, multiline, encoding);
+
 		// Width of the line in pixels
 		int lineWidth = Mathf.RoundToInt(maxWidth * size);
 		if (lineWidth < 1) return text;
@@ -500,7 +621,11 @@ public class UIFont : MonoBehaviour
 	public void Print (string text, Color color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols,
 		bool encoding, Alignment alignment, int lineWidth)
 	{
-		if (mFont != null && text != null)
+		if (mReplacement != null)
+		{
+			mReplacement.Print(text, color, verts, uvs, cols, encoding, alignment, lineWidth);
+		}
+		else if (mFont != null && text != null)
 		{
 			if (!mFont.isValid)
 			{

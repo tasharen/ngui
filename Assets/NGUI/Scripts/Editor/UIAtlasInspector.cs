@@ -34,7 +34,7 @@ public class UIAtlasInspector : Editor
 	{
 		if (mSprite == null) return;
 
-		UISprite[] sprites = Resources.FindObjectsOfTypeAll(typeof(UISprite)) as UISprite[];
+		UISprite[] sprites = GameObject.FindSceneObjectsOfType(typeof(UISprite)) as UISprite[];
 
 		foreach (UISprite sp in sprites)
 		{
@@ -46,7 +46,7 @@ public class UIAtlasInspector : Editor
 			}
 		}
 
-		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+		UILabel[] labels = GameObject.FindSceneObjectsOfType(typeof(UILabel)) as UILabel[];
 
 		foreach (UILabel lbl in labels)
 		{

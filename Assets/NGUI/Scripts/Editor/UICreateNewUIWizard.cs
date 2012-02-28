@@ -97,7 +97,7 @@ public class UICreateNewUIWizard : EditorWindow
 			float depth = -1f;
 			bool clearColor = true;
 			bool audioListener = true;
-			Camera[] cameras = Resources.FindObjectsOfTypeAll(typeof(Camera)) as Camera[];
+			Camera[] cameras = GameObject.FindSceneObjectsOfType(typeof(Camera)) as Camera[];
 
 			foreach (Camera c in cameras)
 			{

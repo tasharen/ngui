@@ -136,7 +136,7 @@ public class UITable : MonoBehaviour
 	/// Is it time to reposition? Do so now.
 	/// </summary>
 
-	void Update ()
+	void LateUpdate ()
 	{
 		if (repositionNow)
 		{

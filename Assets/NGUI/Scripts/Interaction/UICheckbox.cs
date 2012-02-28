@@ -21,6 +21,7 @@ public class UICheckbox : MonoBehaviour
 	public string functionName = "OnActivate";
 	public bool startsChecked = true;
 	public bool option = false;
+	public bool optionCanBeNone = false;
 
 	bool mChecked = true;
 	Transform mTrans;
@@ -29,7 +30,7 @@ public class UICheckbox : MonoBehaviour
 	/// Whether the checkbox is checked.
 	/// </summary>
 
-	public bool isChecked { get { return mChecked; } set { if (!option || value) Set(value); } }
+	public bool isChecked { get { return mChecked; } set { if (!option || value || optionCanBeNone) Set(value); } }
 
 	/// <summary>
 	/// Activate the initial state.

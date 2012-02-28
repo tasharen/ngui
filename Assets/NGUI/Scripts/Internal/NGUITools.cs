@@ -229,9 +229,10 @@ static public class NGUITools
 	/// Want to swap a low-res atlas for a hi-res one? Just use this function.
 	/// </summary>
 
+	[Obsolete("Use UIAtlas.replacement instead")]
 	static public void ReplaceAtlas (UIAtlas before, UIAtlas after)
 	{
-		UISprite[] sprites = Resources.FindObjectsOfTypeAll(typeof(UISprite)) as UISprite[];
+		UISprite[] sprites = GameObject.FindSceneObjectsOfType(typeof(UISprite)) as UISprite[];
 		
 		foreach (UISprite sprite in sprites)
 		{
@@ -241,7 +242,7 @@ static public class NGUITools
 			}
 		}
 
-		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+		UILabel[] labels = GameObject.FindSceneObjectsOfType(typeof(UILabel)) as UILabel[];
 
 		foreach (UILabel lbl in labels)
 		{
@@ -256,9 +257,10 @@ static public class NGUITools
 	/// Want to swap a low-res font for a hi-res one? This is the way.
 	/// </summary>
 
+	[Obsolete("Use UIFont.replacement instead")]
 	static public void ReplaceFont (UIFont before, UIFont after)
 	{
-		UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+		UILabel[] labels = GameObject.FindSceneObjectsOfType(typeof(UILabel)) as UILabel[];
 
 		foreach (UILabel lbl in labels)
 		{

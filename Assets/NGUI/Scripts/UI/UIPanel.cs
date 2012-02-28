@@ -608,7 +608,10 @@ public class UIPanel : MonoBehaviour
 			if (pc.visibleFlag == 1 && w != null && w.UpdateGeometry(ref mWorldToLocal, (pc.changeFlag == 1), generateNormals))
 			{
 				// We will need to refill this buffer
-				if (!mChanged.Contains(w.material)) mChanged.Add(w.material);
+				if (!mChanged.Contains(w.material))
+				{
+					mChanged.Add(w.material);
+				}
 			}
 		}
 	}

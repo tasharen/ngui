@@ -30,19 +30,23 @@ public class UISliderColors : MonoBehaviour
 		val *= (colors.Length - 1);
 		int startIndex = Mathf.FloorToInt(val);
 
-		if (startIndex < 0)
+		Color c = colors[0];
+
+		if (startIndex >= 0)
 		{
-			sprite.color = colors[0];
+			if (startIndex + 1 < colors.Length)
+			{
+				float factor = (val - startIndex) / (colors.Length - 2);
+				c = Color.Lerp(colors[startIndex], colors[startIndex + 1], factor);
+			}
+			else if (startIndex < colors.Length)
+			{
+				c = colors[startIndex];
+			}
+			else c = colors[colors.Length - 1];
 		}
-		else if (startIndex + 1 < colors.Length)
-		{
-			float factor = (val - startIndex) / (colors.Length - 2);
-			sprite.color = Color.Lerp(colors[startIndex], colors[startIndex + 1], factor);
-		}
-		else if (startIndex < colors.Length)
-		{
-			sprite.color = colors[startIndex];
-		}
-		else sprite.color = colors[colors.Length - 1];
+
+		c.a = sprite.color.a;
+		sprite.color = c;
 	}
 }

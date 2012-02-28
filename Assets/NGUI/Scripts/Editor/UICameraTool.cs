@@ -156,21 +156,10 @@ public class UICameraTool : EditorWindow
 	{
 		EditorGUIUtility.LookLikeControls(80f);
 
-		Camera[] cams = Resources.FindObjectsOfTypeAll(typeof(Camera)) as Camera[];
+		Camera[] cams = GameObject.FindSceneObjectsOfType(typeof(Camera)) as Camera[];
 		List<Camera> list = new List<Camera>();
 
-		foreach (Camera c in cams)
-		{
-			if (c.gameObject.hideFlags == 0)
-			{
-#if UNITY_3_4
-				PrefabType type = EditorUtility.GetPrefabType(c.gameObject);
-#else
-				PrefabType type = PrefabUtility.GetPrefabType(c.gameObject);
-#endif
-				if (type != PrefabType.Prefab) list.Add(c);
-			}
-		}
+		foreach (Camera c in cams) if (c.gameObject.hideFlags == 0) list.Add(c);
 
 		if (list.Count > 0)
 		{

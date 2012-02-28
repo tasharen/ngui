@@ -21,7 +21,7 @@ public class UIFontMaker : EditorWindow
 	{
 		if (UISettings.font != null)
 		{
-			UILabel[] labels = Resources.FindObjectsOfTypeAll(typeof(UILabel)) as UILabel[];
+			UILabel[] labels = GameObject.FindSceneObjectsOfType(typeof(UILabel)) as UILabel[];
 
 			foreach (UILabel lbl in labels)
 			{
@@ -270,7 +270,7 @@ public class UIFontMaker : EditorWindow
 					{
 						BMFontReader.Load(UISettings.font.bmFont, NGUITools.GetHierarchy(UISettings.font.gameObject), UISettings.fontData.bytes);
 						EditorUtility.SetDirty(UISettings.font);
-						UISettings.font.Refresh();
+						UISettings.font.MarkAsDirty();
 					}
 
 					UISettings.font = go.GetComponent<UIFont>();
