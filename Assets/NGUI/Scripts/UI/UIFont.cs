@@ -80,7 +80,7 @@ public class UIFont : MonoBehaviour
 			{
 				if (value == null)
 				{
-					if (mAtlas != null) mMat = mAtlas.material;
+					if (mAtlas != null) mMat = mAtlas.spriteMaterial;
 					if (sprite != null) mUVRect = uvRect;
 				}
 
@@ -99,7 +99,7 @@ public class UIFont : MonoBehaviour
 		get
 		{
 			if (mReplacement != null) return mReplacement.material;
-			return (mAtlas != null) ? mAtlas.material : mMat;
+			return (mAtlas != null) ? mAtlas.spriteMaterial : mMat;
 		}
 		set
 		{
@@ -321,7 +321,7 @@ public class UIFont : MonoBehaviour
 			{
 				if (mReplacement != null) MarkAsDirty();
 				mReplacement = value;
-				if (mReplacement != null) MarkAsDirty();
+				MarkAsDirty();
 			}
 		}
 	}

@@ -85,7 +85,7 @@ public class UISpriteInspector : UIWidgetInspector
 		{
 			// Draw the atlas
 			EditorGUILayout.Separator();
-			Rect rect = NGUIEditorTools.DrawSprite(tex, mSprite.outerUV, mUseShader ? mSprite.atlas.material : null);
+			Rect rect = NGUIEditorTools.DrawSprite(tex, mSprite.outerUV, mUseShader ? mSprite.atlas.spriteMaterial : null);
 
 			// Draw the selection
 			NGUIEditorTools.DrawOutline(rect, mSprite.outerUV, new Color(0.4f, 1f, 0f, 1f));

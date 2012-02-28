@@ -214,7 +214,7 @@ public class InvDatabaseInspector : Editor
 					{
 						iconName = sprite.name;
 
-						Material mat = item.iconAtlas.material;
+						Material mat = item.iconAtlas.spriteMaterial;
 
 						if (mat != null)
 						{

@@ -19,12 +19,21 @@ public class UIAtlasInspector : Editor
 		Sprite,
 	}
 
+	enum AtlasType
+	{
+		Normal,
+		Reference,
+	}
+
 	static View mView = View.Sprite;
 	static bool mUseShader = false;
 
 	UIAtlas mAtlas;
 	bool mConfirmDelete = false;
 	UIAtlas.Sprite mSprite;
+
+	AtlasType mType = AtlasType.Normal;
+	UIAtlas mReplacement = null;
 
 	/// <summary>
 	/// Convenience function -- mark all widgets using the sprite as changed.
@@ -61,6 +70,16 @@ public class UIAtlasInspector : Editor
 	}
 
 	/// <summary>
+	/// Replacement atlas selection callback.
+	/// </summary>
+
+	void OnSelectAtlas (MonoBehaviour obj)
+	{
+		mReplacement = obj as UIAtlas;
+		UnityEditor.EditorUtility.SetDirty(mAtlas);
+	}
+
+	/// <summary>
 	/// Draw the inspector widget.
 	/// </summary>
 
@@ -69,15 +88,64 @@ public class UIAtlasInspector : Editor
 		EditorGUIUtility.LookLikeControls(80f);
 		mAtlas = target as UIAtlas;
 
+		NGUIEditorTools.DrawSeparator();
+
+		if (mAtlas.replacement != null)
+		{
+			mType = AtlasType.Reference;
+			mReplacement = mAtlas.replacement;
+		}
+
+		AtlasType after = (AtlasType)EditorGUILayout.EnumPopup("Atlas Type", mType);
+
+		if (mType != after)
+		{
+			if (after == AtlasType.Normal)
+			{
+				NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
+				mReplacement = null;
+				mAtlas.replacement = null;
+				mType = AtlasType.Normal;
+				UnityEditor.EditorUtility.SetDirty(mAtlas);
+			}
+			else
+			{
+				mType = AtlasType.Reference;
+			}
+		}
+
+		if (mType == AtlasType.Reference)
+		{
+			ComponentSelector.Draw<UIAtlas>(mAtlas.replacement, OnSelectAtlas);
+
+			NGUIEditorTools.DrawSeparator();
+			GUILayout.Label("You can have one atlas simply point to\n" +
+				"another one. This is useful if you want to be\n" +
+				"able to quickly replace the contents of one\n" +
+				"atlas with another one, for example for\n" +
+				"swapping an SD atlas with an HD one, or\n" +
+				"replacing an English atlas with a Chinese\n" +
+				"one. All the sprites referencing this atlas\n" +
+				"will update their references to the new one.");
+
+			if (mReplacement != mAtlas && mAtlas.replacement != mReplacement)
+			{
+				NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
+				mAtlas.replacement = mReplacement;
+				UnityEditor.EditorUtility.SetDirty(mAtlas);
+			}
+			return;
+		}
+
 		if (!mConfirmDelete)
 		{
 			NGUIEditorTools.DrawSeparator();
-			Material mat = EditorGUILayout.ObjectField("Material", mAtlas.material, typeof(Material), false) as Material;
+			Material mat = EditorGUILayout.ObjectField("Material", mAtlas.spriteMaterial, typeof(Material), false) as Material;
 
-			if (mAtlas.material != mat)
+			if (mAtlas.spriteMaterial != mat)
 			{
 				NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
-				mAtlas.material = mat;
+				mAtlas.spriteMaterial = mat;
 
 				// Ensure that this atlas has valid import settings
 				if (mAtlas.texture != null) NGUIEditorTools.ImportTexture(mAtlas.texture, false, false);
@@ -112,7 +180,7 @@ public class UIAtlasInspector : Editor
 			}
 		}
 
-		if (mAtlas.material != null)
+		if (mAtlas.spriteMaterial != null)
 		{
 			Color blue = new Color(0f, 0.7f, 1f, 1f);
 			Color green = new Color(0.4f, 1f, 0f, 1f);
@@ -135,7 +203,7 @@ public class UIAtlasInspector : Editor
 						if (GUILayout.Button("Delete"))
 						{
 							NGUIEditorTools.RegisterUndo("Delete Sprite", mAtlas);
-							mAtlas.sprites.Remove(mSprite);
+							mAtlas.spriteList.Remove(mSprite);
 							mConfirmDelete = false;
 						}
 						GUI.backgroundColor = Color.white;
@@ -146,11 +214,11 @@ public class UIAtlasInspector : Editor
 			}
 			else
 			{
-				if (mSprite == null && mAtlas.sprites.Count > 0)
+				if (mSprite == null && mAtlas.spriteList.Count > 0)
 				{
 					string spriteName = PlayerPrefs.GetString("NGUI Selected Sprite");
 					if (!string.IsNullOrEmpty(spriteName)) mSprite = mAtlas.GetSprite(spriteName);
-					if (mSprite == null) mSprite = mAtlas.sprites[0];
+					if (mSprite == null) mSprite = mAtlas.spriteList[0];
 				}
 
 				GUI.backgroundColor = Color.green;
@@ -175,7 +243,7 @@ public class UIAtlasInspector : Editor
 							newSprite.name = "New Sprite";
 						}
 
-						mAtlas.sprites.Add(newSprite);
+						mAtlas.spriteList.Add(newSprite);
 						mSprite = newSprite;
 					}
 
@@ -204,7 +272,7 @@ public class UIAtlasInspector : Editor
 
 					if (mSprite == null) return;
 
-					Texture2D tex = mAtlas.material.mainTexture as Texture2D;
+					Texture2D tex = mAtlas.spriteMaterial.mainTexture as Texture2D;
 
 					if (tex != null)
 					{
@@ -217,7 +285,7 @@ public class UIAtlasInspector : Editor
 						{
 							bool found = false;
 
-							foreach (UIAtlas.Sprite sp in mAtlas.sprites)
+							foreach (UIAtlas.Sprite sp in mAtlas.spriteList)
 							{
 								if (sp.name == name)
 								{
@@ -380,7 +448,7 @@ public class UIAtlasInspector : Editor
 
 						// Draw the atlas
 						EditorGUILayout.Separator();
-						Material m = mUseShader ? mAtlas.material : null;
+						Material m = mUseShader ? mAtlas.spriteMaterial : null;
 						Rect rect = (mView == View.Atlas) ? NGUIEditorTools.DrawAtlas(tex, m) : NGUIEditorTools.DrawSprite(tex, uv0, m);
 
 						// Draw the sprite outline

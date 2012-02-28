@@ -57,8 +57,8 @@ public class NGUIJson
 		}
 
 		atlas.coordinates = UIAtlas.Coordinates.Pixels;
-		List<UIAtlas.Sprite> oldSprites = atlas.sprites;
-		atlas.sprites = new List<UIAtlas.Sprite>();
+		List<UIAtlas.Sprite> oldSprites = atlas.spriteList;
+		atlas.spriteList = new List<UIAtlas.Sprite>();
 
 		Hashtable frames = (Hashtable)decodedHash["frames"];
 
@@ -145,12 +145,12 @@ public class NGUIJson
 			}
 
 			// Add this new sprite
-			atlas.sprites.Add(newSprite);
+			atlas.spriteList.Add(newSprite);
 		}
 
 		// Sort imported sprites alphabetically
-		atlas.sprites.Sort(CompareSprites);
-		Debug.Log("Imported " + atlas.sprites.Count + " sprites");
+		atlas.spriteList.Sort(CompareSprites);
+		Debug.Log("Imported " + atlas.spriteList.Count + " sprites");
 
 		// Unload the asset
 		asset = null;

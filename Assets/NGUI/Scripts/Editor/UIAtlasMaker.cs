@@ -292,7 +292,7 @@ public class UIAtlasMaker : EditorWindow
 	static void ReplaceSprites (UIAtlas atlas, List<SpriteEntry> sprites)
 	{
 		// Get the list of sprites we'll be updating
-		List<UIAtlas.Sprite> spriteList = atlas.sprites;
+		List<UIAtlas.Sprite> spriteList = atlas.spriteList;
 		List<UIAtlas.Sprite> kept = new List<UIAtlas.Sprite>();
 
 		// The atlas must be in pixels
@@ -331,8 +331,9 @@ public class UIAtlasMaker : EditorWindow
 			Color32[] oldPixels = null;
 			int oldWidth = atlasTex.width;
 			int oldHeight = atlasTex.height;
+			List<UIAtlas.Sprite> list = atlas.spriteList;
 
-			foreach (UIAtlas.Sprite asp in atlas.sprites)
+			foreach (UIAtlas.Sprite asp in list)
 			{
 				bool found = false;
 
@@ -426,7 +427,7 @@ public class UIAtlasMaker : EditorWindow
 
 			// Update the atlas texture
 			if (tex == null) Debug.LogError("Failed to load the created atlas saved as " + newPath);
-			else atlas.material.mainTexture = tex;
+			else atlas.spriteMaterial.mainTexture = tex;
 		}
 		else
 		{
@@ -465,9 +466,9 @@ public class UIAtlasMaker : EditorWindow
 		}
 		else
 		{
-			atlas.sprites.Clear();
+			atlas.spriteList.Clear();
 			string path = NGUIEditorTools.GetSaveableTexturePath(atlas);
-			atlas.material.mainTexture = null;
+			atlas.spriteMaterial.mainTexture = null;
 			if (!string.IsNullOrEmpty(path)) AssetDatabase.DeleteAsset(path);
 		}
 		EditorUtility.SetDirty(atlas.gameObject);
@@ -536,7 +537,7 @@ public class UIAtlasMaker : EditorWindow
 		if (UISettings.atlas != null && UISettings.atlas.name == UISettings.atlasName)
 		{
 			prefabPath = AssetDatabase.GetAssetPath(UISettings.atlas.gameObject.GetInstanceID());
-			if (UISettings.atlas.material != null) matPath = AssetDatabase.GetAssetPath(UISettings.atlas.material.GetInstanceID());
+			if (UISettings.atlas.spriteMaterial != null) matPath = AssetDatabase.GetAssetPath(UISettings.atlas.spriteMaterial.GetInstanceID());
 		}
 
 		// Assume default values if needed
@@ -603,7 +604,7 @@ public class UIAtlasMaker : EditorWindow
 #endif
 					// Create a new game object for the atlas
 					go = new GameObject(UISettings.atlasName);
-					go.AddComponent<UIAtlas>().material = mat;
+					go.AddComponent<UIAtlas>().spriteMaterial = mat;
 
 					// Update the prefab
 #if UNITY_3_4
@@ -627,7 +628,7 @@ public class UIAtlasMaker : EditorWindow
 
 		if (UISettings.atlas != null && UISettings.atlas.name == UISettings.atlasName)
 		{
-			Material mat = UISettings.atlas.material;
+			Material mat = UISettings.atlas.spriteMaterial;
 			Texture tex = UISettings.atlas.texture;
 
 			// Material information
@@ -742,11 +743,13 @@ public class UIAtlasMaker : EditorWindow
 			// If this sprite was marked for deletion, remove it from the atlas
 			if (!string.IsNullOrEmpty(delSprite))
 			{
-				foreach (UIAtlas.Sprite sp in UISettings.atlas.sprites)
+				List<UIAtlas.Sprite> list = UISettings.atlas.spriteList;
+
+				foreach (UIAtlas.Sprite sp in list)
 				{
 					if (sp.name == delSprite)
 					{
-						UISettings.atlas.sprites.Remove(sp);
+						list.Remove(sp);
 						List<SpriteEntry> sprites = new List<SpriteEntry>();
 						ExtractSprites(UISettings.atlas, sprites);
 						UpdateAtlas(UISettings.atlas, sprites);

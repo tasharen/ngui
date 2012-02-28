@@ -20,9 +20,24 @@ public class UIFontInspector : Editor
 		Font,
 	}
 
+	enum FontType
+	{
+		Normal,
+		Reference,
+	}
+
 	static View mView = View.Atlas;
 	static bool mUseShader = false;
+	
 	UIFont mFont;
+	FontType mType = FontType.Normal;
+	UIFont mReplacement = null;
+
+	void OnSelectFont (MonoBehaviour obj)
+	{
+		mReplacement = obj as UIFont;
+		UnityEditor.EditorUtility.SetDirty(mFont);
+	}
 
 	void OnSelectAtlas (MonoBehaviour obj)
 	{
@@ -50,11 +65,59 @@ public class UIFontInspector : Editor
 
 	override public void OnInspectorGUI ()
 	{
+		mFont = target as UIFont;
 		EditorGUIUtility.LookLikeControls(80f);
+
 		NGUIEditorTools.DrawSeparator();
 
-		mFont = target as UIFont;
+		if (mFont.replacement != null)
+		{
+			mType = FontType.Reference;
+			mReplacement = mFont.replacement;
+		}
 
+		FontType after = (FontType)EditorGUILayout.EnumPopup("Font Type", mType);
+
+		if (mType != after)
+		{
+			if (after == FontType.Normal)
+			{
+				NGUIEditorTools.RegisterUndo("Font Change", mFont);
+				mReplacement = null;
+				mFont.replacement = null;
+				mType = FontType.Normal;
+				UnityEditor.EditorUtility.SetDirty(mFont);
+			}
+			else
+			{
+				mType = FontType.Reference;
+			}
+		}
+
+		if (mType == FontType.Reference)
+		{
+			ComponentSelector.Draw<UIFont>(mFont.replacement, OnSelectFont);
+
+			NGUIEditorTools.DrawSeparator();
+			GUILayout.Label("You can have one font simply point to\n" +
+				"another one. This is useful if you want to be\n" +
+				"able to quickly replace the contents of one\n" +
+				"font with another one, for example for\n" +
+				"swapping an SD font with an HD one, or\n" +
+				"replacing an English font with a Chinese\n" +
+				"one. All the labels referencing this font\n" +
+				"will update their references to the new one.");
+
+			if (mReplacement != mFont && mFont.replacement != mReplacement)
+			{
+				NGUIEditorTools.RegisterUndo("Font Change", mFont);
+				mFont.replacement = mReplacement;
+				UnityEditor.EditorUtility.SetDirty(mFont);
+			}
+			return;
+		}
+
+		NGUIEditorTools.DrawSeparator();
 		ComponentSelector.Draw<UIAtlas>(mFont.atlas, OnSelectAtlas);
 
 		if (mFont.atlas != null)

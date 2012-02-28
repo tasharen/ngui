@@ -43,33 +43,66 @@ public class UIAtlas : MonoBehaviour
 		TexCoords,
 	}
 
-	/// <summary>
-	/// Material used by this atlas.
-	/// </summary>
+	// Material used by this atlas. Name is kept only for backwards compatibility, it used to be public.
+	[SerializeField] Material material;
 
-	public Material material;
-
-	/// <summary>
-	/// List of all sprites inside the atlas.
-	/// NOTE: Kept only for legacy functionality's sake. Do not access directly! Use 'spriteList' instead.
-	/// </summary>
-
-	public List<Sprite> sprites = new List<Sprite>();
+	// List of all sprites inside the atlas. Name is kept only for backwards compatibility, it used to be public.
+	[SerializeField] List<Sprite> sprites = new List<Sprite>();
 
 	// Currently active set of coordinates
 	[SerializeField] Coordinates mCoordinates = Coordinates.Pixels;
 
+	// Replacement atlas can be used to completely bypass this atlas, pulling the data from another one instead.
+	[SerializeField] UIAtlas mReplacement;
+
 	/// <summary>
-	/// Replacement atlas can be used to completely bypass this atlas, pulling the data from another one instead.
+	/// Material used by the atlas.
 	/// </summary>
 
-	[SerializeField] UIAtlas mReplacement;
+	public Material spriteMaterial
+	{
+		get
+		{
+			return (mReplacement != null) ? mReplacement.spriteMaterial : material;
+		}
+		set
+		{
+			if (mReplacement != null)
+			{
+				mReplacement.spriteMaterial = value;
+			}
+			else
+			{
+				if (material == null)
+				{
+					material = value;
+				}
+				else
+				{
+					MarkAsDirty();
+					material = value;
+					MarkAsDirty();
+				}
+			}
+		}
+	}
 
 	/// <summary>
 	/// List of sprites within the atlas.
 	/// </summary>
 
-	public List<Sprite> spriteList { get { return (mReplacement != null) ? mReplacement.spriteList : sprites; } }
+	public List<Sprite> spriteList
+	{
+		get
+		{
+			return (mReplacement != null) ? mReplacement.spriteList : sprites;
+		}
+		set
+		{
+			if (mReplacement != null) mReplacement.spriteList = value;
+			else sprites = value;
+		}
+	}
 
 	/// <summary>
 	/// Texture used by the atlas.
@@ -139,7 +172,7 @@ public class UIAtlas : MonoBehaviour
 			{
 				if (mReplacement != null) MarkAsDirty();
 				mReplacement = value;
-				if (mReplacement != null) MarkAsDirty();
+				MarkAsDirty();
 			}
 		}
 	}

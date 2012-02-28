@@ -52,14 +52,14 @@ public class UISprite : UIWidget
 				mAtlas = value;
 
 				// Update the material
-				material = (mAtlas != null) ? mAtlas.material : null;
+				material = (mAtlas != null) ? mAtlas.spriteMaterial : null;
 
 				// Automatically choose the first sprite
 				if (string.IsNullOrEmpty(mSpriteName))
 				{
-					if (mAtlas != null && mAtlas.sprites.Count > 0)
+					if (mAtlas != null && mAtlas.spriteList.Count > 0)
 					{
-						sprite = mAtlas.sprites[0];
+						sprite = mAtlas.spriteList[0];
 						mSpriteName = mSprite.name;
 					}
 				}
@@ -216,7 +216,7 @@ public class UISprite : UIWidget
 	{
 		if (mAtlas != null)
 		{
-			if (material == null) material = mAtlas.material;
+			if (material == null) material = mAtlas.spriteMaterial;
 			if (sprite == null) sprite = string.IsNullOrEmpty(mSpriteName) ? null : mAtlas.GetSprite(mSpriteName);
 		}
 	}

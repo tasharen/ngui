@@ -73,7 +73,7 @@ public class UISpriteAnimation : MonoBehaviour
 
 		if (mSprite != null && mSprite.atlas != null)
 		{
-			List<UIAtlas.Sprite> sprites = mSprite.atlas.sprites;
+			List<UIAtlas.Sprite> sprites = mSprite.atlas.spriteList;
 
 			foreach (UIAtlas.Sprite sprite in sprites)
 			{
