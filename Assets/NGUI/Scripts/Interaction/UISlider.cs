@@ -170,6 +170,7 @@ public class UISlider : IgnoreTimeScale
 	{
 		// Clamp the input
 		float val = Mathf.Clamp01(input);
+		if (val < 0.001f) val = 0f;
 
 		// Save the raw value
 		rawValue = val;

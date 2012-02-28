@@ -41,6 +41,16 @@ public class UITextList : MonoBehaviour
 	protected int mTotalLines = 0;
 
 	/// <summary>
+	/// Clear the text.
+	/// </summary>
+
+	public void Clear ()
+	{
+		mParagraphs.Clear();
+		UpdateVisibleText();
+	}
+
+	/// <summary>
 	/// Add a new paragraph.
 	/// </summary>
 
