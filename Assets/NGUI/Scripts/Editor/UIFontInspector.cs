@@ -40,7 +40,7 @@ public class UIFontInspector : Editor
 
 		foreach (UILabel lbl in labels)
 		{
-			if (lbl.font == mFont)
+			if (UIFont.CheckIfRelated(lbl.font, mFont))
 			{
 				lbl.font = null;
 				lbl.font = mFont;

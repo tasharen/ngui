@@ -50,7 +50,7 @@ public class UIAtlasInspector : Editor
 
 		foreach (UILabel lbl in labels)
 		{
-			if (lbl.font != null && lbl.font.atlas == mAtlas && lbl.font.spriteName == mSprite.name)
+			if (lbl.font != null && UIAtlas.CheckIfRelated(lbl.font.atlas, mAtlas) && lbl.font.spriteName == mSprite.name)
 			{
 				UIFont font = lbl.font;
 				lbl.font = null;
