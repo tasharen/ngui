@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.81
+                Version 1.82
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -31,6 +31,16 @@ All can be found here: http://www.tasharen.com/?page_id=197
 -----------------
  Version History
 -----------------
+
+1.82:
+- NEW: It's now possible to specify a "replacement" value on UIAtlas and UIFonts, making swapping of atlases and fonts a trivial matter.
+- NEW: UICheckbox now has an option to allow unchecking the last item within a group.
+- FIX: Most cases of FindObjectsOfTypeAll has been replaced with FindSceneObjectsOfType instead.
+- FIX: UISliderColors now keeps the slider's alpha.
+- FIX: Edit-time modification of UISlider's 'rawValue' in the inspector will now again visibly move the slider.
+- FIX: UIWidget will no longer consider its geometry as changed every frame if there is nothing to draw (empty text labels).
+- FIX: Atlas Maker will now create a new font if the name of the font doesn't match.
+- OLD: NGUITools.ReplaceAtlas and Font functions have been deprecated.
 
 1.81:
 - NEW: UIInput can now be multi-line.
