@@ -109,7 +109,7 @@ public class UIAtlasMaker : EditorWindow
 	{
 		Dictionary<string, int> spriteList = new Dictionary<string, int>();
 
-		if (UISettings.atlas != null)
+		if (UISettings.atlas != null && UISettings.atlas.name == UISettings.atlasName)
 		{
 			List<string> spriteNames = UISettings.atlas.GetListOfSprites();
 			foreach (string sp in spriteNames) spriteList.Add(sp, 0);
@@ -593,7 +593,7 @@ public class UIAtlasMaker : EditorWindow
 					mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
 				}
 
-				if (UISettings.atlas == null)
+				if (UISettings.atlas == null || UISettings.atlas.name != UISettings.atlasName)
 				{
 					// Create a new prefab for the atlas
 #if UNITY_3_4
@@ -625,7 +625,7 @@ public class UIAtlasMaker : EditorWindow
 
 		List<Texture> textures = GetSelectedTextures();
 
-		if (UISettings.atlas != null)
+		if (UISettings.atlas != null && UISettings.atlas.name == UISettings.atlasName)
 		{
 			Material mat = UISettings.atlas.material;
 			Texture tex = UISettings.atlas.texture;
