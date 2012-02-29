@@ -12,10 +12,14 @@ using UnityEngine;
 [AddComponentMenu("NGUI/UI/Input (Basic)")]
 public class UIInput : MonoBehaviour
 {
+	static public UIInput current;
+
 	public UILabel label;
 	public int maxChars = 0;
 	public string caratChar = "|";
 	public Color activeColor = Color.white;
+	public GameObject eventReceiver;
+	public string functionName = "OnSubmit";
 
 	string mText = "";
 	string mDefaultText = "";
@@ -169,7 +173,10 @@ public class UIInput : MonoBehaviour
 			if (mKeyboard.done)
 			{
 				mKeyboard = null;
-				gameObject.SendMessage("OnSubmit", SendMessageOptions.DontRequireReceiver);
+				current = this;
+				if (eventReceiver == null) eventReceiver = gameObject;
+				eventReceiver.SendMessage(functionName, SendMessageOptions.DontRequireReceiver);
+				current = null;
 				selected = false;
 			}
 		}
@@ -207,7 +214,10 @@ public class UIInput : MonoBehaviour
 				else if (c == '\r' || c == '\n')
 				{
 					// Enter
-					gameObject.SendMessage("OnSubmit", SendMessageOptions.DontRequireReceiver);
+					current = this;
+					if (eventReceiver == null) eventReceiver = gameObject;
+					eventReceiver.SendMessage(functionName, SendMessageOptions.DontRequireReceiver);
+					current = null;
 					selected = false;
 					return;
 				}
