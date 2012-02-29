@@ -381,7 +381,7 @@ public class UIFont : MonoBehaviour
 	public void MarkAsDirty ()
 	{
 		mSprite = null;
-		UILabel[] labels = (UILabel[])Object.FindSceneObjectsOfType(typeof(UILabel));
+		UILabel[] labels = NGUITools.FindActive<UILabel>();
 
 		foreach (UILabel lbl in labels)
 		{

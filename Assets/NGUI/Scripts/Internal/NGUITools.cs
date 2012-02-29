@@ -175,13 +175,23 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Find all active objects of specified type.
+	/// </summary>
+
+	static public T[] FindActive<T> () where T : Component
+	{
+		return GameObject.FindSceneObjectsOfType(typeof(T)) as T[];
+	}
+
+	/// <summary>
 	/// Find the camera responsible for drawing the objects on the specified layer.
 	/// </summary>
 
 	static public Camera FindCameraForLayer (int layer)
 	{
 		int layerMask = 1 << layer;
-		Camera[] cameras = GameObject.FindSceneObjectsOfType(typeof(Camera)) as Camera[];
+
+		Camera[] cameras = NGUITools.FindActive<Camera>();
 
 		foreach (Camera cam in cameras)
 		{
@@ -232,7 +242,7 @@ static public class NGUITools
 	[Obsolete("Use UIAtlas.replacement instead")]
 	static public void ReplaceAtlas (UIAtlas before, UIAtlas after)
 	{
-		UISprite[] sprites = GameObject.FindSceneObjectsOfType(typeof(UISprite)) as UISprite[];
+		UISprite[] sprites = NGUITools.FindActive<UISprite>();
 		
 		foreach (UISprite sprite in sprites)
 		{
@@ -242,7 +252,7 @@ static public class NGUITools
 			}
 		}
 
-		UILabel[] labels = GameObject.FindSceneObjectsOfType(typeof(UILabel)) as UILabel[];
+		UILabel[] labels = NGUITools.FindActive<UILabel>();
 
 		foreach (UILabel lbl in labels)
 		{
@@ -260,7 +270,7 @@ static public class NGUITools
 	[Obsolete("Use UIFont.replacement instead")]
 	static public void ReplaceFont (UIFont before, UIFont after)
 	{
-		UILabel[] labels = GameObject.FindSceneObjectsOfType(typeof(UILabel)) as UILabel[];
+		UILabel[] labels = NGUITools.FindActive<UILabel>();
 
 		foreach (UILabel lbl in labels)
 		{

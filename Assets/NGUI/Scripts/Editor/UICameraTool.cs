@@ -156,10 +156,7 @@ public class UICameraTool : EditorWindow
 	{
 		EditorGUIUtility.LookLikeControls(80f);
 
-		Camera[] cams = GameObject.FindSceneObjectsOfType(typeof(Camera)) as Camera[];
-		List<Camera> list = new List<Camera>();
-
-		foreach (Camera c in cams) if (c.gameObject.hideFlags == 0) list.Add(c);
+		List<Camera> list = NGUIEditorTools.FindInScene<Camera>();
 
 		if (list.Count > 0)
 		{

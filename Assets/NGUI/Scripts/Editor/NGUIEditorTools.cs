@@ -454,13 +454,7 @@ public class NGUIEditorTools
 		if (go == null)
 		{
 			UIPanel[] panels = GameObject.FindSceneObjectsOfType(typeof(UIPanel)) as UIPanel[];
-
-			foreach (UIPanel p in panels)
-			{
-				if (!p.gameObject.active) continue;
-				go = p.gameObject;
-				break;
-			}
+			if (panels.Length > 0) go = panels[0].gameObject;
 		}
 
 		// Now find the first uniformly scaled object
@@ -749,5 +743,26 @@ public class NGUIEditorTools
 		{
 			Undo.RegisterSceneUndo(name);
 		}
+	}
+
+	/// <summary>
+	/// Find all scene components, active or inactive.
+	/// </summary>
+
+	static public List<T> FindInScene<T> () where T : Component
+	{
+		T[] comps = Resources.FindObjectsOfTypeAll(typeof(T)) as T[];
+
+		List<T> list = new List<T>();
+
+		foreach (T comp in comps)
+		{
+			if (comp.gameObject.hideFlags == 0)
+			{
+				string path = AssetDatabase.GetAssetPath(comp.gameObject);
+				if (string.IsNullOrEmpty(path)) list.Add(comp);
+			}
+		}
+		return list;
 	}
 }

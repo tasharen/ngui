@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 /// <summary>
 /// Inspector class used to view and edit UIFonts.
@@ -57,7 +58,7 @@ public class UIFontInspector : Editor
 
 	void MarkAsChanged ()
 	{
-		UILabel[] labels = GameObject.FindSceneObjectsOfType(typeof(UILabel)) as UILabel[];
+		List<UILabel> labels = NGUIEditorTools.FindInScene<UILabel>();
 
 		foreach (UILabel lbl in labels)
 		{

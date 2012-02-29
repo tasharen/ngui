@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 /// <summary>
 /// Inspector class used to edit the UIAtlas.
@@ -43,7 +44,7 @@ public class UIAtlasInspector : Editor
 	{
 		if (mSprite == null) return;
 
-		UISprite[] sprites = GameObject.FindSceneObjectsOfType(typeof(UISprite)) as UISprite[];
+		UISprite[] sprites = NGUITools.FindActive<UISprite>();
 
 		foreach (UISprite sp in sprites)
 		{
@@ -55,7 +56,7 @@ public class UIAtlasInspector : Editor
 			}
 		}
 
-		UILabel[] labels = GameObject.FindSceneObjectsOfType(typeof(UILabel)) as UILabel[];
+		UILabel[] labels = NGUITools.FindActive<UILabel>();
 
 		foreach (UILabel lbl in labels)
 		{

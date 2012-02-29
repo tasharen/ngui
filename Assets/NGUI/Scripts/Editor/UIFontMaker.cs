@@ -21,7 +21,7 @@ public class UIFontMaker : EditorWindow
 	{
 		if (UISettings.font != null)
 		{
-			UILabel[] labels = GameObject.FindSceneObjectsOfType(typeof(UILabel)) as UILabel[];
+			List<UILabel> labels = NGUIEditorTools.FindInScene<UILabel>();
 
 			foreach (UILabel lbl in labels)
 			{

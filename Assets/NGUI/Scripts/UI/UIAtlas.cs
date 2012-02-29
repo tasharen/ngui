@@ -245,7 +245,7 @@ public class UIAtlas : MonoBehaviour
 
 	public void MarkAsDirty ()
 	{
-		UISprite[] list = (UISprite[])GameObject.FindSceneObjectsOfType(typeof(UISprite));
+		UISprite[] list = NGUITools.FindActive<UISprite>();
 
 		foreach (UISprite sp in list)
 		{
@@ -259,7 +259,7 @@ public class UIAtlas : MonoBehaviour
 			}
 		}
 
-		UIFont[] fonts = (UIFont[])GameObject.FindSceneObjectsOfType(typeof(UIFont));
+		UIFont[] fonts = NGUITools.FindActive<UIFont>();
 
 		foreach (UIFont font in fonts)
 		{
@@ -273,7 +273,7 @@ public class UIAtlas : MonoBehaviour
 			}
 		}
 
-		UILabel[] labels = (UILabel[])GameObject.FindSceneObjectsOfType(typeof(UILabel));
+		UILabel[] labels = NGUITools.FindActive<UILabel>();
 
 		foreach (UILabel lbl in labels)
 		{

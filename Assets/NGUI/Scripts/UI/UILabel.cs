@@ -443,8 +443,10 @@ public class UILabel : UIWidget
 			uvs.Add(uvs.buffer[i]);
 			cols.Add(cols.buffer[i]);
 
-			verts.buffer[i].x += x;
-			verts.buffer[i].y += y;
+			Vector3 v = verts.buffer[i];
+			v.x += x;
+			v.y += y;
+			verts.buffer[i] = v;
 			cols.buffer[i] = c;
 		}
 	}

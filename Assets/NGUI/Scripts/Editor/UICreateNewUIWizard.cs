@@ -71,15 +71,17 @@ public class UICreateNewUIWizard : EditorWindow
 		if (camType == CameraType.Simple2D)
 		{
 			root = new GameObject("UI Root (2D)");
+			root.AddComponent<UIRoot>();
 		}
 		else
 		{
 			root = new GameObject((camType == CameraType.Advanced3D) ? "UI Root (3D)" : "UI Root");
 			root.transform.localScale = new Vector3(0.0025f, 0.0025f, 0.0025f);
-		}
 
-		// Each UI should start off with a root
-		root.AddComponent<UIRoot>();
+			UIRoot uiRoot = root.AddComponent<UIRoot>();
+			uiRoot.automatic = false;
+			uiRoot.manualHeight = 800;
+		}
 
 		// Assign the layer to be used by everything
 		root.layer = layer;
@@ -97,14 +99,11 @@ public class UICreateNewUIWizard : EditorWindow
 			float depth = -1f;
 			bool clearColor = true;
 			bool audioListener = true;
-			Camera[] cameras = GameObject.FindSceneObjectsOfType(typeof(Camera)) as Camera[];
+
+			List<Camera> cameras = NGUIEditorTools.FindInScene<Camera>();
 
 			foreach (Camera c in cameras)
 			{
-				if (!c.gameObject.active) continue;
-				if (c.name == "Preview Camera") continue;
-				if (c.name == "SceneCamera") continue;
-
 				// Choose the maximum depth
 				depth = Mathf.Max(depth, c.depth);
 
@@ -139,7 +138,7 @@ public class UICreateNewUIWizard : EditorWindow
 			}
 
 			// We don't want to clear color if this is not the first camera
-			if (cameras.Length > 0) cam.clearFlags = clearColor ? CameraClearFlags.Skybox : CameraClearFlags.Depth;
+			if (cameras.Count > 0) cam.clearFlags = clearColor ? CameraClearFlags.Skybox : CameraClearFlags.Depth;
 
 			// Add an audio listener if we need one
 			if (audioListener) cam.gameObject.AddComponent<AudioListener>();

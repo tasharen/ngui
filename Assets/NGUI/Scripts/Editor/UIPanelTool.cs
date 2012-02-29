@@ -37,17 +37,16 @@ public class UIPanelTool : EditorWindow
 
 	static List<UIPanel> GetListOfPanels ()
 	{
-		UIPanel[] panels = GameObject.FindSceneObjectsOfType(typeof(UIPanel)) as UIPanel[];
-		if (panels == null || panels.Length == 0) return null;
+		List<UIPanel> panels = NGUIEditorTools.FindInScene<UIPanel>();
 
-		List<UIPanel> list = new List<UIPanel>();
-
-		foreach (UIPanel panel in panels)
+		for (int i = panels.Count; i > 0; )
 		{
-			if (!panel.showInPanelTool) continue;
-			list.Add(panel);
+			if (!panels[--i].showInPanelTool)
+			{
+				panels.RemoveAt(i);
+			}
 		}
-		return list;
+		return panels;
 	}
 
 	/// <summary>
