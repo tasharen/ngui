@@ -222,7 +222,7 @@ public class UISlider : IgnoreTimeScale
 				thumb.localPosition = pos;
 			}
 
-			if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+			if (eventReceiver != null && !string.IsNullOrEmpty(functionName) && Application.isPlaying)
 			{
 				current = this;
 				eventReceiver.SendMessage(functionName, mStepValue, SendMessageOptions.DontRequireReceiver);
