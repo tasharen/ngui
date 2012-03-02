@@ -11,7 +11,7 @@ public class UISavedOption : MonoBehaviour
 	/// Load and set the state of the checkboxes.
 	/// </summary>
 
-	void Awake ()
+	void OnEnable ()
 	{
 		string s = PlayerPrefs.GetString("NGUI State: " + name);
 		
@@ -21,7 +21,8 @@ public class UISavedOption : MonoBehaviour
 
 			foreach (UICheckbox ch in checkboxes)
 			{
-				ch.startsChecked = (ch.name == s);
+				UIEventListener.Add(ch.gameObject).onClick -= Save;
+				ch.isChecked = (ch.name == s);
 				UIEventListener.Add(ch.gameObject).onClick += Save;
 			}
 		}

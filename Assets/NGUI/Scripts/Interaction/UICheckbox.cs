@@ -24,13 +24,18 @@ public class UICheckbox : MonoBehaviour
 	public bool optionCanBeNone = false;
 
 	bool mChecked = true;
+	bool mStarted = false;
 	Transform mTrans;
 
 	/// <summary>
 	/// Whether the checkbox is checked.
 	/// </summary>
 
-	public bool isChecked { get { return mChecked; } set { if (!option || value || optionCanBeNone) Set(value); } }
+	public bool isChecked
+	{
+		get { return mChecked; }
+		set { if (!option || value || optionCanBeNone || !mStarted) Set(value); }
+	}
 
 	/// <summary>
 	/// Activate the initial state.
@@ -41,6 +46,7 @@ public class UICheckbox : MonoBehaviour
 		mTrans = transform;
 		if (eventReceiver == null) eventReceiver = gameObject;
 		mChecked = !startsChecked;
+		mStarted = true;
 		Set(startsChecked);
 	}
 
@@ -56,7 +62,11 @@ public class UICheckbox : MonoBehaviour
 
 	void Set (bool state)
 	{
-		if (mChecked != state)
+		if (!mStarted)
+		{
+			startsChecked = state;
+		}
+		else if (mChecked != state)
 		{
 			// Uncheck all other checkboxes
 			if (option && state)
