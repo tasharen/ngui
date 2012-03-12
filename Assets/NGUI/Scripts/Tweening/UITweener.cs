@@ -71,7 +71,7 @@ public abstract class UITweener : IgnoreTimeScale
 	/// Amount advanced per delta time.
 	/// </summary>
 
-	float amountPerDelta
+	public float amountPerDelta
 	{
 		get
 		{
