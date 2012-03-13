@@ -8,12 +8,14 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/Examples/Equipment")]
 public class InvEquipment : MonoBehaviour
 {
-	/// <summary>
-	/// List of items that have been equipped.
-	/// </summary>
-
 	InvGameItem[] mItems;
 	InvAttachmentPoint[] mAttachments;
+
+	/// <summary>
+	/// List of equipped items (with a finite number of equipment slots).
+	/// </summary>
+
+	public InvGameItem[] equippedItems { get { return mItems; } }
 
 	/// <summary>
 	/// Equip the specified item automatically replacing an existing one.

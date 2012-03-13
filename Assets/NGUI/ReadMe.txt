@@ -28,6 +28,8 @@ If you have a Standard Edition:
 
 All can be found here: http://www.tasharen.com/?page_id=197
 
+Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.com/?topic=using-ngui-from-javascript-unityscript
+
 -----------------
  Version History
 -----------------
