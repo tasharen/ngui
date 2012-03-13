@@ -168,7 +168,7 @@ public class UIAtlas : MonoBehaviour
 		}
 		set
 		{
-			if (mReplacement != value)
+			if (mReplacement != value && mReplacement != this && (mReplacement == null || mReplacement.replacement != this))
 			{
 				if (mReplacement != null) MarkAsDirty();
 				mReplacement = value;
