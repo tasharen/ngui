@@ -603,10 +603,10 @@ public class UICreateWidgetWizard : EditorWindow
 			lbl.MakePixelPerfect();
 
 			// Add a collider to the background
-			NGUITools.AddWidgetCollider(bg.gameObject);
+			NGUITools.AddWidgetCollider(go);
 
 			// Add an input script to the background and have it point to the label
-			UIInput input = bg.gameObject.AddComponent<UIInput>();
+			UIInput input = go.AddComponent<UIInput>();
 			input.label = lbl;
 
 			// Update the selection
