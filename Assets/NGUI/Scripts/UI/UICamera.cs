@@ -40,8 +40,6 @@ public class UICamera : MonoBehaviour
 		public GameObject current;	// The current game object under the touch or mouse
 		public GameObject hover;	// The last game object to receive OnHover
 		public GameObject pressed;	// The last game object to receive OnPress
-
-		public bool considerForClick = false;
 	}
 
 	class Highlighted
@@ -658,9 +656,6 @@ public class UICamera : MonoBehaviour
 			if (mTooltip != null) ShowTooltip(false);
 			touch.totalDelta += touch.delta;
 			touch.pressed.SendMessage("OnDrag", touch.delta, SendMessageOptions.DontRequireReceiver);
-
-			float threshold = (touch == mMouse) ? 5f : 30f;
-			if (touch.totalDelta.magnitude > threshold) touch.considerForClick = false;
 		}
 
 		// Send out the press message
@@ -668,7 +663,6 @@ public class UICamera : MonoBehaviour
 		{
 			if (mTooltip != null) ShowTooltip(false);
 			touch.pressed = touch.current;
-			touch.considerForClick = true;
 			touch.totalDelta = Vector2.zero;
 			if (touch.pressed != null) touch.pressed.SendMessage("OnPress", true, SendMessageOptions.DontRequireReceiver);
 
@@ -704,7 +698,7 @@ public class UICamera : MonoBehaviour
 					{
 						mSel = touch.pressed;
 					}
-					if (touch.considerForClick) touch.pressed.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
+					if (touch.pressed == touch.current) touch.pressed.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
 				}
 				else // The button/touch was released on a different object
 				{

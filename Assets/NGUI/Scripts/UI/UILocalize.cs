@@ -46,8 +46,8 @@ public class UILocalize : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Localize the widget on start.
+	/// Localize the widget on enable.
 	/// </summary>
 
-	void Start () { if (Localization.instance != null) OnLocalize(Localization.instance); }
+	void OnEnable () { if (Localization.instance != null) OnLocalize(Localization.instance); }
 }

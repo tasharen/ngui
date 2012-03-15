@@ -44,7 +44,7 @@ public class UISlicedSprite : UISprite
 
 		if (tex != null && sprite != null)
 		{
-			if (mInner != mSprite.inner || mOuter != mSprite.outer || cachedTransform.localScale != mScale)
+			if (cachedTransform.localScale != mScale || mInner != mSprite.inner || mOuter != mSprite.outer)
 			{
 				mInner = mSprite.inner;
 				mOuter = mSprite.outer;
