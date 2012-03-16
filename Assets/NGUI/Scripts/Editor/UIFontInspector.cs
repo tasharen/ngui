@@ -125,6 +125,12 @@ public class UIFontInspector : Editor
 
 		if (mFont.atlas != null)
 		{
+			if (mFont.bmFont.LegacyCheck())
+			{
+				Debug.Log(mFont.name + " uses a legacy font data structure. Upgrading, please save.");
+				EditorUtility.SetDirty(mFont);
+			}
+
 			if (mFont.bmFont.isValid)
 			{
 				string spriteName = UISlicedSpriteInspector.SpriteField(mFont.atlas, mFont.spriteName);

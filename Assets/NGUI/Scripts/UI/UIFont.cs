@@ -345,11 +345,7 @@ public class UIFont : MonoBehaviour
 			int xMax = Mathf.RoundToInt(trimmed.xMax - full.xMin);
 			int yMax = Mathf.RoundToInt(trimmed.yMax - full.yMin);
 
-			for (int i = 0; i < mFont.glyphCount; ++i)
-			{
-				BMGlyph glyph = mFont.GetGlyph(i);
-				if (glyph != null) glyph.Trim(xMin, yMin, xMax, yMax);
-			}
+			mFont.Trim(xMin, yMin, xMax, yMax);
 		}
 	}
 

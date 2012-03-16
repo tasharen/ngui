@@ -19,6 +19,7 @@ public class BMGlyph
 		public int amount;
 	}
 
+	public int index;	// Index of this glyph (used by BMFont)
 	public int x;		// Offset from the left side of the texture to the left side of the glyph
 	public int y;		// Offset from the top of the texture to the top of the glyph
 	public int width;	// Glyph's width in pixels

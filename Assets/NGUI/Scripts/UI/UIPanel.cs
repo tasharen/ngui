@@ -424,7 +424,8 @@ public class UIPanel : MonoBehaviour
 	void Start ()
 	{
 		mLayer = gameObject.layer;
-		mCam = NGUITools.FindCameraForLayer(mLayer);
+		UICamera uic = UICamera.FindCameraForLayer(mLayer);
+		mCam = (uic != null) ? uic.cachedCamera : NGUITools.FindCameraForLayer(mLayer);
 	}
 
 	/// <summary>
@@ -728,7 +729,8 @@ public class UIPanel : MonoBehaviour
 		if (mLayer != gameObject.layer)
 		{
 			mLayer = gameObject.layer;
-			mCam = NGUITools.FindCameraForLayer(mLayer);
+			UICamera uic = UICamera.FindCameraForLayer(mLayer);
+			mCam = (uic != null) ? uic.cachedCamera : NGUITools.FindCameraForLayer(mLayer);
 			SetChildLayer(cachedTransform, mLayer);
 			foreach (UIDrawCall dc in drawCalls) dc.gameObject.layer = mLayer;
 		}
@@ -791,11 +793,13 @@ public class UIPanel : MonoBehaviour
 		Vector2 minArea = new Vector2(clipRange.x - offsetX, clipRange.y - offsetY);
 		Vector2 maxArea = new Vector2(clipRange.x + offsetX, clipRange.y + offsetY);
 
-		minArea.x += clipSoftness.x;
-		minArea.y += clipSoftness.y;
-		maxArea.x -= clipSoftness.x;
-		maxArea.y -= clipSoftness.y;
-
+		if (clipping == UIDrawCall.Clipping.SoftClip)
+		{
+			minArea.x += clipSoftness.x;
+			minArea.y += clipSoftness.y;
+			maxArea.x -= clipSoftness.x;
+			maxArea.y -= clipSoftness.y;
+		}
 		return NGUIMath.ConstrainRect(minRect, maxRect, minArea, maxArea);
 	}
 
