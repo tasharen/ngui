@@ -38,6 +38,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: Changed the way the font data is stored, resulting in potentially better loading performance on mobile devices.
 - FIX: UIPanel.Start() should now find cameras faster.
 - FIX: UIPanel will no longer use the clipping softness value unless soft clipping is actually used.
+- FIX: The way click / drag was handled has been changed a bit. It should now be easier to click buttons on retina screens.
 
 1.83:
 - NEW: Added a simple script that can save the state of the checkbox (or a group of checkboxes) to player prefs.
