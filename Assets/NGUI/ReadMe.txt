@@ -8,8 +8,8 @@
 
 Thank you for buying NGUI!
 
-If you have any questions, suggestions, comments or feature requests, please don't hesitate to
-email support@tasharen.com, PM 'ArenMook' on the Unity forums, or add 'arenmook' to Skype.
+If you have any questions, suggestions, comments or feature requests, please
+drop by the NGUI forum, found here: http://www.tasharen.com/?forum=ngui
 
 --------------------
  How To Update NGUI
