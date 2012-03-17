@@ -136,10 +136,13 @@ public class UISlider : IgnoreTimeScale
 	void UpdateDrag ()
 	{
 		// Create a plane for the slider
-		if (mCol == null || UICamera.lastCamera == null) return;
+		if (mCol == null || UICamera.currentCamera == null || UICamera.currentTouch == null) return;
+
+		// Don't consider the slider for click events
+		UICamera.currentTouch.clickNotification = UICamera.ClickNotification.None;
 
 		// Create a ray and a plane
-		Ray ray = UICamera.lastCamera.ScreenPointToRay(UICamera.lastTouchPosition);
+		Ray ray = UICamera.currentCamera.ScreenPointToRay(UICamera.currentTouch.pos);
 		Plane plane = new Plane(mTrans.rotation * Vector3.back, mTrans.position);
 
 		// If the ray doesn't hit the plane, do nothing

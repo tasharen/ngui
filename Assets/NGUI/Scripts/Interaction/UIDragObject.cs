@@ -103,7 +103,7 @@ public class UIDragObject : IgnoreTimeScale
 				mLastPos = UICamera.lastHit.point;
 
 				// Create the plane to drag along
-				Transform trans = UICamera.lastCamera.transform;
+				Transform trans = UICamera.currentCamera.transform;
 				mPlane = new Plane((mPanel != null ? mPanel.cachedTransform.rotation : trans.rotation) * Vector3.back, mLastPos);
 			}
 			else if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None && dragEffect == DragEffect.MomentumAndSpring)
@@ -121,7 +121,9 @@ public class UIDragObject : IgnoreTimeScale
 	{
 		if (enabled && gameObject.active && target != null)
 		{
-			Ray ray = UICamera.lastCamera.ScreenPointToRay(UICamera.lastTouchPosition);
+			UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
+
+			Ray ray = UICamera.currentCamera.ScreenPointToRay(UICamera.currentTouch.pos);
 			float dist = 0f;
 
 			if (mPlane.Raycast(ray, out dist))

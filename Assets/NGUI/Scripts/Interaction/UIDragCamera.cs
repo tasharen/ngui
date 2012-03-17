@@ -104,6 +104,8 @@ public class UIDragCamera : IgnoreTimeScale
 	{
 		if (target != null)
 		{
+			UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
+
 			Vector3 offset = Vector3.Scale((Vector3)delta, -scale);
 			mTrans.localPosition += offset;
 

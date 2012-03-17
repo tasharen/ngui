@@ -128,7 +128,7 @@ public class UIInput : MonoBehaviour
 					Vector3 offset = label.pivotOffset;
 					offset.y += label.relativeSize.y;
 					offset = t.TransformPoint(offset);
-					Input.compositionCursorPos = UICamera.lastCamera.WorldToScreenPoint(offset);
+					Input.compositionCursorPos = UICamera.currentCamera.WorldToScreenPoint(offset);
 					UpdateLabel();
 				}
 			}

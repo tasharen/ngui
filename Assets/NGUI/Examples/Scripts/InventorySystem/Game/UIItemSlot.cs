@@ -69,6 +69,7 @@ public abstract class UIItemSlot : MonoBehaviour
 	{
 		if (mDraggedItem == null && mItem != null)
 		{
+			UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
 			mDraggedItem = Replace(null);
 			NGUITools.PlaySound(grabSound);
 			UpdateCursor();
