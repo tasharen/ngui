@@ -688,7 +688,25 @@ public class UICamera : MonoBehaviour
 		{
 			if (mTooltip != null) ShowTooltip(false);
 			currentTouch.totalDelta += currentTouch.delta;
+
+			bool isDisabled = (currentTouch.clickNotification == ClickNotification.None);
 			currentTouch.pressed.SendMessage("OnDrag", currentTouch.delta, SendMessageOptions.DontRequireReceiver);
+
+			if (isDisabled)
+			{
+				// If the notification status has already been disabled, keep it as such
+				currentTouch.clickNotification = ClickNotification.None;
+			}
+			else if (currentTouch.clickNotification == ClickNotification.BasedOnDelta)
+			{
+				// If the notification is based on delta and the delta gets exceeded, disable the notification
+				float threshold = (currentTouch == mMouse) ? 10f : Screen.height * 0.1f;
+
+				if (currentTouch.totalDelta.magnitude > threshold)
+				{
+					currentTouch.clickNotification = ClickNotification.None;
+				}
+			}
 		}
 
 		// Send out the press message
@@ -731,13 +749,6 @@ public class UICamera : MonoBehaviour
 					else
 					{
 						mSel = currentTouch.pressed;
-					}
-
-					// If the touch should consider clicks based on delta, check the delta
-					if (currentTouch.clickNotification == ClickNotification.BasedOnDelta)
-					{
-						float threshold = (currentTouch == mMouse) ? 10f : Screen.height * 0.1f;
-						if (currentTouch.totalDelta.magnitude < threshold) currentTouch.clickNotification = ClickNotification.Always;
 					}
 
 					// If the touch should consider clicks, send out an OnClick notification
