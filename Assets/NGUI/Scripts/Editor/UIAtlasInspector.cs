@@ -78,12 +78,12 @@ public class UIAtlasInspector : Editor
 	{
 		if (mReplacement != obj)
 		{
-			mReplacement = obj as UIAtlas;
-
 			// Undo doesn't work correctly in this case... so I won't bother.
 			//NGUIEditorTools.RegisterUndo("Atlas Change");
 			//NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
-			mAtlas.replacement = mReplacement;
+
+			mAtlas.replacement = obj as UIAtlas;
+			mReplacement = mAtlas.replacement;
 			UnityEditor.EditorUtility.SetDirty(mAtlas);
 			if (mReplacement == null) mType = AtlasType.Normal;
 		}

@@ -168,10 +168,14 @@ public class UIAtlas : MonoBehaviour
 		}
 		set
 		{
-			if (mReplacement != value && mReplacement != this && (mReplacement == null || mReplacement.replacement != this))
+			UIAtlas rep = value;
+			if (rep == this) rep = null;
+
+			if (mReplacement != rep)
 			{
+				if (rep != null && rep.replacement == this) rep.replacement = null;
 				if (mReplacement != null) MarkAsDirty();
-				mReplacement = value;
+				mReplacement = rep;
 				MarkAsDirty();
 			}
 		}
@@ -251,8 +255,9 @@ public class UIAtlas : MonoBehaviour
 		{
 			if (CheckIfRelated(this, sp.atlas))
 			{
+				UIAtlas atl = sp.atlas;
 				sp.atlas = null;
-				sp.atlas = this;
+				sp.atlas = atl;
 #if UNITY_EDITOR
 				UnityEditor.EditorUtility.SetDirty(sp);
 #endif
@@ -265,8 +270,9 @@ public class UIAtlas : MonoBehaviour
 		{
 			if (CheckIfRelated(this, font.atlas))
 			{
+				UIAtlas atl = font.atlas;
 				font.atlas = null;
-				font.atlas = this;
+				font.atlas = atl;
 #if UNITY_EDITOR
 				UnityEditor.EditorUtility.SetDirty(font);
 #endif

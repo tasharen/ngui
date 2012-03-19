@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.84
+                Version 1.84c
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -39,6 +39,8 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: UIPanel.Start() should now find cameras faster.
 - FIX: UIPanel will no longer use the clipping softness value unless soft clipping is actually used.
 - FIX: The way click / drag was handled has been changed a bit. It should now be easier to click buttons on retina screens.
+- FIX: Rebuilding an atlas was not updating fonts correctly.
+- FIX: Couple of tweaks to UIAtlas and UIFont's replacement feature.
 
 1.83:
 - NEW: Added a simple script that can save the state of the checkbox (or a group of checkboxes) to player prefs.

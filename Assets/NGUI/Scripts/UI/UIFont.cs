@@ -317,10 +317,14 @@ public class UIFont : MonoBehaviour
 		}
 		set
 		{
-			if (mReplacement != value)
+			UIFont rep = value;
+			if (rep == this) rep = null;
+
+			if (mReplacement != rep)
 			{
+				if (rep != null && rep.replacement == this) rep.replacement = null;
 				if (mReplacement != null) MarkAsDirty();
-				mReplacement = value;
+				mReplacement = rep;
 				MarkAsDirty();
 			}
 		}
@@ -383,8 +387,9 @@ public class UIFont : MonoBehaviour
 		{
 			if (lbl.enabled && lbl.gameObject.active && CheckIfRelated(this, lbl.font))
 			{
+				UIFont fnt = lbl.font;
 				lbl.font = null;
-				lbl.font = this;
+				lbl.font = fnt;
 			}
 		}
 	}
