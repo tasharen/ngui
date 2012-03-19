@@ -259,7 +259,7 @@ public class UIAtlas : MonoBehaviour
 			}
 		}
 
-		UIFont[] fonts = NGUITools.FindActive<UIFont>();
+		UIFont[] fonts = Resources.FindObjectsOfTypeAll(typeof(UIFont)) as UIFont[];
 
 		foreach (UIFont font in fonts)
 		{
