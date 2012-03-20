@@ -86,7 +86,7 @@ public class ActiveAnimation : IgnoreTimeScale
 
 				if (mDisableDirection != Direction.Toggle && mLastDirection == mDisableDirection)
 				{
-					gameObject.SetActiveRecursively(false);
+					NGUITools.SetActive(gameObject, false);
 				}
 			}
 		}
@@ -155,7 +155,7 @@ public class ActiveAnimation : IgnoreTimeScale
 			if (enableBeforePlay != EnableCondition.EnableThenPlay) return null;
 
 			// Enable the game object before animating it
-			anim.gameObject.SetActiveRecursively(true);
+			NGUITools.SetActive(anim.gameObject, true);
 		}
 
 		ActiveAnimation aa = anim.GetComponent<ActiveAnimation>();

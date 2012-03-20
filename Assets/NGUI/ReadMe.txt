@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.84c
+                Version 1.85
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -33,6 +33,11 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+1.85:
+- NEW: Added Example 12: Better Scroll View.
+- NEW: Added a script that can be used to efficiently drag the contents of the panel: UIDragPanelContents.
+- NEW: Added a function replacement for SetActiveRecursively (NGUITools.SetActive), since the former has rare odd issues.
 
 1.84:
 - FIX: Changed the way the font data is stored, resulting in potentially better loading performance on mobile devices.

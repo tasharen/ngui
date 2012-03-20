@@ -36,7 +36,7 @@ public class NGUISelectionTools
 		{
 			GameObject[] gos = Selection.gameObjects;
 			bool val = !Selection.activeGameObject.active;
-			foreach (GameObject go in gos) go.SetActiveRecursively(val);
+			foreach (GameObject go in gos) NGUITools.SetActive(go, val);
 		}
 	}
 	

@@ -77,7 +77,7 @@ public class UIButtonTween : MonoBehaviour
 
 			if (isFinished)
 			{
-				tweenTarget.SetActiveRecursively(false);
+				NGUITools.SetActive(tweenTarget, false);
 				mTweens = null;
 			}
 		}
@@ -97,7 +97,7 @@ public class UIButtonTween : MonoBehaviour
 			if (ifDisabledOnPlay != EnableCondition.EnableThenPlay) return;
 
 			// Enable the game object before tweening it
-			go.SetActiveRecursively(true);
+			NGUITools.SetActive(go, true);
 		}
 
 		// Gather the tweening components
@@ -106,7 +106,7 @@ public class UIButtonTween : MonoBehaviour
 		if (mTweens.Length == 0)
 		{
 			// No tweeners found -- should we disable the object?
-			if (disableWhenFinished != DisableCondition.DoNotDisable) tweenTarget.SetActiveRecursively(false);
+			if (disableWhenFinished != DisableCondition.DoNotDisable) NGUITools.SetActive(tweenTarget, false);
 		}
 		else
 		{
@@ -123,7 +123,7 @@ public class UIButtonTween : MonoBehaviour
 					if (!activated && !go.active)
 					{
 						activated = true;
-						go.SetActiveRecursively(true);
+						NGUITools.SetActive(go, true);
 					}
 
 					// Toggle or activate the tween component

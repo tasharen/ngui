@@ -85,6 +85,9 @@ public class UIPanel : MonoBehaviour
 	// When traversing through the child dictionary, deleted values are stored here
 	List<Transform> mRemoved = new List<Transform>();
 
+	// Whether the panel should check the visibility of its widgets (set when the clip range changes).
+	bool mCheckVisibility = false;
+
 #if UNITY_EDITOR
 	// Screen size, saved for gizmos, since Screen.width and Screen.height returns the Scene view's dimensions in OnDrawGizmos.
 	Vector2 mScreenSize = Vector2.one;
@@ -139,6 +142,7 @@ public class UIPanel : MonoBehaviour
 		{
 			if (mClipping != value)
 			{
+				mCheckVisibility = true;
 				mClipping = value;
 				UpdateDrawcalls();
 			}
@@ -159,6 +163,7 @@ public class UIPanel : MonoBehaviour
 		{
 			if (mClipRange != value)
 			{
+				mCheckVisibility = true;
 				mClipRange = value;
 				UpdateDrawcalls();
 			}
@@ -533,7 +538,7 @@ public class UIPanel : MonoBehaviour
 
 	void UpdateTransforms ()
 	{
-		bool transformsChanged = false;
+		bool transformsChanged = mCheckVisibility;
 
 		// Check to see if something has changed
 		foreach (KeyValuePair<Transform, UINode> child in mChildren)
@@ -545,7 +550,7 @@ public class UIPanel : MonoBehaviour
 				mRemoved.Add(node.trans);
 				continue;
 			}
-			
+
 			if (node.HasChanged())
 			{
 				node.changeFlag = 1;
@@ -554,7 +559,7 @@ public class UIPanel : MonoBehaviour
 			else node.changeFlag = -1;
 		}
 
-		// Clean up deleted transforms
+		// Clean up the deleted transforms
 		foreach (Transform rem in mRemoved) mChildren.Remove(rem);
 		mRemoved.Clear();
 
@@ -573,25 +578,26 @@ public class UIPanel : MonoBehaviour
 					// If the change flag has not yet been determined...
 					if (pc.changeFlag == -1) pc.changeFlag = GetChangeFlag(pc);
 
-					if (pc.changeFlag == 1)
+					// Is the widget visible?
+					int visibleFlag = (mCheckVisibility || pc.changeFlag == 1) ? (IsVisible(pc.widget) ? 1 : 0) : pc.visibleFlag;
+
+					// If visibility changed, mark the node as changed as well
+					if (pc.visibleFlag != visibleFlag) pc.changeFlag = 1;
+
+					// If the node has changed and the widget is visible (or was visible before)
+					if (pc.changeFlag == 1 && (visibleFlag == 1 || pc.visibleFlag != 0))
 					{
-						// Is the widget visible?
-						int visibleFlag = IsVisible(pc.widget) ? 1 : 0;
+						// Update the visibility flag
+						pc.visibleFlag = visibleFlag;
+						Material mat = pc.widget.material;
 
-						// If the widget is visible (or the flag hasn't been set yet)
-						if (visibleFlag == 1 || pc.visibleFlag != 0)
-						{
-							// Update the visibility flag
-							pc.visibleFlag = visibleFlag;
-							Material mat = pc.widget.material;
-
-							// Add this material to the list of changed materials
-							if (!mChanged.Contains(mat)) mChanged.Add(mat);
-						}
+						// Add this material to the list of changed materials
+						if (!mChanged.Contains(mat)) mChanged.Add(mat);
 					}
 				}
 			}
 		}
+		mCheckVisibility = false;
 	}
 
 	/// <summary>
@@ -745,7 +751,11 @@ public class UIPanel : MonoBehaviour
 		}
 
 		// Fill the draw calls for all of the changed materials
-		foreach (Material mat in mChanged) Fill(mat);
+		foreach (Material mat in mChanged)
+		{
+			//Debug.Log(Time.time);
+			Fill(mat);
+		}
 
 		// Update the clipping rects
 		UpdateDrawcalls();

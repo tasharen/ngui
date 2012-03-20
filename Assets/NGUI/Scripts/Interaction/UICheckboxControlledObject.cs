@@ -18,6 +18,6 @@ public class UICheckboxControlledObject : MonoBehaviour
 
 	void OnActivate (bool isActive)
 	{
-		if (target != null) target.SetActiveRecursively(inverse ? !isActive : isActive);
+		if (target != null) NGUITools.SetActive(target, inverse ? !isActive : isActive);
 	}
 }

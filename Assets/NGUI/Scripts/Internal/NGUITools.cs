@@ -461,4 +461,49 @@ static public class NGUITools
 		}
 		return false;
 	}
+
+	/// <summary>
+	/// Activate the specified object and all of its children.
+	/// </summary>
+
+	static void Activate (Transform t)
+	{
+		t.gameObject.active = true;
+		
+		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
+		{
+			Transform child = t.GetChild(i);
+			Activate(child);
+		}
+	}
+
+	/// <summary>
+	/// Deactivate the specified obejct and all of its children.
+	/// </summary>
+
+	static void Deactivate (Transform t)
+	{
+		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
+		{
+			Transform child = t.GetChild(i);
+			Deactivate(child);
+		}
+		t.gameObject.active = false;
+	}
+
+	/// <summary>
+	/// SetActiveRecursively has some strange side-effects... better to do it manually.
+	/// </summary>
+
+	static public void SetActive (GameObject go, bool state)
+	{
+		if (state)
+		{
+			Activate(go.transform);
+		}
+		else
+		{
+			Deactivate(go.transform);
+		}
+	}
 }
