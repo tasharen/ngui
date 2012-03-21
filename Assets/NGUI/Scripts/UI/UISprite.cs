@@ -50,6 +50,8 @@ public class UISprite : UIWidget
 			if (mAtlas != value)
 			{
 				mAtlas = value;
+				mSpriteSet = false;
+				mSprite = null;
 
 				// Update the material
 				material = (mAtlas != null) ? mAtlas.spriteMaterial : null;
@@ -97,14 +99,14 @@ public class UISprite : UIWidget
 
 				// Clear the sprite name and the sprite reference
 				mSpriteName = "";
-				sprite = null;
+				mSprite = null;
 				mChanged = true;
 			}
 			else if (mSpriteName != value)
 			{
 				// If the sprite name changes, the sprite reference should also be updated
 				mSpriteName = value;
-				sprite = (mAtlas != null) ? mAtlas.GetSprite(mSpriteName) : null;
+				mSprite = null;
 				mChanged = true;
 				if (mSprite != null) UpdateUVs();
 			}
@@ -120,6 +122,20 @@ public class UISprite : UIWidget
 		get
 		{
 			if (!mSpriteSet) mSprite = null;
+
+			if (mSprite == null && mAtlas != null)
+			{
+				if (!string.IsNullOrEmpty(mSpriteName))
+				{
+					sprite = mAtlas.GetSprite(mSpriteName);
+				}
+
+				if (mSprite == null && mAtlas.spriteList.Count > 0)
+				{
+					sprite = mAtlas.spriteList[0];
+					mSpriteName = mSprite.name;
+				}
+			}
 			return mSprite;
 		}
 		set
@@ -137,11 +153,6 @@ public class UISprite : UIWidget
 	{
 		get
 		{
-			if (sprite == null && mAtlas != null && !string.IsNullOrEmpty(mSpriteName))
-			{
-				sprite = mAtlas.GetSprite(mSpriteName);
-			}
-
 			Vector2 v = Vector2.zero;
 
 			if (mSprite != null)
@@ -217,7 +228,6 @@ public class UISprite : UIWidget
 		if (mAtlas != null)
 		{
 			if (material == null) material = mAtlas.spriteMaterial;
-			if (sprite == null) sprite = string.IsNullOrEmpty(mSpriteName) ? null : mAtlas.GetSprite(mSpriteName);
 		}
 	}
 
