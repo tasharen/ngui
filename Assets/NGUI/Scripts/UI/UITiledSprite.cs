@@ -51,8 +51,9 @@ public class UITiledSprite : UISlicedSprite
 		}
 
 		Vector2 scale = cachedTransform.localScale;
-		float width  = Mathf.Abs(rect.width / scale.x);
-		float height = Mathf.Abs(rect.height / scale.y);
+		float pixelSize = atlas.pixelSize;
+		float width  = Mathf.Abs(rect.width / scale.x) * pixelSize;
+		float height = Mathf.Abs(rect.height / scale.y) * pixelSize;
 
 		// Safety check. Useful so Unity doesn't run out of memory if the sprites are too small.
 		if (width < 0.01f || height < 0.01f)
