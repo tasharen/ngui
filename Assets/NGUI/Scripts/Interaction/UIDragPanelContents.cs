@@ -234,12 +234,7 @@ public class UIDragPanelContents : IgnoreTimeScale
 		float delta = UpdateRealTimeDelta();
 		if (panel == null) return;
 
-		if (mPressed)
-		{
-			mMomentum = Vector3.zero;
-			mScroll = 0f;
-		}
-		else
+		if (!mPressed)
 		{
 			mMomentum += scale * (-mScroll * 0.05f);
 
