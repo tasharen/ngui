@@ -33,7 +33,7 @@ public class UISprite : UIWidget
 	/// Outer set of UV coordinates.
 	/// </summary>
 
-	public Rect outerUV { get { UpdateUVs(); return mOuterUV; } }
+	public Rect outerUV { get { UpdateUVs(false); return mOuterUV; } }
 
 	/// <summary>
 	/// Atlas used by this widget.
@@ -73,8 +73,7 @@ public class UISprite : UIWidget
 					mSpriteName = "";
 					spriteName = sprite;
 					mChanged = true;
-					mOuter = new Rect();
-					UpdateUVs();
+					UpdateUVs(true);
 				}
 			}
 		}
@@ -108,7 +107,7 @@ public class UISprite : UIWidget
 				mSpriteName = value;
 				mSprite = null;
 				mChanged = true;
-				if (mSprite != null) UpdateUVs();
+				if (mSprite != null) UpdateUVs(true);
 			}
 		}
 	}
@@ -135,6 +134,9 @@ public class UISprite : UIWidget
 					sprite = mAtlas.spriteList[0];
 					mSpriteName = mSprite.name;
 				}
+
+				// If the sprite has been set, update the material
+				if (mSprite != null) material = mAtlas.spriteMaterial;
 			}
 			return mSprite;
 		}
@@ -142,6 +144,7 @@ public class UISprite : UIWidget
 		{
 			mSprite = value;
 			mSpriteSet = true;
+			material = (mSprite != null && mAtlas != null) ? mAtlas.spriteMaterial : null;
 		}
 	}
 
@@ -172,14 +175,33 @@ public class UISprite : UIWidget
 	}
 
 	/// <summary>
+	/// Retrieve the material used by the font.
+	/// </summary>
+
+	public override Material material
+	{
+		get
+		{
+			Material mat = base.material;
+
+			if (mat == null)
+			{
+				mat = (mAtlas != null) ? mAtlas.spriteMaterial : null;
+				material = mat;
+				mSprite = null;
+				if (mat != null) UpdateUVs(true);
+			}
+			return mat;
+		}
+	}
+
+	/// <summary>
 	/// Update the texture UVs used by the widget.
 	/// </summary>
 
-	virtual public void UpdateUVs()
+	virtual public void UpdateUVs (bool force)
 	{
-		Init();
-
-		if (sprite != null && mOuter != mSprite.outer)
+		if (sprite != null && (force || mOuter != mSprite.outer))
 		{
 			Texture tex = mainTexture;
 
@@ -219,20 +241,6 @@ public class UISprite : UIWidget
 	}
 
 	/// <summary>
-	/// Ensure that the sprite has been initialized properly.
-	/// This is necessary because the order of execution is unreliable.
-	/// Sometimes the sprite's functions may be called prior to Start().
-	/// </summary>
-
-	protected void Init ()
-	{
-		if (mAtlas != null)
-		{
-			if (material == null) material = mAtlas.spriteMaterial;
-		}
-	}
-
-	/// <summary>
 	/// Set the atlas and the sprite.
 	/// </summary>
 
@@ -240,7 +248,7 @@ public class UISprite : UIWidget
 	{
 		if (mAtlas != null)
 		{
-			UpdateUVs();
+			UpdateUVs(true);
 		}
 	}
 
@@ -255,10 +263,10 @@ public class UISprite : UIWidget
 			mSprite = null;
 			mChanged = true;
 			mLastName = mSpriteName;
-			UpdateUVs();
+			UpdateUVs(false);
 			return true;
 		}
-		UpdateUVs();
+		UpdateUVs(false);
 		return false;
 	}
 

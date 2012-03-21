@@ -24,7 +24,7 @@ public class UISlicedSprite : UISprite
 	/// Inner set of UV coordinates.
 	/// </summary>
 
-	public Rect innerUV { get { UpdateUVs(); return mInnerUV; } }
+	public Rect innerUV { get { UpdateUVs(false); return mInnerUV; } }
 
 	/// <summary>
 	/// Whether the center part of the sprite will be filled or not. Turn it off if you want only to borders to show up.
@@ -36,19 +36,22 @@ public class UISlicedSprite : UISprite
 	/// Update the texture UVs used by the widget.
 	/// </summary>
 
-	override public void UpdateUVs()
+	override public void UpdateUVs (bool force)
 	{
-		Init();
-
-		Texture tex = mainTexture;
-
-		if (tex != null && sprite != null)
+		if (cachedTransform.localScale != mScale)
 		{
-			if (cachedTransform.localScale != mScale || mInner != mSprite.inner || mOuter != mSprite.outer)
+			mScale = cachedTransform.localScale;
+			mChanged = true;
+		}
+
+		if (sprite != null && (force || mInner != mSprite.inner || mOuter != mSprite.outer))
+		{
+			Texture tex = mainTexture;
+
+			if (tex != null)
 			{
 				mInner = mSprite.inner;
 				mOuter = mSprite.outer;
-				mScale = cachedTransform.localScale;
 
 				mInnerUV = mInner;
 				mOuterUV = mOuter;
@@ -58,7 +61,6 @@ public class UISlicedSprite : UISprite
 					mOuterUV = NGUIMath.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
 					mInnerUV = NGUIMath.ConvertToTexCoords(mInnerUV, tex.width, tex.height);
 				}
-				mChanged = true;
 			}
 		}
 	}

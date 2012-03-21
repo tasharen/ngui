@@ -56,14 +56,14 @@ public class UILabel : UIWidget
 		get
 		{
 			return mShouldBeProcessed ||
-				mLastText != text ||
-				mLastWidth != mMaxLineWidth ||
-				mLastEncoding != mEncoding ||
-				mLastMulti != mMultiline ||
-				mLastPass != mPassword ||
-				mLastShow != mShowLastChar ||
-				mLastEffect != mEffectStyle ||
-				mLastColor != mEffectColor;
+				mLastText		!= text ||
+				mLastWidth		!= mMaxLineWidth ||
+				mLastEncoding	!= mEncoding ||
+				mLastMulti		!= mMultiline ||
+				mLastPass		!= mPassword ||
+				mLastShow		!= mShowLastChar ||
+				mLastEffect		!= mEffectStyle ||
+				mLastColor		!= mEffectColor;
 		}
 		set
 		{
@@ -74,15 +74,15 @@ public class UILabel : UIWidget
 			}
 			else
 			{
-				mShouldBeProcessed = false;
-				mLastText = text;
-				mLastWidth = mMaxLineWidth;
-				mLastEncoding = mEncoding;
-				mLastMulti = mMultiline;
-				mLastPass = mPassword;
-				mLastShow = mShowLastChar;
-				mLastEffect = mEffectStyle;
-				mLastColor = mEffectColor;
+				mShouldBeProcessed	= false;
+				mLastText			= text;
+				mLastWidth			= mMaxLineWidth;
+				mLastEncoding		= mEncoding;
+				mLastMulti			= mMultiline;
+				mLastPass			= mPassword;
+				mLastShow			= mShowLastChar;
+				mLastEffect			= mEffectStyle;
+				mLastColor			= mEffectColor;
 			}
 		}
 	}
@@ -206,10 +206,10 @@ public class UILabel : UIWidget
 		{
 			if (mPassword != value)
 			{
-				mPassword = value;
-				mMultiline = false;
-				mEncoding = false;
-				hasChanged = true;
+				mPassword	= value;
+				mMultiline	= false;
+				mEncoding	= false;
+				hasChanged	= true;
 			}
 		}
 	}
@@ -323,6 +323,25 @@ public class UILabel : UIWidget
 				}
 			}
 			return mProcessedText;
+		}
+	}
+
+	/// <summary>
+	/// Retrieve the material used by the font.
+	/// </summary>
+
+	public override Material material
+	{
+		get
+		{
+			Material mat = base.material;
+
+			if (mat == null)
+			{
+				mat = (mFont != null) ? mFont.material : null;
+				material = mat;
+			}
+			return mat;
 		}
 	}
 

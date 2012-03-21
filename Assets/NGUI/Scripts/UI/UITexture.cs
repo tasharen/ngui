@@ -17,6 +17,12 @@ using System.Collections.Generic;
 public class UITexture : UIWidget
 {
 	/// <summary>
+	/// UI textures should keep the material reference.
+	/// </summary>
+
+	public override bool keepMaterial { get { return true; } }
+
+	/// <summary>
 	/// Adjust the scale of the widget to make it pixel-perfect.
 	/// </summary>
 

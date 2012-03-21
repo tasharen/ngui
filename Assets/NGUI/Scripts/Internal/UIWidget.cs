@@ -62,7 +62,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Depth controls the rendering order -- lowest to highest.
 	/// </summary>
 
-	public int depth { get { return mDepth; } set { if (mDepth != value) { mDepth = value; if (mPanel != null) mPanel.MarkMaterialAsChanged(mMat, true); } } }
+	public int depth { get { return mDepth; } set { if (mDepth != value) { mDepth = value; if (mPanel != null) mPanel.MarkMaterialAsChanged(material, true); } } }
 
 	/// <summary>
 	/// Transform gets cached for speed.
@@ -74,7 +74,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Returns the material used by this widget.
 	/// </summary>
 
-	public Material material
+	public virtual Material material
 	{
 		get
 		{
@@ -84,16 +84,13 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			if (mMat != value)
 			{
-				if (mPanel != null)
-				{
-					mPanel.RemoveWidget(this);
-					mPanel = null;
-				}
-				
-				mMat = value;
-				mTex = (mMat != null) ? mMat.mainTexture : null;
+				if (mMat != null && mPanel != null) mPanel.RemoveWidget(this);
 
-				CreatePanel();
+				mPanel = null;
+				mMat = value;
+				mTex = null;
+
+				if (mMat != null) CreatePanel();
 			}
 		}
 	}
@@ -119,7 +116,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Returns the UI panel responsible for this widget.
 	/// </summary>
 
-	public UIPanel panel { get { CreatePanel(); return mPanel; } set { mPanel = value; } }
+	public UIPanel panel { get { if (mPanel == null) CreatePanel(); return mPanel; } set { mPanel = value; } }
 
 	/// <summary>
 	/// Flag set by the UIPanel and used in optimization checks.
@@ -147,7 +144,7 @@ public abstract class UIWidget : MonoBehaviour
 		mChanged = true;
 
 		// If we're in the editor, update the panel right away so its geometry gets updated.
-		if (mPanel != null && enabled && gameObject.active && !Application.isPlaying && mMat != null)
+		if (mPanel != null && enabled && gameObject.active && !Application.isPlaying && material != null)
 		{
 			mPanel.AddWidget(this);
 			CheckLayer();
@@ -164,7 +161,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	void CreatePanel ()
 	{
-		if (mPanel == null && mMat != null && enabled && gameObject.active)
+		if (mPanel == null && enabled && gameObject.active && material != null)
 		{
 			mPanel = UIPanel.Find(cachedTransform);
 			CheckLayer();
@@ -210,7 +207,7 @@ public abstract class UIWidget : MonoBehaviour
 			// This widget is no longer parented to the same panel. Remove it and re-add it to a new one.
 			if (!valid)
 			{
-				mPanel.RemoveWidget(this);
+				material = null;
 				mPanel = null;
 				CreatePanel();
 			}
@@ -242,7 +239,15 @@ public abstract class UIWidget : MonoBehaviour
 	void OnEnable ()
 	{
 		mChanged = true;
-		if (mPanel != null && mMat != null) mPanel.MarkMaterialAsChanged(mMat, false);
+		mPanel = null;
+
+		Material oldMat = mMat;
+		mMat = null;
+		mTex = null;
+		CreatePanel();
+
+		// No material set? Use the last known material.
+		if (mMat == null) material = oldMat;
 	}
 
 	/// <summary>
@@ -282,12 +287,13 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Don't store any references to the panel.
+	/// Clear references.
 	/// </summary>
 
 	void OnDisable ()
 	{
-		if (mPanel != null && mMat != null) mPanel.MarkMaterialAsChanged(mMat, false); mPanel = null;
+		if (!keepMaterial) material = null;
+		mPanel = null;
 	}
 
 	/// <summary>
@@ -450,6 +456,12 @@ public abstract class UIWidget : MonoBehaviour
 	/// </summary>
 
 	virtual public Vector2 relativeSize { get { return Vector2.one; } }
+
+	/// <summary>
+	/// Whether the material will be kept when the widget gets disabled (by default no, it won't be).
+	/// </summary>
+
+	virtual public bool keepMaterial { get { return false; } }
 
 	/// <summary>
 	/// Virtual Start() functionality for widgets.
