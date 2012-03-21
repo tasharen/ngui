@@ -56,7 +56,6 @@ public class UIDragPanelContents : IgnoreTimeScale
 
 	public float momentumAmount = 35f;
 
-	Transform mTrans;
 	Plane mPlane;
 	Vector3 mLastPos;
 	bool mPressed = false;
@@ -76,26 +75,10 @@ public class UIDragPanelContents : IgnoreTimeScale
 			if (!mCalculatedBounds)
 			{
 				mCalculatedBounds = true;
-				mBounds = NGUIMath.CalculateRelativeWidgetBounds(mTrans, mTrans);
+				Transform t = panel.cachedTransform;
+				mBounds = NGUIMath.CalculateRelativeWidgetBounds(t, t);
 			}
 			return mBounds;
-		}
-	}
-
-	/// <summary>
-	/// Ensure we have a panel to work with.
-	/// </summary>
-
-	void OnEnable ()
-	{
-		if (panel == null)
-		{
-			Debug.LogError(GetType() + " script expected to find a panel to work with", gameObject);
-			enabled = false;
-		}
-		else
-		{
-			mTrans = panel.transform;
 		}
 	}
 
@@ -107,6 +90,7 @@ public class UIDragPanelContents : IgnoreTimeScale
 	{
 		if (enabled && gameObject.active && panel != null)
 		{
+			mCalculatedBounds = false;
 			mPressed = pressed;
 
 			if (pressed)
@@ -123,7 +107,7 @@ public class UIDragPanelContents : IgnoreTimeScale
 
 				// Create the plane to drag along
 				Transform trans = UICamera.currentCamera.transform;
-				mPlane = new Plane((panel != null ? mTrans.rotation : trans.rotation) * Vector3.back, mLastPos);
+				mPlane = new Plane((panel != null ? panel.cachedTransform.rotation : trans.rotation) * Vector3.back, mLastPos);
 			}
 			else if (restrictWithinPanel && panel.clipping != UIDrawCall.Clipping.None && dragEffect == DragEffect.MomentumAndSpring)
 			{
@@ -140,7 +124,6 @@ public class UIDragPanelContents : IgnoreTimeScale
 	{
 		if (enabled && gameObject.active && panel != null)
 		{
-			mCalculatedBounds = false;
 			UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
 
 			Ray ray = UICamera.currentCamera.ScreenPointToRay(UICamera.currentTouch.pos);
@@ -154,9 +137,10 @@ public class UIDragPanelContents : IgnoreTimeScale
 
 				if (offset.x != 0f || offset.y != 0f)
 				{
-					offset = mTrans.InverseTransformDirection(offset);
+					Transform t = panel.cachedTransform;
+					offset = t.InverseTransformDirection(offset);
 					offset.Scale(scale);
-					offset = mTrans.TransformDirection(offset);
+					offset = t.TransformDirection(offset);
 				}
 
 				// Adjust the momentum
@@ -189,7 +173,7 @@ public class UIDragPanelContents : IgnoreTimeScale
 			if (dragEffect == DragEffect.MomentumAndSpring)
 			{
 				// Spring back into place
-				SpringPanel.Begin(panel.gameObject, mTrans.localPosition + constraint, 13f);
+				SpringPanel.Begin(panel.gameObject, panel.cachedTransform.localPosition + constraint, 13f);
 			}
 			else
 			{
@@ -222,7 +206,7 @@ public class UIDragPanelContents : IgnoreTimeScale
 
 	void MoveRelative (Vector3 relative)
 	{
-		mTrans.localPosition += relative;
+		panel.cachedTransform.localPosition += relative;
 		Vector4 cr = panel.clipRange;
 		cr.x -= relative.x;
 		cr.y -= relative.y;
@@ -235,8 +219,9 @@ public class UIDragPanelContents : IgnoreTimeScale
 
 	void MoveAbsolute (Vector3 absolute)
 	{
-		Vector3 a = mTrans.InverseTransformPoint(absolute);
-		Vector3 b = mTrans.InverseTransformPoint(Vector3.zero);
+		Transform t = panel.cachedTransform;
+		Vector3 a = t.InverseTransformPoint(absolute);
+		Vector3 b = t.InverseTransformPoint(Vector3.zero);
 		MoveRelative(a - b);
 	}
 
