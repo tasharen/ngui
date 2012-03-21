@@ -20,6 +20,20 @@ public class UIButtonScale : MonoBehaviour
 	Vector3 mScale;
 	bool mInitDone = false;
 
+	void OnDisable ()
+	{
+		if (tweenTarget != null)
+		{
+			TweenScale tc = tweenTarget.GetComponent<TweenScale>();
+
+			if (tc != null)
+			{
+				tc.scale = mScale;
+				tc.enabled = false;
+			}
+		}
+	}
+
 	void Init ()
 	{
 		mInitDone = true;

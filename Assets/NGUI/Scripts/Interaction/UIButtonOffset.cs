@@ -20,6 +20,20 @@ public class UIButtonOffset : MonoBehaviour
 	Vector3 mPos;
 	bool mInitDone = false;
 
+	void OnDisable ()
+	{
+		if (tweenTarget != null)
+		{
+			TweenPosition tc = tweenTarget.GetComponent<TweenPosition>();
+
+			if (tc != null)
+			{
+				tc.position = mPos;
+				tc.enabled = false;
+			}
+		}
+	}
+
 	void Init ()
 	{
 		mInitDone = true;

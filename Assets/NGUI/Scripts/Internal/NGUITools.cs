@@ -478,7 +478,7 @@ static public class NGUITools
 	}
 
 	/// <summary>
-	/// Deactivate the specified obejct and all of its children.
+	/// Deactivate the specified object and all of its children.
 	/// </summary>
 
 	static void Deactivate (Transform t)

@@ -20,6 +20,20 @@ public class UIButtonColor : MonoBehaviour
 	Color mColor;
 	bool mInitDone = false;
 
+	void OnDisable ()
+	{
+		if (tweenTarget != null)
+		{
+			TweenColor tc = tweenTarget.GetComponent<TweenColor>();
+
+			if (tc != null)
+			{
+				tc.color = mColor;
+				tc.enabled = false;
+			}
+		}
+	}
+
 	void Init ()
 	{
 		mInitDone = true;

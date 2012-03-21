@@ -20,6 +20,20 @@ public class UIButtonRotation : MonoBehaviour
 	Quaternion mRot;
 	bool mInitDone = false;
 
+	void OnDisable ()
+	{
+		if (tweenTarget != null)
+		{
+			TweenRotation tc = tweenTarget.GetComponent<TweenRotation>();
+
+			if (tc != null)
+			{
+				tc.rotation = mRot;
+				tc.enabled = false;
+			}
+		}
+	}
+
 	void Init ()
 	{
 		mInitDone = true;
