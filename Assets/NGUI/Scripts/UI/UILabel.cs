@@ -422,8 +422,10 @@ public class UILabel : UIWidget
 				if ((x % 2 == 1) && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
 				if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y -= 0.5f;
 			}
-			cachedTransform.localPosition = pos;
-			cachedTransform.localScale = scale;
+
+			float pixelSize = (font.atlas != null) ? font.atlas.pixelSize : 1f;
+			cachedTransform.localPosition = pos * pixelSize;
+			cachedTransform.localScale = scale * pixelSize;
 		}
 		else base.MakePixelPerfect();
 	}

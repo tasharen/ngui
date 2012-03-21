@@ -52,6 +52,9 @@ public class UIAtlas : MonoBehaviour
 	// Currently active set of coordinates
 	[SerializeField] Coordinates mCoordinates = Coordinates.Pixels;
 
+	// Size in pixels for the sake of MakePixelPerfect functions.
+	[SerializeField] float mPixelSize = 1f;
+
 	// Replacement atlas can be used to completely bypass this atlas, pulling the data from another one instead.
 	[SerializeField] UIAtlas mReplacement;
 
@@ -118,7 +121,7 @@ public class UIAtlas : MonoBehaviour
 	{
 		get
 		{
-			return (mReplacement == null) ? mCoordinates : mReplacement.mCoordinates;
+			return (mReplacement != null) ? mReplacement.coordinates : mCoordinates;
 		}
 		set
 		{
@@ -149,6 +152,37 @@ public class UIAtlas : MonoBehaviour
 						s.outer = NGUIMath.ConvertToPixels(s.outer, tex.width, tex.height, true);
 						s.inner = NGUIMath.ConvertToPixels(s.inner, tex.width, tex.height, true);
 					}
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Pixel size is a multiplier applied to widgets dimensions when performing MakePixelPerfect() pixel correction.
+	/// Most obvious use would be on retina screen displays. The resolution doubles, but with UIRoot staying the same
+	/// for layout purposes, you can still get extra sharpness by switching to an HD atlas that has pixel size set to 0.5.
+	/// </summary>
+
+	public float pixelSize
+	{
+		get
+		{
+			return (mReplacement != null) ? mReplacement.pixelSize : mPixelSize;
+		}
+		set
+		{
+			if (mReplacement != null)
+			{
+				mReplacement.pixelSize = value;
+			}
+			else
+			{
+				float val = Mathf.Clamp(value, 0.25f, 4f);
+
+				if (mPixelSize != val)
+				{
+					mPixelSize = val;
+					MarkAsDirty();
 				}
 			}
 		}

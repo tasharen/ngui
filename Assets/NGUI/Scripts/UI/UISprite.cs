@@ -209,8 +209,9 @@ public class UISprite : UIWidget
 		{
 			Rect rect = NGUIMath.ConvertToPixels(outerUV, tex.width, tex.height, true);
 			Vector3 scale = cachedTransform.localScale;
-			scale.x = rect.width;
-			scale.y = rect.height;
+			float pixelSize = atlas.pixelSize;
+			scale.x = rect.width * pixelSize;
+			scale.y = rect.height * pixelSize;
 			scale.z = 1f;
 			cachedTransform.localScale = scale;
 		}

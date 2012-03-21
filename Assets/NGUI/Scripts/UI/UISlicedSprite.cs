@@ -106,10 +106,11 @@ public class UISlicedSprite : UISprite
 
 		if (tex != null)
 		{
-			float borderLeft	= mInnerUV.xMin - mOuterUV.xMin;
-			float borderRight	= mOuterUV.xMax - mInnerUV.xMax;
-			float borderTop		= mInnerUV.yMax - mOuterUV.yMax;
-			float borderBottom	= mOuterUV.yMin - mInnerUV.yMin;
+			float pixelSize		= atlas.pixelSize;
+			float borderLeft	= (mInnerUV.xMin - mOuterUV.xMin) * pixelSize;
+			float borderRight	= (mOuterUV.xMax - mInnerUV.xMax) * pixelSize;
+			float borderTop		= (mInnerUV.yMax - mOuterUV.yMax) * pixelSize;
+			float borderBottom	= (mOuterUV.yMin - mInnerUV.yMin) * pixelSize;
 
 			Vector3 scale = cachedTransform.localScale;
 			scale.x = Mathf.Max(0f, scale.x);

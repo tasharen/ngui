@@ -183,6 +183,15 @@ public class UIAtlasInspector : Editor
 					mAtlas.coordinates = coords;
 					mConfirmDelete = false;
 				}
+
+				float pixelSize = EditorGUILayout.FloatField("Pixel Size", mAtlas.pixelSize);
+
+				if (pixelSize != mAtlas.pixelSize)
+				{
+					NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
+					mAtlas.pixelSize = pixelSize;
+					mConfirmDelete = false;
+				}
 			}
 		}
 

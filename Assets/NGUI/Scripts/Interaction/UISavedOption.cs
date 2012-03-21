@@ -1,3 +1,8 @@
+//----------------------------------------------
+//            NGUI: Next-Gen UI kit
+// Copyright © 2011-2012 Tasharen Entertainment
+//----------------------------------------------
+
 using UnityEngine;
 
 /// <summary>
@@ -7,14 +12,18 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Saved Option")]
 public class UISavedOption : MonoBehaviour
 {
+	public string keyName;
+
+	string key { get { return (string.IsNullOrEmpty(keyName)) ? "NGUI State: " + name : keyName; } }
+
 	/// <summary>
 	/// Load and set the state of the checkboxes.
 	/// </summary>
 
 	void OnEnable ()
 	{
-		string s = PlayerPrefs.GetString("NGUI State: " + name);
-		
+		string s = PlayerPrefs.GetString(key);
+
 		if (!string.IsNullOrEmpty(s))
 		{
 			UICheckbox[] checkboxes = GetComponentsInChildren<UICheckbox>();
@@ -35,12 +44,12 @@ public class UISavedOption : MonoBehaviour
 	void Save (GameObject go)
 	{
 		UICheckbox[] checkboxes = GetComponentsInChildren<UICheckbox>();
-		
+
 		foreach (UICheckbox ch in checkboxes)
 		{
 			if (ch.isChecked)
 			{
-				PlayerPrefs.SetString("NGUI State: " + name, ch.name);
+				PlayerPrefs.SetString(key, ch.name);
 				break;
 			}
 		}
