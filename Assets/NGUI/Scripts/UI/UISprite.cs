@@ -158,7 +158,7 @@ public class UISprite : UIWidget
 		{
 			Vector2 v = Vector2.zero;
 
-			if (mSprite != null)
+			if (sprite != null)
 			{
 				Pivot pv = pivot;
 

@@ -314,6 +314,7 @@ static public class NGUIMath
 		{
 			Vector2 size = w.relativeSize;
 			Vector2 offset = w.pivotOffset;
+
 			float x = (offset.x + 0.5f) * size.x;
 			float y = (offset.y - 0.5f) * size.y;
 			size *= 0.5f;

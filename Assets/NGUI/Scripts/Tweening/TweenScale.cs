@@ -21,16 +21,21 @@ public class TweenScale : UITweener
 
 	public Vector3 scale { get { return mTrans.localScale; } set { mTrans.localScale = value; } }
 
-	void Awake ()
-	{
-		mTrans = transform;
-		if (updateTable) mTable = NGUITools.FindInParents<UITable>(gameObject);
-	}
+	void Awake () { mTrans = transform; }
 
 	override protected void OnUpdate (float factor)
 	{
 		mTrans.localScale = from * (1f - factor) + to * factor;
-		if (mTable != null) mTable.repositionNow = true;
+
+		if (updateTable)
+		{
+			if (mTable == null)
+			{
+				mTable = NGUITools.FindInParents<UITable>(gameObject);
+				if (mTable == null) { updateTable = false; return; }
+			}
+			mTable.repositionNow = true;
+		}
 	}
 
 	/// <summary>
