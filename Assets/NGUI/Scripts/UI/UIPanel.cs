@@ -337,7 +337,7 @@ public class UIPanel : MonoBehaviour
 			while (mChildren.Remove(t))
 			{
 				t = t.parent;
-				if (t == null || t == cachedTransform || t.GetComponentInChildren<UIWidget>() != null) break;
+				if (t == null || t == mTrans || t.childCount > 1) break;
 			}
 		}
 	}
@@ -365,8 +365,8 @@ public class UIPanel : MonoBehaviour
 			}
 			else
 			{
-				Debug.LogError("Unable to find an appropriate root to add the widget.\n" +
-					"Please make sure that there is at least one game object above this widget!", this);
+				Debug.LogError("Unable to find an appropriate UIRoot for " + NGUITools.GetHierarchy(w.gameObject) +
+					"\nPlease make sure that there is at least one game object above this widget!", w.gameObject);
 			}
 		}
 	}
@@ -875,6 +875,7 @@ public class UIPanel : MonoBehaviour
 
 	static public UIPanel Find (Transform trans, bool createIfMissing)
 	{
+		Transform origin = trans;
 		UIPanel panel = null;
 
 		while (panel == null && trans != null)
@@ -885,7 +886,7 @@ public class UIPanel : MonoBehaviour
 			trans = trans.parent;
 		}
 
-		if (createIfMissing && panel == null)
+		if (createIfMissing && panel == null && trans != origin)
 		{
 			panel = trans.gameObject.AddComponent<UIPanel>();
 			SetChildLayer(panel.cachedTransform, panel.gameObject.layer);

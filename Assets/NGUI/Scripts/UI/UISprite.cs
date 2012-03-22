@@ -187,8 +187,8 @@ public class UISprite : UIWidget
 			if (mat == null)
 			{
 				mat = (mAtlas != null) ? mAtlas.spriteMaterial : null;
-				material = mat;
 				mSprite = null;
+				material = mat;
 				if (mat != null) UpdateUVs(true);
 			}
 			return mat;

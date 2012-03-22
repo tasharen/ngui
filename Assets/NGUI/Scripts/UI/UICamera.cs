@@ -110,11 +110,14 @@ public class UICamera : MonoBehaviour
 	[System.Obsolete("Use UICamera.currentCamera instead")]
 	static public Camera lastCamera { get { return currentCamera; } }
 
-	[System.Obsolete("Use UICamera.currentTouch.pos instead")]
-	static public Vector3 lastTouchPosition { get { return (currentTouch != null) ? currentTouch.pos : Input.mousePosition; } }
-
 	[System.Obsolete("Use UICamera.currentTouchID instead")]
 	static public int lastTouchID { get { return currentTouchID; } }
+
+	/// <summary>
+	/// Position of the last touch (or mouse) event.
+	/// </summary>
+
+	static public Vector3 lastTouchPosition = Vector3.zero;
 
 	/// <summary>
 	/// Last raycast hit prior to sending out the event. This is useful if you want detailed information
@@ -465,6 +468,7 @@ public class UICamera : MonoBehaviour
 
 		// Save the starting mouse position
 		mMouse.pos = Input.mousePosition;
+		lastTouchPosition = mMouse.pos;
 
 		// Add this camera to the list
 		mList.Add(this);
@@ -552,8 +556,8 @@ public class UICamera : MonoBehaviour
 	void ProcessMouse ()
 	{
 		currentTouch = mMouse;
-		Vector3 pos = Input.mousePosition;
-		currentTouch.delta = pos - currentTouch.pos;
+		lastTouchPosition = Input.mousePosition;
+		currentTouch.delta = lastTouchPosition - currentTouch.pos;
 
 		for (int i = 0; i < 3; ++i)
 		{
@@ -564,18 +568,18 @@ public class UICamera : MonoBehaviour
 
 			if (pressed || unpressed || Time.timeScale == 0f)
 			{
-				currentTouch.current = Raycast(pos, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+				currentTouch.current = Raycast(lastTouchPosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
 			}
 
 			// We don't want to update the last camera while there is a touch happening
 			if (pressed) currentTouch.pressedCam = currentCamera;
 			else if (currentTouch.pressed != null) currentCamera = currentTouch.pressedCam;
 
-			if (i == 0 && currentTouch.pos != pos)
+			if (i == 0 && currentTouch.pos != lastTouchPosition)
 			{
 				if (mTooltipTime != 0f) mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
 				else if (mTooltip != null) ShowTooltip(false);
-				currentTouch.pos = pos;
+				currentTouch.pos = lastTouchPosition;
 			}
 
 			// Process the mouse events
@@ -599,7 +603,8 @@ public class UICamera : MonoBehaviour
 			bool pressed = (input.phase == TouchPhase.Began);
 			bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
 
-			currentTouch.pos = input.position;
+			lastTouchPosition = input.position;
+			currentTouch.pos = lastTouchPosition;
 			currentTouch.delta = input.deltaPosition;
 
 			// Update the object under this touch

@@ -164,9 +164,13 @@ public abstract class UIWidget : MonoBehaviour
 		if (mPanel == null && enabled && gameObject.active && material != null)
 		{
 			mPanel = UIPanel.Find(cachedTransform);
-			CheckLayer();
-			mPanel.AddWidget(this);
-			mChanged = true;
+
+			if (mPanel != null)
+			{
+				CheckLayer();
+				mPanel.AddWidget(this);
+				mChanged = true;
+			}
 		}
 	}
 
@@ -239,15 +243,15 @@ public abstract class UIWidget : MonoBehaviour
 	void OnEnable ()
 	{
 		mChanged = true;
-		mPanel = null;
 
-		Material oldMat = mMat;
-		mMat = null;
-		mTex = null;
-		CreatePanel();
-
-		// No material set? Use the last known material.
-		if (mMat == null) material = oldMat;
+		if (!keepMaterial)
+		{
+			mMat = null;
+			mTex = null;
+		}
+	
+		// If we have a panel and a material to work with, mark the material as changed
+		if (mPanel != null && material != null) mPanel.MarkMaterialAsChanged(mMat, false);
 	}
 
 	/// <summary>
