@@ -552,7 +552,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 				uiSlider.thumb = thb.transform;
 			}
-			uiSlider.rawValue = 0.75f;
+			uiSlider.sliderValue = 0.75f;
 
 			// Select the slider
 			Selection.activeGameObject = go;
@@ -650,23 +650,31 @@ public class UICreateWidgetWizard : EditorWindow
 			go = NGUITools.AddChild(go);
 			go.name = isDropDown ? "Popup List" : "Popup Menu";
 
+			UIAtlas.Sprite sphl = UISettings.atlas.GetSprite(mListHL);
+			UIAtlas.Sprite spfg = UISettings.atlas.GetSprite(mListFG);
+
+			Vector2 hlPadding = new Vector2(
+				Mathf.Max(4f, sphl.inner.xMin - sphl.outer.xMin),
+				Mathf.Max(4f, sphl.inner.yMin - sphl.outer.yMin));
+
+			Vector2 fgPadding = new Vector2(
+				Mathf.Max(4f, spfg.inner.xMin - spfg.outer.xMin),
+				Mathf.Max(4f, spfg.inner.yMin - spfg.outer.yMin));
+
 			// Background sprite
 			UISprite sprite = NGUITools.AddSprite(go, UISettings.atlas, mListFG);
 			sprite.depth = depth;
 			sprite.atlas = UISettings.atlas;
-			sprite.transform.localScale = new Vector3(150f, 34f, 1f);
+			sprite.transform.localScale = new Vector3(150f + fgPadding.x * 2f, UISettings.font.size + fgPadding.y * 2f, 1f);
 			sprite.pivot = UIWidget.Pivot.Left;
 			sprite.MakePixelPerfect();
-
-			UIAtlas.Sprite sp = UISettings.atlas.GetSprite(mListFG);
-			float padding = Mathf.Max(4f, sp.inner.xMin - sp.outer.xMin);
 
 			// Text label
 			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
 			lbl.font = UISettings.font;
 			lbl.text = go.name;
 			lbl.pivot = UIWidget.Pivot.Left;
-			lbl.cachedTransform.localPosition = new Vector3(padding, 0f, 0f);
+			lbl.cachedTransform.localPosition = new Vector3(fgPadding.x, 0f, 0f);
 			lbl.MakePixelPerfect();
 
 			// Add a collider
@@ -678,7 +686,7 @@ public class UICreateWidgetWizard : EditorWindow
 			list.font = UISettings.font;
 			list.backgroundSprite = mListBG;
 			list.highlightSprite = mListHL;
-			list.padding = new Vector2(padding, Mathf.RoundToInt(padding * 0.5f));
+			list.padding = hlPadding;
 			if (isDropDown) list.textLabel = lbl;
 			for (int i = 0; i < 5; ++i) list.items.Add(isDropDown ? ("List Option " + i) : ("Menu Option " + i));
 

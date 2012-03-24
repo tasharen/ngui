@@ -116,7 +116,7 @@ public class UISprite : UIWidget
 	/// Get the sprite used by the atlas. Work-around for a bug in Unity.
 	/// </summary>
 
-	protected UIAtlas.Sprite sprite
+	public UIAtlas.Sprite sprite
 	{
 		get
 		{

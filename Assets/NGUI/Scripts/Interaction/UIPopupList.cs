@@ -122,9 +122,11 @@ public class UIPopupList : MonoBehaviour
 	[SerializeField] string mSelectedItem;
 	UIPanel mPanel;
 	GameObject mChild;
+	UISprite mBackground;
 	UISprite mHighlight;
 	UILabel mHighlightedLabel = null;
 	List<UILabel> mLabelList = new List<UILabel>();
+	float mBgBorder = 0f;
 
 	/// <summary>
 	/// Whether the popup list is currently open.
@@ -221,9 +223,17 @@ public class UIPopupList : MonoBehaviour
 	{
 		if (mHighlight != null)
 		{
+			// Don't allow highlighting while the label is animating to its intended position
+			TweenPosition tp = lbl.GetComponent<TweenPosition>();
+			if (tp != null && tp.enabled) return;
+
 			mHighlightedLabel = lbl;
 
-			Vector3 pos = lbl.cachedTransform.localPosition + new Vector3(-padding.x, padding.y, 0f);
+			UIAtlas.Sprite sp = mHighlight.sprite;
+			float offsetX = sp.inner.xMin - sp.outer.xMin;
+			float offsetY = sp.inner.yMin - sp.outer.yMin;
+
+			Vector3 pos = lbl.cachedTransform.localPosition + new Vector3(-offsetX, offsetY, 0f);
 
 			if (instant || !isAnimated)
 			{
@@ -338,6 +348,9 @@ public class UIPopupList : MonoBehaviour
 			{
 				Destroy(mChild);
 			}
+
+			mBackground = null;
+			mHighlight = null;
 			mChild = null;
 		}
 	}
@@ -376,7 +389,7 @@ public class UIPopupList : MonoBehaviour
 	{
 		GameObject go = widget.gameObject;
 		Transform t = widget.cachedTransform;
-		float minSize = font.size * textScale + padding.y * 2f;
+		float minSize = font.size * textScale + mBgBorder * 2f;
 
 		Vector3 scale = t.localScale;
 		t.localScale = new Vector3(scale.x, minSize, scale.z);
@@ -431,29 +444,40 @@ public class UIPopupList : MonoBehaviour
 			t.localScale = Vector3.one;
 
 			// Add a sprite for the background
-			UISprite background = NGUITools.AddSprite(mChild, atlas, backgroundSprite);
-			background.pivot = UIWidget.Pivot.TopLeft;
-			background.depth = NGUITools.CalculateNextDepth(mPanel.gameObject);
-			background.color = backgroundColor;
+			mBackground = NGUITools.AddSprite(mChild, atlas, backgroundSprite);
+			mBackground.pivot = UIWidget.Pivot.TopLeft;
+			mBackground.depth = NGUITools.CalculateNextDepth(mPanel.gameObject);
+			mBackground.color = backgroundColor;
+
+			// We need to know the size of the background sprite for padding purposes
+			UIAtlas.Sprite bgsp = mBackground.sprite;
+			Vector2 bgPadding = new Vector2(bgsp.inner.xMin - bgsp.outer.xMin + padding.x, bgsp.inner.yMin - bgsp.outer.yMin);
+			mBgBorder = bgPadding.y;
+
+			mBackground.cachedTransform.localPosition = new Vector3(0f, bgPadding.y, 0f);
 
 			// Add a sprite used for the selection
 			mHighlight = NGUITools.AddSprite(mChild, atlas, highlightSprite);
 			mHighlight.pivot = UIWidget.Pivot.TopLeft;
 			mHighlight.color = highlightColor;
 
+			UIAtlas.Sprite hlsp = mHighlight.sprite;
+			float hlspHeight = hlsp.inner.yMin - hlsp.outer.yMin;
 			float fontScale = font.size * textScale;
 			float x = 0f, y = -padding.y;
 			List<UILabel> labels = new List<UILabel>();
 
 			// Run through all items and create labels for each one
-			foreach (string s in items)
+			for (int i = 0, imax = items.Count; i < imax; ++i)
 			{
+				string s = items[i];
+
 				UILabel lbl = NGUITools.AddWidget<UILabel>(mChild);
 				lbl.pivot = UIWidget.Pivot.TopLeft;
 				lbl.font = font;
 				lbl.text = (isLocalized && Localization.instance != null) ? Localization.instance.Get(s) : s;
 				lbl.color = textColor;
-				lbl.cachedTransform.localPosition = new Vector3(padding.x, y, 0f);
+				lbl.cachedTransform.localPosition = new Vector3(bgPadding.x, y, 0f);
 				lbl.MakePixelPerfect();
 
 				if (textScale != 1f)
@@ -464,6 +488,7 @@ public class UIPopupList : MonoBehaviour
 				labels.Add(lbl);
 
 				y -= fontScale;
+				y -= padding.y;
 				x = Mathf.Max(x, lbl.relativeSize.x * fontScale);
 
 				// Add an event listener
@@ -480,24 +505,30 @@ public class UIPopupList : MonoBehaviour
 			}
 
 			// The triggering widget's width should be the minimum allowed width
-			x = Mathf.Max(x, bounds.size.x - padding.x * 2f);
+			x = Mathf.Max(x, bounds.size.x - bgPadding.x * 2f);
+
+			Vector3 bcCenter = new Vector3((x * 0.5f) / fontScale, -0.5f, 0f);
+			Vector3 bcSize = new Vector3(x / fontScale, (fontScale + padding.y) / fontScale, 1f);
 
 			// Run through all labels and add colliders
 			foreach (UILabel lbl in labels)
 			{
 				BoxCollider bc = NGUITools.AddWidgetCollider(lbl.gameObject);
-				bc.center = new Vector3((x * 0.5f) / fontScale, -0.5f, bc.center.z);
-				bc.size = new Vector3(x / fontScale, 1f, 1f);
+				bcCenter.z = bc.center.z;
+				bc.center = bcCenter;
+				bc.size = bcSize;
 			}
 
-			x += padding.x * 2f;
-			y -= padding.y;
+			x += bgPadding.x * 2f;
+			y -= bgPadding.y;
 
 			// Scale the background sprite to envelop the entire set of items
-			background.cachedTransform.localScale = new Vector3(x, -y, 1f);
+			mBackground.cachedTransform.localScale = new Vector3(x, -y + bgPadding.y, 1f);
 
 			// Scale the highlight sprite to envelop a single item
-			mHighlight.cachedTransform.localScale = new Vector3(x, fontScale + padding.y * 2f, 1f);
+			mHighlight.cachedTransform.localScale = new Vector3(
+				x - bgPadding.x * 2f + (hlsp.inner.xMin - hlsp.outer.xMin) * 2f,
+				fontScale + hlspHeight * 2f, 1f);
 
 			bool placeAbove = (position == Position.Above);
 
@@ -518,14 +549,14 @@ public class UIPopupList : MonoBehaviour
 				float bottom = y + fontScale;
 				Animate(mHighlight, placeAbove, bottom);
 				foreach (UILabel lbl in labels) Animate(lbl, placeAbove, bottom);
-				AnimateColor(background);
-				AnimateScale(background, placeAbove, bottom);
+				AnimateColor(mBackground);
+				AnimateScale(mBackground, placeAbove, bottom);
 			}
 
 			// If we need to place the popup list above the item, we need to reposition everything by the size of the list
 			if (placeAbove)
 			{
-				t.localPosition = new Vector3(bounds.min.x, bounds.max.y - y, bounds.min.z);
+				t.localPosition = new Vector3(bounds.min.x, bounds.max.y - y - bgPadding.y, bounds.min.z);
 			}
 		}
 		else OnSelect(false);

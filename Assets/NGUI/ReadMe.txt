@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.86e
+                Version 1.87
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -33,6 +33,14 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+1.87:
+- NEW: UISlider now has an inspector class, and 'rawValue' can no longer be modified (use 'sliderValue'!)
+- FIX: An assortment of tweaks and fixes, focusing on stability and ease of use.
+- FIX: Reworked the way the UIPopupList was calculating its padding, making it more robust.
+- FIX: Disabled widgets will get updated correctly when the atlas gets replaced.
+- FIX: Disabling the button on click should no longer make it get stuck in the "clicked" state.
+- FIX: UICamera.lastTouchPosition is back.
 
 1.86:
 - NEW: UIAtlas now has a "pixel size" property that affects MakePixelPerfect logic as well as sliced sprite's border size.

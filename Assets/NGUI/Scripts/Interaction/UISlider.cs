@@ -13,23 +13,62 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Slider")]
 public class UISlider : IgnoreTimeScale
 {
-	static public UISlider current;
-
 	public enum Direction
 	{
 		Horizontal,
 		Vertical,
 	}
 
+	/// <summary>
+	/// Current slider. This value is set prior to the callback function being triggered.
+	/// </summary>
+
+	static public UISlider current;
+
+	/// <summary>
+	/// Object used for the foreground.
+	/// </summary>
+
 	public Transform foreground;
+
+	/// <summary>
+	/// Object that acts as a thumb.
+	/// </summary>
+
 	public Transform thumb;
 
+	/// <summary>
+	/// Direction the slider will expand in.
+	/// </summary>
+
 	public Direction direction = Direction.Horizontal;
-	public float rawValue = 1f;
+
+	/// <summary>
+	/// When at 100%, this will be the size of the foreground object.
+	/// </summary>
+
 	public Vector2 fullSize = Vector2.zero;
+
+	/// <summary>
+	/// Event receiver that will be notified of the value changes.
+	/// </summary>
+
 	public GameObject eventReceiver;
+
+	/// <summary>
+	/// Function on the event receiver that will receive the value changes.
+	/// </summary>
+
 	public string functionName = "OnSliderChange";
+
+	/// <summary>
+	/// Number of steps the slider should be divided into. For example 5 means possible values of 0, 0.25, 0.5, 0.75, and 1.0.
+	/// </summary>
+
 	public int numberOfSteps = 0;
+
+	// Used to be public prior to 1.87
+	[SerializeField] float rawValue = 1f;
 
 	float mStepValue = 1f;
 	BoxCollider mCol;
@@ -39,7 +78,7 @@ public class UISlider : IgnoreTimeScale
 	UIFilledSprite mSprite;
 
 	/// <summary>
-	/// Value of the slider. Will match 'rawValue' unless the slider has steps.
+	/// Value of the slider.
 	/// </summary>
 
 	public float sliderValue { get { return mStepValue; } set { Set(value); } }
