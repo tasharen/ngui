@@ -62,9 +62,10 @@ public class UIButtonTween : MonoBehaviour
 
 	void Update ()
 	{
-		if (disableWhenFinished != DisableCondition.DoNotDisable && (int)playDirection == (int)disableWhenFinished && mTweens != null)
+		if (disableWhenFinished != DisableCondition.DoNotDisable && mTweens != null)
 		{
 			bool isFinished = true;
+			bool properDirection = true;
 
 			foreach (UITweener tw in mTweens)
 			{
@@ -73,11 +74,15 @@ public class UIButtonTween : MonoBehaviour
 					isFinished = false;
 					break;
 				}
+				else if ((int)tw.direction != (int)disableWhenFinished)
+				{
+					properDirection = false;
+				}
 			}
 
 			if (isFinished)
 			{
-				NGUITools.SetActive(tweenTarget, false);
+				if (properDirection) NGUITools.SetActive(tweenTarget, false);
 				mTweens = null;
 			}
 		}

@@ -26,31 +26,23 @@ public class UISavedOption : MonoBehaviour
 
 		if (!string.IsNullOrEmpty(s))
 		{
-			UICheckbox[] checkboxes = GetComponentsInChildren<UICheckbox>();
+			UICheckbox c = GetComponent<UICheckbox>();
 
-			foreach (UICheckbox ch in checkboxes)
+			if (c != null)
 			{
-				UIEventListener.Add(ch.gameObject).onClick -= Save;
-				ch.isChecked = (ch.name == s);
-				UIEventListener.Add(ch.gameObject).onClick += Save;
+				c.isChecked = (s == "true");
 			}
-		}
-	}
-
-	/// <summary>
-	/// Save the state.
-	/// </summary>
-
-	void Save (GameObject go)
-	{
-		UICheckbox[] checkboxes = GetComponentsInChildren<UICheckbox>();
-
-		foreach (UICheckbox ch in checkboxes)
-		{
-			if (ch.isChecked)
+			else
 			{
-				PlayerPrefs.SetString(key, ch.name);
-				break;
+				UICheckbox[] checkboxes = GetComponentsInChildren<UICheckbox>();
+
+				foreach (UICheckbox ch in checkboxes)
+				{
+					UIEventListener.Add(ch.gameObject).onClick -= Save;
+					ch.isChecked = (ch.name == s);
+					Debug.Log(s);
+					UIEventListener.Add(ch.gameObject).onClick += Save;
+				}
 			}
 		}
 	}
@@ -59,5 +51,32 @@ public class UISavedOption : MonoBehaviour
 	/// Save the state on destroy.
 	/// </summary>
 
-	void OnDestroy () { Save(null); }
+	void OnDisable () { Save(null); }
+
+	/// <summary>
+	/// Save the state.
+	/// </summary>
+
+	void Save (GameObject go)
+	{
+		UICheckbox c = GetComponent<UICheckbox>();
+
+		if (c != null)
+		{
+			PlayerPrefs.SetString(key, c.isChecked ? "true" : "false");
+		}
+		else
+		{
+			UICheckbox[] checkboxes = GetComponentsInChildren<UICheckbox>();
+
+			foreach (UICheckbox ch in checkboxes)
+			{
+				if (ch.isChecked)
+				{
+					PlayerPrefs.SetString(key, ch.name);
+					break;
+				}
+			}
+		}
+	}
 }

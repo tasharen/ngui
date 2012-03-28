@@ -46,6 +46,12 @@ public abstract class UITweener : IgnoreTimeScale
 	public float duration = 1f;
 
 	/// <summary>
+	/// Whether the tweener will use steeper curves for ease in / out style interpolation.
+	/// </summary>
+
+	public bool steeperCurves = false;
+
+	/// <summary>
 	/// Used by buttons and tween sequences. Group of '0' means not in a sequence.
 	/// </summary>
 
@@ -83,6 +89,12 @@ public abstract class UITweener : IgnoreTimeScale
 			return mAmountPerDelta;
 		}
 	}
+
+	/// <summary>
+	/// Direction in which the tween is currently playing.
+	/// </summary>
+
+	public AnimationOrTween.Direction direction { get { return mAmountPerDelta < 0f ? AnimationOrTween.Direction.Reverse : AnimationOrTween.Direction.Forward; } }
 
 	/// <summary>
 	/// Update on start, so there is no frame in-between.
@@ -131,15 +143,31 @@ public abstract class UITweener : IgnoreTimeScale
 		if (method == Method.EaseIn)
 		{
 			val = 1f - Mathf.Sin(0.5f * Mathf.PI * (1f - val));
+			if (steeperCurves) val *= val;
 		}
 		else if (method == Method.EaseOut)
 		{
 			val = Mathf.Sin(0.5f * Mathf.PI * val);
+
+			if (steeperCurves)
+			{
+				val = 1f - val;
+				val = 1f - val * val;
+			}
 		}
 		else if (method == Method.EaseInOut)
 		{
 			const float pi2 = Mathf.PI * 2f;
 			val = val - Mathf.Sin(val * pi2) / pi2;
+
+			if (steeperCurves)
+			{
+				val = val * 2f - 1f;
+				float sign = Mathf.Sign(val);
+				val = 1f - Mathf.Abs(val);
+				val = 1f - val * val;
+				val = sign * val * 0.5f + 0.5f;
+			}
 		}
 
 		// Call the virtual update

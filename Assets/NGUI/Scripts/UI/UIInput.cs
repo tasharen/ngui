@@ -17,6 +17,7 @@ public class UIInput : MonoBehaviour
 	public UILabel label;
 	public int maxChars = 0;
 	public string caratChar = "|";
+	public bool isPassword = false;
 	public Color activeColor = Color.white;
 	public GameObject eventReceiver;
 	public string functionName = "OnSubmit";
@@ -109,6 +110,7 @@ public class UIInput : MonoBehaviour
 			{
 				mText = (label.text == mDefaultText) ? "" : label.text;
 				label.color = activeColor;
+				if (isPassword) label.password = true;
 
 #if UNITY_IPHONE || UNITY_ANDROID
 				if (Application.platform == RuntimePlatform.IPhonePlayer ||
@@ -144,6 +146,7 @@ public class UIInput : MonoBehaviour
 				{
 					label.text = mDefaultText;
 					label.color = mDefaultColor;
+					if (isPassword) label.password = false;
 				}
 				else label.text = mText;
 

@@ -253,7 +253,7 @@ public class UIPanel : MonoBehaviour
 
 	public bool IsVisible (UIWidget w)
 	{
-		if (!w.enabled || !w.gameObject.active || w.mainTexture == null || w.color.a < 0.001f) return false;
+		if (!w.enabled || !w.gameObject.active || w.color.a < 0.001f) return false;
 
 		// No clipping? No point in checking.
 		if (mClipping == UIDrawCall.Clipping.None) return true;

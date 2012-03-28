@@ -84,7 +84,7 @@ public class UIGeometry
 		if (verts.size > 0)
 		{
 			mRtpVerts.Clear();
-			foreach (Vector3 v in verts) mRtpVerts.Add(widgetToPanel.MultiplyPoint3x4(v));
+			for (int i = 0, imax = verts.size; i < imax; ++i) mRtpVerts.Add(widgetToPanel.MultiplyPoint3x4(verts[i]));
 
 			// Calculate the widget's normal and tangent
 			mRtpNormal = widgetToPanel.MultiplyVector(Vector3.back).normalized;

@@ -148,7 +148,13 @@ public class ByteReader
 			if (line == null) break;
 
 			string[] split = line.Split(separator, System.StringSplitOptions.RemoveEmptyEntries);
-			if (split.Length == 2) dict.Add(split[0].Trim(), split[1].Trim());
+
+			if (split.Length == 2)
+			{
+				string key = split[0].Trim();
+				string val = split[1].Trim();
+				dict[key] = val;
+			}
 		}
 		return dict;
 	}

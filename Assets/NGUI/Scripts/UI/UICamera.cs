@@ -46,7 +46,7 @@ public class UICamera : MonoBehaviour
 
 	public class MouseOrTouch
 	{
-		public Vector3 pos;			// Current position of the mouse or touch event
+		public Vector2 pos;			// Current position of the mouse or touch event
 		public Vector2 delta;		// Delta since last update
 		public Vector2 totalDelta;	// Delta since the event started being tracked
 
@@ -102,6 +102,18 @@ public class UICamera : MonoBehaviour
 	public float tooltipDelay = 1f;
 
 	/// <summary>
+	/// How far the mouse is allowed to move in pixels before it's no longer considered for click events, if the click notification is based on delta.
+	/// </summary>
+
+	public float mouseClickThreshold = 10f;
+
+	/// <summary>
+	/// How far the touch is allowed to move in pixels before it's no longer considered for click events, if the click notification is based on delta.
+	/// </summary>
+
+	public float touchClickThreshold = 40f;
+
+	/// <summary>
 	/// Name of the axis used for scrolling.
 	/// </summary>
 
@@ -117,7 +129,7 @@ public class UICamera : MonoBehaviour
 	/// Position of the last touch (or mouse) event.
 	/// </summary>
 
-	static public Vector3 lastTouchPosition = Vector3.zero;
+	static public Vector2 lastTouchPosition = Vector2.zero;
 
 	/// <summary>
 	/// Last raycast hit prior to sending out the event. This is useful if you want detailed information
@@ -467,7 +479,8 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Save the starting mouse position
-		mMouse.pos = Input.mousePosition;
+		mMouse.pos.x = Input.mousePosition.x;
+		mMouse.pos.y = Input.mousePosition.y;
 		lastTouchPosition = mMouse.pos;
 
 		// Add this camera to the list
@@ -559,17 +572,31 @@ public class UICamera : MonoBehaviour
 		lastTouchPosition = Input.mousePosition;
 		currentTouch.delta = lastTouchPosition - currentTouch.pos;
 
+		bool updateRaycast = (Time.timeScale < 0.9f);
+
+		if (!updateRaycast)
+		{
+			for (int i = 0; i < 3; ++i)
+			{
+				if (Input.GetMouseButton(i) || Input.GetMouseButtonUp(i))
+				{
+					updateRaycast = true;
+					break;
+				}
+			}
+		}
+
+		if (updateRaycast)
+		{
+			currentTouch.current = Raycast(lastTouchPosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+		}
+
 		for (int i = 0; i < 3; ++i)
 		{
 			bool pressed = Input.GetMouseButtonDown(i);
 			bool unpressed = Input.GetMouseButtonUp(i);
 
 			currentTouchID = -1 - i;
-
-			if (pressed || unpressed || Time.timeScale == 0f)
-			{
-				currentTouch.current = Raycast(lastTouchPosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
-			}
 
 			// We don't want to update the last camera while there is a touch happening
 			if (pressed) currentTouch.pressedCam = currentCamera;
@@ -603,15 +630,19 @@ public class UICamera : MonoBehaviour
 			bool pressed = (input.phase == TouchPhase.Began);
 			bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
 
-			lastTouchPosition = input.position;
-			currentTouch.pos = lastTouchPosition;
-			currentTouch.delta = input.deltaPosition;
-
-			// Update the object under this touch
-			if (pressed || unpressed)
+			if (pressed)
 			{
-				currentTouch.current = Raycast(input.position, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+				currentTouch.delta = Vector2.zero;
 			}
+			else
+			{
+				// Although input.deltaPosition can be used, calculating it manually is safer (just in case)
+				currentTouch.delta = input.position - currentTouch.pos;
+			}
+
+			currentTouch.pos = input.position;
+			currentTouch.current = Raycast(currentTouch.pos, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+			lastTouchPosition = currentTouch.pos;
 
 			// We don't want to update the last camera while there is a touch happening
 			if (pressed) currentTouch.pressedCam = currentCamera;
@@ -705,7 +736,7 @@ public class UICamera : MonoBehaviour
 			else if (currentTouch.clickNotification == ClickNotification.BasedOnDelta)
 			{
 				// If the notification is based on delta and the delta gets exceeded, disable the notification
-				float threshold = (currentTouch == mMouse) ? 10f : Screen.height * 0.1f;
+				float threshold = (currentTouch == mMouse) ? mouseClickThreshold : Mathf.Max(touchClickThreshold, Screen.height * 0.1f);
 
 				if (currentTouch.totalDelta.magnitude > threshold)
 				{
