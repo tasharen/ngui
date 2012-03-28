@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.87
+                Version 1.88
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -33,6 +33,15 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+1.88:
+- NEW: Added an option to the tweener to use steeper pow(2) curves for ease in/out tweens.
+- NEW: You can now specify the movement threshold that will be used to determine whether button presses are eligible for clicks on UICamera.
+- NEW: You can now specify an input field to be password-based, and it will only hide the text once you start typing.
+- FIX: UIButtonTween can now disable objects properly after a toggle.
+- FIX: UISavedOption can now save the state of a single checkbox in addition to a group of checkboxes.
+- FIX: Localization now handles duplicate key entries silently.
+- FIX: Widgets not using a texture will now have gizmos.
 
 1.87:
 - NEW: UISlider now has an inspector class, and 'rawValue' can no longer be modified (use 'sliderValue'!)
