@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.88
+                Version 1.88b
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -42,6 +42,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: UISavedOption can now save the state of a single checkbox in addition to a group of checkboxes.
 - FIX: Localization now handles duplicate key entries silently.
 - FIX: Widgets not using a texture will now have gizmos.
+- FIX: Fix for the OnClick event on touch-based devices.
 
 1.87:
 - NEW: UISlider now has an inspector class, and 'rawValue' can no longer be modified (use 'sliderValue'!)

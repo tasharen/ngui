@@ -719,8 +719,23 @@ public class UICamera : MonoBehaviour
 			Highlight(currentTouch.hover, false);
 		}
 
-		// Send the drag notification, intentionally before the pressed object gets changed
-		if (currentTouch.pressed != null && currentTouch.delta.magnitude != 0f)
+		// Send out the press message
+		if (pressed)
+		{
+			if (mTooltip != null) ShowTooltip(false);
+			currentTouch.pressed = currentTouch.current;
+			currentTouch.clickNotification = ClickNotification.Always;
+			currentTouch.totalDelta = Vector2.zero;
+			if (currentTouch.pressed != null) currentTouch.pressed.SendMessage("OnPress", true, SendMessageOptions.DontRequireReceiver);
+
+			// Clear the selection
+			if (currentTouch.pressed != mSel)
+			{
+				if (mTooltip != null) ShowTooltip(false);
+				selectedObject = null;
+			}
+		}
+		else if (currentTouch.pressed != null && currentTouch.delta.magnitude != 0f)
 		{
 			if (mTooltip != null) ShowTooltip(false);
 			currentTouch.totalDelta += currentTouch.delta;
@@ -742,23 +757,6 @@ public class UICamera : MonoBehaviour
 				{
 					currentTouch.clickNotification = ClickNotification.None;
 				}
-			}
-		}
-
-		// Send out the press message
-		if (pressed)
-		{
-			if (mTooltip != null) ShowTooltip(false);
-			currentTouch.pressed = currentTouch.current;
-			currentTouch.clickNotification = ClickNotification.Always;
-			currentTouch.totalDelta = Vector2.zero;
-			if (currentTouch.pressed != null) currentTouch.pressed.SendMessage("OnPress", true, SendMessageOptions.DontRequireReceiver);
-
-			// Clear the selection
-			if (currentTouch.pressed != mSel)
-			{
-				if (mTooltip != null) ShowTooltip(false);
-				selectedObject = null;
 			}
 		}
 
@@ -788,7 +786,7 @@ public class UICamera : MonoBehaviour
 					}
 
 					// If the touch should consider clicks, send out an OnClick notification
-					if (currentTouch.clickNotification == ClickNotification.Always)
+					if (currentTouch.clickNotification != ClickNotification.None)
 					{
 						currentTouch.pressed.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
 					}
