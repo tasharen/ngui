@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.88b
+                Version 1.90
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -33,6 +33,18 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+1.90:
+- NEW: You can now specify an option on the UIDragPanelContents that will prevent dragging if the contents already fit.
+- NEW: You can now specify a radio button group root on the checkbox instead of always having it be the parent object.
+- NEW: You can now easily adjust the widget's alpha by using the new UIWidget.alpha property.
+- NEW: UIAnchor script has been redesigned, and the 'stretch to fill' property has been removed. You can now position using relative coordinates.
+- NEW: UIStretch script has been added, allowing you to stretch an object in either (or both) directions using relative coordinates.
+- NEW: You can now specify a maximum range distance for UICamera's raycasts, allowing you to limit the interaction distance (for first-person cameras).
+- FIX: Popup list inspector now shows the "Position" drop-down.
+- FIX: Slider now updates correctly when it's first created, and when you change the Full Size property.
+- FIX: UIDragCamera now takes the camera's size into consideration.
+- FIX: DestroyImmediate calls have been replaced with NGUITools.DestroyImmediate as there seem to be odd issues on certain Android devices.
 
 1.88:
 - NEW: Added an option to the tweener to use steeper pow(2) curves for ease in/out tweens.
