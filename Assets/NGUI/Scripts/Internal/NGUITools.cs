@@ -53,8 +53,8 @@ static public class NGUITools
 	}
 
 	/// <summary>
-	/// Same as Random.Range, but the returned value is >= min and <= max.
-	/// Unity's Random.Range is < max instead, unless min == max.
+	/// Same as Random.Range, but the returned value is between min and max, inclusive.
+	/// Unity's Random.Range is less than max instead, unless min == max.
 	/// This means Range(0,1) produces 0 instead of 0 or 1. That's unacceptable.
 	/// </summary>
 
@@ -423,6 +423,19 @@ static public class NGUITools
 		{
 			if (Application.isPlaying) UnityEngine.Object.Destroy(obj);
 			else UnityEngine.Object.DestroyImmediate(obj);
+		}
+	}
+
+	/// <summary>
+	/// Destroy the specified object immediately, unless not in the editor, in which case the regular Destroy is used instead.
+	/// </summary>
+
+	static public void DestroyImmediate (UnityEngine.Object obj)
+	{
+		if (obj != null)
+		{
+			if (Application.isEditor) UnityEngine.Object.DestroyImmediate(obj);
+			else UnityEngine.Object.Destroy(obj);
 		}
 	}
 

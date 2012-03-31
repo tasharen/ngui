@@ -114,6 +114,12 @@ public class UICamera : MonoBehaviour
 	public float touchClickThreshold = 40f;
 
 	/// <summary>
+	/// Raycast range distance. By default it's as far as the camera can see.
+	/// </summary>
+
+	public float rangeDistance = -1f;
+
+	/// <summary>
 	/// Name of the axis used for scrolling.
 	/// </summary>
 
@@ -324,7 +330,8 @@ public class UICamera : MonoBehaviour
 
 			// Raycast into the screen
 			int mask = currentCamera.cullingMask & (int)cam.eventReceiverMask;
-			if (Physics.Raycast(ray, out hit, currentCamera.farClipPlane - currentCamera.nearClipPlane, mask)) return true;
+			float dist = (cam.rangeDistance > 0f) ? cam.rangeDistance : currentCamera.farClipPlane - currentCamera.nearClipPlane;
+			if (Physics.Raycast(ray, out hit, dist, mask)) return true;
 		}
 		return false;
 	}

@@ -33,6 +33,7 @@ public class UISliderInspector : Editor
 		{
 			NGUIEditorTools.RegisterUndo("Slider Change", slider);
 			slider.numberOfSteps = steps;
+			slider.ForceUpdate();
 			UnityEditor.EditorUtility.SetDirty(slider);
 		}
 
@@ -121,6 +122,8 @@ public class UISliderInspector : Editor
 				slider.sliderValue = -1f;
 				slider.sliderValue = sliderValue;
 			}
+			else slider.ForceUpdate();
+
 			UnityEditor.EditorUtility.SetDirty(slider);
 		}
 	}

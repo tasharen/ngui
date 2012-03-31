@@ -76,12 +76,38 @@ public class UISlider : IgnoreTimeScale
 	Transform mForeTrans;
 	UIWidget mWidget;
 	UIFilledSprite mSprite;
+	bool mInitDone = false;
 
 	/// <summary>
 	/// Value of the slider.
 	/// </summary>
 
-	public float sliderValue { get { return mStepValue; } set { Set(value); } }
+	public float sliderValue { get { return mStepValue; } set { Set(value, false); } }
+
+	/// <summary>
+	/// Initialize the cached values.
+	/// </summary>
+
+	void Init ()
+	{
+		mInitDone = true;
+
+		if (foreground != null)
+		{
+			mWidget = foreground.GetComponent<UIWidget>();
+			mSprite = (mWidget != null) ? mWidget as UIFilledSprite : null;
+			mForeTrans = foreground.transform;
+			if (fullSize == Vector2.zero) fullSize = foreground.localScale;
+		}
+		else if (mCol != null)
+		{
+			if (fullSize == Vector2.zero) fullSize = mCol.size;
+		}
+		else
+		{
+			Debug.LogWarning("UISlider expected to find a foreground object or a box collider to work with", this);
+		}
+	}
 
 	/// <summary>
 	/// Ensure that we have a background and a foreground object to work with.
@@ -99,21 +125,7 @@ public class UISlider : IgnoreTimeScale
 
 	void Start ()
 	{
-		if (foreground != null)
-		{
-			mWidget = foreground.GetComponent<UIWidget>();
-			mSprite = (mWidget != null) ? mWidget as UIFilledSprite : null;
-			mForeTrans = foreground.transform;
-			if (fullSize == Vector2.zero) fullSize = foreground.localScale;
-		}
-		else if (mCol != null)
-		{
-			if (fullSize == Vector2.zero) fullSize = mCol.size;
-		}
-		else
-		{
-			Debug.LogWarning("UISlider expected to find a foreground object or a box collider to work with", this);
-		}
+		Init();
 
 		if (Application.isPlaying && thumb != null && thumb.collider != null)
 		{
@@ -121,7 +133,7 @@ public class UISlider : IgnoreTimeScale
 			listener.onPress += OnPressThumb;
 			listener.onDrag += OnDragThumb;
 		}
-		Set(rawValue);
+		Set(rawValue, false);
 	}
 
 	/// <summary>
@@ -158,13 +170,13 @@ public class UISlider : IgnoreTimeScale
 
 		if (direction == Direction.Horizontal)
 		{
-			if		(key == KeyCode.LeftArrow)	Set(rawValue - step);
-			else if (key == KeyCode.RightArrow) Set(rawValue + step);
+			if		(key == KeyCode.LeftArrow)	Set(rawValue - step, false);
+			else if (key == KeyCode.RightArrow) Set(rawValue + step, false);
 		}
 		else
 		{
-			if		(key == KeyCode.DownArrow)	Set(rawValue - step);
-			else if (key == KeyCode.UpArrow)	Set(rawValue + step);
+			if		(key == KeyCode.DownArrow)	Set(rawValue - step, false);
+			else if (key == KeyCode.UpArrow)	Set(rawValue + step, false);
 		}
 	}
 
@@ -197,19 +209,17 @@ public class UISlider : IgnoreTimeScale
 		Vector3 dir = localCursor + localOffset;
 
 		// Update the slider
-		Set( (direction == Direction.Horizontal) ? dir.x / mCol.size.x : dir.y / mCol.size.y );
+		Set( (direction == Direction.Horizontal) ? dir.x / mCol.size.x : dir.y / mCol.size.y, false );
 	}
-
-#if UNITY_EDITOR
-	void Update () { Set(rawValue); }
-#endif
 
 	/// <summary>
 	/// Update the visible slider.
 	/// </summary>
 
-	void Set (float input)
+	void Set (float input, bool force)
 	{
+		if (!mInitDone) Init();
+
 		// Clamp the input
 		float val = Mathf.Clamp01(input);
 		if (val < 0.001f) val = 0f;
@@ -218,10 +228,10 @@ public class UISlider : IgnoreTimeScale
 		rawValue = val;
 
 		// Take steps into consideration
-		if (numberOfSteps > 1) val = Mathf.Round(val * (numberOfSteps - 1)) / (numberOfSteps - 1); ;
+		if (numberOfSteps > 1) val = Mathf.Round(val * (numberOfSteps - 1)) / (numberOfSteps - 1);
 
 		// If the stepped value doesn't match the last one, it's time to update
-		if (mStepValue != val)
+		if (force || mStepValue != val)
 		{
 			mStepValue = val;
 			Vector3 scale = fullSize;
@@ -233,7 +243,7 @@ public class UISlider : IgnoreTimeScale
 			{
 				mSprite.fillAmount = mStepValue;
 			}
-			else if (mForeTrans != null)
+			else if (foreground != null)
 			{
 				mForeTrans.localScale = scale;
 				if (mWidget != null) mWidget.MarkAsChanged();
@@ -272,4 +282,10 @@ public class UISlider : IgnoreTimeScale
 			}
 		}
 	}
+
+	/// <summary>
+	/// Force-update the slider. Useful if you've changed the properties and want it to update visually.
+	/// </summary>
+
+	public void ForceUpdate () { Set(rawValue, true); }
 }

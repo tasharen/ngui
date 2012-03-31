@@ -378,6 +378,27 @@ static public class NGUIMath
 	}
 
 	/// <summary>
+	/// Same as the Vector3 version, it's a framerate-independent Lerp.
+	/// </summary>
+
+	static public Vector2 SpringDampen (ref Vector2 velocity, float strength, float deltaTime)
+	{
+		// Dampening factor applied each millisecond
+		float dampeningFactor = 1f - strength * 0.001f;
+		int ms = Mathf.RoundToInt(deltaTime * 1000f);
+		Vector2 offset = Vector2.zero;
+
+		// Apply the offset for each millisecond
+		for (int i = 0; i < ms; ++i)
+		{
+			// Mimic 60 FPS the editor runs at
+			offset += velocity * 0.06f;
+			velocity *= dampeningFactor;
+		}
+		return offset;
+	}
+
+	/// <summary>
 	/// Calculate how much to interpolate by.
 	/// </summary>
 

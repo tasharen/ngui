@@ -45,6 +45,12 @@ public class UIDragPanelContents : IgnoreTimeScale
 	public bool restrictWithinPanel = false;
 
 	/// <summary>
+	/// Whether dragging will be disabled if the contents fit.
+	/// </summary>
+
+	public bool disableDragIfFits = false;
+
+	/// <summary>
 	/// Effect to apply when dragging.
 	/// </summary>
 
@@ -63,6 +69,7 @@ public class UIDragPanelContents : IgnoreTimeScale
 	float mScroll = 0f;
 	Bounds mBounds;
 	bool mCalculatedBounds = false;
+	bool mShouldMove = false;
 
 	/// <summary>
 	/// Calculate the bounds used by the widgets.
@@ -72,13 +79,46 @@ public class UIDragPanelContents : IgnoreTimeScale
 	{
 		get
 		{
-			if (!mCalculatedBounds)
+			if (!mCalculatedBounds && panel != null)
 			{
 				mCalculatedBounds = true;
 				Transform t = panel.cachedTransform;
 				mBounds = NGUIMath.CalculateRelativeWidgetBounds(t, t);
 			}
 			return mBounds;
+		}
+	}
+
+	/// <summary>
+	/// Whether the contents of the panel should actually be draggable depends on whether they fit or not.
+	/// </summary>
+
+	bool shouldMove
+	{
+		get
+		{
+			if (!disableDragIfFits) return true;
+			if (panel == null) panel = NGUITools.FindInParents<UIPanel>(gameObject);
+			if (panel == null) return false;
+
+			Vector4 clip = panel.clipRange;
+			Bounds b = bounds;
+
+			float hx = clip.z * 0.5f;
+			float hy = clip.w * 0.5f;
+
+			if (!Mathf.Approximately(scale.x, 0f))
+			{
+				if (b.min.x < clip.x - hx) return true;
+				if (b.max.x > clip.x + hx) return true;
+			}
+
+			if (!Mathf.Approximately(scale.y, 0f))
+			{
+				if (b.min.y < clip.y - hy) return true;
+				if (b.max.y > clip.y + hy) return true;
+			}
+			return false;
 		}
 	}
 
@@ -91,6 +131,8 @@ public class UIDragPanelContents : IgnoreTimeScale
 		if (enabled && gameObject.active && panel != null)
 		{
 			mCalculatedBounds = false;
+			mShouldMove = shouldMove;
+			if (!mShouldMove) return;
 			mPressed = pressed;
 
 			if (pressed)
@@ -122,7 +164,7 @@ public class UIDragPanelContents : IgnoreTimeScale
 
 	void OnDrag (Vector2 delta)
 	{
-		if (enabled && gameObject.active && panel != null)
+		if (enabled && gameObject.active && panel != null && mShouldMove)
 		{
 			UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
 
@@ -234,7 +276,7 @@ public class UIDragPanelContents : IgnoreTimeScale
 		float delta = UpdateRealTimeDelta();
 		if (panel == null) return;
 
-		if (!mPressed)
+		if (mShouldMove && !mPressed)
 		{
 			mMomentum += scale * (-mScroll * 0.05f);
 
@@ -258,6 +300,8 @@ public class UIDragPanelContents : IgnoreTimeScale
 
 	void OnScroll (float delta)
 	{
+		mShouldMove = shouldMove;
+
 		if (enabled && gameObject.active)
 		{
 			if (Mathf.Sign(mScroll) != Mathf.Sign(delta)) mScroll = 0f;

@@ -150,7 +150,7 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Rectangle used for clipping (used with a valid shader)
+	/// Clipping position (XY) and size (ZW).
 	/// </summary>
 
 	public Vector4 clipRange
@@ -452,7 +452,7 @@ public class UIPanel : MonoBehaviour
 		for (int i = mDrawCalls.Count; i > 0; )
 		{
 			UIDrawCall dc = mDrawCalls[--i];
-			if (dc != null) DestroyImmediate(dc.gameObject);
+			if (dc != null) NGUITools.DestroyImmediate(dc.gameObject);
 		}
 		mDrawCalls.Clear();
 		mChanged.Clear();
@@ -710,7 +710,7 @@ public class UIPanel : MonoBehaviour
 			if (dc != null)
 			{
 				mDrawCalls.Remove(dc);
-				DestroyImmediate(dc.gameObject);
+				NGUITools.DestroyImmediate(dc.gameObject);
 			}
 		}
 

@@ -30,27 +30,30 @@ public class UIAnchor : MonoBehaviour
 	public Camera uiCamera = null;
 	public Side side = Side.Center;
 	public bool halfPixelOffset = true;
-	public bool stretchToFill = false;
 	public float depthOffset = 0f;
+	public Vector2 relativeOffset = Vector2.zero;
+
+	// Stretching is now done by a separate script -- UIStretch, as of version 1.90.
+	[HideInInspector][SerializeField] bool stretchToFill = false;
 
 	Transform mTrans;
 	bool mIsWindows = false;
 
 	/// <summary>
-	/// Change the associated widget to be top-left aligned.
+	/// Legacy support.
 	/// </summary>
 
-	void ChangeWidgetPivot ()
+	void Start ()
 	{
-		UIWidget widget = GetComponent<UIWidget>();
-		if (widget != null) widget.pivot = UIWidget.Pivot.TopLeft;
+		if (stretchToFill)
+		{
+			stretchToFill = false;
+
+			UIStretch stretch = gameObject.AddComponent<UIStretch>();
+			stretch.style = UIStretch.Style.Both;
+			stretch.uiCamera = uiCamera;
+		}
 	}
-
-	/// <summary>
-	/// Automatically make the widget top-left aligned if we're stretching to fill.
-	/// </summary>
-
-	void Start () { if (stretchToFill) ChangeWidgetPivot(); }
 
 	/// <summary>
 	/// Automatically find the camera responsible for drawing the widgets under this object.
@@ -71,58 +74,54 @@ public class UIAnchor : MonoBehaviour
 	/// Anchor the object to the appropriate point.
 	/// </summary>
 
-	public void Update ()
+	void Update ()
 	{
 		if (uiCamera != null)
 		{
-			if (stretchToFill)
-			{
-				side = Side.TopLeft;
-				if (!Application.isPlaying) ChangeWidgetPivot();
-			}
+			Rect rect = uiCamera.pixelRect;
+			float cx = (rect.xMin + rect.xMax) * 0.5f;
+			float cy = (rect.yMin + rect.yMax) * 0.5f;
+			Vector3 v = new Vector3(cx, cy, depthOffset);
 
-			Vector3 v = new Vector3(Screen.width, Screen.height, 0f);
-
-			if (side == Side.Center)
-			{
-				v.x *= uiCamera.rect.width * 0.5f;
-				v.y *= uiCamera.rect.height * 0.5f;
-			}
-			else
+			if (side != Side.Center)
 			{
 				if (side == Side.Right || side == Side.TopRight || side == Side.BottomRight)
 				{
-					v.x *= uiCamera.rect.xMax;
+					v.x = rect.xMax;
 				}
 				else if (side == Side.Top || side == Side.Center || side == Side.Bottom)
 				{
-					v.x *= (uiCamera.rect.xMax - uiCamera.rect.xMin) * 0.5f;
+					v.x = cx;
 				}
 				else
 				{
-					v.x *= uiCamera.rect.xMin;
+					v.x = rect.xMin;
 				}
 
 				if (side == Side.Top || side == Side.TopRight || side == Side.TopLeft)
 				{
-					v.y *= uiCamera.rect.yMax;
+					v.y = rect.yMax;
 				}
 				else if (side == Side.Left || side == Side.Center || side == Side.Right)
 				{
-					v.y *= (uiCamera.rect.yMax - uiCamera.rect.yMin) * 0.5f;
+					v.y = cy;
 				}
 				else
 				{
-					v.y *= uiCamera.rect.yMin;
+					v.y = rect.yMin;
 				}
 			}
 
-			v.z = (mTrans.TransformPoint(Vector3.forward * depthOffset) -
-				mTrans.TransformPoint(Vector3.zero)).magnitude * Mathf.Sign(depthOffset);
+			float screenWidth  = rect.width;
+			float screenHeight = rect.height;
+
+			v.x += relativeOffset.x * screenWidth  - screenWidth  * 0.5f;
+			v.y += relativeOffset.y * screenHeight - screenHeight * 0.5f;
 
 			if (uiCamera.orthographic)
 			{
-				v.z += (uiCamera.nearClipPlane + uiCamera.farClipPlane) * 0.5f;
+				v.x = Mathf.RoundToInt(v.x);
+				v.y = Mathf.RoundToInt(v.y);
 
 				if (halfPixelOffset && mIsWindows)
 				{
@@ -131,18 +130,8 @@ public class UIAnchor : MonoBehaviour
 				}
 			}
 
-			Vector3 newPos = uiCamera.ScreenToWorldPoint(v);
-			Vector3 currPos = mTrans.position;
-
 			// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
-			if (newPos != currPos) mTrans.position = newPos;
-
-			if (stretchToFill)
-			{
-				Vector3 localPos = mTrans.localPosition;
-				Vector3 localScale = new Vector3(Mathf.Abs(localPos.x) * 2f, Mathf.Abs(localPos.y) * 2f, 1f);
-				if (mTrans.localScale != localScale) mTrans.localScale = localScale;
-			}
+			if (mTrans.localPosition != v) mTrans.localPosition = v;
 		}
 	}
 }

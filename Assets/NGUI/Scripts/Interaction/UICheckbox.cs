@@ -20,8 +20,11 @@ public class UICheckbox : MonoBehaviour
 	public GameObject eventReceiver;
 	public string functionName = "OnActivate";
 	public bool startsChecked = true;
-	public bool option = false;
+	public Transform radioButtonRoot;
 	public bool optionCanBeNone = false;
+
+	// Prior to 1.90 'option' was used to toggle the radio button group functionality
+	[HideInInspector][SerializeField] bool option = false;
 
 	bool mChecked = true;
 	bool mStarted = false;
@@ -34,7 +37,22 @@ public class UICheckbox : MonoBehaviour
 	public bool isChecked
 	{
 		get { return mChecked; }
-		set { if (!option || value || optionCanBeNone || !mStarted) Set(value); }
+		set { if (radioButtonRoot == null || value || optionCanBeNone || !mStarted) Set(value); }
+	}
+
+	/// <summary>
+	/// Legacy functionality support -- set the radio button root if the 'option' value was 'true'.
+	/// </summary>
+
+	void Awake ()
+	{
+		mTrans = transform;
+
+		if (option)
+		{
+			option = false;
+			if (radioButtonRoot == null) radioButtonRoot = mTrans.parent;
+		}
 	}
 
 	/// <summary>
@@ -43,7 +61,6 @@ public class UICheckbox : MonoBehaviour
 
 	void Start ()
 	{
-		mTrans = transform;
 		if (eventReceiver == null) eventReceiver = gameObject;
 		mChecked = !startsChecked;
 		mStarted = true;
@@ -69,10 +86,17 @@ public class UICheckbox : MonoBehaviour
 		else if (mChecked != state)
 		{
 			// Uncheck all other checkboxes
-			if (option && state)
+			if (radioButtonRoot != null && state)
 			{
-				UICheckbox[] cbs = mTrans.parent.GetComponentsInChildren<UICheckbox>();
-				foreach (UICheckbox cb in cbs) if (cb != this) cb.Set(false);
+				UICheckbox[] cbs = radioButtonRoot.GetComponentsInChildren<UICheckbox>();
+
+				foreach (UICheckbox cb in cbs)
+				{
+					if (cb != this && cb.radioButtonRoot == radioButtonRoot)
+					{
+						cb.Set(false);
+					}
+				}
 			}
 
 			// Remember the state

@@ -50,7 +50,7 @@ public class UIDragCamera : IgnoreTimeScale
 
 	Transform mTrans;
 	bool mPressed = false;
-	Vector3 mMomentum = Vector3.zero;
+	Vector2 mMomentum = Vector2.zero;
 	Bounds mBounds;
 	float mScroll = 0f;
 
@@ -82,7 +82,7 @@ public class UIDragCamera : IgnoreTimeScale
 				mBounds = NGUIMath.CalculateAbsoluteWidgetBounds(rootForBounds);
 
 				// Remove all momentum on press
-				mMomentum = Vector3.zero;
+				mMomentum = Vector2.zero;
 				mScroll = 0f;
 
 				// Disable the spring movement
@@ -106,16 +106,16 @@ public class UIDragCamera : IgnoreTimeScale
 		{
 			UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
 
-			Vector3 offset = Vector3.Scale((Vector3)delta, -scale);
-			mTrans.localPosition += offset;
+			Vector2 offset = Vector2.Scale(delta, -scale) * target.orthographicSize;
+			mTrans.localPosition += (Vector3)offset;
 
 			// Adjust the momentum
-			mMomentum = Vector3.Lerp(mMomentum, offset * (realTimeDelta * momentumAmount), 0.5f);
+			mMomentum = Vector2.Lerp(mMomentum, offset * (realTimeDelta * momentumAmount), 0.5f);
 
 			// Constrain the UI to the bounds, and if done so, eliminate the momentum
 			if (dragEffect != UIDragObject.DragEffect.MomentumAndSpring && ConstrainToBounds(true))
 			{
-				mMomentum = Vector3.zero;
+				mMomentum = Vector2.zero;
 				mScroll = 0f;
 			}
 		}
@@ -127,7 +127,7 @@ public class UIDragCamera : IgnoreTimeScale
 
 	Vector3 CalculateConstrainOffset ()
 	{
-		if (target == null || rootForBounds == null) return Vector3.zero;
+		if (target == null || rootForBounds == null || rootForBounds.childCount == 0) return Vector3.zero;
 
 		Vector3 bottomLeft = new Vector3(target.rect.xMin * Screen.width, target.rect.yMin * Screen.height, 0f);
 		Vector3 topRight   = new Vector3(target.rect.xMax * Screen.width, target.rect.yMax * Screen.height, 0f);
@@ -187,13 +187,13 @@ public class UIDragCamera : IgnoreTimeScale
 		}
 		else
 		{
-			mMomentum += (Vector3)scale * (mScroll * 20f);
+			mMomentum += scale * (mScroll * 20f);
 			mScroll = NGUIMath.SpringLerp(mScroll, 0f, 20f, delta);
 
 			if (mMomentum.magnitude > 0.01f)
 			{
 				// Apply the momentum
-				mTrans.localPosition += NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
+				mTrans.localPosition += (Vector3)NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
 				mBounds = NGUIMath.CalculateAbsoluteWidgetBounds(rootForBounds);
 
 				if (!ConstrainToBounds(dragEffect == UIDragObject.DragEffect.None))

@@ -53,6 +53,12 @@ public abstract class UIWidget : MonoBehaviour
 	public Color color { get { return mColor; } set { if (mColor != value) { mColor = value; mChanged = true; } } }
 
 	/// <summary>
+	/// Widget's alpha -- a convenience method.
+	/// </summary>
+
+	public float alpha { get { return mColor.a; } set { Color c = mColor; c.a = value; color = c; } }
+
+	/// <summary>
 	/// Set or get the value that specifies where the widget's pivot point should be.
 	/// </summary>
 
@@ -227,8 +233,7 @@ public abstract class UIWidget : MonoBehaviour
 		if (GetComponents<UIWidget>().Length > 1)
 		{
 			Debug.LogError("Can't have more than one widget on the same game object.\nDestroying the second one.", this);
-			if (Application.isPlaying) DestroyImmediate(this);
-			else Destroy(this);
+			NGUITools.Destroy(this);
 		}
 		else
 		{

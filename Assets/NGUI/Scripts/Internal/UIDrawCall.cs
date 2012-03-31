@@ -270,8 +270,8 @@ public class UIDrawCall : MonoBehaviour
 
 	void OnDestroy ()
 	{
-		if (mMesh != null) DestroyImmediate(mMesh);
-		if (mClippedMat != null) DestroyImmediate(mClippedMat);
-		if (mDepthMat != null) DestroyImmediate(mDepthMat);
+		NGUITools.DestroyImmediate(mMesh);
+		NGUITools.DestroyImmediate(mClippedMat);
+		NGUITools.DestroyImmediate(mDepthMat);
 	}
 }

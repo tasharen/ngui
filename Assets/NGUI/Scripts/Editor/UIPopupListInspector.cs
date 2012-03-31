@@ -97,6 +97,14 @@ public class UIPopupListInspector : Editor
 				mList.selection = sel;
 			}
 
+			UIPopupList.Position pos = (UIPopupList.Position)EditorGUILayout.EnumPopup("Position", mList.position);
+
+			if (mList.position != pos)
+			{
+				RegisterUndo();
+				mList.position = pos;
+			}
+
 			float ts = EditorGUILayout.FloatField("Text Scale", mList.textScale);
 			Color tc = EditorGUILayout.ColorField("Text Color", mList.textColor);
 			Color bc = EditorGUILayout.ColorField("Background", mList.backgroundColor);
