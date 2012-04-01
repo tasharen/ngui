@@ -115,8 +115,8 @@ public class UIAnchor : MonoBehaviour
 			float screenWidth  = rect.width;
 			float screenHeight = rect.height;
 
-			v.x += relativeOffset.x * screenWidth  - screenWidth  * 0.5f;
-			v.y += relativeOffset.y * screenHeight - screenHeight * 0.5f;
+			v.x += relativeOffset.x * screenWidth;
+			v.y += relativeOffset.y * screenHeight;
 
 			if (uiCamera.orthographic)
 			{
@@ -130,8 +130,11 @@ public class UIAnchor : MonoBehaviour
 				}
 			}
 
+			// Convert from screen to world coordinates, since the two may not match (UIRoot set to manual size)
+			v = uiCamera.ScreenToWorldPoint(v);
+
 			// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
-			if (mTrans.localPosition != v) mTrans.localPosition = v;
+			if (mTrans.position != v) mTrans.position = v;
 		}
 	}
 }

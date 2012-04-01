@@ -89,6 +89,12 @@ public class Localization : MonoBehaviour
 	void Awake () { if (mInst == null) mInst = this; }
 
 	/// <summary>
+	/// Oddly enough... sometimes if there is no OnEnable function in Localization, it can get the Awake call after UILocalize's OnEnable.
+	/// </summary>
+
+	void OnEnable () { if (mInst == null) mInst = this; }
+
+	/// <summary>
 	/// Remove the instance reference.
 	/// </summary>
 
