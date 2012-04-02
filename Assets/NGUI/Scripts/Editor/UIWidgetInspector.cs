@@ -17,7 +17,6 @@ public class UIWidgetInspector : Editor
 	static protected bool mUseShader = false;
 
 	bool mInitialized = false;
-	bool mHierarchyCheck = true;
 	protected bool mAllowPreview = true;
 
 	/// <summary>
@@ -45,9 +44,6 @@ public class UIWidgetInspector : Editor
 		}
 
 		NGUIEditorTools.DrawSeparator();
-
-		// Check the hierarchy to ensure that this widget is not parented to another widget
-		if (mHierarchyCheck) CheckHierarchy();
 
 		// Check to see if we can draw the widget's default properties to begin with
 		if (OnDrawProperties())
@@ -149,40 +145,6 @@ public class UIWidgetInspector : Editor
 
 			// Draw the texture last
 			if (UISettings.texturePreview) OnDrawTexture();
-		}
-	}
-
-	/// <summary>
-	/// Check the hierarchy to ensure that this widget is not parented to another widget.
-	/// </summary>
- 
-	void CheckHierarchy()
-	{
-		mHierarchyCheck = false;
-		if (Application.isPlaying) return;
-		Transform trans = mWidget.transform.parent;
-		if (trans == null) return;
-		Vector3 scale = trans.lossyScale;
-
-		if (Mathf.Abs(scale.x - scale.y) > 0.001f || Mathf.Abs(scale.y - scale.x) > 0.001f)
-		{
-			Debug.LogWarning("Parent of " + NGUITools.GetHierarchy(mWidget.gameObject) + " does not have a uniform absolute scale.\n" +
-				"Consider re-parenting to a uniformly-scaled game object instead.");
-
-			// If the warning above gets triggered, it means that the widget's parent does not have a uniform scale.
-			// This may lead to strangeness when scaling or rotating the widget. Consider this hierarchy:
-
-			// Widget #1
-			//  |
-			//  +- Widget #2
-
-			// You can change it to this, solving the problem:
-
-			// GameObject (scale 1, 1, 1)
-			//  |
-			//  +- Widget #1
-			//  |
-			//  +- Widget #2
 		}
 	}
 

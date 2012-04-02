@@ -350,6 +350,35 @@ public class UIPanel : MonoBehaviour
 	{
 		if (w != null)
 		{
+#if UNITY_EDITOR
+			if (Application.isEditor && w.cachedTransform.parent != null)
+			{
+				UIWidget parentWidget = NGUITools.FindInParents<UIWidget>(w.cachedTransform.parent.gameObject);
+
+				if (parentWidget != null)
+				{
+					w.cachedTransform.parent = parentWidget.cachedTransform.parent;
+					Debug.LogError("You should never nest widgets! Parent them to a common game object instead. Forcefully changing the parent.", w);
+
+					// If the error above gets triggered, it means that you parented one widget to another.
+					// If left unchecked, this may lead to odd behavior in the UI. Consider restructuring your UI.
+					// For example, if you were trying to do this:
+
+					// Widget #1
+					//  |
+					//  +- Widget #2
+
+					// You can do this instead, fixing the problem:
+
+					// GameObject (scale 1, 1, 1)
+					//  |
+					//  +- Widget #1
+					//  |
+					//  +- Widget #2
+				}
+			}
+#endif
+
 			UINode node = AddTransform(w.cachedTransform);
 
 			if (node != null)

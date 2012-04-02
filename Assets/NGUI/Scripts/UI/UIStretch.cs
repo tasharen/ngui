@@ -28,10 +28,12 @@ public class UIStretch : MonoBehaviour
 	public Vector2 relativeSize = Vector2.one;
 
 	Transform mTrans;
+	UIRoot mRoot;
 
 	void OnEnable ()
 	{
 		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
+		mRoot = NGUITools.FindInParents<UIRoot>(gameObject);
 	}
 
 	void Update ()
@@ -43,6 +45,13 @@ public class UIStretch : MonoBehaviour
 			Rect rect = uiCamera.pixelRect;
 			float screenWidth  = rect.width;
 			float screenHeight = rect.height;
+
+			if (mRoot != null && !mRoot.automatic && screenHeight > 1f)
+			{
+				float scale = mRoot.manualHeight / screenHeight;
+				screenWidth *= scale;
+				screenHeight *= scale;
+			}
 
 			Vector3 localScale = mTrans.localScale;
 
