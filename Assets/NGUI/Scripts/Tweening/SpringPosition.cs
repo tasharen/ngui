@@ -38,13 +38,23 @@ public class SpringPosition : IgnoreTimeScale
 		{
 			if (mThreshold == 0f) mThreshold = (target - mTrans.position).magnitude * 0.005f;
 			mTrans.position = NGUIMath.SpringLerp(mTrans.position, target, strength, delta);
-			if (mThreshold >= (target - mTrans.position).magnitude) enabled = false;
+
+			if (mThreshold >= (target - mTrans.position).magnitude)
+			{
+				mTrans.localPosition = target;
+				enabled = false;
+			}
 		}
 		else
 		{
 			if (mThreshold == 0f) mThreshold = (target - mTrans.localPosition).magnitude * 0.005f;
 			mTrans.localPosition = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, delta);
-			if (mThreshold >= (target - mTrans.localPosition).magnitude) enabled = false;
+
+			if (mThreshold >= (target - mTrans.localPosition).magnitude)
+			{
+				mTrans.localPosition = target;
+				enabled = false;
+			}
 		}
 	}
 

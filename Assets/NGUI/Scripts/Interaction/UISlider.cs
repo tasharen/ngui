@@ -246,7 +246,19 @@ public class UISlider : IgnoreTimeScale
 			else if (foreground != null)
 			{
 				mForeTrans.localScale = scale;
-				if (mWidget != null) mWidget.MarkAsChanged();
+				
+				if (mWidget != null)
+				{
+					if (val > 0.001f)
+					{
+						mWidget.enabled = true;
+						mWidget.MarkAsChanged();
+					}
+					else
+					{
+						mWidget.enabled = false;
+					}
+				}
 			}
 
 			if (thumb != null)
