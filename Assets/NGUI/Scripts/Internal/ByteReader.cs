@@ -147,7 +147,7 @@ public class ByteReader
 			string line = ReadLine();
 			if (line == null) break;
 
-			string[] split = line.Split(separator, System.StringSplitOptions.RemoveEmptyEntries);
+			string[] split = line.Split(separator, 2, System.StringSplitOptions.RemoveEmptyEntries);
 
 			if (split.Length == 2)
 			{

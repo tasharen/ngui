@@ -41,7 +41,7 @@ public class SpringPosition : IgnoreTimeScale
 
 			if (mThreshold >= (target - mTrans.position).magnitude)
 			{
-				mTrans.localPosition = target;
+				mTrans.position = target;
 				enabled = false;
 			}
 		}
