@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿//----------------------------------------------
+//            NGUI: Next-Gen UI kit
+// Copyright © 2011-2012 Tasharen Entertainment
+//----------------------------------------------
+
+using UnityEngine;
 
 /// <summary>
 /// Abstract UI component observing an item somewhere in the inventory. This item can be equipped on

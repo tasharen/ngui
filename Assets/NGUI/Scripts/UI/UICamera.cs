@@ -177,8 +177,10 @@ public class UICamera : MonoBehaviour
 	// Selected widget (for input)
 	static GameObject mSel = null;
 
-	// Mouse event
-	static MouseOrTouch mMouse = new MouseOrTouch();
+	// Mouse events
+	static MouseOrTouch mMouse0 = new MouseOrTouch();
+	static MouseOrTouch mMouse1 = new MouseOrTouch();
+	static MouseOrTouch mMouse2 = new MouseOrTouch();
 
 	// Joystick/controller/keyboard event
 	static MouseOrTouch mJoystick = new MouseOrTouch();
@@ -214,7 +216,7 @@ public class UICamera : MonoBehaviour
 	/// The object the mouse is hovering over. Results may be somewhat odd on touch-based devices.
 	/// </summary>
 
-	static public GameObject hoveredObject { get { return mMouse.current; } }
+	static public GameObject hoveredObject { get { return mMouse0.current; } }
 
 	/// <summary>
 	/// Option to manually set the selected game object.
@@ -486,9 +488,9 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Save the starting mouse position
-		mMouse.pos.x = Input.mousePosition.x;
-		mMouse.pos.y = Input.mousePosition.y;
-		lastTouchPosition = mMouse.pos;
+		mMouse0.pos.x = Input.mousePosition.x;
+		mMouse0.pos.y = Input.mousePosition.y;
+		lastTouchPosition = mMouse0.pos;
 
 		// Add this camera to the list
 		mList.Add(this);
@@ -515,7 +517,7 @@ public class UICamera : MonoBehaviour
 	{
 		if (useMouse && Application.isPlaying && handlesEvents)
 		{
-			mMouse.current = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+			mMouse0.current = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
 		}
 	}
 
@@ -556,14 +558,14 @@ public class UICamera : MonoBehaviour
 		}
 
 		// If it's time to show a tooltip, inform the object we're hovering over
-		if (useMouse && mMouse.hover != null)
+		if (useMouse && mMouse0.hover != null)
 		{
 			float scroll = Input.GetAxis(scrollAxisName);
-			if (scroll != 0f) mMouse.hover.SendMessage("OnScroll", scroll, SendMessageOptions.DontRequireReceiver);
+			if (scroll != 0f) mMouse0.hover.SendMessage("OnScroll", scroll, SendMessageOptions.DontRequireReceiver);
 
 			if (mTooltipTime != 0f && mTooltipTime < Time.realtimeSinceStartup)
 			{
-				mTooltip = mMouse.hover;
+				mTooltip = mMouse0.hover;
 				ShowTooltip(true);
 			}
 		}
@@ -575,10 +577,6 @@ public class UICamera : MonoBehaviour
 
 	void ProcessMouse ()
 	{
-		currentTouch = mMouse;
-		lastTouchPosition = Input.mousePosition;
-		currentTouch.delta = lastTouchPosition - currentTouch.pos;
-
 		bool updateRaycast = (Time.timeScale < 0.9f);
 
 		if (!updateRaycast)
@@ -593,9 +591,13 @@ public class UICamera : MonoBehaviour
 			}
 		}
 
+		lastTouchPosition = Input.mousePosition;
+		mMouse0.delta = lastTouchPosition - mMouse0.pos;
+		mMouse0.pos = lastTouchPosition;
+
 		if (updateRaycast)
 		{
-			currentTouch.current = Raycast(lastTouchPosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+			mMouse0.current = Raycast(lastTouchPosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
 		}
 
 		for (int i = 0; i < 3; ++i)
@@ -603,7 +605,25 @@ public class UICamera : MonoBehaviour
 			bool pressed = Input.GetMouseButtonDown(i);
 			bool unpressed = Input.GetMouseButtonUp(i);
 
-			currentTouchID = -1 - i;
+			if (i == 2)
+			{
+				currentTouch = mMouse2;
+				currentTouch.pos = mMouse0.pos;
+				currentTouch.delta = mMouse0.delta;
+				currentTouchID = -3;
+			}
+			else if (i == 1)
+			{
+				currentTouch = mMouse1;
+				currentTouch.pos = mMouse0.pos;
+				currentTouch.delta = mMouse0.delta;
+				currentTouchID = -2;
+			}
+			else
+			{
+				currentTouch = mMouse0;
+				currentTouchID = -1;
+			}
 
 			// We don't want to update the last camera while there is a touch happening
 			if (pressed) currentTouch.pressedCam = currentCamera;
@@ -758,7 +778,7 @@ public class UICamera : MonoBehaviour
 			else if (currentTouch.clickNotification == ClickNotification.BasedOnDelta)
 			{
 				// If the notification is based on delta and the delta gets exceeded, disable the notification
-				float threshold = (currentTouch == mMouse) ? mouseClickThreshold : Mathf.Max(touchClickThreshold, Screen.height * 0.1f);
+				float threshold = (currentTouch == mMouse0) ? mouseClickThreshold : Mathf.Max(touchClickThreshold, Screen.height * 0.1f);
 
 				if (currentTouch.totalDelta.magnitude > threshold)
 				{

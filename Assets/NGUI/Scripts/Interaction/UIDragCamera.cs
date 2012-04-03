@@ -102,11 +102,11 @@ public class UIDragCamera : IgnoreTimeScale
 
 	void OnDrag (Vector2 delta)
 	{
-		if (target != null)
+		if (target != null && UICamera.currentTouchID == -1)
 		{
 			UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
 
-			Vector2 offset = Vector2.Scale(delta, -scale) * target.orthographicSize;
+			Vector2 offset = Vector2.Scale(delta, -scale);
 			mTrans.localPosition += (Vector3)offset;
 
 			// Adjust the momentum

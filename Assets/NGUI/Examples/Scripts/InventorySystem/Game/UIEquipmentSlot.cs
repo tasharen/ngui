@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿//----------------------------------------------
+//            NGUI: Next-Gen UI kit
+// Copyright © 2011-2012 Tasharen Entertainment
+//----------------------------------------------
+
+using UnityEngine;
 
 /// <summary>
 /// A UI script that keeps an eye on the slot in character equipment.

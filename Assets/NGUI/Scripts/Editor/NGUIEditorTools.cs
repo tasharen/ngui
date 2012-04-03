@@ -450,8 +450,11 @@ public class NGUIEditorTools
 		// Only use active objects
 		if (go != null && !go.active) go = null;
 
+		// Try to find a panel
+		UIPanel p = (go != null) ? NGUITools.FindInParents<UIPanel>(go) : null;
+
 		// No selection? Try to find the root automatically
-		if (go == null)
+		if (p == null)
 		{
 			UIPanel[] panels = GameObject.FindSceneObjectsOfType(typeof(UIPanel)) as UIPanel[];
 			if (panels.Length > 0) go = panels[0].gameObject;
@@ -467,12 +470,7 @@ public class NGUIEditorTools
 				   !Mathf.Approximately(t.localScale.x, t.localScale.z))
 			{
 				t = t.parent;
-
-				if (t == null)
-				{
-					Debug.LogWarning("You must select a uniformly scaled object first.");
-					return null;
-				}
+				if (t == null) return (p != null) ? p.gameObject : null;
 				else go = t.gameObject;
 			}
 		}

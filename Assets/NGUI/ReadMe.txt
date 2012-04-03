@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.90c
+                Version 1.91
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -33,6 +33,11 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+1.91:
+- NEW: Added a new example scene showing how to easily implement drag & drop from 2D UI to the 3D world.
+- FIX: UICamera was sending multiple OnDrag events for the mouse. This has now been fixed.
+- FIX: UIAnchor changes in 1.90 had a few adverse effects on two of the examples.
 
 1.90:
 - NEW: You can now specify an option on the UIDragPanelContents that will prevent dragging if the contents already fit.
