@@ -90,12 +90,10 @@ public class UICheckbox : MonoBehaviour
 			{
 				UICheckbox[] cbs = radioButtonRoot.GetComponentsInChildren<UICheckbox>();
 
-				foreach (UICheckbox cb in cbs)
+				for (int i = 0, imax = cbs.Length; i < imax; ++i)
 				{
-					if (cb != this && cb.radioButtonRoot == radioButtonRoot)
-					{
-						cb.Set(false);
-					}
+					UICheckbox cb = cbs[i];
+					if (cb != this && cb.radioButtonRoot == radioButtonRoot) cb.Set(false);
 				}
 			}
 

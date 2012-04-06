@@ -38,8 +38,10 @@ public class BMGlyph
 	{
 		if (kerning != null)
 		{
-			foreach (Kerning k in kerning)
+			for (int i = 0, imax = kerning.Count; i < imax; ++i)
 			{
+				Kerning k = kerning[i];
+
 				if (k.previousChar == previousChar)
 				{
 					return k.amount;

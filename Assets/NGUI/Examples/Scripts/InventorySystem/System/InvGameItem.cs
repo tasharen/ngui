@@ -173,16 +173,19 @@ public class InvGameItem
 		{
 			float mult = statMultiplier;
 			List<InvStat> baseStats = baseItem.stats;
-			
-			foreach (InvStat bs in baseStats)
+
+			for (int i = 0, imax = baseStats.Count; i < imax; ++i)
 			{
+				InvStat bs = baseStats[i];
 				int amount = Mathf.RoundToInt(mult * bs.amount);
 				if (amount == 0) continue;
 
 				bool found = false;
 
-				foreach (InvStat s in stats)
+				for (int b = 0, bmax = stats.Count; b < bmax; ++b)
 				{
+					InvStat s = stats[b];
+
 					if (s.id == bs.id && s.modifier == bs.modifier)
 					{
 						s.amount += amount;

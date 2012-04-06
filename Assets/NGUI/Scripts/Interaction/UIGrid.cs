@@ -59,8 +59,9 @@ public class UIGrid : MonoBehaviour
 			for (int i = 0; i < myTrans.childCount; ++i) list.Add(myTrans.GetChild(i));
 			list.Sort(SortByName);
 
-			foreach (Transform t in list)
+			for (int i = 0, imax = list.Count; i < imax; ++i)
 			{
+				Transform t = list[i];
 				if (!t.gameObject.active && hideInactive) continue;
 
 				t.localPosition = (arrangement == Arrangement.Horizontal) ?

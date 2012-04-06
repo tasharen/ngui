@@ -36,8 +36,9 @@ public class UISavedOption : MonoBehaviour
 			{
 				UICheckbox[] checkboxes = GetComponentsInChildren<UICheckbox>();
 
-				foreach (UICheckbox ch in checkboxes)
+				for (int i = 0, imax = checkboxes.Length; i < imax; ++i)
 				{
+					UICheckbox ch = checkboxes[i];
 					UIEventListener.Add(ch.gameObject).onClick -= Save;
 					ch.isChecked = (ch.name == s);
 					Debug.Log(s);
@@ -69,8 +70,10 @@ public class UISavedOption : MonoBehaviour
 		{
 			UICheckbox[] checkboxes = GetComponentsInChildren<UICheckbox>();
 
-			foreach (UICheckbox ch in checkboxes)
+			for (int i = 0, imax = checkboxes.Length; i < imax; ++i)
 			{
+				UICheckbox ch = checkboxes[i];
+
 				if (ch.isChecked)
 				{
 					PlayerPrefs.SetString(key, ch.name);

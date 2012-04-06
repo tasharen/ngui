@@ -44,9 +44,9 @@ public class NGUIDebug : MonoBehaviour
 	
 	void OnGUI()
 	{
-		foreach (string text in mLines)
+		for (int i = 0, imax = mLines.Count; i < imax; ++i)
 		{
-			GUILayout.Label(text);
+			GUILayout.Label(mLines[i]);
 		}
 	}
 }

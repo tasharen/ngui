@@ -383,8 +383,10 @@ public class UIFont : MonoBehaviour
 		mSprite = null;
 		UILabel[] labels = NGUITools.FindActive<UILabel>();
 
-		foreach (UILabel lbl in labels)
+		for (int i = 0, imax = labels.Length; i < imax; ++i)
 		{
+			UILabel lbl = labels[i];
+
 			if (lbl.enabled && lbl.gameObject.active && CheckIfRelated(this, lbl.font))
 			{
 				UIFont fnt = lbl.font;

@@ -193,8 +193,10 @@ static public class NGUITools
 
 		Camera[] cameras = NGUITools.FindActive<Camera>();
 
-		foreach (Camera cam in cameras)
+		for (int i = 0, imax = cameras.Length; i < imax; ++i)
 		{
+			Camera cam = cameras[i];
+
 			if ((cam.cullingMask & layerMask) != 0)
 			{
 				return cam;
@@ -243,9 +245,11 @@ static public class NGUITools
 	static public void ReplaceAtlas (UIAtlas before, UIAtlas after)
 	{
 		UISprite[] sprites = NGUITools.FindActive<UISprite>();
-		
-		foreach (UISprite sprite in sprites)
+
+		for (int i = 0, imax = sprites.Length; i < imax; ++i)
 		{
+			UISprite sprite = sprites[i];
+
 			if (sprite.atlas == before)
 			{
 				sprite.atlas = after;
@@ -254,8 +258,10 @@ static public class NGUITools
 
 		UILabel[] labels = NGUITools.FindActive<UILabel>();
 
-		foreach (UILabel lbl in labels)
+		for (int i = 0, imax = labels.Length; i < imax; ++i)
 		{
+			UILabel lbl = labels[i];
+
 			if (lbl.font != null && lbl.font.atlas == before)
 			{
 				lbl.font.atlas = after;
@@ -272,12 +278,10 @@ static public class NGUITools
 	{
 		UILabel[] labels = NGUITools.FindActive<UILabel>();
 
-		foreach (UILabel lbl in labels)
+		for (int i = 0, imax = labels.Length; i < imax; ++i)
 		{
-			if (lbl.font == before)
-			{
-				lbl.font = after;
-			}
+			UILabel lbl = labels[i];
+			if (lbl.font == before) lbl.font = after;
 		}
 	}
 
@@ -341,7 +345,7 @@ static public class NGUITools
 	{
 		int depth = -1;
 		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
-		foreach (UIWidget w in widgets) depth = Mathf.Max(depth, w.depth);
+		for (int i = 0, imax = widgets.Length; i < imax; ++i) depth = Mathf.Max(depth, widgets[i].depth);
 		return depth + 1;
 	}
 
@@ -446,7 +450,7 @@ static public class NGUITools
 	static public void Broadcast (string funcName)
 	{
 		GameObject[] gos = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
-		foreach (GameObject go in gos) go.SendMessage(funcName, SendMessageOptions.DontRequireReceiver);
+		for (int i = 0, imax = gos.Length; i < imax; ++i) gos[i].SendMessage(funcName, SendMessageOptions.DontRequireReceiver);
 	}
 
 	/// <summary>
@@ -456,7 +460,7 @@ static public class NGUITools
 	static public void Broadcast (string funcName, object param)
 	{
 		GameObject[] gos = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
-		foreach (GameObject go in gos) go.SendMessage(funcName, param, SendMessageOptions.DontRequireReceiver);
+		for (int i = 0, imax = gos.Length; i < imax; ++i) gos[i].SendMessage(funcName, param, SendMessageOptions.DontRequireReceiver);
 	}
 
 	/// <summary>

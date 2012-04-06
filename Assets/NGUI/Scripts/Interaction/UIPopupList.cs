@@ -272,8 +272,10 @@ public class UIPopupList : MonoBehaviour
 
 		UIButtonSound[] sounds = GetComponents<UIButtonSound>();
 
-		foreach (UIButtonSound snd in sounds)
+		for (int i = 0, imax = sounds.Length; i < imax; ++i)
 		{
+			UIButtonSound snd = sounds[i];
+
 			if (snd.trigger == UIButtonSound.Trigger.OnClick)
 			{
 				NGUITools.PlaySound(snd.audioClip, snd.volume);
@@ -332,16 +334,17 @@ public class UIPopupList : MonoBehaviour
 			if (isAnimated)
 			{
 				UIWidget[] widgets = mChild.GetComponentsInChildren<UIWidget>();
-				
-				foreach (UIWidget w in widgets)
+
+				for (int i = 0, imax = widgets.Length; i < imax; ++i)
 				{
+					UIWidget w = widgets[i];
 					Color c = w.color;
 					c.a = 0f;
 					TweenColor.Begin(w.gameObject, animSpeed, c).method = UITweener.Method.EaseOut;
 				}
 
 				Collider[] cols = mChild.GetComponentsInChildren<Collider>();
-				foreach (Collider col in cols) col.enabled = false;
+				for (int i = 0, imax = cols.Length; i < imax; ++i) cols[i].enabled = false;
 				UpdateManager.AddDestroy(mChild, animSpeed);
 			}
 			else
@@ -511,8 +514,9 @@ public class UIPopupList : MonoBehaviour
 			Vector3 bcSize = new Vector3(x / fontScale, (fontScale + padding.y) / fontScale, 1f);
 
 			// Run through all labels and add colliders
-			foreach (UILabel lbl in labels)
+			for (int i = 0, imax = labels.Count; i < imax; ++i)
 			{
+				UILabel lbl = labels[i];
 				BoxCollider bc = NGUITools.AddWidgetCollider(lbl.gameObject);
 				bcCenter.z = bc.center.z;
 				bc.center = bcCenter;
@@ -548,7 +552,7 @@ public class UIPopupList : MonoBehaviour
 			{
 				float bottom = y + fontScale;
 				Animate(mHighlight, placeAbove, bottom);
-				foreach (UILabel lbl in labels) Animate(lbl, placeAbove, bottom);
+				for (int i = 0, imax = labels.Count; i < imax; ++i) Animate(labels[i], placeAbove, bottom);
 				AnimateColor(mBackground);
 				AnimateScale(mBackground, placeAbove, bottom);
 			}

@@ -68,8 +68,10 @@ public class Localization : MonoBehaviour
 				}
 				else
 				{
-					foreach (TextAsset asset in languages)
+					for (int i = 0, imax = languages.Length; i < imax; ++i)
 					{
+						TextAsset asset = languages[i];
+
 						if (asset != null && asset.name == value)
 						{
 							Load(asset);

@@ -79,17 +79,16 @@ public class BMFont
 	{
 		if (mGlyphs != null && mGlyphs.Length > 0)
 		{
-			int i = 0;
-
-			foreach (BMGlyph bmg in mGlyphs)
+			for (int i = 0, imax = mGlyphs.Length; i < imax; ++i)
 			{
+				BMGlyph bmg = mGlyphs[i];
+
 				if (bmg != null)
 				{
 					bmg.index = i;
 					mSaved.Add(bmg);
 					mDict.Add(i, bmg);
 				}
-				++i;
 			}
 			mGlyphs = null;
 			return true;
@@ -128,8 +127,9 @@ public class BMFont
 			else
 			{
 				// Populate the dictionary for faster access
-				foreach (BMGlyph bmg in mSaved)
+				for (int i = 0, imax = mSaved.Count; i < imax; ++i)
 				{
+					BMGlyph bmg = mSaved[i];
 					mDict.Add(bmg.index, bmg);
 				}
 			}
@@ -171,12 +171,10 @@ public class BMFont
 	{
 		if (isValid)
 		{
-			foreach (BMGlyph glyph in mSaved)
+			for (int i = 0, imax = mSaved.Count; i < imax; ++i)
 			{
-				if (glyph != null)
-				{
-					glyph.Trim(xMin, yMin, xMax, yMax);
-				}
+				BMGlyph glyph = mSaved[i];
+				if (glyph != null) glyph.Trim(xMin, yMin, xMax, yMax);
 			}
 		}
 	}

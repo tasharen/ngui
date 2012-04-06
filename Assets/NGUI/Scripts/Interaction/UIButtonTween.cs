@@ -67,8 +67,10 @@ public class UIButtonTween : MonoBehaviour
 			bool isFinished = true;
 			bool properDirection = true;
 
-			foreach (UITweener tw in mTweens)
+			for (int i = 0, imax = mTweens.Length; i < imax; ++i)
 			{
+				UITweener tw = mTweens[i];
+
 				if (tw.enabled)
 				{
 					isFinished = false;
@@ -119,8 +121,10 @@ public class UIButtonTween : MonoBehaviour
 			if (playDirection == Direction.Reverse) forward = !forward;
 
 			// Run through all located tween components
-			foreach (UITweener tw in mTweens)
+			for (int i = 0, imax = mTweens.Length; i < imax; ++i)
 			{
+				UITweener tw = mTweens[i];
+
 				// If the tweener's group matches, we can work with it
 				if (tw.tweenGroup == tweenGroup)
 				{

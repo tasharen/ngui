@@ -30,8 +30,9 @@ public class LanguageSelection : MonoBehaviour
 		{
 			mList.items.Clear();
 
-			foreach (TextAsset asset in Localization.instance.languages)
+			for (int i = 0, imax = Localization.instance.languages.Length; i < imax; ++i)
 			{
+				TextAsset asset = Localization.instance.languages[i];
 				if (asset != null) mList.items.Add(asset.name);
 			}
 			mList.selection = Localization.instance.currentLanguage;

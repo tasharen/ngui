@@ -79,8 +79,9 @@ public class UITooltip : MonoBehaviour
 
 	void SetAlpha (float val)
 	{
-		foreach (UIWidget w in mWidgets)
+		for (int i = 0, imax = mWidgets.Length; i < imax; ++i)
 		{
+			UIWidget w = mWidgets[i];
 			Color c = w.color;
 			c.a = val;
 			w.color = c;
@@ -194,9 +195,10 @@ public class UITooltip : MonoBehaviour
 				t += "[AFAFAF]Level " + item.itemLevel + " " + bi.slot;
 				
 				List<InvStat> stats = item.CalculateStats();
-				
-				foreach (InvStat stat in stats)
+
+				for (int i = 0, imax = stats.Count; i < imax; ++i)
 				{
+					InvStat stat = stats[i];
 					if (stat.amount == 0) continue;
 
 					if (stat.amount < 0)

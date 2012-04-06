@@ -140,8 +140,10 @@ public class UIAtlas : MonoBehaviour
 				mCoordinates = value;
 				Texture tex = material.mainTexture;
 
-				foreach (Sprite s in sprites)
+				for (int i = 0, imax = sprites.Count; i < imax; ++i)
 				{
+					Sprite s = sprites[i];
+
 					if (mCoordinates == Coordinates.TexCoords)
 					{
 						s.outer = NGUIMath.ConvertToTexCoords(s.outer, tex.width, tex.height);
@@ -227,8 +229,10 @@ public class UIAtlas : MonoBehaviour
 		}
 		else if (!string.IsNullOrEmpty(name))
 		{
-			foreach (Sprite s in sprites)
+			for (int i = 0, imax = sprites.Count; i < imax; ++i)
 			{
+				Sprite s = sprites[i];
+
 				// string.Equals doesn't seem to work with Flash export
 				if (!string.IsNullOrEmpty(s.name) && name == s.name)
 				{
@@ -251,7 +255,12 @@ public class UIAtlas : MonoBehaviour
 	{
 		if (mReplacement != null) return mReplacement.GetListOfSprites();
 		List<string> list = new List<string>();
-		foreach (Sprite s in sprites) if (s != null && !string.IsNullOrEmpty(s.name)) list.Add(s.name);
+		
+		for (int i = 0, imax = sprites.Count; i < imax; ++i)
+		{
+			Sprite s = sprites[i];
+			if (s != null && !string.IsNullOrEmpty(s.name)) list.Add(s.name);
+		}
 		list.Sort();
 		return list;
 	}
@@ -285,8 +294,10 @@ public class UIAtlas : MonoBehaviour
 	{
 		UISprite[] list = NGUITools.FindActive<UISprite>();
 
-		foreach (UISprite sp in list)
+		for (int i = 0, imax = list.Length; i < imax; ++i)
 		{
+			UISprite sp = list[i];
+
 			if (CheckIfRelated(this, sp.atlas))
 			{
 				UIAtlas atl = sp.atlas;
@@ -300,8 +311,10 @@ public class UIAtlas : MonoBehaviour
 
 		UIFont[] fonts = Resources.FindObjectsOfTypeAll(typeof(UIFont)) as UIFont[];
 
-		foreach (UIFont font in fonts)
+		for (int i = 0, imax = fonts.Length; i < imax; ++i)
 		{
+			UIFont font = fonts[i];
+
 			if (CheckIfRelated(this, font.atlas))
 			{
 				UIAtlas atl = font.atlas;
@@ -315,8 +328,10 @@ public class UIAtlas : MonoBehaviour
 
 		UILabel[] labels = NGUITools.FindActive<UILabel>();
 
-		foreach (UILabel lbl in labels)
+		for (int i = 0, imax = labels.Length; i < imax; ++i)
 		{
+			UILabel lbl = labels[i];
+
 			if (lbl.font != null && CheckIfRelated(this, lbl.font.atlas))
 			{
 				UIFont font = lbl.font;

@@ -269,8 +269,9 @@ static public class NGUIMath
 		Bounds b = new Bounds(trans.transform.position, Vector3.zero);
 		bool first = true;
 
-		foreach (UIWidget w in widgets)
+		for (int i = 0, imax = widgets.Length; i < imax; ++i)
 		{
+			UIWidget w = widgets[i];
 			Vector2 size = w.relativeSize;
 			Vector2 offset = w.pivotOffset;
 			float x = (offset.x + 0.5f) * size.x;
@@ -310,8 +311,9 @@ static public class NGUIMath
 		Bounds b = new Bounds(Vector3.zero, Vector3.zero);
 		bool first = true;
 
-		foreach (UIWidget w in widgets)
+		for (int i = 0, imax = widgets.Length; i < imax; ++i)
 		{
+			UIWidget w = widgets[i];
 			Vector2 size = w.relativeSize;
 			Vector2 offset = w.pivotOffset;
 

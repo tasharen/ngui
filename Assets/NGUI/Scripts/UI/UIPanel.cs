@@ -6,6 +6,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+#if !UNITY_FLASH
+using System.Collections.Specialized;
+#endif
+
 /// <summary>
 /// UI Panel is responsible for collecting, sorting and updating widgets in addition to generating widgets' geometry.
 /// </summary>
@@ -50,7 +54,11 @@ public class UIPanel : MonoBehaviour
 	[SerializeField] Vector2 mClipSoftness = new Vector2(40f, 40f);
 
 	// List of managed transforms
+#if UNITY_FLASH
 	Dictionary<Transform, UINode> mChildren = new Dictionary<Transform, UINode>();
+#else
+	OrderedDictionary mChildren = new OrderedDictionary();
+#endif
 
 	// List of all widgets managed by this panel
 	List<UIWidget> mWidgets = new List<UIWidget>();
@@ -117,8 +125,9 @@ public class UIPanel : MonoBehaviour
 				List<UIDrawCall> list = drawCalls;
 				HideFlags flags = (mDebugInfo == DebugInfo.Geometry) ? HideFlags.DontSave | HideFlags.NotEditable : HideFlags.HideAndDontSave;
 
-				foreach (UIDrawCall dc in list)
+				for (int i = 0, imax = list.Count; i < imax;  ++i)
 				{
+					UIDrawCall dc = list[i];
 					GameObject go = dc.gameObject;
 					go.active = false;
 					go.hideFlags = flags;
@@ -206,7 +215,11 @@ public class UIPanel : MonoBehaviour
 	UINode GetNode (Transform t)
 	{
 		UINode node = null;
+#if UNITY_FLASH
 		if (t != null) mChildren.TryGetValue(t, out node);
+#else
+		if (t != null && mChildren.Contains(t)) node = (UINode)mChildren[t];
+#endif
 		return node;
 	}
 
@@ -293,7 +306,11 @@ public class UIPanel : MonoBehaviour
 
 	public bool WatchesTransform (Transform t)
 	{
+#if UNITY_FLASH
 		return t == cachedTransform || mChildren.ContainsKey(t);
+#else
+		return t == cachedTransform || mChildren.Contains(t);
+#endif
 	}
 
 	/// <summary>
@@ -309,11 +326,19 @@ public class UIPanel : MonoBehaviour
 		while (t != null && t != cachedTransform)
 		{
 			// If the node is already managed, we're done
+#if UNITY_FLASH
 			if (mChildren.TryGetValue(t, out node))
 			{
 				if (retVal == null) retVal = node;
 				break;
 			}
+#else
+			if (mChildren.Contains(t))
+			{
+				if (retVal == null) retVal = (UINode)mChildren[t];
+				break;
+			}
+#endif
 			else
 			{
 				// The node is not yet managed -- add it to the list
@@ -334,8 +359,14 @@ public class UIPanel : MonoBehaviour
 	{
 		if (t != null)
 		{
+#if UNITY_FLASH
 			while (mChildren.Remove(t))
 			{
+#else
+			while (mChildren.Contains(t))
+			{
+				mChildren.Remove(t);
+#endif
 				t = t.parent;
 				if (t == null || t == mTrans || t.childCount > 1) break;
 			}
@@ -429,7 +460,11 @@ public class UIPanel : MonoBehaviour
 
 	UIDrawCall GetDrawCall (Material mat, bool createIfMissing)
 	{
-		foreach (UIDrawCall dc in drawCalls) if (dc.material == mat) return dc;
+		for (int i = 0, imax = drawCalls.Count; i < imax; ++i)
+		{
+			UIDrawCall dc = drawCalls[i];
+			if (dc.material == mat) return dc;
+		}
 
 		UIDrawCall sc = null;
 
@@ -468,7 +503,7 @@ public class UIPanel : MonoBehaviour
 
 	void OnEnable ()
 	{
-		foreach (UIWidget w in mWidgets) AddWidget(w);
+		for (int i = 0, imax = mWidgets.Count; i < imax; ++i) AddWidget(mWidgets[i]);
 		mRebuildAll = true;
 	}
 
@@ -508,8 +543,14 @@ public class UIPanel : MonoBehaviour
 			for (;;)
 			{
 				// Check the parent's flag
+#if UNITY_FLASH
 				if (mChildren.TryGetValue(trans, out sub))
 				{
+#else
+				if (mChildren.Contains(trans))
+				{
+					sub = (UINode)mChildren[trans];
+#endif
 					flag = sub.changeFlag;
 					trans = trans.parent;
 
@@ -525,7 +566,11 @@ public class UIPanel : MonoBehaviour
 			}
 
 			// Update the parent flags
-			foreach (UINode pc in mHierarchy) pc.changeFlag = flag;
+			for (int i = 0, imax = mHierarchy.Count; i < imax; ++i)
+			{
+				UINode pc = mHierarchy[i];
+				pc.changeFlag = flag;
+			}
 			mHierarchy.Clear();
 		}
 		return flag;
@@ -570,9 +615,15 @@ public class UIPanel : MonoBehaviour
 		bool transformsChanged = mCheckVisibility;
 
 		// Check to see if something has changed
+#if UNITY_FLASH
 		foreach (KeyValuePair<Transform, UINode> child in mChildren)
 		{
 			UINode node = child.Value;
+#else
+		for (int i = 0, imax = mChildren.Count; i < imax; ++i)
+		{
+			UINode node = (UINode)mChildren[i];
+#endif
 
 			if (node.trans == null)
 			{
@@ -589,7 +640,7 @@ public class UIPanel : MonoBehaviour
 		}
 
 		// Clean up the deleted transforms
-		foreach (Transform rem in mRemoved) mChildren.Remove(rem);
+		for (int i = 0, imax = mRemoved.Count; i < imax; ++i) mChildren.Remove(mRemoved[i]);
 		mRemoved.Clear();
 
 		// If something has changed, propagate the changes *down* the tree hierarchy (to children).
@@ -598,9 +649,15 @@ public class UIPanel : MonoBehaviour
 
 		if (transformsChanged || mRebuildAll)
 		{
+#if UNITY_FLASH
 			foreach (KeyValuePair<Transform, UINode> child in mChildren)
 			{
 				UINode pc = child.Value;
+#else
+			for (int i = 0, imax = mChildren.Count; i < imax; ++i)
+			{
+				UINode pc = (UINode)mChildren[i];
+#endif
 
 				if (pc.widget != null)
 				{
@@ -635,9 +692,15 @@ public class UIPanel : MonoBehaviour
 
 	void UpdateWidgets ()
 	{
+#if UNITY_FLASH
 		foreach (KeyValuePair<Transform, UINode> c in mChildren)
 		{
 			UINode pc = c.Value;
+#else
+		for (int i = 0, imax = mChildren.Count; i < imax; ++i)
+		{
+			UINode pc = (UINode)mChildren[i];
+#endif
 			UIWidget w = pc.widget;
 
 			// If the widget is visible, update it
@@ -680,8 +743,9 @@ public class UIPanel : MonoBehaviour
 
 		Transform t = cachedTransform;
 
-		foreach (UIDrawCall dc in mDrawCalls)
+		for (int i = 0, imax = mDrawCalls.Count; i < imax; ++i)
 		{
+			UIDrawCall dc = mDrawCalls[i];
 			dc.clipping = mClipping;
 			dc.clipRange = range;
 			dc.clipSoftness = mClipSoftness;
@@ -706,8 +770,10 @@ public class UIPanel : MonoBehaviour
 		for (int i = mWidgets.Count; i > 0; ) if (mWidgets[--i] == null) mWidgets.RemoveAt(i);
 
 		// Fill the buffers for the specified material
-		foreach (UIWidget w in mWidgets)
+		for (int i = 0, imax = mWidgets.Count; i < imax; ++i)
 		{
+			UIWidget w = mWidgets[i];
+
 			if (w.visibleFlag == 1 && w.material == mat)
 			{
 				UINode node = GetNode(w.cachedTransform);
@@ -767,7 +833,7 @@ public class UIPanel : MonoBehaviour
 			UICamera uic = UICamera.FindCameraForLayer(mLayer);
 			mCam = (uic != null) ? uic.cachedCamera : NGUITools.FindCameraForLayer(mLayer);
 			SetChildLayer(cachedTransform, mLayer);
-			foreach (UIDrawCall dc in drawCalls) dc.gameObject.layer = mLayer;
+			for (int i = 0, imax = drawCalls.Count; i < imax; ++i) mDrawCalls[i].gameObject.layer = mLayer;
 		}
 
 		UpdateWidgets();
@@ -780,11 +846,7 @@ public class UIPanel : MonoBehaviour
 		}
 
 		// Fill the draw calls for all of the changed materials
-		foreach (Material mat in mChanged)
-		{
-			//Debug.Log(Time.time);
-			Fill(mat);
-		}
+		for (int i = 0, imax = mChanged.Count; i < imax; ++i) Fill(mChanged[i]);
 
 		// Update the clipping rects
 		UpdateDrawcalls();

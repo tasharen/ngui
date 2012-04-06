@@ -66,8 +66,9 @@ public class InvDatabase : MonoBehaviour
 
 	InvBaseItem GetItem (int id16)
 	{
-		foreach (InvBaseItem item in items)
+		for (int i = 0, imax = items.Count; i < imax; ++i)
 		{
+			InvBaseItem item = items[i];
 			if (item.id16 == id16) return item;
 		}
 		return null;
@@ -79,12 +80,10 @@ public class InvDatabase : MonoBehaviour
 
 	static InvDatabase GetDatabase (int dbID)
 	{
-		foreach (InvDatabase db in list)
+		for (int i = 0, imax = list.Length; i < imax; ++i)
 		{
-			if (db.databaseID == dbID)
-			{
-				return db;
-			}
+			InvDatabase db = list[i];
+			if (db.databaseID == dbID) return db;
 		}
 		return null;
 	}
@@ -105,10 +104,14 @@ public class InvDatabase : MonoBehaviour
 
 	static public InvBaseItem FindByName (string exact)
 	{
-		foreach (InvDatabase db in list)
+		for (int i = 0, imax = list.Length; i < imax; ++i)
 		{
-			foreach (InvBaseItem item in db.items)
+			InvDatabase db = list[i];
+
+			for (int b = 0, bmax = db.items.Count; b < bmax; ++b)
 			{
+				InvBaseItem item = db.items[b];
+
 				if (item.name == exact)
 				{
 					return item;
@@ -125,8 +128,10 @@ public class InvDatabase : MonoBehaviour
 
 	static public int FindItemID (InvBaseItem item)
 	{
-		foreach (InvDatabase db in list)
+		for (int i = 0, imax = list.Length; i < imax; ++i)
 		{
+			InvDatabase db = list[i];
+
 			if (db.items.Contains(item))
 			{
 				return (db.databaseID << 16) | item.id16;

@@ -288,9 +288,10 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			foreach (UICamera cam in mList)
+			for (int i = 0; i < mList.Count; ++i)
 			{
 				// Invalid or inactive entry -- keep going
+				UICamera cam = mList[i];
 				if (cam == null || !cam.enabled || !cam.gameObject.active) continue;
 				return cam;
 			}
@@ -315,8 +316,10 @@ public class UICamera : MonoBehaviour
 
 	static bool Raycast (Vector3 inPos, ref RaycastHit hit)
 	{
-		foreach (UICamera cam in mList)
+		for (int i = 0; i < mList.Count; ++i)
 		{
+			UICamera cam = mList[i];
+			
 			// Skip inactive scripts
 			if (!cam.enabled || !cam.gameObject.active) continue;
 
@@ -346,8 +349,9 @@ public class UICamera : MonoBehaviour
 	{
 		int layerMask = 1 << layer;
 
-		foreach (UICamera cam in mList)
+		for (int i = 0; i < mList.Count; ++i)
 		{
+			UICamera cam = mList[i];
 			Camera uc = cam.cachedCamera;
 			if ((uc != null) && (uc.cullingMask & layerMask) != 0) return cam;
 		}

@@ -52,8 +52,9 @@ public class UIButtonMessage : MonoBehaviour
 		{
 			Transform[] transforms = target.GetComponentsInChildren<Transform>();
 
-			foreach (Transform t in transforms)
+			for (int i = 0, imax = transforms.Length; i < imax; ++i)
 			{
+				Transform t = transforms[i];
 				t.gameObject.SendMessage(functionName, gameObject, SendMessageOptions.DontRequireReceiver);
 			}
 		}

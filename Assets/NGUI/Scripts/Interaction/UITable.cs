@@ -50,8 +50,9 @@ public class UITable : MonoBehaviour
 		int x = 0;
 		int y = 0;
 
-		foreach (Transform t in children)
+		for (int i = 0, imax = children.Count; i < imax; ++i)
 		{
+			Transform t = children[i];
 			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(t);
 			Vector3 scale = t.localScale;
 			b.min = Vector3.Scale(b.min, scale);
@@ -71,8 +72,9 @@ public class UITable : MonoBehaviour
 		x = 0;
 		y = 0;
 
-		foreach (Transform t in children)
+		for (int i = 0, imax = children.Count; i < imax; ++i)
 		{
+			Transform t = children[i];
 			Bounds b = bounds[y, x];
 			Bounds br = boundsRows[x];
 			Bounds bc = boundsCols[y];

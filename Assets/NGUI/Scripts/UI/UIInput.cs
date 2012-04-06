@@ -207,8 +207,10 @@ public class UIInput : MonoBehaviour
 			if (Application.platform == RuntimePlatform.Android) return;
 			if (Application.platform == RuntimePlatform.IPhonePlayer) return;
 
-			foreach (char c in input)
+			for (int i = 0, imax = input.Length; i < imax; ++i)
 			{
+				char c = input[i];
+
 				if (c == '\b')
 				{
 					// Backspace

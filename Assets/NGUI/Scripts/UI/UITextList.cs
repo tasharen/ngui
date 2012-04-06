@@ -84,7 +84,7 @@ public class UITextList : MonoBehaviour
 
 			// Recalculate the total number of lines
 			mTotalLines = 0;
-			foreach (Paragraph p in mParagraphs) mTotalLines += p.lines.Length;
+			for (int i = 0, imax = mParagraphs.Count; i < imax; ++i) mTotalLines += mParagraphs[i].lines.Length;
 		}
 
 		// Update the visible text
@@ -146,10 +146,14 @@ public class UITextList : MonoBehaviour
 
 				string final = "";
 
-				foreach (Paragraph p in mParagraphs)
+				for (int i = 0, imax = mParagraphs.Count; i < imax; ++i)
 				{
-					foreach (string s in p.lines)
+					Paragraph p = mParagraphs[i];
+
+					for (int b = 0, bmax = p.lines.Length; b < bmax; ++b)
 					{
+						string s = p.lines[b];
+
 						if (offset > 0)
 						{
 							--offset;

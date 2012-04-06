@@ -75,8 +75,10 @@ public class UISpriteAnimation : MonoBehaviour
 		{
 			List<UIAtlas.Sprite> sprites = mSprite.atlas.spriteList;
 
-			foreach (UIAtlas.Sprite sprite in sprites)
+			for (int i = 0, imax = sprites.Count; i < imax; ++i)
 			{
+				UIAtlas.Sprite sprite = sprites[i];
+
 				if (string.IsNullOrEmpty(mPrefix) || sprite.name.StartsWith(mPrefix))
 				{
 					mSpriteNames.Add(sprite.name);

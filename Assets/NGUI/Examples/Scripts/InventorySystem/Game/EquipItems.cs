@@ -23,20 +23,21 @@ public class EquipItems : MonoBehaviour
 
 			int qualityLevels = (int)InvGameItem.Quality._LastDoNotUse;
 
-			foreach (int i in itemIDs)
+			for (int i = 0, imax = itemIDs.Length; i < imax; ++i)
 			{
-				InvBaseItem item = InvDatabase.FindByID(i);
+				int index = itemIDs[i];
+				InvBaseItem item = InvDatabase.FindByID(index);
 
 				if (item != null)
 				{
-					InvGameItem gi = new InvGameItem(i, item);
+					InvGameItem gi = new InvGameItem(index, item);
 					gi.quality = (InvGameItem.Quality)Random.Range(0, qualityLevels);
 					gi.itemLevel = NGUITools.RandomRange(item.minItemLevel, item.maxItemLevel);
 					eq.Equip(gi);
 				}
 				else
 				{
-					Debug.LogWarning("Can't resolve the item ID of " + i);
+					Debug.LogWarning("Can't resolve the item ID of " + index);
 				}
 			}
 		}

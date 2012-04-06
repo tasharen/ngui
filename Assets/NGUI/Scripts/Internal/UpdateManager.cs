@@ -196,7 +196,11 @@ public class UpdateManager : MonoBehaviour
 	{
 #if !UNITY_FLASH
 		// Flash export fails at life.
-		foreach (UpdateEntry ent in list) if (ent.func == func) return;
+		for (int i = 0, imax = list.Count; i < imax; ++i)
+		{
+			UpdateEntry ent = list[i];
+			if (ent.func == func) return;
+		}
 #endif
 
 		UpdateEntry item = new UpdateEntry();

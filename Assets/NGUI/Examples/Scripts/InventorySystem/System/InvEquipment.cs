@@ -45,8 +45,10 @@ public class InvEquipment : MonoBehaviour
 			if (mAttachments == null) mAttachments = GetComponentsInChildren<InvAttachmentPoint>();
 
 			// Equip the item visually
-			foreach (InvAttachmentPoint ip in mAttachments)
+			for (int i = 0, imax = mAttachments.Length; i < imax; ++i)
 			{
+				InvAttachmentPoint ip = mAttachments[i];
+
 				if (ip.slot == slot)
 				{
 					GameObject go = ip.Attach(baseItem != null ? baseItem.attachment : null);
@@ -110,9 +112,9 @@ public class InvEquipment : MonoBehaviour
 	{
 		if (mItems != null)
 		{
-			foreach (InvGameItem i in mItems)
+			for (int i = 0, imax = mItems.Length; i < imax; ++i)
 			{
-				if (i == item) return true;
+				if (mItems[i] == item) return true;
 			}
 		}
 		return false;
@@ -126,9 +128,9 @@ public class InvEquipment : MonoBehaviour
 	{
 		if (mItems != null)
 		{
-			foreach (InvGameItem i in mItems)
+			for (int i = 0, imax = mItems.Length; i < imax; ++i)
 			{
-				InvBaseItem baseItem = i.baseItem;
+				InvBaseItem baseItem = mItems[i].baseItem;
 				if (baseItem != null && baseItem.slot == slot) return true;
 			}
 		}
