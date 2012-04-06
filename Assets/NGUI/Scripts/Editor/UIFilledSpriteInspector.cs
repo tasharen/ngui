@@ -19,20 +19,23 @@ public class UIFilledSpriteInspector : UISpriteInspector
 
 		if (!base.OnDrawProperties()) return false;
 
-		UIFilledSprite.FillDirection fillDirection = (UIFilledSprite.FillDirection)EditorGUILayout.EnumPopup("Fill Dir", sprite.fillDirection);
+		if ((int)sprite.fillDirection > (int)UIFilledSprite.FillDirection.Radial360)
+		{
+			sprite.fillDirection = UIFilledSprite.FillDirection.Horizontal;
+			EditorUtility.SetDirty(sprite);
+		}
 
-		if (sprite.fillDirection != fillDirection)
+		UIFilledSprite.FillDirection fillDirection = (UIFilledSprite.FillDirection)EditorGUILayout.EnumPopup("Fill Dir", sprite.fillDirection);
+		float fillAmount = EditorGUILayout.Slider("Fill Amount", sprite.fillAmount, 0f, 1f);
+		bool invert = EditorGUILayout.Toggle("Invert Fill", sprite.invert);
+
+		if (sprite.fillDirection != fillDirection || sprite.fillAmount != fillAmount || sprite.invert != invert)
 		{
 			NGUIEditorTools.RegisterUndo("Sprite Change", mSprite);
 			sprite.fillDirection = fillDirection;
-		}
-
-		float fillAmount = EditorGUILayout.FloatField("Fill Amount", sprite.fillAmount);
-
-		if (sprite.fillAmount != fillAmount)
-		{
-			NGUIEditorTools.RegisterUndo("Sprite Change", mSprite);
 			sprite.fillAmount = fillAmount;
+			sprite.invert = invert;
+			EditorUtility.SetDirty(sprite);
 		}
 		return true;
 	}

@@ -267,12 +267,13 @@ public class UISlider : IgnoreTimeScale
 
 				if (mSprite != null)
 				{
-					switch (mSprite.fillDirection)
+					if (mSprite.fillDirection == UIFilledSprite.FillDirection.Horizontal)
 					{
-						case UIFilledSprite.FillDirection.TowardRight:		pos.x = scale.x; break;
-						case UIFilledSprite.FillDirection.TowardTop:		pos.y = scale.y; break;
-						case UIFilledSprite.FillDirection.TowardLeft:		pos.x = fullSize.x - scale.x; break;
-						case UIFilledSprite.FillDirection.TowardBottom:		pos.y = fullSize.y - scale.y; break;
+						pos.x = mSprite.invert ? fullSize.x - scale.x : scale.x;
+					}
+					else if (mSprite.fillDirection == UIFilledSprite.FillDirection.Vertical)
+					{
+						pos.y = mSprite.invert ? fullSize.y - scale.y : scale.y;
 					}
 				}
 				else if (direction == Direction.Horizontal)

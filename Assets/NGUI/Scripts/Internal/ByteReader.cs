@@ -147,7 +147,11 @@ public class ByteReader
 			string line = ReadLine();
 			if (line == null) break;
 
+#if UNITY_FLASH
+			string[] split = line.Split(separator, System.StringSplitOptions.RemoveEmptyEntries);
+#else
 			string[] split = line.Split(separator, 2, System.StringSplitOptions.RemoveEmptyEntries);
+#endif
 
 			if (split.Length == 2)
 			{
