@@ -19,8 +19,9 @@ If you have the Professional Edition of NGUI that comes with Git access, just pu
 
 If you have a Standard Edition:
 
-1. Delete the NGUI folder while inside Unity.
-2. Import NGUI from the updated Unity Package.
+1. In Unity, File -> New Scene
+2. Delete the NGUI folder from the Project View.
+3. Import NGUI from the updated Unity Package.
 
 ---------------------------------------
  Support, documentation, and tutorials
