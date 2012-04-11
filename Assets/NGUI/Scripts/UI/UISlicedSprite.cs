@@ -33,6 +33,31 @@ public class UISlicedSprite : UISprite
 	public bool fillCenter { get { return mFillCenter; } set { if (mFillCenter != value) { mFillCenter = value; MarkAsChanged(); } } }
 
 	/// <summary>
+	/// Sliced sprites generally have a border.
+	/// </summary>
+
+	public override Vector4 border
+	{
+		get
+		{
+			UIAtlas.Sprite sp = sprite;
+			if (sp == null) return Vector2.zero;
+
+			Rect outer = sp.outer;
+			Rect inner = sp.inner;
+
+			Texture tex = mainTexture;
+
+			if (atlas.coordinates == UIAtlas.Coordinates.TexCoords && tex != null)
+			{
+				outer = NGUIMath.ConvertToPixels(outer, tex.width, tex.height, true);
+				inner = NGUIMath.ConvertToPixels(inner, tex.width, tex.height, true);
+			}
+			return new Vector4(inner.xMin - outer.xMin, inner.yMin - outer.yMin, outer.xMax - inner.xMax, outer.yMax - inner.yMax) * atlas.pixelSize;
+		}
+	}
+
+	/// <summary>
 	/// Update the texture UVs used by the widget.
 	/// </summary>
 

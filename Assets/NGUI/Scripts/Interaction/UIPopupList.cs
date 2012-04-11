@@ -158,7 +158,7 @@ public class UIPopupList : MonoBehaviour
 #endif
 				}
 
-				if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+				if (eventReceiver != null && !string.IsNullOrEmpty(functionName) && Application.isPlaying)
 				{
 					eventReceiver.SendMessage(functionName, mSelectedItem, SendMessageOptions.DontRequireReceiver);
 				}
@@ -453,8 +453,7 @@ public class UIPopupList : MonoBehaviour
 			mBackground.color = backgroundColor;
 
 			// We need to know the size of the background sprite for padding purposes
-			UIAtlas.Sprite bgsp = mBackground.sprite;
-			Vector2 bgPadding = new Vector2(bgsp.inner.xMin - bgsp.outer.xMin + padding.x, bgsp.inner.yMin - bgsp.outer.yMin);
+			Vector4 bgPadding = mBackground.border;
 			mBgBorder = bgPadding.y;
 
 			mBackground.cachedTransform.localPosition = new Vector3(0f, bgPadding.y, 0f);
@@ -495,7 +494,7 @@ public class UIPopupList : MonoBehaviour
 				x = Mathf.Max(x, lbl.relativeSize.x * fontScale);
 
 				// Add an event listener
-				UIEventListener listener = UIEventListener.Add(lbl.gameObject);
+				UIEventListener listener = UIEventListener.Get(lbl.gameObject);
 				listener.onHover = OnItemHover;
 				listener.onPress = OnItemPress;
 				listener.parameter = s;

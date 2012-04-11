@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 /// <summary>
 /// Unity doesn't keep the values of static variables after scripts change get recompiled. One way around this
-/// is to store the references in PlayerPrefs -- retrieve them at start, and save them whenever something changes.
+/// is to store the references in EditorPrefs -- retrieve them at start, and save them whenever something changes.
 /// </summary>
 
 public class UISettings
@@ -25,31 +25,31 @@ public class UISettings
 
 	static Object GetObject (string name)
 	{
-		int assetID = PlayerPrefs.GetInt(name, -1);
+		int assetID = EditorPrefs.GetInt(name, -1);
 		return (assetID != -1) ? EditorUtility.InstanceIDToObject(assetID) : null;
 	}
 
 	static void Load ()
 	{
 		mLoaded			= true;
-		mFontName		= PlayerPrefs.GetString("NGUI Font Name");
-		mAtlasName		= PlayerPrefs.GetString("NGUI Atlas Name");
+		mFontName		= EditorPrefs.GetString("NGUI Font Name");
+		mAtlasName		= EditorPrefs.GetString("NGUI Atlas Name");
 		mFontData		= GetObject("NGUI Font Asset") as TextAsset;
 		mFontTexture	= GetObject("NGUI Font Texture") as Texture2D;
 		mFont			= GetObject("NGUI Font") as UIFont;
 		mAtlas			= GetObject("NGUI Atlas") as UIAtlas;
-		mPreview		= PlayerPrefs.GetInt("NGUI Preview") == 0;
+		mPreview		= EditorPrefs.GetInt("NGUI Preview") == 0;
 	}
 
 	static void Save ()
 	{
-		PlayerPrefs.SetString("NGUI Font Name", mFontName);
-		PlayerPrefs.SetString("NGUI Atlas Name", mAtlasName);
-		PlayerPrefs.SetInt("NGUI Font Asset", (mFontData != null) ? mFontData.GetInstanceID() : -1);
-		PlayerPrefs.SetInt("NGUI Font Texture", (mFontTexture != null) ? mFontTexture.GetInstanceID() : -1);
-		PlayerPrefs.SetInt("NGUI Font", (mFont != null) ? mFont.GetInstanceID() : -1);
-		PlayerPrefs.SetInt("NGUI Atlas", (mAtlas != null) ? mAtlas.GetInstanceID() : -1);
-		PlayerPrefs.SetInt("NGUI Preview", mPreview ? 0 : 1);
+		EditorPrefs.SetString("NGUI Font Name", mFontName);
+		EditorPrefs.SetString("NGUI Atlas Name", mAtlasName);
+		EditorPrefs.SetInt("NGUI Font Asset", (mFontData != null) ? mFontData.GetInstanceID() : -1);
+		EditorPrefs.SetInt("NGUI Font Texture", (mFontTexture != null) ? mFontTexture.GetInstanceID() : -1);
+		EditorPrefs.SetInt("NGUI Font", (mFont != null) ? mFont.GetInstanceID() : -1);
+		EditorPrefs.SetInt("NGUI Atlas", (mAtlas != null) ? mAtlas.GetInstanceID() : -1);
+		EditorPrefs.SetInt("NGUI Preview", mPreview ? 0 : 1);
 	}
 
 	/// <summary>

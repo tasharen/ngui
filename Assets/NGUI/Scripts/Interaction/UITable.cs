@@ -24,6 +24,7 @@ public class UITable : MonoBehaviour
 	public bool keepWithinPanel = false;
 
 	UIPanel mPanel;
+	UIDraggablePanel mDrag;
 
 	/// <summary>
 	/// Function that sorts items by name.
@@ -122,6 +123,7 @@ public class UITable : MonoBehaviour
 		if (sorted) children.Sort(SortByName);
 		if (children.Count > 0) RepositionVariableSize(children);
 		if (mPanel != null) mPanel.ConstrainTargetToBounds(myTrans, true);
+		if (mDrag != null) mDrag.UpdateScrollbars(true);
 	}
 
 	/// <summary>
@@ -130,7 +132,11 @@ public class UITable : MonoBehaviour
 
 	void Start ()
 	{
-		if (keepWithinPanel) mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
+		if (keepWithinPanel)
+		{
+			mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
+			mDrag = NGUITools.FindInParents<UIDraggablePanel>(gameObject);
+		}
 		Reposition();
 	}
 

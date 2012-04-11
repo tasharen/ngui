@@ -306,40 +306,135 @@ static public class NGUIMath
 	static public Bounds CalculateRelativeWidgetBounds (Transform root, Transform child)
 	{
 		UIWidget[] widgets = child.GetComponentsInChildren<UIWidget>() as UIWidget[];
-
-		Matrix4x4 toLocal = root.worldToLocalMatrix;
 		Bounds b = new Bounds(Vector3.zero, Vector3.zero);
 		bool first = true;
+
+		Matrix4x4 toLocal = root.worldToLocalMatrix;
 
 		for (int i = 0, imax = widgets.Length; i < imax; ++i)
 		{
 			UIWidget w = widgets[i];
 			Vector2 size = w.relativeSize;
 			Vector2 offset = w.pivotOffset;
+			Transform toWorld = w.cachedTransform;
 
 			float x = (offset.x + 0.5f) * size.x;
 			float y = (offset.y - 0.5f) * size.y;
 			size *= 0.5f;
-
-			// Transform the coordinates from relative-to-widget to world space, then make them relative to game object
-			Transform toWorld = w.cachedTransform;
-			Vector3 v0 = toLocal.MultiplyPoint3x4(toWorld.TransformPoint(new Vector3(x - size.x, y - size.y, 0f)));
+			
+			// Start with the corner of the widget
+			Vector3 v = new Vector3(x - size.x, y - size.y, 0f);
+			
+			// Transform the coordinate from relative-to-widget to world space
+			v = toWorld.TransformPoint(v);
+			
+			// Now transform from world space to relative-to-parent space
+			v = toLocal.MultiplyPoint3x4(v);
 
 			if (first)
 			{
 				first = false;
-				b = new Bounds(v0, Vector3.zero);
+				b = new Bounds(v, Vector3.zero);
 			}
 			else
 			{
-				b.Encapsulate(v0);
+				b.Encapsulate(v);
 			}
 
-			b.Encapsulate(toLocal.MultiplyPoint3x4(toWorld.TransformPoint(new Vector3(x - size.x, y + size.y, 0f))));
-			b.Encapsulate(toLocal.MultiplyPoint3x4(toWorld.TransformPoint(new Vector3(x + size.x, y - size.y, 0f))));
-			b.Encapsulate(toLocal.MultiplyPoint3x4(toWorld.TransformPoint(new Vector3(x + size.x, y + size.y, 0f))));
+			// Repeat for the other 3 corners
+			v = new Vector3(x - size.x, y + size.y, 0f);
+			v = toWorld.TransformPoint(v);
+			v = toLocal.MultiplyPoint3x4(v);
+			b.Encapsulate(v);
+
+			v = new Vector3(x + size.x, y - size.y, 0f);
+			v = toWorld.TransformPoint(v);
+			v = toLocal.MultiplyPoint3x4(v);
+			b.Encapsulate(v);
+
+			v = new Vector3(x + size.x, y + size.y, 0f);
+			v = toWorld.TransformPoint(v);
+			v = toLocal.MultiplyPoint3x4(v);
+			b.Encapsulate(v);
 		}
 		return b;
+	}
+
+	/// <summary>
+	/// Calculate the specified sprite's inner bounds relative to the specified root.
+	/// </summary>
+
+	static public Bounds CalculateRelativeInnerBounds (Transform root, UISlicedSprite sprite)
+	{
+		Matrix4x4 toLocal = root.worldToLocalMatrix;
+		Vector2 size = sprite.relativeSize;
+		Vector2 offset = sprite.pivotOffset;
+		Transform toWorld = sprite.cachedTransform;
+
+		float x = (offset.x + 0.5f) * size.x;
+		float y = (offset.y - 0.5f) * size.y;
+		size *= 0.5f;
+
+		float sx = toWorld.localScale.x;
+		float sy = toWorld.localScale.y;
+
+		// Get the border in pixels
+		Vector4 border = sprite.border;
+
+		// Convert pixels to relative coordinates
+		if (sx != 0f)
+		{
+			border.x /= sx;
+			border.z /= sx;
+		}
+
+		if (sy != 0f)
+		{
+			border.y /= sy;
+			border.w /= sy;
+		}
+
+		// Calculate the relative dimensions
+		float left	 = x - size.x + border.x;
+		float right  = x + size.x - border.z;
+		float top	 = y - size.y + border.y;
+		float bottom = y + size.y - border.w;
+
+		// Start with the corner of the widget
+		Vector3 v = new Vector3(left, top, 0f);
+		v = toWorld.TransformPoint(v);
+		v = toLocal.MultiplyPoint3x4(v);
+		Bounds b = new Bounds(v, Vector3.zero);
+
+		// Repeat for the other 3 corners
+		v = new Vector3(left, bottom, 0f);
+		v = toWorld.TransformPoint(v);
+		v = toLocal.MultiplyPoint3x4(v);
+		b.Encapsulate(v);
+
+		v = new Vector3(right, bottom, 0f);
+		v = toWorld.TransformPoint(v);
+		v = toLocal.MultiplyPoint3x4(v);
+		b.Encapsulate(v);
+
+		v = new Vector3(right, top, 0f);
+		v = toWorld.TransformPoint(v);
+		v = toLocal.MultiplyPoint3x4(v);
+		b.Encapsulate(v);
+		return b;
+	}
+
+	/// <summary>
+	/// Convenience function.
+	/// </summary>
+
+	static public Bounds CalculateRelativeInnerBounds (Transform root, UISprite sprite)
+	{
+		if (sprite is UISlicedSprite)
+		{
+			return CalculateRelativeInnerBounds(root, sprite as UISlicedSprite);
+		}
+		return CalculateRelativeWidgetBounds(root, sprite.cachedTransform);
 	}
 
 	/// <summary>

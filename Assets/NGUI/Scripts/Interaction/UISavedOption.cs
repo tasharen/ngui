@@ -39,10 +39,10 @@ public class UISavedOption : MonoBehaviour
 				for (int i = 0, imax = checkboxes.Length; i < imax; ++i)
 				{
 					UICheckbox ch = checkboxes[i];
-					UIEventListener.Add(ch.gameObject).onClick -= Save;
+					UIEventListener.Get(ch.gameObject).onClick -= Save;
 					ch.isChecked = (ch.name == s);
 					Debug.Log(s);
-					UIEventListener.Add(ch.gameObject).onClick += Save;
+					UIEventListener.Get(ch.gameObject).onClick += Save;
 				}
 			}
 		}

@@ -36,7 +36,7 @@ public class SpringPosition : IgnoreTimeScale
 
 		if (worldSpace)
 		{
-			if (mThreshold == 0f) mThreshold = (target - mTrans.position).magnitude * 0.005f;
+			if (mThreshold == 0f) mThreshold = (target - mTrans.position).magnitude * 0.001f;
 			mTrans.position = NGUIMath.SpringLerp(mTrans.position, target, strength, delta);
 
 			if (mThreshold >= (target - mTrans.position).magnitude)
@@ -47,7 +47,7 @@ public class SpringPosition : IgnoreTimeScale
 		}
 		else
 		{
-			if (mThreshold == 0f) mThreshold = (target - mTrans.localPosition).magnitude * 0.005f;
+			if (mThreshold == 0f) mThreshold = (target - mTrans.localPosition).magnitude * 0.001f;
 			mTrans.localPosition = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, delta);
 
 			if (mThreshold >= (target - mTrans.localPosition).magnitude)

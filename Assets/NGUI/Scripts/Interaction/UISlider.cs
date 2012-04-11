@@ -73,9 +73,9 @@ public class UISlider : IgnoreTimeScale
 	float mStepValue = 1f;
 	BoxCollider mCol;
 	Transform mTrans;
-	Transform mForeTrans;
-	UIWidget mWidget;
-	UIFilledSprite mSprite;
+	Transform mFGTrans;
+	UIWidget mFGWidget;
+	UIFilledSprite mFGFilled;
 	bool mInitDone = false;
 
 	/// <summary>
@@ -94,9 +94,9 @@ public class UISlider : IgnoreTimeScale
 
 		if (foreground != null)
 		{
-			mWidget = foreground.GetComponent<UIWidget>();
-			mSprite = (mWidget != null) ? mWidget as UIFilledSprite : null;
-			mForeTrans = foreground.transform;
+			mFGWidget = foreground.GetComponent<UIWidget>();
+			mFGFilled = (mFGWidget != null) ? mFGWidget as UIFilledSprite : null;
+			mFGTrans = foreground.transform;
 			if (fullSize == Vector2.zero) fullSize = foreground.localScale;
 		}
 		else if (mCol != null)
@@ -129,7 +129,7 @@ public class UISlider : IgnoreTimeScale
 
 		if (Application.isPlaying && thumb != null && thumb.collider != null)
 		{
-			UIEventListener listener = UIEventListener.Add(thumb.gameObject);
+			UIEventListener listener = UIEventListener.Get(thumb.gameObject);
 			listener.onPress += OnPressThumb;
 			listener.onDrag += OnDragThumb;
 		}
@@ -239,24 +239,24 @@ public class UISlider : IgnoreTimeScale
 			if (direction == Direction.Horizontal) scale.x *= mStepValue;
 			else scale.y *= mStepValue;
 
-			if (mSprite != null)
+			if (mFGFilled != null)
 			{
-				mSprite.fillAmount = mStepValue;
+				mFGFilled.fillAmount = mStepValue;
 			}
 			else if (foreground != null)
 			{
-				mForeTrans.localScale = scale;
+				mFGTrans.localScale = scale;
 				
-				if (mWidget != null)
+				if (mFGWidget != null)
 				{
 					if (val > 0.001f)
 					{
-						mWidget.enabled = true;
-						mWidget.MarkAsChanged();
+						mFGWidget.enabled = true;
+						mFGWidget.MarkAsChanged();
 					}
 					else
 					{
-						mWidget.enabled = false;
+						mFGWidget.enabled = false;
 					}
 				}
 			}
@@ -265,15 +265,15 @@ public class UISlider : IgnoreTimeScale
 			{
 				Vector3 pos = thumb.localPosition;
 
-				if (mSprite != null)
+				if (mFGFilled != null)
 				{
-					if (mSprite.fillDirection == UIFilledSprite.FillDirection.Horizontal)
+					if (mFGFilled.fillDirection == UIFilledSprite.FillDirection.Horizontal)
 					{
-						pos.x = mSprite.invert ? fullSize.x - scale.x : scale.x;
+						pos.x = mFGFilled.invert ? fullSize.x - scale.x : scale.x;
 					}
-					else if (mSprite.fillDirection == UIFilledSprite.FillDirection.Vertical)
+					else if (mFGFilled.fillDirection == UIFilledSprite.FillDirection.Vertical)
 					{
-						pos.y = mSprite.invert ? fullSize.y - scale.y : scale.y;
+						pos.y = mFGFilled.invert ? fullSize.y - scale.y : scale.y;
 					}
 				}
 				else if (direction == Direction.Horizontal)

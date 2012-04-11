@@ -113,7 +113,7 @@ public class UISprite : UIWidget
 	}
 
 	/// <summary>
-	/// Get the sprite used by the atlas. Work-around for a bug in Unity.
+	/// Get the sprite used by the atlas.
 	/// </summary>
 
 	public UIAtlas.Sprite sprite
@@ -194,6 +194,12 @@ public class UISprite : UIWidget
 			return mat;
 		}
 	}
+
+	/// <summary>
+	/// Dimensions of the sprite's border, if any.
+	/// </summary>
+
+	public virtual Vector4 border { get { return Vector4.zero; } }
 
 	/// <summary>
 	/// Update the texture UVs used by the widget.

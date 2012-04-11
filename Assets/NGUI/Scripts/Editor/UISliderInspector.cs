@@ -11,6 +11,37 @@ public class UISliderInspector : Editor
 {
 	bool mShowWarning = false;
 
+	void ValidatePivot (Transform fg, string name, UISlider.Direction dir)
+	{
+		if (fg != null)
+		{
+			UIWidget widget = fg.GetComponent<UIWidget>();
+
+			if (widget != null && !(widget is UIFilledSprite))
+			{
+				if (dir == UISlider.Direction.Horizontal)
+				{
+					if (widget.pivot != UIWidget.Pivot.Left &&
+						widget.pivot != UIWidget.Pivot.TopLeft &&
+						widget.pivot != UIWidget.Pivot.BottomLeft)
+					{
+						GUI.color = new Color(1f, 0.7f, 0f);
+						GUILayout.Label(name + " should use a Left pivot");
+						GUI.color = Color.white;
+					}
+				}
+				else if (widget.pivot != UIWidget.Pivot.BottomLeft &&
+						 widget.pivot != UIWidget.Pivot.Bottom &&
+						 widget.pivot != UIWidget.Pivot.BottomRight)
+				{
+					GUI.color = new Color(1f, 0.7f, 0f);
+					GUILayout.Label(name + " should use a Bottom pivot");
+					GUI.color = Color.white;
+				}
+			}
+		}
+	}
+
 	public override void OnInspectorGUI ()
 	{
 		EditorGUIUtility.LookLikeControls(80f);
@@ -67,33 +98,7 @@ public class UISliderInspector : Editor
 		UISlider.Direction dir = (UISlider.Direction)EditorGUILayout.EnumPopup("Direction", slider.direction);
 
 		// If we're using a sprite for the foreground, ensure it's using a proper pivot.
-		if (fg != null)
-		{
-			UIWidget widget = fg.GetComponent<UIWidget>();
-
-			if (widget != null && !(widget is UIFilledSprite))
-			{
-				if (dir == UISlider.Direction.Horizontal)
-				{
-					if (widget.pivot != UIWidget.Pivot.Left &&
-						widget.pivot != UIWidget.Pivot.TopLeft &&
-						widget.pivot != UIWidget.Pivot.BottomLeft)
-					{
-						GUI.color = new Color(1f, 0.7f, 0f);
-						GUILayout.Label("Foreground sprite should use a Left pivot");
-						GUI.color = Color.white;
-					}
-				}
-				else if (widget.pivot != UIWidget.Pivot.BottomLeft &&
-						widget.pivot != UIWidget.Pivot.Bottom &&
-						widget.pivot != UIWidget.Pivot.BottomRight)
-				{
-					GUI.color = new Color(1f, 0.7f, 0f);
-					GUILayout.Label("Foreground sprite should use a Bottom pivot");
-					GUI.color = Color.white;
-				}
-			}
-		}
+		ValidatePivot(fg, "Foreground sprite", dir);
 
 		NGUIEditorTools.DrawSeparator();
 
@@ -104,7 +109,12 @@ public class UISliderInspector : Editor
 		GUILayout.Space(18f);
 		GUILayout.EndHorizontal();
 
-		if (slider.foreground != fg || slider.thumb != tb || slider.direction != dir || slider.fullSize != size || slider.eventReceiver != er || slider.functionName != fn)
+		if (slider.foreground != fg ||
+			slider.thumb != tb ||
+			slider.direction != dir ||
+			slider.fullSize != size ||
+			slider.eventReceiver != er ||
+			slider.functionName != fn)
 		{
 			if (slider.fullSize != size) mShowWarning = true;
 

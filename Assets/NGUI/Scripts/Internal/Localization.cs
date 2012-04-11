@@ -60,25 +60,37 @@ public class Localization : MonoBehaviour
 		}
 		set
 		{
-			if (languages != null && mLanguage != value)
+			if (mLanguage != value)
 			{
-				if (string.IsNullOrEmpty(value))
+				if (!string.IsNullOrEmpty(value))
 				{
-					mDictionary.Clear();
-				}
-				else
-				{
-					for (int i = 0, imax = languages.Length; i < imax; ++i)
+					// Check the referenced assets first
+					if (languages != null)
 					{
-						TextAsset asset = languages[i];
-
-						if (asset != null && asset.name == value)
+						for (int i = 0, imax = languages.Length; i < imax; ++i)
 						{
-							Load(asset);
-							return;
+							TextAsset asset = languages[i];
+
+							if (asset != null && asset.name == value)
+							{
+								Load(asset);
+								return;
+							}
 						}
 					}
+
+					// Not a referenced asset -- try to load it dynamically
+					TextAsset txt = Resources.Load(value, typeof(TextAsset)) as TextAsset;
+
+					if (txt != null)
+					{
+						Load(txt);
+						return;
+					}
 				}
+
+				// Either the language is null, or it wasn't found
+				mDictionary.Clear();
 				PlayerPrefs.DeleteKey("Language");
 			}
 		}

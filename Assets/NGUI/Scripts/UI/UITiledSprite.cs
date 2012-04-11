@@ -16,6 +16,12 @@ using System.Collections.Generic;
 public class UITiledSprite : UISlicedSprite
 {
 	/// <summary>
+	/// Tiled sprites don't have a border.
+	/// </summary>
+
+	public override Vector4 border { get { return Vector4.zero; } }
+
+	/// <summary>
 	/// Tiled sprite shouldn't inherit the sprite's changes to this function.
 	/// </summary>
 

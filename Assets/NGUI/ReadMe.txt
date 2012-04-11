@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 1.92
+                Version 2.00
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,20 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.00:
+- NEW: Redesigned the way UIDragCamera and UIDragPanelContents work, making them much more straightforward.
+- NEW: New widget has been added: Scroll Bar. It does exactly what you think it does.
+- NEW: UIDraggableCamera script is used on the camera to make it draggable via UIDragCamera.
+- NEW: UIDraggablePanel script is used on the panel to make it draggable via UIDragPanelContents.
+- NEW: UIDraggablePanel natively supports scroll bars with "always show", "fade out if not needed" and "fade in only when dragging" behaviors.
+- NEW: Scroll View (DragPanel) and Quest Log examples have been updated with scroll bars.
+- NEW: Reorganized all examples to be in a more logical order -- starting with the basic, common functionality and going up from there.
+- NEW: Localization will now try to automatically load the language file via Resources.Load if it wasn't found in the local list.
+- FIX: EditorPrefs are now used instead of PlayerPrefs to store editor-related data.
+- FIX: Popup list will no longer try to call SendMessage in edit mode.
+- FIX: UIEventListener.Add is now UIEventListener.Get, making the function make more sense with the -= operator.
+- DEL: Scroll View example that was using UIDragObject has been removed as it's now obsolete.
 
 1.92:
 - NEW: Expanded the Filled Sprite to support radial-based filling. Great for progress indicators, cooldown timers, circular health bars, etc.

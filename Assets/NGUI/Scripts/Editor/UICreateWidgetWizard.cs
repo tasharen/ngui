@@ -29,6 +29,7 @@ public class UICreateWidgetWizard : EditorWindow
 		Input,
 		PopupList,
 		PopupMenu,
+		ScrollBar,
 	}
 
 	static WidgetType mType = WidgetType.Button;
@@ -49,8 +50,12 @@ public class UICreateWidgetWizard : EditorWindow
 	static string mListFG = "";
 	static string mListBG = "";
 	static string mListHL = "";
+	static string mScrollBG = "";
+	static string mScrollFG = "";
 	static Color mColor = Color.white;
 	static bool mLoaded = false;
+	static bool mScrollCL = true;
+	static UIScrollBar.Direction mScrollDir = UIScrollBar.Direction.Horizontal;
 
 	/// <summary>
 	/// Save the specified string into player prefs.
@@ -60,11 +65,11 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (string.IsNullOrEmpty(val))
 		{
-			PlayerPrefs.DeleteKey(field);
+			EditorPrefs.DeleteKey(field);
 		}
 		else
 		{
-			PlayerPrefs.SetString(field, val);
+			EditorPrefs.SetString(field, val);
 		}
 	}
 
@@ -72,17 +77,19 @@ public class UICreateWidgetWizard : EditorWindow
 	/// Load the specified string from player prefs.
 	/// </summary>
 
-	static string LoadString (string field) { string s = PlayerPrefs.GetString(field); return (string.IsNullOrEmpty(s)) ? "" : s; }
+	static string LoadString (string field) { string s = EditorPrefs.GetString(field); return (string.IsNullOrEmpty(s)) ? "" : s; }
 
 	/// <summary>
-	/// Save all serialized values in player prefs.
+	/// Save all serialized values in editor prefs.
 	/// This is necessary because static values get wiped out as soon as scripts get recompiled.
 	/// </summary>
 
 	static void Save ()
 	{
-		PlayerPrefs.SetInt("NGUI Widget Type", (int)mType);
-		PlayerPrefs.SetInt("NGUI Color", NGUIMath.ColorToInt(mColor));
+		EditorPrefs.SetInt("NGUI Widget Type", (int)mType);
+		EditorPrefs.SetInt("NGUI Color", NGUIMath.ColorToInt(mColor));
+		EditorPrefs.SetBool("NGUI ScrollCL", mScrollCL);
+		EditorPrefs.SetInt("NGUI Scroll Dir", (int)mScrollDir);
 
 		SaveString("NGUI Sprite", mSprite);
 		SaveString("NGUI Sliced", mSliced);
@@ -101,20 +108,21 @@ public class UICreateWidgetWizard : EditorWindow
 		SaveString("NGUI ListFG", mListFG);
 		SaveString("NGUI ListBG", mListBG);
 		SaveString("NGUI ListHL", mListHL);
-
-		PlayerPrefs.Save();
+		SaveString("NGUI ScrollBG", mScrollBG);
+		SaveString("NGUI ScrollFG", mScrollFG);
 	}
 
 	/// <summary>
-	/// Load all serialized values from Player Prefs.
+	/// Load all serialized values from editor prefs.
 	/// This is necessary because static values get wiped out as soon as scripts get recompiled.
 	/// </summary>
 
 	static void Load ()
 	{
-		mType = (WidgetType)PlayerPrefs.GetInt("NGUI Widget Type", 0);
+		mType = (WidgetType)EditorPrefs.GetInt("NGUI Widget Type", 0);
+		mScrollDir = (UIScrollBar.Direction)EditorPrefs.GetInt("NGUI Scroll Dir", 0);
 
-		int color = PlayerPrefs.GetInt("NGUI Color", -1);
+		int color = EditorPrefs.GetInt("NGUI Color", -1);
 		if (color != -1) mColor = NGUIMath.IntToColor(color);
 
 		mSprite		= LoadString("NGUI Sprite");
@@ -134,6 +142,9 @@ public class UICreateWidgetWizard : EditorWindow
 		mListFG		= LoadString("NGUI ListFG");
 		mListBG		= LoadString("NGUI ListBG");
 		mListHL		= LoadString("NGUI ListHL");
+		mScrollBG	= LoadString("NGUI ScrollBG");
+		mScrollFG	= LoadString("NGUI ScrollFG");
+		mScrollCL	= EditorPrefs.GetBool("NGUI ScrollCL", true);
 	}
 
 	/// <summary>
@@ -446,6 +457,79 @@ public class UICreateWidgetWizard : EditorWindow
 			go.AddComponent<UIButtonScale>().tweenTarget = bg.transform;
 			go.AddComponent<UIButtonSound>();
 
+			Selection.activeGameObject = go;
+		}
+	}
+
+	/// <summary>
+	/// Scroll bar template.
+	/// </summary>
+
+	void CreateScrollBar (GameObject go)
+	{
+		if (UISettings.atlas != null)
+		{
+			GUILayout.BeginHorizontal();
+			string bg = UISpriteInspector.SpriteField(UISettings.atlas, "Background", mScrollBG, GUILayout.Width(200f));
+			GUILayout.Space(20f);
+			GUILayout.Label("Sprite for the background");
+			GUILayout.EndHorizontal();
+
+			GUILayout.BeginHorizontal();
+			string fg = UISpriteInspector.SpriteField(UISettings.atlas, "Foreground", mScrollFG, GUILayout.Width(200f));
+			GUILayout.Space(20f);
+			GUILayout.Label("Sprite for the foreground (thumb)");
+			GUILayout.EndHorizontal();
+
+			GUILayout.BeginHorizontal();
+			UIScrollBar.Direction dir = (UIScrollBar.Direction)EditorGUILayout.EnumPopup("Direction", mScrollDir, GUILayout.Width(200f));
+			GUILayout.Space(20f);
+			GUILayout.Label("Add colliders?", GUILayout.Width(80f));
+			bool draggable = EditorGUILayout.Toggle(mScrollCL);
+			GUILayout.EndHorizontal();
+
+			if (mScrollBG != bg || mScrollFG != fg || mScrollCL != draggable || mScrollDir != dir)
+			{
+				mScrollBG = bg;
+				mScrollFG = fg;
+				mScrollCL = draggable;
+				mScrollDir = dir;
+				Save();
+			}
+		}
+
+		if (ShouldCreate(go, UISettings.atlas != null))
+		{
+			int depth = NGUITools.CalculateNextDepth(go);
+			go = NGUITools.AddChild(go);
+			go.name = "Scroll Bar";
+
+			UISlicedSprite bg = NGUITools.AddWidget<UISlicedSprite>(go);
+			bg.name = "Background";
+			bg.depth = depth;
+			bg.atlas = UISettings.atlas;
+			bg.spriteName = mScrollBG;
+			bg.transform.localScale = new Vector3(400f + bg.border.x + bg.border.z, 14f + bg.border.y + bg.border.w, 1f);
+			bg.MakePixelPerfect();
+
+			UISlicedSprite fg = NGUITools.AddWidget<UISlicedSprite>(go);
+			fg.name = "Foreground";
+			fg.atlas = UISettings.atlas;
+			fg.spriteName = mScrollFG;
+
+			UIScrollBar sb = go.AddComponent<UIScrollBar>();
+			sb.background = bg;
+			sb.foreground = fg;
+			sb.direction = mScrollDir;
+			sb.barSize = 0.3f;
+			sb.scrollValue = 0.3f;
+			sb.ForceUpdate();
+
+			if (mScrollCL)
+			{
+				NGUITools.AddWidgetCollider(bg.gameObject);
+				NGUITools.AddWidgetCollider(fg.gameObject);
+			}
 			Selection.activeGameObject = go;
 		}
 	}
@@ -766,6 +850,7 @@ public class UICreateWidgetWizard : EditorWindow
 				case WidgetType.Input:			CreateInput(go); break;
 				case WidgetType.PopupList:		CreatePopup(go, true); break;
 				case WidgetType.PopupMenu:		CreatePopup(go, false); break;
+				case WidgetType.ScrollBar:		CreateScrollBar(go); break;
 			}
 		}
 	}

@@ -231,7 +231,7 @@ public class UIAtlasInspector : Editor
 			{
 				if (mSprite == null && mAtlas.spriteList.Count > 0)
 				{
-					string spriteName = PlayerPrefs.GetString("NGUI Selected Sprite");
+					string spriteName = EditorPrefs.GetString("NGUI Selected Sprite");
 					if (!string.IsNullOrEmpty(spriteName)) mSprite = mAtlas.GetSprite(spriteName);
 					if (mSprite == null) mSprite = mAtlas.spriteList[0];
 				}
@@ -282,7 +282,7 @@ public class UIAtlasInspector : Editor
 					if (spriteName != mSprite.name)
 					{
 						mSprite = mAtlas.GetSprite(spriteName);
-						PlayerPrefs.SetString("NGUI Selected Sprite", spriteName);
+						EditorPrefs.SetString("NGUI Selected Sprite", spriteName);
 					}
 
 					if (mSprite == null) return;

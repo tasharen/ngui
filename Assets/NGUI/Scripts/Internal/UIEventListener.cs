@@ -7,7 +7,7 @@ using UnityEngine;
 
 /// <summary>
 /// Event Hook class lets you easily add remote event listener functions to an object.
-/// Example usage: UIEventListener.Add(gameObject).onClick += MyClickFunction;
+/// Example usage: UIEventListener.Get(gameObject).onClick += MyClickFunction;
 /// </summary>
 
 [AddComponentMenu("NGUI/Internal/Event Listener")]
@@ -43,13 +43,16 @@ public class UIEventListener : MonoBehaviour
 	void OnInput (string text)		{ if (onInput != null) onInput(gameObject, text); }
 
 	/// <summary>
-	/// Add an event listener to the specified game object.
+	/// Get or add an event listener to the specified game object.
 	/// </summary>
 
-	static public UIEventListener Add (GameObject go)
+	static public UIEventListener Get (GameObject go)
 	{
 		UIEventListener listener = go.GetComponent<UIEventListener>();
 		if (listener == null) listener = go.AddComponent<UIEventListener>();
 		return listener;
 	}
+
+	[System.Obsolete("Please use UIEventListener.Get instead of UIEventListener.Add")]
+	static public UIEventListener Add (GameObject go) { return Get(go); }
 }
