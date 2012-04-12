@@ -325,6 +325,10 @@ public class UIDraggablePanel : IgnoreTimeScale
 				}
 			}
 		}
+		else if (recalculateBounds)
+		{
+			mCalculatedBounds = false;
+		}
 	}
 
 	/// <summary>
