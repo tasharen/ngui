@@ -150,22 +150,19 @@ public class UIDraggableCamera : IgnoreTimeScale
 
 	public void Drag (Vector2 delta)
 	{
-		if (UICamera.currentTouchID == -1)
+		UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
+
+		Vector2 offset = Vector2.Scale(delta, -scale);
+		mTrans.localPosition += (Vector3)offset;
+
+		// Adjust the momentum
+		mMomentum = Vector2.Lerp(mMomentum, offset * (realTimeDelta * momentumAmount), 0.5f);
+
+		// Constrain the UI to the bounds, and if done so, eliminate the momentum
+		if (dragEffect != UIDragObject.DragEffect.MomentumAndSpring && ConstrainToBounds(true))
 		{
-			UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
-
-			Vector2 offset = Vector2.Scale(delta, -scale);
-			mTrans.localPosition += (Vector3)offset;
-
-			// Adjust the momentum
-			mMomentum = Vector2.Lerp(mMomentum, offset * (realTimeDelta * momentumAmount), 0.5f);
-
-			// Constrain the UI to the bounds, and if done so, eliminate the momentum
-			if (dragEffect != UIDragObject.DragEffect.MomentumAndSpring && ConstrainToBounds(true))
-			{
-				mMomentum = Vector2.zero;
-				mScroll = 0f;
-			}
+			mMomentum = Vector2.zero;
+			mScroll = 0f;
 		}
 	}
 
