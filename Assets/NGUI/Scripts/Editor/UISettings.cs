@@ -21,6 +21,8 @@ public class UISettings
 	static Texture2D mFontTexture;
 	static string mFontName = "New Font";
 	static string mAtlasName = "New Atlas";
+	static int mAtlasPadding = 1;
+	static public bool mAtlasTrimming = true;
 	static bool mPreview = true;
 
 	static Object GetObject (string name)
@@ -39,6 +41,8 @@ public class UISettings
 		mFont			= GetObject("NGUI Font") as UIFont;
 		mAtlas			= GetObject("NGUI Atlas") as UIAtlas;
 		mPreview		= EditorPrefs.GetInt("NGUI Preview") == 0;
+		mAtlasPadding	= EditorPrefs.GetInt("NGUI Atlas Padding", 1);
+		mAtlasTrimming	= EditorPrefs.GetBool("NGUI Atlas Trimming", true);
 	}
 
 	static void Save ()
@@ -50,6 +54,8 @@ public class UISettings
 		EditorPrefs.SetInt("NGUI Font", (mFont != null) ? mFont.GetInstanceID() : -1);
 		EditorPrefs.SetInt("NGUI Atlas", (mAtlas != null) ? mAtlas.GetInstanceID() : -1);
 		EditorPrefs.SetInt("NGUI Preview", mPreview ? 0 : 1);
+		EditorPrefs.SetInt("NGUI Atlas Padding", mAtlasPadding);
+		EditorPrefs.SetBool("NGUI Atlas Trimming", mAtlasTrimming);
 	}
 
 	/// <summary>
@@ -125,4 +131,16 @@ public class UISettings
 	/// </summary>
 
 	static public bool texturePreview { get { if (!mLoaded) Load(); return mPreview; } set { if (mPreview != value) { mPreview = value; Save(); } } }
+
+	/// <summary>
+	/// Added padding in-between of sprites when creating an atlas.
+	/// </summary>
+
+	static public int atlasPadding { get { if (!mLoaded) Load(); return mAtlasPadding; } set { if (mAtlasPadding != value) { mAtlasPadding = value; Save(); } } }
+
+	/// <summary>
+	/// Whether the transparent pixels will be trimmed away when creating an atlas.
+	/// </summary>
+
+	static public bool atlasTrimming { get { if (!mLoaded) Load(); return mAtlasTrimming; } set { if (mAtlasTrimming != value) { mAtlasTrimming = value; Save(); } } }
 }

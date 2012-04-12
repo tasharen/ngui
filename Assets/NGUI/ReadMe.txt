@@ -9,7 +9,7 @@
 Thank you for buying NGUI!
 
 If you have any questions, suggestions, comments or feature requests, please
-drop by the NGUI forum, found here: http://www.tasharen.com/?forum=ngui
+drop by the NGUI forum, found here: http://www.tasharen.com/forum/index.php?board=1.0
 
 --------------------
  How To Update NGUI
@@ -29,7 +29,7 @@ If you have a Standard Edition:
 
 All can be found here: http://www.tasharen.com/?page_id=197
 
-Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.com/?topic=using-ngui-from-javascript-unityscript
+Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.com/forum/index.php?topic=6
 
 -----------------
  Version History
@@ -44,6 +44,8 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: Scroll View (DragPanel) and Quest Log examples have been updated with scroll bars.
 - NEW: Reorganized all examples to be in a more logical order -- starting with the basic, common functionality and going up from there.
 - NEW: Localization will now try to automatically load the language file via Resources.Load if it wasn't found in the local list.
+- NEW: Atlas Maker tool now allows you to turn off trimming of transparent pixels before importing certain sprites.
+- NEW: Atlas Maker tool now allows you to specify how much padding is applied in-between of sprites.
 - FIX: EditorPrefs are now used instead of PlayerPrefs to store editor-related data.
 - FIX: Popup list will no longer try to call SendMessage in edit mode.
 - FIX: UIEventListener.Add is now UIEventListener.Get, making the function make more sense with the -= operator.

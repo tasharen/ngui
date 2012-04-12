@@ -9,7 +9,7 @@ using UnityEngine;
 /// This script can be used to forward events from one object to another.
 /// Example usage: Forwarding 'drag' event from the slider's thumb to the slider itself.
 /// In most cases you should use UIEventListener script instead. For example:
-/// UIEventListener.Add(gameObject).onClick += MyClickFunction;
+/// UIEventListener.Get(gameObject).onClick += MyClickFunction;
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Forward Events")]

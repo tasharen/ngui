@@ -13,6 +13,8 @@ using System.Collections.Generic;
 
 public class UIAtlasMaker : EditorWindow
 {
+	// TODO: Expand the atlas maker with options.
+
 	class SpriteEntry
 	{
 		public Texture2D tex;	// Sprite texture -- original texture or a temporary texture
@@ -89,7 +91,7 @@ public class UIAtlasMaker : EditorWindow
 		Texture2D[] textures = new Texture2D[sprites.Count];
 		for (int i = 0; i < sprites.Count; ++i) textures[i] = sprites[i].tex;
 
-		Rect[] rects = tex.PackTextures(textures, 1, 4096);
+		Rect[] rects = tex.PackTextures(textures, UISettings.atlasPadding, 4096);
 
 		for (int i = 0; i < sprites.Count; ++i)
 		{
@@ -197,6 +199,17 @@ public class UIAtlasMaker : EditorWindow
 			Texture2D oldTex = NGUIEditorTools.ImportTexture(tex, true, false);
 			if (oldTex == null) continue;
 
+			// If we aren't doing trimming, just use the texture as-is
+			if (!UISettings.atlasTrimming)
+			{
+				SpriteEntry sprite = new SpriteEntry();
+				sprite.rect = new Rect(0f, 0f, oldTex.width, oldTex.height);
+				sprite.tex = oldTex;
+				sprite.temporaryTexture = false;
+				continue;
+			}
+
+			// If we want to trim transparent pixels, there is more work to be done
 			Color32[] pixels = oldTex.GetPixels32();
 
 			int xmin = oldTex.width;
@@ -206,6 +219,7 @@ public class UIAtlasMaker : EditorWindow
 			int oldWidth = oldTex.width;
 			int oldHeight = oldTex.height;
 
+			// Find solid pixels
 			for (int y = 0, yw = oldHeight; y < yw; ++y)
 			{
 				for (int x = 0, xw = oldWidth; x < xw; ++x)
@@ -225,11 +239,13 @@ public class UIAtlasMaker : EditorWindow
 			int newWidth  = (xmax - xmin) + 1;
 			int newHeight = (ymax - ymin) + 1;
 
+			// If the sprite is empty, don't do anything with it
 			if (newWidth > 0 && newHeight > 0)
 			{
 				SpriteEntry sprite = new SpriteEntry();
 				sprite.rect = new Rect(0f, 0f, oldTex.width, oldTex.height);
 
+				// If the dimensions match, then nothing was actually trimmed
 				if (newWidth == oldWidth && newHeight == oldHeight)
 				{
 					sprite.tex = oldTex;
@@ -237,6 +253,7 @@ public class UIAtlasMaker : EditorWindow
 				}
 				else
 				{
+					// Copy the non-trimmed texture data into a temporary buffer
 					Color32[] newPixels = new Color32[newWidth * newHeight];
 
 					for (int y = 0; y < newHeight; ++y)
@@ -665,6 +682,12 @@ public class UIAtlasMaker : EditorWindow
 					GUILayout.Label(" N/A");
 				}
 			}
+			GUILayout.EndHorizontal();
+
+			// Padding and trimming
+			GUILayout.BeginHorizontal();
+			UISettings.atlasPadding = Mathf.Clamp(EditorGUILayout.IntField("Padding", UISettings.atlasPadding, GUILayout.Width(100f)), 0, 8);
+			UISettings.atlasTrimming = EditorGUILayout.Toggle("Trim Alpha", UISettings.atlasTrimming);
 			GUILayout.EndHorizontal();
 
 			if (textures.Count > 0)
