@@ -301,7 +301,14 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnDisable ()
 	{
-		if (!keepMaterial) material = null;
+		if (!keepMaterial)
+		{
+			material = null;
+		}
+		else if (mPanel != null)
+		{
+			mPanel.RemoveWidget(this);
+		}
 		mPanel = null;
 	}
 
