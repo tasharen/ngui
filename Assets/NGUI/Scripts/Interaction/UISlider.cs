@@ -68,7 +68,7 @@ public class UISlider : IgnoreTimeScale
 	public int numberOfSteps = 0;
 
 	// Used to be public prior to 1.87
-	[SerializeField] float rawValue = 1f;
+	[HideInInspector][SerializeField] float rawValue = 1f;
 
 	float mStepValue = 1f;
 	BoxCollider mCol;
@@ -133,7 +133,7 @@ public class UISlider : IgnoreTimeScale
 			listener.onPress += OnPressThumb;
 			listener.onDrag += OnDragThumb;
 		}
-		Set(rawValue, false);
+		Set(rawValue, true);
 	}
 
 	/// <summary>

@@ -82,6 +82,7 @@ public class UICheckbox : MonoBehaviour
 		if (!mStarted)
 		{
 			startsChecked = state;
+			if (checkSprite != null) checkSprite.alpha = state ? 1f : 0f;
 		}
 		else if (mChecked != state)
 		{

@@ -125,6 +125,18 @@ public class UICamera : MonoBehaviour
 
 	public string scrollAxisName = "Mouse ScrollWheel";
 
+	/// <summary>
+	/// Name of the axis used to send up and down key events.
+	/// </summary>
+
+	public string verticalAxisName = "Vertical";
+
+	/// <summary>
+	/// Name of the axis used to send left and right key events.
+	/// </summary>
+
+	public string horizontalAxisName = "Horizontal";
+
 	[System.Obsolete("Use UICamera.currentCamera instead")]
 	static public Camera lastCamera { get { return currentCamera; } }
 
@@ -183,7 +195,7 @@ public class UICamera : MonoBehaviour
 	static MouseOrTouch mMouse2 = new MouseOrTouch();
 
 	// Joystick/controller/keyboard event
-	static MouseOrTouch mJoystick = new MouseOrTouch();
+	static MouseOrTouch mController = new MouseOrTouch();
 
 	// Used to ensure that joystick-based controls don't trigger that often
 	static float mNextEvent = 0f;
@@ -356,6 +368,17 @@ public class UICamera : MonoBehaviour
 			if ((uc != null) && (uc.cullingMask & layerMask) != 0) return cam;
 		}
 		return null;
+	}
+
+	/// <summary>
+	/// Using the keyboard will result in 1 or -1, depending on whether up or down keys have been pressed.
+	/// </summary>
+
+	static int GetDirection (KeyCode up, KeyCode down)
+	{
+		if (Input.GetKeyDown(up)) return 1;
+		if (Input.GetKeyDown(down)) return -1;
+		return 0;
 	}
 
 	/// <summary>
@@ -695,12 +718,15 @@ public class UICamera : MonoBehaviour
 	void ProcessOthers ()
 	{
 		currentTouchID = -100;
-		currentTouch = mJoystick;
+		currentTouch = mController;
+
+		// If this is an input field, ignore WASD and Space key presses
+		bool hasInput = (mSel != null && mSel.GetComponent<UIInput>() != null);
 
 		// Enter key and joystick button 1 keys are treated the same -- as a "click"
-		bool returnKeyDown	= (useKeyboard	 && (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space)));
+		bool returnKeyDown	= (useKeyboard	 && (Input.GetKeyDown(KeyCode.Return) || (!hasInput && Input.GetKeyDown(KeyCode.Space))));
 		bool buttonKeyDown	= (useController &&  Input.GetKeyDown(KeyCode.JoystickButton0));
-		bool returnKeyUp	= (useKeyboard	 && (Input.GetKeyUp(KeyCode.Return) || Input.GetKeyUp(KeyCode.Space)));
+		bool returnKeyUp	= (useKeyboard	 && (Input.GetKeyUp(KeyCode.Return) || (!hasInput && Input.GetKeyUp(KeyCode.Space))));
 		bool buttonKeyUp	= (useController &&  Input.GetKeyUp(KeyCode.JoystickButton0));
 
 		bool down	= returnKeyDown || buttonKeyDown;
@@ -718,14 +744,22 @@ public class UICamera : MonoBehaviour
 
 		if (useKeyboard)
 		{
-			vertical += GetDirection(KeyCode.W, KeyCode.UpArrow, KeyCode.S, KeyCode.DownArrow);
-			horizontal += GetDirection(KeyCode.D, KeyCode.RightArrow, KeyCode.A, KeyCode.LeftArrow);
+			if (hasInput)
+			{
+				vertical += GetDirection(KeyCode.UpArrow, KeyCode.DownArrow);
+				horizontal += GetDirection(KeyCode.RightArrow, KeyCode.LeftArrow);
+			}
+			else
+			{
+				vertical += GetDirection(KeyCode.W, KeyCode.UpArrow, KeyCode.S, KeyCode.DownArrow);
+				horizontal += GetDirection(KeyCode.D, KeyCode.RightArrow, KeyCode.A, KeyCode.LeftArrow);
+			}
 		}
 
 		if (useController)
 		{
-			vertical += GetDirection("Vertical");
-			horizontal += GetDirection("Horizontal");
+			if (!string.IsNullOrEmpty(verticalAxisName)) vertical += GetDirection(verticalAxisName);
+			if (!string.IsNullOrEmpty(horizontalAxisName)) horizontal += GetDirection(horizontalAxisName);
 		}
 
 		// Send out key notifications

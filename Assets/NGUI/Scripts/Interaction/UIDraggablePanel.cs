@@ -9,6 +9,7 @@ using UnityEngine;
 /// This script, when attached to a panel allows dragging of the said panel's contents efficiently by using UIDragPanelContents.
 /// </summary>
 
+[ExecuteInEditMode]
 [RequireComponent(typeof(UIPanel))]
 [AddComponentMenu("NGUI/Interaction/Draggable Panel")]
 public class UIDraggablePanel : IgnoreTimeScale
@@ -64,10 +65,22 @@ public class UIDraggablePanel : IgnoreTimeScale
 	public float momentumAmount = 35f;
 
 	/// <summary>
-	/// Drag value set on start. (0, 0) means top-left corner, (1, 1) means bottom-right.
+	/// Renamed to 'startingRelativePosition'.
 	/// </summary>
 
-	public Vector2 startingDragAmount = Vector2.zero;
+	[HideInInspector][SerializeField] Vector2 startingDragAmount = Vector2.zero;
+
+	/// <summary>
+	/// Starting position of the clipped area. (0, 0) means top-left corner, (1, 1) means bottom-right.
+	/// </summary>
+
+	public Vector2 startingRelativePosition = Vector2.zero;
+
+	/// <summary>
+	/// Whether the position will be reset to the 'startingDragAmount'. Inspector-only value.
+	/// </summary>
+
+	public bool repositionNow = false;
 
 	/// <summary>
 	/// Horizontal scrollbar used for visualization.
@@ -183,6 +196,14 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	void Awake ()
 	{
+		// For backwards compatibility
+		if ((startingRelativePosition.x == 0f && startingRelativePosition.y == 0f) &&
+			(startingDragAmount.x != 0f || startingDragAmount.y != 0f))
+		{
+			startingRelativePosition = startingDragAmount;
+			startingDragAmount = Vector2.zero;
+		}
+
 		mTrans = transform;
 		mPanel = GetComponent<UIPanel>();
 	}
@@ -193,7 +214,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	void Start ()
 	{
-		SetDragAmount(startingDragAmount.x, startingDragAmount.y, true);
+		SetDragAmount(startingRelativePosition.x, startingRelativePosition.y, true);
 
 		if (horizontalScrollBar != null)
 		{
@@ -531,11 +552,25 @@ public class UIDraggablePanel : IgnoreTimeScale
 	}
 
 	/// <summary>
+	/// Reposition the dragging if the flag has been set. This is mainly for inspector use.
+	/// </summary>
+
+	void Update ()
+	{
+		if (repositionNow)
+		{
+			repositionNow = false;
+			SetDragAmount(startingRelativePosition.x, startingRelativePosition.y, true);
+		}
+	}
+
+	/// <summary>
 	/// Apply the dragging momentum.
 	/// </summary>
 
 	void LateUpdate ()
 	{
+		if (!Application.isPlaying) return;
 		float delta = UpdateRealTimeDelta();
 
 		// Fade the scroll bars if needed
@@ -585,4 +620,22 @@ public class UIDraggablePanel : IgnoreTimeScale
 			else mScroll = 0f;
 		}
 	}
+
+#if UNITY_EDITOR
+
+	/// <summary>
+	/// Draw a visible orange outline of the bounds.
+	/// </summary>
+
+	void OnDrawGizmos ()
+	{
+		if (mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos)
+		{
+			Bounds b = bounds;
+			Gizmos.matrix = transform.localToWorldMatrix;
+			Gizmos.color = new Color(1f, 0.4f, 0f);
+			Gizmos.DrawWireCube(new Vector3(b.center.x, b.center.y, b.min.z), new Vector3(b.size.x, b.size.y, 0f));
+		}
+	}
+#endif
 }

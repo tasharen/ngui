@@ -44,8 +44,7 @@ public class UIInput : MonoBehaviour
 	{
 		get
 		{
-			if (selected) return mText;
-			return (label != null) ? label.text : "";
+			return mText;
 		}
 		set
 		{
@@ -53,9 +52,12 @@ public class UIInput : MonoBehaviour
 
 			if (label != null)
 			{
+				if (string.IsNullOrEmpty(value)) value = mDefaultText;
+
 				label.supportEncoding = false;
 				label.text = selected ? value + caratChar : value;
 				label.showLastPasswordChar = selected;
+				label.color = (selected || value != mDefaultText) ? activeColor : mDefaultColor;
 			}
 		}
 	}
@@ -93,10 +95,10 @@ public class UIInput : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Initialize everything on start.
+	/// Initialize everything on awake.
 	/// </summary>
 
-	void Start () { Init(); }
+	void Awake () { Init(); }
 
 	/// <summary>
 	/// Selection event, sent by UICamera.

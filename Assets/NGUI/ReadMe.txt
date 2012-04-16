@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.0.0c
+                Version 2.0.1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -35,7 +35,18 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
  Version History
 -----------------
 
-2.00:
+2.0.1:
+- NEW: UIDraggablePanel will now display the bounds of the draggable widgets as an orange outline in the Scene View.
+- NEW: Added a 'repositionNow' checkbox to UIDraggablePanel that will reset the clipping area using the children widget's current bounds.
+- NEW: It's now possible to specify horizontal and vertical axis names for UICamera.
+- FIX: UICamera will no longer process WASD or Space key events if an Input Field is currently selected.
+- FIX: UIDraggablePanel's 'startingDragAmount' was renamed to 'startingRelativePosition', for clarity.
+- FIX: UICheckbox will now set the checkmark state immediately on start instead of gradually.
+- FIX: UISlider will now always force-set its value value on start.
+- FIX: UIInput.text will now always return its own text rather than that of the label (works better with captions).
+- FIX: Setting UIInput.text now sets the color of the label to the active color.
+
+2.0.0:
 - NEW: Redesigned the way UIDragCamera and UIDragPanelContents work, making them much more straightforward.
 - NEW: New widget has been added: Scroll Bar. It does exactly what you think it does.
 - NEW: UIDraggableCamera script is used on the camera to make it draggable via UIDragCamera.
