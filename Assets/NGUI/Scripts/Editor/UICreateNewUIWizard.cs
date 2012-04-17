@@ -134,7 +134,7 @@ public class UICreateNewUIWizard : EditorWindow
 			{
 				cam.nearClipPlane = 0.1f;
 				cam.farClipPlane = 4f;
-				cam.transform.localPosition = new Vector3(0f, 0f, -700f);
+				cam.transform.localPosition = new Vector3(0f, 0f, -1.7f);
 			}
 
 			// We don't want to clear color if this is not the first camera
