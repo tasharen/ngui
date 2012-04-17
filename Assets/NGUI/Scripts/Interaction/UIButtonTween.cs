@@ -23,10 +23,11 @@ public class UIButtonTween : MonoBehaviour
 	public bool includeChildren = false;
 
 	UITweener[] mTweens;
+	bool mStarted = false;
 
-	void Start () { if (tweenTarget == null) tweenTarget = gameObject; }
+	void Start () { mStarted = true; if (tweenTarget == null) tweenTarget = gameObject; }
 
-	void OnEnable () { OnHover(UICamera.IsHighlighted(gameObject)); }
+	void OnEnable () { if (mStarted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
 	void OnHover (bool isOver)
 	{

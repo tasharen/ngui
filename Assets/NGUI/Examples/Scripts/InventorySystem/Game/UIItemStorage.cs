@@ -93,8 +93,6 @@ public class UIItemStorage : MonoBehaviour
 	{
 		if (template != null)
 		{
-			Transform myTrans = transform;
-
 			int count = 0;
 			Bounds b = new Bounds();
 
@@ -102,12 +100,9 @@ public class UIItemStorage : MonoBehaviour
 			{
 				for (int x = 0; x < maxColumns; ++x)
 				{
-					GameObject go = Instantiate(template) as GameObject;
+					GameObject go = NGUITools.AddChild(gameObject, template);
 					Transform t = go.transform;
-					t.parent = myTrans;
 					t.localPosition = new Vector3(padding + (x + 0.5f) * spacing, -padding - (y + 0.5f) * spacing, 0f);
-					t.localRotation = Quaternion.identity;
-					t.localScale = Vector3.one;
 
 					UIStorageSlot slot = go.GetComponent<UIStorageSlot>();
 					

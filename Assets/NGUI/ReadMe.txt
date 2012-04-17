@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.0.2
+                Version 2.0.2b
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -42,6 +42,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: UIDraggablePanel will no longer reset the panel's position on start.
 - FIX: UIDraggablePanel.ResetPosition() now functions correctly.
 - FIX: UIDraggablePanel.UpdateScrollbars() will now only adjust the position if the scroll bars aren't being updated (ie: called from a scroll bar).
+- FIX: 3D UIs will now be created with a proper anchor offset.
 
 2.0.1:
 - NEW: UIDraggablePanel will now display the bounds of the draggable widgets as an orange outline in the Scene View.

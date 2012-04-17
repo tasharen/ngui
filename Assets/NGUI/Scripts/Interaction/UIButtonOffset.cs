@@ -19,8 +19,11 @@ public class UIButtonOffset : MonoBehaviour
 
 	Vector3 mPos;
 	bool mInitDone = false;
+	bool mStarted = false;
 
-	void OnEnable () { OnHover(UICamera.IsHighlighted(gameObject)); }
+	void Start () { mStarted = true; }
+
+	void OnEnable () { if (mStarted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
 	void OnDisable ()
 	{

@@ -19,8 +19,11 @@ public class UIButtonScale : MonoBehaviour
 
 	Vector3 mScale;
 	bool mInitDone = false;
+	bool mStarted = false;
 
-	void OnEnable () { OnHover(UICamera.IsHighlighted(gameObject)); }
+	void Start () { mStarted = true; }
+
+	void OnEnable () { if (mStarted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
 	void OnDisable ()
 	{

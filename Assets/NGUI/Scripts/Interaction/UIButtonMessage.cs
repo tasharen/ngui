@@ -28,8 +28,11 @@ public class UIButtonMessage : MonoBehaviour
 	public bool includeChildren = false;
 
 	float mLastClick = 0f;
+	bool mStarted = false;
 
-	void OnEnable () { OnHover(UICamera.IsHighlighted(gameObject)); }
+	void Start () { mStarted = true; }
+
+	void OnEnable () { if (mStarted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
 	void OnHover (bool isOver)
 	{
