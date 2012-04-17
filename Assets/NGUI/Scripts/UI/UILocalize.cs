@@ -20,6 +20,7 @@ public class UILocalize : MonoBehaviour
 	public string key;
 
 	string mLanguage;
+	bool mStarted = false;
 
 	/// <summary>
 	/// This function is called by the Localization manager via a broadcast SendMessage.
@@ -46,8 +47,21 @@ public class UILocalize : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Localize the widget on enable.
+	/// Localize the widget on enable, but only if it has been started already.
 	/// </summary>
 
-	void OnEnable () { if (Localization.instance != null) OnLocalize(Localization.instance); }
+	void OnEnable ()
+	{
+		if (mStarted && Localization.instance != null) OnLocalize(Localization.instance);
+	}
+
+	/// <summary>
+	/// Localize the widget on start.
+	/// </summary>
+
+	void Start ()
+	{
+		mStarted = true;
+		if (Localization.instance != null) OnLocalize(Localization.instance);
+	}
 }

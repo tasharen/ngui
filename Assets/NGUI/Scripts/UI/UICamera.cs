@@ -632,9 +632,8 @@ public class UICamera : MonoBehaviour
 			}
 		}
 
-		lastTouchPosition = Input.mousePosition;
-		mMouse0.delta = lastTouchPosition - mMouse0.pos;
-		mMouse0.pos = lastTouchPosition;
+		mMouse0.delta = (Vector2)Input.mousePosition - mMouse0.pos;
+		mMouse0.pos = Input.mousePosition;
 
 		if (updateRaycast)
 		{
@@ -680,6 +679,8 @@ public class UICamera : MonoBehaviour
 			// Process the mouse events
 			ProcessTouch(pressed, unpressed);
 		}
+
+		lastTouchPosition = Input.mousePosition;
 		currentTouch = null;
 	}
 
