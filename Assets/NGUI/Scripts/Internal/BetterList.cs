@@ -7,7 +7,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// This improved version of the List<> doesn't release the buffer on Clear(), resulting in better performance and less garbage collection.
+/// This improved version of the System.Collections.Generic.List that doesn't release the buffer on Clear(), resulting in better performance and less garbage collection.
 /// </summary>
 
 public class BetterList<T>

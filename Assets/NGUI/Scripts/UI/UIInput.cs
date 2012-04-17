@@ -101,6 +101,12 @@ public class UIInput : MonoBehaviour
 	void Awake () { Init(); }
 
 	/// <summary>
+	/// If the object is currently highlighted, it should also be selected.
+	/// </summary>
+
+	void OnEnable () { if (UICamera.IsHighlighted(gameObject)) OnSelect(true); }
+
+	/// <summary>
 	/// Selection event, sent by UICamera.
 	/// </summary>
 

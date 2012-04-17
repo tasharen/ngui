@@ -225,7 +225,7 @@ public class UICamera : MonoBehaviour
 	public Camera cachedCamera { get { if (mCam == null) mCam = camera; return mCam; } }
 
 	/// <summary>
-	/// The object the mouse is hovering over. Results may be somewhat odd on touch-based devices.
+	/// The object the mouse is hovering over.
 	/// </summary>
 
 	static public GameObject hoveredObject { get { return mMouse0.current; } }
@@ -417,6 +417,20 @@ public class UICamera : MonoBehaviour
 			}
 		}
 		return 0;
+	}
+
+	/// <summary>
+	/// Returns whether the widget should be currently highlighted as far as the UICamera knows.
+	/// </summary>
+
+	static public bool IsHighlighted (GameObject go)
+	{
+		for (int i = mHighlighted.Count; i > 0; )
+		{
+			Highlighted hl = mHighlighted[--i];
+			if (hl.go == go) return true;
+		}
+		return false;
 	}
 
 	/// <summary>

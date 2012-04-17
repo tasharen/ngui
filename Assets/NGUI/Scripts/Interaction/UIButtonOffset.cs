@@ -20,6 +20,8 @@ public class UIButtonOffset : MonoBehaviour
 	Vector3 mPos;
 	bool mInitDone = false;
 
+	void OnEnable () { OnHover(UICamera.IsHighlighted(gameObject)); }
+
 	void OnDisable ()
 	{
 		if (tweenTarget != null)

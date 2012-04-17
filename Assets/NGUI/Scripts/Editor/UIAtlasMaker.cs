@@ -13,8 +13,6 @@ using System.Collections.Generic;
 
 public class UIAtlasMaker : EditorWindow
 {
-	// TODO: Expand the atlas maker with options.
-
 	class SpriteEntry
 	{
 		public Texture2D tex;	// Sprite texture -- original texture or a temporary texture
@@ -206,6 +204,7 @@ public class UIAtlasMaker : EditorWindow
 				sprite.rect = new Rect(0f, 0f, oldTex.width, oldTex.height);
 				sprite.tex = oldTex;
 				sprite.temporaryTexture = false;
+				list.Add(sprite);
 				continue;
 			}
 

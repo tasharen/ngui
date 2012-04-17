@@ -20,6 +20,8 @@ public class UIButtonRotation : MonoBehaviour
 	Quaternion mRot;
 	bool mInitDone = false;
 
+	void OnEnable () { OnHover(UICamera.IsHighlighted(gameObject)); }
+
 	void OnDisable ()
 	{
 		if (tweenTarget != null)

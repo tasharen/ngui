@@ -53,6 +53,26 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// New WWW call can fail if the crossdomain policy doesn't check out. Exceptions suck. It's much more elegant to check for null instead.
+	/// </summary>
+
+	static public WWW OpenURL (string url)
+	{
+		WWW www = null;
+
+		try
+		{
+			www = new WWW(url);
+			//Debug.Log(url);
+		}
+		catch (System.Exception ex)
+		{
+			Debug.LogError(ex.Message);
+		}
+		return www;
+	}
+
+	/// <summary>
 	/// Same as Random.Range, but the returned value is between min and max, inclusive.
 	/// Unity's Random.Range is less than max instead, unless min == max.
 	/// This means Range(0,1) produces 0 instead of 0 or 1. That's unacceptable.
@@ -486,7 +506,7 @@ static public class NGUITools
 	static void Activate (Transform t)
 	{
 		t.gameObject.active = true;
-		
+
 		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
 		{
 			Transform child = t.GetChild(i);

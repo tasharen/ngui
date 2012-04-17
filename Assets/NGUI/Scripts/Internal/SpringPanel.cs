@@ -19,6 +19,7 @@ public class SpringPanel : IgnoreTimeScale
 	UIPanel mPanel;
 	Transform mTrans;
 	float mThreshold = 0f;
+	UIDraggablePanel mDrag;
 
 	/// <summary>
 	/// Cache the transform.
@@ -27,6 +28,7 @@ public class SpringPanel : IgnoreTimeScale
 	void Start ()
 	{
 		mPanel = GetComponent<UIPanel>();
+		mDrag = GetComponent<UIDraggablePanel>();
 		mTrans = transform;
 	}
 
@@ -49,6 +51,7 @@ public class SpringPanel : IgnoreTimeScale
 		cr.y -= offset.y;
 		mPanel.clipRange = cr;
 
+		if (mDrag != null) mDrag.UpdateScrollbars(false);
 		if (mThreshold >= (target - mTrans.localPosition).magnitude) enabled = false;
 	}
 

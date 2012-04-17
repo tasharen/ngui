@@ -55,10 +55,11 @@ public class UpdateManager : MonoBehaviour
 		{
 			mInst = GameObject.FindObjectOfType(typeof(UpdateManager)) as UpdateManager;
 
-			if (mInst == null)
+			if (mInst == null && Application.isPlaying)
 			{
-				GameObject go = new GameObject("_UIUpdateManager");
-				go.hideFlags = HideFlags.DontSave;
+				GameObject go = new GameObject("_UpdateManager");
+				DontDestroyOnLoad(go);
+				//go.hideFlags = HideFlags.HideAndDontSave;
 				mInst = go.AddComponent<UpdateManager>();
 			}
 		}

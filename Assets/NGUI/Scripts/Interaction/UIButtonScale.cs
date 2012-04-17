@@ -20,6 +20,8 @@ public class UIButtonScale : MonoBehaviour
 	Vector3 mScale;
 	bool mInitDone = false;
 
+	void OnEnable () { OnHover(UICamera.IsHighlighted(gameObject)); }
+
 	void OnDisable ()
 	{
 		if (tweenTarget != null)

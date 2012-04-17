@@ -123,14 +123,19 @@ public class UIPanel : MonoBehaviour
 			{
 				mDebugInfo = value;
 				List<UIDrawCall> list = drawCalls;
+#if UNITY_EDITOR
 				HideFlags flags = (mDebugInfo == DebugInfo.Geometry) ? HideFlags.DontSave | HideFlags.NotEditable : HideFlags.HideAndDontSave;
-
+#endif
 				for (int i = 0, imax = list.Count; i < imax;  ++i)
 				{
 					UIDrawCall dc = list[i];
 					GameObject go = dc.gameObject;
 					go.active = false;
+#if UNITY_EDITOR
 					go.hideFlags = flags;
+#else
+					DontDestroyOnLoad(go);
+#endif
 					go.active = true;
 				}
 			}
@@ -476,7 +481,7 @@ public class UIPanel : MonoBehaviour
 				(mDebugInfo == DebugInfo.Geometry) ? HideFlags.DontSave | HideFlags.NotEditable : HideFlags.HideAndDontSave);
 #else
 			GameObject go = new GameObject("_UIDrawCall [" + mat.name + "]");
-			go.hideFlags = HideFlags.HideAndDontSave;
+			DontDestroyOnLoad(go);
 #endif
 			go.layer = gameObject.layer;
 			sc = go.AddComponent<UIDrawCall>();

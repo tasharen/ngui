@@ -19,12 +19,17 @@ public class UIButtonMessage : MonoBehaviour
 		OnMouseOut,
 		OnPress,
 		OnRelease,
+		OnDoubleClick,
 	}
 
 	public GameObject target;
 	public string functionName;
 	public Trigger trigger = Trigger.OnClick;
 	public bool includeChildren = false;
+
+	float mLastClick = 0f;
+
+	void OnEnable () { OnHover(UICamera.IsHighlighted(gameObject)); }
 
 	void OnHover (bool isOver)
 	{
@@ -40,7 +45,15 @@ public class UIButtonMessage : MonoBehaviour
 
 	void OnClick ()
 	{
-		if (trigger == Trigger.OnClick) Send();
+		float time = Time.realtimeSinceStartup;
+
+		if (mLastClick + 0.2f > time)
+		{
+			if (trigger == Trigger.OnDoubleClick) Send();
+		}
+		else if (trigger == Trigger.OnClick) Send();
+
+		mLastClick = time;
 	}
 
 	void Send ()

@@ -20,6 +20,8 @@ public class UIButtonColor : MonoBehaviour
 	Color mColor;
 	bool mInitDone = false;
 
+	void OnEnable () { OnHover(UICamera.IsHighlighted(gameObject)); }
+
 	void OnDisable ()
 	{
 		if (tweenTarget != null)

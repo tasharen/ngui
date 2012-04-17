@@ -23,6 +23,8 @@ public class UIButtonPlayAnimation : MonoBehaviour
 	public DisableCondition disableWhenFinished = DisableCondition.DoNotDisable;
 	public string callWhenFinished;
 
+	void OnEnable () { OnHover(UICamera.IsHighlighted(gameObject)); }
+
 	void OnHover (bool isOver)
 	{
 		if (enabled)

@@ -24,7 +24,7 @@ public class UIDragPanelContents : MonoBehaviour
 	[HideInInspector][SerializeField] UIPanel panel;
 
 	/// <summary>
-	/// Automatically find the draggable panel if possible.
+	/// Backwards compatibility.
 	/// </summary>
 
 	void Awake ()
@@ -43,7 +43,15 @@ public class UIDragPanelContents : MonoBehaviour
 			}
 			panel = null;
 		}
-		else if (draggablePanel == null)
+	}
+
+	/// <summary>
+	/// Automatically find the draggable panel if possible.
+	/// </summary>
+
+	void Start ()
+	{
+		if (draggablePanel == null)
 		{
 			draggablePanel = NGUITools.FindInParents<UIDraggablePanel>(gameObject);
 		}

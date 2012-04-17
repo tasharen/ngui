@@ -65,22 +65,16 @@ public class UIDraggablePanel : IgnoreTimeScale
 	public float momentumAmount = 35f;
 
 	/// <summary>
-	/// Renamed to 'startingRelativePosition'.
+	/// Starting position of the clipped area. (0, 0) means top-left corner, (1, 1) means bottom-right. Only used for quick inspector positioning.
 	/// </summary>
 
-	[HideInInspector][SerializeField] Vector2 startingDragAmount = Vector2.zero;
-
-	/// <summary>
-	/// Starting position of the clipped area. (0, 0) means top-left corner, (1, 1) means bottom-right.
-	/// </summary>
-
-	public Vector2 startingRelativePosition = Vector2.zero;
+	public Vector2 relativePositionOnReset = Vector2.zero;
 
 	/// <summary>
 	/// Whether the position will be reset to the 'startingDragAmount'. Inspector-only value.
 	/// </summary>
 
-	public bool repositionNow = false;
+	public bool repositionClipping = false;
 
 	/// <summary>
 	/// Horizontal scrollbar used for visualization.
@@ -196,14 +190,6 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	void Awake ()
 	{
-		// For backwards compatibility
-		if ((startingRelativePosition.x == 0f && startingRelativePosition.y == 0f) &&
-			(startingDragAmount.x != 0f || startingDragAmount.y != 0f))
-		{
-			startingRelativePosition = startingDragAmount;
-			startingDragAmount = Vector2.zero;
-		}
-
 		mTrans = transform;
 		mPanel = GetComponent<UIPanel>();
 	}
@@ -214,8 +200,6 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	void Start ()
 	{
-		SetDragAmount(startingRelativePosition.x, startingRelativePosition.y, true);
-
 		if (horizontalScrollBar != null)
 		{
 			horizontalScrollBar.onChange += OnHorizontalBar;
@@ -265,11 +249,8 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	public void DisableSpring ()
 	{
-		if (mPanel != null)
-		{
-			SpringPanel sp = mPanel.GetComponent<SpringPanel>();
-			if (sp != null) sp.enabled = false;
-		}
+		SpringPanel sp = GetComponent<SpringPanel>();
+		if (sp != null) sp.enabled = false;
 	}
 
 	/// <summary>
@@ -385,10 +366,13 @@ public class UIDraggablePanel : IgnoreTimeScale
 		float oy = Mathf.Lerp(top, bottom, y);
 
 		// Update the position
-		Vector3 pos = mTrans.localPosition;
-		if (scale.x != 0f) pos.x += cr.x - ox;
-		if (scale.y != 0f) pos.y += cr.y - oy;
-		mTrans.localPosition = pos;
+		if (!updateScrollbars)
+		{
+			Vector3 pos = mTrans.localPosition;
+			if (scale.x != 0f) pos.x += cr.x - ox;
+			if (scale.y != 0f) pos.y += cr.y - oy;
+			mTrans.localPosition = pos;
+		}
 
 		// Update the clipping offset
 		cr.x = ox;
@@ -401,9 +385,21 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	/// <summary>
 	/// Reset the panel's position to the top-left corner.
+	/// It's recommended to call this function before AND after you re-populate the panel's contents (ex: switching window tabs).
+	/// Another option is to populate the panel's contents, reset its position, then call this function to reposition the clipping.
 	/// </summary>
 
-	public void ResetPosition () { SetDragAmount(0f, 0f, true); }
+	public void ResetPosition()
+	{
+		// Invalidate the bounds
+		mCalculatedBounds = false;
+
+		// First move the position back to where it would be if the scroll bars got reset to zero
+		SetDragAmount(relativePositionOnReset.x, relativePositionOnReset.y, false);
+
+		// Next move the clipping area back and update the scroll bars
+		SetDragAmount(relativePositionOnReset.x, relativePositionOnReset.y, true);
+	}
 
 	/// <summary>
 	/// Triggered by the horizontal scroll bar when it changes.
@@ -552,24 +548,19 @@ public class UIDraggablePanel : IgnoreTimeScale
 	}
 
 	/// <summary>
-	/// Reposition the dragging if the flag has been set. This is mainly for inspector use.
-	/// </summary>
-
-	void Update ()
-	{
-		if (repositionNow)
-		{
-			repositionNow = false;
-			SetDragAmount(startingRelativePosition.x, startingRelativePosition.y, true);
-		}
-	}
-
-	/// <summary>
 	/// Apply the dragging momentum.
 	/// </summary>
 
 	void LateUpdate ()
 	{
+		// Inspector functionality
+		if (repositionClipping)
+		{
+			repositionClipping = false;
+			mCalculatedBounds = false;
+			SetDragAmount(relativePositionOnReset.x, relativePositionOnReset.y, true);
+		}
+
 		if (!Application.isPlaying) return;
 		float delta = UpdateRealTimeDelta();
 
@@ -616,9 +607,13 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 				// Restrict the contents to be within the panel's bounds
 				if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None) RestrictWithinBounds(false);
+				return;
 			}
 			else mScroll = 0f;
 		}
+
+		// Dampen the momentum
+		NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
 	}
 
 #if UNITY_EDITOR
