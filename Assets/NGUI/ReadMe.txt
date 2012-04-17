@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.0.1
+                Version 2.0.2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,14 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.0.2:
+- FIX: UIButton series of scripts will now correctly disable and re-enable their selected state when the game object is enabled / disabled.
+- FIX: SpringPanel will now notify the Draggable Panel script on movement, letting it update scroll bars correctly.
+- FIX: UIDraggablePanel will now lose its momentum every frame rather than only when it's being dragged.
+- FIX: UIDraggablePanel will no longer reset the panel's position on start.
+- FIX: UIDraggablePanel.ResetPosition() now functions correctly.
+- FIX: UIDraggablePanel.UpdateScrollbars() will now only adjust the position if the scroll bars aren't being updated (ie: called from a scroll bar).
 
 2.0.1:
 - NEW: UIDraggablePanel will now display the bounds of the draggable widgets as an orange outline in the Scene View.
