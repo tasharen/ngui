@@ -12,8 +12,8 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Tween/Scale")]
 public class TweenScale : UITweener
 {
-	public Vector3 from;
-	public Vector3 to;
+	public Vector3 from = Vector3.one;
+	public Vector3 to = Vector3.one;
 	public bool updateTable = false;
 
 	Transform mTrans;

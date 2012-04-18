@@ -234,7 +234,7 @@ public class UIInput : MonoBehaviour
 					selected = false;
 					return;
 				}
-				else
+				else if (c >= ' ')
 				{
 					// All other characters get appended to the text
 					mText += c;

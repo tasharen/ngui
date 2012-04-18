@@ -200,6 +200,8 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	void Start ()
 	{
+		UpdateScrollbars(true);
+
 		if (horizontalScrollBar != null)
 		{
 			horizontalScrollBar.onChange += OnHorizontalBar;
