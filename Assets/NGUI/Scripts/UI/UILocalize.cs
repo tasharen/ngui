@@ -39,9 +39,16 @@ public class UILocalize : MonoBehaviour
 
 			// If we still don't have a key, use the widget's name
 			string val = string.IsNullOrEmpty(key) ? loc.Get(w.name) : loc.Get(key);
-			if (lbl != null) lbl.text = val;
-			else if (sp != null) sp.spriteName = val;
 
+			if (lbl != null)
+			{
+				lbl.text = val;
+			}
+			else if (sp != null)
+			{
+				sp.spriteName = val;
+				sp.MakePixelPerfect();
+			}
 			mLanguage = loc.currentLanguage;
 		}
 	}

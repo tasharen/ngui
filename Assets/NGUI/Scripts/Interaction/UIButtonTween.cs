@@ -97,7 +97,7 @@ public class UIButtonTween : MonoBehaviour
 	/// Activate the tweeners.
 	/// </summary>
 
-	void Play (bool forward)
+	public void Play (bool forward)
 	{
 		GameObject go = (tweenTarget == null) ? gameObject : tweenTarget;
 

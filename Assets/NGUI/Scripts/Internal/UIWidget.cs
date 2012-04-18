@@ -217,7 +217,7 @@ public abstract class UIWidget : MonoBehaviour
 			// This widget is no longer parented to the same panel. Remove it and re-add it to a new one.
 			if (!valid)
 			{
-				material = null;
+				if (!keepMaterial) material = null;
 				mPanel = null;
 				CreatePanel();
 			}

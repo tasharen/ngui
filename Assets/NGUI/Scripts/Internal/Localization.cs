@@ -17,7 +17,29 @@ using System.Collections.Generic;
 public class Localization : MonoBehaviour
 {
 	static Localization mInst;
-	static public Localization instance { get { return mInst; } }
+
+	/// <summary>
+	/// The instance of the localization class. Will create it if one isn't already around.
+	/// </summary>
+
+	static public Localization instance
+	{
+		get
+		{
+			if (mInst == null)
+			{
+				mInst = Object.FindObjectOfType(typeof(Localization)) as Localization;
+
+				if (mInst == null)
+				{
+					GameObject go = new GameObject("_Localization");
+					DontDestroyOnLoad(go);
+					mInst = go.AddComponent<Localization>();
+				}
+			}
+			return mInst;
+		}
+	}
 
 	/// <summary>
 	/// Language the localization manager will start with.
