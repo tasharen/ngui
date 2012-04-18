@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.0.3
+                Version 2.0.3b
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -39,6 +39,8 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: UIDraggablePanel will now update the scroll bars on start.
 - FIX: UITweenScale will now start with a scale of one instead of zero by default.
 - FIX: UIInput will now ignore all characters lower than space, fixing an issue with mac OS input.
+- FIX: UITexture will no longer lose its material whenever something changes.
+- FIX: Reworked the way the mouse is handled in UICamera, fixing a couple of highlighting issues.
 
 2.0.2:
 - FIX: UIButton series of scripts will now correctly disable and re-enable their selected state when the game object is enabled / disabled.
