@@ -391,23 +391,28 @@ public class UILabel : UIWidget
 
 	public void MakePositionPerfect ()
 	{
+		float pixelSize = (font.atlas != null) ? font.atlas.pixelSize : 1f;
 		Vector3 scale = cachedTransform.localScale;
 
-		if (mFont.size == Mathf.RoundToInt(scale.x) && mFont.size == Mathf.RoundToInt(scale.y) &&
+		if (mFont.size == Mathf.RoundToInt(scale.x / pixelSize) &&
+			mFont.size == Mathf.RoundToInt(scale.y / pixelSize) &&
 			cachedTransform.localRotation == Quaternion.identity)
 		{
 			Vector2 actualSize = relativeSize * scale.x;
 
-			int x = Mathf.RoundToInt(actualSize.x);
-			int y = Mathf.RoundToInt(actualSize.y);
+			int x = Mathf.RoundToInt(actualSize.x / pixelSize);
+			int y = Mathf.RoundToInt(actualSize.y / pixelSize);
 
 			Vector3 pos = cachedTransform.localPosition;
-			pos.x = Mathf.FloorToInt(pos.x);
-			pos.y = Mathf.CeilToInt(pos.y);
+			pos.x = Mathf.FloorToInt(pos.x / pixelSize);
+			pos.y = Mathf.CeilToInt(pos.y / pixelSize);
 			pos.z = Mathf.RoundToInt(pos.z);
 
 			if ((x % 2 == 1) && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
 			if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y -= 0.5f;
+
+			pos.x *= pixelSize;
+			pos.y *= pixelSize;
 
 			if (cachedTransform.localPosition != pos) cachedTransform.localPosition = pos;
 		}
@@ -421,19 +426,21 @@ public class UILabel : UIWidget
 	{
 		if (mFont != null)
 		{
+			float pixelSize = (font.atlas != null) ? font.atlas.pixelSize : 1f;
+
 			Vector3 scale = cachedTransform.localScale;
-			scale.x = mFont.size;
+			scale.x = mFont.size * pixelSize;
 			scale.y = scale.x;
 			scale.z = 1f;
 
 			Vector2 actualSize = relativeSize * scale.x;
 
-			int x = Mathf.RoundToInt(actualSize.x);
-			int y = Mathf.RoundToInt(actualSize.y);
+			int x = Mathf.RoundToInt(actualSize.x / pixelSize);
+			int y = Mathf.RoundToInt(actualSize.y / pixelSize);
 
 			Vector3 pos = cachedTransform.localPosition;
-			pos.x = Mathf.FloorToInt(pos.x);
-			pos.y = Mathf.CeilToInt(pos.y);
+			pos.x = Mathf.FloorToInt(pos.x / pixelSize);
+			pos.y = Mathf.CeilToInt(pos.y / pixelSize);
 			pos.z = Mathf.RoundToInt(pos.z);
 
 			if (cachedTransform.localRotation == Quaternion.identity)
@@ -442,9 +449,11 @@ public class UILabel : UIWidget
 				if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y -= 0.5f;
 			}
 
-			float pixelSize = (font.atlas != null) ? font.atlas.pixelSize : 1f;
-			cachedTransform.localPosition = pos * pixelSize;
-			cachedTransform.localScale = scale * pixelSize;
+			pos.x *= pixelSize;
+			pos.y *= pixelSize;
+
+			cachedTransform.localPosition = pos;
+			cachedTransform.localScale = scale;
 		}
 		else base.MakePixelPerfect();
 	}
