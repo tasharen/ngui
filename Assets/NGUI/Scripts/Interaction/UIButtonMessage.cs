@@ -29,39 +29,50 @@ public class UIButtonMessage : MonoBehaviour
 
 	float mLastClick = 0f;
 	bool mStarted = false;
+	bool mHighlighted = false;
 
 	void Start () { mStarted = true; }
 
-	void OnEnable () { if (mStarted) OnHover(UICamera.IsHighlighted(gameObject)); }
+	void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
 	void OnHover (bool isOver)
 	{
-		if (((isOver && trigger == Trigger.OnMouseOver) ||
-			(!isOver && trigger == Trigger.OnMouseOut))) Send();
+		if (enabled)
+		{
+			if (((isOver && trigger == Trigger.OnMouseOver) ||
+				(!isOver && trigger == Trigger.OnMouseOut))) Send();
+			mHighlighted = isOver;
+		}
 	}
 
 	void OnPress (bool isPressed)
 	{
-		if (((isPressed && trigger == Trigger.OnPress) ||
-			(!isPressed && trigger == Trigger.OnRelease))) Send();
+		if (enabled)
+		{
+			if (((isPressed && trigger == Trigger.OnPress) ||
+				(!isPressed && trigger == Trigger.OnRelease))) Send();
+		}
 	}
 
 	void OnClick ()
 	{
-		float time = Time.realtimeSinceStartup;
-
-		if (mLastClick + 0.2f > time)
+		if (enabled)
 		{
-			if (trigger == Trigger.OnDoubleClick) Send();
-		}
-		else if (trigger == Trigger.OnClick) Send();
+			float time = Time.realtimeSinceStartup;
 
-		mLastClick = time;
+			if (mLastClick + 0.2f > time)
+			{
+				if (trigger == Trigger.OnDoubleClick) Send();
+			}
+			else if (trigger == Trigger.OnClick) Send();
+
+			mLastClick = time;
+		}
 	}
 
 	void Send ()
 	{
-		if (!enabled || !gameObject.active || string.IsNullOrEmpty(functionName)) return;
+		if (!gameObject.active || string.IsNullOrEmpty(functionName)) return;
 		if (target == null) target = gameObject;
 
 		if (includeChildren)

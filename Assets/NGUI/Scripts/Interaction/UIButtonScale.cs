@@ -20,10 +20,11 @@ public class UIButtonScale : MonoBehaviour
 	Vector3 mScale;
 	bool mInitDone = false;
 	bool mStarted = false;
+	bool mHighlighted = false;
 
 	void Start () { mStarted = true; }
 
-	void OnEnable () { if (mStarted) OnHover(UICamera.IsHighlighted(gameObject)); }
+	void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
 	void OnDisable ()
 	{
@@ -61,6 +62,7 @@ public class UIButtonScale : MonoBehaviour
 		{
 			if (!mInitDone) Init();
 			TweenScale.Begin(tweenTarget.gameObject, duration, isOver ? Vector3.Scale(mScale, hover) : mScale).method = UITweener.Method.EaseInOut;
+			mHighlighted = isOver;
 		}
 	}
 }

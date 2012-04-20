@@ -12,18 +12,44 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Button Color")]
 public class UIButtonColor : MonoBehaviour
 {
+	/// <summary>
+	/// Target with a widget, renderer, or light that will have its color tweened.
+	/// </summary>
+
 	public GameObject tweenTarget;
+
+	/// <summary>
+	/// Color to apply on hover event (mouse only).
+	/// </summary>
+
 	public Color hover = new Color(0.6f, 1f, 0.2f, 1f);
+
+	/// <summary>
+	/// Color to apply on the pressed event.
+	/// </summary>
+
 	public Color pressed = Color.grey;
+
+	/// <summary>
+	/// Duration of the tween process.
+	/// </summary>
+
 	public float duration = 0.2f;
 
 	Color mColor;
 	bool mInitDone = false;
 	bool mStarted = false;
+	bool mHighlighted = false;
+
+	/// <summary>
+	/// UIButtonColor's default (starting) color. It's useful to be able to change it, just in case.
+	/// </summary>
+
+	public Color defaultColor { get { return mColor; } set { mColor = value; } }
 
 	void Start () { mStarted = true; }
 
-	void OnEnable () { if (mStarted) OnHover(UICamera.IsHighlighted(gameObject)); }
+	void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
 	void OnDisable ()
 	{
@@ -82,7 +108,11 @@ public class UIButtonColor : MonoBehaviour
 
 	void OnHover (bool isOver)
 	{
-		if (!mInitDone) Init();
-		if (enabled) TweenColor.Begin(tweenTarget, duration, isOver ? hover : mColor);
+		if (enabled)
+		{
+			if (!mInitDone) Init();
+			TweenColor.Begin(tweenTarget, duration, isOver ? hover : mColor);
+			mHighlighted = isOver;
+		}
 	}
 }

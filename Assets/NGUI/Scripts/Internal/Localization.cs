@@ -72,7 +72,7 @@ public class Localization : MonoBehaviour
 				{
 					currentLanguage = startingLanguage;
 
-					if (string.IsNullOrEmpty(mLanguage) && languages.Length > 0)
+					if (string.IsNullOrEmpty(mLanguage) && (languages != null && languages.Length > 0))
 					{
 						currentLanguage = languages[0].name;
 					}

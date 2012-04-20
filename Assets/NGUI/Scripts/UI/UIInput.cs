@@ -107,6 +107,12 @@ public class UIInput : MonoBehaviour
 	void OnEnable () { if (UICamera.IsHighlighted(gameObject)) OnSelect(true); }
 
 	/// <summary>
+	/// Remove the selection.
+	/// </summary>
+
+	void OnDisable () { if (UICamera.IsHighlighted(gameObject)) OnSelect(false); }
+
+	/// <summary>
 	/// Selection event, sent by UICamera.
 	/// </summary>
 

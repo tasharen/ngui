@@ -43,8 +43,20 @@ public class UIButtonKeys : MonoBehaviour
 				if (selectOnDown != null) UICamera.selectedObject = selectOnDown.gameObject;
 				break;
 			case KeyCode.Tab:
-				if (selectOnRight != null) UICamera.selectedObject = selectOnRight.gameObject;
-				else if (selectOnDown != null) UICamera.selectedObject = selectOnDown.gameObject;
+				if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+				{
+					if (selectOnLeft != null) UICamera.selectedObject = selectOnLeft.gameObject;
+					else if (selectOnUp != null) UICamera.selectedObject = selectOnUp.gameObject;
+					else if (selectOnDown != null) UICamera.selectedObject = selectOnDown.gameObject;
+					else if (selectOnRight != null) UICamera.selectedObject = selectOnRight.gameObject;
+				}
+				else
+				{
+					if (selectOnRight != null) UICamera.selectedObject = selectOnRight.gameObject;
+					else if (selectOnDown != null) UICamera.selectedObject = selectOnDown.gameObject;
+					else if (selectOnUp != null) UICamera.selectedObject = selectOnUp.gameObject;
+					else if (selectOnRight != null) UICamera.selectedObject = selectOnRight.gameObject;
+				}
 				break;
 			}
 		}

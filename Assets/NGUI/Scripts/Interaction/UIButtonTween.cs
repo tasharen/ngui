@@ -24,10 +24,11 @@ public class UIButtonTween : MonoBehaviour
 
 	UITweener[] mTweens;
 	bool mStarted = false;
+	bool mHighlighted = false;
 
 	void Start () { mStarted = true; if (tweenTarget == null) tweenTarget = gameObject; }
 
-	void OnEnable () { if (mStarted) OnHover(UICamera.IsHighlighted(gameObject)); }
+	void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
 	void OnHover (bool isOver)
 	{
@@ -39,6 +40,7 @@ public class UIButtonTween : MonoBehaviour
 			{
 				Play(isOver);
 			}
+			mHighlighted = isOver;
 		}
 	}
 
