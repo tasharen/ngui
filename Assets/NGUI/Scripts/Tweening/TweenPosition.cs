@@ -17,11 +17,10 @@ public class TweenPosition : UITweener
 
 	Transform mTrans;
 
-	public Vector3 position { get { return mTrans.localPosition; } set { mTrans.localPosition = value; } }
+	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
+	public Vector3 position { get { return cachedTransform.localPosition; } set { cachedTransform.localPosition = value; } }
 
-	void Awake () { mTrans = transform; }
-
-	override protected void OnUpdate (float factor) { mTrans.localPosition = from * (1f - factor) + to * factor; }
+	override protected void OnUpdate (float factor) { cachedTransform.localPosition = from * (1f - factor) + to * factor; }
 
 	/// <summary>
 	/// Start the tweening operation.

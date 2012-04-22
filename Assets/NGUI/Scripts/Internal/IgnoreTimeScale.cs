@@ -44,4 +44,18 @@ public class IgnoreTimeScale : MonoBehaviour
 		mTime = time;
 		return mDelta;
 	}
+
+	/// <summary>
+	/// Update the 'realTimeDelta' parameter, optionally locking to at least 1 millisecond of delta change.
+	/// </summary>
+
+	protected float UpdateRealTimeDelta (bool lockFPS)
+	{
+		float time = Time.realtimeSinceStartup;
+		float delta = Mathf.Max(0f, time - mTime);
+		if (lockFPS && delta < 0.01667f) return 0f;
+		mDelta = delta;
+		mTime = time;
+		return mDelta;
+	}
 }

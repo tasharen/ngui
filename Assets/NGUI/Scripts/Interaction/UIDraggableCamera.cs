@@ -51,6 +51,12 @@ public class UIDraggableCamera : IgnoreTimeScale
 	float mScroll = 0f;
 
 	/// <summary>
+	/// Current momentum, exposed just in case it's needed.
+	/// </summary>
+
+	public Vector2 currentMomentum { get { return mMomentum; } set { mMomentum = value; } }
+
+	/// <summary>
 	/// Cache the common components.
 	/// </summary>
 

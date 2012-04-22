@@ -17,12 +17,11 @@ public class TweenTransform : UITweener
 
 	Transform mTrans;
 
-	void Awake () { mTrans = transform; }
-
 	override protected void OnUpdate (float factor)
 	{
 		if (from != null && to != null)
 		{
+			if (mTrans == null) mTrans = transform;
 			mTrans.position = from.position * (1f - factor) + to.position * factor;
 			mTrans.localScale = from.localScale * (1f - factor) + to.localScale * factor;
 			mTrans.rotation = Quaternion.Slerp(from.rotation, to.rotation, factor);
