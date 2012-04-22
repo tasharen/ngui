@@ -58,18 +58,16 @@ static public class NGUITools
 
 	static public WWW OpenURL (string url)
 	{
+		//Debug.Log(url);
+#if UNITY_FLASH
+		Debug.LogError("WWW is not yet implemented in Flash");
+		return null;
+#else
 		WWW www = null;
-
-		try
-		{
-			www = new WWW(url);
-			//Debug.Log(url);
-		}
-		catch (System.Exception ex)
-		{
-			Debug.LogError(ex.Message);
-		}
+		try { www = new WWW(url); }
+		catch (System.Exception ex) { Debug.LogError(ex.Message); }
 		return www;
+#endif
 	}
 
 	/// <summary>
