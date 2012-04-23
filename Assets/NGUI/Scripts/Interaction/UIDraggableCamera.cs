@@ -162,7 +162,7 @@ public class UIDraggableCamera : IgnoreTimeScale
 		mTrans.localPosition += (Vector3)offset;
 
 		// Adjust the momentum
-		mMomentum = Vector2.Lerp(mMomentum, offset * (realTimeDelta * momentumAmount), 0.5f);
+		mMomentum = Vector2.Lerp(mMomentum, mMomentum + offset * (0.01f * momentumAmount), 0.67f);
 
 		// Constrain the UI to the bounds, and if done so, eliminate the momentum
 		if (dragEffect != UIDragObject.DragEffect.MomentumAndSpring && ConstrainToBounds(true))

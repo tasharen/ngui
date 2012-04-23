@@ -140,7 +140,7 @@ public class UIDragObject : IgnoreTimeScale
 				}
 
 				// Adjust the momentum
-				mMomentum = Vector3.Lerp(mMomentum, offset * (realTimeDelta * momentumAmount), 0.5f);
+				mMomentum = Vector3.Lerp(mMomentum, mMomentum + offset * (0.01f * momentumAmount), 0.67f);
 
 				// We want to constrain the UI to be within bounds
 				if (restrictWithinPanel)

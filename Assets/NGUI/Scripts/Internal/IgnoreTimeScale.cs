@@ -13,6 +13,7 @@ using UnityEngine;
 public class IgnoreTimeScale : MonoBehaviour
 {
 	float mTime = 0f;
+	float mActual = 0f;
 	float mDelta = 0f;
 
 	/// <summary>
@@ -40,21 +41,10 @@ public class IgnoreTimeScale : MonoBehaviour
 	protected float UpdateRealTimeDelta ()
 	{
 		float time = Time.realtimeSinceStartup;
-		mDelta = Mathf.Max(0f, time - mTime);
-		mTime = time;
-		return mDelta;
-	}
-
-	/// <summary>
-	/// Update the 'realTimeDelta' parameter, optionally locking to at least 1 millisecond of delta change.
-	/// </summary>
-
-	protected float UpdateRealTimeDelta (bool lockFPS)
-	{
-		float time = Time.realtimeSinceStartup;
-		float delta = Mathf.Max(0f, time - mTime);
-		if (lockFPS && delta < 0.01667f) return 0f;
-		mDelta = delta;
+		float delta = time - mTime;
+		mActual += Mathf.Max(0f, delta);
+		mDelta = 0.001f * Mathf.Round(mActual * 1000f);
+		mActual -= mDelta;
 		mTime = time;
 		return mDelta;
 	}

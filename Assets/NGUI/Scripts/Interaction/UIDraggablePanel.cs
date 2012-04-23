@@ -525,7 +525,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 				}
 
 				// Adjust the momentum
-				mMomentum = Vector3.Lerp(mMomentum, offset * (realTimeDelta * momentumAmount), 0.5f);
+				mMomentum = Vector3.Lerp(mMomentum, mMomentum + offset * (0.01f * momentumAmount), 0.67f);
 
 				// Move the panel
 				MoveAbsolute(offset);
@@ -611,7 +611,8 @@ public class UIDraggablePanel : IgnoreTimeScale
 				mScroll = NGUIMath.SpringLerp(mScroll, 0f, 20f, delta);
 
 				// Move the panel
-				MoveAbsolute(NGUIMath.SpringDampen(ref mMomentum, 9f, delta));
+				Vector3 offset = NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
+				MoveAbsolute(offset);
 
 				// Restrict the contents to be within the panel's bounds
 				if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None) RestrictWithinBounds(false);
