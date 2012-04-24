@@ -207,10 +207,14 @@ public class UIDragObject : IgnoreTimeScale
 							if (sp != null) sp.enabled = false;
 						}
 					}
+					return;
 				}
 			}
 			else mScroll = 0f;
 		}
+
+		// Dampen the momentum
+		NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
 	}
 
 	/// <summary>
