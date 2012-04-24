@@ -19,13 +19,19 @@ static public class NGUITools
 	/// Play the specified audio clip.
 	/// </summary>
 
-	static public AudioSource PlaySound (AudioClip clip) { return PlaySound(clip, 1f); }
+	static public AudioSource PlaySound (AudioClip clip) { return PlaySound(clip, 1f, 1f); }
 
 	/// <summary>
 	/// Play the specified audio clip with the specified volume.
 	/// </summary>
 
-	static public AudioSource PlaySound (AudioClip clip, float volume)
+	static public AudioSource PlaySound (AudioClip clip, float volume) { return PlaySound(clip, volume, 1f); }
+
+	/// <summary>
+	/// Play the specified audio clip with the specified volume and pitch.
+	/// </summary>
+
+	static public AudioSource PlaySound (AudioClip clip, float volume, float pitch)
 	{
 		if (clip != null)
 		{
@@ -45,6 +51,7 @@ static public class NGUITools
 			{
 				AudioSource source = mListener.audio;
 				if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
+				source.pitch = pitch;
 				source.PlayOneShot(clip, volume);
 				return source;
 			}
