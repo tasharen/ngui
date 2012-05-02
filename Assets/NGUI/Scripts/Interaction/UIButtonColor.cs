@@ -36,10 +36,10 @@ public class UIButtonColor : MonoBehaviour
 
 	public float duration = 0.2f;
 
-	Color mColor;
-	bool mInitDone = false;
-	bool mStarted = false;
-	bool mHighlighted = false;
+	protected Color mColor;
+	protected bool mInitDone = false;
+	protected bool mStarted = false;
+	protected bool mHighlighted = false;
 
 	/// <summary>
 	/// UIButtonColor's default (starting) color. It's useful to be able to change it, just in case.
@@ -47,7 +47,11 @@ public class UIButtonColor : MonoBehaviour
 
 	public Color defaultColor { get { return mColor; } set { mColor = value; } }
 
-	void Start () { mStarted = true; }
+	protected virtual void Start ()
+	{
+		mStarted = true;
+		if (!mInitDone) Init();
+	}
 
 	void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
 

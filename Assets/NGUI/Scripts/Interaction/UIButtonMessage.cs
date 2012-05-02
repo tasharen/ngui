@@ -27,7 +27,6 @@ public class UIButtonMessage : MonoBehaviour
 	public Trigger trigger = Trigger.OnClick;
 	public bool includeChildren = false;
 
-	float mLastClick = 0f;
 	bool mStarted = false;
 	bool mHighlighted = false;
 
@@ -54,21 +53,9 @@ public class UIButtonMessage : MonoBehaviour
 		}
 	}
 
-	void OnClick ()
-	{
-		if (enabled)
-		{
-			float time = Time.realtimeSinceStartup;
+	void OnClick () { if (enabled && trigger == Trigger.OnClick) Send(); }
 
-			if (mLastClick + 0.2f > time)
-			{
-				if (trigger == Trigger.OnDoubleClick) Send();
-			}
-			else if (trigger == Trigger.OnClick) Send();
-
-			mLastClick = time;
-		}
-	}
+	void OnDoubleClick () { if (enabled && trigger == Trigger.OnDoubleClick) Send(); }
 
 	void Send ()
 	{

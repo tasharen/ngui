@@ -44,19 +44,19 @@ public class UIAtlas : MonoBehaviour
 	}
 
 	// Material used by this atlas. Name is kept only for backwards compatibility, it used to be public.
-	[SerializeField] Material material;
+	[HideInInspector][SerializeField] Material material;
 
 	// List of all sprites inside the atlas. Name is kept only for backwards compatibility, it used to be public.
-	[SerializeField] List<Sprite> sprites = new List<Sprite>();
+	[HideInInspector][SerializeField] List<Sprite> sprites = new List<Sprite>();
 
 	// Currently active set of coordinates
-	[SerializeField] Coordinates mCoordinates = Coordinates.Pixels;
+	[HideInInspector][SerializeField] Coordinates mCoordinates = Coordinates.Pixels;
 
 	// Size in pixels for the sake of MakePixelPerfect functions.
-	[SerializeField] float mPixelSize = 1f;
+	[HideInInspector][SerializeField] float mPixelSize = 1f;
 
 	// Replacement atlas can be used to completely bypass this atlas, pulling the data from another one instead.
-	[SerializeField] UIAtlas mReplacement;
+	[HideInInspector][SerializeField] UIAtlas mReplacement;
 
 	/// <summary>
 	/// Material used by the atlas.

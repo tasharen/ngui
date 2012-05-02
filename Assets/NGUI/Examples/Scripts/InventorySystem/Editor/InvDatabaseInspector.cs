@@ -234,7 +234,7 @@ public class InvDatabaseInspector : Editor
 								GUILayout.BeginHorizontal();
 								{
 									GUILayout.Space(Screen.width - iconSize);
-									NGUIEditorTools.DrawSprite(tex, rect, null);
+									NGUIEditorTools.DrawSprite(tex, rect, null, false);
 								}
 								GUILayout.EndHorizontal();
 

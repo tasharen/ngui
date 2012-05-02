@@ -26,10 +26,10 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	// Cached and saved values
-	[SerializeField] Material mMat;
-	[SerializeField] Color mColor = Color.white;
-	[SerializeField] Pivot mPivot = Pivot.Center;
-	[SerializeField] int mDepth = 0;
+	[HideInInspector][SerializeField] Material mMat;
+	[HideInInspector][SerializeField] Color mColor = Color.white;
+	[HideInInspector][SerializeField] Pivot mPivot = Pivot.Center;
+	[HideInInspector][SerializeField] int mDepth = 0;
 
 	Transform mTrans;
 	Texture mTex;

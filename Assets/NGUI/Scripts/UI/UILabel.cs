@@ -17,21 +17,21 @@ public class UILabel : UIWidget
 		Outline,
 	}
 
-	[SerializeField] UIFont mFont;
-	[SerializeField] string mText = "";
-	[SerializeField] int mMaxLineWidth = 0;
-	[SerializeField] bool mEncoding = true;
-	[SerializeField] bool mMultiline = true;
-	[SerializeField] bool mPassword = false;
-	[SerializeField] bool mShowLastChar = false;
-	[SerializeField] Effect mEffectStyle = Effect.None;
-	[SerializeField] Color mEffectColor = Color.black;
+	[HideInInspector][SerializeField] UIFont mFont;
+	[HideInInspector][SerializeField] string mText = "";
+	[HideInInspector][SerializeField] int mMaxLineWidth = 0;
+	[HideInInspector][SerializeField] bool mEncoding = true;
+	[HideInInspector][SerializeField] bool mMultiline = true;
+	[HideInInspector][SerializeField] bool mPassword = false;
+	[HideInInspector][SerializeField] bool mShowLastChar = false;
+	[HideInInspector][SerializeField] Effect mEffectStyle = Effect.None;
+	[HideInInspector][SerializeField] Color mEffectColor = Color.black;
 
 	/// <summary>
 	/// Obsolete, do not use. Use 'mMaxLineWidth' instead.
 	/// </summary>
 
-	[SerializeField] float mLineWidth = 0;
+	[HideInInspector][SerializeField] float mLineWidth = 0;
 
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
@@ -46,6 +46,7 @@ public class UILabel : UIWidget
 	bool mLastShow = false;
 	Effect mLastEffect = Effect.None;
 	Color mLastColor = Color.black;
+	Vector3 mSize = Vector3.zero;
 
 	/// <summary>
 	/// Function used to determine if something has changed (and thus the geometry must be rebuilt)
@@ -289,39 +290,7 @@ public class UILabel : UIWidget
 			}
 
 			// Process the text if necessary
-			if (hasChanged)
-			{
-				mChanged = true;
-				hasChanged = false;
-				mLastText = mText;
-				mProcessedText = mText.Replace("\\n", "\n");
-
-				if (mPassword)
-				{
-					mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, false);
-
-					string hidden = "";
-
-					if (mShowLastChar)
-					{
-						for (int i = 1, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
-						if (mProcessedText.Length > 0) hidden += mProcessedText[mProcessedText.Length - 1];
-					}
-					else
-					{
-						for (int i = 0, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
-					}
-					mProcessedText = hidden;
-				}
-				else if (mMaxLineWidth > 0)
-				{
-					mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.x, mMultiline, mEncoding);
-				}
-				else if (!mMultiline)
-				{
-					mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, mEncoding);
-				}
-			}
+			if (hasChanged) ProcessText();
 			return mProcessedText;
 		}
 	}
@@ -353,12 +322,9 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			Vector3 size = (mFont != null && !string.IsNullOrEmpty(processedText)) ?
-				mFont.CalculatePrintedSize(mProcessedText, mEncoding) : Vector2.one;
-			float scale = cachedTransform.localScale.x;
-			size.x = Mathf.Max(size.x, (mFont != null && scale > 1f) ? lineWidth / scale : 1f);
-			size.y = Mathf.Max(size.y, 1f);
-			return size;
+			if (mFont == null) return Vector3.one;
+			if (hasChanged) ProcessText();
+			return mSize;
 		}
 	}
 
@@ -383,6 +349,49 @@ public class UILabel : UIWidget
 	{
 		hasChanged = true;
 		base.MarkAsChanged();
+	}
+
+	/// <summary>
+	/// Process the raw text, called when something changes.
+	/// </summary>
+
+	void ProcessText ()
+	{
+		mChanged = true;
+		hasChanged = false;
+		mLastText = mText;
+		mProcessedText = mText.Replace("\\n", "\n");
+
+		if (mPassword)
+		{
+			mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, false);
+
+			string hidden = "";
+
+			if (mShowLastChar)
+			{
+				for (int i = 1, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
+				if (mProcessedText.Length > 0) hidden += mProcessedText[mProcessedText.Length - 1];
+			}
+			else
+			{
+				for (int i = 0, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
+			}
+			mProcessedText = hidden;
+		}
+		else if (mMaxLineWidth > 0)
+		{
+			mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.x, mMultiline, mEncoding);
+		}
+		else if (!mMultiline)
+		{
+			mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, mEncoding);
+		}
+
+		mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding) : Vector2.one;
+		float scale = cachedTransform.localScale.x;
+		mSize.x = Mathf.Max(mSize.x, (mFont != null && scale > 1f) ? lineWidth / scale : 1f);
+		mSize.y = Mathf.Max(mSize.y, 1f);
 	}
 
 	/// <summary>

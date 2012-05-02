@@ -46,9 +46,9 @@ public class UISpriteInspector : UIWidgetInspector
 	/// Convenience function that displays a list of sprites and returns the selected value.
 	/// </summary>
 
-	static public string SpriteField (UIAtlas atlas, string name)
+	static public string SpriteField (UIAtlas atlas, string name, params GUILayoutOption[] options)
 	{
-		return SpriteField(atlas, "Sprite", name);
+		return SpriteField(atlas, "Sprite", name, options);
 	}
 
 	/// <summary>

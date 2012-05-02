@@ -64,9 +64,10 @@ public class UIGrid : MonoBehaviour
 				Transform t = list[i];
 				if (!t.gameObject.active && hideInactive) continue;
 
+				float depth = t.localPosition.z;
 				t.localPosition = (arrangement == Arrangement.Horizontal) ?
-					new Vector3(cellWidth * x, -cellHeight * y, 0f) :
-					new Vector3(cellWidth * y, -cellHeight * x, 0f);
+					new Vector3(cellWidth * x, -cellHeight * y, depth) :
+					new Vector3(cellWidth * y, -cellHeight * x, depth);
 
 				if (++x >= maxPerLine && maxPerLine > 0)
 				{
@@ -83,9 +84,10 @@ public class UIGrid : MonoBehaviour
 
 				if (!t.gameObject.active && hideInactive) continue;
 
+				float depth = t.localPosition.z;
 				t.localPosition = (arrangement == Arrangement.Horizontal) ?
-					new Vector3(cellWidth * x, -cellHeight * y, 0f) :
-					new Vector3(cellWidth * y, -cellHeight * x, 0f);
+					new Vector3(cellWidth * x, -cellHeight * y, depth) :
+					new Vector3(cellWidth * y, -cellHeight * x, depth);
 
 				if (++x >= maxPerLine && maxPerLine > 0)
 				{

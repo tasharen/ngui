@@ -1,16 +1,11 @@
-﻿//----------------------------------------------
-//            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
-//----------------------------------------------
-
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
 /// Example script that can be used to show tooltips.
 /// </summary>
 
-[AddComponentMenu("NGUI/Examples/Tooltip")]
+[AddComponentMenu("Game/UI/Tooltip")]
 public class UITooltip : MonoBehaviour
 {
 	static UITooltip mInstance;
@@ -94,10 +89,10 @@ public class UITooltip : MonoBehaviour
 
 	void SetText (string tooltipText)
 	{
-		if (!string.IsNullOrEmpty(tooltipText))
+		if (text != null && !string.IsNullOrEmpty(tooltipText))
 		{
 			mTarget = 1f;
-			
+
 			if (text != null) text.text = tooltipText;
 
 			// Orthographic camera positioning is trivial
@@ -107,24 +102,21 @@ public class UITooltip : MonoBehaviour
 			{
 				Transform backgroundTrans = background.transform;
 
-				if (text != null && text.font != null)
-				{
-					Transform textTrans = text.transform;
-					Vector3 offset = textTrans.localPosition;
-					Vector3 textScale = textTrans.localScale;
+				Transform textTrans = text.transform;
+				Vector3 offset = textTrans.localPosition;
+				Vector3 textScale = textTrans.localScale;
 
-					// Calculate the dimensions of the printed text
-					mSize = text.font.CalculatePrintedSize(tooltipText, true);
+				// Calculate the dimensions of the printed text
+				mSize = text.relativeSize;
 
-					// Scale by the transform and adjust by the padding offset
-					mSize.x *= textScale.x;
-					mSize.y *= textScale.y;
-					mSize.x += offset.x * 2f;
-					mSize.y -= offset.y * 2f;
-					mSize.z = 1f;
+				// Scale by the transform and adjust by the padding offset
+				mSize.x *= textScale.x;
+				mSize.y *= textScale.y;
+				mSize.x += background.border.x + background.border.z + (offset.x - background.border.x) * 2f;
+				mSize.y += background.border.y + background.border.w + (-offset.y - background.border.y) * 2f;
+				mSize.z = 1f;
 
-					backgroundTrans.localScale = mSize;
-				}
+				backgroundTrans.localScale = mSize;
 			}
 
 			if (uiCamera != null)
@@ -191,9 +183,9 @@ public class UITooltip : MonoBehaviour
 			if (bi != null)
 			{
 				string t = "[" + NGUITools.EncodeColor(item.color) + "]" + item.name + "[-]\n";
-				
+
 				t += "[AFAFAF]Level " + item.itemLevel + " " + bi.slot;
-				
+
 				List<InvStat> stats = item.CalculateStats();
 
 				for (int i = 0, imax = stats.Count; i < imax; ++i)
@@ -214,7 +206,7 @@ public class UITooltip : MonoBehaviour
 					t += " " + stat.id;
 					t += "[-]";
 				}
-				
+
 				if (!string.IsNullOrEmpty(bi.description)) t += "\n[FF9900]" + bi.description;
 				ShowText(t);
 				return;

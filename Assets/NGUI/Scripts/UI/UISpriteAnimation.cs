@@ -15,8 +15,8 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Sprite Animation")]
 public class UISpriteAnimation : MonoBehaviour
 {
-	[SerializeField] int mFPS = 30;
-	[SerializeField] string mPrefix = "";
+	[HideInInspector][SerializeField] int mFPS = 30;
+	[HideInInspector][SerializeField] string mPrefix = "";
 
 	UISprite mSprite;
 	float mDelta = 0f;

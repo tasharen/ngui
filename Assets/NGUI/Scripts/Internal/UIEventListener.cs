@@ -24,6 +24,7 @@ public class UIEventListener : MonoBehaviour
 
 	public VoidDelegate onSubmit;
 	public VoidDelegate onClick;
+	public VoidDelegate onDoubleClick;
 	public BoolDelegate onHover;
 	public BoolDelegate onPress;
 	public BoolDelegate onSelect;
@@ -34,6 +35,7 @@ public class UIEventListener : MonoBehaviour
 
 	void OnSubmit ()				{ if (onSubmit != null) onSubmit(gameObject); }
 	void OnClick ()					{ if (onClick != null) onClick(gameObject); }
+	void OnDoubleClick ()			{ if (onDoubleClick != null) onDoubleClick(gameObject); }
 	void OnHover (bool isOver)		{ if (onHover != null) onHover(gameObject, isOver); }
 	void OnPress (bool isPressed)	{ if (onPress != null) onPress(gameObject, isPressed); }
 	void OnSelect (bool selected)	{ if (onSelect != null) onSelect(gameObject, selected); }

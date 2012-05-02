@@ -119,7 +119,7 @@ public class UIPopupList : MonoBehaviour
 
 	public string functionName = "OnSelectionChange";
 
-	[SerializeField] string mSelectedItem;
+	[HideInInspector][SerializeField] string mSelectedItem;
 	UIPanel mPanel;
 	GameObject mChild;
 	UISprite mBackground;

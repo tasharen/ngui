@@ -311,7 +311,7 @@ public class UICreateWidgetWizard : EditorWindow
 			NGUITools.AddWidgetCollider(go);
 
 			// Add the scripts
-			go.AddComponent<UIButtonColor>().tweenTarget = bg.gameObject;
+			go.AddComponent<UIButton>().tweenTarget = bg.gameObject;
 			go.AddComponent<UIButtonScale>();
 			go.AddComponent<UIButtonOffset>();
 			go.AddComponent<UIButtonSound>();
@@ -453,7 +453,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 			// Add the scripts
 			go.AddComponent<UICheckbox>().checkSprite = fg;
-			go.AddComponent<UIButtonColor>().tweenTarget = bg.gameObject;
+			go.AddComponent<UIButton>().tweenTarget = bg.gameObject;
 			go.AddComponent<UIButtonScale>().tweenTarget = bg.transform;
 			go.AddComponent<UIButtonSound>();
 
@@ -775,7 +775,7 @@ public class UICreateWidgetWizard : EditorWindow
 			for (int i = 0; i < 5; ++i) list.items.Add(isDropDown ? ("List Option " + i) : ("Menu Option " + i));
 
 			// Add the scripts
-			go.AddComponent<UIButtonColor>().tweenTarget = sprite.gameObject;
+			go.AddComponent<UIButton>().tweenTarget = sprite.gameObject;
 			go.AddComponent<UIButtonSound>();
 
 			Selection.activeGameObject = go;

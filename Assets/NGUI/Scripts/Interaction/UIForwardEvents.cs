@@ -7,7 +7,6 @@ using UnityEngine;
 
 /// <summary>
 /// This script can be used to forward events from one object to another.
-/// Example usage: Forwarding 'drag' event from the slider's thumb to the slider itself.
 /// In most cases you should use UIEventListener script instead. For example:
 /// UIEventListener.Get(gameObject).onClick += MyClickFunction;
 /// </summary>
@@ -16,14 +15,15 @@ using UnityEngine;
 public class UIForwardEvents : MonoBehaviour
 {
 	public GameObject target;
-	public bool onHover  = false;
-	public bool onPress  = false;
-	public bool onClick  = false;
-	public bool onSelect = false;
-	public bool onDrag	 = false;
-	public bool onDrop	 = false;
-	public bool onInput  = false;
-	public bool onSubmit = false;
+	public bool onHover			= false;
+	public bool onPress			= false;
+	public bool onClick			= false;
+	public bool onDoubleClick	= false;
+	public bool onSelect		= false;
+	public bool onDrag			= false;
+	public bool onDrop			= false;
+	public bool onInput			= false;
+	public bool onSubmit		= false;
 
 	void OnHover (bool isOver)
 	{
@@ -46,6 +46,14 @@ public class UIForwardEvents : MonoBehaviour
 		if (onClick && target != null)
 		{
 			target.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
+		}
+	}
+
+	void OnDoubleClick ()
+	{
+		if (onDoubleClick && target != null)
+		{
+			target.SendMessage("OnDoubleClick", SendMessageOptions.DontRequireReceiver);
 		}
 	}
 

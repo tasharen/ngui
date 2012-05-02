@@ -21,12 +21,12 @@ public class UIScrollBar : MonoBehaviour
 
 	public delegate void OnScrollBarChange (UIScrollBar sb);
 
-	[SerializeField] UISprite mBG;
-	[SerializeField] UISprite mFG;
-	[SerializeField] Direction mDir = Direction.Horizontal;
-	[SerializeField] bool mInverted = false;
-	[SerializeField] float mScroll = 0f;
-	[SerializeField] float mSize = 1f;
+	[HideInInspector][SerializeField] UISprite mBG;
+	[HideInInspector][SerializeField] UISprite mFG;
+	[HideInInspector][SerializeField] Direction mDir = Direction.Horizontal;
+	[HideInInspector][SerializeField] bool mInverted = false;
+	[HideInInspector][SerializeField] float mScroll = 0f;
+	[HideInInspector][SerializeField] float mSize = 1f;
 
 	Transform mTrans;
 	bool mIsDirty = false;

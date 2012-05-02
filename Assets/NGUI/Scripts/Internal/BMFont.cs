@@ -13,15 +13,15 @@ using System.Collections.Generic;
 [System.Serializable]
 public class BMFont
 {
-	[SerializeField] BMGlyph[] mGlyphs = null;	// Prior to version 1.84, glyphs were stored in one large array
-	[SerializeField] int mSize = 0;				// How much to move the cursor when moving to the next line
-	[SerializeField] int mBase = 0;				// Offset from the top of the line to the base of each character
-	[SerializeField] int mWidth = 0;			// Original width of the texture
-	[SerializeField] int mHeight = 0;			// Original height of the texture
-	[SerializeField] string mSpriteName;
+	[HideInInspector][SerializeField] BMGlyph[] mGlyphs = null;	// Prior to version 1.84, glyphs were stored in one large array
+	[HideInInspector][SerializeField] int mSize = 0;				// How much to move the cursor when moving to the next line
+	[HideInInspector][SerializeField] int mBase = 0;				// Offset from the top of the line to the base of each character
+	[HideInInspector][SerializeField] int mWidth = 0;			// Original width of the texture
+	[HideInInspector][SerializeField] int mHeight = 0;			// Original height of the texture
+	[HideInInspector][SerializeField] string mSpriteName;
 
 	// List of serialized glyphs (1.84 and up)
-	[SerializeField] List<BMGlyph> mSaved = new List<BMGlyph>();
+	[HideInInspector][SerializeField] List<BMGlyph> mSaved = new List<BMGlyph>();
 
 	// Actual glyphs that we'll be working with are stored in a dictionary, making the lookup faster (1.84 and up)
 	Dictionary<int, BMGlyph> mDict = new Dictionary<int, BMGlyph>();

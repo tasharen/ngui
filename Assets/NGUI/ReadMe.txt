@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.0.3e
+                Version 2.0.4
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,19 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.0.4:
+- NEW: Added UIButton -- same as UIButtonColor, but has a disabled state.
+- NEW: Added the OnDoubleClick event. Same as OnClick, just sent on double-click.
+- FIX: UIDraggablePanel should now have noticeably better performance with many widgets.
+- FIX: All private serializable properties will now be hidden from the inspector.
+- FIX: UITooltip is now more robust and automatically uses background border size for padding.
+- FIX: UILabel inspector now uses a word-wrapped textbox.
+- FIX: UIButtonPlayAnimation and UIButtonTween now have an event receiver (on finished).
+- FIX: UIGrid no longer modifies Z of its items on reposition.
+- FIX: Only one Localization class is now allowed to be present.
+- FIX: UILabel should now have a bit better performance in the editor.
+- FIX: UISprite's MakePixelPerfect setting now takes padding into account properly.
 
 2.0.3:
 - NEW: UIButtonSound now allows you to specify pitch in addition to volume.

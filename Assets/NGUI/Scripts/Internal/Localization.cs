@@ -122,7 +122,7 @@ public class Localization : MonoBehaviour
 	/// Determine the starting language.
 	/// </summary>
 
-	void Awake () { if (mInst == null) mInst = this; }
+	void Awake () { if (mInst == null) { mInst = this; DontDestroyOnLoad(gameObject); } else Destroy(gameObject); }
 
 	/// <summary>
 	/// Oddly enough... sometimes if there is no OnEnable function in Localization, it can get the Awake call after UILocalize's OnEnable.

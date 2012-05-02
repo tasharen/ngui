@@ -45,7 +45,9 @@ public class UILabelInspector : UIWidgetInspector
 		ComponentSelector.Draw<UIFont>(mLabel.font, OnSelectFont);
 		if (mLabel.font == null) return false;
 
-		string text = EditorGUILayout.TextArea(mLabel.text, GUILayout.Height(100f));
+		GUI.skin.textArea.wordWrap = true;
+		string text = string.IsNullOrEmpty(mLabel.text) ? "" : mLabel.text;
+		text = EditorGUILayout.TextArea(mLabel.text, GUI.skin.textArea, GUILayout.Height(100f));
 		if (!text.Equals(mLabel.text)) { RegisterUndo(); mLabel.text = text; }
 
 		GUILayout.BeginHorizontal();

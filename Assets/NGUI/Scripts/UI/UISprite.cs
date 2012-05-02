@@ -15,8 +15,8 @@ using System.Collections.Generic;
 public class UISprite : UIWidget
 {
 	// Cached and saved values
-	[SerializeField] UIAtlas mAtlas;
-	[SerializeField] string mSpriteName;
+	[HideInInspector][SerializeField] UIAtlas mAtlas;
+	[HideInInspector][SerializeField] string mSpriteName;
 
 	protected UIAtlas.Sprite mSprite;
 	protected Rect mOuter;
@@ -232,18 +232,43 @@ public class UISprite : UIWidget
 	override public void MakePixelPerfect ()
 	{
 		Texture tex = mainTexture;
+		Vector3 scale = cachedTransform.localScale;
 
 		if (tex != null)
 		{
 			Rect rect = NGUIMath.ConvertToPixels(outerUV, tex.width, tex.height, true);
-			Vector3 scale = cachedTransform.localScale;
 			float pixelSize = atlas.pixelSize;
-			scale.x = rect.width * pixelSize;
-			scale.y = rect.height * pixelSize;
+			scale.x = Mathf.RoundToInt(rect.width * pixelSize);
+			scale.y = Mathf.RoundToInt(rect.height * pixelSize);
 			scale.z = 1f;
 			cachedTransform.localScale = scale;
 		}
-		base.MakePixelPerfect();
+
+		int width  = Mathf.RoundToInt(scale.x * (1f + mSprite.paddingLeft + mSprite.paddingRight));
+		int height = Mathf.RoundToInt(scale.y * (1f + mSprite.paddingTop + mSprite.paddingBottom));
+
+		Vector3 pos = cachedTransform.localPosition;
+		pos.z = Mathf.RoundToInt(pos.z);
+
+		if (width % 2 == 1 && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom))
+		{
+			pos.x = Mathf.Floor(pos.x) + 0.5f;
+		}
+		else
+		{
+			pos.x = Mathf.Round(pos.x);
+		}
+
+		if (height % 2 == 1 && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right))
+		{
+			pos.y = Mathf.Ceil(pos.y) - 0.5f;
+		}
+		else
+		{
+			pos.y = Mathf.Round(pos.y);
+		}
+
+		cachedTransform.localPosition = pos;
 	}
 
 	/// <summary>

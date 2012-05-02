@@ -14,7 +14,7 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Sprite (Sliced)")]
 public class UISlicedSprite : UISprite
 {
-	[SerializeField] bool mFillCenter = true;
+	[HideInInspector][SerializeField] bool mFillCenter = true;
 
 	protected Rect mInner;
 	protected Rect mInnerUV;

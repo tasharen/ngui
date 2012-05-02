@@ -16,6 +16,12 @@ using AnimationOrTween;
 public class ActiveAnimation : IgnoreTimeScale
 {
 	/// <summary>
+	/// Game object on which to call the callback function.
+	/// </summary>
+
+	public GameObject eventReceiver;
+
+	/// <summary>
 	/// Function to call when the animation finishes playing.
 	/// </summary>
 
@@ -81,8 +87,11 @@ public class ActiveAnimation : IgnoreTimeScale
 			{
 				mNotify = false;
 
-				// Notify listeners
-				if (!string.IsNullOrEmpty(callWhenFinished)) SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
+				if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
+				{
+					// Notify the event listener target
+					eventReceiver.SendMessage(callWhenFinished, this, SendMessageOptions.DontRequireReceiver);
+				}
 
 				if (mDisableDirection != Direction.Toggle && mLastDirection == mDisableDirection)
 				{

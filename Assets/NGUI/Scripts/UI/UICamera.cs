@@ -16,6 +16,7 @@ using System.Collections.Generic;
 /// - OnPress (isDown) is sent when a mouse button gets pressed on the collider.
 /// - OnSelect (selected) is sent when a mouse button is released on the same object as it was pressed on.
 /// - OnClick (int button) is sent with the same conditions as OnSelect, with the added check to see if the mouse has not moved much.
+/// - OnDoubleClick (int button) is sent when the click happens twice within a fourth of a second.
 /// - OnDrag (delta) is sent when a mouse or touch gets pressed on a collider and starts dragging it.
 /// - OnDrop (gameObject) is sent when the mouse or touch get released on a different collider than the one that was being dragged.
 /// - OnInput (text) is sent when typing (after selecting a collider by clicking on it).
@@ -46,14 +47,16 @@ public class UICamera : MonoBehaviour
 
 	public class MouseOrTouch
 	{
-		public Vector2 pos;			// Current position of the mouse or touch event
-		public Vector2 delta;		// Delta since last update
-		public Vector2 totalDelta;	// Delta since the event started being tracked
+		public Vector2 pos;				// Current position of the mouse or touch event
+		public Vector2 delta;			// Delta since last update
+		public Vector2 totalDelta;		// Delta since the event started being tracked
 
-		public Camera pressedCam;	// Camera that the OnPress(true) was fired with
+		public Camera pressedCam;		// Camera that the OnPress(true) was fired with
 
-		public GameObject current;	// The current game object under the touch or mouse
-		public GameObject pressed;	// The last game object to receive OnPress
+		public GameObject current;		// The current game object under the touch or mouse
+		public GameObject pressed;		// The last game object to receive OnPress
+
+		public float clickTime = 0f;	// The last time a click event was sent out
 
 		public ClickNotification clickNotification = ClickNotification.Always;
 	}
@@ -663,9 +666,14 @@ public class UICamera : MonoBehaviour
 			}
 		}
 
-		// If the position changed, reset the tooltip
-		if (posChanged)
+		if (isPressed)
 		{
+			// A button was pressed -- cancel the tooltip
+			mTooltipTime = 0f;
+		}
+		else if (posChanged)
+		{
+			// If the position changed, reset the tooltip
 			if (mTooltipTime != 0f) mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
 			else if (mTooltip != null) ShowTooltip(false);
 		}
@@ -883,7 +891,15 @@ public class UICamera : MonoBehaviour
 					// If the touch should consider clicks, send out an OnClick notification
 					if (currentTouch.clickNotification != ClickNotification.None)
 					{
+						float time = Time.realtimeSinceStartup;
+
 						currentTouch.pressed.SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
+
+						if (currentTouch.clickTime + 0.25f > time)
+						{
+							currentTouch.pressed.SendMessage("OnDoubleClick", SendMessageOptions.DontRequireReceiver);
+						}
+						currentTouch.clickTime = time;
 					}
 				}
 				else // The button/touch was released on a different object

@@ -48,6 +48,8 @@ public class UICheckbox : MonoBehaviour
 	{
 		mTrans = transform;
 
+		if (checkSprite != null) checkSprite.alpha = startsChecked ? 1f : 0f;
+
 		if (option)
 		{
 			option = false;
@@ -81,6 +83,7 @@ public class UICheckbox : MonoBehaviour
 	{
 		if (!mStarted)
 		{
+			mChecked = state;
 			startsChecked = state;
 			if (checkSprite != null) checkSprite.alpha = state ? 1f : 0f;
 		}
@@ -89,7 +92,7 @@ public class UICheckbox : MonoBehaviour
 			// Uncheck all other checkboxes
 			if (radioButtonRoot != null && state)
 			{
-				UICheckbox[] cbs = radioButtonRoot.GetComponentsInChildren<UICheckbox>();
+				UICheckbox[] cbs = radioButtonRoot.GetComponentsInChildren<UICheckbox>(true);
 
 				for (int i = 0, imax = cbs.Length; i < imax; ++i)
 				{

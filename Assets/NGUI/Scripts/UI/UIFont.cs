@@ -22,13 +22,13 @@ public class UIFont : MonoBehaviour
 		Right,
 	}
 
-	[SerializeField] Material mMat;
-	[SerializeField] Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
-	[SerializeField] BMFont mFont = new BMFont();
-	[SerializeField] int mSpacingX = 0;
-	[SerializeField] int mSpacingY = 0;
-	[SerializeField] UIAtlas mAtlas;
-	[SerializeField] UIFont mReplacement;
+	[HideInInspector][SerializeField] Material mMat;
+	[HideInInspector][SerializeField] Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
+	[HideInInspector][SerializeField] BMFont mFont = new BMFont();
+	[HideInInspector][SerializeField] int mSpacingX = 0;
+	[HideInInspector][SerializeField] int mSpacingY = 0;
+	[HideInInspector][SerializeField] UIAtlas mAtlas;
+	[HideInInspector][SerializeField] UIFont mReplacement;
 
 	// Cached value
 	UIAtlas.Sprite mSprite = null;

@@ -298,10 +298,16 @@ public class NGUIEditorTools
 	/// Draw an enlarged sprite within the specified texture atlas.
 	/// </summary>
 
-	static public Rect DrawSprite (Texture2D tex, Rect sprite, Material mat)
+	static public Rect DrawSprite (Texture2D tex, Rect sprite, Material mat) { return DrawSprite(tex, sprite, mat, true); }
+
+	/// <summary>
+	/// Draw an enlarged sprite within the specified texture atlas.
+	/// </summary>
+
+	static public Rect DrawSprite (Texture2D tex, Rect sprite, Material mat, bool addPadding)
 	{
-		float paddingX = 4f / tex.width;
-		float paddingY = 4f / tex.height;
+		float paddingX = addPadding ? 4f / tex.width : 0f;
+		float paddingY = addPadding ? 4f / tex.height : 0f;
 		float ratio = (sprite.height + paddingY) / (sprite.width + paddingX);
 
 		ratio *= (float)tex.height / tex.width;
@@ -433,7 +439,10 @@ public class NGUIEditorTools
 			}
 
 			// Draw the sprite selection popup
-			index = EditorGUILayout.Popup(field, index, list, options);
+			index = string.IsNullOrEmpty(field) ?
+				EditorGUILayout.Popup(index, list, options) :
+				EditorGUILayout.Popup(field, index, list, options);
+
 			return list[index];
 		}
 		return null;

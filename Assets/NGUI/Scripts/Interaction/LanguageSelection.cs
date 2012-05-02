@@ -26,7 +26,7 @@ public class LanguageSelection : MonoBehaviour
 
 	void UpdateList ()
 	{
-		if (Localization.instance != null)
+		if (Localization.instance != null && Localization.instance.languages != null)
 		{
 			mList.items.Clear();
 

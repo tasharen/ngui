@@ -23,9 +23,9 @@ public class UIFilledSprite : UISprite
 		Radial360,
 	}
 
-	[SerializeField] FillDirection mFillDirection = FillDirection.Radial360;
-	[SerializeField] float mFillAmount = 1.0f;
-	[SerializeField] bool mInvert = false;
+	[HideInInspector][SerializeField] FillDirection mFillDirection = FillDirection.Radial360;
+	[HideInInspector][SerializeField] float mFillAmount = 1.0f;
+	[HideInInspector][SerializeField] bool mInvert = false;
 
 	/// <summary>
 	/// Direction of the cut procedure.
