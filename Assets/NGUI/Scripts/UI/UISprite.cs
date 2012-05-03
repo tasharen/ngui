@@ -231,6 +231,8 @@ public class UISprite : UIWidget
 
 	override public void MakePixelPerfect ()
 	{
+		if (sprite == null) return;
+
 		Texture tex = mainTexture;
 		Vector3 scale = cachedTransform.localScale;
 
