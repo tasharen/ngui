@@ -122,7 +122,7 @@ public class UITable : MonoBehaviour
 		}
 		if (sorted) children.Sort(SortByName);
 		if (children.Count > 0) RepositionVariableSize(children);
-		if (mPanel != null) mPanel.ConstrainTargetToBounds(myTrans, true);
+		if (mPanel != null && mDrag == null) mPanel.ConstrainTargetToBounds(myTrans, true);
 		if (mDrag != null) mDrag.UpdateScrollbars(true);
 	}
 

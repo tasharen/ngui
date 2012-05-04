@@ -4,6 +4,7 @@
 //----------------------------------------------
 
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// This is a script used to keep the game object scaled to 2/(Screen.height).
@@ -14,10 +15,15 @@ using UnityEngine;
 [AddComponentMenu("NGUI/UI/Root")]
 public class UIRoot : MonoBehaviour
 {
+	static List<UIRoot> mRoots = new List<UIRoot>();
+
 	public bool automatic = true;
 	public int manualHeight = 800;
 
 	Transform mTrans;
+
+	void Awake () { mRoots.Add(this); }
+	void OnDestroy () { mRoots.Remove(this); }
 
 	void Start ()
 	{
@@ -46,6 +52,40 @@ public class UIRoot : MonoBehaviour
 			!Mathf.Approximately(ls.z, size))
 		{
 			mTrans.localScale = new Vector3(size, size, size);
+		}
+	}
+
+	/// <summary>
+	/// Broadcast the specified message to the entire UI.
+	/// </summary>
+
+	static public void Broadcast (string funcName)
+	{
+		for (int i = 0, imax = mRoots.Count; i < imax; ++i)
+		{
+			UIRoot root = mRoots[i];
+			if (root != null) root.BroadcastMessage(funcName, SendMessageOptions.DontRequireReceiver);
+		}
+	}
+
+	/// <summary>
+	/// Broadcast the specified message to the entire UI.
+	/// </summary>
+
+	static public void Broadcast (string funcName, object param)
+	{
+		if (param == null)
+		{
+			// More on this: http://answers.unity3d.com/questions/55194/suggested-workaround-for-sendmessage-bug.html
+			Debug.LogError("SendMessage is bugged when you try to pass 'null' in the parameter field. It behaves as if no parameter was specified.");
+		}
+		else
+		{
+			for (int i = 0, imax = mRoots.Count; i < imax; ++i)
+			{
+				UIRoot root = mRoots[i];
+				if (root != null) root.BroadcastMessage(funcName, param, SendMessageOptions.DontRequireReceiver);
+			}
 		}
 	}
 }

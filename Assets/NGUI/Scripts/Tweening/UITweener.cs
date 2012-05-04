@@ -91,6 +91,12 @@ public abstract class UITweener : IgnoreTimeScale
 	}
 
 	/// <summary>
+	/// Tween factor, 0-1 range.
+	/// </summary>
+
+	public float factor { get { return mFactor; } }
+
+	/// <summary>
 	/// Direction in which the tween is currently playing.
 	/// </summary>
 

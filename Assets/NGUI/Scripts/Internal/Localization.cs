@@ -146,7 +146,7 @@ public class Localization : MonoBehaviour
 		PlayerPrefs.SetString("Language", mLanguage);
 		ByteReader reader = new ByteReader(asset);
 		mDictionary = reader.ReadDictionary();
-		NGUITools.Broadcast("OnLocalize", this);
+		UIRoot.Broadcast("OnLocalize", this);
 	}
 
 	/// <summary>

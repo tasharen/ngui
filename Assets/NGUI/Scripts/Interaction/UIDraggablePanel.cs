@@ -561,6 +561,9 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	void LateUpdate ()
 	{
+		// If the panel's geometry changed, recalculate the bounds
+		if (mPanel.changedLastFrame) UpdateScrollbars(true);
+
 		// Inspector functionality
 		if (repositionClipping)
 		{

@@ -26,6 +26,8 @@ public class UINode
 
 	public int changeFlag = -1;		// -1 = not checked, 0 = not changed, 1 = changed
 
+	GameObject mGo;
+
 	/// <summary>
 	/// -1 = not initialized, 0 = not visible, 1 = visible.
 	/// </summary>
@@ -53,6 +55,7 @@ public class UINode
 		lastPos = trans.localPosition;
 		lastRot = trans.localRotation;
 		lastScale = trans.localScale;
+		mGo = t.gameObject;
 	}
 
 	/// <summary>
@@ -61,7 +64,7 @@ public class UINode
 
 	public bool HasChanged ()
 	{
-		bool isActive = trans.gameObject.active && (widget == null || (widget.enabled && widget.color.a > 0.001f));
+		bool isActive = mGo.active && (widget == null || (widget.enabled && widget.color.a > 0.001f));
 
 		if (lastActive != isActive || (isActive &&
 			(lastPos != trans.localPosition ||

@@ -29,7 +29,10 @@ public class UIPanelInspector : Editor
 			EditorWindow.FocusWindowIfItsOpen<UIPanelTool>();
 		}
 
-		bool norms = EditorGUILayout.Toggle("Normals", panel.generateNormals);
+		GUILayout.BeginHorizontal();
+		bool norms = EditorGUILayout.Toggle("Normals", panel.generateNormals, GUILayout.Width(100f));
+		GUILayout.Label("Needed for lit shaders");
+		GUILayout.EndHorizontal();
 
 		if (panel.generateNormals != norms)
 		{
@@ -38,11 +41,26 @@ public class UIPanelInspector : Editor
 			EditorUtility.SetDirty(panel);
 		}
 
-		bool depth = EditorGUILayout.Toggle("Depth Pass", panel.depthPass);
+		GUILayout.BeginHorizontal();
+		bool depth = EditorGUILayout.Toggle("Depth Pass", panel.depthPass, GUILayout.Width(100f));
+		GUILayout.Label("Extra draw call, saves fillrate");
+		GUILayout.EndHorizontal();
 
 		if (panel.depthPass != depth)
 		{
 			panel.depthPass = depth;
+			panel.UpdateDrawcalls();
+			EditorUtility.SetDirty(panel);
+		}
+
+		GUILayout.BeginHorizontal();
+		bool stat = EditorGUILayout.Toggle("Static", panel.widgetsAreStatic, GUILayout.Width(100f));
+		GUILayout.Label("Check if widgets won't move");
+		GUILayout.EndHorizontal();
+
+		if (panel.widgetsAreStatic != stat)
+		{
+			panel.widgetsAreStatic = stat;
 			panel.UpdateDrawcalls();
 			EditorUtility.SetDirty(panel);
 		}
