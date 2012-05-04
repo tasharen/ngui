@@ -42,6 +42,10 @@ public class DragDropItem : MonoBehaviour
 		{
 			// Container found -- parent this object to the container
 			mTrans.parent = container.transform;
+
+			Vector3 pos = mTrans.localPosition;
+			pos.z = 0f;
+			mTrans.localPosition = pos;
 		}
 		else
 		{
@@ -75,6 +79,11 @@ public class DragDropItem : MonoBehaviour
 				mIsDragging = true;
 				mParent = mTrans.parent;
 				mTrans.parent = DragDropRoot.root;
+				
+				Vector3 pos = mTrans.localPosition;
+				pos.z = 0f;
+				mTrans.localPosition = pos;
+				
 				mTrans.BroadcastMessage("CheckParent", SendMessageOptions.DontRequireReceiver);
 			}
 			else
