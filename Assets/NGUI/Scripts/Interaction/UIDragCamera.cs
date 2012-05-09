@@ -68,7 +68,7 @@ public class UIDragCamera : IgnoreTimeScale
 	{
 		if (enabled && gameObject.active && draggableCamera != null)
 		{
-			 draggableCamera.Drag(delta);
+			draggableCamera.Drag(delta);
 		}
 	}
 
