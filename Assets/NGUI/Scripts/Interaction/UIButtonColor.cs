@@ -47,13 +47,9 @@ public class UIButtonColor : MonoBehaviour
 
 	public Color defaultColor { get { return mColor; } set { mColor = value; } }
 
-	protected virtual void Start ()
-	{
-		mStarted = true;
-		if (!mInitDone) Init();
-	}
+	void Start () { mStarted = true; if (!mInitDone) Init(); }
 
-	void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
+	protected virtual void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
 	void OnDisable ()
 	{
@@ -69,7 +65,7 @@ public class UIButtonColor : MonoBehaviour
 		}
 	}
 
-	void Init ()
+	protected void Init ()
 	{
 		mInitDone = true;
 		if (tweenTarget == null) tweenTarget = gameObject;

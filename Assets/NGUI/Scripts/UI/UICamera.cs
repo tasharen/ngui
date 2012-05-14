@@ -104,6 +104,12 @@ public class UICamera : MonoBehaviour
 	public float tooltipDelay = 1f;
 
 	/// <summary>
+	/// Whether the tooltip will disappear as soon as the mouse moves (false) or only if the mouse moves outside of the widget's area (true).
+	/// </summary>
+
+	public bool stickyTooltip = true;
+
+	/// <summary>
 	/// How far the mouse is allowed to move in pixels before it's no longer considered for click events, if the click notification is based on delta.
 	/// </summary>
 
@@ -175,6 +181,12 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	static public MouseOrTouch currentTouch = null;
+
+	/// <summary>
+	/// Whether an input field currently has focus.
+	/// </summary>
+
+	static public bool inputHasFocus = false;
 
 	/// <summary>
 	/// If events don't get handled, they will be forwarded to this game object.
@@ -594,13 +606,14 @@ public class UICamera : MonoBehaviour
 
 			if (input.Length > 0)
 			{
-				if (mTooltip != null) ShowTooltip(false);
+				if (!stickyTooltip && mTooltip != null) ShowTooltip(false);
 				mSel.SendMessage("OnInput", input, SendMessageOptions.DontRequireReceiver);
 			}
 
 			// Update the keyboard and joystick events
 			ProcessOthers();
 		}
+		else inputHasFocus = false;
 
 		// If it's time to show a tooltip, inform the object we're hovering over
 		if (useMouse && mHover != null)
@@ -671,11 +684,18 @@ public class UICamera : MonoBehaviour
 			// A button was pressed -- cancel the tooltip
 			mTooltipTime = 0f;
 		}
-		else if (posChanged)
+		else if (posChanged && (!stickyTooltip || mHover != mMouse[0].current))
 		{
-			// If the position changed, reset the tooltip
-			if (mTooltipTime != 0f) mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
-			else if (mTooltip != null) ShowTooltip(false);
+			if (mTooltipTime != 0f)
+			{
+				// Delay the tooltip
+				mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
+			}
+			else if (mTooltip != null)
+			{
+				// Hide the tooltip
+				ShowTooltip(false);
+			}
 		}
 
 		// The button was released over a different object -- remove the highlight from the previous
@@ -765,12 +785,12 @@ public class UICamera : MonoBehaviour
 		currentTouch = mController;
 
 		// If this is an input field, ignore WASD and Space key presses
-		bool hasInput = (mSel != null && mSel.GetComponent<UIInput>() != null);
+		inputHasFocus = (mSel != null && mSel.GetComponent<UIInput>() != null);
 
 		// Enter key and joystick button 1 keys are treated the same -- as a "click"
-		bool returnKeyDown	= (useKeyboard	 && (Input.GetKeyDown(KeyCode.Return) || (!hasInput && Input.GetKeyDown(KeyCode.Space))));
+		bool returnKeyDown	= (useKeyboard	 && (Input.GetKeyDown(KeyCode.Return) || (!inputHasFocus && Input.GetKeyDown(KeyCode.Space))));
 		bool buttonKeyDown	= (useController &&  Input.GetKeyDown(KeyCode.JoystickButton0));
-		bool returnKeyUp	= (useKeyboard	 && (Input.GetKeyUp(KeyCode.Return) || (!hasInput && Input.GetKeyUp(KeyCode.Space))));
+		bool returnKeyUp	= (useKeyboard	 && (Input.GetKeyUp(KeyCode.Return) || (!inputHasFocus && Input.GetKeyUp(KeyCode.Space))));
 		bool buttonKeyUp	= (useController &&  Input.GetKeyUp(KeyCode.JoystickButton0));
 
 		bool down	= returnKeyDown || buttonKeyDown;
@@ -787,7 +807,7 @@ public class UICamera : MonoBehaviour
 
 		if (useKeyboard)
 		{
-			if (hasInput)
+			if (inputHasFocus)
 			{
 				vertical += GetDirection(KeyCode.UpArrow, KeyCode.DownArrow);
 				horizontal += GetDirection(KeyCode.RightArrow, KeyCode.LeftArrow);
@@ -916,7 +936,7 @@ public class UICamera : MonoBehaviour
 	/// Show or hide the tooltip.
 	/// </summary>
 
-	void ShowTooltip (bool val)
+	public void ShowTooltip (bool val)
 	{
 		mTooltipTime = 0f;
 		if (mTooltip != null) mTooltip.SendMessage("OnTooltip", val, SendMessageOptions.DontRequireReceiver);

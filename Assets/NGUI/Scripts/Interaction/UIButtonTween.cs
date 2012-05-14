@@ -116,6 +116,19 @@ public class UIButtonTween : MonoBehaviour
 		}
 	}
 
+	void OnActivate (bool isActive)
+	{
+		if (enabled)
+		{
+			if (trigger == Trigger.OnActivate ||
+				(trigger == Trigger.OnActivateTrue && isActive) ||
+				(trigger == Trigger.OnActivateFalse && !isActive))
+			{
+				Play(isActive);
+			}
+		}
+	}
+
 	void Update ()
 	{
 		if (disableWhenFinished != DisableCondition.DoNotDisable && mTweens != null)

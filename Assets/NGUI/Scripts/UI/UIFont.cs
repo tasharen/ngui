@@ -410,13 +410,14 @@ public class UIFont : MonoBehaviour
 		{
 			if (encoding) text = NGUITools.StripSymbols(text);
 
+			int length = text.Length;
 			int maxX = 0;
 			int x = 0;
 			int y = 0;
 			int prev = 0;
 			int lineHeight = (mFont.charSize + mSpacingY);
 
-			for (int i = 0, imax = text.Length; i < imax; ++i)
+			for (int i = 0; i < length; ++i)
 			{
 				char c = text[i];
 
@@ -433,12 +434,26 @@ public class UIFont : MonoBehaviour
 				// Skip invalid characters
 				if (c < ' ') { prev = 0; continue; }
 
-				BMGlyph glyph = mFont.GetGlyph(c);
+				// See if there is a symbol matching this text
+				BMSymbol symbol = encoding ? mFont.MatchSymbol(text, i, length) : null;
 
-				if (glyph != null)
+				if (symbol == null)
 				{
-					x += mSpacingX + ((prev != 0) ? glyph.advance + glyph.GetKerning(prev) : glyph.advance);
-					prev = c;
+					// Get the glyph for this character
+					BMGlyph glyph = mFont.GetGlyph(c);
+
+					if (glyph != null)
+					{
+						x += mSpacingX + ((prev != 0) ? glyph.advance + glyph.GetKerning(prev) : glyph.advance);
+						prev = c;
+					}
+				}
+				else
+				{
+					// Symbol found -- use it
+					x += mSpacingX + symbol.width;
+					i += symbol.length - 1;
+					prev = 0;
 				}
 			}
 
@@ -529,63 +544,81 @@ public class UIFont : MonoBehaviour
 				}
 			}
 
-			BMGlyph glyph = mFont.GetGlyph(ch);
+			// See if there is a symbol matching this text
+			BMSymbol symbol = encoding ? mFont.MatchSymbol(text, offset, textLength) : null;
 
-			if (glyph != null)
+			// Find the glyph for this character
+			BMGlyph glyph = (symbol == null) ? mFont.GetGlyph(ch) : null;
+
+			// Calculate how wide this symbol or character is going to be
+			int glyphWidth = mSpacingX;
+
+			if (symbol != null)
 			{
-				int charSize = mSpacingX + ((previousChar != 0) ? glyph.advance + glyph.GetKerning(previousChar) : glyph.advance);
+				glyphWidth += symbol.width;
+			}
+			else if (glyph != null)
+			{
+				glyphWidth += (previousChar != 0) ? glyph.advance + glyph.GetKerning(previousChar) : glyph.advance;
+			}
+			else continue;
 
-				remainingWidth -= charSize;
+			// Remaining width after this glyph gets printed
+			remainingWidth -= glyphWidth;
 
-				// Doesn't fit?
-				if (remainingWidth < 0)
+			// Doesn't fit?
+			if (remainingWidth < 0)
+			{
+				// Can't start a new line
+				if (lineIsEmpty || !multiline)
 				{
-					if (lineIsEmpty || !multiline)
+					// This is the first word on the line -- add it up to the character that fits
+					sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
+
+					if (!multiline)
 					{
-						// This is the first word on the line -- add it up to the character that fits
-						sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
+						start = offset;
+						break;
+					}
+					EndLine(ref sb);
 
-						if (!multiline)
-						{
-							start = offset;
-							break;
-						}
-						EndLine(ref sb);
+					// Start a brand-new line
+					lineIsEmpty = true;
 
-						// Start a brand-new line
-						lineIsEmpty = true;
-
-						if (ch == ' ')
-						{
-							start = offset + 1;
-							remainingWidth = lineWidth;
-						}
-						else
-						{
-							start = offset;
-							remainingWidth = lineWidth - charSize;
-						}
-						previousChar = 0;
+					if (ch == ' ')
+					{
+						start = offset + 1;
+						remainingWidth = lineWidth;
 					}
 					else
 					{
-						// Skip all spaces before the word
-						while (start < textLength && text[start] == ' ') ++start;
-
-						// Revert the position to the beginning of the word and reset the line
-						lineIsEmpty = true;
-						remainingWidth = lineWidth;
-						offset = start - 1;
-						previousChar = 0;
-						if (!multiline) break;
-						EndLine(ref sb);
-						continue;
+						start = offset;
+						remainingWidth = lineWidth - glyphWidth;
 					}
+					previousChar = 0;
 				}
 				else
 				{
-					previousChar = ch;
+					// Skip all spaces before the word
+					while (start < textLength && text[start] == ' ') ++start;
+
+					// Revert the position to the beginning of the word and reset the line
+					lineIsEmpty = true;
+					remainingWidth = lineWidth;
+					offset = start - 1;
+					previousChar = 0;
+					if (!multiline) break;
+					EndLine(ref sb);
+					continue;
 				}
+			}
+			else previousChar = ch;
+
+			// Advance the offset past the symbol
+			if (symbol != null)
+			{
+				offset += symbol.length - 1;
+				previousChar = 0;
 			}
 		}
 
@@ -651,8 +684,9 @@ public class UIFont : MonoBehaviour
 			Vector2 u0 = Vector2.zero, u1 = Vector2.zero;
 			float invX = uvRect.width / mFont.texWidth;
 			float invY = mUVRect.height / mFont.texHeight;
+			int textLength = text.Length;
 
-			for (int i = 0, imax = text.Length; i < imax; ++i)
+			for (int i = 0; i < textLength; ++i)
 			{
 				char c = text[i];
 
@@ -690,44 +724,71 @@ public class UIFont : MonoBehaviour
 					}
 				}
 
-				BMGlyph glyph = mFont.GetGlyph(c);
+				// See if there is a symbol matching this text
+				BMSymbol symbol = encoding ? mFont.MatchSymbol(text, i, textLength) : null;
 
-				if (glyph != null)
+				if (symbol == null)
 				{
+					BMGlyph glyph = mFont.GetGlyph(c);
+					if (glyph == null) continue;
+
 					if (prev != 0) x += glyph.GetKerning(prev);
 
-					if (c != ' ')
+					if (c == ' ')
 					{
-						v0.x = scale.x * (x + glyph.offsetX);
-						v0.y = -scale.y * (y + glyph.offsetY);
-
-						v1.x = v0.x + scale.x * glyph.width;
-						v1.y = v0.y - scale.y * glyph.height;
-
-						u0.x = mUVRect.xMin + invX * glyph.x;
-						u0.y = mUVRect.yMax - invY * glyph.y;
-
-						u1.x = u0.x + invX * glyph.width;
-						u1.y = u0.y - invY * glyph.height;
-
-						verts.Add(new Vector3(v1.x, v0.y));
-						verts.Add(new Vector3(v1.x, v1.y));
-						verts.Add(new Vector3(v0.x, v1.y));
-						verts.Add(new Vector3(v0.x, v0.y));
-
-						uvs.Add(new Vector2(u1.x, u0.y));
-						uvs.Add(new Vector2(u1.x, u1.y));
-						uvs.Add(new Vector2(u0.x, u1.y));
-						uvs.Add(new Vector2(u0.x, u0.y));
-
-						cols.Add(color);
-						cols.Add(color);
-						cols.Add(color);
-						cols.Add(color);
+						x += mSpacingX + glyph.advance;
+						prev = c;
+						continue;
 					}
+
+					v0.x =  scale.x * (x + glyph.offsetX);
+					v0.y = -scale.y * (y + glyph.offsetY);
+
+					v1.x = v0.x + scale.x * glyph.width;
+					v1.y = v0.y - scale.y * glyph.height;
+
+					u0.x = mUVRect.xMin + invX * glyph.x;
+					u0.y = mUVRect.yMax - invY * glyph.y;
+
+					u1.x = u0.x + invX * glyph.width;
+					u1.y = u0.y - invY * glyph.height;
+
 					x += mSpacingX + glyph.advance;
 					prev = c;
 				}
+				else
+				{
+					v0.x =  scale.x * x;
+					v0.y = -scale.y * y;
+
+					v1.x = v0.x + scale.x * symbol.width;
+					v1.y = v0.y - scale.y * symbol.height;
+
+					u0.x = mUVRect.xMin + invX * symbol.x;
+					u0.y = mUVRect.yMax - invY * symbol.y;
+
+					u1.x = u0.x + invX * symbol.width;
+					u1.y = u0.y - invY * symbol.height;
+
+					x += mSpacingX + symbol.width;
+					i += symbol.length - 1;
+					prev = 0;
+				}
+
+				verts.Add(new Vector3(v1.x, v0.y));
+				verts.Add(new Vector3(v1.x, v1.y));
+				verts.Add(new Vector3(v0.x, v1.y));
+				verts.Add(new Vector3(v0.x, v0.y));
+
+				uvs.Add(new Vector2(u1.x, u0.y));
+				uvs.Add(new Vector2(u1.x, u1.y));
+				uvs.Add(new Vector2(u0.x, u1.y));
+				uvs.Add(new Vector2(u0.x, u0.y));
+
+				cols.Add(color);
+				cols.Add(color);
+				cols.Add(color);
+				cols.Add(color);
 			}
 
 			if (alignment != Alignment.Left && indexOffset < verts.size)

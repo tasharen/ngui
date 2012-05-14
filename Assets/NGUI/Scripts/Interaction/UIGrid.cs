@@ -29,8 +29,11 @@ public class UIGrid : MonoBehaviour
 	public bool sorted = false;
 	public bool hideInactive = true;
 
+	bool mStarted = false;
+
 	void Start ()
 	{
+		mStarted = true;
 		Reposition();
 	}
 
@@ -45,8 +48,18 @@ public class UIGrid : MonoBehaviour
 
 	static public int SortByName (Transform a, Transform b) { return string.Compare(a.name, b.name); }
 
+	/// <summary>
+	/// Recalculate the position of all elements within the grid, sorting them alphabetically if necessary.
+	/// </summary>
+
 	public void Reposition ()
 	{
+		if (!mStarted)
+		{
+			repositionNow = true;
+			return;
+		}
+
 		Transform myTrans = transform;
 
 		int x = 0;

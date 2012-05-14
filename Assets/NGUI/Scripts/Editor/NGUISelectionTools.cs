@@ -88,7 +88,7 @@ public class NGUISelectionTools
 	{
 		if (HasValidSelection())
 		{
-			Debug.Log("Asset dependencies:\n\n" + GetDependencyText(Selection.objects));
+			Debug.Log("Selection depends on the following assets:\n\n" + GetDependencyText(Selection.objects, false));
 		}
 	}
 	
@@ -159,9 +159,9 @@ public class NGUISelectionTools
 	/// Function that collects a list of file dependencies from the specified list of objects.
 	/// </summary>
 	
-	static List<AssetEntry> GetDependencyList (Object[] objects)
+	static List<AssetEntry> GetDependencyList (Object[] objects, bool reverse)
 	{
-		Object[] deps = EditorUtility.CollectDependencies(objects);
+		Object[] deps = reverse ? EditorUtility.CollectDeepHierarchy(objects) : EditorUtility.CollectDependencies(objects);
 		
 		List<AssetEntry> list = new List<AssetEntry>();
 		
@@ -214,9 +214,9 @@ public class NGUISelectionTools
 	/// Helper function that gets the dependencies of specified objects and returns them in text format.
 	/// </summary>
 	
-	static string GetDependencyText (Object[] objects)
+	static string GetDependencyText (Object[] objects, bool reverse)
 	{
-		List<AssetEntry> dependencies = GetDependencyList(objects);
+		List<AssetEntry> dependencies = GetDependencyList(objects, reverse);
 		List<string> list = new List<string>();
 		string text = "";
 

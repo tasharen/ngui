@@ -59,7 +59,7 @@ public class UIButtonMessage : MonoBehaviour
 
 	void Send ()
 	{
-		if (!gameObject.active || string.IsNullOrEmpty(functionName)) return;
+		if (string.IsNullOrEmpty(functionName)) return;
 		if (target == null) target = gameObject;
 
 		if (includeChildren)

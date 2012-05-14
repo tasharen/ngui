@@ -45,6 +45,12 @@ public class UIButtonPlayAnimation : MonoBehaviour
 	public bool resetOnPlay = false;
 
 	/// <summary>
+	/// Whether the selected object (this button) will be cleared when the animation gets activated.
+	/// </summary>
+
+	public bool clearSelection = false;
+
+	/// <summary>
 	/// What to do if the target game object is currently disabled.
 	/// </summary>
 
@@ -110,12 +116,27 @@ public class UIButtonPlayAnimation : MonoBehaviour
 		}
 	}
 
+	void OnActivate (bool isActive)
+	{
+		if (enabled)
+		{
+			if (trigger == Trigger.OnActivate ||
+				(trigger == Trigger.OnActivateTrue && isActive) ||
+				(trigger == Trigger.OnActivateFalse && !isActive))
+			{
+				Play(isActive);
+			}
+		}
+	}
+
 	void Play (bool forward)
 	{
 		if (target == null) target = GetComponentInChildren<Animation>();
 
 		if (target != null)
 		{
+			if (clearSelection && UICamera.selectedObject == gameObject) UICamera.selectedObject = null;
+
 			int pd = -(int)playDirection;
 			Direction dir = forward ? playDirection : ((Direction)pd);
 			ActiveAnimation anim = ActiveAnimation.Play(target, clipName, dir, ifDisabledOnPlay, disableWhenFinished);

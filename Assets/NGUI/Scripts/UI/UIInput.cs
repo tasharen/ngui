@@ -228,7 +228,11 @@ public class UIInput : MonoBehaviour
 				if (c == '\b')
 				{
 					// Backspace
-					if (mText.Length > 0) mText = mText.Substring(0, mText.Length - 1);
+					if (mText.Length > 0)
+					{
+						mText = mText.Substring(0, mText.Length - 1);
+						SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
+					}
 				}
 				else if (c == '\r' || c == '\n')
 				{
@@ -244,6 +248,7 @@ public class UIInput : MonoBehaviour
 				{
 					// All other characters get appended to the text
 					mText += c;
+					SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
 				}
 			}
 

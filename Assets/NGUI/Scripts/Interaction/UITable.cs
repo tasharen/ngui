@@ -16,15 +16,26 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/Interaction/Table")]
 public class UITable : MonoBehaviour
 {
+	public delegate void OnReposition ();
+
+	public enum Direction
+	{
+		Down,
+		Up,
+	}
+
 	public int columns = 0;
+	public Direction direction = Direction.Down;
 	public Vector2 padding = Vector2.zero;
 	public bool sorted = false;
 	public bool hideInactive = true;
 	public bool repositionNow = false;
 	public bool keepWithinPanel = false;
+	public OnReposition onReposition;
 
 	UIPanel mPanel;
 	UIDraggablePanel mDrag;
+	bool mStarted = false;
 
 	/// <summary>
 	/// Function that sorts items by name.
@@ -81,11 +92,19 @@ public class UITable : MonoBehaviour
 			Bounds bc = boundsCols[y];
 
 			Vector3 pos = t.localPosition;
-			pos.x =   xOffset + b.extents.x - b.center.x;
-			pos.y = -(yOffset + b.extents.y + b.center.y);
-
+			pos.x = xOffset + b.extents.x - b.center.x;
 			pos.x += b.min.x - br.min.x + padding.x;
-			pos.y += (b.max.y - b.min.y - bc.max.y + bc.min.y) * 0.5f - padding.y;
+
+			if (direction == Direction.Down)
+			{
+				pos.y = -yOffset - b.extents.y - b.center.y;
+				pos.y += (b.max.y - b.min.y - bc.max.y + bc.min.y) * 0.5f - padding.y;
+			}
+			else
+			{
+				pos.y = yOffset + b.extents.y - b.center.y;
+				pos.y += (b.max.y - b.min.y - bc.max.y + bc.min.y) * 0.5f - padding.y;
+			}
 
 			xOffset += br.max.x - br.min.x + padding.x * 2f;
 
@@ -103,27 +122,31 @@ public class UITable : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Reposition all elements in the grid.
+	/// Recalculate the position of all elements within the table, sorting them alphabetically if necessary.
 	/// </summary>
 
 	public void Reposition ()
 	{
-		Transform myTrans = transform;
-		List<Transform> children = new List<Transform>();
-
-		for (int i = 0; i < myTrans.childCount; ++i)
+		if (mStarted)
 		{
-			Transform child = myTrans.GetChild(i);
+			Transform myTrans = transform;
+			List<Transform> children = new List<Transform>();
 
-			if (!hideInactive || child.gameObject.active)
+			for (int i = 0; i < myTrans.childCount; ++i)
 			{
-				children.Add(child);
+				Transform child = myTrans.GetChild(i);
+
+				if (!hideInactive || child.gameObject.active)
+				{
+					children.Add(child);
+				}
 			}
+			if (sorted) children.Sort(SortByName);
+			if (children.Count > 0) RepositionVariableSize(children);
+			if (mPanel != null && mDrag == null) mPanel.ConstrainTargetToBounds(myTrans, true);
+			if (mDrag != null) mDrag.UpdateScrollbars(true);
 		}
-		if (sorted) children.Sort(SortByName);
-		if (children.Count > 0) RepositionVariableSize(children);
-		if (mPanel != null && mDrag == null) mPanel.ConstrainTargetToBounds(myTrans, true);
-		if (mDrag != null) mDrag.UpdateScrollbars(true);
+		else repositionNow = true;
 	}
 
 	/// <summary>
@@ -132,6 +155,8 @@ public class UITable : MonoBehaviour
 
 	void Start ()
 	{
+		mStarted = true;
+
 		if (keepWithinPanel)
 		{
 			mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
@@ -150,6 +175,7 @@ public class UITable : MonoBehaviour
 		{
 			repositionNow = false;
 			Reposition();
+			if (onReposition != null) onReposition();
 		}
 	}
 }

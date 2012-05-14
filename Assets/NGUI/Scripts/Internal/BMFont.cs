@@ -14,14 +14,17 @@ using System.Collections.Generic;
 public class BMFont
 {
 	[HideInInspector][SerializeField] BMGlyph[] mGlyphs = null;	// Prior to version 1.84, glyphs were stored in one large array
-	[HideInInspector][SerializeField] int mSize = 0;				// How much to move the cursor when moving to the next line
-	[HideInInspector][SerializeField] int mBase = 0;				// Offset from the top of the line to the base of each character
+	[HideInInspector][SerializeField] int mSize = 0;			// How much to move the cursor when moving to the next line
+	[HideInInspector][SerializeField] int mBase = 0;			// Offset from the top of the line to the base of each character
 	[HideInInspector][SerializeField] int mWidth = 0;			// Original width of the texture
 	[HideInInspector][SerializeField] int mHeight = 0;			// Original height of the texture
 	[HideInInspector][SerializeField] string mSpriteName;
 
 	// List of serialized glyphs (1.84 and up)
 	[HideInInspector][SerializeField] List<BMGlyph> mSaved = new List<BMGlyph>();
+
+	// List of symbols, such as emoticons like ":)", ":(", etc
+	[HideInInspector][SerializeField] List<BMSymbol> mSymbols = new List<BMSymbol>();
 
 	// Actual glyphs that we'll be working with are stored in a dictionary, making the lookup faster (1.84 and up)
 	Dictionary<int, BMGlyph> mDict = new Dictionary<int, BMGlyph>();
@@ -67,6 +70,12 @@ public class BMFont
 	/// </summary>
 
 	public string spriteName { get { return mSpriteName; } set { mSpriteName = value; } }
+
+	/// <summary>
+	/// List of symbols, such as emoticons like ":)", ":(", etc
+	/// </summary>
+
+	public List<BMSymbol> symbols { get { return mSymbols; } }
 
 	/// <summary>
 	/// Before version 1.84 all glyphs were stored in a single array. This was great, unless the glyphs happened to be
@@ -147,10 +156,70 @@ public class BMFont
 	}
 
 	/// <summary>
-	/// Read access to glyphs.
+	/// Retrieve the specified glyph, if it's present.
 	/// </summary>
 
 	public BMGlyph GetGlyph (int index) { return GetGlyph(index, false); }
+
+	/// <summary>
+	/// Retrieve the specified symbol, optionally creating it if it's missing.
+	/// </summary>
+
+	public BMSymbol GetSymbol (string sequence, bool createIfMissing)
+	{
+		for (int i = 0, imax = mSymbols.Count; i < imax; ++i)
+		{
+			BMSymbol sym = mSymbols[i];
+			if (sym.sequence == sequence) return sym;
+		}
+
+		if (createIfMissing)
+		{
+			BMSymbol sym = new BMSymbol();
+			sym.sequence = sequence;
+			mSymbols.Add(sym);
+			return sym;
+		}
+		return null;
+	}
+
+	/// <summary>
+	/// Retrieve the symbol at the beginning of the specified sequence, if a match is found.
+	/// </summary>
+
+	public BMSymbol MatchSymbol (string text, int offset, int textLength)
+	{
+		// No symbols present
+		int count = mSymbols.Count;
+		if (count == 0) return null;
+		textLength -= offset;
+
+		// Run through all symbols
+		for (int i = 0; i < count; ++i)
+		{
+			BMSymbol sym = mSymbols[i];
+
+			// If the symbol's length is longer, move on
+			int symbolLength = sym.length;
+			if (symbolLength == 0 || textLength < symbolLength) continue;
+
+			bool match = true;
+
+			// Match the characters
+			for (int c = 0; c < symbolLength; ++c)
+			{
+				if (text[offset + c] != sym.sequence[c])
+				{
+					match = false;
+					break;
+				}
+			}
+
+			// Match found
+			if (match) return sym;
+		}
+		return null;
+	}
 
 	/// <summary>
 	/// Clear the glyphs.

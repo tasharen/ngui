@@ -64,7 +64,7 @@ public class UIButtonKeys : MonoBehaviour
 
 	void OnClick ()
 	{
-		if (enabled && gameObject.active && selectOnClick != null)
+		if (enabled && selectOnClick != null)
 		{
 			UICamera.selectedObject = selectOnClick.gameObject;
 		}

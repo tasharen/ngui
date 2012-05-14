@@ -82,9 +82,10 @@ public class NGUIEditorTools
 	{
 		Texture2D tex = new Texture2D(1, 1);
 		tex.name = "[Generated] Dummy Texture";
+		tex.hideFlags = HideFlags.DontSave;
+		tex.filterMode = FilterMode.Point;
 		tex.SetPixel(0, 0, Color.white);
 		tex.Apply();
-		tex.filterMode = FilterMode.Point;
 		return tex;
 	}
 
@@ -96,6 +97,7 @@ public class NGUIEditorTools
 	{
 		Texture2D tex = new Texture2D(16, 16);
 		tex.name = "[Generated] Checker Texture";
+		tex.hideFlags = HideFlags.DontSave;
 
 		for (int y = 0; y < 8;  ++y) for (int x = 0; x < 8;  ++x) tex.SetPixel(x, y, c1);
 		for (int y = 8; y < 16; ++y) for (int x = 0; x < 8;  ++x) tex.SetPixel(x, y, c0);
@@ -115,6 +117,7 @@ public class NGUIEditorTools
 	{
 		Texture2D tex = new Texture2D(1, 16);
 		tex.name = "[Generated] Gradient Texture";
+		tex.hideFlags = HideFlags.DontSave;
 
 		Color c0 = new Color(1f, 1f, 1f, 0f);
 		Color c1 = new Color(1f, 1f, 1f, 0.4f);

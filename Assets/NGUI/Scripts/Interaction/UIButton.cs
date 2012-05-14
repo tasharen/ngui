@@ -16,10 +16,10 @@ public class UIButton : UIButtonColor
 	/// If the collider is disabled, assume the disabled color.
 	/// </summary>
 
-	override protected void Start ()
+	protected override void OnEnable ()
 	{
-		base.Start();
-		if (!isEnabled) UpdateColor(false, true);
+		if (isEnabled) base.OnEnable();
+		else UpdateColor(false, true);
 	}
 
 	/// <summary>
@@ -54,6 +54,8 @@ public class UIButton : UIButtonColor
 	{
 		if (tweenTarget)
 		{
+			if (!mInitDone) Init();
+
 			Color c = defaultColor;
 
 			if (!shouldBeEnabled)

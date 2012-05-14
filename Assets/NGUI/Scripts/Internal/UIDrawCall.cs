@@ -208,6 +208,7 @@ public class UIDrawCall : MonoBehaviour
 				if (mMesh == null)
 				{
 					mMesh = new Mesh();
+					mMesh.hideFlags = HideFlags.DontSave;
 					mMesh.name = "UIDrawCall for " + mSharedMat.name;
 				}
 				else
