@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.0.4c
+                Version 2.0.5
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,16 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.0.5:
+- NEW: Added support for custom-defined symbols (emoticons and such) in fonts.
+- NEW: Added NGUI menu -> Make Pixel Perfect (Alt+Shift+P), and NGUI Menu -> Add Collider is now Alt+Shift+C.
+- NEW: Added OnActivate condition to tweens and active animations.
+- NEW: It's now possible to have a UITable position items upwards instead of downwards.
+- NEW: It's now possible to have a "sticky" tooltip specified on UICamera, making it easier for tooltips to show up.
+- NEW: UIInput will now send out OnInputChanged notifications when typing.
+- NEW: Added TweenVolume script you can use to tween AudioSource's volume.
+- FIX: Fixed what was causing the "Cleaning up leaked objects in scene" message to show up.
 
 2.0.4:
 - NEW: Added UIButton -- same as UIButtonColor, but has a disabled state.
