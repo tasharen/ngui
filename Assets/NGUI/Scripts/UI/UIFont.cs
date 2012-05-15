@@ -755,6 +755,8 @@ public class UIFont : MonoBehaviour
 
 					x += mSpacingX + glyph.advance;
 					prev = c;
+
+					for (int b = 0; b < 4; ++b) cols.Add(color);
 				}
 				else
 				{
@@ -773,6 +775,10 @@ public class UIFont : MonoBehaviour
 					x += mSpacingX + symbol.width;
 					i += symbol.length - 1;
 					prev = 0;
+
+					Color col = Color.white;
+					col.a = color.a;
+					for (int b = 0; b < 4; ++b) cols.Add(col);
 				}
 
 				verts.Add(new Vector3(v1.x, v0.y));
@@ -784,11 +790,6 @@ public class UIFont : MonoBehaviour
 				uvs.Add(new Vector2(u1.x, u1.y));
 				uvs.Add(new Vector2(u0.x, u1.y));
 				uvs.Add(new Vector2(u0.x, u0.y));
-
-				cols.Add(color);
-				cols.Add(color);
-				cols.Add(color);
-				cols.Add(color);
 			}
 
 			if (alignment != Alignment.Left && indexOffset < verts.size)
