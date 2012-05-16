@@ -225,21 +225,10 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Cache the transform.
+	/// Remember whether we're in play mode.
 	/// </summary>
 
-	void Awake ()
-	{
-		if (GetComponents<UIWidget>().Length > 1)
-		{
-			Debug.LogError("Can't have more than one widget on the same game object.\nDestroying the second one.", this);
-			NGUITools.Destroy(this);
-		}
-		else
-		{
-			mPlayMode = Application.isPlaying;
-		}
-	}
+	void Awake () { mPlayMode = Application.isPlaying; }
 
 	/// <summary>
 	/// Mark the widget and the panel as having been changed.
@@ -247,16 +236,26 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnEnable ()
 	{
-		mChanged = true;
-
-		if (!keepMaterial)
+#if UNITY_EDITOR
+		if (GetComponents<UIWidget>().Length > 1)
 		{
-			mMat = null;
-			mTex = null;
+			Debug.LogError("Can't have more than one widget on the same game object!", this);
+			enabled = false;
 		}
-	
-		// If we have a panel and a material to work with, mark the material as changed
-		if (mPanel != null && material != null) mPanel.MarkMaterialAsChanged(mMat, false);
+		else
+#endif
+		{
+			mChanged = true;
+
+			if (!keepMaterial)
+			{
+				mMat = null;
+				mTex = null;
+			}
+
+			// If we have a panel and a material to work with, mark the material as changed
+			if (mPanel != null && material != null) mPanel.MarkMaterialAsChanged(mMat, false);
+		}
 	}
 
 	/// <summary>

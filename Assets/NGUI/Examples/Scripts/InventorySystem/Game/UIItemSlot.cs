@@ -4,6 +4,7 @@
 //----------------------------------------------
 
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Abstract UI component observing an item somewhere in the inventory. This item can be equipped on
@@ -45,7 +46,45 @@ public abstract class UIItemSlot : MonoBehaviour
 
 	void OnTooltip (bool show)
 	{
-		UITooltip.ShowItem(show ? mItem : null);
+		InvGameItem item = show ? mItem : null;
+
+		if (item != null)
+		{
+			InvBaseItem bi = item.baseItem;
+
+			if (bi != null)
+			{
+				string t = "[" + NGUITools.EncodeColor(item.color) + "]" + item.name + "[-]\n";
+
+				t += "[AFAFAF]Level " + item.itemLevel + " " + bi.slot;
+
+				List<InvStat> stats = item.CalculateStats();
+
+				for (int i = 0, imax = stats.Count; i < imax; ++i)
+				{
+					InvStat stat = stats[i];
+					if (stat.amount == 0) continue;
+
+					if (stat.amount < 0)
+					{
+						t += "\n[FF0000]" + stat.amount;
+					}
+					else
+					{
+						t += "\n[00FF00]+" + stat.amount;
+					}
+
+					if (stat.modifier == InvStat.Modifier.Percent) t += "%";
+					t += " " + stat.id;
+					t += "[-]";
+				}
+
+				if (!string.IsNullOrEmpty(bi.description)) t += "\n[FF9900]" + bi.description;
+				UITooltip.ShowText(t);
+				return;
+			}
+		}
+		UITooltip.ShowText(null);
 	}
 
 	/// <summary>

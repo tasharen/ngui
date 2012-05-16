@@ -408,7 +408,7 @@ public class UIPanel : MonoBehaviour
 		if (w != null)
 		{
 #if UNITY_EDITOR
-			if (Application.isEditor && w.cachedTransform.parent != null)
+			if (w.cachedTransform.parent != null)
 			{
 				UIWidget parentWidget = NGUITools.FindInParents<UIWidget>(w.cachedTransform.parent.gameObject);
 

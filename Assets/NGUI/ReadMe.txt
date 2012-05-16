@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.0.5
+                Version 2.0.6
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,12 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.0.6:
+- NEW: UITooltip is now a part of NGUI's core rather than being in examples, allowing you to use it freely.
+- FIX: Unity should no longer crash when a second widget is added to the same game object.
+- FIX: UIDrawCall now uses double-buffering, so iOS performance should increase.
+- FIX: UIFont's symbols are no longer affected by color (just alpha).
 
 2.0.5:
 - NEW: Added support for custom-defined symbols (emoticons and such) in fonts.

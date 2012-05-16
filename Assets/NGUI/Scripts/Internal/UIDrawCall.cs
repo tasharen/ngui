@@ -24,7 +24,8 @@ public class UIDrawCall : MonoBehaviour
 
 	Transform		mTrans;			// Cached transform
 	Material		mSharedMat;		// Material used by this screen
-	Mesh			mMesh;			// Generated mesh
+	Mesh			mMesh0;			// First generated mesh
+	Mesh			mMesh1;			// Second generated mesh
 	MeshFilter		mFilter;		// Mesh filter for this draw call
 	MeshRenderer	mRen;			// Mesh renderer for this screen
 	Clipping		mClipping;		// Clipping mode
@@ -36,6 +37,7 @@ public class UIDrawCall : MonoBehaviour
 
 	bool mDepthPass = false;
 	bool mReset = true;
+	bool mEven = true;
 
 	/// <summary>
 	/// Whether an additional pass will be created to render the geometry to the depth buffer first.
@@ -59,7 +61,14 @@ public class UIDrawCall : MonoBehaviour
 	/// The number of triangles in this draw call.
 	/// </summary>
 
-	public int triangles { get { return mMesh.vertexCount >> 1; } }
+	public int triangles
+	{
+		get
+		{
+			Mesh mesh = mEven ? mMesh0 : mMesh1;
+			return (mesh != null) ? mesh.vertexCount >> 1 : 0;
+		}
+	}
 
 	/// <summary>
 	/// Clipping used by the draw call
@@ -78,6 +87,39 @@ public class UIDrawCall : MonoBehaviour
 	/// </summary>
 
 	public Vector2 clipSoftness { get { return mClipSoft; } set { mClipSoft = value; } }
+
+	/// <summary>
+	/// Returns a mesh for writing into. The mesh is double-buffered as it gets the best performance on iOS devices.
+	/// http://forum.unity3d.com/threads/118723-Huge-performance-loss-in-Mesh.CreateVBO-for-dynamic-meshes-IOS
+	/// </summary>
+
+	Mesh GetMesh ()
+	{
+		mEven = !mEven;
+
+		if (mEven)
+		{
+			if (mMesh0 == null)
+			{
+				mMesh0 = new Mesh();
+				mMesh0.hideFlags = HideFlags.DontSave;
+				mMesh0.name = "Mesh0 for " + mSharedMat.name;
+			}
+			else mMesh0.Clear();
+			return mMesh0;
+		}
+		else
+		{
+			if (mMesh1 == null)
+			{
+				mMesh1 = new Mesh();
+				mMesh1.hideFlags = HideFlags.DontSave;
+				mMesh1.name = "Mesh1 for " + mSharedMat.name;
+			}
+			else mMesh1.Clear();
+			return mMesh1;
+		}
+	}
 
 	/// <summary>
 	/// Update the renderer's materials.
@@ -205,36 +247,26 @@ public class UIDrawCall : MonoBehaviour
 
 			if (verts.size < 65000)
 			{
-				if (mMesh == null)
-				{
-					mMesh = new Mesh();
-					mMesh.hideFlags = HideFlags.DontSave;
-					mMesh.name = "UIDrawCall for " + mSharedMat.name;
-				}
-				else
-				{
-					mMesh.Clear();
-				}
-
 				// Set the mesh values
-				mMesh.vertices = verts.ToArray();
-				if (norms != null) mMesh.normals = norms.ToArray();
-				if (tans != null) mMesh.tangents = tans.ToArray();
-				mMesh.uv = uvs.ToArray();
-				mMesh.colors = cols.ToArray();
-				mMesh.triangles = mIndices;
-				mMesh.RecalculateBounds();
-				mFilter.mesh = mMesh;
+				Mesh mesh = GetMesh();
+				mesh.vertices = verts.ToArray();
+				if (norms != null) mesh.normals = norms.ToArray();
+				if (tans != null) mesh.tangents = tans.ToArray();
+				mesh.uv = uvs.ToArray();
+				mesh.colors = cols.ToArray();
+				mesh.triangles = mIndices;
+				mesh.RecalculateBounds();
+				mFilter.mesh = mesh;
 			}
 			else
 			{
-				if (mMesh != null) mMesh.Clear();
+				if (mFilter.mesh != null) mFilter.mesh.Clear();
 				Debug.LogError("Too many vertices on one panel: " + verts.size);
 			}
 		}
 		else
 		{
-			if (mMesh != null) mMesh.Clear();
+			if (mFilter.mesh != null) mFilter.mesh.Clear();
 			Debug.LogError("UIWidgets must fill the buffer with 4 vertices per quad. Found " + count);
 		}
 	}
@@ -271,7 +303,8 @@ public class UIDrawCall : MonoBehaviour
 
 	void OnDestroy ()
 	{
-		NGUITools.DestroyImmediate(mMesh);
+		NGUITools.DestroyImmediate(mMesh0);
+		NGUITools.DestroyImmediate(mMesh1);
 		NGUITools.DestroyImmediate(mClippedMat);
 		NGUITools.DestroyImmediate(mDepthMat);
 	}
