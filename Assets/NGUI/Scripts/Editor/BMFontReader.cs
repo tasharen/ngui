@@ -58,13 +58,23 @@ public static class BMFontReader
 				string line = reader.ReadLine();
 				if (string.IsNullOrEmpty(line)) break;
 				string[] split = line.Split(separator, System.StringSplitOptions.RemoveEmptyEntries);
+				int len = split.Length;
 
 				if (split[0] == "char")
 				{
 					// Expected data style:
 					// char id=13 x=506 y=62 width=3 height=3 xoffset=-1 yoffset=50 xadvance=0 page=0 chnl=15
 
-					if (split.Length > 8)
+					int channel = (len > 10) ? GetInt(split[10]) : 15;
+
+					if (len > 9 && GetInt(split[9]) > 0)
+					{
+						Debug.LogError("Your font was exported with more than one texture. Only one texture is supported by NGUI.\n" +
+							"You need to re-export your font, enlarging the texture's dimensions until everything fits into just one texture.");
+						break;
+					}
+
+					if (len > 8)
 					{
 						int id = GetInt(split[1]);
 						BMGlyph glyph = font.GetGlyph(id, true);
@@ -78,13 +88,13 @@ public static class BMFontReader
 							glyph.offsetX	= GetInt(split[6]);
 							glyph.offsetY	= GetInt(split[7]);
 							glyph.advance	= GetInt(split[8]);
+							glyph.channel	= channel;
 						}
 						else Debug.Log("Char: " + split[1] + " (" + id + ") is NULL");
 					}
 					else
 					{
-						Debug.LogError("Unexpected number of entries for the 'char' field (" +
-							name + ", " + split.Length + "):\n" + line);
+						Debug.LogError("Unexpected number of entries for the 'char' field (" + name + ", " + split.Length + "):\n" + line);
 						break;
 					}
 				}
@@ -93,7 +103,7 @@ public static class BMFontReader
 					// Expected data style:
 					// kerning first=84 second=244 amount=-5 
 
-					if (split.Length > 3)
+					if (len > 3)
 					{
 						int first  = GetInt(split[1]);
 						int second = GetInt(split[2]);
@@ -114,7 +124,7 @@ public static class BMFontReader
 					// Expected data style:
 					// common lineHeight=64 base=51 scaleW=512 scaleH=512 pages=1 packed=0 alphaChnl=1 redChnl=4 greenChnl=4 blueChnl=4
 
-					if (split.Length > 5)
+					if (len > 5)
 					{
 						font.charSize	= GetInt(split[1]);
 						font.baseOffset = GetInt(split[2]);
@@ -141,7 +151,7 @@ public static class BMFontReader
 					// Expected data style:
 					// page id=0 file="textureName.png"
 
-					if (split.Length > 2)
+					if (len > 2)
 					{
 						font.spriteName = GetString(split[2]).Replace("\"", "");
 						font.spriteName = font.spriteName.Replace(".png", "");
@@ -153,7 +163,7 @@ public static class BMFontReader
 					// Expected data style:
 					// symbol sequence=(A) x=172 y=140 width=20 height=20
 
-					if (split.Length > 5)
+					if (len > 5)
 					{
 						BMSymbol symbol = font.GetSymbol(GetString(split[1]), true);
 						symbol.x		= GetInt(split[2]);

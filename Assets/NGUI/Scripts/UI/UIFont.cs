@@ -22,6 +22,13 @@ public class UIFont : MonoBehaviour
 		Right,
 	}
 
+	public enum SymbolStyle
+	{
+		None,
+		Uncolored,
+		Colored,
+	}
+
 	[HideInInspector][SerializeField] Material mMat;
 	[HideInInspector][SerializeField] Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
 	[HideInInspector][SerializeField] BMFont mFont = new BMFont();
@@ -400,9 +407,9 @@ public class UIFont : MonoBehaviour
 	/// Get the printed size of the specified string. The returned value is in local coordinates. Multiply by transform's scale to get pixels.
 	/// </summary>
 
-	public Vector2 CalculatePrintedSize (string text, bool encoding)
+	public Vector2 CalculatePrintedSize (string text, bool encoding, SymbolStyle symbolStyle)
 	{
-		if (mReplacement != null) return mReplacement.CalculatePrintedSize(text, encoding);
+		if (mReplacement != null) return mReplacement.CalculatePrintedSize(text, encoding, symbolStyle);
 
 		Vector2 v = Vector2.zero;
 
@@ -435,7 +442,7 @@ public class UIFont : MonoBehaviour
 				if (c < ' ') { prev = 0; continue; }
 
 				// See if there is a symbol matching this text
-				BMSymbol symbol = encoding ? mFont.MatchSymbol(text, i, length) : null;
+				BMSymbol symbol = (encoding && symbolStyle != SymbolStyle.None) ? mFont.MatchSymbol(text, i, length) : null;
 
 				if (symbol == null)
 				{
@@ -480,9 +487,9 @@ public class UIFont : MonoBehaviour
 	/// Text wrapping functionality. The 'maxWidth' should be in local coordinates (take pixels and divide them by transform's scale).
 	/// </summary>
 
-	public string WrapText (string text, float maxWidth, bool multiline, bool encoding)
+	public string WrapText (string text, float maxWidth, bool multiline, bool encoding, SymbolStyle symbolStyle)
 	{
-		if (mReplacement != null) return mReplacement.WrapText(text, maxWidth, multiline, encoding);
+		if (mReplacement != null) return mReplacement.WrapText(text, maxWidth, multiline, encoding, symbolStyle);
 
 		// Width of the line in pixels
 		int lineWidth = Mathf.RoundToInt(maxWidth * size);
@@ -545,7 +552,7 @@ public class UIFont : MonoBehaviour
 			}
 
 			// See if there is a symbol matching this text
-			BMSymbol symbol = encoding ? mFont.MatchSymbol(text, offset, textLength) : null;
+			BMSymbol symbol = (encoding && symbolStyle != SymbolStyle.None) ? mFont.MatchSymbol(text, offset, textLength) : null;
 
 			// Find the glyph for this character
 			BMGlyph glyph = (symbol == null) ? mFont.GetGlyph(ch) : null;
@@ -627,6 +634,18 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Text wrapping functionality. Legacy compatibility function.
+	/// </summary>
+
+	public string WrapText (string text, float maxWidth, bool multiline, bool encoding) { return WrapText(text, maxWidth, multiline, encoding, SymbolStyle.None); }
+
+	/// <summary>
+	/// Text wrapping functionality. Legacy compatibility function.
+	/// </summary>
+
+	public string WrapText (string text, float maxWidth, bool multiline) { return WrapText(text, maxWidth, multiline, false, SymbolStyle.None); }
+
+	/// <summary>
 	/// Align the vertices to be right or center-aligned given the specified line width.
 	/// </summary>
 
@@ -655,11 +674,11 @@ public class UIFont : MonoBehaviour
 	/// </summary>
 
 	public void Print (string text, Color color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols,
-		bool encoding, Alignment alignment, int lineWidth)
+		bool encoding, SymbolStyle symbolStyle, Alignment alignment, int lineWidth)
 	{
 		if (mReplacement != null)
 		{
-			mReplacement.Print(text, color, verts, uvs, cols, encoding, alignment, lineWidth);
+			mReplacement.Print(text, color, verts, uvs, cols, encoding, symbolStyle, alignment, lineWidth);
 		}
 		else if (mFont != null && text != null)
 		{
@@ -725,7 +744,7 @@ public class UIFont : MonoBehaviour
 				}
 
 				// See if there is a symbol matching this text
-				BMSymbol symbol = encoding ? mFont.MatchSymbol(text, i, textLength) : null;
+				BMSymbol symbol = (encoding && symbolStyle != SymbolStyle.None) ? mFont.MatchSymbol(text, i, textLength) : null;
 
 				if (symbol == null)
 				{
@@ -756,7 +775,32 @@ public class UIFont : MonoBehaviour
 					x += mSpacingX + glyph.advance;
 					prev = c;
 
-					for (int b = 0; b < 4; ++b) cols.Add(color);
+					if (glyph.channel == 0 || glyph.channel == 15)
+					{
+						for (int b = 0; b < 4; ++b) cols.Add(color);
+					}
+					else
+					{
+						// Packed fonts come as alpha masks in each of the RGBA channels.
+						// In order to use it we need to use a special shader.
+						//
+						// Limitations:
+						// - Alpha channel in the color becomes unused.
+						// - Effects (drop shadow, outline) will not work.
+						// - Should not be a part of the atlas (eastern fonts rarely are anyway).
+
+						Color col = color;
+
+						switch (glyph.channel)
+						{
+							case 1: col.a = 0.75f; break;
+							case 2: col.a = 0.5f; break;
+							case 4: col.a = 0.25f; break;
+							case 8: col.a = 1f; break;
+						}
+
+						for (int b = 0; b < 4; ++b) cols.Add(col);
+					}
 				}
 				else
 				{
@@ -776,9 +820,16 @@ public class UIFont : MonoBehaviour
 					i += symbol.length - 1;
 					prev = 0;
 
-					Color col = Color.white;
-					col.a = color.a;
-					for (int b = 0; b < 4; ++b) cols.Add(col);
+					if (symbolStyle == SymbolStyle.Colored)
+					{
+						for (int b = 0; b < 4; ++b) cols.Add(color); 
+					}
+					else
+					{
+						Color col = Color.white;
+						col.a = color.a;
+						for (int b = 0; b < 4; ++b) cols.Add(col);
+					}
 				}
 
 				verts.Add(new Vector3(v1.x, v0.y));

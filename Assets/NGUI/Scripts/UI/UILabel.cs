@@ -26,6 +26,7 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] bool mShowLastChar = false;
 	[HideInInspector][SerializeField] Effect mEffectStyle = Effect.None;
 	[HideInInspector][SerializeField] Color mEffectColor = Color.black;
+	[HideInInspector][SerializeField] UIFont.SymbolStyle mSymbols = UIFont.SymbolStyle.Uncolored;
 
 	/// <summary>
 	/// Obsolete, do not use. Use 'mMaxLineWidth' instead.
@@ -148,6 +149,26 @@ public class UILabel : UIWidget
 				mEncoding = value;
 				hasChanged = true;
 				if (value) mPassword = false;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Style used for symbols.
+	/// </summary>
+
+	public UIFont.SymbolStyle symbolStyle
+	{
+		get
+		{
+			return mSymbols;
+		}
+		set
+		{
+			if (mSymbols != value)
+			{
+				mSymbols = value;
+				hasChanged = true;
 			}
 		}
 	}
@@ -364,7 +385,7 @@ public class UILabel : UIWidget
 
 		if (mPassword)
 		{
-			mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, false);
+			mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, false, UIFont.SymbolStyle.None);
 
 			string hidden = "";
 
@@ -381,14 +402,14 @@ public class UILabel : UIWidget
 		}
 		else if (mMaxLineWidth > 0)
 		{
-			mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.x, mMultiline, mEncoding);
+			mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.x, mMultiline, mEncoding, mSymbols);
 		}
 		else if (!mMultiline)
 		{
-			mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, mEncoding);
+			mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, mEncoding, mSymbols);
 		}
 
-		mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding) : Vector2.one;
+		mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.one;
 		float scale = cachedTransform.localScale.x;
 		mSize.x = Mathf.Max(mSize.x, (mFont != null && scale > 1f) ? lineWidth / scale : 1f);
 		mSize.y = Mathf.Max(mSize.y, 1f);
@@ -504,16 +525,16 @@ public class UILabel : UIWidget
 		// Print the text into the buffers
 		if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)
 		{
-			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, UIFont.Alignment.Left, 0);
+			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Left, 0);
 		}
 		else if (p == Pivot.Right || p == Pivot.TopRight || p == Pivot.BottomRight)
 		{
-			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, UIFont.Alignment.Right,
+			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Right,
 				Mathf.RoundToInt(relativeSize.x * mFont.size));
 		}
 		else
 		{
-			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, UIFont.Alignment.Center,
+			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Center,
 				Mathf.RoundToInt(relativeSize.x * mFont.size));
 		}
 

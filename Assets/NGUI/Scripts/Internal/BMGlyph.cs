@@ -27,6 +27,7 @@ public class BMGlyph
 	public int offsetX;	// Offset to apply to the cursor's left position before drawing this glyph
 	public int offsetY; // Offset to apply to the cursor's top position before drawing this glyph
 	public int advance;	// How much to move the cursor after printing this character
+	public int channel;	// Channel mask (in most cases this will be 15 (RGBA, 1+2+4+8)
 
 	public List<Kerning> kerning;
 
