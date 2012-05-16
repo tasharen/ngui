@@ -93,7 +93,7 @@ public class UIDrawCall : MonoBehaviour
 	/// http://forum.unity3d.com/threads/118723-Huge-performance-loss-in-Mesh.CreateVBO-for-dynamic-meshes-IOS
 	/// </summary>
 
-	Mesh GetMesh ()
+	Mesh GetMesh (ref bool rebuildIndices, int vertexCount)
 	{
 		mEven = !mEven;
 
@@ -104,21 +104,28 @@ public class UIDrawCall : MonoBehaviour
 				mMesh0 = new Mesh();
 				mMesh0.hideFlags = HideFlags.DontSave;
 				mMesh0.name = "Mesh0 for " + mSharedMat.name;
+				rebuildIndices = true;
 			}
-			else mMesh0.Clear();
+			else if (rebuildIndices || mMesh0.vertexCount != vertexCount)
+			{
+				rebuildIndices = true;
+				mMesh0.Clear();
+			}
 			return mMesh0;
 		}
-		else
+		else if (mMesh1 == null)
 		{
-			if (mMesh1 == null)
-			{
-				mMesh1 = new Mesh();
-				mMesh1.hideFlags = HideFlags.DontSave;
-				mMesh1.name = "Mesh1 for " + mSharedMat.name;
-			}
-			else mMesh1.Clear();
-			return mMesh1;
+			mMesh1 = new Mesh();
+			mMesh1.hideFlags = HideFlags.DontSave;
+			mMesh1.name = "Mesh1 for " + mSharedMat.name;
+			rebuildIndices = true;
 		}
+		else if (rebuildIndices || mMesh1.vertexCount != vertexCount)
+		{
+			rebuildIndices = true;
+			mMesh1.Clear();
+		}
+		return mMesh1;
 	}
 
 	/// <summary>
@@ -212,28 +219,6 @@ public class UIDrawCall : MonoBehaviour
 		// Safety check to ensure we get valid values
 		if (count > 0 && (count == uvs.size && count == cols.size) && (count % 4) == 0)
 		{
-			int index = 0;
-
-			// It takes 6 indices to draw a quad of 4 vertices
-			int indexCount = (count >> 1) * 3;
-
-			// Populate the index buffer
-			if (mIndices == null || mIndices.Length != indexCount)
-			{
-				mIndices = new int[indexCount];
-
-				for (int i = 0; i < count; i += 4)
-				{
-					mIndices[index++] = i;
-					mIndices[index++] = i + 1;
-					mIndices[index++] = i + 2;
-
-					mIndices[index++] = i + 2;
-					mIndices[index++] = i + 3;
-					mIndices[index++] = i;
-				}
-			}
-
 			// Cache all components
 			if (mFilter == null) mFilter = gameObject.GetComponent<MeshFilter>();
 			if (mFilter == null) mFilter = gameObject.AddComponent<MeshFilter>();
@@ -247,14 +232,36 @@ public class UIDrawCall : MonoBehaviour
 
 			if (verts.size < 65000)
 			{
+				int indexCount = (count >> 1) * 3;
+				bool rebuildIndices = (mIndices == null || mIndices.Length != indexCount);
+
+				// Populate the index buffer
+				if (rebuildIndices)
+				{
+					// It takes 6 indices to draw a quad of 4 vertices
+					mIndices = new int[indexCount];
+					int index = 0;
+
+					for (int i = 0; i < count; i += 4)
+					{
+						mIndices[index++] = i;
+						mIndices[index++] = i + 1;
+						mIndices[index++] = i + 2;
+
+						mIndices[index++] = i + 2;
+						mIndices[index++] = i + 3;
+						mIndices[index++] = i;
+					}
+				}
+
 				// Set the mesh values
-				Mesh mesh = GetMesh();
+				Mesh mesh = GetMesh(ref rebuildIndices, verts.size);
 				mesh.vertices = verts.ToArray();
 				if (norms != null) mesh.normals = norms.ToArray();
 				if (tans != null) mesh.tangents = tans.ToArray();
 				mesh.uv = uvs.ToArray();
 				mesh.colors = cols.ToArray();
-				mesh.triangles = mIndices;
+				if (rebuildIndices) mesh.triangles = mIndices;
 				mesh.RecalculateBounds();
 				mFilter.mesh = mesh;
 			}

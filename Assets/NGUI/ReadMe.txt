@@ -38,6 +38,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 2.0.6:
 - NEW: UITooltip is now a part of NGUI's core rather than being in examples, allowing you to use it freely.
 - FIX: Unity should no longer crash when a second widget is added to the same game object.
+- FIX: UIDrawCall no longer updates the index buffer unless it needs to, resulting in increased performance.
 - FIX: UIDrawCall now uses double-buffering, so iOS performance should increase.
 - FIX: UIFont's symbols are no longer affected by color (just alpha).
 
