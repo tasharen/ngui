@@ -145,6 +145,15 @@ public class UICamera : MonoBehaviour
 
 	public string horizontalAxisName = "Horizontal";
 
+	/// <summary>
+	/// Various keys used by the camera.
+	/// </summary>
+
+	public KeyCode submitKey0 = KeyCode.Return;
+	public KeyCode submitKey1 = KeyCode.JoystickButton0;
+	public KeyCode cancelKey0 = KeyCode.Escape;
+	public KeyCode cancelKey1 = KeyCode.JoystickButton1;
+
 	[System.Obsolete("Use UICamera.currentCamera instead")]
 	static public Camera lastCamera { get { return currentCamera; } }
 
@@ -593,8 +602,9 @@ public class UICamera : MonoBehaviour
 		// Process touch input
 		if (useTouch) ProcessTouches();
 
-		// Clear the selection on escape
-		if (useKeyboard && mSel != null && Input.GetKeyDown(KeyCode.Escape)) selectedObject = null;
+		// Clear the selection on the cancel key, but only if mouse input is allowed
+		if (useMouse && mSel != null && (cancelKey0 != KeyCode.None && Input.GetKeyDown(cancelKey0)) ||
+			(cancelKey1 != KeyCode.None && Input.GetKeyDown(cancelKey1))) selectedObject = null;
 
 		// Forward the input to the selected object
 		if (mSel != null)
@@ -787,19 +797,13 @@ public class UICamera : MonoBehaviour
 		// If this is an input field, ignore WASD and Space key presses
 		inputHasFocus = (mSel != null && mSel.GetComponent<UIInput>() != null);
 
-		// Enter key and joystick button 1 keys are treated the same -- as a "click"
-		bool returnKeyDown	= (useKeyboard	 && (Input.GetKeyDown(KeyCode.Return) || (!inputHasFocus && Input.GetKeyDown(KeyCode.Space))));
-		bool buttonKeyDown	= (useController &&  Input.GetKeyDown(KeyCode.JoystickButton0));
-		bool returnKeyUp	= (useKeyboard	 && (Input.GetKeyUp(KeyCode.Return) || (!inputHasFocus && Input.GetKeyUp(KeyCode.Space))));
-		bool buttonKeyUp	= (useController &&  Input.GetKeyUp(KeyCode.JoystickButton0));
+		bool submitKeyDown = (submitKey0 != KeyCode.None && Input.GetKeyDown(submitKey0)) || (submitKey1 != KeyCode.None && Input.GetKeyDown(submitKey1));
+		bool submitKeyUp = (submitKey0 != KeyCode.None && Input.GetKeyUp(submitKey0)) || (submitKey1 != KeyCode.None && Input.GetKeyUp(submitKey1));
 
-		bool down	= returnKeyDown || buttonKeyDown;
-		bool up		= returnKeyUp || buttonKeyUp;
-
-		if (down || up)
+		if (submitKeyDown || submitKeyUp)
 		{
 			currentTouch.current = mSel;
-			ProcessTouch(down, up);
+			ProcessTouch(submitKeyDown, submitKeyUp);
 		}
 
 		int vertical = 0;
@@ -829,7 +833,10 @@ public class UICamera : MonoBehaviour
 		if (vertical != 0) mSel.SendMessage("OnKey", vertical > 0 ? KeyCode.UpArrow : KeyCode.DownArrow, SendMessageOptions.DontRequireReceiver);
 		if (horizontal != 0) mSel.SendMessage("OnKey", horizontal > 0 ? KeyCode.RightArrow : KeyCode.LeftArrow, SendMessageOptions.DontRequireReceiver);
 		if (useKeyboard && Input.GetKeyDown(KeyCode.Tab)) mSel.SendMessage("OnKey", KeyCode.Tab, SendMessageOptions.DontRequireReceiver);
-		if (useController && Input.GetKeyUp(KeyCode.JoystickButton1)) mSel.SendMessage("OnKey", KeyCode.Escape, SendMessageOptions.DontRequireReceiver);
+
+		// Send out the cancel key notification
+		if (cancelKey0 != KeyCode.None && Input.GetKeyDown(cancelKey0)) mSel.SendMessage("OnKey", KeyCode.Escape, SendMessageOptions.DontRequireReceiver);
+		if (cancelKey1 != KeyCode.None && Input.GetKeyDown(cancelKey1)) mSel.SendMessage("OnKey", KeyCode.Escape, SendMessageOptions.DontRequireReceiver);
 
 		currentTouch = null;
 	}

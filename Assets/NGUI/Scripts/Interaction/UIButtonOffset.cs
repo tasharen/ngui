@@ -52,7 +52,8 @@ public class UIButtonOffset : MonoBehaviour
 		if (enabled)
 		{
 			if (!mInitDone) Init();
-			TweenPosition.Begin(tweenTarget.gameObject, duration, isPressed ? mPos + pressed : mPos).method = UITweener.Method.EaseInOut;
+			TweenPosition.Begin(tweenTarget.gameObject, duration, isPressed ? mPos + pressed :
+				(UICamera.IsHighlighted(gameObject) ? mPos + hover : mPos)).method = UITweener.Method.EaseInOut;
 		}
 	}
 

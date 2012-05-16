@@ -52,7 +52,8 @@ public class UIButtonRotation : MonoBehaviour
 		if (enabled)
 		{
 			if (!mInitDone) Init();
-			TweenRotation.Begin(tweenTarget.gameObject, duration, isPressed ? mRot * Quaternion.Euler(pressed) : mRot).method = UITweener.Method.EaseInOut;
+			TweenRotation.Begin(tweenTarget.gameObject, duration, isPressed ? mRot * Quaternion.Euler(pressed) :
+				(UICamera.IsHighlighted(gameObject) ? mRot * Quaternion.Euler(hover) : mRot)).method = UITweener.Method.EaseInOut;
 		}
 	}
 
