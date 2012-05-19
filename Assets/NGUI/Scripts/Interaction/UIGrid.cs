@@ -69,7 +69,11 @@ public class UIGrid : MonoBehaviour
 		{
 			List<Transform> list = new List<Transform>();
 
-			for (int i = 0; i < myTrans.childCount; ++i) list.Add(myTrans.GetChild(i));
+			for (int i = 0; i < myTrans.childCount; ++i)
+			{
+				Transform t = myTrans.GetChild(i);
+				if (t) list.Add(t);
+			}
 			list.Sort(SortByName);
 
 			for (int i = 0, imax = list.Count; i < imax; ++i)

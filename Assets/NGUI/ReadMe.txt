@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.0.6
+                Version 2.0.6b
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -38,10 +38,12 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 2.0.6:
 - NEW: Added support for fonts packed into separate RGBA channels (read: eastern language fonts can now be 75% smaller).
 - NEW: UITooltip is now a part of NGUI's core rather than being in examples, allowing you to use it freely.
+- NEW: Submit and cancel keys can now be specified on the UICamera (before they were hardcoded to Return and Escape).
 - FIX: Unity should no longer crash when a second widget is added to the same game object.
 - FIX: UIDrawCall no longer updates the index buffer unless it needs to, resulting in increased performance.
 - FIX: UIDrawCall now uses double-buffering, so iOS performance should increase.
-- FIX: UIFont's symbols are no longer affected by color (just alpha).
+- FIX: You can now specify whether symbols are affected by color or not (or if they're processed for that matter).
+- FIX: Fixed an issue with highlighting not returning to highlighted state after press.
 
 2.0.5:
 - NEW: Added support for custom-defined symbols (emoticons and such) in fonts.

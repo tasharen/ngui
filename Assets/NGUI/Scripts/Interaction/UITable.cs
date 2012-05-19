@@ -135,11 +135,7 @@ public class UITable : MonoBehaviour
 			for (int i = 0; i < myTrans.childCount; ++i)
 			{
 				Transform child = myTrans.GetChild(i);
-
-				if (!hideInactive || child.gameObject.active)
-				{
-					children.Add(child);
-				}
+				if (child && (!hideInactive || child.gameObject.active)) children.Add(child);
 			}
 			if (sorted) children.Sort(SortByName);
 			if (children.Count > 0) RepositionVariableSize(children);

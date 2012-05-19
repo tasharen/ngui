@@ -34,19 +34,19 @@ Shader "Unlit/Transparent Colored (Packed)"
 			#include "UnityCG.cginc"
 
 			sampler2D _MainTex;
-			float4 _MainTex_ST;
+			half4 _MainTex_ST;
 
 			struct appdata_t
 			{
 				float4 vertex : POSITION;
-				fixed4 color : COLOR;
+				half4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
 			};
 
 			struct v2f
 			{
 				float4 vertex : POSITION;
-				fixed4 color : COLOR;
+				half4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
 			};
 
@@ -59,16 +59,15 @@ Shader "Unlit/Transparent Colored (Packed)"
 				return o;
 			}
 
-			fixed4 frag (v2f IN) : COLOR
+			half4 frag (v2f IN) : COLOR
 			{
 				half4 mask = tex2D(_MainTex, IN.texcoord);
+				half4 mixed = saturate(ceil(IN.color - 0.5));
+				half4 col = saturate((mixed * 0.51 - IN.color) / -0.49);
 
-				half luminance = mask.r;
-				luminance = lerp(luminance, mask.g, saturate(IN.color.a * 4.0 - 1.0));
-				luminance = lerp(luminance, mask.b, saturate(IN.color.a * 4.0 - 2.0));
-				luminance = lerp(luminance, mask.a, saturate(IN.color.a * 4.0 - 3.0));
-
-				return half4(IN.color.rgb, luminance);
+				mask *= mixed;
+				col.a *= mask.r + mask.g + mask.b + mask.a;
+				return col;
 			}
 			ENDCG
 		}

@@ -785,18 +785,20 @@ public class UIFont : MonoBehaviour
 						// In order to use it we need to use a special shader.
 						//
 						// Limitations:
-						// - Alpha channel in the color becomes unused.
 						// - Effects (drop shadow, outline) will not work.
 						// - Should not be a part of the atlas (eastern fonts rarely are anyway).
+						// - Lower color precision
 
 						Color col = color;
 
+						col *= 0.49f;
+
 						switch (glyph.channel)
 						{
-							case 1: col.a = 0.75f; break;
-							case 2: col.a = 0.5f; break;
-							case 4: col.a = 0.25f; break;
-							case 8: col.a = 1f; break;
+							case 1: col.b += 0.51f; break;
+							case 2: col.g += 0.51f; break;
+							case 4: col.r += 0.51f; break;
+							case 8: col.a += 0.51f; break;
 						}
 
 						for (int b = 0; b < 4; ++b) cols.Add(col);
