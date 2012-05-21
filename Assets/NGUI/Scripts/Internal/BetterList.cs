@@ -17,7 +17,7 @@ public class BetterList<T>
 	List<T> mList = new List<T>();
 	
 	/// <summary>
-	/// Direct access to the buffer. Note that you should not use its 'Length' parameter, but instead use BetterList.Length.
+	/// Direct access to the buffer. Note that you should not use its 'Length' parameter, but instead use BetterList.size.
 	/// </summary>
 	
 	public T this[int i]
@@ -83,7 +83,7 @@ public class BetterList<T>
 #else
 
 	/// <summary>
-	/// Direct access to the buffer. Note that you should not use its 'Length' parameter, but instead use BetterList.Length.
+	/// Direct access to the buffer. Note that you should not use its 'Length' parameter, but instead use BetterList.size.
 	/// </summary>
 
 	public T[] buffer;
