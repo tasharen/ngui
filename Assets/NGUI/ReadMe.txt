@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.0.6b
+                Version 2.0.7
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,13 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.0.7:
+- NEW: You can now specify what keyboard type will be used on mobile devices.
+- NEW: You can now add input validation to your inputs to exclude certain characters (such as make your input numeric-only).
+- FIX: Packed fonts no longer tie up the alpha channel, and can now be affected by alpha just fine.
+- FIX: Clipped panels will no longer cause the unused material message in the console.
+- FIX: 3D UIs should now be created with a proper anchor offset.
 
 2.0.6:
 - NEW: Added support for fonts packed into separate RGBA channels (read: eastern language fonts can now be 75% smaller).

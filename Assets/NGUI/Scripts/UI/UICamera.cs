@@ -900,7 +900,7 @@ public class UICamera : MonoBehaviour
 				// Send a hover message to the object, but don't add it to the list of hovered items as it's already present
 				// This happens when the mouse is released over the same button it was pressed on, and since it already had
 				// its 'OnHover' event, it never got Highlight(false), so we simply re-notify it so it can update the visible state.
-				if (currentTouch.pressed == mHover) currentTouch.pressed.SendMessage("OnHover", true, SendMessageOptions.DontRequireReceiver);
+				if (useMouse && currentTouch.pressed == mHover) currentTouch.pressed.SendMessage("OnHover", true, SendMessageOptions.DontRequireReceiver);
 
 				// If the button/touch was released on the same object, consider it a click and select it
 				if (currentTouch.pressed == currentTouch.current)
