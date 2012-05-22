@@ -166,6 +166,7 @@ public class UIDrawCall : MonoBehaviour
 			if (shader != null)
 			{
 				mClippedMat = new Material(mSharedMat);
+				mClippedMat.hideFlags = HideFlags.DontSave;
 				mClippedMat.shader = shader;
 			}
 		}
@@ -182,6 +183,7 @@ public class UIDrawCall : MonoBehaviour
 			{
 				Shader shader = Shader.Find("Depth");
 				mDepthMat = new Material(shader);
+				mDepthMat.hideFlags = HideFlags.DontSave;
 				mDepthMat.mainTexture = mSharedMat.mainTexture;
 			}
 		}

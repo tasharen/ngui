@@ -150,8 +150,8 @@ public class UICreateNewUIWizard : EditorWindow
 			UIAnchor anchor = NGUITools.AddChild<UIAnchor>(cam.gameObject);
 			anchor.uiCamera = cam;
 
-			// Since the camera was brought back 700 units above, we should bring the anchor forward 700 to compensate
-			if (camType == CameraType.Advanced3D) anchor.depthOffset = 700f;
+			// Since the camera was brought back 700 units above, we should bring the anchor forward to compensate
+			if (camType == CameraType.Advanced3D) anchor.depthOffset = 1.7f;
 
 			// And finally -- the first UI panel
 			UIPanel panel = NGUITools.AddChild<UIPanel>(anchor.gameObject);
