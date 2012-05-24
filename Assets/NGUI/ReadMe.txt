@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.0.7
+                Version 2.0.7b
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -41,6 +41,8 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: Packed fonts no longer tie up the alpha channel, and can now be affected by alpha just fine.
 - FIX: Clipped panels will no longer cause the unused material message in the console.
 - FIX: 3D UIs should now be created with a proper anchor offset.
+- FIX: UISliderColors will now work for more than 3 colors.
+- FIX: UIPanel will no longer cause a null exception at run time.
 
 2.0.6:
 - NEW: Added support for fonts packed into separate RGBA channels (read: eastern language fonts can now be 75% smaller).
