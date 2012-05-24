@@ -138,9 +138,8 @@ public class UIPanel : MonoBehaviour
 			{
 				mDebugInfo = value;
 				List<UIDrawCall> list = drawCalls;
-#if UNITY_EDITOR
 				HideFlags flags = (mDebugInfo == DebugInfo.Geometry) ? HideFlags.DontSave | HideFlags.NotEditable : HideFlags.HideAndDontSave;
-#endif
+
 				for (int i = 0, imax = list.Count; i < imax;  ++i)
 				{
 					UIDrawCall dc = list[i];
