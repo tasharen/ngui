@@ -146,11 +146,7 @@ public class UIPanel : MonoBehaviour
 					UIDrawCall dc = list[i];
 					GameObject go = dc.gameObject;
 					go.active = false;
-#if UNITY_EDITOR
 					go.hideFlags = flags;
-#else
-					DontDestroyOnLoad(go);
-#endif
 					go.active = true;
 				}
 			}
@@ -511,7 +507,7 @@ public class UIPanel : MonoBehaviour
 				(mDebugInfo == DebugInfo.Geometry) ? HideFlags.DontSave | HideFlags.NotEditable : HideFlags.HideAndDontSave);
 #else
 			GameObject go = new GameObject("_UIDrawCall [" + mat.name + "]");
-			DontDestroyOnLoad(go);
+			go.hideFlags = HideFlags.DontSave;
 #endif
 			go.layer = gameObject.layer;
 			sc = go.AddComponent<UIDrawCall>();
@@ -913,6 +909,16 @@ public class UIPanel : MonoBehaviour
 #if UNITY_EDITOR
 		mScreenSize = new Vector2(Screen.width, Screen.height);
 #endif
+	}
+
+	/// <summary>
+	/// Immediately refresh the panel.
+	/// </summary>
+
+	public void Refresh ()
+	{
+		BroadcastMessage("Update", SendMessageOptions.DontRequireReceiver);
+		LateUpdate();
 	}
 
 #if UNITY_EDITOR

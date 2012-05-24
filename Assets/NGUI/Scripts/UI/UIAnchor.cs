@@ -40,6 +40,12 @@ public class UIAnchor : MonoBehaviour
 	bool mIsWindows = false;
 
 	/// <summary>
+	/// Cache the transform.
+	/// </summary>
+
+	void Awake () { mTrans = transform; }
+
+	/// <summary>
 	/// Legacy support.
 	/// </summary>
 
@@ -61,8 +67,6 @@ public class UIAnchor : MonoBehaviour
 
 	void OnEnable ()
 	{
-		mTrans = transform;
-
 		mIsWindows = (Application.platform == RuntimePlatform.WindowsPlayer ||
 			Application.platform == RuntimePlatform.WindowsWebPlayer ||
 			Application.platform == RuntimePlatform.WindowsEditor);

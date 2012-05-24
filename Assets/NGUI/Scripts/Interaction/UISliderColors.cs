@@ -36,7 +36,7 @@ public class UISliderColors : MonoBehaviour
 		{
 			if (startIndex + 1 < colors.Length)
 			{
-				float factor = (val - startIndex) / (colors.Length - 2);
+				float factor = (val - startIndex);
 				c = Color.Lerp(colors[startIndex], colors[startIndex + 1], factor);
 			}
 			else if (startIndex < colors.Length)
