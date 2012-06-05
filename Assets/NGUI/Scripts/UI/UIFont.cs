@@ -487,9 +487,9 @@ public class UIFont : MonoBehaviour
 	/// Text wrapping functionality. The 'maxWidth' should be in local coordinates (take pixels and divide them by transform's scale).
 	/// </summary>
 
-	public string WrapText (string text, float maxWidth, bool multiline, bool encoding, SymbolStyle symbolStyle)
+	public string WrapText(string text, float maxWidth, int maxLineCount, bool encoding, SymbolStyle symbolStyle)
 	{
-		if (mReplacement != null) return mReplacement.WrapText(text, maxWidth, multiline, encoding, symbolStyle);
+		if (mReplacement != null) return mReplacement.WrapText(text, maxWidth, maxLineCount, encoding, symbolStyle);
 
 		// Width of the line in pixels
 		int lineWidth = Mathf.RoundToInt(maxWidth * size);
@@ -502,6 +502,8 @@ public class UIFont : MonoBehaviour
 		int start = 0;
 		int offset = 0;
 		bool lineIsEmpty = true;
+		bool multiline = (maxLineCount != 1);
+		int lineCount = 1;
 
 		// Run through all characters
 		for (; offset < textLength; ++offset)
@@ -511,7 +513,7 @@ public class UIFont : MonoBehaviour
 			// New line character -- start a new line
 			if (ch == '\n')
 			{
-				if (!multiline) break;
+				if (!multiline || lineCount == maxLineCount ) break;
 				remainingWidth = lineWidth;
 
 				// Add the previous word to the final string
@@ -519,6 +521,7 @@ public class UIFont : MonoBehaviour
 				else sb.Append(ch);
 
 				lineIsEmpty = true;
+				++lineCount;
 				start = offset + 1;
 				previousChar = 0;
 				continue;
@@ -577,12 +580,12 @@ public class UIFont : MonoBehaviour
 			if (remainingWidth < 0)
 			{
 				// Can't start a new line
-				if (lineIsEmpty || !multiline)
+				if (lineIsEmpty || !multiline || lineCount == maxLineCount)
 				{
 					// This is the first word on the line -- add it up to the character that fits
 					sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
 
-					if (!multiline)
+					if (!multiline || lineCount == maxLineCount)
 					{
 						start = offset;
 						break;
@@ -591,6 +594,7 @@ public class UIFont : MonoBehaviour
 
 					// Start a brand-new line
 					lineIsEmpty = true;
+					++lineCount;
 
 					if (ch == ' ')
 					{
@@ -614,7 +618,8 @@ public class UIFont : MonoBehaviour
 					remainingWidth = lineWidth;
 					offset = start - 1;
 					previousChar = 0;
-					if (!multiline) break;
+					if (!multiline || lineCount == maxLineCount) break;
+					++lineCount;
 					EndLine(ref sb);
 					continue;
 				}
@@ -637,13 +642,13 @@ public class UIFont : MonoBehaviour
 	/// Text wrapping functionality. Legacy compatibility function.
 	/// </summary>
 
-	public string WrapText (string text, float maxWidth, bool multiline, bool encoding) { return WrapText(text, maxWidth, multiline, encoding, SymbolStyle.None); }
+	public string WrapText(string text, float maxWidth, int maxLineCount, bool encoding) { return WrapText(text, maxWidth, maxLineCount, encoding, SymbolStyle.None); }
 
 	/// <summary>
 	/// Text wrapping functionality. Legacy compatibility function.
 	/// </summary>
 
-	public string WrapText (string text, float maxWidth, bool multiline) { return WrapText(text, maxWidth, multiline, false, SymbolStyle.None); }
+	public string WrapText(string text, float maxWidth, int maxLineCount) { return WrapText(text, maxWidth, maxLineCount, false, SymbolStyle.None); }
 
 	/// <summary>
 	/// Align the vertices to be right or center-aligned given the specified line width.

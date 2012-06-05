@@ -351,7 +351,7 @@ public class UIInput : MonoBehaviour
 
 			// Now wrap this text using the specified line width
 			label.supportEncoding = false;
-			processed = label.font.WrapText(processed, label.lineWidth / label.cachedTransform.localScale.x, true, false, UIFont.SymbolStyle.None);
+			processed = label.font.WrapText(processed, label.lineWidth / label.cachedTransform.localScale.x, 0, false, UIFont.SymbolStyle.None);
 
 			if (!label.multiLine)
 			{

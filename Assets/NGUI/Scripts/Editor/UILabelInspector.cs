@@ -55,8 +55,8 @@ public class UILabelInspector : UIWidgetInspector
 			int len = EditorGUILayout.IntField("Line Width", mLabel.lineWidth, GUILayout.Width(120f));
 			if (len != mLabel.lineWidth) { RegisterUndo(); mLabel.lineWidth = len; }
 
-			bool multi = EditorGUILayout.Toggle("Multi-line", mLabel.multiLine, GUILayout.Width(100f));
-			if (multi != mLabel.multiLine) { RegisterUndo(); mLabel.multiLine = multi; }
+			int count = EditorGUILayout.IntField("Line Count", mLabel.maxLineCount, GUILayout.Width(100f));
+			if (count != mLabel.maxLineCount) { RegisterUndo(); mLabel.maxLineCount = count; }
 		}
 		GUILayout.EndHorizontal();
 

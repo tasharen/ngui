@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/Label")]
@@ -21,7 +22,7 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] string mText = "";
 	[HideInInspector][SerializeField] int mMaxLineWidth = 0;
 	[HideInInspector][SerializeField] bool mEncoding = true;
-	[HideInInspector][SerializeField] bool mMultiline = true;
+	[HideInInspector][SerializeField] int mMaxLineCount = 0; // 0 denotes unlimited
 	[HideInInspector][SerializeField] bool mPassword = false;
 	[HideInInspector][SerializeField] bool mShowLastChar = false;
 	[HideInInspector][SerializeField] Effect mEffectStyle = Effect.None;
@@ -34,6 +35,12 @@ public class UILabel : UIWidget
 
 	[HideInInspector][SerializeField] float mLineWidth = 0;
 
+	/// <summary>
+	/// Obsolete, do not use. Use 'mMaxLineCount' instead
+	/// </summary>
+
+	[HideInInspector][SerializeField]bool mMultiline = true;
+
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
 
@@ -42,7 +49,7 @@ public class UILabel : UIWidget
 	string mLastText = "";
 	int mLastWidth = 0;
 	bool mLastEncoding = true;
-	bool mLastMulti = true;
+	int mLastLineCnt = 0;
 	bool mLastPass = false;
 	bool mLastShow = false;
 	Effect mLastEffect = Effect.None;
@@ -61,7 +68,7 @@ public class UILabel : UIWidget
 				mLastText		!= text ||
 				mLastWidth		!= mMaxLineWidth ||
 				mLastEncoding	!= mEncoding ||
-				mLastMulti		!= mMultiline ||
+				mLastLineCnt	!= mMaxLineCount ||
 				mLastPass		!= mPassword ||
 				mLastShow		!= mShowLastChar ||
 				mLastEffect		!= mEffectStyle ||
@@ -80,7 +87,7 @@ public class UILabel : UIWidget
 				mLastText			= text;
 				mLastWidth			= mMaxLineWidth;
 				mLastEncoding		= mEncoding;
-				mLastMulti			= mMultiline;
+				mLastLineCnt		= mMaxLineCount;
 				mLastPass			= mPassword;
 				mLastShow			= mShowLastChar;
 				mLastEffect			= mEffectStyle;
@@ -196,20 +203,41 @@ public class UILabel : UIWidget
 	/// <summary>
 	/// Whether the label supports multiple lines.
 	/// </summary>
-
+	
 	public bool multiLine
 	{
 		get
 		{
-			return mMultiline;
+			return mMaxLineCount != 1;
 		}
 		set
 		{
-			if (mMultiline != value)
+			if ((mMaxLineCount != 1) != value)
 			{
-				mMultiline = value;
+				mMaxLineCount = (value ? 0 : 1);
 				hasChanged = true;
 				if (value) mPassword = false;
+			}
+		}
+	}
+
+	/// <summary>
+	/// The max number of lines to be displayed for the label
+	/// </summary>
+
+	public int maxLineCount
+	{
+		get
+		{
+			return mMaxLineCount;
+		}
+		set
+		{
+			if (mMaxLineCount != value)
+			{
+				mMaxLineCount = Mathf.Max(value, 0);
+				hasChanged = true;
+				if (value == 1) mPassword = false;
 			}
 		}
 	}
@@ -228,10 +256,10 @@ public class UILabel : UIWidget
 		{
 			if (mPassword != value)
 			{
-				mPassword	= value;
-				mMultiline	= false;
-				mEncoding	= false;
-				hasChanged	= true;
+				mPassword		= value;
+				mMaxLineCount	= 1;
+				mEncoding		= false;
+				hasChanged		= true;
 			}
 		}
 	}
@@ -360,6 +388,12 @@ public class UILabel : UIWidget
 			mMaxLineWidth = Mathf.RoundToInt(mLineWidth);
 			mLineWidth = 0f;
 		}
+
+		if (!mMultiline)
+		{
+			mMaxLineWidth = 1;
+			mMultiline = true;
+		}
 	}
 
 	/// <summary>
@@ -385,7 +419,7 @@ public class UILabel : UIWidget
 
 		if (mPassword)
 		{
-			mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, false, UIFont.SymbolStyle.None);
+			mProcessedText = mFont.WrapText(mProcessedText, 100000f, 1, false, UIFont.SymbolStyle.None);
 
 			string hidden = "";
 
@@ -402,11 +436,11 @@ public class UILabel : UIWidget
 		}
 		else if (mMaxLineWidth > 0)
 		{
-			mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.x, mMultiline, mEncoding, mSymbols);
+			mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.x, mMaxLineCount, mEncoding, mSymbols);
 		}
-		else if (!mMultiline)
+		else if (mMaxLineCount == 1)
 		{
-			mProcessedText = mFont.WrapText(mProcessedText, 100000f, false, mEncoding, mSymbols);
+			mProcessedText = mFont.WrapText(mProcessedText, 100000f, 1, mEncoding, mSymbols);
 		}
 
 		mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.one;

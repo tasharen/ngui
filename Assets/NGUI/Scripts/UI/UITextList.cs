@@ -81,7 +81,7 @@ public class UITextList : MonoBehaviour
 		{
 			// Rebuild the line
 			ce.lines = textLabel.font.WrapText(ce.text, maxWidth / textLabel.transform.localScale.y,
-				textLabel.multiLine, textLabel.supportEncoding, textLabel.symbolStyle).Split(mSeparator);
+				textLabel.maxLineCount, textLabel.supportEncoding, textLabel.symbolStyle).Split(mSeparator);
 
 			// Recalculate the total number of lines
 			mTotalLines = 0;
