@@ -153,21 +153,7 @@ public class Localization : MonoBehaviour
 		mLanguage = asset.name;
 		PlayerPrefs.SetString("Language", mLanguage);
 		ByteReader reader = new ByteReader(asset);
-		mDictionary.Clear();// = reader.ReadDictionary();
-		while(reader.canRead)
-		{
-			string line = reader.ReadLine();
-			char[] seperators = new char[] {'='};
-			string[] kvp = line.Split(seperators, 2);
-			
-			if (kvp.Length != 2)
-			{
-				Debug.Log("Error parseing line " + line + "  " + kvp.Length);
-				continue;
-			}
-			
-			mDictionary.Add(kvp[0].Trim(), kvp[1].Trim());			
-		}
+		mDictionary = reader.ReadDictionary();
 		UIRoot.Broadcast("OnLocalize", this);
 	}
 

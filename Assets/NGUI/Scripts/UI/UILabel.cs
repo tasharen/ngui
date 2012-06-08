@@ -49,7 +49,7 @@ public class UILabel : UIWidget
 	string mLastText = "";
 	int mLastWidth = 0;
 	bool mLastEncoding = true;
-	int mLastLineCnt = 0;
+	int mLastCount = 0;
 	bool mLastPass = false;
 	bool mLastShow = false;
 	Effect mLastEffect = Effect.None;
@@ -68,7 +68,7 @@ public class UILabel : UIWidget
 				mLastText		!= text ||
 				mLastWidth		!= mMaxLineWidth ||
 				mLastEncoding	!= mEncoding ||
-				mLastLineCnt	!= mMaxLineCount ||
+				mLastCount		!= mMaxLineCount ||
 				mLastPass		!= mPassword ||
 				mLastShow		!= mShowLastChar ||
 				mLastEffect		!= mEffectStyle ||
@@ -87,7 +87,7 @@ public class UILabel : UIWidget
 				mLastText			= text;
 				mLastWidth			= mMaxLineWidth;
 				mLastEncoding		= mEncoding;
-				mLastLineCnt		= mMaxLineCount;
+				mLastCount			= mMaxLineCount;
 				mLastPass			= mPassword;
 				mLastShow			= mShowLastChar;
 				mLastEffect			= mEffectStyle;
@@ -391,7 +391,7 @@ public class UILabel : UIWidget
 
 		if (!mMultiline)
 		{
-			mMaxLineWidth = 1;
+			mMaxLineCount = 1;
 			mMultiline = true;
 		}
 	}
@@ -438,9 +438,9 @@ public class UILabel : UIWidget
 		{
 			mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.x, mMaxLineCount, mEncoding, mSymbols);
 		}
-		else if (mMaxLineCount == 1)
+		else if (mMaxLineCount > 0)
 		{
-			mProcessedText = mFont.WrapText(mProcessedText, 100000f, 1, mEncoding, mSymbols);
+			mProcessedText = mFont.WrapText(mProcessedText, 100000f, mMaxLineCount, mEncoding, mSymbols);
 		}
 
 		mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.one;

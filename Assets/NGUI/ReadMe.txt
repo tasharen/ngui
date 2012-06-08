@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.0.7c
+                Version 2.0.8
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,18 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.0.8:
+- NEW: Packed fonts now have clipped version of shaders, making them work with clipped panels.
+- NEW: You can now specify the maximum number of lines on UILabel instead of just multiline / single line option.
+- NEW: UIButton's disabled color can now be specified explicitly.
+- NEW: Tweens and animations now have OnDoubleClick and OnSelect events to work with as well.
+- NEW: It's now possible to control the volume used by all UI sounds: NGUITools.soundVolume.
+- NEW: You can now delay a tween by specifying a start time delay.
+- NEW: You can now disable multi-touch on UICamera, making all touches be treated as one.
+- NEW: MakePixelPerfect is now in NGUITools, not NGUIMenu.
+- FIX: UIImageButton won't switch images anymore if the script is disabled.
+- FIX: Starting value in Localization will no longer overwrite the explicitly switched languages.
 
 2.0.7:
 - NEW: You can now specify what keyboard type will be used on mobile devices.
