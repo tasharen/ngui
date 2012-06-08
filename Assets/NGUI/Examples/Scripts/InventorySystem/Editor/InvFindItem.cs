@@ -25,7 +25,7 @@ public class InvFindItem : ScriptableWizard
 	/// Add a menu option to display this wizard.
 	/// </summary>
 
-	[MenuItem("Inventory/Find Item #&i")]
+	[MenuItem("NGUI/Inventory Example/Find Item #&i")]
 	static void FindItem ()
 	{
 		ScriptableWizard.DisplayWizard<InvFindItem>("Find Item");
