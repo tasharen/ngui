@@ -116,6 +116,27 @@ public class UIButtonTween : MonoBehaviour
 		}
 	}
 
+	void OnDoubleClick ()
+	{
+		if (enabled && trigger == Trigger.OnDoubleClick)
+		{
+			Play(true);
+		}
+	}
+
+	void OnSelect (bool isSelected)
+	{
+		if (enabled)
+		{
+			if (trigger == Trigger.OnSelect ||
+				(trigger == Trigger.OnSelectTrue && isSelected) ||
+				(trigger == Trigger.OnSelectFalse && !isSelected))
+			{
+				Play(true);
+			}
+		}
+	}
+
 	void OnActivate (bool isActive)
 	{
 		if (enabled)

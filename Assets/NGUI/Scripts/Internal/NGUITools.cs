@@ -15,6 +15,35 @@ static public class NGUITools
 {
 	static AudioListener mListener;
 
+	static bool mLoaded = false;
+	static float mGlobalVolume = 1f;
+
+	/// <summary>
+	/// Globally accessible volume affecting all music.
+	/// </summary>
+
+	static public float soundVolume
+	{
+		get
+		{
+			if (!mLoaded)
+			{
+				mLoaded = true;
+				mGlobalVolume = PlayerPrefs.GetFloat("Sound", 1f);
+			}
+			return mGlobalVolume;
+		}
+		set
+		{
+			if (mGlobalVolume != value)
+			{
+				mLoaded = true;
+				mGlobalVolume = value;
+				PlayerPrefs.SetFloat("Sound", value);
+			}
+		}
+	}
+
 	/// <summary>
 	/// Play the specified audio clip.
 	/// </summary>
@@ -33,7 +62,9 @@ static public class NGUITools
 
 	static public AudioSource PlaySound (AudioClip clip, float volume, float pitch)
 	{
-		if (clip != null)
+		volume *= soundVolume;
+
+		if (clip != null && volume > 0.01f)
 		{
 			if (mListener == null)
 			{
@@ -546,6 +577,42 @@ static public class NGUITools
 		else
 		{
 			Deactivate(go.transform);
+		}
+	}
+
+	/// <summary>
+	/// Helper function used to make the vector use integer numbers.
+	/// </summary>
+
+	static public Vector3 Round (Vector3 v)
+	{
+		v.x = Mathf.Round(v.x);
+		v.y = Mathf.Round(v.y);
+		v.z = Mathf.Round(v.z);
+		return v;
+	}
+
+	/// <summary>
+	/// Make the specified selection pixel-perfect.
+	/// </summary>
+
+	static public void MakePixelPerfect (Transform t)
+	{
+		UIWidget w = t.GetComponent<UIWidget>();
+
+		if (w != null)
+		{
+			w.MakePixelPerfect();
+		}
+		else
+		{
+			t.localPosition = Round(t.localPosition);
+			t.localScale = Round(t.localScale);
+
+			for (int i = 0, imax = t.childCount; i < imax; ++i)
+			{
+				MakePixelPerfect(t.GetChild(i));
+			}
 		}
 	}
 }

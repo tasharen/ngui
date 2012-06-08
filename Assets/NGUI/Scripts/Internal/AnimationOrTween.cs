@@ -19,6 +19,10 @@ namespace AnimationOrTween
 		OnActivate,
 		OnActivateTrue,
 		OnActivateFalse,
+		OnDoubleClick,
+		OnSelect,
+		OnSelectTrue,
+		OnSelectFalse,
 	}
 
 	public enum Direction

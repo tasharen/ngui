@@ -55,6 +55,7 @@ public class ActiveAnimation : IgnoreTimeScale
 	void Update ()
 	{
 		float delta = UpdateRealTimeDelta();
+		if (delta == 0f) return;
 
 		if (mAnim != null)
 		{
@@ -121,10 +122,13 @@ public class ActiveAnimation : IgnoreTimeScale
 
 			bool noName = string.IsNullOrEmpty(clipName);
 
-			// Play the animation if it's not already playing
+			// Play the animation if it's not playing already
 			if (noName)
 			{
-				if (!mAnim.isPlaying) mAnim.Play();
+				if (!mAnim.isPlaying)
+				{
+					mAnim.Play();
+				}
 			}
 			else if (!mAnim.IsPlaying(clipName))
 			{
@@ -145,7 +149,7 @@ public class ActiveAnimation : IgnoreTimeScale
 				}
 			}
 
-			// Remember the direction for disable checks in Update() below
+			// Remember the direction for disable checks in Update()
 			mLastDirection = playDirection;
 			mNotify = true;
 		}

@@ -49,34 +49,6 @@ static public class NGUIMenu
 		}
 	}
 
-	static Vector3 Round (Vector3 v)
-	{
-		v.x = Mathf.Round(v.x);
-		v.y = Mathf.Round(v.y);
-		v.z = Mathf.Round(v.z);
-		return v;
-	}
-
-	static void MakePixelPerfect (Transform t)
-	{
-		UIWidget w = t.GetComponent<UIWidget>();
-
-		if (w != null)
-		{
-			w.MakePixelPerfect();
-		}
-		else
-		{
-			t.localPosition = Round(t.localPosition);
-			t.localScale = Round(t.localScale);
-
-			for (int i = 0, imax = t.childCount; i < imax; ++i)
-			{
-				MakePixelPerfect(t.GetChild(i));
-			}
-		}
-	}
-
 	[MenuItem("NGUI/Make Pixel Perfect #&p")]
 	static void PixelPerfectSelection ()
 	{
@@ -85,7 +57,7 @@ static public class NGUIMenu
 			Debug.Log("You must select an object in the scene hierarchy first");
 			return;
 		}
-		foreach (Transform t in Selection.transforms) MakePixelPerfect(t);
+		foreach (Transform t in Selection.transforms) NGUITools.MakePixelPerfect(t);
 	}
 
 	[MenuItem("NGUI/Create a Panel")]

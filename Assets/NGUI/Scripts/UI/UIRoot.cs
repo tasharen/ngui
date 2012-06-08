@@ -47,9 +47,9 @@ public class UIRoot : MonoBehaviour
 		float size = 2f / manualHeight;
 		Vector3 ls = mTrans.localScale;
 
-		if (!Mathf.Approximately(ls.x, size) ||
-			!Mathf.Approximately(ls.y, size) ||
-			!Mathf.Approximately(ls.z, size))
+		if (!(Mathf.Abs(ls.x - size) <= float.Epsilon) ||
+			!(Mathf.Abs(ls.y - size) <= float.Epsilon) ||
+			!(Mathf.Abs(ls.z - size) <= float.Epsilon))
 		{
 			mTrans.localScale = new Vector3(size, size, size);
 		}

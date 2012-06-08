@@ -12,27 +12,27 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Internal/Ignore TimeScale Behaviour")]
 public class IgnoreTimeScale : MonoBehaviour
 {
-	float mTime = 0f;
+	float mTimeStart = 0f;
+	float mTimeDelta = 0f;
 	float mActual = 0f;
-	float mDelta = 0f;
+	bool mTimeStarted = false;
 
 	/// <summary>
 	/// Equivalent of Time.deltaTime not affected by timeScale, provided that UpdateRealTimeDelta() was called in the Update().
 	/// </summary>
 
-	public float realTimeDelta { get { return mDelta; } }
+	public float realTimeDelta { get { return mTimeDelta; } }
 
 	/// <summary>
-	/// Record the current time.
+	/// Clear the started flag;
 	/// </summary>
 
-	void OnEnable () { mTime = Time.realtimeSinceStartup; }
-
-	/// <summary>
-	/// Record the time on start.
-	/// </summary>
-
-	void Start () { mTime = Time.realtimeSinceStartup; }
+	void OnEnable ()
+	{
+		mTimeStarted = true;
+		mTimeDelta = 0f;
+		mTimeStart = Time.realtimeSinceStartup;
+	}
 
 	/// <summary>
 	/// Update the 'realTimeDelta' parameter. Should be called once per frame.
@@ -40,12 +40,21 @@ public class IgnoreTimeScale : MonoBehaviour
 
 	protected float UpdateRealTimeDelta ()
 	{
-		float time = Time.realtimeSinceStartup;
-		float delta = time - mTime;
-		mActual += Mathf.Max(0f, delta);
-		mDelta = 0.001f * Mathf.Round(mActual * 1000f);
-		mActual -= mDelta;
-		mTime = time;
-		return mDelta;
+		if (mTimeStarted)
+		{
+			float time = Time.realtimeSinceStartup;
+			float delta = time - mTimeStart;
+			mActual += Mathf.Max(0f, delta);
+			mTimeDelta = 0.001f * Mathf.Round(mActual * 1000f);
+			mActual -= mTimeDelta;
+			mTimeStart = time;
+		}
+		else
+		{
+			mTimeStarted = true;
+			mTimeStart = Time.realtimeSinceStartup;
+			mTimeDelta = 0f;
+		}
+		return mTimeDelta;
 	}
 }

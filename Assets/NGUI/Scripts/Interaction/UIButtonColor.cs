@@ -100,13 +100,13 @@ public class UIButtonColor : MonoBehaviour
 		}
 	}
 
-	void OnPress (bool isPressed)
+	protected virtual void OnPress (bool isPressed)
 	{
 		if (!mInitDone) Init();
 		if (enabled) TweenColor.Begin(tweenTarget, duration, isPressed ? pressed : (UICamera.IsHighlighted(gameObject) ? hover : mColor));
 	}
 
-	void OnHover (bool isOver)
+	protected virtual void OnHover (bool isOver)
 	{
 		if (enabled)
 		{

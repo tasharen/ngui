@@ -40,6 +40,12 @@ public abstract class UITweener : IgnoreTimeScale
 	public Style style = Style.Once;
 
 	/// <summary>
+	/// How long will the tweener wait before starting the tween?
+	/// </summary>
+
+	public float delay = 0f;
+
+	/// <summary>
 	/// How long is the duration of the tween?
 	/// </summary>
 
@@ -69,6 +75,7 @@ public abstract class UITweener : IgnoreTimeScale
 
 	public string callWhenFinished;
 
+	float mStartTime = 0f;
 	float mDuration = 0f;
 	float mAmountPerDelta = 1f;
 	float mFactor = 0f;
@@ -106,7 +113,11 @@ public abstract class UITweener : IgnoreTimeScale
 	/// Update on start, so there is no frame in-between.
 	/// </summary>
 
-	void Start () { Update(); }
+	void Start ()
+	{
+		mStartTime = Time.time + delay;
+		Update();
+	}
 
 	/// <summary>
 	/// Update the tweening factor and call the virtual update function.
@@ -114,6 +125,7 @@ public abstract class UITweener : IgnoreTimeScale
 
 	void Update ()
 	{
+		if (Time.time < mStartTime) return;
 		float delta = UpdateRealTimeDelta();
 
 		// Advance the sampling factor

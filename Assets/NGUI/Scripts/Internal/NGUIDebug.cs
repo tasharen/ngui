@@ -20,6 +20,8 @@ public class NGUIDebug : MonoBehaviour
 	{
 		if (Application.isPlaying)
 		{
+			//Debug.Log(text);
+
 			if (mLines.Count > 20) mLines.RemoveAt(0);
 			mLines.Add(text);
 

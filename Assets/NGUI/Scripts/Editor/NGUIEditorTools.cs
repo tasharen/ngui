@@ -569,7 +569,7 @@ public class NGUIEditorTools
 			settings.wrapMode != TextureWrapMode.Clamp ||
 			settings.npotScale != TextureImporterNPOTScale.ToNearest)
 		{
-			settings.mipmapEnabled = true;
+			//settings.mipmapEnabled = true;
 			settings.readable = false;
 			settings.maxTextureSize = 4096;
 			settings.textureFormat = TextureImporterFormat.RGBA32;

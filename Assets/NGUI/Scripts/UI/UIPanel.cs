@@ -646,11 +646,11 @@ public class UIPanel : MonoBehaviour
 		bool transformsChanged = false;
 #if UNITY_EDITOR
 		bool shouldCull = !Application.isPlaying || Time.realtimeSinceStartup > mCullTime;
+		if (!Application.isPlaying || !widgetsAreStatic || shouldCull != mCulled)
 #else
 		bool shouldCull = Time.realtimeSinceStartup > mCullTime;
+		if (!widgetsAreStatic || shouldCull != mCulled)
 #endif
-		// Check to see if something has changed
-		if (!widgetsAreStatic || (shouldCull != mCulled))
 		{
 #if UNITY_FLASH
 			foreach (KeyValuePair<Transform, UINode> child in mChildren)

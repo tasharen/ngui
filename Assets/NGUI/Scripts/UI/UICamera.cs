@@ -80,6 +80,12 @@ public class UICamera : MonoBehaviour
 	public bool useTouch = true;
 
 	/// <summary>
+	/// Whether multi-touch is allowed.
+	/// </summary>
+
+	public bool allowMultiTouch = true;
+
+	/// <summary>
 	/// Whether the keyboard events will be processed.
 	/// </summary>
 
@@ -505,6 +511,8 @@ public class UICamera : MonoBehaviour
 
 	MouseOrTouch GetTouch (int id)
 	{
+		if (!allowMultiTouch) id = 1;
+
 		MouseOrTouch touch;
 
 		if (!mTouches.TryGetValue(id, out touch))
@@ -521,6 +529,7 @@ public class UICamera : MonoBehaviour
 
 	void RemoveTouch (int id)
 	{
+		if (!allowMultiTouch) id = 1;
 		mTouches.Remove(id);
 	}
 
@@ -709,7 +718,7 @@ public class UICamera : MonoBehaviour
 		}
 
 		// The button was released over a different object -- remove the highlight from the previous
-		if (!isPressed && mHover != null && mHover != mMouse[0].current)
+		if (useMouse && !isPressed && mHover != null && mHover != mMouse[0].current)
 		{
 			if (mTooltip != null) ShowTooltip(false);
 			Highlight(mHover, false);
@@ -735,7 +744,7 @@ public class UICamera : MonoBehaviour
 		currentTouch = null;
 
 		// If nothing is pressed and there is an object under the touch, highlight it
-		if (!isPressed && mHover != mMouse[0].current)
+		if (useMouse && !isPressed && mHover != mMouse[0].current)
 		{
 			mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
 			mHover = mMouse[0].current;
@@ -752,7 +761,7 @@ public class UICamera : MonoBehaviour
 		for (int i = 0; i < Input.touchCount; ++i)
 		{
 			Touch input = Input.GetTouch(i);
-			currentTouchID = input.fingerId;
+			currentTouchID = allowMultiTouch ? input.fingerId : 1;
 			currentTouch = GetTouch(currentTouchID);
 
 			bool pressed = (input.phase == TouchPhase.Began);
