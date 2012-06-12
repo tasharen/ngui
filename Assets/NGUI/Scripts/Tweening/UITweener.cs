@@ -18,6 +18,7 @@ public abstract class UITweener : IgnoreTimeScale
 		EaseIn,
 		EaseOut,
 		EaseInOut,
+		Bounce,
 	}
 
 	public enum Style
@@ -185,6 +186,25 @@ public abstract class UITweener : IgnoreTimeScale
 				val = 1f - Mathf.Abs(val);
 				val = 1f - val * val;
 				val = sign * val * 0.5f + 0.5f;
+			}
+		}
+		else if (method == Method.Bounce)
+		{
+			if (val < (1 / 2.75f))
+			{
+				val = 7.5685f * val * val;
+			}
+			else if (val < (2 / 2.75f))
+			{
+				val = 7.5625f * (val -= (1.5f / 2.75f)) * val + .75f;
+			}
+			else if (val < (2.5 / 2.75f))
+			{
+				val = 7.5625f * (val -= (2.25f / 2.75f)) * val + .9375f;
+			}
+			else
+			{
+				val = 7.5625f * (val -= (2.625f / 2.75f)) * val + .984375f;
 			}
 		}
 
