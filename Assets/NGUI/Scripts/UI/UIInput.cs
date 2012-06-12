@@ -209,17 +209,17 @@ public class UIInput : MonoBehaviour
 					offset.y += label.relativeSize.y;
 					offset = t.TransformPoint(offset);
 					Input.compositionCursorPos = UICamera.currentCamera.WorldToScreenPoint(offset);
-					UpdateLabel();
 				}
+				UpdateLabel();
 			}
-#if UNITY_IPHONE || UNITY_ANDROID
-			else if (mKeyboard != null)
-			{
-				mKeyboard.active = false;
-			}
-#endif
 			else
 			{
+#if UNITY_IPHONE || UNITY_ANDROID
+				if (mKeyboard != null)
+				{
+					mKeyboard.active = false;
+				}
+#endif
 				if (string.IsNullOrEmpty(mText))
 				{
 					label.text = mDefaultText;
