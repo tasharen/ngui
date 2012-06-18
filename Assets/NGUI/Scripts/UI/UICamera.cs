@@ -511,8 +511,6 @@ public class UICamera : MonoBehaviour
 
 	MouseOrTouch GetTouch (int id)
 	{
-		if (!allowMultiTouch) id = 1;
-
 		MouseOrTouch touch;
 
 		if (!mTouches.TryGetValue(id, out touch))
@@ -527,11 +525,7 @@ public class UICamera : MonoBehaviour
 	/// Remove a touch event from the list.
 	/// </summary>
 
-	void RemoveTouch (int id)
-	{
-		if (!allowMultiTouch) id = 1;
-		mTouches.Remove(id);
-	}
+	void RemoveTouch (int id) { mTouches.Remove(id); }
 
 	/// <summary>
 	/// Add this camera to the list.
@@ -761,36 +755,40 @@ public class UICamera : MonoBehaviour
 		for (int i = 0; i < Input.touchCount; ++i)
 		{
 			Touch input = Input.GetTouch(i);
-			currentTouchID = allowMultiTouch ? input.fingerId : 1;
-			currentTouch = GetTouch(currentTouchID);
 
-			bool pressed = (input.phase == TouchPhase.Began);
-			bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
-
-			if (pressed)
+			if (allowMultiTouch || input.fingerId == 0)
 			{
-				currentTouch.delta = Vector2.zero;
+				currentTouchID = allowMultiTouch ? input.fingerId : 1;
+				currentTouch = GetTouch(currentTouchID);
+
+				bool pressed = (input.phase == TouchPhase.Began);
+				bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
+
+				if (pressed)
+				{
+					currentTouch.delta = Vector2.zero;
+				}
+				else
+				{
+					// Although input.deltaPosition can be used, calculating it manually is safer (just in case)
+					currentTouch.delta = input.position - currentTouch.pos;
+				}
+
+				currentTouch.pos = input.position;
+				currentTouch.current = Raycast(currentTouch.pos, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+				lastTouchPosition = currentTouch.pos;
+
+				// We don't want to update the last camera while there is a touch happening
+				if (pressed) currentTouch.pressedCam = currentCamera;
+				else if (currentTouch.pressed != null) currentCamera = currentTouch.pressedCam;
+
+				// Process the events from this touch
+				ProcessTouch(pressed, unpressed);
+
+				// If the touch has ended, remove it from the list
+				if (unpressed) RemoveTouch(currentTouchID);
+				currentTouch = null;
 			}
-			else
-			{
-				// Although input.deltaPosition can be used, calculating it manually is safer (just in case)
-				currentTouch.delta = input.position - currentTouch.pos;
-			}
-
-			currentTouch.pos = input.position;
-			currentTouch.current = Raycast(currentTouch.pos, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
-			lastTouchPosition = currentTouch.pos;
-
-			// We don't want to update the last camera while there is a touch happening
-			if (pressed) currentTouch.pressedCam = currentCamera;
-			else if (currentTouch.pressed != null) currentCamera = currentTouch.pressedCam;
-
-			// Process the events from this touch
-			ProcessTouch(pressed, unpressed);
-
-			// If the touch has ended, remove it from the list
-			if (unpressed) RemoveTouch(currentTouchID);
-			currentTouch = null;
 		}
 	}
 
