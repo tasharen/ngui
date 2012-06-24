@@ -101,10 +101,10 @@ public abstract class UITweener : IgnoreTimeScale
 	/// Tween factor, 0-1 range.
 	/// </summary>
 
-	public float factor { get { return mFactor; } }
+	public float tweenFactor { get { return mFactor; } }
 
 	/// <summary>
-	/// Direction in which the tween is currently playing.
+	/// Direction that the tween is currently playing in.
 	/// </summary>
 
 	public AnimationOrTween.Direction direction { get { return mAmountPerDelta < 0f ? AnimationOrTween.Direction.Reverse : AnimationOrTween.Direction.Forward; } }
@@ -115,7 +115,7 @@ public abstract class UITweener : IgnoreTimeScale
 
 	void Start ()
 	{
-		mStartTime = Time.time + delay;
+		mStartTime = Time.realtimeSinceStartup + delay;
 		Update();
 	}
 
@@ -125,8 +125,8 @@ public abstract class UITweener : IgnoreTimeScale
 
 	void Update ()
 	{
-		if (Time.time < mStartTime) return;
 		float delta = UpdateRealTimeDelta();
+		if (Time.realtimeSinceStartup < mStartTime) return;
 
 		// Advance the sampling factor
 		mFactor += amountPerDelta * delta;
@@ -155,8 +155,43 @@ public abstract class UITweener : IgnoreTimeScale
 			}
 		}
 
+		// Sample the tween at the current factor
+		Sample(mFactor);
+
+		// If the factor goes out of range and this is a one-time tweening operation, disable the script
+		if (style == Style.Once && (mFactor > 1f || mFactor < 0f))
+		{
+			mFactor = Mathf.Clamp01(mFactor);
+
+			if (string.IsNullOrEmpty(callWhenFinished))
+			{
+				enabled = false;
+			}
+			else
+			{
+				if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
+				{
+					// Notify the event listener target
+					eventReceiver.SendMessage(callWhenFinished, this, SendMessageOptions.DontRequireReceiver);
+				}
+
+				// Disable this script unless the SendMessage function above changed something
+				if (mFactor == 1f && mAmountPerDelta > 0f || mFactor == 0f && mAmountPerDelta < 0f)
+				{
+					enabled = false;
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Sample the tween at the specified factor.
+	/// </summary>
+
+	public void Sample (float factor)
+	{
 		// Calculate the sampling value
-		float val = Mathf.Clamp01(mFactor);
+		float val = Mathf.Clamp01(factor);
 
 		if (method == Method.EaseIn)
 		{
@@ -190,31 +225,6 @@ public abstract class UITweener : IgnoreTimeScale
 
 		// Call the virtual update
 		OnUpdate(val);
-
-		// If the factor goes out of range and this is a one-time tweening operation, disable the script
-		if (style == Style.Once && (mFactor > 1f || mFactor < 0f))
-		{
-			mFactor = Mathf.Clamp01(mFactor);
-
-			if (string.IsNullOrEmpty(callWhenFinished))
-			{
-				enabled = false;
-			}
-			else
-			{
-				if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
-				{
-					// Notify the event listener target
-					eventReceiver.SendMessage(callWhenFinished, this, SendMessageOptions.DontRequireReceiver);
-				}
-
-				// Disable this script unless the SendMessage function above changed something
-				if (mFactor == 1f && mAmountPerDelta > 0f || mFactor == 0f && mAmountPerDelta < 0f)
-				{
-					enabled = false;
-				}
-			}
-		}
 	}
 
 	/// <summary>
@@ -276,6 +286,12 @@ public abstract class UITweener : IgnoreTimeScale
 		comp.mFactor = 0f;
 		comp.style = Style.Once;
 		comp.enabled = true;
+
+		if (duration <= 0f)
+		{
+			comp.Sample(1f);
+			comp.enabled = false;
+		}
 		return comp;
 	}
 }

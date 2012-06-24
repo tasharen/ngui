@@ -506,7 +506,8 @@ public class UIPanel : MonoBehaviour
 				(mDebugInfo == DebugInfo.Geometry) ? HideFlags.DontSave | HideFlags.NotEditable : HideFlags.HideAndDontSave);
 #else
 			GameObject go = new GameObject("_UIDrawCall [" + mat.name + "]");
-			go.hideFlags = HideFlags.DontSave;
+			//go.hideFlags = HideFlags.DontSave;
+			DontDestroyOnLoad(go);
 #endif
 			go.layer = gameObject.layer;
 			sc = go.AddComponent<UIDrawCall>();

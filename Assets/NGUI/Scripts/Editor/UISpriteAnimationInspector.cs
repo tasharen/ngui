@@ -24,7 +24,7 @@ public class UISpriteAnimationInspector : Editor
 		UISpriteAnimation anim = target as UISpriteAnimation;
 
 		int fps = EditorGUILayout.IntField("Framerate", anim.framesPerSecond);
-		fps = Mathf.Clamp(fps, 1, 60);
+		fps = Mathf.Clamp(fps, 0, 60);
 
 		if (anim.framesPerSecond != fps)
 		{
