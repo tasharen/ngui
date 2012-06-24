@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.0.8
+                Version 2.0.9
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,17 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.0.9:
+- NEW: UITable can now return its list of children (in sorted order) via UITable.children.
+- FIX: UISpriteAnimation can now be paused with FPS of 0.
+- FIX: UITweener's delay should now work properly.
+- FIX: UIPanel should now create draw calls with "dont destroy on load" flag instead of hideflags at run time, resolving a rare warning.
+- FIX: Tweaks to how multi-touches are handled when they're disabled.
+- FIX: Removed the "#pragma fragmentoption ARB_precision_hint_fastest" which was causing issues due to no support on android, mac mini's and possibly other devices.
+- Fix: UIInput carat should be removed upon leaving the field on iOS.
+- FIX: UIInput default text should be removed OnSelect on iOS.
+- FIX: Inventory example should no longer have its own menu, but will instead be under NGUI.
 
 2.0.8:
 - NEW: Packed fonts now have clipped version of shaders, making them work with clipped panels.
