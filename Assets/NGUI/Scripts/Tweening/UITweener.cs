@@ -18,6 +18,7 @@ public abstract class UITweener : IgnoreTimeScale
 		EaseIn,
 		EaseOut,
 		EaseInOut,
+		Bounce,
 	}
 
 	public enum Style
@@ -77,7 +78,7 @@ public abstract class UITweener : IgnoreTimeScale
 
 	float mStartTime = 0f;
 	float mDuration = 0f;
-	float mAmountPerDelta = 1f;
+	float mAmountPerDelta = 1000f;
 	float mFactor = 0f;
 
 	/// <summary>
@@ -222,7 +223,28 @@ public abstract class UITweener : IgnoreTimeScale
 				val = sign * val * 0.5f + 0.5f;
 			}
 		}
-
+		else if (method == Method.Bounce)
+		{
+			if (val < 0.363636f) // (1 / 2.75) = 0.363636
+			{
+				val = 7.5685f * val * val;
+			}
+			else if (val < 0.727272f) // (2 / 2.75) = 0.727272
+			{
+				// (1.5 / 2.75) = 0.545454
+				val = 7.5625f * (val -= 0.545454f) * val + 0.75f;
+			}
+			else if (val < 0.909090f) // (2.5 / 2.75) = 0.909090
+			{
+				// (2.25 / 2.75) = 0.818181
+				val = 7.5625f * (val -= 0.818181f) * val + 0.9375f;
+			}
+			else
+			{
+				// (2.625 / 2.75) = 0.9545454
+				val = 7.5625f * (val -= 0.9545454f) * val + 0.984375f;
+			}
+		}
 		// Call the virtual update
 		OnUpdate(val);
 	}
@@ -233,9 +255,17 @@ public abstract class UITweener : IgnoreTimeScale
 
 	public void Play (bool forward)
 	{
+		mStartTime = Time.realtimeSinceStartup + delay;
 		mAmountPerDelta = Mathf.Abs(amountPerDelta);
 		if (!forward) mAmountPerDelta = -mAmountPerDelta;
 		enabled = true;
+
+		if (duration <= 0f)
+		{
+			mFactor = forward ? 1f : 0f;
+			Sample(mFactor);
+			enabled = false;
+		}
 	}
 
 	[System.Obsolete("Use Tweener.Play instead")]
@@ -289,7 +319,8 @@ public abstract class UITweener : IgnoreTimeScale
 
 		if (duration <= 0f)
 		{
-			comp.Sample(1f);
+			comp.mFactor = 1f;
+			comp.Sample(comp.mFactor);
 			comp.enabled = false;
 		}
 		return comp;
