@@ -459,13 +459,6 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Deprecated property.
-	/// </summary>
-
-	[System.Obsolete("Use 'relativeSize' instead")]
-	public Vector2 visibleSize { get { return relativeSize; } }
-
-	/// <summary>
 	/// Visible size of the widget in relative coordinates. In most cases this can remain at (1, 1).
 	/// If you want to figure out the widget's size in pixels, scale this value by cachedTransform.localScale.
 	/// </summary>

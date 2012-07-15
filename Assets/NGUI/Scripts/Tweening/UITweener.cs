@@ -18,7 +18,8 @@ public abstract class UITweener : IgnoreTimeScale
 		EaseIn,
 		EaseOut,
 		EaseInOut,
-		Bounce,
+		BounceIn,
+		BounceOut,
 	}
 
 	public enum Style
@@ -78,7 +79,7 @@ public abstract class UITweener : IgnoreTimeScale
 
 	float mStartTime = 0f;
 	float mDuration = 0f;
-	float mAmountPerDelta = 1000f;
+	float mAmountPerDelta = 1f;
 	float mFactor = 0f;
 
 	/// <summary>
@@ -156,13 +157,11 @@ public abstract class UITweener : IgnoreTimeScale
 			}
 		}
 
-		// Sample the tween at the current factor
-		Sample(mFactor);
-
 		// If the factor goes out of range and this is a one-time tweening operation, disable the script
-		if (style == Style.Once && (mFactor > 1f || mFactor < 0f))
+		if ((style == Style.Once) && (mFactor > 1f || mFactor < 0f))
 		{
 			mFactor = Mathf.Clamp01(mFactor);
+			Sample(mFactor, true);
 
 			if (string.IsNullOrEmpty(callWhenFinished))
 			{
@@ -183,13 +182,14 @@ public abstract class UITweener : IgnoreTimeScale
 				}
 			}
 		}
+		else Sample(mFactor, false);
 	}
 
 	/// <summary>
 	/// Sample the tween at the specified factor.
 	/// </summary>
 
-	public void Sample (float factor)
+	public void Sample (float factor, bool isFinished)
 	{
 		// Calculate the sampling value
 		float val = Mathf.Clamp01(factor);
@@ -223,30 +223,41 @@ public abstract class UITweener : IgnoreTimeScale
 				val = sign * val * 0.5f + 0.5f;
 			}
 		}
-		else if (method == Method.Bounce)
+		else if (method == Method.BounceIn)
 		{
-			if (val < 0.363636f) // (1 / 2.75) = 0.363636
-			{
-				val = 7.5685f * val * val;
-			}
-			else if (val < 0.727272f) // (2 / 2.75) = 0.727272
-			{
-				// (1.5 / 2.75) = 0.545454
-				val = 7.5625f * (val -= 0.545454f) * val + 0.75f;
-			}
-			else if (val < 0.909090f) // (2.5 / 2.75) = 0.909090
-			{
-				// (2.25 / 2.75) = 0.818181
-				val = 7.5625f * (val -= 0.818181f) * val + 0.9375f;
-			}
-			else
-			{
-				// (2.625 / 2.75) = 0.9545454
-				val = 7.5625f * (val -= 0.9545454f) * val + 0.984375f;
-			}
+			val = BounceLogic(val);
 		}
+		else if (method == Method.BounceOut)
+		{
+			val = 1f - BounceLogic(1f - val);
+		}
+
 		// Call the virtual update
-		OnUpdate(val);
+		OnUpdate(val, isFinished);
+	}
+
+	/// <summary>
+	/// Main Bounce logic to simplify the Sample function
+	/// </summary>
+	private float BounceLogic(float val)
+	{
+		if (val < 0.363636f) // 0.363636f changed from (1/ 2.75f) for speed reasons.
+		{
+			val = 7.5685f * val * val;
+		}
+		else if (val < 0.727272f) // 0.727272f changed from (2/ 2.75f) for speed reasons.
+		{
+			val = 7.5625f * (val -= 0.545454f) * val + 0.75f; // 0.545454f changed from (1.5f / 2.75f) for speed reasons.
+		}
+		else if (val < 0.909090f) // 0.909090f changed from (2.5 / 2.75f) for speed reasons.
+		{
+			val = 7.5625f * (val -= 0.818181f) * val + 0.9375f; // 0.818181f changed from (2.25f / 2.75f) for speed reasons.
+		}
+		else
+		{
+			val = 7.5625f * (val -= 0.9545454f) * val + 0.984375f; // 0.9545454f changed from (2.625f / 2.75f) for speed reasons.
+		}
+		return val;
 	}
 
 	/// <summary>
@@ -255,21 +266,10 @@ public abstract class UITweener : IgnoreTimeScale
 
 	public void Play (bool forward)
 	{
-		mStartTime = Time.realtimeSinceStartup + delay;
 		mAmountPerDelta = Mathf.Abs(amountPerDelta);
 		if (!forward) mAmountPerDelta = -mAmountPerDelta;
 		enabled = true;
-
-		if (duration <= 0f)
-		{
-			mFactor = forward ? 1f : 0f;
-			Sample(mFactor);
-			enabled = false;
-		}
 	}
-
-	[System.Obsolete("Use Tweener.Play instead")]
-	public void Animate (bool forward) { Play(forward); }
 
 	/// <summary>
 	/// Manually reset the tweener's state to the beginning.
@@ -298,7 +298,7 @@ public abstract class UITweener : IgnoreTimeScale
 	/// Actual tweening logic should go here.
 	/// </summary>
 
-	abstract protected void OnUpdate (float factor);
+	abstract protected void OnUpdate (float factor, bool isFinished);
 
 	/// <summary>
 	/// Starts the tweening operation.
@@ -319,8 +319,7 @@ public abstract class UITweener : IgnoreTimeScale
 
 		if (duration <= 0f)
 		{
-			comp.mFactor = 1f;
-			comp.Sample(comp.mFactor);
+			comp.Sample(1f, true);
 			comp.enabled = false;
 		}
 		return comp;

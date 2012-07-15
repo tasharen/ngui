@@ -88,6 +88,7 @@ public class UIPanel : MonoBehaviour
 	bool mDepthChanged = false;
 	bool mRebuildAll = false;
 	bool mChangedLastFrame = false;
+	bool mWidgetsAdded = false;
 
 	float mMatrixTime = 0f;
 	Matrix4x4 mWorldToLocal = Matrix4x4.identity;
@@ -447,6 +448,7 @@ public class UIPanel : MonoBehaviour
 						mChangedLastFrame = true;
 					}
 					mDepthChanged = true;
+					mWidgetsAdded = true;
 				}
 			}
 			else
@@ -575,10 +577,10 @@ public class UIPanel : MonoBehaviour
 			{
 				// Check the parent's flag
 #if UNITY_FLASH
-				if (mChildren.TryGetValue(trans, out sub))
+				if (trans != null && mChildren.TryGetValue(trans, out sub))
 				{
 #else
-				if (mChildren.Contains(trans))
+				if (trans != null && mChildren.Contains(trans))
 				{
 					sub = (UINode)mChildren[trans];
 #endif
@@ -647,10 +649,10 @@ public class UIPanel : MonoBehaviour
 		bool transformsChanged = false;
 #if UNITY_EDITOR
 		bool shouldCull = !Application.isPlaying || Time.realtimeSinceStartup > mCullTime;
-		if (!Application.isPlaying || !widgetsAreStatic || shouldCull != mCulled)
+		if (!Application.isPlaying || !widgetsAreStatic || mWidgetsAdded || shouldCull != mCulled)
 #else
 		bool shouldCull = Time.realtimeSinceStartup > mCullTime;
-		if (!widgetsAreStatic || shouldCull != mCulled)
+		if (!widgetsAreStatic || mWidgetsAdded || shouldCull != mCulled)
 #endif
 		{
 #if UNITY_FLASH
@@ -735,6 +737,7 @@ public class UIPanel : MonoBehaviour
 		}
 		mCulled = shouldCull;
 		mCheckVisibility = false;
+		mWidgetsAdded = false;
 	}
 
 	/// <summary>

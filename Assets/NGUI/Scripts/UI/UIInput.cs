@@ -197,7 +197,14 @@ public class UIInput : MonoBehaviour
 #if UNITY_3_4
 					mKeyboard = iPhoneKeyboard.Open(mText, (iPhoneKeyboardType)((int)type));
 #else
-					mKeyboard = TouchScreenKeyboard.Open(mText, (TouchScreenKeyboardType)((int)type));
+					if (isPassword)
+					{
+						mKeyboard = TouchScreenKeyboard.Open(mText, TouchScreenKeyboardType.Default, false, false, true);
+					}
+					else
+					{
+						mKeyboard = TouchScreenKeyboard.Open(mText, (TouchScreenKeyboardType)((int)type));
+					}
 #endif
 				}
 				else
@@ -274,7 +281,7 @@ public class UIInput : MonoBehaviour
 #else
 	void Update ()
 	{
-		if (mLastIME != Input.compositionString)
+		if (selected && mLastIME != Input.compositionString)
 		{
 			mLastIME = Input.compositionString;
 			UpdateLabel();

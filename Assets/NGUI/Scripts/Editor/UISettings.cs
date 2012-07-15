@@ -17,6 +17,7 @@ public class UISettings
 	static bool mLoaded = false;
 	static UIFont mFont;
 	static UIAtlas mAtlas;
+	static UIWidget.Pivot mPivot = UIWidget.Pivot.Center;
 	static TextAsset mFontData;
 	static Texture2D mFontTexture;
 	static string mFontName = "New Font";
@@ -43,6 +44,7 @@ public class UISettings
 		mPreview		= EditorPrefs.GetInt("NGUI Preview") == 0;
 		mAtlasPadding	= EditorPrefs.GetInt("NGUI Atlas Padding", 1);
 		mAtlasTrimming	= EditorPrefs.GetBool("NGUI Atlas Trimming", true);
+		mPivot			= (UIWidget.Pivot)EditorPrefs.GetInt("NGUI Pivot", (int)mPivot);
 	}
 
 	static void Save ()
@@ -56,6 +58,7 @@ public class UISettings
 		EditorPrefs.SetInt("NGUI Preview", mPreview ? 0 : 1);
 		EditorPrefs.SetInt("NGUI Atlas Padding", mAtlasPadding);
 		EditorPrefs.SetBool("NGUI Atlas Trimming", mAtlasTrimming);
+		EditorPrefs.SetInt("NGUI Pivot", (int)mPivot);
 	}
 
 	/// <summary>
@@ -97,6 +100,27 @@ public class UISettings
 			{
 				mAtlas = value;
 				mAtlasName = (mAtlas != null) ? mAtlas.name : "New Atlas";
+				Save();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Default pivot point used by sprites.
+	/// </summary>
+
+	static public UIWidget.Pivot pivot
+	{
+		get
+		{
+			if (!mLoaded) Load();
+			return mPivot;
+		}
+		set
+		{
+			if (mPivot != value)
+			{
+				mPivot = value;
 				Save();
 			}
 		}

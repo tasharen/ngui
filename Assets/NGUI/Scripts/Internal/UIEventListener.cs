@@ -54,7 +54,4 @@ public class UIEventListener : MonoBehaviour
 		if (listener == null) listener = go.AddComponent<UIEventListener>();
 		return listener;
 	}
-
-	[System.Obsolete("Please use UIEventListener.Get instead of UIEventListener.Add")]
-	static public UIEventListener Add (GameObject go) { return Get(go); }
 }

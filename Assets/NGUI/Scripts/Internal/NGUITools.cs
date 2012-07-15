@@ -294,54 +294,6 @@ static public class NGUITools
 	}
 
 	/// <summary>
-	/// Want to swap a low-res atlas for a hi-res one? Just use this function.
-	/// </summary>
-
-	[Obsolete("Use UIAtlas.replacement instead")]
-	static public void ReplaceAtlas (UIAtlas before, UIAtlas after)
-	{
-		UISprite[] sprites = NGUITools.FindActive<UISprite>();
-
-		for (int i = 0, imax = sprites.Length; i < imax; ++i)
-		{
-			UISprite sprite = sprites[i];
-
-			if (sprite.atlas == before)
-			{
-				sprite.atlas = after;
-			}
-		}
-
-		UILabel[] labels = NGUITools.FindActive<UILabel>();
-
-		for (int i = 0, imax = labels.Length; i < imax; ++i)
-		{
-			UILabel lbl = labels[i];
-
-			if (lbl.font != null && lbl.font.atlas == before)
-			{
-				lbl.font.atlas = after;
-			}
-		}
-	}
-
-	/// <summary>
-	/// Want to swap a low-res font for a hi-res one? This is the way.
-	/// </summary>
-
-	[Obsolete("Use UIFont.replacement instead")]
-	static public void ReplaceFont (UIFont before, UIFont after)
-	{
-		UILabel[] labels = NGUITools.FindActive<UILabel>();
-
-		for (int i = 0, imax = labels.Length; i < imax; ++i)
-		{
-			UILabel lbl = labels[i];
-			if (lbl.font == before) lbl.font = after;
-		}
-	}
-
-	/// <summary>
 	/// Helper function that returns the string name of the type.
 	/// </summary>
 
@@ -577,6 +529,23 @@ static public class NGUITools
 		else
 		{
 			Deactivate(go.transform);
+		}
+	}
+
+	/// <summary>
+	/// Recursively set the game object's layer.
+	/// </summary>
+
+	static public void SetLayer (GameObject go, int layer)
+	{
+		go.layer = layer;
+
+		Transform t = go.transform;
+		
+		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
+		{
+			Transform child = t.GetChild(i);
+			SetLayer(child.gameObject, layer);
 		}
 	}
 

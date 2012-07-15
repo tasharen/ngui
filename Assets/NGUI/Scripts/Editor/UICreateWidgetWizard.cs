@@ -235,8 +235,15 @@ public class UICreateWidgetWizard : EditorWindow
 			{
 				GUILayout.Space(20f);
 				GUILayout.Label("Sprite that will be created");
+				GUILayout.EndHorizontal();
+
+				GUILayout.BeginHorizontal();
+				UISettings.pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", UISettings.pivot, GUILayout.Width(200f));
+				GUILayout.Space(20f);
+				GUILayout.Label("Initial pivot point used by the sprite");
+				GUILayout.EndHorizontal();
 			}
-			GUILayout.EndHorizontal();
+			else GUILayout.EndHorizontal();
 
 			if (sp != field)
 			{
@@ -251,6 +258,7 @@ public class UICreateWidgetWizard : EditorWindow
 			sprite.name = sprite.name + " (" + field + ")";
 			sprite.atlas = UISettings.atlas;
 			sprite.spriteName = field;
+			sprite.pivot = UISettings.pivot;
 			sprite.MakePixelPerfect();
 			Selection.activeGameObject = sprite.gameObject;
 		}

@@ -41,5 +41,14 @@ public class UISpriteAnimationInspector : Editor
 			anim.namePrefix = namePrefix;
 			EditorUtility.SetDirty(anim);
 		}
+
+		bool loop = EditorGUILayout.Toggle("Loop", anim.loop);
+
+		if (anim.loop != loop)
+		{
+			NGUIEditorTools.RegisterUndo("Sprite Animation Change", anim);
+			anim.loop = loop;
+			EditorUtility.SetDirty(anim);
+		}
 	}
 }

@@ -18,6 +18,14 @@ public class UIImageButton : MonoBehaviour
 	public string hoverSprite;
 	public string pressedSprite;
 
+	void OnEnable ()
+	{
+		if (target != null)
+		{
+			target.spriteName = UICamera.IsHighlighted(gameObject) ? hoverSprite : normalSprite;
+		}
+	}
+
 	void Start ()
 	{
 		if (target == null) target = GetComponentInChildren<UISprite>();

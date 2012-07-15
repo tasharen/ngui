@@ -1,5 +1,7 @@
-fileFormatVersion: 1
+fileFormatVersion: 2
 guid: c4850261060aea044ae098e8e9979e62
 MonoImporter:
-  importerVersion: 1
+  serializedVersion: 2
+  defaultReferences: []
   executionOrder: -300
+  icon: {instanceID: 0}
