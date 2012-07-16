@@ -169,6 +169,7 @@ public class UIButtonPlayAnimation : MonoBehaviour
 				anim.eventReceiver = eventReceiver;
 				anim.callWhenFinished = callWhenFinished;
 			}
+			else anim.eventReceiver = null;
 		}
 	}
 }

@@ -17,6 +17,12 @@ public class UIRoot : MonoBehaviour
 {
 	static List<UIRoot> mRoots = new List<UIRoot>();
 
+	/// <summary>
+	/// List of all UIRoots present in the scene.
+	/// </summary>
+
+	static public List<UIRoot> list { get { return mRoots; } }
+
 	public bool automatic = true;
 	public int manualHeight = 800;
 

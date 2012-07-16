@@ -72,7 +72,7 @@ public class DragDropItem : MonoBehaviour
 
 	void OnDrag (Vector2 delta)
 	{
-		if (UICamera.currentTouchID == -1)
+		if (UICamera.currentTouchID > -2)
 		{
 			if (!mIsDragging)
 			{

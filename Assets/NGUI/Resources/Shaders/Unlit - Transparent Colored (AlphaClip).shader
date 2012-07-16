@@ -29,7 +29,6 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-
 			#include "UnityCG.cginc"
 
 			sampler2D _MainTex;
@@ -38,14 +37,14 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 			struct appdata_t
 			{
 				float4 vertex : POSITION;
-				fixed4 color : COLOR;
+				half4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
 			};
 
 			struct v2f
 			{
 				float4 vertex : POSITION;
-				fixed4 color : COLOR;
+				half4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
 				float2 worldPos : TEXCOORD1;
 			};
@@ -60,11 +59,11 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 				return o;
 			}
 
-			fixed4 frag (v2f IN) : COLOR
+			half4 frag (v2f IN) : COLOR
 			{
 				// Sample the texture
-				fixed4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
-				
+				half4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
+
 				float2 factor = abs(IN.worldPos);
 				float val = 1.0 - max(factor.x, factor.y);
 

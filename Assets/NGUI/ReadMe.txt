@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.0.9
+                Version 2.1.0
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,27 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.1.0:
+- NEW: Now maintained under Unity 3.5.3.
+- NEW: BetterList now has Insert and Contains functions.
+- NEW: UITweener now has bounce style tweening methods.
+- NEW: UITweener's OnUpdate function now has "isFinished" parameter that's set to 'true' if it's the last update.
+- NEW: TweenTransform is now capable of re-parenting the object when finished.
+- NEW: Added TweenVolume that can tween an audio source's volume.
+- NEW: UICamera now has a new property: "Generic Event Handler". If set, this object will receive a copy of all events regardless of where they go.
+- NEW: Widget Wizard now lets you specify an initial pivot point for sprites.
+- NEW: UISpriteAnimation now has an option to not loop the animation anymore, and can tell you how many frames it has.
+- NEW: Added TweenFOV that can be used to tween camera's field of view.
+- NEW: Added a UISoundVolume script that can change the volume of the sounds used by NGUITools.PlaySound when attached to a slider.
+- FIX: UIInput will now bring up a proper password keyboard on touch-based devices.
+- FIX: UIImageButton will now set the correct sprite when it's enabled while highlighted.
+- FIX: DragDropItem example script will now work on touch-based devices.
+- FIX: UIButtonPlayAnimation will now clear the event receiver if none was specified.
+- FIX: Various changes to UICamera, making it more touch-device friendly.
+- FIX: UIPanels marked as static will now update their geometry when new widgets get added.
+- FIX: Shaders no longer use "fixed" data type as it seems to have issues on certain devices.
+- DEL: Removed old deprecated functions in order to clean up the code.
 
 2.0.9:
 - NEW: UITable can now return its list of children (in sorted order) via UITable.children.

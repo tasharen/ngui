@@ -38,14 +38,14 @@ Shader "Unlit/Transparent Colored (HardClip)"
 			struct appdata_t
 			{
 				float4 vertex : POSITION;
-				fixed4 color : COLOR;
+				half4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
 			};
 
 			struct v2f
 			{
 				float4 vertex : POSITION;
-				fixed4 color : COLOR;
+				half4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
 				float2 worldPos : TEXCOORD1;
 			};
@@ -60,7 +60,7 @@ Shader "Unlit/Transparent Colored (HardClip)"
 				return o;
 			}
 
-			fixed4 frag (v2f IN) : COLOR
+			half4 frag (v2f IN) : COLOR
 			{
 				float2 factor = abs(IN.worldPos);
 				clip(1.0 - max(factor.x, factor.y));

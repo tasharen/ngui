@@ -17,11 +17,19 @@ public class UISpriteAnimation : MonoBehaviour
 {
 	[HideInInspector][SerializeField] int mFPS = 30;
 	[HideInInspector][SerializeField] string mPrefix = "";
+	[HideInInspector][SerializeField] bool mLoop = true;
 
 	UISprite mSprite;
 	float mDelta = 0f;
 	int mIndex = 0;
+	bool mActive = true;
 	List<string> mSpriteNames = new List<string>();
+
+	/// <summary>
+	/// Number of frames in the animation.
+	/// </summary>
+
+	public int frames { get { return mSpriteNames.Count; } }
 
 	/// <summary>
 	/// Animation framerate.
@@ -36,6 +44,18 @@ public class UISpriteAnimation : MonoBehaviour
 	public string namePrefix { get { return mPrefix; } set { if (mPrefix != value) { mPrefix = value; RebuildSpriteList(); } } }
 
 	/// <summary>
+	/// Set the animation to be looping or not
+	/// </summary>
+
+	public bool loop { get { return mLoop; } set { mLoop = value; } }
+
+	/// <summary>
+	/// Returns is the animation is still playing or not
+	/// </summary>
+
+	public bool isDone { get { return mActive; } }
+
+	/// <summary>
 	/// Rebuild the sprite list first thing.
 	/// </summary>
 
@@ -47,17 +67,26 @@ public class UISpriteAnimation : MonoBehaviour
 
 	void Update ()
 	{
-		if (mSpriteNames.Count > 1 && Application.isPlaying && mFPS > 0f)
+		if (mActive && mSpriteNames.Count > 1 && Application.isPlaying && mFPS > 0f)
 		{
 			mDelta += Time.deltaTime;
 			float rate = 1f / mFPS;
 
 			if (rate < mDelta)
 			{
+				
 				mDelta = (rate > 0f) ? mDelta - rate : 0f;
-				if (++mIndex >= mSpriteNames.Count) mIndex = 0;
-				mSprite.spriteName = mSpriteNames[mIndex];
-				mSprite.MakePixelPerfect();
+				if (++mIndex >= mSpriteNames.Count)
+				{
+					mIndex = 0;
+					mActive = loop;
+				}
+
+				if (mActive)
+				{
+					mSprite.spriteName = mSpriteNames[mIndex];
+					mSprite.MakePixelPerfect();
+				}
 			}
 		}
 	}
@@ -86,5 +115,15 @@ public class UISpriteAnimation : MonoBehaviour
 			}
 			mSpriteNames.Sort();
 		}
+	}
+	
+	/// <summary>
+	/// Reset the animation to frame 0 and activate it.
+	/// </summary>
+	
+	public void Reset()
+	{
+		mActive = true;
+		mIndex = 0;
 	}
 }
