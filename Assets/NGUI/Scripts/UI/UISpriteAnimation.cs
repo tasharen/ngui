@@ -53,7 +53,7 @@ public class UISpriteAnimation : MonoBehaviour
 	/// Returns is the animation is still playing or not
 	/// </summary>
 
-	public bool isPlaying { get { return mActive; } }
+	public bool isDone { get { return mActive; } }
 
 	/// <summary>
 	/// Rebuild the sprite list first thing.
