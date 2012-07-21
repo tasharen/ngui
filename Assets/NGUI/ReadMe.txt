@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.1.0
+                Version 2.1.1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,16 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.1.1:
+- NEW: New texture packer, alternative to using Unity's built-in one. Default is still Unity for backwards compatibilty.
+- NEW: Added a different line wrapping functionality for input fields contributed by MightyM.
+- NEW: UILocalize now has a "Localize" function you can trigger to make it force-localize whatever it's on.
+- NEW: UITweener now has an option to not ignore timeScale.
+- FIX: Fixed a "drifting panel" issue introduced in the last update.
+- FIX: Added a warning for slider thumb used with radially filled sliders (not supported).
+- FIX: ActiveAnimation will now clear its event receiver and callback on Play.
+- FIX: UISpriteAnimation.isDone is now UISpriteAnimation.isPlaying, and is no longer backwards.
 
 2.1.0:
 - NEW: Now maintained under Unity 3.5.3.

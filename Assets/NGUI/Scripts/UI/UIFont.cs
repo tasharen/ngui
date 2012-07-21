@@ -484,6 +484,57 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Different line wrapping functionality -- contributed by MightyM.
+	/// http://www.tasharen.com/forum/index.php?topic=1049.0
+	/// </summary>
+
+	public string GetEndOfLineThatFits (string text, float maxWidth, bool encoding, SymbolStyle symbolStyle)
+	{
+		int lineWidth = Mathf.RoundToInt(maxWidth * size);
+		if (lineWidth < 1) return text;
+
+		int textLength = text.Length;
+		int remainingWidth = lineWidth;
+		BMGlyph followingGlyph = null;
+		int currentCharacterIndex = textLength;
+
+		while (currentCharacterIndex > 0 && remainingWidth > 0)
+		{
+			char currentCharacter = text[--currentCharacterIndex];
+
+			// See if there is a symbol matching this text
+			BMSymbol symbol = (encoding && symbolStyle != SymbolStyle.None) ? mFont.MatchSymbol(text, currentCharacterIndex, textLength) : null;
+
+			// Find the glyph for this character
+			BMGlyph glyph = (symbol == null) ? mFont.GetGlyph(currentCharacter) : null;
+
+			// Calculate how wide this symbol or character is going to be
+			int glyphWidth = mSpacingX;
+
+			if (symbol != null)
+			{
+				glyphWidth += symbol.width;
+			}
+			else if (glyph != null)
+			{
+				glyphWidth += glyph.advance + ((followingGlyph == null) ? 0 : followingGlyph.GetKerning(currentCharacter));
+				followingGlyph = glyph;
+			}
+			else
+			{
+				followingGlyph = null;
+				continue;
+			}
+
+			// Remaining width after this glyph gets printed
+			remainingWidth -= glyphWidth;
+		}
+		if (remainingWidth < 0) ++currentCharacterIndex;
+		return text.Substring(currentCharacterIndex, textLength - currentCharacterIndex);
+	}
+
+
+	/// <summary>
 	/// Text wrapping functionality. The 'maxWidth' should be in local coordinates (take pixels and divide them by transform's scale).
 	/// </summary>
 

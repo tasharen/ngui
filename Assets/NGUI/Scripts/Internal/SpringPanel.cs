@@ -52,12 +52,7 @@ public class SpringPanel : IgnoreTimeScale
 		mPanel.clipRange = cr;
 
 		if (mDrag != null) mDrag.UpdateScrollbars(false);
-
-		if (mThreshold >= (target - mTrans.localPosition).magnitude)
-		{
-			mTrans.localPosition = target;
-			enabled = false;
-		}
+		if (mThreshold >= (target - mTrans.localPosition).magnitude) enabled = false;
 	}
 
 	/// <summary>

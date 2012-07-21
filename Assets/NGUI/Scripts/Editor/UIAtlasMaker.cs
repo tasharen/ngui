@@ -89,7 +89,10 @@ public class UIAtlasMaker : EditorWindow
 		Texture2D[] textures = new Texture2D[sprites.Count];
 		for (int i = 0; i < sprites.Count; ++i) textures[i] = sprites[i].tex;
 
-		Rect[] rects = tex.PackTextures(textures, UISettings.atlasPadding, 4096);
+		Rect[] rects;
+
+		if (UISettings.unityPacking) rects = tex.PackTextures(textures, UISettings.atlasPadding, 4096);
+		else rects = UITexturePacker.PackTextures(tex, textures, tex.width, tex.height, UISettings.atlasPadding, 4096);
 
 		for (int i = 0; i < sprites.Count; ++i)
 		{
@@ -224,7 +227,7 @@ public class UIAtlasMaker : EditorWindow
 				for (int x = 0, xw = oldWidth; x < xw; ++x)
 				{
 					Color32 c = pixels[y * xw + x];
-					
+
 					if (c.a != 0)
 					{
 						if (y < ymin) ymin = y;
@@ -426,10 +429,18 @@ public class UIAtlasMaker : EditorWindow
 		string oldPath = (tex != null) ? AssetDatabase.GetAssetPath(tex.GetInstanceID()) : "";
 		string newPath = NGUIEditorTools.GetSaveableTexturePath(atlas);
 
+		// Clear the read-only flag in texture file attributes
+		if (System.IO.File.Exists(newPath))
+		{
+			System.IO.FileAttributes newPathAttrs = System.IO.File.GetAttributes(newPath);
+			newPathAttrs &= ~System.IO.FileAttributes.ReadOnly;
+			System.IO.File.SetAttributes(newPath, newPathAttrs);
+		}
+
 		if (tex == null || oldPath != newPath)
 		{
 			// Create a new texture for the atlas
-			tex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+			tex = new Texture2D(1, 1, TextureFormat.ARGB32, false);
 
 			// Pack the sprites into this texture
 			PackTextures(tex, sprites);
@@ -616,7 +627,7 @@ public class UIAtlasMaker : EditorWindow
 #if UNITY_3_4
 					Object prefab = (go != null) ? go : EditorUtility.CreateEmptyPrefab(prefabPath); 
 #else
-					Object prefab = (go != null) ? go :	PrefabUtility.CreateEmptyPrefab(prefabPath);
+					Object prefab = (go != null) ? go : PrefabUtility.CreateEmptyPrefab(prefabPath);
 #endif
 					// Create a new game object for the atlas
 					go = new GameObject(UISettings.atlasName);
@@ -683,10 +694,19 @@ public class UIAtlasMaker : EditorWindow
 			}
 			GUILayout.EndHorizontal();
 
-			// Padding and trimming
 			GUILayout.BeginHorizontal();
 			UISettings.atlasPadding = Mathf.Clamp(EditorGUILayout.IntField("Padding", UISettings.atlasPadding, GUILayout.Width(100f)), 0, 8);
-			UISettings.atlasTrimming = EditorGUILayout.Toggle("Trim Alpha", UISettings.atlasTrimming);
+			GUILayout.Label("in pixels in-between of sprites");
+			GUILayout.EndHorizontal();
+
+			GUILayout.BeginHorizontal();
+			UISettings.atlasTrimming = EditorGUILayout.Toggle("Trim Alpha", UISettings.atlasTrimming, GUILayout.Width(100f));
+			GUILayout.Label("Remove empty space");
+			GUILayout.EndHorizontal();
+
+			GUILayout.BeginHorizontal();
+			UISettings.unityPacking = EditorGUILayout.Toggle("Unity Packer", UISettings.unityPacking, GUILayout.MinWidth(100f));
+			GUILayout.Label("if off, use a custom packer");
 			GUILayout.EndHorizontal();
 
 			if (textures.Count > 0)

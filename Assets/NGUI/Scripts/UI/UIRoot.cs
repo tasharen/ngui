@@ -28,13 +28,11 @@ public class UIRoot : MonoBehaviour
 
 	Transform mTrans;
 
-	void Awake () { mRoots.Add(this); }
+	void Awake () { mTrans = transform; mRoots.Add(this); }
 	void OnDestroy () { mRoots.Remove(this); }
 
 	void Start ()
 	{
-		mTrans = transform;
-
 		UIOrthoCamera oc = GetComponentInChildren<UIOrthoCamera>();
 		
 		if (oc != null)

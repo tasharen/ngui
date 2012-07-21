@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -27,7 +27,7 @@ public class IgnoreTimeScale : MonoBehaviour
 	/// Clear the started flag;
 	/// </summary>
 
-	void OnEnable ()
+	protected virtual void OnEnable ()
 	{
 		mTimeStarted = true;
 		mTimeDelta = 0f;

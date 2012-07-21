@@ -176,6 +176,8 @@ public class ActiveAnimation : IgnoreTimeScale
 		else aa = anim.gameObject.AddComponent<ActiveAnimation>();
 		aa.mAnim = anim;
 		aa.mDisableDirection = (Direction)(int)disableCondition;
+		aa.eventReceiver = null;
+		aa.callWhenFinished = null;
 		aa.Play(clipName, playDirection);
 		return aa;
 	}

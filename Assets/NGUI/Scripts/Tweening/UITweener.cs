@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -40,6 +40,12 @@ public abstract class UITweener : IgnoreTimeScale
 	/// </summary>
 
 	public Style style = Style.Once;
+
+	/// <summary>
+	/// Whether the tween will ignore the timescale, making it work while the game is paused.
+	/// </summary>
+
+	public bool ignoreTimeScale = true;
 
 	/// <summary>
 	/// How long will the tweener wait before starting the tween?
@@ -112,14 +118,16 @@ public abstract class UITweener : IgnoreTimeScale
 	public AnimationOrTween.Direction direction { get { return mAmountPerDelta < 0f ? AnimationOrTween.Direction.Reverse : AnimationOrTween.Direction.Forward; } }
 
 	/// <summary>
+	/// Record the starting time.
+	/// </summary>
+
+	protected override void OnEnable () { base.OnEnable(); mStartTime = Time.realtimeSinceStartup + delay; }
+
+	/// <summary>
 	/// Update on start, so there is no frame in-between.
 	/// </summary>
 
-	void Start ()
-	{
-		mStartTime = Time.realtimeSinceStartup + delay;
-		Update();
-	}
+	void Start () { Update(); }
 
 	/// <summary>
 	/// Update the tweening factor and call the virtual update function.
@@ -127,7 +135,7 @@ public abstract class UITweener : IgnoreTimeScale
 
 	void Update ()
 	{
-		float delta = UpdateRealTimeDelta();
+		float delta = ignoreTimeScale ? UpdateRealTimeDelta() : Time.deltaTime;
 		if (Time.realtimeSinceStartup < mStartTime) return;
 
 		// Advance the sampling factor
@@ -315,6 +323,8 @@ public abstract class UITweener : IgnoreTimeScale
 		comp.duration = duration;
 		comp.mFactor = 0f;
 		comp.style = Style.Once;
+		comp.eventReceiver = null;
+		comp.callWhenFinished = null;
 		comp.enabled = true;
 
 		if (duration <= 0f)

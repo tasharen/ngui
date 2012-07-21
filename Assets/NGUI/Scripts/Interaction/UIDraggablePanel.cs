@@ -188,7 +188,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 	/// Current momentum, exposed just in case it's needed.
 	/// </summary>
 
-	public Vector3 currentMomentum { get { return mMomentum; } set { mMomentum = value; } }
+	public Vector3 currentMomentum { get { return mMomentum; } set { mMomentum = value; mShouldMove = true; } }
 
 	/// <summary>
 	/// Cache the transform and the panel.

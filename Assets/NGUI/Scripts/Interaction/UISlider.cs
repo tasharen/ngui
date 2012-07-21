@@ -275,6 +275,10 @@ public class UISlider : IgnoreTimeScale
 					{
 						pos.y = mFGFilled.invert ? fullSize.y - scale.y : scale.y;
 					}
+					else
+					{
+						Debug.LogWarning("Slider thumb is only supported with Horizontal or Vertical fill direction", this);
+					}
 				}
 				else if (direction == Direction.Horizontal)
 				{

@@ -184,7 +184,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Check to ensure that the widget resides on the same layer as its panel.
 	/// </summary>
 
-	void CheckLayer ()
+	public void CheckLayer ()
 	{
 		if (mPanel != null && mPanel.gameObject.layer != gameObject.layer)
 		{
@@ -198,7 +198,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Checks to ensure that the widget is still parented to the right panel.
 	/// </summary>
 
-	void CheckParent ()
+	public void CheckParent ()
 	{
 		if (mPanel != null)
 		{

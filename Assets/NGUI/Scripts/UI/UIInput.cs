@@ -89,6 +89,8 @@ public class UIInput : MonoBehaviour
 	string mText = "";
 	string mDefaultText = "";
 	Color mDefaultColor = Color.white;
+	UIWidget.Pivot mPivot = UIWidget.Pivot.Left;
+	float mPosition = 0f;
 
 #if UNITY_IPHONE || UNITY_ANDROID
 #if UNITY_3_4
@@ -155,6 +157,8 @@ public class UIInput : MonoBehaviour
 			mDefaultText = label.text;
 			mDefaultColor = label.color;
 			label.supportEncoding = false;
+			mPivot = label.pivot;
+			mPosition = label.cachedTransform.localPosition.x;
 		}
 	}
 
@@ -237,6 +241,7 @@ public class UIInput : MonoBehaviour
 
 				label.showLastPasswordChar = false;
 				Input.imeCompositionMode = IMECompositionMode.Off;
+				RestoreLabel();
 			}
 		}
 	}
@@ -358,19 +363,47 @@ public class UIInput : MonoBehaviour
 
 			// Now wrap this text using the specified line width
 			label.supportEncoding = false;
-			processed = label.font.WrapText(processed, label.lineWidth / label.cachedTransform.localScale.x, 0, false, UIFont.SymbolStyle.None);
 
-			if (!label.multiLine)
+			if (label.multiLine)
 			{
-				// Split it up into lines
-				string[] lines = processed.Split(new char[] { '\n' });
-
-				// Only the last line should be visible
-				processed = (lines.Length > 0) ? lines[lines.Length - 1] : "";
+				processed = label.font.WrapText(processed, label.lineWidth / label.cachedTransform.localScale.x, 0, false, UIFont.SymbolStyle.None);
 			}
+			else
+			{
+				string fit = label.font.GetEndOfLineThatFits(processed, label.lineWidth / label.cachedTransform.localScale.x, false, UIFont.SymbolStyle.None);
+
+				if (fit != processed)
+				{
+					processed = fit;
+					Vector3 pos = label.cachedTransform.localPosition;
+					pos.x = mPosition + label.lineWidth;
+					label.cachedTransform.localPosition = pos;
+
+					if (mPivot == UIWidget.Pivot.Left) label.pivot = UIWidget.Pivot.Right;
+					else if (mPivot == UIWidget.Pivot.TopLeft) label.pivot = UIWidget.Pivot.TopRight;
+					else if (mPivot == UIWidget.Pivot.BottomLeft) label.pivot = UIWidget.Pivot.BottomLeft;
+				}
+				else RestoreLabel();
+			}
+
 			// Update the label's visible text
 			label.text = processed;
 			label.showLastPasswordChar = selected;
+		}
+	}
+
+	/// <summary>
+	/// Restore the input label's pivot point and position.
+	/// </summary>
+
+	void RestoreLabel ()
+	{
+		if (label != null)
+		{
+			label.pivot = mPivot;
+			Vector3 pos = label.cachedTransform.localPosition;
+			pos.x = mPosition;
+			label.cachedTransform.localPosition = pos;
 		}
 	}
 }
