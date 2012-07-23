@@ -81,18 +81,48 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
+	/// Used to sort the sprites by pixels used
+	/// </summary>
+	
+	static int Compare (SpriteEntry a, SpriteEntry b)
+	{
+		// A is null b is not b is greater so put it at the front of the list
+		if (a == null && b != null) return 1;
+
+		// A is not null b is null a is greater so put it at the front of the list
+		if (a == null && b != null) return -1;
+
+		// Get the total pixels used for each sprite
+		int aPixels = (int)(a.rect.height * a.rect.width);
+		int bPixels = (int)(b.rect.height * b.rect.width);
+
+		if (aPixels > bPixels) return -1;
+		else if (aPixels < bPixels) return 1;
+		return 0;
+	}
+
+	/// <summary>
 	/// Pack all of the specified sprites into a single texture, updating the outer and inner rects of the sprites as needed.
 	/// </summary>
 
 	static void PackTextures (Texture2D tex, List<SpriteEntry> sprites)
 	{
 		Texture2D[] textures = new Texture2D[sprites.Count];
-		for (int i = 0; i < sprites.Count; ++i) textures[i] = sprites[i].tex;
-
 		Rect[] rects;
 
-		if (UISettings.unityPacking) rects = tex.PackTextures(textures, UISettings.atlasPadding, 4096);
-		else rects = UITexturePacker.PackTextures(tex, textures, tex.width, tex.height, UISettings.atlasPadding, 4096);
+
+		if (UISettings.unityPacking)
+		{
+			for (int i = 0; i < sprites.Count; ++i) textures[i] = sprites[i].tex;
+
+			rects = tex.PackTextures(textures, UISettings.atlasPadding, 4096);
+		}
+		else
+		{
+			sprites.Sort(Compare);
+			for (int i = 0; i < sprites.Count; ++i) textures[i] = sprites[i].tex;
+			rects = UITexturePacker.PackTextures(tex, textures, 4, 4, UISettings.atlasPadding, 4096);
+		}
 
 		for (int i = 0; i < sprites.Count; ++i)
 		{

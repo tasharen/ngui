@@ -127,7 +127,7 @@ public abstract class UITweener : IgnoreTimeScale
 	/// Update on start, so there is no frame in-between.
 	/// </summary>
 
-	void Start () { Update(); }
+	void Start () { mStartTime = Time.realtimeSinceStartup + delay; Update(); }
 
 	/// <summary>
 	/// Update the tweening factor and call the virtual update function.

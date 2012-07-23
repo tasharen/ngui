@@ -932,16 +932,23 @@ public class UIPanel : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-		if (mDebugInfo == DebugInfo.Gizmos && mClipping != UIDrawCall.Clipping.None)
+		if (mDebugInfo == DebugInfo.Gizmos)
 		{
-			Vector2 size = new Vector2(mClipRange.z, mClipRange.w);
+			bool clip = (mClipping != UIDrawCall.Clipping.None);
+			Vector2 size = clip ? new Vector2(mClipRange.z, mClipRange.w) : Vector2.zero;
+
+			GameObject go = UnityEditor.Selection.activeGameObject;
+			bool selected = (go != null) && (NGUITools.FindInParents<UIPanel>(go) == this);
 
 			if (size.x == 0f) size.x = mScreenSize.x;
 			if (size.y == 0f) size.y = mScreenSize.y;
 
-			Gizmos.matrix = transform.localToWorldMatrix;
-			Gizmos.color = Color.magenta;
-			Gizmos.DrawWireCube(new Vector2(mClipRange.x, mClipRange.y), size);
+			if (selected || clip)
+			{
+				Gizmos.matrix = clip ? transform.localToWorldMatrix : mCam.transform.localToWorldMatrix;
+				Gizmos.color = clip ? Color.magenta : new Color(0.5f, 0f, 0.5f);
+				Gizmos.DrawWireCube(new Vector2(mClipRange.x, mClipRange.y), size);
+			}
 		}
 	}
 #endif

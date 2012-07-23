@@ -34,3 +34,7 @@
 /Build_Data
 *.exe
 /Library
+/Assets/AssetStore
+/Assets/AssetStore.meta
+/Assets/AssetStoreTools.meta
+/Assets/AssetStoreTools
