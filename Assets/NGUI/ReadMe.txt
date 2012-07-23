@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.1.1
+                Version 2.1.2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,11 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.1.2:
+- NEW: Selected widgets now show their panel's bounding rect, which is the screen's rect if the panel isn't clipped.
+- FIX: Tweens that have not been added dynamically will start playing correctly.
+- FIX: Texture packer should now have better packing logic.
 
 2.1.1:
 - NEW: New texture packer, alternative to using Unity's built-in one. Default is still Unity for backwards compatibilty.
