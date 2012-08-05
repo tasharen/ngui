@@ -73,6 +73,12 @@ public class UIButtonTween : MonoBehaviour
 
 	public string callWhenFinished;
 
+	/// <summary>
+	/// Delegate to call. Faster than using 'eventReceiver', and allows for multiple receivers.
+	/// </summary>
+
+	public UITweener.OnFinished onFinished;
+
 	UITweener[] mTweens;
 	bool mStarted = false;
 	bool mHighlighted = false;
@@ -229,6 +235,9 @@ public class UIButtonTween : MonoBehaviour
 					if (playDirection == Direction.Toggle) tw.Toggle();
 					else tw.Play(forward);
 					if (resetOnPlay) tw.Reset();
+
+					// Set the delegate
+					tw.onFinished = onFinished;
 
 					// Copy the event receiver
 					if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))

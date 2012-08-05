@@ -17,7 +17,7 @@ public class UIPanelInspector : Editor
 	public override void OnInspectorGUI ()
 	{
 		UIPanel panel = target as UIPanel;
-		List<UIDrawCall> drawcalls = panel.drawCalls;
+		BetterList<UIDrawCall> drawcalls = panel.drawCalls;
 		EditorGUIUtility.LookLikeControls(80f);
 
 		NGUIEditorTools.DrawSeparator();
@@ -65,8 +65,8 @@ public class UIPanelInspector : Editor
 			EditorUtility.SetDirty(panel);
 		}
 
-		EditorGUILayout.LabelField("Widgets", panel.widgets.Count.ToString());
-		EditorGUILayout.LabelField("Draw Calls", drawcalls.Count.ToString());
+		EditorGUILayout.LabelField("Widgets", panel.widgets.size.ToString());
+		EditorGUILayout.LabelField("Draw Calls", drawcalls.size.ToString());
 
 		UIPanel.DebugInfo di = (UIPanel.DebugInfo)EditorGUILayout.EnumPopup("Debug Info", panel.debugInfo);
 

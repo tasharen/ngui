@@ -27,14 +27,17 @@ public class DownloadTexture : MonoBehaviour
 		if (mTex != null)
 		{
 			UITexture ut = GetComponent<UITexture>();
-			
+
 			if (ut.material == null)
 			{
-				Shader shader = Shader.Find("Unlit/Transparent Colored");
-				mMat = new Material(shader);
-				ut.material = mMat;
+				mMat = new Material(Shader.Find("Unlit/Transparent Colored"));
 			}
-			ut.material.mainTexture = mTex;
+			else
+			{
+				mMat = new Material(ut.material);
+			}
+			ut.material = mMat;
+			mMat.mainTexture = mTex;
 			ut.MakePixelPerfect();
 		}
 		www.Dispose();

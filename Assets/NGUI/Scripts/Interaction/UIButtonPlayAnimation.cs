@@ -74,6 +74,12 @@ public class UIButtonPlayAnimation : MonoBehaviour
 
 	public string callWhenFinished;
 
+	/// <summary>
+	/// Delegate to call. Faster than using 'eventReceiver', and allows for multiple receivers.
+	/// </summary>
+
+	public ActiveAnimation.OnFinished onFinished;
+
 	bool mStarted = false;
 	bool mHighlighted = false;
 
@@ -162,6 +168,9 @@ public class UIButtonPlayAnimation : MonoBehaviour
 			Direction dir = forward ? playDirection : ((Direction)pd);
 			ActiveAnimation anim = ActiveAnimation.Play(target, clipName, dir, ifDisabledOnPlay, disableWhenFinished);
 			if (resetOnPlay) anim.Reset();
+
+			// Set the delegate
+			anim.onFinished = onFinished;
 
 			// Copy the event receiver
 			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))

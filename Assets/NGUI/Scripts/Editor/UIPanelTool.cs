@@ -210,7 +210,7 @@ public class UIPanelTool : EditorWindow
 			panelName = ent.panel.name;
 			layer = LayerMask.LayerToName(ent.panel.gameObject.layer);
 			widgetCount = ent.widgets.Count.ToString();
-			drawCalls = ent.panel.drawCalls.Count.ToString();
+			drawCalls = ent.panel.drawCalls.size.ToString();
 			clipping = (ent.panel.clipping != UIDrawCall.Clipping.None) ? "Yes" : "";
 		}
 		else

@@ -14,6 +14,12 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/Interaction/Popup List")]
 public class UIPopupList : MonoBehaviour
 {
+	/// <summary>
+	/// Current popup list. Only available during the OnSelectionChange event callback.
+	/// </summary>
+
+	static public UIPopupList current;
+
 	const float animSpeed = 0.15f;
 
 	public enum Position
@@ -22,6 +28,8 @@ public class UIPopupList : MonoBehaviour
 		Above,
 		Below,
 	}
+
+	public delegate void OnSelectionChange (string item);
 
 	/// <summary>
 	/// Atlas used by the sprites.
@@ -119,6 +127,12 @@ public class UIPopupList : MonoBehaviour
 
 	public string functionName = "OnSelectionChange";
 
+	/// <summary>
+	/// Delegate that will be called when the selection changes. Faster than using the 'eventReceiver'.
+	/// </summary>
+
+	public OnSelectionChange onSelectionChange;
+
 	[HideInInspector][SerializeField] string mSelectedItem;
 	UIPanel mPanel;
 	GameObject mChild;
@@ -158,10 +172,14 @@ public class UIPopupList : MonoBehaviour
 #endif
 				}
 
+				current = this;
+				if (onSelectionChange != null) onSelectionChange(mSelectedItem);
+
 				if (eventReceiver != null && !string.IsNullOrEmpty(functionName) && Application.isPlaying)
 				{
 					eventReceiver.SendMessage(functionName, mSelectedItem, SendMessageOptions.DontRequireReceiver);
 				}
+				current = null;
 			}
 		}
 	}

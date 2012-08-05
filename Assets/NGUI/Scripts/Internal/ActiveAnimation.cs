@@ -15,6 +15,14 @@ using AnimationOrTween;
 [AddComponentMenu("NGUI/Internal/Active Animation")]
 public class ActiveAnimation : IgnoreTimeScale
 {
+	public delegate void OnFinished (ActiveAnimation anim);
+
+	/// <summary>
+	/// Delegate for subscriptions. Faster than using the 'eventReceiver' and allows for multiple receivers.
+	/// </summary>
+
+	public OnFinished onFinished;
+
 	/// <summary>
 	/// Game object on which to call the callback function.
 	/// </summary>
@@ -88,9 +96,12 @@ public class ActiveAnimation : IgnoreTimeScale
 			{
 				mNotify = false;
 
+				// Notify the delegate
+				if (onFinished != null) onFinished(this);
+
+				// Notify the event listener
 				if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
 				{
-					// Notify the event listener target
 					eventReceiver.SendMessage(callWhenFinished, this, SendMessageOptions.DontRequireReceiver);
 				}
 
@@ -178,6 +189,7 @@ public class ActiveAnimation : IgnoreTimeScale
 		aa.mDisableDirection = (Direction)(int)disableCondition;
 		aa.eventReceiver = null;
 		aa.callWhenFinished = null;
+		aa.onFinished = null;
 		aa.Play(clipName, playDirection);
 		return aa;
 	}

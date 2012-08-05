@@ -6,8 +6,7 @@
 using UnityEngine;
 
 /// <summary>
-/// This script can be used to anchor an object to the side of the screen,
-/// or scale an object to always match the dimensions of the screen.
+/// This script can be used to anchor an object to the side or corner of the screen, panel, or a widget.
 /// </summary>
 
 [ExecuteInEditMode]
@@ -27,39 +26,50 @@ public class UIAnchor : MonoBehaviour
 		Center,
 	}
 
-	public Camera uiCamera = null;
-	public Side side = Side.Center;
-	public bool halfPixelOffset = true;
-	public float depthOffset = 0f;
-	public Vector2 relativeOffset = Vector2.zero;
-
-	// Stretching is now done by a separate script -- UIStretch, as of version 1.90.
-	[HideInInspector][SerializeField] bool stretchToFill = false;
-
-	Transform mTrans;
 	bool mIsWindows = false;
 
 	/// <summary>
-	/// Cache the transform.
+	/// Camera used to determine the anchor bounds. Set automatically if none was specified.
 	/// </summary>
 
-	void Awake () { mTrans = transform; }
+	public Camera uiCamera = null;
 
 	/// <summary>
-	/// Legacy support.
+	/// Widget used to determine the container's bounds. Overwrites the camera-based anchoring if the value was specified.
 	/// </summary>
 
-	void Start ()
-	{
-		if (stretchToFill)
-		{
-			stretchToFill = false;
+	public UIWidget widgetContainer = null;
 
-			UIStretch stretch = gameObject.AddComponent<UIStretch>();
-			stretch.style = UIStretch.Style.Both;
-			stretch.uiCamera = uiCamera;
-		}
-	}
+	/// <summary>
+	/// Panel used to determine the container's bounds. Overwrites the widget-based anchoring if the value was specified.
+	/// </summary>
+
+	public UIPanel panelContainer = null;
+
+	/// <summary>
+	/// Side or corner to anchor to.
+	/// </summary>
+
+	public Side side = Side.Center;
+
+	/// <summary>
+	/// Whether a half-pixel offset will be applied on windows machines. Most of the time you'll want to leave this as 'true'.
+	/// This value is only used if the widget and panel containers were not specified.
+	/// </summary>
+
+	public bool halfPixelOffset = true;
+
+	/// <summary>
+	/// Depth offset applied to the anchored widget. Mainly useful for 3D UIs.
+	/// </summary>
+
+	public float depthOffset = 0f;
+
+	/// <summary>
+	/// Relative offset value, if any. For example "0.25" with 'side' set to Left, means 25% from the left side.
+	/// </summary>
+
+	public Vector2 relativeOffset = Vector2.zero;
 
 	/// <summary>
 	/// Automatically find the camera responsible for drawing the widgets under this object.
@@ -80,48 +90,77 @@ public class UIAnchor : MonoBehaviour
 
 	void Update ()
 	{
-		if (uiCamera != null)
+		Rect rect = new Rect();
+		bool useCamera = false;
+
+		if (panelContainer != null)
 		{
-			Rect rect = uiCamera.pixelRect;
-			float cx = (rect.xMin + rect.xMax) * 0.5f;
-			float cy = (rect.yMin + rect.yMax) * 0.5f;
-			Vector3 v = new Vector3(cx, cy, depthOffset);
-
-			if (side != Side.Center)
+			if (panelContainer.clipping == UIDrawCall.Clipping.None)
 			{
-				if (side == Side.Right || side == Side.TopRight || side == Side.BottomRight)
-				{
-					v.x = rect.xMax;
-				}
-				else if (side == Side.Top || side == Side.Center || side == Side.Bottom)
-				{
-					v.x = cx;
-				}
-				else
-				{
-					v.x = rect.xMin;
-				}
-
-				if (side == Side.Top || side == Side.TopRight || side == Side.TopLeft)
-				{
-					v.y = rect.yMax;
-				}
-				else if (side == Side.Left || side == Side.Center || side == Side.Right)
-				{
-					v.y = cy;
-				}
-				else
-				{
-					v.y = rect.yMin;
-				}
+				// Panel has no clipping -- just use the screen's dimensions
+				rect.xMin = -Screen.width * 0.5f;
+				rect.yMin = -Screen.height * 0.5f;
+				rect.xMax = -rect.xMin;
+				rect.yMax = -rect.yMin;
 			}
+			else
+			{
+				// Panel has clipping -- use it as the rect
+				Vector4 pos = panelContainer.clipRange;
+				rect.x = pos.x - (pos.z * 0.5f);
+				rect.y = pos.y - (pos.w * 0.5f);
+				rect.width = pos.z;
+				rect.height = pos.w;
+			}
+		}
+		else if (widgetContainer != null)
+		{
+			// Widget is used -- use its bounds as the container's bounds
+			Transform t = widgetContainer.cachedTransform;
+			Vector3 ls = t.localScale;
+			Vector3 lp = t.localPosition;
 
-			float screenWidth  = rect.width;
-			float screenHeight = rect.height;
+			Vector3 offset = widgetContainer.pivotOffset;
+			offset.y -= widgetContainer.relativeSize.y;
 
-			v.x += relativeOffset.x * screenWidth;
-			v.y += relativeOffset.y * screenHeight;
+			offset.x *= (widgetContainer.relativeSize.x * ls.x);
+			offset.y *= (widgetContainer.relativeSize.y * ls.y);
 
+			rect.x = lp.x + offset.x;
+			rect.y = lp.y + offset.y;
+			rect.width = ls.x;
+			rect.height = ls.y;
+		}
+		else if (uiCamera != null)
+		{
+			useCamera = true;
+			rect = uiCamera.pixelRect;
+		}
+		else return;
+
+		float cx = (rect.xMin + rect.xMax) * 0.5f;
+		float cy = (rect.yMin + rect.yMax) * 0.5f;
+		Vector3 v = new Vector3(cx, cy, depthOffset);
+
+		if (side != Side.Center)
+		{
+			if (side == Side.Right || side == Side.TopRight || side == Side.BottomRight) v.x = rect.xMax;
+			else if (side == Side.Top || side == Side.Center || side == Side.Bottom) v.x = cx;
+			else v.x = rect.xMin;
+
+			if (side == Side.Top || side == Side.TopRight || side == Side.TopLeft) v.y = rect.yMax;
+			else if (side == Side.Left || side == Side.Center || side == Side.Right) v.y = cy;
+			else v.y = rect.yMin;
+		}
+
+		float width  = rect.width;
+		float height = rect.height;
+
+		v.x += relativeOffset.x * width;
+		v.y += relativeOffset.y * height;
+
+		if (useCamera)
+		{
 			if (uiCamera.orthographic)
 			{
 				v.x = Mathf.RoundToInt(v.x);
@@ -138,7 +177,15 @@ public class UIAnchor : MonoBehaviour
 			v = uiCamera.ScreenToWorldPoint(v);
 
 			// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
-			if (mTrans.position != v) mTrans.position = v;
+			if (transform.position != v) transform.position = v;
+		}
+		else
+		{
+			v.x = Mathf.RoundToInt(v.x);
+			v.y = Mathf.RoundToInt(v.y);
+
+			// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
+			if (transform.localPosition != v) transform.localPosition = v;
 		}
 	}
 }

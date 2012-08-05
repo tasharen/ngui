@@ -19,6 +19,8 @@ public class UISlider : IgnoreTimeScale
 		Vertical,
 	}
 
+	public delegate void OnValueChange (float val);
+
 	/// <summary>
 	/// Current slider. This value is set prior to the callback function being triggered.
 	/// </summary>
@@ -60,6 +62,12 @@ public class UISlider : IgnoreTimeScale
 	/// </summary>
 
 	public string functionName = "OnSliderChange";
+
+	/// <summary>
+	/// Allow for delegate-based subscriptions for faster events than 'eventReceiver', and allowing for multiple receivers.
+	/// </summary>
+
+	public OnValueChange onValueChange;
 
 	/// <summary>
 	/// Number of steps the slider should be divided into. For example 5 means possible values of 0, 0.25, 0.5, 0.75, and 1.0.
@@ -297,6 +305,7 @@ public class UISlider : IgnoreTimeScale
 				eventReceiver.SendMessage(functionName, mStepValue, SendMessageOptions.DontRequireReceiver);
 				current = null;
 			}
+			if (onValueChange != null) onValueChange(mStepValue);
 		}
 	}
 

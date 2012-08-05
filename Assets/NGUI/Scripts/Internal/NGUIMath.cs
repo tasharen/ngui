@@ -14,6 +14,24 @@ using System.Collections.Generic;
 static public class NGUIMath
 {
 	/// <summary>
+	/// Clamp the specified integer to be between 0 and below 'max'.
+	/// </summary>
+
+	static public int ClampIndex (int val, int max) { return (val < 0) ? 0 : (val < max ? val : max - 1); }
+
+	/// <summary>
+	/// Wrap the index using repeating logic, so that for example +1 past the end means index of '1'.
+	/// </summary>
+
+	static public int RepeatIndex (int val, int max)
+	{
+		if (max < 1) return 0;
+		while (val < 0) val += max;
+		while (val >= max) val -= max;
+		return val;
+	}
+
+	/// <summary>
 	/// Ensure that the angle is within -180 to 180 range.
 	/// </summary>
 
@@ -265,9 +283,11 @@ static public class NGUIMath
 	static public Bounds CalculateAbsoluteWidgetBounds (Transform trans)
 	{
 		UIWidget[] widgets = trans.GetComponentsInChildren<UIWidget>() as UIWidget[];
+		if (widgets.Length == 0) return new Bounds(trans.position, Vector3.zero);
 
-		Bounds b = new Bounds(trans.transform.position, Vector3.zero);
-		bool first = true;
+		Vector3 vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+		Vector3 vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+		Vector3 v;
 
 		for (int i = 0, imax = widgets.Length; i < imax; ++i)
 		{
@@ -279,23 +299,26 @@ static public class NGUIMath
 			size *= 0.5f;
 
 			Transform wt = w.cachedTransform;
-			Vector3 v0 = wt.TransformPoint(new Vector3(x - size.x, y - size.y, 0f));
 
-			// 'Bounds' can never start off with nothing, apparently, and including the origin point is wrong.
-			if (first)
-			{
-				first = false;
-				b = new Bounds(v0, Vector3.zero);
-			}
-			else
-			{
-				b.Encapsulate(v0);
-			}
+			v = wt.TransformPoint(new Vector3(x - size.x, y - size.y, 0f));
+			vMax = Vector3.Max(v, vMax);
+			vMin = Vector3.Min(v, vMin);
 
-			b.Encapsulate(wt.TransformPoint(new Vector3(x - size.x, y + size.y, 0f)));
-			b.Encapsulate(wt.TransformPoint(new Vector3(x + size.x, y - size.y, 0f)));
-			b.Encapsulate(wt.TransformPoint(new Vector3(x + size.x, y + size.y, 0f)));
+			v = wt.TransformPoint(new Vector3(x - size.x, y + size.y, 0f));
+			vMax = Vector3.Max(v, vMax);
+			vMin = Vector3.Min(v, vMin);
+
+			v = wt.TransformPoint(new Vector3(x + size.x, y - size.y, 0f));
+			vMax = Vector3.Max(v, vMax);
+			vMin = Vector3.Min(v, vMin);
+
+			v = wt.TransformPoint(new Vector3(x + size.x, y + size.y, 0f));
+			vMax = Vector3.Max(v, vMax);
+			vMin = Vector3.Min(v, vMin);
 		}
+
+		Bounds b = new Bounds(vMin, Vector3.zero);
+		b.Encapsulate(vMax);
 		return b;
 	}
 
@@ -306,8 +329,10 @@ static public class NGUIMath
 	static public Bounds CalculateRelativeWidgetBounds (Transform root, Transform child)
 	{
 		UIWidget[] widgets = child.GetComponentsInChildren<UIWidget>() as UIWidget[];
-		Bounds b = new Bounds(Vector3.zero, Vector3.zero);
-		bool first = true;
+		if (widgets.Length == 0) return new Bounds(root.position, Vector3.zero);
+
+		Vector3 vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+		Vector3 vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
 		Matrix4x4 toLocal = root.worldToLocalMatrix;
 
@@ -331,32 +356,34 @@ static public class NGUIMath
 			// Now transform from world space to relative-to-parent space
 			v = toLocal.MultiplyPoint3x4(v);
 
-			if (first)
-			{
-				first = false;
-				b = new Bounds(v, Vector3.zero);
-			}
-			else
-			{
-				b.Encapsulate(v);
-			}
+			vMax = Vector3.Max(v, vMax);
+			vMin = Vector3.Min(v, vMin);
 
 			// Repeat for the other 3 corners
 			v = new Vector3(x - size.x, y + size.y, 0f);
 			v = toWorld.TransformPoint(v);
 			v = toLocal.MultiplyPoint3x4(v);
-			b.Encapsulate(v);
+
+			vMax = Vector3.Max(v, vMax);
+			vMin = Vector3.Min(v, vMin);
 
 			v = new Vector3(x + size.x, y - size.y, 0f);
 			v = toWorld.TransformPoint(v);
 			v = toLocal.MultiplyPoint3x4(v);
-			b.Encapsulate(v);
+
+			vMax = Vector3.Max(v, vMax);
+			vMin = Vector3.Min(v, vMin);
 
 			v = new Vector3(x + size.x, y + size.y, 0f);
 			v = toWorld.TransformPoint(v);
 			v = toLocal.MultiplyPoint3x4(v);
-			b.Encapsulate(v);
+
+			vMax = Vector3.Max(v, vMax);
+			vMin = Vector3.Min(v, vMin);
 		}
+
+		Bounds b = new Bounds(vMin, Vector3.zero);
+		b.Encapsulate(vMax);
 		return b;
 	}
 

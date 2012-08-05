@@ -27,12 +27,12 @@ public abstract class UIWidget : MonoBehaviour
 
 	// Cached and saved values
 	[HideInInspector][SerializeField] Material mMat;
+	[HideInInspector][SerializeField] Texture mTex;
 	[HideInInspector][SerializeField] Color mColor = Color.white;
 	[HideInInspector][SerializeField] Pivot mPivot = Pivot.Center;
 	[HideInInspector][SerializeField] int mDepth = 0;
 
 	Transform mTrans;
-	Texture mTex;
 	UIPanel mPanel;
 
 	protected bool mChanged = true;
@@ -105,16 +105,49 @@ public abstract class UIWidget : MonoBehaviour
 	/// Returns the texture used to draw this widget.
 	/// </summary>
 
-	public Texture mainTexture
+	public virtual Texture mainTexture
 	{
 		get
 		{
-			if (mTex == null)
+			// If the material has a texture, always use it instead of 'mTex'.
+			Material mat = material;
+			
+			if (mat != null)
 			{
-				Material mat = material;
-				if (mat != null) mTex = mat.mainTexture;
+				if (mat.mainTexture != null)
+				{
+					mTex = mat.mainTexture;
+				}
+				else if (mTex != null)
+				{
+					// The material has no texture, but we have a saved texture
+					if (mPanel != null) mPanel.RemoveWidget(this);
+
+					// Set the material's texture to the saved value
+					mPanel = null;
+					mMat.mainTexture = mTex;
+
+					// Ensure this widget gets added to the panel
+					CreatePanel();
+				}
 			}
 			return mTex;
+		}
+		set
+		{
+			if (mainTexture != value)
+			{
+				if (mPanel != null) mPanel.RemoveWidget(this);
+
+				mPanel = null;
+				mTex = value;
+
+				if (mMat != null)
+				{
+					mMat.mainTexture = value;
+					CreatePanel();
+				}
+			}
 		}
 	}
 
@@ -228,7 +261,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Remember whether we're in play mode.
 	/// </summary>
 
-	void Awake () { mPlayMode = Application.isPlaying; }
+	protected virtual void Awake () { mPlayMode = Application.isPlaying; }
 
 	/// <summary>
 	/// Mark the widget and the panel as having been changed.
@@ -252,9 +285,7 @@ public abstract class UIWidget : MonoBehaviour
 				mMat = null;
 				mTex = null;
 			}
-
-			// If we have a panel and a material to work with, mark the material as changed
-			if (mPanel != null && material != null) mPanel.MarkMaterialAsChanged(mMat, false);
+			mPanel = null;
 		}
 	}
 

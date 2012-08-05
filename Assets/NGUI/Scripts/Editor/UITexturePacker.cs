@@ -27,12 +27,12 @@ public class UITexturePacker
 		RectContactPointRule ///< -CP: Choosest the placement where the rectangle touches other rects as much as possible.
 	};
 
-	public UITexturePacker(int width, int height, bool rotations = true) 
+	public UITexturePacker(int width, int height, bool rotations) 
 	{
 		Init(width, height, rotations);
 	}
 
-	public void Init(int width, int height, bool rotations = true) 
+	public void Init(int width, int height, bool rotations) 
 	{
 		binWidth = width;
 		binHeight = height;
@@ -50,13 +50,20 @@ public class UITexturePacker
 		freeRectangles.Add(n);
 	}
 
+	private struct Storage
+	{
+		public Rect rect;
+		public bool paddingX;
+		public bool paddingY;
+	}
+
 	public static Rect[] PackTextures(Texture2D texture, Texture2D[] textures, int width, int height, int padding, int maxSize) 
 	{
 		if(width > maxSize && height > maxSize) return null;
 		if(width > maxSize || height > maxSize) { int temp = width; width = height; height = temp; }
 	
 		UITexturePacker bp = new UITexturePacker(width, height, false);
-		Rect[] rects = new Rect[textures.Length];
+		Storage[] storage = new Storage[textures.Length];
 	
 		for(int i = 0; i < textures.Length; i++) 
 		{
@@ -64,9 +71,12 @@ public class UITexturePacker
 
 			Rect rect = new Rect();
 
-			for (int xPadding = 1; xPadding >=0; --xPadding)
+			int xPadding = 1;
+			int yPadding = 1;
+
+			for (xPadding = 1; xPadding >=0; --xPadding)
 			{
-				for (int yPadding = 1; yPadding >= 0; --yPadding)
+				for (yPadding = 1; yPadding >= 0; --yPadding)
 				{
 					rect = bp.Insert(tex.width + (xPadding * padding), tex.height + (yPadding * padding), UITexturePacker.FreeRectChoiceHeuristic.RectBestAreaFit);
 
@@ -85,19 +95,29 @@ public class UITexturePacker
 					break;
 				}
 			}
-			rects[i] = rect;
+
+			storage[i] = new Storage();
+			storage[i].rect = rect;
+			storage[i].paddingX = (xPadding != 0);
+			storage[i].paddingY = (yPadding != 0);
 		}
 
 		texture.Resize(width, height);
 		texture.SetPixels(new Color[width * height]);
+
+		// The returned rects
+		Rect[] rects = new Rect[textures.Length];
 		
 		for(int i = 0; i < textures.Length; i++) 
 		{
 			Texture2D tex = textures[i];
-			Rect rect = rects[i];
+			Rect rect = storage[i].rect;
+			int xPadding = (storage[i].paddingX ? padding : 0);
+			int yPadding = (storage[i].paddingY ? padding : 0);
 			Color[] colors = tex.GetPixels();
 		
-			if(rect.width != tex.width + padding) 
+			// Would be used to rotate the texture if need be.
+			if(rect.width != tex.width + xPadding) 
 			{
 				Color[] newColors = tex.GetPixels();
 			
@@ -113,11 +133,11 @@ public class UITexturePacker
 				colors = newColors;
 			}
 		
-			texture.SetPixels((int)rect.x, (int)rect.y, (int)rect.width - padding, (int)rect.height - padding, colors);
+			texture.SetPixels((int)rect.x, (int)rect.y, (int)rect.width - xPadding, (int)rect.height - yPadding, colors);
 			rect.x /= width;
 			rect.y /= height;
-			rect.width = (rect.width- padding) / width ;
-			rect.height = (rect.height - padding) / height;
+			rect.width = (rect.width - xPadding) / width ;
+			rect.height = (rect.height - yPadding) / height;
 			rects[i] = rect;
 		}
 		return rects;

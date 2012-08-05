@@ -1,4 +1,4 @@
-Shader "Depth"
+Shader "Unlit/Depth Cutout"
 {
 	Properties
 	{

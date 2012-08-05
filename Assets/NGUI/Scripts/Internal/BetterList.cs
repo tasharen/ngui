@@ -78,7 +78,7 @@ public class BetterList<T>
 	/// Remove the specified item from the list. Note that RemoveAt() is faster and is advisable if you already know the index.
 	/// </summary>
 
-	public void Remove (T item) { mList.Remove(item); }
+	public bool Remove (T item) { return mList.Remove(item); }
 
 	/// <summary>
 	/// Remove an item at the specified index.
@@ -91,6 +91,12 @@ public class BetterList<T>
 	/// </summary>
 
 	public T[] ToArray () { return mList.ToArray(); }
+
+	/// <summary>
+	/// List.Sort equivalent.
+	/// </summary>
+
+	public void Sort (System.Comparison<T> comparer) { mList.Sort(comparer); }
 
 #else
 
@@ -215,7 +221,7 @@ public class BetterList<T>
 	/// Remove the specified item from the list. Note that RemoveAt() is faster and is advisable if you already know the index.
 	/// </summary>
 
-	public void Remove (T item)
+	public bool Remove (T item)
 	{
 		if (buffer != null)
 		{
@@ -228,10 +234,11 @@ public class BetterList<T>
 					--size;
 					buffer[i] = default(T);
 					for (int b = i; b < size; ++b) buffer[b] = buffer[b + 1];
-					return;
+					return true;
 				}
 			}
 		}
+		return false;
 	}
 
 	/// <summary>
@@ -253,5 +260,30 @@ public class BetterList<T>
 	/// </summary>
 
 	public T[] ToArray () { Trim(); return buffer; }
+
+	/// <summary>
+	/// List.Sort equivalent.
+	/// </summary>
+
+	public void Sort (System.Comparison<T> comparer)
+	{
+		bool changed = true;
+
+		while (changed)
+		{
+			changed = false;
+
+			for (int i = 1; i < size; ++i)
+			{
+				if (comparer.Invoke(buffer[i - 1], buffer[i]) > 0)
+				{
+					T temp = buffer[i];
+					buffer[i] = buffer[i - 1];
+					buffer[i - 1] = temp;
+					changed = true;
+				}
+			}
+		}
+	}
 #endif
 }

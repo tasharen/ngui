@@ -501,6 +501,8 @@ public class UIAtlasMaker : EditorWindow
 			AssetDatabase.Refresh();
 			tex = NGUIEditorTools.ImportTexture(newPath, false, false);
 		}
+		AssetDatabase.SaveAssets();
+		Resources.UnloadUnusedAssets();
 		return tex;
 	}
 
@@ -670,6 +672,7 @@ public class UIAtlasMaker : EditorWindow
 					PrefabUtility.ReplacePrefab(go, prefab);
 #endif
 					DestroyImmediate(go);
+					AssetDatabase.SaveAssets();
 					AssetDatabase.Refresh();
 
 					// Select the atlas

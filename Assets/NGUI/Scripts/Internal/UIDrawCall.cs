@@ -181,7 +181,7 @@ public class UIDrawCall : MonoBehaviour
 		{
 			if (mDepthMat == null)
 			{
-				Shader shader = Shader.Find("Depth");
+				Shader shader = Shader.Find("Unlit/Depth Cutout");
 				mDepthMat = new Material(shader);
 				mDepthMat.hideFlags = HideFlags.DontSave;
 				mDepthMat.mainTexture = mSharedMat.mainTexture;

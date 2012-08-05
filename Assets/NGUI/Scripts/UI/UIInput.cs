@@ -26,6 +26,8 @@ public class UIInput : MonoBehaviour
 		EmailAddress = 7,
 	}
 
+	public delegate void OnSubmit (string inputString);
+
 	/// <summary>
 	/// Current input, available inside OnSubmit callbacks.
 	/// </summary>
@@ -85,6 +87,12 @@ public class UIInput : MonoBehaviour
 	/// </summary>
 
 	public string functionName = "OnSubmit";
+
+	/// <summary>
+	/// Delegate that will be notified when the input field submits its data (by default that's when Enter gets pressed).
+	/// </summary>
+
+	public OnSubmit onSubmit;
 
 	string mText = "";
 	string mDefaultText = "";
@@ -276,8 +284,9 @@ public class UIInput : MonoBehaviour
 			{
 				mKeyboard = null;
 				current = this;
+				if (onSubmit != null) onSubmit(mText);
 				if (eventReceiver == null) eventReceiver = gameObject;
-				eventReceiver.SendMessage(functionName, SendMessageOptions.DontRequireReceiver);
+				eventReceiver.SendMessage(functionName, mText, SendMessageOptions.DontRequireReceiver);
 				current = null;
 				selected = false;
 			}
@@ -321,13 +330,27 @@ public class UIInput : MonoBehaviour
 				}
 				else if (c == '\r' || c == '\n')
 				{
-					// Enter
-					current = this;
-					if (eventReceiver == null) eventReceiver = gameObject;
-					eventReceiver.SendMessage(functionName, SendMessageOptions.DontRequireReceiver);
-					current = null;
-					selected = false;
-					return;
+					if (UICamera.current.submitKey0 == KeyCode.Return || UICamera.current.submitKey1 == KeyCode.Return)
+					{
+						// Enter
+						current = this;
+						if (onSubmit != null) onSubmit(mText);
+						if (eventReceiver == null) eventReceiver = gameObject;
+						eventReceiver.SendMessage(functionName, mText, SendMessageOptions.DontRequireReceiver);
+						current = null;
+						selected = false;
+						return;
+					}
+
+					// If we have an input validator, validate the input first
+					if (validator != null) c = validator(mText, c);
+
+					// If the input is invalid, skip it
+					if (c == 0) continue;
+
+					// Append the character and notify the "input changed" listeners.
+					mText += c;
+					SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
 				}
 				else if (c >= ' ')
 				{

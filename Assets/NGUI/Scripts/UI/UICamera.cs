@@ -60,6 +60,7 @@ public class UICamera : MonoBehaviour
 
 		public ClickNotification clickNotification = ClickNotification.Always;
 		public bool touchBegan = true;
+		public bool dragStarted = false;
 	}
 
 	class Highlighted
@@ -117,10 +118,22 @@ public class UICamera : MonoBehaviour
 	public bool stickyTooltip = true;
 
 	/// <summary>
+	/// How much the mouse has to be moved after pressing a button before it starts to send out drag events.
+	/// </summary>
+
+	public float mouseDragThreshold = 4f;
+
+	/// <summary>
 	/// How far the mouse is allowed to move in pixels before it's no longer considered for click events, if the click notification is based on delta.
 	/// </summary>
 
 	public float mouseClickThreshold = 10f;
+
+	/// <summary>
+	/// How much the mouse has to be moved after pressing a button before it starts to send out drag events.
+	/// </summary>
+
+	public float touchDragThreshold = 40f;
 
 	/// <summary>
 	/// How far the touch is allowed to move in pixels before it's no longer considered for click events, if the click notification is based on delta.
@@ -173,6 +186,12 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	static public RaycastHit lastHit;
+
+	/// <summary>
+	/// UICamera that sent out the event.
+	/// </summary>
+
+	static public UICamera current = null;
 
 	/// <summary>
 	/// Last camera active prior to sending out the event. This will always be the camera that actually sent out the event.
@@ -281,9 +300,11 @@ public class UICamera : MonoBehaviour
 					
 					if (uicam != null)
 					{
+						current = uicam;
 						currentCamera = uicam.mCam;
 						Notify(mSel, "OnSelect", false);
 						if (uicam.useController || uicam.useKeyboard) Highlight(mSel, false);
+						current = null;
 					}
 				}
 
@@ -295,9 +316,11 @@ public class UICamera : MonoBehaviour
 
 					if (uicam != null)
 					{
+						current = uicam;
 						currentCamera = uicam.mCam;
 						if (uicam.useController || uicam.useKeyboard) Highlight(mSel, true);
 						Notify(mSel, "OnSelect", true);
+						current = null;
 					}
 				}
 			}
@@ -619,6 +642,8 @@ public class UICamera : MonoBehaviour
 		// Only the first UI layer should be processing events
 		if (!Application.isPlaying || !handlesEvents) return;
 
+		current = this;
+
 		// Update mouse input
 		if (useMouse || (useTouch && mIsEditor)) ProcessMouse();
 
@@ -660,6 +685,7 @@ public class UICamera : MonoBehaviour
 				ShowTooltip(true);
 			}
 		}
+		current = null;
 	}
 
 	/// <summary>
@@ -888,6 +914,7 @@ public class UICamera : MonoBehaviour
 			currentTouch.pressed = currentTouch.current;
 			currentTouch.clickNotification = ClickNotification.Always;
 			currentTouch.totalDelta = Vector2.zero;
+			currentTouch.dragStarted = false;
 			Notify(currentTouch.pressed, "OnPress", true);
 
 			// Clear the selection
@@ -897,27 +924,46 @@ public class UICamera : MonoBehaviour
 				selectedObject = null;
 			}
 		}
-		else if (currentTouch.pressed != null && currentTouch.delta.magnitude != 0f)
+		else if (currentTouch.pressed != null)
 		{
-			if (mTooltip != null) ShowTooltip(false);
-			currentTouch.totalDelta += currentTouch.delta;
+			float mag = currentTouch.delta.magnitude;
 
-			bool isDisabled = (currentTouch.clickNotification == ClickNotification.None);
-			Notify(currentTouch.pressed, "OnDrag", currentTouch.delta);
-
-			if (isDisabled)
+			if (mag != 0f)
 			{
-				// If the notification status has already been disabled, keep it as such
-				currentTouch.clickNotification = ClickNotification.None;
-			}
-			else if (currentTouch.clickNotification == ClickNotification.BasedOnDelta)
-			{
-				// If the notification is based on delta and the delta gets exceeded, disable the notification
-				float threshold = (currentTouch == mMouse[0]) ? mouseClickThreshold : Mathf.Max(touchClickThreshold, Screen.height * 0.1f);
+				// Whether we're using the mouse
+				bool isMouse = (currentTouch == mMouse[0]);
+				float drag   = isMouse ? mouseDragThreshold : touchDragThreshold;
+				float click  = isMouse ? mouseClickThreshold : Mathf.Max(touchClickThreshold, Screen.height * 0.1f);
 
-				if (currentTouch.totalDelta.magnitude > threshold)
+				// Keep track of the total movement
+				currentTouch.totalDelta += currentTouch.delta;
+				mag = currentTouch.totalDelta.magnitude;
+
+				// If the drag event has not yet started, see if we've dragged the touch far enough to start it
+				if (!currentTouch.dragStarted && drag < mag)
 				{
-					currentTouch.clickNotification = ClickNotification.None;
+					currentTouch.dragStarted = true;
+					currentTouch.delta = currentTouch.totalDelta;
+				}
+
+				// If we're dragging the touch, send out drag events
+				if (currentTouch.dragStarted)
+				{
+					if (mTooltip != null) ShowTooltip(false);
+
+					bool isDisabled = (currentTouch.clickNotification == ClickNotification.None);
+					Notify(currentTouch.pressed, "OnDrag", currentTouch.delta);
+
+					if (isDisabled)
+					{
+						// If the notification status has already been disabled, keep it as such
+						currentTouch.clickNotification = ClickNotification.None;
+					}
+					else if (currentTouch.clickNotification == ClickNotification.BasedOnDelta && click < mag)
+					{
+						// We've dragged far enough to cancel the click
+						currentTouch.clickNotification = ClickNotification.None;
+					}
 				}
 			}
 		}
@@ -969,6 +1015,7 @@ public class UICamera : MonoBehaviour
 					Notify(currentTouch.current, "OnDrop", currentTouch.pressed);
 				}
 			}
+			currentTouch.dragStarted = false;
 			currentTouch.pressed = null;
 		}
 	}

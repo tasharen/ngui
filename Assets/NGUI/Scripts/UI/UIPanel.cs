@@ -67,13 +67,13 @@ public class UIPanel : MonoBehaviour
 #endif
 
 	// List of all widgets managed by this panel
-	List<UIWidget> mWidgets = new List<UIWidget>();
+	BetterList<UIWidget> mWidgets = new BetterList<UIWidget>();
 
 	// Widgets using these materials will be rebuilt next frame
-	List<Material> mChanged = new List<Material>();
+	BetterList<Material> mChanged = new BetterList<Material>();
 
 	// List of UI Screens created on hidden and invisible game objects
-	List<UIDrawCall> mDrawCalls = new List<UIDrawCall>();
+	BetterList<UIDrawCall> mDrawCalls = new BetterList<UIDrawCall>();
 
 	// Cached in order to reduce memory allocations
 	BetterList<Vector3> mVerts = new BetterList<Vector3>();
@@ -138,10 +138,10 @@ public class UIPanel : MonoBehaviour
 			if (mDebugInfo != value)
 			{
 				mDebugInfo = value;
-				List<UIDrawCall> list = drawCalls;
+				BetterList<UIDrawCall> list = drawCalls;
 				HideFlags flags = (mDebugInfo == DebugInfo.Geometry) ? HideFlags.DontSave | HideFlags.NotEditable : HideFlags.HideAndDontSave;
 
-				for (int i = 0, imax = list.Count; i < imax;  ++i)
+				for (int i = 0, imax = list.size; i < imax;  ++i)
 				{
 					UIDrawCall dc = list[i];
 					GameObject go = dc.gameObject;
@@ -206,17 +206,17 @@ public class UIPanel : MonoBehaviour
 	/// Widgets managed by this panel.
 	/// </summary>
 
-	public List<UIWidget> widgets { get { return mWidgets; } }
+	public BetterList<UIWidget> widgets { get { return mWidgets; } }
 
 	/// <summary>
 	/// Retrieve the list of all active draw calls, removing inactive ones in the process.
 	/// </summary>
 
-	public List<UIDrawCall> drawCalls
+	public BetterList<UIDrawCall> drawCalls
 	{
 		get
 		{
-			for (int i = mDrawCalls.Count; i > 0; )
+			for (int i = mDrawCalls.size; i > 0; )
 			{
 				UIDrawCall dc = mDrawCalls[--i];
 				if (dc == null) mDrawCalls.RemoveAt(i);
@@ -492,9 +492,9 @@ public class UIPanel : MonoBehaviour
 
 	UIDrawCall GetDrawCall (Material mat, bool createIfMissing)
 	{
-		for (int i = 0, imax = drawCalls.Count; i < imax; ++i)
+		for (int i = 0, imax = drawCalls.size; i < imax; ++i)
 		{
-			UIDrawCall dc = drawCalls[i];
+			UIDrawCall dc = drawCalls.buffer[i];
 			if (dc.material == mat) return dc;
 		}
 
@@ -536,7 +536,7 @@ public class UIPanel : MonoBehaviour
 
 	void OnEnable ()
 	{
-		for (int i = 0, imax = mWidgets.Count; i < imax; ++i) AddWidget(mWidgets[i]);
+		for (int i = 0, imax = mWidgets.size; i < imax; ++i) AddWidget(mWidgets.buffer[i]);
 		mRebuildAll = true;
 	}
 
@@ -546,9 +546,9 @@ public class UIPanel : MonoBehaviour
 
 	void OnDisable ()
 	{
-		for (int i = mDrawCalls.Count; i > 0; )
+		for (int i = mDrawCalls.size; i > 0; )
 		{
-			UIDrawCall dc = mDrawCalls[--i];
+			UIDrawCall dc = mDrawCalls.buffer[--i];
 			if (dc != null) NGUITools.DestroyImmediate(dc.gameObject);
 		}
 		mDrawCalls.Clear();
@@ -557,7 +557,7 @@ public class UIPanel : MonoBehaviour
 	}
 
 	// Temporary list used in GetChangeFlag()
-	static List<UINode> mHierarchy = new List<UINode>();
+	static BetterList<UINode> mHierarchy = new BetterList<UINode>();
 
 	/// <summary>
 	/// Convenience function that figures out the panel's correct change flag by searching the parents.
@@ -599,9 +599,9 @@ public class UIPanel : MonoBehaviour
 			}
 
 			// Update the parent flags
-			for (int i = 0, imax = mHierarchy.Count; i < imax; ++i)
+			for (int i = 0, imax = mHierarchy.size; i < imax; ++i)
 			{
-				UINode pc = mHierarchy[i];
+				UINode pc = mHierarchy.buffer[i];
 				pc.changeFlag = flag;
 			}
 			mHierarchy.Clear();
@@ -799,9 +799,9 @@ public class UIPanel : MonoBehaviour
 
 		Transform t = cachedTransform;
 
-		for (int i = 0, imax = mDrawCalls.Count; i < imax; ++i)
+		for (int i = 0, imax = mDrawCalls.size; i < imax; ++i)
 		{
-			UIDrawCall dc = mDrawCalls[i];
+			UIDrawCall dc = mDrawCalls.buffer[i];
 			dc.clipping = mClipping;
 			dc.clipRange = range;
 			dc.clipSoftness = mClipSoftness;
@@ -823,12 +823,12 @@ public class UIPanel : MonoBehaviour
 	void Fill (Material mat)
 	{
 		// Cleanup deleted widgets
-		for (int i = mWidgets.Count; i > 0; ) if (mWidgets[--i] == null) mWidgets.RemoveAt(i);
+		for (int i = mWidgets.size; i > 0; ) if (mWidgets[--i] == null) mWidgets.RemoveAt(i);
 
 		// Fill the buffers for the specified material
-		for (int i = 0, imax = mWidgets.Count; i < imax; ++i)
+		for (int i = 0, imax = mWidgets.size; i < imax; ++i)
 		{
-			UIWidget w = mWidgets[i];
+			UIWidget w = mWidgets.buffer[i];
 
 			if (w.visibleFlag == 1 && w.material == mat)
 			{
@@ -889,7 +889,7 @@ public class UIPanel : MonoBehaviour
 			UICamera uic = UICamera.FindCameraForLayer(mLayer);
 			mCam = (uic != null) ? uic.cachedCamera : NGUITools.FindCameraForLayer(mLayer);
 			SetChildLayer(cachedTransform, mLayer);
-			for (int i = 0, imax = drawCalls.Count; i < imax; ++i) mDrawCalls[i].gameObject.layer = mLayer;
+			for (int i = 0, imax = drawCalls.size; i < imax; ++i) mDrawCalls.buffer[i].gameObject.layer = mLayer;
 		}
 
 		UpdateWidgets();
@@ -902,7 +902,7 @@ public class UIPanel : MonoBehaviour
 		}
 
 		// Fill the draw calls for all of the changed materials
-		for (int i = 0, imax = mChanged.Count; i < imax; ++i) Fill(mChanged[i]);
+		for (int i = 0, imax = mChanged.size; i < imax; ++i) Fill(mChanged.buffer[i]);
 
 		// Update the clipping rects
 		UpdateDrawcalls();
@@ -945,9 +945,14 @@ public class UIPanel : MonoBehaviour
 
 			if (selected || clip)
 			{
-				Gizmos.matrix = clip ? transform.localToWorldMatrix : mCam.transform.localToWorldMatrix;
-				Gizmos.color = clip ? Color.magenta : new Color(0.5f, 0f, 0.5f);
-				Gizmos.DrawWireCube(new Vector2(mClipRange.x, mClipRange.y), size);
+				Transform t = clip ? transform : (mCam != null ? mCam.transform : null);
+
+				if (t != null)
+				{
+					Gizmos.matrix = t.localToWorldMatrix;
+					Gizmos.color = clip ? Color.magenta : new Color(0.5f, 0f, 0.5f);
+					Gizmos.DrawWireCube(new Vector2(mClipRange.x, mClipRange.y), size);
+				}
 			}
 		}
 	}

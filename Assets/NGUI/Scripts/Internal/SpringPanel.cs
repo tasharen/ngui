@@ -6,7 +6,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Similar to SpringPosition, but also moves the panel's clipping.
+/// Similar to SpringPosition, but also moves the panel's clipping. Works in local coordinates.
 /// </summary>
 
 [RequireComponent(typeof(UIPanel))]

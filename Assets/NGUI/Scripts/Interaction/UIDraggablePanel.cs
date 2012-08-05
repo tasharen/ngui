@@ -28,6 +28,8 @@ public class UIDraggablePanel : IgnoreTimeScale
 		WhenDragging,
 	}
 
+	public delegate void OnDragFinished ();
+
 	/// <summary>
 	/// Whether the dragging will be restricted to be within the parent panel's bounds.
 	/// </summary>
@@ -94,6 +96,12 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	public ShowCondition showScrollBars = ShowCondition.OnlyIfNeeded;
 
+	/// <summary>
+	/// Event callback to trigger when the drag process finished. Can be used for additional effects, such as centering on some object.
+	/// </summary>
+
+	public OnDragFinished onDragFinished;
+
 	Transform mTrans;
 	UIPanel mPanel;
 	Plane mPlane;
@@ -106,6 +114,12 @@ public class UIDraggablePanel : IgnoreTimeScale
 	bool mShouldMove = false;
 	bool mIgnoreCallbacks = false;
 	int mTouches = 0;
+
+	/// <summary>
+	/// Panel that's being dragged.
+	/// </summary>
+
+	public UIPanel panel { get { return mPanel; } }
 
 	/// <summary>
 	/// Calculate the bounds used by the widgets.
@@ -225,7 +239,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 	/// Restrict the panel's contents to be within the panel's bounds.
 	/// </summary>
 
-	public void RestrictWithinBounds (bool instant)
+	public bool RestrictWithinBounds (bool instant)
 	{
 		Vector3 constraint = mPanel.CalculateConstrainOffset(bounds.min, bounds.max);
 
@@ -243,12 +257,9 @@ public class UIDraggablePanel : IgnoreTimeScale
 				mMomentum = Vector3.zero;
 				mScroll = 0f;
 			}
+			return true;
 		}
-		else
-		{
-			// Remove the spring as it's no longer needed
-			DisableSpring();
-		}
+		return false;
 	}
 
 	/// <summary>
@@ -491,9 +502,13 @@ public class UIDraggablePanel : IgnoreTimeScale
 				// Create the plane to drag along
 				mPlane = new Plane(mTrans.rotation * Vector3.back, mLastPos);
 			}
-			else if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None && dragEffect == DragEffect.MomentumAndSpring)
+			else
 			{
-				RestrictWithinBounds(false);
+				if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None && dragEffect == DragEffect.MomentumAndSpring)
+				{
+					RestrictWithinBounds(false);
+				}
+				if (onDragFinished != null) onDragFinished();
 			}
 		}
 	}
@@ -535,7 +550,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 					mPanel.clipping != UIDrawCall.Clipping.None &&
 					dragEffect != DragEffect.MomentumAndSpring)
 				{
-					RestrictWithinBounds(false);
+					RestrictWithinBounds(true);
 				}
 			}
 		}
@@ -549,6 +564,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 	{
 		if (enabled && gameObject.active)
 		{
+			DisableSpring();
 			mShouldMove = shouldMove;
 			if (Mathf.Sign(mScroll) != Mathf.Sign(delta)) mScroll = 0f;
 			mScroll += delta * scrollWheelFactor;
@@ -607,7 +623,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 		// Apply momentum
 		if (mShouldMove && !mPressed)
 		{
-			mMomentum += scale * (-mScroll * 0.05f);
+			mMomentum -= scale * (mScroll * 0.05f);
 
 			if (mMomentum.magnitude > 0.0001f)
 			{
@@ -621,7 +637,11 @@ public class UIDraggablePanel : IgnoreTimeScale
 				if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None) RestrictWithinBounds(false);
 				return;
 			}
-			else mScroll = 0f;
+			else
+			{
+				mScroll = 0f;
+				mMomentum = Vector3.zero;
+			}
 		}
 		else mScroll = 0f;
 
