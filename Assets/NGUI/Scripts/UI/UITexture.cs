@@ -99,6 +99,7 @@ public class UITexture : UIWidget
 					mDynamicMat = new Material(mShader);
 					mDynamicMat.hideFlags = HideFlags.DontSave;
 					mDynamicMat.mainTexture = mainTexture;
+					base.material = mDynamicMat;
 				}
 				mCreatingMat = false;
 			}

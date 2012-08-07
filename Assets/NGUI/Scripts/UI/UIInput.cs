@@ -332,14 +332,18 @@ public class UIInput : MonoBehaviour
 				{
 					if (UICamera.current.submitKey0 == KeyCode.Return || UICamera.current.submitKey1 == KeyCode.Return)
 					{
-						// Enter
-						current = this;
-						if (onSubmit != null) onSubmit(mText);
-						if (eventReceiver == null) eventReceiver = gameObject;
-						eventReceiver.SendMessage(functionName, mText, SendMessageOptions.DontRequireReceiver);
-						current = null;
-						selected = false;
-						return;
+						// Not multi-line input, or control isn't held
+						if (!label.multiLine || (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl)))
+						{
+							// Enter
+							current = this;
+							if (onSubmit != null) onSubmit(mText);
+							if (eventReceiver == null) eventReceiver = gameObject;
+							eventReceiver.SendMessage(functionName, mText, SendMessageOptions.DontRequireReceiver);
+							current = null;
+							selected = false;
+							return;
+						}
 					}
 
 					// If we have an input validator, validate the input first
@@ -348,8 +352,14 @@ public class UIInput : MonoBehaviour
 					// If the input is invalid, skip it
 					if (c == 0) continue;
 
-					// Append the character and notify the "input changed" listeners.
-					mText += c;
+					// Append the character
+					if (c == '\n' || c == '\r')
+					{
+						if (label.multiLine) mText += "\n";
+					}
+					else mText += c;
+
+					// Notify the listeners
 					SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
 				}
 				else if (c >= ' ')

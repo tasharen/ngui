@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.1.3
+                Version 2.1.4
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,11 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.1.4:
+- NEW: UIInput now supports multi-line input if its label is multi-line. Hold Ctrl when hitting Enter.
+- FIX: UICheckboxControlledComponent will now use delegates by default.
+- FIX: UITexture should now work properly again.
 
 2.1.3:
 - NEW: Seeing as it was an often-asked question, the Scroll View example now features a toggle that makes the scrolled list center on items.
