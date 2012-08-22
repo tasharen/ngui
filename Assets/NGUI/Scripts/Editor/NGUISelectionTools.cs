@@ -35,7 +35,11 @@ public class NGUISelectionTools
 		if (HasValidTransform())
 		{
 			GameObject[] gos = Selection.gameObjects;
+#if UNITY_3_5
 			bool val = !Selection.activeGameObject.active;
+#else
+			bool val = !Selection.activeGameObject.activeSelf;
+#endif
 			foreach (GameObject go in gos) NGUITools.SetActive(go, val);
 		}
 	}

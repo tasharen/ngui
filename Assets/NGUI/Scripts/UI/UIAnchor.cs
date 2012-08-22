@@ -120,16 +120,17 @@ public class UIAnchor : MonoBehaviour
 			Vector3 ls = t.localScale;
 			Vector3 lp = t.localPosition;
 
+			Vector2 size = widgetContainer.relativeSize;
 			Vector3 offset = widgetContainer.pivotOffset;
-			offset.y -= widgetContainer.relativeSize.y;
+			offset.y -= size.y;
 
-			offset.x *= (widgetContainer.relativeSize.x * ls.x);
-			offset.y *= (widgetContainer.relativeSize.y * ls.y);
+			offset.x *= (size.x * ls.x);
+			offset.y *= (size.y * ls.y);
 
 			rect.x = lp.x + offset.x;
 			rect.y = lp.y + offset.y;
-			rect.width = ls.x;
-			rect.height = ls.y;
+			rect.width = size.x * ls.x;
+			rect.height = size.y * ls.y;
 		}
 		else if (uiCamera != null)
 		{

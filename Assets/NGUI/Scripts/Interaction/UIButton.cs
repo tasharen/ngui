@@ -61,10 +61,10 @@ public class UIButton : UIButtonColor
 
 	public void UpdateColor (bool shouldBeEnabled, bool immediate)
 	{
+		if (!mInitDone) Init();
+
 		if (tweenTarget)
 		{
-			if (!mInitDone) Init();
-
 			Color c = shouldBeEnabled ? defaultColor : disabledColor;
 			TweenColor tc = TweenColor.Begin(tweenTarget, 0.15f, c);
 

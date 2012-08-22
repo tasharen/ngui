@@ -53,7 +53,6 @@ public class UILabel : UIWidget
 	bool mLastPass = false;
 	bool mLastShow = false;
 	Effect mLastEffect = Effect.None;
-	Color mLastColor = Color.black;
 	Vector3 mSize = Vector3.zero;
 
 	/// <summary>
@@ -71,8 +70,7 @@ public class UILabel : UIWidget
 				mLastCount		!= mMaxLineCount ||
 				mLastPass		!= mPassword ||
 				mLastShow		!= mShowLastChar ||
-				mLastEffect		!= mEffectStyle ||
-				mLastColor		!= mEffectColor;
+				mLastEffect		!= mEffectStyle;
 		}
 		set
 		{
@@ -91,7 +89,6 @@ public class UILabel : UIWidget
 				mLastPass			= mPassword;
 				mLastShow			= mShowLastChar;
 				mLastEffect			= mEffectStyle;
-				mLastColor			= mEffectColor;
 			}
 		}
 	}
@@ -316,7 +313,7 @@ public class UILabel : UIWidget
 		}
 		set
 		{
-			if (mEffectColor != value)
+			if (!mEffectColor.Equals(value))
 			{
 				mEffectColor = value;
 				if (mEffectStyle != Effect.None) hasChanged = true;
@@ -526,11 +523,21 @@ public class UILabel : UIWidget
 	/// Apply a shadow effect to the buffer.
 	/// </summary>
 
+#if UNITY_3_5_4
 	void ApplyShadow (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols, int start, int end, float x, float y)
+#else
+	void ApplyShadow (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols, int start, int end, float x, float y)
+#endif
 	{
+#if UNITY_3_5_4
 		Color c = mEffectColor;
-		c.a *= color.a;
-
+		c.a = c.a * color.a;
+		Color col = c;
+#else
+		Color c = mEffectColor;
+		c.a = c.a * color.a;
+		Color32 col = c;
+#endif
 		for (int i = start; i < end; ++i)
 		{
 			verts.Add(verts.buffer[i]);
@@ -541,7 +548,7 @@ public class UILabel : UIWidget
 			v.x += x;
 			v.y += y;
 			verts.buffer[i] = v;
-			cols.buffer[i] = c;
+			cols.buffer[i] = col;
 		}
 	}
 
@@ -549,7 +556,11 @@ public class UILabel : UIWidget
 	/// Draw the label.
 	/// </summary>
 
+#if UNITY_3_5_4
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
+#else
+	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
+#endif
 	{
 		if (mFont == null) return;
 		MakePositionPerfect();

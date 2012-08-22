@@ -182,7 +182,11 @@ public class UICameraTool : EditorWindow
 
 		GUILayout.BeginHorizontal();
 		{
+#if UNITY_3_5
 			bool enabled = (cam == null || (cam.gameObject.active && cam.enabled));
+#else
+			bool enabled = (cam == null || (cam.gameObject.activeSelf && cam.enabled));
+#endif
 
 			GUI.color = Color.white;
 

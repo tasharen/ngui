@@ -307,7 +307,12 @@ public class UISprite : UIWidget
 	/// Virtual function called by the UIScreen that fills the buffers.
 	/// </summary>
 
+#if UNITY_3_5_4
 	override public void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
+#else
+	override public void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
+#endif
+
 	{
 		Vector2 uv0 = new Vector2(mOuterUV.xMin, mOuterUV.yMin);
 		Vector2 uv1 = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
@@ -322,9 +327,14 @@ public class UISprite : UIWidget
 		uvs.Add(uv0);
 		uvs.Add(new Vector2(uv0.x, uv1.y));
 
-		cols.Add(color);
-		cols.Add(color);
-		cols.Add(color);
-		cols.Add(color);
+#if UNITY_3_5_4
+		Color col = color;
+#else
+		Color32 col = color;
+#endif
+		cols.Add(col);
+		cols.Add(col);
+		cols.Add(col);
+		cols.Add(col);
 	}
 }

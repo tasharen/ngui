@@ -31,7 +31,6 @@ public abstract class UIWidget : MonoBehaviour
 	[HideInInspector][SerializeField] Color mColor = Color.white;
 	[HideInInspector][SerializeField] Pivot mPivot = Pivot.Center;
 	[HideInInspector][SerializeField] int mDepth = 0;
-
 	Transform mTrans;
 	UIPanel mPanel;
 
@@ -50,7 +49,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Color used by the widget.
 	/// </summary>
 
-	public Color color { get { return mColor; } set { if (mColor != value) { mColor = value; mChanged = true; } } }
+	public Color color { get { return mColor; } set { if (!mColor.Equals(value)) { mColor = value; mChanged = true; } } }
 
 	/// <summary>
 	/// Widget's alpha -- a convenience method.
@@ -128,7 +127,7 @@ public abstract class UIWidget : MonoBehaviour
 					mMat.mainTexture = mTex;
 
 					// Ensure this widget gets added to the panel
-					CreatePanel();
+					if (enabled) CreatePanel();
 				}
 			}
 			return mTex;
@@ -145,7 +144,7 @@ public abstract class UIWidget : MonoBehaviour
 				if (mMat != null)
 				{
 					mMat.mainTexture = value;
-					CreatePanel();
+					if (enabled) CreatePanel();
 				}
 			}
 		}
@@ -183,7 +182,11 @@ public abstract class UIWidget : MonoBehaviour
 		mChanged = true;
 
 		// If we're in the editor, update the panel right away so its geometry gets updated.
+#if UNITY_3_5
 		if (mPanel != null && enabled && gameObject.active && !Application.isPlaying && material != null)
+#else
+		if (mPanel != null && enabled && gameObject.activeSelf && !Application.isPlaying && material != null)
+#endif
 		{
 			mPanel.AddWidget(this);
 			CheckLayer();
@@ -200,7 +203,11 @@ public abstract class UIWidget : MonoBehaviour
 
 	void CreatePanel ()
 	{
+#if UNITY_3_5
 		if (mPanel == null && enabled && gameObject.active && material != null)
+#else
+		if (mPanel == null && enabled && gameObject.activeSelf && material != null)
+#endif
 		{
 			mPanel = UIPanel.Find(cachedTransform);
 
@@ -261,7 +268,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Remember whether we're in play mode.
 	/// </summary>
 
-	protected virtual void Awake () { mPlayMode = Application.isPlaying; }
+	protected virtual void Awake() { mPlayMode = Application.isPlaying; }
 
 	/// <summary>
 	/// Mark the widget and the panel as having been changed.
@@ -424,7 +431,11 @@ public abstract class UIWidget : MonoBehaviour
 	/// Append the local geometry buffers to the specified ones.
 	/// </summary>
 
+#if UNITY_3_5_4
 	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color> c, BetterList<Vector3> n, BetterList<Vector4> t)
+#else
+	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color32> c, BetterList<Vector3> n, BetterList<Vector4> t)
+#endif
 	{
 		mGeom.WriteToBuffers(v, u, c, n, t);
 	}
@@ -518,5 +529,9 @@ public abstract class UIWidget : MonoBehaviour
 	/// Virtual function called by the UIPanel that fills the buffers.
 	/// </summary>
 
+#if UNITY_3_5_4
 	virtual public void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols) { }
+#else
+	virtual public void OnFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols) { }
+#endif
 }

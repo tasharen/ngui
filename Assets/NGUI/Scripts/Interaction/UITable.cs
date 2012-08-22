@@ -60,7 +60,11 @@ public class UITable : MonoBehaviour
 				for (int i = 0; i < myTrans.childCount; ++i)
 				{
 					Transform child = myTrans.GetChild(i);
+#if UNITY_3_5
 					if (child && (!hideInactive || child.gameObject.active)) mChildren.Add(child);
+#else
+					if (child && (!hideInactive || child.gameObject.activeSelf)) mChildren.Add(child);
+#endif
 				}
 				if (sorted) mChildren.Sort(SortByName);
 			}
@@ -160,6 +164,7 @@ public class UITable : MonoBehaviour
 			if (ch.Count > 0) RepositionVariableSize(ch);
 			if (mPanel != null && mDrag == null) mPanel.ConstrainTargetToBounds(myTrans, true);
 			if (mDrag != null) mDrag.UpdateScrollbars(true);
+			if (onReposition != null) onReposition();
 		}
 		else repositionNow = true;
 	}
@@ -190,7 +195,6 @@ public class UITable : MonoBehaviour
 		{
 			repositionNow = false;
 			Reposition();
-			if (onReposition != null) onReposition();
 		}
 	}
 }

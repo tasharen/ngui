@@ -62,7 +62,7 @@ public class TweenColor : UITweener
 	/// Interpolate and update the color.
 	/// </summary>
 
-	override protected void OnUpdate (float factor, bool isFinished) { color = from * (1f - factor) + to * factor; }
+	override protected void OnUpdate(float factor, bool isFinished) { color = Color.Lerp(from, to, factor); }
 
 	/// <summary>
 	/// Start the tweening operation.

@@ -80,7 +80,11 @@ public class UIPanel : MonoBehaviour
 	BetterList<Vector3> mNorms = new BetterList<Vector3>();
 	BetterList<Vector4> mTans = new BetterList<Vector4>();
 	BetterList<Vector2> mUvs = new BetterList<Vector2>();
+#if UNITY_3_5_4
 	BetterList<Color> mCols = new BetterList<Color>();
+#else
+	BetterList<Color32> mCols = new BetterList<Color32>();
+#endif
 
 	Transform mTrans;
 	Camera mCam;
@@ -145,9 +149,17 @@ public class UIPanel : MonoBehaviour
 				{
 					UIDrawCall dc = list[i];
 					GameObject go = dc.gameObject;
+#if UNITY_3_5
 					go.active = false;
+#else
+					go.SetActive(false);
+#endif
 					go.hideFlags = flags;
+#if UNITY_3_5
 					go.active = true;
+#else
+					go.SetActive(true);
+#endif
 				}
 			}
 		}
@@ -283,7 +295,11 @@ public class UIPanel : MonoBehaviour
 
 	public bool IsVisible (UIWidget w)
 	{
+#if UNITY_3_5
 		if (!w.enabled || !w.gameObject.active || w.color.a < 0.001f) return false;
+#else
+		if (!w.enabled || !w.gameObject.activeSelf || w.color.a < 0.001f) return false;
+#endif
 
 		// No clipping? No point in checking.
 		if (mClipping == UIDrawCall.Clipping.None) return true;

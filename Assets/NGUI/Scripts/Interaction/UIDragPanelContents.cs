@@ -63,7 +63,11 @@ public class UIDragPanelContents : MonoBehaviour
 
 	void OnPress (bool pressed)
 	{
+#if UNITY_3_5
 		if (enabled && gameObject.active && draggablePanel != null)
+#else
+		if (enabled && gameObject.activeSelf && draggablePanel != null)
+#endif
 		{
 			draggablePanel.Press(pressed);
 		}
@@ -75,7 +79,11 @@ public class UIDragPanelContents : MonoBehaviour
 
 	void OnDrag (Vector2 delta)
 	{
+#if UNITY_3_5
 		if (enabled && gameObject.active && draggablePanel != null)
+#else
+		if (enabled && gameObject.activeSelf && draggablePanel != null)
+#endif
 		{
 			draggablePanel.Drag(delta);
 		}
@@ -87,7 +95,11 @@ public class UIDragPanelContents : MonoBehaviour
 
 	void OnScroll (float delta)
 	{
+#if UNITY_3_5
 		if (enabled && gameObject.active && draggablePanel != null)
+#else
+		if (enabled && gameObject.activeSelf && draggablePanel != null)
+#endif
 		{
 			draggablePanel.Scroll(delta);
 		}

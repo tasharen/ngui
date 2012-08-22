@@ -194,7 +194,11 @@ public class UIInput : MonoBehaviour
 
 	void OnSelect (bool isSelected)
 	{
+#if UNITY_3_5
 		if (label != null && enabled && gameObject.active)
+#else
+		if (label != null && enabled && gameObject.activeSelf)
+#endif
 		{
 			if (isSelected)
 			{
@@ -309,7 +313,11 @@ public class UIInput : MonoBehaviour
 
 	void OnInput (string input)
 	{
+#if UNITY_3_5
 		if (selected && enabled && gameObject.active)
+#else
+		if (selected && enabled && gameObject.activeSelf)
+#endif
 		{
 			// Mobile devices handle input in Update()
 			if (Application.platform == RuntimePlatform.Android) return;

@@ -173,13 +173,21 @@ public class UIScrollBar : MonoBehaviour
 			if (mFG != null)
 			{
 				mFG.alpha = value;
+#if UNITY_3_5
 				mFG.gameObject.active = mFG.alpha > 0.001f;
+#else
+				mFG.gameObject.SetActive(mFG.alpha > 0.001f);
+#endif
 			}
 
 			if (mBG != null)
 			{
 				mBG.alpha = value;
-				mBG.gameObject.active = mBG.alpha > 0.001f;
+#if UNITY_3_5
+				mFG.gameObject.active = mFG.alpha > 0.001f;
+#else
+				mFG.gameObject.SetActive(mFG.alpha > 0.001f);
+#endif
 			}
 		}
 	}

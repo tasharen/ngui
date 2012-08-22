@@ -214,7 +214,11 @@ public class UIDrawCall : MonoBehaviour
 	/// Set the draw call's geometry.
 	/// </summary>
 
+#if UNITY_3_5_4
 	public void Set (BetterList<Vector3> verts, BetterList<Vector3> norms, BetterList<Vector4> tans, BetterList<Vector2> uvs, BetterList<Color> cols)
+#else
+	public void Set (BetterList<Vector3> verts, BetterList<Vector3> norms, BetterList<Vector4> tans, BetterList<Vector2> uvs, BetterList<Color32> cols)
+#endif
 	{
 		int count = verts.size;
 
@@ -262,7 +266,11 @@ public class UIDrawCall : MonoBehaviour
 				if (norms != null) mesh.normals = norms.ToArray();
 				if (tans != null) mesh.tangents = tans.ToArray();
 				mesh.uv = uvs.ToArray();
+#if UNITY_3_5_4
 				mesh.colors = cols.ToArray();
+#else
+				mesh.colors32 = cols.ToArray();
+#endif
 				if (rebuildIndices) mesh.triangles = mIndices;
 				mesh.RecalculateBounds();
 				mFilter.mesh = mesh;

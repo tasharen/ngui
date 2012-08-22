@@ -58,6 +58,27 @@ public class UISlicedSprite : UISprite
 	}
 
 	/// <summary>
+	/// Sliced sprites shouldn't use padding.
+	/// </summary>
+
+	override public Vector2 pivotOffset
+	{
+		get
+		{
+			Vector2 v = Vector2.zero;
+			Pivot p = pivot;
+
+			if (p == Pivot.Top || p == Pivot.Center || p == Pivot.Bottom) v.x = -0.5f;
+			else if (p == Pivot.TopRight || p == Pivot.Right || p == Pivot.BottomRight) v.x = -1f;
+
+			if (p == Pivot.Left || p == Pivot.Center || p == Pivot.Right) v.y = 0.5f;
+			else if (p == Pivot.BottomLeft || p == Pivot.Bottom || p == Pivot.BottomRight) v.y = 1f;
+
+			return v;
+		}
+	}
+
+	/// <summary>
 	/// Update the texture UVs used by the widget.
 	/// </summary>
 
@@ -113,7 +134,11 @@ public class UISlicedSprite : UISprite
 	/// Draw the widget.
 	/// </summary>
 
+#if UNITY_3_5_4
 	override public void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
+#else
+	override public void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
+#endif
 	{
 		if (mOuterUV == mInnerUV)
 		{
@@ -189,6 +214,12 @@ public class UISlicedSprite : UISprite
 			for (int i = 0; i < 4; ++i) uv[i] = Vector2.zero;
 		}
 
+#if UNITY_3_5_4
+		Color col = color;
+#else
+		Color32 col = color;
+#endif
+
 		for (int x = 0; x < 3; ++x)
 		{
 			int x2 = x + 1;
@@ -209,10 +240,10 @@ public class UISlicedSprite : UISprite
 				uvs.Add(new Vector2(uv[x].x, uv[y2].y));
 				uvs.Add(new Vector2(uv[x].x, uv[y].y));
 
-				cols.Add(color);
-				cols.Add(color);
-				cols.Add(color);
-				cols.Add(color);
+				cols.Add(col);
+				cols.Add(col);
+				cols.Add(col);
+				cols.Add(col);
 			}
 		}
 	}

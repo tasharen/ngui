@@ -113,7 +113,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 	bool mCalculatedBounds = false;
 	bool mShouldMove = false;
 	bool mIgnoreCallbacks = false;
-	int mTouches = 0;
+	int mDragID = -10;
 
 	/// <summary>
 	/// Panel that's being dragged.
@@ -479,9 +479,14 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	public void Press (bool pressed)
 	{
+#if UNITY_3_5
 		if (enabled && gameObject.active)
+#else
+		if (enabled && gameObject.activeSelf)
+#endif
 		{
-			mTouches += (pressed ? 1 : -1);
+			if (!pressed && mDragID == UICamera.currentTouchID) mDragID = -10;
+
 			mCalculatedBounds = false;
 			mShouldMove = shouldMove;
 			if (!mShouldMove) return;
@@ -519,8 +524,13 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	public void Drag (Vector2 delta)
 	{
+#if UNITY_3_5
 		if (enabled && gameObject.active && mShouldMove)
+#else
+		if (enabled && gameObject.activeSelf && mShouldMove)
+#endif
 		{
+			if (mDragID == -10) mDragID = UICamera.currentTouchID;
 			UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
 
 			Ray ray = UICamera.currentCamera.ScreenPointToRay(UICamera.currentTouch.pos);
@@ -562,7 +572,11 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	public void Scroll (float delta)
 	{
+#if UNITY_3_5
 		if (enabled && gameObject.active)
+#else
+		if (enabled && gameObject.activeSelf)
+#endif
 		{
 			DisableSpring();
 			mShouldMove = shouldMove;
@@ -597,7 +611,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 			bool vertical = false;
 			bool horizontal = false;
 
-			if (showScrollBars != ShowCondition.WhenDragging || mTouches > 0)
+			if (showScrollBars != ShowCondition.WhenDragging || mDragID != -10)
 			{
 				vertical = shouldMoveVertically;
 				horizontal = shouldMoveHorizontally;

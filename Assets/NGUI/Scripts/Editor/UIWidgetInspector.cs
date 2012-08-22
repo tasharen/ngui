@@ -124,7 +124,7 @@ public class UIWidgetInspector : Editor
 		{
 			GUILayout.BeginHorizontal();
 			{
-				UISettings.texturePreview = EditorGUILayout.Toggle("Preview", UISettings.texturePreview, GUILayout.Width(100f));
+				NGUISettings.texturePreview = EditorGUILayout.Toggle("Preview", NGUISettings.texturePreview, GUILayout.Width(100f));
 
 				/*if (UISettings.texturePreview)
 				{
@@ -144,7 +144,7 @@ public class UIWidgetInspector : Editor
 			GUILayout.EndHorizontal();
 
 			// Draw the texture last
-			if (UISettings.texturePreview) OnDrawTexture();
+			if (NGUISettings.texturePreview) OnDrawTexture();
 		}
 	}
 

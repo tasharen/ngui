@@ -393,8 +393,12 @@ public class UIFont : MonoBehaviour
 		for (int i = 0, imax = labels.Length; i < imax; ++i)
 		{
 			UILabel lbl = labels[i];
-
+			
+#if UNITY_3_5
 			if (lbl.enabled && lbl.gameObject.active && CheckIfRelated(this, lbl.font))
+#else
+			if (lbl.enabled && lbl.gameObject.activeSelf && CheckIfRelated(this, lbl.font))
+#endif
 			{
 				UIFont fnt = lbl.font;
 				lbl.font = null;
@@ -490,6 +494,8 @@ public class UIFont : MonoBehaviour
 
 	public string GetEndOfLineThatFits (string text, float maxWidth, bool encoding, SymbolStyle symbolStyle)
 	{
+		if (mReplacement != null) return mReplacement.GetEndOfLineThatFits(text, maxWidth, encoding, symbolStyle);
+
 		int lineWidth = Mathf.RoundToInt(maxWidth * size);
 		if (lineWidth < 1) return text;
 
@@ -599,8 +605,11 @@ public class UIFont : MonoBehaviour
 					}
 					else if (offset + 7 < textLength && text[offset + 7] == ']')
 					{
-						offset += 7;
-						continue;
+						if (NGUITools.EncodeColor(NGUITools.ParseColor(text, offset + 1)) == text.Substring(offset + 1, 6).ToUpper())
+						{
+							offset += 7;
+							continue;
+						}
 					}
 				}
 			}
@@ -729,8 +738,13 @@ public class UIFont : MonoBehaviour
 	/// Note: 'lineWidth' parameter should be in pixels.
 	/// </summary>
 
-	public void Print (string text, Color color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols,
+#if UNITY_3_5_4
+	public void Print (string text, Color32 color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols,
 		bool encoding, SymbolStyle symbolStyle, Alignment alignment, int lineWidth)
+#else
+	public void Print (string text, Color32 color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols,
+		bool encoding, SymbolStyle symbolStyle, Alignment alignment, int lineWidth)
+#endif
 	{
 		if (mReplacement != null)
 		{
@@ -884,7 +898,7 @@ public class UIFont : MonoBehaviour
 					}
 					else
 					{
-						Color col = Color.white;
+						Color32 col = Color.white;
 						col.a = color.a;
 						for (int b = 0; b < 4; ++b) cols.Add(col);
 					}

@@ -88,13 +88,21 @@ public class UIPanelTool : EditorWindow
 
 			if (state)
 			{
+#if UNITY_3_5
 				child.gameObject.active = true;
+#else
+				child.gameObject.SetActive(true);
+#endif
 				SetActiveState(child, true);
 			}
 			else
 			{
 				SetActiveState(child, false);
+#if UNITY_3_5
 				child.gameObject.active = false;
+#else
+				child.gameObject.SetActive(false);
+#endif
 			}
 			EditorUtility.SetDirty(child.gameObject);
 		}
@@ -108,13 +116,21 @@ public class UIPanelTool : EditorWindow
 	{
 		if (state)
 		{
+#if UNITY_3_5
 			panel.gameObject.active = true;
+#else
+			panel.gameObject.SetActive(true);
+#endif
 			SetActiveState(panel.transform, true);
 		}
 		else
 		{
 			SetActiveState(panel.transform, false);
+#if UNITY_3_5
 			panel.gameObject.active = false;
+#else
+			panel.gameObject.SetActive(false);
+#endif
 		}
 		EditorUtility.SetDirty(panel.gameObject);
 	}
@@ -141,14 +157,22 @@ public class UIPanelTool : EditorWindow
 				Entry ent = new Entry();
 				ent.panel = panel;
 				ent.widgets = GetWidgets(panel);
+#if UNITY_3_5
 				ent.isEnabled = panel.enabled && panel.gameObject.active;
+#else
+				ent.isEnabled = panel.enabled && panel.gameObject.activeSelf;
+#endif
 				ent.widgetsEnabled = ent.isEnabled;
 
 				if (ent.widgetsEnabled)
 				{
 					foreach (UIWidget w in ent.widgets)
 					{
+#if UNITY_3_5
 						if (!w.gameObject.active)
+#else
+						if (!w.gameObject.activeSelf)
+#endif
 						{
 							allEnabled = false;
 							ent.widgetsEnabled = false;

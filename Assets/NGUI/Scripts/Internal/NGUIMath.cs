@@ -43,6 +43,12 @@ static public class NGUIMath
 	}
 
 	/// <summary>
+	/// In the shader, equivalent function would be 'fract'
+	/// </summary>
+
+	static public float Wrap01 (float val) { return val - Mathf.FloorToInt(val); }
+
+	/// <summary>
 	/// Convert a hexadecimal character to its decimal value.
 	/// </summary>
 
@@ -329,7 +335,7 @@ static public class NGUIMath
 	static public Bounds CalculateRelativeWidgetBounds (Transform root, Transform child)
 	{
 		UIWidget[] widgets = child.GetComponentsInChildren<UIWidget>() as UIWidget[];
-		if (widgets.Length == 0) return new Bounds(root.position, Vector3.zero);
+		if (widgets.Length == 0) return new Bounds(Vector3.zero, Vector3.zero);
 
 		Vector3 vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
 		Vector3 vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);

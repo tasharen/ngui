@@ -168,7 +168,11 @@ public class UITexture : UIWidget
 	/// Virtual function called by the UIScreen that fills the buffers.
 	/// </summary>
 
+#if UNITY_3_5_4
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
+#else
+	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
+#endif
 	{
 		verts.Add(new Vector3(1f,  0f, 0f));
 		verts.Add(new Vector3(1f, -1f, 0f));

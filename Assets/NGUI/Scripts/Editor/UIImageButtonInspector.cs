@@ -64,7 +64,7 @@ public class UIImageButtonInspector : Editor
 					mButton.pressedSprite = press;
 					sprite.spriteName = normal;
 					sprite.MakePixelPerfect();
-					NGUITools.AddWidgetCollider(mButton.gameObject);
+					if (mButton.collider == null || (mButton.collider is BoxCollider)) NGUITools.AddWidgetCollider(mButton.gameObject);
 				}
 			}
 		}

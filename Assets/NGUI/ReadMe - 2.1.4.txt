@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.1.4
+                Version 2.1.5
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,16 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.1.5:
+- NEW: Added support for Unity 4.
+- NEW: NGUI now uses Unity 3.5.5's newly-added Color32 for colors instead of Color, reducing the memory bandwidth a bit.
+- NEW: UIStretch can now stretch to another widget's bounds, not just the screen.
+- FIX: UIImageButton will no longer add a box collider if a non-box collider is present.
+- FIX: NGUITools.ParseSymbol will now check to see if the symbol is valid.
+- FIX: UITexture-related tweaks to UIWidget.
+- FIX: UIAnchor can now anchor to labels.
+- FIX: UISlicedSprite no longer uses padding.
 
 2.1.4:
 - NEW: UIInput now supports multi-line input if its label is multi-line. Hold Ctrl when hitting Enter.

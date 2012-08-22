@@ -86,7 +86,11 @@ public class UpdateManager : MonoBehaviour
 				}
 
 				// If the monobehaviour or its game object are disabled, move on to the next entry
+#if UNITY_3_5
 				if (!ent.mb.enabled || !ent.mb.gameObject.active) continue;
+#else
+				if (!ent.mb.enabled || !ent.mb.gameObject.activeSelf) continue;
+#endif
 			}
 
 			// Call the function

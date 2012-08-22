@@ -45,6 +45,19 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Helper function -- whether the disk access is allowed.
+	/// </summary>
+
+	static public bool fileAccess
+	{
+		get
+		{
+			return Application.platform != RuntimePlatform.WindowsWebPlayer &&
+				Application.platform != RuntimePlatform.OSXWebPlayer;
+		}
+	}
+
+	/// <summary>
 	/// Play the specified audio clip.
 	/// </summary>
 
@@ -189,6 +202,10 @@ static public class NGUITools
 					if (colors != null)
 					{
 						Color c = ParseColor(text, index + 1);
+
+						if (EncodeColor(c) != text.Substring(index + 1, 6).ToUpper())
+							return 0;
+
 						c.a = colors[colors.Count - 1].a;
 						colors.Add(c);
 					}
@@ -493,7 +510,11 @@ static public class NGUITools
 
 	static void Activate (Transform t)
 	{
+#if UNITY_3_5
 		t.gameObject.active = true;
+#else
+		t.gameObject.SetActive(true);
+#endif
 
 		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
 		{
@@ -513,7 +534,11 @@ static public class NGUITools
 			Transform child = t.GetChild(i);
 			Deactivate(child);
 		}
+#if UNITY_3_5
 		t.gameObject.active = false;
+#else
+		t.gameObject.SetActive(false);
+#endif
 	}
 
 	/// <summary>

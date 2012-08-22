@@ -44,7 +44,11 @@ public class UITiledSprite : UISlicedSprite
 	/// Fill the draw buffers.
 	/// </summary>
 
+#if UNITY_3_5_4
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
+#else
+	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
+#endif
 	{
 		Texture tex = material.mainTexture;
 		if (tex == null) return;

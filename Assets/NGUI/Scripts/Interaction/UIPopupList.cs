@@ -313,7 +313,11 @@ public class UIPopupList : MonoBehaviour
 
 	void OnKey (KeyCode key)
 	{
+#if UNITY_3_5
 		if (enabled && gameObject.active && handleEvents)
+#else
+		if (enabled && gameObject.activeSelf && handleEvents)
+#endif
 		{
 			int index = mLabelList.IndexOf(mHighlightedLabel);
 

@@ -12,7 +12,7 @@ using System.Collections.Generic;
 /// is to store the references in EditorPrefs -- retrieve them at start, and save them whenever something changes.
 /// </summary>
 
-public class UISettings
+public class NGUISettings
 {
 	static bool mLoaded = false;
 	static UIFont mFont;
