@@ -586,7 +586,6 @@ public class UIAtlasMaker : EditorWindow
 			tex = NGUIEditorTools.ImportTexture(newPath, false, false);
 		}
 		AssetDatabase.SaveAssets();
-		Resources.UnloadUnusedAssets();
 		return tex;
 	}
 

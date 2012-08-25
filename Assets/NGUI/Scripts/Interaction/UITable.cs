@@ -60,11 +60,8 @@ public class UITable : MonoBehaviour
 				for (int i = 0; i < myTrans.childCount; ++i)
 				{
 					Transform child = myTrans.GetChild(i);
-#if UNITY_3_5
-					if (child && (!hideInactive || child.gameObject.active)) mChildren.Add(child);
-#else
-					if (child && (!hideInactive || child.gameObject.activeSelf)) mChildren.Add(child);
-#endif
+
+					if (child && (!hideInactive || NGUITools.GetActive(child.gameObject))) mChildren.Add(child);
 				}
 				if (sorted) mChildren.Sort(SortByName);
 			}
@@ -162,8 +159,16 @@ public class UITable : MonoBehaviour
 			mChildren.Clear();
 			List<Transform> ch = children;
 			if (ch.Count > 0) RepositionVariableSize(ch);
-			if (mPanel != null && mDrag == null) mPanel.ConstrainTargetToBounds(myTrans, true);
-			if (mDrag != null) mDrag.UpdateScrollbars(true);
+
+			if (mDrag != null)
+			{
+				mDrag.UpdateScrollbars(true);
+				mDrag.RestrictWithinBounds(true);
+			}
+			else if (mPanel != null)
+			{
+				mPanel.ConstrainTargetToBounds(myTrans, true);
+			}
 			if (onReposition != null) onReposition();
 		}
 		else repositionNow = true;

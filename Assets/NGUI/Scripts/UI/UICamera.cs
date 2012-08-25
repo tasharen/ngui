@@ -358,11 +358,7 @@ public class UICamera : MonoBehaviour
 			{
 				// Invalid or inactive entry -- keep going
 				UICamera cam = mList[i];
-#if UNITY_3_5
-				if (cam == null || !cam.enabled || !cam.gameObject.active) continue;
-#else
-				if (cam == null || !cam.enabled || !cam.gameObject.activeSelf) continue;
-#endif
+				if (cam == null || !cam.enabled || !NGUITools.GetActive(cam.gameObject)) continue;
 				return cam;
 			}
 			return null;
@@ -391,11 +387,7 @@ public class UICamera : MonoBehaviour
 			UICamera cam = mList[i];
 			
 			// Skip inactive scripts
-#if UNITY_3_5
-			if (!cam.enabled || !cam.gameObject.active) continue;
-#else
-			if (!cam.enabled || !cam.gameObject.activeSelf) continue;
-#endif
+			if (!cam.enabled || !NGUITools.GetActive(cam.gameObject)) continue;
 
 			// Convert to view space
 			currentCamera = cam.cachedCamera;

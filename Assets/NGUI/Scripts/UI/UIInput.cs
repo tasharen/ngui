@@ -122,6 +122,7 @@ public class UIInput : MonoBehaviour
 		}
 		set
 		{
+			if (mDoInit) Init();
 			mText = value;
 
 			if (label != null)
@@ -159,22 +160,24 @@ public class UIInput : MonoBehaviour
 
 	protected void Init ()
 	{
-		if (label == null) label = GetComponentInChildren<UILabel>();
-		if (label != null)
+		if (mDoInit)
 		{
-			mDefaultText = label.text;
-			mDefaultColor = label.color;
-			label.supportEncoding = false;
-			mPivot = label.pivot;
-			mPosition = label.cachedTransform.localPosition.x;
+			mDoInit = false;
+			if (label == null) label = GetComponentInChildren<UILabel>();
+
+			if (label != null)
+			{
+				mDefaultText = label.text;
+				mDefaultColor = label.color;
+				label.supportEncoding = false;
+				mPivot = label.pivot;
+				mPosition = label.cachedTransform.localPosition.x;
+			}
+			else enabled = false;
 		}
 	}
 
-	/// <summary>
-	/// Initialize everything on awake.
-	/// </summary>
-
-	void Awake () { Init(); }
+	bool mDoInit = true;
 
 	/// <summary>
 	/// If the object is currently highlighted, it should also be selected.
@@ -194,11 +197,9 @@ public class UIInput : MonoBehaviour
 
 	void OnSelect (bool isSelected)
 	{
-#if UNITY_3_5
-		if (label != null && enabled && gameObject.active)
-#else
-		if (label != null && enabled && gameObject.activeSelf)
-#endif
+		if (mDoInit) Init();
+
+		if (label != null && enabled && NGUITools.GetActive(gameObject))
 		{
 			if (isSelected)
 			{
@@ -313,11 +314,9 @@ public class UIInput : MonoBehaviour
 
 	void OnInput (string input)
 	{
-#if UNITY_3_5
-		if (selected && enabled && gameObject.active)
-#else
-		if (selected && enabled && gameObject.activeSelf)
-#endif
+		if (mDoInit) Init();
+
+		if (selected && enabled && NGUITools.GetActive(gameObject))
 		{
 			// Mobile devices handle input in Update()
 			if (Application.platform == RuntimePlatform.Android) return;
@@ -395,6 +394,7 @@ public class UIInput : MonoBehaviour
 
 	void UpdateLabel ()
 	{
+		if (mDoInit) Init();
 		if (maxChars > 0 && mText.Length > maxChars) mText = mText.Substring(0, maxChars);
 
 		if (label.font != null)

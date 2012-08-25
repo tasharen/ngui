@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.1.5
+                Version 2.1.6
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,14 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.1.6:
+- NEW: UISavedOption now works on a popup list as well.
+- FIX: Replaced ifdefs for Unity 4 with a new helper functions for cleaner code (NGUITools.GetActive and NGUITools.SetActiveSelf).
+- FIX: UITable was not properly keeping the contents within the draggable panel.
+- FIX: UIDraggablePanel.UpdateScrollbars was not considering soft clipping properly, resulting in some jitterness.
+- FIX: SpringPanel was not setting position / clipping when it finished, resulting in floating-point drifting errors.
+- FIX: UIInput's "not selected" text can now be localized using UILocalize.
 
 2.1.5:
 - NEW: Added support for Unity 4.

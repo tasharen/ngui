@@ -79,11 +79,8 @@ public class UIGrid : MonoBehaviour
 			for (int i = 0, imax = list.Count; i < imax; ++i)
 			{
 				Transform t = list[i];
-#if UNITY_3_5
-				if (!t.gameObject.active && hideInactive) continue;
-#else
-				if (!t.gameObject.activeSelf && hideInactive) continue;
-#endif
+
+				if (!NGUITools.GetActive(t.gameObject) && hideInactive) continue;
 
 				float depth = t.localPosition.z;
 				t.localPosition = (arrangement == Arrangement.Horizontal) ?
@@ -102,11 +99,8 @@ public class UIGrid : MonoBehaviour
 			for (int i = 0; i < myTrans.childCount; ++i)
 			{
 				Transform t = myTrans.GetChild(i);
-#if UNITY_3_5
-				if (!t.gameObject.active && hideInactive) continue;
-#else
-				if (!t.gameObject.activeSelf && hideInactive) continue;
-#endif
+
+				if (!NGUITools.GetActive(t.gameObject) && hideInactive) continue;
 
 				float depth = t.localPosition.z;
 				t.localPosition = (arrangement == Arrangement.Horizontal) ?

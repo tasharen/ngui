@@ -394,11 +394,7 @@ public class UIFont : MonoBehaviour
 		{
 			UILabel lbl = labels[i];
 			
-#if UNITY_3_5
-			if (lbl.enabled && lbl.gameObject.active && CheckIfRelated(this, lbl.font))
-#else
-			if (lbl.enabled && lbl.gameObject.activeSelf && CheckIfRelated(this, lbl.font))
-#endif
+			if (lbl.enabled && NGUITools.GetActive(lbl.gameObject) && CheckIfRelated(this, lbl.font))
 			{
 				UIFont fnt = lbl.font;
 				lbl.font = null;

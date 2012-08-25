@@ -180,8 +180,8 @@ public class UIDraggablePanel : IgnoreTimeScale
 			Vector4 clip = mPanel.clipRange;
 			Bounds b = bounds;
 
-			float hx = clip.z * 0.5f;
-			float hy = clip.w * 0.5f;
+			float hx = (clip.z == 0f) ? Screen.width  : clip.z * 0.5f;
+			float hy = (clip.w == 0f) ? Screen.height : clip.w * 0.5f;
 
 			if (!Mathf.Approximately(scale.x, 0f))
 			{
@@ -288,62 +288,51 @@ public class UIDraggablePanel : IgnoreTimeScale
 				mShouldMove = shouldMove;
 			}
 
-			if (horizontalScrollBar != null)
+			Bounds b = bounds;
+			Vector2 bmin = b.min;
+			Vector2 bmax = b.max;
+
+			if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
 			{
-				Bounds b = bounds;
-				Vector3 boundsSize = b.size;
-
-				if (boundsSize.x > 0f)
-				{
-					Vector4 clip = mPanel.clipRange;
-					float extents = clip.z * 0.5f;
-					float min = clip.x - extents - b.min.x;
-					float max = b.max.x - extents - clip.x;
-
-					if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
-					{
-						min += mPanel.clipSoftness.x;
-						max -= mPanel.clipSoftness.x;
-					}
-
-					min = Mathf.Clamp01(min / boundsSize.x);
-					max = Mathf.Clamp01(max / boundsSize.x);
-
-					float sum = min + max;
-					mIgnoreCallbacks = true;
-					horizontalScrollBar.barSize = 1f - sum;
-					horizontalScrollBar.scrollValue = (sum > 0.001f) ? min / sum : 0f;
-					mIgnoreCallbacks = false;
-				}
+				Vector2 soft = mPanel.clipSoftness;
+				bmin -= soft;
+				bmax += soft;
 			}
 
-			if (verticalScrollBar != null)
+			if (horizontalScrollBar != null && bmax.x > bmin.x)
 			{
-				Bounds b = bounds;
-				Vector3 boundsSize = b.size;
+				Vector4 clip = mPanel.clipRange;
+				float extents = clip.z * 0.5f;
+				float min = clip.x - extents - b.min.x;
+				float max = b.max.x - extents - clip.x;
 
-				if (boundsSize.y > 0f)
-				{
-					Vector4 clip = mPanel.clipRange;
-					float extents = clip.w * 0.5f;
-					float min = clip.y - extents - b.min.y;
-					float max = b.max.y - extents - clip.y;
+				float width = bmax.x - bmin.x;
+				min = Mathf.Clamp01(min / width);
+				max = Mathf.Clamp01(max / width);
 
-					if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
-					{
-						min += mPanel.clipSoftness.y;
-						max -= mPanel.clipSoftness.y;
-					}
+				float sum = min + max;
+				mIgnoreCallbacks = true;
+				horizontalScrollBar.barSize = 1f - sum;
+				horizontalScrollBar.scrollValue = (sum > 0.001f) ? min / sum : 0f;
+				mIgnoreCallbacks = false;
+			}
 
-					min = Mathf.Clamp01(min / boundsSize.y);
-					max = Mathf.Clamp01(max / boundsSize.y);
-					float sum = min + max;
+			if (verticalScrollBar != null && bmax.y > bmin.y)
+			{
+				Vector4 clip = mPanel.clipRange;
+				float extents = clip.w * 0.5f;
+				float min = clip.y - extents - bmin.y;
+				float max = bmax.y - extents - clip.y;
 
-					mIgnoreCallbacks = true;
-					verticalScrollBar.barSize = 1f - sum;
-					verticalScrollBar.scrollValue = (sum > 0.001f) ? 1f - min / sum : 0f;
-					mIgnoreCallbacks = false;
-				}
+				float height = bmax.y - bmin.y;
+				min = Mathf.Clamp01(min / height);
+				max = Mathf.Clamp01(max / height);
+				float sum = min + max;
+
+				mIgnoreCallbacks = true;
+				verticalScrollBar.barSize = 1f - sum;
+				verticalScrollBar.scrollValue = (sum > 0.001f) ? 1f - min / sum : 0f;
+				mIgnoreCallbacks = false;
 			}
 		}
 		else if (recalculateBounds)
@@ -452,7 +441,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 	/// Move the panel by the specified amount.
 	/// </summary>
 
-	void MoveRelative (Vector3 relative)
+	public void MoveRelative (Vector3 relative)
 	{
 		mTrans.localPosition += relative;
 		Vector4 cr = mPanel.clipRange;
@@ -466,7 +455,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 	/// Move the panel by the specified amount.
 	/// </summary>
 
-	void MoveAbsolute (Vector3 absolute)
+	public void MoveAbsolute (Vector3 absolute)
 	{
 		Vector3 a = mTrans.InverseTransformPoint(absolute);
 		Vector3 b = mTrans.InverseTransformPoint(Vector3.zero);
@@ -479,11 +468,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	public void Press (bool pressed)
 	{
-#if UNITY_3_5
-		if (enabled && gameObject.active)
-#else
-		if (enabled && gameObject.activeSelf)
-#endif
+		if (enabled && NGUITools.GetActive(gameObject))
 		{
 			if (!pressed && mDragID == UICamera.currentTouchID) mDragID = -10;
 
@@ -524,11 +509,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	public void Drag (Vector2 delta)
 	{
-#if UNITY_3_5
-		if (enabled && gameObject.active && mShouldMove)
-#else
-		if (enabled && gameObject.activeSelf && mShouldMove)
-#endif
+		if (enabled && NGUITools.GetActive(gameObject) && mShouldMove)
 		{
 			if (mDragID == -10) mDragID = UICamera.currentTouchID;
 			UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
@@ -572,11 +553,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	public void Scroll (float delta)
 	{
-#if UNITY_3_5
-		if (enabled && gameObject.active)
-#else
-		if (enabled && gameObject.activeSelf)
-#endif
+		if (enabled && NGUITools.GetActive(gameObject))
 		{
 			DisableSpring();
 			mShouldMove = shouldMove;

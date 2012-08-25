@@ -96,6 +96,7 @@ static public class NGUITools
 				AudioSource source = mListener.audio;
 				if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
 				source.pitch = pitch;
+				source.priority = 255;
 				source.PlayOneShot(clip, volume);
 				return source;
 			}
@@ -510,11 +511,7 @@ static public class NGUITools
 
 	static void Activate (Transform t)
 	{
-#if UNITY_3_5
-		t.gameObject.active = true;
-#else
-		t.gameObject.SetActive(true);
-#endif
+		SetActiveSelf(t.gameObject, true);
 
 		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
 		{
@@ -534,11 +531,7 @@ static public class NGUITools
 			Transform child = t.GetChild(i);
 			Deactivate(child);
 		}
-#if UNITY_3_5
-		t.gameObject.active = false;
-#else
-		t.gameObject.SetActive(false);
-#endif
+		SetActiveSelf(t.gameObject, false);
 	}
 
 	/// <summary>
@@ -555,6 +548,32 @@ static public class NGUITools
 		{
 			Deactivate(go.transform);
 		}
+	}
+
+	/// <summary>
+	/// Unity4 has changed .active to .activeself to clean up the code check here
+	/// </summary>
+
+	static public bool GetActive(GameObject go)
+	{
+#if UNITY_3_5
+		return go.active;
+#else
+		return go.activeSelf;
+#endif
+	}
+
+	/// <summary>
+	/// Unity4 has changed .active to SetActive to clean up the code check here
+	/// </summary>
+
+	static public void SetActiveSelf(GameObject go, bool state)
+	{
+#if UNITY_3_5
+		go.active = state;
+#else
+		go.SetActive(state);
+#endif
 	}
 
 	/// <summary>

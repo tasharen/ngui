@@ -43,16 +43,22 @@ public class SpringPanel : IgnoreTimeScale
 		if (mThreshold == 0f) mThreshold = (target - mTrans.localPosition).magnitude * 0.005f;
 
 		Vector3 before = mTrans.localPosition;
-		mTrans.localPosition = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, delta);
+		Vector3 after = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, delta);
 
-		Vector3 offset = mTrans.localPosition - before;
+		if (mThreshold >= Vector3.Magnitude(after - target))
+		{
+			after = target;
+			enabled = false;
+		}
+		mTrans.localPosition = after;
+
+		Vector3 offset = after - before;
 		Vector4 cr = mPanel.clipRange;
 		cr.x -= offset.x;
 		cr.y -= offset.y;
 		mPanel.clipRange = cr;
 
 		if (mDrag != null) mDrag.UpdateScrollbars(false);
-		if (mThreshold >= (target - mTrans.localPosition).magnitude) enabled = false;
 	}
 
 	/// <summary>

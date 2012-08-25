@@ -16,8 +16,6 @@ public class UIInputSaved : UIInput
 
 	void Start ()
 	{
-		Init();
-
 		if (!string.IsNullOrEmpty(playerPrefsField) && PlayerPrefs.HasKey(playerPrefsField))
 		{
 			text = PlayerPrefs.GetString(playerPrefsField);

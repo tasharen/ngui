@@ -460,11 +460,7 @@ public class NGUIEditorTools
 		GameObject go = Selection.activeGameObject;
 
 		// Only use active objects
-#if UNITY_3_5
-		if (go != null && !go.active) go = null;
-#else
-		if (go != null && !go.activeSelf) go = null;
-#endif
+		if (go != null && !NGUITools.GetActive(go)) go = null;
 
 		// Try to find a panel
 		UIPanel p = (go != null) ? NGUITools.FindInParents<UIPanel>(go) : null;
