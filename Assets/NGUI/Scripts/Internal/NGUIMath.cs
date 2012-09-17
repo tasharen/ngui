@@ -6,6 +6,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 /// <summary>
 /// Helper class containing generic functions used throughout the UI library.
@@ -86,6 +87,41 @@ static public class NGUIMath
 			case 'F': return 0xF;
 		}
 		return 0xF;
+	}
+
+	/// <summary>
+	/// Convert a single 0-15 value into its hex representation.
+	/// It's coded because int.ToString(format) syntax doesn't seem to be supported by Unity's Flash. It just silently crashes.
+	/// </summary>
+
+	static public char DecimalToHexChar (int num)
+	{
+		if (num > 15) return 'F';
+		if (num < 10) return (char)('0' + num);
+		return (char)('A' + num - 10);
+	}
+
+	/// <summary>
+	/// Convert a decimal value to its hex representation.
+	/// It's coded because num.ToString("X6") syntax doesn't seem to be supported by Unity's Flash. It just silently crashes.
+	/// string.Format("{0,6:X}", num).Replace(' ', '0') doesn't work either. It returns the format string, not the formatted value.
+	/// </summary>
+
+	static public string DecimalToHex (int num)
+	{
+		num &= 0xFFFFFF;
+#if UNITY_FLASH
+		StringBuilder sb = new StringBuilder();
+		sb.Append(DecimalToHexChar((num >> 20) & 0xF));
+		sb.Append(DecimalToHexChar((num >> 16) & 0xF));
+		sb.Append(DecimalToHexChar((num >> 12) & 0xF));
+		sb.Append(DecimalToHexChar((num >> 8) & 0xF));
+		sb.Append(DecimalToHexChar((num >> 4) & 0xF));
+		sb.Append(DecimalToHexChar(num & 0xF));
+		return sb.ToString();
+#else
+		return num.ToString("X6");
+#endif
 	}
 
 	/// <summary>

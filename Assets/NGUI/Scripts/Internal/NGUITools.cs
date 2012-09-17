@@ -171,13 +171,8 @@ static public class NGUITools
 
 	static public string EncodeColor (Color c)
 	{
-#if UNITY_FLASH
-		// int.ToString(format) doesn't seem to be supported on Flash as of 3.5.0 -- it simply silently crashes
-		return "FFFFFF";
-#else
 		int i = 0xFFFFFF & (NGUIMath.ColorToInt(c) >> 8);
-		return i.ToString("X6");
-#endif
+		return NGUIMath.DecimalToHex(i);
 	}
 
 	/// <summary>
