@@ -43,6 +43,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: When editing a sprite in the atlas, a "Return to ..." button is shown if you've navigated here from a sprite.
 - FIX: UIAnchor and UIStretch now work with labels properly.
 - FIX: UITexture will no longer occasionally lose the reference to its texture.
+- FIX: NGUITools.EncodeColor now works in Flash (created a work-around).
 
 2.1.6:
 - NEW: UISavedOption now works on a popup list as well.
