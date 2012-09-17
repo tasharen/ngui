@@ -33,22 +33,18 @@ public class UISpriteInspector : UIWidgetInspector
 	}
 
 	/// <summary>
-	/// Convenience function that displays a list of sprites and returns the selected value.
+	/// Sprite selection callback function.
 	/// </summary>
 
-	static public string SpriteField (UIAtlas atlas, string field, string name, params GUILayoutOption[] options)
+	void SelectSprite (string spriteName)
 	{
-		List<string> sprites = atlas.GetListOfSprites();
-		return (sprites != null && sprites.Count > 0) ? NGUIEditorTools.DrawList(field, sprites.ToArray(), name, options) : null;
-	}
-
-	/// <summary>
-	/// Convenience function that displays a list of sprites and returns the selected value.
-	/// </summary>
-
-	static public string SpriteField (UIAtlas atlas, string name, params GUILayoutOption[] options)
-	{
-		return SpriteField(atlas, "Sprite", name, options);
+		if (mSprite != null && mSprite.spriteName != spriteName)
+		{
+			NGUIEditorTools.RegisterUndo("Sprite Change", mSprite);
+			mSprite.spriteName = spriteName;
+			mSprite.MakePixelPerfect();
+			EditorUtility.SetDirty(mSprite.gameObject);
+		}
 	}
 
 	/// <summary>
@@ -60,44 +56,40 @@ public class UISpriteInspector : UIWidgetInspector
 		mSprite = mWidget as UISprite;
 		ComponentSelector.Draw<UIAtlas>(mSprite.atlas, OnSelectAtlas);
 		if (mSprite.atlas == null) return false;
-
-		string spriteName = SpriteField(mSprite.atlas, mSprite.spriteName);
-
-		if (mSprite.spriteName != spriteName)
-		{
-			NGUIEditorTools.RegisterUndo("Sprite Change", mSprite);
-			mSprite.spriteName = spriteName;
-			mSprite.MakePixelPerfect();
-			EditorUtility.SetDirty(mSprite.gameObject);
-		}
+		NGUIEditorTools.AdvancedSpriteField(mSprite.atlas, mSprite.spriteName, SelectSprite, false);
 		return true;
 	}
 
 	/// <summary>
-	/// Draw the sprite texture.
+	/// All widgets have a preview.
 	/// </summary>
 
-	override protected void OnDrawTexture ()
+	public override bool HasPreviewGUI () { return true; }
+
+	/// <summary>
+	/// Draw the sprite preview.
+	/// </summary>
+
+	public override void OnPreviewGUI (Rect rect, GUIStyle background)
 	{
+		if (mSprite == null) return;
+
 		Texture2D tex = mSprite.mainTexture as Texture2D;
+		if (tex == null) return;
 
-		if (tex != null)
+		Rect outer = new Rect(mSprite.sprite.outer);
+		Rect inner = new Rect(mSprite.sprite.inner);
+		Rect uv = outer;
+
+		if (mSprite.atlas.coordinates == UIAtlas.Coordinates.Pixels)
 		{
-			// Draw the atlas
-			EditorGUILayout.Separator();
-			Rect rect = NGUIEditorTools.DrawSprite(tex, mSprite.outerUV, mUseShader ? mSprite.atlas.spriteMaterial : null);
-
-			// Draw the selection
-			NGUIEditorTools.DrawOutline(rect, mSprite.outerUV, new Color(0.4f, 1f, 0f, 1f));
-
-			// Sprite size label
-			string text = "Sprite Size: ";
-			text += Mathf.RoundToInt(Mathf.Abs(mSprite.outerUV.width * tex.width));
-			text += "x";
-			text += Mathf.RoundToInt(Mathf.Abs(mSprite.outerUV.height * tex.height));
-
-			rect = GUILayoutUtility.GetRect(Screen.width, 18f);
-			EditorGUI.DropShadowLabel(rect, text);
+			uv = NGUIMath.ConvertToTexCoords(outer, tex.width, tex.height);
 		}
+		else
+		{
+			outer = NGUIMath.ConvertToPixels(outer, tex.width, tex.height, true);
+			inner = NGUIMath.ConvertToPixels(inner, tex.width, tex.height, true);
+		}
+		NGUIEditorTools.DrawSprite(tex, rect, outer, inner, uv, mSprite.color);
 	}
 }

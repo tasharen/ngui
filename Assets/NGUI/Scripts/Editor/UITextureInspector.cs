@@ -62,25 +62,4 @@ public class UITextureInspector : UIWidgetInspector
 		}
 		return (mWidget.material != null);
 	}
-
-	override protected void OnDrawTexture ()
-	{
-		Texture2D tex = mWidget.mainTexture as Texture2D;
-
-		if (tex != null)
-		{
-			// Draw the atlas
-			EditorGUILayout.Separator();
-
-			// Draw the texture and its UV outline
-			bool isSmall = (mTex.uvRect.width < 0.25f && mTex.uvRect.height < 0.25f);
-			Rect spriteRect = NGUIEditorTools.DrawSprite(tex, isSmall ?
-				mTex.uvRect : new Rect(0f, 0f, 1f, 1f), null, isSmall);
-			NGUIEditorTools.DrawOutline(spriteRect, mTex.uvRect, Color.green);
-
-			// Sprite size label
-			Rect rect = GUILayoutUtility.GetRect(Screen.width, 18f);
-			EditorGUI.DropShadowLabel(rect, "Texture Size: " + tex.width + "x" + tex.height);
-		}
-	}
 }

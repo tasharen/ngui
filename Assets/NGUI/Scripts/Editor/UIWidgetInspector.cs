@@ -17,7 +17,7 @@ public class UIWidgetInspector : Editor
 	static protected bool mUseShader = false;
 
 	bool mInitialized = false;
-	protected bool mAllowPreview = true;
+	bool mDepthCheck = false;
 
 	/// <summary>
 	/// Register an Undo command with the Unity editor.
@@ -83,20 +83,49 @@ public class UIWidgetInspector : Editor
 				{
 					NGUIEditorTools.RegisterUndo("Depth Change", mWidget);
 					mWidget.depth = depth;
+					mDepthCheck = true;
 				}
 			}
 			GUILayout.EndHorizontal();
+
+			UIPanel panel = mWidget.panel;
+
+			if (panel != null)
+			{
+				int count = 0;
+
+				for (int i = 0; i < panel.widgets.size; ++i)
+				{
+					UIWidget w = panel.widgets[i];
+					if (w != null && w.depth == mWidget.depth && w.material == mWidget.material) ++count;
+				}
+
+				if (count > 1)
+				{
+					EditorGUILayout.HelpBox(count + " widgets are using the depth value of " + mWidget.depth +
+						". It may not be clear what should be in front of what.", MessageType.Warning);
+				}
+
+				if (mDepthCheck)
+				{
+					if (panel.drawCalls.size > 1)
+					{
+						EditorGUILayout.HelpBox("The widgets underneath this panel are using more than one atlas. You may need to adjust transform position's Z value instead. When adjusting the Z, lower value means closer to the camera.", MessageType.Warning);
+					}
+				}
+			}
 		}
 
-		Color color = EditorGUILayout.ColorField("Color Tint", mWidget.color);
+		// Pivot point
+		UIWidget.Pivot pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", mWidget.pivot);
 
-		if (mWidget.color != color)
+		if (mWidget.pivot != pivot)
 		{
-			NGUIEditorTools.RegisterUndo("Color Change", mWidget);
-			mWidget.color = color;
+			NGUIEditorTools.RegisterUndo("Pivot Change", mWidget);
+			mWidget.pivot = pivot;
 		}
 
-		// Depth navigation
+		// Pixel-correctness
 		if (type != PrefabType.Prefab)
 		{
 			GUILayout.BeginHorizontal();
@@ -112,39 +141,13 @@ public class UIWidgetInspector : Editor
 			GUILayout.EndHorizontal();
 		}
 
-		UIWidget.Pivot pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", mWidget.pivot);
+		// Color tint
+		Color color = EditorGUILayout.ColorField("Color Tint", mWidget.color);
 
-		if (mWidget.pivot != pivot)
+		if (mWidget.color != color)
 		{
-			NGUIEditorTools.RegisterUndo("Pivot Change", mWidget);
-			mWidget.pivot = pivot;
-		}
-
-		if (mAllowPreview && mWidget.mainTexture != null)
-		{
-			GUILayout.BeginHorizontal();
-			{
-				NGUISettings.texturePreview = EditorGUILayout.Toggle("Preview", NGUISettings.texturePreview, GUILayout.Width(100f));
-
-				/*if (UISettings.texturePreview)
-				{
-					if (mUseShader != EditorGUILayout.Toggle("Use Shader", mUseShader))
-					{
-						mUseShader = !mUseShader;
-
-						if (mUseShader)
-						{
-							// TODO: Remove this when Unity fixes the bug with DrawPreviewTexture not being affected by BeginGroup
-							Debug.LogWarning("There is a bug in Unity that prevents the texture from getting clipped properly.\n" +
-								"Until it's fixed by Unity, your texture may spill onto the rest of the Unity's GUI while using this mode.");
-						}
-					}
-				}*/
-			}
-			GUILayout.EndHorizontal();
-
-			// Draw the texture last
-			if (NGUISettings.texturePreview) OnDrawTexture();
+			NGUIEditorTools.RegisterUndo("Color Change", mWidget);
+			mWidget.color = color;
 		}
 	}
 
@@ -154,5 +157,4 @@ public class UIWidgetInspector : Editor
 
 	protected virtual void OnInit() { }
 	protected virtual bool OnDrawProperties () { return true; }
-	protected virtual void OnDrawTexture () { }
 }

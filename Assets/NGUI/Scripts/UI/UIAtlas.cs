@@ -248,20 +248,72 @@ public class UIAtlas : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Function used for sorting in the GetListOfSprites() function below.
+	/// </summary>
+
+	static int CompareString (string a, string b) { return a.CompareTo(b); }
+
+	/// <summary>
 	/// Convenience function that retrieves a list of all sprite names.
 	/// </summary>
 
-	public List<string> GetListOfSprites ()
+	public BetterList<string> GetListOfSprites ()
 	{
 		if (mReplacement != null) return mReplacement.GetListOfSprites();
-		List<string> list = new List<string>();
+		BetterList<string> list = new BetterList<string>();
 		
 		for (int i = 0, imax = sprites.Count; i < imax; ++i)
 		{
 			Sprite s = sprites[i];
 			if (s != null && !string.IsNullOrEmpty(s.name)) list.Add(s.name);
 		}
-		list.Sort();
+		list.Sort(CompareString);
+		return list;
+	}
+
+	/// <summary>
+	/// Convenience function that retrieves a list of all sprite names that contain the specified phrase
+	/// </summary>
+
+	public BetterList<string> GetListOfSprites (string match)
+	{
+		if (mReplacement != null) return mReplacement.GetListOfSprites();
+		BetterList<string> list = new BetterList<string>();
+
+		// First try to find an exact match
+		for (int i = 0, imax = sprites.Count; i < imax; ++i)
+		{
+			Sprite s = sprites[i];
+			
+			if (s != null && !string.IsNullOrEmpty(s.name) && string.Equals(match, s.name, StringComparison.OrdinalIgnoreCase))
+			{
+				list.Add(s.name);
+				return list;
+			}
+		}
+
+		// No exact match found? Split up the search into space-separated components.
+		string[] keywords = match.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+		for (int i = 0; i < keywords.Length; ++i) keywords[i] = keywords[i].ToLower();
+
+		// Try to find all sprites where all keywords are present
+		for (int i = 0, imax = sprites.Count; i < imax; ++i)
+		{
+			Sprite s = sprites[i];
+			
+			if (s != null && !string.IsNullOrEmpty(s.name))
+			{
+				string tl = s.name.ToLower();
+				int matches = 0;
+
+				for (int b = 0; b < keywords.Length; ++b)
+				{
+					if (tl.Contains(keywords[b])) ++matches;
+				}
+				if (matches == keywords.Length) list.Add(s.name);
+			}
+		}
+		list.Sort(CompareString);
 		return list;
 	}
 

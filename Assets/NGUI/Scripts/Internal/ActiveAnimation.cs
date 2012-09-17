@@ -86,10 +86,7 @@ public class ActiveAnimation : IgnoreTimeScale
 				}
 			}
 
-			mAnim.enabled = true;
 			mAnim.Sample();
-			mAnim.enabled = false;
-
 			if (isPlaying) return;
 
 			if (mNotify)
@@ -122,7 +119,7 @@ public class ActiveAnimation : IgnoreTimeScale
 	{
 		if (mAnim != null)
 		{
-			// We will sample the animation manually so that it works when time is paused
+			// We will sample the animation manually so that it works when the time is paused
 			mAnim.enabled = false;
 
 			// Determine the play direction
@@ -136,10 +133,7 @@ public class ActiveAnimation : IgnoreTimeScale
 			// Play the animation if it's not playing already
 			if (noName)
 			{
-				if (!mAnim.isPlaying)
-				{
-					mAnim.Play();
-				}
+				if (!mAnim.isPlaying) mAnim.Play();
 			}
 			else if (!mAnim.IsPlaying(clipName))
 			{
@@ -163,6 +157,7 @@ public class ActiveAnimation : IgnoreTimeScale
 			// Remember the direction for disable checks in Update()
 			mLastDirection = playDirection;
 			mNotify = true;
+			mAnim.Sample();
 		}
 	}
 
@@ -180,6 +175,10 @@ public class ActiveAnimation : IgnoreTimeScale
 
 			// Enable the game object before animating it
 			NGUITools.SetActive(anim.gameObject, true);
+			
+			// Refresh all panels right away so that there is no one frame delay
+			UIPanel[] panels = anim.gameObject.GetComponentsInChildren<UIPanel>();
+			for (int i = 0, imax = panels.Length; i < imax; ++i) panels[i].Refresh();
 		}
 
 		ActiveAnimation aa = anim.GetComponent<ActiveAnimation>();

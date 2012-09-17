@@ -17,6 +17,7 @@ public class NGUIEditorTools
 	static Texture2D mBackdropTex;
 	static Texture2D mContrastTex;
 	static Texture2D mGradientTex;
+	static GameObject mPrevious;
 
 	/// <summary>
 	/// Returns a blank usable 1x1 white texture.
@@ -26,8 +27,7 @@ public class NGUIEditorTools
 	{
 		get
 		{
-			if (mWhiteTex == null) mWhiteTex = CreateDummyTex();
-			return mWhiteTex;
+			return EditorGUIUtility.whiteTexture;
 		}
 	}
 
@@ -99,9 +99,9 @@ public class NGUIEditorTools
 		tex.name = "[Generated] Checker Texture";
 		tex.hideFlags = HideFlags.DontSave;
 
-		for (int y = 0; y < 8;  ++y) for (int x = 0; x < 8;  ++x) tex.SetPixel(x, y, c1);
-		for (int y = 8; y < 16; ++y) for (int x = 0; x < 8;  ++x) tex.SetPixel(x, y, c0);
-		for (int y = 0; y < 8;  ++y) for (int x = 8; x < 16; ++x) tex.SetPixel(x, y, c0);
+		for (int y = 0; y < 8; ++y) for (int x = 0; x < 8; ++x) tex.SetPixel(x, y, c1);
+		for (int y = 8; y < 16; ++y) for (int x = 0; x < 8; ++x) tex.SetPixel(x, y, c0);
+		for (int y = 0; y < 8; ++y) for (int x = 8; x < 16; ++x) tex.SetPixel(x, y, c0);
 		for (int y = 8; y < 16; ++y) for (int x = 8; x < 16; ++x) tex.SetPixel(x, y, c1);
 
 		tex.Apply();
@@ -301,13 +301,22 @@ public class NGUIEditorTools
 	/// Draw an enlarged sprite within the specified texture atlas.
 	/// </summary>
 
-	static public Rect DrawSprite (Texture2D tex, Rect sprite, Material mat) { return DrawSprite(tex, sprite, mat, true); }
+	static public Rect DrawSprite (Texture2D tex, Rect sprite, Material mat) { return DrawSprite(tex, sprite, mat, true, 0); }
 
 	/// <summary>
 	/// Draw an enlarged sprite within the specified texture atlas.
 	/// </summary>
 
 	static public Rect DrawSprite (Texture2D tex, Rect sprite, Material mat, bool addPadding)
+	{
+		return DrawSprite(tex, sprite, mat, addPadding, 0);
+	}
+
+	/// <summary>
+	/// Draw an enlarged sprite within the specified texture atlas.
+	/// </summary>
+
+	static public Rect DrawSprite (Texture2D tex, Rect sprite, Material mat, bool addPadding, int maxSize)
 	{
 		float paddingX = addPadding ? 4f / tex.width : 0f;
 		float paddingY = addPadding ? 4f / tex.height : 0f;
@@ -316,39 +325,35 @@ public class NGUIEditorTools
 		ratio *= (float)tex.height / tex.width;
 
 		// Draw the checkered background
+		Color c = GUI.color;
 		Rect rect = DrawBackground(tex, ratio);
+		GUI.color = c;
+
+		if (maxSize > 0)
+		{
+			float dim = maxSize / Mathf.Max(rect.width, rect.height);
+			rect.width *= dim;
+			rect.height *= dim;
+		}
 
 		// We only want to draw into this rectangle
-		GUI.BeginGroup(rect);
+		if (Event.current.type == EventType.Repaint)
 		{
-			if (Event.current.type == EventType.Repaint)
+			if (mat == null)
 			{
-				// We need to calculate where to begin and how to stretch the texture
-				// for it to appear properly scaled in the rectangle
-				float scaleX = rect.width / (sprite.width + paddingX);
-				float scaleY = rect.height / (sprite.height + paddingY);
-				float ox = scaleX * (sprite.x - paddingX * 0.5f);
-				float oy = scaleY * (1f - (sprite.yMax + paddingY * 0.5f));
-
-				Rect drawRect = new Rect(-ox, -oy, scaleX, scaleY);
-
-				if (mat == null)
-				{
-					GUI.DrawTexture(drawRect, tex);
-				}
-				else
-				{
-					// NOTE: DrawPreviewTexture doesn't seem to support BeginGroup-based clipping
-					// when a custom material is specified. It seems to be a bug in Unity.
-					// Passing 'null' for the material or omitting the parameter clips as expected.
-					UnityEditor.EditorGUI.DrawPreviewTexture(drawRect, tex, mat);
-					//UnityEditor.EditorGUI.DrawPreviewTexture(drawRect, tex);
-					//GUI.DrawTexture(drawRect, tex);
-				}
-				rect = new Rect(drawRect.x + rect.x, drawRect.y + rect.y, drawRect.width, drawRect.height);
+				GUI.DrawTextureWithTexCoords(rect, tex, sprite);
 			}
+			else
+			{
+				// NOTE: DrawPreviewTexture doesn't seem to support BeginGroup-based clipping
+				// when a custom material is specified. It seems to be a bug in Unity.
+				// Passing 'null' for the material or omitting the parameter clips as expected.
+				UnityEditor.EditorGUI.DrawPreviewTexture(sprite, tex, mat);
+				//UnityEditor.EditorGUI.DrawPreviewTexture(drawRect, tex);
+				//GUI.DrawTexture(drawRect, tex);
+			}
+			rect = new Rect(sprite.x + rect.x, sprite.y + rect.y, sprite.width, sprite.height);
 		}
-		GUI.EndGroup();
 		return rect;
 	}
 
@@ -452,6 +457,40 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
+	/// Convenience function that displays a list of sprites and returns the selected value.
+	/// </summary>
+
+	static public string DrawAdvancedList (string field, string[] list, string selection, params GUILayoutOption[] options)
+	{
+		if (list != null && list.Length > 0)
+		{
+			int index = 0;
+			if (string.IsNullOrEmpty(selection)) selection = list[0];
+
+			// We need to find the sprite in order to have it selected
+			if (!string.IsNullOrEmpty(selection))
+			{
+				for (int i = 0; i < list.Length; ++i)
+				{
+					if (selection.Equals(list[i], System.StringComparison.OrdinalIgnoreCase))
+					{
+						index = i;
+						break;
+					}
+				}
+			}
+
+			// Draw the sprite selection popup
+			index = string.IsNullOrEmpty(field) ?
+				EditorGUILayout.Popup(index, list, "DropDownButton", options) :
+				EditorGUILayout.Popup(field, index, list, "DropDownButton", options);
+
+			return list[index];
+		}
+		return null;
+	}
+
+	/// <summary>
 	/// Helper function that returns the selected root object.
 	/// </summary>
 
@@ -543,7 +582,7 @@ public class NGUIEditorTools
 			settings.filterMode = FilterMode.Point;
 			settings.wrapMode = TextureWrapMode.Clamp;
 			settings.npotScale = TextureImporterNPOTScale.None;
-			
+
 			ti.SetTextureSettings(settings);
 			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
 		}
@@ -577,7 +616,7 @@ public class NGUIEditorTools
 			settings.aniso = 4;
 			settings.wrapMode = TextureWrapMode.Clamp;
 			settings.npotScale = TextureImporterNPOTScale.ToNearest;
-			
+
 			ti.SetTextureSettings(settings);
 			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
 		}
@@ -775,4 +814,218 @@ public class NGUIEditorTools
 		}
 		return list;
 	}
+
+	/// <summary>
+	/// Draw the specified sprite.
+	/// </summary>
+
+	public static void DrawSprite (Texture2D tex, Rect rect, Rect outer, Rect inner, Rect uv, Color color)
+	{
+		// Create the texture rectangle that is centered inside rect.
+		Rect outerRect = new Rect(rect);
+		outerRect.width = outer.width;
+		outerRect.height = outer.height;
+
+		if (rect.width > outerRect.width)
+		{
+			float f = rect.width / outerRect.width;
+			outerRect.width *= f;
+			outerRect.height *= f;
+		}
+
+		if (rect.height > outerRect.height)
+		{
+			outerRect.y += (rect.height - outerRect.height) * 0.5f;
+		}
+		else if (outerRect.height > rect.height)
+		{
+			float f = rect.height / outerRect.height;
+			outerRect.width *= f;
+			outerRect.height *= f;
+		}
+
+		if (rect.width > outerRect.width) outerRect.x += (rect.width - outerRect.width) * 0.5f;
+
+		// Draw the background
+		NGUIEditorTools.DrawTiledTexture(outerRect, NGUIEditorTools.backdropTexture);
+
+		// Draw the sprite
+		GUI.color = color;
+		GUI.DrawTextureWithTexCoords(outerRect, tex, uv, true);
+
+		// Draw the border indicator lines
+		GUI.BeginGroup(outerRect);
+		{
+			tex = NGUIEditorTools.contrastTexture;
+			GUI.color = Color.white;
+
+			if (inner.xMin != outer.xMin)
+			{
+				float x0 = (inner.xMin - outer.xMin) / outer.width * outerRect.width - 1;
+				NGUIEditorTools.DrawTiledTexture(new Rect(x0, 0f, 1f, outerRect.height), tex);
+			}
+
+			if (inner.xMax != outer.xMax)
+			{
+				float x1 = (inner.xMax - outer.xMin) / outer.width * outerRect.width - 1;
+				NGUIEditorTools.DrawTiledTexture(new Rect(x1, 0f, 1f, outerRect.height), tex);
+			}
+
+			if (inner.yMin != outer.yMin)
+			{
+				float y0 = (inner.yMin - outer.yMin) / outer.height * outerRect.height - 1;
+				NGUIEditorTools.DrawTiledTexture(new Rect(0f, y0, outerRect.width, 1f), tex);
+			}
+
+			if (inner.yMax != outer.yMax)
+			{
+				float y1 = (inner.yMax - outer.yMin) / outer.height * outerRect.height - 1;
+				NGUIEditorTools.DrawTiledTexture(new Rect(0f, y1, outerRect.width, 1f), tex);
+			}
+		}
+		GUI.EndGroup();
+
+		// Draw the lines around the sprite
+		Handles.color = Color.black;
+		Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMin), new Vector3(outerRect.xMin, outerRect.yMax));
+		Handles.DrawLine(new Vector3(outerRect.xMax, outerRect.yMin), new Vector3(outerRect.xMax, outerRect.yMax));
+		Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMin), new Vector3(outerRect.xMax, outerRect.yMin));
+		Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMax), new Vector3(outerRect.xMax, outerRect.yMax));
+
+		// Sprite size label
+		string text = string.Format("Sprite Size: {0}x{1}",
+			Mathf.RoundToInt(Mathf.Abs(outer.width)),
+			Mathf.RoundToInt(Mathf.Abs(outer.height)));
+		EditorGUI.DropShadowLabel(GUILayoutUtility.GetRect(Screen.width, 18f), text);
+	}
+
+	/// <summary>
+	/// Draw a sprite selection field.
+	/// </summary>
+
+	static public void SpriteField (string fieldName, UIAtlas atlas, string spriteName,
+		SpriteSelector.Callback callback, params GUILayoutOption[] options)
+	{
+		GUILayout.BeginHorizontal();
+		GUILayout.Label(fieldName, GUILayout.Width(76f));
+
+		if (GUILayout.Button(spriteName, "MiniPullDown", options))
+		{
+			SpriteSelector.Show(atlas, spriteName, callback);
+		}
+		GUILayout.EndHorizontal();
+	}
+
+	/// <summary>
+	/// Draw a sprite selection field.
+	/// </summary>
+
+	static public void SpriteField (string fieldName, UIAtlas atlas, string spriteName, SpriteSelector.Callback callback)
+	{
+		SpriteField(fieldName, null, atlas, spriteName, callback);
+	}
+
+	/// <summary>
+	/// Draw a sprite selection field.
+	/// </summary>
+
+	static public void SpriteField (string fieldName, string caption, UIAtlas atlas, string spriteName, SpriteSelector.Callback callback)
+	{
+		GUILayout.BeginHorizontal();
+		GUILayout.Label(fieldName, GUILayout.Width(76f));
+
+		if (GUILayout.Button(spriteName, "MiniPullDown", GUILayout.Width(120f)))
+		{
+			SpriteSelector.Show(atlas, spriteName, callback);
+		}
+		
+		if (!string.IsNullOrEmpty(caption))
+		{
+			GUILayout.Space(20f);
+			GUILayout.Label(caption);
+		}
+		GUILayout.EndHorizontal();
+	}
+
+	/// <summary>
+	/// Convenience function that displays a list of sprites and returns the selected value.
+	/// </summary>
+
+	static public void AdvancedSpriteField (UIAtlas atlas, string spriteName, SpriteSelector.Callback callback, bool editable,
+		params GUILayoutOption[] options)
+	{
+		// Give the user a warning if there are no sprites in the atlas
+		if (atlas.spriteList.Count == 0)
+		{
+			EditorGUILayout.HelpBox("No sprites found", MessageType.Warning);
+			return;
+		}
+
+		// Sprite selection drop-down list
+		GUILayout.BeginHorizontal();
+		{
+			if (GUILayout.Button("Sprite", "DropDownButton", GUILayout.Width(76f)))
+			{
+				SpriteSelector.Show(atlas, spriteName, callback);
+			}
+
+			if (editable)
+			{
+				string sn = GUILayout.TextField(spriteName);
+
+				if (sn != spriteName)
+				{
+					UIAtlas.Sprite sp = atlas.GetSprite(spriteName);
+
+					if (sp != null)
+					{
+						NGUIEditorTools.RegisterUndo("Edit Sprite Name", atlas);
+						sp.name = sn;
+						spriteName = sn;
+					}
+				}
+			}
+			else
+			{
+				string[] list = new string[] { spriteName, "...Edit" };
+				int selection = EditorGUILayout.Popup(0, list, "DropDownButton");
+
+				if (selection == 1)
+				{
+					EditorPrefs.SetString("NGUI Selected Sprite", spriteName);
+					Select(atlas.gameObject);
+				}
+			}
+		}
+		GUILayout.EndHorizontal();
+	}
+
+	/// <summary>
+	/// Select the specified game object and remember what was selected before.
+	/// </summary>
+
+	static public void Select (GameObject go)
+	{
+		mPrevious = Selection.activeGameObject;
+		Selection.activeGameObject = go;
+	}
+	
+	/// <summary>
+	/// Select the previous game object.
+	/// </summary>
+
+	static public void SelectPrevious ()
+	{
+		if (mPrevious != null)
+		{
+			Selection.activeGameObject = mPrevious;
+			mPrevious = null;
+		}
+	}
+
+	/// <summary>
+	/// Previously selected game object.
+	/// </summary>
+
+	static public GameObject previousSelection { get { return mPrevious; } }
 }

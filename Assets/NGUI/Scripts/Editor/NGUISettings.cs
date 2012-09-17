@@ -20,12 +20,12 @@ public class NGUISettings
 	static UIWidget.Pivot mPivot = UIWidget.Pivot.Center;
 	static TextAsset mFontData;
 	static Texture2D mFontTexture;
+	static string mPartial = "";
 	static string mFontName = "New Font";
 	static string mAtlasName = "New Atlas";
 	static int mAtlasPadding = 1;
 	static public bool mAtlasTrimming = true;
 	static bool mUnityPacking = true;
-	static bool mPreview = true;
 
 	static Object GetObject (string name)
 	{
@@ -36,13 +36,13 @@ public class NGUISettings
 	static void Load ()
 	{
 		mLoaded			= true;
+		mPartial		= EditorPrefs.GetString("NGUI Partial");
 		mFontName		= EditorPrefs.GetString("NGUI Font Name");
 		mAtlasName		= EditorPrefs.GetString("NGUI Atlas Name");
 		mFontData		= GetObject("NGUI Font Asset") as TextAsset;
 		mFontTexture	= GetObject("NGUI Font Texture") as Texture2D;
 		mFont			= GetObject("NGUI Font") as UIFont;
 		mAtlas			= GetObject("NGUI Atlas") as UIAtlas;
-		mPreview		= EditorPrefs.GetInt("NGUI Preview") == 0;
 		mAtlasPadding	= EditorPrefs.GetInt("NGUI Atlas Padding", 1);
 		mAtlasTrimming	= EditorPrefs.GetBool("NGUI Atlas Trimming", true);
 		mUnityPacking	= EditorPrefs.GetBool("NGUI Unity Packing", true);
@@ -51,13 +51,13 @@ public class NGUISettings
 
 	static void Save ()
 	{
+		EditorPrefs.SetString("NGUI Partial", mPartial);
 		EditorPrefs.SetString("NGUI Font Name", mFontName);
 		EditorPrefs.SetString("NGUI Atlas Name", mAtlasName);
 		EditorPrefs.SetInt("NGUI Font Asset", (mFontData != null) ? mFontData.GetInstanceID() : -1);
 		EditorPrefs.SetInt("NGUI Font Texture", (mFontTexture != null) ? mFontTexture.GetInstanceID() : -1);
 		EditorPrefs.SetInt("NGUI Font", (mFont != null) ? mFont.GetInstanceID() : -1);
 		EditorPrefs.SetInt("NGUI Atlas", (mAtlas != null) ? mAtlas.GetInstanceID() : -1);
-		EditorPrefs.SetInt("NGUI Preview", mPreview ? 0 : 1);
 		EditorPrefs.SetInt("NGUI Atlas Padding", mAtlasPadding);
 		EditorPrefs.SetBool("NGUI Atlas Trimming", mAtlasTrimming);
 		EditorPrefs.SetBool("NGUI Unity Packing", mUnityPacking);
@@ -154,10 +154,25 @@ public class NGUISettings
 	static public string atlasName { get { if (!mLoaded) Load(); return mAtlasName; } set { if (mAtlasName != value) { mAtlasName = value; Save(); } } }
 
 	/// <summary>
-	/// Whether the texture preview will be shown.
+	/// Name of the partial sprite name, used to filter sprites.
 	/// </summary>
 
-	static public bool texturePreview { get { if (!mLoaded) Load(); return mPreview; } set { if (mPreview != value) { mPreview = value; Save(); } } }
+	static public string partialSprite
+	{
+		get
+		{
+			if (!mLoaded) Load();
+			return mPartial;
+		}
+		set
+		{
+			if (mPartial != value)
+			{
+				mPartial = value;
+				EditorPrefs.SetString("NGUI Partial", mPartial);
+			}
+		}
+	}
 
 	/// <summary>
 	/// Added padding in-between of sprites when creating an atlas.

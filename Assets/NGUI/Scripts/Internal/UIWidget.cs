@@ -134,7 +134,7 @@ public abstract class UIWidget : MonoBehaviour
 		}
 		set
 		{
-			if (mainTexture != value)
+			if (mMat == null || mMat.mainTexture != value)
 			{
 				if (mPanel != null) mPanel.RemoveWidget(this);
 
@@ -304,7 +304,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// is brought in on a prefab object as it happens before it gets parented.
 	/// </summary>
 
-	void Update ()
+	public void Update ()
 	{
 		CheckLayer();
 

@@ -45,8 +45,11 @@ public class UIStretch : MonoBehaviour
 
 	Transform mTrans;
 	UIRoot mRoot;
+	Animation mAnim;
 
-	void OnEnable ()
+	void Awake () { mAnim = animation; }
+
+	void Start ()
 	{
 		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
 		mRoot = NGUITools.FindInParents<UIRoot>(gameObject);
@@ -54,6 +57,8 @@ public class UIStretch : MonoBehaviour
 
 	void Update ()
 	{
+		if (mAnim != null && mAnim.isPlaying) return;
+
 		if (style != Style.None)
 		{
 			if (mTrans == null) mTrans = transform;
@@ -87,16 +92,18 @@ public class UIStretch : MonoBehaviour
 				Vector3 ls = t.localScale;
 				Vector3 lp = t.localPosition;
 
+				Vector3 size = widgetContainer.relativeSize;
 				Vector3 offset = widgetContainer.pivotOffset;
-				offset.y -= widgetContainer.relativeSize.y;
+				offset.y -= 1f;
 
 				offset.x *= (widgetContainer.relativeSize.x * ls.x);
 				offset.y *= (widgetContainer.relativeSize.y * ls.y);
 
 				rect.x = lp.x + offset.x;
 				rect.y = lp.y + offset.y;
-				rect.width = ls.x;
-				rect.height = ls.y;
+
+				rect.width = size.x * ls.x;
+				rect.height = size.y * ls.y;
 			}
 			else if (uiCamera != null)
 			{

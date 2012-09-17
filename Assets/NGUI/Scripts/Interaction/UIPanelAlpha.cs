@@ -20,7 +20,7 @@ public class UIPanelAlpha : MonoBehaviour
 	UIWidget[] mWidgets;
 	float[] mAlpha;
 	float mLastAlpha = 1f;
-	public int mLevel = 2;
+	int mLevel = 2;
 
 	void Start ()
 	{

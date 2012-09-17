@@ -924,7 +924,8 @@ public class UIPanel : MonoBehaviour
 
 	public void Refresh ()
 	{
-		BroadcastMessage("Update", SendMessageOptions.DontRequireReceiver);
+		UIWidget[] wd = GetComponentsInChildren<UIWidget>();
+		for (int i = 0, imax = wd.Length; i < imax; ++i) wd[i].Update();
 		LateUpdate();
 	}
 

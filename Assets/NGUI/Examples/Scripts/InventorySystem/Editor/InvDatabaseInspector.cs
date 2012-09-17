@@ -186,8 +186,7 @@ public class InvDatabaseInspector : Editor
 
 				if (item.iconAtlas != null)
 				{
-					List<string> sprites = item.iconAtlas.GetListOfSprites();
-
+					BetterList<string> sprites = item.iconAtlas.GetListOfSprites();
 					sprites.Insert(0, "<None>");
 
 					int index = 0;
@@ -196,7 +195,7 @@ public class InvDatabaseInspector : Editor
 					// We need to find the sprite in order to have it selected
 					if (!string.IsNullOrEmpty(spriteName))
 					{
-						for (int i = 1; i < sprites.Count; ++i)
+						for (int i = 1; i < sprites.size; ++i)
 						{
 							if (spriteName.Equals(sprites[i], System.StringComparison.OrdinalIgnoreCase))
 							{

@@ -18,6 +18,7 @@ public class UITexture : UIWidget
 {
 	[HideInInspector][SerializeField] Rect mRect = new Rect(0f, 0f, 1f, 1f);
 	[HideInInspector][SerializeField] Shader mShader;
+	[HideInInspector][SerializeField] Texture mTexture;
 
 	Material mDynamicMat;
 	bool mCreatingMat = false;
@@ -124,10 +125,12 @@ public class UITexture : UIWidget
 	{
 		get
 		{
-			return base.mainTexture;
+			return (mTexture != null) ? mTexture : base.mainTexture;
 		}
 		set
 		{
+			mTexture = value;
+
 			if (material == null)
 			{
 				mDynamicMat = new Material(shader);

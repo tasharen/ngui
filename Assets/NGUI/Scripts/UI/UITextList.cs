@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System.Text;
 
 /// <summary>
 /// Text list can be used with a UILabel to create a scrollable multi-line text field that's
@@ -145,7 +146,7 @@ public class UITextList : MonoBehaviour
 					offset = Mathf.Max(0, mTotalLines - maxLines - offset);
 				}
 
-				string final = "";
+				StringBuilder final = new StringBuilder();
 
 				for (int i = 0, imax = mParagraphs.Count; i < imax; ++i)
 				{
@@ -161,15 +162,15 @@ public class UITextList : MonoBehaviour
 						}
 						else
 						{
-							if (final.Length > 0) final += "\n";
-							final += s;
+							if (final.Length > 0) final.Append("\n");
+							final.Append(s);
 							++lines;
 							if (lines >= maxLines) break;
 						}
 					}
 					if (lines >= maxLines) break;
 				}
-				textLabel.text = final;
+				textLabel.text = final.ToString();
 			}
 		}
 	}

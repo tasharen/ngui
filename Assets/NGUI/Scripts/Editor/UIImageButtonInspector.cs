@@ -15,6 +15,7 @@ using System.Collections.Generic;
 public class UIImageButtonInspector : Editor
 {
 	UIImageButton mButton;
+	UISprite mSprite;
 
 	/// <summary>
 	/// Atlas selection callback.
@@ -34,39 +35,49 @@ public class UIImageButtonInspector : Editor
 	{
 		EditorGUIUtility.LookLikeControls(80f);
 		mButton = target as UIImageButton;
+		mSprite = EditorGUILayout.ObjectField("Sprite", mButton.target, typeof(UISprite), true) as UISprite;
 
-		UISprite sprite = EditorGUILayout.ObjectField("Sprite", mButton.target, typeof(UISprite), true) as UISprite;
-
-		if (mButton.target != sprite)
+		if (mButton.target != mSprite)
 		{
 			NGUIEditorTools.RegisterUndo("Image Button Change", mButton);
-			mButton.target = sprite;
-			if (sprite != null) sprite.spriteName = mButton.normalSprite;
+			mButton.target = mSprite;
+			if (mSprite != null) mSprite.spriteName = mButton.normalSprite;
 		}
 
-		if (mButton.target != null)
+		if (mSprite != null)
 		{
-			ComponentSelector.Draw<UIAtlas>(sprite.atlas, OnSelectAtlas);
+			ComponentSelector.Draw<UIAtlas>(mSprite.atlas, OnSelectAtlas);
 
-			if (sprite.atlas != null)
+			if (mSprite.atlas != null)
 			{
-				string normal = UISpriteInspector.SpriteField(sprite.atlas, "Normal", mButton.normalSprite);
-				string hover  = UISpriteInspector.SpriteField(sprite.atlas, "Hover", mButton.hoverSprite);
-				string press  = UISpriteInspector.SpriteField(sprite.atlas, "Pressed", mButton.pressedSprite);
-
-				if (mButton.normalSprite != normal ||
-					mButton.hoverSprite != hover ||
-					mButton.pressedSprite != press)
-				{
-					NGUIEditorTools.RegisterUndo("Image Button Change", mButton, mButton.gameObject, sprite);
-					mButton.normalSprite = normal;
-					mButton.hoverSprite = hover;
-					mButton.pressedSprite = press;
-					sprite.spriteName = normal;
-					sprite.MakePixelPerfect();
-					if (mButton.collider == null || (mButton.collider is BoxCollider)) NGUITools.AddWidgetCollider(mButton.gameObject);
-				}
+				NGUIEditorTools.SpriteField("Normal", mSprite.atlas, mButton.normalSprite, OnNormal);
+				NGUIEditorTools.SpriteField("Hover", mSprite.atlas, mButton.hoverSprite, OnHover);
+				NGUIEditorTools.SpriteField("Pressed", mSprite.atlas, mButton.pressedSprite, OnPressed);
 			}
 		}
+	}
+
+	void OnNormal (string spriteName)
+	{
+		NGUIEditorTools.RegisterUndo("Image Button Change", mButton, mButton.gameObject, mSprite);
+		mButton.normalSprite = spriteName;
+		mSprite.spriteName = spriteName;
+		mSprite.MakePixelPerfect();
+		if (mButton.collider == null || (mButton.collider is BoxCollider)) NGUITools.AddWidgetCollider(mButton.gameObject);
+		Repaint();
+	}
+
+	void OnHover (string spriteName)
+	{
+		NGUIEditorTools.RegisterUndo("Image Button Change", mButton, mButton.gameObject, mSprite);
+		mButton.hoverSprite = spriteName;
+		Repaint();
+	}
+
+	void OnPressed (string spriteName)
+	{
+		NGUIEditorTools.RegisterUndo("Image Button Change", mButton, mButton.gameObject, mSprite);
+		mButton.pressedSprite = spriteName;
+		Repaint();
 	}
 }

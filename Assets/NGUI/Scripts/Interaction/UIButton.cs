@@ -61,8 +61,6 @@ public class UIButton : UIButtonColor
 
 	public void UpdateColor (bool shouldBeEnabled, bool immediate)
 	{
-		if (!mInitDone) Init();
-
 		if (tweenTarget)
 		{
 			Color c = shouldBeEnabled ? defaultColor : disabledColor;

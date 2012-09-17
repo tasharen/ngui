@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.1.6
+                Version 2.2.0
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,15 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.2.0:
+- NEW: Added a sprite selection window that replaces the drop-down selection list. Think texture selection window for your sprites. The sprite selection window has a search box to narrow down your selection.
+- NEW: Sprite preview is now shown in the Preview window, and is affected by the widget's color tint.
+- NEW: Added warning messages when more than one widget is using the same depth value, and when more than one atlas is used by the panel.
+- NEW: It's now possible to edit a sprite quickly by choosing the "edit" option.
+- NEW: When editing a sprite in the atlas, a "Return to ..." button is shown if you've navigated here from a sprite.
+- FIX: UIAnchor and UIStretch now work with labels properly.
+- FIX: UITexture will no longer occasionally lose the reference to its texture.
 
 2.1.6:
 - NEW: UISavedOption now works on a popup list as well.

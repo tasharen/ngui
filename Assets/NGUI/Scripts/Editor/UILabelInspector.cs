@@ -37,8 +37,6 @@ public class UILabelInspector : UIWidgetInspector
 		}
 	}
 
-	override protected void OnInit () { mAllowPreview = false; }
-
 	override protected bool OnDrawProperties ()
 	{
 		mLabel = mWidget as UILabel;
@@ -89,21 +87,5 @@ public class UILabelInspector : UIWidgetInspector
 		}
 		GUILayout.EndHorizontal();
 		return true;
-	}
-
-	override protected void OnDrawTexture ()
-	{
-		Texture2D tex = mLabel.mainTexture as Texture2D;
-
-		if (tex != null)
-		{
-			// Draw the atlas
-			EditorGUILayout.Separator();
-			NGUIEditorTools.DrawSprite(tex, mLabel.font.uvRect, mUseShader ? mLabel.font.material : null);
-
-			// Sprite size label
-			Rect rect = GUILayoutUtility.GetRect(Screen.width, 18f);
-			EditorGUI.DropShadowLabel(rect, "Font Size: " + mLabel.font.size);
-		}
 	}
 }

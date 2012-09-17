@@ -34,33 +34,4 @@ public class UISlicedSpriteInspector : UISpriteInspector
 		}
 		return false;
 	}
-
-	/// <summary>
-	/// Any and all derived functionality.
-	/// </summary>
-
-	protected override void OnDrawTexture ()
-	{
-		UISlicedSprite sprite = mWidget as UISlicedSprite;
-		Texture2D tex = sprite.mainTexture as Texture2D;
-
-		if (tex != null)
-		{
-			// Draw the atlas
-			EditorGUILayout.Separator();
-			Rect rect = NGUIEditorTools.DrawSprite(tex, sprite.outerUV, mUseShader ? mSprite.atlas.spriteMaterial : null);
-
-			// Draw the selection
-			NGUIEditorTools.DrawOutline(rect, sprite.outerUV, sprite.innerUV);
-
-			// Sprite size label
-			string text = "Sprite Size: ";
-			text += Mathf.RoundToInt(Mathf.Abs(sprite.outerUV.width * tex.width));
-			text += "x";
-			text += Mathf.RoundToInt(Mathf.Abs(sprite.outerUV.height * tex.height));
-
-			rect = GUILayoutUtility.GetRect(Screen.width, 18f);
-			EditorGUI.DropShadowLabel(rect, text);
-		}
-	}
 }

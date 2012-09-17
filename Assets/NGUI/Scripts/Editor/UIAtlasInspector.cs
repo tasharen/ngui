@@ -14,20 +14,11 @@ using System.Collections.Generic;
 [CustomEditor(typeof(UIAtlas))]
 public class UIAtlasInspector : Editor
 {
-	enum View
-	{
-		Atlas,
-		Sprite,
-	}
-
 	enum AtlasType
 	{
 		Normal,
 		Reference,
 	}
-
-	static View mView = View.Sprite;
-	static bool mUseShader = false;
 
 	UIAtlas mAtlas;
 	bool mConfirmDelete = false;
@@ -184,7 +175,7 @@ public class UIAtlasInspector : Editor
 					mConfirmDelete = false;
 				}
 
-				float pixelSize = EditorGUILayout.FloatField("Pixel Size", mAtlas.pixelSize);
+				float pixelSize = EditorGUILayout.FloatField("Pixel Size", mAtlas.pixelSize, GUILayout.Width(120f));
 
 				if (pixelSize != mAtlas.pixelSize)
 				{
@@ -236,54 +227,10 @@ public class UIAtlasInspector : Editor
 					if (mSprite == null) mSprite = mAtlas.spriteList[0];
 				}
 
-				GUI.backgroundColor = Color.green;
-
-				GUILayout.BeginHorizontal();
-				{
-					EditorGUILayout.PrefixLabel("Add/Delete");
-
-					if (GUILayout.Button("New Sprite"))
-					{
-						NGUIEditorTools.RegisterUndo("Add Sprite", mAtlas);
-						UIAtlas.Sprite newSprite = new UIAtlas.Sprite();
-
-						if (mSprite != null)
-						{
-							newSprite.name = "Copy of " + mSprite.name;
-							newSprite.outer = mSprite.outer;
-							newSprite.inner = mSprite.inner;
-						}
-						else
-						{
-							newSprite.name = "New Sprite";
-						}
-
-						mAtlas.spriteList.Add(newSprite);
-						mSprite = newSprite;
-					}
-
-					// Show the delete button
-					GUI.backgroundColor = Color.red;
-
-					if (mSprite != null && GUILayout.Button("Delete", GUILayout.Width(55f)))
-					{
-						mConfirmDelete = true;
-					}
-					GUI.backgroundColor = Color.white;
-				}
-				GUILayout.EndHorizontal();
-
 				if (!mConfirmDelete && mSprite != null)
 				{
 					NGUIEditorTools.DrawSeparator();
-
-					string spriteName = UISpriteInspector.SpriteField(mAtlas, mSprite.name);
-
-					if (spriteName != mSprite.name)
-					{
-						mSprite = mAtlas.GetSprite(spriteName);
-						EditorPrefs.SetString("NGUI Selected Sprite", spriteName);
-					}
+					NGUIEditorTools.AdvancedSpriteField(mAtlas, mSprite.name, SelectSprite, true);
 
 					if (mSprite == null) return;
 
@@ -293,28 +240,6 @@ public class UIAtlasInspector : Editor
 					{
 						Rect inner = mSprite.inner;
 						Rect outer = mSprite.outer;
-
-						string name = EditorGUILayout.TextField("Edit Name", mSprite.name);
-
-						if (mSprite.name != name && !string.IsNullOrEmpty(name))
-						{
-							bool found = false;
-
-							foreach (UIAtlas.Sprite sp in mAtlas.spriteList)
-							{
-								if (sp.name == name)
-								{
-									found = true;
-									break;
-								}
-							}
-
-							if (!found)
-							{
-								NGUIEditorTools.RegisterUndo("Edit Sprite Name", mAtlas);
-								mSprite.name = name;
-							}
-						}
 
 						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 						{
@@ -423,55 +348,103 @@ public class UIAtlasInspector : Editor
 							}
 							GUILayout.EndHorizontal();
 						}
+					}
 
-						GUILayout.BeginHorizontal();
+					NGUIEditorTools.DrawSeparator();
+
+					GUILayout.BeginHorizontal();
+					{
+						EditorGUILayout.PrefixLabel("Add/Delete");
+
+						if (GUILayout.Button("Clone Sprite"))
 						{
-							mView = (View)EditorGUILayout.EnumPopup("Show", mView);
-							GUILayout.Label("Shader", GUILayout.Width(45f));
+							NGUIEditorTools.RegisterUndo("Add Sprite", mAtlas);
+							UIAtlas.Sprite newSprite = new UIAtlas.Sprite();
 
-							if (mUseShader != EditorGUILayout.Toggle(mUseShader, GUILayout.Width(20f)))
+							if (mSprite != null)
 							{
-								mUseShader = !mUseShader;
-
-								if (mUseShader && mView == View.Sprite)
-								{
-									// TODO: Remove this when Unity fixes the bug with DrawPreviewTexture not being affected by BeginGroup
-									Debug.LogWarning("There is a bug in Unity that prevents the texture from getting clipped properly.\n" +
-										"Until it's fixed by Unity, your texture may spill onto the rest of the Unity's GUI while using this mode.");
-								}
+								newSprite.name = "Copy of " + mSprite.name;
+								newSprite.outer = mSprite.outer;
+								newSprite.inner = mSprite.inner;
 							}
-						}
-						GUILayout.EndHorizontal();
+							else
+							{
+								newSprite.name = "New Sprite";
+							}
 
-						if (mSprite.outer != outer || mSprite.inner != inner)
+							mAtlas.spriteList.Add(newSprite);
+							mSprite = newSprite;
+						}
+
+						// Show the delete button
+						GUI.backgroundColor = Color.red;
+
+						if (mSprite != null && GUILayout.Button("Delete", GUILayout.Width(55f)))
 						{
-							NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
-							mSprite.outer = outer;
-							mSprite.inner = inner;
-							mConfirmDelete = false;
-							MarkSpriteAsDirty();
+							mConfirmDelete = true;
 						}
+						GUI.backgroundColor = Color.white;
+					}
+					GUILayout.EndHorizontal();
 
-						Rect uv0 = outer;
-						Rect uv1 = inner;
+					if (NGUIEditorTools.previousSelection != null)
+					{
+						NGUIEditorTools.DrawSeparator();
 
-						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
+						GUI.backgroundColor = Color.green;
+
+						if (GUILayout.Button("<< Return to " + NGUIEditorTools.previousSelection.name))
 						{
-							uv0 = NGUIMath.ConvertToTexCoords(uv0, tex.width, tex.height);
-							uv1 = NGUIMath.ConvertToTexCoords(uv1, tex.width, tex.height);
+							NGUIEditorTools.SelectPrevious();
 						}
-
-						// Draw the atlas
-						EditorGUILayout.Separator();
-						Material m = mUseShader ? mAtlas.spriteMaterial : null;
-						Rect rect = (mView == View.Atlas) ? NGUIEditorTools.DrawAtlas(tex, m) : NGUIEditorTools.DrawSprite(tex, uv0, m);
-
-						// Draw the sprite outline
-						NGUIEditorTools.DrawOutline(rect, uv0, uv1);
-						EditorGUILayout.Separator();
+						GUI.backgroundColor = Color.white;
 					}
 				}
 			}
 		}
+	}
+
+	/// <summary>
+	/// Sprite selection callback.
+	/// </summary>
+
+	void SelectSprite (string spriteName)
+	{
+		mSprite = mAtlas.GetSprite(spriteName);
+		EditorPrefs.SetString("NGUI Selected Sprite", spriteName);
+		Repaint();
+	}
+
+	/// <summary>
+	/// All widgets have a preview.
+	/// </summary>
+
+	public override bool HasPreviewGUI () { return true; }
+
+	/// <summary>
+	/// Draw the sprite preview.
+	/// </summary>
+
+	public override void OnPreviewGUI (Rect rect, GUIStyle background)
+	{
+		if (mSprite == null) return;
+
+		Texture2D tex = mAtlas.texture as Texture2D;
+		if (tex == null) return;
+
+		Rect outer = new Rect(mSprite.outer);
+		Rect inner = new Rect(mSprite.inner);
+		Rect uv = outer;
+
+		if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
+		{
+			uv = NGUIMath.ConvertToTexCoords(outer, tex.width, tex.height);
+		}
+		else
+		{
+			outer = NGUIMath.ConvertToPixels(outer, tex.width, tex.height, true);
+			inner = NGUIMath.ConvertToPixels(inner, tex.width, tex.height, true);
+		}
+		NGUIEditorTools.DrawSprite(tex, rect, outer, inner, uv, Color.white);
 	}
 }

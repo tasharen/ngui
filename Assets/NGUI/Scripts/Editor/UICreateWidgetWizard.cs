@@ -224,31 +224,19 @@ public class UICreateWidgetWizard : EditorWindow
 	/// Sprite creation function.
 	/// </summary>
 
-	void CreateSprite<T> (GameObject go, ref string field) where T : UISprite
+	void CreateSprite<T> (GameObject go, string field, SpriteSelector.Callback callback) where T : UISprite
 	{
 		if (NGUISettings.atlas != null)
 		{
-			GUILayout.BeginHorizontal();
-			string sp = UISpriteInspector.SpriteField(NGUISettings.atlas, "Sprite", field, GUILayout.Width(200f));
+			NGUIEditorTools.SpriteField("Sprite", "Sprite that will be created", NGUISettings.atlas, field, callback);
 
-			if (!string.IsNullOrEmpty(sp))
+			if (!string.IsNullOrEmpty(field))
 			{
-				GUILayout.Space(20f);
-				GUILayout.Label("Sprite that will be created");
-				GUILayout.EndHorizontal();
-
 				GUILayout.BeginHorizontal();
 				NGUISettings.pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", NGUISettings.pivot, GUILayout.Width(200f));
 				GUILayout.Space(20f);
 				GUILayout.Label("Initial pivot point used by the sprite");
 				GUILayout.EndHorizontal();
-			}
-			else GUILayout.EndHorizontal();
-
-			if (sp != field)
-			{
-				field = sp;
-				Save();
 			}
 		}
 
@@ -263,6 +251,11 @@ public class UICreateWidgetWizard : EditorWindow
 			Selection.activeGameObject = sprite.gameObject;
 		}
 	}
+
+	void OnSprite (string val) { mSprite = val; Save(); Repaint(); }
+	void OnSliced (string val) { mSliced = val; Save(); Repaint(); }
+	void OnTiled  (string val) { mTiled = val;  Save(); Repaint(); }
+	void OnFilled (string val) { mFilled = val; Save(); Repaint(); }
 
 	/// <summary>
 	/// UI Texture doesn't do anything other than creating the widget.
@@ -285,12 +278,7 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			GUILayout.BeginHorizontal();
-			string bg = UISpriteInspector.SpriteField(NGUISettings.atlas, "Background", mButton, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Sliced Sprite for the background");
-			GUILayout.EndHorizontal();
-			if (mButton != bg) { mButton = bg; Save(); }
+			NGUIEditorTools.SpriteField("Background", "Sliced Sprite for the background", NGUISettings.atlas, mButton, OnButton);
 		}
 
 		if (ShouldCreate(go, NGUISettings.atlas != null))
@@ -328,6 +316,8 @@ public class UICreateWidgetWizard : EditorWindow
 		}
 	}
 
+	void OnButton (string val) { mButton = val; Save(); Repaint(); }
+
 	/// <summary>
 	/// Button creation function.
 	/// </summary>
@@ -336,26 +326,9 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			GUILayout.BeginHorizontal();
-			string bg = UISpriteInspector.SpriteField(NGUISettings.atlas, "Normal", mImage0, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Normal state sprite");
-			GUILayout.EndHorizontal();
-			if (mImage0 != bg) { mImage0 = bg; Save(); }
-
-			GUILayout.BeginHorizontal();
-			bg = UISpriteInspector.SpriteField(NGUISettings.atlas, "Hover", mImage1, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Hover state sprite");
-			GUILayout.EndHorizontal();
-			if (mImage1 != bg) { mImage1 = bg; Save(); }
-
-			GUILayout.BeginHorizontal();
-			bg = UISpriteInspector.SpriteField(NGUISettings.atlas, "Pressed", mImage2, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Pressed state sprite");
-			GUILayout.EndHorizontal();
-			if (mImage2 != bg) { mImage2 = bg; Save(); }
+			NGUIEditorTools.SpriteField("Normal", "Normal state sprite", NGUISettings.atlas, mImage0, OnImage0);
+			NGUIEditorTools.SpriteField("Hover", "Hover state sprite", NGUISettings.atlas, mImage1, OnImage1);
+			NGUIEditorTools.SpriteField("Pressed", "Pressed state sprite", NGUISettings.atlas, mImage2, OnImage2);
 		}
 
 		if (ShouldCreate(go, NGUISettings.atlas != null))
@@ -398,6 +371,10 @@ public class UICreateWidgetWizard : EditorWindow
 		}
 	}
 
+	void OnImage0 (string val) { mImage0 = val; Save(); Repaint(); }
+	void OnImage1 (string val) { mImage1 = val; Save(); Repaint(); }
+	void OnImage2 (string val) { mImage2 = val; Save(); Repaint(); }
+
 	/// <summary>
 	/// Checkbox creation function.
 	/// </summary>
@@ -406,24 +383,8 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			GUILayout.BeginHorizontal();
-			string bg = UISpriteInspector.SpriteField(NGUISettings.atlas, "Background", mCheckBG, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Sliced Sprite for the background");
-			GUILayout.EndHorizontal();
-
-			GUILayout.BeginHorizontal();
-			string ck = UISpriteInspector.SpriteField(NGUISettings.atlas, "Checkmark", mCheck, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Sprite visible when the state is 'checked'");
-			GUILayout.EndHorizontal();
-
-			if (mCheckBG != bg || mCheck != ck)
-			{
-				mCheckBG = bg;
-				mCheck = ck;
-				Save();
-			}
+			NGUIEditorTools.SpriteField("Background", "Sprite used for the background", NGUISettings.atlas, mCheckBG, OnCheckBG);
+			NGUIEditorTools.SpriteField("Checkmark", "Sprite used for the checkmark", NGUISettings.atlas, mCheck, OnCheck);
 		}
 
 		if (ShouldCreate(go, NGUISettings.atlas != null))
@@ -469,6 +430,9 @@ public class UICreateWidgetWizard : EditorWindow
 		}
 	}
 
+	void OnCheckBG (string val) { mCheckBG = val; Save(); Repaint(); }
+	void OnCheck (string val) { mCheck = val; Save(); Repaint(); }
+
 	/// <summary>
 	/// Scroll bar template.
 	/// </summary>
@@ -477,29 +441,18 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			GUILayout.BeginHorizontal();
-			string bg = UISpriteInspector.SpriteField(NGUISettings.atlas, "Background", mScrollBG, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Sprite for the background");
-			GUILayout.EndHorizontal();
-
-			GUILayout.BeginHorizontal();
-			string fg = UISpriteInspector.SpriteField(NGUISettings.atlas, "Foreground", mScrollFG, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Sprite for the foreground (thumb)");
-			GUILayout.EndHorizontal();
+			NGUIEditorTools.SpriteField("Background", "Sprite used for the background", NGUISettings.atlas, mScrollBG, OnScrollBG);
+			NGUIEditorTools.SpriteField("Foreground", "Sprite used for the foreground (thumb)", NGUISettings.atlas, mScrollFG, OnScrollFG);
 
 			GUILayout.BeginHorizontal();
 			UIScrollBar.Direction dir = (UIScrollBar.Direction)EditorGUILayout.EnumPopup("Direction", mScrollDir, GUILayout.Width(200f));
 			GUILayout.Space(20f);
-			GUILayout.Label("Add colliders?", GUILayout.Width(80f));
+			GUILayout.Label("Add colliders?", GUILayout.Width(90f));
 			bool draggable = EditorGUILayout.Toggle(mScrollCL);
 			GUILayout.EndHorizontal();
 
-			if (mScrollBG != bg || mScrollFG != fg || mScrollCL != draggable || mScrollDir != dir)
+			if (mScrollCL != draggable || mScrollDir != dir)
 			{
-				mScrollBG = bg;
-				mScrollFG = fg;
 				mScrollCL = draggable;
 				mScrollDir = dir;
 				Save();
@@ -542,6 +495,9 @@ public class UICreateWidgetWizard : EditorWindow
 		}
 	}
 
+	void OnScrollBG (string val) { mScrollBG = val; Save(); Repaint(); }
+	void OnScrollFG (string val) { mScrollFG = val; Save(); Repaint(); }
+
 	/// <summary>
 	/// Progress bar creation function.
 	/// </summary>
@@ -550,35 +506,12 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			GUILayout.BeginHorizontal();
-			string bg = UISpriteInspector.SpriteField(NGUISettings.atlas, "Background", mSliderBG, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Sprite for the background (empty bar)");
-			GUILayout.EndHorizontal();
-
-			GUILayout.BeginHorizontal();
-			string fg = UISpriteInspector.SpriteField(NGUISettings.atlas, "Foreground", mSliderFG, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Sprite for the foreground (full bar)");
-			GUILayout.EndHorizontal();
-
-			string tb = mSliderTB;
+			NGUIEditorTools.SpriteField("Empty", "Sprite for the background (empty bar)", NGUISettings.atlas, mSliderBG, OnSliderBG);
+			NGUIEditorTools.SpriteField("Full", "Sprite for the foreground (full bar)", NGUISettings.atlas, mSliderFG, OnSliderFG);
 
 			if (slider)
 			{
-				GUILayout.BeginHorizontal();
-				tb = UISpriteInspector.SpriteField(NGUISettings.atlas, "Thumb", mSliderTB, GUILayout.Width(200f));
-				GUILayout.Space(20f);
-				GUILayout.Label("Sprite for the thumb indicator");
-				GUILayout.EndHorizontal();
-			}
-
-			if (mSliderBG != bg || mSliderFG != fg || mSliderTB != tb)
-			{
-				mSliderBG = bg;
-				mSliderFG = fg;
-				mSliderTB = tb;
-				Save();
+				NGUIEditorTools.SpriteField("Thumb", "Sprite for the thumb indicator", NGUISettings.atlas, mSliderTB, OnSliderTB);
 			}
 		}
 
@@ -651,6 +584,10 @@ public class UICreateWidgetWizard : EditorWindow
 		}
 	}
 
+	void OnSliderBG (string val) { mSliderBG = val; Save(); Repaint(); }
+	void OnSliderFG (string val) { mSliderFG = val; Save(); Repaint(); }
+	void OnSliderTB (string val) { mSliderTB = val; Save(); Repaint(); }
+
 	/// <summary>
 	/// Input field creation function.
 	/// </summary>
@@ -659,12 +596,7 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			GUILayout.BeginHorizontal();
-			string bg = UISpriteInspector.SpriteField(NGUISettings.atlas, "Background", mInputBG, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Sliced Sprite for the background");
-			GUILayout.EndHorizontal();
-			if (mInputBG != bg) { mInputBG = bg; Save(); }
+			NGUIEditorTools.SpriteField("Background", "Sliced Sprite for the background", NGUISettings.atlas, mInputBG, OnInputBG);
 		}
 
 		if (ShouldCreate(go, NGUISettings.atlas != null && NGUISettings.font != null))
@@ -706,6 +638,8 @@ public class UICreateWidgetWizard : EditorWindow
 		}
 	}
 
+	void OnInputBG (string val) { mInputBG = val; Save(); Repaint(); }
+
 	/// <summary>
 	/// Create a popup list or a menu.
 	/// </summary>
@@ -714,26 +648,9 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			GUILayout.BeginHorizontal();
-			string sprite = UISpriteInspector.SpriteField(NGUISettings.atlas, "Foreground", mListFG, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Foreground sprite (shown on the button)");
-			GUILayout.EndHorizontal();
-			if (mListFG != sprite) { mListFG = sprite; Save(); }
-
-			GUILayout.BeginHorizontal();
-			sprite = UISpriteInspector.SpriteField(NGUISettings.atlas, "Background", mListBG, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Background sprite (envelops the options)");
-			GUILayout.EndHorizontal();
-			if (mListBG != sprite) { mListBG = sprite; Save(); }
-
-			GUILayout.BeginHorizontal();
-			sprite = UISpriteInspector.SpriteField(NGUISettings.atlas, "Highlight", mListHL, GUILayout.Width(200f));
-			GUILayout.Space(20f);
-			GUILayout.Label("Sprite used to highlight the selected option");
-			GUILayout.EndHorizontal();
-			if (mListHL != sprite) { mListHL = sprite; Save(); }
+			NGUIEditorTools.SpriteField("Foreground", "Foreground sprite (shown on the button)", NGUISettings.atlas, mListFG, OnListFG);
+			NGUIEditorTools.SpriteField("Background", "Background sprite (envelops the options)", NGUISettings.atlas, mListBG, OnListBG);
+			NGUIEditorTools.SpriteField("Highlight", "Sprite used to highlight the selected option", NGUISettings.atlas, mListHL, OnListHL);
 		}
 
 		if (ShouldCreate(go, NGUISettings.atlas != null && NGUISettings.font != null))
@@ -790,6 +707,10 @@ public class UICreateWidgetWizard : EditorWindow
 		}
 	}
 
+	void OnListFG (string val) { mListFG = val; Save(); Repaint(); }
+	void OnListBG (string val) { mListBG = val; Save(); Repaint(); }
+	void OnListHL (string val) { mListHL = val; Save(); Repaint(); }
+
 	/// <summary>
 	/// Repaint the window on selection.
 	/// </summary>
@@ -845,10 +766,10 @@ public class UICreateWidgetWizard : EditorWindow
 			switch (mType)
 			{
 				case WidgetType.Label:			CreateLabel(go); break;
-				case WidgetType.Sprite:			CreateSprite<UISprite>(go, ref mSprite); break;
-				case WidgetType.SlicedSprite:	CreateSprite<UISlicedSprite>(go, ref mSliced); break;
-				case WidgetType.TiledSprite:	CreateSprite<UITiledSprite>(go, ref mTiled); break;
-				case WidgetType.FilledSprite:	CreateSprite<UIFilledSprite>(go, ref mFilled); break;
+				case WidgetType.Sprite:			CreateSprite<UISprite>(go, mSprite, OnSprite); break;
+				case WidgetType.SlicedSprite:	CreateSprite<UISlicedSprite>(go, mSliced, OnSliced); break;
+				case WidgetType.TiledSprite:	CreateSprite<UITiledSprite>(go, mTiled, OnTiled); break;
+				case WidgetType.FilledSprite:	CreateSprite<UIFilledSprite>(go, mFilled, OnFilled); break;
 				case WidgetType.SimpleTexture:	CreateSimpleTexture(go); break;
 				case WidgetType.Button:			CreateButton(go); break;
 				case WidgetType.ImageButton:	CreateImageButton(go); break;

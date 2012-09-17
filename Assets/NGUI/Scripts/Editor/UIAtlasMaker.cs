@@ -228,7 +228,7 @@ public class UIAtlasMaker : EditorWindow
 
 		if (NGUISettings.atlas != null && NGUISettings.atlas.name == NGUISettings.atlasName)
 		{
-			List<string> spriteNames = NGUISettings.atlas.GetListOfSprites();
+			BetterList<string> spriteNames = NGUISettings.atlas.GetListOfSprites();
 			foreach (string sp in spriteNames) spriteList.Add(sp, 0);
 		}
 

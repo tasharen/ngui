@@ -46,16 +46,19 @@ public class UIRoot : MonoBehaviour
 
 	void Update ()
 	{
-		manualHeight = Mathf.Max(2, automatic ? Screen.height : manualHeight);
-
-		float size = 2f / manualHeight;
-		Vector3 ls = mTrans.localScale;
-
-		if (!(Mathf.Abs(ls.x - size) <= float.Epsilon) ||
-			!(Mathf.Abs(ls.y - size) <= float.Epsilon) ||
-			!(Mathf.Abs(ls.z - size) <= float.Epsilon))
+		if (mTrans != null)
 		{
-			mTrans.localScale = new Vector3(size, size, size);
+			manualHeight = Mathf.Max(2, automatic ? Screen.height : manualHeight);
+
+			float size = 2f / manualHeight;
+			Vector3 ls = mTrans.localScale;
+
+			if (!(Mathf.Abs(ls.x - size) <= float.Epsilon) ||
+				!(Mathf.Abs(ls.y - size) <= float.Epsilon) ||
+				!(Mathf.Abs(ls.z - size) <= float.Epsilon))
+			{
+				mTrans.localScale = new Vector3(size, size, size);
+			}
 		}
 	}
 

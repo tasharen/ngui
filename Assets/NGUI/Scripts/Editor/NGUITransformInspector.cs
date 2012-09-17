@@ -62,9 +62,9 @@ public class NGUITransformInspector : Editor
 		if (GUI.changed)
 		{
 			NGUIEditorTools.RegisterUndo("Transform Change", trans);
-			trans.localPosition		= Validate(pos);
-			trans.localEulerAngles	= Validate(rot);
-			trans.localScale		= Validate(scale);
+			trans.localPosition = Validate(pos);
+			trans.localEulerAngles = Validate(rot);
+			trans.localScale = Validate(scale);
 		}
 	}
 

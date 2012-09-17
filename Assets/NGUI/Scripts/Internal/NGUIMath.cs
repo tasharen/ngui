@@ -14,6 +14,12 @@ using System.Collections.Generic;
 static public class NGUIMath
 {
 	/// <summary>
+	/// Lerp function that doesn't clamp the 'factor' in 0-1 range.
+	/// </summary>
+
+	static public float Lerp (float from, float to, float factor) { return from * (1f - factor) + to * factor; }
+
+	/// <summary>
 	/// Clamp the specified integer to be between 0 and below 'max'.
 	/// </summary>
 

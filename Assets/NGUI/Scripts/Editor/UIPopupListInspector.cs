@@ -33,6 +33,20 @@ public class UIPopupListInspector : Editor
 		mList.font = obj as UIFont;
 	}
 
+	void OnBackground (string spriteName)
+	{
+		RegisterUndo();
+		mList.backgroundSprite = spriteName;
+		Repaint();
+	}
+
+	void OnHighlight (string spriteName)
+	{
+		RegisterUndo();
+		mList.highlightSprite = spriteName;
+		Repaint();
+	}
+
 	public override void OnInspectorGUI ()
 	{
 		EditorGUIUtility.LookLikeControls(80f);
@@ -52,15 +66,8 @@ public class UIPopupListInspector : Editor
 
 		if (mList.atlas != null)
 		{
-			string bg = UISpriteInspector.SpriteField(mList.atlas, "Background", mList.backgroundSprite);
-			string hl = UISpriteInspector.SpriteField(mList.atlas, "Highlight", mList.highlightSprite);
-
-			if (mList.backgroundSprite != bg || mList.highlightSprite != hl)
-			{
-				RegisterUndo();
-				mList.backgroundSprite = bg;
-				mList.highlightSprite = hl;
-			}
+			NGUIEditorTools.SpriteField("Background", mList.atlas, mList.backgroundSprite, OnBackground);
+			NGUIEditorTools.SpriteField("Highlight", mList.atlas, mList.highlightSprite, OnHighlight);
 
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(6f);
@@ -70,7 +77,7 @@ public class UIPopupListInspector : Editor
 			string text = "";
 			foreach (string s in mList.items) text += s + "\n";
 
-			GUILayout.Space(-22f);
+			GUILayout.Space(-14f);
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(84f);
 			string modified = EditorGUILayout.TextArea(text, GUILayout.Height(100f));

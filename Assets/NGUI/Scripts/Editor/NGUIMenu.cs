@@ -49,6 +49,38 @@ static public class NGUIMenu
 		}
 	}
 
+	[MenuItem("NGUI/Attach an Anchor #&h")]
+	static public void AddAnchor ()
+	{
+		GameObject go = Selection.activeGameObject;
+
+		if (go != null)
+		{
+			NGUIEditorTools.RegisterUndo("Add an Anchor", go);
+			if (go.GetComponent<UIAnchor>() == null) go.AddComponent<UIAnchor>();
+		}
+		else
+		{
+			Debug.Log("You must select a game object first.");
+		}
+	}
+
+	[MenuItem("NGUI/Attach UIStretch #&s")]
+	static public void AddUIStretch ()
+	{
+		GameObject go = Selection.activeGameObject;
+
+		if (go != null)
+		{
+			NGUIEditorTools.RegisterUndo("Add a UIStretch", go);
+			if (go.GetComponent<UIStretch>() == null) go.AddComponent<UIStretch>();
+		}
+		else
+		{
+			Debug.Log("You must select a game object first.");
+		}
+	}
+
 	[MenuItem("NGUI/Make Pixel Perfect #&p")]
 	static void PixelPerfectSelection ()
 	{

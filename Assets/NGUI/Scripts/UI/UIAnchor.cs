@@ -71,11 +71,15 @@ public class UIAnchor : MonoBehaviour
 
 	public Vector2 relativeOffset = Vector2.zero;
 
+	Animation mAnim;
+
+	void Awake () { mAnim = animation; }
+
 	/// <summary>
 	/// Automatically find the camera responsible for drawing the widgets under this object.
 	/// </summary>
 
-	void OnEnable ()
+	void Start ()
 	{
 		mIsWindows = (Application.platform == RuntimePlatform.WindowsPlayer ||
 			Application.platform == RuntimePlatform.WindowsWebPlayer ||
@@ -90,6 +94,8 @@ public class UIAnchor : MonoBehaviour
 
 	void Update ()
 	{
+		if (mAnim != null && mAnim.isPlaying) return;
+
 		Rect rect = new Rect();
 		bool useCamera = false;
 
@@ -120,15 +126,16 @@ public class UIAnchor : MonoBehaviour
 			Vector3 ls = t.localScale;
 			Vector3 lp = t.localPosition;
 
-			Vector2 size = widgetContainer.relativeSize;
+			Vector3 size = widgetContainer.relativeSize;
 			Vector3 offset = widgetContainer.pivotOffset;
-			offset.y -= size.y;
-
-			offset.x *= (size.x * ls.x);
-			offset.y *= (size.y * ls.y);
-
+			offset.y -= 1f;
+			
+			offset.x *= (widgetContainer.relativeSize.x * ls.x);
+			offset.y *= (widgetContainer.relativeSize.y * ls.y);
+			
 			rect.x = lp.x + offset.x;
 			rect.y = lp.y + offset.y;
+			
 			rect.width = size.x * ls.x;
 			rect.height = size.y * ls.y;
 		}

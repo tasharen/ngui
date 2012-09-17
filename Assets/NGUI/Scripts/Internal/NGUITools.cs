@@ -96,7 +96,9 @@ static public class NGUITools
 				AudioSource source = mListener.audio;
 				if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
 				source.pitch = pitch;
+#if !UNITY_FLASH
 				source.priority = 255;
+#endif
 				source.PlayOneShot(clip, volume);
 				return source;
 			}
@@ -535,7 +537,8 @@ static public class NGUITools
 	}
 
 	/// <summary>
-	/// SetActiveRecursively has some strange side-effects... better to do it manually.
+	/// SetActiveRecursively enables children before parents. This is a problem when a widget gets re-enabled
+	/// and it tries to find a panel on its parent.
 	/// </summary>
 
 	static public void SetActive (GameObject go, bool state)
@@ -551,7 +554,33 @@ static public class NGUITools
 	}
 
 	/// <summary>
-	/// Unity4 has changed .active to .activeself to clean up the code check here
+	/// Activate or deactivate children of the specified game object without changing the active state of the object itself.
+	/// </summary>
+
+	static public void SetActiveChildren (GameObject go, bool state)
+	{
+		Transform t = go.transform;
+
+		if (state)
+		{
+			for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
+			{
+				Transform child = t.GetChild(i);
+				Activate(child);
+			}
+		}
+		else
+		{
+			for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
+			{
+				Transform child = t.GetChild(i);
+				Deactivate(child);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Unity4 has changed GameObject.active to GameObject.activeself.
 	/// </summary>
 
 	static public bool GetActive(GameObject go)
@@ -559,12 +588,12 @@ static public class NGUITools
 #if UNITY_3_5
 		return go.active;
 #else
-		return go.activeSelf;
+		return go.activeInHierarchy;
 #endif
 	}
 
 	/// <summary>
-	/// Unity4 has changed .active to SetActive to clean up the code check here
+	/// Unity4 has changed GameObject.active to GameObject.SetActive.
 	/// </summary>
 
 	static public void SetActiveSelf(GameObject go, bool state)

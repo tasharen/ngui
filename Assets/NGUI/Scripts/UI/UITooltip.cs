@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// Example script that can be used to show tooltips.
 /// </summary>
 
-[AddComponentMenu("Game/UI/Tooltip")]
+[AddComponentMenu("NGUI/UI/Tooltip")]
 public class UITooltip : MonoBehaviour
 {
 	static UITooltip mInstance;

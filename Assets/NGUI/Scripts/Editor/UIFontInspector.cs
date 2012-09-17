@@ -133,13 +133,7 @@ public class UIFontInspector : Editor
 
 			if (mFont.bmFont.isValid)
 			{
-				string spriteName = UISlicedSpriteInspector.SpriteField(mFont.atlas, mFont.spriteName);
-
-				if (mFont.spriteName != spriteName)
-				{
-					NGUIEditorTools.RegisterUndo("Font Sprite", mFont);
-					mFont.spriteName = spriteName;
-				}
+				NGUIEditorTools.AdvancedSpriteField(mFont.atlas, mFont.spriteName, SelectSprite, false);
 			}
 		}
 		else
@@ -279,5 +273,16 @@ public class UIFontInspector : Editor
 				}
 			}
 		}
+	}
+
+	/// <summary>
+	/// Sprite selection callback.
+	/// </summary>
+
+	void SelectSprite (string spriteName)
+	{
+		NGUIEditorTools.RegisterUndo("Font Sprite", mFont);
+		mFont.spriteName = spriteName;
+		Repaint();
 	}
 }

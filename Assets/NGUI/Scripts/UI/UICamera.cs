@@ -175,6 +175,12 @@ public class UICamera : MonoBehaviour
 	public KeyCode cancelKey1 = KeyCode.JoystickButton1;
 
 	/// <summary>
+	/// Whether tooltips will be shown or not.
+	/// </summary>
+
+	static public bool showTooltips = true;
+
+	/// <summary>
 	/// Position of the last touch (or mouse) event.
 	/// </summary>
 
@@ -679,7 +685,8 @@ public class UICamera : MonoBehaviour
 			float scroll = Input.GetAxis(scrollAxisName);
 			if (scroll != 0f) Notify(mHover, "OnScroll", scroll);
 
-			if (mTooltipTime != 0f && mTooltipTime < Time.realtimeSinceStartup)
+			if (showTooltips && mTooltipTime != 0f && (mTooltipTime < Time.realtimeSinceStartup ||
+				Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
 			{
 				mTooltip = mHover;
 				ShowTooltip(true);
