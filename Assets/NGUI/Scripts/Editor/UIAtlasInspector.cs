@@ -288,10 +288,20 @@ public class UIAtlasInspector : Editor
 						inner.xMax = Mathf.Clamp(inner.xMax, outer.xMin, outer.xMax);
 						inner.yMin = Mathf.Clamp(inner.yMin, outer.yMin, outer.yMax);
 						inner.yMax = Mathf.Clamp(inner.yMax, outer.yMin, outer.yMax);
+						
+						bool changed = false;
+						
+						if (mSprite.inner != inner || mSprite.outer != outer)
+						{
+							NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
+							mSprite.inner = inner;
+							mSprite.outer = outer;
+							MarkSpriteAsDirty();
+							changed = true;
+						}
 
 						EditorGUILayout.Separator();
 
-						// Padding is mainly meant to be used by the 'trimmed' feature of TexturePacker
 						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 						{
 							int left	= Mathf.RoundToInt(mSprite.paddingLeft	 * mSprite.outer.width);
@@ -302,7 +312,7 @@ public class UIAtlasInspector : Editor
 							NGUIEditorTools.IntVector a = NGUIEditorTools.IntPair("Padding", "Left", "Top", left, top);
 							NGUIEditorTools.IntVector b = NGUIEditorTools.IntPair(null, "Right", "Bottom", right, bottom);
 
-							if (a.x != left || a.y != top || b.x != right || b.y != bottom)
+							if (changed || a.x != left || a.y != top || b.x != right || b.y != bottom)
 							{
 								NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
 								mSprite.paddingLeft		= a.x / mSprite.outer.width;

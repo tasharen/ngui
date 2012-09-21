@@ -126,49 +126,52 @@ public class SpriteSelector : ScriptableWizard
 								mCallback(sprite.name);
 							}
 						}
-
-						// On top of the button we have a checkboard grid
-						NGUIEditorTools.DrawTiledTexture(rect, NGUIEditorTools.backdropTexture);
-
-						Rect uv = sprite.outer;
-						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
-							uv = NGUIMath.ConvertToTexCoords(uv, tex.width, tex.height);
-
-						// Calculate the texture's scale that's needed to display the sprite in the clipped area
-						float scaleX = rect.width / uv.width;
-						float scaleY = rect.height / uv.height;
-
-						// Stretch the sprite so that it will appear proper
-						float aspect = scaleY / scaleX;
-						if (aspect < 1f) scaleX *= aspect;
-						else scaleY /= aspect;
-
-						Rect clipRect = rect;
-
-						if (aspect != 1f)
+						
+						if (Event.current.type == EventType.Repaint)
 						{
-							if (aspect < 1f)
+							// On top of the button we have a checkboard grid
+							NGUIEditorTools.DrawTiledTexture(rect, NGUIEditorTools.backdropTexture);
+	
+							Rect uv = sprite.outer;
+							if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
+								uv = NGUIMath.ConvertToTexCoords(uv, tex.width, tex.height);
+	
+							// Calculate the texture's scale that's needed to display the sprite in the clipped area
+							float scaleX = rect.width / uv.width;
+							float scaleY = rect.height / uv.height;
+	
+							// Stretch the sprite so that it will appear proper
+							float aspect = scaleY / scaleX;
+							if (aspect < 1f) scaleX *= aspect;
+							else scaleY /= aspect;
+	
+							Rect clipRect = rect;
+	
+							if (aspect != 1f)
 							{
-								// The sprite is taller than it is wider
-								float padding = size * (1f - aspect) * 0.5f;
-								clipRect.xMin += padding;
-								clipRect.xMax -= padding;
+								if (aspect < 1f)
+								{
+									// The sprite is taller than it is wider
+									float padding = size * (1f - aspect) * 0.5f;
+									clipRect.xMin += padding;
+									clipRect.xMax -= padding;
+								}
+								else
+								{
+									// The sprite is wider than it is taller
+									float padding = size * (1f - 1f / aspect) * 0.5f;
+									clipRect.yMin += padding;
+									clipRect.yMax -= padding;
+								}
 							}
-							else
+	
+							GUI.DrawTextureWithTexCoords(clipRect, tex, uv);
+	
+							// Draw the selection
+							if (spriteName == sprite.name)
 							{
-								// The sprite is wider than it is taller
-								float padding = size * (1f - 1f / aspect) * 0.5f;
-								clipRect.yMin += padding;
-								clipRect.yMax -= padding;
+								NGUIEditorTools.DrawOutline(rect, new Color(0.4f, 1f, 0f, 1f));
 							}
-						}
-
-						GUI.DrawTextureWithTexCoords(clipRect, tex, uv);
-
-						// Draw the selection
-						if (spriteName == sprite.name)
-						{
-							NGUIEditorTools.DrawOutline(rect, new Color(0.4f, 1f, 0f, 1f));
 						}
 
 						if (++col >= columns)

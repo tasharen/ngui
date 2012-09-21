@@ -96,9 +96,6 @@ static public class NGUITools
 				AudioSource source = mListener.audio;
 				if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
 				source.pitch = pitch;
-#if !UNITY_FLASH
-				source.priority = 255;
-#endif
 				source.PlayOneShot(clip, volume);
 				return source;
 			}

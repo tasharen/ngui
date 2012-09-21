@@ -33,7 +33,7 @@ public class UpdateManager : MonoBehaviour
 
 	static int Compare (UpdateEntry a, UpdateEntry b)
 	{
-		if (a.index < b.index) return 1;
+		if (a.index < b.index) return -1;
 		if (a.index > b.index) return 1;
 		return 0;
 	}

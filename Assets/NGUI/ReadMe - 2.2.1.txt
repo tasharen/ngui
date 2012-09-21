@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.2.0
+                Version 2.2.1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,11 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.2.1:
+- FIX: Sprite list should now be faster.
+- FIX: Sprite border editing should now work properly again.
+- FIX: A couple of other minor fixes.
 
 2.2.0:
 - NEW: Added a sprite selection window that replaces the drop-down selection list. Think texture selection window for your sprites. The sprite selection window has a search box to narrow down your selection.

@@ -267,7 +267,7 @@ public class UIAtlas : MonoBehaviour
 			Sprite s = sprites[i];
 			if (s != null && !string.IsNullOrEmpty(s.name)) list.Add(s.name);
 		}
-		list.Sort(CompareString);
+		//list.Sort(CompareString);
 		return list;
 	}
 
@@ -277,7 +277,8 @@ public class UIAtlas : MonoBehaviour
 
 	public BetterList<string> GetListOfSprites (string match)
 	{
-		if (mReplacement != null) return mReplacement.GetListOfSprites();
+		if (mReplacement != null) return mReplacement.GetListOfSprites(match);
+		if (string.IsNullOrEmpty(match)) return GetListOfSprites();
 		BetterList<string> list = new BetterList<string>();
 
 		// First try to find an exact match
@@ -313,7 +314,7 @@ public class UIAtlas : MonoBehaviour
 				if (matches == keywords.Length) list.Add(s.name);
 			}
 		}
-		list.Sort(CompareString);
+		//list.Sort(CompareString);
 		return list;
 	}
 
