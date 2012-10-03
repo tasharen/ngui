@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.2.1
+                Version 2.2.2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,18 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.2.2:
+- NEW: You can now specify a minimum and maximum height on UIRoot.
+- NEW: Label shadow and outline distance can now be modified.
+- NEW: Added UIButtonActivate -- an extremely simple script that can be used to activate or deactivate something on click.
+- NEW: Creating a new UI will now automatically add a kinematic rigidbody to the UIRoot, as it's supposedly faster for physics checks.
+- NEW: Game objects destroyed via NGUITools.Destroy will now automatically get un-parented.
+- NEW: UIEventListener now has an OnKey delegate.
+- FIX: Sprite preview should now display wide sprites correctly.
+- FIX: Fixed copy/paste error in the atlas inspector (thanks athos!).
+- FIX: UIGrid will no longer consider destroyed game objects.
+- FIX: Couple of other smaller fixes.
 
 2.2.1:
 - FIX: Sprite list should now be faster.

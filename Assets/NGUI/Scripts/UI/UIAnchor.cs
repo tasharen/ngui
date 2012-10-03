@@ -72,6 +72,7 @@ public class UIAnchor : MonoBehaviour
 	public Vector2 relativeOffset = Vector2.zero;
 
 	Animation mAnim;
+	UIRoot mRoot;
 
 	void Awake () { mAnim = animation; }
 
@@ -81,6 +82,7 @@ public class UIAnchor : MonoBehaviour
 
 	void Start ()
 	{
+		mRoot = NGUITools.FindInParents<UIRoot>(gameObject);
 		mIsWindows = (Application.platform == RuntimePlatform.WindowsPlayer ||
 			Application.platform == RuntimePlatform.WindowsWebPlayer ||
 			Application.platform == RuntimePlatform.WindowsEditor);
@@ -94,7 +96,7 @@ public class UIAnchor : MonoBehaviour
 
 	void Update ()
 	{
-		if (mAnim != null && mAnim.isPlaying) return;
+		if (mAnim != null && mAnim.enabled && mAnim.isPlaying) return;
 
 		Rect rect = new Rect();
 		bool useCamera = false;
@@ -104,8 +106,9 @@ public class UIAnchor : MonoBehaviour
 			if (panelContainer.clipping == UIDrawCall.Clipping.None)
 			{
 				// Panel has no clipping -- just use the screen's dimensions
-				rect.xMin = -Screen.width * 0.5f;
-				rect.yMin = -Screen.height * 0.5f;
+				float ratio = (mRoot != null) ? mRoot.manualHeight / Screen.height * 0.5f : 0.5f;
+				rect.xMin = -Screen.width * ratio;
+				rect.yMin = -Screen.height * ratio;
 				rect.xMax = -rect.xMin;
 				rect.yMax = -rect.yMin;
 			}
@@ -192,8 +195,21 @@ public class UIAnchor : MonoBehaviour
 			v.x = Mathf.RoundToInt(v.x);
 			v.y = Mathf.RoundToInt(v.y);
 
+			float oldZ = v.z;
+			if (widgetContainer != null)
+			{
+				v = widgetContainer.transform.parent.TransformPoint(v);
+				
+			}
+			else if (panelContainer != null)
+			{
+				v = panelContainer.transform.parent.TransformPoint(v);
+			}
+
+			v.z = oldZ;
+
 			// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
-			if (transform.localPosition != v) transform.localPosition = v;
+			if (transform.position != v) transform.position = v;
 		}
 	}
 }

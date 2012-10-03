@@ -23,10 +23,64 @@ public class UIRoot : MonoBehaviour
 
 	static public List<UIRoot> list { get { return mRoots; } }
 
+	Transform mTrans;
+
+	/// <summary>
+	/// If set to 'true', the UIRoot will be scaled automatically as the resolution changes, and will keep the UI under it
+	/// pixel-perfect. If set to 'false', 'manualHeight' is used instead, and the UI will scale proportionally to screen's height,
+	/// always remaining the same relative size regardless of the resolution changes.
+	/// </summary>
+
 	public bool automatic = true;
+
+	/// <summary>
+	/// Height of the screen when 'automatic' is turned off.
+	/// </summary>
+
 	public int manualHeight = 800;
 
-	Transform mTrans;
+	/// <summary>
+	/// If the screen height goes below this value, it will be as if 'automatic' is turned off with the 'manualHeight' set to this value.
+	/// </summary>
+
+	public int minimumHeight = 320;
+
+	/// <summary>
+	/// If the screen height goes above this value, it will be as if 'automatic' is turned off with the 'manualHeight' set to this value.
+	/// </summary>
+
+	public int maximumHeight = 1080;
+
+	/// <summary>
+	/// UI Root's active height, based on the size of the screen.
+	/// </summary>
+
+	public int activeHeight
+	{
+		get
+		{
+			int height = Mathf.Max(2, Screen.height);
+			if (height < minimumHeight) return minimumHeight;
+			if (height > maximumHeight) return maximumHeight;
+			else if (automatic) return height;
+			return manualHeight;
+		}
+	}
+
+	/// <summary>
+	/// Pixel size adjustment. Most of the time it's at 1, unless 'automatic' is turned off.
+	/// </summary>
+
+	public float pixelSizeAdjustment
+	{
+		get
+		{
+			float height = Screen.height;
+			if (height < minimumHeight) return minimumHeight / height;
+			if (height > maximumHeight) return maximumHeight / height;
+			return automatic ? 1f : manualHeight / height;
+		}
+	}
 
 	void Awake () { mTrans = transform; mRoots.Add(this); }
 	void OnDestroy () { mRoots.Remove(this); }
@@ -48,9 +102,7 @@ public class UIRoot : MonoBehaviour
 	{
 		if (mTrans != null)
 		{
-			manualHeight = Mathf.Max(2, automatic ? Screen.height : manualHeight);
-
-			float size = 2f / manualHeight;
+			float size = 2f / activeHeight;
 			Vector3 ls = mTrans.localScale;
 
 			if (!(Mathf.Abs(ls.x - size) <= float.Epsilon) ||

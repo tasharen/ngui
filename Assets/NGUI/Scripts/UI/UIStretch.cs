@@ -114,10 +114,11 @@ public class UIStretch : MonoBehaviour
 			
 			float rectWidth  = rect.width;
 			float rectHeight = rect.height;
+			float adj = (mRoot != null) ? mRoot.pixelSizeAdjustment : 1f;
 
-			if (mRoot != null && !mRoot.automatic && rectHeight > 1f)
+			if (adj != 1f && rectHeight > 1f)
 			{
-				float scale = mRoot.manualHeight / rectHeight;
+				float scale = mRoot.activeHeight / rectHeight;
 				rectWidth *= scale;
 				rectHeight *= scale;
 			}

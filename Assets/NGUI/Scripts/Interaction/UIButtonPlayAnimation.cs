@@ -167,6 +167,7 @@ public class UIButtonPlayAnimation : MonoBehaviour
 			int pd = -(int)playDirection;
 			Direction dir = forward ? playDirection : ((Direction)pd);
 			ActiveAnimation anim = ActiveAnimation.Play(target, clipName, dir, ifDisabledOnPlay, disableWhenFinished);
+			if (anim == null) return;
 			if (resetOnPlay) anim.Reset();
 
 			// Set the delegate

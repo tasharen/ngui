@@ -61,7 +61,7 @@ public class UITable : MonoBehaviour
 				{
 					Transform child = myTrans.GetChild(i);
 
-					if (child && (!hideInactive || NGUITools.GetActive(child.gameObject))) mChildren.Add(child);
+					if (child && child.gameObject && (!hideInactive || NGUITools.GetActive(child.gameObject))) mChildren.Add(child);
 				}
 				if (sorted) mChildren.Sort(SortByName);
 			}

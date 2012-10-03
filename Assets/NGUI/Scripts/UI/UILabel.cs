@@ -28,6 +28,7 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] Effect mEffectStyle = Effect.None;
 	[HideInInspector][SerializeField] Color mEffectColor = Color.black;
 	[HideInInspector][SerializeField] UIFont.SymbolStyle mSymbols = UIFont.SymbolStyle.Uncolored;
+	[HideInInspector][SerializeField] Vector2 mEffectDistance = Vector2.one;
 
 	/// <summary>
 	/// Obsolete, do not use. Use 'mMaxLineWidth' instead.
@@ -322,6 +323,26 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Effect distance in pixels.
+	/// </summary>
+
+	public Vector2 effectDistance
+	{
+		get
+		{
+			return mEffectDistance;
+		}
+		set
+		{
+			if (mEffectDistance != value)
+			{
+				mEffectDistance = value;
+				hasChanged = true;
+			}
+		}
+	}
+
+	/// <summary>
 	/// Returns the processed version of 'text', with new line characters, line wrapping, etc.
 	/// </summary>
 
@@ -592,24 +613,27 @@ public class UILabel : UIWidget
 			int end = verts.size;
 			float pixel =  1f / mFont.size;
 
-			ApplyShadow(verts, uvs, cols, offset, end, pixel, -pixel);
+			float fx = pixel * mEffectDistance.x;
+			float fy = pixel * mEffectDistance.y;
+
+			ApplyShadow(verts, uvs, cols, offset, end, fx, -fy);
 
 			if (effectStyle == Effect.Outline)
 			{
 				offset = end;
 				end = verts.size;
 
-				ApplyShadow(verts, uvs, cols, offset, end, -pixel, pixel);
+				ApplyShadow(verts, uvs, cols, offset, end, -fx, fy);
 
 				offset = end;
 				end = verts.size;
 
-				ApplyShadow(verts, uvs, cols, offset, end, pixel, pixel);
+				ApplyShadow(verts, uvs, cols, offset, end, fx, fy);
 
 				offset = end;
 				end = verts.size;
 
-				ApplyShadow(verts, uvs, cols, offset, end, -pixel, -pixel);
+				ApplyShadow(verts, uvs, cols, offset, end, -fx, -fy);
 			}
 		}
 	}

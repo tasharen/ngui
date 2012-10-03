@@ -86,6 +86,23 @@ public class UILabelInspector : UIWidgetInspector
 			}
 		}
 		GUILayout.EndHorizontal();
+
+		if (mLabel.effectStyle != UILabel.Effect.None)
+		{
+			GUILayout.Label("Distance", GUILayout.Width(70f));
+			GUILayout.Space(-34f);
+			GUILayout.BeginHorizontal();
+			GUILayout.Space(70f);
+			Vector2 offset = EditorGUILayout.Vector2Field("", mLabel.effectDistance);
+			GUILayout.Space(20f);
+
+			if (offset != mLabel.effectDistance)
+			{
+				RegisterUndo();
+				mLabel.effectDistance = offset;
+			}
+			GUILayout.EndHorizontal();
+		}
 		return true;
 	}
 }

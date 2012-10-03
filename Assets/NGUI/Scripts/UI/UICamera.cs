@@ -914,6 +914,11 @@ public class UICamera : MonoBehaviour
 
 	void ProcessTouch (bool pressed, bool unpressed)
 	{
+		// Whether we're using the mouse
+		bool isMouse = (currentTouch == mMouse[0]);
+		float drag   = isMouse ? mouseDragThreshold : touchDragThreshold;
+		float click  = isMouse ? mouseClickThreshold : Mathf.Max(touchClickThreshold, Screen.height * 0.1f);
+
 		// Send out the press message
 		if (pressed)
 		{
@@ -937,11 +942,6 @@ public class UICamera : MonoBehaviour
 
 			if (mag != 0f)
 			{
-				// Whether we're using the mouse
-				bool isMouse = (currentTouch == mMouse[0]);
-				float drag   = isMouse ? mouseDragThreshold : touchDragThreshold;
-				float click  = isMouse ? mouseClickThreshold : Mathf.Max(touchClickThreshold, Screen.height * 0.1f);
-
 				// Keep track of the total movement
 				currentTouch.totalDelta += currentTouch.delta;
 				mag = currentTouch.totalDelta.magnitude;
@@ -990,7 +990,8 @@ public class UICamera : MonoBehaviour
 				if (useMouse && currentTouch.pressed == mHover) Notify(currentTouch.pressed, "OnHover", true);
 
 				// If the button/touch was released on the same object, consider it a click and select it
-				if (currentTouch.pressed == currentTouch.current)
+				if (currentTouch.pressed == currentTouch.current ||
+					(currentTouch.clickNotification != ClickNotification.None && currentTouch.totalDelta.magnitude < drag))
 				{
 					if (currentTouch.pressed != mSel)
 					{

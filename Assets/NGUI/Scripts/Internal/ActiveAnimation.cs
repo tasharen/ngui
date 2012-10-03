@@ -88,6 +88,7 @@ public class ActiveAnimation : IgnoreTimeScale
 
 			mAnim.Sample();
 			if (isPlaying) return;
+			enabled = false;
 
 			if (mNotify)
 			{
@@ -108,7 +109,7 @@ public class ActiveAnimation : IgnoreTimeScale
 				}
 			}
 		}
-		enabled = false;
+		else enabled = false;
 	}
 
 	/// <summary>
@@ -120,6 +121,7 @@ public class ActiveAnimation : IgnoreTimeScale
 		if (mAnim != null)
 		{
 			// We will sample the animation manually so that it works when the time is paused
+			enabled = true;
 			mAnim.enabled = false;
 
 			// Determine the play direction
@@ -182,8 +184,7 @@ public class ActiveAnimation : IgnoreTimeScale
 		}
 
 		ActiveAnimation aa = anim.GetComponent<ActiveAnimation>();
-		if (aa != null) aa.enabled = true;
-		else aa = anim.gameObject.AddComponent<ActiveAnimation>();
+		if (aa == null) aa = anim.gameObject.AddComponent<ActiveAnimation>();
 		aa.mAnim = anim;
 		aa.mDisableDirection = (Direction)(int)disableCondition;
 		aa.eventReceiver = null;

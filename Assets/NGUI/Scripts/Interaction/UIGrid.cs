@@ -72,7 +72,7 @@ public class UIGrid : MonoBehaviour
 			for (int i = 0; i < myTrans.childCount; ++i)
 			{
 				Transform t = myTrans.GetChild(i);
-				if (t) list.Add(t);
+				if (t && NGUITools.GetActive(t.gameObject)) list.Add(t);
 			}
 			list.Sort(SortByName);
 

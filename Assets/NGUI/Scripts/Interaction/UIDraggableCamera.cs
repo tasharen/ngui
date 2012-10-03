@@ -164,8 +164,7 @@ public class UIDraggableCamera : IgnoreTimeScale
 	public void Drag (Vector2 delta)
 	{
 		UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
-
-		if (mRoot != null && !mRoot.automatic) delta *= (float)mRoot.manualHeight / Screen.height;
+		if (mRoot != null) delta *= mRoot.pixelSizeAdjustment;
 
 		Vector2 offset = Vector2.Scale(delta, -scale);
 		mTrans.localPosition += (Vector3)offset;

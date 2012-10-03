@@ -316,8 +316,8 @@ public class UIAtlasInspector : Editor
 							{
 								NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
 								mSprite.paddingLeft		= a.x / mSprite.outer.width;
-								mSprite.paddingTop		= a.y / mSprite.outer.width;
-								mSprite.paddingRight	= b.x / mSprite.outer.height;
+								mSprite.paddingTop		= a.y / mSprite.outer.height;
+								mSprite.paddingRight	= b.x / mSprite.outer.width;
 								mSprite.paddingBottom	= b.y / mSprite.outer.height;
 								MarkSpriteAsDirty();
 							}

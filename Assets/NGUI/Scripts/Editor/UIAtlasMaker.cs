@@ -110,11 +110,9 @@ public class UIAtlasMaker : EditorWindow
 		Texture2D[] textures = new Texture2D[sprites.Count];
 		Rect[] rects;
 
-
 		if (NGUISettings.unityPacking)
 		{
 			for (int i = 0; i < sprites.Count; ++i) textures[i] = sprites[i].tex;
-
 			rects = tex.PackTextures(textures, NGUISettings.atlasPadding, 4096);
 		}
 		else

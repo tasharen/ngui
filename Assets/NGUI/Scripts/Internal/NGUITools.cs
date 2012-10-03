@@ -6,6 +6,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 /// <summary>
 /// Helper class containing generic functions used throughout the UI library.
@@ -109,7 +110,6 @@ static public class NGUITools
 
 	static public WWW OpenURL (string url)
 	{
-		//Debug.Log(url);
 #if UNITY_FLASH
 		Debug.LogError("WWW is not yet implemented in Flash");
 		return null;
@@ -117,6 +117,24 @@ static public class NGUITools
 		WWW www = null;
 		try { www = new WWW(url); }
 		catch (System.Exception ex) { Debug.LogError(ex.Message); }
+		return www;
+#endif
+	}
+
+	/// <summary>
+	/// New WWW call can fail if the crossdomain policy doesn't check out. Exceptions suck. It's much more elegant to check for null instead.
+	/// </summary>
+
+	static public WWW OpenURL (string url, WWWForm form)
+	{
+		if (form == null) return OpenURL(url);
+#if UNITY_FLASH
+		Debug.LogError("WWW is not yet implemented in Flash");
+		return null;
+#else
+		WWW www = null;
+		try { www = new WWW(url, form); }
+		catch (System.Exception ex) { Debug.LogError(ex != null ? ex.Message : "<null>"); }
 		return www;
 #endif
 	}
@@ -445,7 +463,16 @@ static public class NGUITools
 	{
 		if (obj != null)
 		{
-			if (Application.isPlaying) UnityEngine.Object.Destroy(obj);
+			if (Application.isPlaying)
+			{
+				if (obj is GameObject)
+				{
+					GameObject go = obj as GameObject;
+					go.transform.parent = null;
+				}
+
+				UnityEngine.Object.Destroy(obj);
+			}
 			else UnityEngine.Object.DestroyImmediate(obj);
 		}
 	}
@@ -578,9 +605,9 @@ static public class NGUITools
 	static public bool GetActive(GameObject go)
 	{
 #if UNITY_3_5
-		return go.active;
+		return go && go.active;
 #else
-		return go.activeInHierarchy;
+		return go && go.activeInHierarchy;
 #endif
 	}
 
@@ -648,5 +675,63 @@ static public class NGUITools
 				MakePixelPerfect(t.GetChild(i));
 			}
 		}
+	}
+
+	/// <summary>
+	/// Save the specified binary data into the specified file.
+	/// </summary>
+
+	static public bool Save (string fileName, byte[] bytes)
+	{
+#if UNITY_WEBPLAYER || UNITY_FLASH
+		return false;
+#else
+		if (!NGUITools.fileAccess) return false;
+
+		string path = Application.persistentDataPath + "/" + fileName;
+
+		if (bytes == null)
+		{
+			if (File.Exists(path)) File.Delete(path);
+			return true;
+		}
+
+		FileStream file = null;
+
+		try
+		{
+			file = File.Create(path);
+		}
+		catch (System.Exception ex)
+		{
+			NGUIDebug.Log(ex.Message);
+			return false;
+		}
+
+		file.Write(bytes, 0, bytes.Length);
+		file.Close();
+		return true;
+#endif
+	}
+
+	/// <summary>
+	/// Load all binary data from the specified file.
+	/// </summary>
+
+	static public byte[] Load (string fileName)
+	{
+#if UNITY_WEBPLAYER || UNITY_FLASH
+		return null;
+#else
+		if (!NGUITools.fileAccess) return null;
+
+		string path = Application.persistentDataPath + "/" + fileName;
+
+		if (File.Exists(path))
+		{
+			return File.ReadAllBytes(path);
+		}
+		return null;
+#endif
 	}
 }

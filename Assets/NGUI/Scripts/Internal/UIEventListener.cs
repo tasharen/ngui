@@ -19,6 +19,7 @@ public class UIEventListener : MonoBehaviour
 	public delegate void VectorDelegate (GameObject go, Vector2 delta);
 	public delegate void StringDelegate (GameObject go, string text);
 	public delegate void ObjectDelegate (GameObject go, GameObject draggedObject);
+	public delegate void KeyCodeDelegate (GameObject go, KeyCode key);
 
 	public object parameter;
 
@@ -32,6 +33,7 @@ public class UIEventListener : MonoBehaviour
 	public VectorDelegate onDrag;
 	public ObjectDelegate onDrop;
 	public StringDelegate onInput;
+	public KeyCodeDelegate onKey;
 
 	void OnSubmit ()				{ if (onSubmit != null) onSubmit(gameObject); }
 	void OnClick ()					{ if (onClick != null) onClick(gameObject); }
@@ -43,6 +45,7 @@ public class UIEventListener : MonoBehaviour
 	void OnDrag (Vector2 delta)		{ if (onDrag != null) onDrag(gameObject, delta); }
 	void OnDrop (GameObject go)		{ if (onDrop != null) onDrop(gameObject, go); }
 	void OnInput (string text)		{ if (onInput != null) onInput(gameObject, text); }
+	void OnKey (KeyCode key)		{ if (onKey != null) onKey(gameObject, key); }
 
 	/// <summary>
 	/// Get or add an event listener to the specified game object.

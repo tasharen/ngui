@@ -826,7 +826,7 @@ public class NGUIEditorTools
 		outerRect.width = outer.width;
 		outerRect.height = outer.height;
 
-		if (rect.width > outerRect.width)
+		if (outerRect.width > 0f)
 		{
 			float f = rect.width / outerRect.width;
 			outerRect.width *= f;
