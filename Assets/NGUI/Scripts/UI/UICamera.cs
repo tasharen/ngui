@@ -701,7 +701,7 @@ public class UICamera : MonoBehaviour
 
 	void ProcessMouse ()
 	{
-		bool updateRaycast = (Time.timeScale < 0.9f);
+		bool updateRaycast = (useMouse && Time.timeScale < 0.9f);
 
 		if (!updateRaycast)
 		{
@@ -755,7 +755,7 @@ public class UICamera : MonoBehaviour
 			// A button was pressed -- cancel the tooltip
 			mTooltipTime = 0f;
 		}
-		else if (posChanged && (!stickyTooltip || mHover != mMouse[0].current))
+		else if (useMouse && posChanged && (!stickyTooltip || mHover != mMouse[0].current))
 		{
 			if (mTooltipTime != 0f)
 			{
@@ -778,22 +778,25 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Process all 3 mouse buttons as individual touches
-		for (int i = 0; i < 3; ++i)
+		if (useMouse)
 		{
-			bool pressed = Input.GetMouseButtonDown(i);
-			bool unpressed = Input.GetMouseButtonUp(i);
-
-			currentTouch = mMouse[i];
-			currentTouchID = -1 - i;
-
-			// We don't want to update the last camera while there is a touch happening
-			if (pressed) currentTouch.pressedCam = currentCamera;
-			else if (currentTouch.pressed != null) currentCamera = currentTouch.pressedCam;
-
-			// Process the mouse events
-			ProcessTouch(pressed, unpressed);
+			for (int i = 0; i < 3; ++i)
+			{
+				bool pressed = Input.GetMouseButtonDown(i);
+				bool unpressed = Input.GetMouseButtonUp(i);
+	
+				currentTouch = mMouse[i];
+				currentTouchID = -1 - i;
+	
+				// We don't want to update the last camera while there is a touch happening
+				if (pressed) currentTouch.pressedCam = currentCamera;
+				else if (currentTouch.pressed != null) currentCamera = currentTouch.pressedCam;
+	
+				// Process the mouse events
+				ProcessTouch(pressed, unpressed);
+			}
+			currentTouch = null;
 		}
-		currentTouch = null;
 
 		// If nothing is pressed and there is an object under the touch, highlight it
 		if (useMouse && !isPressed && mHover != mMouse[0].current)

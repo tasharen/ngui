@@ -106,7 +106,7 @@ public class UIAnchor : MonoBehaviour
 			if (panelContainer.clipping == UIDrawCall.Clipping.None)
 			{
 				// Panel has no clipping -- just use the screen's dimensions
-				float ratio = (mRoot != null) ? mRoot.manualHeight / Screen.height * 0.5f : 0.5f;
+				float ratio = (mRoot != null) ? (float)mRoot.manualHeight / Screen.height * 0.5f : 0.5f;
 				rect.xMin = -Screen.width * ratio;
 				rect.yMin = -Screen.height * ratio;
 				rect.xMax = -rect.xMin;
@@ -195,7 +195,6 @@ public class UIAnchor : MonoBehaviour
 			v.x = Mathf.RoundToInt(v.x);
 			v.y = Mathf.RoundToInt(v.y);
 
-			float oldZ = v.z;
 			if (widgetContainer != null)
 			{
 				v = widgetContainer.transform.parent.TransformPoint(v);
@@ -205,8 +204,6 @@ public class UIAnchor : MonoBehaviour
 			{
 				v = panelContainer.transform.parent.TransformPoint(v);
 			}
-
-			v.z = oldZ;
 
 			// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
 			if (transform.position != v) transform.position = v;
