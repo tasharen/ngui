@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.2.2
+                Version 2.2.3
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,11 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.2.3:
+- FIX: Small fix for UIAnchor using a clipped panel container (thanks yuewah!)
+- FIX: Work-around/fix-ish thing for Unity Remote sending both mouse and touch events.
+- FIX: hideInactive on UIGrid should now function correctly.
 
 2.2.2:
 - NEW: You can now specify a minimum and maximum height on UIRoot.
