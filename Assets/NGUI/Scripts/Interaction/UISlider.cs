@@ -148,7 +148,7 @@ public class UISlider : IgnoreTimeScale
 	/// Update the slider's position on press.
 	/// </summary>
 
-	void OnPress (bool pressed) { if (pressed) UpdateDrag(); }
+	void OnPress (bool pressed) { if (pressed && UICamera.currentTouchID != -100) UpdateDrag(); }
 
 	/// <summary>
 	/// When dragged, figure out where the mouse is and calculate the updated value of the slider.

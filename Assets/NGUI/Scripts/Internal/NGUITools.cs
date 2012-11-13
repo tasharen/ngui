@@ -534,11 +534,16 @@ static public class NGUITools
 	{
 		SetActiveSelf(t.gameObject, true);
 
+		// Unity 4.0 nests the 'active' state, so there is no longer any need to recurse through children.
+		// However... for compatibility's sake, I am leaving this as it was so that NGUI's examples
+		// work properly in both Unity 3.5 as well as 4.0.
+//#if UNITY_3_5
 		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
 		{
 			Transform child = t.GetChild(i);
 			Activate(child);
 		}
+//#endif
 	}
 
 	/// <summary>
@@ -547,11 +552,13 @@ static public class NGUITools
 
 	static void Deactivate (Transform t)
 	{
+//#if UNITY_3_5
 		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
 		{
 			Transform child = t.GetChild(i);
 			Deactivate(child);
 		}
+//#endif
 		SetActiveSelf(t.gameObject, false);
 	}
 
