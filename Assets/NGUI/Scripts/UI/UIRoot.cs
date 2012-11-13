@@ -60,9 +60,13 @@ public class UIRoot : MonoBehaviour
 		get
 		{
 			int height = Mathf.Max(2, Screen.height);
-			if (height < minimumHeight) return minimumHeight;
-			if (height > maximumHeight) return maximumHeight;
-			else if (automatic) return height;
+
+			if (automatic)
+			{
+				if (height < minimumHeight) return minimumHeight;
+				if (height > maximumHeight) return maximumHeight;
+				return height;
+			}
 			return manualHeight;
 		}
 	}
@@ -76,9 +80,14 @@ public class UIRoot : MonoBehaviour
 		get
 		{
 			float height = Screen.height;
-			if (height < minimumHeight) return minimumHeight / height;
-			if (height > maximumHeight) return maximumHeight / height;
-			return automatic ? 1f : manualHeight / height;
+
+			if (automatic)
+			{
+				if (height < minimumHeight) return minimumHeight / height;
+				if (height > maximumHeight) return maximumHeight / height;
+				return 1f;
+			}
+			return manualHeight / height;
 		}
 	}
 
