@@ -254,10 +254,13 @@ public class UILabel : UIWidget
 		{
 			if (mPassword != value)
 			{
-				mPassword		= value;
-				mMaxLineCount	= 1;
-				mEncoding		= false;
-				hasChanged		= true;
+				if (value)
+				{
+					mMaxLineCount = 1;
+					mEncoding = false;
+				}
+				mPassword = value;
+				hasChanged = true;
 			}
 		}
 	}
@@ -437,8 +440,6 @@ public class UILabel : UIWidget
 
 		if (mPassword)
 		{
-			mProcessedText = mFont.WrapText(mProcessedText, 100000f, 1, false, UIFont.SymbolStyle.None);
-
 			string hidden = "";
 
 			if (mShowLastChar)
@@ -450,7 +451,8 @@ public class UILabel : UIWidget
 			{
 				for (int i = 0, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
 			}
-			mProcessedText = hidden;
+			mProcessedText = mFont.WrapText(hidden, mMaxLineWidth / cachedTransform.localScale.x, mMaxLineCount,
+				false, UIFont.SymbolStyle.None);
 		}
 		else if (mMaxLineWidth > 0)
 		{
