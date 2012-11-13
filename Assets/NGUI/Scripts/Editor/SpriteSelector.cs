@@ -20,6 +20,7 @@ public class SpriteSelector : ScriptableWizard
 	string mName;
 	Vector2 mPos = Vector2.zero;
 	Callback mCallback;
+	float mClickTime = 0f;
 
 	/// <summary>
 	/// Name of the selected sprite.
@@ -66,6 +67,7 @@ public class SpriteSelector : ScriptableWizard
 		}
 		else
 		{
+			bool close = false;
 			GUILayout.Label(mAtlas.name + " Sprites", "LODLevelNotifyText");
 			NGUIEditorTools.DrawSeparator();
 
@@ -111,20 +113,27 @@ public class SpriteSelector : ScriptableWizard
 						if (sprite == null) continue;
 
 						// Button comes first
-						if (GUI.Button(rect, "") && spriteName != sprite.name)
+						if (GUI.Button(rect, ""))
 						{
-							if (mSprite != null)
+							float delta = Time.realtimeSinceStartup - mClickTime;
+							mClickTime = Time.realtimeSinceStartup;
+
+							if (spriteName != sprite.name)
 							{
-								NGUIEditorTools.RegisterUndo("Atlas Selection", mSprite);
-								mSprite.spriteName = sprite.name;
-								mSprite.MakePixelPerfect();
-								EditorUtility.SetDirty(mSprite.gameObject);
+								if (mSprite != null)
+								{
+									NGUIEditorTools.RegisterUndo("Atlas Selection", mSprite);
+									mSprite.spriteName = sprite.name;
+									mSprite.MakePixelPerfect();
+									EditorUtility.SetDirty(mSprite.gameObject);
+								}
+								else if (mCallback != null)
+								{
+									mName = sprite.name;
+									mCallback(sprite.name);
+								}
 							}
-							else if (mCallback != null)
-							{
-								mName = sprite.name;
-								mCallback(sprite.name);
-							}
+							else if (delta < 0.25f) close = true;
 						}
 						
 						if (Event.current.type == EventType.Repaint)
@@ -187,6 +196,7 @@ public class SpriteSelector : ScriptableWizard
 				rect.y += padded;
 			}
 			GUILayout.EndScrollView();
+			if (close) Close();
 		}
 	}
 }
