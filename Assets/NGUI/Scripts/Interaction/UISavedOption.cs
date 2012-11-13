@@ -35,7 +35,11 @@ public class UISavedOption : MonoBehaviour
 	/// Remove the callback.
 	/// </summary>
 
-	void OnDestroy () { if (mList != null) mList.onSelectionChange -= SaveSelection; }
+	void OnDestroy ()
+	{
+		if (mCheck != null) mCheck.onStateChange -= SaveState;
+		if (mList != null) mList.onSelectionChange -= SaveSelection;
+	}
 
 	/// <summary>
 	/// Load and set the state of the checkboxes.

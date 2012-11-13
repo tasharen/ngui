@@ -332,12 +332,6 @@ public abstract class UITweener : IgnoreTimeScale
 		comp.callWhenFinished = null;
 		comp.onFinished = null;
 		comp.enabled = true;
-
-		if (duration <= 0f)
-		{
-			comp.Sample(1f, true);
-			comp.enabled = false;
-		}
 		return comp;
 	}
 }

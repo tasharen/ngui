@@ -47,6 +47,7 @@ public class IgnoreTimeScale : MonoBehaviour
 			mActual += Mathf.Max(0f, delta);
 			mTimeDelta = 0.001f * Mathf.Round(mActual * 1000f);
 			mActual -= mTimeDelta;
+			if (mTimeDelta > 1f) mTimeDelta = 1f;
 			mTimeStart = time;
 		}
 		else

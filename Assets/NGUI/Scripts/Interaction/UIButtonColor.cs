@@ -49,7 +49,7 @@ public class UIButtonColor : MonoBehaviour
 
 	void Awake () { Init(); }
 
-	void Start () { mStarted = true; }
+	void Start () { mStarted = true; OnEnable(); }
 
 	protected virtual void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
 

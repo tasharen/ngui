@@ -611,7 +611,7 @@ public class UIAtlasMaker : EditorWindow
 			atlas.spriteMaterial.mainTexture = null;
 			if (!string.IsNullOrEmpty(path)) AssetDatabase.DeleteAsset(path);
 		}
-		EditorUtility.SetDirty(atlas.gameObject);
+		atlas.MarkAsDirty();
 	}
 
 	/// <summary>

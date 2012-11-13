@@ -16,6 +16,9 @@ public class SpringPanel : IgnoreTimeScale
 	public Vector3 target = Vector3.zero;
 	public float strength = 10f;
 
+	public delegate void OnFinished ();
+	public OnFinished onFinished;
+
 	UIPanel mPanel;
 	Transform mTrans;
 	float mThreshold = 0f;
@@ -42,6 +45,7 @@ public class SpringPanel : IgnoreTimeScale
 
 		if (mThreshold == 0f) mThreshold = (target - mTrans.localPosition).magnitude * 0.005f;
 
+		bool trigger = false;
 		Vector3 before = mTrans.localPosition;
 		Vector3 after = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, delta);
 
@@ -49,6 +53,7 @@ public class SpringPanel : IgnoreTimeScale
 		{
 			after = target;
 			enabled = false;
+			trigger = true;
 		}
 		mTrans.localPosition = after;
 
@@ -59,6 +64,7 @@ public class SpringPanel : IgnoreTimeScale
 		mPanel.clipRange = cr;
 
 		if (mDrag != null) mDrag.UpdateScrollbars(false);
+		if (trigger && onFinished != null) onFinished();
 	}
 
 	/// <summary>
@@ -71,6 +77,7 @@ public class SpringPanel : IgnoreTimeScale
 		if (sp == null) sp = go.AddComponent<SpringPanel>();
 		sp.target = pos;
 		sp.strength = strength;
+		sp.onFinished = null;
 
 		if (!sp.enabled)
 		{

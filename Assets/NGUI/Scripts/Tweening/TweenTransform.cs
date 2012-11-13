@@ -70,6 +70,12 @@ public class TweenTransform : UITweener
 		TweenTransform comp = UITweener.Begin<TweenTransform>(go, duration);
 		comp.from = from;
 		comp.to = to;
+
+		if (duration <= 0f)
+		{
+			comp.Sample(1f, true);
+			comp.enabled = false;
+		}
 		return comp;
 	}
 }

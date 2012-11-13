@@ -195,14 +195,14 @@ public class UIAnchor : MonoBehaviour
 			v.x = Mathf.RoundToInt(v.x);
 			v.y = Mathf.RoundToInt(v.y);
 
-			if (widgetContainer != null)
+			if (panelContainer != null)
 			{
-				v = widgetContainer.transform.parent.TransformPoint(v);
-				
+				v = panelContainer.transform.TransformPoint(v);
 			}
-			else if (panelContainer != null)
+			else if (widgetContainer != null)
 			{
-				v = panelContainer.transform.parent.TransformPoint(v);
+				Transform t = widgetContainer.transform.parent;
+				if (t != null) v = t.TransformPoint(v);
 			}
 
 			// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame

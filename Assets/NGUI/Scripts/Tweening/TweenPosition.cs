@@ -31,6 +31,12 @@ public class TweenPosition : UITweener
 		TweenPosition comp = UITweener.Begin<TweenPosition>(go, duration);
 		comp.from = comp.position;
 		comp.to = pos;
+
+		if (duration <= 0f)
+		{
+			comp.Sample(1f, true);
+			comp.enabled = false;
+		}
 		return comp;
 	}
 }

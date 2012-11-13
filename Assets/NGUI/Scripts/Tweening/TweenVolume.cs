@@ -69,6 +69,12 @@ public class TweenVolume : UITweener
 		TweenVolume comp = UITweener.Begin<TweenVolume>(go, duration);
 		comp.from = comp.volume;
 		comp.to = targetVolume;
+
+		if (duration <= 0f)
+		{
+			comp.Sample(1f, true);
+			comp.enabled = false;
+		}
 		return comp;
 	}
 }

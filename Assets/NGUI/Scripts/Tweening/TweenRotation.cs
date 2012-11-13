@@ -34,6 +34,12 @@ public class TweenRotation : UITweener
 		TweenRotation comp = UITweener.Begin<TweenRotation>(go, duration);
 		comp.from = comp.rotation.eulerAngles;
 		comp.to = rot.eulerAngles;
+
+		if (duration <= 0f)
+		{
+			comp.Sample(1f, true);
+			comp.enabled = false;
+		}
 		return comp;
 	}
 }

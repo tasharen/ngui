@@ -249,7 +249,7 @@ public abstract class UIWidget : MonoBehaviour
 			// This widget is no longer parented to the same panel. Remove it and re-add it to a new one.
 			if (!valid)
 			{
-				if (!keepMaterial) material = null;
+				if (!keepMaterial || Application.isPlaying) material = null;
 				mPanel = null;
 				CreatePanel();
 			}
@@ -371,7 +371,7 @@ public abstract class UIWidget : MonoBehaviour
 			pos.z -= mDepth * 0.25f;
 
 			// Widget's local size
-			Vector2 size = relativeSize;
+			Vector3 size = relativeSize;
 			Vector2 offset = pivotOffset;
 			pos.x += (offset.x + 0.5f) * size.x;
 			pos.y += (offset.y - 0.5f) * size.y;
@@ -380,6 +380,7 @@ public abstract class UIWidget : MonoBehaviour
 			Gizmos.matrix = cachedTransform.localToWorldMatrix;
 			Gizmos.color = (UnityEditor.Selection.activeGameObject == gameObject) ? new Color(0f, 0.75f, 1f) : outline;
 			Gizmos.DrawWireCube(pos, size);
+			size.z = 0.01f;
 			Gizmos.color = Color.clear;
 			Gizmos.DrawCube(pos, size);
 		}

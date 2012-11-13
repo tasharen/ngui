@@ -8,6 +8,8 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Center On Child")]
 public class UICenterOnChild : MonoBehaviour
 {
+	public SpringPanel.OnFinished onFinished;
+
 	UIDraggablePanel mDrag;
 	GameObject mCenteredObject;
 
@@ -87,7 +89,7 @@ public class UICenterOnChild : MonoBehaviour
 			if (mDrag.scale.z == 0f) offset.z = 0f;
 
 			// Spring the panel to this calculated position
-			SpringPanel.Begin(mDrag.gameObject, dt.localPosition - offset, 8f);
+			SpringPanel.Begin(mDrag.gameObject, dt.localPosition - offset, 8f).onFinished = onFinished;
 		}
 		else mCenteredObject = null;
 	}

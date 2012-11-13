@@ -32,6 +32,12 @@ public class TweenFOV : UITweener
 		TweenFOV comp = UITweener.Begin<TweenFOV>(go, duration);
 		comp.from = comp.fov;
 		comp.to = to;
+
+		if (duration <= 0f)
+		{
+			comp.Sample(1f, true);
+			comp.enabled = false;
+		}
 		return comp;
 	}
 }

@@ -553,7 +553,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	public void Scroll (float delta)
 	{
-		if (enabled && NGUITools.GetActive(gameObject))
+		if (enabled && NGUITools.GetActive(gameObject) && scrollWheelFactor != 0f)
 		{
 			DisableSpring();
 			mShouldMove = shouldMove;

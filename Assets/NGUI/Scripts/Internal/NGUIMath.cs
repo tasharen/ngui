@@ -535,6 +535,7 @@ static public class NGUIMath
 	static public Vector3 SpringDampen (ref Vector3 velocity, float strength, float deltaTime)
 	{
 		// Dampening factor applied each millisecond
+		if (deltaTime > 1f) deltaTime = 1f;
 		float dampeningFactor = 1f - strength * 0.001f;
 		int ms = Mathf.RoundToInt(deltaTime * 1000f);
 		Vector3 offset = Vector3.zero;
@@ -556,6 +557,7 @@ static public class NGUIMath
 	static public Vector2 SpringDampen (ref Vector2 velocity, float strength, float deltaTime)
 	{
 		// Dampening factor applied each millisecond
+		if (deltaTime > 1f) deltaTime = 1f;
 		float dampeningFactor = 1f - strength * 0.001f;
 		int ms = Mathf.RoundToInt(deltaTime * 1000f);
 		Vector2 offset = Vector2.zero;
@@ -576,6 +578,7 @@ static public class NGUIMath
 
 	static public float SpringLerp (float strength, float deltaTime)
 	{
+		if (deltaTime > 1f) deltaTime = 1f;
 		int ms = Mathf.RoundToInt(deltaTime * 1000f);
 		deltaTime = 0.001f * strength;
 		float cumulative = 0f;
@@ -589,6 +592,7 @@ static public class NGUIMath
 
 	static public float SpringLerp (float from, float to, float strength, float deltaTime)
 	{
+		if (deltaTime > 1f) deltaTime = 1f;
 		int ms = Mathf.RoundToInt(deltaTime * 1000f);
 		deltaTime = 0.001f * strength;
 		for (int i = 0; i < ms; ++i) from = Mathf.Lerp(from, to, deltaTime);

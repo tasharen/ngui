@@ -269,7 +269,6 @@ public class UIFontMaker : EditorWindow
 					else if (NGUISettings.fontData != null)
 					{
 						BMFontReader.Load(NGUISettings.font.bmFont, NGUITools.GetHierarchy(NGUISettings.font.gameObject), NGUISettings.fontData.bytes);
-						EditorUtility.SetDirty(NGUISettings.font);
 						NGUISettings.font.MarkAsDirty();
 					}
 

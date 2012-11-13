@@ -47,6 +47,12 @@ public class TweenScale : UITweener
 		TweenScale comp = UITweener.Begin<TweenScale>(go, duration);
 		comp.from = comp.scale;
 		comp.to = scale;
+
+		if (duration <= 0f)
+		{
+			comp.Sample(1f, true);
+			comp.enabled = false;
+		}
 		return comp;
 	}
 }

@@ -73,6 +73,12 @@ public class TweenColor : UITweener
 		TweenColor comp = UITweener.Begin<TweenColor>(go, duration);
 		comp.from = comp.color;
 		comp.to = color;
+
+		if (duration <= 0f)
+		{
+			comp.Sample(1f, true);
+			comp.enabled = false;
+		}
 		return comp;
 	}
 }
