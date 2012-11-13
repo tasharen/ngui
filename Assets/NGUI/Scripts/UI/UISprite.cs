@@ -240,14 +240,14 @@ public class UISprite : UIWidget
 		{
 			Rect rect = NGUIMath.ConvertToPixels(outerUV, tex.width, tex.height, true);
 			float pixelSize = atlas.pixelSize;
-			scale.x = Mathf.RoundToInt(rect.width * pixelSize);
-			scale.y = Mathf.RoundToInt(rect.height * pixelSize);
+			scale.x = Mathf.RoundToInt(rect.width * pixelSize) * Mathf.Sign(scale.x);
+			scale.y = Mathf.RoundToInt(rect.height * pixelSize) * Mathf.Sign(scale.y);
 			scale.z = 1f;
 			cachedTransform.localScale = scale;
 		}
 
-		int width  = Mathf.RoundToInt(scale.x * (1f + mSprite.paddingLeft + mSprite.paddingRight));
-		int height = Mathf.RoundToInt(scale.y * (1f + mSprite.paddingTop + mSprite.paddingBottom));
+		int width  = Mathf.RoundToInt(Mathf.Abs(scale.x) * (1f + mSprite.paddingLeft + mSprite.paddingRight));
+		int height = Mathf.RoundToInt(Mathf.Abs(scale.y) * (1f + mSprite.paddingTop + mSprite.paddingBottom));
 
 		Vector3 pos = cachedTransform.localPosition;
 		pos.z = Mathf.RoundToInt(pos.z);
