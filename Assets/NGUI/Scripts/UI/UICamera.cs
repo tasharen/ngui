@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// This script should be attached to each camera that's used to draw the objects with
@@ -421,20 +422,42 @@ public class UICamera : MonoBehaviour
 			{
 				RaycastHit[] hits = Physics.RaycastAll(ray, dist, mask);
 
-				for (int b = 0, bmax = hits.Length; b < bmax; ++b)
+				if (hits.Length > 1)
 				{
-					RaycastHit h = hits[b];
+					hits = hits.OrderBy(h => h.distance).ToArray();
 
-					UIPanel panel = NGUITools.FindInParents<UIPanel>(h.collider.gameObject);
-
-					if (panel == null || panel.IsVisible(h.point))
+					for (int b = 0, bmax = hits.Length; b < bmax; ++b)
 					{
-						hit = h;
-						return true;
+						if (IsVisible(ref hits[b]))
+						{
+							hit = hits[b];
+							return true;
+						}
 					}
+					return false;
+				}
+				else if (hits.Length == 1 && IsVisible(ref hits[0]))
+				{
+					hit = hits[0];
+					return true;
 				}
 			}
-			else if (Physics.Raycast(ray, out hit, dist, mask)) return true;
+			if (Physics.Raycast(ray, out hit, dist, mask)) return true;
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Helper function to check if the specified hit is visible by the panel.
+	/// </summary>
+
+	static bool IsVisible (ref RaycastHit hit)
+	{
+		UIPanel panel = NGUITools.FindInParents<UIPanel>(hit.collider.gameObject);
+
+		if (panel == null || panel.clipping == UIDrawCall.Clipping.None || panel.IsVisible(hit.point))
+		{
+			return true;
 		}
 		return false;
 	}

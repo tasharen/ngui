@@ -547,7 +547,7 @@ static public class NGUITools
 		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
 		{
 			Transform child = t.GetChild(i);
-			if (child.activeSelf) return;
+			if (child.gameObject.activeSelf) return;
 		}
 
 		// If this point is reached, then all the children are disabled, so we must be using a Unity 3.5-based active state scheme.
