@@ -37,6 +37,8 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 
 2.2.6:
 - NEW: Mouse and touch events now have an option to be clipped by the panel's clipping rect, just like widgets.
+- NEW: Made it possible to delete several sprites at once (Atlas Maker).
+- FIX: Added proper support for Unity 4-based nested active state while maintaining backwards compatibility.
 
 2.2.5:
 - NEW: Double-clicking a sprite in the sprite selection window will now close the window.

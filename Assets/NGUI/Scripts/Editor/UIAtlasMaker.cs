@@ -25,7 +25,7 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	Vector2 mScroll = Vector2.zero;
-	string mDelName = null;
+	List<string> mDelNames = new List<string>();
 
 	/// <summary>
 	/// Atlas selection callback.
@@ -41,7 +41,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Refresh the window on selection.
 	/// </summary>
 
-	void OnSelectionChange () { mDelName = null; Repaint(); }
+	void OnSelectionChange () { mDelNames.Clear(); Repaint(); }
 
 	/// <summary>
 	/// Helper function that retrieves the list of currently selected textures.
@@ -612,6 +612,8 @@ public class UIAtlasMaker : EditorWindow
 			if (!string.IsNullOrEmpty(path)) AssetDatabase.DeleteAsset(path);
 		}
 		atlas.MarkAsDirty();
+
+		EditorUtility.DisplayDialog("Atlas Changed", "The atlas has been updated. Don't forget to save the scene to write the changes!", "OK");
 	}
 
 	/// <summary>
@@ -850,7 +852,7 @@ public class UIAtlasMaker : EditorWindow
 
 			mScroll = GUILayout.BeginScrollView(mScroll);
 
-			string delSprite = null;
+			bool delete = false;
 			int index = 0;
 			foreach (KeyValuePair<string, int> iter in spriteList)
 			{
@@ -874,22 +876,26 @@ public class UIAtlasMaker : EditorWindow
 				}
 				else
 				{
-					if (string.IsNullOrEmpty(mDelName) || mDelName != iter.Key)
-					{
-						// If we have not yet selected a sprite for deletion, show a small "X" button
-						if (GUILayout.Button("X", GUILayout.Width(22f))) mDelName = iter.Key;
-					}
-					else
+					if (mDelNames.Contains(iter.Key))
 					{
 						GUI.backgroundColor = Color.red;
 
 						if (GUILayout.Button("Delete", GUILayout.Width(60f)))
 						{
-							// Confirmation button clicked on -- delete this sprite
-							delSprite = iter.Key;
-							mDelName = null;
+							delete = true;
+						}
+						GUI.backgroundColor = Color.green;
+						if (GUILayout.Button("X", GUILayout.Width(22f)))
+						{
+							mDelNames.Remove(iter.Key);
+							delete = false;
 						}
 						GUI.backgroundColor = Color.white;
+					}
+					else
+					{
+						// If we have not yet selected a sprite for deletion, show a small "X" button
+						if (GUILayout.Button("X", GUILayout.Width(22f))) mDelNames.Add(iter.Key);
 					}
 				}
 				GUILayout.EndHorizontal();
@@ -897,22 +903,22 @@ public class UIAtlasMaker : EditorWindow
 			GUILayout.EndScrollView();
 
 			// If this sprite was marked for deletion, remove it from the atlas
-			if (!string.IsNullOrEmpty(delSprite))
+			if (delete)
 			{
-				List<UIAtlas.Sprite> list = NGUISettings.atlas.spriteList;
+				List<SpriteEntry> sprites = new List<SpriteEntry>();
+				ExtractSprites(NGUISettings.atlas, sprites);
 
-				foreach (UIAtlas.Sprite sp in list)
+				for (int i = sprites.Count; i > 0; )
 				{
-					if (sp.name == delSprite)
+					SpriteEntry ent = sprites[--i];
+
+					if (mDelNames.Contains(ent.tex.name))
 					{
-						list.Remove(sp);
-						List<SpriteEntry> sprites = new List<SpriteEntry>();
-						ExtractSprites(NGUISettings.atlas, sprites);
-						UpdateAtlas(NGUISettings.atlas, sprites);
-						mDelName = null;
-						return;
+						sprites.RemoveAt(i);
 					}
 				}
+				UpdateAtlas(NGUISettings.atlas, sprites);
+				mDelNames.Clear();
 			}
 			else if (update) UpdateAtlas(textures, true);
 			else if (replace) UpdateAtlas(textures, false);

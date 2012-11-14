@@ -534,16 +534,29 @@ static public class NGUITools
 	{
 		SetActiveSelf(t.gameObject, true);
 
-		// Unity 4.0 nests the 'active' state, so there is no longer any need to recurse through children.
-		// However... for compatibility's sake, I am leaving this as it was so that NGUI's examples
-		// work properly in both Unity 3.5 as well as 4.0.
-//#if UNITY_3_5
+		// Prior to Unity 4, active state was not nested. It was possible to have an enabled child of a disabled object.
+		// Unity 4 onwards made it so that the state is nested, and a disabled parent results in a disabled child.
+#if UNITY_3_5
 		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
 		{
 			Transform child = t.GetChild(i);
 			Activate(child);
 		}
-//#endif
+#else
+		// If there is even a single enabled child, then we're using a Unity 4.0-based nested active state scheme.
+		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
+		{
+			Transform child = t.GetChild(i);
+			if (child.activeSelf) return;
+		}
+
+		// If this point is reached, then all the children are disabled, so we must be using a Unity 3.5-based active state scheme.
+		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
+		{
+			Transform child = t.GetChild(i);
+			Activate(child);
+		}
+#endif
 	}
 
 	/// <summary>
@@ -552,13 +565,13 @@ static public class NGUITools
 
 	static void Deactivate (Transform t)
 	{
-//#if UNITY_3_5
+#if UNITY_3_5
 		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
 		{
 			Transform child = t.GetChild(i);
 			Deactivate(child);
 		}
-//#endif
+#endif
 		SetActiveSelf(t.gameObject, false);
 	}
 
