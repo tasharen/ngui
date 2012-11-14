@@ -106,6 +106,13 @@ public class UICamera : MonoBehaviour
 	public LayerMask eventReceiverMask = -1;
 
 	/// <summary>
+	/// Whether raycast events will be clipped just like widgets. This essentially means that clicking on a collider that
+	/// happens to have been clipped will not produce a hit. Note that having this enabled will slightly reduce performance.
+	/// </summary>
+
+	public bool clipRaycasts = true;
+
+	/// <summary>
 	/// How long of a delay to expect before showing the tooltip.
 	/// </summary>
 
@@ -408,7 +415,26 @@ public class UICamera : MonoBehaviour
 			// Raycast into the screen
 			int mask = currentCamera.cullingMask & (int)cam.eventReceiverMask;
 			float dist = (cam.rangeDistance > 0f) ? cam.rangeDistance : currentCamera.farClipPlane - currentCamera.nearClipPlane;
-			if (Physics.Raycast(ray, out hit, dist, mask)) return true;
+
+			// If raycasts should be clipped by panels, we need to find a panel for each hit
+			if (cam.clipRaycasts)
+			{
+				RaycastHit[] hits = Physics.RaycastAll(ray, dist, mask);
+
+				for (int b = 0, bmax = hits.Length; b < bmax; ++b)
+				{
+					RaycastHit h = hits[b];
+
+					UIPanel panel = NGUITools.FindInParents<UIPanel>(h.collider.gameObject);
+
+					if (panel == null || panel.IsVisible(h.point))
+					{
+						hit = h;
+						return true;
+					}
+				}
+			}
+			else if (Physics.Raycast(ray, out hit, dist, mask)) return true;
 		}
 		return false;
 	}

@@ -282,6 +282,23 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Returns whether the specified world position is within the panel's bounds determined by the clipping rect.
+	/// </summary>
+
+	public bool IsVisible (Vector3 worldPos)
+	{
+		if (mClipping == UIDrawCall.Clipping.None) return true;
+		UpdateTransformMatrix();
+
+		Vector3 pos = mWorldToLocal.MultiplyPoint3x4(worldPos);
+		if (pos.x < mMin.x) return false;
+		if (pos.y < mMin.y) return false;
+		if (pos.x > mMax.x) return false;
+		if (pos.y > mMax.y) return false;
+		return true;
+	}
+
+	/// <summary>
 	/// Returns whether the specified widget is visible by the panel.
 	/// </summary>
 

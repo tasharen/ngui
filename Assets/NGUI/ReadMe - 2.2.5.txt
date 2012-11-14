@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.2.5
+                Version 2.2.6
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,9 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.2.6:
+- NEW: Mouse and touch events now have an option to be clipped by the panel's clipping rect, just like widgets.
 
 2.2.5:
 - NEW: Double-clicking a sprite in the sprite selection window will now close the window.
