@@ -5,7 +5,6 @@
 
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
 
 /// <summary>
 /// This script should be attached to each camera that's used to draw the objects with
@@ -424,7 +423,7 @@ public class UICamera : MonoBehaviour
 
 				if (hits.Length > 1)
 				{
-					hits = hits.OrderBy(h => h.distance).ToArray();
+					System.Array.Sort(hits, delegate(RaycastHit r1, RaycastHit r2) { return r1.distance.CompareTo(r2.distance); });
 
 					for (int b = 0, bmax = hits.Length; b < bmax; ++b)
 					{
