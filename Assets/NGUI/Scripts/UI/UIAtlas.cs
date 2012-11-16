@@ -345,10 +345,15 @@ public class UIAtlas : MonoBehaviour
 
 	public void MarkAsDirty ()
 	{
-		if (mReplacement != null) mReplacement.MarkAsDirty();
 #if UNITY_EDITOR
 		UnityEditor.EditorUtility.SetDirty(gameObject);
 #endif
+		if (mReplacement != null)
+		{
+			mReplacement.MarkAsDirty();
+			return;
+		}
+
 		UISprite[] list = NGUITools.FindActive<UISprite>();
 
 		for (int i = 0, imax = list.Length; i < imax; ++i)

@@ -387,10 +387,15 @@ public class UIFont : MonoBehaviour
 
 	public void MarkAsDirty ()
 	{
-		if (mReplacement != null) mReplacement.MarkAsDirty();
 #if UNITY_EDITOR
 		UnityEditor.EditorUtility.SetDirty(gameObject);
 #endif
+		if (mReplacement != null)
+		{
+			mReplacement.MarkAsDirty();
+			return;
+		}
+
 		mSprite = null;
 		UILabel[] labels = NGUITools.FindActive<UILabel>();
 
