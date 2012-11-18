@@ -613,7 +613,7 @@ public class UIAtlasMaker : EditorWindow
 		}
 		atlas.MarkAsDirty();
 
-		EditorUtility.DisplayDialog("Atlas Changed", "The atlas has been updated. Don't forget to save the scene to write the changes!", "OK");
+		Debug.Log("The atlas has been updated. Don't forget to save the scene to write the changes!");
 	}
 
 	/// <summary>

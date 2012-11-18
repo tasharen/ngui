@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.2.6
+                Version 2.2.6c
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
