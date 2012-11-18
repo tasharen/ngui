@@ -41,6 +41,12 @@ public class UICenterOnChild : MonoBehaviour
 			else
 			{
 				mDrag.onDragFinished = OnDragFinished;
+				
+				if (mDrag.horizontalScrollBar != null)
+					mDrag.horizontalScrollBar.onDragFinished = OnDragFinished;
+
+				if (mDrag.verticalScrollBar != null)
+					mDrag.verticalScrollBar.onDragFinished = OnDragFinished;
 			}
 		}
 		if (mDrag.panel == null) return;

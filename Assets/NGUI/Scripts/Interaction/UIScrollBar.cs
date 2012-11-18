@@ -20,6 +20,7 @@ public class UIScrollBar : MonoBehaviour
 	};
 
 	public delegate void OnScrollBarChange (UIScrollBar sb);
+	public delegate void OnDragFinished ();
 
 	[HideInInspector][SerializeField] UISprite mBG;
 	[HideInInspector][SerializeField] UISprite mFG;
@@ -38,6 +39,13 @@ public class UIScrollBar : MonoBehaviour
 	/// </summary>
 
 	public OnScrollBarChange onChange;
+
+	/// <summary>
+	/// Delegate triggered when the scroll bar stops being dragged.
+	/// Useful for things like centering on the closest valid object, for example.
+	/// </summary>
+
+	public OnDragFinished onDragFinished;
 
 	/// <summary>
 	/// Cached for speed.
@@ -241,6 +249,7 @@ public class UIScrollBar : MonoBehaviour
 	{
 		mCam = UICamera.currentCamera;
 		Reposition(UICamera.lastTouchPosition);
+		if (!isPressed && onDragFinished != null) onDragFinished();
 	}
 
 	/// <summary>
@@ -265,6 +274,7 @@ public class UIScrollBar : MonoBehaviour
 			Bounds b = NGUIMath.CalculateAbsoluteWidgetBounds(mFG.cachedTransform);
 			mScreenPos = mCam.WorldToScreenPoint(b.center);
 		}
+		else if (onDragFinished != null) onDragFinished();
 	}
 
 	/// <summary>
