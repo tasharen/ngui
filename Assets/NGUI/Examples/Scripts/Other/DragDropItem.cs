@@ -72,7 +72,7 @@ public class DragDropItem : MonoBehaviour
 
 	void OnDrag (Vector2 delta)
 	{
-		if (UICamera.currentTouchID > -2)
+		if (enabled && UICamera.currentTouchID > -2)
 		{
 			if (!mIsDragging)
 			{
@@ -99,9 +99,12 @@ public class DragDropItem : MonoBehaviour
 
 	void OnPress (bool isPressed)
 	{
-		mIsDragging = false;
-		Collider col = collider;
-		if (col != null) col.enabled = !isPressed;
-		if (!isPressed) Drop();
+		if (enabled)
+		{
+			mIsDragging = false;
+			Collider col = collider;
+			if (col != null) col.enabled = !isPressed;
+			if (!isPressed) Drop();
+		}
 	}
 }

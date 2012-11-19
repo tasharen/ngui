@@ -348,11 +348,7 @@ public class UIAtlas : MonoBehaviour
 #if UNITY_EDITOR
 		UnityEditor.EditorUtility.SetDirty(gameObject);
 #endif
-		if (mReplacement != null)
-		{
-			mReplacement.MarkAsDirty();
-			return;
-		}
+		if (mReplacement != null) mReplacement.MarkAsDirty();
 
 		UISprite[] list = NGUITools.FindActive<UISprite>();
 

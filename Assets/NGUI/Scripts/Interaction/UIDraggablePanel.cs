@@ -534,7 +534,19 @@ public class UIDraggablePanel : IgnoreTimeScale
 				mMomentum = Vector3.Lerp(mMomentum, mMomentum + offset * (0.01f * momentumAmount), 0.67f);
 
 				// Move the panel
-				MoveAbsolute(offset);
+				//MoveAbsolute(offset);
+
+				Vector3 constraint = mPanel.CalculateConstrainOffset(bounds.min, bounds.max);
+
+				if (constraint.magnitude > 0.001f)
+				{
+					MoveAbsolute(offset * 0.5f);
+					mMomentum *= 0.5f;
+				}
+				else
+				{
+					MoveAbsolute(offset);
+				}
 
 				// We want to constrain the UI to be within bounds
 				if (restrictWithinPanel &&
