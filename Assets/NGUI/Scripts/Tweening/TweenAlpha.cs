@@ -17,18 +17,36 @@ public class TweenAlpha : UITweener
 
 	Transform mTrans;
 	UIWidget mWidget;
+	UIPanelAlpha mPanelAlpha;
 
 	/// <summary>
 	/// Current alpha.
 	/// </summary>
 
-	public float alpha { get { return mWidget.alpha; } set { mWidget.alpha = value; } }
+	public float alpha
+	{
+		get
+		{
+			if (mWidget != null) return mWidget.alpha;
+			if (mPanelAlpha != null) return mPanelAlpha.alpha;
+			return 0f;
+		}
+		set
+		{
+			if (mWidget != null) mWidget.alpha = value;
+			else if (mPanelAlpha != null) mPanelAlpha.alpha = value;
+		}
+	}
 
 	/// <summary>
 	/// Find all needed components.
 	/// </summary>
 
-	void Awake () { mWidget = GetComponentInChildren<UIWidget>(); }
+	void Awake ()
+	{
+		mPanelAlpha = GetComponent<UIPanelAlpha>();
+		if (mPanelAlpha == null) mWidget = GetComponentInChildren<UIWidget>();
+	}
 
 	/// <summary>
 	/// Interpolate and update the alpha.
