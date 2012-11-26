@@ -49,7 +49,7 @@ public class UIRoot : MonoBehaviour
 	/// If the screen height goes above this value, it will be as if 'automatic' is turned off with the 'manualHeight' set to this value.
 	/// </summary>
 
-	public int maximumHeight = 1080;
+	public int maximumHeight = 1536;
 
 	/// <summary>
 	/// UI Root's active height, based on the size of the screen.

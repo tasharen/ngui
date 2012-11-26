@@ -393,7 +393,7 @@ public class UICamera : MonoBehaviour
 	/// Returns the object under the specified position.
 	/// </summary>
 
-	static bool Raycast (Vector3 inPos, ref RaycastHit hit)
+	static public bool Raycast (Vector3 inPos, ref RaycastHit hit)
 	{
 		for (int i = 0; i < mList.Count; ++i)
 		{
@@ -604,7 +604,7 @@ public class UICamera : MonoBehaviour
 	/// Get or create a touch event.
 	/// </summary>
 
-	MouseOrTouch GetTouch (int id)
+	public MouseOrTouch GetTouch (int id)
 	{
 		MouseOrTouch touch;
 
@@ -621,7 +621,7 @@ public class UICamera : MonoBehaviour
 	/// Remove a touch event from the list.
 	/// </summary>
 
-	void RemoveTouch (int id) { mTouches.Remove(id); }
+	public void RemoveTouch (int id) { mTouches.Remove(id); }
 
 	/// <summary>
 	/// Add this camera to the list.
@@ -747,7 +747,7 @@ public class UICamera : MonoBehaviour
 	/// Update mouse input.
 	/// </summary>
 
-	void ProcessMouse ()
+	public void ProcessMouse ()
 	{
 		bool updateRaycast = (useMouse && Time.timeScale < 0.9f);
 
@@ -859,7 +859,7 @@ public class UICamera : MonoBehaviour
 	/// Update touch-based events.
 	/// </summary>
 
-	void ProcessTouches ()
+	public void ProcessTouches ()
 	{
 		for (int i = 0; i < Input.touchCount; ++i)
 		{
@@ -907,7 +907,7 @@ public class UICamera : MonoBehaviour
 	/// Process keyboard and joystick events.
 	/// </summary>
 
-	void ProcessOthers ()
+	public void ProcessOthers ()
 	{
 		currentTouchID = -100;
 		currentTouch = mController;
@@ -963,7 +963,7 @@ public class UICamera : MonoBehaviour
 	/// Process the events of the specified touch.
 	/// </summary>
 
-	void ProcessTouch (bool pressed, bool unpressed)
+	public void ProcessTouch (bool pressed, bool unpressed)
 	{
 		// Whether we're using the mouse
 		bool isMouse = (currentTouch == mMouse[0]);
