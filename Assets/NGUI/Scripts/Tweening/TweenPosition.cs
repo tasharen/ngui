@@ -10,7 +10,7 @@ using UnityEngine;
 /// </summary>
 
 [AddComponentMenu("NGUI/Tween/Position")]
-public class TweenPosition : UITweener
+public class TweenPosition : UITweener, InspectorExtendable
 {
 	public Vector3 from;
 	public Vector3 to;
@@ -39,4 +39,17 @@ public class TweenPosition : UITweener
 		}
 		return comp;
 	}
+	
+	public void OnInspectorGUI()
+	{
+		if (GUILayout.Button("position --> 'from'"))
+			from = this.transform.localPosition;
+		
+		if (GUILayout.Button("position --> 'to'"))
+			to = this.transform.localPosition;
+		
+		if (GUILayout.Button("'from' --> position"))
+			this.transform.localPosition = from;	
+	}
+	
 }
