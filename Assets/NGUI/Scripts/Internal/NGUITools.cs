@@ -7,6 +7,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 /// <summary>
 /// Helper class containing generic functions used throughout the UI library.
@@ -494,20 +495,19 @@ static public class NGUITools
 	/// Call the specified function on all objects in the scene.
 	/// </summary>
 
-	static public void Broadcast (string funcName)
+	static public void Broadcast (string funcName, params object[] parameters)
 	{
-		GameObject[] gos = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
-		for (int i = 0, imax = gos.Length; i < imax; ++i) gos[i].SendMessage(funcName, SendMessageOptions.DontRequireReceiver);
-	}
+		MonoBehaviour[] mbs = UnityEngine.Object.FindObjectsOfType(typeof(MonoBehaviour)) as MonoBehaviour[];
 
-	/// <summary>
-	/// Call the specified function on all objects in the scene.
-	/// </summary>
-
-	static public void Broadcast (string funcName, object param)
-	{
-		GameObject[] gos = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
-		for (int i = 0, imax = gos.Length; i < imax; ++i) gos[i].SendMessage(funcName, param, SendMessageOptions.DontRequireReceiver);
+		for (int i = 0, imax = mbs.Length; i < imax; ++i)
+		{
+			MonoBehaviour mb = mbs[i];
+			MethodInfo method = mb.GetType().GetMethod(funcName,
+				BindingFlags.Instance |
+				BindingFlags.NonPublic |
+				BindingFlags.Public);
+			if (method != null) method.Invoke(mb, parameters);
+		}
 	}
 
 	/// <summary>

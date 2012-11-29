@@ -72,13 +72,13 @@ public class UIAnchor : MonoBehaviour
 	public Vector2 relativeOffset = Vector2.zero;
 
 	Animation mAnim;
-	Rect positionRect;
+	Rect mRect;
 	UIRoot mRoot;
 	
 	void Awake () 
 	{ 
 		mAnim = animation; 
-		positionRect = new Rect();
+		mRect = new Rect();
 	}
 
 	/// <summary>
@@ -111,19 +111,19 @@ public class UIAnchor : MonoBehaviour
 			{
 				// Panel has no clipping -- just use the screen's dimensions
 				float ratio = (mRoot != null) ? (float)mRoot.activeHeight / Screen.height * 0.5f : 0.5f;
-				positionRect.xMin = -Screen.width * ratio;
-				positionRect.yMin = -Screen.height * ratio;
-				positionRect.xMax = -positionRect.xMin;
-				positionRect.yMax = -positionRect.yMin;
+				mRect.xMin = -Screen.width * ratio;
+				mRect.yMin = -Screen.height * ratio;
+				mRect.xMax = -mRect.xMin;
+				mRect.yMax = -mRect.yMin;
 			}
 			else
 			{
 				// Panel has clipping -- use it as the rect
 				Vector4 pos = panelContainer.clipRange;
-				positionRect.x = pos.x - (pos.z * 0.5f);
-				positionRect.y = pos.y - (pos.w * 0.5f);
-				positionRect.width = pos.z;
-				positionRect.height = pos.w;
+				mRect.x = pos.x - (pos.z * 0.5f);
+				mRect.y = pos.y - (pos.w * 0.5f);
+				mRect.width = pos.z;
+				mRect.height = pos.w;
 			}
 		}
 		else if (widgetContainer != null)
@@ -140,36 +140,36 @@ public class UIAnchor : MonoBehaviour
 			offset.x *= (widgetContainer.relativeSize.x * ls.x);
 			offset.y *= (widgetContainer.relativeSize.y * ls.y);
 			
-			positionRect.x = lp.x + offset.x;
-			positionRect.y = lp.y + offset.y;
+			mRect.x = lp.x + offset.x;
+			mRect.y = lp.y + offset.y;
 			
-			positionRect.width = size.x * ls.x;
-			positionRect.height = size.y * ls.y;
+			mRect.width = size.x * ls.x;
+			mRect.height = size.y * ls.y;
 		}
 		else if (uiCamera != null)
 		{
 			useCamera = true;
-			positionRect = uiCamera.pixelRect;
+			mRect = uiCamera.pixelRect;
 		}
 		else return;
 
-		float cx = (positionRect.xMin + positionRect.xMax) * 0.5f;
-		float cy = (positionRect.yMin + positionRect.yMax) * 0.5f;
+		float cx = (mRect.xMin + mRect.xMax) * 0.5f;
+		float cy = (mRect.yMin + mRect.yMax) * 0.5f;
 		Vector3 v = new Vector3(cx, cy, depthOffset);
 
 		if (side != Side.Center)
 		{
-			if (side == Side.Right || side == Side.TopRight || side == Side.BottomRight) v.x = positionRect.xMax;
+			if (side == Side.Right || side == Side.TopRight || side == Side.BottomRight) v.x = mRect.xMax;
 			else if (side == Side.Top || side == Side.Center || side == Side.Bottom) v.x = cx;
-			else v.x = positionRect.xMin;
+			else v.x = mRect.xMin;
 
-			if (side == Side.Top || side == Side.TopRight || side == Side.TopLeft) v.y = positionRect.yMax;
+			if (side == Side.Top || side == Side.TopRight || side == Side.TopLeft) v.y = mRect.yMax;
 			else if (side == Side.Left || side == Side.Center || side == Side.Right) v.y = cy;
-			else v.y = positionRect.yMin;
+			else v.y = mRect.yMin;
 		}
 
-		float width  = positionRect.width;
-		float height = positionRect.height;
+		float width  = mRect.width;
+		float height = mRect.height;
 
 		v.x += relativeOffset.x * width;
 		v.y += relativeOffset.y * height;
