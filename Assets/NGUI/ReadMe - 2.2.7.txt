@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.2.6c
+                Version 2.2.7
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,10 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.2.7:
+- FIX: Inventory example should work correctly in Unity 4.0.
+- FIX: Assortment of tweaks and fixes submitted by Andrew Osborne (community contribution).
 
 2.2.6:
 - NEW: Mouse and touch events now have an option to be clipped by the panel's clipping rect, just like widgets.
