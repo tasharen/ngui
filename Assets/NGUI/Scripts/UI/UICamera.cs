@@ -60,6 +60,7 @@ public class UICamera : MonoBehaviour
 
 		public ClickNotification clickNotification = ClickNotification.Always;
 		public bool touchBegan = true;
+		public bool pressStarted = false;
 		public bool dragStarted = false;
 	}
 
@@ -98,6 +99,15 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	public bool useController = true;
+
+	/// <summary>
+	/// If 'true', once a press event is started on some object, that object will be the only one that will be
+	/// receiving future events until the press event is finally released, regardless of where that happens.
+	/// If 'false', the press event won't be locked to the original object, and other objects will be receiving
+	/// OnPress(true) and OnPress(false) events as the touch enters and leaves their area.
+	/// </summary>
+
+	public bool stickyPress = true;
 
 	/// <summary>
 	/// Which layers will receive events.
@@ -288,10 +298,10 @@ public class UICamera : MonoBehaviour
 	public Camera cachedCamera { get { if (mCam == null) mCam = camera; return mCam; } }
 
 	/// <summary>
-	/// The object the mouse is hovering over.
+	/// The object hit by the last Raycast that was the result of a mouse or touch event.
 	/// </summary>
 
-	static public GameObject hoveredObject { get { return mMouse[0].current; } }
+	static public GameObject hoveredObject;
 
 	/// <summary>
 	/// Option to manually set the selected game object.
@@ -681,9 +691,9 @@ public class UICamera : MonoBehaviour
 	{
 		if (useMouse && Application.isPlaying && handlesEvents)
 		{
-			GameObject go = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
-			if (go == null) go = genericEventHandler;
-			for (int i = 0; i < 3; ++i) mMouse[i].current = go;
+			hoveredObject = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+			if (hoveredObject == null) hoveredObject = genericEventHandler;
+			for (int i = 0; i < 3; ++i) mMouse[i].current = hoveredObject;
 		}
 	}
 
@@ -773,9 +783,9 @@ public class UICamera : MonoBehaviour
 		// Update the object under the mouse
 		if (updateRaycast)
 		{
-			GameObject go = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
-			if (go == null) go = genericEventHandler;
-			mMouse[0].current = go;
+			hoveredObject = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+			if (hoveredObject == null) hoveredObject = genericEventHandler;
+			mMouse[0].current = hoveredObject;
 		}
 
 		// Propagate the updates to the other mouse buttons
@@ -885,8 +895,9 @@ public class UICamera : MonoBehaviour
 				}
 
 				currentTouch.pos = input.position;
-				currentTouch.current = Raycast(currentTouch.pos, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
-				if (currentTouch.current == null) currentTouch.current = genericEventHandler;
+				hoveredObject = Raycast(currentTouch.pos, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+				if (hoveredObject == null) hoveredObject = genericEventHandler;
+				currentTouch.current = hoveredObject;
 				lastTouchPosition = currentTouch.pos;
 
 				// We don't want to update the last camera while there is a touch happening
@@ -974,6 +985,8 @@ public class UICamera : MonoBehaviour
 		if (pressed)
 		{
 			if (mTooltip != null) ShowTooltip(false);
+			
+			currentTouch.pressStarted = true;
 			currentTouch.pressed = currentTouch.current;
 			currentTouch.clickNotification = ClickNotification.Always;
 			currentTouch.totalDelta = Vector2.zero;
@@ -987,40 +1000,52 @@ public class UICamera : MonoBehaviour
 				selectedObject = null;
 			}
 		}
-		else if (currentTouch.pressed != null)
+		else
 		{
-			float mag = currentTouch.delta.magnitude;
-
-			if (mag != 0f)
+			// If the user is pressing down and has dragged the touch away from the original object,
+			// unpress the original object and notify the new object that it is now being pressed on.
+			if (!stickyPress && !unpressed && currentTouch.pressStarted && currentTouch.pressed != hoveredObject)
 			{
-				// Keep track of the total movement
-				currentTouch.totalDelta += currentTouch.delta;
-				mag = currentTouch.totalDelta.magnitude;
+				if (currentTouch.pressed != null) Notify(currentTouch.pressed, "OnPress", false);
+				currentTouch.pressed = hoveredObject;
+				if (currentTouch.pressed != null) Notify(currentTouch.pressed, "OnPress", true);
+			}
 
-				// If the drag event has not yet started, see if we've dragged the touch far enough to start it
-				if (!currentTouch.dragStarted && drag < mag)
+			if (currentTouch.pressed != null)
+			{
+				float mag = currentTouch.delta.magnitude;
+
+				if (mag != 0f)
 				{
-					currentTouch.dragStarted = true;
-					currentTouch.delta = currentTouch.totalDelta;
-				}
+					// Keep track of the total movement
+					currentTouch.totalDelta += currentTouch.delta;
+					mag = currentTouch.totalDelta.magnitude;
 
-				// If we're dragging the touch, send out drag events
-				if (currentTouch.dragStarted)
-				{
-					if (mTooltip != null) ShowTooltip(false);
-
-					bool isDisabled = (currentTouch.clickNotification == ClickNotification.None);
-					Notify(currentTouch.pressed, "OnDrag", currentTouch.delta);
-
-					if (isDisabled)
+					// If the drag event has not yet started, see if we've dragged the touch far enough to start it
+					if (!currentTouch.dragStarted && drag < mag)
 					{
-						// If the notification status has already been disabled, keep it as such
-						currentTouch.clickNotification = ClickNotification.None;
+						currentTouch.dragStarted = true;
+						currentTouch.delta = currentTouch.totalDelta;
 					}
-					else if (currentTouch.clickNotification == ClickNotification.BasedOnDelta && click < mag)
+
+					// If we're dragging the touch, send out drag events
+					if (currentTouch.dragStarted)
 					{
-						// We've dragged far enough to cancel the click
-						currentTouch.clickNotification = ClickNotification.None;
+						if (mTooltip != null) ShowTooltip(false);
+
+						bool isDisabled = (currentTouch.clickNotification == ClickNotification.None);
+						Notify(currentTouch.pressed, "OnDrag", currentTouch.delta);
+
+						if (isDisabled)
+						{
+							// If the notification status has already been disabled, keep it as such
+							currentTouch.clickNotification = ClickNotification.None;
+						}
+						else if (currentTouch.clickNotification == ClickNotification.BasedOnDelta && click < mag)
+						{
+							// We've dragged far enough to cancel the click
+							currentTouch.clickNotification = ClickNotification.None;
+						}
 					}
 				}
 			}
@@ -1029,20 +1054,23 @@ public class UICamera : MonoBehaviour
 		// Send out the unpress message
 		if (unpressed)
 		{
+			currentTouch.pressStarted = false;
 			if (mTooltip != null) ShowTooltip(false);
 
 			if (currentTouch.pressed != null)
 			{
 				Notify(currentTouch.pressed, "OnPress", false);
 
-				// Send a hover message to the object, but don't add it to the list of hovered items as it's already present
-				// This happens when the mouse is released over the same button it was pressed on, and since it already had
-				// its 'OnHover' event, it never got Highlight(false), so we simply re-notify it so it can update the visible state.
+				// Send a hover message to the object, but don't add it to the list of hovered items
+				// as it's already present. This happens when the mouse is released over the same button
+				// it was pressed on, and since it already had its 'OnHover' event, it never got
+				// Highlight(false), so we simply re-notify it so it can update the visible state.
 				if (useMouse && currentTouch.pressed == mHover) Notify(currentTouch.pressed, "OnHover", true);
 
 				// If the button/touch was released on the same object, consider it a click and select it
 				if (currentTouch.pressed == currentTouch.current ||
-					(currentTouch.clickNotification != ClickNotification.None && currentTouch.totalDelta.magnitude < drag))
+					(currentTouch.clickNotification != ClickNotification.None &&
+					currentTouch.totalDelta.magnitude < drag))
 				{
 					if (currentTouch.pressed != mSel)
 					{

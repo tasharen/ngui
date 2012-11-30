@@ -36,6 +36,8 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
 
 2.2.7:
+- NEW: Added UICamera.stickyPress option that makes it possible for multiple objects to receive OnPress notifications from a single touch.
+- NEW: UICamera.hoveredObject now works for touch events as well, and will always hold the result of the last Raycast.
 - FIX: Inventory example should work correctly in Unity 4.0.
 - FIX: Assortment of tweaks and fixes submitted by Andrew Osborne (community contribution).
 

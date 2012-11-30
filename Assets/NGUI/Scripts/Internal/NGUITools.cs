@@ -21,7 +21,7 @@ static public class NGUITools
 	static float mGlobalVolume = 1f;
 
 	/// <summary>
-	/// Globally accessible volume affecting all music.
+	/// Globally accessible volume affecting all sounds played via NGUITools.PlaySound().
 	/// </summary>
 
 	static public float soundVolume
