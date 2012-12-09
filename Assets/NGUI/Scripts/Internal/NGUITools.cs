@@ -495,19 +495,20 @@ static public class NGUITools
 	/// Call the specified function on all objects in the scene.
 	/// </summary>
 
-	static public void Broadcast (string funcName, params object[] parameters)
+	static public void Broadcast (string funcName)
 	{
-		MonoBehaviour[] mbs = UnityEngine.Object.FindObjectsOfType(typeof(MonoBehaviour)) as MonoBehaviour[];
+		GameObject[] gos = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
+		for (int i = 0, imax = gos.Length; i < imax; ++i) gos[i].SendMessage(funcName, SendMessageOptions.DontRequireReceiver);
+	}
 
-		for (int i = 0, imax = mbs.Length; i < imax; ++i)
-		{
-			MonoBehaviour mb = mbs[i];
-			MethodInfo method = mb.GetType().GetMethod(funcName,
-				BindingFlags.Instance |
-				BindingFlags.NonPublic |
-				BindingFlags.Public);
-			if (method != null) method.Invoke(mb, parameters);
-		}
+	/// <summary>
+	/// Call the specified function on all objects in the scene.
+	/// </summary>
+
+	static public void Broadcast (string funcName, object param)
+	{
+		GameObject[] gos = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
+		for (int i = 0, imax = gos.Length; i < imax; ++i) gos[i].SendMessage(funcName, param, SendMessageOptions.DontRequireReceiver);
 	}
 
 	/// <summary>
