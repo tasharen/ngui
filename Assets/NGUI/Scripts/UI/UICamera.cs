@@ -451,7 +451,7 @@ public class UICamera : MonoBehaviour
 					return true;
 				}
 			}
-			if (Physics.Raycast(ray, out hit, dist, mask)) return true;
+			else if (Physics.Raycast(ray, out hit, dist, mask)) return true;
 		}
 		return false;
 	}
