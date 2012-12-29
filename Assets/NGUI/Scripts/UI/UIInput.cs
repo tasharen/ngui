@@ -71,6 +71,15 @@ public class UIInput : MonoBehaviour
 	public bool isPassword = false;
 
 	/// <summary>
+	/// Whether the label's text value will be used as the input's text value on start.
+	/// By default the label is just a tooltip of sorts, letting you choose helpful
+	/// half-transparent text such as "Press Enter to start typing", while the actual
+	/// value of the input field will remain empty.
+	/// </summary>
+
+	public bool useLabelTextAtStart = false;
+
+	/// <summary>
 	/// Color of the label when the input field has focus.
 	/// </summary>
 
@@ -118,6 +127,7 @@ public class UIInput : MonoBehaviour
 	{
 		get
 		{
+			if (mDoInit) Init();
 			return mText;
 		}
 		set
@@ -167,6 +177,7 @@ public class UIInput : MonoBehaviour
 
 			if (label != null)
 			{
+				if (useLabelTextAtStart) mText = label.text;
 				mDefaultText = label.text;
 				mDefaultColor = label.color;
 				label.supportEncoding = false;
