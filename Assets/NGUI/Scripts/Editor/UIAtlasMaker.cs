@@ -765,7 +765,7 @@ public class UIAtlasMaker : EditorWindow
 			}
 		}
 
-		ComponentSelector.Draw<UIAtlas>("...or select", NGUISettings.atlas, OnSelectAtlas);
+		ComponentSelector.Draw<UIAtlas>("Select", NGUISettings.atlas, OnSelectAtlas);
 
 		List<Texture> textures = GetSelectedTextures();
 
@@ -821,7 +821,7 @@ public class UIAtlasMaker : EditorWindow
 			GUILayout.EndHorizontal();
 
 			GUILayout.BeginHorizontal();
-			NGUISettings.unityPacking = EditorGUILayout.Toggle("Unity Packer", NGUISettings.unityPacking, GUILayout.MinWidth(100f));
+			NGUISettings.unityPacking = EditorGUILayout.Toggle("Unity Packer", NGUISettings.unityPacking, GUILayout.Width(100f));
 			GUILayout.Label("if off, use a custom packer");
 			GUILayout.EndHorizontal();
 

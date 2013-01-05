@@ -166,7 +166,7 @@ public class UIPopupList : MonoBehaviour
 				
 				if (textLabel != null)
 				{
-					textLabel.text = (isLocalized && Localization.instance != null) ? Localization.instance.Get(value) : value;
+					textLabel.text = (isLocalized) ? Localization.Localize(value) : value;
 #if UNITY_EDITOR
 					UnityEditor.EditorUtility.SetDirty(textLabel.gameObject);
 #endif

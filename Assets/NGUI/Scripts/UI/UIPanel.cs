@@ -948,6 +948,11 @@ public class UIPanel : MonoBehaviour
 
 #if UNITY_EDITOR
 
+	// This is necessary because Screen.height inside OnDrawGizmos will return the size of the Scene window,
+	// and we need the size of the game window in order to draw the bounds properly.
+	float mScreenHeight = 720f;
+	void Update () { mScreenHeight = Screen.height; }
+
 	/// <summary>
 	/// Draw a visible pink outline for the clipped area.
 	/// </summary>
@@ -962,11 +967,15 @@ public class UIPanel : MonoBehaviour
 			GameObject go = UnityEditor.Selection.activeGameObject;
 			bool selected = (go != null) && (NGUITools.FindInParents<UIPanel>(go) == this);
 
-			if (size.x == 0f) size.x = mScreenSize.x;
-			if (size.y == 0f) size.y = mScreenSize.y;
-
 			if (selected || clip)
 			{
+				if (size.x == 0f) size.x = mScreenSize.x;
+				if (size.y == 0f) size.y = mScreenSize.y;
+
+				UIRoot root = NGUITools.FindInParents<UIRoot>(gameObject);
+				float scale = (root != null && !root.automatic) ? root.manualHeight / mScreenHeight : 1f;
+				size *= scale;
+
 				Transform t = clip ? transform : (mCam != null ? mCam.transform : null);
 
 				if (t != null)

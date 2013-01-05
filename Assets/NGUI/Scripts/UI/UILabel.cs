@@ -129,7 +129,13 @@ public class UILabel : UIWidget
 		}
 		set
 		{
-			if (value != null && mText != value)
+			if (string.IsNullOrEmpty(value))
+			{
+				if (!string.IsNullOrEmpty(mText))
+					mText = "";
+				hasChanged = true;
+			}
+			else if (mText != value)
 			{
 				mText = value;
 				hasChanged = true;

@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -98,7 +98,7 @@ public class UIFontMaker : EditorWindow
 			NGUISettings.fontName = GUILayout.TextField(NGUISettings.fontName);
 			GUILayout.EndHorizontal();
 
-			ComponentSelector.Draw<UIFont>("...or select", NGUISettings.font, OnSelectFont);
+			ComponentSelector.Draw<UIFont>("Select", NGUISettings.font, OnSelectFont);
 			ComponentSelector.Draw<UIAtlas>(NGUISettings.atlas, OnSelectAtlas);
 		}
 		NGUIEditorTools.DrawSeparator();

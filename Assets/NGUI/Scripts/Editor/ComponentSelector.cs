@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -36,6 +36,10 @@ public class ComponentSelector : ScriptableWizard
 #if !UNITY_3_4
 		GUILayout.EndVertical();
 #endif
+		if (o != null && Selection.activeObject != o.gameObject && GUILayout.Button("Edit", GUILayout.Width(40f)))
+		{
+			Selection.activeObject = o.gameObject;
+		}
 		GUILayout.EndHorizontal();
 		if (show) Show<T>(cb);
 		else if (o != obj) cb(o);

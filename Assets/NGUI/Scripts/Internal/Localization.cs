@@ -16,7 +16,7 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/Internal/Localization")]
 public class Localization : MonoBehaviour
 {
-	static Localization mInst;
+	static Localization mInstance;
 
 	/// <summary>
 	/// The instance of the localization class. Will create it if one isn't already around.
@@ -26,18 +26,18 @@ public class Localization : MonoBehaviour
 	{
 		get
 		{
-			if (mInst == null)
+			if (mInstance == null)
 			{
-				mInst = Object.FindObjectOfType(typeof(Localization)) as Localization;
+				mInstance = Object.FindObjectOfType(typeof(Localization)) as Localization;
 
-				if (mInst == null)
+				if (mInstance == null)
 				{
 					GameObject go = new GameObject("_Localization");
 					DontDestroyOnLoad(go);
-					mInst = go.AddComponent<Localization>();
+					mInstance = go.AddComponent<Localization>();
 				}
 			}
-			return mInst;
+			return mInstance;
 		}
 	}
 
@@ -124,7 +124,7 @@ public class Localization : MonoBehaviour
 	/// Determine the starting language.
 	/// </summary>
 
-	void Awake () { if (mInst == null) { mInst = this; DontDestroyOnLoad(gameObject); } else Destroy(gameObject); }
+	void Awake () { if (mInstance == null) { mInstance = this; DontDestroyOnLoad(gameObject); } else Destroy(gameObject); }
 
 	/// <summary>
 	/// Start with the specified starting language.
@@ -136,13 +136,13 @@ public class Localization : MonoBehaviour
 	/// Oddly enough... sometimes if there is no OnEnable function in Localization, it can get the Awake call after UILocalize's OnEnable.
 	/// </summary>
 
-	void OnEnable () { if (mInst == null) mInst = this; }
+	void OnEnable () { if (mInstance == null) mInstance = this; }
 
 	/// <summary>
 	/// Remove the instance reference.
 	/// </summary>
 
-	void OnDestroy () { if (mInst == this) mInst = null; }
+	void OnDestroy () { if (mInstance == this) mInstance = null; }
 
 	/// <summary>
 	/// Load the specified asset and activate the localization.
@@ -165,5 +165,14 @@ public class Localization : MonoBehaviour
 	{
 		string val;
 		return (mDictionary.TryGetValue(key, out val)) ? val : key;
+	}
+
+	/// <summary>
+	/// Localize the specified value.
+	/// </summary>
+
+	static public string Localize (string key)
+	{
+		return (mInstance != null) ? mInstance.Get(key) : key;
 	}
 }

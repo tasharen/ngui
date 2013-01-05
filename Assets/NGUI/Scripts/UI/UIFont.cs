@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -299,12 +299,7 @@ public class UIFont : MonoBehaviour
 				mSprite = mAtlas.GetSprite(mFont.spriteName);
 				if (mSprite == null) mSprite = mAtlas.GetSprite(name);
 				mSpriteSet = true;
-
-				if (mSprite == null)
-				{
-					Debug.LogError("Can't find the sprite '" + mFont.spriteName + "' in UIAtlas on " + NGUITools.GetHierarchy(mAtlas.gameObject));
-					mFont.spriteName = null;
-				}
+				if (mSprite == null) mFont.spriteName = null;
 			}
 			return mSprite;
 		}

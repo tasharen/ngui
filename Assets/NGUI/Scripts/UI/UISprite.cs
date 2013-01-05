@@ -107,7 +107,7 @@ public class UISprite : UIWidget
 				mSpriteName = value;
 				mSprite = null;
 				mChanged = true;
-				if (mSprite != null) UpdateUVs(true);
+				if (sprite != null) UpdateUVs(true);
 			}
 		}
 	}

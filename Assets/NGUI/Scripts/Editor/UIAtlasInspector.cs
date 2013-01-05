@@ -360,7 +360,8 @@ public class UIAtlasInspector : Editor
 						}
 					}
 
-					NGUIEditorTools.DrawSeparator();
+					// This functionality is no longer used. It became obsolete when the Atlas Maker was added.
+					/*NGUIEditorTools.DrawSeparator();
 
 					GUILayout.BeginHorizontal();
 					{
@@ -395,7 +396,7 @@ public class UIAtlasInspector : Editor
 						}
 						GUI.backgroundColor = Color.white;
 					}
-					GUILayout.EndHorizontal();
+					GUILayout.EndHorizontal();*/
 
 					if (NGUIEditorTools.previousSelection != null)
 					{
@@ -437,7 +438,7 @@ public class UIAtlasInspector : Editor
 
 	public override void OnPreviewGUI (Rect rect, GUIStyle background)
 	{
-		if (mSprite == null) return;
+		if (mSprite == null || mAtlas == null) return;
 
 		Texture2D tex = mAtlas.texture as Texture2D;
 		if (tex == null) return;
