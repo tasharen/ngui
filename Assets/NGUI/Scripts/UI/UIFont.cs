@@ -1,4 +1,4 @@
-//----------------------------------------------
+﻿//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -735,7 +735,7 @@ public class UIFont : MonoBehaviour
 	/// </summary>
 
 #if UNITY_3_5_4
-	public void Print (string text, Color32 color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols,
+	public void Print (string text, Color color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols,
 		bool encoding, SymbolStyle symbolStyle, Alignment alignment, int lineWidth)
 #else
 	public void Print (string text, Color32 color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols,

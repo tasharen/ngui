@@ -443,13 +443,13 @@ public class UICamera : MonoBehaviour
 							return true;
 						}
 					}
-					return false;
 				}
 				else if (hits.Length == 1 && IsVisible(ref hits[0]))
 				{
 					hit = hits[0];
 					return true;
 				}
+				return false;
 			}
 			if (Physics.Raycast(ray, out hit, dist, mask)) return true;
 		}

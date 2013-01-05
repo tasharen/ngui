@@ -26,13 +26,13 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	// Cached and saved values
-	[HideInInspector][SerializeField] Material mMat;
-	[HideInInspector][SerializeField] Texture mTex;
+	[HideInInspector][SerializeField] protected Material mMat;
+	[HideInInspector][SerializeField] protected Texture mTex;
 	[HideInInspector][SerializeField] Color mColor = Color.white;
 	[HideInInspector][SerializeField] Pivot mPivot = Pivot.Center;
 	[HideInInspector][SerializeField] int mDepth = 0;
-	Transform mTrans;
-	UIPanel mPanel;
+	protected Transform mTrans;
+	protected UIPanel mPanel;
 
 	protected bool mChanged = true;
 	protected bool mPlayMode = true;
@@ -134,16 +134,19 @@ public abstract class UIWidget : MonoBehaviour
 		}
 		set
 		{
-			if (mMat == null || mMat.mainTexture != value)
+			Material mat = material;
+
+			if (mat == null || mat.mainTexture != value)
 			{
 				if (mPanel != null) mPanel.RemoveWidget(this);
 
 				mPanel = null;
 				mTex = value;
+				mat = material;
 
-				if (mMat != null)
+				if (mat != null)
 				{
-					mMat.mainTexture = value;
+					mat.mainTexture = value;
 					if (enabled) CreatePanel();
 				}
 			}
@@ -197,7 +200,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Ensure we have a panel referencing this widget.
 	/// </summary>
 
-	void CreatePanel ()
+	public void CreatePanel ()
 	{
 		if (mPanel == null && enabled && NGUITools.GetActive(gameObject) && material != null)
 		{

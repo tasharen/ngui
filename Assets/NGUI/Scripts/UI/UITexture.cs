@@ -90,7 +90,7 @@ public class UITexture : UIWidget
 	{
 		get
 		{
-			if (!mCreatingMat && base.material == null)
+			if (!mCreatingMat && mMat == null)
 			{
 				mCreatingMat = true;
 
@@ -104,7 +104,7 @@ public class UITexture : UIWidget
 				}
 				mCreatingMat = false;
 			}
-			return base.material;
+			return mMat;
 		}
 		set
 		{
@@ -129,16 +129,21 @@ public class UITexture : UIWidget
 		}
 		set
 		{
-			mTexture = value;
+			if (mPanel != null && mMat != null) mPanel.RemoveWidget(this);
 
-			if (material == null)
+			if (mMat == null)
 			{
 				mDynamicMat = new Material(shader);
 				mDynamicMat.hideFlags = HideFlags.DontSave;
-				mDynamicMat.mainTexture = mainTexture;
-				material = mDynamicMat;
+				mMat = mDynamicMat;
 			}
-			base.mainTexture = value;
+			
+			mPanel = null;
+			mTex = value;
+			mTexture = value;
+			mMat.mainTexture = value;
+			
+			if (enabled) CreatePanel();
 		}
 	}
 

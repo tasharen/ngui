@@ -44,6 +44,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: You can now set UILabel.text to null.
 - FIX: UIPanel was not drawing its rect correctly in some cases.
 - FIX: Assortment of tweaks and fixes submitted by Andrew Osborne (community contribution).
+- FIX: Switching a mainTexture of a UITexture belonging to a clipped panel will now work properly.
 
 2.2.6:
 - NEW: Mouse and touch events now have an option to be clipped by the panel's clipping rect, just like widgets.
