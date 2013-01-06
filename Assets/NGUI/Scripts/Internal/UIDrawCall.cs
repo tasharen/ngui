@@ -136,18 +136,6 @@ public class UIDrawCall : MonoBehaviour
 	{
 		bool useClipping = (mClipping != Clipping.None);
 
-		if (mClippedMat != null)
-		{
-			NGUITools.Destroy(mClippedMat);
-			mClippedMat = null;
-		}
-
-		if (mDepthMat != null)
-		{
-			NGUITools.Destroy(mDepthMat);
-			mDepthMat = null;
-		}
-
 		// If clipping should be used, create the clipped material
 		if (useClipping)
 		{
@@ -177,19 +165,41 @@ public class UIDrawCall : MonoBehaviour
 			// If we found the shader, create a new material
 			if (shader != null)
 			{
-				mClippedMat = new Material(mSharedMat);
-				mClippedMat.hideFlags = HideFlags.DontSave;
+				if (mClippedMat == null)
+				{
+					mClippedMat = new Material(mSharedMat);
+					mClippedMat.hideFlags = HideFlags.DontSave;
+				}
 				mClippedMat.shader = shader;
+				mClippedMat.mainTexture = mSharedMat.mainTexture;
 			}
+			else if (mClippedMat != null)
+			{
+				NGUITools.Destroy(mClippedMat);
+				mClippedMat = null;
+			}
+		}
+		else if (mClippedMat != null)
+		{
+			NGUITools.Destroy(mClippedMat);
+			mClippedMat = null;
 		}
 
 		// If depth pass should be used, create the depth material
 		if (mDepthPass)
 		{
-			Shader shader = Shader.Find("Unlit/Depth Cutout");
-			mDepthMat = new Material(shader);
-			mDepthMat.hideFlags = HideFlags.DontSave;
+			if (mDepthMat == null)
+			{
+				Shader shader = Shader.Find("Unlit/Depth Cutout");
+				mDepthMat = new Material(shader);
+				mDepthMat.hideFlags = HideFlags.DontSave;
+			}
 			mDepthMat.mainTexture = mSharedMat.mainTexture;
+		}
+		else if (mDepthMat != null)
+		{
+			NGUITools.Destroy(mDepthMat);
+			mDepthMat = null;
 		}
 
 		// Determine which material should be used
