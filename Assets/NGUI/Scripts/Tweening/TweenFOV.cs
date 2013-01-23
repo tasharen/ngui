@@ -18,10 +18,26 @@ public class TweenFOV : UITweener
 
 	Camera mCam;
 
+	/// <summary>
+	/// Camera that's being tweened.
+	/// </summary>
+
 	public Camera cachedCamera { get { if (mCam == null) mCam = camera; return mCam; } }
+
+	/// <summary>
+	/// Current field of view value.
+	/// </summary>
+
 	public float fov { get { return cachedCamera.fov; } set { cachedCamera.fov = value; } }
 
-	override protected void OnUpdate (float factor, bool isFinished) { cachedCamera.fov = from * (1f - factor) + to * factor; }
+	/// <summary>
+	/// Perform the tween.
+	/// </summary>
+
+	override protected void OnUpdate (float factor, bool isFinished)
+	{
+		cachedCamera.fov = from * (1f - factor) + to * factor;
+	}
 
 	/// <summary>
 	/// Start the tweening operation.

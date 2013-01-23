@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright Â© 2011-2012 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -55,6 +55,7 @@ public class UILabel : UIWidget
 	bool mLastShow = false;
 	Effect mLastEffect = Effect.None;
 	Vector3 mSize = Vector3.zero;
+	bool mPremultiply = false;
 
 	/// <summary>
 	/// Function used to determine if something has changed (and thus the geometry must be rebuilt)
@@ -421,6 +422,9 @@ public class UILabel : UIWidget
 			mMaxLineCount = 1;
 			mMultiline = true;
 		}
+
+		// Whether this is a premultiplied alpha shader
+		mPremultiply = (font != null && font.material != null && font.material.shader.name.Contains("Premultiplied"));
 	}
 
 	/// <summary>
@@ -450,15 +454,15 @@ public class UILabel : UIWidget
 
 			if (mShowLastChar)
 			{
-				for (int i = 1, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
+				for (int i = 0, imax = mProcessedText.Length - 1; i < imax; ++i) hidden += "*";
 				if (mProcessedText.Length > 0) hidden += mProcessedText[mProcessedText.Length - 1];
 			}
 			else
 			{
 				for (int i = 0, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
 			}
-			mProcessedText = mFont.WrapText(hidden, mMaxLineWidth / cachedTransform.localScale.x, mMaxLineCount,
-				false, UIFont.SymbolStyle.None);
+			mProcessedText = mFont.WrapText(hidden, mMaxLineWidth / cachedTransform.localScale.x,
+				mMaxLineCount, false, UIFont.SymbolStyle.None);
 		}
 		else if (mMaxLineWidth > 0)
 		{
@@ -529,8 +533,8 @@ public class UILabel : UIWidget
 			int y = Mathf.RoundToInt(actualSize.y / pixelSize);
 
 			Vector3 pos = cachedTransform.localPosition;
-			pos.x = Mathf.FloorToInt(pos.x / pixelSize);
-			pos.y = Mathf.CeilToInt(pos.y / pixelSize);
+			pos.x = (Mathf.CeilToInt(pos.x / pixelSize * 4f) >> 2);
+			pos.y = (Mathf.CeilToInt(pos.y / pixelSize * 4f) >> 2);
 			pos.z = Mathf.RoundToInt(pos.z);
 
 			if (cachedTransform.localRotation == Quaternion.identity)
@@ -595,21 +599,22 @@ public class UILabel : UIWidget
 		MakePositionPerfect();
 		Pivot p = pivot;
 		int offset = verts.size;
+		Color col = font.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
 
 		// Print the text into the buffers
 		if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)
 		{
-			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Left, 0);
+			mFont.Print(processedText, col, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Left, 0, mPremultiply);
 		}
 		else if (p == Pivot.Right || p == Pivot.TopRight || p == Pivot.BottomRight)
 		{
-			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Right,
-				Mathf.RoundToInt(relativeSize.x * mFont.size));
+			mFont.Print(processedText, col, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Right,
+				Mathf.RoundToInt(relativeSize.x * mFont.size), mPremultiply);
 		}
 		else
 		{
-			mFont.Print(processedText, color, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Center,
-				Mathf.RoundToInt(relativeSize.x * mFont.size));
+			mFont.Print(processedText, col, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Center,
+				Mathf.RoundToInt(relativeSize.x * mFont.size), mPremultiply);
 		}
 
 		// Apply an effect if one was requested

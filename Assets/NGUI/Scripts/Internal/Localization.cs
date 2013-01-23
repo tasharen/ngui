@@ -45,7 +45,7 @@ public class Localization : MonoBehaviour
 	/// Language the localization manager will start with.
 	/// </summary>
 
-	public string startingLanguage;
+	public string startingLanguage = "English";
 
 	/// <summary>
 	/// Available list of languages.
@@ -64,20 +64,6 @@ public class Localization : MonoBehaviour
 	{
 		get
 		{
-			if (string.IsNullOrEmpty(mLanguage))
-			{
-				currentLanguage = PlayerPrefs.GetString("Language");
-
-				if (string.IsNullOrEmpty(mLanguage))
-				{
-					currentLanguage = startingLanguage;
-
-					if (string.IsNullOrEmpty(mLanguage) && (languages != null && languages.Length > 0))
-					{
-						currentLanguage = languages[0].name;
-					}
-				}
-			}
 			return mLanguage;
 		}
 		set
@@ -124,13 +110,22 @@ public class Localization : MonoBehaviour
 	/// Determine the starting language.
 	/// </summary>
 
-	void Awake () { if (mInstance == null) { mInstance = this; DontDestroyOnLoad(gameObject); } else Destroy(gameObject); }
+	void Awake ()
+	{
+		if (mInstance == null)
+		{
+			mInstance = this;
+			DontDestroyOnLoad(gameObject);
 
-	/// <summary>
-	/// Start with the specified starting language.
-	/// </summary>
+			currentLanguage = PlayerPrefs.GetString("Language", startingLanguage);
 
-	void Start () { if (!string.IsNullOrEmpty(startingLanguage)) currentLanguage = startingLanguage; }
+			if (string.IsNullOrEmpty(mLanguage) && (languages != null && languages.Length > 0))
+			{
+				currentLanguage = languages[0].name;
+			}
+		}
+		else Destroy(gameObject);
+	}
 
 	/// <summary>
 	/// Oddly enough... sometimes if there is no OnEnable function in Localization, it can get the Awake call after UILocalize's OnEnable.
@@ -164,6 +159,9 @@ public class Localization : MonoBehaviour
 	public string Get (string key)
 	{
 		string val;
+#if UNITY_IPHONE || UNITY_ANDROID
+		if (mDictionary.TryGetValue(key + " Mobile", out val)) return val;
+#endif
 		return (mDictionary.TryGetValue(key, out val)) ? val : key;
 	}
 
@@ -171,8 +169,5 @@ public class Localization : MonoBehaviour
 	/// Localize the specified value.
 	/// </summary>
 
-	static public string Localize (string key)
-	{
-		return (mInstance != null) ? mInstance.Get(key) : key;
-	}
+	static public string Localize (string key) { return (instance != null) ? instance.Get(key) : key; }
 }

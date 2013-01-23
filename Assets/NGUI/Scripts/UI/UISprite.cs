@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -250,24 +250,18 @@ public class UISprite : UIWidget
 		int height = Mathf.RoundToInt(Mathf.Abs(scale.y) * (1f + mSprite.paddingTop + mSprite.paddingBottom));
 
 		Vector3 pos = cachedTransform.localPosition;
+		pos.x = (Mathf.CeilToInt(pos.x * 4f) >> 2);
+		pos.y = (Mathf.CeilToInt(pos.y * 4f) >> 2);
 		pos.z = Mathf.RoundToInt(pos.z);
 
 		if (width % 2 == 1 && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom))
 		{
-			pos.x = Mathf.Floor(pos.x) + 0.5f;
-		}
-		else
-		{
-			pos.x = Mathf.Round(pos.x);
+			pos.x += 0.5f;
 		}
 
 		if (height % 2 == 1 && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right))
 		{
-			pos.y = Mathf.Ceil(pos.y) - 0.5f;
-		}
-		else
-		{
-			pos.y = Mathf.Round(pos.y);
+			pos.y += 0.5f;
 		}
 
 		cachedTransform.localPosition = pos;
@@ -328,9 +322,9 @@ public class UISprite : UIWidget
 		uvs.Add(new Vector2(uv0.x, uv1.y));
 
 #if UNITY_3_5_4
-		Color col = color;
+		Color col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
 #else
-		Color32 col = color;
+		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
 #endif
 		cols.Add(col);
 		cols.Add(col);

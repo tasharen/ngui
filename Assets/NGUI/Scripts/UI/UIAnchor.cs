@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -60,23 +60,19 @@ public class UIAnchor : MonoBehaviour
 	public bool halfPixelOffset = true;
 
 	/// <summary>
-	/// Depth offset applied to the anchored widget. Mainly useful for 3D UIs.
-	/// </summary>
-
-	public float depthOffset = 0f;
-
-	/// <summary>
 	/// Relative offset value, if any. For example "0.25" with 'side' set to Left, means 25% from the left side.
 	/// </summary>
 
 	public Vector2 relativeOffset = Vector2.zero;
 
+	Transform mTrans;
 	Animation mAnim;
 	Rect mRect;
 	UIRoot mRoot;
 	
 	void Awake () 
-	{ 
+	{
+		mTrans = transform;
 		mAnim = animation; 
 		mRect = new Rect();
 	}
@@ -93,6 +89,7 @@ public class UIAnchor : MonoBehaviour
 			Application.platform == RuntimePlatform.WindowsEditor);
 
 		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
+		Update();
 	}
 
 	/// <summary>
@@ -155,7 +152,7 @@ public class UIAnchor : MonoBehaviour
 
 		float cx = (mRect.xMin + mRect.xMax) * 0.5f;
 		float cy = (mRect.yMin + mRect.yMax) * 0.5f;
-		Vector3 v = new Vector3(cx, cy, depthOffset);
+		Vector3 v = new Vector3(cx, cy, 0f);
 
 		if (side != Side.Center)
 		{
@@ -198,16 +195,17 @@ public class UIAnchor : MonoBehaviour
 
 			if (panelContainer != null)
 			{
-				v = panelContainer.transform.TransformPoint(v);
+				v = panelContainer.cachedTransform.TransformPoint(v);
 			}
 			else if (widgetContainer != null)
 			{
-				Transform t = widgetContainer.transform.parent;
+				Transform t = widgetContainer.cachedTransform.parent;
 				if (t != null) v = t.TransformPoint(v);
 			}
 		}
 		
 		// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
-		if (transform.position != v) transform.position = v;
+		v.z = mTrans.position.z;
+		if (mTrans.position != v) mTrans.position = v;
 	}
 }

@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -133,7 +133,7 @@ public class SpriteSelector : ScriptableWizard
 									mCallback(sprite.name);
 								}
 							}
-							else if (delta < 0.25f) close = true;
+							else if (delta < 0.5f) close = true;
 						}
 						
 						if (Event.current.type == EventType.Repaint)

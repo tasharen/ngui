@@ -1,4 +1,4 @@
-Shader "Unlit/Transparent Colored (Packed) (HardClip)"
+Shader "Unlit/Premultiplied Colored (AlphaClip)"
 {
 	Properties
 	{
@@ -15,25 +15,25 @@ Shader "Unlit/Transparent Colored (Packed) (HardClip)"
 			"IgnoreProjector" = "True"
 			"RenderType" = "Transparent"
 		}
-		
+
 		Pass
 		{
 			Cull Off
 			Lighting Off
 			ZWrite Off
-			Offset -1, -1
+			AlphaTest Off
 			Fog { Mode Off }
+			Offset -1, -1
 			ColorMask RGB
-			Blend SrcAlpha OneMinusSrcAlpha
-
+			Blend One OneMinusSrcAlpha
+		
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-
 			#include "UnityCG.cginc"
 
 			sampler2D _MainTex;
-			half4 _MainTex_ST;
+			float4 _MainTex_ST;
 
 			struct appdata_t
 			{
@@ -62,18 +62,52 @@ Shader "Unlit/Transparent Colored (Packed) (HardClip)"
 
 			half4 frag (v2f IN) : COLOR
 			{
-				half4 mask = tex2D(_MainTex, IN.texcoord);
-				half4 mixed = saturate(ceil(IN.color - 0.5));
-				half4 col = saturate((mixed * 0.51 - IN.color) / -0.49);
+				// Sample the texture
+				half4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
+
 				float2 factor = abs(IN.worldPos);
-				
-				clip(1.0 - max(factor.x, factor.y));
-				mask *= mixed;
-				col.a *= mask.r + mask.g + mask.b + mask.a;
+				float val = 1.0 - max(factor.x, factor.y);
+
+				// Option 1: 'if' statement
+				if (val < 0.0) col.a = 0.0;
+
+				// Option 2: no 'if' statement -- may be faster on some devices
+				//col.a *= ceil(clamp(val, 0.0, 1.0));
+
+				//col.rgb = lerp(half3(0.0, 0.0, 0.0), col.rgb, col.a);
 				return col;
 			}
 			ENDCG
 		}
 	}
-	Fallback Off
+	
+	SubShader
+	{
+		LOD 100
+
+		Tags
+		{
+			"Queue" = "Transparent"
+			"IgnoreProjector" = "True"
+			"RenderType" = "Transparent"
+		}
+		
+		Pass
+		{
+			Cull Off
+			Lighting Off
+			ZWrite Off
+			AlphaTest Off
+			Fog { Mode Off }
+			Offset -1, -1
+			ColorMask RGB
+			Blend One OneMinusSrcAlpha 
+			ColorMaterial AmbientAndDiffuse
+			
+			SetTexture [_MainTex]
+			{
+				Combine Texture * Primary
+			}
+		}
+	}
 }

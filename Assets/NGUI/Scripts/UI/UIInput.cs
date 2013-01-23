@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -161,6 +161,23 @@ public class UIInput : MonoBehaviour
 		{
 			if (!value && UICamera.selectedObject == gameObject) UICamera.selectedObject = null;
 			else if (value) UICamera.selectedObject = gameObject;
+		}
+	}
+
+	/// <summary>
+	/// Set the default text of an input.
+	/// </summary>
+
+	public string defaultText
+	{
+		get
+		{
+			return mDefaultText;
+		}
+		set
+		{
+			if (label.text == mDefaultText) label.text = value;
+			mDefaultText = value;
 		}
 	}
 
@@ -411,7 +428,15 @@ public class UIInput : MonoBehaviour
 		if (label.font != null)
 		{
 			// Start with the text and append the IME composition and carat chars
-			string processed = selected ? (mText + Input.compositionString + caratChar) : mText;
+			string processed;
+
+			if (isPassword && selected)
+			{
+				processed = "";
+				for (int i = 0, imax = mText.Length; i < imax; ++i) processed += "*";
+				processed += Input.compositionString + caratChar;
+			}
+			else processed = selected ? (mText + Input.compositionString + caratChar) : mText;
 
 			// Now wrap this text using the specified line width
 			label.supportEncoding = false;
@@ -433,7 +458,7 @@ public class UIInput : MonoBehaviour
 
 					if (mPivot == UIWidget.Pivot.Left) label.pivot = UIWidget.Pivot.Right;
 					else if (mPivot == UIWidget.Pivot.TopLeft) label.pivot = UIWidget.Pivot.TopRight;
-					else if (mPivot == UIWidget.Pivot.BottomLeft) label.pivot = UIWidget.Pivot.BottomLeft;
+					else if (mPivot == UIWidget.Pivot.BottomLeft) label.pivot = UIWidget.Pivot.BottomRight;
 				}
 				else RestoreLabel();
 			}

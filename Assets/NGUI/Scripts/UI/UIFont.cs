@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -39,6 +39,7 @@ public class UIFont : MonoBehaviour
 
 	// Cached value
 	UIAtlas.Sprite mSprite = null;
+	int mPMA = -1;
 
 	// BUG: There is a bug in Unity 3.4.2 and all the way up to 3.5 b7 -- when instantiating from prefabs,
 	// for some strange reason classes get initialized with default values. So for example, 'mSprite' above
@@ -91,6 +92,7 @@ public class UIFont : MonoBehaviour
 					if (sprite != null) mUVRect = uvRect;
 				}
 
+				mPMA = -1;
 				mAtlas = value;
 				MarkAsDirty();
 			}
@@ -116,9 +118,31 @@ public class UIFont : MonoBehaviour
 			}
 			else if (mAtlas == null && mMat != value)
 			{
+				mPMA = -1;
 				mMat = value;
 				MarkAsDirty();
 			}
+		}
+	}
+
+	/// <summary>
+	/// Whether the font is using a premultiplied alpha material.
+	/// </summary>
+
+	public bool premultipliedAlpha
+	{
+		get
+		{
+			if (mReplacement != null) return mReplacement.premultipliedAlpha;
+
+			if (mAtlas != null) return mAtlas.premultipliedAlpha;
+
+			if (mPMA == -1)
+			{
+				Material mat = material;
+				mPMA = (mat != null && mat.shader != null && mat.shader.name.Contains("Premultiplied")) ? 1 : 0;
+			}
+			return (mPMA == 1);
 		}
 	}
 
@@ -736,15 +760,15 @@ public class UIFont : MonoBehaviour
 
 #if UNITY_3_5_4
 	public void Print (string text, Color color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols,
-		bool encoding, SymbolStyle symbolStyle, Alignment alignment, int lineWidth)
+		bool encoding, SymbolStyle symbolStyle, Alignment alignment, int lineWidth, bool premultiply)
 #else
 	public void Print (string text, Color32 color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols,
-		bool encoding, SymbolStyle symbolStyle, Alignment alignment, int lineWidth)
+		bool encoding, SymbolStyle symbolStyle, Alignment alignment, int lineWidth, bool premultiply)
 #endif
 	{
 		if (mReplacement != null)
 		{
-			mReplacement.Print(text, color, verts, uvs, cols, encoding, symbolStyle, alignment, lineWidth);
+			mReplacement.Print(text, color, verts, uvs, cols, encoding, symbolStyle, alignment, lineWidth, premultiply);
 		}
 		else if (mFont != null && text != null)
 		{
@@ -799,7 +823,7 @@ public class UIFont : MonoBehaviour
 
 				if (encoding && c == '[')
 				{
-					int retVal = NGUITools.ParseSymbol(text, i, mColors);
+					int retVal = NGUITools.ParseSymbol(text, i, mColors, premultiply);
 
 					if (retVal > 0)
 					{

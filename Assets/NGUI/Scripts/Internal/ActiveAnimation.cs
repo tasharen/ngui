@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -41,6 +41,34 @@ public class ActiveAnimation : IgnoreTimeScale
 	bool mNotify = false;
 
 	/// <summary>
+	/// Whether the animation is currently playing.
+	/// </summary>
+
+	public bool isPlaying
+	{
+		get
+		{
+			if (mAnim == null) return false;
+
+			foreach (AnimationState state in mAnim)
+			{
+				if (!mAnim.IsPlaying(state.name)) continue;
+
+				if (mLastDirection == Direction.Forward)
+				{
+					if (state.time < state.length) return true;
+				}
+				else if (mLastDirection == Direction.Reverse)
+				{
+					if (state.time > 0f) return true;
+				}
+				else return true;
+			}
+			return false;
+		}
+	}
+
+	/// <summary>
 	/// Manually reset the active animation to the beginning.
 	/// </summary>
 
@@ -71,6 +99,7 @@ public class ActiveAnimation : IgnoreTimeScale
 
 			foreach (AnimationState state in mAnim)
 			{
+				if (!mAnim.IsPlaying(state.name)) continue;
 				float movement = state.speed * delta;
 				state.time += movement;
 

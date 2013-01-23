@@ -13,12 +13,6 @@ using System.Collections.Generic;
 [System.Serializable]
 public class BMGlyph
 {
-	public struct Kerning
-	{
-		public int previousChar;
-		public int amount;
-	}
-
 	public int index;	// Index of this glyph (used by BMFont)
 	public int x;		// Offset from the left side of the texture to the left side of the glyph
 	public int y;		// Offset from the top of the texture to the top of the glyph
@@ -28,8 +22,7 @@ public class BMGlyph
 	public int offsetY; // Offset to apply to the cursor's top position before drawing this glyph
 	public int advance;	// How much to move the cursor after printing this character
 	public int channel;	// Channel mask (in most cases this will be 15 (RGBA, 1+2+4+8)
-
-	public List<Kerning> kerning;
+	public List<int> kerning;
 
 	/// <summary>
 	/// Retrieves the special amount by which to adjust the cursor position, given the specified previous character.
@@ -39,15 +32,9 @@ public class BMGlyph
 	{
 		if (kerning != null)
 		{
-			for (int i = 0, imax = kerning.Count; i < imax; ++i)
-			{
-				Kerning k = kerning[i];
-
-				if (k.previousChar == previousChar)
-				{
-					return k.amount;
-				}
-			}
+			for (int i = 0, imax = kerning.Count; i < imax; i += 2)
+				if (kerning[i] == previousChar)
+					return kerning[i+1];
 		}
 		return 0;
 	}
@@ -58,23 +45,19 @@ public class BMGlyph
 
 	public void SetKerning (int previousChar, int amount)
 	{
-		if (kerning == null) kerning = new List<Kerning>();
+		if (kerning == null) kerning = new List<int>();
 
-		for (int i = 0; i < kerning.Count; ++i)
+		for (int i = 0; i < kerning.Count; i += 2)
 		{
-			if (kerning[i].previousChar == previousChar)
+			if (kerning[i] == previousChar)
 			{
-				Kerning k = kerning[i];
-				k.amount = amount;
-				kerning[i] = k;
+				kerning[i+1] = amount;
 				return;
 			}
 		}
 
-		Kerning ker = new Kerning();
-		ker.previousChar = previousChar;
-		ker.amount = amount;
-		kerning.Add(ker);
+		kerning.Add(previousChar);
+		kerning.Add(amount);
 	}
 
 	/// <summary>

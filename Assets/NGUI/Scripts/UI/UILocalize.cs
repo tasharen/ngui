@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -63,7 +63,10 @@ public class UILocalize : MonoBehaviour
 
 		if (lbl != null)
 		{
-			lbl.text = val;
+			// If this is a label used by input, we should localize its default value instead
+			UIInput input = NGUITools.FindInParents<UIInput>(lbl.gameObject);
+			if (input != null && input.label == lbl) input.defaultText = val;
+			else lbl.text = val;
 		}
 		else if (sp != null)
 		{

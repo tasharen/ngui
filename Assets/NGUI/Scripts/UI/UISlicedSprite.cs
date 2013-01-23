@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -215,9 +215,9 @@ public class UISlicedSprite : UISprite
 		}
 
 #if UNITY_3_5_4
-		Color col = color;
+		Color col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
 #else
-		Color32 col = color;
+		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
 #endif
 
 		for (int x = 0; x < 3; ++x)

@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -190,6 +190,15 @@ public class UICamera : MonoBehaviour
 	public KeyCode submitKey1 = KeyCode.JoystickButton0;
 	public KeyCode cancelKey0 = KeyCode.Escape;
 	public KeyCode cancelKey1 = KeyCode.JoystickButton1;
+
+	public delegate void OnCustomInput ();
+
+	/// <summary>
+	/// Custom input processing logic, if desired. For example: WP7 touches.
+	/// Use UICamera.current to get the current camera.
+	/// </summary>
+
+	static public OnCustomInput onCustomInput;
 
 	/// <summary>
 	/// Whether tooltips will be shown or not.
@@ -714,6 +723,9 @@ public class UICamera : MonoBehaviour
 		// Process touch input
 		if (useTouch) ProcessTouches();
 
+		// Custom input processing
+		if (onCustomInput != null) onCustomInput();
+
 		// Clear the selection on the cancel key, but only if mouse input is allowed
 		if (useMouse && mSel != null && ((cancelKey0 != KeyCode.None && Input.GetKeyDown(cancelKey0)) ||
 			(cancelKey1 != KeyCode.None && Input.GetKeyDown(cancelKey1)))) selectedObject = null;
@@ -875,42 +887,45 @@ public class UICamera : MonoBehaviour
 		{
 			Touch input = Input.GetTouch(i);
 
-			if (allowMultiTouch || input.fingerId == 0)
+			currentTouchID = allowMultiTouch ? input.fingerId : 1;
+			currentTouch = GetTouch(currentTouchID);
+
+			bool pressed = (input.phase == TouchPhase.Began) || currentTouch.touchBegan;
+			bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
+			currentTouch.touchBegan = false;
+
+			if (pressed)
 			{
-				currentTouchID = allowMultiTouch ? input.fingerId : 1;
-				currentTouch = GetTouch(currentTouchID);
-
-				bool pressed = (input.phase == TouchPhase.Began) || currentTouch.touchBegan;
-				bool unpressed = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
-				currentTouch.touchBegan = false;
-
-				if (pressed)
-				{
-					currentTouch.delta = Vector2.zero;
-				}
-				else
-				{
-					// Although input.deltaPosition can be used, calculating it manually is safer (just in case)
-					currentTouch.delta = input.position - currentTouch.pos;
-				}
-
-				currentTouch.pos = input.position;
-				hoveredObject = Raycast(currentTouch.pos, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
-				if (hoveredObject == null) hoveredObject = genericEventHandler;
-				currentTouch.current = hoveredObject;
-				lastTouchPosition = currentTouch.pos;
-
-				// We don't want to update the last camera while there is a touch happening
-				if (pressed) currentTouch.pressedCam = currentCamera;
-				else if (currentTouch.pressed != null) currentCamera = currentTouch.pressedCam;
-
-				// Process the events from this touch
-				ProcessTouch(pressed, unpressed);
-
-				// If the touch has ended, remove it from the list
-				if (unpressed) RemoveTouch(currentTouchID);
-				currentTouch = null;
+				currentTouch.delta = Vector2.zero;
 			}
+			else
+			{
+				// Although input.deltaPosition can be used, calculating it manually is safer (just in case)
+				currentTouch.delta = input.position - currentTouch.pos;
+			}
+
+			currentTouch.pos = input.position;
+			hoveredObject = Raycast(currentTouch.pos, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+			if (hoveredObject == null) hoveredObject = genericEventHandler;
+			currentTouch.current = hoveredObject;
+			lastTouchPosition = currentTouch.pos;
+
+			// We don't want to update the last camera while there is a touch happening
+			if (pressed) currentTouch.pressedCam = currentCamera;
+			else if (currentTouch.pressed != null) currentCamera = currentTouch.pressedCam;
+
+			// Double-tap support
+			if (input.tapCount > 1) currentTouch.clickTime = Time.realtimeSinceStartup;
+
+			// Process the events from this touch
+			ProcessTouch(pressed, unpressed);
+
+			// If the touch has ended, remove it from the list
+			if (unpressed) RemoveTouch(currentTouchID);
+			currentTouch = null;
+
+			// Don't consider other touches
+			if (!allowMultiTouch) break;
 		}
 	}
 
@@ -1089,7 +1104,7 @@ public class UICamera : MonoBehaviour
 
 						Notify(currentTouch.pressed, "OnClick", null);
 
-						if (currentTouch.clickTime + 0.25f > time)
+						if (currentTouch.clickTime + 0.35f > time)
 						{
 							Notify(currentTouch.pressed, "OnDoubleClick", null);
 						}

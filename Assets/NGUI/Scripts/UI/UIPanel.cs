@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -173,6 +173,7 @@ public class UIPanel : MonoBehaviour
 			{
 				mCheckVisibility = true;
 				mClipping = value;
+				mMatrixTime = 0f;
 				UpdateDrawcalls();
 			}
 		}
@@ -195,6 +196,7 @@ public class UIPanel : MonoBehaviour
 				mCullTime = (mCullTime == 0f) ? 0.001f : Time.realtimeSinceStartup + 0.15f;
 				mCheckVisibility = true;
 				mClipRange = value;
+				mMatrixTime = 0f;
 				UpdateDrawcalls();
 			}
 		}
@@ -950,7 +952,7 @@ public class UIPanel : MonoBehaviour
 
 	// This is necessary because Screen.height inside OnDrawGizmos will return the size of the Scene window,
 	// and we need the size of the game window in order to draw the bounds properly.
-	float mScreenHeight = 720f;
+	int mScreenHeight = 720;
 	void Update () { mScreenHeight = Screen.height; }
 
 	/// <summary>
@@ -972,9 +974,11 @@ public class UIPanel : MonoBehaviour
 				if (size.x == 0f) size.x = mScreenSize.x;
 				if (size.y == 0f) size.y = mScreenSize.y;
 
-				UIRoot root = NGUITools.FindInParents<UIRoot>(gameObject);
-				float scale = (root != null && !root.automatic) ? root.manualHeight / mScreenHeight : 1f;
-				size *= scale;
+				if (!clip)
+				{
+					UIRoot root = NGUITools.FindInParents<UIRoot>(gameObject);
+					if (root != null) size *= root.GetPixelSizeAdjustment(mScreenHeight);
+				}
 
 				Transform t = clip ? transform : (mCam != null ? mCam.transform : null);
 

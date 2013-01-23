@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright ï¿½ 2011-2012 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -67,6 +67,7 @@ public class UIStretch : MonoBehaviour
 
 		if (style != Style.None)
 		{
+			float adjustment = 1f;
 
 			if (panelContainer != null)
 			{
@@ -111,15 +112,14 @@ public class UIStretch : MonoBehaviour
 			else if (uiCamera != null)
 			{
 				mRect = uiCamera.pixelRect;
+				if (mRoot != null) adjustment = mRoot.pixelSizeAdjustment;
 			}
 			else return;
 			
-			
 			float rectWidth  = mRect.width;
 			float rectHeight = mRect.height;
-			float adj = (mRoot != null) ? mRoot.pixelSizeAdjustment : 1f;
 
-			if (adj != 1f && rectHeight > 1f)
+			if (adjustment != 1f && rectHeight > 1f)
 			{
 				float scale = mRoot.activeHeight / rectHeight;
 				rectWidth *= scale;

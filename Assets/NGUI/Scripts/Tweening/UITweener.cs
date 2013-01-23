@@ -50,6 +50,12 @@ public abstract class UITweener : IgnoreTimeScale
 	public Style style = Style.Once;
 
 	/// <summary>
+	/// Optional curve to apply to the tween's time factor value.
+	/// </summary>
+
+	public AnimationCurve animationCurve = new AnimationCurve(new Keyframe(0f, 0f, 0f, 1f), new Keyframe(1f, 1f, 1f, 0f));
+
+	/// <summary>
 	/// Whether the tween will ignore the timescale, making it work while the game is paused.
 	/// </summary>
 
@@ -245,29 +251,30 @@ public abstract class UITweener : IgnoreTimeScale
 		}
 
 		// Call the virtual update
-		OnUpdate(val, isFinished);
+		OnUpdate((animationCurve != null) ? animationCurve.Evaluate(val) : val, isFinished);
 	}
 
 	/// <summary>
 	/// Main Bounce logic to simplify the Sample function
 	/// </summary>
-	private float BounceLogic(float val)
+	
+	float BounceLogic (float val)
 	{
-		if (val < 0.363636f) // 0.363636f changed from (1/ 2.75f) for speed reasons.
+		if (val < 0.363636f) // 0.363636 = (1/ 2.75)
 		{
 			val = 7.5685f * val * val;
 		}
-		else if (val < 0.727272f) // 0.727272f changed from (2/ 2.75f) for speed reasons.
+		else if (val < 0.727272f) // 0.727272 = (2 / 2.75)
 		{
-			val = 7.5625f * (val -= 0.545454f) * val + 0.75f; // 0.545454f changed from (1.5f / 2.75f) for speed reasons.
+			val = 7.5625f * (val -= 0.545454f) * val + 0.75f; // 0.545454f = (1.5 / 2.75) 
 		}
-		else if (val < 0.909090f) // 0.909090f changed from (2.5 / 2.75f) for speed reasons.
+		else if (val < 0.909090f) // 0.909090 = (2.5 / 2.75) 
 		{
-			val = 7.5625f * (val -= 0.818181f) * val + 0.9375f; // 0.818181f changed from (2.25f / 2.75f) for speed reasons.
+			val = 7.5625f * (val -= 0.818181f) * val + 0.9375f; // 0.818181 = (2.25 / 2.75) 
 		}
 		else
 		{
-			val = 7.5625f * (val -= 0.9545454f) * val + 0.984375f; // 0.9545454f changed from (2.625f / 2.75f) for speed reasons.
+			val = 7.5625f * (val -= 0.9545454f) * val + 0.984375f; // 0.9545454 = (2.625 / 2.75) 
 		}
 		return val;
 	}
@@ -328,6 +335,7 @@ public abstract class UITweener : IgnoreTimeScale
 		comp.mFactor = 0f;
 		comp.mAmountPerDelta = Mathf.Abs(comp.mAmountPerDelta);
 		comp.style = Style.Once;
+		comp.animationCurve = new AnimationCurve(new Keyframe(0f, 0f, 0f, 1f), new Keyframe(1f, 1f, 1f, 0f));
 		comp.eventReceiver = null;
 		comp.callWhenFinished = null;
 		comp.onFinished = null;

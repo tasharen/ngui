@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.2.7c
+                Version 2.3.0
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,27 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.3.0:
+- NEW: Added Premultiplied Alpha support to NGUI along with the appropriate shaders.
+- NEW: Added UIButtonKeyBinding script that makes it easy to do button key bindings.
+- NEW: Transform inspector now supports multi-object editing (contribution by Bardelot 'Cripple' Alexandre)
+- NEW: UIRoot's 'automatic' flag is now gone, replaced by a more intuitive drop-down list.
+- NEW: It's now possible to make UIRoot fixed size on mobiles, but pixel-perfect on desktops (it's an option).
+- NEW: You can now specify an animation curve on all tweens.
+- NEW: Localization will now attempt to load the starting language automatically.
+- NEW: Added UICamera.onCustomInput callback making it possible to add input form custom devices.
+- FIX: Tweaks to Localization to make it easier to use. You can now just do Localization.Localize everywhere.
+- FIX: UILocalize attached to a label used by input will now localize its default value instead.
+- FIX: Kerning should now get saved properly. You will need to re-import your fonts.
+- FIX: UICamera with multi-touch turned off should now work properly when returning from sleep.
+- FIX: ActiveAnimation's onFinished callback will no longer wait for all animation states to finish (only the playing one).
+- FIX: UICamera's touch detection should now work properly when returning from sleep.
+- FIX: Changed the way MakePixelPerfect works a bit, hopefully fixing an issue with sprites moving by a pixel.
+- FIX: UIPanel should now display the clipped rectangle correctly.
+- FIX: UIInputSaved will now save on submit.
+- DEL: Removed UIAnchor.depthOffset seeing as it caused more confusion than anything else. Just use an offset child GameObject.
+- DEL: Deprecated hard clipping, seeing as it causes issues on too many devices.
 
 2.2.7:
 - NEW: Added UICamera.stickyPress option that makes it possible for multiple objects to receive OnPress notifications from a single touch.

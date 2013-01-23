@@ -81,6 +81,8 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 	
 	SubShader
 	{
+		LOD 100
+
 		Tags
 		{
 			"Queue" = "Transparent"
@@ -88,17 +90,15 @@ Shader "Unlit/Transparent Colored (AlphaClip)"
 			"RenderType" = "Transparent"
 		}
 		
-		LOD 100
-		Cull Off
-		Lighting Off
-		ZWrite Off
-		Fog { Mode Off }
-		ColorMask RGB
-		AlphaTest Greater .01
-		Blend SrcAlpha OneMinusSrcAlpha
-		
 		Pass
 		{
+			Cull Off
+			Lighting Off
+			ZWrite Off
+			Fog { Mode Off }
+			ColorMask RGB
+			AlphaTest Greater .01
+			Blend SrcAlpha OneMinusSrcAlpha
 			ColorMaterial AmbientAndDiffuse
 			
 			SetTexture [_MainTex]

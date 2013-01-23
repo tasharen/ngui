@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -77,10 +77,7 @@ public class UICreateNewUIWizard : EditorWindow
 		{
 			root = new GameObject((camType == CameraType.Advanced3D) ? "UI Root (3D)" : "UI Root");
 			root.transform.localScale = new Vector3(0.0025f, 0.0025f, 0.0025f);
-
-			UIRoot uiRoot = root.AddComponent<UIRoot>();
-			uiRoot.automatic = false;
-			uiRoot.manualHeight = 800;
+			root.AddComponent<UIRoot>();
 		}
 
 		// Apparently ensuring that there is a kinematic rigidbody on the root of the UI makes collisions checks much faster.
@@ -139,7 +136,7 @@ public class UICreateNewUIWizard : EditorWindow
 			{
 				cam.nearClipPlane = 0.1f;
 				cam.farClipPlane = 4f;
-				cam.transform.localPosition = new Vector3(0f, 0f, -1.7f);
+				cam.transform.localPosition = new Vector3(0f, 0f, -700f);
 			}
 
 			// We don't want to clear color if this is not the first camera
@@ -151,16 +148,21 @@ public class UICreateNewUIWizard : EditorWindow
 			// Add a UI Camera for event handling
 			cam.gameObject.AddComponent<UICamera>();
 
-			// Anchor is useful to have
-			UIAnchor anchor = NGUITools.AddChild<UIAnchor>(cam.gameObject);
-			anchor.uiCamera = cam;
+			if (camType == CameraType.Simple2D)
+			{
+				// Anchor is useful to have
+				UIAnchor anchor = NGUITools.AddChild<UIAnchor>(cam.gameObject);
+				anchor.uiCamera = cam;
 
-			// Since the camera was brought back 700 units above, we should bring the anchor forward to compensate
-			if (camType == CameraType.Advanced3D) anchor.depthOffset = 1.7f;
-
-			// And finally -- the first UI panel
-			UIPanel panel = NGUITools.AddChild<UIPanel>(anchor.gameObject);
-			Selection.activeGameObject = panel.gameObject;
+				// And finally -- the first UI panel
+				UIPanel panel = NGUITools.AddChild<UIPanel>(anchor.gameObject);
+				Selection.activeGameObject = panel.gameObject;
+			}
+			else
+			{
+				UIPanel panel = NGUITools.AddChild<UIPanel>(root);
+				Selection.activeGameObject = panel.gameObject;
+			}
 		}
 	}
 }

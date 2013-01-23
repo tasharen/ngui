@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright ï¿½ 2011-2012 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -251,9 +251,9 @@ public class UIFilledSprite : UISprite
 		uv[3] = new Vector2(u0, v1);
 
 #if UNITY_3_5_4
-		Color col = color;
+		Color col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
 #else
-		Color32 col = color;
+		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
 #endif
 
 		if (fillDirection == FillDirection.Radial90)
