@@ -648,6 +648,11 @@ public class UICamera : MonoBehaviour
 
 	void Awake ()
 	{
+#if !UNITY_3 && !UNITY_4_0
+		// We don't want the camera to send out any kind of mouse events
+		cachedCamera.eventMask = 0;
+#endif
+
 		if (Application.platform == RuntimePlatform.Android ||
 			Application.platform == RuntimePlatform.IPhonePlayer)
 		{
@@ -680,7 +685,7 @@ public class UICamera : MonoBehaviour
 		mList.Sort(CompareFunc);
 
 		// If no event receiver mask was specified, use the camera's mask
-		if (eventReceiverMask == -1) eventReceiverMask = camera.cullingMask;
+		if (eventReceiverMask == -1) eventReceiverMask = cachedCamera.cullingMask;
 	}
 
 	/// <summary>
