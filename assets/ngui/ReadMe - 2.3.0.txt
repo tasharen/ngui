@@ -44,6 +44,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: You can now specify an animation curve on all tweens.
 - NEW: Localization will now attempt to load the starting language automatically.
 - NEW: Added UICamera.onCustomInput callback making it possible to add input form custom devices.
+- NEW: Support for optimizations in Unity 4.1.
 - FIX: Tweaks to Localization to make it easier to use. You can now just do Localization.Localize everywhere.
 - FIX: UILocalize attached to a label used by input will now localize its default value instead.
 - FIX: Kerning should now get saved properly. You will need to re-import your fonts.
