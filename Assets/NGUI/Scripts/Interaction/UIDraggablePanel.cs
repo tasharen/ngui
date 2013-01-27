@@ -600,7 +600,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 			bool vertical = false;
 			bool horizontal = false;
 
-			if (showScrollBars != ShowCondition.WhenDragging || mDragID != -10)
+			if (showScrollBars != ShowCondition.WhenDragging || mDragID != -10 || mMomentum.magnitude > 0.01f)
 			{
 				vertical = shouldMoveVertically;
 				horizontal = shouldMoveHorizontally;

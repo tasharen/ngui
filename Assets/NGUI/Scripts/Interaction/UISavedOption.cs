@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright Â© 2011-2012 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -12,6 +12,10 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Saved Option")]
 public class UISavedOption : MonoBehaviour
 {
+	/// <summary>
+	/// PlayerPrefs-stored key for this option.
+	/// </summary>
+
 	public string keyName;
 
 	string key { get { return (string.IsNullOrEmpty(keyName)) ? "NGUI State: " + name : keyName; } }
@@ -47,29 +51,26 @@ public class UISavedOption : MonoBehaviour
 
 	void OnEnable ()
 	{
-		string s = PlayerPrefs.GetString(key);
-
-		if (!string.IsNullOrEmpty(s))
+		if (mList != null)
 		{
-			if (mList != null)
-			{
-				mList.selection = s;
-				return;
-			}
+			string s = PlayerPrefs.GetString(key);
+			if (!string.IsNullOrEmpty(s)) mList.selection = s;
+			return;
+		}
 
-			if (mCheck != null)
-			{
-				mCheck.isChecked = (s == "true");
-			}
-			else
-			{
-				UICheckbox[] checkboxes = GetComponentsInChildren<UICheckbox>();
+		if (mCheck != null)
+		{
+			mCheck.isChecked = (PlayerPrefs.GetInt(key, 1) != 0);
+		}
+		else
+		{
+			string s = PlayerPrefs.GetString(key);
+			UICheckbox[] checkboxes = GetComponentsInChildren<UICheckbox>();
 
-				for (int i = 0, imax = checkboxes.Length; i < imax; ++i)
-				{
-					UICheckbox ch = checkboxes[i];
-					ch.isChecked = (ch.name == s);
-				}
+			for (int i = 0, imax = checkboxes.Length; i < imax; ++i)
+			{
+				UICheckbox ch = checkboxes[i];
+				ch.isChecked = (ch.name == s);
 			}
 		}
 	}
@@ -107,5 +108,5 @@ public class UISavedOption : MonoBehaviour
 	/// Save the state.
 	/// </summary>
 
-	void SaveState (bool state) { PlayerPrefs.SetString(key, state ? "true" : "false"); }
+	void SaveState (bool state) { PlayerPrefs.SetInt(key, state ? 1 : 0); }
 }

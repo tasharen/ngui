@@ -71,6 +71,12 @@ public class UIInput : MonoBehaviour
 	public bool isPassword = false;
 
 	/// <summary>
+	/// Whether to use auto-correction on mobile devices.
+	/// </summary>
+
+	public bool autoCorrect = false;
+
+	/// <summary>
 	/// Whether the label's text value will be used as the input's text value on start.
 	/// By default the label is just a tooltip of sorts, letting you choose helpful
 	/// half-transparent text such as "Press Enter to start typing", while the actual
@@ -240,7 +246,7 @@ public class UIInput : MonoBehaviour
 					Application.platform == RuntimePlatform.Android)
 				{
 #if UNITY_3_4
-					mKeyboard = iPhoneKeyboard.Open(mText, (iPhoneKeyboardType)((int)type));
+					mKeyboard = iPhoneKeyboard.Open(mText, (iPhoneKeyboardType)((int)type), autoCorrect);
 #else
 					if (isPassword)
 					{
@@ -248,7 +254,7 @@ public class UIInput : MonoBehaviour
 					}
 					else
 					{
-						mKeyboard = TouchScreenKeyboard.Open(mText, (TouchScreenKeyboardType)((int)type));
+						mKeyboard = TouchScreenKeyboard.Open(mText, (TouchScreenKeyboardType)((int)type), autoCorrect);
 					}
 #endif
 				}

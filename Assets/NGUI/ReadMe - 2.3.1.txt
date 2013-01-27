@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
- Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.3.0
+ Copyright ï¿½ 2011-2012 Tasharen Entertainment
+                Version 2.3.1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,12 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.3.1
+- NEW: Added UICamera.touchCount.
+- NEW: Added an option on the UIInput to turn on auto-correction on mobiles.
+- FIX: Fixed compilation on Unity 3.
+- FIX: Font inspector will now display the font in a preview window.
 
 2.3.0:
 - NEW: Added Premultiplied Alpha support to NGUI along with the appropriate shaders.

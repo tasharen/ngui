@@ -20,6 +20,7 @@ public class UIAtlas : MonoBehaviour
 		public string name = "Unity Bug";
 		public Rect outer = new Rect(0f, 0f, 1f, 1f);
 		public Rect inner = new Rect(0f, 0f, 1f, 1f);
+		public bool rotated = false;
 
 		// Padding is needed for trimmed sprites and is relative to sprite width and height
 		public float paddingLeft	= 0f;

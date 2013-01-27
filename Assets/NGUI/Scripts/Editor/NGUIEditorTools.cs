@@ -251,7 +251,7 @@ public class NGUIEditorTools
 	/// Draw a checkered background for the specified texture.
 	/// </summary>
 
-	static Rect DrawBackground (Texture2D tex, float ratio)
+	static public Rect DrawBackground (Texture2D tex, float ratio)
 	{
 		Rect rect = GUILayoutUtility.GetRect(0f, 0f);
 		rect.width = Screen.width - rect.xMin;
@@ -271,88 +271,6 @@ public class NGUIEditorTools
 
 			// Checker background
 			DrawTiledTexture(rect, check);
-		}
-		return rect;
-	}
-
-	/// <summary>
-	/// Draw a texture atlas, complete with a background texture and an outline.
-	/// </summary>
-
-	static public Rect DrawAtlas (Texture2D tex, Material mat)
-	{
-		Rect rect = DrawBackground(tex, (float)tex.height / tex.width);
-
-		if (Event.current.type == EventType.Repaint)
-		{
-			if (mat == null)
-			{
-				GUI.DrawTexture(rect, tex);
-			}
-			else
-			{
-				UnityEditor.EditorGUI.DrawPreviewTexture(rect, tex, mat);
-			}
-		}
-		return rect;
-	}
-
-	/// <summary>
-	/// Draw an enlarged sprite within the specified texture atlas.
-	/// </summary>
-
-	static public Rect DrawSprite (Texture2D tex, Rect sprite, Material mat) { return DrawSprite(tex, sprite, mat, true, 0); }
-
-	/// <summary>
-	/// Draw an enlarged sprite within the specified texture atlas.
-	/// </summary>
-
-	static public Rect DrawSprite (Texture2D tex, Rect sprite, Material mat, bool addPadding)
-	{
-		return DrawSprite(tex, sprite, mat, addPadding, 0);
-	}
-
-	/// <summary>
-	/// Draw an enlarged sprite within the specified texture atlas.
-	/// </summary>
-
-	static public Rect DrawSprite (Texture2D tex, Rect sprite, Material mat, bool addPadding, int maxSize)
-	{
-		float paddingX = addPadding ? 4f / tex.width : 0f;
-		float paddingY = addPadding ? 4f / tex.height : 0f;
-		float ratio = (sprite.height + paddingY) / (sprite.width + paddingX);
-
-		ratio *= (float)tex.height / tex.width;
-
-		// Draw the checkered background
-		Color c = GUI.color;
-		Rect rect = DrawBackground(tex, ratio);
-		GUI.color = c;
-
-		if (maxSize > 0)
-		{
-			float dim = maxSize / Mathf.Max(rect.width, rect.height);
-			rect.width *= dim;
-			rect.height *= dim;
-		}
-
-		// We only want to draw into this rectangle
-		if (Event.current.type == EventType.Repaint)
-		{
-			if (mat == null)
-			{
-				GUI.DrawTextureWithTexCoords(rect, tex, sprite);
-			}
-			else
-			{
-				// NOTE: DrawPreviewTexture doesn't seem to support BeginGroup-based clipping
-				// when a custom material is specified. It seems to be a bug in Unity.
-				// Passing 'null' for the material or omitting the parameter clips as expected.
-				UnityEditor.EditorGUI.DrawPreviewTexture(sprite, tex, mat);
-				//UnityEditor.EditorGUI.DrawPreviewTexture(drawRect, tex);
-				//GUI.DrawTexture(drawRect, tex);
-			}
-			rect = new Rect(sprite.x + rect.x, sprite.y + rect.y, sprite.width, sprite.height);
 		}
 		return rect;
 	}
@@ -821,8 +739,17 @@ public class NGUIEditorTools
 
 	public static void DrawSprite (Texture2D tex, Rect rect, Rect outer, Rect inner, Rect uv, Color color)
 	{
+		DrawSprite(tex, rect, outer, inner, uv, color, null);
+	}
+
+	/// <summary>
+	/// Draw the specified sprite.
+	/// </summary>
+
+	public static void DrawSprite (Texture2D tex, Rect rect, Rect outer, Rect inner, Rect uv, Color color, Material mat)
+	{
 		// Create the texture rectangle that is centered inside rect.
-		Rect outerRect = new Rect(rect);
+		Rect outerRect = rect;
 		outerRect.width = outer.width;
 		outerRect.height = outer.height;
 
@@ -851,7 +778,17 @@ public class NGUIEditorTools
 
 		// Draw the sprite
 		GUI.color = color;
-		GUI.DrawTextureWithTexCoords(outerRect, tex, uv, true);
+		
+		if (mat == null)
+		{
+			GUI.DrawTextureWithTexCoords(outerRect, tex, uv, true);
+		}
+		else
+		{
+			// NOTE: There is an issue in Unity that prevents it from clipping the drawn preview
+			// using BeginGroup/EndGroup, and there is no way to specify a UV rect... le'suq.
+			UnityEditor.EditorGUI.DrawPreviewTexture(outerRect, tex, mat);
+		}
 
 		// Draw the border indicator lines
 		GUI.BeginGroup(outerRect);

@@ -283,7 +283,7 @@ public class UICamera : MonoBehaviour
 	static float mNextEvent = 0f;
 
 	// List of currently active touches
-	Dictionary<int, MouseOrTouch> mTouches = new Dictionary<int, MouseOrTouch>();
+	static Dictionary<int, MouseOrTouch> mTouches = new Dictionary<int, MouseOrTouch>();
 
 	// Tooltip widget (mouse only)
 	GameObject mTooltip = null;
@@ -356,6 +356,31 @@ public class UICamera : MonoBehaviour
 					}
 				}
 			}
+		}
+	}
+
+	/// <summary>
+	/// Number of active touches from all sources.
+	/// </summary>
+
+	static public int touchCount
+	{
+		get
+		{
+			int count = 0;
+
+			for (int i = 0; i < mMouse.Length; ++i)
+				if (mMouse[i].pressed != null)
+					++count;
+
+			if (mController.pressed != null)
+				++count;
+
+			for (int i = 0; i < mTouches.Count; ++i)
+				if (mTouches[i].pressed != null)
+					++count;
+
+			return count;
 		}
 	}
 
@@ -606,7 +631,7 @@ public class UICamera : MonoBehaviour
 	/// Generic notification function. Used in place of SendMessage to shorten the code and allow for more than one receiver.
 	/// </summary>
 
-	static void Notify (GameObject go, string funcName, object obj)
+	static public void Notify (GameObject go, string funcName, object obj)
 	{
 		if (go != null)
 		{
@@ -623,7 +648,7 @@ public class UICamera : MonoBehaviour
 	/// Get or create a touch event.
 	/// </summary>
 
-	public MouseOrTouch GetTouch (int id)
+	static public MouseOrTouch GetTouch (int id)
 	{
 		MouseOrTouch touch;
 
@@ -640,7 +665,7 @@ public class UICamera : MonoBehaviour
 	/// Remove a touch event from the list.
 	/// </summary>
 
-	public void RemoveTouch (int id) { mTouches.Remove(id); }
+	static public void RemoveTouch (int id) { mTouches.Remove(id); }
 
 	/// <summary>
 	/// Add this camera to the list.
@@ -648,7 +673,7 @@ public class UICamera : MonoBehaviour
 
 	void Awake ()
 	{
-#if !UNITY_3 && !UNITY_4_0
+#if !UNITY_3_4 && !UNITY_3_5 && !UNITY_4_0
 		// We don't want the camera to send out any kind of mouse events
 		cachedCamera.eventMask = 0;
 #endif
@@ -748,11 +773,11 @@ public class UICamera : MonoBehaviour
 				if (!stickyTooltip && mTooltip != null) ShowTooltip(false);
 				Notify(mSel, "OnInput", input);
 			}
-
-			// Update the keyboard and joystick events
-			ProcessOthers();
 		}
 		else inputHasFocus = false;
+
+		// Update the keyboard and joystick events
+		if (!inputHasFocus && mSel != null) ProcessOthers();
 
 		// If it's time to show a tooltip, inform the object we're hovering over
 		if (useMouse && mHover != null)
@@ -953,6 +978,7 @@ public class UICamera : MonoBehaviour
 		{
 			currentTouch.current = mSel;
 			ProcessTouch(submitKeyDown, submitKeyUp);
+			currentTouch.current = null;
 		}
 
 		int vertical = 0;
@@ -1007,6 +1033,7 @@ public class UICamera : MonoBehaviour
 			if (mTooltip != null) ShowTooltip(false);
 			
 			currentTouch.pressStarted = true;
+			Notify(currentTouch.pressed, "OnPress", false);
 			currentTouch.pressed = currentTouch.current;
 			currentTouch.clickNotification = ClickNotification.Always;
 			currentTouch.totalDelta = Vector2.zero;
@@ -1026,9 +1053,9 @@ public class UICamera : MonoBehaviour
 			// unpress the original object and notify the new object that it is now being pressed on.
 			if (!stickyPress && !unpressed && currentTouch.pressStarted && currentTouch.pressed != hoveredObject)
 			{
-				if (currentTouch.pressed != null) Notify(currentTouch.pressed, "OnPress", false);
+				Notify(currentTouch.pressed, "OnPress", false);
 				currentTouch.pressed = hoveredObject;
-				if (currentTouch.pressed != null) Notify(currentTouch.pressed, "OnPress", true);
+				Notify(currentTouch.pressed, "OnPress", true);
 			}
 
 			if (currentTouch.pressed != null)

@@ -3,6 +3,10 @@
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
 
+#if UNITY_3_4 || UNITY_3_5
+#define UNITY_3
+#endif
+
 using UnityEngine;
 using System.Collections.Generic;
 

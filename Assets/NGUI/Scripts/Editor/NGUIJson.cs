@@ -93,10 +93,10 @@ public class NGUIJson
 			int frameH = int.Parse(frame["h"].ToString());
 
 			// Read the rotation value
-			bool rotated = (bool)table["rotated"];
+			newSprite.rotated = (bool)table["rotated"];
 
 			// Fill in the proper values
-			if (rotated)
+			if (newSprite.rotated)
 			{
 				newSprite.outer = new Rect(frameX, frameY, frameH, frameW);
 				newSprite.inner = new Rect(frameX, frameY, frameH, frameW);
