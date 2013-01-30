@@ -175,8 +175,8 @@ public class UIAnchor : MonoBehaviour
 		{
 			if (uiCamera.orthographic)
 			{
-				v.x = Mathf.RoundToInt(v.x);
-				v.y = Mathf.RoundToInt(v.y);
+				v.x = Mathf.Round(v.x);
+				v.y = Mathf.Round(v.y);
 
 				if (halfPixelOffset && mIsWindows)
 				{
@@ -184,14 +184,13 @@ public class UIAnchor : MonoBehaviour
 					v.y += 0.5f;
 				}
 			}
-
-			// Convert from screen to world coordinates, since the two may not match (UIRoot set to manual size)
+			v.z = uiCamera.WorldToScreenPoint(mTrans.position).z;
 			v = uiCamera.ScreenToWorldPoint(v);
 		}
 		else
 		{
-			v.x = Mathf.RoundToInt(v.x);
-			v.y = Mathf.RoundToInt(v.y);
+			v.x = Mathf.Round(v.x);
+			v.y = Mathf.Round(v.y);
 
 			if (panelContainer != null)
 			{
@@ -202,10 +201,10 @@ public class UIAnchor : MonoBehaviour
 				Transform t = widgetContainer.cachedTransform.parent;
 				if (t != null) v = t.TransformPoint(v);
 			}
+			v.z = mTrans.position.z;
 		}
 		
 		// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
-		v.z = mTrans.position.z;
 		if (mTrans.position != v) mTrans.position = v;
 	}
 }
