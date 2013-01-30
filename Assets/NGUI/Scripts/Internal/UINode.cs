@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -30,6 +30,8 @@ public class UINode
 	public Vector3 lastScale;		// Last local scale
 
 	GameObject mGo;
+#else
+	float mLastAlpha = 0f;
 #endif
 
 	public int changeFlag = -1;		// -1 = not checked, 0 = not changed, 1 = changed
@@ -87,7 +89,13 @@ public class UINode
 			return true;
 		}
 #else
-		if (trans.hasChanged)
+		if (widget != null && widget.alpha != mLastAlpha)
+		{
+			mLastAlpha = widget.alpha;
+			trans.hasChanged = false;
+			return true;
+		}
+		else if (trans.hasChanged)
 		{
 			trans.hasChanged = false;
 			return true;
