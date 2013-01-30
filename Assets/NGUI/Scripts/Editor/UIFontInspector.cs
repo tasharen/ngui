@@ -241,13 +241,29 @@ public class UIFontInspector : Editor
 				}
 				GUILayout.EndHorizontal();
 
-				GUILayout.BeginHorizontal();
+				if (mFont.atlas == null)
 				{
-					mView = (View)EditorGUILayout.EnumPopup("Preview", mView);
-					GUILayout.Label("Shader", GUILayout.Width(45f));
-					mUseShader = EditorGUILayout.Toggle(mUseShader, GUILayout.Width(20f));
+					mView = View.Font;
+					mUseShader = false;
+
+					float pixelSize = EditorGUILayout.FloatField("Pixel Size", mFont.pixelSize, GUILayout.Width(120f));
+
+					if (pixelSize != mFont.pixelSize)
+					{
+						NGUIEditorTools.RegisterUndo("Font Change", mFont);
+						mFont.pixelSize = pixelSize;
+					}
 				}
-				GUILayout.EndHorizontal();
+				else
+				{
+					GUILayout.BeginHorizontal();
+					{
+						mView = (View)EditorGUILayout.EnumPopup("Preview", mView);
+						GUILayout.Label("Shader", GUILayout.Width(45f));
+						mUseShader = EditorGUILayout.Toggle(mUseShader, GUILayout.Width(20f));
+					}
+					GUILayout.EndHorizontal();
+				}
 			}
 		}
 	}

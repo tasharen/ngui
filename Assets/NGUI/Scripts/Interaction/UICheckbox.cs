@@ -148,9 +148,7 @@ public class UICheckbox : MonoBehaviour
 			// Tween the color of the checkmark
 			if (checkSprite != null)
 			{
-				Color c = checkSprite.color;
-				c.a = mChecked ? 1f : 0f;
-				TweenColor.Begin(checkSprite.gameObject, 0.2f, c);
+				TweenAlpha.Begin(checkSprite.gameObject, 0.15f, mChecked ? 1f : 0f);
 			}
 
 			// Notify the delegate

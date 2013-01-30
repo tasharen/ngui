@@ -683,8 +683,12 @@ public class UICamera : MonoBehaviour
 		{
 			useMouse = false;
 			useTouch = true;
-			useKeyboard = false;
-			useController = false;
+
+			if (Application.platform == RuntimePlatform.IPhonePlayer)
+			{
+				useKeyboard = false;
+				useController = false;
+			}
 		}
 		else if (Application.platform == RuntimePlatform.PS3 ||
 				 Application.platform == RuntimePlatform.XBOX360)

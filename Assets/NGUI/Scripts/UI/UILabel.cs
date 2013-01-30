@@ -485,7 +485,7 @@ public class UILabel : UIWidget
 
 	public void MakePositionPerfect ()
 	{
-		float pixelSize = (font.atlas != null) ? font.atlas.pixelSize : 1f;
+		float pixelSize = font.pixelSize;
 		Vector3 scale = cachedTransform.localScale;
 
 		if (mFont.size == Mathf.RoundToInt(scale.x / pixelSize) &&
@@ -502,8 +502,8 @@ public class UILabel : UIWidget
 			pos.y = Mathf.CeilToInt(pos.y / pixelSize);
 			pos.z = Mathf.RoundToInt(pos.z);
 
-			if ((x % 2 == 1) && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
-			if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y -= 0.5f;
+			if ((x % 2 == 1) && (pivot == Pivot.Top  || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
+			if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right )) pos.y -= 0.5f;
 
 			pos.x *= pixelSize;
 			pos.y *= pixelSize;
@@ -520,7 +520,7 @@ public class UILabel : UIWidget
 	{
 		if (mFont != null)
 		{
-			float pixelSize = (font.atlas != null) ? font.atlas.pixelSize : 1f;
+			float pixelSize = font.pixelSize;
 
 			Vector3 scale = cachedTransform.localScale;
 			scale.x = mFont.size * pixelSize;

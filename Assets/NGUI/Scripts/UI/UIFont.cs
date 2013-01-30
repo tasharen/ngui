@@ -36,6 +36,7 @@ public class UIFont : MonoBehaviour
 	[HideInInspector][SerializeField] int mSpacingY = 0;
 	[HideInInspector][SerializeField] UIAtlas mAtlas;
 	[HideInInspector][SerializeField] UIFont mReplacement;
+	[HideInInspector][SerializeField] float mPixelSize = 1f;
 
 	// Cached value
 	UIAtlas.Sprite mSprite = null;
@@ -121,6 +122,43 @@ public class UIFont : MonoBehaviour
 				mPMA = -1;
 				mMat = value;
 				MarkAsDirty();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Pixel size is a multiplier applied to label dimensions when performing MakePixelPerfect() pixel correction.
+	/// Most obvious use would be on retina screen displays. The resolution doubles, but with UIRoot staying the same
+	/// for layout purposes, you can still get extra sharpness by switching to an HD font that has pixel size set to 0.5.
+	/// </summary>
+
+	public float pixelSize
+	{
+		get
+		{
+			if (mReplacement != null) return mReplacement.pixelSize;
+			if (mAtlas != null) return mAtlas.pixelSize;
+			return mPixelSize;
+		}
+		set
+		{
+			if (mReplacement != null)
+			{
+				mReplacement.pixelSize = value;
+			}
+			else if (mAtlas != null)
+			{
+				mAtlas.pixelSize = value;
+			}
+			else
+			{
+				float val = Mathf.Clamp(value, 0.25f, 4f);
+
+				if (mPixelSize != val)
+				{
+					mPixelSize = val;
+					MarkAsDirty();
+				}
 			}
 		}
 	}
