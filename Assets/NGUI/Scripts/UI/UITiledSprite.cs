@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -78,10 +78,12 @@ public class UITiledSprite : UISlicedSprite
 		Vector2 max = new Vector2(rect.xMax / tex.width, rect.yMax / tex.height);
 		Vector2 clipped = max;
 
+		Color colF = color;
+		colF.a *= mPanel.alpha;
 #if UNITY_3_5_4
-		Color col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
+		Color col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 #else
-		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
+		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 #endif
 		float y = 0f;
 

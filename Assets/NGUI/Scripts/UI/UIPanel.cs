@@ -51,6 +51,9 @@ public class UIPanel : MonoBehaviour
 
 	public bool widgetsAreStatic = false;
 
+	// Panel's alpha (affects the alpha of all widgets)
+	[HideInInspector][SerializeField] float mAlpha = 1f;
+
 	// Whether generated geometry is shown or hidden
 	[HideInInspector][SerializeField] DebugInfo mDebugInfo = DebugInfo.Gizmos;
 
@@ -126,6 +129,39 @@ public class UIPanel : MonoBehaviour
 	/// </summary>
 
 	public bool changedLastFrame { get { return mChangedLastFrame; } }
+
+	/// <summary>
+	/// Panel's alpha affects everything drawn by the panel.
+	/// </summary>
+
+	public float alpha
+	{
+		get
+		{
+			return mAlpha;
+		}
+		set
+		{
+			float val = Mathf.Clamp01(value);
+
+			if (mAlpha != val)
+			{
+				mAlpha = val;
+				mCheckVisibility = true;
+
+				for (int i = 0; i < mDrawCalls.size; ++i)
+				{
+					UIDrawCall dc = mDrawCalls[i];
+					MarkMaterialAsChanged(dc.material, false);
+				}
+
+				for (int i = 0; i < mWidgets.size; ++i)
+				{
+					mWidgets[i].MarkAsChangedLite();
+				}
+			}
+		}
+	}
 
 	/// <summary>
 	/// Whether the panel's generated geometry will be hidden or not.
@@ -289,6 +325,7 @@ public class UIPanel : MonoBehaviour
 
 	public bool IsVisible (Vector3 worldPos)
 	{
+		if (mAlpha < 0.001f) return false;
 		if (mClipping == UIDrawCall.Clipping.None) return true;
 		UpdateTransformMatrix();
 
@@ -306,6 +343,7 @@ public class UIPanel : MonoBehaviour
 
 	public bool IsVisible (UIWidget w)
 	{
+		if (mAlpha < 0.001f) return false;
 		if (!w.enabled || !NGUITools.GetActive(w.gameObject) || w.color.a < 0.001f) return false;
 
 		// No clipping? No point in checking.

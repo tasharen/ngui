@@ -214,10 +214,12 @@ public class UISlicedSprite : UISprite
 			for (int i = 0; i < 4; ++i) uv[i] = Vector2.zero;
 		}
 
+		Color colF = color;
+		colF.a *= mPanel.alpha;
 #if UNITY_3_5_4
-		Color col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
+		Color col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 #else
-		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
+		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 #endif
 
 		for (int x = 0; x < 3; ++x)

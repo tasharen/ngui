@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -40,7 +40,7 @@ public class TweenOrthoSize : UITweener
 
 	override protected void OnUpdate (float factor, bool isFinished)
 	{
-		cachedCamera.fov = from * (1f - factor) + to * factor;
+		cachedCamera.orthographicSize = from * (1f - factor) + to * factor;
 	}
 
 	/// <summary>

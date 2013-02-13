@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -17,7 +17,7 @@ public class TweenAlpha : UITweener
 
 	Transform mTrans;
 	UIWidget mWidget;
-	UIPanelAlpha mPanelAlpha;
+	UIPanel mPanel;
 
 	/// <summary>
 	/// Current alpha.
@@ -28,13 +28,13 @@ public class TweenAlpha : UITweener
 		get
 		{
 			if (mWidget != null) return mWidget.alpha;
-			if (mPanelAlpha != null) return mPanelAlpha.alpha;
+			if (mPanel != null) return mPanel.alpha;
 			return 0f;
 		}
 		set
 		{
 			if (mWidget != null) mWidget.alpha = value;
-			else if (mPanelAlpha != null) mPanelAlpha.alpha = value;
+			else if (mPanel != null) mPanel.alpha = value;
 		}
 	}
 
@@ -44,8 +44,8 @@ public class TweenAlpha : UITweener
 
 	void Awake ()
 	{
-		mPanelAlpha = GetComponent<UIPanelAlpha>();
-		if (mPanelAlpha == null) mWidget = GetComponentInChildren<UIWidget>();
+		mPanel = GetComponent<UIPanel>();
+		if (mPanel == null) mWidget = GetComponentInChildren<UIWidget>();
 	}
 
 	/// <summary>

@@ -150,10 +150,7 @@ public class SpriteSelector : ScriptableWizard
 							float scaleY = rect.height / uv.height;
 	
 							// Stretch the sprite so that it will appear proper
-							float aspect = scaleY / scaleX;
-							if (aspect < 1f) scaleX *= aspect;
-							else scaleY /= aspect;
-	
+							float aspect = (scaleY / scaleX) / (tex.height / tex.width);
 							Rect clipRect = rect;
 	
 							if (aspect != 1f)

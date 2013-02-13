@@ -75,7 +75,7 @@ public class UINode
 	public bool HasChanged ()
 	{
 #if UNITY_3 || UNITY_4_0
-		bool isActive = NGUITools.GetActive(mGo) && (widget == null || (widget.enabled && widget.color.a > 0.001f));
+		bool isActive = NGUITools.GetActive(mGo) && (widget == null || (widget.enabled && widget.isVisible));
 
 		if (lastActive != isActive || (isActive &&
 			(lastPos != trans.localPosition ||
@@ -89,9 +89,9 @@ public class UINode
 			return true;
 		}
 #else
-		if (widget != null && widget.alpha != mLastAlpha)
+		if (widget != null && widget.finalAlpha != mLastAlpha)
 		{
-			mLastAlpha = widget.alpha;
+			mLastAlpha = widget.finalAlpha;
 			trans.hasChanged = false;
 			return true;
 		}

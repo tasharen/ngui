@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright Â© 2011-2012 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -483,7 +483,7 @@ public class UIPopupList : MonoBehaviour
 
 			UIAtlas.Sprite hlsp = mHighlight.sprite;
 			float hlspHeight = hlsp.inner.yMin - hlsp.outer.yMin;
-			float fontScale = font.size * textScale;
+			float fontScale = font.size * font.atlas.pixelSize * textScale;
 			float x = 0f, y = -padding.y;
 			List<UILabel> labels = new List<UILabel>();
 

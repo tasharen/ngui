@@ -55,6 +55,7 @@ public class UIPopupListInspector : Editor
 		ComponentSelector.Draw<UIAtlas>(mList.atlas, OnSelectAtlas);
 		ComponentSelector.Draw<UIFont>(mList.font, OnSelectFont);
 
+		GUILayout.BeginHorizontal();
 		UILabel lbl = EditorGUILayout.ObjectField("Text Label", mList.textLabel, typeof(UILabel), true) as UILabel;
 
 		if (mList.textLabel != lbl)
@@ -63,6 +64,8 @@ public class UIPopupListInspector : Editor
 			mList.textLabel = lbl;
 			if (lbl != null) lbl.text = mList.selection;
 		}
+		GUILayout.Space(44f);
+		GUILayout.EndHorizontal();
 
 		if (mList.atlas != null)
 		{

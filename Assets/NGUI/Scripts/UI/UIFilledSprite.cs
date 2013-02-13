@@ -250,10 +250,12 @@ public class UIFilledSprite : UISprite
 		uv[2] = new Vector2(u0, v0);
 		uv[3] = new Vector2(u0, v1);
 
+		Color colF = color;
+		colF.a *= mPanel.alpha;
 #if UNITY_3_5_4
-		Color col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
+		Color col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 #else
-		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
+		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 #endif
 
 		if (fillDirection == FillDirection.Radial90)

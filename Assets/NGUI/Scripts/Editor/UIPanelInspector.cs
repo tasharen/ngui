@@ -22,6 +22,14 @@ public class UIPanelInspector : Editor
 
 		NGUIEditorTools.DrawSeparator();
 
+		float alpha = EditorGUILayout.Slider("Alpha", panel.alpha, 0f, 1f);
+
+		if (alpha != panel.alpha)
+		{
+			NGUIEditorTools.RegisterUndo("Panel Alpha", panel);
+			panel.alpha = alpha;
+		}
+
 		if (panel.showInPanelTool != EditorGUILayout.Toggle("Panel Tool", panel.showInPanelTool))
 		{
 			panel.showInPanelTool = !panel.showInPanelTool;

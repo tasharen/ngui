@@ -562,15 +562,14 @@ public class UILabel : UIWidget
 	void ApplyShadow (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols, int start, int end, float x, float y)
 #endif
 	{
+		Color c = mEffectColor;
+		c.a *= mPanel.alpha;
 #if UNITY_3_5_4
-		Color c = mEffectColor;
-		c.a = c.a * color.a;
-		Color col = c;
+		Color col = (font.premultipliedAlpha) ? NGUITools.ApplyPMA(c) : c;
 #else
-		Color c = mEffectColor;
-		c.a = c.a * color.a;
-		Color32 col = c;
+		Color32 col = (font.premultipliedAlpha) ? NGUITools.ApplyPMA(c) : c;
 #endif
+
 		for (int i = start; i < end; ++i)
 		{
 			verts.Add(verts.buffer[i]);
@@ -599,7 +598,10 @@ public class UILabel : UIWidget
 		MakePositionPerfect();
 		Pivot p = pivot;
 		int offset = verts.size;
-		Color col = font.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
+
+		Color col = color;
+		col.a *= mPanel.alpha;
+		if (font.premultipliedAlpha) col = NGUITools.ApplyPMA(col);
 
 		// Print the text into the buffers
 		if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)

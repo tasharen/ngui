@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -18,11 +18,10 @@ public class UIButtonRotation : MonoBehaviour
 	public float duration = 0.2f;
 
 	Quaternion mRot;
-	bool mInitDone = false;
 	bool mStarted = false;
 	bool mHighlighted = false;
 
-	void Start () { mStarted = true; }
+	void Start () { Init(); mStarted = true; }
 
 	void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
@@ -42,7 +41,6 @@ public class UIButtonRotation : MonoBehaviour
 
 	void Init ()
 	{
-		mInitDone = true;
 		if (tweenTarget == null) tweenTarget = transform;
 		mRot = tweenTarget.localRotation;
 	}
@@ -51,7 +49,6 @@ public class UIButtonRotation : MonoBehaviour
 	{
 		if (enabled)
 		{
-			if (!mInitDone) Init();
 			TweenRotation.Begin(tweenTarget.gameObject, duration, isPressed ? mRot * Quaternion.Euler(pressed) :
 				(UICamera.IsHighlighted(gameObject) ? mRot * Quaternion.Euler(hover) : mRot)).method = UITweener.Method.EaseInOut;
 		}
@@ -61,7 +58,6 @@ public class UIButtonRotation : MonoBehaviour
 	{
 		if (enabled)
 		{
-			if (!mInitDone) Init();
 			TweenRotation.Begin(tweenTarget.gameObject, duration, isOver ? mRot * Quaternion.Euler(hover) : mRot).method = UITweener.Method.EaseInOut;
 			mHighlighted = isOver;
 		}

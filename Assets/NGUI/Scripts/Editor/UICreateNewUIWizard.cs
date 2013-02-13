@@ -81,9 +81,9 @@ public class UICreateNewUIWizard : EditorWindow
 		}
 
 		// Apparently ensuring that there is a kinematic rigidbody on the root of the UI makes collisions checks much faster.
-		Rigidbody rb = root.AddComponent<Rigidbody>();
-		rb.useGravity = false;
-		rb.isKinematic = true;
+		//Rigidbody rb = root.AddComponent<Rigidbody>();
+		//rb.useGravity = false;
+		//rb.isKinematic = true;
 
 		// Assign the layer to be used by everything
 		root.layer = layer;

@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -151,15 +151,17 @@ public class UICheckbox : MonoBehaviour
 				TweenAlpha.Begin(checkSprite.gameObject, 0.15f, mChecked ? 1f : 0f);
 			}
 
+			current = this;
+
 			// Notify the delegate
 			if (onStateChange != null) onStateChange(mChecked);
 
 			// Send out the event notification
 			if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
 			{
-				current = this;
 				eventReceiver.SendMessage(functionName, mChecked, SendMessageOptions.DontRequireReceiver);
 			}
+			current = null;
 
 			// Play the checkmark animation
 			if (checkAnimation != null)

@@ -142,9 +142,25 @@ public class UISprite : UIWidget
 		}
 		set
 		{
+			mChanged = true;
 			mSprite = value;
 			mSpriteSet = true;
-			material = (mSprite != null && mAtlas != null) ? mAtlas.spriteMaterial : null;
+
+			if (mSprite != null)
+			{
+				mSpriteName = mSprite.name;
+
+				if (mAtlas != null)
+				{
+					material = mAtlas.spriteMaterial;
+					UpdateUVs(true);
+				}
+			}
+			else
+			{
+				mSpriteName = "";
+				material = null;
+			}
 		}
 	}
 
@@ -321,10 +337,12 @@ public class UISprite : UIWidget
 		uvs.Add(uv0);
 		uvs.Add(new Vector2(uv0.x, uv1.y));
 
+		Color colF = color;
+		colF.a *= mPanel.alpha;
 #if UNITY_3_5_4
-		Color col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
+		Color col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 #else
-		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(color) : color;
+		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 #endif
 		cols.Add(col);
 		cols.Add(col);

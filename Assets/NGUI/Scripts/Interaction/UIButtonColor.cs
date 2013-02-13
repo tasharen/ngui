@@ -37,7 +37,6 @@ public class UIButtonColor : MonoBehaviour
 	public float duration = 0.2f;
 
 	protected Color mColor;
-	protected bool mInitDone = false;
 	protected bool mStarted = false;
 	protected bool mHighlighted = false;
 
@@ -47,9 +46,7 @@ public class UIButtonColor : MonoBehaviour
 
 	public Color defaultColor { get { return mColor; } set { mColor = value; } }
 
-	void Awake () { Init(); }
-
-	void Start () { mStarted = true; OnEnable(); }
+	void Start () { Init(); mStarted = true; OnEnable(); }
 
 	protected virtual void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
@@ -69,7 +66,6 @@ public class UIButtonColor : MonoBehaviour
 
 	protected void Init ()
 	{
-		mInitDone = true;
 		if (tweenTarget == null) tweenTarget = gameObject;
 		UIWidget widget = tweenTarget.GetComponent<UIWidget>();
 
