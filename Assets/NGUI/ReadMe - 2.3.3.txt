@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.3.1
+                Version 2.3.3
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,20 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.3.3
+- NEW: UIPanels now have alpha for easy fading, and TweenAlpha can now tween panels.
+- NEW: Added UICamera.debug mode for when you want to know what the mouse is hovering over.
+- NEW: Added AnimatedColor and AnimatedAlpha scripts in case you want to animate widget color or alpha via Unity's animations.
+- NEW: Android devices should now be able to support a keyboard and a controller (OUYA).
+- NEW: Added UIFont.pixelSize, making it possible to have HD/UD fonts that are not a part of an atlas.
+- FIX: Unity 4.1 optimization fix.
+- FIX: Label shadow should now be affected by alpha using PMA shaders.
+- FIX: UICheckbox.current will now work correctly for checkbox event receivers.
+- FIX: UIButton series of scripts should now initialize themselves on start, not when they are used.
+- FIX: TweenOrthoSize should now tween the size instead of FOV (o_O).
+- FIX: Sprite selection window will now show sprites properly when the atlas is not square.
+- FIX: UIAnchor should now always maintain the same Z-depth, and once again works in 3D UIs.
 
 2.3.1
 - NEW: Added UICamera.touchCount.
