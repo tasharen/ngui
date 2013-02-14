@@ -27,6 +27,7 @@ public class UIAnchor : MonoBehaviour
 	}
 
 	bool mIsWindows = false;
+	bool mIsDirectX10OrHigher = false;
 
 	/// <summary>
 	/// Camera used to determine the anchor bounds. Set automatically if none was specified.
@@ -87,6 +88,9 @@ public class UIAnchor : MonoBehaviour
 		mIsWindows = (Application.platform == RuntimePlatform.WindowsPlayer ||
 			Application.platform == RuntimePlatform.WindowsWebPlayer ||
 			Application.platform == RuntimePlatform.WindowsEditor);
+
+		if (mIsWindows)
+			mIsDirectX10OrHigher = (SystemInfo.graphicsShaderLevel >= 40);
 
 		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
 		Update();
@@ -179,6 +183,7 @@ public class UIAnchor : MonoBehaviour
 				v.y = Mathf.Round(v.y);
 
 				if (halfPixelOffset && mIsWindows)
+				if (halfPixelOffset && (mIsWindows && !mIsDirectX10OrHigher))
 				{
 					v.x -= 0.5f;
 					v.y += 0.5f;
