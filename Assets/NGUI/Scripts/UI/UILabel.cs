@@ -563,7 +563,7 @@ public class UILabel : UIWidget
 #endif
 	{
 		Color c = mEffectColor;
-		c.a *= mPanel.alpha;
+		c.a *= alpha * mPanel.alpha;
 #if UNITY_3_5_4
 		Color col = (font.premultipliedAlpha) ? NGUITools.ApplyPMA(c) : c;
 #else

@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -870,6 +870,9 @@ public class NGUIEditorTools
 	{
 		GUILayout.BeginHorizontal();
 		GUILayout.Label(fieldName, GUILayout.Width(76f));
+
+		if (atlas == null || atlas.GetSprite(spriteName) == null)
+			spriteName = "";
 
 		if (GUILayout.Button(spriteName, "MiniPullDown", GUILayout.Width(120f)))
 		{
