@@ -483,7 +483,7 @@ public class UIPopupList : MonoBehaviour
 
 			UIAtlas.Sprite hlsp = mHighlight.sprite;
 			float hlspHeight = hlsp.inner.yMin - hlsp.outer.yMin;
-			float fontScale = font.size * font.atlas.pixelSize * textScale;
+			float fontScale = font.size * font.pixelSize * textScale;
 			float x = 0f, y = -padding.y;
 			List<UILabel> labels = new List<UILabel>();
 

@@ -67,7 +67,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Widget's final alpha, after taking the panel's alpha into account.
 	/// </summary>
 
-	public float finalAlpha { get { if (mPanel == null) CreatePanel(); return mColor.a * mPanel.alpha; } }
+	public float finalAlpha { get { if (mPanel == null) CreatePanel(); return (mPanel != null) ? mColor.a * mPanel.alpha : mColor.a; } }
 
 	/// <summary>
 	/// Set or get the value that specifies where the widget's pivot point should be.

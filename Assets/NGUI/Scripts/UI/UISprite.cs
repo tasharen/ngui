@@ -158,7 +158,6 @@ public class UISprite : UIWidget
 			}
 			else
 			{
-				mSpriteName = "";
 				material = null;
 			}
 		}
