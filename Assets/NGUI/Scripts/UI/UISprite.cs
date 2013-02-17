@@ -61,7 +61,7 @@ public class UISprite : UIWidget
 				{
 					if (mAtlas != null && mAtlas.spriteList.Count > 0)
 					{
-						sprite = mAtlas.spriteList[0];
+						SetAtlasSprite(mAtlas.spriteList[0]);
 						mSpriteName = mSprite.name;
 					}
 				}
@@ -107,61 +107,59 @@ public class UISprite : UIWidget
 				mSpriteName = value;
 				mSprite = null;
 				mChanged = true;
-				if (sprite != null) UpdateUVs(true);
+				if (isValid) UpdateUVs(true);
 			}
 		}
 	}
 
-	/// <summary>
-	/// Get the sprite used by the atlas.
-	/// </summary>
-
-	public UIAtlas.Sprite sprite
+	public UIAtlas.Sprite GetAtlasSprite ()
 	{
-		get
+		if (!mSpriteSet) mSprite = null;
+
+		if (mSprite == null && mAtlas != null)
 		{
-			if (!mSpriteSet) mSprite = null;
-
-			if (mSprite == null && mAtlas != null)
+			if (!string.IsNullOrEmpty(mSpriteName))
 			{
-				if (!string.IsNullOrEmpty(mSpriteName))
-				{
-					sprite = mAtlas.GetSprite(mSpriteName);
-				}
-
-				if (mSprite == null && mAtlas.spriteList.Count > 0)
-				{
-					sprite = mAtlas.spriteList[0];
-					mSpriteName = mSprite.name;
-				}
-
-				// If the sprite has been set, update the material
-				if (mSprite != null) material = mAtlas.spriteMaterial;
+				SetAtlasSprite(mAtlas.GetSprite(mSpriteName));
 			}
-			return mSprite;
-		}
-		set
-		{
-			mChanged = true;
-			mSprite = value;
-			mSpriteSet = true;
 
-			if (mSprite != null)
+			if (mSprite == null && mAtlas.spriteList.Count > 0)
 			{
+				SetAtlasSprite(mAtlas.spriteList[0]);
 				mSpriteName = mSprite.name;
+			}
 
-				if (mAtlas != null)
-				{
-					material = mAtlas.spriteMaterial;
-					UpdateUVs(true);
-				}
-			}
-			else
+			// If the sprite has been set, update the material
+			if (mSprite != null) material = mAtlas.spriteMaterial;
+		}
+		return mSprite;
+	}
+
+	protected void SetAtlasSprite (UIAtlas.Sprite sp)
+	{
+		mChanged = true;
+		mSpriteSet = true;
+
+		if (sp != null)
+		{
+			mSprite = sp;
+			mSpriteName = mSprite.name;
+
+			if (mAtlas != null)
 			{
-				material = null;
+				material = mAtlas.spriteMaterial;
+				UpdateUVs(true);
 			}
+		}
+		else
+		{
+			mSpriteName = (mSprite != null) ? mSprite.name : "";
+			mSprite = sp;
+			material = null;
 		}
 	}
+
+	public bool isValid { get { return GetAtlasSprite() != null; } }
 
 	/// <summary>
 	/// Helper function that calculates the relative offset based on the current pivot.
@@ -173,7 +171,7 @@ public class UISprite : UIWidget
 		{
 			Vector2 v = Vector2.zero;
 
-			if (sprite != null)
+			if (isValid)
 			{
 				Pivot pv = pivot;
 
@@ -222,7 +220,7 @@ public class UISprite : UIWidget
 
 	virtual public void UpdateUVs (bool force)
 	{
-		if (sprite != null && (force || mOuter != mSprite.outer))
+		if (isValid && (force || mOuter != mSprite.outer))
 		{
 			Texture tex = mainTexture;
 
@@ -246,7 +244,7 @@ public class UISprite : UIWidget
 
 	override public void MakePixelPerfect ()
 	{
-		if (sprite == null) return;
+		if (!isValid) return;
 
 		Texture tex = mainTexture;
 		Vector3 scale = cachedTransform.localScale;

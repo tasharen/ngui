@@ -40,7 +40,7 @@ public class UISlicedSprite : UISprite
 	{
 		get
 		{
-			UIAtlas.Sprite sp = sprite;
+			UIAtlas.Sprite sp = GetAtlasSprite();
 			if (sp == null) return Vector2.zero;
 
 			Rect outer = sp.outer;
@@ -90,7 +90,7 @@ public class UISlicedSprite : UISprite
 			mChanged = true;
 		}
 
-		if (sprite != null && (force || mInner != mSprite.inner || mOuter != mSprite.outer))
+		if (isValid && (force || mInner != mSprite.inner || mOuter != mSprite.outer))
 		{
 			Texture tex = mainTexture;
 

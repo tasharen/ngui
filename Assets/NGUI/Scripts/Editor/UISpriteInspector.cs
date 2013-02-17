@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright ï¿½ 2011-2012 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -72,13 +72,13 @@ public class UISpriteInspector : UIWidgetInspector
 
 	public override void OnPreviewGUI (Rect rect, GUIStyle background)
 	{
-		if (mSprite == null) return;
+		if (mSprite == null || !mSprite.isValid) return;
 
 		Texture2D tex = mSprite.mainTexture as Texture2D;
 		if (tex == null) return;
 
-		Rect outer = new Rect(mSprite.sprite.outer);
-		Rect inner = new Rect(mSprite.sprite.inner);
+		Rect outer = new Rect(mSprite.GetAtlasSprite().outer);
+		Rect inner = new Rect(mSprite.GetAtlasSprite().inner);
 		Rect uv = outer;
 
 		if (mSprite.atlas.coordinates == UIAtlas.Coordinates.Pixels)
