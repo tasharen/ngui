@@ -68,8 +68,9 @@ Shader "Unlit/Premultiplied Colored (SoftClip)"
 			
 				// Sample the texture
 				half4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
-				col.a *= clamp( min(factor.x, factor.y), 0.0, 1.0);
-				//col.rgb = lerp(half3(0.0, 0.0, 0.0), col.rgb, col.a);
+				float fade = clamp( min(factor.x, factor.y), 0.0, 1.0);
+				col.a *= fade;
+				col.rgb = lerp(half3(0.0, 0.0, 0.0), col.rgb, fade);
 				return col;
 			}
 			ENDCG
