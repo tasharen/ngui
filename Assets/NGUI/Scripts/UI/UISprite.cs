@@ -112,6 +112,16 @@ public class UISprite : UIWidget
 		}
 	}
 
+	/// <summary>
+	/// Is there a valid sprite to work with?
+	/// </summary>
+
+	public bool isValid { get { return GetAtlasSprite() != null; } }
+
+	/// <summary>
+	/// Retrieve the atlas sprite referenced by the spriteName field.
+	/// </summary>
+
 	public UIAtlas.Sprite GetAtlasSprite ()
 	{
 		if (!mSpriteSet) mSprite = null;
@@ -120,7 +130,9 @@ public class UISprite : UIWidget
 		{
 			if (!string.IsNullOrEmpty(mSpriteName))
 			{
-				SetAtlasSprite(mAtlas.GetSprite(mSpriteName));
+				UIAtlas.Sprite sp = mAtlas.GetSprite(mSpriteName);
+				if (sp == null) return null;
+				SetAtlasSprite(sp);
 			}
 
 			if (mSprite == null && mAtlas.spriteList.Count > 0)
@@ -134,6 +146,10 @@ public class UISprite : UIWidget
 		}
 		return mSprite;
 	}
+
+	/// <summary>
+	/// Set the atlas sprite directly.
+	/// </summary>
 
 	protected void SetAtlasSprite (UIAtlas.Sprite sp)
 	{
@@ -158,8 +174,6 @@ public class UISprite : UIWidget
 			material = null;
 		}
 	}
-
-	public bool isValid { get { return GetAtlasSprite() != null; } }
 
 	/// <summary>
 	/// Helper function that calculates the relative offset based on the current pivot.
