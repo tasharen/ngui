@@ -137,7 +137,15 @@ public class UISprite : UIWidget
 
 			if (mSprite == null && mAtlas.spriteList.Count > 0)
 			{
-				SetAtlasSprite(mAtlas.spriteList[0]);
+				UIAtlas.Sprite sp = mAtlas.spriteList[0];
+				if (sp == null) return null;
+				SetAtlasSprite(sp);
+
+				if (mSprite == null)
+				{
+					Debug.LogError(mAtlas.name + " seems to have a null sprite!");
+					return null;
+				}
 				mSpriteName = mSprite.name;
 			}
 
@@ -160,18 +168,11 @@ public class UISprite : UIWidget
 		{
 			mSprite = sp;
 			mSpriteName = mSprite.name;
-
-			if (mAtlas != null)
-			{
-				material = mAtlas.spriteMaterial;
-				UpdateUVs(true);
-			}
 		}
 		else
 		{
 			mSpriteName = (mSprite != null) ? mSprite.name : "";
 			mSprite = sp;
-			material = null;
 		}
 	}
 
