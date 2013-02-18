@@ -540,7 +540,7 @@ public class UILabel : UIWidget
 			if (cachedTransform.localRotation == Quaternion.identity)
 			{
 				if ((x % 2 == 1) && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
-				if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y -= 0.5f;
+				if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y += 0.5f;
 			}
 
 			pos.x *= pixelSize;
