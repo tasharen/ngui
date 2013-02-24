@@ -274,6 +274,8 @@ public class UIFontInspector : Editor
 
 	public override void OnPreviewGUI (Rect rect, GUIStyle background)
 	{
+		mFont = target as UIFont;
+		if (mFont == null) return;
 		Texture2D tex = mFont.texture;
 
 		if (mView != View.Nothing && tex != null)

@@ -21,7 +21,15 @@ public class UIButtonOffset : MonoBehaviour
 	bool mStarted = false;
 	bool mHighlighted = false;
 
-	void Start () { Init(); mStarted = true; }
+	void Start ()
+	{
+		if (!mStarted)
+		{
+			mStarted = true;
+			if (tweenTarget == null) tweenTarget = transform;
+			mPos = tweenTarget.localPosition;
+		}
+	}
 
 	void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
@@ -39,16 +47,11 @@ public class UIButtonOffset : MonoBehaviour
 		}
 	}
 
-	void Init ()
-	{
-		if (tweenTarget == null) tweenTarget = transform;
-		mPos = tweenTarget.localPosition;
-	}
-
 	void OnPress (bool isPressed)
 	{
 		if (enabled)
 		{
+			if (!mStarted) Start();
 			TweenPosition.Begin(tweenTarget.gameObject, duration, isPressed ? mPos + pressed :
 				(UICamera.IsHighlighted(gameObject) ? mPos + hover : mPos)).method = UITweener.Method.EaseInOut;
 		}
@@ -58,6 +61,7 @@ public class UIButtonOffset : MonoBehaviour
 	{
 		if (enabled)
 		{
+			if (!mStarted) Start();
 			TweenPosition.Begin(tweenTarget.gameObject, duration, isOver ? mPos + hover : mPos).method = UITweener.Method.EaseInOut;
 			mHighlighted = isOver;
 		}

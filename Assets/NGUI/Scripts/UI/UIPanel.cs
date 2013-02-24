@@ -97,6 +97,7 @@ public class UIPanel : MonoBehaviour
 	bool mChangedLastFrame = false;
 	bool mWidgetsAdded = false;
 
+	float mUpdateTime = 0f;
 	float mMatrixTime = 0f;
 	Matrix4x4 mWorldToLocal = Matrix4x4.identity;
 
@@ -344,7 +345,7 @@ public class UIPanel : MonoBehaviour
 	public bool IsVisible (UIWidget w)
 	{
 		if (mAlpha < 0.001f) return false;
-		if (!w.enabled || !NGUITools.GetActive(w.gameObject) || w.color.a < 0.001f) return false;
+		if (!w.enabled || !NGUITools.GetActive(w.gameObject) || w.alpha < 0.001f) return false;
 
 		// No clipping? No point in checking.
 		if (mClipping == UIDrawCall.Clipping.None) return true;
@@ -498,6 +499,7 @@ public class UIPanel : MonoBehaviour
 			if (node != null)
 			{
 				node.widget = w;
+				w.visibleFlag = 1;
 
 				if (!mWidgets.Contains(w))
 				{
@@ -514,7 +516,7 @@ public class UIPanel : MonoBehaviour
 			}
 			else
 			{
-				Debug.LogError("Unable to find an appropriate UIRoot for " + NGUITools.GetHierarchy(w.gameObject) +
+				Debug.LogError("Unable to find an appropriate root for " + NGUITools.GetHierarchy(w.gameObject) +
 					"\nPlease make sure that there is at least one game object above this widget!", w.gameObject);
 			}
 		}
@@ -676,11 +678,9 @@ public class UIPanel : MonoBehaviour
 
 	void UpdateTransformMatrix ()
 	{
-		float time = Time.realtimeSinceStartup;
-
-		if (time == 0f || mMatrixTime != time)
+		if (mUpdateTime == 0f || mMatrixTime != mUpdateTime)
 		{
-			mMatrixTime = time;
+			mMatrixTime = mUpdateTime;
 			mWorldToLocal = cachedTransform.worldToLocalMatrix;
 
 			if (mClipping != UIDrawCall.Clipping.None)
@@ -708,11 +708,13 @@ public class UIPanel : MonoBehaviour
 	{
 		mChangedLastFrame = false;
 		bool transformsChanged = false;
+		bool shouldCull = false;
+
 #if UNITY_EDITOR
-		bool shouldCull = !Application.isPlaying || Time.realtimeSinceStartup > mCullTime;
+		shouldCull = (clipping != UIDrawCall.Clipping.None) && (!Application.isPlaying || mUpdateTime > mCullTime);
 		if (!Application.isPlaying || !widgetsAreStatic || mWidgetsAdded || shouldCull != mCulled)
 #else
-		bool shouldCull = Time.realtimeSinceStartup > mCullTime;
+		shouldCull = (clipping != UIDrawCall.Clipping.None) && (mUpdateTime > mCullTime);
 		if (!widgetsAreStatic || mWidgetsAdded || shouldCull != mCulled)
 #endif
 		{
@@ -735,6 +737,16 @@ public class UIPanel : MonoBehaviour
 				{
 					node.changeFlag = 1;
 					transformsChanged = true;
+#if UNITY_EDITOR
+					Vector3 s = node.trans.lossyScale;
+					float min = Mathf.Abs(Mathf.Min(s.x, s.y));
+
+					if (min == 0f)
+					{
+						Debug.LogError("Scale of 0 is invalid! Zero cannot be divided by, which causes problems. Use a small value instead, such as 0.01\n" +
+						node.trans.lossyScale, node.trans);
+					}
+#endif
 				}
 				else node.changeFlag = -1;
 			}
@@ -940,6 +952,7 @@ public class UIPanel : MonoBehaviour
 
 	void LateUpdate ()
 	{
+		mUpdateTime = Time.realtimeSinceStartup;
 		UpdateTransformMatrix();
 		UpdateTransforms();
 

@@ -26,6 +26,7 @@ public class NGUISettings
 	static int mAtlasPadding = 1;
 	static public bool mAtlasTrimming = true;
 	static bool mUnityPacking = true;
+	static Color mColor = Color.white;
 
 	static Object GetObject (string name)
 	{
@@ -47,6 +48,8 @@ public class NGUISettings
 		mAtlasTrimming	= EditorPrefs.GetBool("NGUI Atlas Trimming", true);
 		mUnityPacking	= EditorPrefs.GetBool("NGUI Unity Packing", true);
 		mPivot			= (UIWidget.Pivot)EditorPrefs.GetInt("NGUI Pivot", (int)mPivot);
+
+		LoadColor();
 	}
 
 	static void Save ()
@@ -62,6 +65,51 @@ public class NGUISettings
 		EditorPrefs.SetBool("NGUI Atlas Trimming", mAtlasTrimming);
 		EditorPrefs.SetBool("NGUI Unity Packing", mUnityPacking);
 		EditorPrefs.SetInt("NGUI Pivot", (int)mPivot);
+		SaveColor();
+	}
+
+	static void LoadColor ()
+	{
+		string sc = EditorPrefs.GetString("NGUI Color");
+
+		if (!string.IsNullOrEmpty(sc))
+		{
+			string[] colors = sc.Split(' ');
+
+			if (colors.Length == 4)
+			{
+				float.TryParse(colors[0], out mColor.r);
+				float.TryParse(colors[1], out mColor.g);
+				float.TryParse(colors[2], out mColor.b);
+				float.TryParse(colors[3], out mColor.a);
+			}
+		}
+	}
+
+	static void SaveColor ()
+	{
+		EditorPrefs.SetString("NGUI Color", mColor.r + " " + mColor.g + " " + mColor.b + " " + mColor.a);
+	}
+
+	/// <summary>
+	/// Color is used to easily copy/paste the widget's color value.
+	/// </summary>
+
+	static public Color color
+	{
+		get
+		{
+			if (!mLoaded) Load();
+			return mColor;
+		}
+		set
+		{
+			if (mColor != value)
+			{
+				mColor = value;
+				SaveColor();
+			}
+		}
 	}
 
 	/// <summary>

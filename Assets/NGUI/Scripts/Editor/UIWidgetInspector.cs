@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright Â© 2011-2012 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -142,7 +142,17 @@ public class UIWidgetInspector : Editor
 		}
 
 		// Color tint
+		GUILayout.BeginHorizontal();
 		Color color = EditorGUILayout.ColorField("Color Tint", mWidget.color);
+		if (GUILayout.Button("Copy", GUILayout.Width(50f)))
+			NGUISettings.color = color;
+		GUILayout.EndHorizontal();
+		
+		GUILayout.BeginHorizontal();
+		NGUISettings.color = EditorGUILayout.ColorField("Clipboard", NGUISettings.color);
+		if (GUILayout.Button("Paste", GUILayout.Width(50f)))
+			color = NGUISettings.color;
+		GUILayout.EndHorizontal();
 
 		if (mWidget.color != color)
 		{
