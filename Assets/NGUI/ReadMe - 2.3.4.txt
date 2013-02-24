@@ -35,6 +35,11 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
  Version History
 -----------------
 
+2.3.4:
+- NEW: Added the ability to easily copy/paste widget colors in the inspector.
+- FIX: Random fixes for minor issues noted on the forums.
+- FIX: Minor performance improvements.
+
 2.3.3
 - NEW: UIPanels now have alpha for easy fading, and TweenAlpha can now tween panels.
 - NEW: Added UICamera.debug mode for when you want to know what the mouse is hovering over.
