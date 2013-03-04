@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.3.4
+                Version 2.3.5
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,12 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.3.5:
+- NEW: Font symbols can now have an offset for easier positioning.
+- FIX: UISlider will now set the 'current' property before calling the delegate.
+- FIX: Fixed the checkbox animation issue that was brought to light as a result of 2.3.4.
+- FIX: Minor other tweaks, nothing important.
 
 2.3.4:
 - NEW: Added the ability to easily copy/paste widget colors in the inspector.
