@@ -86,10 +86,7 @@ public class UISliderInspector : Editor
 
 			if (widget != null && !(widget is UIFilledSprite))
 			{
-				GUI.color = new Color(1f, 0.7f, 0f);
-				GUILayout.Label("Don't forget to adjust the background as well");
-				GUILayout.Label("(the slider doesn't know what it is)");
-				GUI.color = Color.white;
+				EditorGUILayout.HelpBox("Don't forget to adjust the background as well (the slider doesn't know what it is)", MessageType.Warning);
 			}
 		}
 

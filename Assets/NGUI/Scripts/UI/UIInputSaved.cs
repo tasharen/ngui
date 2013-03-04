@@ -14,6 +14,19 @@ public class UIInputSaved : UIInput
 {
 	public string playerPrefsField;
 
+	public override string text
+	{
+		get
+		{
+			return base.text;
+		}
+		set
+		{
+			base.text = value;
+			SaveToPlayerPrefs(value);
+		}
+	}
+
 	void Awake ()
 	{
 		onSubmit = SaveToPlayerPrefs;

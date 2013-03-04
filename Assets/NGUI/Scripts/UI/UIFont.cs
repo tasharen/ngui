@@ -934,8 +934,8 @@ public class UIFont : MonoBehaviour
 				}
 				else
 				{
-					v0.x =  scale.x * x;
-					v0.y = -scale.y * y;
+					v0.x =  scale.x * (x + symbol.offsetX);
+					v0.y = -scale.y * (y + symbol.offsetY);
 
 					v1.x = v0.x + scale.x * symbol.width;
 					v1.y = v0.y - scale.y * symbol.height;
@@ -946,7 +946,7 @@ public class UIFont : MonoBehaviour
 					u1.x = u0.x + invX * symbol.width;
 					u1.y = u0.y - invY * symbol.height;
 
-					x += mSpacingX + symbol.width;
+					x += mSpacingX + symbol.width + symbol.offsetX;
 					i += symbol.length - 1;
 					prev = 0;
 

@@ -44,9 +44,17 @@ public class UIButtonColor : MonoBehaviour
 	/// UIButtonColor's default (starting) color. It's useful to be able to change it, just in case.
 	/// </summary>
 
-	public Color defaultColor { get { return mColor; } set { mColor = value; } }
+	public Color defaultColor
+	{
+		get
+		{
+			if (!mStarted) Init();
+			return mColor;
+		}
+		set { mColor = value; }
+	}
 
-	void Start ()
+	protected virtual void Start ()
 	{
 		if (!mStarted)
 		{
@@ -106,7 +114,7 @@ public class UIButtonColor : MonoBehaviour
 		OnEnable();
 	}
 
-	protected virtual void OnPress (bool isPressed)
+	public virtual void OnPress (bool isPressed)
 	{
 		if (enabled)
 		{
@@ -115,7 +123,7 @@ public class UIButtonColor : MonoBehaviour
 		}
 	}
 
-	protected virtual void OnHover (bool isOver)
+	public virtual void OnHover (bool isOver)
 	{
 		if (enabled)
 		{

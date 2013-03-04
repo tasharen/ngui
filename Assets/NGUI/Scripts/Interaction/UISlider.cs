@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright Â© 2011-2012 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -299,13 +299,14 @@ public class UISlider : IgnoreTimeScale
 				thumb.localPosition = pos;
 			}
 
+			current = this;
+
 			if (eventReceiver != null && !string.IsNullOrEmpty(functionName) && Application.isPlaying)
 			{
-				current = this;
 				eventReceiver.SendMessage(functionName, mStepValue, SendMessageOptions.DontRequireReceiver);
-				current = null;
 			}
 			if (onValueChange != null) onValueChange(mStepValue);
+			current = null;
 		}
 	}
 

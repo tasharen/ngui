@@ -129,7 +129,7 @@ public class UIInput : MonoBehaviour
 	/// Input field's current text value.
 	/// </summary>
 
-	public string text
+	public virtual string text
 	{
 		get
 		{

@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright Â© 2011-2012 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -161,7 +161,7 @@ public static class BMFontReader
 				else if (split[0] == "symbol")
 				{
 					// Expected data style:
-					// symbol sequence=(A) x=172 y=140 width=20 height=20
+					// symbol sequence=(A) x=172 y=140 width=20 height=20 xoffset=-10 yoffset=-10
 
 					if (len > 5)
 					{
@@ -170,6 +170,12 @@ public static class BMFontReader
 						symbol.y		= GetInt(split[3]);
 						symbol.width	= GetInt(split[4]);
 						symbol.height	= GetInt(split[5]);
+
+						if (len > 7)
+						{
+							symbol.offsetX = GetInt(split[6]);
+							symbol.offsetY = GetInt(split[7]);
+						}
 					}
 				}
 			}

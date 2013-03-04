@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -18,6 +18,8 @@ public class BMSymbol
 	public int y;
 	public int width;
 	public int height;
+	public int offsetX = 0;
+	public int offsetY = 0;
 
 	int mLength = 0;
 
