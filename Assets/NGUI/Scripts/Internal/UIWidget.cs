@@ -249,10 +249,17 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// For backwards compatibility. Use ParentHasChanged() instead.
+	/// </summary>
+
+	[System.Obsolete("Use ParentHasChanged() instead")]
+	public void CheckParent () { ParentHasChanged(); }
+
+	/// <summary>
 	/// Checks to ensure that the widget is still parented to the right panel.
 	/// </summary>
 
-	public void CheckParent ()
+	public void ParentHasChanged ()
 	{
 		if (mPanel != null)
 		{
@@ -333,7 +340,7 @@ public abstract class UIWidget : MonoBehaviour
 		// Ensure we have a panel to work with by now
 		if (mPanel == null) CreatePanel();
 #if UNITY_EDITOR
-		else if (!Application.isPlaying) CheckParent();
+		else if (!Application.isPlaying) ParentHasChanged();
 #endif
 		
 		// Automatically reset the Z scaling component back to 1 as it's not used

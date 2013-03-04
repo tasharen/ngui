@@ -40,6 +40,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: UISlider will now set the 'current' property before calling the delegate.
 - FIX: Fixed the checkbox animation issue that was brought to light as a result of 2.3.4.
 - FIX: Minor other tweaks, nothing important.
+- FIX: Fix for a rare widget reparenting issue.
 
 2.3.4:
 - NEW: Added the ability to easily copy/paste widget colors in the inspector.

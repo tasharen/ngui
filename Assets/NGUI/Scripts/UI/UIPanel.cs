@@ -409,18 +409,17 @@ public class UIPanel : MonoBehaviour
 		// Add transforms all the way up to the panel
 		while (t != null && t != cachedTransform)
 		{
-			// If the node is already managed, we're done
 #if UNITY_FLASH
 			if (mChildren.TryGetValue(t, out node))
 			{
-				if (retVal == null) retVal = node;
-				break;
+				if (retVal == null)
+					retVal = node;
 			}
 #else
 			if (mChildren.Contains(t))
 			{
-				if (retVal == null) retVal = (UINode)mChildren[t];
-				break;
+				if (retVal == null)
+					retVal = (UINode)mChildren[t];
 			}
 #endif
 			else
@@ -429,8 +428,8 @@ public class UIPanel : MonoBehaviour
 				node = new UINode(t);
 				if (retVal == null) retVal = node;
 				mChildren.Add(t, node);
-				t = t.parent;
 			}
+			t = t.parent;
 		}
 		return retVal;
 	}
