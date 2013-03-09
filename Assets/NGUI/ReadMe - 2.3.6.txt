@@ -41,6 +41,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: Various improvements to widget and sprite inspectors.
 - FIX: There is no need to display the "symbols" option on the labels if the font doesn't have any.
 - FIX: Removed the hard-coded screen height-based touch threshold on the UICamera.
+- FIX: Removed the need for sliders to have a "full size" property.
 
 2.3.5:
 - NEW: Font symbols can now have an offset for easier positioning.
