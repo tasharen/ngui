@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright Â© 2011-2012 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -57,7 +57,7 @@ public class DragDropItem : MonoBehaviour
 		UpdateTable();
 
 		// Make all widgets update their parents
-		BroadcastMessage("CheckParent", SendMessageOptions.DontRequireReceiver);
+		NGUITools.MarkParentAsChanged(gameObject);
 	}
 
 	/// <summary>
@@ -83,8 +83,8 @@ public class DragDropItem : MonoBehaviour
 				Vector3 pos = mTrans.localPosition;
 				pos.z = 0f;
 				mTrans.localPosition = pos;
-				
-				mTrans.BroadcastMessage("CheckParent", SendMessageOptions.DontRequireReceiver);
+
+				NGUITools.MarkParentAsChanged(gameObject);
 			}
 			else
 			{
