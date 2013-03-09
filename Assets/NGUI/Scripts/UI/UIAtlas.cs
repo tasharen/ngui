@@ -14,6 +14,9 @@ using System;
 [AddComponentMenu("NGUI/UI/Atlas")]
 public class UIAtlas : MonoBehaviour
 {
+	// Ideally this class should be called UISpriteData and should be separate from UIAtlas...
+	// But unfortunately I can't rename it or move it out as it will break backwards compatibility.
+
 	[System.Serializable]
 	public class Sprite
 	{
@@ -264,10 +267,6 @@ public class UIAtlas : MonoBehaviour
 					return s;
 				}
 			}
-		}
-		else
-		{
-			Debug.LogWarning("Expected a valid name, found nothing");
 		}
 		return null;
 	}

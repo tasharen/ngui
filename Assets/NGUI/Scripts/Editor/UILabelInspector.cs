@@ -68,7 +68,7 @@ public class UILabelInspector : UIWidgetInspector
 
 		GUILayout.EndHorizontal();
 
-		if (encoding)
+		if (encoding && mLabel.font.hasSymbols)
 		{
 			UIFont.SymbolStyle sym = (UIFont.SymbolStyle)EditorGUILayout.EnumPopup("Symbols", mLabel.symbolStyle, GUILayout.Width(170f));
 			if (sym != mLabel.symbolStyle) { RegisterUndo(); mLabel.symbolStyle = sym; }

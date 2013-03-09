@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.3.5
+                Version 2.3.6
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,13 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.3.6
+- NEW: Added a much easier way to add symbols and emoticons (select the font, you will see it).
+- NEW: Added a couple of conditional warnings to the UIPanel warning of common mistakes.
+- NEW: Various improvements to widget and sprite inspectors.
+- FIX: There is no need to display the "symbols" option on the labels if the font doesn't have any.
+- FIX: Removed the hard-coded screen height-based touch threshold on the UICamera.
 
 2.3.5:
 - NEW: Font symbols can now have an offset for easier positioning.

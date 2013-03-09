@@ -775,4 +775,15 @@ static public class NGUITools
 		}
 		return c;
 	}
+
+	/// <summary>
+	/// Inform all widgets underneath the specified object that the parent has changed.
+	/// </summary>
+
+	static public void MarkParentAsChanged (GameObject go)
+	{
+		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
+		for (int i = 0, imax = widgets.Length; i < imax; ++i)
+			widgets[i].ParentHasChanged();
+	}
 }
