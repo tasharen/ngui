@@ -109,6 +109,9 @@ public class UIPanel : MonoBehaviour
 	// When traversing through the child dictionary, deleted values are stored here
 	List<Transform> mRemoved = new List<Transform>();
 
+	// Used for SetAlphaRecursive()
+	UIPanel[] mChildPanels;
+
 	// Whether the panel should check the visibility of its widgets (set when the clip range changes).
 	bool mCheckVisibility = false;
 	float mCullTime = 0f;
@@ -162,6 +165,18 @@ public class UIPanel : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	/// <summary>
+	/// Recursively set the alpha for this panel and all of its children.
+	/// </summary>
+
+	public void SetAlphaRecursive (float val, bool rebuildList)
+	{
+		if (rebuildList || mChildPanels == null)
+			mChildPanels = GetComponentsInChildren<UIPanel>(true);
+		for (int i = 0, imax = mChildPanels.Length; i < imax; ++i)
+			mChildPanels[i].alpha = val;
 	}
 
 	/// <summary>
@@ -1019,7 +1034,7 @@ public class UIPanel : MonoBehaviour
 			GameObject go = UnityEditor.Selection.activeGameObject;
 			bool selected = (go != null) && (NGUITools.FindInParents<UIPanel>(go) == this);
 
-			if (selected || clip)
+			if (selected || clip || (mCam != null && mCam.isOrthoGraphic))
 			{
 				if (size.x == 0f) size.x = mScreenSize.x;
 				if (size.y == 0f) size.y = mScreenSize.y;

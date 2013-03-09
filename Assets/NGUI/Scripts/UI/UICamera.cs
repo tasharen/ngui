@@ -1035,7 +1035,7 @@ public class UICamera : MonoBehaviour
 		// Whether we're using the mouse
 		bool isMouse = (currentTouch == mMouse[0]);
 		float drag   = isMouse ? mouseDragThreshold : touchDragThreshold;
-		float click  = isMouse ? mouseClickThreshold : Mathf.Max(touchClickThreshold, Screen.height * 0.1f);
+		float click  = isMouse ? mouseClickThreshold : touchClickThreshold;
 
 		// Send out the press message
 		if (pressed)

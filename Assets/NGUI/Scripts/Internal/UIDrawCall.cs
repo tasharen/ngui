@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -69,6 +69,12 @@ public class UIDrawCall : MonoBehaviour
 			return (mesh != null) ? mesh.vertexCount >> 1 : 0;
 		}
 	}
+
+	/// <summary>
+	/// Whether the draw call is currently using a clipped shader.
+	/// </summary>
+
+	public bool isClipped { get { return mClippedMat != null; } }
 
 	/// <summary>
 	/// Clipping used by the draw call

@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -140,11 +140,32 @@ public class UIPanelInspector : Editor
 			}
 		}
 
+		if (clipping == UIDrawCall.Clipping.HardClip)
+		{
+			EditorGUILayout.HelpBox("Hard clipping has been removed due to major performance issues on certain Android devices. Alpha clipping will be used instead.", MessageType.Warning);
+		}
+
+		if (clipping != UIDrawCall.Clipping.None && !NGUIEditorTools.IsUniform(panel.transform.lossyScale))
+		{
+			EditorGUILayout.HelpBox("Clipped panels must have a uniform scale, or clipping won't work properly!", MessageType.Error);
+			
+			if (GUILayout.Button("Auto-fix"))
+			{
+				NGUIEditorTools.FixUniform(panel.gameObject);
+			}
+		}
+
 		foreach (UIDrawCall dc in drawcalls)
 		{
 			NGUIEditorTools.DrawSeparator();
 			EditorGUILayout.ObjectField("Material", dc.material, typeof(Material), false);
 			EditorGUILayout.LabelField("Triangles", dc.triangles.ToString());
+
+			if (clipping != UIDrawCall.Clipping.None && !dc.isClipped)
+			{
+				EditorGUILayout.HelpBox("You must switch this material's shader to Unlit/Transparent Colored or Unlit/Premultiplied Colored in order for clipping to work.",
+					MessageType.Warning);
+			}
 		}
 	}
 }

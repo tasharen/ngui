@@ -54,7 +54,7 @@ public class UIButtonColor : MonoBehaviour
 		set { mColor = value; }
 	}
 
-	protected virtual void Start ()
+	void Start ()
 	{
 		if (!mStarted)
 		{

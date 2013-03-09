@@ -33,6 +33,9 @@ public class UIFontInspector : Editor
 	UIFont mFont;
 	FontType mType = FontType.Normal;
 	UIFont mReplacement = null;
+	string mSymbolSequence = "";
+	string mSymbolSprite = "";
+	BMSymbol mSelectedSymbol = null;
 
 	public override bool HasPreviewGUI () { return mView != View.Nothing; }
 
@@ -127,12 +130,6 @@ public class UIFontInspector : Editor
 
 		if (mFont.atlas != null)
 		{
-			if (mFont.bmFont.LegacyCheck())
-			{
-				Debug.Log(mFont.name + " uses a legacy font data structure. Upgrading, please save.");
-				EditorUtility.SetDirty(mFont);
-			}
-
 			if (mFont.bmFont.isValid)
 			{
 				NGUIEditorTools.AdvancedSpriteField(mFont.atlas, mFont.spriteName, SelectSprite, false);
@@ -150,22 +147,6 @@ public class UIFontInspector : Editor
 			}
 		}
 
-		bool resetWidthHeight = false;
-
-		if (mFont.atlas != null || mFont.material != null)
-		{
-			TextAsset data = EditorGUILayout.ObjectField("Import Font", null, typeof(TextAsset), false) as TextAsset;
-
-			if (data != null)
-			{
-				NGUIEditorTools.RegisterUndo("Import Font Data", mFont);
-				BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), data.bytes);
-				mFont.MarkAsDirty();
-				resetWidthHeight = true;
-				Debug.Log("Imported " + mFont.bmFont.glyphCount + " characters");
-			}
-		}
-
 		if (mFont.bmFont.isValid)
 		{
 			Color green = new Color(0.4f, 1f, 0f, 1f);
@@ -177,13 +158,6 @@ public class UIFontInspector : Editor
 				{
 					// Pixels are easier to work with than UVs
 					Rect pixels = NGUIMath.ConvertToPixels(mFont.uvRect, tex.width, tex.height, false);
-
-					// Automatically set the width and height of the rectangle to be the original font texture's dimensions
-					if (resetWidthHeight)
-					{
-						pixels.width = mFont.texWidth;
-						pixels.height = mFont.texHeight;
-					}
 
 					// Font sprite rectangle
 					GUI.backgroundColor = green;
@@ -230,6 +204,7 @@ public class UIFontInspector : Editor
 					int x = EditorGUILayout.IntField(mFont.horizontalSpacing);
 					GUILayout.Label("Y", GUILayout.Width(12f));
 					int y = EditorGUILayout.IntField(mFont.verticalSpacing);
+					GUILayout.Space(62f);
 					EditorGUIUtility.LookLikeControls(80f);
 
 					if (mFont.horizontalSpacing != x || mFont.verticalSpacing != y)
@@ -256,6 +231,7 @@ public class UIFontInspector : Editor
 				}
 				else
 				{
+					GUILayout.Space(4f);
 					GUILayout.BeginHorizontal();
 					{
 						mView = (View)EditorGUILayout.EnumPopup("Preview", mView);
@@ -265,6 +241,101 @@ public class UIFontInspector : Editor
 					GUILayout.EndHorizontal();
 				}
 			}
+
+			if (mFont.atlas != null)
+			{
+				NGUIEditorTools.DrawHeader("Symbols and Emoticons");
+
+				List<BMSymbol> symbols = mFont.symbols;
+				
+				for (int i = 0; i < symbols.Count; )
+				{
+					BMSymbol sym = symbols[i];
+
+					GUILayout.BeginHorizontal();
+					GUILayout.Label(sym.sequence, GUILayout.Width(40f));
+					if (NGUIEditorTools.SimpleSpriteField(mFont.atlas, sym.spriteName, ChangeSymbolSprite))
+						mSelectedSymbol = sym;
+
+					if (GUILayout.Button("Edit", GUILayout.Width(40f)))
+					{
+						if (mFont.atlas != null)
+						{
+							EditorPrefs.SetString("NGUI Selected Sprite", sym.spriteName);
+							NGUIEditorTools.Select(mFont.atlas.gameObject);
+						}
+					}
+
+					GUI.backgroundColor = Color.red;
+
+					if (GUILayout.Button("X", GUILayout.Width(22f)))
+					{
+						NGUIEditorTools.RegisterUndo("Remove symbol", mFont);
+						mSymbolSequence = sym.sequence;
+						mSymbolSprite = sym.spriteName;
+						symbols.Remove(sym);
+						mFont.MarkAsDirty();
+					}
+					GUI.backgroundColor = Color.white;
+					GUILayout.EndHorizontal();
+					GUILayout.Space(4f);
+					++i;
+				}
+
+				if (symbols.Count > 0)
+				{
+					NGUIEditorTools.DrawSeparator();
+				}
+
+				GUILayout.BeginHorizontal();
+				mSymbolSequence = EditorGUILayout.TextField(mSymbolSequence, GUILayout.Width(40f));
+				NGUIEditorTools.SimpleSpriteField(mFont.atlas, mSymbolSprite, SelectSymbolSprite);
+
+				bool isValid = !string.IsNullOrEmpty(mSymbolSequence) && !string.IsNullOrEmpty(mSymbolSprite);
+				GUI.backgroundColor = isValid ? Color.green : Color.grey;
+				
+				if (GUILayout.Button("Add", GUILayout.Width(40f)) && isValid)
+				{
+					NGUIEditorTools.RegisterUndo("Add symbol", mFont);
+					mFont.AddSymbol(mSymbolSequence, mSymbolSprite);
+					mFont.MarkAsDirty();
+					mSymbolSequence = "";
+					mSymbolSprite = "";
+				}
+				GUI.backgroundColor = Color.white;
+				GUILayout.EndHorizontal();
+
+				if (symbols.Count == 0)
+				{
+					EditorGUILayout.HelpBox("Want to add an emoticon to your font? In the field above type ':)', choose a sprite, then hit the Add button.", MessageType.Info);
+				}
+				else GUILayout.Space(4f);
+			}
+		}
+	}
+
+	/// <summary>
+	/// "New Sprite" selection.
+	/// </summary>
+
+	void SelectSymbolSprite (string spriteName)
+	{
+		mSymbolSprite = spriteName;
+		Repaint();
+	}
+
+	/// <summary>
+	/// Existing sprite selection.
+	/// </summary>
+
+	void ChangeSymbolSprite (string spriteName)
+	{
+		if (mSelectedSymbol != null && mFont != null)
+		{
+			NGUIEditorTools.RegisterUndo("Change symbol", mFont);
+			mSelectedSymbol.spriteName = spriteName;
+			Repaint();
+			mFont.MarkAsDirty();
 		}
 	}
 

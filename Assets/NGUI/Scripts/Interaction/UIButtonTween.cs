@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -166,6 +166,7 @@ public class UIButtonTween : MonoBehaviour
 			for (int i = 0, imax = mTweens.Length; i < imax; ++i)
 			{
 				UITweener tw = mTweens[i];
+				if (tw.tweenFactor != tweenGroup) continue;
 
 				if (tw.enabled)
 				{

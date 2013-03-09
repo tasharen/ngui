@@ -1,4 +1,4 @@
-//----------------------------------------------
+﻿//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -67,17 +67,54 @@ public class UIWidgetInspector : Editor
 
 		NGUIEditorTools.DrawSeparator();
 
+		// Pixel-correctness
+		if (type != PrefabType.Prefab)
+		{
+			GUILayout.BeginHorizontal();
+			{
+				EditorGUILayout.PrefixLabel("Correction");
+
+				if (GUILayout.Button("Make Pixel-Perfect"))
+				{
+					NGUIEditorTools.RegisterUndo("Make Pixel-Perfect", mWidget.transform);
+					mWidget.MakePixelPerfect();
+				}
+			}
+			GUILayout.EndHorizontal();
+		}
+
+		// Pivot point -- old school drop-down style
+		//UIWidget.Pivot pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", mWidget.pivot);
+
+		//if (mWidget.pivot != pivot)
+		//{
+		//    NGUIEditorTools.RegisterUndo("Pivot Change", mWidget);
+		//    mWidget.pivot = pivot;
+		//}
+
+		// Pivot point -- the new, more visual style
+		GUILayout.BeginHorizontal();
+		GUILayout.Label("Pivot", GUILayout.Width(76f));
+		Toggle("◄", "ButtonLeft", UIWidget.Pivot.Left, true);
+		Toggle("▬", "ButtonMid", UIWidget.Pivot.Center, true);
+		Toggle("►", "ButtonRight", UIWidget.Pivot.Right, true);
+		Toggle("▲", "ButtonLeft", UIWidget.Pivot.Top, false);
+		Toggle("▌", "ButtonMid", UIWidget.Pivot.Center, false);
+		Toggle("▼", "ButtonRight", UIWidget.Pivot.Bottom, false);
+		GUILayout.EndHorizontal();
+
 		// Depth navigation
 		if (type != PrefabType.Prefab)
 		{
+			GUILayout.Space(2f);
 			GUILayout.BeginHorizontal();
 			{
 				EditorGUILayout.PrefixLabel("Depth");
 
 				int depth = mWidget.depth;
-				if (GUILayout.Button("Back")) --depth;
-				depth = EditorGUILayout.IntField(depth, GUILayout.Width(40f));
-				if (GUILayout.Button("Forward")) ++depth;
+				if (GUILayout.Button("Back", GUILayout.Width(60f))) --depth;
+				depth = EditorGUILayout.IntField(depth);
+				if (GUILayout.Button("Forward", GUILayout.Width(60f))) ++depth;
 
 				if (mWidget.depth != depth)
 				{
@@ -116,30 +153,7 @@ public class UIWidgetInspector : Editor
 			}
 		}
 
-		// Pivot point
-		UIWidget.Pivot pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", mWidget.pivot);
-
-		if (mWidget.pivot != pivot)
-		{
-			NGUIEditorTools.RegisterUndo("Pivot Change", mWidget);
-			mWidget.pivot = pivot;
-		}
-
-		// Pixel-correctness
-		if (type != PrefabType.Prefab)
-		{
-			GUILayout.BeginHorizontal();
-			{
-				EditorGUILayout.PrefixLabel("Correction");
-
-				if (GUILayout.Button("Make Pixel-Perfect"))
-				{
-					NGUIEditorTools.RegisterUndo("Make Pixel-Perfect", mWidget.transform);
-					mWidget.MakePixelPerfect();
-				}
-			}
-			GUILayout.EndHorizontal();
-		}
+		NGUIEditorTools.DrawSeparator();
 
 		// Color tint
 		GUILayout.BeginHorizontal();
@@ -158,6 +172,115 @@ public class UIWidgetInspector : Editor
 		{
 			NGUIEditorTools.RegisterUndo("Color Change", mWidget);
 			mWidget.color = color;
+		}
+	}
+
+	/// <summary>
+	/// Draw a toggle button for the pivot point.
+	/// </summary>
+
+	void Toggle (string text, string style, UIWidget.Pivot pivot, bool isHorizontal)
+	{
+		bool isActive = false;
+
+		switch (pivot)
+		{
+			case UIWidget.Pivot.Left:
+			isActive = IsLeft(mWidget.pivot);
+			break;
+
+			case UIWidget.Pivot.Right:
+			isActive = IsRight(mWidget.pivot);
+			break;
+
+			case UIWidget.Pivot.Top:
+			isActive = IsTop(mWidget.pivot);
+			break;
+
+			case UIWidget.Pivot.Bottom:
+			isActive = IsBottom(mWidget.pivot);
+			break;
+
+			case UIWidget.Pivot.Center:
+			isActive = isHorizontal ? pivot == GetHorizontal(mWidget.pivot) : pivot == GetVertical(mWidget.pivot);
+			break;
+		}
+
+		if (GUILayout.Toggle(isActive, text, style) != isActive)
+			SetPivot(pivot, isHorizontal);
+	}
+
+	static bool IsLeft (UIWidget.Pivot pivot)
+	{
+		return pivot == UIWidget.Pivot.Left ||
+			pivot == UIWidget.Pivot.TopLeft ||
+			pivot == UIWidget.Pivot.BottomLeft;
+	}
+
+	static bool IsRight (UIWidget.Pivot pivot)
+	{
+		return pivot == UIWidget.Pivot.Right ||
+			pivot == UIWidget.Pivot.TopRight ||
+			pivot == UIWidget.Pivot.BottomRight;
+	}
+
+	static bool IsTop (UIWidget.Pivot pivot)
+	{
+		return pivot == UIWidget.Pivot.Top ||
+			pivot == UIWidget.Pivot.TopLeft ||
+			pivot == UIWidget.Pivot.TopRight;
+	}
+
+	static bool IsBottom (UIWidget.Pivot pivot)
+	{
+		return pivot == UIWidget.Pivot.Bottom ||
+			pivot == UIWidget.Pivot.BottomLeft ||
+			pivot == UIWidget.Pivot.BottomRight;
+	}
+
+	static UIWidget.Pivot GetHorizontal (UIWidget.Pivot pivot)
+	{
+		if (IsLeft(pivot)) return UIWidget.Pivot.Left;
+		if (IsRight(pivot)) return UIWidget.Pivot.Right;
+		return UIWidget.Pivot.Center;
+	}
+
+	static UIWidget.Pivot GetVertical (UIWidget.Pivot pivot)
+	{
+		if (IsTop(pivot)) return UIWidget.Pivot.Top;
+		if (IsBottom(pivot)) return UIWidget.Pivot.Bottom;
+		return UIWidget.Pivot.Center;
+	}
+
+	static UIWidget.Pivot Combine (UIWidget.Pivot horizontal, UIWidget.Pivot vertical)
+	{
+		if (horizontal == UIWidget.Pivot.Left)
+		{
+			if (vertical == UIWidget.Pivot.Top) return UIWidget.Pivot.TopLeft;
+			if (vertical == UIWidget.Pivot.Bottom) return UIWidget.Pivot.BottomLeft;
+			return UIWidget.Pivot.Left;
+		}
+
+		if (horizontal == UIWidget.Pivot.Right)
+		{
+			if (vertical == UIWidget.Pivot.Top) return UIWidget.Pivot.TopRight;
+			if (vertical == UIWidget.Pivot.Bottom) return UIWidget.Pivot.BottomRight;
+			return UIWidget.Pivot.Right;
+		}
+		return vertical;
+	}
+
+	void SetPivot (UIWidget.Pivot pivot, bool isHorizontal)
+	{
+		UIWidget.Pivot horizontal = GetHorizontal(mWidget.pivot);
+		UIWidget.Pivot vertical = GetVertical(mWidget.pivot);
+
+		pivot = isHorizontal ? Combine(pivot, vertical) : Combine(horizontal, pivot);
+
+		if (mWidget.pivot != pivot)
+		{
+			NGUIEditorTools.RegisterUndo("Pivot change", mWidget);
+			mWidget.pivot = pivot;
 		}
 	}
 

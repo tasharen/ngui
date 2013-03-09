@@ -888,6 +888,23 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
+	/// Draw a simple sprite selection button.
+	/// </summary>
+
+	static public bool SimpleSpriteField (UIAtlas atlas, string spriteName, SpriteSelector.Callback callback, params GUILayoutOption[] options)
+	{
+		if (atlas.GetSprite(spriteName) == null)
+			spriteName = "";
+
+		if (GUILayout.Button(spriteName, "DropDown", options))
+		{
+			SpriteSelector.Show(atlas, spriteName, callback);
+			return true;
+		}
+		return false;
+	}
+
+	/// <summary>
 	/// Convenience function that displays a list of sprites and returns the selected value.
 	/// </summary>
 
@@ -927,10 +944,12 @@ public class NGUIEditorTools
 			}
 			else
 			{
-				string[] list = new string[] { spriteName, "...Edit" };
-				int selection = EditorGUILayout.Popup(0, list, "DropDownButton");
+				GUILayout.BeginHorizontal();
+				GUILayout.Label(spriteName, "HelpBox", GUILayout.Height(18f));
+				GUILayout.Space(18f);
+				GUILayout.EndHorizontal();
 
-				if (selection == 1)
+				if (GUILayout.Button("Edit", GUILayout.Width(40f)))
 				{
 					EditorPrefs.SetString("NGUI Selected Sprite", spriteName);
 					Select(atlas.gameObject);
@@ -968,4 +987,49 @@ public class NGUIEditorTools
 	/// </summary>
 
 	static public GameObject previousSelection { get { return mPrevious; } }
+
+	/// <summary>
+	/// Helper function that checks to see if the scale is uniform.
+	/// </summary>
+
+	static public bool IsUniform (Vector3 scale)
+	{
+		return Mathf.Approximately(scale.x, scale.y) && Mathf.Approximately(scale.x, scale.z);
+	}
+
+	/// <summary>
+	/// Check to see if the specified game object has a uniform scale.
+	/// </summary>
+
+	static public bool IsUniform (GameObject go)
+	{
+		if (go == null) return true;
+
+		if (go.GetComponent<UIWidget>() != null)
+		{
+			Transform parent = go.transform.parent;
+			return parent == null || IsUniform(parent.gameObject);
+		}
+		return IsUniform(go.transform.lossyScale);
+	}
+
+	/// <summary>
+	/// Fix uniform scaling of the specified object.
+	/// </summary>
+
+	static public void FixUniform (GameObject go)
+	{
+		Transform t = go.transform;
+
+		while (t != null && t.gameObject.GetComponent<UIRoot>() == null)
+		{
+			if (!NGUIEditorTools.IsUniform(t.localScale))
+			{
+				Undo.RegisterUndo(t, "Uniform scaling fix");
+				t.localScale = Vector3.one;
+				EditorUtility.SetDirty(t);
+			}
+			t = t.parent;
+		}
+	}
 }

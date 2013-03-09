@@ -554,7 +554,6 @@ public class UICreateWidgetWizard : EditorWindow
 			// Add the slider script
 			UISlider uiSlider = go.AddComponent<UISlider>();
 			uiSlider.foreground = front.transform;
-			uiSlider.fullSize = front.transform.localScale;
 
 			// Thumb sprite
 			if (slider)
