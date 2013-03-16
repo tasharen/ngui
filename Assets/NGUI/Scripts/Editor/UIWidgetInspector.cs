@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -83,15 +83,16 @@ public class UIWidgetInspector : Editor
 			GUILayout.EndHorizontal();
 		}
 
+#if UNITY_3_5
 		// Pivot point -- old school drop-down style
-		//UIWidget.Pivot pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", mWidget.pivot);
+		UIWidget.Pivot pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", mWidget.pivot);
 
-		//if (mWidget.pivot != pivot)
-		//{
-		//    NGUIEditorTools.RegisterUndo("Pivot Change", mWidget);
-		//    mWidget.pivot = pivot;
-		//}
-
+		if (mWidget.pivot != pivot)
+		{
+		    NGUIEditorTools.RegisterUndo("Pivot Change", mWidget);
+		    mWidget.pivot = pivot;
+		}
+#else
 		// Pivot point -- the new, more visual style
 		GUILayout.BeginHorizontal();
 		GUILayout.Label("Pivot", GUILayout.Width(76f));
@@ -102,6 +103,7 @@ public class UIWidgetInspector : Editor
 		Toggle("▌", "ButtonMid", UIWidget.Pivot.Center, false);
 		Toggle("▼", "ButtonRight", UIWidget.Pivot.Bottom, false);
 		GUILayout.EndHorizontal();
+#endif
 
 		// Depth navigation
 		if (type != PrefabType.Prefab)
