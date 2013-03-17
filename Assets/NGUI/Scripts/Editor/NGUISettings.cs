@@ -26,6 +26,7 @@ public class NGUISettings
 	static int mAtlasPadding = 1;
 	static public bool mAtlasTrimming = true;
 	static bool mUnityPacking = true;
+	static bool mForceSquareAtlas = true;
 	static Color mColor = Color.white;
 
 	static Object GetObject (string name)
@@ -47,6 +48,7 @@ public class NGUISettings
 		mAtlasPadding	= EditorPrefs.GetInt("NGUI Atlas Padding", 1);
 		mAtlasTrimming	= EditorPrefs.GetBool("NGUI Atlas Trimming", true);
 		mUnityPacking	= EditorPrefs.GetBool("NGUI Unity Packing", true);
+		mForceSquareAtlas = EditorPrefs.GetBool("NGUI Force Square Atlas", true);
 		mPivot			= (UIWidget.Pivot)EditorPrefs.GetInt("NGUI Pivot", (int)mPivot);
 
 		LoadColor();
@@ -64,6 +66,7 @@ public class NGUISettings
 		EditorPrefs.SetInt("NGUI Atlas Padding", mAtlasPadding);
 		EditorPrefs.SetBool("NGUI Atlas Trimming", mAtlasTrimming);
 		EditorPrefs.SetBool("NGUI Unity Packing", mUnityPacking);
+		EditorPrefs.SetBool("NGUI Force Square Atlas", mForceSquareAtlas);
 		EditorPrefs.SetInt("NGUI Pivot", (int)mPivot);
 		SaveColor();
 	}
@@ -239,4 +242,10 @@ public class NGUISettings
 	/// </summary>
 
 	static public bool unityPacking { get { if (!mLoaded) Load(); return mUnityPacking; } set { if (mUnityPacking != value) { mUnityPacking = value; Save(); } } }
+	
+	/// <summary>
+	/// Whether the Atlas Maker will force a square atlas texture when creating an atlas
+	/// </summary>
+	
+	static public bool forceSquareAtlas { get { if (!mLoaded) Load(); return mForceSquareAtlas; } set { if (mForceSquareAtlas != value) { mForceSquareAtlas = value; Save(); } } }
 }
