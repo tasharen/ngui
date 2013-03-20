@@ -16,7 +16,7 @@ public class UITextureInspector : UIWidgetInspector
 {
 	UITexture mTex;
 
-	override protected bool OnDrawProperties ()
+	override protected bool DrawProperties ()
 	{
 		mTex = mWidget as UITexture;
 

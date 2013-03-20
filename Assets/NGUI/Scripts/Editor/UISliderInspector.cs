@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -13,24 +13,24 @@ public class UISliderInspector : Editor
 	{
 		if (fg != null)
 		{
-			UIWidget widget = fg.GetComponent<UIWidget>();
+			UISprite sprite = fg.GetComponent<UISprite>();
 
-			if (widget != null && !(widget is UIFilledSprite))
+			if (sprite != null && sprite.type != UISprite.Type.Filled)
 			{
 				if (dir == UISlider.Direction.Horizontal)
 				{
-					if (widget.pivot != UIWidget.Pivot.Left &&
-						widget.pivot != UIWidget.Pivot.TopLeft &&
-						widget.pivot != UIWidget.Pivot.BottomLeft)
+					if (sprite.pivot != UIWidget.Pivot.Left &&
+						sprite.pivot != UIWidget.Pivot.TopLeft &&
+						sprite.pivot != UIWidget.Pivot.BottomLeft)
 					{
 						GUI.color = new Color(1f, 0.7f, 0f);
 						GUILayout.Label(name + " should use a Left pivot");
 						GUI.color = Color.white;
 					}
 				}
-				else if (widget.pivot != UIWidget.Pivot.BottomLeft &&
-						 widget.pivot != UIWidget.Pivot.Bottom &&
-						 widget.pivot != UIWidget.Pivot.BottomRight)
+				else if (sprite.pivot != UIWidget.Pivot.BottomLeft &&
+						 sprite.pivot != UIWidget.Pivot.Bottom &&
+						 sprite.pivot != UIWidget.Pivot.BottomRight)
 				{
 					GUI.color = new Color(1f, 0.7f, 0f);
 					GUILayout.Label(name + " should use a Bottom pivot");

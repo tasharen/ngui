@@ -427,16 +427,34 @@ static public class NGUITools
 
 	/// <summary>
 	/// Add a sprite appropriate for the specified atlas sprite.
-	/// It will be a UISlicedSprite if the sprite has an inner rect, and a regular sprite otherwise.
+	/// It will be sliced if the sprite has an inner rect, and a regular sprite otherwise.
 	/// </summary>
 
 	static public UISprite AddSprite (GameObject go, UIAtlas atlas, string spriteName)
 	{
 		UIAtlas.Sprite sp = (atlas != null) ? atlas.GetSprite(spriteName) : null;
-		UISprite sprite = (sp == null || sp.inner == sp.outer) ? AddWidget<UISprite>(go) : (UISprite)AddWidget<UISlicedSprite>(go);
+		UISprite sprite = AddWidget<UISprite>(go);
+		sprite.type = (sp == null || sp.inner == sp.outer) ? UISprite.Type.Simple : UISprite.Type.Sliced;
 		sprite.atlas = atlas;
 		sprite.spriteName = spriteName;
 		return sprite;
+	}
+
+	/// <summary>
+	/// Get the rootmost object of the specified game object.
+	/// </summary>
+
+	static public GameObject GetRoot (GameObject go)
+	{
+		Transform t = go.transform;
+
+		for (; ; )
+		{
+			Transform parent = t.parent;
+			if (parent == null) break;
+			t = parent;
+		}
+		return t.gameObject;
 	}
 
 	/// <summary>

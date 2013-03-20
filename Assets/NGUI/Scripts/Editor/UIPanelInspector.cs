@@ -11,6 +11,38 @@ using System.Collections.Generic;
 public class UIPanelInspector : Editor
 {
 	/// <summary>
+	/// Handles & interaction.
+	/// </summary>
+
+	public void OnSceneGUI ()
+	{
+		//Tools.current = Tool.View;
+
+		Event e = Event.current;
+
+		switch (e.type)
+		{
+			case EventType.MouseUp:
+			{
+				UIWidget[] widgets = NGUIEditorTools.Raycast(target as UIPanel, e.mousePosition);
+				if (widgets.Length > 0) Selection.activeGameObject = widgets[0].gameObject;
+			}
+			break;
+
+			case EventType.KeyDown:
+			{
+				if (e.keyCode == KeyCode.Escape)
+				{
+					Tools.current = Tool.Move;
+					Selection.activeGameObject = null;
+					e.Use();
+				}
+			}
+			break;
+		}
+	}
+
+	/// <summary>
 	/// Draw the inspector widget.
 	/// </summary>
 
@@ -20,7 +52,8 @@ public class UIPanelInspector : Editor
 		BetterList<UIDrawCall> drawcalls = panel.drawCalls;
 		EditorGUIUtility.LookLikeControls(80f);
 
-		NGUIEditorTools.DrawSeparator();
+		//NGUIEditorTools.DrawSeparator();
+		EditorGUILayout.Space();
 
 		float alpha = EditorGUILayout.Slider("Alpha", panel.alpha, 0f, 1f);
 

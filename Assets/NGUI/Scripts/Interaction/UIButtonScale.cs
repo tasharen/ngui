@@ -35,7 +35,7 @@ public class UIButtonScale : MonoBehaviour
 
 	void OnDisable ()
 	{
-		if (tweenTarget != null)
+		if (mStarted && tweenTarget != null)
 		{
 			TweenScale tc = tweenTarget.GetComponent<TweenScale>();
 

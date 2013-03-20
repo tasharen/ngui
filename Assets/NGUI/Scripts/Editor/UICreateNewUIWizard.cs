@@ -20,8 +20,7 @@ public class UICreateNewUIWizard : EditorWindow
 		Advanced3D,
 	}
 
-	static public int layer = 0;
-	static CameraType camType = CameraType.Simple2D;
+	static public CameraType camType = CameraType.Simple2D;
 
 	/// <summary>
 	/// Refresh the window on selection.
@@ -41,7 +40,7 @@ public class UICreateNewUIWizard : EditorWindow
 		NGUIEditorTools.DrawSeparator();
 
 		GUILayout.BeginHorizontal();
-		layer = EditorGUILayout.LayerField("Layer", layer, GUILayout.Width(200f));
+		NGUISettings.layer = EditorGUILayout.LayerField("Layer", NGUISettings.layer, GUILayout.Width(200f));
 		GUILayout.Space(20f);
 		GUILayout.Label("This is the layer your UI will reside on");
 		GUILayout.EndHorizontal();
@@ -61,7 +60,11 @@ public class UICreateNewUIWizard : EditorWindow
 		if (create) CreateNewUI();
 	}
 
-	void CreateNewUI ()
+	/// <summary>
+	/// Create a brand-new UI hierarchy.
+	/// </summary>
+
+	static public GameObject CreateNewUI ()
 	{
 		NGUIEditorTools.RegisterUndo("Create New UI");
 
@@ -71,22 +74,17 @@ public class UICreateNewUIWizard : EditorWindow
 		if (camType == CameraType.Simple2D)
 		{
 			root = new GameObject("UI Root (2D)");
-			root.AddComponent<UIRoot>();
+			root.AddComponent<UIRoot>().scalingStyle = UIRoot.Scaling.PixelPerfect;
 		}
 		else
 		{
 			root = new GameObject((camType == CameraType.Advanced3D) ? "UI Root (3D)" : "UI Root");
 			root.transform.localScale = new Vector3(0.0025f, 0.0025f, 0.0025f);
-			root.AddComponent<UIRoot>();
+			root.AddComponent<UIRoot>().scalingStyle = UIRoot.Scaling.FixedSize;
 		}
 
-		// Apparently ensuring that there is a kinematic rigidbody on the root of the UI makes collisions checks much faster.
-		//Rigidbody rb = root.AddComponent<Rigidbody>();
-		//rb.useGravity = false;
-		//rb.isKinematic = true;
-
 		// Assign the layer to be used by everything
-		root.layer = layer;
+		root.layer = NGUISettings.layer;
 
 		// Figure out the depth of the highest camera
 		if (camType == CameraType.None)
@@ -97,7 +95,7 @@ public class UICreateNewUIWizard : EditorWindow
 		}
 		else
 		{
-			int mask = 1 << layer;
+			int mask = 1 << NGUISettings.layer;
 			float depth = -1f;
 			bool clearColor = true;
 			bool audioListener = true;
@@ -110,7 +108,7 @@ public class UICreateNewUIWizard : EditorWindow
 				depth = Mathf.Max(depth, c.depth);
 
 				// Automatically exclude the specified layer mask from the camera if it can see more than that layer
-				if (layer != 0 && c.cullingMask != mask) c.cullingMask = (c.cullingMask & (~mask));
+				if (NGUISettings.layer != 0 && c.cullingMask != mask) c.cullingMask = (c.cullingMask & (~mask));
 
 				// Only consider this object if it's active
 				if (c.enabled && NGUITools.GetActive(c.gameObject)) clearColor = false;
@@ -164,5 +162,6 @@ public class UICreateNewUIWizard : EditorWindow
 				Selection.activeGameObject = panel.gameObject;
 			}
 		}
+		return Selection.activeGameObject;
 	}
 }

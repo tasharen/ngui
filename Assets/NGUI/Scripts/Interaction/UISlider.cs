@@ -75,7 +75,7 @@ public class UISlider : IgnoreTimeScale
 	Transform mTrans;
 	Transform mFGTrans;
 	UIWidget mFGWidget;
-	UIFilledSprite mFGFilled;
+	UISprite mFGFilled;
 	bool mInitDone = false;
 	Vector2 mSize = Vector2.zero;
 
@@ -98,6 +98,12 @@ public class UISlider : IgnoreTimeScale
 	}
 
 	/// <summary>
+	/// Change the full size of the slider, in case you need to.
+	/// </summary>
+
+	public Vector2 fullSize { get { return mSize; } set { if (mSize != value) { mSize = value; ForceUpdate(); } } }
+
+	/// <summary>
 	/// Initialize the cached values.
 	/// </summary>
 
@@ -108,7 +114,7 @@ public class UISlider : IgnoreTimeScale
 		if (foreground != null)
 		{
 			mFGWidget = foreground.GetComponent<UIWidget>();
-			mFGFilled = (mFGWidget != null) ? mFGWidget as UIFilledSprite : null;
+			mFGFilled = (mFGWidget != null) ? mFGWidget as UISprite : null;
 			mFGTrans = foreground.transform;
 			if (mSize == Vector2.zero) mSize = foreground.localScale;
 		}
@@ -265,7 +271,7 @@ public class UISlider : IgnoreTimeScale
 			if (Application.isPlaying)
 #endif
 			{
-				if (mFGFilled != null)
+				if (mFGFilled != null && mFGFilled.type == UISprite.Type.Filled)
 				{
 					mFGFilled.fillAmount = stepValue;
 				}
@@ -294,11 +300,11 @@ public class UISlider : IgnoreTimeScale
 
 				if (mFGFilled != null)
 				{
-					if (mFGFilled.fillDirection == UIFilledSprite.FillDirection.Horizontal)
+					if (mFGFilled.fillDirection == UISprite.FillDirection.Horizontal)
 					{
 						pos.x = mFGFilled.invert ? mSize.x - scale.x : scale.x;
 					}
-					else if (mFGFilled.fillDirection == UIFilledSprite.FillDirection.Vertical)
+					else if (mFGFilled.fillDirection == UISprite.FillDirection.Vertical)
 					{
 						pos.y = mFGFilled.invert ? mSize.y - scale.y : scale.y;
 					}

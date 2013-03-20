@@ -35,7 +35,7 @@ public class UIButtonRotation : MonoBehaviour
 
 	void OnDisable ()
 	{
-		if (tweenTarget != null)
+		if (mStarted && tweenTarget != null)
 		{
 			TweenRotation tc = tweenTarget.GetComponent<TweenRotation>();
 

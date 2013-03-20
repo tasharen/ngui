@@ -3,10 +3,14 @@
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
 
+#if UNITY_FLASH || UNITY_WP8 || UNITY_METRO
+#define USE_SIMPLE_DICTIONARY
+#endif
+
 using UnityEngine;
 using System.Collections.Generic;
 
-#if !UNITY_FLASH
+#if !USE_SIMPLE_DICTIONARY
 using System.Collections.Specialized;
 #endif
 
@@ -63,7 +67,7 @@ public class UIPanel : MonoBehaviour
 	[HideInInspector][SerializeField] Vector2 mClipSoftness = new Vector2(40f, 40f);
 
 	// List of managed transforms
-#if UNITY_FLASH
+#if USE_SIMPLE_DICTIONARY
 	Dictionary<Transform, UINode> mChildren = new Dictionary<Transform, UINode>();
 #else
 	OrderedDictionary mChildren = new OrderedDictionary();
@@ -83,11 +87,7 @@ public class UIPanel : MonoBehaviour
 	BetterList<Vector3> mNorms = new BetterList<Vector3>();
 	BetterList<Vector4> mTans = new BetterList<Vector4>();
 	BetterList<Vector2> mUvs = new BetterList<Vector2>();
-#if UNITY_3_5_4
-	BetterList<Color> mCols = new BetterList<Color>();
-#else
 	BetterList<Color32> mCols = new BetterList<Color32>();
-#endif
 
 	Transform mTrans;
 	Camera mCam;
@@ -290,7 +290,7 @@ public class UIPanel : MonoBehaviour
 	UINode GetNode (Transform t)
 	{
 		UINode node = null;
-#if UNITY_FLASH
+#if USE_SIMPLE_DICTIONARY
 		if (t != null) mChildren.TryGetValue(t, out node);
 #else
 		if (t != null && mChildren.Contains(t)) node = (UINode)mChildren[t];
@@ -405,7 +405,7 @@ public class UIPanel : MonoBehaviour
 
 	public bool WatchesTransform (Transform t)
 	{
-#if UNITY_FLASH
+#if USE_SIMPLE_DICTIONARY
 		return t == cachedTransform || mChildren.ContainsKey(t);
 #else
 		return t == cachedTransform || mChildren.Contains(t);
@@ -424,7 +424,7 @@ public class UIPanel : MonoBehaviour
 		// Add transforms all the way up to the panel
 		while (t != null && t != cachedTransform)
 		{
-#if UNITY_FLASH
+#if USE_SIMPLE_DICTIONARY
 			if (mChildren.TryGetValue(t, out node))
 			{
 				if (retVal == null)
@@ -457,7 +457,7 @@ public class UIPanel : MonoBehaviour
 	{
 		if (t != null)
 		{
-#if UNITY_FLASH
+#if USE_SIMPLE_DICTIONARY
 			while (mChildren.Remove(t))
 			{
 #else
@@ -653,7 +653,7 @@ public class UIPanel : MonoBehaviour
 			for (;;)
 			{
 				// Check the parent's flag
-#if UNITY_FLASH
+#if USE_SIMPLE_DICTIONARY
 				if (trans != null && mChildren.TryGetValue(trans, out sub))
 				{
 #else
@@ -732,7 +732,7 @@ public class UIPanel : MonoBehaviour
 		if (!widgetsAreStatic || mWidgetsAdded || shouldCull != mCulled)
 #endif
 		{
-#if UNITY_FLASH
+#if USE_SIMPLE_DICTIONARY
 			foreach (KeyValuePair<Transform, UINode> child in mChildren)
 			{
 				UINode node = child.Value;
@@ -779,7 +779,7 @@ public class UIPanel : MonoBehaviour
 
 		if (mCheckVisibility || transformsChanged || mRebuildAll)
 		{
-#if UNITY_FLASH
+#if USE_SIMPLE_DICTIONARY
 			foreach (KeyValuePair<Transform, UINode> child in mChildren)
 			{
 				UINode pc = child.Value;
@@ -833,7 +833,7 @@ public class UIPanel : MonoBehaviour
 
 	void UpdateWidgets ()
 	{
-#if UNITY_FLASH
+#if USE_SIMPLE_DICTIONARY
 		foreach (KeyValuePair<Transform, UINode> c in mChildren)
 		{
 			UINode pc = c.Value;
@@ -1049,9 +1049,24 @@ public class UIPanel : MonoBehaviour
 
 				if (t != null)
 				{
+					Vector3 pos = new Vector2(mClipRange.x, mClipRange.y);
+
 					Gizmos.matrix = t.localToWorldMatrix;
-					Gizmos.color = clip ? Color.magenta : new Color(0.5f, 0f, 0.5f);
-					Gizmos.DrawWireCube(new Vector2(mClipRange.x, mClipRange.y), size);
+
+					if (go != gameObject)
+					{
+						Gizmos.color = clip ? Color.magenta : new Color(0.5f, 0f, 0.5f);
+						Gizmos.DrawWireCube(pos, size);
+
+						// Make the panel selectable
+						//Gizmos.color = Color.clear;
+						//Gizmos.DrawCube(pos, size);
+					}
+					else
+					{
+						Gizmos.color = Color.green;
+						Gizmos.DrawWireCube(pos, size);
+					}
 				}
 			}
 		}

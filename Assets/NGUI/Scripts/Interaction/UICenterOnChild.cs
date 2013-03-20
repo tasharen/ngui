@@ -8,6 +8,16 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Center On Child")]
 public class UICenterOnChild : MonoBehaviour
 {
+	/// <summary>
+	/// The strength of the spring.
+	/// </summary>
+
+	public float springStrength = 8f;
+
+	/// <summary>
+	/// Callback to be triggered when the centering operation completes.
+	/// </summary>
+
 	public SpringPanel.OnFinished onFinished;
 
 	UIDraggablePanel mDrag;
@@ -26,7 +36,7 @@ public class UICenterOnChild : MonoBehaviour
 	/// Recenter the draggable list on the center-most child.
 	/// </summary>
 
-	public void Recenter()
+	public void Recenter ()
 	{
 		if (mDrag == null)
 		{
@@ -95,7 +105,7 @@ public class UICenterOnChild : MonoBehaviour
 			if (mDrag.scale.z == 0f) offset.z = 0f;
 
 			// Spring the panel to this calculated position
-			SpringPanel.Begin(mDrag.gameObject, dt.localPosition - offset, 8f).onFinished = onFinished;
+			SpringPanel.Begin(mDrag.gameObject, dt.localPosition - offset, springStrength).onFinished = onFinished;
 		}
 		else mCenteredObject = null;
 	}

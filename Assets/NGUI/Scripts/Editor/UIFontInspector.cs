@@ -134,10 +134,6 @@ public class UIFontInspector : Editor
 			{
 				NGUIEditorTools.AdvancedSpriteField(mFont.atlas, mFont.spriteName, SelectSprite, false);
 			}
-			else
-			{
-				EditorGUILayout.HelpBox("This font is invalid. Either it was not created correctly, or it was created so long ago that its functionality has since been deprecated and removed. Please re-create this font using the Font Maker tool.", MessageType.Warning);
-			}
 		}
 		else
 		{

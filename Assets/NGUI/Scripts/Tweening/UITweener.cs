@@ -97,6 +97,7 @@ public abstract class UITweener : IgnoreTimeScale
 
 	public string callWhenFinished;
 
+	bool mStarted = false;
 	float mStartTime = 0f;
 	float mDuration = 0f;
 	float mAmountPerDelta = 1f;
@@ -132,16 +133,10 @@ public abstract class UITweener : IgnoreTimeScale
 	public AnimationOrTween.Direction direction { get { return mAmountPerDelta < 0f ? AnimationOrTween.Direction.Reverse : AnimationOrTween.Direction.Forward; } }
 
 	/// <summary>
-	/// Record the starting time.
+	/// Update as soon as it's started so that there is no delay.
 	/// </summary>
 
-	protected override void OnEnable () { base.OnEnable(); mStartTime = Time.realtimeSinceStartup + delay; }
-
-	/// <summary>
-	/// Update on start, so there is no frame in-between.
-	/// </summary>
-
-	void Start () { mStartTime = Time.realtimeSinceStartup + delay; Update(); }
+	void Start () { Update(); }
 
 	/// <summary>
 	/// Update the tweening factor and call the virtual update function.
@@ -150,7 +145,15 @@ public abstract class UITweener : IgnoreTimeScale
 	void Update ()
 	{
 		float delta = ignoreTimeScale ? UpdateRealTimeDelta() : Time.deltaTime;
-		if (Time.realtimeSinceStartup < mStartTime) return;
+		float time = ignoreTimeScale ? realTime : Time.time;
+
+		if (!mStarted)
+		{
+			mStarted = true;
+			mStartTime = time + delay;
+		}
+
+		if (time < mStartTime) return;
 
 		// Advance the sampling factor
 		mFactor += amountPerDelta * delta;
@@ -331,6 +334,7 @@ public abstract class UITweener : IgnoreTimeScale
 #else
 		if (comp == null) comp = go.AddComponent<T>();
 #endif
+		comp.mStarted = false;
 		comp.duration = duration;
 		comp.mFactor = 0f;
 		comp.mAmountPerDelta = Mathf.Abs(comp.mAmountPerDelta);

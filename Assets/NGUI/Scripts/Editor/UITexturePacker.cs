@@ -62,7 +62,7 @@ public class UITexturePacker
 		if (width > maxSize && height > maxSize) return null;
 		if (width > maxSize || height > maxSize) { int temp = width; width = height; height = temp; }
 		
-		//force square by sizing up.
+		// Force square by sizing up
 		if (NGUISettings.forceSquareAtlas)
 		{
 			if (width > height)

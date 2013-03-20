@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
@@ -197,19 +197,12 @@ public class UITexture : UIWidget
 	/// Virtual function called by the UIScreen that fills the buffers.
 	/// </summary>
 
-#if UNITY_3_5_4
-	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
-#else
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
-#endif
 	{
 		Color colF = color;
 		colF.a *= mPanel.alpha;
-#if UNITY_3_5_4
-		Color col = premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
-#else
 		Color32 col = premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
-#endif
+	
 		verts.Add(new Vector3(1f,  0f, 0f));
 		verts.Add(new Vector3(1f, -1f, 0f));
 		verts.Add(new Vector3(0f, -1f, 0f));
