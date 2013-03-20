@@ -11,7 +11,7 @@ using UnityEngine;
 /// it can be dragged outside.
 /// </summary>
 
-[AddComponentMenu("NGUI/Examples/Drag & Drop Root")]
+[AddComponentMenu("NGUI/Examples/Drag and Drop Root")]
 public class DragDropRoot : MonoBehaviour
 {
 	static public Transform root;
