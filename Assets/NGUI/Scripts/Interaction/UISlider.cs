@@ -298,7 +298,7 @@ public class UISlider : IgnoreTimeScale
 			{
 				Vector3 pos = thumb.localPosition;
 
-				if (mFGFilled != null)
+				if (mFGFilled != null && mFGFilled.type == UISprite.Type.Filled)
 				{
 					if (mFGFilled.fillDirection == UISprite.FillDirection.Horizontal)
 					{

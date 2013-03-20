@@ -35,7 +35,7 @@ public class UISprite : UIWidget
 	[HideInInspector][SerializeField] UIAtlas mAtlas;
 	[HideInInspector][SerializeField] string mSpriteName;
 	[HideInInspector][SerializeField] bool mFillCenter = true;
-	[HideInInspector][SerializeField] protected Type mType = Type.Simple;
+	[HideInInspector][SerializeField] Type mType = Type.Simple;
 	[HideInInspector][SerializeField] FillDirection mFillDirection = FillDirection.Radial360;
 	[HideInInspector][SerializeField] float mFillAmount = 1.0f;
 	[HideInInspector][SerializeField] bool mInvert = false;
@@ -53,7 +53,7 @@ public class UISprite : UIWidget
 	/// How the sprite is drawn.
 	/// </summary>
 
-	public Type type
+	virtual public Type type
 	{
 		get
 		{
@@ -263,7 +263,7 @@ public class UISprite : UIWidget
 	{
 		get
 		{
-			if (isValid && mType == Type.Simple)
+			if (isValid && type == Type.Simple)
 			{
 				return new Vector4(mSprite.paddingLeft, mSprite.paddingTop, mSprite.paddingRight, mSprite.paddingBottom);
 			}
@@ -279,7 +279,7 @@ public class UISprite : UIWidget
 	{
 		get
 		{
-			if (mType == Type.Sliced)
+			if (type == Type.Sliced)
 			{
 				UIAtlas.Sprite sp = GetAtlasSprite();
 				if (sp == null) return Vector2.zero;
@@ -304,7 +304,7 @@ public class UISprite : UIWidget
 	/// Whether this widget will automatically become pixel-perfect after resize operation finishes.
 	/// </summary>
 
-	override public bool pixelPerfectAfterResize { get { return mType == Type.Sliced; } }
+	override public bool pixelPerfectAfterResize { get { return type == Type.Sliced; } }
 
 	/// <summary>
 	/// Retrieve the atlas sprite referenced by the spriteName field.
@@ -338,7 +338,11 @@ public class UISprite : UIWidget
 			}
 
 			// If the sprite has been set, update the material
-			if (mSprite != null) material = mAtlas.spriteMaterial;
+			if (mSprite != null)
+			{
+				material = mAtlas.spriteMaterial;
+				UpdateUVs(true);
+			}
 		}
 		return mSprite;
 	}
@@ -370,7 +374,7 @@ public class UISprite : UIWidget
 
 	public void UpdateUVs (bool force)
 	{
-		if ((mType == Type.Sliced || mType == Type.Tiled) && cachedTransform.localScale != mScale)
+		if ((type == Type.Sliced || type == Type.Tiled) && cachedTransform.localScale != mScale)
 		{
 			mScale = cachedTransform.localScale;
 			mChanged = true;
@@ -409,7 +413,11 @@ public class UISprite : UIWidget
 	{
 		if (!isValid) return;
 
-		if (mType == Type.Sliced)
+		UpdateUVs(false);
+
+		UISprite.Type t = type;
+
+		if (t == Type.Sliced)
 		{
 			// Sliced sprite should have dimensions divisible by 2 for best results
 			Vector3 pos = cachedTransform.localPosition;
@@ -424,7 +432,7 @@ public class UISprite : UIWidget
 			scale.z = 1f;
 			cachedTransform.localScale = scale;
 		}
-		else if (mType == Type.Tiled)
+		else if (t == Type.Tiled)
 		{
 			// Tiled sprite just needs whole integers
 			Vector3 pos = cachedTransform.localPosition;
@@ -509,7 +517,7 @@ public class UISprite : UIWidget
 
 	override public void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
-		switch (mType)
+		switch (type)
 		{
 			case Type.Simple:
 			SimpleFill(verts, uvs, cols);

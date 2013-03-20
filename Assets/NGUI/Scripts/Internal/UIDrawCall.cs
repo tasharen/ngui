@@ -110,7 +110,9 @@ public class UIDrawCall : MonoBehaviour
 				mMesh0 = new Mesh();
 				mMesh0.hideFlags = HideFlags.DontSave;
 				mMesh0.name = "Mesh0 for " + mSharedMat.name;
+#if !UNITY_3_5
 				mMesh0.MarkDynamic();
+#endif
 				rebuildIndices = true;
 			}
 			else if (rebuildIndices || mMesh0.vertexCount != vertexCount)
@@ -125,7 +127,9 @@ public class UIDrawCall : MonoBehaviour
 			mMesh1 = new Mesh();
 			mMesh1.hideFlags = HideFlags.DontSave;
 			mMesh1.name = "Mesh1 for " + mSharedMat.name;
+#if !UNITY_3_5
 			mMesh1.MarkDynamic();
+#endif
 			rebuildIndices = true;
 		}
 		else if (rebuildIndices || mMesh1.vertexCount != vertexCount)

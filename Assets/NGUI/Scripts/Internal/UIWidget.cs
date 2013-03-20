@@ -349,7 +349,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Mark the widget and the panel as having been changed.
 	/// </summary>
 
-	void OnEnable ()
+	protected virtual void OnEnable ()
 	{
 #if UNITY_EDITOR
 		if (GetComponents<UIWidget>().Length > 1)

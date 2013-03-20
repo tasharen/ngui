@@ -12,11 +12,5 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class UISlicedSprite : UISprite
 {
-	override protected void Awake ()
-	{
-		mType = UISprite.Type.Sliced;
-		base.Awake();
-	}
-
-	override protected void OnStart () { mType = Type.Sliced; }
+	override public Type type { get { return UISprite.Type.Sliced; } }
 }

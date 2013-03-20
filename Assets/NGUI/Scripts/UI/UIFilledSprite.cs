@@ -12,11 +12,5 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class UIFilledSprite : UISprite
 {
-	override protected void Awake ()
-	{
-		mType = UISprite.Type.Filled;
-		base.Awake();
-	}
-
-	override protected void OnStart () { mType = Type.Filled; }
+	override public Type type { get { return UISprite.Type.Filled; } }
 }
