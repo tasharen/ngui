@@ -5,7 +5,7 @@
 
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Examples/Drag & Drop Container")]
+[AddComponentMenu("NGUI/Examples/Drag and Drop Container")]
 public class DragDropContainer : MonoBehaviour
 {
 	// No code here. Attaching this script simply identifies it as a container for the DragDropObject script.

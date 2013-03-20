@@ -10,7 +10,7 @@ using UnityEngine;
 /// and if so -- create its prefab on the surface, then destroy the object.
 /// </summary>
 
-[AddComponentMenu("NGUI/Examples/Drag & Drop Surface")]
+[AddComponentMenu("NGUI/Examples/Drag and Drop Surface")]
 public class DragDropSurface : MonoBehaviour
 {
 	public bool rotatePlacedObject = false;
