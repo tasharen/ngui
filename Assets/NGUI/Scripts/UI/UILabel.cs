@@ -556,19 +556,11 @@ public class UILabel : UIWidget
 	/// Apply a shadow effect to the buffer.
 	/// </summary>
 
-#if UNITY_3_5_4
-	void ApplyShadow (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols, int start, int end, float x, float y)
-#else
 	void ApplyShadow (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols, int start, int end, float x, float y)
-#endif
 	{
 		Color c = mEffectColor;
 		c.a *= alpha * mPanel.alpha;
-#if UNITY_3_5_4
-		Color col = (font.premultipliedAlpha) ? NGUITools.ApplyPMA(c) : c;
-#else
 		Color32 col = (font.premultipliedAlpha) ? NGUITools.ApplyPMA(c) : c;
-#endif
 
 		for (int i = start; i < end; ++i)
 		{
@@ -588,11 +580,7 @@ public class UILabel : UIWidget
 	/// Draw the label.
 	/// </summary>
 
-#if UNITY_3_5_4
-	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
-#else
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
-#endif
 	{
 		if (mFont == null) return;
 		MakePositionPerfect();

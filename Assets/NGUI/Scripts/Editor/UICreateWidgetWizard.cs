@@ -17,10 +17,7 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		Label,
 		Sprite,
-		SlicedSprite,
-		TiledSprite,
-		FilledSprite,
-		SimpleTexture,
+		Texture,
 		Button,
 		ImageButton,
 		Checkbox,
@@ -34,9 +31,6 @@ public class UICreateWidgetWizard : EditorWindow
 
 	static WidgetType mType = WidgetType.Button;
 	static string mSprite = "";
-	static string mSliced = "";
-	static string mTiled = "";
-	static string mFilled = "";
 	static string mButton = "";
 	static string mImage0 = "";
 	static string mImage1 = "";
@@ -92,9 +86,6 @@ public class UICreateWidgetWizard : EditorWindow
 		EditorPrefs.SetInt("NGUI Scroll Dir", (int)mScrollDir);
 
 		SaveString("NGUI Sprite", mSprite);
-		SaveString("NGUI Sliced", mSliced);
-		SaveString("NGUI Tiled", mTiled);
-		SaveString("NGUI Filled", mFilled);
 		SaveString("NGUI Button", mButton);
 		SaveString("NGUI Image 0", mImage0);
 		SaveString("NGUI Image 1", mImage1);
@@ -126,9 +117,6 @@ public class UICreateWidgetWizard : EditorWindow
 		if (color != -1) mColor = NGUIMath.IntToColor(color);
 
 		mSprite		= LoadString("NGUI Sprite");
-		mSliced		= LoadString("NGUI Sliced");
-		mTiled		= LoadString("NGUI Tiled");
-		mFilled		= LoadString("NGUI Filled");
 		mButton		= LoadString("NGUI Button");
 		mImage0		= LoadString("NGUI Image 0");
 		mImage1		= LoadString("NGUI Image 1");
@@ -171,7 +159,7 @@ public class UICreateWidgetWizard : EditorWindow
 	/// Convenience function -- creates the "Add To" button and the parent object field to the right of it.
 	/// </summary>
 
-	bool ShouldCreate (GameObject go, bool isValid)
+	static public bool ShouldCreate (GameObject go, bool isValid)
 	{
 		GUI.color = isValid ? Color.green : Color.grey;
 
@@ -224,11 +212,11 @@ public class UICreateWidgetWizard : EditorWindow
 	/// Sprite creation function.
 	/// </summary>
 
-	void CreateSprite<T> (GameObject go, string field, SpriteSelector.Callback callback) where T : UISprite
+	void CreateSprite (GameObject go, string field)
 	{
 		if (NGUISettings.atlas != null)
 		{
-			NGUIEditorTools.SpriteField("Sprite", "Sprite that will be created", NGUISettings.atlas, field, callback);
+			NGUIEditorTools.SpriteField("Sprite", "Sprite that will be created", NGUISettings.atlas, field, OnSprite);
 
 			if (!string.IsNullOrEmpty(field))
 			{
@@ -242,7 +230,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 		if (ShouldCreate(go, NGUISettings.atlas != null))
 		{
-			T sprite = NGUITools.AddWidget<T>(go);
+			UISprite sprite = NGUITools.AddWidget<UISprite>(go);
 			sprite.name = sprite.name + " (" + field + ")";
 			sprite.atlas = NGUISettings.atlas;
 			sprite.spriteName = field;
@@ -253,9 +241,6 @@ public class UICreateWidgetWizard : EditorWindow
 	}
 
 	void OnSprite (string val) { mSprite = val; Save(); Repaint(); }
-	void OnSliced (string val) { mSliced = val; Save(); Repaint(); }
-	void OnTiled  (string val) { mTiled = val;  Save(); Repaint(); }
-	void OnFilled (string val) { mFilled = val; Save(); Repaint(); }
 
 	/// <summary>
 	/// UI Texture doesn't do anything other than creating the widget.
@@ -287,7 +272,8 @@ public class UICreateWidgetWizard : EditorWindow
 			go = NGUITools.AddChild(go);
 			go.name = "Button";
 
-			UISlicedSprite bg = NGUITools.AddWidget<UISlicedSprite>(go);
+			UISprite bg = NGUITools.AddWidget<UISprite>(go);
+			bg.type = UISprite.Type.Sliced;
 			bg.name = "Background";
 			bg.depth = depth;
 			bg.atlas = NGUISettings.atlas;
@@ -338,9 +324,8 @@ public class UICreateWidgetWizard : EditorWindow
 			go.name = "Image Button";
 
 			UIAtlas.Sprite sp = NGUISettings.atlas.GetSprite(mImage0);
-			UISprite sprite = (sp.inner == sp.outer) ? NGUITools.AddWidget<UISprite>(go) :
-				(UISprite)NGUITools.AddWidget<UISlicedSprite>(go);
-
+			UISprite sprite = NGUITools.AddWidget<UISprite>(go);
+			sprite.type = (sp.inner == sp.outer) ? UISprite.Type.Simple : UISprite.Type.Sliced;
 			sprite.name = "Background";
 			sprite.depth = depth;
 			sprite.atlas = NGUISettings.atlas;
@@ -393,7 +378,8 @@ public class UICreateWidgetWizard : EditorWindow
 			go = NGUITools.AddChild(go);
 			go.name = "Checkbox";
 
-			UISlicedSprite bg = NGUITools.AddWidget<UISlicedSprite>(go);
+			UISprite bg = NGUITools.AddWidget<UISprite>(go);
+			bg.type = UISprite.Type.Sliced;
 			bg.name = "Background";
 			bg.depth = depth;
 			bg.atlas = NGUISettings.atlas;
@@ -465,7 +451,8 @@ public class UICreateWidgetWizard : EditorWindow
 			go = NGUITools.AddChild(go);
 			go.name = "Scroll Bar";
 
-			UISlicedSprite bg = NGUITools.AddWidget<UISlicedSprite>(go);
+			UISprite bg = NGUITools.AddWidget<UISprite>(go);
+			bg.type = UISprite.Type.Sliced;
 			bg.name = "Background";
 			bg.depth = depth;
 			bg.atlas = NGUISettings.atlas;
@@ -473,7 +460,8 @@ public class UICreateWidgetWizard : EditorWindow
 			bg.transform.localScale = new Vector3(400f + bg.border.x + bg.border.z, 14f + bg.border.y + bg.border.w, 1f);
 			bg.MakePixelPerfect();
 
-			UISlicedSprite fg = NGUITools.AddWidget<UISlicedSprite>(go);
+			UISprite fg = NGUITools.AddWidget<UISprite>(go);
+			fg.type = UISprite.Type.Sliced;
 			fg.name = "Foreground";
 			fg.atlas = NGUISettings.atlas;
 			fg.spriteName = mScrollFG;
@@ -523,29 +511,28 @@ public class UICreateWidgetWizard : EditorWindow
 
 			// Background sprite
 			UIAtlas.Sprite bgs = NGUISettings.atlas.GetSprite(mSliderBG);
-			UISprite back = (bgs.inner == bgs.outer) ?
-				(UISprite)NGUITools.AddWidget<UISprite>(go) :
-				(UISprite)NGUITools.AddWidget<UISlicedSprite>(go);
+			UISprite back = (UISprite)NGUITools.AddWidget<UISprite>(go);
 
+			back.type = (bgs.inner == bgs.outer) ? UISprite.Type.Simple : UISprite.Type.Sliced;
 			back.name = "Background";
 			back.depth = depth;
 			back.pivot = UIWidget.Pivot.Left;
 			back.atlas = NGUISettings.atlas;
 			back.spriteName = mSliderBG;
 			back.transform.localScale = new Vector3(200f, 30f, 1f);
+			back.transform.localPosition = Vector3.zero;
 			back.MakePixelPerfect();
 
-			// Fireground sprite
+			// Foreground sprite
 			UIAtlas.Sprite fgs = NGUISettings.atlas.GetSprite(mSliderFG);
-			UISprite front = (fgs.inner == fgs.outer) ?
-				(UISprite)NGUITools.AddWidget<UIFilledSprite>(go) :
-				(UISprite)NGUITools.AddWidget<UISlicedSprite>(go);
-
+			UISprite front = NGUITools.AddWidget<UISprite>(go);
+			front.type = (fgs.inner == fgs.outer) ? UISprite.Type.Filled : UISprite.Type.Sliced;
 			front.name = "Foreground";
 			front.pivot = UIWidget.Pivot.Left;
 			front.atlas = NGUISettings.atlas;
 			front.spriteName = mSliderFG;
 			front.transform.localScale = new Vector3(200f, 30f, 1f);
+			front.transform.localPosition = Vector3.zero;
 			front.MakePixelPerfect();
 
 			// Add a collider
@@ -559,10 +546,9 @@ public class UICreateWidgetWizard : EditorWindow
 			if (slider)
 			{
 				UIAtlas.Sprite tbs = NGUISettings.atlas.GetSprite(mSliderTB);
-				UISprite thb = (tbs.inner == tbs.outer) ?
-					(UISprite)NGUITools.AddWidget<UISprite>(go) :
-					(UISprite)NGUITools.AddWidget<UISlicedSprite>(go);
+				UISprite thb = NGUITools.AddWidget<UISprite>(go);
 
+				thb.type = (tbs.inner == tbs.outer) ? UISprite.Type.Simple : UISprite.Type.Sliced;
 				thb.name = "Thumb";
 				thb.atlas = NGUISettings.atlas;
 				thb.spriteName = mSliderTB;
@@ -576,7 +562,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 				uiSlider.thumb = thb.transform;
 			}
-			uiSlider.sliderValue = 0.75f;
+			uiSlider.sliderValue = 1f;
 
 			// Select the slider
 			Selection.activeGameObject = go;
@@ -606,13 +592,15 @@ public class UICreateWidgetWizard : EditorWindow
 
 			float padding = 3f;
 
-			UISlicedSprite bg = NGUITools.AddWidget<UISlicedSprite>(go);
+			UISprite bg = NGUITools.AddWidget<UISprite>(go);
+			bg.type = UISprite.Type.Sliced;
 			bg.name = "Background";
 			bg.depth = depth;
 			bg.atlas = NGUISettings.atlas;
 			bg.spriteName = mInputBG;
 			bg.pivot = UIWidget.Pivot.Left;
 			bg.transform.localScale = new Vector3(400f, NGUISettings.font.size + padding * 2f, 1f);
+			bg.transform.localPosition = Vector3.zero;
 			bg.MakePixelPerfect();
 
 			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
@@ -673,8 +661,9 @@ public class UICreateWidgetWizard : EditorWindow
 			UISprite sprite = NGUITools.AddSprite(go, NGUISettings.atlas, mListFG);
 			sprite.depth = depth;
 			sprite.atlas = NGUISettings.atlas;
-			sprite.transform.localScale = new Vector3(150f + fgPadding.x * 2f, NGUISettings.font.size + fgPadding.y * 2f, 1f);
 			sprite.pivot = UIWidget.Pivot.Left;
+			sprite.transform.localScale = new Vector3(150f + fgPadding.x * 2f, NGUISettings.font.size + fgPadding.y * 2f, 1f);
+			sprite.transform.localPosition = Vector3.zero;
 			sprite.MakePixelPerfect();
 
 			// Text label
@@ -765,11 +754,8 @@ public class UICreateWidgetWizard : EditorWindow
 			switch (mType)
 			{
 				case WidgetType.Label:			CreateLabel(go); break;
-				case WidgetType.Sprite:			CreateSprite<UISprite>(go, mSprite, OnSprite); break;
-				case WidgetType.SlicedSprite:	CreateSprite<UISlicedSprite>(go, mSliced, OnSliced); break;
-				case WidgetType.TiledSprite:	CreateSprite<UITiledSprite>(go, mTiled, OnTiled); break;
-				case WidgetType.FilledSprite:	CreateSprite<UIFilledSprite>(go, mFilled, OnFilled); break;
-				case WidgetType.SimpleTexture:	CreateSimpleTexture(go); break;
+				case WidgetType.Sprite:			CreateSprite(go, mSprite); break;
+				case WidgetType.Texture:		CreateSimpleTexture(go); break;
 				case WidgetType.Button:			CreateButton(go); break;
 				case WidgetType.ImageButton:	CreateImageButton(go); break;
 				case WidgetType.Checkbox:		CreateCheckbox(go); break;

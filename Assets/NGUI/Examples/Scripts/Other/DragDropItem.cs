@@ -5,7 +5,7 @@
 
 using UnityEngine;
 
-[AddComponentMenu("NGUI/Examples/Drag & Drop Item")]
+[AddComponentMenu("NGUI/Examples/Drag and Drop Item")]
 public class DragDropItem : MonoBehaviour
 {
 	/// <summary>

@@ -67,7 +67,7 @@ public class UIButtonColor : MonoBehaviour
 
 	void OnDisable ()
 	{
-		if (tweenTarget != null)
+		if (mStarted && tweenTarget != null)
 		{
 			TweenColor tc = tweenTarget.GetComponent<TweenColor>();
 

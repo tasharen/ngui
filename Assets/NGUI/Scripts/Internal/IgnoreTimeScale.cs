@@ -12,10 +12,17 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Internal/Ignore TimeScale Behaviour")]
 public class IgnoreTimeScale : MonoBehaviour
 {
+	float mRt = 0f;
 	float mTimeStart = 0f;
 	float mTimeDelta = 0f;
 	float mActual = 0f;
 	bool mTimeStarted = false;
+
+	/// <summary>
+	/// Real time of the last time UpdateRealTimeDelta() was called.
+	/// </summary>
+
+	public float realTime { get { return mRt; } }
 
 	/// <summary>
 	/// Equivalent of Time.deltaTime not affected by timeScale, provided that UpdateRealTimeDelta() was called in the Update().
@@ -40,20 +47,21 @@ public class IgnoreTimeScale : MonoBehaviour
 
 	protected float UpdateRealTimeDelta ()
 	{
+		mRt = Time.realtimeSinceStartup;
+
 		if (mTimeStarted)
 		{
-			float time = Time.realtimeSinceStartup;
-			float delta = time - mTimeStart;
+			float delta = mRt - mTimeStart;
 			mActual += Mathf.Max(0f, delta);
 			mTimeDelta = 0.001f * Mathf.Round(mActual * 1000f);
 			mActual -= mTimeDelta;
 			if (mTimeDelta > 1f) mTimeDelta = 1f;
-			mTimeStart = time;
+			mTimeStart = mRt;
 		}
 		else
 		{
 			mTimeStarted = true;
-			mTimeStart = Time.realtimeSinceStartup;
+			mTimeStart = mRt;
 			mTimeDelta = 0f;
 		}
 		return mTimeDelta;

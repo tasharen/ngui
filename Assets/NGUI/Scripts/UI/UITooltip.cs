@@ -12,7 +12,7 @@ public class UITooltip : MonoBehaviour
 
 	public Camera uiCamera;
 	public UILabel text;
-	public UISlicedSprite background;
+	public UISprite background;
 	public float appearSpeed = 10f;
 	public bool scalingTransitions = true;
 
@@ -91,7 +91,6 @@ public class UITooltip : MonoBehaviour
 		if (text != null && !string.IsNullOrEmpty(tooltipText))
 		{
 			mTarget = 1f;
-
 			if (text != null) text.text = tooltipText;
 
 			// Orthographic camera positioning is trivial

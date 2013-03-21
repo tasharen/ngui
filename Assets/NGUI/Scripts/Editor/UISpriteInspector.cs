@@ -51,13 +51,71 @@ public class UISpriteInspector : UIWidgetInspector
 	/// Draw the atlas and sprite selection fields.
 	/// </summary>
 
-	override protected bool OnDrawProperties ()
+	override protected bool DrawProperties ()
 	{
 		mSprite = mWidget as UISprite;
 		ComponentSelector.Draw<UIAtlas>(mSprite.atlas, OnSelectAtlas);
 		if (mSprite.atlas == null) return false;
 		NGUIEditorTools.AdvancedSpriteField(mSprite.atlas, mSprite.spriteName, SelectSprite, false);
 		return true;
+	}
+
+	/// <summary>
+	/// Sprites's custom properties based on the type.
+	/// </summary>
+
+	override protected void DrawExtraProperties ()
+	{
+		NGUIEditorTools.DrawSeparator();
+
+		if (GetType() == typeof(UISpriteInspector))
+		{
+			//GUILayout.BeginHorizontal();
+			UISprite.Type type = (UISprite.Type)EditorGUILayout.EnumPopup("Sprite Type", mSprite.type);
+			//GUILayout.Label("sprite", GUILayout.Width(58f));
+			//GUILayout.EndHorizontal();
+
+			if (mSprite.type != type)
+			{
+				NGUIEditorTools.RegisterUndo("Sprite Change", mSprite);
+				mSprite.type = type;
+				EditorUtility.SetDirty(mSprite.gameObject);
+			}
+		}
+
+		if (mSprite.type == UISprite.Type.Sliced)
+		{
+			bool fill = EditorGUILayout.Toggle("Fill Center", mSprite.fillCenter);
+
+			if (mSprite.fillCenter != fill)
+			{
+				NGUIEditorTools.RegisterUndo("Sprite Change", mSprite);
+				mSprite.fillCenter = fill;
+				EditorUtility.SetDirty(mSprite.gameObject);
+			}
+		}
+		else if (mSprite.type == UISprite.Type.Filled)
+		{
+			if ((int)mSprite.fillDirection > (int)UISprite.FillDirection.Radial360)
+			{
+				mSprite.fillDirection = UISprite.FillDirection.Horizontal;
+				EditorUtility.SetDirty(mSprite);
+			}
+
+			UISprite.FillDirection fillDirection = (UISprite.FillDirection)EditorGUILayout.EnumPopup("Fill Dir", mSprite.fillDirection);
+			float fillAmount = EditorGUILayout.Slider("Fill Amount", mSprite.fillAmount, 0f, 1f);
+			bool invert = EditorGUILayout.Toggle("Invert Fill", mSprite.invert);
+
+			if (mSprite.fillDirection != fillDirection || mSprite.fillAmount != fillAmount || mSprite.invert != invert)
+			{
+				NGUIEditorTools.RegisterUndo("Sprite Change", mSprite);
+				mSprite.fillDirection = fillDirection;
+				mSprite.fillAmount = fillAmount;
+				mSprite.invert = invert;
+				EditorUtility.SetDirty(mSprite);
+			}
+		}
+		GUILayout.Space(4f);
 	}
 
 	/// <summary>

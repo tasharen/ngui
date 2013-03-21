@@ -35,7 +35,7 @@ public class UIButtonOffset : MonoBehaviour
 
 	void OnDisable ()
 	{
-		if (tweenTarget != null)
+		if (mStarted && tweenTarget != null)
 		{
 			TweenPosition tc = tweenTarget.GetComponent<TweenPosition>();
 

@@ -536,7 +536,7 @@ public class UIFont : MonoBehaviour
 				// See if there is a symbol matching this text
 				BMSymbol symbol = useSymbols ? MatchSymbol(text, i, length) : null;
 
-				if (symbol == null || !symbol.Validate(atlas))
+				if (symbol == null)
 				{
 					// Get the glyph for this character
 					BMGlyph glyph = mFont.GetGlyph(c);
@@ -603,7 +603,7 @@ public class UIFont : MonoBehaviour
 			// Calculate how wide this symbol or character is going to be
 			int glyphWidth = mSpacingX;
 
-			if (symbol != null && symbol.Validate(atlas))
+			if (symbol != null)
 			{
 				glyphWidth += symbol.advance;
 			}
@@ -713,7 +713,7 @@ public class UIFont : MonoBehaviour
 			// Calculate how wide this symbol or character is going to be
 			int glyphWidth = mSpacingX;
 
-			if (symbol != null && symbol.Validate(atlas))
+			if (symbol != null)
 			{
 				glyphWidth += symbol.advance;
 			}
@@ -834,13 +834,8 @@ public class UIFont : MonoBehaviour
 	/// Note: 'lineWidth' parameter should be in pixels.
 	/// </summary>
 
-#if UNITY_3_5_4
-	public void Print (string text, Color color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols,
-		bool encoding, SymbolStyle symbolStyle, Alignment alignment, int lineWidth, bool premultiply)
-#else
 	public void Print (string text, Color32 color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols,
 		bool encoding, SymbolStyle symbolStyle, Alignment alignment, int lineWidth, bool premultiply)
-#endif
 	{
 		if (mReplacement != null)
 		{
@@ -913,7 +908,7 @@ public class UIFont : MonoBehaviour
 				// See if there is a symbol matching this text
 				BMSymbol symbol = useSymbols ? MatchSymbol(text, i, textLength) : null;
 
-				if (symbol == null || !symbol.Validate(atlas))
+				if (symbol == null)
 				{
 					BMGlyph glyph = mFont.GetGlyph(c);
 					if (glyph == null) continue;
@@ -1076,7 +1071,7 @@ public class UIFont : MonoBehaviour
 			}
 
 			// Match found
-			if (match) return sym;
+			if (match && sym.Validate(atlas)) return sym;
 		}
 		return null;
 	}

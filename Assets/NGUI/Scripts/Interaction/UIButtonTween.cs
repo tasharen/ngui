@@ -166,7 +166,7 @@ public class UIButtonTween : MonoBehaviour
 			for (int i = 0, imax = mTweens.Length; i < imax; ++i)
 			{
 				UITweener tw = mTweens[i];
-				if (tw.tweenFactor != tweenGroup) continue;
+				if (tw.tweenGroup != tweenGroup) continue;
 
 				if (tw.enabled)
 				{

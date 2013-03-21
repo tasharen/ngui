@@ -73,13 +73,67 @@ public abstract class UIWidget : MonoBehaviour
 	/// Set or get the value that specifies where the widget's pivot point should be.
 	/// </summary>
 
-	public Pivot pivot { get { return mPivot; } set { if (mPivot != value) { mPivot = value; mChanged = true; } } }
+	public Pivot pivot
+	{
+		get
+		{
+			return mPivot;
+		}
+		set
+		{
+			if (mPivot != value)
+			{
+				Vector3 before = NGUIMath.CalculateWidgetCorners(this)[0];
+
+				mPivot = value;
+				mChanged = true;
+
+				Vector3 after = NGUIMath.CalculateWidgetCorners(this)[0];
+
+				Transform t = cachedTransform;
+				Vector3 pos = t.position;
+				pos.x += (before.x - after.x);
+				pos.y += (before.y - after.y);
+				cachedTransform.position = pos;
+
+				pos = cachedTransform.localPosition;
+				pos.x = Mathf.Round(pos.x);
+				pos.y = Mathf.Round(pos.y);
+				cachedTransform.localPosition = pos;
+			}
+		}
+	}
 	
 	/// <summary>
 	/// Depth controls the rendering order -- lowest to highest.
 	/// </summary>
 
 	public int depth { get { return mDepth; } set { if (mDepth != value) { mDepth = value; if (mPanel != null) mPanel.MarkMaterialAsChanged(material, true); } } }
+
+	/// <summary>
+	/// Helper function that calculates the relative offset based on the current pivot.
+	/// </summary>
+
+	public Vector2 pivotOffset
+	{
+		get
+		{
+			Vector2 v = Vector2.zero;
+			Vector4 p = relativePadding;
+
+			Pivot pv = pivot;
+
+			if (pv == Pivot.Top || pv == Pivot.Center || pv == Pivot.Bottom) v.x = (p.x - p.z - 1f) * 0.5f;
+			else if (pv == Pivot.TopRight || pv == Pivot.Right || pv == Pivot.BottomRight) v.x = -1f - p.z;
+			else v.x = p.x;
+
+			if (pv == Pivot.Left || pv == Pivot.Center || pv == Pivot.Right) v.y = (p.w - p.y + 1f) * 0.5f;
+			else if (pv == Pivot.BottomLeft || pv == Pivot.Bottom || pv == Pivot.BottomRight) v.y = 1f + p.w;
+			else v.y = -p.y;
+
+			return v;
+		}
+	}
 
 	/// <summary>
 	/// Transform gets cached for speed.
@@ -295,7 +349,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Mark the widget and the panel as having been changed.
 	/// </summary>
 
-	void OnEnable ()
+	protected virtual void OnEnable ()
 	{
 #if UNITY_EDITOR
 		if (GetComponents<UIWidget>().Length > 1)
@@ -391,7 +445,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-		if (mVisibleFlag != 0 && mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos)
+		if (mVisibleFlag != 0 && mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos && UnityEditor.Selection.activeGameObject != gameObject)
 		{
 			Color outline = new Color(1f, 1f, 1f, 0.2f);
 
@@ -399,16 +453,28 @@ public abstract class UIWidget : MonoBehaviour
 			Vector3 pos = Vector3.zero;
 			pos.z -= mDepth * 0.25f;
 
-			// Widget's local size
 			Vector3 size = relativeSize;
 			Vector2 offset = pivotOffset;
-			pos.x += (offset.x + 0.5f) * size.x;
-			pos.y += (offset.y - 0.5f) * size.y;
+			Vector4 padding = relativePadding;
+
+			float x0 = offset.x * size.x - padding.x;
+			float y0 = offset.y * size.y + padding.y;
+
+			float x1 = x0 + size.x + padding.x + padding.z;
+			float y1 = y0 - size.y - padding.y - padding.w;
+
+			pos.x = (x0 + x1) * 0.5f;
+			pos.y = (y0 + y1) * 0.5f;
+
+			size.x = (x1 - x0);
+			size.y = (y1 - y0);
 
 			// Draw the gizmo
 			Gizmos.matrix = cachedTransform.localToWorldMatrix;
 			Gizmos.color = (UnityEditor.Selection.activeGameObject == gameObject) ? new Color(0f, 0.75f, 1f) : outline;
 			Gizmos.DrawWireCube(pos, size);
+			
+			// Make the widget selectable
 			size.z = 0.01f;
 			Gizmos.color = Color.clear;
 			Gizmos.DrawCube(pos, size);
@@ -434,6 +500,7 @@ public abstract class UIWidget : MonoBehaviour
 			{
 				Vector3 offset = pivotOffset;
 				Vector2 scale = relativeSize;
+
 				offset.x *= scale.x;
 				offset.y *= scale.y;
 
@@ -453,11 +520,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Append the local geometry buffers to the specified ones.
 	/// </summary>
 
-#if UNITY_3_5_4
-	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color> c, BetterList<Vector3> n, BetterList<Vector4> t)
-#else
 	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color32> c, BetterList<Vector3> n, BetterList<Vector4> t)
-#endif
 	{
 		mGeom.WriteToBuffers(v, u, c, n, t);
 	}
@@ -503,26 +566,6 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Helper function that calculates the relative offset based on the current pivot.
-	/// </summary>
-
-	virtual public Vector2 pivotOffset
-	{
-		get
-		{
-			Vector2 v = Vector2.zero;
-
-			if (mPivot == Pivot.Top || mPivot == Pivot.Center || mPivot == Pivot.Bottom) v.x = -0.5f;
-			else if (mPivot == Pivot.TopRight || mPivot == Pivot.Right || mPivot == Pivot.BottomRight) v.x = -1f;
-
-			if (mPivot == Pivot.Left || mPivot == Pivot.Center || mPivot == Pivot.Right) v.y = 0.5f;
-			else if (mPivot == Pivot.BottomLeft || mPivot == Pivot.Bottom || mPivot == Pivot.BottomRight) v.y = 1f;
-
-			return v;
-		}
-	}
-
-	/// <summary>
 	/// Visible size of the widget in relative coordinates. In most cases this can remain at (1, 1).
 	/// If you want to figure out the widget's size in pixels, scale this value by cachedTransform.localScale.
 	/// </summary>
@@ -530,10 +573,28 @@ public abstract class UIWidget : MonoBehaviour
 	virtual public Vector2 relativeSize { get { return Vector2.one; } }
 
 	/// <summary>
+	/// Extra padding around the sprite, in pixels.
+	/// </summary>
+
+	virtual public Vector4 relativePadding { get { return Vector4.zero; } }
+
+	/// <summary>
+	/// Dimensions of the sprite's border, if any.
+	/// </summary>
+
+	virtual public Vector4 border { get { return Vector4.zero; } }
+
+	/// <summary>
 	/// Whether the material will be kept when the widget gets disabled (by default no, it won't be).
 	/// </summary>
 
 	virtual public bool keepMaterial { get { return false; } }
+
+	/// <summary>
+	/// Whether this widget will automatically become pixel-perfect after resize operation finishes.
+	/// </summary>
+
+	virtual public bool pixelPerfectAfterResize { get { return false; } }
 
 	/// <summary>
 	/// Virtual Start() functionality for widgets.
@@ -551,9 +612,5 @@ public abstract class UIWidget : MonoBehaviour
 	/// Virtual function called by the UIPanel that fills the buffers.
 	/// </summary>
 
-#if UNITY_3_5_4
-	virtual public void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols) { }
-#else
 	virtual public void OnFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols) { }
-#endif
 }

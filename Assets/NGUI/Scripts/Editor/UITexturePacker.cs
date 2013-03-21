@@ -61,7 +61,15 @@ public class UITexturePacker
 	{
 		if (width > maxSize && height > maxSize) return null;
 		if (width > maxSize || height > maxSize) { int temp = width; width = height; height = temp; }
-
+		
+		// Force square by sizing up
+		if (NGUISettings.forceSquareAtlas)
+		{
+			if (width > height)
+				height = width;
+			else if (height > width)
+				width = height;
+		}
 		UITexturePacker bp = new UITexturePacker(width, height, false);
 		Storage[] storage = new Storage[textures.Length];
 
