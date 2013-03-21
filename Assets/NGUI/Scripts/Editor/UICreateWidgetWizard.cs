@@ -520,9 +520,10 @@ public class UICreateWidgetWizard : EditorWindow
 			back.atlas = NGUISettings.atlas;
 			back.spriteName = mSliderBG;
 			back.transform.localScale = new Vector3(200f, 30f, 1f);
+			back.transform.localPosition = Vector3.zero;
 			back.MakePixelPerfect();
 
-			// Fireground sprite
+			// Foreground sprite
 			UIAtlas.Sprite fgs = NGUISettings.atlas.GetSprite(mSliderFG);
 			UISprite front = NGUITools.AddWidget<UISprite>(go);
 			front.type = (fgs.inner == fgs.outer) ? UISprite.Type.Filled : UISprite.Type.Sliced;
@@ -531,6 +532,7 @@ public class UICreateWidgetWizard : EditorWindow
 			front.atlas = NGUISettings.atlas;
 			front.spriteName = mSliderFG;
 			front.transform.localScale = new Vector3(200f, 30f, 1f);
+			front.transform.localPosition = Vector3.zero;
 			front.MakePixelPerfect();
 
 			// Add a collider
@@ -560,7 +562,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 				uiSlider.thumb = thb.transform;
 			}
-			uiSlider.sliderValue = 0.75f;
+			uiSlider.sliderValue = 1f;
 
 			// Select the slider
 			Selection.activeGameObject = go;
@@ -598,6 +600,7 @@ public class UICreateWidgetWizard : EditorWindow
 			bg.spriteName = mInputBG;
 			bg.pivot = UIWidget.Pivot.Left;
 			bg.transform.localScale = new Vector3(400f, NGUISettings.font.size + padding * 2f, 1f);
+			bg.transform.localPosition = Vector3.zero;
 			bg.MakePixelPerfect();
 
 			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
@@ -658,8 +661,9 @@ public class UICreateWidgetWizard : EditorWindow
 			UISprite sprite = NGUITools.AddSprite(go, NGUISettings.atlas, mListFG);
 			sprite.depth = depth;
 			sprite.atlas = NGUISettings.atlas;
-			sprite.transform.localScale = new Vector3(150f + fgPadding.x * 2f, NGUISettings.font.size + fgPadding.y * 2f, 1f);
 			sprite.pivot = UIWidget.Pivot.Left;
+			sprite.transform.localScale = new Vector3(150f + fgPadding.x * 2f, NGUISettings.font.size + fgPadding.y * 2f, 1f);
+			sprite.transform.localPosition = Vector3.zero;
 			sprite.MakePixelPerfect();
 
 			// Text label
