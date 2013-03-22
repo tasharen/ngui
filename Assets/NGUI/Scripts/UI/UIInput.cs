@@ -460,11 +460,12 @@ public class UIInput : MonoBehaviour
 					processed = fit;
 					Vector3 pos = label.cachedTransform.localPosition;
 					pos.x = mPosition + label.lineWidth;
-					label.cachedTransform.localPosition = pos;
 
 					if (mPivot == UIWidget.Pivot.Left) label.pivot = UIWidget.Pivot.Right;
 					else if (mPivot == UIWidget.Pivot.TopLeft) label.pivot = UIWidget.Pivot.TopRight;
 					else if (mPivot == UIWidget.Pivot.BottomLeft) label.pivot = UIWidget.Pivot.BottomRight;
+
+					label.cachedTransform.localPosition = pos;
 				}
 				else RestoreLabel();
 			}
