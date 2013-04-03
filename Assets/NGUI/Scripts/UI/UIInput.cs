@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -204,6 +204,7 @@ public class UIInput : MonoBehaviour
 				mDefaultText = label.text;
 				mDefaultColor = label.color;
 				label.supportEncoding = false;
+				label.password = isPassword;
 				mPivot = label.pivot;
 				mPosition = label.cachedTransform.localPosition.x;
 			}
