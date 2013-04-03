@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -147,6 +147,26 @@ public class UIFontInspector : Editor
 			}
 		}
 
+		// For updating the font's data when importing from an external source, such as the texture packer
+		bool resetWidthHeight = false;
+
+		if (mFont.atlas != null || mFont.material != null)
+		{
+			GUILayout.BeginHorizontal();
+			TextAsset data = EditorGUILayout.ObjectField("Import Data", null, typeof(TextAsset), false) as TextAsset;
+			GUILayout.Space(44f);
+			GUILayout.EndHorizontal();
+
+			if (data != null)
+			{
+				NGUIEditorTools.RegisterUndo("Import Font Data", mFont);
+				BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), data.bytes);
+				mFont.MarkAsDirty();
+				resetWidthHeight = true;
+				Debug.Log("Imported " + mFont.bmFont.glyphCount + " characters");
+			}
+		}
+
 		if (mFont.bmFont.isValid)
 		{
 			Color green = new Color(0.4f, 1f, 0f, 1f);
@@ -158,6 +178,13 @@ public class UIFontInspector : Editor
 				{
 					// Pixels are easier to work with than UVs
 					Rect pixels = NGUIMath.ConvertToPixels(mFont.uvRect, tex.width, tex.height, false);
+
+					// Automatically set the width and height of the rectangle to be the original font texture's dimensions
+					if (resetWidthHeight)
+					{
+						pixels.width = mFont.texWidth;
+						pixels.height = mFont.texHeight;
+					}
 
 					// Font sprite rectangle
 					GUI.backgroundColor = green;

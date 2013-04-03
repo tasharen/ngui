@@ -1,6 +1,6 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -49,24 +49,33 @@ public class UILabelInspector : UIWidgetInspector
 		if (!text.Equals(mLabel.text)) { RegisterUndo(); mLabel.text = text; }
 
 		GUILayout.BeginHorizontal();
-		{
-			int len = EditorGUILayout.IntField("Line Width", mLabel.lineWidth, GUILayout.Width(120f));
-			if (len != mLabel.lineWidth) { RegisterUndo(); mLabel.lineWidth = len; }
-
-			int count = EditorGUILayout.IntField("Line Count", mLabel.maxLineCount, GUILayout.Width(100f));
-			if (count != mLabel.maxLineCount) { RegisterUndo(); mLabel.maxLineCount = count; }
-		}
+		int len = EditorGUILayout.IntField("Max Width", mLabel.lineWidth, GUILayout.Width(120f));
+		GUILayout.Label("pixels");
 		GUILayout.EndHorizontal();
+		if (len != mLabel.lineWidth) { RegisterUndo(); mLabel.lineWidth = len; }
+
+		int count = EditorGUILayout.IntField("Max Lines", mLabel.maxLineCount, GUILayout.Width(100f));
+		if (count != mLabel.maxLineCount) { RegisterUndo(); mLabel.maxLineCount = count; }
 
 		GUILayout.BeginHorizontal();
+		bool shrinkToFit = EditorGUILayout.Toggle("Shrink to Fit", mLabel.shrinkToFit, GUILayout.Width(100f));
+		GUILayout.Label("- adjust scale if doesn't fit");
+		GUILayout.EndHorizontal();
+		if (shrinkToFit != mLabel.shrinkToFit) { RegisterUndo(); mLabel.shrinkToFit = shrinkToFit; }
 
-		bool password = EditorGUILayout.Toggle("Password", mLabel.password, GUILayout.Width(120f));
+		GUILayout.BeginHorizontal();
+		bool password = EditorGUILayout.Toggle("Password", mLabel.password, GUILayout.Width(100f));
+		GUILayout.Label("- hide characters");
+		GUILayout.EndHorizontal();
 		if (password != mLabel.password) { RegisterUndo(); mLabel.password = password; }
 
+		GUILayout.BeginHorizontal();
 		bool encoding = EditorGUILayout.Toggle("Encoding", mLabel.supportEncoding, GUILayout.Width(100f));
+		GUILayout.Label("- use emoticons and colors");
+		GUILayout.EndHorizontal();
 		if (encoding != mLabel.supportEncoding) { RegisterUndo(); mLabel.supportEncoding = encoding; }
 
-		GUILayout.EndHorizontal();
+		//GUILayout.EndHorizontal();
 
 		if (encoding && mLabel.font.hasSymbols)
 		{

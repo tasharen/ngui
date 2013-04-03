@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -521,7 +521,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 	/// Drag the object along the plane.
 	/// </summary>
 
-	public void Drag (Vector2 delta)
+	public void Drag ()
 	{
 		if (enabled && NGUITools.GetActive(gameObject) && mShouldMove)
 		{

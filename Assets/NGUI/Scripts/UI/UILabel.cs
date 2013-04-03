@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -29,6 +29,7 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] Color mEffectColor = Color.black;
 	[HideInInspector][SerializeField] UIFont.SymbolStyle mSymbols = UIFont.SymbolStyle.Uncolored;
 	[HideInInspector][SerializeField] Vector2 mEffectDistance = Vector2.one;
+	[HideInInspector][SerializeField] bool mShrinkToFit = false;
 
 	/// <summary>
 	/// Obsolete, do not use. Use 'mMaxLineWidth' instead.
@@ -353,6 +354,26 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Whether the label will automatically shrink its size in order to fit the maximum line width.
+	/// </summary>
+
+	public bool shrinkToFit
+	{
+		get
+		{
+			return mShrinkToFit;
+		}
+		set
+		{
+			if (mShrinkToFit != value)
+			{
+				mShrinkToFit = value;
+				if (mMaxLineWidth > 0f) hasChanged = true;
+			}
+		}
+	}
+
+	/// <summary>
 	/// Returns the processed version of 'text', with new line characters, line wrapping, etc.
 	/// </summary>
 
@@ -464,18 +485,41 @@ public class UILabel : UIWidget
 			mProcessedText = mFont.WrapText(hidden, mMaxLineWidth / cachedTransform.localScale.x,
 				mMaxLineCount, false, UIFont.SymbolStyle.None);
 		}
-		else if (mMaxLineWidth > 0)
+		else if (!mShrinkToFit)
 		{
-			mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.x, mMaxLineCount, mEncoding, mSymbols);
-		}
-		else if (mMaxLineCount > 0)
-		{
-			mProcessedText = mFont.WrapText(mProcessedText, 100000f, mMaxLineCount, mEncoding, mSymbols);
+			if (mMaxLineWidth > 0)
+			{
+				mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.x, mMaxLineCount, mEncoding, mSymbols);
+			}
+			else if (mMaxLineCount > 0)
+			{
+				mProcessedText = mFont.WrapText(mProcessedText, 100000f, mMaxLineCount, mEncoding, mSymbols);
+			}
 		}
 
+		float scale = Mathf.Abs(cachedTransform.localScale.x);
 		mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.one;
-		float scale = cachedTransform.localScale.x;
-		mSize.x = Mathf.Max(mSize.x, (mFont != null && scale > 1f) ? lineWidth / scale : 1f);
+
+		if (mShrinkToFit && mMaxLineWidth > 0)
+		{
+			// We want to shrink the label (when it doesn't fit)
+			if (scale > 0f)
+			{
+				float maxSize = (float)mMaxLineWidth / mFont.size;
+				scale = (mSize.x > maxSize) ? (maxSize / mSize.x) * mFont.size : mFont.size;
+				cachedTransform.localScale = new Vector3(scale, scale, 1f);
+			}
+			else
+			{
+				mSize.x = 1f;
+				cachedTransform.localScale = new Vector3(mFont.size, mFont.size, 1f);
+			}
+		}
+		else
+		{
+			mSize.x = Mathf.Max(mSize.x, (scale > 0f) ? lineWidth / scale : 1f);
+		}
+
 		mSize.y = Mathf.Max(mSize.y, 1f);
 	}
 
