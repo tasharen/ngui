@@ -431,7 +431,7 @@ public class NGUIEditorTools
 		// No selection? Try to find the root automatically
 		if (p == null)
 		{
-			UIPanel[] panels = GameObject.FindSceneObjectsOfType(typeof(UIPanel)) as UIPanel[];
+			UIPanel[] panels = NGUITools.FindActive<UIPanel>();
 			if (panels.Length > 0) go = panels[0].gameObject;
 		}
 

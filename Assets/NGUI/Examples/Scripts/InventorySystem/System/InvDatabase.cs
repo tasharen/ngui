@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 
 [ExecuteInEditMode]
@@ -20,10 +20,7 @@ public class InvDatabase : MonoBehaviour
 			if (mIsDirty)
 			{
 				mIsDirty = false;
-				mList = GameObject.FindSceneObjectsOfType(typeof(InvDatabase)) as InvDatabase[];
-
-				// Alternative method, considers prefabs:
-				//mList = Resources.FindObjectsOfTypeAll(typeof(InvDatabase)) as InvDatabase[];
+				mList = NGUITools.FindActive<InvDatabase>();
 			}
 			return mList;
 		}
