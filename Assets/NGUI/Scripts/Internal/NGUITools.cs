@@ -272,7 +272,11 @@ static public class NGUITools
 
 	static public T[] FindActive<T> () where T : Component
 	{
+#if UNITY_3_5 || UNITY_4_0
 		return GameObject.FindSceneObjectsOfType(typeof(T)) as T[];
+#else
+		return GameObject.FindObjectsOfType(typeof(T)) as T[];
+#endif
 	}
 
 	/// <summary>
@@ -568,14 +572,14 @@ static public class NGUITools
 		}
 #else
 		// If there is even a single enabled child, then we're using a Unity 4.0-based nested active state scheme.
-		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
+		for (int i = 0, imax = t.childCount; i < imax; ++i)
 		{
 			Transform child = t.GetChild(i);
 			if (child.gameObject.activeSelf) return;
 		}
 
 		// If this point is reached, then all the children are disabled, so we must be using a Unity 3.5-based active state scheme.
-		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
+		for (int i = 0, imax = t.childCount; i < imax; ++i)
 		{
 			Transform child = t.GetChild(i);
 			Activate(child);
@@ -626,7 +630,7 @@ static public class NGUITools
 
 		if (state)
 		{
-			for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
+			for (int i = 0, imax = t.childCount; i < imax; ++i)
 			{
 				Transform child = t.GetChild(i);
 				Activate(child);
@@ -634,7 +638,7 @@ static public class NGUITools
 		}
 		else
 		{
-			for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
+			for (int i = 0, imax = t.childCount; i < imax; ++i)
 			{
 				Transform child = t.GetChild(i);
 				Deactivate(child);
@@ -678,7 +682,7 @@ static public class NGUITools
 
 		Transform t = go.transform;
 		
-		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
+		for (int i = 0, imax = t.childCount; i < imax; ++i)
 		{
 			Transform child = t.GetChild(i);
 			SetLayer(child.gameObject, layer);

@@ -473,7 +473,7 @@ public abstract class UIWidget : MonoBehaviour
 			Gizmos.matrix = cachedTransform.localToWorldMatrix;
 			Gizmos.color = (UnityEditor.Selection.activeGameObject == gameObject) ? new Color(0f, 0.75f, 1f) : outline;
 			Gizmos.DrawWireCube(pos, size);
-			
+
 			// Make the widget selectable
 			size.z = 0.01f;
 			Gizmos.color = Color.clear;
