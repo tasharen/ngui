@@ -17,13 +17,30 @@ public class UIImageButton : MonoBehaviour
 	public string normalSprite;
 	public string hoverSprite;
 	public string pressedSprite;
+	public string disabledSprite;
+	
+	public bool isEnabled
+	{
+		get
+		{
+			Collider col = collider;
+			return col && col.enabled;
+		}
+		set
+		{
+			Collider col = collider;
+			if (!col) return;
+
+			if (col.enabled != value)
+			{
+				col.enabled = value;				
+			}
+		}
+	}
 
 	void OnEnable ()
 	{
-		if (target != null)
-		{
-			target.spriteName = UICamera.IsHighlighted(gameObject) ? hoverSprite : normalSprite;
-		}
+		UpdateImage();		
 	}
 
 	void Start ()
@@ -33,18 +50,29 @@ public class UIImageButton : MonoBehaviour
 
 	void OnHover (bool isOver)
 	{
-		if (enabled && target != null)
+		if (enabled)
 		{
-			target.spriteName = isOver ? hoverSprite : normalSprite;
-			target.MakePixelPerfect();
+			UpdateImage();
 		}
 	}
 
 	void OnPress (bool pressed)
 	{
-		if (enabled && target != null)
+		if (enabled)
 		{
-			target.spriteName = pressed ? pressedSprite : normalSprite;
+			UpdateImage();
+		}
+	}
+	
+	void UpdateImage()
+	{
+		if (target != null)
+		{		
+			if (isEnabled)
+				target.spriteName = UICamera.IsHighlighted(gameObject) ? hoverSprite : normalSprite;
+			else
+				target.spriteName = disabledSprite;
+				
 			target.MakePixelPerfect();
 		}
 	}
