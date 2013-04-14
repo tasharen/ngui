@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2013 Tasharen Entertainment
+// Copyright © 2011-2012 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -53,6 +53,7 @@ public class UIImageButtonInspector : Editor
 				NGUIEditorTools.SpriteField("Normal", mSprite.atlas, mButton.normalSprite, OnNormal);
 				NGUIEditorTools.SpriteField("Hover", mSprite.atlas, mButton.hoverSprite, OnHover);
 				NGUIEditorTools.SpriteField("Pressed", mSprite.atlas, mButton.pressedSprite, OnPressed);
+				NGUIEditorTools.SpriteField("Disabled", mSprite.atlas, mButton.disabledSprite, OnPressed);
 			}
 		}
 	}
@@ -78,6 +79,13 @@ public class UIImageButtonInspector : Editor
 	{
 		NGUIEditorTools.RegisterUndo("Image Button Change", mButton, mButton.gameObject, mSprite);
 		mButton.pressedSprite = spriteName;
+		Repaint();
+	}
+	
+	void OnDisabled(string spriteName)
+	{
+		NGUIEditorTools.RegisterUndo("Image Button Change", mButton, mButton.gameObject, mSprite);
+		mButton.disabledSprite = spriteName;
 		Repaint();
 	}
 }
