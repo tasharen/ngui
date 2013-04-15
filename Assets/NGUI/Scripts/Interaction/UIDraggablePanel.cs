@@ -83,7 +83,13 @@ public class UIDraggablePanel : IgnoreTimeScale
 	/// </summary>
 
 	public bool repositionClipping = false;
-
+	
+	/// <summary>
+	/// Whether to use iOS drag emulation, where the content only drags at half the speed of the touch/mouse movement when the content edge is within the clipping area.
+	/// </summary>	
+	
+	public bool iOSDragEmulation = true;
+	
 	/// <summary>
 	/// Horizontal scrollbar used for visualization.
 	/// </summary>
@@ -558,18 +564,23 @@ public class UIDraggablePanel : IgnoreTimeScale
 				mMomentum = Vector3.Lerp(mMomentum, mMomentum + offset * (0.01f * momentumAmount), 0.67f);
 
 				// Move the panel
-				//MoveAbsolute(offset);
-
-				Vector3 constraint = mPanel.CalculateConstrainOffset(bounds.min, bounds.max);
-
-				if (constraint.magnitude > 0.001f)
+				if (!iOSDragEmulation)
 				{
-					MoveAbsolute(offset * 0.5f);
-					mMomentum *= 0.5f;
+					MoveAbsolute(offset);	
 				}
 				else
 				{
-					MoveAbsolute(offset);
+					Vector3 constraint = mPanel.CalculateConstrainOffset(bounds.min, bounds.max);
+
+					if (constraint.magnitude > 0.001f)
+					{
+						MoveAbsolute(offset * 0.5f);
+						mMomentum *= 0.5f;
+					}
+					else
+					{
+						MoveAbsolute(offset);
+					}
 				}
 
 				// We want to constrain the UI to be within bounds
