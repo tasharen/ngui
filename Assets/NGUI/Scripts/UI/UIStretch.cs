@@ -21,6 +21,8 @@ public class UIStretch : MonoBehaviour
 		Vertical,
 		Both,
 		BasedOnHeight,
+		FillKeepingRatio, //Fits the image so that it entirely fills the specified container keeping its ratio
+		FitInternalKeepingRatio //Fits the image/item inside of the specified container keeping its ratio
 	}
 
 	/// <summary>
@@ -43,6 +45,10 @@ public class UIStretch : MonoBehaviour
 	public Style style = Style.None;
 	public Vector2 relativeSize = Vector2.one;
 
+	//This is the size that the item/image should start out initially
+	//This is used for FillKeepingRatio, and FitInternalKeepingRatio
+	public Vector2 initialSize = Vector2.one; 
+	
 	Transform mTrans;
 	UIRoot mRoot;
 	Animation mAnim;
@@ -132,6 +138,46 @@ public class UIStretch : MonoBehaviour
 			{
 				localScale.x = relativeSize.x * rectHeight;
 				localScale.y = relativeSize.y * rectHeight;
+			}
+			else if(style == Style.FillKeepingRatio)
+			{
+				float screenRatio = rectWidth / rectHeight;
+				float imageRatio = initialSize.x / initialSize.y;
+			
+				if(imageRatio < screenRatio)
+				{	
+					//Fit horizontally
+					float scale = rectWidth / initialSize.x;
+					localScale.x = rectWidth;
+					localScale.y = initialSize.y * scale;
+				}
+				else
+				{
+					//Fit vertically
+					float scale = rectHeight / initialSize.y;
+					localScale.x = initialSize.x * scale;
+					localScale.y = rectHeight;
+				}
+			}
+			else if(style == Style.FitInternalKeepingRatio)
+			{
+				float screenRatio = rectWidth / rectHeight;
+				float imageRatio = initialSize.x / initialSize.y;
+			
+				if(imageRatio > screenRatio)
+				{	
+					//Fit horizontally
+					float scale = rectWidth / initialSize.x;
+					localScale.x = rectWidth;
+					localScale.y = initialSize.y * scale;
+				}
+				else
+				{
+					//Fit vertically
+					float scale = rectHeight / initialSize.y;
+					localScale.x = initialSize.x * scale;
+					localScale.y = rectHeight;
+				}
 			}
 			else
 			{
