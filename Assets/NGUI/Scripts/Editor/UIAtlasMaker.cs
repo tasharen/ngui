@@ -110,7 +110,11 @@ public class UIAtlasMaker : EditorWindow
 		Texture2D[] textures = new Texture2D[sprites.Count];
 		Rect[] rects;
 
+#if UNITY_3_5
+		int maxSize = 4096;
+#else
 		int maxSize = SystemInfo.maxTextureSize;
+#endif
 
 #if UNITY_ANDROID || UNITY_IPHONE
 		if (PlayerSettings.targetGlesGraphics == TargetGlesGraphics.OpenGLES_1_x)

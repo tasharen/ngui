@@ -93,7 +93,7 @@ static public class NGUITools
 				}
 			}
 
-			if (mListener != null && mListener.enabled && mListener.gameObject.activeInHierarchy)
+			if (mListener != null && mListener.enabled && NGUITools.GetActive(mListener.gameObject))
 			{
 				AudioSource source = mListener.audio;
 				if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
