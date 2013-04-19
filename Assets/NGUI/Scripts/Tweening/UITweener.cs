@@ -207,6 +207,12 @@ public abstract class UITweener : IgnoreTimeScale
 	}
 
 	/// <summary>
+	/// Mark as not started when finished to enable delay on next play.
+	/// </summary>
+
+	void OnDisable () { mStarted = false; }
+
+	/// <summary>
 	/// Sample the tween at the specified factor.
 	/// </summary>
 
