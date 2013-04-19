@@ -335,10 +335,32 @@ public class UIInput : MonoBehaviour
 #else
 	void Update ()
 	{
-		if (selected && mLastIME != Input.compositionString)
+		if (selected)
 		{
-			mLastIME = Input.compositionString;
-			UpdateLabel();
+			// TODO: Investigate a work-around
+			// Backspace... doesn't seem to work on the mac either.
+			//if (Input.GetKeyDown(KeyCode.Delete) && mText.Length > 0)
+			//{
+			//    mText = mText.Substring(0, mText.Length - 1);
+			//    SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
+			//}
+
+			// Note: this won't work in the editor. Only in the actual published app. Unity blocks control-keys in the editor.
+			if (Input.GetKeyDown(KeyCode.V) &&
+#if UNITY_STANDALONE_OSX
+				(Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand)))
+#else
+				(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+#endif
+			{
+				Append(NGUITools.clipboard);
+			}
+			
+			if (mLastIME != Input.compositionString)
+			{
+				mLastIME = Input.compositionString;
+				UpdateLabel();
+			}
 		}
 	}
 #endif
@@ -356,71 +378,79 @@ public class UIInput : MonoBehaviour
 			// Mobile devices handle input in Update()
 			if (Application.platform == RuntimePlatform.Android) return;
 			if (Application.platform == RuntimePlatform.IPhonePlayer) return;
+			Append(input);
+		}
+	}
 
-			for (int i = 0, imax = input.Length; i < imax; ++i)
+	/// <summary>
+	/// Append the specified text to the end of the current.
+	/// </summary>
+
+	void Append (string input)
+	{
+		for (int i = 0, imax = input.Length; i < imax; ++i)
+		{
+			char c = input[i];
+
+			if (c == '\b')
 			{
-				char c = input[i];
-
-				if (c == '\b')
+				// Backspace
+				if (mText.Length > 0)
 				{
-					// Backspace
-					if (mText.Length > 0)
-					{
-						mText = mText.Substring(0, mText.Length - 1);
-						SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
-					}
-				}
-				else if (c == '\r' || c == '\n')
-				{
-					if (UICamera.current.submitKey0 == KeyCode.Return || UICamera.current.submitKey1 == KeyCode.Return)
-					{
-						// Not multi-line input, or control isn't held
-						if (!label.multiLine || (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl)))
-						{
-							// Enter
-							current = this;
-							if (onSubmit != null) onSubmit(mText);
-							if (eventReceiver == null) eventReceiver = gameObject;
-							eventReceiver.SendMessage(functionName, mText, SendMessageOptions.DontRequireReceiver);
-							current = null;
-							selected = false;
-							return;
-						}
-					}
-
-					// If we have an input validator, validate the input first
-					if (validator != null) c = validator(mText, c);
-
-					// If the input is invalid, skip it
-					if (c == 0) continue;
-
-					// Append the character
-					if (c == '\n' || c == '\r')
-					{
-						if (label.multiLine) mText += "\n";
-					}
-					else mText += c;
-
-					// Notify the listeners
-					SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
-				}
-				else if (c >= ' ')
-				{
-					// If we have an input validator, validate the input first
-					if (validator != null) c = validator(mText, c);
-
-					// If the input is invalid, skip it
-					if (c == 0) continue;
-
-					// Append the character and notify the "input changed" listeners.
-					mText += c;
+					mText = mText.Substring(0, mText.Length - 1);
 					SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
 				}
 			}
+			else if (c == '\r' || c == '\n')
+			{
+				if (UICamera.current.submitKey0 == KeyCode.Return || UICamera.current.submitKey1 == KeyCode.Return)
+				{
+					// Not multi-line input, or control isn't held
+					if (!label.multiLine || (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl)))
+					{
+						// Enter
+						current = this;
+						if (onSubmit != null) onSubmit(mText);
+						if (eventReceiver == null) eventReceiver = gameObject;
+						eventReceiver.SendMessage(functionName, mText, SendMessageOptions.DontRequireReceiver);
+						current = null;
+						selected = false;
+						return;
+					}
+				}
 
-			// Ensure that we don't exceed the maximum length
-			UpdateLabel();
+				// If we have an input validator, validate the input first
+				if (validator != null) c = validator(mText, c);
+
+				// If the input is invalid, skip it
+				if (c == 0) continue;
+
+				// Append the character
+				if (c == '\n' || c == '\r')
+				{
+					if (label.multiLine) mText += "\n";
+				}
+				else mText += c;
+
+				// Notify the listeners
+				SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
+			}
+			else if (c >= ' ')
+			{
+				// If we have an input validator, validate the input first
+				if (validator != null) c = validator(mText, c);
+
+				// If the input is invalid, skip it
+				if (c == 0) continue;
+
+				// Append the character and notify the "input changed" listeners.
+				mText += c;
+				SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
+			}
 		}
+
+		// Ensure that we don't exceed the maximum length
+		UpdateLabel();
 	}
 
 	/// <summary>
@@ -448,27 +478,30 @@ public class UIInput : MonoBehaviour
 			// Now wrap this text using the specified line width
 			label.supportEncoding = false;
 
-			if (label.multiLine)
+			if (!label.shrinkToFit)
 			{
-				processed = label.font.WrapText(processed, label.lineWidth / label.cachedTransform.localScale.x, 0, false, UIFont.SymbolStyle.None);
-			}
-			else
-			{
-				string fit = label.font.GetEndOfLineThatFits(processed, label.lineWidth / label.cachedTransform.localScale.x, false, UIFont.SymbolStyle.None);
-
-				if (fit != processed)
+				if (label.multiLine)
 				{
-					processed = fit;
-					Vector3 pos = label.cachedTransform.localPosition;
-					pos.x = mPosition + label.lineWidth;
-
-					if (mPivot == UIWidget.Pivot.Left) label.pivot = UIWidget.Pivot.Right;
-					else if (mPivot == UIWidget.Pivot.TopLeft) label.pivot = UIWidget.Pivot.TopRight;
-					else if (mPivot == UIWidget.Pivot.BottomLeft) label.pivot = UIWidget.Pivot.BottomRight;
-
-					label.cachedTransform.localPosition = pos;
+					processed = label.font.WrapText(processed, label.lineWidth / label.cachedTransform.localScale.x, 0, false, UIFont.SymbolStyle.None);
 				}
-				else RestoreLabel();
+				else
+				{
+					string fit = label.font.GetEndOfLineThatFits(processed, label.lineWidth / label.cachedTransform.localScale.x, false, UIFont.SymbolStyle.None);
+
+					if (fit != processed)
+					{
+						processed = fit;
+						Vector3 pos = label.cachedTransform.localPosition;
+						pos.x = mPosition + label.lineWidth;
+
+						if (mPivot == UIWidget.Pivot.Left) label.pivot = UIWidget.Pivot.Right;
+						else if (mPivot == UIWidget.Pivot.TopLeft) label.pivot = UIWidget.Pivot.TopRight;
+						else if (mPivot == UIWidget.Pivot.BottomLeft) label.pivot = UIWidget.Pivot.BottomRight;
+
+						label.cachedTransform.localPosition = pos;
+					}
+					else RestoreLabel();
+				}
 			}
 
 			// Update the label's visible text

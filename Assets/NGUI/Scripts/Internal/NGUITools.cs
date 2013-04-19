@@ -93,7 +93,7 @@ static public class NGUITools
 				}
 			}
 
-			if (mListener != null)
+			if (mListener != null && mListener.enabled && mListener.gameObject.activeInHierarchy)
 			{
 				AudioSource source = mListener.audio;
 				if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
@@ -243,8 +243,6 @@ static public class NGUITools
 	{
 		if (text != null)
 		{
-			text = text.Replace("\\n", "\n");
-
 			for (int i = 0, imax = text.Length; i < imax; )
 			{
 				char c = text[i];
@@ -807,5 +805,39 @@ static public class NGUITools
 		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
 		for (int i = 0, imax = widgets.Length; i < imax; ++i)
 			widgets[i].ParentHasChanged();
+	}
+
+	/// <summary>
+	/// Clipboard access via reflection.
+	/// http://answers.unity3d.com/questions/266244/how-can-i-add-copypaste-clipboard-support-to-my-ga.html
+	/// </summary>
+
+	static PropertyInfo mSystemCopyBuffer = null;
+	static PropertyInfo GetSystemCopyBufferProperty ()
+	{
+		if (mSystemCopyBuffer == null)
+		{
+			Type gui = typeof(GUIUtility);
+			mSystemCopyBuffer = gui.GetProperty("systemCopyBuffer", BindingFlags.Static | BindingFlags.NonPublic);
+		}
+		return mSystemCopyBuffer;
+	}
+
+	/// <summary>
+	/// Access to the clipboard via a hacky method of accessing Unity's internals. Won't work in the web player.
+	/// </summary>
+
+	public static string clipboard
+	{
+		get
+		{
+			PropertyInfo copyBuffer = GetSystemCopyBufferProperty();
+			return (copyBuffer != null) ? (string)copyBuffer.GetValue(null, null) : null;
+		}
+		set
+		{
+			PropertyInfo copyBuffer = GetSystemCopyBufferProperty();
+			if (copyBuffer != null) copyBuffer.SetValue(null, value, null);
+		}
 	}
 }

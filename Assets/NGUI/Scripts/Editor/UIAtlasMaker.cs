@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
@@ -105,28 +105,47 @@ public class UIAtlasMaker : EditorWindow
 	/// Pack all of the specified sprites into a single texture, updating the outer and inner rects of the sprites as needed.
 	/// </summary>
 
-	static void PackTextures (Texture2D tex, List<SpriteEntry> sprites)
+	static bool PackTextures (Texture2D tex, List<SpriteEntry> sprites)
 	{
 		Texture2D[] textures = new Texture2D[sprites.Count];
 		Rect[] rects;
 
+		int maxSize = SystemInfo.maxTextureSize;
+
+#if UNITY_ANDROID || UNITY_IPHONE
+		if (PlayerSettings.targetGlesGraphics == TargetGlesGraphics.OpenGLES_1_x)
+		{
+			maxSize = Mathf.Min(maxSize, 1024);
+		}
+		else
+		{
+			maxSize = Mathf.Min(maxSize, NGUISettings.allow4096 ? 4096 : 2048);
+		}
+#endif
+
 		if (NGUISettings.unityPacking)
 		{
 			for (int i = 0; i < sprites.Count; ++i) textures[i] = sprites[i].tex;
-			rects = tex.PackTextures(textures, NGUISettings.atlasPadding, 4096);
+			rects = tex.PackTextures(textures, NGUISettings.atlasPadding, maxSize);
 		}
 		else
 		{
 			sprites.Sort(Compare);
 			for (int i = 0; i < sprites.Count; ++i) textures[i] = sprites[i].tex;
-			rects = UITexturePacker.PackTextures(tex, textures, 4, 4, NGUISettings.atlasPadding, 4096);
+			rects = UITexturePacker.PackTextures(tex, textures, 4, 4, NGUISettings.atlasPadding, maxSize);
 		}
 
 		for (int i = 0; i < sprites.Count; ++i)
 		{
-			sprites[i].rect = NGUIMath.ConvertToPixels(rects[i], tex.width, tex.height, true);
+			Rect rect = NGUIMath.ConvertToPixels(rects[i], tex.width, tex.height, true);
+
+			// Make sure that we don't shrink the textures
+			if (Mathf.RoundToInt(rect.width) != textures[i].width) return false;
+
+			sprites[i].rect = rect;
 			//BleedTexture(tex, sprites[i].rect);
 		}
+		return true;
 	}
 
 	/// <summary>
@@ -534,7 +553,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Combine all sprites into a single texture and save it to disk.
 	/// </summary>
 
-	static Texture2D UpdateTexture (UIAtlas atlas, List<SpriteEntry> sprites)
+	static bool UpdateTexture (UIAtlas atlas, List<SpriteEntry> sprites)
 	{
 		// Get the texture for the atlas
 		Texture2D tex = atlas.texture as Texture2D;
@@ -549,42 +568,52 @@ public class UIAtlasMaker : EditorWindow
 			System.IO.File.SetAttributes(newPath, newPathAttrs);
 		}
 
-		if (tex == null || oldPath != newPath)
+		bool newTexture = (tex == null || oldPath != newPath);
+
+		if (newTexture)
 		{
 			// Create a new texture for the atlas
 			tex = new Texture2D(1, 1, TextureFormat.ARGB32, false);
-
-			// Pack the sprites into this texture
-			PackTextures(tex, sprites);
-			byte[] bytes = tex.EncodeToPNG();
-			System.IO.File.WriteAllBytes(newPath, bytes);
-			bytes = null;
-
-			// Load the texture we just saved as a Texture2D
-			AssetDatabase.Refresh();
-			tex = NGUIEditorTools.ImportTexture(newPath, false, true);
-
-			// Update the atlas texture
-			if (tex == null) Debug.LogError("Failed to load the created atlas saved as " + newPath);
-			else atlas.spriteMaterial.mainTexture = tex;
 		}
 		else
 		{
 			// Make the atlas readable so we can save it
 			tex = NGUIEditorTools.ImportTexture(oldPath, true, false);
+		}
 
-			// Pack all sprites into atlas texture
-			PackTextures(tex, sprites);
+		// Pack the sprites into this texture
+		if (PackTextures(tex, sprites))
+		{
 			byte[] bytes = tex.EncodeToPNG();
 			System.IO.File.WriteAllBytes(newPath, bytes);
 			bytes = null;
 
-			// Re-import the newly created texture, turning off the 'readable' flag
+			// Load the texture we just saved as a Texture2D
+			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh();
-			tex = NGUIEditorTools.ImportTexture(newPath, false, false);
+			tex = NGUIEditorTools.ImportTexture(newPath, false, true);
+
+			// Update the atlas texture
+			if (newTexture)
+			{
+				if (tex == null) Debug.LogError("Failed to load the created atlas saved as " + newPath);
+				else atlas.spriteMaterial.mainTexture = tex;
+				AssetDatabase.SaveAssets();
+				AssetDatabase.Refresh();
+			}
+			return true;
 		}
-		AssetDatabase.SaveAssets();
-		return tex;
+		else
+		{
+			if (!newTexture) NGUIEditorTools.ImportTexture(oldPath, false, true);
+			
+			//Debug.LogError("Operation canceled: The selected sprites can't fit into the atlas.\n" +
+			//	"Keep large sprites outside the atlas (use UITexture), and/or use multiple atlases instead.");
+			
+			EditorUtility.DisplayDialog("Operation Canceled", "The selected sprites can't fit into the atlas.\n" +
+					"Keep large sprites outside the atlas (use UITexture), and/or use multiple atlases instead", "OK");
+			return false;
+		}
 	}
 
 	/// <summary>
@@ -596,13 +625,15 @@ public class UIAtlasMaker : EditorWindow
 		if (sprites.Count > 0)
 		{
 			// Combine all sprites into a single texture and save it
-			UpdateTexture(atlas, sprites);
+			if (UpdateTexture(atlas, sprites))
+			{
+				// Replace the sprites within the atlas
+				ReplaceSprites(atlas, sprites);
 
-			// Replace the sprites within the atlas
-			ReplaceSprites(atlas, sprites);
-
-			// Release the temporary textures
-			ReleaseSprites(sprites);
+				// Release the temporary textures
+				ReleaseSprites(sprites);
+			}
+			else return;
 		}
 		else
 		{
@@ -812,7 +843,7 @@ public class UIAtlasMaker : EditorWindow
 
 			GUILayout.BeginHorizontal();
 			NGUISettings.atlasPadding = Mathf.Clamp(EditorGUILayout.IntField("Padding", NGUISettings.atlasPadding, GUILayout.Width(100f)), 0, 8);
-			GUILayout.Label("in pixels in-between of sprites");
+			GUILayout.Label((NGUISettings.atlasPadding == 1 ? "pixel" : "pixels") + " in-between of sprites");
 			GUILayout.EndHorizontal();
 
 			GUILayout.BeginHorizontal();
@@ -824,7 +855,7 @@ public class UIAtlasMaker : EditorWindow
 			NGUISettings.unityPacking = EditorGUILayout.Toggle("Unity Packer", NGUISettings.unityPacking, GUILayout.Width(100f));
 			GUILayout.Label("if off, use a custom packer");
 			GUILayout.EndHorizontal();
-			
+
 			if (!NGUISettings.unityPacking)
 			{
 				GUILayout.BeginHorizontal();
@@ -833,6 +864,12 @@ public class UIAtlasMaker : EditorWindow
 				GUILayout.EndHorizontal();
 			}
 
+#if UNITY_IPHONE || UNITY_ANDROID
+			GUILayout.BeginHorizontal();
+			NGUISettings.allow4096 = EditorGUILayout.Toggle("4096x4096", NGUISettings.allow4096, GUILayout.Width(100f));
+			GUILayout.Label("if off, limit atlases to 2048x2048");
+			GUILayout.EndHorizontal();
+#endif
 			if (textures.Count > 0)
 			{
 				GUI.backgroundColor = Color.green;

@@ -78,6 +78,7 @@ public class UISlider : IgnoreTimeScale
 	UISprite mFGFilled;
 	bool mInitDone = false;
 	Vector2 mSize = Vector2.zero;
+	Vector2 mCenter = Vector3.zero;
 
 	/// <summary>
 	/// Value of the slider.
@@ -117,10 +118,12 @@ public class UISlider : IgnoreTimeScale
 			mFGFilled = (mFGWidget != null) ? mFGWidget as UISprite : null;
 			mFGTrans = foreground.transform;
 			if (mSize == Vector2.zero) mSize = foreground.localScale;
+			if (mCenter == Vector2.zero) mCenter = foreground.localPosition + foreground.localScale * 0.5f;
 		}
 		else if (mCol != null)
 		{
 			if (mSize == Vector2.zero) mSize = mCol.size;
+			if (mCenter == Vector2.zero) mCenter = mCol.center;
 		}
 		else
 		{
@@ -220,7 +223,7 @@ public class UISlider : IgnoreTimeScale
 		if (!plane.Raycast(ray, out dist)) return;
 
 		// Collider's bottom-left corner in local space
-		Vector3 localOrigin = mTrans.localPosition + mCol.center - mCol.size * 0.5f;
+		Vector3 localOrigin = mTrans.localPosition + (Vector3)(mCenter - mSize * 0.5f);
 		Vector3 localOffset = mTrans.localPosition - localOrigin;
 
 		// Direction to the point on the plane in scaled local space
@@ -228,7 +231,7 @@ public class UISlider : IgnoreTimeScale
 		Vector3 dir = localCursor + localOffset;
 
 		// Update the slider
-		Set( (direction == Direction.Horizontal) ? dir.x / mCol.size.x : dir.y / mCol.size.y, false );
+		Set((direction == Direction.Horizontal) ? dir.x / mSize.x : dir.y / mSize.y, false);
 	}
 
 	/// <summary>
@@ -281,7 +284,7 @@ public class UISlider : IgnoreTimeScale
 
 					if (mFGWidget != null)
 					{
-						if (val > 0.001f)
+						if (stepValue > 0.001f)
 						{
 							mFGWidget.enabled = true;
 							mFGWidget.MarkAsChanged();

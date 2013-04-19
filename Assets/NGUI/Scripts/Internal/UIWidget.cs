@@ -92,6 +92,7 @@ public abstract class UIWidget : MonoBehaviour
 
 				Transform t = cachedTransform;
 				Vector3 pos = t.position;
+				float z = t.localPosition.z;
 				pos.x += (before.x - after.x);
 				pos.y += (before.y - after.y);
 				cachedTransform.position = pos;
@@ -99,6 +100,7 @@ public abstract class UIWidget : MonoBehaviour
 				pos = cachedTransform.localPosition;
 				pos.x = Mathf.Round(pos.x);
 				pos.y = Mathf.Round(pos.y);
+				pos.z = z;
 				cachedTransform.localPosition = pos;
 			}
 		}
@@ -445,8 +447,10 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-		if (mVisibleFlag != 0 && mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos && UnityEditor.Selection.activeGameObject != gameObject)
+		if (mVisibleFlag != 0 && mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos)
 		{
+			if (UnityEditor.Selection.activeGameObject == gameObject && UnityEditor.EditorPrefs.GetBool("New GUI", true)) return;
+
 			Color outline = new Color(1f, 1f, 1f, 0.2f);
 
 			// Position should be offset by depth so that the selection works properly
@@ -471,7 +475,7 @@ public abstract class UIWidget : MonoBehaviour
 
 			// Draw the gizmo
 			Gizmos.matrix = cachedTransform.localToWorldMatrix;
-			Gizmos.color = (UnityEditor.Selection.activeGameObject == gameObject) ? new Color(0f, 0.75f, 1f) : outline;
+			Gizmos.color = (UnityEditor.Selection.activeGameObject == gameObject) ? Color.green : outline;
 			Gizmos.DrawWireCube(pos, size);
 
 			// Make the widget selectable

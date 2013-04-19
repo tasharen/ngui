@@ -297,7 +297,7 @@ public abstract class UITweener : IgnoreTimeScale
 	/// Manually reset the tweener's state to the beginning.
 	/// </summary>
 
-	public void Reset() { mFactor = (mAmountPerDelta < 0f) ? 1f : 0f; Sample(mFactor, false); }
+	public void Reset () { mStarted = false; mFactor = (mAmountPerDelta < 0f) ? 1f : 0f; Sample(mFactor, false); }
 
 	/// <summary>
 	/// Manually start the tweening process, reversing its direction.

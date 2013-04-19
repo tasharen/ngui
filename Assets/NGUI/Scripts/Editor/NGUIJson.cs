@@ -81,7 +81,11 @@ public class NGUIJson
 
 			// Get rid of the extension if the sprite doesn't exist
 			// The extension is kept for backwards compatibility so it's still possible to update older atlases.
-			if (!exists) newSprite.name = newSprite.name.Replace(".png", "");
+			if (!exists)
+			{
+				newSprite.name = newSprite.name.Replace(".png", "");
+				newSprite.name = newSprite.name.Replace(".tga", "");
+			}
 
 			// Extract the info we need from the TexturePacker json file, mainly uvRect and size
 			Hashtable table = (Hashtable)item.Value;

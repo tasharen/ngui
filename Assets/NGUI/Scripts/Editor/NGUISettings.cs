@@ -27,6 +27,7 @@ public class NGUISettings
 	static public bool mAtlasTrimming = true;
 	static bool mUnityPacking = true;
 	static bool mForceSquare = true;
+	static bool mAllow4096 = false;
 	static Color mColor = Color.white;
 	static int mLayer = 0;
 
@@ -275,4 +276,10 @@ public class NGUISettings
 	/// </summary>
 	
 	static public bool forceSquareAtlas { get { if (!mLoaded) Load(); return mForceSquare; } set { if (mForceSquare != value) { mForceSquare = value; Save(); } } }
+
+	/// <summary>
+	/// Whether the atlas maker will allow 4096 width/height textures on mobiles.
+	/// </summary>
+
+	static public bool allow4096 { get { if (!mLoaded) Load(); return mAllow4096; } set { if (mAllow4096 != value) { mAllow4096 = value; Save(); } } }
 }

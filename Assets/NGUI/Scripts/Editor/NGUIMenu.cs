@@ -214,4 +214,20 @@ static public class NGUIMenu
 	{
 		EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true);
 	}
+
+	[MenuItem("NGUI/Toggle Draggable Handles")]
+	static public void ToggleNewGUI ()
+	{
+		bool isActive = !EditorPrefs.GetBool("New GUI", true);
+		EditorPrefs.SetBool("New GUI", isActive);
+
+		if (isActive)
+		{
+			Debug.Log("Now using the 2.5.0+ GUI handles. Selecting a widget will bring up draggable handles.");
+		}
+		else
+		{
+			Debug.Log("No longer using the 2.5.0+ GUI handles. Selecting a widget will not bring up draggable handles.");
+		}
+	}
 }
