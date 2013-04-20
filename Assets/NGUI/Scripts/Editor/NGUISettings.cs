@@ -30,6 +30,7 @@ public class NGUISettings
 	static bool mAllow4096 = false;
 	static Color mColor = Color.white;
 	static int mLayer = 0;
+	static Font mDynFont;
 
 	static Object GetObject (string name)
 	{
@@ -56,6 +57,7 @@ public class NGUISettings
 		mForceSquare	= EditorPrefs.GetBool("NGUI Force Square Atlas", true);
 		mPivot			= (UIWidget.Pivot)EditorPrefs.GetInt("NGUI Pivot", (int)mPivot);
 		mLayer			= EditorPrefs.GetInt("NGUI Layer", l);
+		mDynFont		= GetObject("NGUI DynFont") as Font;
 
 		LoadColor();
 	}
@@ -75,6 +77,8 @@ public class NGUISettings
 		EditorPrefs.SetBool("NGUI Force Square Atlas", mForceSquare);
 		EditorPrefs.SetInt("NGUI Pivot", (int)mPivot);
 		EditorPrefs.SetInt("NGUI Layer", mLayer);
+		EditorPrefs.SetInt("NGUI DynFont", (mDynFont != null) ? mDynFont.GetInstanceID() : -1);
+
 		SaveColor();
 	}
 
@@ -123,7 +127,7 @@ public class NGUISettings
 	}
 
 	/// <summary>
-	/// Default font used by NGUI.
+	/// Default bitmap font used by NGUI.
 	/// </summary>
 
 	static public UIFont font
@@ -139,6 +143,28 @@ public class NGUISettings
 			{
 				mFont = value;
 				mFontName = (mFont != null) ? mFont.name : "New Font";
+				Save();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Default dynamic font used by NGUI.
+	/// </summary>
+
+	static public Font dynamicFont
+	{
+		get
+		{
+			if (!mLoaded) Load();
+			return mDynFont;
+		}
+		set
+		{
+			if (mDynFont != value)
+			{
+				mDynFont = value;
+				mFontName = (mDynFont != null) ? mDynFont.name : "New Font";
 				Save();
 			}
 		}
