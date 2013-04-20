@@ -88,6 +88,7 @@ public class UINode
 		// If the transform says it hasn't changed, there is really no point in going further
 		if (!changed && !trans.hasChanged) return false;
 		trans.hasChanged = false;
+		changed = true;
 #endif
 		if (changed || (isActive &&
 			(mLastPos != trans.localPosition ||
