@@ -191,6 +191,7 @@ public class UIFontInspector : Editor
 				{
 					NGUIEditorTools.AdvancedSpriteField(mFont.atlas, mFont.spriteName, SelectSprite, false);
 				}
+				EditorGUILayout.Space();
 			}
 			else
 			{
@@ -209,7 +210,6 @@ public class UIFontInspector : Editor
 
 			if (mFont.atlas != null || mFont.material != null)
 			{
-				EditorGUILayout.Space();
 				TextAsset data = EditorGUILayout.ObjectField("Import Data", null, typeof(TextAsset), false) as TextAsset;
 
 				if (data != null)
@@ -249,8 +249,6 @@ public class UIFontInspector : Editor
 						// Create a button that can make the coordinates pixel-perfect on click
 						GUILayout.BeginHorizontal();
 						{
-							GUILayout.Label("Correction", GUILayout.Width(75f));
-
 							Rect corrected = NGUIMath.MakePixelPerfect(pixels);
 
 							if (corrected == pixels)
@@ -275,20 +273,8 @@ public class UIFontInspector : Editor
 							NGUIEditorTools.RegisterUndo("Font Pixel Rect", mFont);
 							mFont.uvRect = uvRect;
 						}
-					}
-
-					if (mFont.atlas == null)
-					{
-						mView = View.Font;
-						mUseShader = false;
-
-						float pixelSize = EditorGUILayout.FloatField("Pixel Size", mFont.pixelSize, GUILayout.Width(120f));
-
-						if (pixelSize != mFont.pixelSize)
-						{
-							NGUIEditorTools.RegisterUndo("Font Change", mFont);
-							mFont.pixelSize = pixelSize;
-						}
+						//NGUIEditorTools.DrawSeparator();
+						EditorGUILayout.Space();
 					}
 				}
 			}
@@ -317,6 +303,20 @@ public class UIFontInspector : Editor
 				}
 			}
 			GUILayout.EndHorizontal();
+
+			if (mFont.atlas == null)
+			{
+				mView = View.Font;
+				mUseShader = false;
+
+				float pixelSize = EditorGUILayout.FloatField("Pixel Size", mFont.pixelSize, GUILayout.Width(120f));
+
+				if (pixelSize != mFont.pixelSize)
+				{
+					NGUIEditorTools.RegisterUndo("Font Change", mFont);
+					mFont.pixelSize = pixelSize;
+				}
+			}
 			EditorGUILayout.Space();
 		}
 
