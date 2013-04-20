@@ -62,9 +62,8 @@ Shader "GUI/Text Shader (AlphaClip)"
 			half4 frag (v2f IN) : COLOR
 			{
 				// Sample the texture
-				//half4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
-				half4 col = IN.color; 									//handles the 8bit alpha texture unity creates.
-				col.a *= UNITY_SAMPLE_1CHANNEL(_MainTex, IN.texcoord);	//handles the 8bit alpha texture unity creates.
+				half4 col = IN.color;
+				col.a *= tex2D(_MainTex, IN.texcoord).a;
 
 				float2 factor = abs(IN.worldPos);
 				float val = 1.0 - max(factor.x, factor.y);

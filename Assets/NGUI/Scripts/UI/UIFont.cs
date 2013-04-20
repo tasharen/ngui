@@ -48,7 +48,9 @@ public class UIFont : MonoBehaviour
 	[HideInInspector][SerializeField] Font mDynamicFont;
 	[HideInInspector][SerializeField] int mDynamicFontSize = 16;
 	[HideInInspector][SerializeField] FontStyle mDynamicFontStyle = FontStyle.Normal;
+#if !UNITY_3_5
 	[HideInInspector][SerializeField] float mDynamicFontOffset = 0f;
+#endif
 
 	// Cached value
 	UIAtlas.Sprite mSprite = null;
