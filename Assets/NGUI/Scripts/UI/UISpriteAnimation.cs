@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
@@ -125,5 +125,11 @@ public class UISpriteAnimation : MonoBehaviour
 	{
 		mActive = true;
 		mIndex = 0;
+
+		if (mSprite != null && mSpriteNames.Count > 0)
+		{
+			mSprite.spriteName = mSpriteNames[mIndex];
+			mSprite.MakePixelPerfect();
+		}
 	}
 }

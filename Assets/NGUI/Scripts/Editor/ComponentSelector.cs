@@ -74,16 +74,42 @@ public class ComponentSelector : ScriptableWizard
 	void OnGUI ()
 	{
 		EditorGUIUtility.LookLikeControls(80f);
+		GUILayout.Label("Recently used components", "LODLevelNotifyText");
+		NGUIEditorTools.DrawSeparator();
 
 		if (mObjects.Length == 0)
 		{
-			GUILayout.Label("No recently used " + mType.ToString() + " components found.\nTry drag & dropping one instead.");
+			EditorGUILayout.HelpBox("No recently used " + mType.ToString() + " components found.\nTry drag & dropping one instead, or creating a new one.", MessageType.Info);
+
+			bool isDone = false;
+
+			EditorGUILayout.Space();
+			GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
+
+			if (mType == typeof(UIFont))
+			{
+				if (GUILayout.Button("Open the Font Maker", GUILayout.Width(150f)))
+				{
+					EditorWindow.GetWindow<UIFontMaker>(false, "Font Maker", true);
+					isDone = true;
+				}
+			}
+			else if (mType == typeof(UIAtlas))
+			{
+				if (GUILayout.Button("Open the Atlas Maker", GUILayout.Width(150f)))
+				{
+					EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true);
+					isDone = true;
+				}
+			}
+
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+			if (isDone) Close();
 		}
 		else
 		{
-			GUILayout.Label("Recently used components", "LODLevelNotifyText");
-			NGUIEditorTools.DrawSeparator();
-
 			MonoBehaviour sel = null;
 
 			foreach (MonoBehaviour o in mObjects)
