@@ -37,6 +37,7 @@ public abstract class UIWidget : MonoBehaviour
 	protected bool mChanged = true;
 	protected bool mPlayMode = true;
 
+	GameObject mGo;
 	Vector3 mDiffPos;
 	Quaternion mDiffRot;
 	Vector3 mDiffScale;
@@ -345,7 +346,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Remember whether we're in play mode.
 	/// </summary>
 
-	protected virtual void Awake() { mPlayMode = Application.isPlaying; }
+	protected virtual void Awake () { mGo = gameObject; mPlayMode = Application.isPlaying; }
 
 	/// <summary>
 	/// Mark the widget and the panel as having been changed.
@@ -490,28 +491,39 @@ public abstract class UIWidget : MonoBehaviour
 	/// Update the widget and fill its geometry if necessary. Returns whether something was changed.
 	/// </summary>
 
-	public bool UpdateGeometry (ref Matrix4x4 worldToPanel, bool parentMoved, bool generateNormals)
+	public bool UpdateGeometry (UIPanel p, ref Matrix4x4 worldToPanel, bool parentMoved, bool generateNormals)
 	{
 		if (material == null) return false;
 
 		if (OnUpdate() || mChanged)
 		{
 			mChanged = false;
-			mGeom.Clear();
-			OnFill(mGeom.verts, mGeom.uvs, mGeom.cols);
 
-			if (mGeom.hasVertices)
+			if (NGUITools.GetActive(mGo))
 			{
-				Vector3 offset = pivotOffset;
-				Vector2 scale = relativeSize;
+				mPanel = p;
+				mGeom.Clear();
+				OnFill(mGeom.verts, mGeom.uvs, mGeom.cols);
 
-				offset.x *= scale.x;
-				offset.y *= scale.y;
+				if (mGeom.hasVertices)
+				{
+					Vector3 offset = pivotOffset;
+					Vector2 scale = relativeSize;
 
-				mGeom.ApplyOffset(offset);
-				mGeom.ApplyTransform(worldToPanel * cachedTransform.localToWorldMatrix, generateNormals);
+					offset.x *= scale.x;
+					offset.y *= scale.y;
+
+					mGeom.ApplyOffset(offset);
+					mGeom.ApplyTransform(worldToPanel * cachedTransform.localToWorldMatrix, generateNormals);
+				}
+				return true;
 			}
-			return true;
+			else if (mGeom.hasVertices)
+			{
+				mGeom.Clear();
+				return true;
+			}
+			return false;
 		}
 		else if (mGeom.hasVertices && parentMoved)
 		{

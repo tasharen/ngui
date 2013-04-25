@@ -845,7 +845,7 @@ public class UIPanel : MonoBehaviour
 			UIWidget w = pc.widget;
 
 			// If the widget is visible, update it
-			if (pc.visibleFlag == 1 && w != null && w.UpdateGeometry(ref mWorldToLocal, (pc.changeFlag == 1), generateNormals))
+			if (pc.visibleFlag == 1 && w != null && w.UpdateGeometry(this, ref mWorldToLocal, (pc.changeFlag == 1), generateNormals))
 			{
 				// We will need to refill this buffer
 				if (!mChanged.Contains(w.material))
