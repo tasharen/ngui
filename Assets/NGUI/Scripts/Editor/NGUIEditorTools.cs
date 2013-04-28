@@ -521,7 +521,7 @@ public class NGUIEditorTools
 			settings.npotScale = TextureImporterNPOTScale.None;
 
 			ti.SetTextureSettings(settings);
-			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
 		}
 		return true;
 	}
@@ -555,7 +555,7 @@ public class NGUIEditorTools
 			settings.npotScale = TextureImporterNPOTScale.ToNearest;
 
 			ti.SetTextureSettings(settings);
-			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
 		}
 		return true;
 	}
@@ -570,7 +570,11 @@ public class NGUIEditorTools
 		{
 			if (forInput) { if (!MakeTextureReadable(path, force)) return null; }
 			else if (!MakeTextureAnAtlas(path, force)) return null;
-			return AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
+			//return AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
+
+			Texture2D tex = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
+			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+			return tex;
 		}
 		return null;
 	}

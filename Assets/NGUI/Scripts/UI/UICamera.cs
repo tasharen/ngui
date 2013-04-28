@@ -3,16 +3,8 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
-#if UNITY_FLASH || UNITY_WP8 || UNITY_METRO
-#define USE_SIMPLE_DICTIONARY
-#endif
-
 using UnityEngine;
 using System.Collections.Generic;
-
-#if !USE_SIMPLE_DICTIONARY
-using System.Collections.Specialized;
-#endif
 
 /// <summary>
 /// This script should be attached to each camera that's used to draw the objects with
@@ -297,11 +289,7 @@ public class UICamera : MonoBehaviour
 	static float mNextEvent = 0f;
 
 	// List of currently active touches
-#if USE_SIMPLE_DICTIONARY
 	static Dictionary<int, MouseOrTouch> mTouches = new Dictionary<int, MouseOrTouch>();
-#else
-	static OrderedDictionary mTouches = new OrderedDictionary();
-#endif
 
 	// Tooltip widget (mouse only)
 	GameObject mTooltip = null;
@@ -385,7 +373,7 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			int count = 0;
+			int count = mTouches.Count;
 
 			for (int i = 0; i < mMouse.Length; ++i)
 				if (mMouse[i].pressed != null)
@@ -394,16 +382,6 @@ public class UICamera : MonoBehaviour
 			if (mController.pressed != null)
 				++count;
 
-#if USE_SIMPLE_DICTIONARY
-			foreach (KeyValuePair<int, MouseOrTouch> t in mTouches)
-				if (t.Value.pressed != null) ++count;
-#else
-			for (int i = 0, imax = mTouches.Count; i < imax; ++i)
-			{
-				MouseOrTouch t = (MouseOrTouch)mTouches[i];
-				if (t.pressed != null) ++count;
-			}
-#endif
 			return count;
 		}
 	}
@@ -676,15 +654,7 @@ public class UICamera : MonoBehaviour
 	{
 		MouseOrTouch touch = null;
 
-#if USE_SIMPLE_DICTIONARY
-		if (!mTouches.TryGetValue(t, out touch))
-#else
-		if (mTouches.Contains(id))
-		{
-			touch = (MouseOrTouch)mTouches[id];
-		}
-		else
-#endif
+		if (!mTouches.TryGetValue(id, out touch))
 		{
 			touch = new MouseOrTouch();
 			touch.touchBegan = true;
