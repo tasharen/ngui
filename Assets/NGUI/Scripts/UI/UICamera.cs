@@ -373,7 +373,7 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			int count = 0;
+			int count = mTouches.Count;
 
 			for (int i = 0; i < mMouse.Length; ++i)
 				if (mMouse[i].pressed != null)
@@ -381,10 +381,6 @@ public class UICamera : MonoBehaviour
 
 			if (mController.pressed != null)
 				++count;
-
-			for (int i = 0; i < mTouches.Count; ++i)
-				if (mTouches[i].pressed != null)
-					++count;
 
 			return count;
 		}
@@ -656,7 +652,7 @@ public class UICamera : MonoBehaviour
 
 	static public MouseOrTouch GetTouch (int id)
 	{
-		MouseOrTouch touch;
+		MouseOrTouch touch = null;
 
 		if (!mTouches.TryGetValue(id, out touch))
 		{

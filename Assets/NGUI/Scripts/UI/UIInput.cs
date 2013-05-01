@@ -238,7 +238,7 @@ public class UIInput : MonoBehaviour
 		{
 			if (isSelected)
 			{
-				mText = (label.text == mDefaultText) ? "" : label.text;
+				mText = (!useLabelTextAtStart && label.text == mDefaultText) ? "" : label.text;
 				label.color = activeColor;
 				if (isPassword) label.password = true;
 
