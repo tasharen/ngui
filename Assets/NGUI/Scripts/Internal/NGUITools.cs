@@ -815,10 +815,10 @@ static public class NGUITools
 	static PropertyInfo mSystemCopyBuffer = null;
 	static PropertyInfo GetSystemCopyBufferProperty ()
 	{
-#if UNITY_METRO
-	return null;
+#if UNITY_WEBPLAYER || UNITY_FLASH || UNITY_METRO
+		return null;
 #else
-		
+
 		if (mSystemCopyBuffer == null)
 		{
 			Type gui = typeof(GUIUtility);
