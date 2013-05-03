@@ -815,12 +815,17 @@ static public class NGUITools
 	static PropertyInfo mSystemCopyBuffer = null;
 	static PropertyInfo GetSystemCopyBufferProperty ()
 	{
+#if UNITY_METRO
+	return null;
+#else
+		
 		if (mSystemCopyBuffer == null)
 		{
 			Type gui = typeof(GUIUtility);
 			mSystemCopyBuffer = gui.GetProperty("systemCopyBuffer", BindingFlags.Static | BindingFlags.NonPublic);
 		}
 		return mSystemCopyBuffer;
+#endif
 	}
 
 	/// <summary>
