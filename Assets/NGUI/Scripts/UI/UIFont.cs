@@ -565,7 +565,18 @@ public class UIFont : MonoBehaviour
 	static public bool CheckIfRelated (UIFont a, UIFont b)
 	{
 		if (a == null || b == null) return false;
+		if (a.isDynamic && a.dynamicTexture == b.dynamicTexture) return true;
 		return a == b || a.References(b) || b.References(a);
+	}
+
+	Texture dynamicTexture
+	{
+		get
+		{
+			if (mReplacement) return mReplacement.dynamicTexture;
+			if (isDynamic) return mDynamicFont.material.mainTexture;
+			return null;
+		}
 	}
 
 	/// <summary>
@@ -607,7 +618,7 @@ public class UIFont : MonoBehaviour
 	/// and then determine the difference between the glyph's position and the font's size.
 	/// </summary>
 
-	public void RecalculateDynamicOffset()
+	public bool RecalculateDynamicOffset()
 	{
 #if !UNITY_3_5
 		if (mDynamicFont != null)
@@ -615,9 +626,16 @@ public class UIFont : MonoBehaviour
 			CharacterInfo j;
 			mDynamicFont.RequestCharactersInTexture("j", mDynamicFontSize, mDynamicFontStyle);
 			mDynamicFont.GetCharacterInfo('j', out j, mDynamicFontSize, mDynamicFontStyle);
-			mDynamicFontOffset = (mDynamicFontSize + j.vert.yMax);
+			float offset = (mDynamicFontSize + j.vert.yMax);
+			
+			if (!float.Equals(mDynamicFontOffset, offset))
+			{
+				mDynamicFontOffset = offset;
+				return true;
+			}
 		}
 #endif
+		return false;
 	}
 
 	/// <summary>
@@ -639,7 +657,12 @@ public class UIFont : MonoBehaviour
 		{
 			if (encoding) text = NGUITools.StripSymbols(text);
 #if !UNITY_3_5
-			if (dynamic) mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
+			if (dynamic)
+			{
+				mDynamicFont.textureRebuildCallback = OnFontChanged;
+				mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
+				mDynamicFont.textureRebuildCallback = null;
+			}
 #endif
 			int length = text.Length;
 			int maxX = 0;
@@ -739,7 +762,12 @@ public class UIFont : MonoBehaviour
 		bool dynamic = isDynamic;
 
 #if !UNITY_3_5
-		if (dynamic) mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
+		if (dynamic)
+		{
+			mDynamicFont.textureRebuildCallback = OnFontChanged;
+			mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
+			mDynamicFont.textureRebuildCallback = null;
+		}
 #endif
 		while (currentCharacterIndex > 0 && remainingWidth > 0)
 		{
@@ -819,7 +847,12 @@ public class UIFont : MonoBehaviour
 
 #if !UNITY_3_5
 		// Make sure the characters are present in the dynamic font before printing them
-		if (dynamic) mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
+		if (dynamic)
+		{
+			mDynamicFont.textureRebuildCallback = OnFontChanged;
+			mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
+			mDynamicFont.textureRebuildCallback = null;
+		}
 #endif
 
 		// Run through all characters
@@ -1011,6 +1044,8 @@ public class UIFont : MonoBehaviour
 		}
 	}
 
+	void OnFontChanged () { MarkAsDirty(); }
+
 	/// <summary>
 	/// Print the specified text into the buffers.
 	/// Note: 'lineWidth' parameter should be in pixels.
@@ -1034,7 +1069,16 @@ public class UIFont : MonoBehaviour
 			// Make sure the characters are present in the dynamic font before printing them
 			bool dynamic = isDynamic;
 #if !UNITY_3_5
-			if (dynamic) mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
+			if (dynamic)
+			{
+				Material mat = mDynamicFont.material;
+				int width = mat.mainTexture.width;
+				int height = mat.mainTexture.height;
+
+				mDynamicFont.textureRebuildCallback = OnFontChanged;
+				mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
+				mDynamicFont.textureRebuildCallback = null;
+			}
 #endif
 			mColors.Clear();
 			mColors.Add(color);

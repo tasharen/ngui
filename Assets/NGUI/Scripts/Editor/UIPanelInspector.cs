@@ -84,7 +84,7 @@ public class UIPanelInspector : Editor
 
 		GUILayout.BeginHorizontal();
 		bool depth = EditorGUILayout.Toggle("Depth Pass", panel.depthPass, GUILayout.Width(100f));
-		GUILayout.Label("Extra draw call, saves fillrate");
+		GUILayout.Label("Doubles draw calls, saves fillrate");
 		GUILayout.EndHorizontal();
 
 		if (panel.depthPass != depth)
@@ -92,6 +92,16 @@ public class UIPanelInspector : Editor
 			panel.depthPass = depth;
 			panel.UpdateDrawcalls();
 			EditorUtility.SetDirty(panel);
+		}
+
+		if (depth)
+		{
+			UICamera cam = UICamera.FindCameraForLayer(panel.gameObject.layer);
+
+			if (cam == null || cam.camera.isOrthoGraphic)
+			{
+				EditorGUILayout.HelpBox("Please note that depth pass will only save fillrate when used with 3D UIs, and only UIs drawn by the game camera. If you are using a separate camera for the UI, you will not see any benefit!", MessageType.Warning);
+			}
 		}
 
 		GUILayout.BeginHorizontal();
