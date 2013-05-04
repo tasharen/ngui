@@ -1071,10 +1071,6 @@ public class UIFont : MonoBehaviour
 #if !UNITY_3_5
 			if (dynamic)
 			{
-				Material mat = mDynamicFont.material;
-				int width = mat.mainTexture.width;
-				int height = mat.mainTexture.height;
-
 				mDynamicFont.textureRebuildCallback = OnFontChanged;
 				mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
 				mDynamicFont.textureRebuildCallback = null;
