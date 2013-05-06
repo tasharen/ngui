@@ -44,6 +44,7 @@ public class NGUISettings
 	{
 		int l = LayerMask.NameToLayer("UI");
 		if (l == -1) l = LayerMask.NameToLayer("GUI");
+		if (l == -1) l = 31;
 
 		mLoaded			= true;
 		mPartial		= EditorPrefs.GetString("NGUI Partial");

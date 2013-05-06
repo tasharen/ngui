@@ -316,6 +316,7 @@ public class UIInput : MonoBehaviour
 					if (ch != 0) mText += ch;
 				}
 
+				if (maxChars > 0 && mText.Length > maxChars) mText = mText.Substring(0, maxChars);
 				if (mText != text) mKeyboard.text = mText;
 				UpdateLabel();
 			}
