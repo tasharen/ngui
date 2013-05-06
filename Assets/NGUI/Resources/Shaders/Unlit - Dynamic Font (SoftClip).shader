@@ -68,8 +68,8 @@ Shader "Unlit/Dynamic Font (SoftClip)"
 				float2 factor = (float2(1.0, 1.0) - abs(IN.worldPos)) * _ClipSharpness;
 			
 				// Sample the texture				
-				half4 col = IN.color; 									//handles the 8bit alpha texture unity creates.
-				col.a *= UNITY_SAMPLE_1CHANNEL(_MainTex, IN.texcoord);	//handles the 8bit alpha texture unity creates.
+				half4 col = IN.color;
+				col.a *= tex2D(_MainTex, IN.texcoord).a;
 				col.a *= clamp( min(factor.x, factor.y), 0.0, 1.0);
 
 				return col;
