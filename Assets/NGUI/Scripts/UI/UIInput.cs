@@ -92,6 +92,12 @@ public class UIInput : MonoBehaviour
 	public Color activeColor = Color.white;
 
 	/// <summary>
+	/// Object to select when Tab key gets pressed.
+	/// </summary>
+
+	public GameObject selectOnTab;
+
+	/// <summary>
 	/// Event receiver that will be notified when the input field submits its data (enter gets pressed).
 	/// </summary>
 
@@ -338,18 +344,15 @@ public class UIInput : MonoBehaviour
 	{
 		if (selected)
 		{
-			// TODO: Investigate a work-around
-			// Backspace... doesn't seem to work on the mac either.
-			//if (Input.GetKeyDown(KeyCode.Delete) && mText.Length > 0)
-			//{
-			//    mText = mText.Substring(0, mText.Length - 1);
-			//    SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
-			//}
+			if (selectOnTab != null && Input.GetKeyDown(KeyCode.Tab))
+			{
+				UICamera.selectedObject = selectOnTab;
+			}
 
 			// Note: this won't work in the editor. Only in the actual published app. Unity blocks control-keys in the editor.
 			if (Input.GetKeyDown(KeyCode.V) &&
 #if UNITY_STANDALONE_OSX
-				(Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand)))
+				(Input.GetKey(KeyCode.LeftApple) || Input.GetKey(KeyCode.LeftApple)))
 #else
 				(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
 #endif

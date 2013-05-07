@@ -121,14 +121,14 @@ public class UIFontInspector : Editor
 			ComponentSelector.Draw<UIFont>(mFont.replacement, OnSelectFont);
 
 			NGUIEditorTools.DrawSeparator();
-			GUILayout.Label("You can have one font simply point to\n" +
-				"another one. This is useful if you want to be\n" +
-				"able to quickly replace the contents of one\n" +
-				"font with another one, for example for\n" +
-				"swapping an SD font with an HD one, or\n" +
-				"replacing an English font with a Chinese\n" +
-				"one. All the labels referencing this font\n" +
-				"will update their references to the new one.");
+			EditorGUILayout.HelpBox("You can have one font simply point to " +
+				"another one. This is useful if you want to be " +
+				"able to quickly replace the contents of one " +
+				"font with another one, for example for " +
+				"swapping an SD font with an HD one, or " +
+				"replacing an English font with a Chinese " +
+				"one. All the labels referencing this font " +
+				"will update their references to the new one.", MessageType.Info);
 
 			if (mReplacement != mFont && mFont.replacement != mReplacement)
 			{

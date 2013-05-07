@@ -144,7 +144,7 @@ public class UIFont : MonoBehaviour
 			{
 				mReplacement.material = value;
 			}
-			else if (mAtlas == null && mMat != value)
+			else if (mMat != value)
 			{
 				mPMA = -1;
 				mMat = value;

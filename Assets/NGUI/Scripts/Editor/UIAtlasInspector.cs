@@ -116,14 +116,14 @@ public class UIAtlasInspector : Editor
 			ComponentSelector.Draw<UIAtlas>(mAtlas.replacement, OnSelectAtlas);
 
 			NGUIEditorTools.DrawSeparator();
-			GUILayout.Label("You can have one atlas simply point to\n" +
-				"another one. This is useful if you want to be\n" +
-				"able to quickly replace the contents of one\n" +
-				"atlas with another one, for example for\n" +
-				"swapping an SD atlas with an HD one, or\n" +
-				"replacing an English atlas with a Chinese\n" +
-				"one. All the sprites referencing this atlas\n" +
-				"will update their references to the new one.");
+			EditorGUILayout.HelpBox("You can have one atlas simply point to " +
+				"another one. This is useful if you want to be " +
+				"able to quickly replace the contents of one " +
+				"atlas with another one, for example for " +
+				"swapping an SD atlas with an HD one, or " +
+				"replacing an English atlas with a Chinese " +
+				"one. All the sprites referencing this atlas " +
+				"will update their references to the new one.", MessageType.Info);
 
 			if (mReplacement != mAtlas && mAtlas.replacement != mReplacement)
 			{
