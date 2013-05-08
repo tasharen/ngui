@@ -41,8 +41,6 @@ public class UIImageButton : MonoBehaviour
 
 	void Awake () { if (target == null) target = GetComponentInChildren<UISprite>(); }
 	void OnEnable () { UpdateImage(); }
-	void OnHover (bool isOver) { if (enabled) UpdateImage(); }
-	void OnPress (bool pressed) { if (enabled) UpdateImage(); }
 	
 	void UpdateImage()
 	{
@@ -58,5 +56,24 @@ public class UIImageButton : MonoBehaviour
 			}	
 			target.MakePixelPerfect();
 		}
+	}
+
+	void OnHover (bool isOver)
+	{
+		if (enabled && target != null)
+		{
+			target.spriteName = isOver ? hoverSprite : normalSprite;
+			target.MakePixelPerfect();
+		}
+	}
+
+	void OnPress (bool pressed)
+	{
+		if (pressed)
+		{
+			target.spriteName = pressedSprite;
+			target.MakePixelPerfect();
+		}
+		else UpdateImage();
 	}
 }
