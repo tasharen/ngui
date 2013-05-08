@@ -131,12 +131,22 @@ public class UIFont : MonoBehaviour
 		{
 			if (mReplacement != null) return mReplacement.material;
 
-			if (isDynamic)
+			if (mAtlas != null) return mAtlas.spriteMaterial;
+			
+			if (mMat != null)
 			{
-				if (mMat != null) mMat.mainTexture = mDynamicFont.material.mainTexture;
+				if (mDynamicFont != null && mMat != mDynamicFont.material)
+				{
+					mMat.mainTexture = mDynamicFont.material.mainTexture;
+				}
+				return mMat;
+			}
+
+			if (mDynamicFont != null)
+			{
 				return mDynamicFont.material;
 			}
-			return (mAtlas != null) ? mAtlas.spriteMaterial : mMat;
+			return null;
 		}
 		set
 		{
