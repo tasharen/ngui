@@ -273,6 +273,10 @@ public class UIFontMaker : EditorWindow
 					}
 					mat.mainTexture = NGUISettings.fontTexture;
 				}
+				else if (create != 1)
+				{
+					UIAtlasMaker.AddOrUpdate(NGUISettings.atlas, NGUISettings.fontTexture);
+				}
 
 				// Font doesn't exist yet
 				if (go == null || go.GetComponent<UIFont>() == null)

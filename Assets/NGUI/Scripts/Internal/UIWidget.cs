@@ -450,7 +450,8 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		if (mVisibleFlag != 0 && mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos)
 		{
-			if (UnityEditor.Selection.activeGameObject == gameObject && UnityEditor.EditorPrefs.GetBool("New GUI", true)) return;
+			if (UnityEditor.Selection.activeGameObject == gameObject && UnityEditor.Tools.current == UnityEditor.Tool.View &&
+				UnityEditor.EditorPrefs.GetBool("New GUI", true)) return;
 
 			Color outline = new Color(1f, 1f, 1f, 0.2f);
 
