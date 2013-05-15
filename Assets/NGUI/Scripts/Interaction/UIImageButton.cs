@@ -60,7 +60,7 @@ public class UIImageButton : MonoBehaviour
 
 	void OnHover (bool isOver)
 	{
-		if (enabled && target != null)
+		if (isEnabled && target != null)
 		{
 			target.spriteName = isOver ? hoverSprite : normalSprite;
 			target.MakePixelPerfect();

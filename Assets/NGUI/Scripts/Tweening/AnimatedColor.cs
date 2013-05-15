@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
@@ -15,8 +15,8 @@ public class AnimatedColor : MonoBehaviour
 {
 	public Color color = Color.white;
 	
-	UILabel mLabel;
-	
-	void Awake () { mLabel = GetComponent<UILabel>(); }
-	void Update () { mLabel.color = color; }
+	UIWidget mWidget;
+
+	void Awake () { mWidget = GetComponent<UIWidget>(); }
+	void Update () { mWidget.color = color; }
 }

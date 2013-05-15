@@ -812,21 +812,20 @@ static public class NGUITools
 	/// http://answers.unity3d.com/questions/266244/how-can-i-add-copypaste-clipboard-support-to-my-ga.html
 	/// </summary>
 
+#if UNITY_WEBPLAYER || UNITY_FLASH || UNITY_METRO
+	static PropertyInfo GetSystemCopyBufferProperty () { return null; }
+#else
 	static PropertyInfo mSystemCopyBuffer = null;
 	static PropertyInfo GetSystemCopyBufferProperty ()
 	{
-#if UNITY_WEBPLAYER || UNITY_FLASH || UNITY_METRO
-		return null;
-#else
-
 		if (mSystemCopyBuffer == null)
 		{
 			Type gui = typeof(GUIUtility);
 			mSystemCopyBuffer = gui.GetProperty("systemCopyBuffer", BindingFlags.Static | BindingFlags.NonPublic);
 		}
 		return mSystemCopyBuffer;
-#endif
 	}
+#endif
 
 	/// <summary>
 	/// Access to the clipboard via a hacky method of accessing Unity's internals. Won't work in the web player.
