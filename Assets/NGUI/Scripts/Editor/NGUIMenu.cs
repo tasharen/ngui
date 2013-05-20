@@ -218,16 +218,15 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Toggle Draggable Handles")]
 	static public void ToggleNewGUI ()
 	{
-		bool isActive = !EditorPrefs.GetBool("New GUI", true);
-		EditorPrefs.SetBool("New GUI", isActive);
+		UIWidget.showHandlesWithMoveTool = !UIWidget.showHandlesWithMoveTool;
 
-		if (isActive)
+		if (UIWidget.showHandlesWithMoveTool)
 		{
-			Debug.Log("Now using the 2.5.0+ GUI handles. Selecting a widget will bring up draggable handles.");
+			Debug.Log("Simple Mode: Draggable Handles will show up with the Move Tool selected (W).");
 		}
 		else
 		{
-			Debug.Log("No longer using the 2.5.0+ GUI handles. Selecting a widget will not bring up draggable handles.");
+			Debug.Log("Classic Mode: Draggable Handles will show up only with the View Tool selected (Q).");
 		}
 	}
 }

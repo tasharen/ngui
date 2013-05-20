@@ -147,6 +147,9 @@ public class UIInput : MonoBehaviour
 			if (mDoInit) Init();
 			mText = value;
 
+#if UNITY_IPHONE || UNITY_ANDROID
+			if (mKeyboard != null) mKeyboard.text = text;
+#endif
 			if (label != null)
 			{
 				if (string.IsNullOrEmpty(value)) value = mDefaultText;
@@ -325,6 +328,7 @@ public class UIInput : MonoBehaviour
 				if (maxChars > 0 && mText.Length > maxChars) mText = mText.Substring(0, maxChars);
 				if (mText != text) mKeyboard.text = mText;
 				UpdateLabel();
+				SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
 			}
 
 			if (mKeyboard.done)

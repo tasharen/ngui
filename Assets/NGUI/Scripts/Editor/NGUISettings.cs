@@ -42,10 +42,6 @@ public class NGUISettings
 
 	static void Load ()
 	{
-		int l = LayerMask.NameToLayer("UI");
-		if (l == -1) l = LayerMask.NameToLayer("GUI");
-		if (l == -1) l = 31;
-
 		mLoaded			= true;
 		mPartial		= EditorPrefs.GetString("NGUI Partial");
 		mFontName		= EditorPrefs.GetString("NGUI Font Name");
@@ -59,10 +55,18 @@ public class NGUISettings
 		mUnityPacking	= EditorPrefs.GetBool("NGUI Unity Packing", true);
 		mForceSquare	= EditorPrefs.GetBool("NGUI Force Square Atlas", true);
 		mPivot			= (UIWidget.Pivot)EditorPrefs.GetInt("NGUI Pivot", (int)mPivot);
-		mLayer			= EditorPrefs.GetInt("NGUI Layer", l);
+		mLayer			= EditorPrefs.GetInt("NGUI Layer", -1);
 		mDynFont		= GetObject("NGUI DynFont") as Font;
 		mDynFontSize	= EditorPrefs.GetInt("NGUI DynFontSize", 16);
 		mDynFontStyle	= (FontStyle)EditorPrefs.GetInt("NGUI DynFontStyle", (int)FontStyle.Normal);
+
+		if (string.IsNullOrEmpty(LayerMask.LayerToName(mLayer))) mLayer = -1;
+
+		if (mLayer == -1) mLayer = LayerMask.NameToLayer("UI");
+		if (mLayer == -1) mLayer = LayerMask.NameToLayer("GUI");
+		if (mLayer == -1) mLayer = 5;
+
+		EditorPrefs.SetInt("UI Layer", mLayer);
 
 		LoadColor();
 	}

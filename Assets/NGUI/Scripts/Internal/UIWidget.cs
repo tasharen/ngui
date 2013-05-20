@@ -442,6 +442,50 @@ public abstract class UIWidget : MonoBehaviour
 
 #if UNITY_EDITOR
 
+	static int mHandles = -1;
+
+	/// <summary>
+	/// Whether widgets will show handles with the Move Tool, or just the View Tool.
+	/// </summary>
+
+	static public bool showHandlesWithMoveTool
+	{
+		get
+		{
+			if (mHandles == -1)
+			{
+				mHandles = UnityEditor.EditorPrefs.GetInt("NGUI Handles", 1);
+			}
+			return (mHandles == 1);
+		}
+		set
+		{
+			int val = value ? 1 : 0;
+
+			if (mHandles != val)
+			{
+				mHandles = val;
+				UnityEditor.EditorPrefs.SetInt("NGUI Handles", mHandles);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Whether handles should be shown around the widget for easy scaling and resizing.
+	/// </summary>
+
+	static public bool showHandles
+	{
+		get
+		{
+			if (showHandlesWithMoveTool)
+			{
+				return UnityEditor.Tools.current == UnityEditor.Tool.Move;
+			}
+			return UnityEditor.Tools.current == UnityEditor.Tool.View;
+		}
+	}
+
 	/// <summary>
 	/// Draw some selectable gizmos.
 	/// </summary>
@@ -450,8 +494,7 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		if (mVisibleFlag != 0 && mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos)
 		{
-			if (UnityEditor.Selection.activeGameObject == gameObject && UnityEditor.Tools.current == UnityEditor.Tool.View &&
-				UnityEditor.EditorPrefs.GetBool("New GUI", true)) return;
+			if (UnityEditor.Selection.activeGameObject == gameObject && showHandles) return;
 
 			Color outline = new Color(1f, 1f, 1f, 0.2f);
 

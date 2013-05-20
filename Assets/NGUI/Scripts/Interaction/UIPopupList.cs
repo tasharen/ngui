@@ -258,7 +258,7 @@ public class UIPopupList : MonoBehaviour
 			float offsetX = sp.inner.xMin - sp.outer.xMin;
 			float offsetY = sp.inner.yMin - sp.outer.yMin;
 
-			Vector3 pos = lbl.cachedTransform.localPosition + new Vector3(-offsetX, offsetY, 0f);
+			Vector3 pos = lbl.cachedTransform.localPosition + new Vector3(-offsetX, offsetY, 1f);
 
 			if (instant || !isAnimated)
 			{
