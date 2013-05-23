@@ -365,7 +365,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 		DisableSpring();
 
 		Bounds b = bounds;
-		if (b.min.x == b.max.x || b.min.y == b.max.x) return;
+		if (b.min.x == b.max.x || b.min.y == b.max.y) return;
 		Vector4 cr = mPanel.clipRange;
 
 		float hx = cr.z * 0.5f;
