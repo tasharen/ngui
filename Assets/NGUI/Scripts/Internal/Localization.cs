@@ -19,6 +19,12 @@ public class Localization : MonoBehaviour
 	static Localization mInstance;
 
 	/// <summary>
+	/// Whether there is an instance of the localization class present.
+	/// </summary>
+
+	static public bool isActive { get { return mInstance != null; } }
+
+	/// <summary>
 	/// The instance of the localization class. Will create it if one isn't already around.
 	/// </summary>
 

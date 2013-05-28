@@ -370,7 +370,7 @@ public class UIPopupList : MonoBehaviour
 
 				Collider[] cols = mChild.GetComponentsInChildren<Collider>();
 				for (int i = 0, imax = cols.Length; i < imax; ++i) cols[i].enabled = false;
-				UpdateManager.AddDestroy(mChild, animSpeed);
+				Destroy(mChild, animSpeed);
 			}
 			else
 			{
