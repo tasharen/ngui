@@ -147,95 +147,10 @@ public class UIAtlasMaker : EditorWindow
 
 			// Make sure that we don't shrink the textures
 			if (Mathf.RoundToInt(rect.width) != textures[i].width) return false;
-
 			sprites[i].rect = rect;
-			//BleedTexture(tex, sprites[i].rect);
 		}
 		return true;
 	}
-
-	/// <summary>
-	/// Bleed sprite within texture defined in rect. Contributed by imkira.
-	/// </summary>
-
-	/*static void BleedTexture(Texture2D tex, Rect rect)
-	{
-		// bleeding border is shared between two adjacent sprites
-		int border = NGUISettings.atlasPadding >> 1;
-		if (border <= 0) return;
-
-		int xMin = Mathf.RoundToInt(rect.xMin);
-		int xMax = Mathf.RoundToInt(rect.xMax);
-		int yMin = tex.height - Mathf.RoundToInt(rect.yMax);
-		int yMax = tex.height - Mathf.RoundToInt(rect.yMin);
-		int rectMinX = xMin - border;
-		int rectMaxX = xMax + border;
-		int rectMinY = yMin - border;
-		int rectMaxY = yMax + border;
-		int x, y;
-
-		// horizontal
-		for (x = rectMinX; x < rectMaxX; ++x)
-		{
-			if ((x < 0) || (x >= tex.width)) continue;
-
-			// border bottom
-			y = yMin;
-			if ((y >= 0) && (y < tex.height))
-			{
-				Color color = tex.GetPixel(Mathf.Clamp(x, xMin, xMax - 1), y);
-				for (--y; (y >= 0) && (y >= rectMinY); --y)
-				{
-					tex.SetPixel(x, y, color);
-				}
-			}
-
-			// border top
-			y = yMax - 1;
-			if ((y >= 0) && (y < tex.height))
-			{
-				Color color = tex.GetPixel(Mathf.Clamp(x, xMin, xMax - 1), y);
-				for (++y; (y < rectMaxY); ++y)
-				{
-					tex.SetPixel(x, y, color);
-				}
-			}
-		}
-
-		// vertical 
-		for (y = rectMinY; y < rectMaxY; ++y)
-		{
-			if ((y < 0) || (y >= tex.height))
-			{
-				continue;
-			}
-
-			// border left
-			x = xMin;
-			if ((x >= 0) && (x < tex.width))
-			{
-				Color color = tex.GetPixel(x, Mathf.Clamp(y, yMin, yMax - 1));
-				for (--x; (x >= 0) && (x >= rectMinX); --x)
-				{
-					tex.SetPixel(x, y, color);
-				}
-			}
-
-			// border top
-			x = xMax - 1;
-			if ((x >= 0) && (x < tex.width))
-			{
-				Color color = tex.GetPixel(x, Mathf.Clamp(y, yMin, yMax - 1));
-				for (++x; (x < rectMaxX); ++x)
-				{
-					tex.SetPixel(x, y, color);
-				}
-			}
-		}
-
-		// apply pixels
-		tex.Apply();
-	}*/
 
 	/// <summary>
 	/// Helper function that creates a single sprite list from both the atlas's sprites as well as selected textures.
@@ -338,7 +253,7 @@ public class UIAtlasMaker : EditorWindow
 			if (oldTex == null) continue;
 
 			// If we aren't doing trimming, just use the texture as-is
-			if (!NGUISettings.atlasTrimming)
+			if (!NGUISettings.atlasTrimming && !NGUISettings.atlasPMA)
 			{
 				SpriteEntry sprite = new SpriteEntry();
 				sprite.rect = new Rect(0f, 0f, oldTex.width, oldTex.height);
@@ -359,20 +274,30 @@ public class UIAtlasMaker : EditorWindow
 			int oldHeight = oldTex.height;
 
 			// Find solid pixels
-			for (int y = 0, yw = oldHeight; y < yw; ++y)
+			if (NGUISettings.atlasTrimming)
 			{
-				for (int x = 0, xw = oldWidth; x < xw; ++x)
+				for (int y = 0, yw = oldHeight; y < yw; ++y)
 				{
-					Color32 c = pixels[y * xw + x];
-
-					if (c.a != 0)
+					for (int x = 0, xw = oldWidth; x < xw; ++x)
 					{
-						if (y < ymin) ymin = y;
-						if (y > ymax) ymax = y;
-						if (x < xmin) xmin = x;
-						if (x > xmax) xmax = x;
+						Color32 c = pixels[y * xw + x];
+
+						if (c.a != 0)
+						{
+							if (y < ymin) ymin = y;
+							if (y > ymax) ymax = y;
+							if (x < xmin) xmin = x;
+							if (x > xmax) xmax = x;
+						}
 					}
 				}
+			}
+			else
+			{
+				xmin = 0;
+				xmax = oldWidth - 1;
+				ymin = 0;
+				ymax = oldHeight - 1;
 			}
 
 			int newWidth  = (xmax - xmin) + 1;
@@ -385,7 +310,7 @@ public class UIAtlasMaker : EditorWindow
 				sprite.rect = new Rect(0f, 0f, oldTex.width, oldTex.height);
 
 				// If the dimensions match, then nothing was actually trimmed
-				if (newWidth == oldWidth && newHeight == oldHeight)
+				if (!NGUISettings.atlasPMA && (newWidth == oldWidth && newHeight == oldHeight))
 				{
 					sprite.tex = oldTex;
 					sprite.temporaryTexture = false;
@@ -401,7 +326,8 @@ public class UIAtlasMaker : EditorWindow
 						{
 							int newIndex = y * newWidth + x;
 							int oldIndex = (ymin + y) * oldWidth + (xmin + x);
-							newPixels[newIndex] = pixels[oldIndex];
+							if (NGUISettings.atlasPMA) newPixels[newIndex] = NGUITools.ApplyPMA(pixels[oldIndex]);
+							else newPixels[newIndex] = pixels[oldIndex];
 						}
 					}
 
@@ -762,7 +688,7 @@ public class UIAtlasMaker : EditorWindow
 				// If the material doesn't exist, create it
 				if (mat == null)
 				{
-					Shader shader = Shader.Find("Unlit/Transparent Colored");
+					Shader shader = Shader.Find(NGUISettings.atlasPMA ? "Unlit/Premultiplied Colored" : "Unlit/Transparent Colored");
 					mat = new Material(shader);
 
 					// Save the material
@@ -858,6 +784,11 @@ public class UIAtlasMaker : EditorWindow
 			GUILayout.EndHorizontal();
 
 			GUILayout.BeginHorizontal();
+			NGUISettings.atlasPMA = EditorGUILayout.Toggle("PMA Shader", NGUISettings.atlasPMA, GUILayout.Width(100f));
+			GUILayout.Label("Pre-multiply color by alpha");
+			GUILayout.EndHorizontal();
+
+			GUILayout.BeginHorizontal();
 			NGUISettings.unityPacking = EditorGUILayout.Toggle("Unity Packer", NGUISettings.unityPacking, GUILayout.Width(100f));
 			GUILayout.Label("if off, use a custom packer");
 			GUILayout.EndHorizontal();
@@ -884,14 +815,12 @@ public class UIAtlasMaker : EditorWindow
 			}
 			else
 			{
-				NGUIEditorTools.DrawSeparator();
-				GUILayout.Label("You can reveal more options by selecting\none or more textures in the Project View\nwindow.");
+				EditorGUILayout.HelpBox("You can reveal more options by selecting one or more textures in the Project View window.", MessageType.Info);
 			}
 		}
 		else
 		{
-			NGUIEditorTools.DrawSeparator();
-			GUILayout.Label("You can create a new atlas by selecting\none or more textures in the Project View\nwindow, then clicking \"Create\".");
+			EditorGUILayout.HelpBox("You can create a new atlas by selecting one or more textures in the Project View window, then clicking \"Create\".", MessageType.Info);
 		}
 
 		Dictionary<string, int> spriteList = GetSpriteList(textures);

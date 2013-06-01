@@ -60,9 +60,15 @@ public class UILabelInspector : UIWidgetInspector
 
 			GUILayout.BeginHorizontal();
 			bool shrinkToFit = EditorGUILayout.Toggle("Shrink to Fit", mLabel.shrinkToFit, GUILayout.Width(100f));
-			GUILayout.Label("- adjust scale if doesn't fit");
+			GUILayout.Label("- adjust scale to fit");
 			GUILayout.EndHorizontal();
-			if (shrinkToFit != mLabel.shrinkToFit) { RegisterUndo(); mLabel.shrinkToFit = shrinkToFit; }
+			
+			if (shrinkToFit != mLabel.shrinkToFit)
+			{
+				RegisterUndo();
+				mLabel.shrinkToFit = shrinkToFit;
+				if (!shrinkToFit) mLabel.MakePixelPerfect();
+			}
 
 			GUILayout.BeginHorizontal();
 			bool password = EditorGUILayout.Toggle("Password", mLabel.password, GUILayout.Width(100f));

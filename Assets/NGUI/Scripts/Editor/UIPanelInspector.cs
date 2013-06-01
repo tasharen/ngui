@@ -24,8 +24,9 @@ public class UIPanelInspector : Editor
 		{
 			case EventType.MouseUp:
 			{
-				UIWidget[] widgets = NGUIEditorTools.Raycast(target as UIPanel, e.mousePosition);
-				if (widgets.Length > 0) Selection.activeGameObject = widgets[0].gameObject;
+				UIPanel panel = target as UIPanel;
+				BetterList<UIWidget> widgets = UIWidgetInspector.SceneViewRaycast(panel, e.mousePosition);
+				if (widgets.size > 0) Selection.activeGameObject = widgets[0].gameObject;
 			}
 			break;
 

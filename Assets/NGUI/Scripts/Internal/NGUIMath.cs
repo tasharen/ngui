@@ -656,4 +656,73 @@ static public class NGUIMath
 		if (Mathf.Abs(diff) > maxAngle) diff = maxAngle * Mathf.Sign(diff);
 		return from + diff;
 	}
+
+	/// <summary>
+	/// Determine the distance from the specified point to the line segment.
+	/// </summary>
+
+	static float DistancePointToLineSegment (Vector2 point, Vector2 a, Vector2 b)
+	{
+		float l2 = (b - a).sqrMagnitude;
+		if (l2 == 0f) return (point - a).magnitude;
+		float t = Vector2.Dot(point - a, b - a) / l2;
+		if (t < 0f) return (point - a).magnitude;
+		else if (t > 1f) return (point - b).magnitude;
+		Vector2 projection = a + t * (b - a);
+		return (point - projection).magnitude;
+	}
+
+	/// <summary>
+	/// Determine the distance from the mouse position to the screen space rectangle specified by the 4 points.
+	/// </summary>
+
+	static public float DistanceToRectangle (Vector2[] screenPoints, Vector2 mousePos)
+	{
+		bool oddNodes = false;
+		int j = 4;
+
+		for (int i = 0; i < 5; i++)
+		{
+			Vector3 v0 = screenPoints[NGUIMath.RepeatIndex(i, 4)];
+			Vector3 v1 = screenPoints[NGUIMath.RepeatIndex(j, 4)];
+
+			if ((v0.y > mousePos.y) != (v1.y > mousePos.y))
+			{
+				if (mousePos.x < (v1.x - v0.x) * (mousePos.y - v0.y) / (v1.y - v0.y) + v0.x)
+				{
+					oddNodes = !oddNodes;
+				}
+			}
+			j = i;
+		}
+
+		if (!oddNodes)
+		{
+			float dist, closestDist = -1f;
+
+			for (int i = 0; i < 4; i++)
+			{
+				Vector3 v0 = screenPoints[i];
+				Vector3 v1 = screenPoints[NGUIMath.RepeatIndex(i + 1, 4)];
+
+				dist = DistancePointToLineSegment(mousePos, v0, v1);
+
+				if (dist < closestDist || closestDist < 0f) closestDist = dist;
+			}
+			return closestDist;
+		}
+		else return 0f;
+	}
+
+	/// <summary>
+	/// Determine the distance from the mouse position to the world rectangle specified by the 4 points.
+	/// </summary>
+
+	static public float DistanceToRectangle (Vector3[] worldPoints, Vector2 mousePos, Camera cam)
+	{
+		Vector2[] screenPoints = new Vector2[4];
+		for (int i = 0; i < 4; ++i)
+			screenPoints[i] = cam.WorldToScreenPoint(worldPoints[i]);
+		return DistanceToRectangle(screenPoints, mousePos);
+	}
 }

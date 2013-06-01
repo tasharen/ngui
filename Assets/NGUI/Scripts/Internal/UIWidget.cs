@@ -235,6 +235,35 @@ public abstract class UIWidget : MonoBehaviour
 	public int visibleFlag { get { return mVisibleFlag; } set { mVisibleFlag = value; } }
 
 	/// <summary>
+	/// Raycast into the screen and return a list of widgets in order from closest to farthest away.
+	/// This is a slow operation and will consider ALL widgets underneath the specified game object.
+	/// </summary>
+
+	static public BetterList<UIWidget> Raycast (GameObject root, Vector2 mousePos)
+	{
+		BetterList<UIWidget> list = new BetterList<UIWidget>();
+		UICamera uiCam = UICamera.FindCameraForLayer(root.layer);
+
+		if (uiCam != null)
+		{
+			Camera cam = uiCam.cachedCamera;
+			UIWidget[] widgets = root.GetComponentsInChildren<UIWidget>();
+
+			for (int i = 0; i < widgets.Length; ++i)
+			{
+				UIWidget w = widgets[i];
+
+				Vector3[] corners = NGUIMath.CalculateWidgetCorners(w);
+				if (NGUIMath.DistanceToRectangle(corners, mousePos, cam) == 0f)
+					list.Add(w);
+			}
+
+			list.Sort(delegate(UIWidget w1, UIWidget w2) { return w2.depth.CompareTo(w1.depth); });
+		}
+		return list;
+	}
+
+	/// <summary>
 	/// Static widget comparison function used for Z-sorting.
 	/// </summary>
 

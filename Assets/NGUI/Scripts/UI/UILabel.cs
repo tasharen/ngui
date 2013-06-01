@@ -55,7 +55,7 @@ public class UILabel : UIWidget
 	bool mLastPass = false;
 	bool mLastShow = false;
 	Effect mLastEffect = Effect.None;
-	Vector3 mSize = Vector3.zero;
+	Vector2 mSize = Vector2.zero;
 	bool mPremultiply = false;
 
 	/// <summary>
@@ -368,7 +368,7 @@ public class UILabel : UIWidget
 			if (mShrinkToFit != value)
 			{
 				mShrinkToFit = value;
-				if (mMaxLineWidth > 0f) hasChanged = true;
+				hasChanged = true;
 			}
 		}
 	}
@@ -479,59 +479,75 @@ public class UILabel : UIWidget
 		mChanged = true;
 		hasChanged = false;
 		mLastText = mText;
-		mProcessedText = mText;
-
-		if (mPassword)
-		{
-			string hidden = "";
-
-			if (mShowLastChar)
-			{
-				for (int i = 0, imax = mProcessedText.Length - 1; i < imax; ++i) hidden += "*";
-				if (mProcessedText.Length > 0) hidden += mProcessedText[mProcessedText.Length - 1];
-			}
-			else
-			{
-				for (int i = 0, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
-			}
-			mProcessedText = mFont.WrapText(hidden, mMaxLineWidth / cachedTransform.localScale.x,
-				mMaxLineCount, false, UIFont.SymbolStyle.None);
-		}
-		else if (!mShrinkToFit)
-		{
-			if (mMaxLineWidth > 0)
-			{
-				mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.x, mMaxLineCount, mEncoding, mSymbols);
-			}
-			else if (mMaxLineCount > 0)
-			{
-				mProcessedText = mFont.WrapText(mProcessedText, 100000f, mMaxLineCount, mEncoding, mSymbols);
-			}
-		}
 
 		float scale = Mathf.Abs(cachedTransform.localScale.x);
-		mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.one;
+		float maxY = mFont.size * mMaxLineCount;
 
-		if (mShrinkToFit && mMaxLineWidth > 0)
+		if (scale > 0f)
 		{
-			// We want to shrink the label (when it doesn't fit)
-			if (scale > 0f)
+			for (;;)
 			{
-				float maxSize = (float)mMaxLineWidth / mFont.size;
-				scale = (mSize.x > maxSize) ? (maxSize / mSize.x) * mFont.size : mFont.size;
-				cachedTransform.localScale = new Vector3(scale, scale, 1f);
+				if (mPassword)
+				{
+					mProcessedText = "";
+
+					if (mShowLastChar)
+					{
+						for (int i = 0, imax = mText.Length - 1; i < imax; ++i) mProcessedText += "*";
+						if (mText.Length > 0) mProcessedText += mText[mText.Length - 1];
+					}
+					else
+					{
+						for (int i = 0, imax = mText.Length; i < imax; ++i) mProcessedText += "*";
+					}
+					mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / scale, mMaxLineCount, false, UIFont.SymbolStyle.None);
+				}
+				else if (mMaxLineWidth > 0)
+				{
+					mProcessedText = mFont.WrapText(mText, mMaxLineWidth / scale, mShrinkToFit ? 0 : mMaxLineCount, mEncoding, mSymbols);
+				}
+				else if (!mShrinkToFit && mMaxLineCount > 0)
+				{
+					mProcessedText = mFont.WrapText(mText, 100000f, mMaxLineCount, mEncoding, mSymbols);
+				}
+				else
+				{
+					mProcessedText = mText;
+				}
+
+				mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.one;
+
+				if (mShrinkToFit)
+				{
+					// We want to shrink the label (when it doesn't fit)
+					if (mMaxLineCount > 0 && mSize.y * scale > maxY)
+					{
+						scale = Mathf.Round(scale - 1f);
+						if (scale > 1f) continue;
+					}
+
+					if (mMaxLineWidth > 0)
+					{
+						float maxX = (float)mMaxLineWidth / scale;
+						float x = (mSize.x * scale > maxX) ? (maxX / mSize.x) * scale : scale;
+						scale = Mathf.Min(x, scale);
+					}
+					
+					scale = Mathf.Round(scale);
+					cachedTransform.localScale = new Vector3(scale, scale, 1f);
+				}
+				break;
 			}
-			else
-			{
-				mSize.x = 1f;
-				cachedTransform.localScale = new Vector3(mFont.size, mFont.size, 1f);
-			}
+			mSize.x = Mathf.Max(mSize.x, (scale > 0f) ? lineWidth / scale : 1f);
 		}
 		else
 		{
-			mSize.x = Mathf.Max(mSize.x, (scale > 0f) ? lineWidth / scale : 1f);
+			// This should never happen (label should never have a scale of 0) -- but just in case.
+			mSize.x = 1f;
+			scale = mFont.size;
+			cachedTransform.localScale = new Vector3(0.01f, 0.01f, 1f);
+			mProcessedText = "";
 		}
-
 		mSize.y = Mathf.Max(mSize.y, 1f);
 	}
 
@@ -666,9 +682,6 @@ public class UILabel : UIWidget
 		// Apply an effect if one was requested
 		if (effectStyle != Effect.None)
 		{
-			Vector3 scale = cachedTransform.localScale;
-			if (scale.x == 0f || scale.y == 0f) return;
-
 			int end = verts.size;
 			float pixel =  1f / mFont.size;
 

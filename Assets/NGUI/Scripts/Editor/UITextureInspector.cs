@@ -16,10 +16,14 @@ public class UITextureInspector : UIWidgetInspector
 {
 	UITexture mTex;
 
+	protected override void OnEnable ()
+	{
+		base.OnEnable();
+		mTex = target as UITexture;
+	}
+
 	override protected bool DrawProperties ()
 	{
-		mTex = mWidget as UITexture;
-
 		if (!mTex.hasDynamicMaterial && (mTex.material != null || mTex.mainTexture == null))
 		{
 			Material mat = EditorGUILayout.ObjectField("Material", mTex.material, typeof(Material), false) as Material;
@@ -61,5 +65,30 @@ public class UITextureInspector : UIWidgetInspector
 			}
 		}
 		return (mWidget.material != null);
+	}
+
+	/// <summary>
+	/// Allow the texture to be previewed.
+	/// </summary>
+
+	public override bool HasPreviewGUI ()
+	{
+		return (mTex != null) && (mTex.mainTexture as Texture2D != null);
+	}
+
+	/// <summary>
+	/// Draw the sprite preview.
+	/// </summary>
+
+	public override void OnPreviewGUI (Rect rect, GUIStyle background)
+	{
+		Texture2D tex = mTex.mainTexture as Texture2D;
+
+		if (tex != null)
+		{
+			Rect uv = mTex.uvRect;
+			Rect outer = NGUIMath.ConvertToPixels(uv, tex.width, tex.height, true);
+			NGUIEditorTools.DrawSprite(tex, rect, outer, outer, uv, mTex.color);
+		}
 	}
 }

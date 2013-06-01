@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.6.1e
+                Version 2.6.2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,16 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.6.2:
+- NEW: You can now automatically apply alpha pre-multiplication to textures when creating an atlas.
+- NEW: Added UIWidget.Raycast to perform a raycast without using colliders.
+- NEW: Added a texture preview to UITexture.
+- NEW: Added an option to UIAnchor to run only once, and then destroy itself. Also optimized it slightly.
+- NEW: Transform inspector will now gray out fields that are not commonly used by the UI when a widget is selected.
+- FIX: Transform multi-object editing was not quite right for widgets...
+- FIX: "Shrink to fit" option on labels now works vertically, not just horizontally.
+- FIX: Changing a sprite in inspector will no longer auto-resize it. Use MakePixelPerfect to resize it.
 
 2.6.1:
 - FIX: Dynamic font-related fixes.
