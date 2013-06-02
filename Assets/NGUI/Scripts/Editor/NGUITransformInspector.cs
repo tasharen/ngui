@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //			  NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 // Multi-objects editing support added by 
@@ -142,8 +142,8 @@ public class NGUITransformInspector : Editor
 
 	void OnEnable ()
 	{
-		mRotation = serializedObject.FindProperty("m_LocalRotation");
 		mPosition = serializedObject.FindProperty("m_LocalPosition");
+		mRotation = serializedObject.FindProperty("m_LocalRotation");
 		mScale = serializedObject.FindProperty("m_LocalScale");
 	}
 
@@ -204,11 +204,11 @@ public class NGUITransformInspector : Editor
 
 					if (t != null)
 					{
-						Vector3 v = t.localEulerAngles;
+						Vector3 v = t.localPosition;
 						if ((final.axes & Axes.X) != 0) v.x = final.value.x;
 						if ((final.axes & Axes.Y) != 0) v.y = final.value.y;
 						if ((final.axes & Axes.Z) != 0) v.z = final.value.z;
-						t.localEulerAngles = v;
+						t.localPosition = v;
 					}
 				}
 			}
