@@ -73,15 +73,13 @@ public class UIAnchor : MonoBehaviour
 
 	Transform mTrans;
 	Animation mAnim;
-	Rect mRect;
+	Rect mRect = new Rect();
 	UIRoot mRoot;
-	static Rect mTemp;
-	
-	void Awake () 
+
+	void Awake ()
 	{
 		mTrans = transform;
-		mAnim = animation; 
-		mRect = new Rect();
+		mAnim = animation;
 	}
 
 	/// <summary>
@@ -110,7 +108,7 @@ public class UIAnchor : MonoBehaviour
 	void Update ()
 	{
 		if (mAnim != null && mAnim.enabled && mAnim.isPlaying) return;
-		
+
 		bool useCamera = false;
 
 		if (panelContainer != null)
@@ -119,19 +117,19 @@ public class UIAnchor : MonoBehaviour
 			{
 				// Panel has no clipping -- just use the screen's dimensions
 				float ratio = (mRoot != null) ? (float)mRoot.activeHeight / Screen.height * 0.5f : 0.5f;
-				mTemp.xMin = -Screen.width * ratio;
-				mTemp.yMin = -Screen.height * ratio;
-				mTemp.xMax = -mTemp.xMin;
-				mTemp.yMax = -mTemp.yMin;
+				mRect.xMin = -Screen.width * ratio;
+				mRect.yMin = -Screen.height * ratio;
+				mRect.xMax = -mRect.xMin;
+				mRect.yMax = -mRect.yMin;
 			}
 			else
 			{
-				// Panel has clipping -- use it as the mTemp
+				// Panel has clipping -- use it as the mRect
 				Vector4 pos = panelContainer.clipRange;
-				mTemp.x = pos.x - (pos.z * 0.5f);
-				mTemp.y = pos.y - (pos.w * 0.5f);
-				mTemp.width = pos.z;
-				mTemp.height = pos.w;
+				mRect.x = pos.x - (pos.z * 0.5f);
+				mRect.y = pos.y - (pos.w * 0.5f);
+				mRect.width = pos.z;
+				mRect.height = pos.w;
 			}
 		}
 		else if (widgetContainer != null)
@@ -144,25 +142,22 @@ public class UIAnchor : MonoBehaviour
 			Vector3 size = widgetContainer.relativeSize;
 			Vector3 offset = widgetContainer.pivotOffset;
 			offset.y -= 1f;
-			
+
 			offset.x *= (widgetContainer.relativeSize.x * ls.x);
 			offset.y *= (widgetContainer.relativeSize.y * ls.y);
-			
-			mTemp.x = lp.x + offset.x;
-			mTemp.y = lp.y + offset.y;
-			
-			mTemp.width = size.x * ls.x;
-			mTemp.height = size.y * ls.y;
+
+			mRect.x = lp.x + offset.x;
+			mRect.y = lp.y + offset.y;
+
+			mRect.width = size.x * ls.x;
+			mRect.height = size.y * ls.y;
 		}
 		else if (uiCamera != null)
 		{
 			useCamera = true;
-			mTemp = uiCamera.pixelRect;
+			mRect = uiCamera.pixelRect;
 		}
 		else return;
-
-		if (mRect == mTemp) return;
-		mRect = mTemp;
 
 		float cx = (mRect.xMin + mRect.xMax) * 0.5f;
 		float cy = (mRect.yMin + mRect.yMax) * 0.5f;
@@ -179,7 +174,7 @@ public class UIAnchor : MonoBehaviour
 			else v.y = mRect.yMin;
 		}
 
-		float width  = mRect.width;
+		float width = mRect.width;
 		float height = mRect.height;
 
 		v.x += relativeOffset.x * width;
@@ -217,7 +212,7 @@ public class UIAnchor : MonoBehaviour
 			}
 			v.z = mTrans.position.z;
 		}
-		
+
 		// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
 		if (mTrans.position != v) mTrans.position = v;
 		if (runOnlyOnce && Application.isPlaying) Destroy(this);
