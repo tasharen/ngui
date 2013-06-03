@@ -121,7 +121,7 @@ public class UIInput : MonoBehaviour
 	UIWidget.Pivot mPivot = UIWidget.Pivot.Left;
 	float mPosition = 0f;
 
-#if UNITY_IPHONE || UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8
 #if UNITY_3_4
 	iPhoneKeyboard mKeyboard;
 #else
@@ -147,7 +147,7 @@ public class UIInput : MonoBehaviour
 			if (mDoInit) Init();
 			mText = value;
 
-#if UNITY_IPHONE || UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8
 			if (mKeyboard != null) mKeyboard.text = text;
 #endif
 			if (label != null)
@@ -251,9 +251,13 @@ public class UIInput : MonoBehaviour
 				label.color = activeColor;
 				if (isPassword) label.password = true;
 
-#if UNITY_IPHONE || UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8
 				if (Application.platform == RuntimePlatform.IPhonePlayer ||
-					Application.platform == RuntimePlatform.Android)
+					Application.platform == RuntimePlatform.Android
+#if UNITY_WP8 
+					|| Application.platform == RuntimePlatform.WP8Player
+#endif
+					)
 				{
 #if UNITY_3_4
 					mKeyboard = iPhoneKeyboard.Open(mText, (iPhoneKeyboardType)((int)type), autoCorrect);
@@ -282,7 +286,7 @@ public class UIInput : MonoBehaviour
 			}
 			else
 			{
-#if UNITY_IPHONE || UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8
 				if (mKeyboard != null)
 				{
 					mKeyboard.active = false;
@@ -303,7 +307,7 @@ public class UIInput : MonoBehaviour
 		}
 	}
 
-#if UNITY_IPHONE || UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8
 	/// <summary>
 	/// Update the text and the label by grabbing it from the iOS/Android keyboard.
 	/// </summary>
