@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
@@ -253,6 +253,21 @@ public class BetterList<T>
 			buffer[index] = default(T);
 			for (int b = index; b < size; ++b) buffer[b] = buffer[b + 1];
 		}
+	}
+
+	/// <summary>
+	/// Remove an item from the end.
+	/// </summary>
+
+	public T Pop ()
+	{
+		if (buffer != null && size != 0)
+		{
+			T val = buffer[--size];
+			buffer[size] = default(T);
+			return val;
+		}
+		return default(T);
 	}
 
 	/// <summary>
