@@ -133,14 +133,19 @@ public class UILabel : UIWidget
 		{
 			if (string.IsNullOrEmpty(value))
 			{
-				if (!string.IsNullOrEmpty(mText))
-					mText = "";
+				if (!string.IsNullOrEmpty(mText)) mText = "";
 				hasChanged = true;
 			}
 			else if (mText != value)
 			{
 				mText = value;
 				hasChanged = true;
+				
+				if (shrinkToFit)
+				{
+					MakePixelPerfect();
+					ProcessText();
+				}
 			}
 		}
 	}

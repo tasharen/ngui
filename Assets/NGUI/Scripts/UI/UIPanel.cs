@@ -913,24 +913,29 @@ public class UIPanel : MonoBehaviour
 		for (int i = mWidgets.size; i > 0; ) if (mWidgets[--i] == null) mWidgets.RemoveAt(i);
 
 		// Fill the buffers for the specified material
-		for (int i = 0, imax = mWidgets.size; i < imax; ++i)
+		for (int i = 0; i < mWidgets.size; )
 		{
 			UIWidget w = mWidgets.buffer[i];
 
-			if (w.visibleFlag == 1 && w.material == mat)
+			if (w == null)
 			{
-				UINode node = GetNode(w.cachedTransform);
-
-				if (node != null)
+				mWidgets.RemoveAt(i);
+				continue;
+			}
+			else if (w.visibleFlag == 1 && w.material == mat)
+			{
+				if (w.panel == this)
 				{
 					if (generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
 					else w.WriteToBuffers(mVerts, mUvs, mCols, null, null);
 				}
 				else
 				{
-					Debug.LogError("No transform found for " + NGUITools.GetHierarchy(w.gameObject), this);
+					mWidgets.RemoveAt(i);
+					continue;
 				}
 			}
+			++i;
 		}
 
 		if (mVerts.size > 0)

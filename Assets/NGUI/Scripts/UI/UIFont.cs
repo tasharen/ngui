@@ -575,7 +575,7 @@ public class UIFont : MonoBehaviour
 	static public bool CheckIfRelated (UIFont a, UIFont b)
 	{
 		if (a == null || b == null) return false;
-		if (a.isDynamic && a.dynamicTexture == b.dynamicTexture) return true;
+		if (a.isDynamic && b.isDynamic && a.dynamicFont.fontNames[0] == b.dynamicFont.fontNames[0]) return true;
 		return a == b || a.References(b) || b.References(a);
 	}
 
