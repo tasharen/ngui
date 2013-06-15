@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
@@ -14,6 +14,8 @@ using System.Collections.Generic;
 [CustomEditor(typeof(UIAtlas))]
 public class UIAtlasInspector : Editor
 {
+	static public UIAtlasInspector instance;
+
 	enum AtlasType
 	{
 		Normal,
@@ -22,10 +24,12 @@ public class UIAtlasInspector : Editor
 
 	UIAtlas mAtlas;
 	bool mConfirmDelete = false;
-	UIAtlas.Sprite mSprite;
 
 	AtlasType mType = AtlasType.Normal;
 	UIAtlas mReplacement = null;
+
+	void OnEnable () { instance = this; }
+	void OnDisable () { instance = null; }
 
 	/// <summary>
 	/// Convenience function -- mark all widgets using the sprite as changed.
@@ -33,13 +37,14 @@ public class UIAtlasInspector : Editor
 
 	void MarkSpriteAsDirty ()
 	{
-		if (mSprite == null) return;
+		UIAtlas.Sprite sprite = (mAtlas != null) ? mAtlas.GetSprite(NGUISettings.selectedSprite) : null;
+		if (sprite == null) return;
 
 		UISprite[] sprites = NGUITools.FindActive<UISprite>();
 
 		foreach (UISprite sp in sprites)
 		{
-			if (sp.spriteName == mSprite.name)
+			if (sp.spriteName == sprite.name)
 			{
 				sp.atlas = null;
 				sp.atlas = mAtlas;
@@ -51,7 +56,7 @@ public class UIAtlasInspector : Editor
 
 		foreach (UILabel lbl in labels)
 		{
-			if (lbl.font != null && UIAtlas.CheckIfRelated(lbl.font.atlas, mAtlas) && lbl.font.UsesSprite(mSprite.name))
+			if (lbl.font != null && UIAtlas.CheckIfRelated(lbl.font.atlas, mAtlas) && lbl.font.UsesSprite(sprite.name))
 			{
 				UIFont font = lbl.font;
 				lbl.font = null;
@@ -88,6 +93,8 @@ public class UIAtlasInspector : Editor
 	{
 		EditorGUIUtility.LookLikeControls(80f);
 		mAtlas = target as UIAtlas;
+
+		UIAtlas.Sprite sprite = (mAtlas != null) ? mAtlas.GetSprite(NGUISettings.selectedSprite) : null;
 
 		NGUIEditorTools.DrawSeparator();
 
@@ -162,7 +169,7 @@ public class UIAtlasInspector : Editor
 
 					NGUIEditorTools.RegisterUndo("Import Sprites", mAtlas);
 					NGUIJson.LoadSpriteData(mAtlas, ta);
-					if (mSprite != null) mSprite = mAtlas.GetSprite(mSprite.name);
+					if (sprite != null) sprite = mAtlas.GetSprite(sprite.name);
 					mAtlas.MarkAsDirty();
 				}
 				
@@ -193,11 +200,11 @@ public class UIAtlasInspector : Editor
 
 			if (mConfirmDelete)
 			{
-				if (mSprite != null)
+				if (sprite != null)
 				{
 					// Show the confirmation dialog
 					NGUIEditorTools.DrawSeparator();
-					GUILayout.Label("Are you sure you want to delete '" + mSprite.name + "'?");
+					GUILayout.Label("Are you sure you want to delete '" + sprite.name + "'?");
 					NGUIEditorTools.DrawSeparator();
 
 					GUILayout.BeginHorizontal();
@@ -209,7 +216,7 @@ public class UIAtlasInspector : Editor
 						if (GUILayout.Button("Delete"))
 						{
 							NGUIEditorTools.RegisterUndo("Delete Sprite", mAtlas);
-							mAtlas.spriteList.Remove(mSprite);
+							mAtlas.spriteList.Remove(sprite);
 							mConfirmDelete = false;
 						}
 						GUI.backgroundColor = Color.white;
@@ -220,64 +227,64 @@ public class UIAtlasInspector : Editor
 			}
 			else
 			{
-				if (mSprite == null && mAtlas.spriteList.Count > 0)
+				if (sprite == null && mAtlas.spriteList.Count > 0)
 				{
-					string spriteName = EditorPrefs.GetString("NGUI Selected Sprite");
-					if (!string.IsNullOrEmpty(spriteName)) mSprite = mAtlas.GetSprite(spriteName);
-					if (mSprite == null) mSprite = mAtlas.spriteList[0];
+					string spriteName = NGUISettings.selectedSprite;
+					if (!string.IsNullOrEmpty(spriteName)) sprite = mAtlas.GetSprite(spriteName);
+					if (sprite == null) sprite = mAtlas.spriteList[0];
 				}
 
-				if (!mConfirmDelete && mSprite != null)
+				if (!mConfirmDelete && sprite != null)
 				{
 					NGUIEditorTools.DrawSeparator();
-					NGUIEditorTools.AdvancedSpriteField(mAtlas, mSprite.name, SelectSprite, true);
+					NGUIEditorTools.AdvancedSpriteField(mAtlas, sprite.name, SelectSprite, true);
 
-					if (mSprite == null) return;
+					if (sprite == null) return;
 
 					Texture2D tex = mAtlas.spriteMaterial.mainTexture as Texture2D;
 
 					if (tex != null)
 					{
-						Rect inner = mSprite.inner;
-						Rect outer = mSprite.outer;
+						Rect inner = sprite.inner;
+						Rect outer = sprite.outer;
 
 						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 						{
 							GUI.backgroundColor = green;
-							outer = NGUIEditorTools.IntRect("Dimensions", mSprite.outer);
+							outer = NGUIEditorTools.IntRect("Dimensions", sprite.outer);
 
 							Vector4 border = new Vector4(
-								mSprite.inner.xMin - mSprite.outer.xMin,
-								mSprite.inner.yMin - mSprite.outer.yMin,
-								mSprite.outer.xMax - mSprite.inner.xMax,
-								mSprite.outer.yMax - mSprite.inner.yMax);
+								sprite.inner.xMin - sprite.outer.xMin,
+								sprite.inner.yMin - sprite.outer.yMin,
+								sprite.outer.xMax - sprite.inner.xMax,
+								sprite.outer.yMax - sprite.inner.yMax);
 
 							GUI.backgroundColor = blue;
 							border = NGUIEditorTools.IntPadding("Border", border);
 							GUI.backgroundColor = Color.white;
 
-							inner.xMin = mSprite.outer.xMin + border.x;
-							inner.yMin = mSprite.outer.yMin + border.y;
-							inner.xMax = mSprite.outer.xMax - border.z;
-							inner.yMax = mSprite.outer.yMax - border.w;
+							inner.xMin = sprite.outer.xMin + border.x;
+							inner.yMin = sprite.outer.yMin + border.y;
+							inner.xMax = sprite.outer.xMax - border.z;
+							inner.yMax = sprite.outer.yMax - border.w;
 						}
 						else
 						{
 							// Draw the inner and outer rectangle dimensions
 							GUI.backgroundColor = green;
-							outer = EditorGUILayout.RectField("Outer Rect", mSprite.outer);
+							outer = EditorGUILayout.RectField("Outer Rect", sprite.outer);
 							GUI.backgroundColor = blue;
-							inner = EditorGUILayout.RectField("Inner Rect", mSprite.inner);
+							inner = EditorGUILayout.RectField("Inner Rect", sprite.inner);
 							GUI.backgroundColor = Color.white;
 						}
 
 						if (outer.xMax < outer.xMin) outer.xMax = outer.xMin;
 						if (outer.yMax < outer.yMin) outer.yMax = outer.yMin;
 
-						if (outer != mSprite.outer)
+						if (outer != sprite.outer)
 						{
-							float x = outer.xMin - mSprite.outer.xMin;
-							float y = outer.yMin - mSprite.outer.yMin;
+							float x = outer.xMin - sprite.outer.xMin;
+							float y = outer.yMin - sprite.outer.yMin;
 
 							inner.x += x;
 							inner.y += y;
@@ -291,11 +298,11 @@ public class UIAtlasInspector : Editor
 						
 						bool changed = false;
 						
-						if (mSprite.inner != inner || mSprite.outer != outer)
+						if (sprite.inner != inner || sprite.outer != outer)
 						{
 							NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
-							mSprite.inner = inner;
-							mSprite.outer = outer;
+							sprite.inner = inner;
+							sprite.outer = outer;
 							MarkSpriteAsDirty();
 							changed = true;
 						}
@@ -304,10 +311,10 @@ public class UIAtlasInspector : Editor
 
 						if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
 						{
-							int left	= Mathf.RoundToInt(mSprite.paddingLeft	 * mSprite.outer.width);
-							int right	= Mathf.RoundToInt(mSprite.paddingRight	 * mSprite.outer.width);
-							int top		= Mathf.RoundToInt(mSprite.paddingTop	 * mSprite.outer.height);
-							int bottom	= Mathf.RoundToInt(mSprite.paddingBottom * mSprite.outer.height);
+							int left	= Mathf.RoundToInt(sprite.paddingLeft	* sprite.outer.width);
+							int right	= Mathf.RoundToInt(sprite.paddingRight	* sprite.outer.width);
+							int top		= Mathf.RoundToInt(sprite.paddingTop	* sprite.outer.height);
+							int bottom	= Mathf.RoundToInt(sprite.paddingBottom	* sprite.outer.height);
 
 							NGUIEditorTools.IntVector a = NGUIEditorTools.IntPair("Padding", "Left", "Top", left, top);
 							NGUIEditorTools.IntVector b = NGUIEditorTools.IntPair(null, "Right", "Bottom", right, bottom);
@@ -315,10 +322,10 @@ public class UIAtlasInspector : Editor
 							if (changed || a.x != left || a.y != top || b.x != right || b.y != bottom)
 							{
 								NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
-								mSprite.paddingLeft		= a.x / mSprite.outer.width;
-								mSprite.paddingTop		= a.y / mSprite.outer.height;
-								mSprite.paddingRight	= b.x / mSprite.outer.width;
-								mSprite.paddingBottom	= b.y / mSprite.outer.height;
+								sprite.paddingLeft		= a.x / sprite.outer.width;
+								sprite.paddingTop		= a.y / sprite.outer.height;
+								sprite.paddingRight		= b.x / sprite.outer.width;
+								sprite.paddingBottom	= b.y / sprite.outer.height;
 								MarkSpriteAsDirty();
 							}
 						}
@@ -343,7 +350,7 @@ public class UIAtlasInspector : Editor
 									corrected1 = NGUIMath.MakePixelPerfect(corrected1, tex.width, tex.height);
 								}
 
-								if (corrected0 == mSprite.outer && corrected1 == mSprite.inner)
+								if (corrected0 == sprite.outer && corrected1 == sprite.inner)
 								{
 									GUI.color = Color.grey;
 									GUILayout.Button("Make Pixel-Perfect");
@@ -372,11 +379,11 @@ public class UIAtlasInspector : Editor
 							NGUIEditorTools.RegisterUndo("Add Sprite", mAtlas);
 							UIAtlas.Sprite newSprite = new UIAtlas.Sprite();
 
-							if (mSprite != null)
+							if (sprite != null)
 							{
-								newSprite.name = "Copy of " + mSprite.name;
-								newSprite.outer = mSprite.outer;
-								newSprite.inner = mSprite.inner;
+								newSprite.name = "Copy of " + sprite.name;
+								newSprite.outer = sprite.outer;
+								newSprite.inner = sprite.inner;
 							}
 							else
 							{
@@ -384,13 +391,13 @@ public class UIAtlasInspector : Editor
 							}
 
 							mAtlas.spriteList.Add(newSprite);
-							mSprite = newSprite;
+							sprite = newSprite;
 						}
 
 						// Show the delete button
 						GUI.backgroundColor = Color.red;
 
-						if (mSprite != null && GUILayout.Button("Delete", GUILayout.Width(55f)))
+						if (sprite != null && GUILayout.Button("Delete", GUILayout.Width(55f)))
 						{
 							mConfirmDelete = true;
 						}
@@ -421,8 +428,7 @@ public class UIAtlasInspector : Editor
 
 	void SelectSprite (string spriteName)
 	{
-		mSprite = mAtlas.GetSprite(spriteName);
-		EditorPrefs.SetString("NGUI Selected Sprite", spriteName);
+		NGUISettings.selectedSprite = spriteName;
 		Repaint();
 	}
 
@@ -438,13 +444,14 @@ public class UIAtlasInspector : Editor
 
 	public override void OnPreviewGUI (Rect rect, GUIStyle background)
 	{
-		if (mSprite == null || mAtlas == null) return;
+		UIAtlas.Sprite sprite = (mAtlas != null) ? mAtlas.GetSprite(NGUISettings.selectedSprite) : null;
+		if (sprite == null) return;
 
 		Texture2D tex = mAtlas.texture as Texture2D;
 		if (tex == null) return;
 
-		Rect outer = new Rect(mSprite.outer);
-		Rect inner = new Rect(mSprite.inner);
+		Rect outer = new Rect(sprite.outer);
+		Rect inner = new Rect(sprite.inner);
 		Rect uv = outer;
 
 		if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)

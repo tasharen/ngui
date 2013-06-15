@@ -421,22 +421,11 @@ public abstract class UIWidget : MonoBehaviour
 
 	public void Update ()
 	{
-		CheckLayer();
-
 		// Ensure we have a panel to work with by now
 		if (mPanel == null) CreatePanel();
 #if UNITY_EDITOR
 		else if (!Application.isPlaying) ParentHasChanged();
 #endif
-		
-		// Automatically reset the Z scaling component back to 1 as it's not used
-		Vector3 scale = cachedTransform.localScale;
-
-		if (scale.z != 1f)
-		{
-			scale.z = 1f;
-			mTrans.localScale = scale;
-		}
 	}
 
 	/// <summary>

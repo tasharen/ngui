@@ -577,6 +577,7 @@ public class UIAtlasMaker : EditorWindow
 		atlas.MarkAsDirty();
 
 		Debug.Log("The atlas has been updated. Don't forget to save the scene to write the changes!");
+		Selection.activeGameObject = (NGUISettings.atlas != null) ? NGUISettings.atlas.gameObject : null;
 	}
 
 	/// <summary>
@@ -823,6 +824,7 @@ public class UIAtlasMaker : EditorWindow
 			EditorGUILayout.HelpBox("You can create a new atlas by selecting one or more textures in the Project View window, then clicking \"Create\".", MessageType.Info);
 		}
 
+		string selection = null;
 		Dictionary<string, int> spriteList = GetSpriteList(textures);
 
 		if (spriteList.Count > 0)
@@ -837,10 +839,16 @@ public class UIAtlasMaker : EditorWindow
 			foreach (KeyValuePair<string, int> iter in spriteList)
 			{
 				++index;
-				NGUIEditorTools.HighlightLine(new Color(0.6f, 0.6f, 0.6f));
-				GUILayout.BeginHorizontal();
+
+				GUILayout.Space(-1f);
+				bool highlight = (UIAtlasInspector.instance != null) && (NGUISettings.selectedSprite == iter.Key);
+				GUI.backgroundColor = highlight ? Color.white : new Color(0.8f, 0.8f, 0.8f);
+				GUILayout.BeginHorizontal("AS TextArea", GUILayout.MinHeight(20f));
+				GUI.backgroundColor = Color.white;
 				GUILayout.Label(index.ToString(), GUILayout.Width(24f));
-				GUILayout.Label(iter.Key);
+
+				if (GUILayout.Button(iter.Key, "OL TextField", GUILayout.Height(20f)))
+					selection = iter.Key;
 
 				if (iter.Value == 2)
 				{
@@ -902,7 +910,15 @@ public class UIAtlasMaker : EditorWindow
 			}
 			else if (update) UpdateAtlas(textures, true);
 			else if (replace) UpdateAtlas(textures, false);
-			return;
+
+			if (NGUISettings.atlas != null && !string.IsNullOrEmpty(selection))
+			{
+				NGUISettings.selectedSprite = selection;
+				Selection.activeGameObject = NGUISettings.atlas.gameObject;
+				
+				if (UIAtlasInspector.instance != null)
+					UIAtlasInspector.instance.Repaint();
+			}
 		}
 	}
 }

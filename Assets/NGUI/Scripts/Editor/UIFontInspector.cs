@@ -354,7 +354,7 @@ public class UIFontInspector : Editor
 					{
 						if (mFont.atlas != null)
 						{
-							EditorPrefs.SetString("NGUI Selected Sprite", sym.spriteName);
+							NGUISettings.selectedSprite = sym.spriteName;
 							NGUIEditorTools.Select(mFont.atlas.gameObject);
 						}
 					}

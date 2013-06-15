@@ -380,7 +380,11 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			int count = mTouches.Count;
+			int count = 0;
+
+			for (int i = 0; i < mTouches.Count; ++i)
+				if (mTouches[i].pressed != null)
+					++count;
 
 			for (int i = 0; i < mMouse.Length; ++i)
 				if (mMouse[i].pressed != null)

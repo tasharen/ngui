@@ -23,6 +23,7 @@ public class NGUISettings
 	static string mPartial = "";
 	static string mFontName = "New Font";
 	static string mAtlasName = "New Atlas";
+	static string mSpriteName;
 	static int mAtlasPadding = 1;
 	static public bool mAtlasTrimming = true;
 	static public bool mAtlasPMA = false;
@@ -47,6 +48,7 @@ public class NGUISettings
 		mPartial		= EditorPrefs.GetString("NGUI Partial");
 		mFontName		= EditorPrefs.GetString("NGUI Font Name");
 		mAtlasName		= EditorPrefs.GetString("NGUI Atlas Name");
+		mSpriteName		= EditorPrefs.GetString("NGUI Selected Sprite");
 		mFontData		= GetObject("NGUI Font Asset") as TextAsset;
 		mFontTexture	= GetObject("NGUI Font Texture") as Texture2D;
 		mFont			= GetObject("NGUI Font") as UIFont;
@@ -78,6 +80,7 @@ public class NGUISettings
 		EditorPrefs.SetString("NGUI Partial", mPartial);
 		EditorPrefs.SetString("NGUI Font Name", mFontName);
 		EditorPrefs.SetString("NGUI Atlas Name", mAtlasName);
+		EditorPrefs.SetString("NGUI Selected Sprite", mSpriteName);
 		EditorPrefs.SetInt("NGUI Font Asset", (mFontData != null) ? mFontData.GetInstanceID() : -1);
 		EditorPrefs.SetInt("NGUI Font Texture", (mFontTexture != null) ? mFontTexture.GetInstanceID() : -1);
 		EditorPrefs.SetInt("NGUI Font", (mFont != null) ? mFont.GetInstanceID() : -1);
@@ -201,6 +204,27 @@ public class NGUISettings
 			{
 				mAtlas = value;
 				mAtlasName = (mAtlas != null) ? mAtlas.name : "New Atlas";
+				Save();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Currently selected sprite.
+	/// </summary>
+
+	static public string selectedSprite
+	{
+		get
+		{
+			if (!mLoaded) Load();
+			return mSpriteName;
+		}
+		set
+		{
+			if (mSpriteName != value)
+			{
+				mSpriteName = value;
 				Save();
 			}
 		}
