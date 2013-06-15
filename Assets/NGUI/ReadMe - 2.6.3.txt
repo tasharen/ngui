@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.6.2
+                Version 2.6.3
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,12 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.6.3:
+- NEW: It's now possible to select sprites in the Atlas Maker for preview purposes.
+- FIX: Noticeably improved performance and garbage collection when using Unity 4.1+
+- FIX: Widgets will no longer be constantly checking for layer changes in update.
+- FIX: Shrink-to-fit labels will now auto-grow when possible.
 
 2.6.2:
 - NEW: You can now automatically apply alpha pre-multiplication to textures when creating an atlas.
