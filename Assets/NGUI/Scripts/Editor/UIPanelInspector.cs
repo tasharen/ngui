@@ -117,6 +117,18 @@ public class UIPanelInspector : Editor
 			EditorUtility.SetDirty(panel);
 		}
 
+		GUILayout.BeginHorizontal();
+		bool cull = EditorGUILayout.Toggle("Cull", panel.cullWhileDragging, GUILayout.Width(100f));
+		GUILayout.Label("Cull widgets while dragging them");
+		GUILayout.EndHorizontal();
+
+		if (panel.cullWhileDragging != cull)
+		{
+			panel.cullWhileDragging = cull;
+			panel.UpdateDrawcalls();
+			EditorUtility.SetDirty(panel);
+		}
+
 		EditorGUILayout.LabelField("Widgets", panel.widgets.size.ToString());
 		EditorGUILayout.LabelField("Draw Calls", drawcalls.size.ToString());
 

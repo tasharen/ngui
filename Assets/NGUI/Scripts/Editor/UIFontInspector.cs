@@ -79,7 +79,7 @@ public class UIFontInspector : Editor
 		}
 	}
 
-	override public void OnInspectorGUI ()
+	public override void OnInspectorGUI ()
 	{
 		mFont = target as UIFont;
 		EditorGUIUtility.LookLikeControls(80f);

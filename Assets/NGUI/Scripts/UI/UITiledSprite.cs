@@ -12,5 +12,5 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class UITiledSprite : UISlicedSprite
 {
-	override public Type type { get { return UISprite.Type.Tiled; } }
+	public override Type type { get { return UISprite.Type.Tiled; } }
 }

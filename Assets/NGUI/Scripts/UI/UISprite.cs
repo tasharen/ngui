@@ -259,7 +259,7 @@ public class UISprite : UIWidget
 	/// Extra padding around the sprite, in pixels.
 	/// </summary>
 
-	override public Vector4 relativePadding
+	public override Vector4 relativePadding
 	{
 		get
 		{
@@ -275,7 +275,7 @@ public class UISprite : UIWidget
 	/// Sliced sprites generally have a border.
 	/// </summary>
 
-	override public Vector4 border
+	public override Vector4 border
 	{
 		get
 		{
@@ -304,7 +304,7 @@ public class UISprite : UIWidget
 	/// Whether this widget will automatically become pixel-perfect after resize operation finishes.
 	/// </summary>
 
-	override public bool pixelPerfectAfterResize { get { return type == Type.Sliced; } }
+	public override bool pixelPerfectAfterResize { get { return type == Type.Sliced; } }
 
 	/// <summary>
 	/// Retrieve the atlas sprite referenced by the spriteName field.
@@ -409,7 +409,7 @@ public class UISprite : UIWidget
 	/// Adjust the scale of the widget to make it pixel-perfect.
 	/// </summary>
 
-	override public void MakePixelPerfect ()
+	public override void MakePixelPerfect ()
 	{
 		if (!isValid) return;
 
@@ -485,7 +485,7 @@ public class UISprite : UIWidget
 	/// Set the atlas and the sprite.
 	/// </summary>
 
-	override protected void OnStart ()
+	protected override void OnStart ()
 	{
 		if (mAtlas != null)
 		{
@@ -497,25 +497,25 @@ public class UISprite : UIWidget
 	/// Update the UV coordinates.
 	/// </summary>
 
-	override public bool OnUpdate ()
+	public override void Update ()
 	{
+		base.Update();
+
 		if (mChanged || !mSpriteSet)
 		{
 			mSpriteSet = true;
 			mSprite = null;
 			mChanged = true;
 			UpdateUVs(true);
-			return true;
 		}
-		UpdateUVs(false);
-		return false;
+		else UpdateUVs(false);
 	}
 
 	/// <summary>
 	/// Virtual function called by the UIScreen that fills the buffers.
 	/// </summary>
 
-	override public void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
+	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
 		switch (type)
 		{

@@ -34,7 +34,7 @@ public class TweenFOV : UITweener
 	/// Perform the tween.
 	/// </summary>
 
-	override protected void OnUpdate (float factor, bool isFinished)
+	protected override void OnUpdate (float factor, bool isFinished)
 	{
 		cachedCamera.fieldOfView = from * (1f - factor) + to * factor;
 	}

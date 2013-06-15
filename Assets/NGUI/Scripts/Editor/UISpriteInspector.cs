@@ -48,7 +48,7 @@ public class UISpriteInspector : UIWidgetInspector
 	/// Draw the atlas and sprite selection fields.
 	/// </summary>
 
-	override protected bool DrawProperties ()
+	protected override bool DrawProperties ()
 	{
 		mSprite = mWidget as UISprite;
 		ComponentSelector.Draw<UIAtlas>(mSprite.atlas, OnSelectAtlas);
@@ -61,7 +61,7 @@ public class UISpriteInspector : UIWidgetInspector
 	/// Sprites's custom properties based on the type.
 	/// </summary>
 
-	override protected void DrawExtraProperties ()
+	protected override void DrawExtraProperties ()
 	{
 		NGUIEditorTools.DrawSeparator();
 

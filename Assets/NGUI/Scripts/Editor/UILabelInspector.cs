@@ -37,7 +37,7 @@ public class UILabelInspector : UIWidgetInspector
 		}
 	}
 
-	override protected bool DrawProperties ()
+	protected override bool DrawProperties ()
 	{
 		mLabel = mWidget as UILabel;
 		ComponentSelector.Draw<UIFont>(mLabel.font, OnSelectFont);

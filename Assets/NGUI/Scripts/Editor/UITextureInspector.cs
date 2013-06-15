@@ -22,7 +22,7 @@ public class UITextureInspector : UIWidgetInspector
 		mTex = target as UITexture;
 	}
 
-	override protected bool DrawProperties ()
+	protected override bool DrawProperties ()
 	{
 		if (!mTex.hasDynamicMaterial && (mTex.material != null || mTex.mainTexture == null))
 		{

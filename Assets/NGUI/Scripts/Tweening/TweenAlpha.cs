@@ -52,7 +52,7 @@ public class TweenAlpha : UITweener
 	/// Interpolate and update the alpha.
 	/// </summary>
 
-	override protected void OnUpdate (float factor, bool isFinished) { alpha = Mathf.Lerp(from, to, factor); }
+	protected override void OnUpdate (float factor, bool isFinished) { alpha = Mathf.Lerp(from, to, factor); }
 
 	/// <summary>
 	/// Start the tweening operation.

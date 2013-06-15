@@ -454,14 +454,15 @@ public class UILabel : UIWidget
 	}
 
 #if UNITY_EDITOR
-	public override bool OnUpdate ()
+	public override void Update ()
 	{
-		if (mFont.isDynamic && !Application.isPlaying && mFont.RecalculateDynamicOffset())
+		base.Update();
+
+		if (mFont != null && mFont.isDynamic && !Application.isPlaying && mFont.RecalculateDynamicOffset())
 		{
 			mFont.MarkAsDirty();
-			return true;
+			mChanged = true;
 		}
-		return false;
 	}
 #endif
 

@@ -12,5 +12,5 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class UIFilledSprite : UISprite
 {
-	override public Type type { get { return UISprite.Type.Filled; } }
+	public override Type type { get { return UISprite.Type.Filled; } }
 }

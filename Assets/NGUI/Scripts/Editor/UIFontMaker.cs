@@ -188,7 +188,7 @@ public class UIFontMaker : EditorWindow
 			// Helpful info
 			if (NGUISettings.fontData == null)
 			{
-				EditorGUILayout.HelpBox("The bitmap font creation mostly takes place outside of Unity. You can use BMFont on" +
+				EditorGUILayout.HelpBox("The bitmap font creation mostly takes place outside of Unity. You can use BMFont on " +
 					"Windows or your choice of Glyph Designer or the less expensive bmGlyph on the Mac.\n\n" +
 					"Either of these tools will create a FNT file for you that you will drag & drop into the field above.", MessageType.Info);
 			}
