@@ -33,6 +33,14 @@ public class UIPanel : MonoBehaviour
 		Geometry,
 	}
 
+	public delegate void OnChangeDelegate ();
+
+	/// <summary>
+	/// Notification triggered when something changes within the panel.
+	/// </summary>
+
+	public OnChangeDelegate onChange;
+
 	/// <summary>
 	/// Whether this panel will show up in the panel tool (set this to 'false' for dynamically created temporary panels)
 	/// </summary>
@@ -114,7 +122,6 @@ public class UIPanel : MonoBehaviour
 	Camera mCam;
 	int mLayer = -1;
 	bool mDepthChanged = false;
-	bool mChangedLastFrame = false;
 #if OLD_UNITY
 	bool mRebuildAll = false;
 	bool mWidgetsAdded = false;
@@ -152,12 +159,6 @@ public class UIPanel : MonoBehaviour
 	/// </summary>
 
 	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
-
-	/// <summary>
-	/// Whether the panel's geometry has changed in the past (or current) frame.
-	/// </summary>
-
-	public bool changedLastFrame { get { return mChangedLastFrame; } }
 
 	/// <summary>
 	/// Panel's alpha affects everything drawn by the panel.
@@ -422,12 +423,8 @@ public class UIPanel : MonoBehaviour
 		if (mat != null)
 		{
 			if (sort) mDepthChanged = true;
-
 			if (!mChanged.Contains(mat))
-			{
 				mChanged.Add(mat);
-				mChangedLastFrame = true;
-			}
 		}
 	}
 
@@ -554,10 +551,8 @@ public class UIPanel : MonoBehaviour
 					mWidgets.Add(w);
 
 					if (!mChanged.Contains(w.material))
-					{
 						mChanged.Add(w.material);
-						mChangedLastFrame = true;
-					}
+
 					mDepthChanged = true;
 					mWidgetsAdded = true;
 				}
@@ -573,10 +568,8 @@ public class UIPanel : MonoBehaviour
 				mWidgets.Add(w);
 
 				if (!mChanged.Contains(w.material))
-				{
 					mChanged.Add(w.material);
-					mChangedLastFrame = true;
-				}
+
 				mDepthChanged = true;
 			}
 #endif
@@ -599,10 +592,7 @@ public class UIPanel : MonoBehaviour
 			{
 				// Mark the material as having been changed
 				if (pc.visibleFlag == 1 && !mChanged.Contains(w.material))
-				{
 					mChanged.Add(w.material);
-					mChangedLastFrame = true;
-				}
 
 				// Remove this transform
 				RemoveTransform(w.cachedTransform);
@@ -897,10 +887,7 @@ public class UIPanel : MonoBehaviour
 
 						// Add this material to the list of changed materials
 						if (!mChanged.Contains(mat))
-						{
 							mChanged.Add(mat);
-							mChangedLastFrame = true;
-						}
 					}
 				}
 			}
@@ -932,10 +919,7 @@ public class UIPanel : MonoBehaviour
 			{
 				// We will need to refill this buffer
 				if (!mChanged.Contains(w.material))
-				{
 					mChanged.Add(w.material);
-					mChangedLastFrame = true;
-				}
 			}
 			pc.changeFlag = 0;
 		}
@@ -993,9 +977,6 @@ public class UIPanel : MonoBehaviour
 
 	void Fill (Material mat)
 	{
-		// Cleanup deleted widgets
-		for (int i = mWidgets.size; i > 0; ) if (mWidgets[--i] == null) mWidgets.RemoveAt(i);
-
 		// Fill the buffers for the specified material
 		for (int i = 0; i < mWidgets.size; )
 		{
@@ -1059,7 +1040,6 @@ public class UIPanel : MonoBehaviour
 
 	void LateUpdate ()
 	{
-		mChangedLastFrame = false;
 		mUpdateTime = Time.realtimeSinceStartup;
 		UpdateTransformMatrix();
 #if OLD_UNITY
@@ -1089,14 +1069,16 @@ public class UIPanel : MonoBehaviour
 			UIWidget w = mWidgets[i];
 
 			// If the widget is visible, update it
-			if (w.UpdateGeometry(this, ref worldToLocal, generateNormals, forceVisible))
+			if (w.UpdateGeometry(this, forceVisible))
 			{
 				// We will need to refill this buffer
 				if (!mChanged.Contains(w.material))
-					mChanged.Add(w.material);
+					 mChanged.Add(w.material);
 			}
 		}
 #endif
+		// Inform the changed event listeners
+		if (mChanged.size != 0 && onChange != null) onChange();
 
 		// If the depth has changed, we need to re-sort the widgets
 		if (mDepthChanged)

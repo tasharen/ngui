@@ -606,10 +606,10 @@ public abstract class UIWidget : MonoBehaviour
 	/// Update the widget and fill its geometry if necessary. Returns whether something was changed.
 	/// </summary>
 
-	public bool UpdateGeometry (UIPanel p, ref Matrix4x4 worldToPanel, bool generateNormals, bool forceVisible)
+	public bool UpdateGeometry (UIPanel p, bool forceVisible)
 #endif
 	{
-		if (material != null)
+		if (material != null && p != null)
 		{
 			mPanel = p;
 			bool hasMatrix = false;
@@ -636,7 +636,7 @@ public abstract class UIWidget : MonoBehaviour
 					float x1 = x0 + size.x + padding.x + padding.z;
 					float y1 = y0 - size.y - padding.y - padding.w;
 
-					mLocalToPanel = worldToPanel * cachedTransform.localToWorldMatrix;
+					mLocalToPanel = p.worldToLocal * cachedTransform.localToWorldMatrix;
 					hasMatrix = true;
 
 					Vector3 v0 = new Vector3(x0, y0, 0f);
@@ -697,10 +697,10 @@ public abstract class UIWidget : MonoBehaviour
 						offset.x *= scale.x;
 						offset.y *= scale.y;
 
-						if (!hasMatrix) mLocalToPanel = worldToPanel * cachedTransform.localToWorldMatrix;
+						if (!hasMatrix) mLocalToPanel = p.worldToLocal * cachedTransform.localToWorldMatrix;
 
 						mGeom.ApplyOffset(offset);
-						mGeom.ApplyTransform(mLocalToPanel, generateNormals);
+						mGeom.ApplyTransform(mLocalToPanel, p.generateNormals);
 					}
 					return true;
 				}
@@ -713,7 +713,7 @@ public abstract class UIWidget : MonoBehaviour
 #if OLD_UNITY
 			else if (parentMoved && mGeom.hasVertices)
 			{
-				mGeom.ApplyTransform(worldToPanel * cachedTransform.localToWorldMatrix, generateNormals);
+				mGeom.ApplyTransform(p.worldToLocal * cachedTransform.localToWorldMatrix, p.generateNormals);
 			}
 #endif
 		}

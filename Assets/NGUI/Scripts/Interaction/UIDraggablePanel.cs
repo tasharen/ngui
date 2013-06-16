@@ -226,7 +226,16 @@ public class UIDraggablePanel : IgnoreTimeScale
 	{
 		mTrans = transform;
 		mPanel = GetComponent<UIPanel>();
+		mPanel.onChange += OnPanelChange;
 	}
+
+	void OnDestroy ()
+	{
+		if (mPanel != null)
+			mPanel.onChange -= OnPanelChange;
+	}
+
+	void OnPanelChange () { UpdateScrollbars(true); }
 
 	/// <summary>
 	/// Set the initial drag value and register the listener delegates.
@@ -615,9 +624,6 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	void LateUpdate ()
 	{
-		// If the panel's geometry changed, recalculate the bounds
-		if (mPanel.changedLastFrame) UpdateScrollbars(true);
-
 		// Inspector functionality
 		if (repositionClipping)
 		{
