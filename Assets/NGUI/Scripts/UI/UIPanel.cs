@@ -953,10 +953,12 @@ public class UIPanel : MonoBehaviour
 		}
 
 		Transform t = cachedTransform;
+		UIDrawCall dc;
+		Transform dt;
 
 		for (int i = 0, imax = mDrawCalls.size; i < imax; ++i)
 		{
-			UIDrawCall dc = mDrawCalls.buffer[i];
+			dc = mDrawCalls.buffer[i];
 			dc.clipping = mClipping;
 			dc.clipRange = range;
 			dc.clipSoftness = mClipSoftness;
@@ -964,7 +966,7 @@ public class UIPanel : MonoBehaviour
 
 			// Set the draw call's transform to match the panel's.
 			// Note that parenting directly to the panel causes unity to crash as soon as you hit Play.
-			Transform dt = dc.transform;
+			dt = dc.transform;
 			dt.position = t.position;
 			dt.rotation = t.rotation;
 			dt.localScale = t.lossyScale;
