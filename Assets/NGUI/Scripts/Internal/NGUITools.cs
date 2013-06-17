@@ -813,7 +813,15 @@ static public class NGUITools
 	/// </summary>
 
 #if UNITY_WEBPLAYER || UNITY_FLASH || UNITY_METRO
-	static PropertyInfo GetSystemCopyBufferProperty () { return null; }
+	/// <summary>
+	/// Access to the clipboard is not supported on this platform.
+	/// </summary>
+
+	public static string clipboard
+	{
+		get { return null; }
+		set { };
+	}
 #else
 	static PropertyInfo mSystemCopyBuffer = null;
 	static PropertyInfo GetSystemCopyBufferProperty ()
@@ -825,7 +833,6 @@ static public class NGUITools
 		}
 		return mSystemCopyBuffer;
 	}
-#endif
 
 	/// <summary>
 	/// Access to the clipboard via a hacky method of accessing Unity's internals. Won't work in the web player.
@@ -844,4 +851,5 @@ static public class NGUITools
 			if (copyBuffer != null) copyBuffer.SetValue(null, value, null);
 		}
 	}
+#endif
 }
