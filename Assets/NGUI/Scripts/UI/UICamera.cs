@@ -1067,15 +1067,18 @@ public class UICamera : MonoBehaviour
 		}
 		else
 		{
-			// If the user is pressing down and has dragged the touch away from the original object,
-			// unpress the original object and notify the new object that it is now being pressed on.
-			if (!stickyPress && !unpressed && currentTouch.pressStarted && currentTouch.pressed != hoveredObject)
+			if (currentTouch.clickNotification != ClickNotification.None)
 			{
-				isDragging = true;
-				Notify(currentTouch.pressed, "OnPress", false);
-				currentTouch.pressed = hoveredObject;
-				Notify(currentTouch.pressed, "OnPress", true);
-				isDragging = false;
+				// If the user is pressing down and has dragged the touch away from the original object,
+				// unpress the original object and notify the new object that it is now being pressed on.
+				if (!stickyPress && !unpressed && currentTouch.pressStarted && currentTouch.pressed != hoveredObject)
+				{
+					isDragging = true;
+					Notify(currentTouch.pressed, "OnPress", false);
+					currentTouch.pressed = hoveredObject;
+					Notify(currentTouch.pressed, "OnPress", true);
+					isDragging = false;
+				}
 			}
 
 			if (currentTouch.pressed != null)
