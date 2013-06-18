@@ -398,6 +398,33 @@ public class UICamera : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Number of active drag events from all sources.
+	/// </summary>
+
+	static public int dragCount
+	{
+		get
+		{
+			int count = 0;
+
+			for (int i = 0; i < mTouches.Count; ++i)
+			{
+				if (mTouches[i].dragged != null)
+					++count;
+			}
+
+			for (int i = 0; i < mMouse.Length; ++i)
+				if (mMouse[i].dragged != null)
+					++count;
+
+			if (mController.dragged != null)
+				++count;
+
+			return count;
+		}
+	}
+
+	/// <summary>
 	/// Clear the list on application quit (also when Play mode is exited)
 	/// </summary>
 

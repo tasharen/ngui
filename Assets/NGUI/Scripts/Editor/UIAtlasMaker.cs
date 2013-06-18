@@ -16,6 +16,7 @@ public class UIAtlasMaker : EditorWindow
 	class SpriteEntry
 	{
 		public Texture2D tex;	// Sprite texture -- original texture or a temporary texture
+		public string name;		// Name of the texture, since a reference to the texture may be lost due to a bug in Unity
 		public Rect rect;		// Sprite's outer rectangle within the generated texture atlas
 		public int minX = 0;	// Padding, if any (set if the sprite is trimmed)
 		public int maxX = 0;
@@ -197,7 +198,7 @@ public class UIAtlasMaker : EditorWindow
 		// See if this sprite already exists
 		foreach (UIAtlas.Sprite sp in sprites)
 		{
-			if (sp.name == se.tex.name)
+			if (sp.name == se.name)
 			{
 				sprite = sp;
 				break;
@@ -222,7 +223,7 @@ public class UIAtlasMaker : EditorWindow
 		else
 		{
 			sprite = new UIAtlas.Sprite();
-			sprite.name = se.tex.name;
+			sprite.name = se.name;
 			sprite.outer = se.rect;
 			sprite.inner = se.rect;
 			sprites.Add(sprite);
@@ -258,6 +259,7 @@ public class UIAtlasMaker : EditorWindow
 				SpriteEntry sprite = new SpriteEntry();
 				sprite.rect = new Rect(0f, 0f, oldTex.width, oldTex.height);
 				sprite.tex = oldTex;
+				sprite.name = oldTex.name;
 				sprite.temporaryTexture = false;
 				list.Add(sprite);
 				continue;
@@ -303,7 +305,6 @@ public class UIAtlasMaker : EditorWindow
 			int newWidth  = (xmax - xmin) + 1;
 			int newHeight = (ymax - ymin) + 1;
 
-			// If the sprite is empty, don't do anything with it
 			if (newWidth > 0 && newHeight > 0)
 			{
 				SpriteEntry sprite = new SpriteEntry();
@@ -313,6 +314,7 @@ public class UIAtlasMaker : EditorWindow
 				if (!NGUISettings.atlasPMA && (newWidth == oldWidth && newHeight == oldHeight))
 				{
 					sprite.tex = oldTex;
+					sprite.name = oldTex.name;
 					sprite.temporaryTexture = false;
 				}
 				else
@@ -333,8 +335,8 @@ public class UIAtlasMaker : EditorWindow
 
 					// Create a new texture
 					sprite.temporaryTexture = true;
+					sprite.name = oldTex.name;
 					sprite.tex = new Texture2D(newWidth, newHeight);
-					sprite.tex.name = oldTex.name;
 					sprite.tex.SetPixels32(newPixels);
 					sprite.tex.Apply();
 
@@ -421,7 +423,7 @@ public class UIAtlasMaker : EditorWindow
 
 				foreach (SpriteEntry se in sprites)
 				{
-					if (asp.name == se.tex.name)
+					if (asp.name == se.name)
 					{
 						found = true;
 						break;
@@ -459,9 +461,9 @@ public class UIAtlasMaker : EditorWindow
 
 					// Create a new sprite
 					SpriteEntry sprite = new SpriteEntry();
+					sprite.name = asp.name;
 					sprite.temporaryTexture = true;
 					sprite.tex = new Texture2D(newWidth, newHeight);
-					sprite.tex.name = asp.name;
 					sprite.rect = new Rect(0f, 0f, newWidth, newHeight);
 					sprite.tex.SetPixels32(newPixels);
 					sprite.tex.Apply();
@@ -530,6 +532,8 @@ public class UIAtlasMaker : EditorWindow
 			{
 				if (tex == null) Debug.LogError("Failed to load the created atlas saved as " + newPath);
 				else atlas.spriteMaterial.mainTexture = tex;
+				ReleaseSprites(sprites);
+				
 				AssetDatabase.SaveAssets();
 				AssetDatabase.Refresh();
 			}
@@ -546,38 +550,6 @@ public class UIAtlasMaker : EditorWindow
 					"Keep large sprites outside the atlas (use UITexture), and/or use multiple atlases instead", "OK");
 			return false;
 		}
-	}
-
-	/// <summary>
-	/// Update the sprite atlas, keeping only the sprites that are on the specified list.
-	/// </summary>
-
-	static void UpdateAtlas (UIAtlas atlas, List<SpriteEntry> sprites)
-	{
-		if (sprites.Count > 0)
-		{
-			// Combine all sprites into a single texture and save it
-			if (UpdateTexture(atlas, sprites))
-			{
-				// Replace the sprites within the atlas
-				ReplaceSprites(atlas, sprites);
-
-				// Release the temporary textures
-				ReleaseSprites(sprites);
-			}
-			else return;
-		}
-		else
-		{
-			atlas.spriteList.Clear();
-			string path = NGUIEditorTools.GetSaveableTexturePath(atlas);
-			atlas.spriteMaterial.mainTexture = null;
-			if (!string.IsNullOrEmpty(path)) AssetDatabase.DeleteAsset(path);
-		}
-		atlas.MarkAsDirty();
-
-		Debug.Log("The atlas has been updated. Don't forget to save the scene to write the changes!");
-		Selection.activeGameObject = (NGUISettings.atlas != null) ? NGUISettings.atlas.gameObject : null;
 	}
 
 	/// <summary>
@@ -624,6 +596,38 @@ public class UIAtlasMaker : EditorWindow
 		{
 			UpdateAtlas(NGUISettings.atlas, sprites);
 		}
+	}
+
+	/// <summary>
+	/// Update the sprite atlas, keeping only the sprites that are on the specified list.
+	/// </summary>
+
+	static void UpdateAtlas (UIAtlas atlas, List<SpriteEntry> sprites)
+	{
+		if (sprites.Count > 0)
+		{
+			// Combine all sprites into a single texture and save it
+			if (UpdateTexture(atlas, sprites))
+			{
+				// Replace the sprites within the atlas
+				ReplaceSprites(atlas, sprites);
+			}
+
+			// Release the temporary textures
+			ReleaseSprites(sprites);
+			return;
+		}
+		else
+		{
+			atlas.spriteList.Clear();
+			string path = NGUIEditorTools.GetSaveableTexturePath(atlas);
+			atlas.spriteMaterial.mainTexture = null;
+			if (!string.IsNullOrEmpty(path)) AssetDatabase.DeleteAsset(path);
+		}
+		atlas.MarkAsDirty();
+
+		Debug.Log("The atlas has been updated. Don't forget to save the scene to write the changes!");
+		Selection.activeGameObject = (NGUISettings.atlas != null) ? NGUISettings.atlas.gameObject : null;
 	}
 
 	/// <summary>
@@ -773,41 +777,44 @@ public class UIAtlasMaker : EditorWindow
 				}
 			}
 			GUILayout.EndHorizontal();
+		}
 
+		GUILayout.BeginHorizontal();
+		NGUISettings.atlasPadding = Mathf.Clamp(EditorGUILayout.IntField("Padding", NGUISettings.atlasPadding, GUILayout.Width(100f)), 0, 8);
+		GUILayout.Label((NGUISettings.atlasPadding == 1 ? "pixel" : "pixels") + " in-between of sprites");
+		GUILayout.EndHorizontal();
+
+		GUILayout.BeginHorizontal();
+		NGUISettings.atlasTrimming = EditorGUILayout.Toggle("Trim Alpha", NGUISettings.atlasTrimming, GUILayout.Width(100f));
+		GUILayout.Label("Remove empty space");
+		GUILayout.EndHorizontal();
+
+		GUILayout.BeginHorizontal();
+		NGUISettings.atlasPMA = EditorGUILayout.Toggle("PMA Shader", NGUISettings.atlasPMA, GUILayout.Width(100f));
+		GUILayout.Label("Pre-multiply color by alpha");
+		GUILayout.EndHorizontal();
+
+		GUILayout.BeginHorizontal();
+		NGUISettings.unityPacking = EditorGUILayout.Toggle("Unity Packer", NGUISettings.unityPacking, GUILayout.Width(100f));
+		GUILayout.Label("if off, use a custom packer");
+		GUILayout.EndHorizontal();
+
+		if (!NGUISettings.unityPacking)
+		{
 			GUILayout.BeginHorizontal();
-			NGUISettings.atlasPadding = Mathf.Clamp(EditorGUILayout.IntField("Padding", NGUISettings.atlasPadding, GUILayout.Width(100f)), 0, 8);
-			GUILayout.Label((NGUISettings.atlasPadding == 1 ? "pixel" : "pixels") + " in-between of sprites");
+			NGUISettings.forceSquareAtlas = EditorGUILayout.Toggle("Force Square", NGUISettings.forceSquareAtlas, GUILayout.Width(100f));
+			GUILayout.Label("if on, forces a square atlas texture");
 			GUILayout.EndHorizontal();
-
-			GUILayout.BeginHorizontal();
-			NGUISettings.atlasTrimming = EditorGUILayout.Toggle("Trim Alpha", NGUISettings.atlasTrimming, GUILayout.Width(100f));
-			GUILayout.Label("Remove empty space");
-			GUILayout.EndHorizontal();
-
-			GUILayout.BeginHorizontal();
-			NGUISettings.atlasPMA = EditorGUILayout.Toggle("PMA Shader", NGUISettings.atlasPMA, GUILayout.Width(100f));
-			GUILayout.Label("Pre-multiply color by alpha");
-			GUILayout.EndHorizontal();
-
-			GUILayout.BeginHorizontal();
-			NGUISettings.unityPacking = EditorGUILayout.Toggle("Unity Packer", NGUISettings.unityPacking, GUILayout.Width(100f));
-			GUILayout.Label("if off, use a custom packer");
-			GUILayout.EndHorizontal();
-
-			if (!NGUISettings.unityPacking)
-			{
-				GUILayout.BeginHorizontal();
-				NGUISettings.forceSquareAtlas = EditorGUILayout.Toggle("Force Square", NGUISettings.forceSquareAtlas, GUILayout.Width(100f));
-				GUILayout.Label("if on, forces a square atlas texture");
-				GUILayout.EndHorizontal();
-			}
+		}
 
 #if UNITY_IPHONE || UNITY_ANDROID
-			GUILayout.BeginHorizontal();
-			NGUISettings.allow4096 = EditorGUILayout.Toggle("4096x4096", NGUISettings.allow4096, GUILayout.Width(100f));
-			GUILayout.Label("if off, limit atlases to 2048x2048");
-			GUILayout.EndHorizontal();
+		GUILayout.BeginHorizontal();
+		NGUISettings.allow4096 = EditorGUILayout.Toggle("4096x4096", NGUISettings.allow4096, GUILayout.Width(100f));
+		GUILayout.Label("if off, limit atlases to 2048x2048");
+		GUILayout.EndHorizontal();
 #endif
+		if (NGUISettings.atlas != null && NGUISettings.atlas.name == NGUISettings.atlasName)
+		{
 			if (textures.Count > 0)
 			{
 				GUI.backgroundColor = Color.green;
@@ -899,11 +906,8 @@ public class UIAtlasMaker : EditorWindow
 				for (int i = sprites.Count; i > 0; )
 				{
 					SpriteEntry ent = sprites[--i];
-
-					if (mDelNames.Contains(ent.tex.name))
-					{
+					if (mDelNames.Contains(ent.name))
 						sprites.RemoveAt(i);
-					}
 				}
 				UpdateAtlas(NGUISettings.atlas, sprites);
 				mDelNames.Clear();
