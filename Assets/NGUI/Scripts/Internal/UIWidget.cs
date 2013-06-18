@@ -3,7 +3,7 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
-#if UNITY_3_4 || UNITY_3_5 || UNITY_4_0
+#if UNITY_3_5 || UNITY_4_0
 #define OLD_UNITY
 #endif
 

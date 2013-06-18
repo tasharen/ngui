@@ -7,7 +7,7 @@
 #define USE_SIMPLE_DICTIONARY
 #endif
 
-#if UNITY_3_4 || UNITY_3_5 || UNITY_4_0
+#if UNITY_3_5 || UNITY_4_0
 #define OLD_UNITY
 #endif
 

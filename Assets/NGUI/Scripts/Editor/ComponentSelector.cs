@@ -28,14 +28,12 @@ public class ComponentSelector : ScriptableWizard
 	{
 		GUILayout.BeginHorizontal();
 		bool show = GUILayout.Button(buttonName, "DropDownButton", GUILayout.Width(76f));
-#if !UNITY_3_4
 		GUILayout.BeginVertical();
 		GUILayout.Space(5f);
-#endif
+
 		T o = EditorGUILayout.ObjectField(obj, typeof(T), false, options) as T;
-#if !UNITY_3_4
 		GUILayout.EndVertical();
-#endif
+
 		if (o != null && Selection.activeObject != o.gameObject && GUILayout.Button("Edit", GUILayout.Width(40f)))
 		{
 			Selection.activeObject = o.gameObject;

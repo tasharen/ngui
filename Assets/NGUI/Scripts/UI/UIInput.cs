@@ -122,11 +122,7 @@ public class UIInput : MonoBehaviour
 	float mPosition = 0f;
 
 #if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8
-#if UNITY_3_4
-	iPhoneKeyboard mKeyboard;
-#else
 	TouchScreenKeyboard mKeyboard;
-#endif
 #else
 	string mLastIME = "";
 #endif
@@ -259,9 +255,6 @@ public class UIInput : MonoBehaviour
 #endif
 					)
 				{
-#if UNITY_3_4
-					mKeyboard = iPhoneKeyboard.Open(mText, (iPhoneKeyboardType)((int)type), autoCorrect);
-#else
 					if (isPassword)
 					{
 						mKeyboard = TouchScreenKeyboard.Open(mText, TouchScreenKeyboardType.Default, false, false, true);
@@ -270,7 +263,6 @@ public class UIInput : MonoBehaviour
 					{
 						mKeyboard = TouchScreenKeyboard.Open(mText, (TouchScreenKeyboardType)((int)type), autoCorrect);
 					}
-#endif
 				}
 				else
 #endif

@@ -707,21 +707,14 @@ public class UIAtlasMaker : EditorWindow
 				if (NGUISettings.atlas == null || NGUISettings.atlas.name != NGUISettings.atlasName)
 				{
 					// Create a new prefab for the atlas
-#if UNITY_3_4
-					Object prefab = (go != null) ? go : EditorUtility.CreateEmptyPrefab(prefabPath); 
-#else
 					Object prefab = (go != null) ? go : PrefabUtility.CreateEmptyPrefab(prefabPath);
-#endif
+
 					// Create a new game object for the atlas
 					go = new GameObject(NGUISettings.atlasName);
 					go.AddComponent<UIAtlas>().spriteMaterial = mat;
 
 					// Update the prefab
-#if UNITY_3_4
-					EditorUtility.ReplacePrefab(go, prefab);
-#else
 					PrefabUtility.ReplacePrefab(go, prefab);
-#endif
 					DestroyImmediate(go);
 					AssetDatabase.SaveAssets();
 					AssetDatabase.Refresh();
