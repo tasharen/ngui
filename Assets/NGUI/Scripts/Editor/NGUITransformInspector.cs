@@ -12,6 +12,8 @@ using UnityEditor;
 [CanEditMultipleObjects]
 public class NGUITransformInspector : Editor
 {
+	static public NGUITransformInspector instance;
+
 #region Helpers structs/enum
 	// Enumeration of axes.
 	public enum Axes
@@ -142,10 +144,13 @@ public class NGUITransformInspector : Editor
 
 	void OnEnable ()
 	{
+		instance = this;
 		mPosition = serializedObject.FindProperty("m_LocalPosition");
 		mRotation = serializedObject.FindProperty("m_LocalRotation");
 		mScale = serializedObject.FindProperty("m_LocalScale");
 	}
+
+	void OnDestroy () { instance = null; }
 
 	/// <summary>
 	/// Draw the inspector widget.
@@ -160,6 +165,7 @@ public class NGUITransformInspector : Editor
 
 		// For clarity purposes, if there is a widget, we want to disable rotation around X and Y, and disable scaling on the Z.
 		bool isWidget = false;
+		bool isStatic = false;
 
 		foreach (Object obj in serializedObject.targetObjects)
 		{
@@ -167,9 +173,17 @@ public class NGUITransformInspector : Editor
 
 			if (t != null)
 			{
-				if (t.GetComponent<UIWidget>() != null)
+				UIWidget w = t.GetComponent<UIWidget>();
+
+				if (w != null)
 				{
 					isWidget = true;
+
+					if (Application.isPlaying)
+					{
+						PrefabType type = PrefabUtility.GetPrefabType(w.gameObject);
+						if (type != PrefabType.Prefab) isStatic = (w.panel != null) && w.panel.widgetsAreStatic;
+					}
 					break;
 				}
 			}
@@ -180,7 +194,7 @@ public class NGUITransformInspector : Editor
 		{
 			Axes axes = GetMultipleValuesAxes(mPosition);
 
-			if (DrawButton("P", "Reset Position", axes != Axes.None || IsResetPositionValid(trans), 20f))
+			if (DrawButton("P", "Reset Position", !isStatic && (axes != Axes.None || IsResetPositionValid(trans)), 20f))
 			{
 				NGUIEditorTools.RegisterUndo("Reset Position", serializedObject.targetObjects);
 
@@ -192,7 +206,7 @@ public class NGUITransformInspector : Editor
 			}
 
 			GUI.changed = false;
-			VectorWrapper final = DrawVector3(trans.localPosition, axes, Axes.All);
+			VectorWrapper final = DrawVector3(trans.localPosition, axes, isStatic ? Axes.None : Axes.All);
 
 			if (GUI.changed)
 			{
@@ -220,7 +234,7 @@ public class NGUITransformInspector : Editor
 		{
 			Axes axes = GetMultipleValuesAxes(mRotation);
 
-			if (DrawButton("R", "Reset Rotation", axes != Axes.None || IsResetRotationValid(trans), 20f))
+			if (DrawButton("R", "Reset Rotation", !isStatic && (axes != Axes.None || IsResetRotationValid(trans)), 20f))
 			{
 				NGUIEditorTools.RegisterUndo("Reset Rotation", serializedObject.targetObjects);
 
@@ -232,7 +246,7 @@ public class NGUITransformInspector : Editor
 			}
 
 			GUI.changed = false;
-			VectorWrapper final = DrawVector3(trans.localEulerAngles, axes, isWidget ? Axes.Z : Axes.All);
+			VectorWrapper final = DrawVector3(trans.localEulerAngles, axes, isStatic ? Axes.None : (isWidget ? Axes.Z : Axes.All));
 
 			if (GUI.changed)
 			{
@@ -260,7 +274,7 @@ public class NGUITransformInspector : Editor
 		{
 			Axes axes = GetMultipleValuesAxes(mScale);
 
-			if (DrawButton("S", "Reset Scale", (axes != Axes.None || IsResetScaleValid(trans)), 20f))
+			if (DrawButton("S", "Reset Scale", !isStatic && (axes != Axes.None || IsResetScaleValid(trans)), 20f))
 			{
 				NGUIEditorTools.RegisterUndo("Reset Scale", serializedObject.targetObjects);
 
@@ -278,7 +292,7 @@ public class NGUITransformInspector : Editor
 			}
 
 			GUI.changed = false;
-			VectorWrapper final = DrawVector3(trans.localScale, axes, isWidget ? (Axes.X | Axes.Y) : Axes.All);
+			VectorWrapper final = DrawVector3(trans.localScale, axes, isStatic ? Axes.None : (isWidget ? (Axes.X | Axes.Y) : Axes.All));
 
 			if (GUI.changed)
 			{
@@ -300,6 +314,11 @@ public class NGUITransformInspector : Editor
 			}
 		}
 		EditorGUILayout.EndHorizontal();
+
+		if (isStatic)
+		{
+			EditorGUILayout.HelpBox("The panel managing this widget has the \"widgets are static\" flag set, so all transform changes will be ignored.", MessageType.Warning);
+		}
 	}
 
 	/// <summary>

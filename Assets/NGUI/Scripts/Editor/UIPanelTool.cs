@@ -263,17 +263,29 @@ public class UIPanelTool : EditorWindow
 
 			if (ent == null)
 			{
+				GUILayout.Label("Stc", GUILayout.Width(24f));
 				GUILayout.Label("Giz", GUILayout.Width(24f));
 			}
 			else
 			{
 				GUI.contentColor = ent.isEnabled ? Color.white : new Color(0.7f, 0.7f, 0.7f);
-				bool debug = (ent.panel.debugInfo == UIPanel.DebugInfo.Gizmos);
 
-				if (debug != EditorGUILayout.Toggle(debug, GUILayout.Width(20f)))
+				bool val = ent.panel.widgetsAreStatic;
+
+				if (val != EditorGUILayout.Toggle(val, GUILayout.Width(20f)))
 				{
-					// debug != value, so it's currently inverse
-					ent.panel.debugInfo = debug ? UIPanel.DebugInfo.None : UIPanel.DebugInfo.Gizmos;
+					ent.panel.widgetsAreStatic = !val;
+					EditorUtility.SetDirty(ent.panel.gameObject);
+
+					if (NGUITransformInspector.instance != null)
+						NGUITransformInspector.instance.Repaint();
+				}
+
+				val = (ent.panel.debugInfo == UIPanel.DebugInfo.Gizmos);
+
+				if (val != EditorGUILayout.Toggle(val, GUILayout.Width(20f)))
+				{
+					ent.panel.debugInfo = val ? UIPanel.DebugInfo.None : UIPanel.DebugInfo.Gizmos;
 					EditorUtility.SetDirty(ent.panel.gameObject);
 				}
 			}

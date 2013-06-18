@@ -527,10 +527,10 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Whether handles should be shown around the widget for easy scaling and resizing.
+	/// Whether the widget should have some form of handles shown.
 	/// </summary>
 
-	public virtual bool showHandles
+	static public bool showHandles
 	{
 		get
 		{
@@ -541,6 +541,12 @@ public abstract class UIWidget : MonoBehaviour
 			return UnityEditor.Tools.current == UnityEditor.Tool.View;
 		}
 	}
+
+	/// <summary>
+	/// Whether handles should be shown around the widget for easy scaling and resizing.
+	/// </summary>
+
+	public virtual bool showResizeHandles { get { return true; } }
 
 	/// <summary>
 	/// Draw some selectable gizmos.
@@ -622,9 +628,13 @@ public abstract class UIWidget : MonoBehaviour
 			if (cachedTransform.hasChanged)
 			{
 				mTrans.hasChanged = false;
-
+				
 				// Check to see if the widget has moved relative to the panel that manages it
+#if UNITY_EDITOR
+				if (!mPanel.widgetsAreStatic || !Application.isPlaying)
+#else
 				if (!mPanel.widgetsAreStatic)
+#endif
 				{
 					Vector2 size = relativeSize;
 					Vector2 offset = pivotOffset;

@@ -454,7 +454,7 @@ public class UILabel : UIWidget
 	/// Labels are not resizable using the handles.
 	/// </summary>
 
-	public override bool showHandles { get { return false; } }
+	public override bool showResizeHandles { get { return false; } }
 	
 	public override void Update ()
 	{
