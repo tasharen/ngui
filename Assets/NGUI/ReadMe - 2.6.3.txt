@@ -36,10 +36,17 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
 
 2.6.3:
+- NEW: Noticeably improved performance and garbage collection when using Unity 4.1+
 - NEW: It's now possible to select sprites in the Atlas Maker for preview purposes.
-- FIX: Noticeably improved performance and garbage collection when using Unity 4.1+
+- NEW: Transform inspector will now warn you when widget panel is marked as 'static'.
+- NEW: You can now toggle the panel's "widgets are static" flag from within the panel tool.
 - FIX: Widgets will no longer be constantly checking for layer changes in update.
 - FIX: Shrink-to-fit labels will now auto-grow when possible.
+- FIX: Labels can no longer be resized using handles (but can still be moved and rotated).
+- FIX: Labels will now auto-adjust their size properly when the max width gets adjusted.
+- FIX: Creating an atlas would rarely throw a null exception. This has been fixed.
+- FIX: Draggable panel + non-sticky keys will now mix properly.
+- DEL: Dropped all remaining support for Unity 3.4.
 
 2.6.2:
 - NEW: You can now automatically apply alpha pre-multiplication to textures when creating an atlas.
