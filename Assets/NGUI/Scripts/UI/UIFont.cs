@@ -1037,10 +1037,24 @@ public class UIFont : MonoBehaviour
 
 			if (fs > 0)
 			{
-				float offset = (alignment == Alignment.Right) ? lineWidth - x : (lineWidth - x) * 0.5f;
-				offset = Mathf.RoundToInt(offset);
-				if (offset < 0f) offset = 0f;
-				offset /= size;
+				float offset = 0f;
+
+				if (alignment == Alignment.Right)
+				{
+					offset = Mathf.RoundToInt(lineWidth - x);
+					if (offset < 0f) offset = 0f;
+					offset /= size;
+				}
+				else
+				{
+					// Centered alignment
+					offset = Mathf.RoundToInt((lineWidth - x) * 0.5f);
+					if (offset < 0f) offset = 0f;
+					offset /= size;
+
+					// Keep it pixel-perfect
+					if ((lineWidth & 1) == 1) offset += 0.5f / fs;
+				}
 
 				Vector3 temp;
 

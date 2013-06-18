@@ -530,7 +530,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Whether handles should be shown around the widget for easy scaling and resizing.
 	/// </summary>
 
-	static public bool showHandles
+	public virtual bool showHandles
 	{
 		get
 		{

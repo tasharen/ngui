@@ -140,12 +140,7 @@ public class UILabel : UIWidget
 			{
 				mText = value;
 				hasChanged = true;
-				
-				if (shrinkToFit)
-				{
-					MakePixelPerfect();
-					ProcessText();
-				}
+				if (shrinkToFit) MakePixelPerfect();
 			}
 		}
 	}
@@ -207,6 +202,7 @@ public class UILabel : UIWidget
 			{
 				mMaxLineWidth = value;
 				hasChanged = true;
+				if (shrinkToFit) MakePixelPerfect();
 			}
 		}
 	}
@@ -454,6 +450,12 @@ public class UILabel : UIWidget
 	}
 
 #if UNITY_EDITOR
+	/// <summary>
+	/// Labels are not resizable using the handles.
+	/// </summary>
+
+	public override bool showHandles { get { return false; } }
+	
 	public override void Update ()
 	{
 		base.Update();
@@ -558,39 +560,6 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
-	/// Same as MakePixelPerfect(), but only adjusts the position, not the scale.
-	/// </summary>
-
-	public void MakePositionPerfect ()
-	{
-		float pixelSize = font.pixelSize;
-		Vector3 scale = cachedTransform.localScale;
-
-		if (mFont.size == Mathf.RoundToInt(scale.x / pixelSize) &&
-			mFont.size == Mathf.RoundToInt(scale.y / pixelSize) &&
-			cachedTransform.localRotation == Quaternion.identity)
-		{
-			Vector2 actualSize = relativeSize * scale.x;
-
-			int x = Mathf.RoundToInt(actualSize.x / pixelSize);
-			int y = Mathf.RoundToInt(actualSize.y / pixelSize);
-
-			Vector3 pos = cachedTransform.localPosition;
-			pos.x = Mathf.FloorToInt(pos.x / pixelSize);
-			pos.y = Mathf.CeilToInt(pos.y / pixelSize);
-			pos.z = Mathf.RoundToInt(pos.z);
-
-			if ((x % 2 == 1) && (pivot == Pivot.Top  || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
-			if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right )) pos.y -= 0.5f;
-
-			pos.x *= pixelSize;
-			pos.y *= pixelSize;
-
-			if (cachedTransform.localPosition != pos) cachedTransform.localPosition = pos;
-		}
-	}
-
-	/// <summary>
 	/// Text is pixel-perfect when its scale matches the size.
 	/// </summary>
 
@@ -605,27 +574,18 @@ public class UILabel : UIWidget
 			scale.y = scale.x;
 			scale.z = 1f;
 
-			Vector2 actualSize = relativeSize * scale.x;
-
-			int x = Mathf.RoundToInt(actualSize.x / pixelSize);
-			int y = Mathf.RoundToInt(actualSize.y / pixelSize);
-
 			Vector3 pos = cachedTransform.localPosition;
 			pos.x = (Mathf.CeilToInt(pos.x / pixelSize * 4f) >> 2);
 			pos.y = (Mathf.CeilToInt(pos.y / pixelSize * 4f) >> 2);
 			pos.z = Mathf.RoundToInt(pos.z);
-
-			if (cachedTransform.localRotation == Quaternion.identity)
-			{
-				if ((x % 2 == 1) && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
-				if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y += 0.5f;
-			}
 
 			pos.x *= pixelSize;
 			pos.y *= pixelSize;
 
 			cachedTransform.localPosition = pos;
 			cachedTransform.localScale = scale;
+			
+			if (shrinkToFit) ProcessText();
 		}
 		else base.MakePixelPerfect();
 	}
@@ -661,7 +621,6 @@ public class UILabel : UIWidget
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
 		if (mFont == null) return;
-		MakePositionPerfect();
 		Pivot p = pivot;
 		int offset = verts.size;
 
