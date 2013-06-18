@@ -749,12 +749,18 @@ public class UICamera : MonoBehaviour
 		mMouse[0].pos.y = Input.mousePosition.y;
 		lastTouchPosition = mMouse[0].pos;
 
-		// Add this camera to the list
-		mList.Add(this);
-		mList.Sort(CompareFunc);
-
 		// If no event receiver mask was specified, use the camera's mask
 		if (eventReceiverMask == -1) eventReceiverMask = cachedCamera.cullingMask;
+	}
+
+	/// <summary>
+	/// Add this camera to the list.
+	/// </summary>
+
+	void Start ()
+	{
+		mList.Add(this);
+		mList.Sort(CompareFunc);
 	}
 
 	/// <summary>
@@ -1067,7 +1073,7 @@ public class UICamera : MonoBehaviour
 	public void ProcessTouch (bool pressed, bool unpressed)
 	{
 		// Whether we're using the mouse
-		bool isMouse = (currentTouch == mMouse[0]);
+		bool isMouse = (currentTouch == mMouse[0] || currentTouch == mMouse[1] || currentTouch == mMouse[2]);
 		float drag   = isMouse ? mouseDragThreshold : touchDragThreshold;
 		float click  = isMouse ? mouseClickThreshold : touchClickThreshold;
 
@@ -1080,7 +1086,7 @@ public class UICamera : MonoBehaviour
 			Notify(currentTouch.pressed, "OnPress", false);
 			currentTouch.pressed = currentTouch.current;
 			currentTouch.dragged = currentTouch.current;
-			currentTouch.clickNotification = ClickNotification.Always;
+			currentTouch.clickNotification = isMouse ? ClickNotification.BasedOnDelta : ClickNotification.Always;
 			currentTouch.totalDelta = Vector2.zero;
 			currentTouch.dragStarted = false;
 			Notify(currentTouch.pressed, "OnPress", true);
