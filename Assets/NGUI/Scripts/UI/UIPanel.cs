@@ -1237,7 +1237,7 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Helper function that recursively sets all childrens' game objects layers to the specified value, stopping when it hits another UIPanel.
+	/// Helper function that recursively sets all children with widgets' game objects layers to the specified value, stopping when it hits another UIPanel.
 	/// </summary>
 
 	static void SetChildLayer (Transform t, int layer)
@@ -1248,7 +1248,10 @@ public class UIPanel : MonoBehaviour
 
 			if (child.GetComponent<UIPanel>() == null)
 			{
-				child.gameObject.layer = layer;
+				if (child.GetComponent<UIWidget>() != null)
+				{
+					child.gameObject.layer = layer;
+				}					
 				SetChildLayer(child, layer);
 			}
 		}
