@@ -125,7 +125,21 @@ public abstract class UIWidget : MonoBehaviour
 	/// Depth controls the rendering order -- lowest to highest.
 	/// </summary>
 
-	public int depth { get { return mDepth; } set { if (mDepth != value) { mDepth = value; if (mPanel != null) mPanel.MarkMaterialAsChanged(material, true); } } }
+	public int depth
+	{
+		get
+		{
+			return mDepth;
+		}
+		set
+		{
+			if (mDepth != value)
+			{
+				mDepth = value;
+				if (mPanel != null) mPanel.MarkMaterialAsChanged(material, true);
+			}
+		}
+	}
 
 	/// <summary>
 	/// Helper function that calculates the relative offset based on the current pivot.
@@ -280,7 +294,7 @@ public abstract class UIWidget : MonoBehaviour
 					list.Add(w);
 			}
 
-			list.Sort(delegate(UIWidget w1, UIWidget w2) { return w2.depth.CompareTo(w1.depth); });
+			list.Sort(delegate(UIWidget w1, UIWidget w2) { return w2.mDepth.CompareTo(w1.mDepth); });
 		}
 		return list;
 	}

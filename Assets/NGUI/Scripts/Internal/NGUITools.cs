@@ -820,7 +820,7 @@ static public class NGUITools
 	public static string clipboard
 	{
 		get { return null; }
-		set { };
+		set { }
 	}
 #else
 	static PropertyInfo mSystemCopyBuffer = null;

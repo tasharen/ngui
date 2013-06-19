@@ -6,6 +6,10 @@
 // Dynamic font support contributed by the NGUI community members:
 // Unisip, zh4ox, Mudwiz, Nicki, DarkMagicCK.
 
+#if !UNITY_3_5 && !UNITY_FLASH
+#define DYNAMIC_FONT
+#endif
+
 using UnityEngine;
 using System.Collections.Generic;
 using System.Text;
@@ -48,7 +52,7 @@ public class UIFont : MonoBehaviour
 	[HideInInspector][SerializeField] Font mDynamicFont;
 	[HideInInspector][SerializeField] int mDynamicFontSize = 16;
 	[HideInInspector][SerializeField] FontStyle mDynamicFontStyle = FontStyle.Normal;
-#if !UNITY_3_5
+#if DYNAMIC_FONT
 	[HideInInspector][SerializeField] float mDynamicFontOffset = 0f;
 #endif
 
@@ -379,10 +383,10 @@ public class UIFont : MonoBehaviour
 	/// Whether this is a valid font.
 	/// </summary>
 
-#if UNITY_3_5
-	public bool isValid { get { return mFont.isValid; } }
-#else
+#if DYNAMIC_FONT
 	public bool isValid { get { return mDynamicFont != null || mFont.isValid; } }
+#else
+	public bool isValid { get { return mFont.isValid; } }
 #endif
 
 	/// <summary>
@@ -575,7 +579,9 @@ public class UIFont : MonoBehaviour
 	static public bool CheckIfRelated (UIFont a, UIFont b)
 	{
 		if (a == null || b == null) return false;
+#if DYNAMIC_FONT
 		if (a.isDynamic && b.isDynamic && a.dynamicFont.fontNames[0] == b.dynamicFont.fontNames[0]) return true;
+#endif
 		return a == b || a.References(b) || b.References(a);
 	}
 
@@ -630,7 +636,7 @@ public class UIFont : MonoBehaviour
 
 	public bool RecalculateDynamicOffset()
 	{
-#if !UNITY_3_5
+#if DYNAMIC_FONT
 		if (mDynamicFont != null)
 		{
 			CharacterInfo j;
@@ -659,14 +665,14 @@ public class UIFont : MonoBehaviour
 		Vector2 v = Vector2.zero;
 		bool dynamic = isDynamic;
 
-#if UNITY_3_5
-		if (mFont != null && mFont.isValid && !string.IsNullOrEmpty(text))
-#else
+#if DYNAMIC_FONT
 		if (dynamic || (mFont != null && mFont.isValid && !string.IsNullOrEmpty(text)))
+#else
+		if (mFont != null && mFont.isValid && !string.IsNullOrEmpty(text))
 #endif
 		{
 			if (encoding) text = NGUITools.StripSymbols(text);
-#if !UNITY_3_5
+#if DYNAMIC_FONT
 			if (dynamic)
 			{
 				mDynamicFont.textureRebuildCallback = OnFontChanged;
@@ -724,7 +730,7 @@ public class UIFont : MonoBehaviour
 						prev = 0;
 					}
 				}
-#if !UNITY_3_5
+#if DYNAMIC_FONT
 				else
 				{
 					if (mDynamicFont.GetCharacterInfo(c, out mChar, mDynamicFontSize, mDynamicFontStyle))
@@ -771,7 +777,7 @@ public class UIFont : MonoBehaviour
 		bool useSymbols = encoding && symbolStyle != SymbolStyle.None && hasSymbols;
 		bool dynamic = isDynamic;
 
-#if !UNITY_3_5
+#if DYNAMIC_FONT
 		if (dynamic)
 		{
 			mDynamicFont.textureRebuildCallback = OnFontChanged;
@@ -812,7 +818,7 @@ public class UIFont : MonoBehaviour
 					}
 				}
 			}
-#if !UNITY_3_5
+#if DYNAMIC_FONT
 			else
 			{
 				if (mDynamicFont.GetCharacterInfo(currentCharacter, out mChar, mDynamicFontSize, mDynamicFontStyle))
@@ -826,11 +832,11 @@ public class UIFont : MonoBehaviour
 		return text.Substring(currentCharacterIndex, textLength - currentCharacterIndex);
 	}
 
-#if !UNITY_3_5
+#if DYNAMIC_FONT
 	// Used for dynamic fonts
 	static CharacterInfo mChar;
 #endif
-	
+
 	/// <summary>
 	/// Text wrapping functionality. The 'maxWidth' should be in local coordinates (take pixels and divide them by transform's scale).
 	/// </summary>
@@ -855,7 +861,7 @@ public class UIFont : MonoBehaviour
 		bool useSymbols = encoding && symbolStyle != SymbolStyle.None && hasSymbols;
 		bool dynamic = isDynamic;
 
-#if !UNITY_3_5
+#if DYNAMIC_FONT
 		// Make sure the characters are present in the dynamic font before printing them
 		if (dynamic)
 		{
@@ -941,7 +947,7 @@ public class UIFont : MonoBehaviour
 					else continue;
 				}
 			}
-#if !UNITY_3_5
+#if DYNAMIC_FONT
 			else
 			{
 				if (mDynamicFont.GetCharacterInfo(ch, out mChar, mDynamicFontSize, mDynamicFontStyle))
@@ -1092,7 +1098,7 @@ public class UIFont : MonoBehaviour
 
 			// Make sure the characters are present in the dynamic font before printing them
 			bool dynamic = isDynamic;
-#if !UNITY_3_5
+#if DYNAMIC_FONT
 			if (dynamic)
 			{
 				mDynamicFont.textureRebuildCallback = OnFontChanged;
@@ -1261,7 +1267,7 @@ public class UIFont : MonoBehaviour
 					uvs.Add(new Vector2(u0.x, u1.y));
 					uvs.Add(new Vector2(u0.x, u0.y));
 				}
-#if !UNITY_3_5
+#if DYNAMIC_FONT
 				else
 				{
 					if (!mDynamicFont.GetCharacterInfo(c, out mChar, mDynamicFontSize, mDynamicFontStyle))
