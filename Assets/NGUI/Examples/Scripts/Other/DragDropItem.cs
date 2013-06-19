@@ -16,6 +16,7 @@ public class DragDropItem : MonoBehaviour
 
 	Transform mTrans;
 	bool mIsDragging = false;
+	bool mSticky = false;
 	Transform mParent;
 
 	/// <summary>
@@ -101,6 +102,20 @@ public class DragDropItem : MonoBehaviour
 	{
 		if (enabled)
 		{
+			if (isPressed)
+			{
+				if (!UICamera.current.stickyPress)
+				{
+					mSticky = true;
+					UICamera.current.stickyPress = true;
+				}
+			}
+			else if (mSticky)
+			{
+				mSticky = false;
+				UICamera.current.stickyPress = false;
+			}
+
 			mIsDragging = false;
 			Collider col = collider;
 			if (col != null) col.enabled = !isPressed;

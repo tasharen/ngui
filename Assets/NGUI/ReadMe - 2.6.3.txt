@@ -46,6 +46,8 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: Labels will now auto-adjust their size properly when the max width gets adjusted.
 - FIX: Creating an atlas would rarely throw a null exception. This has been fixed.
 - FIX: Draggable panel + non-sticky keys will now mix properly.
+- FIX: Drag & drop should now work with non-sticky press.
+- FIX: Flash export should now work again.
 - DEL: Dropped all remaining support for Unity 3.4.
 
 2.6.2:
