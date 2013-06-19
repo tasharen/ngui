@@ -321,26 +321,6 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
-	/// Draw a simple box outline for the entire line.
-	/// </summary>
-
-	static public void HighlightLine (Color c)
-	{
-		Rect rect = GUILayoutUtility.GetRect(Screen.width - 16f, 22f);
-		GUILayout.Space(-23f);
-		c.a *= 0.3f;
-		GUI.color = c;
-		GUI.DrawTexture(rect, gradientTexture);
-		c.r *= 0.5f;
-		c.g *= 0.5f;
-		c.b *= 0.5f;
-		GUI.color = c;
-		GUI.DrawTexture(new Rect(rect.x, rect.y + 1f, rect.width, 1f), blankTexture);
-		GUI.DrawTexture(new Rect(rect.x, rect.y + rect.height - 1f, rect.width, 1f), blankTexture);
-		GUI.color = Color.white;
-	}
-
-	/// <summary>
 	/// Convenience function that displays a list of sprites and returns the selected value.
 	/// </summary>
 
@@ -476,11 +456,8 @@ public class NGUIEditorTools
 		if (root.transform != null)
 		{
 			// Check if the selected object is a prefab instance and display a warning
-#if UNITY_3_4
-			PrefabType type = EditorUtility.GetPrefabType(root);
-#else
 			PrefabType type = PrefabUtility.GetPrefabType(root);
-#endif
+
 			if (type == PrefabType.PrefabInstance)
 			{
 				return EditorUtility.DisplayDialog("Losing prefab",
@@ -521,7 +498,7 @@ public class NGUIEditorTools
 			settings.npotScale = TextureImporterNPOTScale.None;
 
 			ti.SetTextureSettings(settings);
-			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
 		}
 		return true;
 	}
@@ -555,7 +532,7 @@ public class NGUIEditorTools
 			settings.npotScale = TextureImporterNPOTScale.ToNearest;
 
 			ti.SetTextureSettings(settings);
-			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
 		}
 		return true;
 	}
@@ -570,7 +547,11 @@ public class NGUIEditorTools
 		{
 			if (forInput) { if (!MakeTextureReadable(path, force)) return null; }
 			else if (!MakeTextureAnAtlas(path, force)) return null;
-			return AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
+			//return AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
+
+			Texture2D tex = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
+			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+			return tex;
 		}
 		return null;
 	}
@@ -969,7 +950,7 @@ public class NGUIEditorTools
 
 				if (GUILayout.Button("Edit", GUILayout.Width(40f)))
 				{
-					EditorPrefs.SetString("NGUI Selected Sprite", spriteName);
+					NGUISettings.selectedSprite = spriteName;
 					Select(atlas.gameObject);
 				}
 			}
@@ -1049,99 +1030,5 @@ public class NGUIEditorTools
 			}
 			t = t.parent;
 		}
-	}
-
-	/// <summary>
-	/// Raycast into the specified panel, returning a list of widgets.
-	/// </summary>
-
-	static public UIWidget[] Raycast (UIPanel panel, Vector2 mousePos)
-	{
-		List<UIWidget> list = new List<UIWidget>();
-		UIWidget[] widgets = panel.gameObject.GetComponentsInChildren<UIWidget>();
-
-		for (int i = 0; i < widgets.Length; ++i)
-		{
-			UIWidget w = widgets[i];
-
-			if (w.panel == panel)
-			{
-				Vector3[] corners = NGUIMath.CalculateWidgetCorners(w);
-				if (DistanceToRectangle(corners, mousePos) == 0f)
-					list.Add(w);
-			}
-		}
-
-		list.Sort(delegate(UIWidget w1, UIWidget w2) { return w2.depth.CompareTo(w1.depth); });
-		return list.ToArray();
-	}
-
-	/// <summary>
-	/// Determine the distance from the specified point to the line segment.
-	/// </summary>
-
-	static float DistancePointToLineSegment (Vector2 point, Vector2 a, Vector2 b)
-	{
-		float l2 = (b - a).sqrMagnitude;
-		if (l2 == 0f) return (point - a).magnitude;
-		float t = Vector2.Dot(point - a, b - a) / l2;
-		if (t < 0f) return (point - a).magnitude;
-		else if (t > 1f) return (point - b).magnitude;
-		Vector2 projection = a + t * (b - a);
-		return (point - projection).magnitude;
-	}
-
-	/// <summary>
-	/// Determine the distance from the mouse position to the world rectangle specified by the 4 points.
-	/// </summary>
-
-	static public float DistanceToRectangle (Vector3[] worldPoints, Vector2 mousePos)
-	{
-		Vector2[] screenPoints = new Vector2[4];
-		for (int i = 0; i < 4; ++i)
-			screenPoints[i] = HandleUtility.WorldToGUIPoint(worldPoints[i]);
-		return DistanceToRectangle(screenPoints, mousePos);
-	}
-
-	/// <summary>
-	/// Determine the distance from the mouse position to the screen space rectangle specified by the 4 points.
-	/// </summary>
-
-	static public float DistanceToRectangle (Vector2[] screenPoints, Vector2 mousePos)
-	{
-		bool oddNodes = false;
-		int j = 4;
-
-		for (int i = 0; i < 5; i++)
-		{
-			Vector3 v0 = screenPoints[NGUIMath.RepeatIndex(i, 4)];
-			Vector3 v1 = screenPoints[NGUIMath.RepeatIndex(j, 4)];
-
-			if ((v0.y > mousePos.y) != (v1.y > mousePos.y))
-			{
-				if (mousePos.x < (v1.x - v0.x) * (mousePos.y - v0.y) / (v1.y - v0.y) + v0.x)
-				{
-					oddNodes = !oddNodes;
-				}
-			}
-			j = i;
-		}
-
-		if (!oddNodes)
-		{
-			float dist, closestDist = -1f;
-
-			for (int i = 0; i < 4; i++)
-			{
-				Vector3 v0 = screenPoints[i];
-				Vector3 v1 = screenPoints[NGUIMath.RepeatIndex(i + 1, 4)];
-
-				dist = DistancePointToLineSegment(mousePos, v0, v1);
-
-				if (dist < closestDist || closestDist < 0f) closestDist = dist;
-			}
-			return closestDist;
-		}
-		else return 0f;
 	}
 }

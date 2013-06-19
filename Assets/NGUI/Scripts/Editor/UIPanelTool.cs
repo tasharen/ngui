@@ -222,62 +222,63 @@ public class UIPanelTool : EditorWindow
 			clipping = "Clip";
 		}
 
-		if (ent != null) NGUIEditorTools.HighlightLine(ent.isEnabled ? new Color(0.6f, 0.6f, 0.6f) : Color.black);
+		if (ent != null) GUILayout.Space(-1f);
 
-		GUILayout.BeginHorizontal();
+		if (ent != null)
 		{
-			GUI.color = Color.white;
+			GUI.backgroundColor = ent.panel == selected ? Color.white : new Color(0.8f, 0.8f, 0.8f);
+			GUILayout.BeginHorizontal("AS TextArea", GUILayout.MinHeight(20f));
+			GUI.backgroundColor = Color.white;
+		}
+		else
+		{
+			GUILayout.BeginHorizontal();
+		}
 
-			if (isChecked != EditorGUILayout.Toggle(isChecked, GUILayout.Width(20f))) retVal = true;
+		GUI.contentColor = (ent == null || ent.isEnabled) ? Color.white : new Color(0.7f, 0.7f, 0.7f);
+		if (isChecked != EditorGUILayout.Toggle(isChecked, GUILayout.Width(20f))) retVal = true;
 
-			if (ent == null)
+		if (GUILayout.Button(panelName, EditorStyles.label, GUILayout.MinWidth(100f)))
+		{
+			if (ent != null)
 			{
-				GUI.contentColor = Color.white;
-			}
-			else if (ent.isEnabled)
-			{
-				GUI.contentColor = (ent.panel == selected) ? new Color(0f, 0.8f, 1f) : Color.white; 
-			}
-			else
-			{
-				GUI.contentColor = (ent.panel == selected) ? new Color(0f, 0.5f, 0.8f) : Color.grey;
-			}
-
-#if UNITY_3_4
-			if (GUILayout.Button(panelName, EditorStyles.structHeadingLabel, GUILayout.MinWidth(100f)))
-#else
-			if (GUILayout.Button(panelName, EditorStyles.label, GUILayout.MinWidth(100f)))
-#endif
-			{
-				if (ent != null)
-				{
-					Selection.activeGameObject = ent.panel.gameObject;
-					EditorUtility.SetDirty(ent.panel.gameObject);
-				}
-			}
-
-			GUILayout.Label(layer, GUILayout.Width(ent == null ? 65f : 70f));
-			GUILayout.Label(widgetCount, GUILayout.Width(30f));
-			GUILayout.Label(drawCalls, GUILayout.Width(30f));
-			GUILayout.Label(clipping, GUILayout.Width(30f));
-
-			if (ent == null)
-			{
-				GUILayout.Label("Giz", GUILayout.Width(24f));
-			}
-			else
-			{
-				GUI.contentColor = ent.isEnabled ? Color.white : new Color(0.7f, 0.7f, 0.7f);
-				bool debug = (ent.panel.debugInfo == UIPanel.DebugInfo.Gizmos);
-
-				if (debug != EditorGUILayout.Toggle(debug, GUILayout.Width(20f)))
-				{
-					// debug != value, so it's currently inverse
-					ent.panel.debugInfo = debug ? UIPanel.DebugInfo.None : UIPanel.DebugInfo.Gizmos;
-					EditorUtility.SetDirty(ent.panel.gameObject);
-				}
+				Selection.activeGameObject = ent.panel.gameObject;
+				EditorUtility.SetDirty(ent.panel.gameObject);
 			}
 		}
+
+		GUILayout.Label(layer, GUILayout.Width(ent == null ? 65f : 70f));
+		GUILayout.Label(widgetCount, GUILayout.Width(30f));
+		GUILayout.Label(drawCalls, GUILayout.Width(30f));
+		GUILayout.Label(clipping, GUILayout.Width(30f));
+
+		if (ent == null)
+		{
+			GUILayout.Label("Stc", GUILayout.Width(24f));
+			GUILayout.Label("Giz", GUILayout.Width(24f));
+		}
+		else
+		{
+			bool val = ent.panel.widgetsAreStatic;
+
+			if (val != EditorGUILayout.Toggle(val, GUILayout.Width(20f)))
+			{
+				ent.panel.widgetsAreStatic = !val;
+				EditorUtility.SetDirty(ent.panel.gameObject);
+
+				if (NGUITransformInspector.instance != null)
+					NGUITransformInspector.instance.Repaint();
+			}
+
+			val = (ent.panel.debugInfo == UIPanel.DebugInfo.Gizmos);
+
+			if (val != EditorGUILayout.Toggle(val, GUILayout.Width(20f)))
+			{
+				ent.panel.debugInfo = val ? UIPanel.DebugInfo.None : UIPanel.DebugInfo.Gizmos;
+				EditorUtility.SetDirty(ent.panel.gameObject);
+			}
+		}
+		GUI.contentColor = Color.white;
 		GUILayout.EndHorizontal();
 		return retVal;
 	}

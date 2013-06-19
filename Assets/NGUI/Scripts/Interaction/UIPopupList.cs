@@ -180,6 +180,8 @@ public class UIPopupList : MonoBehaviour
 					eventReceiver.SendMessage(functionName, mSelectedItem, SendMessageOptions.DontRequireReceiver);
 				}
 				current = null;
+
+				if (textLabel == null) mSelectedItem = null;
 			}
 		}
 	}
@@ -208,16 +210,19 @@ public class UIPopupList : MonoBehaviour
 
 	void Start ()
 	{
-		// Automatically choose the first item
-		if (string.IsNullOrEmpty(mSelectedItem))
+		if (textLabel != null)
 		{
-			if (items.Count > 0) selection = items[0];
-		}
-		else
-		{
-			string s = mSelectedItem;
-			mSelectedItem = null;
-			selection = s;
+			// Automatically choose the first item
+			if (string.IsNullOrEmpty(mSelectedItem))
+			{
+				if (items.Count > 0) selection = items[0];
+			}
+			else
+			{
+				string s = mSelectedItem;
+				mSelectedItem = null;
+				selection = s;
+			}
 		}
 	}
 
@@ -253,7 +258,7 @@ public class UIPopupList : MonoBehaviour
 			float offsetX = sp.inner.xMin - sp.outer.xMin;
 			float offsetY = sp.inner.yMin - sp.outer.yMin;
 
-			Vector3 pos = lbl.cachedTransform.localPosition + new Vector3(-offsetX, offsetY, 0f);
+			Vector3 pos = lbl.cachedTransform.localPosition + new Vector3(-offsetX, offsetY, 1f);
 
 			if (instant || !isAnimated)
 			{
@@ -365,7 +370,7 @@ public class UIPopupList : MonoBehaviour
 
 				Collider[] cols = mChild.GetComponentsInChildren<Collider>();
 				for (int i = 0, imax = cols.Length; i < imax; ++i) cols[i].enabled = false;
-				UpdateManager.AddDestroy(mChild, animSpeed);
+				Destroy(mChild, animSpeed);
 			}
 			else
 			{
@@ -501,7 +506,7 @@ public class UIPopupList : MonoBehaviour
 				lbl.font = font;
 				lbl.text = (isLocalized && Localization.instance != null) ? Localization.instance.Get(s) : s;
 				lbl.color = textColor;
-				lbl.cachedTransform.localPosition = new Vector3(bgPadding.x + padding.x, y, -0.01f);
+				lbl.cachedTransform.localPosition = new Vector3(bgPadding.x + padding.x, y, -1f);
 				lbl.MakePixelPerfect();
 
 				if (textScale != 1f)

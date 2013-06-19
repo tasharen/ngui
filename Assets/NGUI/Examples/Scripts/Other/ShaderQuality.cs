@@ -12,11 +12,7 @@ public class ShaderQuality : MonoBehaviour
 
 	void Update ()
 	{
-#if UNITY_3_4
-		int current = ((int)QualitySettings.currentLevel + 1) * 100;
-#else
 		int current = (QualitySettings.GetQualityLevel() + 1) * 100;
-#endif
 
 		if (mCurrent != current)
 		{

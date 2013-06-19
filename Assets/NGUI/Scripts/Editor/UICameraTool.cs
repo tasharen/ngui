@@ -178,94 +178,96 @@ public class UICameraTool : EditorWindow
 
 	void DrawRow (Camera cam)
 	{
-		if (cam != null) NGUIEditorTools.HighlightLine(new Color(0.6f, 0.6f, 0.6f));
-
-		GUILayout.BeginHorizontal();
-		{
-			bool enabled = (cam == null || (NGUITools.GetActive(cam.gameObject) && cam.enabled));
-
-			GUI.color = Color.white;
-
-			if (cam != null)
-			{
-				if (enabled != EditorGUILayout.Toggle(enabled, GUILayout.Width(20f)))
-				{
-					cam.enabled = !enabled;
-					EditorUtility.SetDirty(cam.gameObject);
-				}
-			}
-			else
-			{
-				GUILayout.Space(30f);
-			}
-
-			bool highlight = (cam == null || Selection.activeGameObject == null) ? false :
+		bool highlight = (cam == null || Selection.activeGameObject == null) ? false :
 				(0 != (cam.cullingMask & (1 << Selection.activeGameObject.layer)));
 
-			if (enabled)
-			{
-				GUI.color = highlight ? new Color(0f, 0.8f, 1f) : Color.white;
-			}
-			else
-			{
-				GUI.color = highlight ? new Color(0f, 0.5f, 0.8f) : Color.grey;
-			}
+		if (cam != null)
+		{
+			GUI.backgroundColor = highlight ? Color.white : new Color(0.8f, 0.8f, 0.8f);
+			GUILayout.BeginHorizontal("AS TextArea", GUILayout.MinHeight(20f));
+			GUI.backgroundColor = Color.white;
+		}
+		else
+		{
+			GUILayout.BeginHorizontal();
+		}
 
-			string camName, camLayer;
+		bool enabled = (cam == null || (NGUITools.GetActive(cam.gameObject) && cam.enabled));
 
-			if (cam == null)
-			{
-				camName = "Camera's Name";
-				camLayer = "Layer";
-			}
-			else
-			{
-				camName = cam.name + (cam.orthographic ? " (2D)" : " (3D)");
-				camLayer = LayerMask.LayerToName(cam.gameObject.layer);
-			}
+		GUI.color = Color.white;
 
-#if UNITY_3_4
-			if (GUILayout.Button(camName, EditorStyles.structHeadingLabel, GUILayout.MinWidth(100f)) && cam != null)
-#else
-			if (GUILayout.Button(camName, EditorStyles.label, GUILayout.MinWidth(100f)) && cam != null)
-#endif
+		if (cam != null)
+		{
+			if (enabled != EditorGUILayout.Toggle(enabled, GUILayout.Width(20f)))
 			{
-				Selection.activeGameObject = cam.gameObject;
+				cam.enabled = !enabled;
 				EditorUtility.SetDirty(cam.gameObject);
 			}
-			GUILayout.Label(camLayer, GUILayout.Width(70f));
+		}
+		else
+		{
+			GUILayout.Space(30f);
+		}
 
-			GUI.color = enabled ? Color.white : new Color(0.7f, 0.7f, 0.7f);
+		if (enabled)
+		{
+			GUI.color = highlight ? new Color(0f, 0.8f, 1f) : Color.white;
+		}
+		else
+		{
+			GUI.color = highlight ? new Color(0f, 0.5f, 0.8f) : Color.grey;
+		}
 
-			if (cam == null)
+		string camName, camLayer;
+
+		if (cam == null)
+		{
+			camName = "Camera's Name";
+			camLayer = "Layer";
+		}
+		else
+		{
+			camName = cam.name + (cam.orthographic ? " (2D)" : " (3D)");
+			camLayer = LayerMask.LayerToName(cam.gameObject.layer);
+		}
+
+		if (GUILayout.Button(camName, EditorStyles.label, GUILayout.MinWidth(100f)) && cam != null)
+		{
+			Selection.activeGameObject = cam.gameObject;
+			EditorUtility.SetDirty(cam.gameObject);
+		}
+		GUILayout.Label(camLayer, GUILayout.Width(70f));
+
+		GUI.color = enabled ? Color.white : new Color(0.7f, 0.7f, 0.7f);
+
+		if (cam == null)
+		{
+			GUILayout.Label("EV", GUILayout.Width(26f));
+		}
+		else
+		{
+			UICamera uic = cam.GetComponent<UICamera>();
+			bool ev = (uic != null && uic.enabled);
+
+			if (ev != EditorGUILayout.Toggle(ev, GUILayout.Width(20f)))
 			{
-				GUILayout.Label("EV", GUILayout.Width(26f));
+				if (uic == null) uic = cam.gameObject.AddComponent<UICamera>();
+				uic.enabled = !ev;
 			}
-			else
-			{
-				UICamera uic = cam.GetComponent<UICamera>();
-				bool ev = (uic != null && uic.enabled);
+		}
 
-				if (ev != EditorGUILayout.Toggle(ev, GUILayout.Width(20f)))
-				{
-					if (uic == null) uic = cam.gameObject.AddComponent<UICamera>();
-					uic.enabled = !ev;
-				}
-			}
+		if (cam == null)
+		{
+			GUILayout.Label("Mask", GUILayout.Width(100f));
+		}
+		else
+		{
+			int mask = LayerMaskField(cam.cullingMask, GUILayout.Width(105f));
 
-			if (cam == null)
+			if (cam.cullingMask != mask)
 			{
-				GUILayout.Label("Mask", GUILayout.Width(100f));
-			}
-			else
-			{
-				int mask = LayerMaskField(cam.cullingMask, GUILayout.Width(105f));
-
-				if (cam.cullingMask != mask)
-				{
-					NGUIEditorTools.RegisterUndo("Camera Mask Change", cam);
-					cam.cullingMask = mask;
-				}
+				NGUIEditorTools.RegisterUndo("Camera Mask Change", cam);
+				cam.cullingMask = mask;
 			}
 		}
 		GUILayout.EndHorizontal();

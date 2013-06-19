@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2013 Tasharen Entertainment
+// Copyright Â© 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -137,21 +137,17 @@ public class NGUISelectionTools
 	static bool PrefabCheck()
 	{
 		if (Selection.activeTransform != null)
-        {
-            // Check if the selected object is a prefab instance and display a warning
-#if UNITY_3_4
-			PrefabType type = EditorUtility.GetPrefabType(Selection.activeGameObject);
-#else
+		{
+			// Check if the selected object is a prefab instance and display a warning
 			PrefabType type = PrefabUtility.GetPrefabType(Selection.activeGameObject);
-#endif
 
-            if (type == PrefabType.PrefabInstance)
-            {
-                return EditorUtility.DisplayDialog("Losing prefab",
+			if (type == PrefabType.PrefabInstance)
+			{
+				return EditorUtility.DisplayDialog("Losing prefab",
 					"This action will lose the prefab connection. Are you sure you wish to continue?",
 					"Continue", "Cancel");
-            }
-        }
+			}
+		}
 		return true;
 	}
 	

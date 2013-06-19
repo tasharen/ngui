@@ -60,6 +60,12 @@ public class UIAnchor : MonoBehaviour
 	public bool halfPixelOffset = true;
 
 	/// <summary>
+	/// If set to 'true', UIAnchor will execute once, then will be removed. Useful if your screen resolution never changes.
+	/// </summary>
+
+	public bool runOnlyOnce = false;
+
+	/// <summary>
 	/// Relative offset value, if any. For example "0.25" with 'side' set to Left, means 25% from the left side.
 	/// </summary>
 
@@ -67,14 +73,13 @@ public class UIAnchor : MonoBehaviour
 
 	Transform mTrans;
 	Animation mAnim;
-	Rect mRect;
+	Rect mRect = new Rect();
 	UIRoot mRoot;
-	
-	void Awake () 
+
+	void Awake ()
 	{
 		mTrans = transform;
-		mAnim = animation; 
-		mRect = new Rect();
+		mAnim = animation;
 	}
 
 	/// <summary>
@@ -85,6 +90,7 @@ public class UIAnchor : MonoBehaviour
 	{
 		mRoot = NGUITools.FindInParents<UIRoot>(gameObject);
 		mNeedsHalfPixelOffset = (Application.platform == RuntimePlatform.WindowsPlayer ||
+			Application.platform == RuntimePlatform.XBOX360 ||
 			Application.platform == RuntimePlatform.WindowsWebPlayer ||
 			Application.platform == RuntimePlatform.WindowsEditor);
 
@@ -102,7 +108,7 @@ public class UIAnchor : MonoBehaviour
 	void Update ()
 	{
 		if (mAnim != null && mAnim.enabled && mAnim.isPlaying) return;
-		
+
 		bool useCamera = false;
 
 		if (panelContainer != null)
@@ -118,7 +124,7 @@ public class UIAnchor : MonoBehaviour
 			}
 			else
 			{
-				// Panel has clipping -- use it as the rect
+				// Panel has clipping -- use it as the mRect
 				Vector4 pos = panelContainer.clipRange;
 				mRect.x = pos.x - (pos.z * 0.5f);
 				mRect.y = pos.y - (pos.w * 0.5f);
@@ -136,13 +142,13 @@ public class UIAnchor : MonoBehaviour
 			Vector3 size = widgetContainer.relativeSize;
 			Vector3 offset = widgetContainer.pivotOffset;
 			offset.y -= 1f;
-			
+
 			offset.x *= (widgetContainer.relativeSize.x * ls.x);
 			offset.y *= (widgetContainer.relativeSize.y * ls.y);
-			
+
 			mRect.x = lp.x + offset.x;
 			mRect.y = lp.y + offset.y;
-			
+
 			mRect.width = size.x * ls.x;
 			mRect.height = size.y * ls.y;
 		}
@@ -168,7 +174,7 @@ public class UIAnchor : MonoBehaviour
 			else v.y = mRect.yMin;
 		}
 
-		float width  = mRect.width;
+		float width = mRect.width;
 		float height = mRect.height;
 
 		v.x += relativeOffset.x * width;
@@ -206,8 +212,9 @@ public class UIAnchor : MonoBehaviour
 			}
 			v.z = mTrans.position.z;
 		}
-		
+
 		// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
 		if (mTrans.position != v) mTrans.position = v;
+		if (runOnlyOnce && Application.isPlaying) Destroy(this);
 	}
 }

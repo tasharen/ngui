@@ -3,6 +3,9 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
+// Dynamic font support contributed by the NGUI community members:
+// Unisip, zh4ox, Mudwiz, Nicki, DarkMagicCK.
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -25,11 +28,12 @@ public class UIFontInspector : Editor
 	{
 		Normal,
 		Reference,
+		Dynamic,
 	}
 
 	static View mView = View.Font;
 	static bool mUseShader = false;
-	
+
 	UIFont mFont;
 	FontType mType = FontType.Normal;
 	UIFont mReplacement = null;
@@ -75,7 +79,7 @@ public class UIFontInspector : Editor
 		}
 	}
 
-	override public void OnInspectorGUI ()
+	public override void OnInspectorGUI ()
 	{
 		mFont = target as UIFont;
 		EditorGUIUtility.LookLikeControls(80f);
@@ -87,19 +91,29 @@ public class UIFontInspector : Editor
 			mType = FontType.Reference;
 			mReplacement = mFont.replacement;
 		}
-
-		FontType after = (FontType)EditorGUILayout.EnumPopup("Font Type", mType);
-
-		if (mType != after)
+		else if (mFont.dynamicFont != null)
 		{
-			if (after == FontType.Normal)
+			mType = FontType.Dynamic;
+		}
+
+		GUILayout.BeginHorizontal();
+		FontType fontType = (FontType)EditorGUILayout.EnumPopup("Font Type", mType);
+		GUILayout.Space(18f);
+		GUILayout.EndHorizontal();
+
+		if (mType != fontType)
+		{
+			if (fontType == FontType.Normal)
 			{
 				OnSelectFont(null);
 			}
 			else
 			{
-				mType = FontType.Reference;
+				mType = fontType;
 			}
+
+			if (mType != FontType.Dynamic && mFont.dynamicFont != null)
+				mFont.dynamicFont = null;
 		}
 
 		if (mType == FontType.Reference)
@@ -107,14 +121,14 @@ public class UIFontInspector : Editor
 			ComponentSelector.Draw<UIFont>(mFont.replacement, OnSelectFont);
 
 			NGUIEditorTools.DrawSeparator();
-			GUILayout.Label("You can have one font simply point to\n" +
-				"another one. This is useful if you want to be\n" +
-				"able to quickly replace the contents of one\n" +
-				"font with another one, for example for\n" +
-				"swapping an SD font with an HD one, or\n" +
-				"replacing an English font with a Chinese\n" +
-				"one. All the labels referencing this font\n" +
-				"will update their references to the new one.");
+			EditorGUILayout.HelpBox("You can have one font simply point to " +
+				"another one. This is useful if you want to be " +
+				"able to quickly replace the contents of one " +
+				"font with another one, for example for " +
+				"swapping an SD font with an HD one, or " +
+				"replacing an English font with a Chinese " +
+				"one. All the labels referencing this font " +
+				"will update their references to the new one.", MessageType.Info);
 
 			if (mReplacement != mFont && mFont.replacement != mReplacement)
 			{
@@ -124,20 +138,38 @@ public class UIFontInspector : Editor
 			}
 			return;
 		}
-
-		NGUIEditorTools.DrawSeparator();
-		ComponentSelector.Draw<UIAtlas>(mFont.atlas, OnSelectAtlas);
-
-		if (mFont.atlas != null)
+		else if (mType == FontType.Dynamic)
 		{
-			if (mFont.bmFont.isValid)
+#if UNITY_3_5
+			EditorGUILayout.HelpBox("Dynamic fonts require Unity 4.0 or higher.", MessageType.Error);
+#else
+			NGUIEditorTools.DrawSeparator();
+			Font fnt = EditorGUILayout.ObjectField("TTF Font", mFont.dynamicFont, typeof(Font), false) as Font;
+			
+			if (fnt != mFont.dynamicFont)
 			{
-				NGUIEditorTools.AdvancedSpriteField(mFont.atlas, mFont.spriteName, SelectSprite, false);
+				NGUIEditorTools.RegisterUndo("Font change", mFont);
+				mFont.dynamicFont = fnt;
 			}
-		}
-		else
-		{
-			// No atlas specified -- set the material and texture rectangle directly
+
+			GUILayout.BeginHorizontal();
+			int size = EditorGUILayout.IntField("Size", mFont.dynamicFontSize, GUILayout.Width(120f));
+			FontStyle style = (FontStyle)EditorGUILayout.EnumPopup(mFont.dynamicFontStyle);
+			GUILayout.Space(18f);
+			GUILayout.EndHorizontal();
+
+			if (size != mFont.dynamicFontSize)
+			{
+				NGUIEditorTools.RegisterUndo("Font change", mFont);
+				mFont.dynamicFontSize = size;
+			}
+
+			if (style != mFont.dynamicFontStyle)
+			{
+				NGUIEditorTools.RegisterUndo("Font change", mFont);
+				mFont.dynamicFontStyle = style;
+			}
+
 			Material mat = EditorGUILayout.ObjectField("Material", mFont.material, typeof(Material), false) as Material;
 
 			if (mFont.material != mat)
@@ -145,136 +177,170 @@ public class UIFontInspector : Editor
 				NGUIEditorTools.RegisterUndo("Font Material", mFont);
 				mFont.material = mat;
 			}
+#endif
+		}
+		else
+		{
+			NGUIEditorTools.DrawSeparator();
+
+			ComponentSelector.Draw<UIAtlas>(mFont.atlas, OnSelectAtlas);
+
+			if (mFont.atlas != null)
+			{
+				if (mFont.bmFont.isValid)
+				{
+					NGUIEditorTools.AdvancedSpriteField(mFont.atlas, mFont.spriteName, SelectSprite, false);
+				}
+				EditorGUILayout.Space();
+			}
+			else
+			{
+				// No atlas specified -- set the material and texture rectangle directly
+				Material mat = EditorGUILayout.ObjectField("Material", mFont.material, typeof(Material), false) as Material;
+
+				if (mFont.material != mat)
+				{
+					NGUIEditorTools.RegisterUndo("Font Material", mFont);
+					mFont.material = mat;
+				}
+			}
+
+			// For updating the font's data when importing from an external source, such as the texture packer
+			bool resetWidthHeight = false;
+
+			if (mFont.atlas != null || mFont.material != null)
+			{
+				TextAsset data = EditorGUILayout.ObjectField("Import Data", null, typeof(TextAsset), false) as TextAsset;
+
+				if (data != null)
+				{
+					NGUIEditorTools.RegisterUndo("Import Font Data", mFont);
+					BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), data.bytes);
+					mFont.MarkAsDirty();
+					resetWidthHeight = true;
+					Debug.Log("Imported " + mFont.bmFont.glyphCount + " characters");
+				}
+			}
+
+			if (mFont.bmFont.isValid)
+			{
+				Color green = new Color(0.4f, 1f, 0f, 1f);
+				Texture2D tex = mFont.texture;
+
+				if (tex != null)
+				{
+					if (mFont.atlas == null)
+					{
+						// Pixels are easier to work with than UVs
+						Rect pixels = NGUIMath.ConvertToPixels(mFont.uvRect, tex.width, tex.height, false);
+
+						// Automatically set the width and height of the rectangle to be the original font texture's dimensions
+						if (resetWidthHeight)
+						{
+							pixels.width = mFont.texWidth;
+							pixels.height = mFont.texHeight;
+						}
+
+						// Font sprite rectangle
+						GUI.backgroundColor = green;
+						pixels = EditorGUILayout.RectField("Pixel Rect", pixels);
+						GUI.backgroundColor = Color.white;
+
+						// Create a button that can make the coordinates pixel-perfect on click
+						GUILayout.BeginHorizontal();
+						{
+							Rect corrected = NGUIMath.MakePixelPerfect(pixels);
+
+							if (corrected == pixels)
+							{
+								GUI.color = Color.grey;
+								GUILayout.Button("Make Pixel-Perfect");
+								GUI.color = Color.white;
+							}
+							else if (GUILayout.Button("Make Pixel-Perfect"))
+							{
+								pixels = corrected;
+								GUI.changed = true;
+							}
+						}
+						GUILayout.EndHorizontal();
+
+						// Convert the pixel coordinates back to UV coordinates
+						Rect uvRect = NGUIMath.ConvertToTexCoords(pixels, tex.width, tex.height);
+
+						if (mFont.uvRect != uvRect)
+						{
+							NGUIEditorTools.RegisterUndo("Font Pixel Rect", mFont);
+							mFont.uvRect = uvRect;
+						}
+						//NGUIEditorTools.DrawSeparator();
+						EditorGUILayout.Space();
+					}
+				}
+			}
 		}
 
-		// For updating the font's data when importing from an external source, such as the texture packer
-		bool resetWidthHeight = false;
-
-		if (mFont.atlas != null || mFont.material != null)
+		// The font must be valid at this point for the rest of the options to show up
+		if (mFont.isDynamic || mFont.bmFont.isValid)
 		{
+			// Font spacing
 			GUILayout.BeginHorizontal();
-			TextAsset data = EditorGUILayout.ObjectField("Import Data", null, typeof(TextAsset), false) as TextAsset;
-			GUILayout.Space(44f);
+			{
+				EditorGUIUtility.LookLikeControls(0f);
+				GUILayout.Label("Spacing", GUILayout.Width(60f));
+				GUILayout.Label("X", GUILayout.Width(12f));
+				int x = EditorGUILayout.IntField(mFont.horizontalSpacing);
+				GUILayout.Label("Y", GUILayout.Width(12f));
+				int y = EditorGUILayout.IntField(mFont.verticalSpacing);
+				GUILayout.Space(18f);
+				EditorGUIUtility.LookLikeControls(80f);
+
+				if (mFont.horizontalSpacing != x || mFont.verticalSpacing != y)
+				{
+					NGUIEditorTools.RegisterUndo("Font Spacing", mFont);
+					mFont.horizontalSpacing = x;
+					mFont.verticalSpacing = y;
+				}
+			}
 			GUILayout.EndHorizontal();
 
-			if (data != null)
+			if (mFont.atlas == null)
 			{
-				NGUIEditorTools.RegisterUndo("Import Font Data", mFont);
-				BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), data.bytes);
-				mFont.MarkAsDirty();
-				resetWidthHeight = true;
-				Debug.Log("Imported " + mFont.bmFont.glyphCount + " characters");
+				mView = View.Font;
+				mUseShader = false;
+
+				float pixelSize = EditorGUILayout.FloatField("Pixel Size", mFont.pixelSize, GUILayout.Width(120f));
+
+				if (pixelSize != mFont.pixelSize)
+				{
+					NGUIEditorTools.RegisterUndo("Font Change", mFont);
+					mFont.pixelSize = pixelSize;
+				}
 			}
+			EditorGUILayout.Space();
 		}
 
-		if (mFont.bmFont.isValid)
+		// Preview option
+		if (!mFont.isDynamic && mFont.atlas != null)
 		{
-			Color green = new Color(0.4f, 1f, 0f, 1f);
-			Texture2D tex = mFont.texture;
-
-			if (tex != null)
+			GUILayout.BeginHorizontal();
 			{
-				if (mFont.atlas == null)
-				{
-					// Pixels are easier to work with than UVs
-					Rect pixels = NGUIMath.ConvertToPixels(mFont.uvRect, tex.width, tex.height, false);
-
-					// Automatically set the width and height of the rectangle to be the original font texture's dimensions
-					if (resetWidthHeight)
-					{
-						pixels.width = mFont.texWidth;
-						pixels.height = mFont.texHeight;
-					}
-
-					// Font sprite rectangle
-					GUI.backgroundColor = green;
-					pixels = EditorGUILayout.RectField("Pixel Rect", pixels);
-					GUI.backgroundColor = Color.white;
-
-					// Create a button that can make the coordinates pixel-perfect on click
-					GUILayout.BeginHorizontal();
-					{
-						GUILayout.Label("Correction", GUILayout.Width(75f));
-
-						Rect corrected = NGUIMath.MakePixelPerfect(pixels);
-
-						if (corrected == pixels)
-						{
-							GUI.color = Color.grey;
-							GUILayout.Button("Make Pixel-Perfect");
-							GUI.color = Color.white;
-						}
-						else if (GUILayout.Button("Make Pixel-Perfect"))
-						{
-							pixels = corrected;
-							GUI.changed = true;
-						}
-					}
-					GUILayout.EndHorizontal();
-
-					// Convert the pixel coordinates back to UV coordinates
-					Rect uvRect = NGUIMath.ConvertToTexCoords(pixels, tex.width, tex.height);
-
-					if (mFont.uvRect != uvRect)
-					{
-						NGUIEditorTools.RegisterUndo("Font Pixel Rect", mFont);
-						mFont.uvRect = uvRect;
-					}
-				}
-
-				// Font spacing
-				GUILayout.BeginHorizontal();
-				{
-					EditorGUIUtility.LookLikeControls(0f);
-					GUILayout.Label("Spacing", GUILayout.Width(60f));
-					GUILayout.Label("X", GUILayout.Width(12f));
-					int x = EditorGUILayout.IntField(mFont.horizontalSpacing);
-					GUILayout.Label("Y", GUILayout.Width(12f));
-					int y = EditorGUILayout.IntField(mFont.verticalSpacing);
-					GUILayout.Space(62f);
-					EditorGUIUtility.LookLikeControls(80f);
-
-					if (mFont.horizontalSpacing != x || mFont.verticalSpacing != y)
-					{
-						NGUIEditorTools.RegisterUndo("Font Spacing", mFont);
-						mFont.horizontalSpacing = x;
-						mFont.verticalSpacing = y;
-					}
-				}
-				GUILayout.EndHorizontal();
-
-				if (mFont.atlas == null)
-				{
-					mView = View.Font;
-					mUseShader = false;
-
-					float pixelSize = EditorGUILayout.FloatField("Pixel Size", mFont.pixelSize, GUILayout.Width(120f));
-
-					if (pixelSize != mFont.pixelSize)
-					{
-						NGUIEditorTools.RegisterUndo("Font Change", mFont);
-						mFont.pixelSize = pixelSize;
-					}
-				}
-				else
-				{
-					GUILayout.Space(4f);
-					GUILayout.BeginHorizontal();
-					{
-						mView = (View)EditorGUILayout.EnumPopup("Preview", mView);
-						GUILayout.Label("Shader", GUILayout.Width(45f));
-						mUseShader = EditorGUILayout.Toggle(mUseShader, GUILayout.Width(20f));
-					}
-					GUILayout.EndHorizontal();
-				}
+				mView = (View)EditorGUILayout.EnumPopup("Preview", mView);
+				GUILayout.Label("Shader", GUILayout.Width(45f));
+				mUseShader = EditorGUILayout.Toggle(mUseShader, GUILayout.Width(20f));
 			}
+			GUILayout.EndHorizontal();
+		}
 
+		// Dynamic fonts don't support emoticons
+		if (!mFont.isDynamic && mFont.bmFont.isValid)
+		{
 			if (mFont.atlas != null)
 			{
 				NGUIEditorTools.DrawHeader("Symbols and Emoticons");
 
 				List<BMSymbol> symbols = mFont.symbols;
-				
+
 				for (int i = 0; i < symbols.Count; )
 				{
 					BMSymbol sym = symbols[i];
@@ -288,7 +354,7 @@ public class UIFontInspector : Editor
 					{
 						if (mFont.atlas != null)
 						{
-							EditorPrefs.SetString("NGUI Selected Sprite", sym.spriteName);
+							NGUISettings.selectedSprite = sym.spriteName;
 							NGUIEditorTools.Select(mFont.atlas.gameObject);
 						}
 					}
@@ -320,7 +386,7 @@ public class UIFontInspector : Editor
 
 				bool isValid = !string.IsNullOrEmpty(mSymbolSequence) && !string.IsNullOrEmpty(mSymbolSprite);
 				GUI.backgroundColor = isValid ? Color.green : Color.grey;
-				
+
 				if (GUILayout.Button("Add", GUILayout.Width(40f)) && isValid)
 				{
 					NGUIEditorTools.RegisterUndo("Add symbol", mFont);

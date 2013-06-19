@@ -29,6 +29,12 @@ public class UICheckbox : MonoBehaviour
 	public Animation checkAnimation;
 
 	/// <summary>
+	/// If checked, tween-based transition will be instant instead.
+	/// </summary>
+
+	public bool instantTween = false;
+
+	/// <summary>
 	/// Whether the checkbox starts checked.
 	/// </summary>
 
@@ -148,7 +154,14 @@ public class UICheckbox : MonoBehaviour
 			// Tween the color of the checkmark
 			if (checkSprite != null)
 			{
-				TweenAlpha.Begin(checkSprite.gameObject, 0.15f, mChecked ? 1f : 0f);
+				if (instantTween)
+				{
+					checkSprite.alpha = mChecked ? 1f : 0f;
+				}
+				else
+				{
+					TweenAlpha.Begin(checkSprite.gameObject, 0.15f, mChecked ? 1f : 0f);
+				}
 			}
 
 			current = this;

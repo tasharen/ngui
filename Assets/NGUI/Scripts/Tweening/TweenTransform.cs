@@ -25,7 +25,7 @@ public class TweenTransform : UITweener
 	/// Interpolate the position, scale, and rotation.
 	/// </summary>
 
-	override protected void OnUpdate (float factor, bool isFinished)
+	protected override void OnUpdate (float factor, bool isFinished)
 	{
 		if (to != null)
 		{

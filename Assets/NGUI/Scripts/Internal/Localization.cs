@@ -3,20 +3,29 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
+//#define SHOW_REPORT
+
 using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
 /// Localization manager is able to parse localization information from text assets.
-/// Although a singleton, you will generally not access this class as such. Instead
-/// you should implement "void Localize (Localization loc)" functions in your classes.
-/// Take a look at UILocalize to see how it's used.
+/// Using it is simple: text = Localization.Localize(key), or just add a UILocalize script to your labels.
+/// You can switch the language by using Localization.instance.currentLanguage = "French", for example.
+/// This will attempt to load the file called "French.txt" in the Resources folder.
+/// The localization file should contain key = value pairs, one pair per line.
 /// </summary>
 
 [AddComponentMenu("NGUI/Internal/Localization")]
 public class Localization : MonoBehaviour
 {
 	static Localization mInstance;
+
+	/// <summary>
+	/// Whether there is an instance of the localization class present.
+	/// </summary>
+
+	static public bool isActive { get { return mInstance != null; } }
 
 	/// <summary>
 	/// The instance of the localization class. Will create it if one isn't already around.
@@ -55,6 +64,10 @@ public class Localization : MonoBehaviour
 
 	Dictionary<string, string> mDictionary = new Dictionary<string, string>();
 	string mLanguage;
+
+#if SHOW_REPORT
+	BetterList<string> mUsed = new BetterList<string>();
+#endif
 
 	/// <summary>
 	/// Name of the currently active language.
@@ -133,6 +146,38 @@ public class Localization : MonoBehaviour
 
 	void OnEnable () { if (mInstance == null) mInstance = this; }
 
+#if SHOW_REPORT
+	/// <summary>
+	/// It's often useful to be able to tell which keys are used in localization, and which are not.
+	/// For this to work properly it's advised to play through the entire game and view all localized content before hitting the Stop button.
+	/// </summary>
+
+	void OnDisable ()
+	{
+		string final = "";
+		BetterList<string> full = new BetterList<string>();
+
+		// Create a list of all the known keys
+		foreach (KeyValuePair<string, string> pair in mDictionary) full.Add(pair.Key);
+
+		// Sort the full list
+		full.Sort(delegate(string s1, string s2) { return s1.CompareTo(s2); });
+
+		// Create the final string with the localization keys
+		for (int i = 0; i < full.size; ++i)
+		{
+			string key = full[i];
+			string val = mDictionary[key].Replace("\n", "\\n");
+			if (mUsed.Contains(key)) final += key + " = " + val + "\n";
+			else final += "//" + key + " = " + val + "\n";
+		}
+		
+		// Show the final report in a format that makes it easy to copy/paste into the original localization file
+		if (!string.IsNullOrEmpty(final))
+			Debug.Log("// Localization Report\n\n" + final);
+	}
+#endif
+
 	/// <summary>
 	/// Remove the instance reference.
 	/// </summary>
@@ -145,6 +190,9 @@ public class Localization : MonoBehaviour
 
 	void Load (TextAsset asset)
 	{
+#if SHOW_REPORT
+		mUsed.Clear();
+#endif
 		mLanguage = asset.name;
 		PlayerPrefs.SetString("Language", mLanguage);
 		ByteReader reader = new ByteReader(asset);
@@ -160,6 +208,9 @@ public class Localization : MonoBehaviour
 	{
 #if UNITY_EDITOR
 		if (!Application.isPlaying) return key;
+#endif
+#if SHOW_REPORT
+		if (!mUsed.Contains(key)) mUsed.Add(key);
 #endif
 		string val;
 #if UNITY_IPHONE || UNITY_ANDROID

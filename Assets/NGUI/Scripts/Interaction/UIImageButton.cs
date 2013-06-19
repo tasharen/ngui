@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2013 Tasharen Entertainment
+// Copyright Â© 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -33,47 +33,47 @@ public class UIImageButton : MonoBehaviour
 
 			if (col.enabled != value)
 			{
-				col.enabled = value;				
+				col.enabled = value;
+				UpdateImage();
 			}
 		}
 	}
 
-	void OnEnable ()
+	void Awake () { if (target == null) target = GetComponentInChildren<UISprite>(); }
+	void OnEnable () { UpdateImage(); }
+	
+	void UpdateImage()
 	{
-		UpdateImage();		
-	}
-
-	void Start ()
-	{
-		if (target == null) target = GetComponentInChildren<UISprite>();
+		if (target != null)
+		{
+			if (isEnabled)
+			{
+				target.spriteName = UICamera.IsHighlighted(gameObject) ? hoverSprite : normalSprite;
+			}
+			else
+			{
+				target.spriteName = disabledSprite;
+			}	
+			target.MakePixelPerfect();
+		}
 	}
 
 	void OnHover (bool isOver)
 	{
-		if (enabled)
+		if (isEnabled && target != null)
 		{
-			UpdateImage();
+			target.spriteName = isOver ? hoverSprite : normalSprite;
+			target.MakePixelPerfect();
 		}
 	}
 
 	void OnPress (bool pressed)
 	{
-		if (enabled)
+		if (pressed)
 		{
-			UpdateImage();
-		}
-	}
-	
-	void UpdateImage()
-	{
-		if (target != null)
-		{		
-			if (isEnabled)
-				target.spriteName = UICamera.IsHighlighted(gameObject) ? hoverSprite : normalSprite;
-			else
-				target.spriteName = disabledSprite;
-				
+			target.spriteName = pressedSprite;
 			target.MakePixelPerfect();
 		}
+		else UpdateImage();
 	}
 }

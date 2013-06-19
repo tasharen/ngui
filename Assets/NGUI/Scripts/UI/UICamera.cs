@@ -55,6 +55,7 @@ public class UICamera : MonoBehaviour
 
 		public GameObject current;		// The current game object under the touch or mouse
 		public GameObject pressed;		// The last game object to receive OnPress
+		public GameObject dragged;		// The last game object to receive OnDrag
 
 		public float clickTime = 0f;	// The last time a click event was sent out
 
@@ -313,6 +314,12 @@ public class UICamera : MonoBehaviour
 	public Camera cachedCamera { get { if (mCam == null) mCam = camera; return mCam; } }
 
 	/// <summary>
+	/// Set to 'true' just before OnDrag-related events are sent (this includes OnPress events that resulted from dragging).
+	/// </summary>
+
+	static public bool isDragging = false;
+
+	/// <summary>
 	/// The object hit by the last Raycast that was the result of a mouse or touch event.
 	/// </summary>
 
@@ -375,6 +382,10 @@ public class UICamera : MonoBehaviour
 		{
 			int count = 0;
 
+			for (int i = 0; i < mTouches.Count; ++i)
+				if (mTouches[i].pressed != null)
+					++count;
+
 			for (int i = 0; i < mMouse.Length; ++i)
 				if (mMouse[i].pressed != null)
 					++count;
@@ -382,9 +393,32 @@ public class UICamera : MonoBehaviour
 			if (mController.pressed != null)
 				++count;
 
+			return count;
+		}
+	}
+
+	/// <summary>
+	/// Number of active drag events from all sources.
+	/// </summary>
+
+	static public int dragCount
+	{
+		get
+		{
+			int count = 0;
+
 			for (int i = 0; i < mTouches.Count; ++i)
-				if (mTouches[i].pressed != null)
+			{
+				if (mTouches[i].dragged != null)
 					++count;
+			}
+
+			for (int i = 0; i < mMouse.Length; ++i)
+				if (mMouse[i].dragged != null)
+					++count;
+
+			if (mController.dragged != null)
+				++count;
 
 			return count;
 		}
@@ -656,7 +690,7 @@ public class UICamera : MonoBehaviour
 
 	static public MouseOrTouch GetTouch (int id)
 	{
-		MouseOrTouch touch;
+		MouseOrTouch touch = null;
 
 		if (!mTouches.TryGetValue(id, out touch))
 		{
@@ -679,7 +713,7 @@ public class UICamera : MonoBehaviour
 
 	void Awake ()
 	{
-#if !UNITY_3_4 && !UNITY_3_5 && !UNITY_4_0
+#if !UNITY_3_5 && !UNITY_4_0
 		// We don't want the camera to send out any kind of mouse events
 		cachedCamera.eventMask = 0;
 #endif
@@ -715,12 +749,18 @@ public class UICamera : MonoBehaviour
 		mMouse[0].pos.y = Input.mousePosition.y;
 		lastTouchPosition = mMouse[0].pos;
 
-		// Add this camera to the list
-		mList.Add(this);
-		mList.Sort(CompareFunc);
-
 		// If no event receiver mask was specified, use the camera's mask
 		if (eventReceiverMask == -1) eventReceiverMask = cachedCamera.cullingMask;
+	}
+
+	/// <summary>
+	/// Add this camera to the list.
+	/// </summary>
+
+	void Start ()
+	{
+		mList.Add(this);
+		mList.Sort(CompareFunc);
 	}
 
 	/// <summary>
@@ -1033,7 +1073,7 @@ public class UICamera : MonoBehaviour
 	public void ProcessTouch (bool pressed, bool unpressed)
 	{
 		// Whether we're using the mouse
-		bool isMouse = (currentTouch == mMouse[0]);
+		bool isMouse = (currentTouch == mMouse[0] || currentTouch == mMouse[1] || currentTouch == mMouse[2]);
 		float drag   = isMouse ? mouseDragThreshold : touchDragThreshold;
 		float click  = isMouse ? mouseClickThreshold : touchClickThreshold;
 
@@ -1045,7 +1085,8 @@ public class UICamera : MonoBehaviour
 			currentTouch.pressStarted = true;
 			Notify(currentTouch.pressed, "OnPress", false);
 			currentTouch.pressed = currentTouch.current;
-			currentTouch.clickNotification = ClickNotification.Always;
+			currentTouch.dragged = currentTouch.current;
+			currentTouch.clickNotification = isMouse ? ClickNotification.BasedOnDelta : ClickNotification.Always;
 			currentTouch.totalDelta = Vector2.zero;
 			currentTouch.dragStarted = false;
 			Notify(currentTouch.pressed, "OnPress", true);
@@ -1059,13 +1100,18 @@ public class UICamera : MonoBehaviour
 		}
 		else
 		{
-			// If the user is pressing down and has dragged the touch away from the original object,
-			// unpress the original object and notify the new object that it is now being pressed on.
-			if (!stickyPress && !unpressed && currentTouch.pressStarted && currentTouch.pressed != hoveredObject)
+			if (currentTouch.clickNotification != ClickNotification.None)
 			{
-				Notify(currentTouch.pressed, "OnPress", false);
-				currentTouch.pressed = hoveredObject;
-				Notify(currentTouch.pressed, "OnPress", true);
+				// If the user is pressing down and has dragged the touch away from the original object,
+				// unpress the original object and notify the new object that it is now being pressed on.
+				if (!stickyPress && !unpressed && currentTouch.pressStarted && currentTouch.pressed != hoveredObject)
+				{
+					isDragging = true;
+					Notify(currentTouch.pressed, "OnPress", false);
+					currentTouch.pressed = hoveredObject;
+					Notify(currentTouch.pressed, "OnPress", true);
+					isDragging = false;
+				}
 			}
 
 			if (currentTouch.pressed != null)
@@ -1090,8 +1136,10 @@ public class UICamera : MonoBehaviour
 					{
 						if (mTooltip != null) ShowTooltip(false);
 
+						isDragging = true;
 						bool isDisabled = (currentTouch.clickNotification == ClickNotification.None);
-						Notify(currentTouch.pressed, "OnDrag", currentTouch.delta);
+						Notify(currentTouch.dragged, "OnDrag", currentTouch.delta);
+						isDragging = false;
 
 						if (isDisabled)
 						{
@@ -1125,7 +1173,7 @@ public class UICamera : MonoBehaviour
 				if (useMouse && currentTouch.pressed == mHover) Notify(currentTouch.pressed, "OnHover", true);
 
 				// If the button/touch was released on the same object, consider it a click and select it
-				if (currentTouch.pressed == currentTouch.current ||
+				if (currentTouch.dragged == currentTouch.current ||
 					(currentTouch.clickNotification != ClickNotification.None &&
 					currentTouch.totalDelta.magnitude < drag))
 				{
@@ -1156,11 +1204,12 @@ public class UICamera : MonoBehaviour
 				else // The button/touch was released on a different object
 				{
 					// Send a drop notification (for drag & drop)
-					Notify(currentTouch.current, "OnDrop", currentTouch.pressed);
+					Notify(currentTouch.current, "OnDrop", currentTouch.dragged);
 				}
 			}
 			currentTouch.dragStarted = false;
 			currentTouch.pressed = null;
+			currentTouch.dragged = null;
 		}
 	}
 

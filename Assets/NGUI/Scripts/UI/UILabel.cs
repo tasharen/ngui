@@ -55,7 +55,7 @@ public class UILabel : UIWidget
 	bool mLastPass = false;
 	bool mLastShow = false;
 	Effect mLastEffect = Effect.None;
-	Vector3 mSize = Vector3.zero;
+	Vector2 mSize = Vector2.zero;
 	bool mPremultiply = false;
 
 	/// <summary>
@@ -133,14 +133,14 @@ public class UILabel : UIWidget
 		{
 			if (string.IsNullOrEmpty(value))
 			{
-				if (!string.IsNullOrEmpty(mText))
-					mText = "";
+				if (!string.IsNullOrEmpty(mText)) mText = "";
 				hasChanged = true;
 			}
 			else if (mText != value)
 			{
 				mText = value;
 				hasChanged = true;
+				if (shrinkToFit) MakePixelPerfect();
 			}
 		}
 	}
@@ -202,6 +202,7 @@ public class UILabel : UIWidget
 			{
 				mMaxLineWidth = value;
 				hasChanged = true;
+				if (shrinkToFit) MakePixelPerfect();
 			}
 		}
 	}
@@ -368,7 +369,7 @@ public class UILabel : UIWidget
 			if (mShrinkToFit != value)
 			{
 				mShrinkToFit = value;
-				if (mMaxLineWidth > 0f) hasChanged = true;
+				hasChanged = true;
 			}
 		}
 	}
@@ -448,6 +449,25 @@ public class UILabel : UIWidget
 		mPremultiply = (font != null && font.material != null && font.material.shader.name.Contains("Premultiplied"));
 	}
 
+#if UNITY_EDITOR
+	/// <summary>
+	/// Labels are not resizable using the handles.
+	/// </summary>
+
+	public override bool showResizeHandles { get { return false; } }
+	
+	public override void Update ()
+	{
+		base.Update();
+
+		if (mFont != null && mFont.isDynamic && !Application.isPlaying && mFont.RecalculateDynamicOffset())
+		{
+			mFont.MarkAsDirty();
+			mChanged = true;
+		}
+	}
+#endif
+
 	/// <summary>
 	/// UILabel needs additional processing when something changes.
 	/// </summary>
@@ -467,93 +487,76 @@ public class UILabel : UIWidget
 		mChanged = true;
 		hasChanged = false;
 		mLastText = mText;
-		mProcessedText = mText.Replace("\\n", "\n");
-
-		if (mPassword)
-		{
-			string hidden = "";
-
-			if (mShowLastChar)
-			{
-				for (int i = 0, imax = mProcessedText.Length - 1; i < imax; ++i) hidden += "*";
-				if (mProcessedText.Length > 0) hidden += mProcessedText[mProcessedText.Length - 1];
-			}
-			else
-			{
-				for (int i = 0, imax = mProcessedText.Length; i < imax; ++i) hidden += "*";
-			}
-			mProcessedText = mFont.WrapText(hidden, mMaxLineWidth / cachedTransform.localScale.x,
-				mMaxLineCount, false, UIFont.SymbolStyle.None);
-		}
-		else if (!mShrinkToFit)
-		{
-			if (mMaxLineWidth > 0)
-			{
-				mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / cachedTransform.localScale.x, mMaxLineCount, mEncoding, mSymbols);
-			}
-			else if (mMaxLineCount > 0)
-			{
-				mProcessedText = mFont.WrapText(mProcessedText, 100000f, mMaxLineCount, mEncoding, mSymbols);
-			}
-		}
 
 		float scale = Mathf.Abs(cachedTransform.localScale.x);
-		mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.one;
+		float maxY = mFont.size * mMaxLineCount;
 
-		if (mShrinkToFit && mMaxLineWidth > 0)
+		if (scale > 0f)
 		{
-			// We want to shrink the label (when it doesn't fit)
-			if (scale > 0f)
+			for (;;)
 			{
-				float maxSize = (float)mMaxLineWidth / mFont.size;
-				scale = (mSize.x > maxSize) ? (maxSize / mSize.x) * mFont.size : mFont.size;
-				cachedTransform.localScale = new Vector3(scale, scale, 1f);
+				if (mPassword)
+				{
+					mProcessedText = "";
+
+					if (mShowLastChar)
+					{
+						for (int i = 0, imax = mText.Length - 1; i < imax; ++i) mProcessedText += "*";
+						if (mText.Length > 0) mProcessedText += mText[mText.Length - 1];
+					}
+					else
+					{
+						for (int i = 0, imax = mText.Length; i < imax; ++i) mProcessedText += "*";
+					}
+					mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / scale, mMaxLineCount, false, UIFont.SymbolStyle.None);
+				}
+				else if (mMaxLineWidth > 0)
+				{
+					mProcessedText = mFont.WrapText(mText, mMaxLineWidth / scale, mShrinkToFit ? 0 : mMaxLineCount, mEncoding, mSymbols);
+				}
+				else if (!mShrinkToFit && mMaxLineCount > 0)
+				{
+					mProcessedText = mFont.WrapText(mText, 100000f, mMaxLineCount, mEncoding, mSymbols);
+				}
+				else
+				{
+					mProcessedText = mText;
+				}
+
+				mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.one;
+
+				if (mShrinkToFit)
+				{
+					// We want to shrink the label (when it doesn't fit)
+					if (mMaxLineCount > 0 && mSize.y * scale > maxY)
+					{
+						scale = Mathf.Round(scale - 1f);
+						if (scale > 1f) continue;
+					}
+
+					if (mMaxLineWidth > 0)
+					{
+						float maxX = (float)mMaxLineWidth / scale;
+						float x = (mSize.x * scale > maxX) ? (maxX / mSize.x) * scale : scale;
+						scale = Mathf.Min(x, scale);
+					}
+					
+					scale = Mathf.Round(scale);
+					cachedTransform.localScale = new Vector3(scale, scale, 1f);
+				}
+				break;
 			}
-			else
-			{
-				mSize.x = 1f;
-				cachedTransform.localScale = new Vector3(mFont.size, mFont.size, 1f);
-			}
+			mSize.x = Mathf.Max(mSize.x, (scale > 0f) ? lineWidth / scale : 1f);
 		}
 		else
 		{
-			mSize.x = Mathf.Max(mSize.x, (scale > 0f) ? lineWidth / scale : 1f);
+			// This should never happen (label should never have a scale of 0) -- but just in case.
+			mSize.x = 1f;
+			scale = mFont.size;
+			cachedTransform.localScale = new Vector3(0.01f, 0.01f, 1f);
+			mProcessedText = "";
 		}
-
 		mSize.y = Mathf.Max(mSize.y, 1f);
-	}
-
-	/// <summary>
-	/// Same as MakePixelPerfect(), but only adjusts the position, not the scale.
-	/// </summary>
-
-	public void MakePositionPerfect ()
-	{
-		float pixelSize = font.pixelSize;
-		Vector3 scale = cachedTransform.localScale;
-
-		if (mFont.size == Mathf.RoundToInt(scale.x / pixelSize) &&
-			mFont.size == Mathf.RoundToInt(scale.y / pixelSize) &&
-			cachedTransform.localRotation == Quaternion.identity)
-		{
-			Vector2 actualSize = relativeSize * scale.x;
-
-			int x = Mathf.RoundToInt(actualSize.x / pixelSize);
-			int y = Mathf.RoundToInt(actualSize.y / pixelSize);
-
-			Vector3 pos = cachedTransform.localPosition;
-			pos.x = Mathf.FloorToInt(pos.x / pixelSize);
-			pos.y = Mathf.CeilToInt(pos.y / pixelSize);
-			pos.z = Mathf.RoundToInt(pos.z);
-
-			if ((x % 2 == 1) && (pivot == Pivot.Top  || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
-			if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right )) pos.y -= 0.5f;
-
-			pos.x *= pixelSize;
-			pos.y *= pixelSize;
-
-			if (cachedTransform.localPosition != pos) cachedTransform.localPosition = pos;
-		}
 	}
 
 	/// <summary>
@@ -571,27 +574,18 @@ public class UILabel : UIWidget
 			scale.y = scale.x;
 			scale.z = 1f;
 
-			Vector2 actualSize = relativeSize * scale.x;
-
-			int x = Mathf.RoundToInt(actualSize.x / pixelSize);
-			int y = Mathf.RoundToInt(actualSize.y / pixelSize);
-
 			Vector3 pos = cachedTransform.localPosition;
 			pos.x = (Mathf.CeilToInt(pos.x / pixelSize * 4f) >> 2);
 			pos.y = (Mathf.CeilToInt(pos.y / pixelSize * 4f) >> 2);
 			pos.z = Mathf.RoundToInt(pos.z);
-
-			if (cachedTransform.localRotation == Quaternion.identity)
-			{
-				if ((x % 2 == 1) && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)) pos.x += 0.5f;
-				if ((y % 2 == 1) && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right)) pos.y += 0.5f;
-			}
 
 			pos.x *= pixelSize;
 			pos.y *= pixelSize;
 
 			cachedTransform.localPosition = pos;
 			cachedTransform.localScale = scale;
+			
+			if (shrinkToFit) ProcessText();
 		}
 		else base.MakePixelPerfect();
 	}
@@ -627,7 +621,6 @@ public class UILabel : UIWidget
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
 		if (mFont == null) return;
-		MakePositionPerfect();
 		Pivot p = pivot;
 		int offset = verts.size;
 
@@ -654,9 +647,6 @@ public class UILabel : UIWidget
 		// Apply an effect if one was requested
 		if (effectStyle != Effect.None)
 		{
-			Vector3 scale = cachedTransform.localScale;
-			if (scale.x == 0f || scale.y == 0f) return;
-
 			int end = verts.size;
 			float pixel =  1f / mFont.size;
 

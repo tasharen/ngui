@@ -214,4 +214,19 @@ static public class NGUIMenu
 	{
 		EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true);
 	}
+
+	[MenuItem("NGUI/Toggle Draggable Handles")]
+	static public void ToggleNewGUI ()
+	{
+		UIWidget.showHandlesWithMoveTool = !UIWidget.showHandlesWithMoveTool;
+
+		if (UIWidget.showHandlesWithMoveTool)
+		{
+			Debug.Log("Simple Mode: Draggable Handles will show up with the Move Tool selected (W).");
+		}
+		else
+		{
+			Debug.Log("Classic Mode: Draggable Handles will show up only with the View Tool selected (Q).");
+		}
+	}
 }

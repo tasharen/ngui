@@ -25,9 +25,7 @@ public class UISpriteInspector : UIWidgetInspector
 		if (mSprite != null)
 		{
 			NGUIEditorTools.RegisterUndo("Atlas Selection", mSprite);
-			bool resize = (mSprite.atlas == null);
 			mSprite.atlas = obj as UIAtlas;
-			if (resize) mSprite.MakePixelPerfect();
 			EditorUtility.SetDirty(mSprite.gameObject);
 		}
 	}
@@ -42,7 +40,6 @@ public class UISpriteInspector : UIWidgetInspector
 		{
 			NGUIEditorTools.RegisterUndo("Sprite Change", mSprite);
 			mSprite.spriteName = spriteName;
-			mSprite.MakePixelPerfect();
 			EditorUtility.SetDirty(mSprite.gameObject);
 		}
 	}
@@ -51,7 +48,7 @@ public class UISpriteInspector : UIWidgetInspector
 	/// Draw the atlas and sprite selection fields.
 	/// </summary>
 
-	override protected bool DrawProperties ()
+	protected override bool DrawProperties ()
 	{
 		mSprite = mWidget as UISprite;
 		ComponentSelector.Draw<UIAtlas>(mSprite.atlas, OnSelectAtlas);
@@ -64,7 +61,7 @@ public class UISpriteInspector : UIWidgetInspector
 	/// Sprites's custom properties based on the type.
 	/// </summary>
 
-	override protected void DrawExtraProperties ()
+	protected override void DrawExtraProperties ()
 	{
 		NGUIEditorTools.DrawSeparator();
 

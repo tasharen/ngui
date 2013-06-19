@@ -134,7 +134,8 @@ public class SpriteSelector : ScriptableWizard
 									mSprite.MakePixelPerfect();
 									EditorUtility.SetDirty(mSprite.gameObject);
 								}
-								else if (mCallback != null)
+								
+								if (mCallback != null)
 								{
 									mName = sprite.name;
 									mCallback(sprite.name);

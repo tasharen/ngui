@@ -93,7 +93,7 @@ static public class NGUITools
 				}
 			}
 
-			if (mListener != null)
+			if (mListener != null && mListener.enabled && NGUITools.GetActive(mListener.gameObject))
 			{
 				AudioSource source = mListener.audio;
 				if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
@@ -243,8 +243,6 @@ static public class NGUITools
 	{
 		if (text != null)
 		{
-			text = text.Replace("\\n", "\n");
-
 			for (int i = 0, imax = text.Length; i < imax; )
 			{
 				char c = text[i];
@@ -731,7 +729,7 @@ static public class NGUITools
 
 	static public bool Save (string fileName, byte[] bytes)
 	{
-#if UNITY_WEBPLAYER || UNITY_FLASH
+#if UNITY_WEBPLAYER || UNITY_FLASH || UNITY_METRO
 		return false;
 #else
 		if (!NGUITools.fileAccess) return false;
@@ -768,7 +766,7 @@ static public class NGUITools
 
 	static public byte[] Load (string fileName)
 	{
-#if UNITY_WEBPLAYER || UNITY_FLASH
+#if UNITY_WEBPLAYER || UNITY_FLASH || UNITY_METRO
 		return null;
 #else
 		if (!NGUITools.fileAccess) return null;
@@ -808,4 +806,50 @@ static public class NGUITools
 		for (int i = 0, imax = widgets.Length; i < imax; ++i)
 			widgets[i].ParentHasChanged();
 	}
+
+	/// <summary>
+	/// Clipboard access via reflection.
+	/// http://answers.unity3d.com/questions/266244/how-can-i-add-copypaste-clipboard-support-to-my-ga.html
+	/// </summary>
+
+#if UNITY_WEBPLAYER || UNITY_FLASH || UNITY_METRO
+	/// <summary>
+	/// Access to the clipboard is not supported on this platform.
+	/// </summary>
+
+	public static string clipboard
+	{
+		get { return null; }
+		set { };
+	}
+#else
+	static PropertyInfo mSystemCopyBuffer = null;
+	static PropertyInfo GetSystemCopyBufferProperty ()
+	{
+		if (mSystemCopyBuffer == null)
+		{
+			Type gui = typeof(GUIUtility);
+			mSystemCopyBuffer = gui.GetProperty("systemCopyBuffer", BindingFlags.Static | BindingFlags.NonPublic);
+		}
+		return mSystemCopyBuffer;
+	}
+
+	/// <summary>
+	/// Access to the clipboard via a hacky method of accessing Unity's internals. Won't work in the web player.
+	/// </summary>
+
+	public static string clipboard
+	{
+		get
+		{
+			PropertyInfo copyBuffer = GetSystemCopyBufferProperty();
+			return (copyBuffer != null) ? (string)copyBuffer.GetValue(null, null) : null;
+		}
+		set
+		{
+			PropertyInfo copyBuffer = GetSystemCopyBufferProperty();
+			if (copyBuffer != null) copyBuffer.SetValue(null, value, null);
+		}
+	}
+#endif
 }

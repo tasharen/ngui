@@ -289,6 +289,7 @@ public class UICreateWidgetWizard : EditorWindow
 				UILabel lbl = NGUITools.AddWidget<UILabel>(go);
 				lbl.font = NGUISettings.font;
 				lbl.text = go.name;
+				if (lbl.font.dynamicFont) lbl.transform.localPosition = new Vector3(0f, 0f, -1f);
 				lbl.MakePixelPerfect();
 			}
 
@@ -342,6 +343,7 @@ public class UICreateWidgetWizard : EditorWindow
 				UILabel lbl = NGUITools.AddWidget<UILabel>(go);
 				lbl.font = NGUISettings.font;
 				lbl.text = go.name;
+				if (lbl.font.dynamicFont) lbl.transform.localPosition = new Vector3(0f, 0f, -1f);
 				lbl.MakePixelPerfect();
 			}
 

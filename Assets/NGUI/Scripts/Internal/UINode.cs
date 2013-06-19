@@ -3,9 +3,7 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
-#if UNITY_3_4 || UNITY_3_5 || UNITY_4_0
-#define OLD_UNITY
-#endif
+#if UNITY_3_5 || UNITY_4_0
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -22,6 +20,7 @@ public class UINode
 
 	public Transform trans;		// Managed transform
 	public UIWidget widget;		// Widget on this transform, if any
+	public int changeFlag = -1;	// -1 = not checked, 0 = not changed, 1 = changed
 	
 	bool mLastActive = false;	// Last active state
 	Vector3 mLastPos;			// Last local position, used to see if it has changed
@@ -29,10 +28,7 @@ public class UINode
 	Vector3 mLastScale;			// Last local scale
 
 	GameObject mGo;
-#if !OLD_UNITY
 	float mLastAlpha = 0f;
-#endif
-	public int changeFlag = -1;		// -1 = not checked, 0 = not changed, 1 = changed
 
 	/// <summary>
 	/// -1 = not initialized, 0 = not visible, 1 = visible.
@@ -73,7 +69,6 @@ public class UINode
 		bool isActive = NGUITools.GetActive(mGo) && (widget == null || (widget.enabled && widget.isVisible));
 		bool changed = (mLastActive != isActive);
 
-#if !OLD_UNITY
 		if (widget != null)
 		{
 			float alpha = widget.finalAlpha;
@@ -84,11 +79,7 @@ public class UINode
 				changed = true;
 			}
 		}
-		
-		// If the transform says it hasn't changed, there is really no point in going further
-		if (!changed && !trans.hasChanged) return false;
-		trans.hasChanged = false;
-#endif
+
 		if (changed || (isActive &&
 			(mLastPos != trans.localPosition ||
 			 mLastRot != trans.localRotation ||
@@ -103,3 +94,4 @@ public class UINode
 		return changed;
 	}
 }
+#endif

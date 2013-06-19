@@ -3,6 +3,10 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
+#if UNITY_3_5 || UNITY_4_0
+#define OLD_UNITY
+#endif
+
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -31,6 +35,8 @@ public abstract class UIWidget : MonoBehaviour
 	[HideInInspector][SerializeField] Color mColor = Color.white;
 	[HideInInspector][SerializeField] Pivot mPivot = Pivot.Center;
 	[HideInInspector][SerializeField] int mDepth = 0;
+
+	protected GameObject mGo;
 	protected Transform mTrans;
 	protected UIPanel mPanel;
 
@@ -40,8 +46,13 @@ public abstract class UIWidget : MonoBehaviour
 	Vector3 mDiffPos;
 	Quaternion mDiffRot;
 	Vector3 mDiffScale;
+	Matrix4x4 mLocalToPanel;
+#if OLD_UNITY
 	int mVisibleFlag = -1;
-
+#else
+	bool mVisibleByPanel = true;
+	float mLastAlpha = 0f;
+#endif
 	// Widget's generated geometry
 	UIGeometry mGeom = new UIGeometry();
 
@@ -49,7 +60,11 @@ public abstract class UIWidget : MonoBehaviour
 	/// Whether the widget is visible.
 	/// </summary>
 
+#if OLD_UNITY
 	public bool isVisible { get { return finalAlpha > 0.001f; } }
+#else
+	public bool isVisible { get { return mVisibleByPanel && finalAlpha > 0.001f; } }
+#endif
 
 	/// <summary>
 	/// Color used by the widget.
@@ -92,6 +107,7 @@ public abstract class UIWidget : MonoBehaviour
 
 				Transform t = cachedTransform;
 				Vector3 pos = t.position;
+				float z = t.localPosition.z;
 				pos.x += (before.x - after.x);
 				pos.y += (before.y - after.y);
 				cachedTransform.position = pos;
@@ -99,6 +115,7 @@ public abstract class UIWidget : MonoBehaviour
 				pos = cachedTransform.localPosition;
 				pos.x = Mathf.Round(pos.x);
 				pos.y = Mathf.Round(pos.y);
+				pos.z = z;
 				cachedTransform.localPosition = pos;
 			}
 		}
@@ -136,7 +153,13 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Transform gets cached for speed.
+	/// Game object gets cached for speed. Can't simply return 'mGo' set in Awake because this function may be called on a prefab.
+	/// </summary>
+
+	public GameObject cachedGameObject { get { if (mGo == null) mGo = gameObject; return mGo; } }
+
+	/// <summary>
+	/// Transform gets cached for speed. Can't simply return 'mTrans' set in Awake because this function may be called on a prefab.
 	/// </summary>
 
 	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
@@ -225,11 +248,42 @@ public abstract class UIWidget : MonoBehaviour
 
 	public UIPanel panel { get { if (mPanel == null) CreatePanel(); return mPanel; } set { mPanel = value; } }
 
+#if OLD_UNITY
 	/// <summary>
 	/// Flag set by the UIPanel and used in optimization checks.
 	/// </summary>
 
 	public int visibleFlag { get { return mVisibleFlag; } set { mVisibleFlag = value; } }
+#endif
+
+	/// <summary>
+	/// Raycast into the screen and return a list of widgets in order from closest to farthest away.
+	/// This is a slow operation and will consider ALL widgets underneath the specified game object.
+	/// </summary>
+
+	static public BetterList<UIWidget> Raycast (GameObject root, Vector2 mousePos)
+	{
+		BetterList<UIWidget> list = new BetterList<UIWidget>();
+		UICamera uiCam = UICamera.FindCameraForLayer(root.layer);
+
+		if (uiCam != null)
+		{
+			Camera cam = uiCam.cachedCamera;
+			UIWidget[] widgets = root.GetComponentsInChildren<UIWidget>();
+
+			for (int i = 0; i < widgets.Length; ++i)
+			{
+				UIWidget w = widgets[i];
+
+				Vector3[] corners = NGUIMath.CalculateWidgetCorners(w);
+				if (NGUIMath.DistanceToRectangle(corners, mousePos, cam) == 0f)
+					list.Add(w);
+			}
+
+			list.Sort(delegate(UIWidget w1, UIWidget w2) { return w2.depth.CompareTo(w1.depth); });
+		}
+		return list;
+	}
 
 	/// <summary>
 	/// Static widget comparison function used for Z-sorting.
@@ -317,6 +371,7 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		if (mPanel != null)
 		{
+#if OLD_UNITY
 			// This code allows drag & dropping of widgets onto different panels in the editor.
 			bool valid = true;
 			Transform t = cachedTransform.parent;
@@ -336,6 +391,17 @@ public abstract class UIWidget : MonoBehaviour
 				mPanel = null;
 				CreatePanel();
 			}
+#else
+			UIPanel p = UIPanel.Find(cachedTransform);
+
+			if (mPanel != p)
+			{
+				mPanel.RemoveWidget(this);
+				if (!keepMaterial || Application.isPlaying) material = null;
+				mPanel = null;
+				CreatePanel();
+			}
+#endif
 		}
 	}
 
@@ -343,7 +409,11 @@ public abstract class UIWidget : MonoBehaviour
 	/// Remember whether we're in play mode.
 	/// </summary>
 
-	protected virtual void Awake() { mPlayMode = Application.isPlaying; }
+	protected virtual void Awake ()
+	{
+		mGo = gameObject;
+		mPlayMode = Application.isPlaying;
+	}
 
 	/// <summary>
 	/// Mark the widget and the panel as having been changed.
@@ -387,24 +457,13 @@ public abstract class UIWidget : MonoBehaviour
 	/// is brought in on a prefab object as it happens before it gets parented.
 	/// </summary>
 
-	public void Update ()
+	public virtual void Update ()
 	{
-		CheckLayer();
-
 		// Ensure we have a panel to work with by now
 		if (mPanel == null) CreatePanel();
 #if UNITY_EDITOR
 		else if (!Application.isPlaying) ParentHasChanged();
 #endif
-		
-		// Automatically reset the Z scaling component back to 1 as it's not used
-		Vector3 scale = cachedTransform.localScale;
-
-		if (scale.z != 1f)
-		{
-			scale.z = 1f;
-			mTrans.localScale = scale;
-		}
 	}
 
 	/// <summary>
@@ -439,14 +498,70 @@ public abstract class UIWidget : MonoBehaviour
 
 #if UNITY_EDITOR
 
+	static int mHandles = -1;
+
+	/// <summary>
+	/// Whether widgets will show handles with the Move Tool, or just the View Tool.
+	/// </summary>
+
+	static public bool showHandlesWithMoveTool
+	{
+		get
+		{
+			if (mHandles == -1)
+			{
+				mHandles = UnityEditor.EditorPrefs.GetInt("NGUI Handles", 1);
+			}
+			return (mHandles == 1);
+		}
+		set
+		{
+			int val = value ? 1 : 0;
+
+			if (mHandles != val)
+			{
+				mHandles = val;
+				UnityEditor.EditorPrefs.SetInt("NGUI Handles", mHandles);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Whether the widget should have some form of handles shown.
+	/// </summary>
+
+	static public bool showHandles
+	{
+		get
+		{
+			if (showHandlesWithMoveTool)
+			{
+				return UnityEditor.Tools.current == UnityEditor.Tool.Move;
+			}
+			return UnityEditor.Tools.current == UnityEditor.Tool.View;
+		}
+	}
+
+	/// <summary>
+	/// Whether handles should be shown around the widget for easy scaling and resizing.
+	/// </summary>
+
+	public virtual bool showResizeHandles { get { return true; } }
+
 	/// <summary>
 	/// Draw some selectable gizmos.
 	/// </summary>
 
 	void OnDrawGizmos ()
 	{
-		if (mVisibleFlag != 0 && mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos && UnityEditor.Selection.activeGameObject != gameObject)
+#if OLD_UNITY
+		if (mVisibleFlag != 0 && mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos)
+#else
+		if (isVisible && mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos)
+#endif
 		{
+			if (UnityEditor.Selection.activeGameObject == gameObject && showHandles) return;
+
 			Color outline = new Color(1f, 1f, 1f, 0.2f);
 
 			// Position should be offset by depth so that the selection works properly
@@ -471,7 +586,7 @@ public abstract class UIWidget : MonoBehaviour
 
 			// Draw the gizmo
 			Gizmos.matrix = cachedTransform.localToWorldMatrix;
-			Gizmos.color = (UnityEditor.Selection.activeGameObject == gameObject) ? new Color(0f, 0.75f, 1f) : outline;
+			Gizmos.color = (UnityEditor.Selection.activeGameObject == gameObject) ? Color.green : outline;
 			Gizmos.DrawWireCube(pos, size);
 
 			// Make the widget selectable
@@ -482,36 +597,135 @@ public abstract class UIWidget : MonoBehaviour
 	}
 #endif
 
+#if OLD_UNITY
 	/// <summary>
 	/// Update the widget and fill its geometry if necessary. Returns whether something was changed.
 	/// </summary>
 
-	public bool UpdateGeometry (ref Matrix4x4 worldToPanel, bool parentMoved, bool generateNormals)
+	public bool UpdateGeometry (UIPanel p, ref Matrix4x4 worldToPanel, bool parentMoved, bool generateNormals)
+#else
+	bool mForceVisible = false;
+	Vector3 mOldV0;
+	Vector3 mOldV1;
+
+	/// <summary>
+	/// Update the widget and fill its geometry if necessary. Returns whether something was changed.
+	/// </summary>
+
+	public bool UpdateGeometry (UIPanel p, bool forceVisible)
+#endif
 	{
-		if (material == null) return false;
-
-		if (OnUpdate() || mChanged)
+		if (material != null && p != null)
 		{
-			mChanged = false;
-			mGeom.Clear();
-			OnFill(mGeom.verts, mGeom.uvs, mGeom.cols);
+			mPanel = p;
+			bool hasMatrix = false;
+#if !OLD_UNITY
+			float final = finalAlpha;
+			bool visibleByAlpha = (final > 0.001f);
+			bool visibleByPanel = forceVisible || mVisibleByPanel;
 
-			if (mGeom.hasVertices)
+			// Has transform moved?
+			if (cachedTransform.hasChanged)
 			{
-				Vector3 offset = pivotOffset;
-				Vector2 scale = relativeSize;
+				mTrans.hasChanged = false;
+				
+				// Check to see if the widget has moved relative to the panel that manages it
+#if UNITY_EDITOR
+				if (!mPanel.widgetsAreStatic || !Application.isPlaying)
+#else
+				if (!mPanel.widgetsAreStatic)
+#endif
+				{
+					Vector2 size = relativeSize;
+					Vector2 offset = pivotOffset;
+					Vector4 padding = relativePadding;
 
-				offset.x *= scale.x;
-				offset.y *= scale.y;
+					float x0 = offset.x * size.x - padding.x;
+					float y0 = offset.y * size.y + padding.y;
 
-				mGeom.ApplyOffset(offset);
-				mGeom.ApplyTransform(worldToPanel * cachedTransform.localToWorldMatrix, generateNormals);
+					float x1 = x0 + size.x + padding.x + padding.z;
+					float y1 = y0 - size.y - padding.y - padding.w;
+
+					mLocalToPanel = p.worldToLocal * cachedTransform.localToWorldMatrix;
+					hasMatrix = true;
+
+					Vector3 v0 = new Vector3(x0, y0, 0f);
+					Vector3 v1 = new Vector3(x1, y1, 0f);
+
+					v0 = mLocalToPanel.MultiplyPoint3x4(v0);
+					v1 = mLocalToPanel.MultiplyPoint3x4(v1);
+
+					if (Vector3.SqrMagnitude(mOldV0 - v0) > 0.000001f || Vector3.SqrMagnitude(mOldV1 - v1) > 0.000001f)
+					{
+						mChanged = true;
+						mOldV0 = v0;
+						mOldV1 = v1;
+					}
+				}
+
+				// Is the widget visible by the panel?
+				if (visibleByAlpha || mForceVisible != forceVisible)
+				{
+					mForceVisible = forceVisible;
+					visibleByPanel = forceVisible || mPanel.IsVisible(this);
+				}
 			}
-			return true;
-		}
-		else if (mGeom.hasVertices && parentMoved)
-		{
-			mGeom.ApplyTransform(worldToPanel * cachedTransform.localToWorldMatrix, generateNormals);
+			else if (visibleByAlpha && mForceVisible != forceVisible)
+			{
+				mForceVisible = forceVisible;
+				visibleByPanel = mPanel.IsVisible(this);
+			}
+
+			// Is the visibility changing?
+			if (mVisibleByPanel != visibleByPanel)
+			{
+				mVisibleByPanel = visibleByPanel;
+				mChanged = true;
+			}
+
+			// Has the alpha changed?
+			if (mVisibleByPanel && mLastAlpha != final) mChanged = true;
+			mLastAlpha = final;
+#endif
+			if (mChanged)
+			{
+				mChanged = false;
+
+				if (isVisible)
+				{
+					mGeom.Clear();
+					OnFill(mGeom.verts, mGeom.uvs, mGeom.cols);
+
+					// Want to see what's being filled? Uncomment this line.
+					//Debug.Log("Fill " + name + " (" + Time.time + ")");
+
+					if (mGeom.hasVertices)
+					{
+						Vector3 offset = pivotOffset;
+						Vector2 scale = relativeSize;
+
+						offset.x *= scale.x;
+						offset.y *= scale.y;
+
+						if (!hasMatrix) mLocalToPanel = p.worldToLocal * cachedTransform.localToWorldMatrix;
+
+						mGeom.ApplyOffset(offset);
+						mGeom.ApplyTransform(mLocalToPanel, p.generateNormals);
+					}
+					return true;
+				}
+				else if (mGeom.hasVertices)
+				{
+					mGeom.Clear();
+					return true;
+				}
+			}
+#if OLD_UNITY
+			else if (parentMoved && mGeom.hasVertices)
+			{
+				mGeom.ApplyTransform(p.worldToLocal * cachedTransform.localToWorldMatrix, p.generateNormals);
+			}
+#endif
 		}
 		return false;
 	}
@@ -601,12 +815,6 @@ public abstract class UIWidget : MonoBehaviour
 	/// </summary>
 
 	virtual protected void OnStart () { }
-
-	/// <summary>
-	/// Virtual version of the Update function. Should return 'true' if the widget has changed visually.
-	/// </summary>
-
-	virtual public bool OnUpdate () { return false; }
 
 	/// <summary>
 	/// Virtual function called by the UIPanel that fills the buffers.

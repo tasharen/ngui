@@ -23,7 +23,7 @@ public class TweenScale : UITweener
 
 	public Vector3 scale { get { return cachedTransform.localScale; } set { cachedTransform.localScale = value; } }
 
-	override protected void OnUpdate (float factor, bool isFinished)
+	protected override void OnUpdate (float factor, bool isFinished)
 	{
 		cachedTransform.localScale = from * (1f - factor) + to * factor;
 

@@ -24,8 +24,9 @@ public class UIPanelInspector : Editor
 		{
 			case EventType.MouseUp:
 			{
-				UIWidget[] widgets = NGUIEditorTools.Raycast(target as UIPanel, e.mousePosition);
-				if (widgets.Length > 0) Selection.activeGameObject = widgets[0].gameObject;
+				UIPanel panel = target as UIPanel;
+				BetterList<UIWidget> widgets = UIWidgetInspector.SceneViewRaycast(panel, e.mousePosition);
+				if (widgets.size > 0) Selection.activeGameObject = widgets[0].gameObject;
 			}
 			break;
 
@@ -84,7 +85,7 @@ public class UIPanelInspector : Editor
 
 		GUILayout.BeginHorizontal();
 		bool depth = EditorGUILayout.Toggle("Depth Pass", panel.depthPass, GUILayout.Width(100f));
-		GUILayout.Label("Extra draw call, saves fillrate");
+		GUILayout.Label("Doubles draw calls, saves fillrate");
 		GUILayout.EndHorizontal();
 
 		if (panel.depthPass != depth)
@@ -92,6 +93,16 @@ public class UIPanelInspector : Editor
 			panel.depthPass = depth;
 			panel.UpdateDrawcalls();
 			EditorUtility.SetDirty(panel);
+		}
+
+		if (depth)
+		{
+			UICamera cam = UICamera.FindCameraForLayer(panel.gameObject.layer);
+
+			if (cam == null || cam.camera.isOrthoGraphic)
+			{
+				EditorGUILayout.HelpBox("Please note that depth pass will only save fillrate when used with 3D UIs, and only UIs drawn by the game camera. If you are using a separate camera for the UI, you will not see any benefit!", MessageType.Warning);
+			}
 		}
 
 		GUILayout.BeginHorizontal();
@@ -102,6 +113,18 @@ public class UIPanelInspector : Editor
 		if (panel.widgetsAreStatic != stat)
 		{
 			panel.widgetsAreStatic = stat;
+			panel.UpdateDrawcalls();
+			EditorUtility.SetDirty(panel);
+		}
+
+		GUILayout.BeginHorizontal();
+		bool cull = EditorGUILayout.Toggle("Cull", panel.cullWhileDragging, GUILayout.Width(100f));
+		GUILayout.Label("Cull widgets while dragging them");
+		GUILayout.EndHorizontal();
+
+		if (panel.cullWhileDragging != cull)
+		{
+			panel.cullWhileDragging = cull;
 			panel.UpdateDrawcalls();
 			EditorUtility.SetDirty(panel);
 		}
@@ -171,6 +194,13 @@ public class UIPanelInspector : Editor
 					EditorUtility.SetDirty(panel);
 				}
 			}
+
+#if !UNITY_3_5 && !UNITY_4_0 && (UNITY_ANDROID || UNITY_IPHONE)
+			if (PlayerSettings.targetGlesGraphics == TargetGlesGraphics.OpenGLES_1_x)
+			{
+				EditorGUILayout.HelpBox("Clipping requires shader support!\n\nOpen File -> Build Settings -> Player Settings -> Other Settings, then set:\n\n- Graphics Level: OpenGL ES 2.0.", MessageType.Error);
+			}
+#endif
 		}
 
 		if (clipping == UIDrawCall.Clipping.HardClip)

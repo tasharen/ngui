@@ -181,7 +181,7 @@ public class UIDrawCall : MonoBehaviour
 					mClippedMat.hideFlags = HideFlags.DontSave;
 				}
 				mClippedMat.shader = shader;
-				mClippedMat.mainTexture = mSharedMat.mainTexture;
+				mClippedMat.CopyPropertiesFromMaterial(mSharedMat);
 			}
 			else if (mClippedMat != null)
 			{

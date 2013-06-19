@@ -28,14 +28,12 @@ public class ComponentSelector : ScriptableWizard
 	{
 		GUILayout.BeginHorizontal();
 		bool show = GUILayout.Button(buttonName, "DropDownButton", GUILayout.Width(76f));
-#if !UNITY_3_4
 		GUILayout.BeginVertical();
 		GUILayout.Space(5f);
-#endif
+
 		T o = EditorGUILayout.ObjectField(obj, typeof(T), false, options) as T;
-#if !UNITY_3_4
 		GUILayout.EndVertical();
-#endif
+
 		if (o != null && Selection.activeObject != o.gameObject && GUILayout.Button("Edit", GUILayout.Width(40f)))
 		{
 			Selection.activeObject = o.gameObject;
@@ -74,16 +72,42 @@ public class ComponentSelector : ScriptableWizard
 	void OnGUI ()
 	{
 		EditorGUIUtility.LookLikeControls(80f);
+		GUILayout.Label("Recently used components", "LODLevelNotifyText");
+		NGUIEditorTools.DrawSeparator();
 
 		if (mObjects.Length == 0)
 		{
-			GUILayout.Label("No recently used " + mType.ToString() + " components found.\nTry drag & dropping one instead.");
+			EditorGUILayout.HelpBox("No recently used " + mType.ToString() + " components found.\nTry drag & dropping one instead, or creating a new one.", MessageType.Info);
+
+			bool isDone = false;
+
+			EditorGUILayout.Space();
+			GUILayout.BeginHorizontal();
+			GUILayout.FlexibleSpace();
+
+			if (mType == typeof(UIFont))
+			{
+				if (GUILayout.Button("Open the Font Maker", GUILayout.Width(150f)))
+				{
+					EditorWindow.GetWindow<UIFontMaker>(false, "Font Maker", true);
+					isDone = true;
+				}
+			}
+			else if (mType == typeof(UIAtlas))
+			{
+				if (GUILayout.Button("Open the Atlas Maker", GUILayout.Width(150f)))
+				{
+					EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true);
+					isDone = true;
+				}
+			}
+
+			GUILayout.FlexibleSpace();
+			GUILayout.EndHorizontal();
+			if (isDone) Close();
 		}
 		else
 		{
-			GUILayout.Label("Recently used components", "LODLevelNotifyText");
-			NGUIEditorTools.DrawSeparator();
-
 			MonoBehaviour sel = null;
 
 			foreach (MonoBehaviour o in mObjects)

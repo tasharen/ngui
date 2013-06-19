@@ -226,7 +226,16 @@ public class UIDraggablePanel : IgnoreTimeScale
 	{
 		mTrans = transform;
 		mPanel = GetComponent<UIPanel>();
+		mPanel.onChange += OnPanelChange;
 	}
+
+	void OnDestroy ()
+	{
+		if (mPanel != null)
+			mPanel.onChange -= OnPanelChange;
+	}
+
+	void OnPanelChange () { UpdateScrollbars(true); }
 
 	/// <summary>
 	/// Set the initial drag value and register the listener delegates.
@@ -365,7 +374,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 		DisableSpring();
 
 		Bounds b = bounds;
-		if (b.min.x == b.max.x || b.min.y == b.max.x) return;
+		if (b.min.x == b.max.x || b.min.y == b.max.y) return;
 		Vector4 cr = mPanel.clipRange;
 
 		float hx = cr.z * 0.5f;
@@ -615,9 +624,6 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 	void LateUpdate ()
 	{
-		// If the panel's geometry changed, recalculate the bounds
-		if (mPanel.changedLastFrame) UpdateScrollbars(true);
-
 		// Inspector functionality
 		if (repositionClipping)
 		{
@@ -673,6 +679,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 				// Restrict the contents to be within the panel's bounds
 				if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None) RestrictWithinBounds(false);
+				if (mMomentum.magnitude < 0.0001f && onDragFinished != null) onDragFinished();
 				return;
 			}
 			else
