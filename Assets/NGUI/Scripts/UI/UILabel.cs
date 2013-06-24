@@ -510,9 +510,9 @@ public class UILabel : UIWidget
 					}
 					mProcessedText = mFont.WrapText(mProcessedText, mMaxLineWidth / scale, mMaxLineCount, false, UIFont.SymbolStyle.None);
 				}
-				else if (mMaxLineWidth > 0 && mMaxLineCount > 0)
+				else if (mMaxLineWidth > 0)
 				{
-					mProcessedText = mFont.WrapText(mText, mMaxLineWidth / scale, mShrinkToFit ? 0 : mMaxLineCount, mEncoding, mSymbols);
+					mProcessedText = mFont.WrapText(mText, mMaxLineWidth / scale, mMaxLineCount, mEncoding, mSymbols);
 				}
 				else if (!mShrinkToFit && mMaxLineCount > 0)
 				{
