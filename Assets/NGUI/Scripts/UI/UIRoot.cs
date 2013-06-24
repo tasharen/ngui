@@ -140,7 +140,7 @@ public class UIRoot : MonoBehaviour
 	void Start ()
 	{
 		UIOrthoCamera oc = GetComponentInChildren<UIOrthoCamera>();
-		
+
 		if (oc != null)
 		{
 			Debug.LogWarning("UIRoot should not be active at the same time as UIOrthoCamera. Disabling UIOrthoCamera.", oc);
@@ -148,6 +148,7 @@ public class UIRoot : MonoBehaviour
 			oc.enabled = false;
 			if (cam != null) cam.orthographicSize = 1f;
 		}
+		else Update();
 	}
 
 	void Update ()
