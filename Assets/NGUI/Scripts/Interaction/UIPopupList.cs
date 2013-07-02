@@ -180,8 +180,6 @@ public class UIPopupList : MonoBehaviour
 					eventReceiver.SendMessage(functionName, mSelectedItem, SendMessageOptions.DontRequireReceiver);
 				}
 				current = null;
-
-				if (textLabel == null) mSelectedItem = null;
 			}
 		}
 	}
@@ -210,19 +208,16 @@ public class UIPopupList : MonoBehaviour
 
 	void Start ()
 	{
-		if (textLabel != null)
+		// Automatically choose the first item
+		if (string.IsNullOrEmpty(mSelectedItem))
 		{
-			// Automatically choose the first item
-			if (string.IsNullOrEmpty(mSelectedItem))
-			{
-				if (items.Count > 0) selection = items[0];
-			}
-			else
-			{
-				string s = mSelectedItem;
-				mSelectedItem = null;
-				selection = s;
-			}
+			if (items.Count > 0) selection = items[0];
+		}
+		else
+		{
+			string s = mSelectedItem;
+			mSelectedItem = null;
+			selection = s;
 		}
 	}
 
