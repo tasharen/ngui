@@ -699,10 +699,10 @@ public class UIPanel : MonoBehaviour
 			UIDrawCall dc = mDrawCalls.buffer[--i];
 			if (dc != null) NGUITools.DestroyImmediate(dc.gameObject);
 		}
-		mDrawCalls.Clear();
-		mChanged.Clear();
+		mDrawCalls.Release();
+		mChanged.Release();
 #if OLD_UNITY
-		mChildren.Clear();
+		mChildren.Release();
 #endif
 	}
 

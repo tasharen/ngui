@@ -42,7 +42,23 @@ public class UIStretch : MonoBehaviour
 	/// </summary>
 
 	public UIPanel panelContainer = null;
+
+	/// <summary>
+	/// Stretching style.
+	/// </summary>
+
 	public Style style = Style.None;
+
+	/// <summary>
+	/// Whether the operation will occur only once and the script will then be disabled.
+	/// </summary>
+
+	public bool runOnlyOnce = false;
+
+	/// <summary>
+	/// Relative-to-target size.
+	/// </summary>
+
 	public Vector2 relativeSize = Vector2.one;
 
 	/// <summary>
@@ -69,6 +85,7 @@ public class UIStretch : MonoBehaviour
 	{
 		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
 		mRoot = NGUITools.FindInParents<UIRoot>(gameObject);
+		Update();
 	}
 
 	void Update ()
@@ -192,6 +209,7 @@ public class UIStretch : MonoBehaviour
 			}
 
 			if (mTrans.localScale != localScale) mTrans.localScale = localScale;
+			if (runOnlyOnce && Application.isPlaying) Destroy(this);
 		}
 	}
 }

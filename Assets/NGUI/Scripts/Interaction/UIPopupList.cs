@@ -250,8 +250,9 @@ public class UIPopupList : MonoBehaviour
 			UIAtlas.Sprite sp = mHighlight.GetAtlasSprite();
 			if (sp == null) return;
 
-			float offsetX = sp.inner.xMin - sp.outer.xMin;
-			float offsetY = sp.inner.yMin - sp.outer.yMin;
+			float scaleFactor = atlas.pixelSize;
+			float offsetX = (sp.inner.xMin - sp.outer.xMin) * scaleFactor;
+			float offsetY = (sp.inner.yMin - sp.outer.yMin) * scaleFactor;
 
 			Vector3 pos = lbl.cachedTransform.localPosition + new Vector3(-offsetX, offsetY, 1f);
 
@@ -551,9 +552,10 @@ public class UIPopupList : MonoBehaviour
 			mBackground.cachedTransform.localScale = new Vector3(x, -y + bgPadding.y, 1f);
 
 			// Scale the highlight sprite to envelop a single item
+			float scaleFactor = 2f * atlas.pixelSize;
 			mHighlight.cachedTransform.localScale = new Vector3(
-				x - (bgPadding.x + padding.x) * 2f + (hlsp.inner.xMin - hlsp.outer.xMin) * 2f,
-				fontScale + hlspHeight * 2f, 1f);
+				   x - (bgPadding.x + padding.x) * 2f + (hlsp.inner.xMin - hlsp.outer.xMin) * scaleFactor,
+				   fontScale + hlspHeight * scaleFactor, 1f);
 
 			bool placeAbove = (position == Position.Above);
 
