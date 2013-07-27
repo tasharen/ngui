@@ -1081,7 +1081,7 @@ public class UICamera : MonoBehaviour
 		if (pressed)
 		{
 			if (mTooltip != null) ShowTooltip(false);
-			
+
 			currentTouch.pressStarted = true;
 			Notify(currentTouch.pressed, "OnPress", false);
 			currentTouch.pressed = currentTouch.current;
@@ -1100,18 +1100,15 @@ public class UICamera : MonoBehaviour
 		}
 		else
 		{
-			if (currentTouch.clickNotification != ClickNotification.None)
+			// If the user is pressing down and has dragged the touch away from the original object,
+			// unpress the original object and notify the new object that it is now being pressed on.
+			if (!stickyPress && !unpressed && currentTouch.pressStarted && currentTouch.pressed != hoveredObject)
 			{
-				// If the user is pressing down and has dragged the touch away from the original object,
-				// unpress the original object and notify the new object that it is now being pressed on.
-				if (!stickyPress && !unpressed && currentTouch.pressStarted && currentTouch.pressed != hoveredObject)
-				{
-					isDragging = true;
-					Notify(currentTouch.pressed, "OnPress", false);
-					currentTouch.pressed = hoveredObject;
-					Notify(currentTouch.pressed, "OnPress", true);
-					isDragging = false;
-				}
+				isDragging = true;
+				Notify(currentTouch.pressed, "OnPress", false);
+				currentTouch.pressed = hoveredObject;
+				Notify(currentTouch.pressed, "OnPress", true);
+				isDragging = false;
 			}
 
 			if (currentTouch.pressed != null)
