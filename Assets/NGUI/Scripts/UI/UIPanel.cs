@@ -14,7 +14,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-#if !USE_SIMPLE_DICTIONARY
+#if !USE_SIMPLE_DICTIONARY && OLD_UNITY
 using System.Collections.Specialized;
 #endif
 

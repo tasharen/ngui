@@ -351,11 +351,12 @@ public class UICreateWidgetWizard : EditorWindow
 			NGUITools.AddWidgetCollider(go);
 
 			// Add the scripts
-			UIImageButton ib = go.AddComponent<UIImageButton>();
-			ib.target		 = sprite;
-			ib.normalSprite  = mImage0;
-			ib.hoverSprite	 = mImage1;
-			ib.pressedSprite = mImage2;
+			UIImageButton ib	= go.AddComponent<UIImageButton>();
+			ib.target			= sprite;
+			ib.normalSprite		= mImage0;
+			ib.hoverSprite		= mImage1;
+			ib.pressedSprite	= mImage2;
+			ib.disabledSprite	= mImage3;
 			go.AddComponent<UIButtonSound>();
 
 			Selection.activeGameObject = go;

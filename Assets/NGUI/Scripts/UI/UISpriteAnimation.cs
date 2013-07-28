@@ -7,7 +7,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// Very simple sprite animation. Attach to a sprite and specify a bunch of sprite names and it will cycle through them.
+/// Very simple sprite animation. Attach to a sprite and specify a common prefix such as "idle" and it will cycle through them.
 /// </summary>
 
 [ExecuteInEditMode]

@@ -322,8 +322,8 @@ public class UIInput : MonoBehaviour
 				}
 
 				if (maxChars > 0 && mText.Length > maxChars) mText = mText.Substring(0, maxChars);
-				if (mText != text) mKeyboard.text = mText;
 				UpdateLabel();
+				if (mText != text) mKeyboard.text = mText;
 				SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
 			}
 
