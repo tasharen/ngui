@@ -27,12 +27,10 @@ public class UIButtonKeys : MonoBehaviour
 		{
 			if (!NGUITools.GetActive(UICamera.selectedObject))
 			{
-				Debug.Log(gameObject.name);
 				UICamera.selectedObject = gameObject;
 			}
 			else
 			{
-				Debug.Log("Hover: " + gameObject.name);
 				UICamera.Notify(gameObject, "OnHover", true);
 			}
 		}
