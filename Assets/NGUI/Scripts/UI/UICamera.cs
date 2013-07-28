@@ -342,7 +342,7 @@ public class UICamera : MonoBehaviour
 				if (mSel != null)
 				{
 					UICamera uicam = FindCameraForLayer(mSel.layer);
-					
+
 					if (uicam != null)
 					{
 						current = uicam;
@@ -367,6 +367,7 @@ public class UICamera : MonoBehaviour
 						Notify(mSel, "OnSelect", true);
 						current = null;
 					}
+					else Debug.Log("The fuck? " + mList.Count);
 				}
 			}
 		}
@@ -713,6 +714,8 @@ public class UICamera : MonoBehaviour
 
 	void Awake ()
 	{
+		mList.Add(this);
+
 #if !UNITY_3_5 && !UNITY_4_0
 		// We don't want the camera to send out any kind of mouse events
 		cachedCamera.eventMask = 0;
@@ -754,23 +757,16 @@ public class UICamera : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Add this camera to the list.
-	/// </summary>
-
-	void Start ()
-	{
-		mList.Add(this);
-		mList.Sort(CompareFunc);
-	}
-
-	/// <summary>
 	/// Remove this camera from the list.
 	/// </summary>
 
-	void OnDestroy ()
-	{
-		mList.Remove(this);
-	}
+	void OnDestroy () { mList.Remove(this); }
+
+	/// <summary>
+	/// Sort the list when enabled.
+	/// </summary>
+
+	void OnEnable () { mList.Sort(CompareFunc); }
 
 	/// <summary>
 	/// Update the object under the mouse if we're not using touch-based input.
