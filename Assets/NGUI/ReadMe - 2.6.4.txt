@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.6.3
+                Version 2.6.4
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,15 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.6.4:
+- NEW: UIStretch now has the 'run once' option matching UIAnchor.
+- FIX: Non-sticky press was not working quite right...
+- FIX: Rewrote the transform inspector.
+- FIX: Removed the "depth pass" option from the panel's inspector since 99.9% of the people were mis-using it.
+- FIX: UIButtonKeys.startsSelected got broken at some point.
+- FIX: UIPopupList now respects atlas pixel size and again works correctly for menu style popups.
+- FIX: UIPanel will no longer keep references to materials when disabled.
 
 2.6.3:
 - NEW: Noticeably improved performance and garbage collection when using Unity 4.1+
