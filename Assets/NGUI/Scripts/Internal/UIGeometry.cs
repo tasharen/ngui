@@ -79,7 +79,7 @@ public class UIGeometry
 	/// Step 3: Transform the vertices by the provided matrix.
 	/// </summary>
 
-	public void ApplyTransform (Matrix4x4 widgetToPanel, bool normals)
+	public void ApplyTransform (Matrix4x4 widgetToPanel)
 	{
 		if (verts.size > 0)
 		{

@@ -724,7 +724,7 @@ public abstract class UIWidget : MonoBehaviour
 						if (!hasMatrix) mLocalToPanel = p.worldToLocal * cachedTransform.localToWorldMatrix;
 
 						mGeom.ApplyOffset(offset);
-						mGeom.ApplyTransform(mLocalToPanel, p.generateNormals);
+						mGeom.ApplyTransform(mLocalToPanel);
 					}
 					return true;
 				}

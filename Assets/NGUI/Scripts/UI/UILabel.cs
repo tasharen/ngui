@@ -512,7 +512,7 @@ public class UILabel : UIWidget
 				}
 				else if (mMaxLineWidth > 0)
 				{
-					mProcessedText = mFont.WrapText(mText, mMaxLineWidth / scale, mMaxLineCount, mEncoding, mSymbols);
+					mProcessedText = mFont.WrapText(mText, mMaxLineWidth / scale, mShrinkToFit ? 0 : mMaxLineCount, mEncoding, mSymbols);
 				}
 				else if (!mShrinkToFit && mMaxLineCount > 0)
 				{
@@ -530,7 +530,7 @@ public class UILabel : UIWidget
 					// We want to shrink the label (when it doesn't fit)
 					if (mMaxLineCount > 0 && mSize.y * scale > maxY)
 					{
-						scale = Mathf.Floor(scale - 1f);
+						scale = Mathf.Round(scale - 1f);
 						if (scale > 1f) continue;
 					}
 
@@ -540,8 +540,8 @@ public class UILabel : UIWidget
 						float x = (mSize.x * scale > maxX) ? (maxX / mSize.x) * scale : scale;
 						scale = Mathf.Min(x, scale);
 					}
-					
-					scale = Mathf.Floor(scale);
+
+					scale = Mathf.Round(scale);
 					cachedTransform.localScale = new Vector3(scale, scale, 1f);
 				}
 				break;
