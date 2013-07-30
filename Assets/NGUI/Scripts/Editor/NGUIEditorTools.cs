@@ -299,26 +299,26 @@ public class NGUIEditorTools
 	/// Draw a distinctly different looking header label
 	/// </summary>
 
-	static public Rect DrawHeader (string text)
-	{
-		GUILayout.Space(28f);
-		Rect rect = GUILayoutUtility.GetLastRect();
-		rect.yMin += 5f;
-		rect.yMax -= 4f;
-		rect.width = Screen.width;
+	//static public Rect DrawHeader (string text)
+	//{
+	//    GUILayout.Space(28f);
+	//    Rect rect = GUILayoutUtility.GetLastRect();
+	//    rect.yMin += 5f;
+	//    rect.yMax -= 4f;
+	//    rect.width = Screen.width;
 
-		if (Event.current.type == EventType.Repaint)
-		{
-			GUI.color = Color.black;
-			GUI.DrawTexture(new Rect(0f, rect.yMin, Screen.width, rect.yMax - rect.yMin), gradientTexture);
-			GUI.color = new Color(0f, 0f, 0f, 0.25f);
-			GUI.DrawTexture(new Rect(0f, rect.yMin, Screen.width, 1f), blankTexture);
-			GUI.DrawTexture(new Rect(0f, rect.yMax - 1, Screen.width, 1f), blankTexture);
-			GUI.color = Color.white;
-			GUI.Label(new Rect(rect.x + 4f, rect.y, rect.width - 4, rect.height), text, EditorStyles.boldLabel);
-		}
-		return rect;
-	}
+	//    if (Event.current.type == EventType.Repaint)
+	//    {
+	//        GUI.color = Color.black;
+	//        GUI.DrawTexture(new Rect(0f, rect.yMin, Screen.width, rect.yMax - rect.yMin), gradientTexture);
+	//        GUI.color = new Color(0f, 0f, 0f, 0.25f);
+	//        GUI.DrawTexture(new Rect(0f, rect.yMin, Screen.width, 1f), blankTexture);
+	//        GUI.DrawTexture(new Rect(0f, rect.yMax - 1, Screen.width, 1f), blankTexture);
+	//        GUI.color = Color.white;
+	//        GUI.Label(new Rect(rect.x + 4f, rect.y, rect.width - 4, rect.height), text, EditorStyles.boldLabel);
+	//    }
+	//    return rect;
+	//}
 
 	/// <summary>
 	/// Convenience function that displays a list of sprites and returns the selected value.
@@ -1030,5 +1030,62 @@ public class NGUIEditorTools
 			}
 			t = t.parent;
 		}
+	}
+
+	/// <summary>
+	/// Draw a distinctly different looking header label
+	/// </summary>
+
+	static public bool DrawHeader (string text) { return DrawHeader(text, text); }
+
+	/// <summary>
+	/// Draw a distinctly different looking header label
+	/// </summary>
+
+	static public bool DrawHeader (string text, string key)
+	{
+		bool state = EditorPrefs.GetBool(key, false);
+
+		GUILayout.Space(3f);
+		if (!state) GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f);
+		GUILayout.BeginHorizontal();
+		GUILayout.Space(3f);
+
+		GUI.changed = false;
+		if (!GUILayout.Toggle(true, "<b><size=11>" + text + "</size></b>", "dragtab")) state = !state;
+		if (GUI.changed) EditorPrefs.SetBool(key, state);
+
+		GUILayout.Space(2f);
+		GUILayout.EndHorizontal();
+		GUI.backgroundColor = Color.white;
+		if (!state) GUILayout.Space(3f);
+		return state;
+	}
+
+	/// <summary>
+	/// Begin drawing the content area.
+	/// </summary>
+
+	static public void BeginContents ()
+	{
+		GUILayout.BeginHorizontal();
+		GUILayout.Space(4f);
+		EditorGUILayout.BeginHorizontal("AS TextArea", GUILayout.MinHeight(10f));
+		GUILayout.BeginVertical();
+		GUILayout.Space(2f);
+	}
+
+	/// <summary>
+	/// End drawing the content area.
+	/// </summary>
+
+	static public void EndContents ()
+	{
+		GUILayout.Space(3f);
+		GUILayout.EndVertical();
+		EditorGUILayout.EndHorizontal();
+		GUILayout.Space(3f);
+		GUILayout.EndHorizontal();
+		GUILayout.Space(3f);
 	}
 }

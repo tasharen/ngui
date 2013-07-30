@@ -163,6 +163,7 @@ public class UIPopupList : MonoBehaviour
 			if (mSelectedItem != value)
 			{
 				mSelectedItem = value;
+				if (mSelectedItem == null) return;
 				
 				if (textLabel != null)
 				{

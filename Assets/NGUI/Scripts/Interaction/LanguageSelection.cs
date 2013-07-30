@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2013 Tasharen Entertainment
+// Copyright Â© 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -26,7 +26,7 @@ public class LanguageSelection : MonoBehaviour
 
 	void UpdateList ()
 	{
-		if (Localization.instance != null && Localization.instance.languages != null)
+		if (Localization.instance != null && Localization.instance.languages != null && Localization.instance.languages.Length > 0)
 		{
 			mList.items.Clear();
 

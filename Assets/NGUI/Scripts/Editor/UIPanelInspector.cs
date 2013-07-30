@@ -64,13 +64,6 @@ public class UIPanelInspector : Editor
 			panel.alpha = alpha;
 		}
 
-		if (panel.showInPanelTool != EditorGUILayout.Toggle("Panel Tool", panel.showInPanelTool))
-		{
-			panel.showInPanelTool = !panel.showInPanelTool;
-			EditorUtility.SetDirty(panel);
-			EditorWindow.FocusWindowIfItsOpen<UIPanelTool>();
-		}
-
 		GUILayout.BeginHorizontal();
 		bool norms = EditorGUILayout.Toggle("Normals", panel.generateNormals, GUILayout.Width(100f));
 		GUILayout.Label("Needed for lit shaders");
@@ -83,26 +76,41 @@ public class UIPanelInspector : Editor
 			EditorUtility.SetDirty(panel);
 		}
 
+		// No one seems to know how to use this properly correctly. Solution? Removing it.
+		// If you know wtf you're doing, you're welcome to uncomment it.
+
+		//GUILayout.BeginHorizontal();
+		//bool depth = EditorGUILayout.Toggle("Depth Pass", panel.depthPass, GUILayout.Width(100f));
+		//GUILayout.Label("Doubles draw calls, saves fillrate");
+		//GUILayout.EndHorizontal();
+
+		//if (panel.depthPass != depth)
+		//{
+		//    panel.depthPass = depth;
+		//    panel.UpdateDrawcalls();
+		//    EditorUtility.SetDirty(panel);
+		//}
+
+		//if (depth)
+		//{
+		//    UICamera cam = UICamera.FindCameraForLayer(panel.gameObject.layer);
+
+		//    if (cam == null || cam.camera.isOrthoGraphic)
+		//    {
+		//        EditorGUILayout.HelpBox("Please note that depth pass will only save fillrate when used with 3D UIs, and only UIs drawn by the game camera. If you are using a separate camera for the UI, you will not see any benefit!", MessageType.Warning);
+		//    }
+		//}
+
 		GUILayout.BeginHorizontal();
-		bool depth = EditorGUILayout.Toggle("Depth Pass", panel.depthPass, GUILayout.Width(100f));
-		GUILayout.Label("Doubles draw calls, saves fillrate");
+		bool cull = EditorGUILayout.Toggle("Cull", panel.cullWhileDragging, GUILayout.Width(100f));
+		GUILayout.Label("Cull widgets while dragging them");
 		GUILayout.EndHorizontal();
 
-		if (panel.depthPass != depth)
+		if (panel.cullWhileDragging != cull)
 		{
-			panel.depthPass = depth;
+			panel.cullWhileDragging = cull;
 			panel.UpdateDrawcalls();
 			EditorUtility.SetDirty(panel);
-		}
-
-		if (depth)
-		{
-			UICamera cam = UICamera.FindCameraForLayer(panel.gameObject.layer);
-
-			if (cam == null || cam.camera.isOrthoGraphic)
-			{
-				EditorGUILayout.HelpBox("Please note that depth pass will only save fillrate when used with 3D UIs, and only UIs drawn by the game camera. If you are using a separate camera for the UI, you will not see any benefit!", MessageType.Warning);
-			}
 		}
 
 		GUILayout.BeginHorizontal();
@@ -117,20 +125,17 @@ public class UIPanelInspector : Editor
 			EditorUtility.SetDirty(panel);
 		}
 
-		GUILayout.BeginHorizontal();
-		bool cull = EditorGUILayout.Toggle("Cull", panel.cullWhileDragging, GUILayout.Width(100f));
-		GUILayout.Label("Cull widgets while dragging them");
-		GUILayout.EndHorizontal();
-
-		if (panel.cullWhileDragging != cull)
+		if (stat)
 		{
-			panel.cullWhileDragging = cull;
-			panel.UpdateDrawcalls();
-			EditorUtility.SetDirty(panel);
+			EditorGUILayout.HelpBox("Only mark the panel as 'static' if you know FOR CERTAIN that the widgets underneath will not move, rotate, or scale. Doing this improves performance, but moving widgets around will have no effect.", MessageType.Warning);
 		}
 
-		EditorGUILayout.LabelField("Widgets", panel.widgets.size.ToString());
-		EditorGUILayout.LabelField("Draw Calls", drawcalls.size.ToString());
+		if (panel.showInPanelTool != EditorGUILayout.Toggle("Panel Tool", panel.showInPanelTool))
+		{
+			panel.showInPanelTool = !panel.showInPanelTool;
+			EditorUtility.SetDirty(panel);
+			EditorWindow.FocusWindowIfItsOpen<UIPanelTool>();
+		}
 
 		UIPanel.DebugInfo di = (UIPanel.DebugInfo)EditorGUILayout.EnumPopup("Debug Info", panel.debugInfo);
 
@@ -218,17 +223,22 @@ public class UIPanelInspector : Editor
 			}
 		}
 
-		foreach (UIDrawCall dc in drawcalls)
+		if (panel.drawCalls.size > 0 && NGUIEditorTools.DrawHeader(panel.drawCalls.size + " draw calls from " + panel.widgets.size + " widgets", "DrawCalls"))
 		{
-			NGUIEditorTools.DrawSeparator();
-			EditorGUILayout.ObjectField("Material", dc.material, typeof(Material), false);
-			EditorGUILayout.LabelField("Triangles", dc.triangles.ToString());
-
-			if (clipping != UIDrawCall.Clipping.None && !dc.isClipped)
+			NGUIEditorTools.BeginContents();
+			
+			foreach (UIDrawCall dc in drawcalls)
 			{
-				EditorGUILayout.HelpBox("You must switch this material's shader to Unlit/Transparent Colored or Unlit/Premultiplied Colored in order for clipping to work.",
-					MessageType.Warning);
+				EditorGUILayout.ObjectField("Material", dc.material, typeof(Material), false);
+				EditorGUILayout.LabelField("Triangles", dc.triangles.ToString());
+
+				if (clipping != UIDrawCall.Clipping.None && !dc.isClipped)
+				{
+					EditorGUILayout.HelpBox("You must switch this material's shader to Unlit/Transparent Colored or Unlit/Premultiplied Colored in order for clipping to work.",
+						MessageType.Warning);
+				}
 			}
+			NGUIEditorTools.EndContents();
 		}
 	}
 }

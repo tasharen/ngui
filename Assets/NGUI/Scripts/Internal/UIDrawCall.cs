@@ -35,7 +35,7 @@ public class UIDrawCall : MonoBehaviour
 	Material		mDepthMat;		// Depth-writing material, created if necessary
 	int[]			mIndices;		// Cached indices
 
-	bool mDepthPass = false;
+	bool mUseDepth = false;
 	bool mReset = true;
 	bool mEven = true;
 
@@ -43,7 +43,7 @@ public class UIDrawCall : MonoBehaviour
 	/// Whether an additional pass will be created to render the geometry to the depth buffer first.
 	/// </summary>
 
-	public bool depthPass { get { return mDepthPass; } set { if (mDepthPass != value) { mDepthPass = value; mReset = true; } } }
+	public bool depthPass { get { return mUseDepth; } set { if (mUseDepth != value) { mUseDepth = value; mReset = true; } } }
 
 	/// <summary>
 	/// Transform is cached for speed and efficiency.
@@ -196,7 +196,7 @@ public class UIDrawCall : MonoBehaviour
 		}
 
 		// If depth pass should be used, create the depth material
-		if (mDepthPass)
+		if (mUseDepth)
 		{
 			if (mDepthMat == null)
 			{
