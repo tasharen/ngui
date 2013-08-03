@@ -737,7 +737,7 @@ public abstract class UIWidget : MonoBehaviour
 #if OLD_UNITY
 			else if (parentMoved && mGeom.hasVertices)
 			{
-				mGeom.ApplyTransform(p.worldToLocal * cachedTransform.localToWorldMatrix, p.generateNormals);
+				mGeom.ApplyTransform(p.worldToLocal * cachedTransform.localToWorldMatrix);
 			}
 #endif
 		}

@@ -265,9 +265,10 @@ public class UIPanelTool : EditorWindow
 			{
 				ent.panel.widgetsAreStatic = !val;
 				EditorUtility.SetDirty(ent.panel.gameObject);
-
+#if !UNITY_3_5
 				if (NGUITransformInspector.instance != null)
 					NGUITransformInspector.instance.Repaint();
+#endif
 			}
 
 			val = (ent.panel.debugInfo == UIPanel.DebugInfo.Gizmos);

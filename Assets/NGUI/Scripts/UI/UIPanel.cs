@@ -702,7 +702,7 @@ public class UIPanel : MonoBehaviour
 		mDrawCalls.Release();
 		mChanged.Release();
 #if OLD_UNITY
-		mChildren.Release();
+		mChildren.Clear();
 #endif
 	}
 

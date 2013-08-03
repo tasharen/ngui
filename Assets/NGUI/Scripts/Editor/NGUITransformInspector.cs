@@ -3,6 +3,7 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
+#if !UNITY_3_5
 using UnityEngine;
 using UnityEditor;
 
@@ -220,3 +221,4 @@ public class NGUITransformInspector : Editor
 	}
 #endregion
 }
+#endif
