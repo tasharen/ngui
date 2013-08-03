@@ -70,11 +70,12 @@ public class UILabelInspector : UIWidgetInspector
 				if (!shrinkToFit) mLabel.MakePixelPerfect();
 			}
 
-			GUILayout.BeginHorizontal();
-			bool password = EditorGUILayout.Toggle("Password", mLabel.password, GUILayout.Width(100f));
-			GUILayout.Label("- hide characters");
-			GUILayout.EndHorizontal();
-			if (password != mLabel.password) { RegisterUndo(); mLabel.password = password; }
+			// Only input fields need this setting exposed, and they have their own "is password" setting, so hiding it here.
+			//GUILayout.BeginHorizontal();
+			//bool password = EditorGUILayout.Toggle("Password", mLabel.password, GUILayout.Width(100f));
+			//GUILayout.Label("- hide characters");
+			//GUILayout.EndHorizontal();
+			//if (password != mLabel.password) { RegisterUndo(); mLabel.password = password; }
 
 			GUILayout.BeginHorizontal();
 			bool encoding = EditorGUILayout.Toggle("Encoding", mLabel.supportEncoding, GUILayout.Width(100f));
