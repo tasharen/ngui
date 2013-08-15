@@ -367,7 +367,6 @@ public class UICamera : MonoBehaviour
 						Notify(mSel, "OnSelect", true);
 						current = null;
 					}
-					else Debug.Log("The fuck? " + mList.Count);
 				}
 			}
 		}
@@ -490,6 +489,7 @@ public class UICamera : MonoBehaviour
 			// Convert to view space
 			currentCamera = cam.cachedCamera;
 			Vector3 pos = currentCamera.ScreenToViewportPoint(inPos);
+			if (float.IsNaN(pos.x) || float.IsNaN(pos.y)) continue;
 
 			// If it's outside the camera's viewport, do nothing
 			if (pos.x < 0f || pos.x > 1f || pos.y < 0f || pos.y > 1f) continue;
@@ -722,7 +722,12 @@ public class UICamera : MonoBehaviour
 #endif
 
 		if (Application.platform == RuntimePlatform.Android ||
-			Application.platform == RuntimePlatform.IPhonePlayer)
+			Application.platform == RuntimePlatform.IPhonePlayer
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1
+			|| Application.platform == RuntimePlatform.WP8Player
+			|| Application.platform == RuntimePlatform.BB10Player
+#endif
+			)
 		{
 			useMouse = false;
 			useTouch = true;

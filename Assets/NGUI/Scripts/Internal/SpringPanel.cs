@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
@@ -43,7 +43,11 @@ public class SpringPanel : IgnoreTimeScale
 	{
 		float delta = UpdateRealTimeDelta();
 
-		if (mThreshold == 0f) mThreshold = (target - mTrans.localPosition).magnitude * 0.005f;
+		if (mThreshold == 0f)
+		{
+			mThreshold = (target - mTrans.localPosition).magnitude * 0.005f;
+			mThreshold = Mathf.Max(mThreshold, 0.00001f);
+		}
 
 		bool trigger = false;
 		Vector3 before = mTrans.localPosition;
@@ -78,12 +82,8 @@ public class SpringPanel : IgnoreTimeScale
 		sp.target = pos;
 		sp.strength = strength;
 		sp.onFinished = null;
-
-		if (!sp.enabled)
-		{
-			sp.mThreshold = 0f;
-			sp.enabled = true;
-		}
+		sp.mThreshold = 0f;
+		sp.enabled = true;
 		return sp;
 	}
 }

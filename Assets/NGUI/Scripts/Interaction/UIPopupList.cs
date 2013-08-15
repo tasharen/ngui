@@ -444,7 +444,7 @@ public class UIPopupList : MonoBehaviour
 
 	void OnClick()
 	{
-		if (mChild == null && atlas != null && font != null && items.Count > 0)
+		if (enabled && NGUITools.GetActive(gameObject) && mChild == null && atlas != null && font != null && items.Count > 0)
 		{
 			mLabelList.Clear();
 

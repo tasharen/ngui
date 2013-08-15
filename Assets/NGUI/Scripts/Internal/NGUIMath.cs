@@ -369,6 +369,8 @@ static public class NGUIMath
 		for (int i = 0, imax = widgets.Length; i < imax; ++i)
 		{
 			UIWidget w = widgets[i];
+			if (!w.enabled) continue;
+
 			Vector2 size = w.relativeSize;
 			Vector2 offset = w.pivotOffset;
 			float x = (offset.x + 0.5f) * size.x;
@@ -416,6 +418,8 @@ static public class NGUIMath
 		for (int i = 0, imax = widgets.Length; i < imax; ++i)
 		{
 			UIWidget w = widgets[i];
+			if (!w.enabled) continue;
+
 			Vector2 size = w.relativeSize;
 			Vector2 offset = w.pivotOffset;
 			Transform toWorld = w.cachedTransform;

@@ -524,6 +524,7 @@ public class UILabel : UIWidget
 				}
 
 				mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.one;
+				mSize *= mFont.pixelSize;
 
 				if (mShrinkToFit)
 				{
@@ -648,7 +649,7 @@ public class UILabel : UIWidget
 		if (effectStyle != Effect.None)
 		{
 			int end = verts.size;
-			float pixel =  1f / mFont.size;
+			float pixel = 1f / (mFont.size * mFont.pixelSize);
 
 			float fx = pixel * mEffectDistance.x;
 			float fy = pixel * mEffectDistance.y;
