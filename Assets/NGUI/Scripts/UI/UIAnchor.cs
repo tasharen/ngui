@@ -193,8 +193,7 @@ public class UIAnchor : MonoBehaviour
 			{
 				v.x = Mathf.Round(v.x);
 				v.y = Mathf.Round(v.y);
-				
-				//put here to give the user the option of moving .5 pixels for certain widgets.
+
 				v.x += pixelOffset.x;
 				v.y += pixelOffset.y;
 
@@ -211,10 +210,10 @@ public class UIAnchor : MonoBehaviour
 		{
 			v.x = Mathf.Round(v.x);
 			v.y = Mathf.Round(v.y);
-				
-			//put here to give the user the option of moving .5 pixels for certain widgets.
+
 			v.x += pixelOffset.x;
 			v.y += pixelOffset.y;
+
 			if (panelContainer != null)
 			{
 				v = panelContainer.cachedTransform.TransformPoint(v);
