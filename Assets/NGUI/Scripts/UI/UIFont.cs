@@ -605,7 +605,6 @@ public class UIFont : MonoBehaviour
 		UnityEditor.EditorUtility.SetDirty(gameObject);
 #endif
 		if (mReplacement != null) mReplacement.MarkAsDirty();
-		RecalculateDynamicOffset();
 
 		mSprite = null;
 		UILabel[] labels = NGUITools.FindActive<UILabel>();
@@ -627,32 +626,49 @@ public class UIFont : MonoBehaviour
 			symbols[i].MarkAsDirty();
 	}
 
+#if DYNAMIC_FONT
+	static CharacterInfo mTemp;
+	static bool mHasChanged = false;
+
 	/// <summary>
-	/// BUG: Unity's CharacterInfo.vert.y makes no sense at all. It changes depending on the imported font's size,
-	/// even though it shouldn't, since I overwrite the requested character size here. In order to calculate the
-	/// actual proper offset that needs to be applied to this weird value, I get the coordinates of the 'j' glyph
-	/// and then determine the difference between the glyph's position and the font's size.
+	/// Called when the dynamic font texture gets rebuilt.
 	/// </summary>
 
-	public bool RecalculateDynamicOffset()
+	void OnFontChanged () { mHasChanged = true; }
+
+	/// <summary>
+	/// Requests the following text to be present in the font's texture. Returns whether the texture has changed.
+	/// </summary>
+
+	public bool Request (string text)
 	{
-#if DYNAMIC_FONT
-		if (mDynamicFont != null)
+		if (!string.IsNullOrEmpty(text))
 		{
-			CharacterInfo j;
-			mDynamicFont.RequestCharactersInTexture("j", mDynamicFontSize, mDynamicFontStyle);
-			mDynamicFont.GetCharacterInfo('j', out j, mDynamicFontSize, mDynamicFontStyle);
-			float offset = (mDynamicFontSize + j.vert.yMax);
-			
-			if (!float.Equals(mDynamicFontOffset, offset))
+			if (mReplacement != null)
 			{
-				mDynamicFontOffset = offset;
-				return true;
+				return mReplacement.Request(text);
+			}
+			else if (mDynamicFont != null)
+			{
+				mHasChanged = false;
+				mDynamicFont.textureRebuildCallback = OnFontChanged;
+
+				mDynamicFont.RequestCharactersInTexture("j", mDynamicFontSize, mDynamicFontStyle);
+				mDynamicFont.GetCharacterInfo('j', out mTemp, mDynamicFontSize, mDynamicFontStyle);
+				mDynamicFontOffset = (mDynamicFontSize + mTemp.vert.yMax);
+
+				mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
+				mDynamicFont.textureRebuildCallback = null;
+
+				if (mHasChanged) MarkAsDirty();
+				return mHasChanged;
 			}
 		}
-#endif
 		return false;
 	}
+#else
+	public bool Request (string text) { return false; }
+#endif
 
 	/// <summary>
 	/// Get the printed size of the specified string. The returned value is in local coordinates. Multiply by transform's scale to get pixels.
@@ -672,14 +688,7 @@ public class UIFont : MonoBehaviour
 #endif
 		{
 			if (encoding) text = NGUITools.StripSymbols(text);
-#if DYNAMIC_FONT
-			if (dynamic)
-			{
-				mDynamicFont.textureRebuildCallback = OnFontChanged;
-				mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
-				mDynamicFont.textureRebuildCallback = null;
-			}
-#endif
+
 			int length = text.Length;
 			int maxX = 0;
 			int x = 0;
@@ -777,14 +786,6 @@ public class UIFont : MonoBehaviour
 		bool useSymbols = encoding && symbolStyle != SymbolStyle.None && hasSymbols;
 		bool dynamic = isDynamic;
 
-#if DYNAMIC_FONT
-		if (dynamic)
-		{
-			mDynamicFont.textureRebuildCallback = OnFontChanged;
-			mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
-			mDynamicFont.textureRebuildCallback = null;
-		}
-#endif
 		while (currentCharacterIndex > 0 && remainingWidth > 0)
 		{
 			char currentCharacter = text[--currentCharacterIndex];
@@ -860,16 +861,6 @@ public class UIFont : MonoBehaviour
 		int lineCount = 1;
 		bool useSymbols = encoding && symbolStyle != SymbolStyle.None && hasSymbols;
 		bool dynamic = isDynamic;
-
-#if DYNAMIC_FONT
-		// Make sure the characters are present in the dynamic font before printing them
-		if (dynamic)
-		{
-			mDynamicFont.textureRebuildCallback = OnFontChanged;
-			mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
-			mDynamicFont.textureRebuildCallback = null;
-		}
-#endif
 
 		// Run through all characters
 		for (; offset < textLength; ++offset)
@@ -1074,8 +1065,6 @@ public class UIFont : MonoBehaviour
 		}
 	}
 
-	void OnFontChanged () { MarkAsDirty(); }
-
 	/// <summary>
 	/// Print the specified text into the buffers.
 	/// Note: 'lineWidth' parameter should be in pixels.
@@ -1098,14 +1087,7 @@ public class UIFont : MonoBehaviour
 
 			// Make sure the characters are present in the dynamic font before printing them
 			bool dynamic = isDynamic;
-#if DYNAMIC_FONT
-			if (dynamic)
-			{
-				mDynamicFont.textureRebuildCallback = OnFontChanged;
-				mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
-				mDynamicFont.textureRebuildCallback = null;
-			}
-#endif
+
 			mColors.Clear();
 			mColors.Add(color);
 

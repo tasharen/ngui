@@ -114,6 +114,7 @@ public class UILabel : UIWidget
 				material = (mFont != null) ? mFont.material : null;
 				mChanged = true;
 				hasChanged = true;
+				if (mFont != null) mFont.Request(mText);
 				MarkAsChanged();
 			}
 		}
@@ -140,6 +141,7 @@ public class UILabel : UIWidget
 			{
 				mText = value;
 				hasChanged = true;
+				if (mFont != null) mFont.Request(value);
 				if (shrinkToFit) MakePixelPerfect();
 			}
 		}
@@ -428,7 +430,7 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
-	/// Legacy functionality support.
+	/// Determine start-up values.
 	/// </summary>
 
 	protected override void OnStart ()
@@ -447,6 +449,9 @@ public class UILabel : UIWidget
 
 		// Whether this is a premultiplied alpha shader
 		mPremultiply = (font != null && font.material != null && font.material.shader.name.Contains("Premultiplied"));
+
+		// Request the text within the font
+		if (mFont != null) mFont.Request(mText);
 	}
 
 #if UNITY_EDITOR
@@ -455,17 +460,6 @@ public class UILabel : UIWidget
 	/// </summary>
 
 	public override bool showResizeHandles { get { return false; } }
-	
-	public override void Update ()
-	{
-		base.Update();
-
-		if (mFont != null && mFont.isDynamic && !Application.isPlaying && mFont.RecalculateDynamicOffset())
-		{
-			mFont.MarkAsDirty();
-			mChanged = true;
-		}
-	}
 #endif
 
 	/// <summary>

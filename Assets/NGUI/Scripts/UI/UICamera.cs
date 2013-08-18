@@ -473,11 +473,13 @@ public class UICamera : MonoBehaviour
 		return 0;
 	}
 
+	static RaycastHit mEmpty = new RaycastHit();
+
 	/// <summary>
 	/// Returns the object under the specified position.
 	/// </summary>
 
-	static public bool Raycast (Vector3 inPos, ref RaycastHit hit)
+	static public bool Raycast (Vector3 inPos, out RaycastHit hit)
 	{
 		for (int i = 0; i < mList.Count; ++i)
 		{
@@ -528,6 +530,7 @@ public class UICamera : MonoBehaviour
 			}
 			if (Physics.Raycast(ray, out hit, dist, mask)) return true;
 		}
+		hit = mEmpty;
 		return false;
 	}
 
@@ -781,7 +784,7 @@ public class UICamera : MonoBehaviour
 	{
 		if (useMouse && Application.isPlaying && handlesEvents)
 		{
-			hoveredObject = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+			hoveredObject = Raycast(Input.mousePosition, out lastHit) ? lastHit.collider.gameObject : fallThrough;
 			if (hoveredObject == null) hoveredObject = genericEventHandler;
 			for (int i = 0; i < 3; ++i) mMouse[i].current = hoveredObject;
 		}
@@ -876,7 +879,7 @@ public class UICamera : MonoBehaviour
 		// Update the object under the mouse
 		if (updateRaycast)
 		{
-			hoveredObject = Raycast(Input.mousePosition, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+			hoveredObject = Raycast(Input.mousePosition, out lastHit) ? lastHit.collider.gameObject : fallThrough;
 			if (hoveredObject == null) hoveredObject = genericEventHandler;
 			mMouse[0].current = hoveredObject;
 		}
@@ -986,7 +989,7 @@ public class UICamera : MonoBehaviour
 			}
 
 			currentTouch.pos = input.position;
-			hoveredObject = Raycast(currentTouch.pos, ref lastHit) ? lastHit.collider.gameObject : fallThrough;
+			hoveredObject = Raycast(currentTouch.pos, out lastHit) ? lastHit.collider.gameObject : fallThrough;
 			if (hoveredObject == null) hoveredObject = genericEventHandler;
 			currentTouch.current = hoveredObject;
 			lastTouchPosition = currentTouch.pos;
