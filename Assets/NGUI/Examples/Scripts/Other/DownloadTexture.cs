@@ -13,7 +13,7 @@ using System.Collections;
 [RequireComponent(typeof(UITexture))]
 public class DownloadTexture : MonoBehaviour
 {
-	public string url = "http://www.tasharen.com/misc/logo.png";
+	public string url = "http://www.yourwebsite.com/logo.png";
 
 	Material mMat;
 	Texture2D mTex;
