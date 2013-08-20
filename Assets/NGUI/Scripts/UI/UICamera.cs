@@ -382,8 +382,8 @@ public class UICamera : MonoBehaviour
 		{
 			int count = 0;
 
-			for (int i = 0; i < mTouches.Count; ++i)
-				if (mTouches[i].pressed != null)
+			foreach (KeyValuePair<int, MouseOrTouch> touch in mTouches)
+				if (touch.Value.pressed != null)
 					++count;
 
 			for (int i = 0; i < mMouse.Length; ++i)
@@ -407,11 +407,9 @@ public class UICamera : MonoBehaviour
 		{
 			int count = 0;
 
-			for (int i = 0; i < mTouches.Count; ++i)
-			{
-				if (mTouches[i].dragged != null)
+			foreach (KeyValuePair<int, MouseOrTouch> touch in mTouches)
+				if (touch.Value.dragged != null)
 					++count;
-			}
 
 			for (int i = 0; i < mMouse.Length; ++i)
 				if (mMouse[i].dragged != null)
