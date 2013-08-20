@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2013 Tasharen Entertainment
+// Copyright Â© 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -92,6 +92,7 @@ public class UITable : MonoBehaviour
 		{
 			Transform t = children[i];
 			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(t);
+
 			Vector3 scale = t.localScale;
 			b.min = Vector3.Scale(b.min, scale);
 			b.max = Vector3.Scale(b.max, scale);
