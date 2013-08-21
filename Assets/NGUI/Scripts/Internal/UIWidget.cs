@@ -43,6 +43,7 @@ public abstract class UIWidget : MonoBehaviour
 	protected bool mChanged = true;
 	protected bool mPlayMode = true;
 
+	bool mStarted = false;
 	Vector3 mDiffPos;
 	Quaternion mDiffRot;
 	Vector3 mDiffScale;
@@ -198,7 +199,7 @@ public abstract class UIWidget : MonoBehaviour
 				mMat = value;
 				mTex = null;
 
-				if (mMat != null) CreatePanel();
+				if (mMat != null && enabled) CreatePanel();
 			}
 		}
 	}
@@ -347,7 +348,7 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			mPanel = UIPanel.Find(cachedTransform);
 
-			if (mPanel != null)
+			if (mPanel != null && mStarted)
 			{
 				CheckLayer();
 				mPanel.AddWidget(this);
@@ -461,6 +462,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	void Start ()
 	{
+		mStarted = true;
 		OnStart();
 		CreatePanel();
 	}

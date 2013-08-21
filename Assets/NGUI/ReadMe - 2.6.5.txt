@@ -36,12 +36,14 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
 
 2.6.5:
-- FIX: Fix for issues with the dynamic fonts.
+- FIX: Fix for some issues with the dynamic fonts.
 - FIX: Removed the "password" setting from UILabel in order to clear up some confusion.
 - FIX: Transparent colored shader no longer has fixed function pipeline code inside.
 - FIX: Atlas maker will now be more perforce-friendly.
 - FIX: Popup list will no longer show on Click when the Popup List script is disabled.
 - FIX: NGUIMath.Calculate functions will now ignore recently disabled widgets.
+- FIX: UIWidget will no longer attempt to create a panel until after Start().
+- FIX: UICamera.touchCount and UICamera.dragCount will now work correctly with multi-touch turned off.
 - FIX: WP8 and BB10 tweaks.
 
 2.6.4:
