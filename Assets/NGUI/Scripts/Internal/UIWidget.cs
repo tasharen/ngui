@@ -346,9 +346,9 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		if (mPanel == null && enabled && NGUITools.GetActive(gameObject) && material != null)
 		{
-			mPanel = UIPanel.Find(cachedTransform);
+			mPanel = UIPanel.Find(cachedTransform, mStarted);
 
-			if (mPanel != null && mStarted)
+			if (mPanel != null)
 			{
 				CheckLayer();
 				mPanel.AddWidget(this);
