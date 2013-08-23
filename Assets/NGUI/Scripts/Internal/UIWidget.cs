@@ -486,7 +486,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Clear references.
 	/// </summary>
 
-	void OnDisable ()
+	protected virtual void OnDisable ()
 	{
 		if (!keepMaterial)
 		{

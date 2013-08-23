@@ -3,6 +3,10 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
+#if !UNITY_3_5 && !UNITY_FLASH
+#define DYNAMIC_FONT
+#endif
+
 using UnityEngine;
 using System.Collections.Generic;
 using System;
@@ -110,11 +114,21 @@ public class UILabel : UIWidget
 		{
 			if (mFont != value)
 			{
+#if DYNAMIC_FONT
+				if (mFont != null && mFont.dynamicFont != null)
+					mFont.dynamicFont.textureRebuildCallback -= MarkAsChanged;
+#endif
 				mFont = value;
 				material = (mFont != null) ? mFont.material : null;
 				mChanged = true;
 				hasChanged = true;
-				if (mFont != null) mFont.Request(mText);
+#if DYNAMIC_FONT
+				if (mFont != null && mFont.dynamicFont != null)
+				{
+					mFont.dynamicFont.textureRebuildCallback += MarkAsChanged;
+					mFont.Request(mText);
+				}
+#endif
 				MarkAsChanged();
 			}
 		}
@@ -141,7 +155,9 @@ public class UILabel : UIWidget
 			{
 				mText = value;
 				hasChanged = true;
+#if DYNAMIC_FONT
 				if (mFont != null) mFont.Request(value);
+#endif
 				if (shrinkToFit) MakePixelPerfect();
 			}
 		}
@@ -429,6 +445,30 @@ public class UILabel : UIWidget
 		}
 	}
 
+#if DYNAMIC_FONT
+	/// <summary>
+	/// Register the font texture change listener.
+	/// </summary>
+
+	protected override void OnEnable ()
+	{
+		base.OnEnable();
+		if (mFont != null && mFont.dynamicFont != null)
+			mFont.dynamicFont.textureRebuildCallback += MarkAsChanged;
+	}
+
+	/// <summary>
+	/// Remove the font texture change listener.
+	/// </summary>
+
+	protected override void OnDisable ()
+	{
+		if (mFont != null && mFont.dynamicFont != null)
+			mFont.dynamicFont.textureRebuildCallback -= MarkAsChanged;
+		base.OnDisable();
+	}
+#endif
+
 	/// <summary>
 	/// Determine start-up values.
 	/// </summary>
@@ -450,8 +490,10 @@ public class UILabel : UIWidget
 		// Whether this is a premultiplied alpha shader
 		mPremultiply = (font != null && font.material != null && font.material.shader.name.Contains("Premultiplied"));
 
+#if DYNAMIC_FONT
 		// Request the text within the font
 		if (mFont != null) mFont.Request(mText);
+#endif
 	}
 
 #if UNITY_EDITOR

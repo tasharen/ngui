@@ -628,46 +628,28 @@ public class UIFont : MonoBehaviour
 
 #if DYNAMIC_FONT
 	static CharacterInfo mTemp;
-	static bool mHasChanged = false;
-
-	/// <summary>
-	/// Called when the dynamic font texture gets rebuilt.
-	/// </summary>
-
-	void OnFontChanged () { mHasChanged = true; }
 
 	/// <summary>
 	/// Requests the following text to be present in the font's texture. Returns whether the texture has changed.
 	/// </summary>
 
-	public bool Request (string text)
+	public void Request (string text)
 	{
 		if (!string.IsNullOrEmpty(text))
 		{
 			if (mReplacement != null)
 			{
-				return mReplacement.Request(text);
+				mReplacement.Request(text);
 			}
 			else if (mDynamicFont != null)
 			{
-				mHasChanged = false;
-				mDynamicFont.textureRebuildCallback = OnFontChanged;
-
 				mDynamicFont.RequestCharactersInTexture("j", mDynamicFontSize, mDynamicFontStyle);
 				mDynamicFont.GetCharacterInfo('j', out mTemp, mDynamicFontSize, mDynamicFontStyle);
 				mDynamicFontOffset = (mDynamicFontSize + mTemp.vert.yMax);
-
 				mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
-				mDynamicFont.textureRebuildCallback = null;
-
-				if (mHasChanged) MarkAsDirty();
-				return mHasChanged;
 			}
 		}
-		return false;
 	}
-#else
-	public bool Request (string text) { return false; }
 #endif
 
 	/// <summary>
