@@ -670,7 +670,9 @@ public class UIFont : MonoBehaviour
 #endif
 		{
 			if (encoding) text = NGUITools.StripSymbols(text);
-
+#if DYNAMIC_FONT
+			if (mDynamicFont != null) mDynamicFont.RequestCharactersInTexture(text);
+#endif
 			int length = text.Length;
 			int maxX = 0;
 			int x = 0;
@@ -761,6 +763,9 @@ public class UIFont : MonoBehaviour
 		int lineWidth = Mathf.RoundToInt(maxWidth * size);
 		if (lineWidth < 1) return text;
 
+#if DYNAMIC_FONT
+		if (mDynamicFont != null) mDynamicFont.RequestCharactersInTexture(text);
+#endif
 		int textLength = text.Length;
 		int remainingWidth = lineWidth;
 		BMGlyph followingGlyph = null;
@@ -832,6 +837,9 @@ public class UIFont : MonoBehaviour
 		int lineWidth = Mathf.RoundToInt(maxWidth * size);
 		if (lineWidth < 1) return text;
 
+#if DYNAMIC_FONT
+		if (mDynamicFont != null) mDynamicFont.RequestCharactersInTexture(text);
+#endif
 		StringBuilder sb = new StringBuilder();
 		int textLength = text.Length;
 		int remainingWidth = lineWidth;
@@ -1067,6 +1075,9 @@ public class UIFont : MonoBehaviour
 				return;
 			}
 
+#if DYNAMIC_FONT
+			if (mDynamicFont != null) mDynamicFont.RequestCharactersInTexture(text);
+#endif
 			// Make sure the characters are present in the dynamic font before printing them
 			bool dynamic = isDynamic;
 
