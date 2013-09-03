@@ -36,6 +36,8 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
 
 2.6.5:
+- FIX: Labels now have "Max Height", and "Max Lines" again works as expected.
+- FIX: Widgets no longer store a reference to texture and material.
 - FIX: Fix for some issues with the dynamic fonts.
 - FIX: Removed the "password" setting from UILabel in order to clear up some confusion.
 - FIX: Transparent colored shader no longer has fixed function pipeline code inside.
