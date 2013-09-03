@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2013 Tasharen Entertainment
+// Copyright Â© 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -81,8 +81,11 @@ public class UITextList : MonoBehaviour
 		if (textLabel != null && textLabel.font != null)
 		{
 			// Rebuild the line
-			ce.lines = textLabel.font.WrapText(ce.text, maxWidth / textLabel.transform.localScale.y,
-				textLabel.maxLineCount, textLabel.supportEncoding, textLabel.symbolStyle).Split(mSeparator);
+			Vector3 scale = textLabel.transform.localScale;
+			string line;
+			textLabel.font.WrapText(ce.text, out line, maxWidth / scale.x, maxHeight / scale.y,
+				textLabel.maxLineCount, textLabel.supportEncoding, textLabel.symbolStyle);
+			ce.lines = line.Split(mSeparator);
 
 			// Recalculate the total number of lines
 			mTotalLines = 0;

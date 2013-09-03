@@ -487,13 +487,15 @@ public class UIInput : MonoBehaviour
 
 			if (!label.shrinkToFit)
 			{
+				Vector3 scale = label.cachedTransform.localScale;
+
 				if (label.multiLine)
 				{
-					processed = label.font.WrapText(processed, label.lineWidth / label.cachedTransform.localScale.x, 0, false, UIFont.SymbolStyle.None);
+					label.font.WrapText(processed, out processed, label.lineWidth / scale.x, label.lineHeight / scale.y, 0, false, UIFont.SymbolStyle.None);
 				}
 				else
 				{
-					string fit = label.font.GetEndOfLineThatFits(processed, label.lineWidth / label.cachedTransform.localScale.x, false, UIFont.SymbolStyle.None);
+					string fit = label.font.GetEndOfLineThatFits(processed, label.lineWidth / scale.x, false, UIFont.SymbolStyle.None);
 
 					if (fit != processed)
 					{

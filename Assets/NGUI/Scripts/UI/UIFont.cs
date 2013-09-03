@@ -671,7 +671,7 @@ public class UIFont : MonoBehaviour
 		{
 			if (encoding) text = NGUITools.StripSymbols(text);
 #if DYNAMIC_FONT
-			if (mDynamicFont != null) mDynamicFont.RequestCharactersInTexture(text);
+			if (mDynamicFont != null) mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize);
 #endif
 			int length = text.Length;
 			int maxX = 0;
@@ -764,7 +764,7 @@ public class UIFont : MonoBehaviour
 		if (lineWidth < 1) return text;
 
 #if DYNAMIC_FONT
-		if (mDynamicFont != null) mDynamicFont.RequestCharactersInTexture(text);
+		if (mDynamicFont != null) mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize);
 #endif
 		int textLength = text.Length;
 		int remainingWidth = lineWidth;
@@ -829,16 +829,42 @@ public class UIFont : MonoBehaviour
 	/// Text wrapping functionality. The 'maxWidth' should be in local coordinates (take pixels and divide them by transform's scale).
 	/// </summary>
 
-	public string WrapText (string text, float maxWidth, int maxLineCount, bool encoding, SymbolStyle symbolStyle)
+	public bool WrapText (string text, out string finalText, float width, float height, int lines, bool encoding, SymbolStyle symbolStyle)
 	{
-		if (mReplacement != null) return mReplacement.WrapText(text, maxWidth, maxLineCount, encoding, symbolStyle);
+		if (mReplacement != null)
+		{
+			return mReplacement.WrapText(text, out finalText, width, height, lines, encoding, symbolStyle);
+		}
 
-		// Width of the line in pixels
-		int lineWidth = Mathf.RoundToInt(maxWidth * size);
-		if (lineWidth < 1) return text;
+		// Zero means unlimited
+		if (width == 0f) width = 100000f;
+		if (height == 0f) height = 100000f;
+
+		// Width and height of the line in pixels
+		int lineWidth = Mathf.FloorToInt(width * size);
+		int lineHeight = Mathf.FloorToInt(height * size);
+		
+		if (lineWidth < 1 || lineHeight < 1)
+		{
+			finalText = "";
+			return false;
+		}
+
+		int maxLineCount = (lines > 0) ? lines : 999999;
+
+		if (height != 0f)
+		{
+			maxLineCount = Mathf.Min(maxLineCount, Mathf.FloorToInt(height));
+
+			if (maxLineCount == 0)
+			{
+				finalText = "";
+				return false;
+			}
+		}
 
 #if DYNAMIC_FONT
-		if (mDynamicFont != null) mDynamicFont.RequestCharactersInTexture(text);
+		if (mDynamicFont != null) mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize);
 #endif
 		StringBuilder sb = new StringBuilder();
 		int textLength = text.Length;
@@ -847,7 +873,7 @@ public class UIFont : MonoBehaviour
 		int start = 0;
 		int offset = 0;
 		bool lineIsEmpty = true;
-		bool multiline = (maxLineCount != 1);
+		bool multiline = (lines != 1);
 		int lineCount = 1;
 		bool useSymbols = encoding && symbolStyle != SymbolStyle.None && hasSymbols;
 		bool dynamic = isDynamic;
@@ -980,6 +1006,7 @@ public class UIFont : MonoBehaviour
 					remainingWidth = lineWidth;
 					offset = start - 1;
 					previousChar = 0;
+
 					if (!multiline || lineCount == maxLineCount) break;
 					++lineCount;
 					EndLine(ref sb);
@@ -997,20 +1024,27 @@ public class UIFont : MonoBehaviour
 		}
 
 		if (start < offset) sb.Append(text.Substring(start, offset - start));
-		return sb.ToString();
+		finalText = sb.ToString();
+		return (!multiline || offset == textLength || (lines > 0 && lineCount <= lines));
 	}
 
 	/// <summary>
 	/// Text wrapping functionality. Legacy compatibility function.
 	/// </summary>
 
-	public string WrapText (string text, float maxWidth, int maxLineCount, bool encoding) { return WrapText(text, maxWidth, maxLineCount, encoding, SymbolStyle.None); }
+	public bool WrapText (string text, out string finalText, float maxWidth, float maxHeight, int maxLineCount, bool encoding)
+	{
+		return WrapText(text, out finalText, maxWidth, maxHeight, maxLineCount, encoding, SymbolStyle.None);
+	}
 
 	/// <summary>
 	/// Text wrapping functionality. Legacy compatibility function.
 	/// </summary>
 
-	public string WrapText (string text, float maxWidth, int maxLineCount) { return WrapText(text, maxWidth, maxLineCount, false, SymbolStyle.None); }
+	public bool WrapText (string text, out string finalText, float maxWidth, float maxHeight, int maxLineCount)
+	{
+		return WrapText(text, out finalText, maxWidth, maxHeight, maxLineCount, false, SymbolStyle.None);
+	}
 
 	/// <summary>
 	/// Align the vertices to be right or center-aligned given the specified line width.
@@ -1076,7 +1110,7 @@ public class UIFont : MonoBehaviour
 			}
 
 #if DYNAMIC_FONT
-			if (mDynamicFont != null) mDynamicFont.RequestCharactersInTexture(text);
+			if (mDynamicFont != null) mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize);
 #endif
 			// Make sure the characters are present in the dynamic font before printing them
 			bool dynamic = isDynamic;
