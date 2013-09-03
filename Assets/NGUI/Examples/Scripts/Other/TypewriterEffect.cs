@@ -22,7 +22,8 @@ public class TypewriterEffect : MonoBehaviour
 			mLabel = GetComponent<UILabel>();
 			mLabel.supportEncoding = false;
 			mLabel.symbolStyle = UIFont.SymbolStyle.None;
-			mText = mLabel.font.WrapText(mLabel.text, mLabel.lineWidth / mLabel.cachedTransform.localScale.x, mLabel.maxLineCount, false, UIFont.SymbolStyle.None);
+			Vector2 scale = mLabel.cachedTransform.localScale;
+			mLabel.font.WrapText(mLabel.text, out mText, mLabel.lineWidth / scale.x, mLabel.lineHeight / scale.y, mLabel.maxLineCount, false, UIFont.SymbolStyle.None);
 		}
 
 		if (mOffset < mText.Length)

@@ -24,7 +24,7 @@ public class UITextureInspector : UIWidgetInspector
 
 	protected override bool DrawProperties ()
 	{
-		if (!mTex.hasDynamicMaterial && (mTex.material != null || mTex.mainTexture == null))
+		if (mTex.material != null || mTex.mainTexture == null)
 		{
 			Material mat = EditorGUILayout.ObjectField("Material", mTex.material, typeof(Material), false) as Material;
 

@@ -368,8 +368,7 @@ public abstract class UIWidget : MonoBehaviour
 			// This widget is no longer parented to the same panel. Remove it and re-add it to a new one.
 			if (!valid)
 			{
-				if (!keepMaterial || Application.isPlaying) material = null;
-				mPanel = null;
+				RemoveFromPanel();
 				CreatePanel();
 			}
 #else
@@ -377,9 +376,7 @@ public abstract class UIWidget : MonoBehaviour
 
 			if (mPanel != p)
 			{
-				mPanel.RemoveWidget(this);
-				if (!keepMaterial || Application.isPlaying) material = null;
-				mPanel = null;
+				RemoveFromPanel();
 				CreatePanel();
 			}
 #endif
@@ -755,12 +752,6 @@ public abstract class UIWidget : MonoBehaviour
 	/// </summary>
 
 	virtual public Vector4 border { get { return Vector4.zero; } }
-
-	/// <summary>
-	/// Whether the material will be kept when the widget gets disabled (by default no, it won't be).
-	/// </summary>
-
-	virtual public bool keepMaterial { get { return false; } }
 
 	/// <summary>
 	/// Whether this widget will automatically become pixel-perfect after resize operation finishes.
