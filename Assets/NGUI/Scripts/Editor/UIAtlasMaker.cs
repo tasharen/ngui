@@ -836,92 +836,99 @@ public class UIAtlasMaker : EditorWindow
 
 		if (spriteList.Count > 0)
 		{
-			NGUIEditorTools.DrawHeader("Sprites");
-			GUILayout.Space(-7f);
-
-			mScroll = GUILayout.BeginScrollView(mScroll);
-
-			bool delete = false;
-			int index = 0;
-			foreach (KeyValuePair<string, int> iter in spriteList)
+			if (NGUIEditorTools.DrawHeader("Sprites"))
 			{
-				++index;
+				GUILayout.BeginHorizontal();
+				GUILayout.Space(3f);
+				GUILayout.BeginVertical();
 
-				GUILayout.Space(-1f);
-				bool highlight = (UIAtlasInspector.instance != null) && (NGUISettings.selectedSprite == iter.Key);
-				GUI.backgroundColor = highlight ? Color.white : new Color(0.8f, 0.8f, 0.8f);
-				GUILayout.BeginHorizontal("AS TextArea", GUILayout.MinHeight(20f));
-				GUI.backgroundColor = Color.white;
-				GUILayout.Label(index.ToString(), GUILayout.Width(24f));
+				mScroll = GUILayout.BeginScrollView(mScroll);
 
-				if (GUILayout.Button(iter.Key, "OL TextField", GUILayout.Height(20f)))
-					selection = iter.Key;
+				bool delete = false;
+				int index = 0;
+				foreach (KeyValuePair<string, int> iter in spriteList)
+				{
+					++index;
 
-				if (iter.Value == 2)
-				{
-					GUI.color = Color.green;
-					GUILayout.Label("Add", GUILayout.Width(27f));
-					GUI.color = Color.white;
-				}
-				else if (iter.Value == 1)
-				{
-					GUI.color = Color.cyan;
-					GUILayout.Label("Update", GUILayout.Width(45f));
-					GUI.color = Color.white;
-				}
-				else
-				{
-					if (mDelNames.Contains(iter.Key))
+					GUILayout.Space(-1f);
+					bool highlight = (UIAtlasInspector.instance != null) && (NGUISettings.selectedSprite == iter.Key);
+					GUI.backgroundColor = highlight ? Color.white : new Color(0.8f, 0.8f, 0.8f);
+					GUILayout.BeginHorizontal("AS TextArea", GUILayout.MinHeight(20f));
+					GUI.backgroundColor = Color.white;
+					GUILayout.Label(index.ToString(), GUILayout.Width(24f));
+
+					if (GUILayout.Button(iter.Key, "OL TextField", GUILayout.Height(20f)))
+						selection = iter.Key;
+
+					if (iter.Value == 2)
 					{
-						GUI.backgroundColor = Color.red;
-
-						if (GUILayout.Button("Delete", GUILayout.Width(60f)))
-						{
-							delete = true;
-						}
-						GUI.backgroundColor = Color.green;
-						if (GUILayout.Button("X", GUILayout.Width(22f)))
-						{
-							mDelNames.Remove(iter.Key);
-							delete = false;
-						}
-						GUI.backgroundColor = Color.white;
+						GUI.color = Color.green;
+						GUILayout.Label("Add", GUILayout.Width(27f));
+						GUI.color = Color.white;
+					}
+					else if (iter.Value == 1)
+					{
+						GUI.color = Color.cyan;
+						GUILayout.Label("Update", GUILayout.Width(45f));
+						GUI.color = Color.white;
 					}
 					else
 					{
-						// If we have not yet selected a sprite for deletion, show a small "X" button
-						if (GUILayout.Button("X", GUILayout.Width(22f))) mDelNames.Add(iter.Key);
+						if (mDelNames.Contains(iter.Key))
+						{
+							GUI.backgroundColor = Color.red;
+
+							if (GUILayout.Button("Delete", GUILayout.Width(60f)))
+							{
+								delete = true;
+							}
+							GUI.backgroundColor = Color.green;
+							if (GUILayout.Button("X", GUILayout.Width(22f)))
+							{
+								mDelNames.Remove(iter.Key);
+								delete = false;
+							}
+							GUI.backgroundColor = Color.white;
+						}
+						else
+						{
+							// If we have not yet selected a sprite for deletion, show a small "X" button
+							if (GUILayout.Button("X", GUILayout.Width(22f))) mDelNames.Add(iter.Key);
+						}
 					}
+					GUILayout.EndHorizontal();
 				}
+				GUILayout.EndScrollView();
+				GUILayout.EndVertical();
+				GUILayout.Space(3f);
 				GUILayout.EndHorizontal();
-			}
-			GUILayout.EndScrollView();
 
-			// If this sprite was marked for deletion, remove it from the atlas
-			if (delete)
-			{
-				List<SpriteEntry> sprites = new List<SpriteEntry>();
-				ExtractSprites(NGUISettings.atlas, sprites);
-
-				for (int i = sprites.Count; i > 0; )
+				// If this sprite was marked for deletion, remove it from the atlas
+				if (delete)
 				{
-					SpriteEntry ent = sprites[--i];
-					if (mDelNames.Contains(ent.name))
-						sprites.RemoveAt(i);
-				}
-				UpdateAtlas(NGUISettings.atlas, sprites);
-				mDelNames.Clear();
-			}
-			else if (update) UpdateAtlas(textures, true);
-			else if (replace) UpdateAtlas(textures, false);
+					List<SpriteEntry> sprites = new List<SpriteEntry>();
+					ExtractSprites(NGUISettings.atlas, sprites);
 
-			if (NGUISettings.atlas != null && !string.IsNullOrEmpty(selection))
-			{
-				NGUISettings.selectedSprite = selection;
-				Selection.activeGameObject = NGUISettings.atlas.gameObject;
-				
-				if (UIAtlasInspector.instance != null)
-					UIAtlasInspector.instance.Repaint();
+					for (int i = sprites.Count; i > 0; )
+					{
+						SpriteEntry ent = sprites[--i];
+						if (mDelNames.Contains(ent.name))
+							sprites.RemoveAt(i);
+					}
+					UpdateAtlas(NGUISettings.atlas, sprites);
+					mDelNames.Clear();
+				}
+				else if (update) UpdateAtlas(textures, true);
+				else if (replace) UpdateAtlas(textures, false);
+
+				if (NGUISettings.atlas != null && !string.IsNullOrEmpty(selection))
+				{
+					NGUISettings.selectedSprite = selection;
+					Selection.activeGameObject = NGUISettings.atlas.gameObject;
+
+					if (UIAtlasInspector.instance != null)
+						UIAtlasInspector.instance.Repaint();
+				}
 			}
 		}
 	}
