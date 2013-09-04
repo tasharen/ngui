@@ -545,7 +545,6 @@ public class UILabel : UIWidget
 				else mProcessedText = mText;
 
 				mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.one;
-				mSize *= mFont.pixelSize;
 
 				if (mShrinkToFit)
 				{
