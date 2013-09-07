@@ -42,6 +42,12 @@ public class UIPanel : MonoBehaviour
 	public OnChangeDelegate onChange;
 
 	/// <summary>
+	/// Defaults to 'false' so that older UIs work as expected.
+	/// </summary>
+
+	public bool sortByDepth = false;
+
+	/// <summary>
 	/// Whether this panel will show up in the panel tool (set this to 'false' for dynamically created temporary panels)
 	/// </summary>
 
@@ -1017,13 +1023,7 @@ public class UIPanel : MonoBehaviour
 			// Rebuild the draw call's mesh
 			UIDrawCall dc = GetDrawCall(mat, true);
 			dc.depthPass = depthPass && mClipping == UIDrawCall.Clipping.None;
-
-			// By default, the panels only use the widget's depth in order to determine their draw order.
-			dc.depth = highest;
-			
-			// Replace with this line if you want the panels to take their transform's Z position into consideration as well.
-			//dc.depth = highest + Mathf.RoundToInt(-cachedTransform.localPosition.z);
-
+			dc.depth = sortByDepth ? highest : 0;
 			dc.Set(mVerts, generateNormals ? mNorms : null, generateNormals ? mTans : null, mUvs, mCols);
 		}
 		else
@@ -1287,6 +1287,7 @@ public class UIPanel : MonoBehaviour
 		if (createIfMissing && panel == null && trans != origin)
 		{
 			panel = trans.gameObject.AddComponent<UIPanel>();
+			panel.sortByDepth = true;
 			SetChildLayer(panel.cachedTransform, panel.cachedGameObject.layer);
 		}
 		return panel;
