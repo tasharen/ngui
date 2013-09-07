@@ -1044,7 +1044,7 @@ public class NGUIEditorTools
 
 	static public bool DrawHeader (string text, string key)
 	{
-		bool state = EditorPrefs.GetBool(key, false);
+		bool state = EditorPrefs.GetBool(key, true);
 
 		GUILayout.Space(3f);
 		if (!state) GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f);
@@ -1052,7 +1052,11 @@ public class NGUIEditorTools
 		GUILayout.Space(3f);
 
 		GUI.changed = false;
+#if UNITY_3_5
+		if (!GUILayout.Toggle(true, text, "dragtab")) state = !state;
+#else
 		if (!GUILayout.Toggle(true, "<b><size=11>" + text + "</size></b>", "dragtab")) state = !state;
+#endif
 		if (GUI.changed) EditorPrefs.SetBool(key, state);
 
 		GUILayout.Space(2f);
