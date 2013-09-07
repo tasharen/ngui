@@ -37,6 +37,8 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 
 2.7.0:
 - FIX: Eliminated Z/Depth issues.
+- FIX: DownloadTexture no longer leaves a shadow of the previous texture behind.
+- FIX: UIDragObject will no longer behave oddly with multiple touches.
 
 2.6.5:
 - FIX: Labels now have "Max Height", and "Max Lines" again works as expected.
