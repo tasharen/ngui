@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.6.5b
+                Version 2.7.0
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,9 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+2.7.0:
+- FIX: Eliminated Z/Depth issues.
 
 2.6.5:
 - FIX: Labels now have "Max Height", and "Max Lines" again works as expected.

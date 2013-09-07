@@ -51,6 +51,7 @@ public class UIPanelInspector : Editor
 	{
 		UIPanel panel = target as UIPanel;
 		BetterList<UIDrawCall> drawcalls = panel.drawCalls;
+		drawcalls.Sort(delegate(UIDrawCall w1, UIDrawCall w2) { return w1.depth.CompareTo(w2.depth); });
 		EditorGUIUtility.LookLikeControls(80f);
 
 		//NGUIEditorTools.DrawSeparator();

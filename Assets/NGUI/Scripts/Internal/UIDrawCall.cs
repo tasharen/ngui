@@ -31,19 +31,41 @@ public class UIDrawCall : MonoBehaviour
 	Clipping		mClipping;		// Clipping mode
 	Vector4			mClipRange;		// Clipping, if used
 	Vector2			mClipSoft;		// Clipping softness
-	Material		mClippedMat;	// Instantiated clipped material, if necessary
+	Material		mMat;			// Instantiated material
 	Material		mDepthMat;		// Depth-writing material, created if necessary
 	int[]			mIndices;		// Cached indices
 
 	bool mUseDepth = false;
 	bool mReset = true;
 	bool mEven = true;
+	int mDepth = 0;
 
 	/// <summary>
 	/// Whether an additional pass will be created to render the geometry to the depth buffer first.
 	/// </summary>
 
 	public bool depthPass { get { return mUseDepth; } set { if (mUseDepth != value) { mUseDepth = value; mReset = true; } } }
+
+	/// <summary>
+	/// Draw order used by the draw call.
+	/// </summary>
+
+	public int depth
+	{
+		get
+		{
+			return mDepth;
+		}
+		set
+		{
+			if (mDepth != value)
+			{
+				mDepth = value;
+				if (mMat != null && mSharedMat != null)
+					mMat.renderQueue = mSharedMat.renderQueue + value;
+			}
+		}
+	}
 
 	/// <summary>
 	/// Transform is cached for speed and efficiency.
@@ -74,7 +96,7 @@ public class UIDrawCall : MonoBehaviour
 	/// Whether the draw call is currently using a clipped shader.
 	/// </summary>
 
-	public bool isClipped { get { return mClippedMat != null; } }
+	public bool isClipped { get { return mClipping != Clipping.None; } }
 
 	/// <summary>
 	/// Clipping used by the draw call
@@ -148,51 +170,42 @@ public class UIDrawCall : MonoBehaviour
 	{
 		bool useClipping = (mClipping != Clipping.None);
 
-		// If clipping should be used, create the clipped material
-		if (useClipping)
+		// Create a temporary material
+		if (mMat == null)
+		{
+			mMat = new Material(mSharedMat);
+			mMat.hideFlags = HideFlags.DontSave;
+			mMat.CopyPropertiesFromMaterial(mSharedMat);
+			mMat.renderQueue = mSharedMat.renderQueue + mDepth;
+		}
+
+		// If clipping should be used, we need to find a replacement shader
+		if (useClipping && mClipping != Clipping.None)
 		{
 			Shader shader = null;
+			const string alpha	= " (AlphaClip)";
+			const string soft	= " (SoftClip)";
 
-			if (mClipping != Clipping.None)
-			{
-				const string alpha	= " (AlphaClip)";
-				const string soft	= " (SoftClip)";
+			// Figure out the normal shader's name
+			string shaderName = mSharedMat.shader.name;
+			shaderName = shaderName.Replace(alpha, "");
+			shaderName = shaderName.Replace(soft, "");
 
-				// Figure out the normal shader's name
-				string shaderName = mSharedMat.shader.name;
-				shaderName = shaderName.Replace(alpha, "");
-				shaderName = shaderName.Replace(soft, "");
+			// Try to find the new shader
+			if (mClipping == Clipping.HardClip ||
+				mClipping == Clipping.AlphaClip) shader = Shader.Find(shaderName + alpha);
+			else if (mClipping == Clipping.SoftClip) shader = Shader.Find(shaderName + soft);
 
-				// Try to find the new shader
-				if (mClipping == Clipping.HardClip ||
-					mClipping == Clipping.AlphaClip) shader = Shader.Find(shaderName + alpha);
-				else if (mClipping == Clipping.SoftClip) shader = Shader.Find(shaderName + soft);
-
-				// If there is a valid shader, assign it to the custom material
-				if (shader == null) mClipping = Clipping.None;
-			}
-
-			// If we found the shader, create a new material
+			// If there is a valid shader, assign it to the custom material
 			if (shader != null)
 			{
-				if (mClippedMat == null)
-				{
-					mClippedMat = new Material(mSharedMat);
-					mClippedMat.hideFlags = HideFlags.DontSave;
-				}
-				mClippedMat.shader = shader;
-				mClippedMat.CopyPropertiesFromMaterial(mSharedMat);
+				mMat.shader = shader;
 			}
-			else if (mClippedMat != null)
+			else
 			{
-				NGUITools.Destroy(mClippedMat);
-				mClippedMat = null;
+				mClipping = Clipping.None;
+				Debug.LogError(shaderName + " doesn't have a clipped shader version for " + mClipping);
 			}
-		}
-		else if (mClippedMat != null)
-		{
-			NGUITools.Destroy(mClippedMat);
-			mClippedMat = null;
 		}
 
 		// If depth pass should be used, create the depth material
@@ -212,20 +225,17 @@ public class UIDrawCall : MonoBehaviour
 			mDepthMat = null;
 		}
 
-		// Determine which material should be used
-		Material mat = (mClippedMat != null) ? mClippedMat : mSharedMat;
-
 		if (mDepthMat != null)
 		{
 			// If we're already using this material, do nothing
-			if (mRen.sharedMaterials != null && mRen.sharedMaterials.Length == 2 && mRen.sharedMaterials[1] == mat) return;
+			if (mRen.sharedMaterials != null && mRen.sharedMaterials.Length == 2 && mRen.sharedMaterials[1] == mMat) return;
 
 			// Set the double material
-			mRen.sharedMaterials = new Material[] { mDepthMat, mat };
+			mRen.sharedMaterials = new Material[] { mDepthMat, mMat };
 		}
-		else if (mRen.sharedMaterial != mat)
+		else if (mRen.sharedMaterial != mMat)
 		{
-			mRen.sharedMaterials = new Material[] { mat };
+			mRen.sharedMaterials = new Material[] { mMat };
 		}
 	}
 
@@ -250,7 +260,7 @@ public class UIDrawCall : MonoBehaviour
 				mRen = gameObject.AddComponent<MeshRenderer>();
 				UpdateMaterials();
 			}
-			else if (mClippedMat != null && mClippedMat.mainTexture != mSharedMat.mainTexture)
+			else if (mMat != null && mMat.mainTexture != mSharedMat.mainTexture)
 			{
 				UpdateMaterials();
 			}
@@ -317,15 +327,15 @@ public class UIDrawCall : MonoBehaviour
 			UpdateMaterials();
 		}
 
-		if (mClippedMat != null)
+		if (mMat != null && isClipped)
 		{
-			mClippedMat.mainTextureOffset = new Vector2(-mClipRange.x / mClipRange.z, -mClipRange.y / mClipRange.w);
-			mClippedMat.mainTextureScale = new Vector2(1f / mClipRange.z, 1f / mClipRange.w);
+			mMat.mainTextureOffset = new Vector2(-mClipRange.x / mClipRange.z, -mClipRange.y / mClipRange.w);
+			mMat.mainTextureScale = new Vector2(1f / mClipRange.z, 1f / mClipRange.w);
 
 			Vector2 sharpness = new Vector2(1000.0f, 1000.0f);
 			if (mClipSoft.x > 0f) sharpness.x = mClipRange.z / mClipSoft.x;
 			if (mClipSoft.y > 0f) sharpness.y = mClipRange.w / mClipSoft.y;
-			mClippedMat.SetVector("_ClipSharpness", sharpness);
+			mMat.SetVector("_ClipSharpness", sharpness);
 		}
 	}
 
@@ -337,7 +347,7 @@ public class UIDrawCall : MonoBehaviour
 	{
 		NGUITools.DestroyImmediate(mMesh0);
 		NGUITools.DestroyImmediate(mMesh1);
-		NGUITools.DestroyImmediate(mClippedMat);
+		NGUITools.DestroyImmediate(mMat);
 		NGUITools.DestroyImmediate(mDepthMat);
 	}
 }

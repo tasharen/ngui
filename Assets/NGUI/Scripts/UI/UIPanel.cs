@@ -187,9 +187,7 @@ public class UIPanel : MonoBehaviour
 				}
 
 				for (int i = 0; i < mWidgets.size; ++i)
-				{
 					mWidgets[i].MarkAsChangedLite();
-				}
 			}
 		}
 	}
@@ -614,7 +612,8 @@ public class UIPanel : MonoBehaviour
 		for (int i = 0, imax = drawCalls.size; i < imax; ++i)
 		{
 			UIDrawCall dc = drawCalls.buffer[i];
-			if (dc.material == mat) return dc;
+			if (dc.material == mat)
+				return dc;
 		}
 
 		UIDrawCall sc = null;
@@ -979,6 +978,8 @@ public class UIPanel : MonoBehaviour
 
 	void Fill (Material mat)
 	{
+		int highest = -100;
+
 		// Fill the buffers for the specified material
 		for (int i = 0; i < mWidgets.size; )
 		{
@@ -997,6 +998,8 @@ public class UIPanel : MonoBehaviour
 			{
 				if (w.panel == this)
 				{
+					int depth = w.depth;
+					if (depth > highest) highest = depth;
 					if (generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
 					else w.WriteToBuffers(mVerts, mUvs, mCols, null, null);
 				}
@@ -1014,6 +1017,13 @@ public class UIPanel : MonoBehaviour
 			// Rebuild the draw call's mesh
 			UIDrawCall dc = GetDrawCall(mat, true);
 			dc.depthPass = depthPass && mClipping == UIDrawCall.Clipping.None;
+
+			// By default, the panels only use the widget's depth in order to determine their draw order.
+			dc.depth = highest;
+			
+			// Replace with this line if you want the panels to take their transform's Z position into consideration as well.
+			//dc.depth = highest + Mathf.RoundToInt(-cachedTransform.localPosition.z);
+
 			dc.Set(mVerts, generateNormals ? mNorms : null, generateNormals ? mTans : null, mUvs, mCols);
 		}
 		else

@@ -16,6 +16,12 @@ using System.Collections.Generic;
 
 public abstract class UIWidget : MonoBehaviour
 {
+	/// <summary>
+	/// List of all the active widgets currently present in the scene.
+	/// </summary>
+
+	static public BetterList<UIWidget> list = new BetterList<UIWidget>();
+
 	public enum Pivot
 	{
 		TopLeft,
@@ -408,6 +414,7 @@ public abstract class UIWidget : MonoBehaviour
 		else
 #endif
 		{
+			list.Add(this);
 			mChanged = true;
 			mPanel = null;
 		}
@@ -443,7 +450,11 @@ public abstract class UIWidget : MonoBehaviour
 	/// Clear references.
 	/// </summary>
 
-	protected virtual void OnDisable () { RemoveFromPanel(); }
+	protected virtual void OnDisable ()
+	{
+		list.Remove(this);
+		RemoveFromPanel();
+	}
 
 	/// <summary>
 	/// Unregister this widget.

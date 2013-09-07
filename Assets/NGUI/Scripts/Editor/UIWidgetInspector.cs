@@ -54,7 +54,6 @@ public class UIWidgetInspector : Editor
 	Vector3 mStartRot = Vector3.zero;
 	Vector3 mStartDir = Vector3.right;
 	UIWidget.Pivot mDragPivot = UIWidget.Pivot.Center;
-	bool mDepthCheck = false;
 
 	/// <summary>
 	/// Register an Undo command with the Unity editor.
@@ -812,46 +811,23 @@ public class UIWidgetInspector : Editor
 				{
 					NGUIEditorTools.RegisterUndo("Depth Change", mWidget);
 					mWidget.depth = depth;
-					mDepthCheck = true;
 				}
 			}
 			GUILayout.EndHorizontal();
 
-			UIPanel panel = mWidget.panel;
+			int matchingDepths = 0;
 
-			if (panel != null)
+			for (int i = 0; i < UIWidget.list.size; ++i)
 			{
-				int matchingDepths = 0;
-				int matchingMaterials = 0;
+				UIWidget w = UIWidget.list[i];
+				if (w != null && w.depth == mWidget.depth)
+					++matchingDepths;
+			}
 
-				for (int i = 0; i < panel.widgets.size; ++i)
-				{
-					UIWidget w = panel.widgets[i];
-
-					if (w != null && w.material == mWidget.material)
-					{
-						++matchingMaterials;
-						if (w.depth == mWidget.depth) ++matchingDepths;
-					}
-				}
-
-				if (matchingDepths > 1)
-				{
-					EditorGUILayout.HelpBox(matchingDepths + " widgets are using the depth value of " + mWidget.depth +
-						". It may not be clear what should be in front of what.", MessageType.Warning);
-				}
-				else if (matchingMaterials < 2 && panel.widgets.size > 1)
-				{
-					EditorGUILayout.HelpBox("This widget uses a unique material and doesn't get batched with any others. You will need to adjust its transform position's Z to determine what's in front of what.", MessageType.Warning);
-				}
-
-				if (mDepthCheck)
-				{
-					if (panel.drawCalls.size > 1)
-					{
-						EditorGUILayout.HelpBox("The widgets underneath this panel are using more than one atlas. You may need to adjust transform position's Z value instead. When adjusting the Z, lower value means closer to the camera.", MessageType.Warning);
-					}
-				}
+			if (matchingDepths > 1)
+			{
+				EditorGUILayout.HelpBox(matchingDepths + " widgets are using the depth value of " + mWidget.depth +
+					". It may not be clear what should be in front of what.", MessageType.Warning);
 			}
 		}
 
@@ -1008,18 +984,13 @@ public class UIWidgetInspector : Editor
 	static public BetterList<UIWidget> SceneViewRaycast (UIPanel panel, Vector2 mousePos)
 	{
 		BetterList<UIWidget> list = new BetterList<UIWidget>();
-		UIWidget[] widgets = panel.gameObject.GetComponentsInChildren<UIWidget>();
 
-		for (int i = 0; i < widgets.Length; ++i)
+		for (int i = 0; i < UIWidget.list.size; ++i)
 		{
-			UIWidget w = widgets[i];
-
-			if (w.panel == panel)
-			{
-				Vector3[] corners = NGUIMath.CalculateWidgetCorners(w);
-				if (SceneViewDistanceToRectangle(corners, mousePos) == 0f)
-					list.Add(w);
-			}
+			UIWidget w = UIWidget.list[i];
+			Vector3[] corners = NGUIMath.CalculateWidgetCorners(w);
+			if (SceneViewDistanceToRectangle(corners, mousePos) == 0f)
+				list.Add(w);
 		}
 
 		list.Sort(delegate(UIWidget w1, UIWidget w2) { return w2.depth.CompareTo(w1.depth); });
