@@ -80,6 +80,12 @@ public class UIDrawCall : MonoBehaviour
 	public Material material { get { return mSharedMat; } set { mSharedMat = value; } }
 
 	/// <summary>
+	/// Texture used by the material.
+	/// </summary>
+
+	public Texture mainTexture { get { return mMat.mainTexture; } set { mMat.mainTexture = value; } }
+
+	/// <summary>
 	/// The number of triangles in this draw call.
 	/// </summary>
 

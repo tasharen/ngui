@@ -1025,6 +1025,7 @@ public class UIPanel : MonoBehaviour
 			dc.depthPass = depthPass && mClipping == UIDrawCall.Clipping.None;
 			dc.depth = sortByDepth ? highest : 0;
 			dc.Set(mVerts, generateNormals ? mNorms : null, generateNormals ? mTans : null, mUvs, mCols);
+			dc.mainTexture = mat.mainTexture;
 		}
 		else
 		{
