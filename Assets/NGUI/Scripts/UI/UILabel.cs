@@ -26,7 +26,8 @@ public class UILabel : UIWidget
 	{
 		ShrinkContent,
 		ClampContent,
-		ResizeLabel,
+		ResizeFreely,
+		ResizeHeight,
 	}
 
 	[HideInInspector][SerializeField] UIFont mFont;
@@ -213,7 +214,7 @@ public class UILabel : UIWidget
 	/// Labels can't be resized manually if the overflow method is set to 'resize'.
 	/// </summary>
 
-	public override bool canResize { get { return mOverflow != Overflow.ResizeLabel; } }
+	public override bool canResize { get { return mOverflow != Overflow.ResizeFreely; } }
 
 	/// <summary>
 	/// Maximum width of the label in pixels.
@@ -477,8 +478,12 @@ public class UILabel : UIWidget
 			mMaxLineCount = 0;
 		}
 
-		if (mMaxLineWidth != 0) width = mMaxLineWidth;
-		else overflowMethod = Overflow.ResizeLabel;
+		if (mMaxLineWidth != 0)
+		{
+			width = mMaxLineWidth;
+			overflowMethod = mMaxLineCount > 0 ? Overflow.ResizeHeight : Overflow.ShrinkContent;
+		}
+		else overflowMethod = Overflow.ResizeFreely;
 
 		if (mMaxLineHeight != 0)
 			height = mMaxLineHeight;
@@ -558,8 +563,9 @@ public class UILabel : UIWidget
 
 				bool fits = true;
 
-				int pw = (mOverflow == Overflow.ResizeLabel) ? 100000 : Mathf.RoundToInt(lw / mScale);
-				int ph = (mOverflow == Overflow.ResizeLabel) ? 100000 : Mathf.RoundToInt(lh / mScale);
+				int pw = (mOverflow == Overflow.ResizeFreely) ? 100000 : Mathf.RoundToInt(lw / mScale);
+				int ph = (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight) ?
+					100000 : Mathf.RoundToInt(lh / mScale);
 
 				if (mPassword)
 				{
@@ -589,15 +595,22 @@ public class UILabel : UIWidget
 				// Remember the final printed size
 				mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.zero;
 
-				if (mOverflow == Overflow.ResizeLabel)
+				if (mOverflow == Overflow.ResizeFreely)
 				{
-					width = Mathf.RoundToInt(mSize.x);
-					height = Mathf.RoundToInt(mSize.y);
+					mWidth = Mathf.RoundToInt(mSize.x);
+					mHeight = Mathf.RoundToInt(mSize.y);
 				}
-				else if (mOverflow == Overflow.ShrinkContent && !fits)
+				else if (mOverflow == Overflow.ResizeHeight)
 				{
-					printSize = Mathf.Round(printSize - 1f);
-					if (printSize > 1f) continue;
+					mHeight = Mathf.RoundToInt(mSize.y);
+				}
+				else if (!fits)
+				{
+					if (mOverflow == Overflow.ShrinkContent)
+					{
+						printSize = Mathf.Round(printSize - 1f);
+						if (printSize > 1f) continue;
+					}
 				}
 
 				// Upgrade to the new system

@@ -102,7 +102,7 @@ public class UITextList : MonoBehaviour
 	void Awake ()
 	{
 		if (textLabel == null) textLabel = GetComponentInChildren<UILabel>();
-		if (textLabel != null) textLabel.overflowMethod = UILabel.Overflow.ResizeLabel;
+		if (textLabel != null) textLabel.overflowMethod = UILabel.Overflow.ResizeFreely;
 
 		Collider col = collider;
 
