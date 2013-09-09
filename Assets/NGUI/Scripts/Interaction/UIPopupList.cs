@@ -427,16 +427,15 @@ public class UIPopupList : MonoBehaviour
 	{
 		GameObject go = widget.gameObject;
 		Transform t = widget.cachedTransform;
-		float minSize = font.size * textScale + mBgBorder * 2f;
 
-		Vector3 scale = t.localScale;
-		t.localScale = new Vector3(scale.x, minSize, scale.z);
-		TweenScale.Begin(go, animSpeed, scale).method = UITweener.Method.EaseOut;
+		float minHeight = font.size * textScale + mBgBorder * 2f;
+		t.localScale = new Vector3(1f, minHeight / widget.height, 1f);
+		TweenScale.Begin(go, animSpeed, Vector3.one).method = UITweener.Method.EaseOut;
 
 		if (placeAbove)
 		{
 			Vector3 pos = t.localPosition;
-			t.localPosition = new Vector3(pos.x, pos.y - scale.y + minSize, pos.z);
+			t.localPosition = new Vector3(pos.x, pos.y - widget.height + minHeight, pos.z);
 			TweenPosition.Begin(go, animSpeed, pos).method = UITweener.Method.EaseOut;
 		}
 	}
@@ -502,7 +501,7 @@ public class UIPopupList : MonoBehaviour
 			if (hlsp == null) return;
 
 			float hlspHeight = hlsp.inner.yMin - hlsp.outer.yMin;
-			float fontScale = font.size * font.pixelSize * textScale;
+			float labelHeight = font.size * font.pixelSize * textScale;
 			float x = 0f, y = -padding.y;
 			List<UILabel> labels = new List<UILabel>();
 
@@ -517,18 +516,14 @@ public class UIPopupList : MonoBehaviour
 				lbl.text = (isLocalized && Localization.instance != null) ? Localization.instance.Get(s) : s;
 				lbl.color = textColor;
 				lbl.cachedTransform.localPosition = new Vector3(bgPadding.x + padding.x, y, -1f);
+				lbl.overflowMethod = UILabel.Overflow.ResizeLabel;
 				lbl.MakePixelPerfect();
-
-				if (textScale != 1f)
-				{
-					Vector3 scale = lbl.cachedTransform.localScale;
-					lbl.cachedTransform.localScale = scale * textScale;
-				}
+				if (textScale != 1f) lbl.cachedTransform.localScale = Vector3.one * textScale;
 				labels.Add(lbl);
 
-				y -= fontScale;
+				y -= labelHeight;
 				y -= padding.y;
-				x = Mathf.Max(x, lbl.relativeSize.x * fontScale);
+				x = Mathf.Max(x, labelHeight);
 
 				// Add an event listener
 				UIEventListener listener = UIEventListener.Get(lbl.gameObject);
@@ -546,8 +541,8 @@ public class UIPopupList : MonoBehaviour
 			// The triggering widget's width should be the minimum allowed width
 			x = Mathf.Max(x, bounds.size.x - (bgPadding.x + padding.x) * 2f);
 
-			Vector3 bcCenter = new Vector3((x * 0.5f) / fontScale, -0.5f, 0f);
-			Vector3 bcSize = new Vector3(x / fontScale, (fontScale + padding.y) / fontScale, 1f);
+			Vector3 bcCenter = new Vector3(x * 0.5f, -labelHeight * 0.5f, 0f);
+			Vector3 bcSize = new Vector3(x, (labelHeight + padding.y), 1f);
 
 			// Run through all labels and add colliders
 			for (int i = 0, imax = labels.Count; i < imax; ++i)
@@ -563,13 +558,15 @@ public class UIPopupList : MonoBehaviour
 			y -= bgPadding.y;
 
 			// Scale the background sprite to envelop the entire set of items
-			mBackground.cachedTransform.localScale = new Vector3(x, -y + bgPadding.y, 1f);
+			mBackground.width = Mathf.RoundToInt(x);
+			mBackground.height = Mathf.RoundToInt(-y + bgPadding.y);
 
 			// Scale the highlight sprite to envelop a single item
 			float scaleFactor = 2f * atlas.pixelSize;
-			mHighlight.cachedTransform.localScale = new Vector3(
-				   x - (bgPadding.x + padding.x) * 2f + (hlsp.inner.xMin - hlsp.outer.xMin) * scaleFactor,
-				   fontScale + hlspHeight * scaleFactor, 1f);
+			float w = x - (bgPadding.x + padding.x) * 2f + (hlsp.inner.xMin - hlsp.outer.xMin) * scaleFactor;
+			float h = labelHeight + hlspHeight * scaleFactor;
+			mHighlight.width = Mathf.RoundToInt(w);
+			mHighlight.height = Mathf.RoundToInt(h);
 
 			bool placeAbove = (position == Position.Above);
 
@@ -587,7 +584,7 @@ public class UIPopupList : MonoBehaviour
 			// If the list should be animated, let's animate it by expanding it
 			if (isAnimated)
 			{
-				float bottom = y + fontScale;
+				float bottom = y + labelHeight;
 				Animate(mHighlight, placeAbove, bottom);
 				for (int i = 0, imax = labels.Count; i < imax; ++i) Animate(labels[i], placeAbove, bottom);
 				AnimateColor(mBackground);

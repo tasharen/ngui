@@ -142,22 +142,15 @@ public class UIAnchor : MonoBehaviour
 		else if (widgetContainer != null)
 		{
 			// Widget is used -- use its bounds as the container's bounds
-			Transform t = widgetContainer.cachedTransform;
-			Vector3 ls = t.localScale;
-			Vector3 lp = t.localPosition;
+			Transform root = transform.parent;
+			Bounds b = (root != null) ? NGUIMath.CalculateRelativeWidgetBounds(root, widgetContainer.cachedTransform) :
+				NGUIMath.CalculateRelativeWidgetBounds(widgetContainer.cachedTransform);
 
-			Vector3 size = widgetContainer.relativeSize;
-			Vector3 offset = widgetContainer.pivotOffset;
-			offset.y -= 1f;
+			mRect.x = b.min.x;
+			mRect.y = b.min.y;
 
-			offset.x *= (widgetContainer.relativeSize.x * ls.x);
-			offset.y *= (widgetContainer.relativeSize.y * ls.y);
-
-			mRect.x = lp.x + offset.x;
-			mRect.y = lp.y + offset.y;
-
-			mRect.width = size.x * ls.x;
-			mRect.height = size.y * ls.y;
+			mRect.width = b.size.x;
+			mRect.height = b.size.y;
 		}
 		else if (uiCamera != null)
 		{

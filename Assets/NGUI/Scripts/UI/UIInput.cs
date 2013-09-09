@@ -271,11 +271,7 @@ public class UIInput : MonoBehaviour
 #endif
 				{
 					Input.imeCompositionMode = IMECompositionMode.On;
-					Transform t = label.cachedTransform;
-					Vector3 offset = label.pivotOffset;
-					offset.y += label.relativeSize.y;
-					offset = t.TransformPoint(offset);
-					Input.compositionCursorPos = UICamera.currentCamera.WorldToScreenPoint(offset);
+					Input.compositionCursorPos = UICamera.currentCamera.WorldToScreenPoint(label.worldCorners[0]);
 				}
 				UpdateLabel();
 			}
@@ -485,23 +481,21 @@ public class UIInput : MonoBehaviour
 			// Now wrap this text using the specified line width
 			label.supportEncoding = false;
 
-			if (!label.shrinkToFit)
+			if (label.overflowMethod == UILabel.Overflow.ClampContent)
 			{
-				Vector3 scale = label.cachedTransform.localScale;
-
 				if (label.multiLine)
 				{
-					label.font.WrapText(processed, out processed, label.lineWidth / scale.x, label.lineHeight / scale.y, 0, false, UIFont.SymbolStyle.None);
+					label.font.WrapText(processed, out processed, label.width, label.height, 0, false, UIFont.SymbolStyle.None);
 				}
 				else
 				{
-					string fit = label.font.GetEndOfLineThatFits(processed, label.lineWidth / scale.x, false, UIFont.SymbolStyle.None);
+					string fit = label.font.GetEndOfLineThatFits(processed, label.width, false, UIFont.SymbolStyle.None);
 
 					if (fit != processed)
 					{
 						processed = fit;
 						Vector3 pos = label.cachedTransform.localPosition;
-						pos.x = mPosition + label.lineWidth;
+						pos.x = mPosition + label.width;
 
 						if (mPivot == UIWidget.Pivot.Left) label.pivot = UIWidget.Pivot.Right;
 						else if (mPivot == UIWidget.Pivot.TopLeft) label.pivot = UIWidget.Pivot.TopRight;

@@ -402,20 +402,8 @@ public class UIPanel : MonoBehaviour
 		// No clipping? No point in checking.
 		if (mClipping == UIDrawCall.Clipping.None) return true;
 
-		Vector2 size = w.relativeSize;
-		Vector2 a = Vector2.Scale(w.pivotOffset, size);
-		Vector2 b = a;
-
-		a.x += size.x;
-		a.y -= size.y;
-
-		// Transform coordinates into world space
-		Transform wt = w.cachedTransform;
-		Vector3 v0 = wt.TransformPoint(a);
-		Vector3 v1 = wt.TransformPoint(new Vector2(a.x, b.y));
-		Vector3 v2 = wt.TransformPoint(new Vector2(b.x, a.y));
-		Vector3 v3 = wt.TransformPoint(b);
-		return IsVisible(v0, v1, v2, v3);
+		Vector3[] corners = w.worldCorners;
+		return IsVisible(corners[0], corners[1], corners[2], corners[3]);
 	}
 
 	/// <summary>
@@ -514,34 +502,6 @@ public class UIPanel : MonoBehaviour
 	{
 		if (w != null)
 		{
-#if UNITY_EDITOR
-			if (w.cachedTransform.parent != null)
-			{
-				UIWidget parentWidget = NGUITools.FindInParents<UIWidget>(w.cachedTransform.parent.gameObject);
-
-				if (parentWidget != null)
-				{
-					w.cachedTransform.parent = parentWidget.cachedTransform.parent;
-					Debug.LogError("You should never nest widgets! Parent them to a common game object instead. Forcefully changing the parent.", w);
-
-					// If the error above gets triggered, it means that you parented one widget to another.
-					// If left unchecked, this may lead to odd behavior in the UI. Consider restructuring your UI.
-					// For example, if you were trying to do this:
-
-					// Widget #1
-					//  |
-					//  +- Widget #2
-
-					// You can do this instead, fixing the problem:
-
-					// GameObject (scale 1, 1, 1)
-					//  |
-					//  +- Widget #1
-					//  |
-					//  +- Widget #2
-				}
-			}
-#endif
 #if OLD_UNITY
 			UINode node = AddTransform(w.cachedTransform);
 
@@ -1082,11 +1042,11 @@ public class UIPanel : MonoBehaviour
 			UIWidget w = mWidgets[i];
 
 			// If the widget is visible, update it
-			if (w.UpdateGeometry(this, forceVisible))
+			if (w.enabled && w.UpdateGeometry(this, forceVisible))
 			{
 				// We will need to refill this buffer
 				if (!mChanged.Contains(w.material))
-					 mChanged.Add(w.material);
+					mChanged.Add(w.material);
 			}
 		}
 #endif
@@ -1101,7 +1061,8 @@ public class UIPanel : MonoBehaviour
 		}
 
 		// Fill the draw calls for all of the changed materials
-		for (int i = 0, imax = mChanged.size; i < imax; ++i) Fill(mChanged.buffer[i]);
+		for (int i = 0, imax = mChanged.size; i < imax; ++i)
+			Fill(mChanged.buffer[i]);
 
 		// Update the clipping rects
 		UpdateDrawcalls();

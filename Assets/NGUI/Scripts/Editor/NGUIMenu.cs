@@ -30,6 +30,32 @@ static public class NGUIMenu
 		return go;
 	}
 
+	[MenuItem("NGUI/Bring Widget Forward %=")]
+	static public void BringForward ()
+	{
+		UIWidget w = Selection.activeGameObject.GetComponent<UIWidget>();
+		if (w != null) w.depth = w.depth + 1;
+	}
+
+	[MenuItem("NGUI/Bring Widget Forward %=", true)]
+	static public bool BringForwardValidation ()
+	{
+		return (Selection.activeGameObject != null) && Selection.activeGameObject.GetComponent<UIWidget>() != null;
+	}
+
+	[MenuItem("NGUI/Push Widget Back %-")]
+	static public void PushBack ()
+	{
+		UIWidget w = Selection.activeGameObject.GetComponent<UIWidget>();
+		if (w != null) w.depth = w.depth - 1;
+	}
+
+	[MenuItem("NGUI/Push Widget Back %-", true)]
+	static public bool PushBackValidation ()
+	{
+		return (Selection.activeGameObject != null) && Selection.activeGameObject.GetComponent<UIWidget>() != null;
+	}
+
 	[MenuItem("NGUI/Create a Sprite #&s")]
 	static public void AddSprite ()
 	{
@@ -55,7 +81,8 @@ static public class NGUIMenu
 				}
 			}
 			sprite.pivot = NGUISettings.pivot;
-			sprite.cachedTransform.localScale = new Vector3(100f, 100f, 1f);
+			sprite.width = 100;
+			sprite.height = 100;
 			sprite.MakePixelPerfect();
 			Selection.activeGameObject = sprite.gameObject;
 		}
@@ -79,7 +106,8 @@ static public class NGUIMenu
 			lbl.font = NGUISettings.font;
 			lbl.text = "New Label";
 			lbl.pivot = NGUISettings.pivot;
-			lbl.cachedTransform.localScale = new Vector3(100f, 100f, 1f);
+			lbl.width = 120;
+			lbl.height = 30;
 			lbl.MakePixelPerfect();
 			Selection.activeGameObject = lbl.gameObject;
 		}
@@ -101,7 +129,8 @@ static public class NGUIMenu
 			UITexture tex = NGUITools.AddWidget<UITexture>(go);
 			tex.name = "Texture";
 			tex.pivot = NGUISettings.pivot;
-			tex.cachedTransform.localScale = new Vector3(100f, 100f, 1f);
+			tex.width = 100;
+			tex.height = 100;
 			Selection.activeGameObject = tex.gameObject;
 		}
 		else
@@ -227,6 +256,23 @@ static public class NGUIMenu
 		else
 		{
 			Debug.Log("Classic Mode: Draggable Handles will show up only with the View Tool selected (Q).");
+		}
+	}
+
+	[MenuItem("NGUI/Change Color Mode")]
+	static public void ChangeColorMode ()
+	{
+		if (NGUISettings.colorMode == NGUISettings.ColorMode.Orange)
+		{
+			NGUISettings.colorMode = NGUISettings.ColorMode.Green;
+		}
+		else if (NGUISettings.colorMode == NGUISettings.ColorMode.Green)
+		{
+			NGUISettings.colorMode = NGUISettings.ColorMode.Blue;
+		}
+		else
+		{
+			NGUISettings.colorMode = NGUISettings.ColorMode.Orange;
 		}
 	}
 }

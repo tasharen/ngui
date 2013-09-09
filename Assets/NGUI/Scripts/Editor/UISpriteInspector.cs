@@ -63,7 +63,7 @@ public class UISpriteInspector : UIWidgetInspector
 
 	protected override void DrawExtraProperties ()
 	{
-		NGUIEditorTools.DrawSeparator();
+		GUILayout.Space(6f);
 
 		if (GetType() == typeof(UISpriteInspector))
 		{

@@ -117,8 +117,24 @@ public class UISlider : IgnoreTimeScale
 			mFGWidget = foreground.GetComponent<UIWidget>();
 			mFGFilled = (mFGWidget != null) ? mFGWidget as UISprite : null;
 			mFGTrans = foreground.transform;
-			if (mSize == Vector2.zero) mSize = foreground.localScale;
-			if (mCenter == Vector2.zero) mCenter = foreground.localPosition + foreground.localScale * 0.5f;
+
+			if (mSize == Vector2.zero)
+			{
+				UIWidget w = foreground.GetComponent<UIWidget>();
+				mSize = (w != null) ? new Vector2(w.width, w.height) : (Vector2)foreground.localScale;
+			}
+
+			if (mCenter == Vector2.zero)
+			{
+				UIWidget w = foreground.GetComponent<UIWidget>();
+
+				if (w != null)
+				{
+					Vector3[] wc = w.localCorners;
+					mCenter = Vector3.Lerp(wc[0], wc[2], 0.5f);
+				}
+				else mCenter = foreground.localPosition + foreground.localScale * 0.5f;
+			}
 		}
 		else if (mCol != null)
 		{
@@ -281,22 +297,22 @@ public class UISlider : IgnoreTimeScale
 				{
 					mFGFilled.fillAmount = stepValue;
 				}
+				else if (mFGWidget != null)
+				{
+					if (stepValue > 0.001f)
+					{
+						mFGWidget.width = Mathf.RoundToInt(scale.x);
+						mFGWidget.height = Mathf.RoundToInt(scale.y);
+						mFGWidget.enabled = true;
+					}
+					else
+					{
+						mFGWidget.enabled = false;
+					}
+				}
 				else if (foreground != null)
 				{
 					mFGTrans.localScale = scale;
-
-					if (mFGWidget != null)
-					{
-						if (stepValue > 0.001f)
-						{
-							mFGWidget.enabled = true;
-							mFGWidget.MarkAsChanged();
-						}
-						else
-						{
-							mFGWidget.enabled = false;
-						}
-					}
 				}
 			}
 

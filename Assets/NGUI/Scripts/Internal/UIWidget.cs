@@ -36,9 +36,11 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	// Cached and saved values
-	[HideInInspector][SerializeField] Color mColor = Color.white;
-	[HideInInspector][SerializeField] Pivot mPivot = Pivot.Center;
-	[HideInInspector][SerializeField] int mDepth = 0;
+	[HideInInspector][SerializeField] protected Color mColor = Color.white;
+	[HideInInspector][SerializeField] protected Pivot mPivot = Pivot.Center;
+	[HideInInspector][SerializeField] protected int mWidth = 0;
+	[HideInInspector][SerializeField] protected int mHeight = 0;
+	[HideInInspector][SerializeField] protected int mDepth = 0;
 
 	protected GameObject mGo;
 	protected Transform mTrans;
@@ -60,6 +62,7 @@ public abstract class UIWidget : MonoBehaviour
 #endif
 	// Widget's generated geometry
 	UIGeometry mGeom = new UIGeometry();
+	Vector3[] mCorners = new Vector3[4];
 
 	/// <summary>
 	/// Whether the widget is visible.
@@ -70,6 +73,52 @@ public abstract class UIWidget : MonoBehaviour
 #else
 	public bool isVisible { get { return mVisibleByPanel && finalAlpha > 0.001f; } }
 #endif
+
+	/// <summary>
+	/// Widget's width in pixels.
+	/// </summary>
+
+	public int width
+	{
+		get
+		{
+			return mWidth;
+		}
+		set
+		{
+			int min = minWidth;
+			if (value < min) value = min;
+
+			if (mWidth != value)
+			{
+				mWidth = value;
+				MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Widget's height in pixels.
+	/// </summary>
+
+	public int height
+	{
+		get
+		{
+			return mHeight;
+		}
+		set
+		{
+			int min = minHeight;
+			if (value < min) value = min;
+
+			if (mHeight != value)
+			{
+				mHeight = value;
+				MarkAsChanged();
+			}
+		}
+	}
 
 	/// <summary>
 	/// Color used by the widget.
@@ -103,12 +152,12 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			if (mPivot != value)
 			{
-				Vector3 before = NGUIMath.CalculateWidgetCorners(this)[0];
+				Vector3 before = worldCorners[0];
 
 				mPivot = value;
 				mChanged = true;
 
-				Vector3 after = NGUIMath.CalculateWidgetCorners(this)[0];
+				Vector3 after = worldCorners[0];
 
 				Transform t = cachedTransform;
 				Vector3 pos = t.position;
@@ -147,29 +196,95 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Helper function that calculates the relative offset based on the current pivot.
+	/// Local space corners of the widget. The order is bottom-left, top-left, top-right, bottom-right.
 	/// </summary>
 
-	public Vector2 pivotOffset
+	public Vector3[] localCorners
 	{
 		get
 		{
-			Vector2 v = Vector2.zero;
-			Vector4 p = relativePadding;
+			Vector2 offset = pivotOffset;
 
-			Pivot pv = pivot;
+			float x0 = -offset.x * mWidth;
+			float y0 = -offset.y * mHeight;
+			float x1 = x0 + mWidth;
+			float y1 = y0 + mHeight;
 
-			if (pv == Pivot.Top || pv == Pivot.Center || pv == Pivot.Bottom) v.x = (p.x - p.z - 1f) * 0.5f;
-			else if (pv == Pivot.TopRight || pv == Pivot.Right || pv == Pivot.BottomRight) v.x = -1f - p.z;
-			else v.x = p.x;
+			mCorners[0] = new Vector3(x0, y0, 0f);
+			mCorners[1] = new Vector3(x0, y1, 0f);
+			mCorners[2] = new Vector3(x1, y1, 0f);
+			mCorners[3] = new Vector3(x1, y0, 0f);
 
-			if (pv == Pivot.Left || pv == Pivot.Center || pv == Pivot.Right) v.y = (p.w - p.y + 1f) * 0.5f;
-			else if (pv == Pivot.BottomLeft || pv == Pivot.Bottom || pv == Pivot.BottomRight) v.y = 1f + p.w;
-			else v.y = -p.y;
-
-			return v;
+			return mCorners;
 		}
 	}
+
+	/// <summary>
+	/// World-space corners of the widget. The order is bottom-left, top-left, top-right, bottom-right.
+	/// </summary>
+
+	public Vector3[] worldCorners
+	{
+		get
+		{
+			Vector2 offset = pivotOffset;
+
+			float x0 = -offset.x * mWidth;
+			float y0 = -offset.y * mHeight;
+			float x1 = x0 + mWidth;
+			float y1 = y0 + mHeight;
+
+			Transform wt = cachedTransform;
+
+			mCorners[0] = wt.TransformPoint(x0, y0, 0f);
+			mCorners[1] = wt.TransformPoint(x0, y1, 0f);
+			mCorners[2] = wt.TransformPoint(x1, y1, 0f);
+			mCorners[3] = wt.TransformPoint(x1, y0, 0f);
+
+			return mCorners;
+		}
+	}
+
+	/// <summary>
+	/// World-space inner rect's corners of the widget. The order is bottom-left, top-left, top-right, bottom-right.
+	/// </summary>
+
+	public Vector3[] innerWorldCorners
+	{
+		get
+		{
+			Vector2 offset = pivotOffset;
+
+			float x0 = -offset.x * mWidth;
+			float y0 = -offset.y * mHeight;
+			float x1 = x0 + mWidth;
+			float y1 = y0 + mHeight;
+
+			Vector4 br = border;
+
+			x0 += br.x;
+			y0 += br.y;
+			x1 -= br.z;
+			y1 -= br.w;
+
+			Transform wt = cachedTransform;
+
+			mCorners[0] = wt.TransformPoint(x0, y0, 0f);
+			mCorners[1] = wt.TransformPoint(x0, y1, 0f);
+			mCorners[2] = wt.TransformPoint(x1, y1, 0f);
+			mCorners[3] = wt.TransformPoint(x1, y0, 0f);
+
+			return mCorners;
+		}
+	}
+
+	/// <summary>
+	/// Helper function that calculates the relative offset based on the current pivot.
+	/// X = 0 (left) to 1 (right)
+	/// Y = 0 (bottom) to 1 (top)
+	/// </summary>
+
+	public Vector2 pivotOffset { get { return NGUIMath.GetPivotOffset(pivot); } }
 
 	/// <summary>
 	/// Game object gets cached for speed. Can't simply return 'mGo' set in Awake because this function may be called on a prefab.
@@ -249,7 +364,7 @@ public abstract class UIWidget : MonoBehaviour
 			{
 				UIWidget w = widgets[i];
 
-				Vector3[] corners = NGUIMath.CalculateWidgetCorners(w);
+				Vector3[] corners = w.worldCorners;
 				if (NGUIMath.DistanceToRectangle(corners, mousePos, cam) == 0f)
 					list.Add(w);
 			}
@@ -405,19 +520,32 @@ public abstract class UIWidget : MonoBehaviour
 
 	protected virtual void OnEnable ()
 	{
+		list.Add(this);
+		mChanged = true;
+		mPanel = null;
+
+		// Prior to NGUI 2.7.0 width and height was specified as transform's local scale
+		if (mWidth == 0 && mHeight == 0)
+		{
+			UpgradeFrom265();
+			cachedTransform.localScale = Vector3.one;
 #if UNITY_EDITOR
-		if (GetComponents<UIWidget>().Length > 1)
-		{
-			Debug.LogError("Can't have more than one widget on the same game object!", this);
-			enabled = false;
-		}
-		else
+			UnityEditor.EditorUtility.SetDirty(this);
 #endif
-		{
-			list.Add(this);
-			mChanged = true;
-			mPanel = null;
 		}
+	}
+
+	/// <summary>
+	/// Facilitates upgrading from NGUI 2.6.5 or earlier versions.
+	/// </summary>
+
+	protected virtual void UpgradeFrom265 ()
+	{
+		Vector3 scale = cachedTransform.localScale;
+		mWidth = Mathf.Abs(Mathf.RoundToInt(scale.x));
+		mHeight = Mathf.Abs(Mathf.RoundToInt(scale.y));
+		if (GetComponent<BoxCollider>() != null)
+			NGUITools.AddWidgetCollider(gameObject, true);
 	}
 
 	/// <summary>
@@ -509,10 +637,10 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Whether handles should be shown around the widget for easy scaling and resizing.
+	/// Whether the widget can be resized using drag handles.
 	/// </summary>
 
-	public virtual bool showResizeHandles { get { return true; } }
+	public virtual bool canResize { get { return true; } }
 
 	/// <summary>
 	/// Draw some selectable gizmos.
@@ -530,35 +658,19 @@ public abstract class UIWidget : MonoBehaviour
 
 			Color outline = new Color(1f, 1f, 1f, 0.2f);
 
-			// Position should be offset by depth so that the selection works properly
-			Vector3 pos = Vector3.zero;
-			pos.z -= mDepth * 0.25f;
-
-			Vector3 size = relativeSize;
 			Vector2 offset = pivotOffset;
-			Vector4 padding = relativePadding;
-
-			float x0 = offset.x * size.x - padding.x;
-			float y0 = offset.y * size.y + padding.y;
-
-			float x1 = x0 + size.x + padding.x + padding.z;
-			float y1 = y0 - size.y - padding.y - padding.w;
-
-			pos.x = (x0 + x1) * 0.5f;
-			pos.y = (y0 + y1) * 0.5f;
-
-			size.x = (x1 - x0);
-			size.y = (y1 - y0);
+			Vector3 center = new Vector3(mWidth * (0.5f - offset.x), mHeight * (0.5f - offset.y), -mDepth * 0.25f);
+			Vector3 size = new Vector3(mWidth, mHeight, 1f);
 
 			// Draw the gizmo
 			Gizmos.matrix = cachedTransform.localToWorldMatrix;
-			Gizmos.color = (UnityEditor.Selection.activeGameObject == gameObject) ? Color.green : outline;
-			Gizmos.DrawWireCube(pos, size);
+			Gizmos.color = (UnityEditor.Selection.activeGameObject == cachedTransform) ? Color.white : outline;
+			Gizmos.DrawWireCube(center, size);
 
 			// Make the widget selectable
 			size.z = 0.01f;
 			Gizmos.color = Color.clear;
-			Gizmos.DrawCube(pos, size);
+			Gizmos.DrawCube(center, size);
 		}
 	}
 #endif
@@ -602,24 +714,12 @@ public abstract class UIWidget : MonoBehaviour
 				if (!mPanel.widgetsAreStatic)
 #endif
 				{
-					Vector2 size = relativeSize;
-					Vector2 offset = pivotOffset;
-					Vector4 padding = relativePadding;
-
-					float x0 = offset.x * size.x - padding.x;
-					float y0 = offset.y * size.y + padding.y;
-
-					float x1 = x0 + size.x + padding.x + padding.z;
-					float y1 = y0 - size.y - padding.y - padding.w;
-
 					mLocalToPanel = p.worldToLocal * cachedTransform.localToWorldMatrix;
 					hasMatrix = true;
 
-					Vector3 v0 = new Vector3(x0, y0, 0f);
-					Vector3 v1 = new Vector3(x1, y1, 0f);
-
-					v0 = mLocalToPanel.MultiplyPoint3x4(v0);
-					v1 = mLocalToPanel.MultiplyPoint3x4(v1);
+					Vector3[] wc = worldCorners;
+					Vector3 v0 = p.worldToLocal.MultiplyPoint3x4(wc[0]);
+					Vector3 v1 = p.worldToLocal.MultiplyPoint3x4(wc[2]);
 
 					if (Vector3.SqrMagnitude(mOldV0 - v0) > 0.000001f || Vector3.SqrMagnitude(mOldV1 - v1) > 0.000001f)
 					{
@@ -667,15 +767,7 @@ public abstract class UIWidget : MonoBehaviour
 
 					if (mGeom.hasVertices)
 					{
-						Vector3 offset = pivotOffset;
-						Vector2 scale = relativeSize;
-
-						offset.x *= scale.x;
-						offset.y *= scale.y;
-
 						if (!hasMatrix) mLocalToPanel = p.worldToLocal * cachedTransform.localToWorldMatrix;
-
-						mGeom.ApplyOffset(offset);
 						mGeom.ApplyTransform(mLocalToPanel);
 					}
 					return true;
@@ -711,52 +803,34 @@ public abstract class UIWidget : MonoBehaviour
 
 	virtual public void MakePixelPerfect ()
 	{
-		Vector3 scale = cachedTransform.localScale;
-
-		int width  = Mathf.RoundToInt(scale.x);
-		int height = Mathf.RoundToInt(scale.y);
-
-		scale.x = width;
-		scale.y = height;
-		scale.z = 1f;
-
 		Vector3 pos = cachedTransform.localPosition;
-		pos.z = Mathf.RoundToInt(pos.z);
-
-		if (width % 2 == 1 && (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom))
-		{
-			pos.x = Mathf.Floor(pos.x) + 0.5f;
-		}
-		else
-		{
-			pos.x = Mathf.Round(pos.x);
-		}
-
-		if (height % 2 == 1 && (pivot == Pivot.Left || pivot == Pivot.Center || pivot == Pivot.Right))
-		{
-			pos.y = Mathf.Ceil(pos.y) - 0.5f;
-		}
-		else
-		{
-			pos.y = Mathf.Round(pos.y);
-		}
-
+		pos.z = Mathf.Round(pos.z);
+		pos.x = Mathf.Round(pos.x);
+		pos.y = Mathf.Round(pos.y);
 		cachedTransform.localPosition = pos;
-		cachedTransform.localScale = scale;
+
+		Vector3 ls = cachedTransform.localScale;
+		cachedTransform.localScale = new Vector3(Mathf.Sign(ls.x), Mathf.Sign(ls.y), 1f);
 	}
 
 	/// <summary>
-	/// Visible size of the widget in relative coordinates. In most cases this can remain at (1, 1).
-	/// If you want to figure out the widget's size in pixels, scale this value by cachedTransform.localScale.
+	/// Minimum allowed width for this widget.
 	/// </summary>
 
-	virtual public Vector2 relativeSize { get { return Vector2.one; } }
+	virtual public int minWidth { get { return 4; } }
 
 	/// <summary>
-	/// Extra padding around the sprite, in pixels.
+	/// Minimum allowed height for this widget.
 	/// </summary>
 
-	virtual public Vector4 relativePadding { get { return Vector4.zero; } }
+	virtual public int minHeight { get { return 4; } }
+
+	/// <summary>
+	/// TODO: Do not use this, it's obsolete.
+	/// </summary>
+
+	[System.Obsolete("There is no relative scale anymore. Widgets now have width and height instead")]
+	virtual public Vector2 relativeSize { get { return Vector2.one; } }
 
 	/// <summary>
 	/// Dimensions of the sprite's border, if any.

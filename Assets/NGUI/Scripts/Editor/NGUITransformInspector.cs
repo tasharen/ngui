@@ -223,10 +223,9 @@ public class NGUITransformInspector : Editor
 		{
 			bool reset = GUILayout.Button("S", GUILayout.Width(20f));
 
+			if (isWidget) GUI.color = new Color(0.7f, 0.7f, 0.7f);
 			EditorGUILayout.PropertyField(mScale.FindPropertyRelative("x"));
 			EditorGUILayout.PropertyField(mScale.FindPropertyRelative("y"));
-
-			if (isWidget) GUI.color = new Color(0.7f, 0.7f, 0.7f);
 			EditorGUILayout.PropertyField(mScale.FindPropertyRelative("z"));
 			if (isWidget) GUI.color = Color.white;
 

@@ -14,6 +14,13 @@ using System.Collections.Generic;
 
 public class NGUISettings
 {
+	public enum ColorMode
+	{
+		Orange,
+		Green,
+		Blue,
+	}
+
 	static bool mLoaded = false;
 	static UIFont mFont;
 	static UIAtlas mAtlas;
@@ -35,6 +42,7 @@ public class NGUISettings
 	static Font mDynFont;
 	static int mDynFontSize = 16;
 	static FontStyle mDynFontStyle = FontStyle.Normal;
+	static ColorMode mColorMode = ColorMode.Orange;
 
 	static Object GetObject (string name)
 	{
@@ -63,6 +71,7 @@ public class NGUISettings
 		mDynFont		= GetObject("NGUI DynFont") as Font;
 		mDynFontSize	= EditorPrefs.GetInt("NGUI DynFontSize", 16);
 		mDynFontStyle	= (FontStyle)EditorPrefs.GetInt("NGUI DynFontStyle", (int)FontStyle.Normal);
+		mColorMode		= (ColorMode)EditorPrefs.GetInt("NGUI Color Mode", (int)ColorMode.Orange);
 
 		if (mLayer < 0 || string.IsNullOrEmpty(LayerMask.LayerToName(mLayer))) mLayer = -1;
 
@@ -95,6 +104,7 @@ public class NGUISettings
 		EditorPrefs.SetInt("NGUI DynFont", (mDynFont != null) ? mDynFont.GetInstanceID() : -1);
 		EditorPrefs.SetInt("NGUI DynFontSize", mDynFontSize);
 		EditorPrefs.SetInt("NGUI DynFontStyle", (int)mDynFontStyle);
+		EditorPrefs.SetInt("NGUI Color Mode", (int)mColorMode);
 
 		SaveColor();
 	}
@@ -139,6 +149,27 @@ public class NGUISettings
 			{
 				mColor = value;
 				SaveColor();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Color mode changes how the selection looks.
+	/// </summary>
+
+	static public ColorMode colorMode
+	{
+		get
+		{
+			if (!mLoaded) Load();
+			return mColorMode;
+		}
+		set
+		{
+			if (mColorMode != value)
+			{
+				mColorMode = value;
+				Save();
 			}
 		}
 	}

@@ -98,23 +98,24 @@ public class UITooltip : MonoBehaviour
 
 			if (background != null)
 			{
-				Transform backgroundTrans = background.transform;
-
 				Transform textTrans = text.transform;
 				Vector3 offset = textTrans.localPosition;
 				Vector3 textScale = textTrans.localScale;
+				Vector3[] corners = text.worldCorners;
 
 				// Calculate the dimensions of the printed text
-				mSize = text.relativeSize;
+				mSize = corners[2] - corners[0];
 
 				// Scale by the transform and adjust by the padding offset
 				mSize.x *= textScale.x;
 				mSize.y *= textScale.y;
-				mSize.x += background.border.x + background.border.z + ( offset.x - background.border.x) * 2f;
-				mSize.y += background.border.y + background.border.w + (-offset.y - background.border.y) * 2f;
-				mSize.z = 1f;
 
-				backgroundTrans.localScale = mSize;
+				Vector4 border = background.border;
+				mSize.x += border.x + border.z + ( offset.x - border.x) * 2f;
+				mSize.y += border.y + border.w + (-offset.y - border.y) * 2f;
+
+				background.width = Mathf.RoundToInt(mSize.x);
+				background.height = Mathf.RoundToInt(mSize.y);
 			}
 
 			if (uiCamera != null)

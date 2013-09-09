@@ -81,9 +81,8 @@ public class UITextList : MonoBehaviour
 		if (textLabel != null && textLabel.font != null)
 		{
 			// Rebuild the line
-			Vector3 scale = textLabel.transform.localScale;
 			string line;
-			textLabel.font.WrapText(ce.text, out line, maxWidth / scale.x, maxHeight / scale.y,
+			textLabel.font.WrapText(ce.text, out line, Mathf.RoundToInt(maxWidth), Mathf.RoundToInt(maxHeight),
 				textLabel.maxLineCount, textLabel.supportEncoding, textLabel.symbolStyle);
 			ce.lines = line.Split(mSeparator);
 
@@ -103,7 +102,7 @@ public class UITextList : MonoBehaviour
 	void Awake ()
 	{
 		if (textLabel == null) textLabel = GetComponentInChildren<UILabel>();
-		if (textLabel != null) textLabel.lineWidth = 0;
+		if (textLabel != null) textLabel.overflowMethod = UILabel.Overflow.ResizeLabel;
 
 		Collider col = collider;
 

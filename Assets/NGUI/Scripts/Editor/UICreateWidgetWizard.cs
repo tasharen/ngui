@@ -465,7 +465,10 @@ public class UICreateWidgetWizard : EditorWindow
 			bg.depth = depth;
 			bg.atlas = NGUISettings.atlas;
 			bg.spriteName = mScrollBG;
-			bg.transform.localScale = new Vector3(400f + bg.border.x + bg.border.z, 14f + bg.border.y + bg.border.w, 1f);
+
+			Vector4 border = bg.border;
+			bg.width = Mathf.RoundToInt(400f + border.x + border.z);
+			bg.height = Mathf.RoundToInt(14f + border.y + border.w);
 			bg.MakePixelPerfect();
 
 			UISprite fg = NGUITools.AddWidget<UISprite>(go);
@@ -617,7 +620,7 @@ public class UICreateWidgetWizard : EditorWindow
 			lbl.transform.localPosition = new Vector3(padding, 0f, 0f);
 			lbl.multiLine = false;
 			lbl.supportEncoding = false;
-			lbl.lineWidth = Mathf.RoundToInt(400f - padding * 2f);
+			lbl.width = Mathf.RoundToInt(400f - padding * 2f);
 			lbl.text = "You can type here";
 			lbl.MakePixelPerfect();
 

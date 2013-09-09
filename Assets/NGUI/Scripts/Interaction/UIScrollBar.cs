@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2013 Tasharen Entertainment
+// Copyright Â© 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -91,16 +91,14 @@ public class UIScrollBar : MonoBehaviour
 				// Since the direction is changing, see if we need to swap width with height (for convenience)
 				if (mBG != null)
 				{
-					Transform t = mBG.cachedTransform;
-					Vector3 scale = t.localScale;
+					int width = mBG.width;
+					int height = mBG.height;
 
-					if ((mDir == Direction.Vertical   && scale.x > scale.y) ||
-						(mDir == Direction.Horizontal && scale.x < scale.y))
+					if ((mDir == Direction.Vertical   && width > height) ||
+						(mDir == Direction.Horizontal && width < height))
 					{
-						float x = scale.x;
-						scale.x = scale.y;
-						scale.y = x;
-						t.localScale = scale;
+						mBG.width = height;
+						mBG.height = width;
 						ForceUpdate();
 
 						// Update the colliders as well
@@ -333,8 +331,8 @@ public class UIScrollBar : MonoBehaviour
 
 			// Space available for the background
 			Vector2 bgs = new Vector2(
-				Mathf.Max(0f, mBG.cachedTransform.localScale.x - bg.x - bg.z),
-				Mathf.Max(0f, mBG.cachedTransform.localScale.y - bg.y - bg.w));
+				Mathf.Max(0f, mBG.width - bg.x - bg.z),
+				Mathf.Max(0f, mBG.height - bg.y - bg.w));
 
 			float val = mInverted ? 1f - mScroll : mScroll;
 
@@ -346,8 +344,10 @@ public class UIScrollBar : MonoBehaviour
 				mBG.pivot = UIWidget.Pivot.Left;
 				mBG.cachedTransform.localPosition = Vector3.zero;
 				mFG.cachedTransform.localPosition = new Vector3(bg.x - fg.x + (bgs.x - fgs.x) * val, 0f, 0f);
-				mFG.cachedTransform.localScale = new Vector3(fgs.x + fg.x + fg.z, fgs.y + fg.y + fg.w, 1f);
+				mFG.width = Mathf.RoundToInt(fgs.x + fg.x + fg.z);
+				mFG.height = Mathf.RoundToInt(fgs.y + fg.y + fg.w);
 				if (val < 0.999f && val > 0.001f) mFG.MakePixelPerfect();
+				if (mFG.collider != null) NGUITools.AddWidgetCollider(mFG.gameObject);
 			}
 			else
 			{
@@ -357,8 +357,10 @@ public class UIScrollBar : MonoBehaviour
 				mBG.pivot = UIWidget.Pivot.Top;
 				mBG.cachedTransform.localPosition = Vector3.zero;
 				mFG.cachedTransform.localPosition = new Vector3(0f, -bg.y + fg.y - (bgs.y - fgs.y) * val, 0f);
-				mFG.cachedTransform.localScale = new Vector3(fgs.x + fg.x + fg.z, fgs.y + fg.y + fg.w, 1f);
+				mFG.width = Mathf.RoundToInt(fgs.x + fg.x + fg.z);
+				mFG.height = Mathf.RoundToInt(fgs.y + fg.y + fg.w);
 				if (val < 0.999f && val > 0.001f) mFG.MakePixelPerfect();
+				if (mFG.collider != null) NGUITools.AddWidgetCollider(mFG.gameObject);
 			}
 		}
 	}

@@ -57,7 +57,7 @@ public class UITexture : UIWidget
 			{
 				Material mat = material;
 				if (mat != null) mShader = mat.shader;
-				if (mShader == null) mShader = Shader.Find("Unlit/Transparent Colored");
+				if (mShader == null) mShader = Shader.Find("Unlit/Texture");
 			}
 			return mShader;
 		}
@@ -94,7 +94,7 @@ public class UITexture : UIWidget
 			{
 				mCreatingMat = true;
 
-				if (mShader == null) mShader = Shader.Find("Unlit/Texture");
+				if (mShader == null) mShader = Shader.Find("Unlit/Transparent Colored");
 
 				Cleanup();
 
@@ -158,8 +158,10 @@ public class UITexture : UIWidget
 				mPanel = null;
 				mTexture = value;
 				mat.mainTexture = value;
+				MarkAsChangedLite();
 
 				if (enabled) CreatePanel();
+				if (mPanel != null) mPanel.Refresh();
 			}
 		}
 	}
@@ -189,11 +191,14 @@ public class UITexture : UIWidget
 
 		if (tex != null)
 		{
-			Vector3 scale = cachedTransform.localScale;
-			scale.x = tex.width * uvRect.width;
-			scale.y = tex.height * uvRect.height;
-			scale.z = 1f;
-			cachedTransform.localScale = scale;
+			int x = tex.width;
+			if ((x & 1) == 1) ++x;
+
+			int y = tex.height;
+			if ((y & 1) == 1) ++y;
+
+			width = x;
+			height = y;
 		}
 		base.MakePixelPerfect();
 	}
@@ -207,16 +212,18 @@ public class UITexture : UIWidget
 		Color colF = color;
 		colF.a *= mPanel.alpha;
 		Color32 col = premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
-	
-		verts.Add(new Vector3(1f,  0f, 0f));
-		verts.Add(new Vector3(1f, -1f, 0f));
-		verts.Add(new Vector3(0f, -1f, 0f));
-		verts.Add(new Vector3(0f,  0f, 0f));
 
-		uvs.Add(new Vector2(mRect.xMax, mRect.yMax));
-		uvs.Add(new Vector2(mRect.xMax, mRect.yMin));
+		Vector3[] cv = localCorners;
+
+		verts.Add(cv[0]);
+		verts.Add(cv[1]);
+		verts.Add(cv[2]);
+		verts.Add(cv[3]);
+
 		uvs.Add(new Vector2(mRect.xMin, mRect.yMin));
 		uvs.Add(new Vector2(mRect.xMin, mRect.yMax));
+		uvs.Add(new Vector2(mRect.xMax, mRect.yMax));
+		uvs.Add(new Vector2(mRect.xMax, mRect.yMin));
 
 		cols.Add(col);
 		cols.Add(col);

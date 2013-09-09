@@ -303,7 +303,7 @@ static public class NGUITools
 	/// Add a collider to the game object containing one or more widgets.
 	/// </summary>
 
-	static public BoxCollider AddWidgetCollider (GameObject go)
+	static public BoxCollider AddWidgetCollider (GameObject go, bool considerInactive = false)
 	{
 		if (go != null)
 		{
@@ -322,7 +322,7 @@ static public class NGUITools
 
 			int depth = NGUITools.CalculateNextDepth(go);
 
-			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform);
+			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
 			box.isTrigger = true;
 			box.center = b.center + Vector3.back * (depth * 0.25f);
 			box.size = new Vector3(b.size.x, b.size.y, 0f);
@@ -416,13 +416,9 @@ static public class NGUITools
 
 		// Create the widget and place it above other widgets
 		T widget = AddChild<T>(go);
+		widget.width = 100;
+		widget.height = 100;
 		widget.depth = depth;
-
-		// Clear the local transform
-		Transform t = widget.transform;
-		t.localPosition = Vector3.zero;
-		t.localRotation = Quaternion.identity;
-		t.localScale = new Vector3(100f, 100f, 1f);
 		widget.gameObject.layer = go.layer;
 		return widget;
 	}

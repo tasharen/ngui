@@ -49,32 +49,8 @@ public class UILabelInspector : UIWidgetInspector
 			text = EditorGUILayout.TextArea(mLabel.text, GUI.skin.textArea, GUILayout.Height(100f));
 			if (!text.Equals(mLabel.text)) { RegisterUndo(); mLabel.text = text; }
 
-			GUILayout.BeginHorizontal();
-			int len = EditorGUILayout.IntField("Max Width", mLabel.lineWidth, GUILayout.Width(120f));
-			GUILayout.Label("pixels");
-			GUILayout.EndHorizontal();
-			if (len != mLabel.lineWidth && len >= 0f) { RegisterUndo(); mLabel.lineWidth = len; }
-
-			GUILayout.BeginHorizontal();
-			len = EditorGUILayout.IntField("Max Height", mLabel.lineHeight, GUILayout.Width(120f));
-			GUILayout.Label("pixels");
-			GUILayout.EndHorizontal();
-			if (len != mLabel.lineHeight && len >= 0f) { RegisterUndo(); mLabel.lineHeight = len; }
-
-			int count = EditorGUILayout.IntField("Max Lines", mLabel.maxLineCount, GUILayout.Width(100f));
-			if (count != mLabel.maxLineCount) { RegisterUndo(); mLabel.maxLineCount = count; }
-
-			GUILayout.BeginHorizontal();
-			bool shrinkToFit = EditorGUILayout.Toggle("Shrink to Fit", mLabel.shrinkToFit, GUILayout.Width(100f));
-			GUILayout.Label("- adjust scale to fit");
-			GUILayout.EndHorizontal();
-			
-			if (shrinkToFit != mLabel.shrinkToFit)
-			{
-				RegisterUndo();
-				mLabel.shrinkToFit = shrinkToFit;
-				if (!shrinkToFit) mLabel.MakePixelPerfect();
-			}
+			UILabel.Overflow ov = (UILabel.Overflow)EditorGUILayout.EnumPopup("Overflow", mLabel.overflowMethod);
+			if (ov != mLabel.overflowMethod) { RegisterUndo(); mLabel.overflowMethod = ov; }
 
 			// Only input fields need this setting exposed, and they have their own "is password" setting, so hiding it here.
 			//GUILayout.BeginHorizontal();
@@ -126,6 +102,9 @@ public class UILabelInspector : UIWidgetInspector
 				}
 				GUILayout.EndHorizontal();
 			}
+
+			int count = EditorGUILayout.IntField("Max Lines", mLabel.maxLineCount, GUILayout.Width(100f));
+			if (count != mLabel.maxLineCount) { RegisterUndo(); mLabel.maxLineCount = count; }
 			return true;
 		}
 		EditorGUILayout.Space();

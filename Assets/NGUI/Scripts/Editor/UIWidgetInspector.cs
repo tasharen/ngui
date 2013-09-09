@@ -29,26 +29,29 @@ public class UIWidgetInspector : Editor
 	protected UIWidget mWidget;
 
 	static protected bool mUseShader = false;
-	static Color mOutlineColor = Color.green;
-	static GUIStyle mSelectedDot = null;
-	static GUIStyle mNormalDot = null;
+	static GUIStyle mBlueDot = null;
+	static GUIStyle mYellowDot = null;
+	static GUIStyle mOrangeDot = null;
+	static GUIStyle mGreenDot = null;
+	static GUIStyle mGreyDot = null;
 	static MouseCursor mCursor = MouseCursor.Arrow;
 
 	static UIWidget.Pivot[] mPivots =
 	{
-		UIWidget.Pivot.TopLeft,
 		UIWidget.Pivot.BottomLeft,
-		UIWidget.Pivot.BottomRight,
+		UIWidget.Pivot.TopLeft,
 		UIWidget.Pivot.TopRight,
+		UIWidget.Pivot.BottomRight,
 		UIWidget.Pivot.Left,
-		UIWidget.Pivot.Bottom,
-		UIWidget.Pivot.Right,
 		UIWidget.Pivot.Top,
+		UIWidget.Pivot.Right,
+		UIWidget.Pivot.Bottom,
 	};
 
 	static int s_Hash = "WidgetHash".GetHashCode();
 	Vector3 mStartPos = Vector3.zero;
-	Vector3 mStartScale = Vector3.zero;
+	int mStartWidth = 0;
+	int mStartHeight = 0;
 	Vector3 mStartDrag = Vector3.zero;
 	Vector2 mStartMouse = Vector2.zero;
 	Vector3 mStartRot = Vector3.zero;
@@ -82,16 +85,48 @@ public class UIWidgetInspector : Editor
 	/// Draw a control dot at the specified world position.
 	/// </summary>
 
-	static void DrawKnob (Vector3 point, bool selected, int id)
+	static void DrawKnob (Vector3 point, bool selected, bool canResize, int id)
 	{
-		if (mSelectedDot == null) mSelectedDot = "sv_label_5";
-		if (mNormalDot == null) mNormalDot = "sv_label_3";
+		if (mGreyDot == null) mGreyDot = "sv_label_0";
+		if (mBlueDot == null) mBlueDot = "sv_label_1";
+		if (mGreenDot == null) mGreenDot = "sv_label_3";
+		if (mYellowDot == null) mYellowDot = "sv_label_4";
+		if (mOrangeDot == null) mOrangeDot = "sv_label_5";
 
 		Vector2 screenPoint = HandleUtility.WorldToGUIPoint(point);
 
 		Rect rect = new Rect(screenPoint.x - 7f, screenPoint.y - 7f, 14f, 14f);
-		if (selected) mSelectedDot.Draw(rect, GUIContent.none, id);
-		else mNormalDot.Draw(rect, GUIContent.none, id);
+
+		if (selected)
+		{
+			if (NGUISettings.colorMode == NGUISettings.ColorMode.Orange)
+			{
+				mYellowDot.Draw(rect, GUIContent.none, id);
+			}
+			else
+			{
+				mOrangeDot.Draw(rect, GUIContent.none, id);
+			}
+		}
+		else if (canResize)
+		{
+			if (NGUISettings.colorMode == NGUISettings.ColorMode.Orange)
+			{
+				mOrangeDot.Draw(rect, GUIContent.none, id);
+			}
+			else if (NGUISettings.colorMode == NGUISettings.ColorMode.Green)
+			{
+				mGreenDot.Draw(rect, GUIContent.none, id);
+			}
+			else
+			{
+				mBlueDot.Draw(rect, GUIContent.none, id);
+			}
+		}
+		else
+		{
+			mGreyDot.Draw(rect, GUIContent.none, id);
+		}
 	}
 
 	/// <summary>
@@ -168,14 +203,23 @@ public class UIWidgetInspector : Editor
 
 		mWidget = target as UIWidget;
 
-		Handles.color = mOutlineColor;
+		if (NGUISettings.colorMode == NGUISettings.ColorMode.Orange)
+		{
+			Handles.color = new Color(1f, 0.5f, 0f);
+		}
+		else if (NGUISettings.colorMode == NGUISettings.ColorMode.Green)
+		{
+			Handles.color = Color.green;
+		}
+		else Handles.color = Color.white;
+
 		Transform t = mWidget.cachedTransform;
 
 		Event e = Event.current;
 		int id = GUIUtility.GetControlID(s_Hash, FocusType.Passive);
 		EventType type = e.GetTypeForControl(id);
 
-		Vector3[] corners = NGUIMath.CalculateWidgetCorners(mWidget);
+		Vector3[] corners = mWidget.worldCorners;
 		Handles.DrawLine(corners[0], corners[1]);
 		Handles.DrawLine(corners[1], corners[2]);
 		Handles.DrawLine(corners[2], corners[3]);
@@ -208,7 +252,7 @@ public class UIWidgetInspector : Editor
 			int index = 0;
 			float dist = GetScreenDistance(worldPos, e.mousePosition, out index);
 
-			if (mWidget.showResizeHandles && dist < 10f)
+			if (mWidget.canResize && dist < 10f)
 			{
 				pivotUnderMouse = mPivots[index];
 				actionUnderMouse = Action.Scale;
@@ -244,7 +288,7 @@ public class UIWidgetInspector : Editor
 			{
 				SetCursorRect(rect, MouseCursor.MoveArrow);
 			}
-			else if (mWidget.showResizeHandles && actionUnderMouse == Action.Scale)
+			else if (actionUnderMouse == Action.Scale)
 			{
 				SetCursorRect(rect, MouseCursor.ScaleArrow);
 			}
@@ -256,17 +300,14 @@ public class UIWidgetInspector : Editor
 		{
 			case EventType.Repaint:
 			{
-				if (mWidget.showResizeHandles)
+				Handles.BeginGUI();
 				{
-					Handles.BeginGUI();
+					for (int i = 0; i < 8; ++i)
 					{
-						for (int i = 0; i < 8; ++i)
-						{
-							DrawKnob(worldPos[i], mWidget.pivot == mPivots[i], id);
-						}
+						DrawKnob(worldPos[i], mWidget.pivot == mPivots[i], mWidget.canResize, id);
 					}
-					Handles.EndGUI();
 				}
+				Handles.EndGUI();
 			}
 			break;
 
@@ -288,7 +329,8 @@ public class UIWidgetInspector : Editor
 					mStartPos = t.position;
 					mStartRot = t.localRotation.eulerAngles;
 					mStartDir = mStartDrag - t.position;
-					mStartScale = t.localScale;
+					mStartWidth = mWidget.width;
+					mStartHeight = mWidget.height;
 					mDragPivot = pivotUnderMouse;
 					mActionUnderMouse = actionUnderMouse;
 					GUIUtility.hotControl = GUIUtility.keyboardControl = id;
@@ -332,9 +374,11 @@ public class UIWidgetInspector : Editor
 									else if (mActionUnderMouse == Action.Scale)
 									{
 										mStartPos = t.localPosition;
-										mStartScale = t.localScale;
+										mStartWidth = mWidget.width;
+										mStartHeight = mWidget.height;
 										mDragPivot = pivotUnderMouse;
 										NGUIEditorTools.RegisterUndo("Scale widget", t);
+										NGUIEditorTools.RegisterUndo("Scale widget", mWidget);
 									}
 									mAction = actionUnderMouse;
 								}
@@ -371,7 +415,7 @@ public class UIWidgetInspector : Editor
 									Vector3 delta = pos - mStartDrag;
 
 									// Adjust the widget's position and scale based on the delta, restricted by the pivot
-									AdjustPosAndScale(mWidget, mStartPos, mStartScale, delta, mDragPivot);
+									AdjustPosAndScale(mWidget, mStartPos, mStartWidth, mStartHeight, delta, mDragPivot);
 								}
 							}
 						}
@@ -498,7 +542,8 @@ public class UIWidgetInspector : Editor
 							else if (mAction == Action.Scale)
 							{
 								t.position = mStartPos;
-								t.localScale = mStartScale;
+								mWidget.width = mStartWidth;
+								mWidget.height = mStartHeight;
 							}
 						}
 
@@ -561,7 +606,7 @@ public class UIWidgetInspector : Editor
 	/// Adjust the transform's position and scale.
 	/// </summary>
 
-	static void AdjustPosAndScale (UIWidget w, Vector3 startLocalPos, Vector3 startLocalScale, Vector3 worldDelta, UIWidget.Pivot dragPivot)
+	static void AdjustPosAndScale (UIWidget w, Vector3 startLocalPos, int width, int height, Vector3 worldDelta, UIWidget.Pivot pivot)
 	{
 		Transform t = w.cachedTransform;
 		Transform parent = t.parent;
@@ -571,169 +616,162 @@ public class UIWidgetInspector : Editor
 		worldToLocal = worldToLocal * Matrix4x4.TRS(Vector3.zero, invRot, Vector3.one);
 		Vector3 localDelta = worldToLocal.MultiplyVector(worldDelta);
 
-		bool canBeSquare = false;
 		float left = 0f;
 		float right = 0f;
 		float top = 0f;
 		float bottom = 0f;
 
-		switch (dragPivot)
+		Vector2 dragPivot = NGUIMath.GetPivotOffset(pivot);
+
+		if (dragPivot.x == 0f && dragPivot.y == 1f)
 		{
-			case UIWidget.Pivot.TopLeft:
-			canBeSquare = (w.pivot == UIWidget.Pivot.BottomRight);
 			left = localDelta.x;
 			top = localDelta.y;
-			break;
-
-			case UIWidget.Pivot.Left:
+		}
+		else if (dragPivot.x == 0f && dragPivot.y == 0.5f)
+		{
 			left = localDelta.x;
-			break;
-
-			case UIWidget.Pivot.BottomLeft:
-			canBeSquare = (w.pivot == UIWidget.Pivot.TopRight);
+		}
+		else if (dragPivot.x == 0f && dragPivot.y == 0f)
+		{
 			left = localDelta.x;
 			bottom = localDelta.y;
-			break;
-
-			case UIWidget.Pivot.Top:
+		}
+		else if (dragPivot.x == 0.5f && dragPivot.y == 1f)
+		{
 			top = localDelta.y;
-			break;
-
-			case UIWidget.Pivot.Bottom:
+		}
+		else if (dragPivot.x == 0.5f && dragPivot.y == 0f)
+		{
 			bottom = localDelta.y;
-			break;
-
-			case UIWidget.Pivot.TopRight:
-			canBeSquare = (w.pivot == UIWidget.Pivot.BottomLeft);
+		}
+		else if (dragPivot.x == 1f && dragPivot.y == 1f)
+		{
 			right = localDelta.x;
 			top = localDelta.y;
-			break;
-
-			case UIWidget.Pivot.Right:
+		}
+		else if (dragPivot.x == 1f && dragPivot.y == 0.5f)
+		{
 			right = localDelta.x;
-			break;
-
-			case UIWidget.Pivot.BottomRight:
-			canBeSquare = (w.pivot == UIWidget.Pivot.TopLeft);
+		}
+		else if (dragPivot.x == 1f && dragPivot.y == 0f)
+		{
 			right = localDelta.x;
 			bottom = localDelta.y;
-			break;
 		}
 
-		AdjustWidget(w, startLocalPos, startLocalScale, left, top, right, bottom, canBeSquare && Event.current.modifiers == EventModifiers.Shift);
+		AdjustWidget(w, startLocalPos, width, height,
+			Mathf.RoundToInt(left), Mathf.RoundToInt(top),
+			Mathf.RoundToInt(right), Mathf.RoundToInt(bottom));
 	}
 	
 	/// <summary>
 	/// Adjust the widget's rectangle based on the specified modifier values.
 	/// </summary>
 
-	static void AdjustWidget (UIWidget w, Vector3 pos, Vector3 scale, float left, float top, float right, float bottom, bool makeSquare)
+	static void AdjustWidget (UIWidget w, Vector3 pos, int width, int height, int left, int top, int right, int bottom)
 	{
-		Vector2 offset = w.pivotOffset;
-		Vector4 padding = w.relativePadding;
-		Vector2 size = w.relativeSize;
-
-		offset.x -= padding.x;
-		offset.y -= padding.y;
-		size.x += padding.x + padding.z;
-		size.y += padding.y + padding.w;
-		
-		scale.Scale(size);
-
-		offset.y = -offset.y;
-
+		Vector2 pivot = w.pivotOffset;
 		Transform t = w.cachedTransform;
 		Quaternion rot = t.localRotation;
-		UIWidget.Pivot pivot = w.pivot;
+
+		// Centered pivot means adjustments should be done by two pixels instead of 1
+		if (pivot.x == 0.5f)
+		{
+			right = ((right >> 1) << 1);
+			left = ((left >> 1) << 1);
+		}
+
+		if (pivot.y == 0.5f)
+		{
+			bottom = ((bottom >> 1) << 1);
+			top = ((top >> 1) << 1);
+		}
+
+		width += right - left;
+		height += top - bottom;
+
+		// Centered pivot means width and height must be dividable by two
+		if (pivot.x == 0.5f) width = ((width >> 1) << 1);
+		if (pivot.y == 0.5f) height = ((height >> 1) << 1);
 
 		Vector2 rotatedTL = new Vector2(left, top);
 		Vector2 rotatedTR = new Vector2(right, top);
 		Vector2 rotatedBL = new Vector2(left, bottom);
 		Vector2 rotatedBR = new Vector2(right, bottom);
-		Vector2 rotatedL  = new Vector2(left, 0f);
-		Vector2 rotatedR  = new Vector2(right, 0f);
-		Vector2 rotatedT  = new Vector2(0f, top);
-		Vector2 rotatedB  = new Vector2(0f, bottom);
-		
+		Vector2 rotatedL = new Vector2(left, 0f);
+		Vector2 rotatedR = new Vector2(right, 0f);
+		Vector2 rotatedT = new Vector2(0f, top);
+		Vector2 rotatedB = new Vector2(0f, bottom);
+
 		rotatedTL = rot * rotatedTL;
 		rotatedTR = rot * rotatedTR;
 		rotatedBL = rot * rotatedBL;
 		rotatedBR = rot * rotatedBR;
-		rotatedL  = rot * rotatedL;
-		rotatedR  = rot * rotatedR;
-		rotatedT  = rot * rotatedT;
-		rotatedB  = rot * rotatedB;
+		rotatedL = rot * rotatedL;
+		rotatedR = rot * rotatedR;
+		rotatedT = rot * rotatedT;
+		rotatedB = rot * rotatedB;
 
-		switch (pivot)
+		if (pivot.x == 0f && pivot.y == 1f)
 		{
-			case UIWidget.Pivot.TopLeft:
 			pos.x += rotatedTL.x;
 			pos.y += rotatedTL.y;
-			break;
-
-			case UIWidget.Pivot.BottomRight:
+		}
+		else if (pivot.x == 1f && pivot.y == 0f)
+		{
 			pos.x += rotatedBR.x;
 			pos.y += rotatedBR.y;
-			break;
-
-			case UIWidget.Pivot.BottomLeft:
+		}
+		else if (pivot.x == 0f && pivot.y == 0f)
+		{
 			pos.x += rotatedBL.x;
 			pos.y += rotatedBL.y;
-			break;
-
-			case UIWidget.Pivot.TopRight:
+		}
+		else if (pivot.x == 1f && pivot.y == 1f)
+		{
 			pos.x += rotatedTR.x;
 			pos.y += rotatedTR.y;
-			break;
-
-			case UIWidget.Pivot.Left:
+		}
+		else if (pivot.x == 0f && pivot.y == 0.5f)
+		{
 			pos.x += rotatedL.x + (rotatedT.x + rotatedB.x) * 0.5f;
 			pos.y += rotatedL.y + (rotatedT.y + rotatedB.y) * 0.5f;
-			break;
-
-			case UIWidget.Pivot.Right:
+		}
+		else if (pivot.x == 1f && pivot.y == 0.5f)
+		{
 			pos.x += rotatedR.x + (rotatedT.x + rotatedB.x) * 0.5f;
 			pos.y += rotatedR.y + (rotatedT.y + rotatedB.y) * 0.5f;
-			break;
-
-			case UIWidget.Pivot.Top:
+		}
+		else if (pivot.x == 0.5f && pivot.y == 1f)
+		{
 			pos.x += rotatedT.x + (rotatedL.x + rotatedR.x) * 0.5f;
 			pos.y += rotatedT.y + (rotatedL.y + rotatedR.y) * 0.5f;
-			break;
-
-			case UIWidget.Pivot.Bottom:
+		}
+		else if (pivot.x == 0.5f && pivot.y == 0f)
+		{
 			pos.x += rotatedB.x + (rotatedL.x + rotatedR.x) * 0.5f;
 			pos.y += rotatedB.y + (rotatedL.y + rotatedR.y) * 0.5f;
-			break;
-
-			case UIWidget.Pivot.Center:
+		}
+		else if (pivot.x == 0.5f && pivot.y == 0.5f)
+		{
 			pos.x += (rotatedL.x + rotatedR.x + rotatedT.x + rotatedB.x) * 0.5f;
 			pos.y += (rotatedT.y + rotatedB.y + rotatedL.y + rotatedR.y) * 0.5f;
-			break;
 		}
-
-		scale.x -= left - right;
-		scale.y += top - bottom;
-
-		scale.x /= size.x;
-		scale.y /= size.y;
-
-		Vector4 border = w.border;
-		float minx = Mathf.Max(2f, padding.x + padding.z + border.x + border.z);
-		float miny = Mathf.Max(2f, padding.y + padding.w + border.y + border.w);
-
-		if (scale.x < minx) scale.x = minx;
-		if (scale.y < miny) scale.y = miny;
-
-		// NOTE: This will only work correctly when dragging the corner opposite of the pivot point
-		if (makeSquare)
+		else
 		{
-			scale.x = Mathf.Min(scale.x, scale.y);
-			scale.y = scale.x;
+			Debug.LogWarning("Pivot " + pivot + " dragging is not supported");
 		}
+
+		int minx = Mathf.Max(2, w.minWidth);
+		int miny = Mathf.Max(2, w.minHeight);
+
+		if (width < minx) width = minx;
+		if (height < miny) height = miny;
 
 		t.localPosition = pos;
-		t.localScale = scale;
+		w.width = width;
+		w.height = height;
 	}
 
 	/// <summary>
@@ -757,9 +795,8 @@ public class UIWidgetInspector : Editor
 		// Check to see if we can draw the widget's default properties to begin with
 		if (DrawProperties())
 		{
-			// Draw all common properties next
-			DrawCommonProperties();
 			DrawExtraProperties();
+			DrawCommonProperties();
 		}
 	}
 
@@ -770,102 +807,119 @@ public class UIWidgetInspector : Editor
 	protected void DrawCommonProperties ()
 	{
 		PrefabType type = PrefabUtility.GetPrefabType(mWidget.gameObject);
-		NGUIEditorTools.DrawSeparator();
 
-#if UNITY_3_5
-		// Pivot point -- old school drop-down style
-		UIWidget.Pivot pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", mWidget.pivot);
-
-		if (mWidget.pivot != pivot)
+		if (NGUIEditorTools.DrawHeader("Widget"))
 		{
-		    NGUIEditorTools.RegisterUndo("Pivot Change", mWidget);
-		    mWidget.pivot = pivot;
-		}
-#else
-		// Pivot point -- the new, more visual style
-		GUILayout.BeginHorizontal();
-		GUILayout.Label("Pivot", GUILayout.Width(76f));
-		Toggle("\u25C4", "ButtonLeft", UIWidget.Pivot.Left, true);
-		Toggle("\u25AC", "ButtonMid", UIWidget.Pivot.Center, true);
-		Toggle("\u25BA", "ButtonRight", UIWidget.Pivot.Right, true);
-		Toggle("\u25B2", "ButtonLeft", UIWidget.Pivot.Top, false);
-		Toggle("\u258C", "ButtonMid", UIWidget.Pivot.Center, false);
-		Toggle("\u25BC", "ButtonRight", UIWidget.Pivot.Bottom, false);
-		GUILayout.EndHorizontal();
-#endif
+			NGUIEditorTools.BeginContents();
 
-		// Depth navigation
-		if (type != PrefabType.Prefab)
-		{
-			GUILayout.Space(2f);
+			// Color tint
 			GUILayout.BeginHorizontal();
-			{
-				EditorGUILayout.PrefixLabel("Depth");
-
-				int depth = mWidget.depth;
-				if (GUILayout.Button("Back", GUILayout.Width(60f))) --depth;
-				depth = EditorGUILayout.IntField(depth);
-				if (GUILayout.Button("Forward", GUILayout.Width(60f))) ++depth;
-
-				if (mWidget.depth != depth)
-				{
-					NGUIEditorTools.RegisterUndo("Depth Change", mWidget);
-					mWidget.depth = depth;
-				}
-			}
+			Color color = EditorGUILayout.ColorField("Color Tint", mWidget.color);
+			if (GUILayout.Button("Copy", GUILayout.Width(50f)))
+				NGUISettings.color = color;
 			GUILayout.EndHorizontal();
 
-			int matchingDepths = 0;
-
-			for (int i = 0; i < UIWidget.list.size; ++i)
-			{
-				UIWidget w = UIWidget.list[i];
-				if (w != null && w.depth == mWidget.depth)
-					++matchingDepths;
-			}
-
-			if (matchingDepths > 1)
-			{
-				EditorGUILayout.HelpBox(matchingDepths + " widgets are using the depth value of " + mWidget.depth +
-					". It may not be clear what should be in front of what.", MessageType.Warning);
-			}
-		}
-
-		// Pixel-correctness
-		if (type != PrefabType.Prefab)
-		{
 			GUILayout.BeginHorizontal();
-			{
-				EditorGUILayout.PrefixLabel("Correction");
+			NGUISettings.color = EditorGUILayout.ColorField("Clipboard", NGUISettings.color);
+			if (GUILayout.Button("Paste", GUILayout.Width(50f)))
+				color = NGUISettings.color;
+			GUILayout.EndHorizontal();
 
-				if (GUILayout.Button("Make Pixel-Perfect"))
+			if (mWidget.color != color)
+			{
+				NGUIEditorTools.RegisterUndo("Color Change", mWidget);
+				mWidget.color = color;
+			}
+
+			GUILayout.Space(6f);
+
+#if UNITY_3_5
+			// Pivot point -- old school drop-down style
+			UIWidget.Pivot pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", mWidget.pivot);
+
+			if (mWidget.pivot != pivot)
+			{
+				NGUIEditorTools.RegisterUndo("Pivot Change", mWidget);
+				mWidget.pivot = pivot;
+			}
+#else
+			// Pivot point -- the new, more visual style
+			GUILayout.BeginHorizontal();
+			GUILayout.Label("Pivot", GUILayout.Width(76f));
+			Toggle("\u25C4", "ButtonLeft", UIWidget.Pivot.Left, true);
+			Toggle("\u25AC", "ButtonMid", UIWidget.Pivot.Center, true);
+			Toggle("\u25BA", "ButtonRight", UIWidget.Pivot.Right, true);
+			Toggle("\u25B2", "ButtonLeft", UIWidget.Pivot.Top, false);
+			Toggle("\u258C", "ButtonMid", UIWidget.Pivot.Center, false);
+			Toggle("\u25BC", "ButtonRight", UIWidget.Pivot.Bottom, false);
+			GUILayout.EndHorizontal();
+#endif
+			// Depth navigation
+			if (type != PrefabType.Prefab)
+			{
+				GUILayout.Space(2f);
+				GUILayout.BeginHorizontal();
 				{
+					EditorGUILayout.PrefixLabel("Depth");
+
+					int depth = mWidget.depth;
+					if (GUILayout.Button("Back", GUILayout.Width(60f))) --depth;
+					depth = EditorGUILayout.IntField(depth, GUILayout.MinWidth(20f));
+					if (GUILayout.Button("Forward", GUILayout.Width(68f))) ++depth;
+
+					if (mWidget.depth != depth)
+					{
+						NGUIEditorTools.RegisterUndo("Depth Change", mWidget);
+						mWidget.depth = depth;
+					}
+				}
+				GUILayout.EndHorizontal();
+
+				int matchingDepths = 0;
+
+				for (int i = 0; i < UIWidget.list.size; ++i)
+				{
+					UIWidget w = UIWidget.list[i];
+					if (w != null && w.depth == mWidget.depth)
+						++matchingDepths;
+				}
+
+				if (matchingDepths > 1)
+				{
+					EditorGUILayout.HelpBox(matchingDepths + " widgets are using the depth value of " + mWidget.depth +
+						". It may not be clear what should be in front of what.", MessageType.Warning);
+				}
+			}
+
+			GUI.changed = false;
+			GUILayout.BeginHorizontal();
+			GUILayout.Label("Dimensions", GUILayout.Width(76f));
+			int width = EditorGUILayout.IntField(mWidget.width, GUILayout.MinWidth(34f));
+			GUILayout.Label("x", GUILayout.Width(10f));
+			int height = EditorGUILayout.IntField(mWidget.height, GUILayout.MinWidth(34f));
+
+			if (GUI.changed)
+			{
+				NGUIEditorTools.RegisterUndo("Widget Change", mWidget);
+				mWidget.width = width;
+				mWidget.height = height;
+			}
+
+			if (type != PrefabType.Prefab)
+			{
+				if (GUILayout.Button("Correct", GUILayout.Width(68f)))
+				{
+					NGUIEditorTools.RegisterUndo("Widget Change", mWidget);
 					NGUIEditorTools.RegisterUndo("Make Pixel-Perfect", mWidget.transform);
 					mWidget.MakePixelPerfect();
 				}
 			}
+			else
+			{
+				GUILayout.Space(70f);
+			}
 			GUILayout.EndHorizontal();
-		}
-
-		EditorGUILayout.Space();
-
-		// Color tint
-		GUILayout.BeginHorizontal();
-		Color color = EditorGUILayout.ColorField("Color Tint", mWidget.color);
-		if (GUILayout.Button("Copy", GUILayout.Width(50f)))
-			NGUISettings.color = color;
-		GUILayout.EndHorizontal();
-		
-		GUILayout.BeginHorizontal();
-		NGUISettings.color = EditorGUILayout.ColorField("Clipboard", NGUISettings.color);
-		if (GUILayout.Button("Paste", GUILayout.Width(50f)))
-			color = NGUISettings.color;
-		GUILayout.EndHorizontal();
-
-		if (mWidget.color != color)
-		{
-			NGUIEditorTools.RegisterUndo("Color Change", mWidget);
-			mWidget.color = color;
+			NGUIEditorTools.EndContents();
 		}
 	}
 
@@ -988,7 +1042,7 @@ public class UIWidgetInspector : Editor
 		for (int i = 0; i < UIWidget.list.size; ++i)
 		{
 			UIWidget w = UIWidget.list[i];
-			Vector3[] corners = NGUIMath.CalculateWidgetCorners(w);
+			Vector3[] corners = w.worldCorners;
 			if (SceneViewDistanceToRectangle(corners, mousePos) == 0f)
 				list.Add(w);
 		}

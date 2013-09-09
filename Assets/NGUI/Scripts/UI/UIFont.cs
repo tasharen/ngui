@@ -653,7 +653,7 @@ public class UIFont : MonoBehaviour
 #endif
 
 	/// <summary>
-	/// Get the printed size of the specified string. The returned value is in local coordinates. Multiply by transform's scale to get pixels.
+	/// Get the printed size of the specified string. The returned value is in pixels.
 	/// </summary>
 
 	public Vector2 CalculatePrintedSize (string text, bool encoding, SymbolStyle symbolStyle)
@@ -733,9 +733,8 @@ public class UIFont : MonoBehaviour
 			}
 
 			// Convert from pixel coordinates to local coordinates
-			float scale = (fs > 0) ? 1f / fs : 1f;
-			v.x = scale * ((x > maxX) ? x : maxX);
-			v.y = scale * (y + lineHeight);
+			v.x = ((x > maxX) ? x : maxX);
+			v.y = (y + lineHeight);
 		}
 		return v;
 	}
@@ -826,41 +825,29 @@ public class UIFont : MonoBehaviour
 #endif
 
 	/// <summary>
-	/// Text wrapping functionality. The 'maxWidth' should be in local coordinates (take pixels and divide them by transform's scale).
+	/// Text wrapping functionality. The 'width' and 'height' should be in pixels.
 	/// </summary>
 
-	public bool WrapText (string text, out string finalText, float width, float height, int lines, bool encoding, SymbolStyle symbolStyle)
+	public bool WrapText (string text, out string finalText, int width, int height, int maxLines, bool encoding, SymbolStyle symbolStyle)
 	{
 		if (mReplacement != null)
 		{
-			return mReplacement.WrapText(text, out finalText, width, height, lines, encoding, symbolStyle);
+			return mReplacement.WrapText(text, out finalText, width, height, maxLines, encoding, symbolStyle);
 		}
-
-		// Zero means unlimited
-		if (width == 0f) width = 100000f;
-		if (height == 0f) height = 100000f;
-
-		// Width and height of the line in pixels
-		int lineWidth = Mathf.FloorToInt(width * size);
-		int lineHeight = Mathf.FloorToInt(height * size);
 		
-		if (lineWidth < 1 || lineHeight < 1)
+		if (width < 1 || height < 1)
 		{
 			finalText = "";
 			return false;
 		}
 
-		int maxLineCount = (lines > 0) ? lines : 999999;
+		int maxLineCount = (maxLines > 0) ? maxLines : 999999;
+		maxLineCount = Mathf.Min(maxLineCount, height / size);
 
-		if (height != 0f)
+		if (maxLineCount == 0)
 		{
-			maxLineCount = Mathf.Min(maxLineCount, Mathf.FloorToInt(height));
-
-			if (maxLineCount == 0)
-			{
-				finalText = "";
-				return false;
-			}
+			finalText = "";
+			return false;
 		}
 
 #if DYNAMIC_FONT
@@ -868,12 +855,12 @@ public class UIFont : MonoBehaviour
 #endif
 		StringBuilder sb = new StringBuilder();
 		int textLength = text.Length;
-		int remainingWidth = lineWidth;
+		int remainingWidth = width;
 		int previousChar = 0;
 		int start = 0;
 		int offset = 0;
 		bool lineIsEmpty = true;
-		bool multiline = (lines != 1);
+		bool multiline = (maxLines != 1);
 		int lineCount = 1;
 		bool useSymbols = encoding && symbolStyle != SymbolStyle.None && hasSymbols;
 		bool dynamic = isDynamic;
@@ -887,7 +874,7 @@ public class UIFont : MonoBehaviour
 			if (ch == '\n')
 			{
 				if (!multiline || lineCount == maxLineCount) break;
-				remainingWidth = lineWidth;
+				remainingWidth = width;
 
 				// Add the previous word to the final string
 				if (start < offset) sb.Append(text.Substring(start, offset - start + 1));
@@ -987,12 +974,12 @@ public class UIFont : MonoBehaviour
 					if (ch == ' ')
 					{
 						start = offset + 1;
-						remainingWidth = lineWidth;
+						remainingWidth = width;
 					}
 					else
 					{
 						start = offset;
-						remainingWidth = lineWidth - glyphWidth;
+						remainingWidth = width - glyphWidth;
 					}
 					previousChar = 0;
 				}
@@ -1003,7 +990,7 @@ public class UIFont : MonoBehaviour
 
 					// Revert the position to the beginning of the word and reset the line
 					lineIsEmpty = true;
-					remainingWidth = lineWidth;
+					remainingWidth = width;
 					offset = start - 1;
 					previousChar = 0;
 
@@ -1025,25 +1012,25 @@ public class UIFont : MonoBehaviour
 
 		if (start < offset) sb.Append(text.Substring(start, offset - start));
 		finalText = sb.ToString();
-		return (!multiline || offset == textLength || (lines > 0 && lineCount <= lines));
+		return (!multiline || offset == textLength || (maxLines > 0 && lineCount <= maxLines));
 	}
 
 	/// <summary>
 	/// Text wrapping functionality. Legacy compatibility function.
 	/// </summary>
 
-	public bool WrapText (string text, out string finalText, float maxWidth, float maxHeight, int maxLineCount, bool encoding)
+	public bool WrapText (string text, out string finalText, int width, int height, int maxLines, bool encoding)
 	{
-		return WrapText(text, out finalText, maxWidth, maxHeight, maxLineCount, encoding, SymbolStyle.None);
+		return WrapText(text, out finalText, width, height, maxLines, encoding, SymbolStyle.None);
 	}
 
 	/// <summary>
 	/// Text wrapping functionality. Legacy compatibility function.
 	/// </summary>
 
-	public bool WrapText (string text, out string finalText, float maxWidth, float maxHeight, int maxLineCount)
+	public bool WrapText (string text, out string finalText, int width, int height, int maxLineCount)
 	{
-		return WrapText(text, out finalText, maxWidth, maxHeight, maxLineCount, false, SymbolStyle.None);
+		return WrapText(text, out finalText, width, height, maxLineCount, false, SymbolStyle.None);
 	}
 
 	/// <summary>
@@ -1054,37 +1041,30 @@ public class UIFont : MonoBehaviour
 	{
 		if (alignment != Alignment.Left)
 		{
-			int fs = size;
+			float offset = 0f;
 
-			if (fs > 0)
+			if (alignment == Alignment.Right)
 			{
-				float offset = 0f;
+				offset = lineWidth - x;
+				if (offset < 0f) offset = 0f;
+			}
+			else
+			{
+				// Centered alignment
+				offset = Mathf.RoundToInt((lineWidth - x) * 0.5f);
+				if (offset < 0f) offset = 0f;
 
-				if (alignment == Alignment.Right)
-				{
-					offset = Mathf.RoundToInt(lineWidth - x);
-					if (offset < 0f) offset = 0f;
-					offset /= size;
-				}
-				else
-				{
-					// Centered alignment
-					offset = Mathf.RoundToInt((lineWidth - x) * 0.5f);
-					if (offset < 0f) offset = 0f;
-					offset /= size;
+				// Keep it pixel-perfect
+				if ((lineWidth & 1) == 1) offset += 0.5f;
+			}
 
-					// Keep it pixel-perfect
-					if ((lineWidth & 1) == 1) offset += 0.5f / fs;
-				}
+			Vector3 temp;
 
-				Vector3 temp;
-
-				for (int i = indexOffset; i < verts.size; ++i)
-				{
-					temp = verts.buffer[i];
-					temp.x += offset;
-					verts.buffer[i] = temp;
-				}
+			for (int i = indexOffset; i < verts.size; ++i)
+			{
+				temp = verts.buffer[i];
+				temp.x += offset;
+				verts.buffer[i] = temp;
 			}
 		}
 	}
@@ -1119,8 +1099,6 @@ public class UIFont : MonoBehaviour
 			mColors.Add(color);
 
 			int fs = size;
-			Vector2 invSize = fs > 0 ? new Vector2(1f / fs, 1f / fs) : Vector2.one;
-
 			int indexOffset = verts.size;
 			int maxX = 0;
 			int x = 0;
@@ -1191,11 +1169,11 @@ public class UIFont : MonoBehaviour
 							continue;
 						}
 
-						v0.x =  invSize.x * (x + glyph.offsetX);
-						v0.y = -invSize.y * (y + glyph.offsetY);
+						v0.x =  (x + glyph.offsetX);
+						v0.y = -(y + glyph.offsetY);
 
-						v1.x = v0.x + invSize.x * glyph.width;
-						v1.y = v0.y - invSize.y * glyph.height;
+						v1.x = v0.x + glyph.width;
+						v1.y = v0.y - glyph.height;
 
 						u0.x = mUVRect.xMin + invX * glyph.x;
 						u0.y = mUVRect.yMax - invY * glyph.y;
@@ -1237,11 +1215,11 @@ public class UIFont : MonoBehaviour
 					}
 					else
 					{
-						v0.x =  invSize.x * (x + symbol.offsetX);
-						v0.y = -invSize.y * (y + symbol.offsetY);
+						v0.x =  (x + symbol.offsetX);
+						v0.y = -(y + symbol.offsetY);
 
-						v1.x = v0.x + invSize.x * symbol.width;
-						v1.y = v0.y - invSize.y * symbol.height;
+						v1.x = v0.x + symbol.width;
+						v1.y = v0.y - symbol.height;
 
 						Rect uv = symbol.uvRect;
 
@@ -1282,11 +1260,11 @@ public class UIFont : MonoBehaviour
 					if (!mDynamicFont.GetCharacterInfo(c, out mChar, mDynamicFontSize, mDynamicFontStyle))
 						continue;
 
-					v0.x =  invSize.x * (x + mChar.vert.xMin);
-					v0.y = -invSize.y * (y - mChar.vert.yMax + mDynamicFontOffset);
-					
-					v1.x = v0.x + invSize.x * mChar.vert.width;
-					v1.y = v0.y - invSize.y * mChar.vert.height;
+					v0.x =  (x + mChar.vert.xMin);
+					v0.y = -(y - mChar.vert.yMax + mDynamicFontOffset);
+
+					v1.x = v0.x + mChar.vert.width;
+					v1.y = v0.y - mChar.vert.height;
 
 					u0.x = mChar.uv.xMin;
 					u0.y = mChar.uv.yMin;

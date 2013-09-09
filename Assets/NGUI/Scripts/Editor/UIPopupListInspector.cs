@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
@@ -116,6 +116,20 @@ public class UIPopupListInspector : Editor
 			}
 
 			float ts = EditorGUILayout.FloatField("Text Scale", mList.textScale);
+
+			GUILayout.BeginHorizontal();
+			GUILayout.Label("Padding", GUILayout.Width(76f));
+			Vector2 padding = mList.padding;
+			padding.x = EditorGUILayout.FloatField(padding.x);
+			padding.y = EditorGUILayout.FloatField(padding.y);
+			GUILayout.EndHorizontal();
+
+			if (mList.padding != padding)
+			{
+				RegisterUndo();
+				mList.padding = padding;
+			}
+
 			Color tc = EditorGUILayout.ColorField("Text Color", mList.textColor);
 			Color bc = EditorGUILayout.ColorField("Background", mList.backgroundColor);
 			Color hc = EditorGUILayout.ColorField("Highlight", mList.highlightColor);
@@ -142,22 +156,6 @@ public class UIPopupListInspector : Editor
 			}
 
 			NGUIEditorTools.DrawSeparator();
-
-			GUILayout.BeginHorizontal();
-			GUILayout.Space(6f);
-			GUILayout.Label("Padding", GUILayout.Width(76f));
-			GUILayout.BeginVertical();
-			GUILayout.Space(-12f);
-			Vector2 padding = EditorGUILayout.Vector2Field("", mList.padding);
-			GUILayout.EndVertical();
-			GUILayout.EndHorizontal();
-			
-			if (mList.padding != padding)
-			{
-				RegisterUndo();
-				mList.padding = padding;
-			}
-
 			EditorGUIUtility.LookLikeControls(100f);
 
 			GameObject go = EditorGUILayout.ObjectField("Event Receiver", mList.eventReceiver,
