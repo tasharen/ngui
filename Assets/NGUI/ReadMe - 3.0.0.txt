@@ -35,7 +35,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
  Version History
 -----------------
 
-*** NOTE ***
+*** WARNING ***
 PLEASE BACK UP YOUR PROJECT BEFORE UPDATING!
 3.0.0 is a major changeset. You will need to open and re-save all of your scenes and prefabs after updating!
 After updating, expect some things to no longer work the same way they used to. Widgets scale is no longer
@@ -50,7 +50,7 @@ used as its size, so any code that you had relying on this will need to change t
 - NEW: It's now possible to change the selection handles color via the NGUI menu.
 - NEW: UICheckbox is now a UIToggle, and you now specify a 'group' ID rather than a common root object.
 - NEW: Added TweenWidth and TweenHeight to tween widgets width and height properties.
-- NEW: You can now specify the label overflow method: shrink content, clamp content, or resize label.
+- NEW: You can now specify the label overflow method: shrink content, clamp content, resize height, or resize freely.
 - NEW: When labels are in "resize label" overflow mode, the drag handles will be greyed out.
 - FIX: DownloadTexture no longer leaves a shadow of the previous texture behind.
 - FIX: UIDragObject will no longer behave oddly with multiple touches.
