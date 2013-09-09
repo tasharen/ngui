@@ -101,7 +101,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: Handles can now be toggled on/off from the NGUI menu.
 - NEW: Atlas maker will now be limited by max texture size, and will no longer make it possible to corrupt an atlas.
 - NEW: Warning will be shown on the panel if clipping is not possible (GLES 1.1).
-- NEW: Checkbox can now have fade in the checkmark instantly.
+- NEW: Toggle can now have fade in the checkmark instantly.
 - NEW: You can now leave C++ style comments (//) in the localization files.
 - NEW: You can now paste into input fields in stand-alone builds.
 - NEW: Added disabled state to UIImageButton (Nicki)
@@ -141,7 +141,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 2.3.5:
 - NEW: Font symbols can now have an offset for easier positioning.
 - FIX: UISlider will now set the 'current' property before calling the delegate.
-- FIX: Fixed the checkbox animation issue that was brought to light as a result of 2.3.4.
+- FIX: Fixed the toggle animation issue that was brought to light as a result of 2.3.4.
 - FIX: Minor other tweaks, nothing important.
 
 2.3.4:
@@ -157,7 +157,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: Added UIFont.pixelSize, making it possible to have HD/UD fonts that are not a part of an atlas.
 - FIX: Unity 4.1 optimization fix.
 - FIX: Label shadow should now be affected by alpha using PMA shaders.
-- FIX: UICheckbox.current will now work correctly for checkbox event receivers.
+- FIX: UIToggle.current will now work correctly for toggle event receivers.
 - FIX: UIButton series of scripts should now initialize themselves on start, not when they are used.
 - FIX: TweenOrthoSize should now tween the size instead of FOV (o_O).
 - FIX: Sprite selection window will now show sprites properly when the atlas is not square.
@@ -275,7 +275,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 
 2.1.4:
 - NEW: UIInput now supports multi-line input if its label is multi-line. Hold Ctrl when hitting Enter.
-- FIX: UICheckboxControlledComponent will now use delegates by default.
+- FIX: UIToggleControlledComponent will now use delegates by default.
 - FIX: UITexture should now work properly again.
 
 2.1.3:
@@ -411,11 +411,11 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 
 2.0.1:
 - NEW: UIDraggablePanel will now display the bounds of the draggable widgets as an orange outline in the Scene View.
-- NEW: Added a 'repositionNow' checkbox to UIDraggablePanel that will reset the clipping area using the children widget's current bounds.
+- NEW: Added a 'repositionNow' toggle to UIDraggablePanel that will reset the clipping area using the children widget's current bounds.
 - NEW: It's now possible to specify horizontal and vertical axis names for UICamera.
 - FIX: UICamera will no longer process WASD or Space key events if an Input Field is currently selected.
 - FIX: UIDraggablePanel's 'startingDragAmount' was renamed to 'startingRelativePosition', for clarity.
-- FIX: UICheckbox will now set the checkmark state immediately on start instead of gradually.
+- FIX: UIToggle will now set the checkmark state immediately on start instead of gradually.
 - FIX: UISlider will now always force-set its value value on start.
 - FIX: UIInput.text will now always return its own text rather than that of the label (works better with captions).
 - FIX: Setting UIInput.text now sets the color of the label to the active color.
@@ -447,7 +447,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 
 1.90:
 - NEW: You can now specify an option on the UIDragPanelContents that will prevent dragging if the contents already fit.
-- NEW: You can now specify a radio button group root on the checkbox instead of always having it be the parent object.
+- NEW: You can now specify a radio button group root on the toggle instead of always having it be the parent object.
 - NEW: You can now easily adjust the widget's alpha by using the new UIWidget.alpha property.
 - NEW: UIAnchor script has been redesigned, and the 'stretch to fill' property has been removed. You can now position using relative coordinates.
 - NEW: UIStretch script has been added, allowing you to stretch an object in either (or both) directions using relative coordinates.
@@ -462,7 +462,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: You can now specify the movement threshold that will be used to determine whether button presses are eligible for clicks on UICamera.
 - NEW: You can now specify an input field to be password-based, and it will only hide the text once you start typing.
 - FIX: UIButtonTween can now disable objects properly after a toggle.
-- FIX: UISavedOption can now save the state of a single checkbox in addition to a group of checkboxes.
+- FIX: UISavedOption can now save the state of a single toggle in addition to a group of togglees.
 - FIX: Localization now handles duplicate key entries silently.
 - FIX: Widgets not using a texture will now have gizmos.
 - FIX: Fix for the OnClick event on touch-based devices.
@@ -494,12 +494,12 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: Couple of tweaks to UIAtlas and UIFont's replacement feature.
 
 1.83:
-- NEW: Added a simple script that can save the state of the checkbox (or a group of checkboxes) to player prefs.
+- NEW: Added a simple script that can save the state of the toggle (or a group of togglees) to player prefs.
 - FIX: A variety of minor tweaks.
 
 1.82:
 - NEW: It's now possible to specify a "replacement" value on UIAtlas and UIFonts, making swapping of atlases and fonts a trivial matter.
-- NEW: UICheckbox now has an option to allow unchecking the last item within a group.
+- NEW: UIToggle now has an option to allow unchecking the last item within a group.
 - FIX: Most cases of FindObjectsOfTypeAll has been replaced with FindSceneObjectsOfType instead.
 - FIX: UISliderColors now keeps the slider's alpha.
 - FIX: Edit-time modification of UISlider's 'rawValue' in the inspector will now again visibly move the slider.
@@ -517,7 +517,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: Creating sliders via the wizard will now set their full size property.
 
 1.80:
-- NEW: You can now add a colored shadow/bevel or an outline effect to your labels via a simple checkbox.
+- NEW: You can now add a colored shadow/bevel or an outline effect to your labels via a simple toggle.
 - NEW: UICamera now has support for keyboard, joystick and controller input.
 - NEW: UICamera can now control what kind of events it will process (only touch, only keyboard, etc).
 - NEW: UISlider can now be adjusted via keyboard, joystick and controller input.
@@ -539,7 +539,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 
 1.69:
 - NEW: Added right-click support by simply adding an optional integer parameter to the OnClick event.
-- NEW: The contents of the UIPopupList can now be localized by enabling a checkbox on it.
+- NEW: The contents of the UIPopupList can now be localized by enabling a toggle on it.
 - NEW: You can now give the UIEventListener an optional parameter that you can retrieve later.
 
 1.68:
@@ -601,7 +601,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: Atlas and Font maker will now create new atlases and fonts in the same folder as the selected items.
 
 1.61:
-- NEW: UICheckbox.current will hold the checkbox that triggered the 'functionName' function on the 'eventReceiver'.
+- NEW: UIToggle.current will hold the toggle that triggered the 'functionName' function on the 'eventReceiver'.
 - FIX: UIPopupList will now place the created object onto a proper layer.
 
 1.60:
@@ -680,7 +680,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 
 1.42:
 - NEW: Added a new tool: Widget Creation Wizard. It replaces all "Add" functions in NGUI menu.
-- NEW: Added new templates to the Widget Wizard: Button, Checkbox, Progress Bar, Slider.
+- NEW: Added new templates to the Widget Wizard: Button, Toggle, Progress Bar, Slider.
 - NEW: When adding widgets via the wizard, widget depth is now chosen automatically so that each new widget appears on top.
 - NEW: AddWidget<> functionality is now exposed to runtime scripts (found in NGUITools).
 - FIX: Widget colliders of widgets layed on top of each other are now offset by wiget's depth.
@@ -706,8 +706,8 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: Panel tool will now update itself on object selection.
 
 1.33:
-- NEW: UICheckbox now has a configurable function to call.
-- NEW: UICheckbox now has an animation parameter it can trigger when checked/unchecked.
+- NEW: UIToggle now has a configurable function to call.
+- NEW: UIToggle now has an animation parameter it can trigger when checked/unchecked.
 - NEW: You can now play remote animations via UIButtonPlayAnimations.
 - NEW: Tweener now sends out notifications when it finishes.
 - NEW: Tweener now has a 'group' parameter that can be used to only enable/disable only certain tweens on the same object.
@@ -733,7 +733,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: UISpriteAnimation for some simple sprite animation (attach to a sprite).
 - NEW: UIAnchor can now specify depth offset to be used with perspective cameras.
 - NEW: UIDragObject can now restrict dragging of objects to be within the panel's clipping bounds.
-- NEW: UICheckbox now has an "option" field that lets you create option button groups (Tutorial 11).
+- NEW: UIToggle now has an "option" field that lets you create option button groups (Tutorial 11).
 - NEW: Example 7 showing how to use the clipping feature.
 - NEW: Example 0 (Anchor) has been redone.
 - NEW: Most tutorials and examples now explain what they do inside them.

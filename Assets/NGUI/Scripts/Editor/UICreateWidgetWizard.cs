@@ -20,7 +20,7 @@ public class UICreateWidgetWizard : EditorWindow
 		Texture,
 		Button,
 		ImageButton,
-		Checkbox,
+		Toggle,
 		ProgressBar,
 		Slider,
 		Input,
@@ -369,10 +369,10 @@ public class UICreateWidgetWizard : EditorWindow
 	void OnImage3 (string val) { mImage3 = val; Save(); Repaint(); }
 
 	/// <summary>
-	/// Checkbox creation function.
+	/// Toggle creation function.
 	/// </summary>
 
-	void CreateCheckbox (GameObject go)
+	void CreateToggle (GameObject go)
 	{
 		if (NGUISettings.atlas != null)
 		{
@@ -384,7 +384,7 @@ public class UICreateWidgetWizard : EditorWindow
 		{
 			int depth = NGUITools.CalculateNextDepth(go);
 			go = NGUITools.AddChild(go);
-			go.name = "Checkbox";
+			go.name = "Toggle";
 
 			UISprite bg = NGUITools.AddWidget<UISprite>(go);
 			bg.type = UISprite.Type.Sliced;
@@ -415,7 +415,7 @@ public class UICreateWidgetWizard : EditorWindow
 			NGUITools.AddWidgetCollider(go);
 
 			// Add the scripts
-			go.AddComponent<UICheckbox>().checkSprite = fg;
+			go.AddComponent<UIToggle>().activeSprite = fg;
 			go.AddComponent<UIButton>().tweenTarget = bg.gameObject;
 			go.AddComponent<UIButtonScale>().tweenTarget = bg.transform;
 			go.AddComponent<UIButtonSound>();
@@ -769,7 +769,7 @@ public class UICreateWidgetWizard : EditorWindow
 				case WidgetType.Texture:		CreateSimpleTexture(go); break;
 				case WidgetType.Button:			CreateButton(go); break;
 				case WidgetType.ImageButton:	CreateImageButton(go); break;
-				case WidgetType.Checkbox:		CreateCheckbox(go); break;
+				case WidgetType.Toggle:		CreateToggle(go); break;
 				case WidgetType.ProgressBar:	CreateSlider(go, false); break;
 				case WidgetType.Slider:			CreateSlider(go, true); break;
 				case WidgetType.Input:			CreateInput(go); break;

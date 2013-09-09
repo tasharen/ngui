@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
@@ -7,18 +7,18 @@ using UnityEngine;
 
 /// <summary>
 /// Example script showing how to activate or deactivate a game object when OnActivate event is received.
-/// OnActivate event is sent out by the UICheckbox script.
+/// OnActivate event is sent out by the UIToggle script.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/Checkbox Controlled Object")]
-public class UICheckboxControlledObject : MonoBehaviour
+[AddComponentMenu("NGUI/Interaction/Toggle Controlled Object")]
+public class UIToggleControlledObject : MonoBehaviour
 {
 	public GameObject target;
 	public bool inverse = false;
 
 	void OnEnable ()
 	{
-		UICheckbox chk = GetComponent<UICheckbox>();
+		UIToggle chk = GetComponent<UIToggle>();
 		if (chk != null) OnActivate(chk.isChecked);
 	}
 

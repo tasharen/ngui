@@ -6,7 +6,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Attach this script to a popup list, the parent of a group of checkboxes, or to a checkbox itself to save its state.
+/// Attach this script to a popup list, the parent of a group of togglees, or to a toggle itself to save its state.
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Saved Option")]
@@ -21,7 +21,7 @@ public class UISavedOption : MonoBehaviour
 	string key { get { return (string.IsNullOrEmpty(keyName)) ? "NGUI State: " + name : keyName; } }
 
 	UIPopupList mList;
-	UICheckbox mCheck;
+	UIToggle mCheck;
 
 	/// <summary>
 	/// Cache the components and register a listener callback.
@@ -30,7 +30,7 @@ public class UISavedOption : MonoBehaviour
 	void Awake ()
 	{
 		mList = GetComponent<UIPopupList>();
-		mCheck = GetComponent<UICheckbox>();
+		mCheck = GetComponent<UIToggle>();
 		if (mList != null) mList.onSelectionChange += SaveSelection;
 		if (mCheck != null) mCheck.onStateChange += SaveState;
 	}
@@ -46,7 +46,7 @@ public class UISavedOption : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Load and set the state of the checkboxes.
+	/// Load and set the state of the togglees.
 	/// </summary>
 
 	void OnEnable ()
@@ -65,11 +65,11 @@ public class UISavedOption : MonoBehaviour
 		else
 		{
 			string s = PlayerPrefs.GetString(key);
-			UICheckbox[] checkboxes = GetComponentsInChildren<UICheckbox>(true);
+			UIToggle[] togglees = GetComponentsInChildren<UIToggle>(true);
 
-			for (int i = 0, imax = checkboxes.Length; i < imax; ++i)
+			for (int i = 0, imax = togglees.Length; i < imax; ++i)
 			{
-				UICheckbox ch = checkboxes[i];
+				UIToggle ch = togglees[i];
 				ch.isChecked = (ch.name == s);
 			}
 		}
@@ -83,11 +83,11 @@ public class UISavedOption : MonoBehaviour
 	{
 		if (mCheck == null && mList == null)
 		{
-			UICheckbox[] checkboxes = GetComponentsInChildren<UICheckbox>(true);
+			UIToggle[] togglees = GetComponentsInChildren<UIToggle>(true);
 
-			for (int i = 0, imax = checkboxes.Length; i < imax; ++i)
+			for (int i = 0, imax = togglees.Length; i < imax; ++i)
 			{
-				UICheckbox ch = checkboxes[i];
+				UIToggle ch = togglees[i];
 
 				if (ch.isChecked)
 				{
