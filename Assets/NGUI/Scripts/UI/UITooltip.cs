@@ -101,10 +101,9 @@ public class UITooltip : MonoBehaviour
 				Transform textTrans = text.transform;
 				Vector3 offset = textTrans.localPosition;
 				Vector3 textScale = textTrans.localScale;
-				Vector3[] corners = text.worldCorners;
 
 				// Calculate the dimensions of the printed text
-				mSize = corners[2] - corners[0];
+				mSize = text.printedSize;
 
 				// Scale by the transform and adjust by the padding offset
 				mSize.x *= textScale.x;
