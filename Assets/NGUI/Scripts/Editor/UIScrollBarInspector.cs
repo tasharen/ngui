@@ -14,13 +14,13 @@ public class UIScrollBarInspector : Editor
 		EditorGUIUtility.LookLikeControls(80f);
 		UIScrollBar sb = target as UIScrollBar;
 
-		NGUIEditorTools.DrawSeparator();
+		GUILayout.Space(3f);
 
 		float val = EditorGUILayout.Slider("Value", sb.scrollValue, 0f, 1f);
 		float size = EditorGUILayout.Slider("Size", sb.barSize, 0f, 1f);
 		float alpha = EditorGUILayout.Slider("Alpha", sb.alpha, 0f, 1f);
 
-		NGUIEditorTools.DrawSeparator();
+		EditorGUILayout.Space();
 
 		UISprite bg = (UISprite)EditorGUILayout.ObjectField("Background", sb.background, typeof(UISprite), true);
 		UISprite fg = (UISprite)EditorGUILayout.ObjectField("Foreground", sb.foreground, typeof(UISprite), true);

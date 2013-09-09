@@ -45,7 +45,7 @@ public class UISliderInspector : Editor
 		EditorGUIUtility.LookLikeControls(80f);
 		UISlider slider = target as UISlider;
 
-		NGUIEditorTools.DrawSeparator();
+		GUILayout.Space(3f);
 
 		float sliderValue = EditorGUILayout.Slider("Value", slider.sliderValue, 0f, 1f);
 
@@ -66,7 +66,7 @@ public class UISliderInspector : Editor
 			UnityEditor.EditorUtility.SetDirty(slider);
 		}
 
-		NGUIEditorTools.DrawSeparator();
+		EditorGUILayout.Space();
 
 		Transform fg = EditorGUILayout.ObjectField("Foreground", slider.foreground, typeof(Transform), true) as Transform;
 		Transform tb = EditorGUILayout.ObjectField("Thumb", slider.thumb, typeof(Transform), true) as Transform;
@@ -75,27 +75,37 @@ public class UISliderInspector : Editor
 		// If we're using a sprite for the foreground, ensure it's using a proper pivot.
 		ValidatePivot(fg, "Foreground sprite", dir);
 
-		NGUIEditorTools.DrawSeparator();
+		GUILayout.Space(3f);
 
-		GameObject er = EditorGUILayout.ObjectField("Event Recv.", slider.eventReceiver, typeof(GameObject), true) as GameObject;
+		if (NGUIEditorTools.DrawHeader("Event Notification"))
+		{
+			NGUIEditorTools.BeginContents();
+			GameObject go = EditorGUILayout.ObjectField("Receiver", slider.eventReceiver,
+						typeof(GameObject), true) as GameObject;
 
-		GUILayout.BeginHorizontal();
-		string fn = EditorGUILayout.TextField("Function", slider.functionName);
-		GUILayout.Space(18f);
-		GUILayout.EndHorizontal();
+			GUILayout.BeginHorizontal();
+			string fn = EditorGUILayout.TextField("Function", slider.functionName);
+			GUILayout.Space(18f);
+			GUILayout.EndHorizontal();
+
+			if (slider.eventReceiver != go ||
+				slider.functionName != fn)
+			{
+				NGUIEditorTools.RegisterUndo("Slider Change", slider);
+				slider.eventReceiver = go;
+				slider.functionName = fn;
+			}
+			NGUIEditorTools.EndContents();
+		}
 
 		if (slider.foreground != fg ||
 			slider.thumb != tb ||
-			slider.direction != dir ||
-			slider.eventReceiver != er ||
-			slider.functionName != fn)
+			slider.direction != dir)
 		{
 			NGUIEditorTools.RegisterUndo("Slider Change", slider);
 			slider.foreground = fg;
 			slider.thumb = tb;
 			slider.direction = dir;
-			slider.eventReceiver = er;
-			slider.functionName = fn;
 
 			if (slider.thumb != null)
 			{

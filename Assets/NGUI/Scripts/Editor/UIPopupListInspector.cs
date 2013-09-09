@@ -67,11 +67,13 @@ public class UIPopupListInspector : Editor
 		GUILayout.Space(44f);
 		GUILayout.EndHorizontal();
 
+		if (mList.textLabel == null)
+		{
+			EditorGUILayout.HelpBox("This popup list has no label to update, so it will behave like a menu.", MessageType.Info);
+		}
+
 		if (mList.atlas != null)
 		{
-			NGUIEditorTools.SpriteField("Background", mList.atlas, mList.backgroundSprite, OnBackground);
-			NGUIEditorTools.SpriteField("Highlight", mList.atlas, mList.highlightSprite, OnHighlight);
-
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(6f);
 			GUILayout.Label("Options");
@@ -99,7 +101,7 @@ public class UIPopupListInspector : Editor
 				}
 			}
 
-			string sel = NGUIEditorTools.DrawList("Selection", mList.items.ToArray(), mList.selection);
+			string sel = NGUIEditorTools.DrawList("Default", mList.items.ToArray(), mList.selection);
 
 			if (mList.selection != sel)
 			{
@@ -115,59 +117,89 @@ public class UIPopupListInspector : Editor
 				mList.position = pos;
 			}
 
-			float ts = EditorGUILayout.FloatField("Text Scale", mList.textScale);
+			bool isLocalized = EditorGUILayout.Toggle("Localized", mList.isLocalized);
 
-			GUILayout.BeginHorizontal();
-			GUILayout.Label("Padding", GUILayout.Width(76f));
-			Vector2 padding = mList.padding;
-			padding.x = EditorGUILayout.FloatField(padding.x);
-			padding.y = EditorGUILayout.FloatField(padding.y);
-			GUILayout.EndHorizontal();
-
-			if (mList.padding != padding)
+			if (mList.isLocalized != isLocalized)
 			{
 				RegisterUndo();
-				mList.padding = padding;
-			}
-
-			Color tc = EditorGUILayout.ColorField("Text Color", mList.textColor);
-			Color bc = EditorGUILayout.ColorField("Background", mList.backgroundColor);
-			Color hc = EditorGUILayout.ColorField("Highlight", mList.highlightColor);
-
-			GUILayout.BeginHorizontal();
-			bool isLocalized = EditorGUILayout.Toggle("Localized", mList.isLocalized, GUILayout.Width(100f));
-			bool isAnimated = EditorGUILayout.Toggle("Animated", mList.isAnimated);
-			GUILayout.EndHorizontal();
-
-			if (mList.textScale != ts ||
-				mList.textColor != tc ||
-				mList.highlightColor != hc ||
-				mList.backgroundColor != bc ||
-				mList.isLocalized != isLocalized ||
-				mList.isAnimated != isAnimated)
-			{
-				RegisterUndo();
-				mList.textScale = ts;
-				mList.textColor = tc;
-				mList.backgroundColor = bc;
-				mList.highlightColor = hc;
 				mList.isLocalized = isLocalized;
-				mList.isAnimated = isAnimated;
 			}
 
-			NGUIEditorTools.DrawSeparator();
-			EditorGUIUtility.LookLikeControls(100f);
-
-			GameObject go = EditorGUILayout.ObjectField("Event Receiver", mList.eventReceiver,
-				typeof(GameObject), true) as GameObject;
-
-			string fn = EditorGUILayout.TextField("Function Name", mList.functionName);
-
-			if (mList.eventReceiver != go || mList.functionName != fn)
+			if (NGUIEditorTools.DrawHeader("Visual Properties"))
 			{
-				RegisterUndo();
-				mList.eventReceiver = go;
-				mList.functionName = fn;
+				NGUIEditorTools.BeginContents();
+
+				NGUIEditorTools.SpriteField("Background", mList.atlas, mList.backgroundSprite, OnBackground);
+				NGUIEditorTools.SpriteField("Highlight", mList.atlas, mList.highlightSprite, OnHighlight);
+
+				EditorGUILayout.Space();
+
+				Color tc = EditorGUILayout.ColorField("Text Color", mList.textColor);
+				Color bc = EditorGUILayout.ColorField("Background", mList.backgroundColor);
+				Color hc = EditorGUILayout.ColorField("Highlight", mList.highlightColor);
+
+				if (mList.textColor != tc ||
+					mList.highlightColor != hc ||
+					mList.backgroundColor != bc)
+				{
+					RegisterUndo();
+					mList.textColor = tc;
+					mList.backgroundColor = bc;
+					mList.highlightColor = hc;;
+				}
+
+				EditorGUILayout.Space();
+
+				GUILayout.BeginHorizontal();
+				GUILayout.Label("Padding", GUILayout.Width(76f));
+				Vector2 padding = mList.padding;
+				padding.x = EditorGUILayout.FloatField(padding.x);
+				padding.y = EditorGUILayout.FloatField(padding.y);
+				GUILayout.EndHorizontal();
+
+				if (mList.padding != padding)
+				{
+					RegisterUndo();
+					mList.padding = padding;
+				}
+
+				float ts = EditorGUILayout.FloatField("Text Scale", mList.textScale, GUILayout.Width(120f));
+
+				if (mList.textScale != ts)
+				{
+					RegisterUndo();
+					mList.textScale = ts;
+				}
+
+				bool isAnimated = EditorGUILayout.Toggle("Animated", mList.isAnimated);
+
+				if (mList.isAnimated != isAnimated)
+				{
+					RegisterUndo();
+					mList.isAnimated = isAnimated;
+				}
+				NGUIEditorTools.EndContents();
+			}
+
+			if (NGUIEditorTools.DrawHeader("Event Notification"))
+			{
+				NGUIEditorTools.BeginContents();
+
+				GameObject go = EditorGUILayout.ObjectField("Receiver", mList.eventReceiver,
+					typeof(GameObject), true) as GameObject;
+
+				GUILayout.BeginHorizontal();
+				string fn = EditorGUILayout.TextField("Function", mList.functionName);
+				GUILayout.Space(18f);
+				GUILayout.EndHorizontal();
+
+				if (mList.eventReceiver != go || mList.functionName != fn)
+				{
+					RegisterUndo();
+					mList.eventReceiver = go;
+					mList.functionName = fn;
+				}
+				NGUIEditorTools.EndContents();
 			}
 		}
 	}
