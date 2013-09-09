@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2012 Tasharen Entertainment
-                Version 2.7.0
+                Version 3.0.0
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -35,10 +35,27 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
  Version History
 -----------------
 
-2.7.0:
-- FIX: Eliminated Z/Depth issues.
+*** NOTE ***
+PLEASE BACK UP YOUR PROJECT BEFORE UPDATING!
+3.0.0 is a major changeset. You will need to open and re-save all of your scenes and prefabs after updating!
+After updating, expect some things to no longer work the same way they used to. Widgets scale is no longer
+used as its size, so any code that you had relying on this will need to change to use 'width' and 'height'.
+
+3.0.0:
+- NEW: Re-designed the way widget width & height gets specified. The values are now explicit, and scale is no longer used.
+- NEW: Eliminated Z/Depth issues. You can now also use CTRL+ and CTRL- shortcut keys to adjust widget depth.
+- NEW: It's now possible to have clipped panels in 3D and not have them break when tilting the camera.
+- NEW: It's now possible to nest widgets.
+- NEW: It's now possible to have multiple widgets on the same object.
+- NEW: It's now possible to change the selection handles color via the NGUI menu.
+- NEW: UICheckbox is now a UIToggle, and you now specify a 'group' ID rather than a common root object.
+- NEW: Added TweenWidth and TweenHeight to tween widgets width and height properties.
+- NEW: You can now specify the label overflow method: shrink content, clamp content, or resize label.
+- NEW: When labels are in "resize label" overflow mode, the drag handles will be greyed out.
 - FIX: DownloadTexture no longer leaves a shadow of the previous texture behind.
 - FIX: UIDragObject will no longer behave oddly with multiple touches.
+- FIX: Labels will now again align vertically properly.
+- FIX: UITexture will now default to Unlit/Transparent Colored like all widgets.
 
 2.6.5:
 - FIX: Labels now have "Max Height", and "Max Lines" again works as expected.

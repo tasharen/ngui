@@ -42,7 +42,7 @@ public class NGUISettings
 	static Font mDynFont;
 	static int mDynFontSize = 16;
 	static FontStyle mDynFontStyle = FontStyle.Normal;
-	static ColorMode mColorMode = ColorMode.Orange;
+	static ColorMode mColorMode = ColorMode.Blue;
 
 	static Object GetObject (string name)
 	{
@@ -71,7 +71,7 @@ public class NGUISettings
 		mDynFont		= GetObject("NGUI DynFont") as Font;
 		mDynFontSize	= EditorPrefs.GetInt("NGUI DynFontSize", 16);
 		mDynFontStyle	= (FontStyle)EditorPrefs.GetInt("NGUI DynFontStyle", (int)FontStyle.Normal);
-		mColorMode		= (ColorMode)EditorPrefs.GetInt("NGUI Color Mode", (int)ColorMode.Orange);
+		mColorMode		= (ColorMode)EditorPrefs.GetInt("NGUI Color Mode", (int)ColorMode.Blue);
 
 		if (mLayer < 0 || string.IsNullOrEmpty(LayerMask.LayerToName(mLayer))) mLayer = -1;
 

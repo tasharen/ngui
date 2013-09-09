@@ -672,7 +672,7 @@ public class UISprite : UIWidget
 		float height = Mathf.Abs(size.y / mHeight);
 
 		// Safety check. Useful so Unity doesn't run out of memory if the sprites are too small.
-		if (width < 0.01f || height < 0.01f)
+		if (width * height < 0.0001f)
 		{
 			Debug.LogWarning("The tiled sprite (" + NGUITools.GetHierarchy(gameObject) + ") is too small.\nConsider using a bigger one.");
 
