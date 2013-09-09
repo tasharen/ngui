@@ -604,13 +604,10 @@ public class UILabel : UIWidget
 				{
 					mHeight = Mathf.RoundToInt(mSize.y);
 				}
-				else if (!fits)
+				else if (mOverflow == Overflow.ShrinkContent && !fits)
 				{
-					if (mOverflow == Overflow.ShrinkContent)
-					{
-						printSize = Mathf.Round(printSize - 1f);
-						if (printSize > 1f) continue;
-					}
+					printSize = Mathf.Round(printSize - 1f);
+					if (printSize > 1f) continue;
 				}
 
 				// Upgrade to the new system
@@ -701,21 +698,22 @@ public class UILabel : UIWidget
 		col.a *= mPanel.alpha;
 		if (font.premultipliedAlpha) col = NGUITools.ApplyPMA(col);
 
+		string text = processedText;
 		int w = Mathf.RoundToInt(width / mScale);
 		int start = verts.size;
 
 		// Print the text into the buffers
 		if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)
 		{
-			mFont.Print(processedText, col, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Left, w, mPremultiply);
+			mFont.Print(text, col, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Left, w, mPremultiply);
 		}
 		else if (p == Pivot.Right || p == Pivot.TopRight || p == Pivot.BottomRight)
 		{
-			mFont.Print(processedText, col, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Right, w, mPremultiply);
+			mFont.Print(text, col, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Right, w, mPremultiply);
 		}
 		else
 		{
-			mFont.Print(processedText, col, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Center, w, mPremultiply);
+			mFont.Print(text, col, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Center, w, mPremultiply);
 		}
 
 		Vector2 po = pivotOffset;
