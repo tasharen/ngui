@@ -281,7 +281,8 @@ public class UICreateWidgetWizard : EditorWindow
 			bg.depth = depth;
 			bg.atlas = NGUISettings.atlas;
 			bg.spriteName = mButton;
-			bg.transform.localScale = new Vector3(150f, 40f, 1f);
+			bg.width = 150;
+			bg.height = 40;
 			bg.MakePixelPerfect();
 
 			if (NGUISettings.font != null)
@@ -335,7 +336,8 @@ public class UICreateWidgetWizard : EditorWindow
 			sprite.depth = depth;
 			sprite.atlas = NGUISettings.atlas;
 			sprite.spriteName = mImage0;
-			sprite.transform.localScale = new Vector3(150f, 40f, 1f);
+			sprite.width = 150;
+			sprite.height = 40;
 			sprite.MakePixelPerfect();
 
 			if (NGUISettings.font != null)
@@ -392,7 +394,8 @@ public class UICreateWidgetWizard : EditorWindow
 			bg.depth = depth;
 			bg.atlas = NGUISettings.atlas;
 			bg.spriteName = mCheckBG;
-			bg.transform.localScale = new Vector3(26f, 26f, 1f);
+			bg.width = 26;
+			bg.height = 26;
 			bg.MakePixelPerfect();
 
 			UISprite fg = NGUITools.AddWidget<UISprite>(go);
@@ -530,7 +533,8 @@ public class UICreateWidgetWizard : EditorWindow
 			back.pivot = UIWidget.Pivot.Left;
 			back.atlas = NGUISettings.atlas;
 			back.spriteName = mSliderBG;
-			back.transform.localScale = new Vector3(200f, 30f, 1f);
+			back.width = 200;
+			back.height = 30;
 			back.transform.localPosition = Vector3.zero;
 			back.MakePixelPerfect();
 
@@ -542,7 +546,8 @@ public class UICreateWidgetWizard : EditorWindow
 			front.pivot = UIWidget.Pivot.Left;
 			front.atlas = NGUISettings.atlas;
 			front.spriteName = mSliderFG;
-			front.transform.localScale = new Vector3(200f, 30f, 1f);
+			front.width = 200;
+			front.height = 30;
 			front.transform.localPosition = Vector3.zero;
 			front.MakePixelPerfect();
 
@@ -563,8 +568,9 @@ public class UICreateWidgetWizard : EditorWindow
 				thb.name = "Thumb";
 				thb.atlas = NGUISettings.atlas;
 				thb.spriteName = mSliderTB;
+				thb.width = 20;
+				thb.height = 40;
 				thb.transform.localPosition = new Vector3(200f, 0f, 0f);
-				thb.transform.localScale = new Vector3(20f, 40f, 1f);
 				thb.MakePixelPerfect();
 
 				NGUITools.AddWidgetCollider(thb.gameObject);
@@ -600,8 +606,7 @@ public class UICreateWidgetWizard : EditorWindow
 			int depth = NGUITools.CalculateNextDepth(go);
 			go = NGUITools.AddChild(go);
 			go.name = "Input";
-
-			float padding = 3f;
+			int padding = 3;
 
 			UISprite bg = NGUITools.AddWidget<UISprite>(go);
 			bg.type = UISprite.Type.Sliced;
@@ -610,7 +615,8 @@ public class UICreateWidgetWizard : EditorWindow
 			bg.atlas = NGUISettings.atlas;
 			bg.spriteName = mInputBG;
 			bg.pivot = UIWidget.Pivot.Left;
-			bg.transform.localScale = new Vector3(400f, NGUISettings.font.size + padding * 2f, 1f);
+			bg.width = 400;
+			bg.height = NGUISettings.font.size + padding * 2;
 			bg.transform.localPosition = Vector3.zero;
 			bg.MakePixelPerfect();
 
@@ -673,7 +679,8 @@ public class UICreateWidgetWizard : EditorWindow
 			sprite.depth = depth;
 			sprite.atlas = NGUISettings.atlas;
 			sprite.pivot = UIWidget.Pivot.Left;
-			sprite.transform.localScale = new Vector3(150f + fgPadding.x * 2f, NGUISettings.font.size + fgPadding.y * 2f, 1f);
+			sprite.width = Mathf.RoundToInt(150f + fgPadding.x * 2f);
+			sprite.height = Mathf.RoundToInt(NGUISettings.font.size + fgPadding.y * 2f);
 			sprite.transform.localPosition = Vector3.zero;
 			sprite.MakePixelPerfect();
 
@@ -769,7 +776,7 @@ public class UICreateWidgetWizard : EditorWindow
 				case WidgetType.Texture:		CreateSimpleTexture(go); break;
 				case WidgetType.Button:			CreateButton(go); break;
 				case WidgetType.ImageButton:	CreateImageButton(go); break;
-				case WidgetType.Toggle:		CreateToggle(go); break;
+				case WidgetType.Toggle:			CreateToggle(go); break;
 				case WidgetType.ProgressBar:	CreateSlider(go, false); break;
 				case WidgetType.Slider:			CreateSlider(go, true); break;
 				case WidgetType.Input:			CreateInput(go); break;

@@ -303,12 +303,6 @@ public class UISprite : UIWidget
 	}
 
 	/// <summary>
-	/// Whether this widget will automatically become pixel-perfect after resize operation finishes.
-	/// </summary>
-
-	public override bool pixelPerfectAfterResize { get { return type == Type.Sliced; } }
-
-	/// <summary>
 	/// Retrieve the atlas sprite referenced by the spriteName field.
 	/// </summary>
 

@@ -456,25 +456,9 @@ public class UIWidgetInspector : Editor
 							mAction = Action.None;
 							mActionUnderMouse = Action.None;
 							Vector3 pos = t.localPosition;
-							Vector3 scale = t.localScale;
-
-							if (mWidget.pixelPerfectAfterResize)
-							{
-								t.localPosition = pos;
-								t.localScale = scale;
-
-								mWidget.MakePixelPerfect();
-							}
-							else
-							{
-								pos.x = Mathf.Round(pos.x);
-								pos.y = Mathf.Round(pos.y);
-								scale.x = Mathf.Round(scale.x);
-								scale.y = Mathf.Round(scale.y);
-
-								t.localPosition = pos;
-								t.localScale = scale;
-							}
+							pos.x = Mathf.Round(pos.x);
+							pos.y = Mathf.Round(pos.y);
+							t.localPosition = pos;
 							handled = true;
 						}
 

@@ -20,7 +20,7 @@ public class UITooltip : MonoBehaviour
 	float mTarget = 0f;
 	float mCurrent = 0f;
 	Vector3 mPos;
-	Vector3 mSize;
+	Vector3 mSize = Vector3.zero;
 
 	UIWidget[] mWidgets;
 
@@ -36,7 +36,6 @@ public class UITooltip : MonoBehaviour
 		mTrans = transform;
 		mWidgets = GetComponentsInChildren<UIWidget>();
 		mPos = mTrans.localPosition;
-		mSize = mTrans.localScale;
 		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
 		SetAlpha(0f);
 	}

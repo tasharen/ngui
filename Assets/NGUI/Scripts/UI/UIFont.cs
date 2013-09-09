@@ -759,7 +759,7 @@ public class UIFont : MonoBehaviour
 	{
 		if (mReplacement != null) return mReplacement.GetEndOfLineThatFits(text, maxWidth, encoding, symbolStyle);
 
-		int lineWidth = Mathf.RoundToInt(maxWidth * size);
+		int lineWidth = Mathf.RoundToInt(maxWidth);
 		if (lineWidth < 1) return text;
 
 #if DYNAMIC_FONT

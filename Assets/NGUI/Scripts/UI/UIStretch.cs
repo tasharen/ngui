@@ -146,12 +146,12 @@ public class UIStretch : MonoBehaviour
 				rectHeight *= scale;
 			}
 
-			Vector3 localScale = mTrans.localScale;
+			Vector3 size = mTrans.localScale;
 
 			if (style == Style.BasedOnHeight)
 			{
-				localScale.x = relativeSize.x * rectHeight;
-				localScale.y = relativeSize.y * rectHeight;
+				size.x = relativeSize.x * rectHeight;
+				size.y = relativeSize.y * rectHeight;
 			}
 			else if (style == Style.FillKeepingRatio)
 			{
@@ -163,15 +163,15 @@ public class UIStretch : MonoBehaviour
 				{
 					// Fit horizontally
 					float scale = rectWidth / initialSize.x;
-					localScale.x = rectWidth;
-					localScale.y = initialSize.y * scale;
+					size.x = rectWidth;
+					size.y = initialSize.y * scale;
 				}
 				else
 				{
 					// Fit vertically
 					float scale = rectHeight / initialSize.y;
-					localScale.x = initialSize.x * scale;
-					localScale.y = rectHeight;
+					size.x = initialSize.x * scale;
+					size.y = rectHeight;
 				}
 			}
 			else if (style == Style.FitInternalKeepingRatio)
@@ -184,34 +184,34 @@ public class UIStretch : MonoBehaviour
 				{
 					// Fit horizontally
 					float scale = rectWidth / initialSize.x;
-					localScale.x = rectWidth;
-					localScale.y = initialSize.y * scale;
+					size.x = rectWidth;
+					size.y = initialSize.y * scale;
 				}
 				else
 				{
 					// Fit vertically
 					float scale = rectHeight / initialSize.y;
-					localScale.x = initialSize.x * scale;
-					localScale.y = rectHeight;
+					size.x = initialSize.x * scale;
+					size.y = rectHeight;
 				}
 			}
 			else
 			{
-				if (style == Style.Both || style == Style.Horizontal) localScale.x = relativeSize.x * rectWidth;
-				if (style == Style.Both || style == Style.Vertical) localScale.y = relativeSize.y * rectHeight;
+				if (style == Style.Both || style == Style.Horizontal) size.x = relativeSize.x * rectWidth;
+				if (style == Style.Both || style == Style.Vertical) size.y = relativeSize.y * rectHeight;
 			}
 
 			UIWidget w = mTrans.GetComponent<UIWidget>();
 
 			if (w != null)
 			{
-				w.width = Mathf.RoundToInt(localScale.x);
-				w.height = Mathf.RoundToInt(localScale.y);
-				localScale = Vector3.one;
+				w.width = Mathf.RoundToInt(size.x);
+				w.height = Mathf.RoundToInt(size.y);
+				size = Vector3.one;
 			}
 			
-			if (mTrans.localScale != localScale)
-				mTrans.localScale = localScale;
+			if (mTrans.localScale != size)
+				mTrans.localScale = size;
 
 			if (runOnlyOnce && Application.isPlaying) Destroy(this);
 		}

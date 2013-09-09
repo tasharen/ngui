@@ -259,7 +259,7 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Change Color Mode")]
+	[MenuItem("NGUI/Change Handles Color")]
 	static public void ChangeColorMode ()
 	{
 		if (NGUISettings.colorMode == NGUISettings.ColorMode.Orange)

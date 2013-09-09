@@ -839,12 +839,6 @@ public abstract class UIWidget : MonoBehaviour
 	virtual public Vector4 border { get { return Vector4.zero; } }
 
 	/// <summary>
-	/// Whether this widget will automatically become pixel-perfect after resize operation finishes.
-	/// </summary>
-
-	virtual public bool pixelPerfectAfterResize { get { return false; } }
-
-	/// <summary>
 	/// Virtual Start() functionality for widgets.
 	/// </summary>
 
