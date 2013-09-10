@@ -20,7 +20,7 @@ public class UIToggleInspector : Editor
 		EditorGUIUtility.LookLikeControls(80f);
 		UIToggle toggle = target as UIToggle;
 
-		GUILayout.Space(3f);
+		GUILayout.Space(6f);
 		GUI.changed = false;
 
 		GUILayout.BeginHorizontal();

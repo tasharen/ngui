@@ -271,6 +271,9 @@ public class UISlider : IgnoreTimeScale
 		// Save the raw value
 		rawValue = val;
 
+#if UNITY_EDITOR
+		if (!Application.isPlaying) return;
+#endif
 		// Take steps into account
 		float stepValue = value;
 
@@ -279,42 +282,29 @@ public class UISlider : IgnoreTimeScale
 		{
 			Vector3 scale = mSize;
 
-#if UNITY_EDITOR
-			if (Application.isPlaying)
-			{
-				if (direction == Direction.Horizontal) scale.x *= stepValue;
-				else scale.y *= stepValue;
-			}
-#else
 			if (direction == Direction.Horizontal) scale.x *= stepValue;
 			else scale.y *= stepValue;
-#endif
-
-#if UNITY_EDITOR
-			if (Application.isPlaying)
-#endif
+			
+			if (mFGFilled != null && mFGFilled.type == UISprite.Type.Filled)
 			{
-				if (mFGFilled != null && mFGFilled.type == UISprite.Type.Filled)
+				mFGFilled.fillAmount = stepValue;
+			}
+			else if (mFGWidget != null)
+			{
+				if (stepValue > 0.001f)
 				{
-					mFGFilled.fillAmount = stepValue;
+					mFGWidget.width = Mathf.RoundToInt(scale.x);
+					mFGWidget.height = Mathf.RoundToInt(scale.y);
+					mFGWidget.enabled = true;
 				}
-				else if (mFGWidget != null)
+				else
 				{
-					if (stepValue > 0.001f)
-					{
-						mFGWidget.width = Mathf.RoundToInt(scale.x);
-						mFGWidget.height = Mathf.RoundToInt(scale.y);
-						mFGWidget.enabled = true;
-					}
-					else
-					{
-						mFGWidget.enabled = false;
-					}
+					mFGWidget.enabled = false;
 				}
-				else if (foreground != null)
-				{
-					mFGTrans.localScale = scale;
-				}
+			}
+			else if (foreground != null)
+			{
+				mFGTrans.localScale = scale;
 			}
 
 			if (thumb != null)

@@ -188,6 +188,9 @@ public class UITable : MonoBehaviour
 			mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
 			mDrag = NGUITools.FindInParents<UIDraggablePanel>(gameObject);
 		}
+#if UNITY_EDITOR
+		if (Application.isPlaying)
+#endif
 		Reposition();
 	}
 

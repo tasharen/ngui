@@ -34,6 +34,9 @@ public class UIGrid : MonoBehaviour
 	void Start ()
 	{
 		mStarted = true;
+#if UNITY_EDITOR
+		if (Application.isPlaying)
+#endif
 		Reposition();
 	}
 

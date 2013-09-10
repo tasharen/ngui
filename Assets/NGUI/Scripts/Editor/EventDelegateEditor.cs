@@ -108,7 +108,11 @@ public static class EventDelegateEditor
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(64f);
 
+#if UNITY_3_5
+			if (GUILayout.Button("X", GUILayout.Width(20f)))
+#else
 			if (GUILayout.Button("", "ToggleMixed", GUILayout.Width(20f)))
+#endif
 			{
 				target = null;
 			}
