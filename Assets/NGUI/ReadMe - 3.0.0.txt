@@ -52,6 +52,7 @@ used as its size, so any code that you had relying on this will need to change t
 - NEW: Added TweenWidth and TweenHeight to tween widgets width and height properties.
 - NEW: You can now specify the label overflow method: shrink content, clamp content, resize height, or resize freely.
 - NEW: When labels are in "resize label" overflow mode, the drag handles will be greyed out.
+- NEW: Added a simple EventDelegate class and improved generic components to use it.
 - FIX: DownloadTexture no longer leaves a shadow of the previous texture behind.
 - FIX: UIDragObject will no longer behave oddly with multiple touches.
 - FIX: Labels will now again align vertically properly.
