@@ -4,12 +4,12 @@
 //----------------------------------------------
 
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Scroll bar functionality.
 /// </summary>
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Scroll Bar")]
 public class UIScrollBar : MonoBehaviour
 {
@@ -19,7 +19,24 @@ public class UIScrollBar : MonoBehaviour
 		Vertical,
 	};
 
-	public delegate void OnScrollBarChange (UIScrollBar sb);
+	/// <summary>
+	/// Current scroll bar. This value is set prior to the callback function being triggered.
+	/// </summary>
+
+	static public UIScrollBar current;
+
+	/// <summary>
+	/// Callbacks triggered when the scroll bar's value changes.
+	/// </summary>
+
+	public List<EventDelegate> onChange = new List<EventDelegate>();
+
+	/// <summary>
+	/// Delegate triggered when the scroll bar stops being dragged.
+	/// Useful for things like centering on the closest valid object, for example.
+	/// </summary>
+
+	public OnDragFinished onDragFinished;
 	public delegate void OnDragFinished ();
 
 	[HideInInspector][SerializeField] UISprite mBG;
@@ -33,19 +50,6 @@ public class UIScrollBar : MonoBehaviour
 	bool mIsDirty = false;
 	Camera mCam;
 	Vector2 mScreenPos = Vector2.zero;
-
-	/// <summary>
-	/// Delegate triggered when the scroll bar has changed visibly.
-	/// </summary>
-
-	public OnScrollBarChange onChange;
-
-	/// <summary>
-	/// Delegate triggered when the scroll bar stops being dragged.
-	/// Useful for things like centering on the closest valid object, for example.
-	/// </summary>
-
-	public OnDragFinished onDragFinished;
 
 	/// <summary>
 	/// Cached for speed.
@@ -120,7 +124,7 @@ public class UIScrollBar : MonoBehaviour
 	/// Modifiable value for the scroll bar, 0-1 range.
 	/// </summary>
 
-	public float scrollValue
+	public float value
 	{
 		get
 		{
@@ -134,10 +138,19 @@ public class UIScrollBar : MonoBehaviour
 			{
 				mScroll = val;
 				mIsDirty = true;
-				if (onChange != null) onChange(this);
+				
+				if (onChange != null)
+				{
+					current = this;
+					EventDelegate.Execute(onChange);
+					current = null;
+				}
 			}
 		}
 	}
+
+	[System.Obsolete("Use 'value' instead")]
+	public float scrollValue { get { return this.value; } set { this.value = value; } }
 
 	/// <summary>
 	/// The size of the foreground bar in percent (0-1 range).
@@ -157,7 +170,13 @@ public class UIScrollBar : MonoBehaviour
 			{
 				mSize = val;
 				mIsDirty = true;
-				if (onChange != null) onChange(this);
+
+				if (onChange != null)
+				{
+					current = this;
+					EventDelegate.Execute(onChange);
+					current = null;
+				}
 			}
 		}
 	}
@@ -208,7 +227,7 @@ public class UIScrollBar : MonoBehaviour
 			float offset = size * 0.5f;
 			float min = bg.center.x - offset;
 			float val = (size > 0f) ? (localPos.x - min) / size : 0f;
-			scrollValue = mInverted ? 1f - val : val;
+			value = mInverted ? 1f - val : val;
 		}
 		else
 		{
@@ -216,7 +235,7 @@ public class UIScrollBar : MonoBehaviour
 			float offset = size * 0.5f;
 			float min = bg.center.y - offset;
 			float val = (size > 0f) ? 1f - (localPos.y - min) / size : 0f;
-			scrollValue = mInverted ? 1f - val : val;
+			value = mInverted ? 1f - val : val;
 		}
 	}
 
@@ -303,6 +322,13 @@ public class UIScrollBar : MonoBehaviour
 			UIEventListener listener = UIEventListener.Get(foreground.gameObject);
 			listener.onPress += OnPressForeground;
 			listener.onDrag += OnDragForeground;
+		}
+
+		if (onChange != null)
+		{
+			current = this;
+			EventDelegate.Execute(onChange);
+			current = null;
 		}
 		ForceUpdate();
 	}

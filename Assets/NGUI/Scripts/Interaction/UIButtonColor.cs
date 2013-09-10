@@ -48,11 +48,17 @@ public class UIButtonColor : MonoBehaviour
 	{
 		get
 		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying) return Color.white;
+#endif
 			Start();
 			return mColor;
 		}
 		set
 		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying) return;
+#endif
 			Start();
 			mColor = value;
 		}
@@ -67,9 +73,13 @@ public class UIButtonColor : MonoBehaviour
 		}
 	}
 
-	protected virtual void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
+	protected virtual void OnEnable ()
+	{
+		if (mStarted && mHighlighted)
+			OnHover(UICamera.IsHighlighted(gameObject));
+	}
 
-	void OnDisable ()
+	protected virtual void OnDisable ()
 	{
 		if (mStarted && tweenTarget != null)
 		{

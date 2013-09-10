@@ -6,6 +6,7 @@
 using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Reflection;
 
 /// <summary>
 /// Tools for the editor
@@ -1036,18 +1037,18 @@ public class NGUIEditorTools
 	/// Draw a distinctly different looking header label
 	/// </summary>
 
-	static public bool DrawHeader (string text) { return DrawHeader(text, text); }
+	static public bool DrawHeader (string text, bool forceOn = false) { return DrawHeader(text, text, forceOn); }
 
 	/// <summary>
 	/// Draw a distinctly different looking header label
 	/// </summary>
 
-	static public bool DrawHeader (string text, string key)
+	static public bool DrawHeader (string text, string key, bool forceOn = false)
 	{
 		bool state = EditorPrefs.GetBool(key, true);
 
 		GUILayout.Space(3f);
-		if (!state) GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f);
+		if (!forceOn && !state) GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f);
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(3f);
 
@@ -1062,7 +1063,7 @@ public class NGUIEditorTools
 		GUILayout.Space(2f);
 		GUILayout.EndHorizontal();
 		GUI.backgroundColor = Color.white;
-		if (!state) GUILayout.Space(3f);
+		if (!forceOn && !state) GUILayout.Space(3f);
 		return state;
 	}
 
@@ -1091,5 +1092,26 @@ public class NGUIEditorTools
 		GUILayout.Space(3f);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(3f);
+	}
+
+	/// <summary>
+	/// Draw a list of fields for the specified list of delegates.
+	/// </summary>
+
+	static public void DrawEvents (string text, Object undoObject, List<EventDelegate> list)
+	{
+		DrawEvents(text, undoObject, list, null, null);
+	}
+
+	/// <summary>
+	/// Draw a list of fields for the specified list of delegates.
+	/// </summary>
+
+	static public void DrawEvents (string text, Object undoObject, List<EventDelegate> list, string noTarget, string notValid)
+	{
+		if (!NGUIEditorTools.DrawHeader(text)) return;
+		NGUIEditorTools.BeginContents();
+		EventDelegateEditor.Field(undoObject, list, notValid, notValid);
+		NGUIEditorTools.EndContents();
 	}
 }

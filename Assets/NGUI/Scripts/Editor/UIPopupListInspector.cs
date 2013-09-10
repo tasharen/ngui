@@ -62,7 +62,7 @@ public class UIPopupListInspector : Editor
 		{
 			RegisterUndo();
 			mList.textLabel = lbl;
-			if (lbl != null) lbl.text = mList.selection;
+			if (lbl != null) lbl.text = mList.value;
 		}
 		GUILayout.Space(44f);
 		GUILayout.EndHorizontal();
@@ -95,18 +95,18 @@ public class UIPopupListInspector : Editor
 				mList.items.Clear();
 				foreach (string s in split) mList.items.Add(s);
 
-				if (string.IsNullOrEmpty(mList.selection) || !mList.items.Contains(mList.selection))
+				if (string.IsNullOrEmpty(mList.value) || !mList.items.Contains(mList.value))
 				{
-					mList.selection = mList.items.Count > 0 ? mList.items[0] : "";
+					mList.value = mList.items.Count > 0 ? mList.items[0] : "";
 				}
 			}
 
-			string sel = NGUIEditorTools.DrawList("Default", mList.items.ToArray(), mList.selection);
+			string sel = NGUIEditorTools.DrawList("Default", mList.items.ToArray(), mList.value);
 
-			if (mList.selection != sel)
+			if (mList.value != sel)
 			{
 				RegisterUndo();
-				mList.selection = sel;
+				mList.value = sel;
 			}
 
 			UIPopupList.Position pos = (UIPopupList.Position)EditorGUILayout.EnumPopup("Position", mList.position);
@@ -125,7 +125,7 @@ public class UIPopupListInspector : Editor
 				mList.isLocalized = isLocalized;
 			}
 
-			if (NGUIEditorTools.DrawHeader("Visual Properties"))
+			if (NGUIEditorTools.DrawHeader("Appearance"))
 			{
 				NGUIEditorTools.BeginContents();
 
@@ -155,6 +155,7 @@ public class UIPopupListInspector : Editor
 				Vector2 padding = mList.padding;
 				padding.x = EditorGUILayout.FloatField(padding.x);
 				padding.y = EditorGUILayout.FloatField(padding.y);
+				GUILayout.Space(18f);
 				GUILayout.EndHorizontal();
 
 				if (mList.padding != padding)
@@ -181,26 +182,7 @@ public class UIPopupListInspector : Editor
 				NGUIEditorTools.EndContents();
 			}
 
-			if (NGUIEditorTools.DrawHeader("Event Notification"))
-			{
-				NGUIEditorTools.BeginContents();
-
-				GameObject go = EditorGUILayout.ObjectField("Receiver", mList.eventReceiver,
-					typeof(GameObject), true) as GameObject;
-
-				GUILayout.BeginHorizontal();
-				string fn = EditorGUILayout.TextField("Function", mList.functionName);
-				GUILayout.Space(18f);
-				GUILayout.EndHorizontal();
-
-				if (mList.eventReceiver != go || mList.functionName != fn)
-				{
-					RegisterUndo();
-					mList.eventReceiver = go;
-					mList.functionName = fn;
-				}
-				NGUIEditorTools.EndContents();
-			}
+			NGUIEditorTools.DrawEvents("On Value Change", mList, mList.onChange);
 		}
 	}
 }

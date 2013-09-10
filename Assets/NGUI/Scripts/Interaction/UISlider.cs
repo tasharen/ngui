@@ -4,6 +4,7 @@
 //----------------------------------------------
 
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Simple slider functionality.
@@ -17,8 +18,6 @@ public class UISlider : IgnoreTimeScale
 		Horizontal,
 		Vertical,
 	}
-
-	public delegate void OnValueChange (float val);
 
 	/// <summary>
 	/// Current slider. This value is set prior to the callback function being triggered.
@@ -45,31 +44,23 @@ public class UISlider : IgnoreTimeScale
 	public Direction direction = Direction.Horizontal;
 
 	/// <summary>
-	/// Event receiver that will be notified of the value changes.
-	/// </summary>
-
-	public GameObject eventReceiver;
-
-	/// <summary>
-	/// Function on the event receiver that will receive the value changes.
-	/// </summary>
-
-	public string functionName = "OnSliderChange";
-
-	/// <summary>
-	/// Allow for delegate-based subscriptions for faster events than 'eventReceiver', and allowing for multiple receivers.
-	/// </summary>
-
-	public OnValueChange onValueChange;
-
-	/// <summary>
 	/// Number of steps the slider should be divided into. For example 5 means possible values of 0, 0.25, 0.5, 0.75, and 1.0.
 	/// </summary>
 
 	public int numberOfSteps = 0;
 
+	/// <summary>
+	/// Callbacks triggered when the scroll bar's value changes.
+	/// </summary>
+
+	public List<EventDelegate> onChange = new List<EventDelegate>();
+
 	// Used to be public prior to 1.87
 	[HideInInspector][SerializeField] float rawValue = 1f;
+	
+	// Deprecated functionality, kept for backwards compatibility
+	[HideInInspector][SerializeField] GameObject eventReceiver;
+	[HideInInspector][SerializeField] string functionName = "OnSliderChange";
 
 	BoxCollider mCol;
 	Transform mTrans;
@@ -84,7 +75,7 @@ public class UISlider : IgnoreTimeScale
 	/// Value of the slider.
 	/// </summary>
 
-	public float sliderValue
+	public float value
 	{
 		get
 		{
@@ -97,6 +88,9 @@ public class UISlider : IgnoreTimeScale
 			Set(value, false);
 		}
 	}
+
+	[System.Obsolete("Use 'value' instead")]
+	public float sliderValue { get { return this.value; } set { this.value = value; } }
 
 	/// <summary>
 	/// Change the full size of the slider, in case you need to.
@@ -164,6 +158,13 @@ public class UISlider : IgnoreTimeScale
 	void Start ()
 	{
 		Init();
+
+		// Remove legacy functionality
+		if (EventDelegate.IsValid(onChange))
+		{
+			eventReceiver = null;
+			functionName = null;
+		}
 
 		if (Application.isPlaying && thumb != null && thumb.collider != null)
 		{
@@ -265,13 +266,13 @@ public class UISlider : IgnoreTimeScale
 		float val = Mathf.Clamp01(input);
 		if (val < 0.001f) val = 0f;
 
-		float prevStep = sliderValue;
+		float prevStep = value;
 
 		// Save the raw value
 		rawValue = val;
 
 		// Take steps into account
-		float stepValue = sliderValue;
+		float stepValue = value;
 
 		// If the stepped value doesn't match the last one, it's time to update
 		if (force || prevStep != stepValue)
@@ -348,11 +349,15 @@ public class UISlider : IgnoreTimeScale
 
 			current = this;
 
-			if (eventReceiver != null && !string.IsNullOrEmpty(functionName) && Application.isPlaying)
+			if (EventDelegate.IsValid(onChange))
 			{
+				EventDelegate.Execute(onChange);
+			}
+			else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+			{
+				// Legacy functionality support (for backwards compatibility)
 				eventReceiver.SendMessage(functionName, stepValue, SendMessageOptions.DontRequireReceiver);
 			}
-			if (onValueChange != null) onValueChange(stepValue);
 			current = null;
 		}
 	}

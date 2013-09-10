@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using AnimationOrTween;
+using System.Collections.Generic;
 
 /// <summary>
 /// Simple toggle functionality.
@@ -25,7 +26,6 @@ public class UIToggle : MonoBehaviour
 	/// </summary>
 
 	static public UIToggle current;
-	public delegate void OnStateChange (bool state);
 
 	/// <summary>
 	/// If set to anything other than '0', all active toggles in this group will behave as radio buttons.
@@ -34,13 +34,13 @@ public class UIToggle : MonoBehaviour
 	public int group = 0;
 
 	/// <summary>
-	/// Sprite that's visible when the 'isChecked' status is 'true'.
+	/// Sprite that's visible when the 'isActive' status is 'true'.
 	/// </summary>
 
-	public UISprite activeSprite;
+	public UIWidget activeSprite;
 
 	/// <summary>
-	/// Animation to play on the checkmark sprite, if any.
+	/// Animation to play on the active sprite, if any.
 	/// </summary>
 
 	public Animation activeAnimation;
@@ -64,22 +64,10 @@ public class UIToggle : MonoBehaviour
 	public bool optionCanBeNone = false;
 
 	/// <summary>
-	/// Generic event receiver that will be notified when the state changes.
+	/// Callbacks triggered when the toggle's state changes.
 	/// </summary>
 
-	public GameObject eventReceiver;
-
-	/// <summary>
-	/// Function that will be called on the event receiver when the state changes.
-	/// </summary>
-
-	public string functionName = "OnActivate";
-
-	/// <summary>
-	/// Delegate that will be called when the toggle's state changes. Faster than using 'eventReceiver'.
-	/// </summary>
-
-	public OnStateChange onStateChange;
+	public List<EventDelegate> onChange = new List<EventDelegate>();
 
 	/// <summary>
 	/// Deprecated functionality. Use the 'group' option instead.
@@ -89,48 +77,24 @@ public class UIToggle : MonoBehaviour
 	[HideInInspector][SerializeField] bool startsChecked;
 	[HideInInspector][SerializeField] UISprite checkSprite;
 	[HideInInspector][SerializeField] Animation checkAnimation;
+	[HideInInspector][SerializeField] GameObject eventReceiver;
+	[HideInInspector][SerializeField] string functionName = "OnActivate";
 
-	bool mChecked = true;
+	bool mIsActive = true;
 	bool mStarted = false;
 
 	/// <summary>
 	/// Whether the toggle is checked.
 	/// </summary>
 
-	public bool isChecked
+	public bool value
 	{
-		get { return mChecked; }
+		get { return mIsActive; }
 		set { if (group == 0 || value || optionCanBeNone || !mStarted) Set(value); }
 	}
 
-	/// <summary>
-	/// Legacy functionality support -- set the radio button root if the 'option' value was 'true'.
-	/// </summary>
-
-	void Awake ()
-	{
-		// Auto-upgrade
-		if (startsChecked)
-		{
-			startsChecked = false;
-			startsActive = true;
-		}
-
-		if (checkSprite != null && activeSprite == null)
-		{
-			activeSprite = checkSprite;
-			checkSprite = null;
-		}
-
-		if (checkAnimation != null && activeAnimation == null)
-		{
-			activeAnimation = checkAnimation;
-			checkAnimation = null;
-		}
-
-		if (Application.isPlaying && activeSprite != null)
-			activeSprite.alpha = startsActive ? 1f : 0f;
-	}
+	[System.Obsolete("Use 'value' instead")]
+	public bool isChecked { get { return value; } set { this.value = value; } }
 
 	void OnEnable ()  { list.Add(this); }
 	void OnDisable () { list.Remove(this); }
@@ -141,16 +105,47 @@ public class UIToggle : MonoBehaviour
 
 	void Start ()
 	{
-		if (radioButtonRoot != null && group == 0)
+#if UNITY_EDITOR
+		// Auto-upgrade
+		if (!Application.isPlaying)
 		{
-			Debug.LogWarning(NGUITools.GetHierarchy(gameObject) +
-				" uses a 'Radio Button Root'. You need to change it to use a 'group' instead.", this);
-		}
+			if (startsChecked)
+			{
+				startsChecked = false;
+				startsActive = true;
+			}
 
-		if (Application.isPlaying)
+			if (checkSprite != null && activeSprite == null)
+			{
+				activeSprite = checkSprite;
+				checkSprite = null;
+			}
+
+			if (checkAnimation != null && activeAnimation == null)
+			{
+				activeAnimation = checkAnimation;
+				checkAnimation = null;
+			}
+
+			if (Application.isPlaying && activeSprite != null)
+				activeSprite.alpha = startsActive ? 1f : 0f;
+
+			if (radioButtonRoot != null && group == 0)
+			{
+				Debug.LogWarning(NGUITools.GetHierarchy(gameObject) +
+					" uses a 'Radio Button Root'. You need to change it to use a 'group' instead.", this);
+			}
+
+			if (EventDelegate.IsValid(onChange))
+			{
+				eventReceiver = null;
+				functionName = null;
+			}
+		}
+		else
+#endif
 		{
-			if (eventReceiver == null) eventReceiver = gameObject;
-			mChecked = !startsActive;
+			mIsActive = !startsActive;
 			mStarted = true;
 			Set(startsActive);
 		}
@@ -160,23 +155,23 @@ public class UIToggle : MonoBehaviour
 	/// Check or uncheck on click.
 	/// </summary>
 
-	void OnClick () { if (enabled) isChecked = !isChecked; }
+	void OnClick () { if (enabled) value = !value; }
 
 	/// <summary>
-	/// Fade out or fade in the checkmark and notify the target of OnChecked event.
+	/// Fade out or fade in the active sprite and notify the OnChange event listener.
 	/// </summary>
 
 	void Set (bool state)
 	{
 		if (!mStarted)
 		{
-			mChecked = state;
+			mIsActive = state;
 			startsActive = state;
 			if (activeSprite != null) activeSprite.alpha = state ? 1f : 0f;
 		}
-		else if (mChecked != state)
+		else if (mIsActive != state)
 		{
-			// Uncheck all other togglees
+			// Uncheck all other toggles
 			if (group != 0 && state)
 			{
 				for (int i = 0, imax = list.size; i < imax; ++i)
@@ -187,30 +182,31 @@ public class UIToggle : MonoBehaviour
 			}
 
 			// Remember the state
-			mChecked = state;
+			mIsActive = state;
 
-			// Tween the color of the checkmark
+			// Tween the color of the active sprite
 			if (activeSprite != null)
 			{
 				if (instantTween)
 				{
-					activeSprite.alpha = mChecked ? 1f : 0f;
+					activeSprite.alpha = mIsActive ? 1f : 0f;
 				}
 				else
 				{
-					TweenAlpha.Begin(activeSprite.gameObject, 0.15f, mChecked ? 1f : 0f);
+					TweenAlpha.Begin(activeSprite.gameObject, 0.15f, mIsActive ? 1f : 0f);
 				}
 			}
 
 			current = this;
 
-			// Notify the delegate
-			if (onStateChange != null) onStateChange(mChecked);
-
-			// Send out the event notification
-			if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+			if (EventDelegate.IsValid(onChange))
 			{
-				eventReceiver.SendMessage(functionName, mChecked, SendMessageOptions.DontRequireReceiver);
+				EventDelegate.Execute(onChange);
+			}
+			else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+			{
+				// Legacy functionality support (for backwards compatibility)
+				eventReceiver.SendMessage(functionName, mIsActive, SendMessageOptions.DontRequireReceiver);
 			}
 			current = null;
 

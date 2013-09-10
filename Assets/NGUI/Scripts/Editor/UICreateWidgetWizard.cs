@@ -281,8 +281,8 @@ public class UICreateWidgetWizard : EditorWindow
 			bg.depth = depth;
 			bg.atlas = NGUISettings.atlas;
 			bg.spriteName = mButton;
-			bg.width = 150;
-			bg.height = 40;
+			bg.width = 200;
+			bg.height = 50;
 			bg.MakePixelPerfect();
 
 			if (NGUISettings.font != null)
@@ -290,7 +290,6 @@ public class UICreateWidgetWizard : EditorWindow
 				UILabel lbl = NGUITools.AddWidget<UILabel>(go);
 				lbl.font = NGUISettings.font;
 				lbl.text = go.name;
-				if (lbl.font.dynamicFont) lbl.transform.localPosition = new Vector3(0f, 0f, -1f);
 				lbl.MakePixelPerfect();
 			}
 
@@ -299,8 +298,6 @@ public class UICreateWidgetWizard : EditorWindow
 
 			// Add the scripts
 			go.AddComponent<UIButton>().tweenTarget = bg.gameObject;
-			go.AddComponent<UIButtonScale>();
-			go.AddComponent<UIButtonOffset>();
 			go.AddComponent<UIButtonSound>();
 
 			Selection.activeGameObject = go;
@@ -345,7 +342,6 @@ public class UICreateWidgetWizard : EditorWindow
 				UILabel lbl = NGUITools.AddWidget<UILabel>(go);
 				lbl.font = NGUISettings.font;
 				lbl.text = go.name;
-				if (lbl.font.dynamicFont) lbl.transform.localPosition = new Vector3(0f, 0f, -1f);
 				lbl.MakePixelPerfect();
 			}
 
@@ -485,7 +481,7 @@ public class UICreateWidgetWizard : EditorWindow
 			sb.foreground = fg;
 			sb.direction = mScrollDir;
 			sb.barSize = 0.3f;
-			sb.scrollValue = 0.3f;
+			sb.value = 0.3f;
 			sb.ForceUpdate();
 
 			if (mScrollCL)
@@ -579,7 +575,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 				uiSlider.thumb = thb.transform;
 			}
-			uiSlider.sliderValue = 1f;
+			uiSlider.value = 1f;
 
 			// Select the slider
 			Selection.activeGameObject = go;

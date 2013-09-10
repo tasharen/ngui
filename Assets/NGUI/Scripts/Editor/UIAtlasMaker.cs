@@ -836,7 +836,7 @@ public class UIAtlasMaker : EditorWindow
 
 		if (spriteList.Count > 0)
 		{
-			if (NGUIEditorTools.DrawHeader("Sprites"))
+			NGUIEditorTools.DrawHeader("Sprites", true);
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Space(3f);

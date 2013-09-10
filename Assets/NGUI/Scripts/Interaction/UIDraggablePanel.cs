@@ -9,7 +9,6 @@ using UnityEngine;
 /// This script, when attached to a panel allows dragging of the said panel's contents efficiently by using UIDragPanelContents.
 /// </summary>
 
-[ExecuteInEditMode]
 [RequireComponent(typeof(UIPanel))]
 [AddComponentMenu("NGUI/Interaction/Draggable Panel")]
 public class UIDraggablePanel : IgnoreTimeScale
@@ -247,13 +246,13 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 		if (horizontalScrollBar != null)
 		{
-			horizontalScrollBar.onChange += OnHorizontalBar;
+			horizontalScrollBar.onChange.Add(new EventDelegate(OnHorizontalBar));
 			horizontalScrollBar.alpha = ((showScrollBars == ShowCondition.Always) || shouldMoveHorizontally) ? 1f : 0f;
 		}
 
 		if (verticalScrollBar != null)
 		{
-			verticalScrollBar.onChange += OnVerticalBar;
+			verticalScrollBar.onChange.Add(new EventDelegate(OnVerticalBar));
 			verticalScrollBar.alpha = ((showScrollBars == ShowCondition.Always) || shouldMoveVertically) ? 1f : 0f;
 		}
 	}
@@ -336,7 +335,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 				float sum = min + max;
 				mIgnoreCallbacks = true;
 				horizontalScrollBar.barSize = 1f - sum;
-				horizontalScrollBar.scrollValue = (sum > 0.001f) ? min / sum : 0f;
+				horizontalScrollBar.value = (sum > 0.001f) ? min / sum : 0f;
 				mIgnoreCallbacks = false;
 			}
 
@@ -354,7 +353,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 
 				mIgnoreCallbacks = true;
 				verticalScrollBar.barSize = 1f - sum;
-				verticalScrollBar.scrollValue = (sum > 0.001f) ? 1f - min / sum : 0f;
+				verticalScrollBar.value = (sum > 0.001f) ? 1f - min / sum : 0f;
 				mIgnoreCallbacks = false;
 			}
 		}
@@ -436,12 +435,12 @@ public class UIDraggablePanel : IgnoreTimeScale
 	/// Triggered by the horizontal scroll bar when it changes.
 	/// </summary>
 
-	void OnHorizontalBar (UIScrollBar sb)
+	void OnHorizontalBar ()
 	{
 		if (!mIgnoreCallbacks)
 		{
-			float x = (horizontalScrollBar != null) ? horizontalScrollBar.scrollValue : 0f;
-			float y = (verticalScrollBar != null) ? verticalScrollBar.scrollValue : 0f;
+			float x = (horizontalScrollBar != null) ? horizontalScrollBar.value : 0f;
+			float y = (verticalScrollBar != null) ? verticalScrollBar.value : 0f;
 			SetDragAmount(x, y, false);
 		}
 	}
@@ -450,12 +449,12 @@ public class UIDraggablePanel : IgnoreTimeScale
 	/// Triggered by the vertical scroll bar when it changes.
 	/// </summary>
 
-	void OnVerticalBar (UIScrollBar sb)
+	void OnVerticalBar ()
 	{
 		if (!mIgnoreCallbacks)
 		{
-			float x = (horizontalScrollBar != null) ? horizontalScrollBar.scrollValue : 0f;
-			float y = (verticalScrollBar != null) ? verticalScrollBar.scrollValue : 0f;
+			float x = (horizontalScrollBar != null) ? horizontalScrollBar.value : 0f;
+			float y = (verticalScrollBar != null) ? verticalScrollBar.value : 0f;
 			SetDragAmount(x, y, false);
 		}
 	}

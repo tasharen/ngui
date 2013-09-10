@@ -19,16 +19,25 @@ public class UIToggleControlledObject : MonoBehaviour
 	void OnEnable ()
 	{
 		UIToggle chk = GetComponent<UIToggle>();
-		if (chk != null) OnActivate(chk.isChecked);
+		
+		if (chk != null)
+		{
+			UIToggle.current = chk;
+			Toggle();
+			UIToggle.current = null;
+		}
 	}
 
-	void OnActivate (bool isActive)
+	public void Toggle ()
 	{
 		if (target != null)
 		{
-			NGUITools.SetActive(target, inverse ? !isActive : isActive);
+			NGUITools.SetActive(target, inverse ? !UIToggle.current.value : UIToggle.current.value);
 			UIPanel panel = NGUITools.FindInParents<UIPanel>(target);
 			if (panel != null) panel.Refresh();
 		}
 	}
+
+	// Legacy functionality, kept for backwards compatibility
+	void OnActivate (bool state) { Toggle(); }
 }

@@ -10,7 +10,6 @@ using System.Collections.Generic;
 /// Popup list can be used to display pop-up menus and drop-down lists.
 /// </summary>
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Popup List")]
 public class UIPopupList : MonoBehaviour
 {
@@ -28,8 +27,6 @@ public class UIPopupList : MonoBehaviour
 		Above,
 		Below,
 	}
-
-	public delegate void OnSelectionChange (string item);
 
 	/// <summary>
 	/// Atlas used by the sprites.
@@ -116,24 +113,13 @@ public class UIPopupList : MonoBehaviour
 	public bool isLocalized = false;
 
 	/// <summary>
-	/// Target game object that will be notified when selection changes.
+	/// Callbacks triggered when the popup list gets a new item selection.
 	/// </summary>
 
-	public GameObject eventReceiver;
-
-	/// <summary>
-	/// Function to call when the selection changes. Function prototype: void OnSelectionChange (string selectedItemName);
-	/// </summary>
-
-	public string functionName = "OnSelectionChange";
-
-	/// <summary>
-	/// Delegate that will be called when the selection changes. Faster than using the 'eventReceiver'.
-	/// </summary>
-
-	public OnSelectionChange onSelectionChange;
+	public List<EventDelegate> onChange = new List<EventDelegate>();
 
 	[HideInInspector][SerializeField] string mSelectedItem;
+
 	UIPanel mPanel;
 	GameObject mChild;
 	UISprite mBackground;
@@ -141,6 +127,16 @@ public class UIPopupList : MonoBehaviour
 	UILabel mHighlightedLabel = null;
 	List<UILabel> mLabelList = new List<UILabel>();
 	float mBgBorder = 0f;
+
+	// Deprecated functionality
+	[HideInInspector][SerializeField] GameObject eventReceiver;
+	[HideInInspector][SerializeField] string functionName = "OnSelectionChange";
+
+	public delegate void LegacyEvent (string val);
+	LegacyEvent mLegacyEvent;
+
+	[System.Obsolete("Use EventDelegate.Add(popup.onChange, YourCallback) instead, and UIPopupList.current.value to determine the state")]
+	public LegacyEvent onSelectionChange { get { return mLegacyEvent; } set { mLegacyEvent = value; } }
 
 	/// <summary>
 	/// Whether the popup list is currently open.
@@ -152,7 +148,7 @@ public class UIPopupList : MonoBehaviour
 	/// Current selection.
 	/// </summary>
 
-	public string selection
+	public string value
 	{
 		get
 		{
@@ -166,30 +162,42 @@ public class UIPopupList : MonoBehaviour
 			{
 				mSelectedItem = value;
 				if (mSelectedItem == null) return;
-				
+#if UNITY_EDITOR
+				if (!Application.isPlaying) return;
+#endif
 				if (textLabel != null)
 				{
 					textLabel.text = (isLocalized) ? Localization.Localize(value) : value;
-#if UNITY_EDITOR
-					UnityEditor.EditorUtility.SetDirty(textLabel.gameObject);
-#endif
 				}
 				trigger = true;
 			}
 
+#if UNITY_EDITOR
+			if (!Application.isPlaying) return;
+#endif
 			if (mSelectedItem != null && (trigger || textLabel == null))
 			{
 				current = this;
-				if (onSelectionChange != null) onSelectionChange(mSelectedItem);
 
-				if (eventReceiver != null && !string.IsNullOrEmpty(functionName) && Application.isPlaying)
+				// Legacy functionality
+				if (mLegacyEvent != null) mLegacyEvent(mSelectedItem);
+
+				if (EventDelegate.IsValid(onChange))
 				{
+					EventDelegate.Execute(onChange);
+				}
+				else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+				{
+					// Legacy functionality support (for backwards compatibility)
 					eventReceiver.SendMessage(functionName, mSelectedItem, SendMessageOptions.DontRequireReceiver);
 				}
 				current = null;
 			}
 		}
 	}
+
+	[System.Obsolete("Use 'value' instead")]
+	public string selection { get { return value; } set { this.value = value; } }
 
 	/// <summary>
 	/// Whether the popup list will be handling keyboard, joystick and controller events.
@@ -215,16 +223,23 @@ public class UIPopupList : MonoBehaviour
 
 	void Start ()
 	{
+		// Remove legacy functionality
+		if (EventDelegate.IsValid(onChange))
+		{
+			eventReceiver = null;
+			functionName = null;
+		}
+
 		// Automatically choose the first item
 		if (string.IsNullOrEmpty(mSelectedItem))
 		{
-			if (items.Count > 0) selection = items[0];
+			if (items.Count > 0) value = items[0];
 		}
 		else
 		{
 			string s = mSelectedItem;
 			mSelectedItem = null;
-			selection = s;
+			value = s;
 		}
 	}
 
@@ -296,7 +311,7 @@ public class UIPopupList : MonoBehaviour
 		Highlight(lbl, instant);
 		
 		UIEventListener listener = lbl.gameObject.GetComponent<UIEventListener>();
-		selection = listener.parameter as string;
+		value = listener.parameter as string;
 
 		UIButtonSound[] sounds = GetComponents<UIButtonSound>();
 
