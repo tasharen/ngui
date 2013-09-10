@@ -717,11 +717,23 @@ public abstract class UIWidget : MonoBehaviour
 					mLocalToPanel = p.worldToLocal * cachedTransform.localToWorldMatrix;
 					hasMatrix = true;
 
-					Vector3[] wc = worldCorners;
-					Vector3 v0 = p.worldToLocal.MultiplyPoint3x4(wc[0]);
-					Vector3 v1 = p.worldToLocal.MultiplyPoint3x4(wc[2]);
+					Vector2 offset = pivotOffset;
 
-					if (Vector3.SqrMagnitude(mOldV0 - v0) > 0.000001f || Vector3.SqrMagnitude(mOldV1 - v1) > 0.000001f)
+					float x0 = -offset.x * mWidth;
+					float y0 = -offset.y * mHeight;
+					float x1 = x0 + mWidth;
+					float y1 = y0 + mHeight;
+
+					Transform wt = cachedTransform;
+
+					Vector3 v0 = wt.TransformPoint(x0, y0, 0f);
+					Vector3 v1 = wt.TransformPoint(x1, y1, 0f);
+
+					v0 = p.worldToLocal.MultiplyPoint3x4(v0);
+					v1 = p.worldToLocal.MultiplyPoint3x4(v1);
+
+					if (Vector3.SqrMagnitude(mOldV0 - v0) > 0.000001f ||
+						Vector3.SqrMagnitude(mOldV1 - v1) > 0.000001f)
 					{
 						mChanged = true;
 						mOldV0 = v0;
