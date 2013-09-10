@@ -241,6 +241,24 @@ public class EventDelegate
 	}
 
 	/// <summary>
+	/// Append a new event delegate to the list.
+	/// </summary>
+
+	static public void Add (List<EventDelegate> list, EventDelegate ev)
+	{
+		if (list != null)
+		{
+			for (int i = 0, imax = list.Count; i < imax; ++i)
+			{
+				EventDelegate del = list[i];
+				if (del != null && del.Equals(ev))
+					return;
+			}
+			list.Add(new EventDelegate(ev.target, ev.methodName));
+		}
+	}
+
+	/// <summary>
 	/// Remove an existing event delegate from the list.
 	/// </summary>
 

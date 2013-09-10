@@ -1,10 +1,11 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
 using AnimationOrTween;
+using System.Collections.Generic;
 
 /// <summary>
 /// Play the specified animation on click.
@@ -63,22 +64,14 @@ public class UIButtonPlayAnimation : MonoBehaviour
 	public DisableCondition disableWhenFinished = DisableCondition.DoNotDisable;
 
 	/// <summary>
-	/// Event receiver to trigger the callback on when the animation finishes.
+	/// Event delegates called when the animation finishes.
 	/// </summary>
 
-	public GameObject eventReceiver;
+	public List<EventDelegate> onFinished = new List<EventDelegate>();
 
-	/// <summary>
-	/// Function to call on the event receiver when the animation finishes.
-	/// </summary>
-
-	public string callWhenFinished;
-
-	/// <summary>
-	/// Delegate to call. Faster than using 'eventReceiver', and allows for multiple receivers.
-	/// </summary>
-
-	public ActiveAnimation.OnFinished onFinished;
+	// Deprecated functionality, kept for backwards compatibility
+	[HideInInspector][SerializeField] GameObject eventReceiver;
+	[HideInInspector][SerializeField] string callWhenFinished;
 
 	bool mStarted = false;
 	bool mHighlighted = false;
@@ -170,10 +163,12 @@ public class UIButtonPlayAnimation : MonoBehaviour
 			if (anim == null) return;
 			if (resetOnPlay) anim.Reset();
 
-			// Set the delegate
-			anim.onFinished = onFinished;
+			// Copy the delegates
+			anim.onFinished.Clear();
+			for (int i = 0; i < onFinished.Count; ++i)
+				EventDelegate.Add(anim.onFinished, onFinished[i]);
 
-			// Copy the event receiver
+			// Deprecated functionality, kept for backwards compatibility
 			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
 			{
 				anim.eventReceiver = eventReceiver;

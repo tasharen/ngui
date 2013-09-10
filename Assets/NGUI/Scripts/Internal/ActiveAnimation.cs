@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using AnimationOrTween;
+using System.Collections.Generic;
 
 /// <summary>
 /// Mainly an internal script used by UIButtonPlayAnimation, but can also be used to call
@@ -15,25 +16,21 @@ using AnimationOrTween;
 [AddComponentMenu("NGUI/Internal/Active Animation")]
 public class ActiveAnimation : IgnoreTimeScale
 {
-	public delegate void OnFinished (ActiveAnimation anim);
-
 	/// <summary>
-	/// Delegate for subscriptions. Faster than using the 'eventReceiver' and allows for multiple receivers.
+	/// Active animation that resulted in the event notification.
 	/// </summary>
 
-	public OnFinished onFinished;
+	static public ActiveAnimation current;
 
 	/// <summary>
-	/// Game object on which to call the callback function.
+	/// Event delegates called when the animation finishes.
 	/// </summary>
 
-	public GameObject eventReceiver;
+	public List<EventDelegate> onFinished = new List<EventDelegate>();
 
-	/// <summary>
-	/// Function to call when the animation finishes playing.
-	/// </summary>
-
-	public string callWhenFinished;
+	// Deprecated functionality, kept for backwards compatibility
+	[HideInInspector] public GameObject eventReceiver;
+	[HideInInspector] public string callWhenFinished;
 
 	Animation mAnim;
 	Direction mLastDirection = Direction.Toggle;
@@ -123,19 +120,17 @@ public class ActiveAnimation : IgnoreTimeScale
 			{
 				mNotify = false;
 
-				// Notify the delegate
-				if (onFinished != null) onFinished(this);
+				current = this;
+				EventDelegate.Execute(onFinished);
 
-				// Notify the event listener
+				// Deprecated functionality, kept for backwards compatibility
 				if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
-				{
-					eventReceiver.SendMessage(callWhenFinished, this, SendMessageOptions.DontRequireReceiver);
-				}
+					eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
+
+				current = null;
 
 				if (mDisableDirection != Direction.Toggle && mLastDirection == mDisableDirection)
-				{
 					NGUITools.SetActive(gameObject, false);
-				}
 			}
 		}
 		else enabled = false;
@@ -216,9 +211,7 @@ public class ActiveAnimation : IgnoreTimeScale
 		if (aa == null) aa = anim.gameObject.AddComponent<ActiveAnimation>();
 		aa.mAnim = anim;
 		aa.mDisableDirection = (Direction)(int)disableCondition;
-		aa.eventReceiver = null;
-		aa.callWhenFinished = null;
-		aa.onFinished = null;
+		aa.onFinished.Clear();
 		aa.Play(clipName, playDirection);
 		return aa;
 	}
