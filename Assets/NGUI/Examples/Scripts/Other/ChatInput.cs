@@ -42,6 +42,7 @@ public class ChatInput : MonoBehaviour
 		{
 			if (!mIgnoreNextEnter && !mInput.selected)
 			{
+				mInput.label.maxLineCount = 1;
 				mInput.selected = true;
 			}
 			mIgnoreNextEnter = false;

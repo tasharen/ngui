@@ -7,19 +7,18 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// Example script showing how to activate or deactivate MonoBehaviours with a toggle.
+/// Example script showing how to activate or deactivate a game object when OnActivate event is received.
+/// OnActivate event is sent out by the UIToggle script.
 /// </summary>
 
 [ExecuteInEditMode]
-[RequireComponent(typeof(UIToggle))]
-[AddComponentMenu("NGUI/Interaction/Toggle Controlled Component")]
-public class UIToggleControlledComponents : MonoBehaviour
+[AddComponentMenu("NGUI/Interaction/Toggled Objects")]
+public class UIToggledObjects : MonoBehaviour
 {
-	public List<MonoBehaviour> activate;
-	public List<MonoBehaviour> deactivate;
+	public List<GameObject> activate;
+	public List<GameObject> deactivate;
 
-	// Deprecated functionality
-	[HideInInspector][SerializeField] MonoBehaviour target;
+	[HideInInspector][SerializeField] GameObject target;
 	[HideInInspector][SerializeField] bool inverse = false;
 
 	void Awake ()
@@ -46,21 +45,25 @@ public class UIToggleControlledComponents : MonoBehaviour
 		EventDelegate.Add(toggle.onChange, Toggle);
 	}
 
-	void Toggle ()
+	public void Toggle ()
 	{
 		if (enabled)
 		{
 			for (int i = 0; i < activate.Count; ++i)
-			{
-				MonoBehaviour comp = activate[i];
-				comp.enabled = UIToggle.current.value;
-			}
+				Set(activate[i], UIToggle.current.value);
 
 			for (int i = 0; i < deactivate.Count; ++i)
-			{
-				MonoBehaviour comp = deactivate[i];
-				comp.enabled = !UIToggle.current.value;
-			}
+				Set(activate[i], !UIToggle.current.value);
+		}
+	}
+
+	void Set (GameObject go, bool state)
+	{
+		if (go != null)
+		{
+			NGUITools.SetActive(go, state);
+			//UIPanel panel = NGUITools.FindInParents<UIPanel>(target);
+			//if (panel != null) panel.Refresh();
 		}
 	}
 }

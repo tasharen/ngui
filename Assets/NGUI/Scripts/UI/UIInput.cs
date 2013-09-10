@@ -210,6 +210,7 @@ public class UIInput : MonoBehaviour
 				mDefaultColor = label.color;
 				label.supportEncoding = false;
 				label.password = isPassword;
+				label.maxLineCount = 1;
 				mPivot = label.pivot;
 				mPosition = label.cachedTransform.localPosition.x;
 			}
@@ -218,6 +219,8 @@ public class UIInput : MonoBehaviour
 	}
 
 	bool mDoInit = true;
+
+	void Awake () { if (label == null) label = GetComponentInChildren<UILabel>(); }
 
 	/// <summary>
 	/// If the object is currently highlighted, it should also be selected.
