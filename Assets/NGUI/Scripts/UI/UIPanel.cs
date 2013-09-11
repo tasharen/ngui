@@ -789,16 +789,6 @@ public class UIPanel : MonoBehaviour
 				{
 					node.changeFlag = 1;
 					transformsChanged = true;
-#if UNITY_EDITOR
-					Vector3 s = node.trans.lossyScale;
-					float min = Mathf.Abs(Mathf.Min(s.x, s.y));
-
-					if (min == 0f)
-					{
-						Debug.LogError("Scale of 0 is invalid! Zero cannot be divided by, which causes problems. Use a small value instead, such as 0.01\n" +
-						node.trans.lossyScale, node.trans);
-					}
-#endif
 				}
 				else node.changeFlag = -1;
 			}
