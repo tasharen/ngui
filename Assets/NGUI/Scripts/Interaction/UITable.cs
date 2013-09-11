@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Table")]
-public class UITable : MonoBehaviour
+public class UITable : UIWidgetContainer
 {
 	public delegate void OnReposition ();
 
@@ -26,12 +26,12 @@ public class UITable : MonoBehaviour
 
 	public int columns = 0;
 	public Direction direction = Direction.Down;
-	public Vector2 padding = Vector2.zero;
 	public bool sorted = false;
 	public bool hideInactive = true;
-	public bool repositionNow = false;
 	public bool keepWithinPanel = false;
+	public bool repositionNow = false;
 	public OnReposition onReposition;
+	public Vector2 padding = Vector2.zero;
 
 	UIPanel mPanel;
 	UIDraggablePanel mDrag;

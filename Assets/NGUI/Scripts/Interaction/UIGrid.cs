@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Grid")]
-public class UIGrid : MonoBehaviour
+public class UIGrid : UIWidgetContainer
 {
 	public enum Arrangement
 	{

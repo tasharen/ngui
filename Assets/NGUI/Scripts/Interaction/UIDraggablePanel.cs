@@ -11,7 +11,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(UIPanel))]
 [AddComponentMenu("NGUI/Interaction/Draggable Panel")]
-public class UIDraggablePanel : IgnoreTimeScale
+public class UIDraggablePanel : MonoBehaviour
 {
 	public enum DragEffect
 	{
@@ -632,7 +632,7 @@ public class UIDraggablePanel : IgnoreTimeScale
 		}
 
 		if (!Application.isPlaying) return;
-		float delta = UpdateRealTimeDelta();
+		float delta = RealTime.deltaTime;
 
 		// Fade the scroll bars if needed
 		if (showScrollBars != ShowCondition.Always)

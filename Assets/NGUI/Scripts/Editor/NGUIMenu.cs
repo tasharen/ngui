@@ -30,6 +30,213 @@ static public class NGUIMenu
 		return go;
 	}
 
+	[MenuItem("NGUI/Create/Sprite #&s")]
+	static public void AddSprite ()
+	{
+		GameObject go = NGUIEditorTools.SelectedRoot(true);
+
+		if (go != null)
+		{
+			Undo.RegisterSceneUndo("Add a Sprite");
+
+			UISprite sprite = NGUITools.AddWidget<UISprite>(go);
+			sprite.name = "Sprite";
+			sprite.atlas = NGUISettings.atlas;
+
+			if (sprite.atlas != null)
+			{
+				string sn = EditorPrefs.GetString("NGUI Sprite", "");
+				UIAtlas.Sprite sp = sprite.atlas.GetSprite(sn);
+
+				if (sp != null)
+				{
+					sprite.spriteName = sn;
+					if (sp.inner != sp.outer) sprite.type = UISprite.Type.Sliced;
+				}
+			}
+			sprite.pivot = NGUISettings.pivot;
+			sprite.width = 100;
+			sprite.height = 100;
+			sprite.MakePixelPerfect();
+			Selection.activeGameObject = sprite.gameObject;
+		}
+		else
+		{
+			Debug.Log("You must select a game object first.");
+		}
+	}
+
+	[MenuItem("NGUI/Create/Label #&l")]
+	static public void AddLabel ()
+	{
+		GameObject go = NGUIEditorTools.SelectedRoot(true);
+
+		if (go != null)
+		{
+			Undo.RegisterSceneUndo("Add a Label");
+
+			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
+			lbl.name = "Label";
+			lbl.font = NGUISettings.font;
+			lbl.text = "New Label";
+			lbl.pivot = NGUISettings.pivot;
+			lbl.width = 120;
+			lbl.height = 30;
+			lbl.MakePixelPerfect();
+			Selection.activeGameObject = lbl.gameObject;
+		}
+		else
+		{
+			Debug.Log("You must select a game object first.");
+		}
+	}
+
+	[MenuItem("NGUI/Create/Texture #&t")]
+	static public void AddTexture ()
+	{
+		GameObject go = NGUIEditorTools.SelectedRoot(true);
+
+		if (go != null)
+		{
+			Undo.RegisterSceneUndo("Add a Texture");
+
+			UITexture tex = NGUITools.AddWidget<UITexture>(go);
+			tex.name = "Texture";
+			tex.pivot = NGUISettings.pivot;
+			tex.width = 100;
+			tex.height = 100;
+			Selection.activeGameObject = tex.gameObject;
+		}
+		else
+		{
+			Debug.Log("You must select a game object first.");
+		}
+	}
+
+	[MenuItem("NGUI/Create/Panel")]
+	static public void AddPanel ()
+	{
+		GameObject go = SelectedRoot();
+
+		if (NGUIEditorTools.WillLosePrefab(go))
+		{
+			NGUIEditorTools.RegisterUndo("Add a child UI Panel", go);
+
+			GameObject child = new GameObject(NGUITools.GetName<UIPanel>());
+			child.layer = go.layer;
+
+			Transform ct = child.transform;
+			ct.parent = go.transform;
+			ct.localPosition = Vector3.zero;
+			ct.localRotation = Quaternion.identity;
+			ct.localScale = Vector3.one;
+
+			child.AddComponent<UIPanel>().sortByDepth = true;
+			Selection.activeGameObject = child;
+		}
+	}
+
+	[MenuItem("NGUI/Attach/Collider #&c")]
+	static public void AddCollider ()
+	{
+		GameObject go = Selection.activeGameObject;
+
+		if (NGUIEditorTools.WillLosePrefab(go))
+		{
+			if (go != null)
+			{
+				NGUIEditorTools.RegisterUndo("Add Widget Collider", go);
+				NGUITools.AddWidgetCollider(go);
+			}
+			else
+			{
+				Debug.Log("You must select a game object first, such as your button.");
+			}
+		}
+	}
+
+	[MenuItem("NGUI/Attach/Anchor #&h")]
+	static public void AddAnchor ()
+	{
+		GameObject go = Selection.activeGameObject;
+
+		if (go != null)
+		{
+			NGUIEditorTools.RegisterUndo("Add an Anchor", go);
+			if (go.GetComponent<UIAnchor>() == null) go.AddComponent<UIAnchor>();
+		}
+		else
+		{
+			Debug.Log("You must select a game object first.");
+		}
+	}
+
+	[MenuItem("NGUI/Open/Atlas Maker #&m")]
+	static public void OpenAtlasMaker ()
+	{
+		EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true);
+	}
+
+	[MenuItem("NGUI/Open/Font Maker #&f")]
+	static public void OpenFontMaker ()
+	{
+		EditorWindow.GetWindow<UIFontMaker>(false, "Font Maker", true);
+	}
+
+	[MenuItem("NGUI/Open/Widget Wizard")]
+	static public void CreateWidgetWizard ()
+	{
+		EditorWindow.GetWindow<UICreateWidgetWizard>(false, "Widget Tool", true);
+	}
+
+	[MenuItem("NGUI/Open/UI Wizard")]
+	static public void CreateUIWizard ()
+	{
+		EditorWindow.GetWindow<UICreateNewUIWizard>(false, "UI Tool", true);
+	}
+
+	[MenuItem("NGUI/Open/Panel Tool")]
+	static public void OpenPanelWizard ()
+	{
+		EditorWindow.GetWindow<UIPanelTool>(false, "Panel Tool", true);
+	}
+
+	[MenuItem("NGUI/Open/Camera Tool")]
+	static public void OpenCameraWizard ()
+	{
+		EditorWindow.GetWindow<UICameraTool>(false, "Camera Tool", true);
+	}
+
+	[MenuItem("NGUI/Handles/Turn On", true)]
+	static public bool TurnHandlesOnCheck () { return !UIWidget.showHandlesWithMoveTool; }
+
+	[MenuItem("NGUI/Handles/Turn On")]
+	static public void TurnHandlesOn () { UIWidget.showHandlesWithMoveTool = true; }
+
+	[MenuItem("NGUI/Handles/Turn Off", true)]
+	static public bool TurnHandlesOffCheck () { return UIWidget.showHandlesWithMoveTool; }
+
+	[MenuItem("NGUI/Handles/Turn Off")]
+	static public void TurnHandlesOff () { UIWidget.showHandlesWithMoveTool = false; }
+
+	[MenuItem("NGUI/Handles/Set to Blue", true)]
+	static public bool SetToBlueCheck () { return UIWidget.showHandlesWithMoveTool && NGUISettings.colorMode != NGUISettings.ColorMode.Blue; }
+
+	[MenuItem("NGUI/Handles/Set to Blue")]
+	static public void SetToBlue () { NGUISettings.colorMode = NGUISettings.ColorMode.Blue; }
+
+	[MenuItem("NGUI/Handles/Set to Orange", true)]
+	static public bool SetToOrangeCheck () { return UIWidget.showHandlesWithMoveTool && NGUISettings.colorMode != NGUISettings.ColorMode.Orange; }
+
+	[MenuItem("NGUI/Handles/Set to Orange")]
+	static public void SetToOrange () { NGUISettings.colorMode = NGUISettings.ColorMode.Orange; }
+
+	[MenuItem("NGUI/Handles/Set to Green", true)]
+	static public bool SetToGreenCheck () { return UIWidget.showHandlesWithMoveTool && NGUISettings.colorMode != NGUISettings.ColorMode.Green; }
+
+	[MenuItem("NGUI/Handles/Set to Green")]
+	static public void SetToGreen () { NGUISettings.colorMode = NGUISettings.ColorMode.Green; }
+
 	[MenuItem("NGUI/Bring Widget Forward %=")]
 	static public void BringForward ()
 	{
@@ -56,147 +263,6 @@ static public class NGUIMenu
 		return (Selection.activeGameObject != null) && Selection.activeGameObject.GetComponent<UIWidget>() != null;
 	}
 
-	[MenuItem("NGUI/Create a Sprite #&s")]
-	static public void AddSprite ()
-	{
-		GameObject go = NGUIEditorTools.SelectedRoot(true);
-
-		if (go != null)
-		{
-			Undo.RegisterSceneUndo("Add a Sprite");
-			
-			UISprite sprite = NGUITools.AddWidget<UISprite>(go);
-			sprite.name = "Sprite";
-			sprite.atlas = NGUISettings.atlas;
-			
-			if (sprite.atlas != null)
-			{
-				string sn = EditorPrefs.GetString("NGUI Sprite", "");
-				UIAtlas.Sprite sp = sprite.atlas.GetSprite(sn);
-				
-				if (sp != null)
-				{
-					sprite.spriteName = sn;
-					if (sp.inner != sp.outer) sprite.type = UISprite.Type.Sliced;
-				}
-			}
-			sprite.pivot = NGUISettings.pivot;
-			sprite.width = 100;
-			sprite.height = 100;
-			sprite.MakePixelPerfect();
-			Selection.activeGameObject = sprite.gameObject;
-		}
-		else
-		{
-			Debug.Log("You must select a game object first.");
-		}
-	}
-
-	[MenuItem("NGUI/Create a Label #&l")]
-	static public void AddLabel ()
-	{
-		GameObject go = NGUIEditorTools.SelectedRoot(true);
-
-		if (go != null)
-		{
-			Undo.RegisterSceneUndo("Add a Label");
-
-			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
-			lbl.name = "Label";
-			lbl.font = NGUISettings.font;
-			lbl.text = "New Label";
-			lbl.pivot = NGUISettings.pivot;
-			lbl.width = 120;
-			lbl.height = 30;
-			lbl.MakePixelPerfect();
-			Selection.activeGameObject = lbl.gameObject;
-		}
-		else
-		{
-			Debug.Log("You must select a game object first.");
-		}
-	}
-
-	[MenuItem("NGUI/Create a Texture #&t")]
-	static public void AddTexture ()
-	{
-		GameObject go = NGUIEditorTools.SelectedRoot(true);
-
-		if (go != null)
-		{
-			Undo.RegisterSceneUndo("Add a Texture");
-
-			UITexture tex = NGUITools.AddWidget<UITexture>(go);
-			tex.name = "Texture";
-			tex.pivot = NGUISettings.pivot;
-			tex.width = 100;
-			tex.height = 100;
-			Selection.activeGameObject = tex.gameObject;
-		}
-		else
-		{
-			Debug.Log("You must select a game object first.");
-		}
-	}
-
-	[MenuItem("NGUI/Create a Panel")]
-	static public void AddPanel ()
-	{
-		GameObject go = SelectedRoot();
-
-		if (NGUIEditorTools.WillLosePrefab(go))
-		{
-			NGUIEditorTools.RegisterUndo("Add a child UI Panel", go);
-
-			GameObject child = new GameObject(NGUITools.GetName<UIPanel>());
-			child.layer = go.layer;
-
-			Transform ct = child.transform;
-			ct.parent = go.transform;
-			ct.localPosition = Vector3.zero;
-			ct.localRotation = Quaternion.identity;
-			ct.localScale = Vector3.one;
-
-			child.AddComponent<UIPanel>().sortByDepth = true;
-			Selection.activeGameObject = child;
-		}
-	}
-
-	[MenuItem("NGUI/Attach a Collider #&c")]
-	static public void AddCollider ()
-	{
-		GameObject go = Selection.activeGameObject;
-
-		if (NGUIEditorTools.WillLosePrefab(go))
-		{
-			if (go != null)
-			{
-				NGUIEditorTools.RegisterUndo("Add Widget Collider", go);
-				NGUITools.AddWidgetCollider(go);
-			}
-			else
-			{
-				Debug.Log("You must select a game object first, such as your button.");
-			}
-		}
-	}
-
-	[MenuItem("NGUI/Attach an Anchor #&h")]
-	static public void AddAnchor ()
-	{
-		GameObject go = Selection.activeGameObject;
-
-		if (go != null)
-		{
-			NGUIEditorTools.RegisterUndo("Add an Anchor", go);
-			if (go.GetComponent<UIAnchor>() == null) go.AddComponent<UIAnchor>();
-		}
-		else
-		{
-			Debug.Log("You must select a game object first.");
-		}
-	}
-
 	[MenuItem("NGUI/Make Pixel Perfect #&p")]
 	static void PixelPerfectSelection ()
 	{
@@ -206,73 +272,5 @@ static public class NGUIMenu
 			return;
 		}
 		foreach (Transform t in Selection.transforms) NGUITools.MakePixelPerfect(t);
-	}
-
-	[MenuItem("NGUI/Open the Widget Wizard")]
-	static public void CreateWidgetWizard ()
-	{
-		EditorWindow.GetWindow<UICreateWidgetWizard>(false, "Widget Tool", true);
-	}
-
-	[MenuItem("NGUI/Open the UI Wizard")]
-	static public void CreateUIWizard ()
-	{
-		EditorWindow.GetWindow<UICreateNewUIWizard>(false, "UI Tool", true);
-	}
-
-	[MenuItem("NGUI/Open the Panel Tool")]
-	static public void OpenPanelWizard ()
-	{
-		EditorWindow.GetWindow<UIPanelTool>(false, "Panel Tool", true);
-	}
-
-	[MenuItem("NGUI/Open the Camera Tool")]
-	static public void OpenCameraWizard ()
-	{
-		EditorWindow.GetWindow<UICameraTool>(false, "Camera Tool", true);
-	}
-
-	[MenuItem("NGUI/Open the Font Maker #&f")]
-	static public void OpenFontMaker ()
-	{
-		EditorWindow.GetWindow<UIFontMaker>(false, "Font Maker", true);
-	}
-
-	[MenuItem("NGUI/Open the Atlas Maker #&m")]
-	static public void OpenAtlasMaker ()
-	{
-		EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true);
-	}
-
-	[MenuItem("NGUI/Toggle Draggable Handles")]
-	static public void ToggleNewGUI ()
-	{
-		UIWidget.showHandlesWithMoveTool = !UIWidget.showHandlesWithMoveTool;
-
-		if (UIWidget.showHandlesWithMoveTool)
-		{
-			Debug.Log("Simple Mode: Draggable Handles will show up with the Move Tool selected (W).");
-		}
-		else
-		{
-			Debug.Log("Classic Mode: Draggable Handles will show up only with the View Tool selected (Q).");
-		}
-	}
-
-	[MenuItem("NGUI/Change Handles Color")]
-	static public void ChangeColorMode ()
-	{
-		if (NGUISettings.colorMode == NGUISettings.ColorMode.Orange)
-		{
-			NGUISettings.colorMode = NGUISettings.ColorMode.Green;
-		}
-		else if (NGUISettings.colorMode == NGUISettings.ColorMode.Green)
-		{
-			NGUISettings.colorMode = NGUISettings.ColorMode.Blue;
-		}
-		else
-		{
-			NGUISettings.colorMode = NGUISettings.ColorMode.Orange;
-		}
 	}
 }

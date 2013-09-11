@@ -11,7 +11,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Scroll Bar")]
-public class UIScrollBar : MonoBehaviour
+public class UIScrollBar : UIWidgetContainer
 {
 	public enum Direction
 	{

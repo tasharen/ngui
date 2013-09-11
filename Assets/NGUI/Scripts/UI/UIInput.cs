@@ -10,7 +10,7 @@ using UnityEngine;
 /// </summary>
 
 [AddComponentMenu("NGUI/UI/Input (Basic)")]
-public class UIInput : MonoBehaviour
+public class UIInput : UIWidgetContainer
 {
 	public delegate char Validator (string currentText, char nextChar);
 

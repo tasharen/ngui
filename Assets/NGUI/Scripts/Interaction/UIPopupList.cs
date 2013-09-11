@@ -11,7 +11,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Popup List")]
-public class UIPopupList : MonoBehaviour
+public class UIPopupList : UIWidgetContainer
 {
 	/// <summary>
 	/// Current popup list. Only available during the OnSelectionChange event callback.

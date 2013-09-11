@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Toggle")]
-public class UIToggle : MonoBehaviour
+public class UIToggle : UIWidgetContainer
 {
 	/// <summary>
 	/// List of all the active toggles currently in the scene.

@@ -11,7 +11,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(UIPanel))]
 [AddComponentMenu("NGUI/Internal/Spring Panel")]
-public class SpringPanel : IgnoreTimeScale
+public class SpringPanel : MonoBehaviour
 {
 	public Vector3 target = Vector3.zero;
 	public float strength = 10f;
@@ -41,7 +41,7 @@ public class SpringPanel : IgnoreTimeScale
 
 	void Update ()
 	{
-		float delta = UpdateRealTimeDelta();
+		float delta = RealTime.deltaTime;
 
 		if (mThreshold == 0f)
 		{

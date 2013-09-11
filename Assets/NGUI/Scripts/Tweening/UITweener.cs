@@ -11,7 +11,7 @@ using System.Collections.Generic;
 /// Base class for all tweening operations.
 /// </summary>
 
-public abstract class UITweener : IgnoreTimeScale
+public abstract class UITweener : MonoBehaviour
 {
 	/// <summary>
 	/// Current tween that triggered the callback function.
@@ -141,8 +141,8 @@ public abstract class UITweener : IgnoreTimeScale
 
 	void Update ()
 	{
-		float delta = ignoreTimeScale ? UpdateRealTimeDelta() : Time.deltaTime;
-		float time = ignoreTimeScale ? realTime : Time.time;
+		float delta = ignoreTimeScale ? RealTime.deltaTime : Time.deltaTime;
+		float time = ignoreTimeScale ? RealTime.time : Time.time;
 
 		if (!mStarted)
 		{

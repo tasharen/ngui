@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
@@ -11,7 +11,7 @@ using UnityEngine;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Drag Camera")]
-public class UIDragCamera : IgnoreTimeScale
+public class UIDragCamera : MonoBehaviour
 {
 	/// <summary>
 	/// Target object that will be dragged.

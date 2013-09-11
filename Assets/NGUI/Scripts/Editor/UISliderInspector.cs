@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(UISlider))]
-public class UISliderInspector : Editor
+public class UISliderInspector : UIWidgetContainerEditor
 {
 	void ValidatePivot (Transform fg, string name, UISlider.Direction dir)
 	{

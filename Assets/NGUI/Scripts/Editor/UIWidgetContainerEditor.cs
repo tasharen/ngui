@@ -10,8 +10,8 @@ using UnityEditor;
 /// Widget containers are classes that are meant to hold more than one widget inside, but should still be easily movable using the mouse.
 /// </summary>
 
-[CustomEditor(typeof(UIWidgetContainer))]
 [CanEditMultipleObjects]
+[CustomEditor(typeof(UIWidgetContainer))]
 public class UIWidgetContainerEditor : Editor
 {
 	static int mHash = "WidgetContainer".GetHashCode();
@@ -23,12 +23,6 @@ public class UIWidgetContainerEditor : Editor
 	bool mCanDrag = false;
 	bool mAllowSelection = true;
 	bool mIsDragging = false;
-
-	/// <summary>
-	/// Hide the properties.
-	/// </summary>
-
-	public override void OnInspectorGUI () { }
 
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2 && !UNITY_4_3
 	void OnDisable() { UnityEditor.Tools.hidden = false; }

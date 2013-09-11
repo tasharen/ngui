@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 [RequireComponent(typeof(Animation))]
 [AddComponentMenu("NGUI/Internal/Active Animation")]
-public class ActiveAnimation : IgnoreTimeScale
+public class ActiveAnimation : MonoBehaviour
 {
 	/// <summary>
 	/// Active animation that resulted in the event notification.
@@ -100,7 +100,7 @@ public class ActiveAnimation : IgnoreTimeScale
 
 	void Update ()
 	{
-		float delta = UpdateRealTimeDelta();
+		float delta = RealTime.deltaTime;
 		if (delta == 0f) return;
 
 		if (mAnim != null)

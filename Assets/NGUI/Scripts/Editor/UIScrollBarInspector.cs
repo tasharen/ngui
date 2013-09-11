@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(UIScrollBar))]
-public class UIScrollBarInspector : Editor
+public class UIScrollBarInspector : UIWidgetContainerEditor
 {
 	public override void OnInspectorGUI ()
 	{

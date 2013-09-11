@@ -11,7 +11,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Slider")]
-public class UISlider : IgnoreTimeScale
+public class UISlider : UIWidgetContainer
 {
 	public enum Direction
 	{

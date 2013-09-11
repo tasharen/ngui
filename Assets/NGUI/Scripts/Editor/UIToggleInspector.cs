@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(UIToggle))]
-public class UIToggleInspector : Editor
+public class UIToggleInspector : UIWidgetContainerEditor
 {
 	enum Transition
 	{

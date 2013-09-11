@@ -12,7 +12,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [CustomEditor(typeof(UIPopupList))]
-public class UIPopupListInspector : Editor
+public class UIPopupListInspector : UIWidgetContainerEditor
 {
 	UIPopupList mList;
 
