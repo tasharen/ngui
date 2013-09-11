@@ -346,6 +346,13 @@ public abstract class UIWidget : MonoBehaviour
 #endif
 
 	/// <summary>
+	/// TODO: Do not use this, it's obsolete.
+	/// </summary>
+
+	[System.Obsolete("There is no relative scale anymore. Widgets now have width and height instead")]
+	public Vector2 relativeSize { get { return Vector2.one; } }
+
+	/// <summary>
 	/// Raycast into the screen and return a list of widgets in order from closest to farthest away.
 	/// This is a slow operation and will consider ALL widgets underneath the specified game object.
 	/// </summary>
@@ -836,13 +843,6 @@ public abstract class UIWidget : MonoBehaviour
 	/// </summary>
 
 	virtual public int minHeight { get { return 4; } }
-
-	/// <summary>
-	/// TODO: Do not use this, it's obsolete.
-	/// </summary>
-
-	[System.Obsolete("There is no relative scale anymore. Widgets now have width and height instead")]
-	virtual public Vector2 relativeSize { get { return Vector2.one; } }
 
 	/// <summary>
 	/// Dimensions of the sprite's border, if any.
