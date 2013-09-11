@@ -10,7 +10,7 @@ using UnityEngine;
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Button Color")]
-public class UIButtonColor : MonoBehaviour
+public class UIButtonColor : UIWidgetContainer
 {
 	/// <summary>
 	/// Target with a widget, renderer, or light that will have its color tweened.

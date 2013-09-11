@@ -24,8 +24,7 @@ public class UIPanelInspector : Editor
 		{
 			case EventType.MouseUp:
 			{
-				UIPanel panel = target as UIPanel;
-				BetterList<UIWidget> widgets = UIWidgetInspector.SceneViewRaycast(panel, e.mousePosition);
+				BetterList<UIWidget> widgets = NGUIEditorTools.SceneViewRaycast(e.mousePosition);
 				if (widgets.size > 0) Selection.activeGameObject = widgets[0].gameObject;
 			}
 			break;
@@ -241,7 +240,8 @@ public class UIPanelInspector : Editor
 			}
 		}
 
-		if (panel.drawCalls.size > 0 && NGUIEditorTools.DrawHeader(panel.drawCalls.size + " draw calls from " + panel.widgets.size + " widgets", "DrawCalls"))
+		if (panel.drawCalls.size > 0 && NGUIEditorTools.DrawHeader(panel.drawCalls.size +
+			(panel.drawCalls.size == 1 ? " draw call from " : " draw calls from ") + panel.widgets.size + " widgets", "DrawCalls"))
 		{
 			NGUIEditorTools.BeginContents();
 			

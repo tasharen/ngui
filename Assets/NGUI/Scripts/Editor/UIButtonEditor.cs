@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(UIButton))]
-public class UIButtonInspector : Editor
+public class UIButtonEditor : UIWidgetContainerEditor
 {
 	public override void OnInspectorGUI ()
 	{

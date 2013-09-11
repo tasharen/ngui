@@ -71,7 +71,7 @@ public class UIWidgetInspector : Editor
 	/// Raycast into the screen.
 	/// </summary>
 
-	static bool Raycast (Vector3[] corners, out Vector3 hit)
+	static public bool Raycast (Vector3[] corners, out Vector3 hit)
 	{
 		Plane plane = new Plane(corners[0], corners[1], corners[2]);
 		Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
@@ -82,10 +82,30 @@ public class UIWidgetInspector : Editor
 	}
 
 	/// <summary>
+	/// Color used by the handles based on the current color scheme.
+	/// </summary>
+
+	static public Color handlesColor
+	{
+		get
+		{
+			if (NGUISettings.colorMode == NGUISettings.ColorMode.Orange)
+			{
+				return new Color(1f, 0.5f, 0f);
+			}
+			else if (NGUISettings.colorMode == NGUISettings.ColorMode.Green)
+			{
+				return Color.green;
+			}
+			return Color.white;
+		}
+	}
+
+	/// <summary>
 	/// Draw a control dot at the specified world position.
 	/// </summary>
 
-	static void DrawKnob (Vector3 point, bool selected, bool canResize, int id)
+	static public void DrawKnob (Vector3 point, bool selected, bool canResize, int id)
 	{
 		if (mGreyDot == null) mGreyDot = "sv_label_0";
 		if (mBlueDot == null) mBlueDot = "sv_label_1";
@@ -179,7 +199,7 @@ public class UIWidgetInspector : Editor
 	/// Set the mouse cursor rectangle, refreshing the screen when it gets changed.
 	/// </summary>
 
-	static void SetCursorRect (Rect rect, MouseCursor cursor)
+	static public void SetCursorRect (Rect rect, MouseCursor cursor)
 	{
 		EditorGUIUtility.AddCursorRect(rect, cursor);
 
@@ -193,25 +213,22 @@ public class UIWidgetInspector : Editor
 		}
 	}
 
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2 && !UNITY_4_3
+	void OnDisable() { UnityEditor.Tools.hidden = false; }
+#endif
+
 	/// <summary>
 	/// Draw the on-screen selection, knobs, and handle all interaction logic.
 	/// </summary>
 
 	public void OnSceneGUI ()
 	{
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2 && !UNITY_4_3
+		UnityEditor.Tools.hidden = UnityEditor.Tools.current == UnityEditor.Tool.Move;
+#endif
 		if (!UIWidget.showHandles) return;
 
 		mWidget = target as UIWidget;
-
-		if (NGUISettings.colorMode == NGUISettings.ColorMode.Orange)
-		{
-			Handles.color = new Color(1f, 0.5f, 0f);
-		}
-		else if (NGUISettings.colorMode == NGUISettings.ColorMode.Green)
-		{
-			Handles.color = Color.green;
-		}
-		else Handles.color = Color.white;
 
 		Transform t = mWidget.cachedTransform;
 
@@ -220,6 +237,8 @@ public class UIWidgetInspector : Editor
 		EventType type = e.GetTypeForControl(id);
 
 		Vector3[] corners = mWidget.worldCorners;
+		
+		Handles.color = handlesColor;
 		Handles.DrawLine(corners[0], corners[1]);
 		Handles.DrawLine(corners[1], corners[2]);
 		Handles.DrawLine(corners[2], corners[3]);
@@ -237,12 +256,6 @@ public class UIWidgetInspector : Editor
 		worldPos[6] = (corners[2] + corners[3]) * 0.5f;
 		worldPos[7] = (corners[0] + corners[3]) * 0.5f;
 
-		Vector2[] screenPos = new Vector2[8];
-		for (int i = 0; i < 8; ++i) screenPos[i] = HandleUtility.WorldToGUIPoint(worldPos[i]);
-
-		Bounds b = new Bounds(screenPos[0], Vector3.zero);
-		for (int i = 1; i < 8; ++i) b.Encapsulate(screenPos[i]);
-
 		// Time to figure out what kind of action is underneath the mouse
 		Action actionUnderMouse = mAction;
 		UIWidget.Pivot pivotUnderMouse = UIWidget.Pivot.Center;
@@ -257,7 +270,7 @@ public class UIWidgetInspector : Editor
 				pivotUnderMouse = mPivots[index];
 				actionUnderMouse = Action.Scale;
 			}
-			else if (e.modifiers == 0 && SceneViewDistanceToRectangle(corners, e.mousePosition) == 0f)
+			else if (e.modifiers == 0 && NGUIEditorTools.SceneViewDistanceToRectangle(corners, e.mousePosition) == 0f)
 			{
 				actionUnderMouse = Action.Move;
 			}
@@ -270,6 +283,12 @@ public class UIWidgetInspector : Editor
 		// Change the mouse cursor to a more appropriate one
 #if !UNITY_3_5
 		{
+			Vector2[] screenPos = new Vector2[8];
+			for (int i = 0; i < 8; ++i) screenPos[i] = HandleUtility.WorldToGUIPoint(worldPos[i]);
+
+			Bounds b = new Bounds(screenPos[0], Vector3.zero);
+			for (int i = 1; i < 8; ++i) b.Encapsulate(screenPos[i]);
+
 			Vector2 min = b.min;
 			Vector2 max = b.max;
 
@@ -438,7 +457,7 @@ public class UIWidgetInspector : Editor
 						if (e.button == 1)
 						{
 							// Right-click: Select the widget below
-							SelectWidget(mWidget, e.mousePosition, false);
+							NGUIEditorTools.SelectWidgetOrContainer(mWidget.gameObject, e.mousePosition, false);
 							handled = true;
 						}
 						else if (mAction == Action.None)
@@ -446,7 +465,7 @@ public class UIWidgetInspector : Editor
 							if (mAllowSelection)
 							{
 								// Left-click: Select the widget above
-								SelectWidget(mWidget, e.mousePosition, true);
+								NGUIEditorTools.SelectWidgetOrContainer(mWidget.gameObject, e.mousePosition, true);
 								handled = true;
 							}
 						}
@@ -472,7 +491,7 @@ public class UIWidgetInspector : Editor
 				}
 				else if (mAllowSelection)
 				{
-					BetterList<UIWidget> widgets = SceneViewRaycast(mWidget.panel, e.mousePosition);
+					BetterList<UIWidget> widgets = NGUIEditorTools.SceneViewRaycast(e.mousePosition);
 					if (widgets.size > 0) Selection.activeGameObject = widgets[0].gameObject;
 				}
 				mAllowSelection = true;
@@ -543,47 +562,6 @@ public class UIWidgetInspector : Editor
 			}
 			break;
 		}
-	}
-
-	/// <summary>
-	/// Select the next widget in line.
-	/// </summary>
-
-	static public bool SelectWidget (UIWidget start, Vector2 pos, bool inFront)
-	{
-		GameObject go = null;
-		UIPanel p = start.panel;
-		if (p == null) p = NGUITools.FindInParents<UIPanel>(start.gameObject);
-		BetterList<UIWidget> widgets = SceneViewRaycast(p, pos);
-
-		if (inFront)
-		{
-			if (widgets.size > 0)
-			{
-				for (int i = 0; i < widgets.size; ++i)
-				{
-					UIWidget w = widgets[i];
-					if (w == start) break;
-					go = w.gameObject;
-				}
-			}
-		}
-		else
-		{
-			for (int i = widgets.size; i > 0; )
-			{
-				UIWidget w = widgets[--i];
-				if (w == start) break;
-				go = w.gameObject;
-			}
-		}
-
-		if (go != null)
-		{
-			Selection.activeGameObject = go;
-			return true;
-		}
-		return false;
 	}
 
 	/// <summary>
@@ -1000,39 +978,6 @@ public class UIWidgetInspector : Editor
 			return UIWidget.Pivot.Right;
 		}
 		return vertical;
-	}
-
-	/// <summary>
-	/// Determine the distance from the mouse position to the world rectangle specified by the 4 points.
-	/// </summary>
-
-	static public float SceneViewDistanceToRectangle (Vector3[] worldPoints, Vector2 mousePos)
-	{
-		Vector2[] screenPoints = new Vector2[4];
-		for (int i = 0; i < 4; ++i)
-			screenPoints[i] = HandleUtility.WorldToGUIPoint(worldPoints[i]);
-		return NGUIMath.DistanceToRectangle(screenPoints, mousePos);
-	}
-
-	/// <summary>
-	/// Raycast into the specified panel, returning a list of widgets.
-	/// Just like NGUIMath.Raycast, but doesn't rely on having a camera.
-	/// </summary>
-
-	static public BetterList<UIWidget> SceneViewRaycast (UIPanel panel, Vector2 mousePos)
-	{
-		BetterList<UIWidget> list = new BetterList<UIWidget>();
-
-		for (int i = 0; i < UIWidget.list.size; ++i)
-		{
-			UIWidget w = UIWidget.list[i];
-			Vector3[] corners = w.worldCorners;
-			if (SceneViewDistanceToRectangle(corners, mousePos) == 0f)
-				list.Add(w);
-		}
-
-		list.Sort(delegate(UIWidget w1, UIWidget w2) { return w2.depth.CompareTo(w1.depth); });
-		return list;
 	}
 
 	void SetPivot (UIWidget.Pivot pivot, bool isHorizontal)

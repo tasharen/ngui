@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(UIButtonColor))]
-public class UIButtonColorEditor : Editor
+public class UIButtonColorEditor : UIWidgetContainerEditor
 {
 	public override void OnInspectorGUI ()
 	{

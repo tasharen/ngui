@@ -1114,4 +1114,98 @@ public class NGUIEditorTools
 		EventDelegateEditor.Field(undoObject, list, notValid, notValid);
 		NGUIEditorTools.EndContents();
 	}
+
+	/// <summary>
+	/// Determine the distance from the mouse position to the world rectangle specified by the 4 points.
+	/// </summary>
+
+	static public float SceneViewDistanceToRectangle (Vector3[] worldPoints, Vector2 mousePos)
+	{
+		Vector2[] screenPoints = new Vector2[4];
+		for (int i = 0; i < 4; ++i)
+			screenPoints[i] = HandleUtility.WorldToGUIPoint(worldPoints[i]);
+		return NGUIMath.DistanceToRectangle(screenPoints, mousePos);
+	}
+
+	/// <summary>
+	/// Raycast into the specified panel, returning a list of widgets.
+	/// Just like NGUIMath.Raycast, but doesn't rely on having a camera.
+	/// </summary>
+
+	static public BetterList<UIWidget> SceneViewRaycast (Vector2 mousePos)
+	{
+		BetterList<UIWidget> list = new BetterList<UIWidget>();
+
+		for (int i = 0; i < UIWidget.list.size; ++i)
+		{
+			UIWidget w = UIWidget.list[i];
+			Vector3[] corners = w.worldCorners;
+			if (SceneViewDistanceToRectangle(corners, mousePos) == 0f)
+				list.Add(w);
+		}
+
+		list.Sort(delegate(UIWidget w1, UIWidget w2) { return w2.depth.CompareTo(w1.depth); });
+		return list;
+	}
+
+	/// <summary>
+	/// Select the next widget in line.
+	/// </summary>
+
+	static public bool SelectWidget (GameObject start, Vector2 pos, bool inFront)
+	{
+		GameObject go = null;
+		BetterList<UIWidget> widgets = SceneViewRaycast(pos);
+
+		if (inFront)
+		{
+			if (widgets.size > 0)
+			{
+				for (int i = 0; i < widgets.size; ++i)
+				{
+					UIWidget w = widgets[i];
+					if (w.cachedGameObject == start) break;
+					go = w.cachedGameObject;
+				}
+			}
+		}
+		else
+		{
+			for (int i = widgets.size; i > 0; )
+			{
+				UIWidget w = widgets[--i];
+				if (w.cachedGameObject == start) break;
+				go = w.cachedGameObject;
+			}
+		}
+
+		if (go != null && go != start)
+		{
+			Selection.activeGameObject = go;
+			return true;
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Select the next widget or container.
+	/// </summary>
+
+	static public bool SelectWidgetOrContainer (GameObject go, Vector2 pos, bool inFront)
+	{
+		if (!SelectWidget(go, pos, inFront))
+		{
+			if (inFront)
+			{
+				UIWidgetContainer wc = NGUITools.FindInParents<UIWidgetContainer>(go);
+
+				if (wc != null && wc.gameObject != go)
+				{
+					Selection.activeGameObject = wc.gameObject;
+					return true;
+				}
+			}
+		}
+		return true;
+	}
 }

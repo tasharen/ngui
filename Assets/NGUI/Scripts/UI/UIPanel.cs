@@ -1126,7 +1126,12 @@ public class UIPanel : MonoBehaviour
 
 					Gizmos.matrix = t.localToWorldMatrix;
 
-					if (go != cachedGameObject)
+					if (go == cachedGameObject)
+					{
+						Gizmos.color = new Color(1f, 0f, 0.5f);
+						Gizmos.DrawWireCube(pos, size);
+					}
+					else
 					{
 						Gizmos.color = clip ? Color.magenta : new Color(0.5f, 0f, 0.5f);
 						Gizmos.DrawWireCube(pos, size);
@@ -1134,11 +1139,6 @@ public class UIPanel : MonoBehaviour
 						// Make the panel selectable
 						//Gizmos.color = Color.clear;
 						//Gizmos.DrawCube(pos, size);
-					}
-					else
-					{
-						Gizmos.color = Color.green;
-						Gizmos.DrawWireCube(pos, size);
 					}
 				}
 			}
