@@ -3,7 +3,14 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
+#if UNITY_EDITOR || (!UNITY_FLASH && !UNITY_WP8)
+#define REFLECTION_SUPPORT
+#endif
+
+#if REFLECTION_SUPPORT
 using System.Reflection;
+#endif
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,6 +23,12 @@ public class EventDelegate
 {
 	[SerializeField] MonoBehaviour mTarget;
 	[SerializeField] string mMethodName;
+
+	/// <summary>
+	/// Whether the event delegate will be removed after execution.
+	/// </summary>
+
+	public bool oneShot = false;
 
 	public delegate void Callback();
 	Callback mCachedCallback;
@@ -81,12 +94,12 @@ public class EventDelegate
 
 	public override int GetHashCode () { return s_Hash; }
 
-#if !UNITY_FLASH
+#if REFLECTION_SUPPORT
 	/// <summary>
 	/// Convert the saved target and method name into an actual delegate.
 	/// </summary>
 
-	public Callback Get ()
+	Callback Get ()
 	{
 		if (mCachedCallback == null || mCachedCallback.Target != mTarget || mCachedCallback.Method.Name != mMethodName)
 		{
@@ -98,15 +111,13 @@ public class EventDelegate
 		}
 		return mCachedCallback;
 	}
-#else
-	public Callback Get () { return null; }
 #endif
 
 	/// <summary>
 	/// Set the delegate callback directly.
 	/// </summary>
 
-	public void Set (Callback call)
+	void Set (Callback call)
 	{
 		if (call == null || call.Method == null)
 		{
@@ -143,13 +154,7 @@ public class EventDelegate
 		if (Application.isPlaying)
 #endif
 		{
-#if UNITY_FLASH
-			if (isValid)
-			{
-				mTarget.SendMessage(mMethodName, SendMessageOptions.DontRequireReceiver);
-				return true;
-			}
-#else
+#if REFLECTION_SUPPORT
 			Callback call = Get();
 			
 			if (call != null)
@@ -157,6 +162,13 @@ public class EventDelegate
 				call();
 				return true;
 			}
+#else
+			if (isValid)
+			{
+				mTarget.SendMessage(mMethodName, SendMessageOptions.DontRequireReceiver);
+				return true;
+			}
+
 #endif
 		}
 		return false;
@@ -184,10 +196,24 @@ public class EventDelegate
 
 	static public void Execute (List<EventDelegate> list)
 	{
-		for (int i = 0, imax = list.Count; i < imax; ++i)
+		if (list != null)
 		{
-			EventDelegate del = list[i];
-			if (del != null) del.Execute();
+			for (int i = 0; i < list.Count; )
+			{
+				EventDelegate del = list[i];
+
+				if (del != null)
+				{
+					del.Execute();
+
+					if (del.oneShot)
+					{
+						list.RemoveAt(i);
+						continue;
+					}
+				}
+				++i;
+			}
 		}
 	}
 
@@ -226,7 +252,7 @@ public class EventDelegate
 	/// Append a new event delegate to the list.
 	/// </summary>
 
-	static public void Add (List<EventDelegate> list, Callback callback)
+	static public void Add (List<EventDelegate> list, Callback callback, bool oneShot = false)
 	{
 		if (list != null)
 		{
@@ -236,7 +262,10 @@ public class EventDelegate
 				if (del != null && del.Equals(callback))
 					return;
 			}
-			list.Add(new EventDelegate(callback));
+
+			EventDelegate ed = new EventDelegate(callback);
+			ed.oneShot = oneShot;
+			list.Add(ed);
 		}
 	}
 
@@ -244,7 +273,7 @@ public class EventDelegate
 	/// Append a new event delegate to the list.
 	/// </summary>
 
-	static public void Add (List<EventDelegate> list, EventDelegate ev)
+	static public void Add (List<EventDelegate> list, EventDelegate ev, bool oneShot = false)
 	{
 		if (list != null)
 		{
@@ -254,7 +283,10 @@ public class EventDelegate
 				if (del != null && del.Equals(ev))
 					return;
 			}
-			list.Add(new EventDelegate(ev.target, ev.methodName));
+			
+			EventDelegate ed = new EventDelegate(ev.target, ev.methodName);
+			ed.oneShot = oneShot;
+			list.Add(ed);
 		}
 	}
 

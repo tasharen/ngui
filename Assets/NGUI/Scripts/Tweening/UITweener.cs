@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// Base class for all tweening operations.
@@ -12,6 +13,12 @@ using System.Collections;
 
 public abstract class UITweener : IgnoreTimeScale
 {
+	/// <summary>
+	/// Current tween that triggered the callback function.
+	/// </summary>
+
+	static public UITweener current;
+
 	public enum Method
 	{
 		Linear,
@@ -28,14 +35,6 @@ public abstract class UITweener : IgnoreTimeScale
 		Loop,
 		PingPong,
 	}
-
-	public delegate void OnFinished (UITweener tween);
-
-	/// <summary>
-	/// Delegate for subscriptions. Faster than using the 'eventReceiver' and allows for multiple receivers.
-	/// </summary>
-
-	public OnFinished onFinished;
 
 	/// <summary>
 	/// Tweening method used.
@@ -86,16 +85,14 @@ public abstract class UITweener : IgnoreTimeScale
 	public int tweenGroup = 0;
 
 	/// <summary>
-	/// Target used with 'callWhenFinished', or this game object if none was specified.
+	/// Event delegates called when the animation finishes.
 	/// </summary>
 
-	public GameObject eventReceiver;
+	public List<EventDelegate> onFinished = new List<EventDelegate>();
 
-	/// <summary>
-	/// Name of the function to call when the tween finishes.
-	/// </summary>
-
-	public string callWhenFinished;
+	// Deprecated functionality, kept for backwards compatibility
+	[HideInInspector] public GameObject eventReceiver;
+	[HideInInspector] public string callWhenFinished;
 
 	bool mStarted = false;
 	float mStartTime = 0f;
@@ -188,20 +185,20 @@ public abstract class UITweener : IgnoreTimeScale
 			mFactor = Mathf.Clamp01(mFactor);
 			Sample(mFactor, true);
 
-			// Notify the listener delegate
-			if (onFinished != null) onFinished(this);
+			current = this;
 
-			// Notify the event listener target
+			// Notify the listener delegates
+			EventDelegate.Execute(onFinished);
+
+			// Deprecated legacy functionality support
 			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
-			{
 				eventReceiver.SendMessage(callWhenFinished, this, SendMessageOptions.DontRequireReceiver);
-			}
+
+			current = null;
 
 			// Disable this script unless the function calls above changed something
 			if (mFactor == 1f && mAmountPerDelta > 0f || mFactor == 0f && mAmountPerDelta < 0f)
-			{
 				enabled = false;
-			}
 		}
 		else Sample(mFactor, false);
 	}

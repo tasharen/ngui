@@ -1,0 +1,60 @@
+//----------------------------------------------
+//            NGUI: Next-Gen UI kit
+// Copyright © 2011-2013 Tasharen Entertainment
+//----------------------------------------------
+
+using UnityEngine;
+using UnityEditor;
+
+[CustomEditor(typeof(UIButtonTween))]
+public class UIButtonTweenEditor : Editor
+{
+	enum ResetOnPlay
+	{
+		Continue,
+		StartFromBeginning,
+	}
+
+	enum SelectedObject
+	{
+		KeepCurrent,
+		SetToNothing,
+	}
+
+	public override void OnInspectorGUI ()
+	{
+		EditorGUIUtility.LookLikeControls(120f);
+		UIButtonTween tw = target as UIButtonTween;
+		GUILayout.Space(6f);
+
+		GUI.changed = false;
+		GameObject tt = (GameObject)EditorGUILayout.ObjectField("Tween Target", tw.tweenTarget, typeof(GameObject), true);
+
+		bool inc = EditorGUILayout.Toggle("Include Children", tw.includeChildren);
+		int group = EditorGUILayout.IntField("Tween Group", tw.tweenGroup, GUILayout.Width(160f));
+
+		AnimationOrTween.Trigger trigger = (AnimationOrTween.Trigger)EditorGUILayout.EnumPopup("Trigger condition", tw.trigger);
+		AnimationOrTween.Direction dir = (AnimationOrTween.Direction)EditorGUILayout.EnumPopup("Play direction", tw.playDirection);
+		AnimationOrTween.EnableCondition enab = (AnimationOrTween.EnableCondition)EditorGUILayout.EnumPopup("If disabled on start", tw.ifDisabledOnPlay);
+		ResetOnPlay rs = tw.resetOnPlay ? ResetOnPlay.StartFromBeginning : ResetOnPlay.Continue;
+		bool reset = (ResetOnPlay)EditorGUILayout.EnumPopup("If already playing", rs) == ResetOnPlay.StartFromBeginning;
+		AnimationOrTween.DisableCondition dis = (AnimationOrTween.DisableCondition)EditorGUILayout.EnumPopup("When finished", tw.disableWhenFinished);
+
+		if (GUI.changed)
+		{
+			NGUIEditorTools.RegisterUndo("Tween Change", tw);
+			tw.tweenTarget = tt;
+			tw.tweenGroup = group;
+			tw.includeChildren = inc;
+			tw.trigger = trigger;
+			tw.playDirection = dir;
+			tw.ifDisabledOnPlay = enab;
+			tw.resetOnPlay = reset;
+			tw.disableWhenFinished = dis;
+			UnityEditor.EditorUtility.SetDirty(tw);
+		}
+
+		EditorGUIUtility.LookLikeControls(80f);
+		NGUIEditorTools.DrawEvents("On Finished", tw, tw.onFinished);
+	}
+}

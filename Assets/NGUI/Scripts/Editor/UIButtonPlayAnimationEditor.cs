@@ -30,44 +30,15 @@ public class UIButtonPlayAnimationEditor : Editor
 		GUI.changed = false;
 		Animation anim = (Animation)EditorGUILayout.ObjectField("Target", pa.target, typeof(Animation), true);
 
-		GUILayout.BeginHorizontal();
 		string clipName = EditorGUILayout.TextField("Clip Name", pa.clipName);
-		GUILayout.Space(18f);
-		GUILayout.EndHorizontal();
-
-		GUILayout.BeginHorizontal();
 		AnimationOrTween.Trigger trigger = (AnimationOrTween.Trigger)EditorGUILayout.EnumPopup("Trigger condition", pa.trigger);
-		GUILayout.Space(18f);
-		GUILayout.EndHorizontal();
-
-		GUILayout.BeginHorizontal();
 		AnimationOrTween.Direction dir = (AnimationOrTween.Direction)EditorGUILayout.EnumPopup("Play direction", pa.playDirection);
-		GUILayout.Space(18f);
-		GUILayout.EndHorizontal();
-
 		SelectedObject so = pa.clearSelection ? SelectedObject.SetToNothing : SelectedObject.KeepCurrent;
-
-		GUILayout.BeginHorizontal();
 		bool clear = (SelectedObject)EditorGUILayout.EnumPopup("Selected object", so) == SelectedObject.SetToNothing;
-		GUILayout.Space(18f);
-		GUILayout.EndHorizontal();
-
-		GUILayout.BeginHorizontal();
 		AnimationOrTween.EnableCondition enab = (AnimationOrTween.EnableCondition)EditorGUILayout.EnumPopup("If disabled on start", pa.ifDisabledOnPlay);
-		GUILayout.Space(18f);
-		GUILayout.EndHorizontal();
-
 		ResetOnPlay rs = pa.resetOnPlay ? ResetOnPlay.StartFromBeginning : ResetOnPlay.Continue;
-
-		GUILayout.BeginHorizontal();
 		bool reset = (ResetOnPlay)EditorGUILayout.EnumPopup("If already playing", rs) == ResetOnPlay.StartFromBeginning;
-		GUILayout.Space(18f);
-		GUILayout.EndHorizontal();
-
-		GUILayout.BeginHorizontal();
 		AnimationOrTween.DisableCondition dis = (AnimationOrTween.DisableCondition)EditorGUILayout.EnumPopup("When finished", pa.disableWhenFinished);
-		GUILayout.Space(18f);
-		GUILayout.EndHorizontal();
 
 		if (GUI.changed)
 		{

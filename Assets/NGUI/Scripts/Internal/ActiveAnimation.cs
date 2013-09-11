@@ -82,6 +82,19 @@ public class ActiveAnimation : IgnoreTimeScale
 	}
 
 	/// <summary>
+	/// Event receiver is only kept for backwards compatibility purposes. It's removed on start if new functionality is used.
+	/// </summary>
+
+	void Start ()
+	{
+		if (eventReceiver != null && EventDelegate.IsValid(onFinished))
+		{
+			eventReceiver = null;
+			callWhenFinished = null;
+		}
+	}
+
+	/// <summary>
 	/// Notify the target when the animation finishes playing.
 	/// </summary>
 
