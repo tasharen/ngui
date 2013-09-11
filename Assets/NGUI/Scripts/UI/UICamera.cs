@@ -72,6 +72,12 @@ public class UICamera : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Which layers will receive events.
+	/// </summary>
+
+	public LayerMask eventReceiverMask = -1;
+
+	/// <summary>
 	/// If 'true', currently hovered object will be shown in the top left corner.
 	/// </summary>
 
@@ -117,12 +123,6 @@ public class UICamera : MonoBehaviour
 	public bool stickyPress = true;
 
 	/// <summary>
-	/// Which layers will receive events.
-	/// </summary>
-
-	public LayerMask eventReceiverMask = -1;
-
-	/// <summary>
 	/// Whether raycast events will be clipped just like widgets. This essentially means that clicking on a collider that
 	/// happens to have been clipped will not produce a hit. Note that having this enabled will slightly reduce performance.
 	/// </summary>
@@ -130,16 +130,16 @@ public class UICamera : MonoBehaviour
 	public bool clipRaycasts = true;
 
 	/// <summary>
-	/// How long of a delay to expect before showing the tooltip.
-	/// </summary>
-
-	public float tooltipDelay = 1f;
-
-	/// <summary>
 	/// Whether the tooltip will disappear as soon as the mouse moves (false) or only if the mouse moves outside of the widget's area (true).
 	/// </summary>
 
 	public bool stickyTooltip = true;
+
+	/// <summary>
+	/// How long of a delay to expect before showing the tooltip.
+	/// </summary>
+
+	public float tooltipDelay = 1f;
 
 	/// <summary>
 	/// How much the mouse has to be moved after pressing a button before it starts to send out drag events.
