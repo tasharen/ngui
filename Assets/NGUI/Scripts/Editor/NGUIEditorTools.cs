@@ -297,31 +297,6 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
-	/// Draw a distinctly different looking header label
-	/// </summary>
-
-	//static public Rect DrawHeader (string text)
-	//{
-	//    GUILayout.Space(28f);
-	//    Rect rect = GUILayoutUtility.GetLastRect();
-	//    rect.yMin += 5f;
-	//    rect.yMax -= 4f;
-	//    rect.width = Screen.width;
-
-	//    if (Event.current.type == EventType.Repaint)
-	//    {
-	//        GUI.color = Color.black;
-	//        GUI.DrawTexture(new Rect(0f, rect.yMin, Screen.width, rect.yMax - rect.yMin), gradientTexture);
-	//        GUI.color = new Color(0f, 0f, 0f, 0.25f);
-	//        GUI.DrawTexture(new Rect(0f, rect.yMin, Screen.width, 1f), blankTexture);
-	//        GUI.DrawTexture(new Rect(0f, rect.yMax - 1, Screen.width, 1f), blankTexture);
-	//        GUI.color = Color.white;
-	//        GUI.Label(new Rect(rect.x + 4f, rect.y, rect.width - 4, rect.height), text, EditorStyles.boldLabel);
-	//    }
-	//    return rect;
-	//}
-
-	/// <summary>
 	/// Convenience function that displays a list of sprites and returns the selected value.
 	/// </summary>
 
