@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CanEditMultipleObjects]
-[CustomEditor(typeof(UIRoot))]
-public class UIRootEditor : Editor
+[CustomEditor(typeof(UIAnchor))]
+public class UIAnchorEditor : Editor
 {
 }
