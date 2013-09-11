@@ -13,8 +13,8 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Tween/Tween Width")]
 public class TweenWidth : UITweener
 {
-	public int from = 1;
-	public int to = 1;
+	public int from = 100;
+	public int to = 100;
 	public bool updateTable = false;
 
 	UIWidget mWidget;

@@ -40,54 +40,63 @@ public abstract class UITweener : MonoBehaviour
 	/// Tweening method used.
 	/// </summary>
 
+	[HideInInspector]
 	public Method method = Method.Linear;
 
 	/// <summary>
 	/// Does it play once? Does it loop?
 	/// </summary>
 
+	[HideInInspector]
 	public Style style = Style.Once;
 
 	/// <summary>
 	/// Optional curve to apply to the tween's time factor value.
 	/// </summary>
 
+	[HideInInspector]
 	public AnimationCurve animationCurve = new AnimationCurve(new Keyframe(0f, 0f, 0f, 1f), new Keyframe(1f, 1f, 1f, 0f));
 
 	/// <summary>
 	/// Whether the tween will ignore the timescale, making it work while the game is paused.
 	/// </summary>
-
+	
+	[HideInInspector]
 	public bool ignoreTimeScale = true;
 
 	/// <summary>
 	/// How long will the tweener wait before starting the tween?
 	/// </summary>
 
+	[HideInInspector]
 	public float delay = 0f;
 
 	/// <summary>
 	/// How long is the duration of the tween?
 	/// </summary>
 
+	[HideInInspector]
 	public float duration = 1f;
 
 	/// <summary>
 	/// Whether the tweener will use steeper curves for ease in / out style interpolation.
 	/// </summary>
 
+	[HideInInspector]
 	public bool steeperCurves = false;
 
 	/// <summary>
 	/// Used by buttons and tween sequences. Group of '0' means not in a sequence.
 	/// </summary>
 
+	[HideInInspector]
 	public int tweenGroup = 0;
 
 	/// <summary>
 	/// Event delegates called when the animation finishes.
 	/// </summary>
 
+	[HideInInspector]
 	public List<EventDelegate> onFinished = new List<EventDelegate>();
 
 	// Deprecated functionality, kept for backwards compatibility
