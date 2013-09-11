@@ -43,7 +43,6 @@ used as its size, so any code that you had relying on this will need to change t
 
 3.0.0:
 - NEW: Re-designed the way widget width & height gets specified. The values are now explicit, and scale is no longer used.
-- NEW: Eliminated Z/Depth issues. You can now also use CTRL+ and CTRL- shortcut keys to adjust widget depth.
 - NEW: It's now possible to have clipped panels in 3D and not have them break when tilting the camera.
 - NEW: It's now possible to nest widgets.
 - NEW: It's now possible to have multiple widgets on the same object.
@@ -52,11 +51,18 @@ used as its size, so any code that you had relying on this will need to change t
 - NEW: Added TweenWidth and TweenHeight to tween widgets width and height properties.
 - NEW: You can now specify the label overflow method: shrink content, clamp content, resize height, or resize freely.
 - NEW: When labels are in "resize label" overflow mode, the drag handles will be greyed out.
-- NEW: Added a simple EventDelegate class and improved generic components to use it.
+- NEW: Added a simple EventDelegate class and improved all generic components to use it.
+- NEW: Added a Widget Container class that can be used to easily select and move groups of widgets (think: buttons, windows).
+- NEW: Added the RealTime helper class that removed IgnoreTimeScale. Usage: RealTime.time, RealTime.deltaTime.
+- FIX: Labels will now again align vertically properly.
+
+2.7.0:
+- NEW: Added a way to resolve all Depth/Z issues. Check your UIPanels and enable Depth Sorting.
 - FIX: DownloadTexture no longer leaves a shadow of the previous texture behind.
 - FIX: UIDragObject will no longer behave oddly with multiple touches.
-- FIX: Labels will now again align vertically properly.
-- FIX: UITexture will now default to Unlit/Transparent Colored like all widgets.
+- FIX: Popup menu will now correctly trigger OnChange functions on the same selection.
+- FIX: UITexture will now default to the Unlit/Transparent Colored shader.
+- FIX: Atlas Maker will no longer default sprite list to be hidden.
 
 2.6.5:
 - FIX: Labels now have "Max Height", and "Max Lines" again works as expected.
