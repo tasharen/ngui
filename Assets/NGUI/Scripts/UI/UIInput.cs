@@ -4,11 +4,13 @@
 //----------------------------------------------
 
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Editable text input field.
 /// </summary>
 
+[ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/Input (Basic)")]
 public class UIInput : UIWidgetContainer
 {
@@ -25,8 +27,6 @@ public class UIInput : UIWidgetContainer
 		NamePhonePad = 6,
 		EmailAddress = 7,
 	}
-
-	public delegate void OnSubmit (string inputString);
 
 	/// <summary>
 	/// Current input, available inside OnSubmit callbacks.
@@ -51,6 +51,12 @@ public class UIInput : UIWidgetContainer
 	/// </summary>
 
 	public string caratChar = "|";
+
+	/// <summary>
+	/// Field in player prefs used to automatically save the value.
+	/// </summary>
+
+	public string playerPrefsField;
 
 	/// <summary>
 	/// Delegate used for validation.
@@ -98,22 +104,14 @@ public class UIInput : UIWidgetContainer
 	public GameObject selectOnTab;
 
 	/// <summary>
-	/// Event receiver that will be notified when the input field submits its data (enter gets pressed).
+	/// Callbacks triggered when the input field submits the text.
 	/// </summary>
 
-	public GameObject eventReceiver;
+	public List<EventDelegate> onSubmit = new List<EventDelegate>();
 
-	/// <summary>
-	/// Function that will be called on the event receiver when the input field submits its data.
-	/// </summary>
-
-	public string functionName = "OnSubmit";
-
-	/// <summary>
-	/// Delegate that will be notified when the input field submits its data (by default that's when Enter gets pressed).
-	/// </summary>
-
-	public OnSubmit onSubmit;
+	// Deprecated functionality, kept for backwards compatibility
+	[HideInInspector][SerializeField] GameObject eventReceiver;
+	[HideInInspector][SerializeField] string functionName = "OnSubmit";
 
 	string mText = "";
 	string mDefaultText = "";
@@ -135,13 +133,24 @@ public class UIInput : UIWidgetContainer
 	{
 		get
 		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying) return "";
+#endif
 			if (mDoInit) Init();
 			return mText;
 		}
 		set
 		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying) return;
+#endif
 			if (mDoInit) Init();
-			mText = value;
+
+			if (mText != value)
+			{
+				mText = value;
+				SaveToPlayerPrefs(mText);
+			}
 
 #if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_BLACKBERRY
 			if (mKeyboard != null) mKeyboard.text = text;
@@ -218,21 +227,86 @@ public class UIInput : UIWidgetContainer
 		}
 	}
 
+	/// <summary>
+	/// Save the specified value to player prefs.
+	/// </summary>
+
+	void SaveToPlayerPrefs (string val)
+	{
+		if (!string.IsNullOrEmpty(playerPrefsField))
+		{
+			if (string.IsNullOrEmpty(val))
+			{
+				PlayerPrefs.DeleteKey(playerPrefsField);
+			}
+			else
+			{
+				PlayerPrefs.SetString(playerPrefsField, val);
+			}
+		}
+	}
+
 	bool mDoInit = true;
 
-	void Awake () { if (label == null) label = GetComponentInChildren<UILabel>(); }
+	void Awake ()
+	{
+		if (label == null) label = GetComponentInChildren<UILabel>();
+		
+		if (!string.IsNullOrEmpty(playerPrefsField) && PlayerPrefs.HasKey(playerPrefsField))
+		{
+			text = PlayerPrefs.GetString(playerPrefsField);
+		}
+	}
+
+	/// <summary>
+	/// Remove legacy functionality.
+	/// </summary>
+
+	void Start ()
+	{
+		if (EventDelegate.IsValid(onSubmit))
+		{
+			if (eventReceiver != null || !string.IsNullOrEmpty(functionName))
+			{
+				eventReceiver = null;
+				functionName = null;
+#if UNITY_EDITOR
+				if (!Application.isPlaying) UnityEditor.EditorUtility.SetDirty(this);
+#endif
+			}
+		}
+		else if (eventReceiver == null && !EventDelegate.IsValid(onSubmit))
+		{
+			// Kept for backwards compatibility
+			eventReceiver = gameObject;
+		}
+	}
 
 	/// <summary>
 	/// If the object is currently highlighted, it should also be selected.
 	/// </summary>
 
-	void OnEnable () { if (UICamera.IsHighlighted(gameObject)) OnSelect(true); }
+	void OnEnable ()
+	{
+#if UNITY_EDITOR
+		if (!Application.isPlaying) return;
+#endif
+		if (UICamera.IsHighlighted(gameObject))
+			OnSelect(true);
+	}
 
 	/// <summary>
 	/// Remove the selection.
 	/// </summary>
 
-	void OnDisable () { if (UICamera.IsHighlighted(gameObject)) OnSelect(false); }
+	void OnDisable ()
+	{
+#if UNITY_EDITOR
+		if (!Application.isPlaying) return;
+#endif
+		if (UICamera.IsHighlighted(gameObject))
+			OnSelect(false);
+	}
 
 	/// <summary>
 	/// Selection event, sent by UICamera.
@@ -308,6 +382,9 @@ public class UIInput : UIWidgetContainer
 
 	void Update()
 	{
+#if UNITY_EDITOR
+		if (!Application.isPlaying) return;
+#endif
 		if (mKeyboard != null)
 		{
 			string text = mKeyboard.text;
@@ -332,11 +409,7 @@ public class UIInput : UIWidgetContainer
 			if (mKeyboard.done)
 			{
 				mKeyboard = null;
-				current = this;
-				if (onSubmit != null) onSubmit(mText);
-				if (eventReceiver == null) eventReceiver = gameObject;
-				eventReceiver.SendMessage(functionName, mText, SendMessageOptions.DontRequireReceiver);
-				current = null;
+				Submit();
 				selected = false;
 			}
 		}
@@ -344,6 +417,9 @@ public class UIInput : UIWidgetContainer
 #else
 	void Update ()
 	{
+#if UNITY_EDITOR
+		if (!Application.isPlaying) return;
+#endif
 		if (selected)
 		{
 			if (selectOnTab != null && Input.GetKeyDown(KeyCode.Tab))
@@ -389,6 +465,28 @@ public class UIInput : UIWidgetContainer
 	}
 
 	/// <summary>
+	/// Submit the input field's text.
+	/// </summary>
+
+	void Submit ()
+	{
+		current = this;
+
+		if (EventDelegate.IsValid(onSubmit))
+		{
+			EventDelegate.Execute(onSubmit);
+		}
+		else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+		{
+			// Legacy functionality support (for backwards compatibility)
+			eventReceiver.SendMessage(functionName, mText, SendMessageOptions.DontRequireReceiver);
+		}
+
+		SaveToPlayerPrefs(mText);
+		current = null;
+	}
+
+	/// <summary>
 	/// Append the specified text to the end of the current.
 	/// </summary>
 
@@ -414,12 +512,7 @@ public class UIInput : UIWidgetContainer
 					// Not multi-line input, or control isn't held
 					if (!label.multiLine || (!Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl)))
 					{
-						// Enter
-						current = this;
-						if (onSubmit != null) onSubmit(mText);
-						if (eventReceiver == null) eventReceiver = gameObject;
-						eventReceiver.SendMessage(functionName, mText, SendMessageOptions.DontRequireReceiver);
-						current = null;
+						Submit();
 						selected = false;
 						return;
 					}

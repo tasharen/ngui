@@ -6,47 +6,10 @@
 using UnityEngine;
 
 /// <summary>
-/// Editable text input field that automatically saves its data to PlayerPrefs.
+/// This script has been deprecated and is no longer needed. Just use 'UIInput' instead.
 /// </summary>
 
-[AddComponentMenu("NGUI/UI/Input (Saved)")]
 public class UIInputSaved : UIInput
 {
-	public string playerPrefsField;
-
-	public override string text
-	{
-		get
-		{
-			return base.text;
-		}
-		set
-		{
-			base.text = value;
-			SaveToPlayerPrefs(value);
-		}
-	}
-
-	void Awake ()
-	{
-		onSubmit = SaveToPlayerPrefs;
-
-		if (!string.IsNullOrEmpty(playerPrefsField) && PlayerPrefs.HasKey(playerPrefsField))
-		{
-			text = PlayerPrefs.GetString(playerPrefsField);
-		}
-	}
-
-	private void SaveToPlayerPrefs (string val)
-	{
-		if (!string.IsNullOrEmpty(playerPrefsField))
-		{
-			PlayerPrefs.SetString(playerPrefsField, val);
-		}
-	}
-
-	void OnApplicationQuit ()
-	{
-		SaveToPlayerPrefs(text);
-	}
+	// Do nothing -- this script is deprecated and is only kept for backwards compatibility
 }

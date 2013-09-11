@@ -182,8 +182,9 @@ public class UIWidgetContainerEditor : Editor
 							{
 								t.position = mStartPos + (pos - mStartDrag);
 								pos = t.localPosition;
-								pos.x = Mathf.RoundToInt(pos.x);
-								pos.y = Mathf.RoundToInt(pos.y);
+								pos.x = Mathf.Round(pos.x);
+								pos.y = Mathf.Round(pos.y);
+								pos.z = Mathf.Round(pos.z);
 								t.localPosition = pos;
 							}
 						}
@@ -207,6 +208,7 @@ public class UIWidgetContainerEditor : Editor
 							Vector3 pos = t.localPosition;
 							pos.x = Mathf.Round(pos.x);
 							pos.y = Mathf.Round(pos.y);
+							pos.z = Mathf.Round(pos.z);
 							t.localPosition = pos;
 						}
 						e.Use();

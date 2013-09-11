@@ -53,7 +53,7 @@ public class ChatInput : MonoBehaviour
 	/// Submit notification is sent by UIInput when 'enter' is pressed or iOS/Android keyboard finalizes input.
 	/// </summary>
 
-	void OnSubmit ()
+	public void OnSubmit ()
 	{
 		if (textList != null)
 		{
