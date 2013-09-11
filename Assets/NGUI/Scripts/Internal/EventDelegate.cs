@@ -267,6 +267,10 @@ public class EventDelegate
 			ed.oneShot = oneShot;
 			list.Add(ed);
 		}
+		else
+		{
+			Debug.LogWarning("Attempting to add a callback to a list that's null");
+		}
 	}
 
 	/// <summary>
@@ -287,6 +291,10 @@ public class EventDelegate
 			EventDelegate ed = new EventDelegate(ev.target, ev.methodName);
 			ed.oneShot = oneShot;
 			list.Add(ed);
+		}
+		else
+		{
+			Debug.LogWarning("Attempting to add a callback to a list that's null");
 		}
 	}
 
