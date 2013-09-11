@@ -21,7 +21,7 @@ public class UIWidgetContainerEditor : Editor
 	Vector2 mStartMouse = Vector2.zero;
 
 	bool mCanDrag = false;
-	bool mCanSelect = true;
+	bool mAllowSelection = true;
 	bool mIsDragging = false;
 
 	/// <summary>
@@ -142,7 +142,7 @@ public class UIWidgetContainerEditor : Editor
 
 			case EventType.MouseDown:
 			{
-				mCanSelect = true;
+				mAllowSelection = true;
 				mStartMouse = e.mousePosition;
 
 				if (e.button == 1)
@@ -164,7 +164,7 @@ public class UIWidgetContainerEditor : Editor
 			{
 				// Prevent selection once the drag operation begins
 				bool dragStarted = (e.mousePosition - mStartMouse).magnitude > 3f;
-				if (dragStarted) mCanSelect = false;
+				if (dragStarted) mAllowSelection = false;
 
 				if (GUIUtility.hotControl == id)
 				{
@@ -214,13 +214,13 @@ public class UIWidgetContainerEditor : Editor
 							pos.x = Mathf.Round(pos.x);
 							pos.y = Mathf.Round(pos.y);
 							t.localPosition = pos;
-							e.Use();
 						}
+						e.Use();
 					}
-					else if (e.button == 1 && mCanSelect)
+					else if (e.button == 1 && mAllowSelection)
 					{
-						BetterList<UIWidget> wlist = NGUIEditorTools.SceneViewRaycast(e.mousePosition);
-						if (wlist.size > 0) Selection.activeGameObject = wlist[0].gameObject;
+						if (NGUIEditorTools.SelectWidgetOrContainer(mb.gameObject, e.mousePosition, false))
+							e.Use();
 					}
 					mCanDrag = false;
 				}

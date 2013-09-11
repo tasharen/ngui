@@ -16,19 +16,10 @@ public class UIPanelInspector : Editor
 
 	public void OnSceneGUI ()
 	{
-		//Tools.current = Tool.View;
-
 		Event e = Event.current;
 
 		switch (e.type)
 		{
-			case EventType.MouseUp:
-			{
-				BetterList<UIWidget> widgets = NGUIEditorTools.SceneViewRaycast(e.mousePosition);
-				if (widgets.size > 0) Selection.activeGameObject = widgets[0].gameObject;
-			}
-			break;
-
 			case EventType.KeyDown:
 			{
 				if (e.keyCode == KeyCode.Escape)
