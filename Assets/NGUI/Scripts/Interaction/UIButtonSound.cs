@@ -23,8 +23,14 @@ public class UIButtonSound : MonoBehaviour
 
 	public AudioClip audioClip;
 	public Trigger trigger = Trigger.OnClick;
+
+#if UNITY_3_5
 	public float volume = 1f;
 	public float pitch = 1f;
+#else
+	[Range(0f, 1f)] public float volume = 1f;
+	[Range(0f, 2f)] public float pitch = 1f;
+#endif
 
 	void OnHover (bool isOver)
 	{

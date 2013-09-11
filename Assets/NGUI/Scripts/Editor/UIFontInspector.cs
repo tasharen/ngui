@@ -84,7 +84,7 @@ public class UIFontInspector : Editor
 		mFont = target as UIFont;
 		EditorGUIUtility.LookLikeControls(80f);
 
-		NGUIEditorTools.DrawSeparator();
+		GUILayout.Space(6f);
 
 		if (mFont.replacement != null)
 		{
@@ -337,72 +337,77 @@ public class UIFontInspector : Editor
 		{
 			if (mFont.atlas != null)
 			{
-				NGUIEditorTools.DrawHeader("Symbols and Emoticons");
-
-				List<BMSymbol> symbols = mFont.symbols;
-
-				for (int i = 0; i < symbols.Count; )
+				if (NGUIEditorTools.DrawHeader("Symbols and Emoticons"))
 				{
-					BMSymbol sym = symbols[i];
+					NGUIEditorTools.BeginContents();
 
-					GUILayout.BeginHorizontal();
-					GUILayout.Label(sym.sequence, GUILayout.Width(40f));
-					if (NGUIEditorTools.SimpleSpriteField(mFont.atlas, sym.spriteName, ChangeSymbolSprite))
-						mSelectedSymbol = sym;
+					List<BMSymbol> symbols = mFont.symbols;
 
-					if (GUILayout.Button("Edit", GUILayout.Width(40f)))
+					for (int i = 0; i < symbols.Count; )
 					{
-						if (mFont.atlas != null)
+						BMSymbol sym = symbols[i];
+
+						GUILayout.BeginHorizontal();
+						GUILayout.Label(sym.sequence, GUILayout.Width(40f));
+						if (NGUIEditorTools.SimpleSpriteField(mFont.atlas, sym.spriteName, ChangeSymbolSprite))
+							mSelectedSymbol = sym;
+
+						if (GUILayout.Button("Edit", GUILayout.Width(40f)))
 						{
-							NGUISettings.selectedSprite = sym.spriteName;
-							NGUIEditorTools.Select(mFont.atlas.gameObject);
+							if (mFont.atlas != null)
+							{
+								NGUISettings.selectedSprite = sym.spriteName;
+								NGUIEditorTools.Select(mFont.atlas.gameObject);
+							}
 						}
+
+						GUI.backgroundColor = Color.red;
+
+						if (GUILayout.Button("X", GUILayout.Width(22f)))
+						{
+							NGUIEditorTools.RegisterUndo("Remove symbol", mFont);
+							mSymbolSequence = sym.sequence;
+							mSymbolSprite = sym.spriteName;
+							symbols.Remove(sym);
+							mFont.MarkAsDirty();
+						}
+						GUI.backgroundColor = Color.white;
+						GUILayout.EndHorizontal();
+						GUILayout.Space(4f);
+						++i;
 					}
 
-					GUI.backgroundColor = Color.red;
-
-					if (GUILayout.Button("X", GUILayout.Width(22f)))
+					if (symbols.Count > 0)
 					{
-						NGUIEditorTools.RegisterUndo("Remove symbol", mFont);
-						mSymbolSequence = sym.sequence;
-						mSymbolSprite = sym.spriteName;
-						symbols.Remove(sym);
+						GUILayout.Space(6f);
+					}
+
+					GUILayout.BeginHorizontal();
+					mSymbolSequence = EditorGUILayout.TextField(mSymbolSequence, GUILayout.Width(40f));
+					NGUIEditorTools.SimpleSpriteField(mFont.atlas, mSymbolSprite, SelectSymbolSprite);
+
+					bool isValid = !string.IsNullOrEmpty(mSymbolSequence) && !string.IsNullOrEmpty(mSymbolSprite);
+					GUI.backgroundColor = isValid ? Color.green : Color.grey;
+
+					if (GUILayout.Button("Add", GUILayout.Width(40f)) && isValid)
+					{
+						NGUIEditorTools.RegisterUndo("Add symbol", mFont);
+						mFont.AddSymbol(mSymbolSequence, mSymbolSprite);
 						mFont.MarkAsDirty();
+						mSymbolSequence = "";
+						mSymbolSprite = "";
 					}
 					GUI.backgroundColor = Color.white;
 					GUILayout.EndHorizontal();
-					GUILayout.Space(4f);
-					++i;
+
+					if (symbols.Count == 0)
+					{
+						EditorGUILayout.HelpBox("Want to add an emoticon to your font? In the field above type ':)', choose a sprite, then hit the Add button.", MessageType.Info);
+					}
+					else GUILayout.Space(4f);
+
+					NGUIEditorTools.EndContents();
 				}
-
-				if (symbols.Count > 0)
-				{
-					NGUIEditorTools.DrawSeparator();
-				}
-
-				GUILayout.BeginHorizontal();
-				mSymbolSequence = EditorGUILayout.TextField(mSymbolSequence, GUILayout.Width(40f));
-				NGUIEditorTools.SimpleSpriteField(mFont.atlas, mSymbolSprite, SelectSymbolSprite);
-
-				bool isValid = !string.IsNullOrEmpty(mSymbolSequence) && !string.IsNullOrEmpty(mSymbolSprite);
-				GUI.backgroundColor = isValid ? Color.green : Color.grey;
-
-				if (GUILayout.Button("Add", GUILayout.Width(40f)) && isValid)
-				{
-					NGUIEditorTools.RegisterUndo("Add symbol", mFont);
-					mFont.AddSymbol(mSymbolSequence, mSymbolSprite);
-					mFont.MarkAsDirty();
-					mSymbolSequence = "";
-					mSymbolSprite = "";
-				}
-				GUI.backgroundColor = Color.white;
-				GUILayout.EndHorizontal();
-
-				if (symbols.Count == 0)
-				{
-					EditorGUILayout.HelpBox("Want to add an emoticon to your font? In the field above type ':)', choose a sprite, then hit the Add button.", MessageType.Info);
-				}
-				else GUILayout.Space(4f);
 			}
 		}
 	}

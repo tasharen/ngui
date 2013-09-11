@@ -96,7 +96,7 @@ public class UIAtlasInspector : Editor
 
 		UIAtlas.Sprite sprite = (mAtlas != null) ? mAtlas.GetSprite(NGUISettings.selectedSprite) : null;
 
-		NGUIEditorTools.DrawSeparator();
+		GUILayout.Space(6f);
 
 		if (mAtlas.replacement != null)
 		{

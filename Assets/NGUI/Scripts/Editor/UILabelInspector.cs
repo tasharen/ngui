@@ -61,7 +61,7 @@ public class UILabelInspector : UIWidgetInspector
 
 			GUILayout.BeginHorizontal();
 			bool encoding = EditorGUILayout.Toggle("Encoding", mLabel.supportEncoding, GUILayout.Width(100f));
-			GUILayout.Label("- use emoticons and colors");
+			GUILayout.Label("use emoticons and colors");
 			GUILayout.EndHorizontal();
 			if (encoding != mLabel.supportEncoding) { RegisterUndo(); mLabel.supportEncoding = encoding; }
 
