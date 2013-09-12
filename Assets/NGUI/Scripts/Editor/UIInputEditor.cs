@@ -18,7 +18,7 @@ public class UIInputEditor : UIWidgetContainerEditor
 
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.labelWidth = (120f);
+		NGUIEditorTools.SetLabelWidth(120f);
 		UIInput input = target as UIInput;
 
 		GUILayout.Space(6f);
@@ -94,7 +94,7 @@ public class UIInputEditor : UIWidgetContainerEditor
 			UnityEditor.EditorUtility.SetDirty(input);
 		}
 
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 		NGUIEditorTools.DrawEvents("On Submit", input, input.onSubmit);
 	}
 }

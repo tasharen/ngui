@@ -37,7 +37,7 @@ public class InvFindItem : ScriptableWizard
 
 	void OnGUI ()
 	{
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 		string newItemName = EditorGUILayout.TextField("Search for:", mItemName);
 		NGUIEditorTools.DrawSeparator();
 

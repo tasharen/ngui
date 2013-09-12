@@ -23,7 +23,7 @@ public class UIPlayAnimationEditor : Editor
 
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.labelWidth = (120f);
+		NGUIEditorTools.SetLabelWidth(120f);
 		UIPlayAnimation pa = target as UIPlayAnimation;
 		GUILayout.Space(6f);
 
@@ -54,7 +54,7 @@ public class UIPlayAnimationEditor : Editor
 			UnityEditor.EditorUtility.SetDirty(pa);
 		}
 
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 		NGUIEditorTools.DrawEvents("On Finished", pa, pa.onFinished);
 	}
 }

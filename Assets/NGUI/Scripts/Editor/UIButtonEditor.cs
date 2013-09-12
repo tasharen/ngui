@@ -11,7 +11,7 @@ public class UIButtonEditor : UIWidgetContainerEditor
 {
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 		UIButton button = target as UIButton;
 
 		GUILayout.Space(6f);

@@ -163,7 +163,7 @@ public class UIPanelTool : EditorWindow
 			// Sort the list alphabetically
 			entries.Sort(Compare);
 
-			EditorGUIUtility.labelWidth = (80f);
+			NGUIEditorTools.SetLabelWidth(80f);
 			bool showAll = DrawRow(null, null, allEnabled);
 			NGUIEditorTools.DrawSeparator();
 

@@ -82,7 +82,7 @@ public class UIFontInspector : Editor
 	public override void OnInspectorGUI ()
 	{
 		mFont = target as UIFont;
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 
 		GUILayout.Space(6f);
 
@@ -286,14 +286,14 @@ public class UIFontInspector : Editor
 			// Font spacing
 			GUILayout.BeginHorizontal();
 			{
-				EditorGUIUtility.labelWidth = (0f);
+				NGUIEditorTools.SetLabelWidth(0f);
 				GUILayout.Label("Spacing", GUILayout.Width(60f));
 				GUILayout.Label("X", GUILayout.Width(12f));
 				int x = EditorGUILayout.IntField(mFont.horizontalSpacing);
 				GUILayout.Label("Y", GUILayout.Width(12f));
 				int y = EditorGUILayout.IntField(mFont.verticalSpacing);
 				GUILayout.Space(18f);
-				EditorGUIUtility.labelWidth = (80f);
+				NGUIEditorTools.SetLabelWidth(80f);
 
 				if (mFont.horizontalSpacing != x || mFont.verticalSpacing != y)
 				{

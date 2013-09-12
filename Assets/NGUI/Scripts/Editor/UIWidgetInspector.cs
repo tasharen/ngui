@@ -746,7 +746,7 @@ public class UIWidgetInspector : Editor
 
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 		EditorGUILayout.Space();
 
 		// Check to see if we can draw the widget's default properties to begin with

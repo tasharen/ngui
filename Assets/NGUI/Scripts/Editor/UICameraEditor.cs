@@ -12,7 +12,7 @@ public class UICameraEditor : Editor
 {
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.labelWidth = 140f;
+		NGUIEditorTools.SetLabelWidth(140f);
 		base.OnInspectorGUI();
 	}
 }

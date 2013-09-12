@@ -42,7 +42,7 @@ public class UISliderInspector : UIWidgetContainerEditor
 
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 		UISlider slider = target as UISlider;
 
 		GUILayout.Space(3f);

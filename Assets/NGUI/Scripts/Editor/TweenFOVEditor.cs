@@ -12,7 +12,7 @@ public class TweenFOVEditor : UITweenerEditor
 	public override void OnInspectorGUI ()
 	{
 		GUILayout.Space(6f);
-		EditorGUIUtility.labelWidth = (120f);
+		NGUIEditorTools.SetLabelWidth(120f);
 
 		TweenFOV tw = target as TweenFOV;
 		GUI.changed = false;

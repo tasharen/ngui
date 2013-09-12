@@ -12,7 +12,7 @@ public class TweenAlphaEditor : UITweenerEditor
 	public override void OnInspectorGUI ()
 	{
 		GUILayout.Space(6f);
-		EditorGUIUtility.labelWidth = (120f);
+		NGUIEditorTools.SetLabelWidth(120f);
 
 		TweenAlpha tw = target as TweenAlpha;
 		GUI.changed = false;

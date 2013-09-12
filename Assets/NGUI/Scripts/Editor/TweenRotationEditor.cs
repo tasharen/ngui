@@ -12,7 +12,7 @@ public class TweenRotationEditor : UITweenerEditor
 	public override void OnInspectorGUI ()
 	{
 		GUILayout.Space(6f);
-		EditorGUIUtility.labelWidth = (120f);
+		NGUIEditorTools.SetLabelWidth(120f);
 
 		TweenRotation tw = target as TweenRotation;
 		GUI.changed = false;

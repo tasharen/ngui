@@ -11,7 +11,7 @@ public class UIButtonColorEditor : UIWidgetContainerEditor
 {
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 		UIButtonColor button = target as UIButtonColor;
 
 		GUILayout.Space(6f);

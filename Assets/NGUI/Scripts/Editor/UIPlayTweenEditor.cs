@@ -23,7 +23,7 @@ public class UIPlayTweenEditor : Editor
 
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.labelWidth = (120f);
+		NGUIEditorTools.SetLabelWidth(120f);
 		UIPlayTween tw = target as UIPlayTween;
 		GUILayout.Space(6f);
 
@@ -54,7 +54,7 @@ public class UIPlayTweenEditor : Editor
 			UnityEditor.EditorUtility.SetDirty(tw);
 		}
 
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 		NGUIEditorTools.DrawEvents("On Finished", tw, tw.onFinished);
 	}
 }

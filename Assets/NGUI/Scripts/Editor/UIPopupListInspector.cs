@@ -49,7 +49,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 		mList = target as UIPopupList;
 
 		ComponentSelector.Draw<UIAtlas>(mList.atlas, OnSelectAtlas);

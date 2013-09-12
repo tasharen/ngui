@@ -42,7 +42,7 @@ public class UIPanelInspector : Editor
 		UIPanel panel = target as UIPanel;
 		BetterList<UIDrawCall> drawcalls = panel.drawCalls;
 		drawcalls.Sort(delegate(UIDrawCall w1, UIDrawCall w2) { return w1.depth.CompareTo(w2.depth); });
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 
 		//NGUIEditorTools.DrawSeparator();
 		EditorGUILayout.Space();

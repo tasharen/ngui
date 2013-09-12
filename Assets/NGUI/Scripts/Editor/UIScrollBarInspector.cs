@@ -11,7 +11,7 @@ public class UIScrollBarInspector : UIWidgetContainerEditor
 {
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 		UIScrollBar sb = target as UIScrollBar;
 
 		GUILayout.Space(3f);

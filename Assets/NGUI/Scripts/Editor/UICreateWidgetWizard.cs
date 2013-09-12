@@ -728,7 +728,7 @@ public class UICreateWidgetWizard : EditorWindow
 		// Load the saved preferences
 		if (!mLoaded) { mLoaded = true; Load(); }
 
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 		GameObject go = NGUIEditorTools.SelectedRoot();
 
 		if (go == null)

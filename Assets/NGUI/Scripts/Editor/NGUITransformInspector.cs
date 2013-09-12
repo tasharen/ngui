@@ -18,7 +18,7 @@ public class NGUITransformInspector : Editor
 	public override void OnInspectorGUI ()
 	{
 		Transform trans = target as Transform;
-		EditorGUIUtility.labelWidth = (15f);
+		NGUIEditorTools.SetLabelWidth(15f);
 
 		Vector3 pos;
 		Vector3 rot;
@@ -178,7 +178,7 @@ public class NGUITransformInspector : Editor
 
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.labelWidth = (15f);
+		NGUIEditorTools.SetLabelWidth(15f);
 
 		serializedObject.Update();
 

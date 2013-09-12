@@ -59,7 +59,7 @@ public class SpriteSelector : ScriptableWizard
 
 	void OnGUI ()
 	{
-		EditorGUIUtility.labelWidth = (80f);
+		NGUIEditorTools.SetLabelWidth(80f);
 
 		if (mAtlas == null)
 		{

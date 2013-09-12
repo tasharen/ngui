@@ -12,7 +12,7 @@ public class TweenOrthoSizeEditor : UITweenerEditor
 	public override void OnInspectorGUI ()
 	{
 		GUILayout.Space(6f);
-		EditorGUIUtility.labelWidth = (120f);
+		NGUIEditorTools.SetLabelWidth(120f);
 
 		TweenOrthoSize tw = target as TweenOrthoSize;
 		GUI.changed = false;
