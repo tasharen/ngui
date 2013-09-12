@@ -1185,16 +1185,15 @@ public class NGUIEditorTools
 		if (objects != null && objects.Length > 0)
 		{
 #if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
-			//foreach (Object obj in objects)
-			//{
-			//    if (obj == null) continue;
-			//    NGUIEditorTools.Undo(obj, name);
-			//    EditorUtility.SetDirty(obj);
-			//}
 			UnityEditor.Undo.RegisterUndo(objects, name);
 #else
 			UnityEditor.Undo.RecordObjects(objects, name);
 #endif
+			foreach (Object obj in objects)
+			{
+				if (obj == null) continue;
+				EditorUtility.SetDirty(obj);
+			}
 		}
 	}
 
