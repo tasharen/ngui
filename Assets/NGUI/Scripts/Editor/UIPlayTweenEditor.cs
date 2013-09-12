@@ -6,8 +6,8 @@
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(UIButtonTween))]
-public class UIButtonTweenEditor : Editor
+[CustomEditor(typeof(UIPlayTween))]
+public class UIPlayTweenEditor : Editor
 {
 	enum ResetOnPlay
 	{
@@ -23,8 +23,8 @@ public class UIButtonTweenEditor : Editor
 
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.LookLikeControls(120f);
-		UIButtonTween tw = target as UIButtonTween;
+		EditorGUIUtility.labelWidth = (120f);
+		UIPlayTween tw = target as UIPlayTween;
 		GUILayout.Space(6f);
 
 		GUI.changed = false;
@@ -54,7 +54,7 @@ public class UIButtonTweenEditor : Editor
 			UnityEditor.EditorUtility.SetDirty(tw);
 		}
 
-		EditorGUIUtility.LookLikeControls(80f);
+		EditorGUIUtility.labelWidth = (80f);
 		NGUIEditorTools.DrawEvents("On Finished", tw, tw.onFinished);
 	}
 }

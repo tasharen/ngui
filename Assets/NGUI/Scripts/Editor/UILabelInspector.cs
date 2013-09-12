@@ -88,19 +88,29 @@ public class UILabelInspector : UIWidgetInspector
 
 			if (mLabel.effectStyle != UILabel.Effect.None)
 			{
+#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 				GUILayout.Label("Distance", GUILayout.Width(70f));
 				GUILayout.Space(-34f);
 				GUILayout.BeginHorizontal();
 				GUILayout.Space(70f);
 				Vector2 offset = EditorGUILayout.Vector2Field("", mLabel.effectDistance);
 				GUILayout.Space(20f);
+				GUILayout.EndHorizontal();
+#else
+				Vector2 offset = mLabel.effectDistance;
 
+				GUILayout.BeginHorizontal();
+				GUILayout.Label("Distance", GUILayout.Width(76f));
+				offset.x = EditorGUILayout.FloatField(offset.x);
+				offset.y = EditorGUILayout.FloatField(offset.y);
+				GUILayout.Space(18f);
+				GUILayout.EndHorizontal();
+#endif
 				if (offset != mLabel.effectDistance)
 				{
 					RegisterUndo();
 					mLabel.effectDistance = offset;
 				}
-				GUILayout.EndHorizontal();
 			}
 
 			int count = EditorGUILayout.IntField("Max Lines", mLabel.maxLineCount, GUILayout.Width(100f));

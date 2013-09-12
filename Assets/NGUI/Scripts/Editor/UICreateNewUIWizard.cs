@@ -34,7 +34,7 @@ public class UICreateNewUIWizard : EditorWindow
 
 	void OnGUI ()
 	{
-		EditorGUIUtility.LookLikeControls(80f);
+		EditorGUIUtility.labelWidth = (80f);
 
 		GUILayout.Label("Create a new UI with the following parameters:");
 		NGUIEditorTools.DrawSeparator();

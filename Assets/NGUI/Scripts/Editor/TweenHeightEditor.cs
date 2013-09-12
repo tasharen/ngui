@@ -12,7 +12,7 @@ public class TweenHeightEditor : UITweenerEditor
 	public override void OnInspectorGUI ()
 	{
 		GUILayout.Space(6f);
-		EditorGUIUtility.LookLikeControls(120f);
+		EditorGUIUtility.labelWidth = (120f);
 
 		TweenHeight tw = target as TweenHeight;
 		GUI.changed = false;

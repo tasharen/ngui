@@ -620,13 +620,13 @@ public class NGUIEditorTools
 			GUILayout.Label(prefix, GUILayout.Width(74f));
 		}
 
-		EditorGUIUtility.LookLikeControls(48f);
+		EditorGUIUtility.labelWidth = (48f);
 
 		IntVector retVal;
 		retVal.x = EditorGUILayout.IntField(leftCaption, x, GUILayout.MinWidth(30f));
 		retVal.y = EditorGUILayout.IntField(rightCaption, y, GUILayout.MinWidth(30f));
 
-		EditorGUIUtility.LookLikeControls(80f);
+		EditorGUIUtility.labelWidth = (80f);
 
 		GUILayout.EndHorizontal();
 		return retVal;
@@ -664,27 +664,6 @@ public class NGUIEditorTools
 		NGUIEditorTools.IntVector b = NGUIEditorTools.IntPair(null, "Right", "Bottom", right, bottom);
 
 		return new Vector4(a.x, a.y, b.x, b.y);
-	}
-
-	/// <summary>
-	/// Create an undo point for the specified objects.
-	/// </summary>
-
-	static public void RegisterUndo (string name, params Object[] objects)
-	{
-		if (objects != null && objects.Length > 0)
-		{
-			foreach (Object obj in objects)
-			{
-				if (obj == null) continue;
-				Undo.RegisterUndo(obj, name);
-				EditorUtility.SetDirty(obj);
-			}
-		}
-		else
-		{
-			Undo.RegisterSceneUndo(name);
-		}
 	}
 
 	/// <summary>
@@ -1000,7 +979,7 @@ public class NGUIEditorTools
 		{
 			if (!NGUIEditorTools.IsUniform(t.localScale))
 			{
-				Undo.RegisterUndo(t, "Uniform scaling fix");
+				NGUIEditorTools.RegisterUndo("Uniform scaling fix", t);
 				t.localScale = Vector3.one;
 				EditorUtility.SetDirty(t);
 			}
@@ -1182,5 +1161,52 @@ public class NGUIEditorTools
 			}
 		}
 		return true;
+	}
+
+	/// <summary>
+	/// Unity 4.3 changed the way LookLikeControls works.
+	/// </summary>
+
+	static public void SetLabelWidth (float width)
+	{
+#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
+		EditorGUIUtility.LookLikeControls(width);
+#else
+		EditorGUIUtility.labelWidth = width;
+#endif
+	}
+
+	/// <summary>
+	/// Create an undo point for the specified objects.
+	/// </summary>
+
+	static public void RegisterUndo (string name, params Object[] objects)
+	{
+		if (objects != null && objects.Length > 0)
+		{
+#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
+			//foreach (Object obj in objects)
+			//{
+			//    if (obj == null) continue;
+			//    NGUIEditorTools.Undo(obj, name);
+			//    EditorUtility.SetDirty(obj);
+			//}
+			UnityEditor.Undo.RegisterUndo(objects, name);
+#else
+			UnityEditor.Undo.RecordObjects(objects, name);
+#endif
+		}
+	}
+
+	/// <summary>
+	/// Unity 4.5+ makes it possible to hide the move tool.
+	/// </summary>
+	/// <param name="hide"></param>
+
+	static public void HideMoveTool (bool hide)
+	{
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2 && !UNITY_4_3
+		UnityEditor.Tools.hidden = hide && (UnityEditor.Tools.current == UnityEditor.Tool.Move);
+#endif
 	}
 }

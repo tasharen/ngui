@@ -24,18 +24,15 @@ public class UIWidgetContainerEditor : Editor
 	bool mAllowSelection = true;
 	bool mIsDragging = false;
 
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2 && !UNITY_4_3
-	void OnDisable() { UnityEditor.Tools.hidden = false; }
-#endif
+	void OnDisable () { NGUIEditorTools.HideMoveTool(false); }
+
 	/// <summary>
 	/// Make it possible to easily drag the transform around.
 	/// </summary>
 
 	public void OnSceneGUI ()
 	{
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2 && !UNITY_4_3
-		UnityEditor.Tools.hidden = UnityEditor.Tools.current == UnityEditor.Tool.Move;
-#endif
+		NGUIEditorTools.HideMoveTool(true);
 		if (Tools.current != Tool.Move) return;
 
 		MonoBehaviour mb = target as MonoBehaviour;

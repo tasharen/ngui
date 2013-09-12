@@ -125,7 +125,7 @@ public static class EventDelegateEditor
 
 		if (del.target != target)
 		{
-			Undo.RegisterUndo(undoObject, "Delegate Selection");
+			NGUIEditorTools.RegisterUndo("Delegate Selection", undoObject);
 			del.target = target;
 			EditorUtility.SetDirty(undoObject);
 		}
@@ -149,7 +149,7 @@ public static class EventDelegateEditor
 				if (choice != index)
 				{
 					Entry entry = list[choice - 1];
-					Undo.RegisterUndo(undoObject, "Delegate Selection");
+					NGUIEditorTools.RegisterUndo("Delegate Selection", undoObject);
 					del.target = entry.target;
 					del.methodName = entry.method.Name;
 					EditorUtility.SetDirty(undoObject);

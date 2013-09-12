@@ -12,7 +12,7 @@ public class TweenColorEditor : UITweenerEditor
 	public override void OnInspectorGUI ()
 	{
 		GUILayout.Space(6f);
-		EditorGUIUtility.LookLikeControls(120f);
+		EditorGUIUtility.labelWidth = (120f);
 
 		TweenColor tw = target as TweenColor;
 		GUI.changed = false;

@@ -666,7 +666,7 @@ public class UIAtlasMaker : EditorWindow
 		GameObject go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
 		if (NGUISettings.atlas == null && go != null) NGUISettings.atlas = go.GetComponent<UIAtlas>();
 
-		EditorGUIUtility.LookLikeControls(80f);
+		EditorGUIUtility.labelWidth = (80f);
 
 		GUILayout.Space(6f);
 		GUILayout.BeginHorizontal();

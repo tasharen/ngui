@@ -6,8 +6,8 @@
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(UIButtonPlayAnimation))]
-public class UIButtonPlayAnimationEditor : Editor
+[CustomEditor(typeof(UIPlayAnimation))]
+public class UIPlayAnimationEditor : Editor
 {
 	enum ResetOnPlay
 	{
@@ -23,8 +23,8 @@ public class UIButtonPlayAnimationEditor : Editor
 
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.LookLikeControls(120f);
-		UIButtonPlayAnimation pa = target as UIButtonPlayAnimation;
+		EditorGUIUtility.labelWidth = (120f);
+		UIPlayAnimation pa = target as UIPlayAnimation;
 		GUILayout.Space(6f);
 
 		GUI.changed = false;
@@ -54,7 +54,7 @@ public class UIButtonPlayAnimationEditor : Editor
 			UnityEditor.EditorUtility.SetDirty(pa);
 		}
 
-		EditorGUIUtility.LookLikeControls(80f);
+		EditorGUIUtility.labelWidth = (80f);
 		NGUIEditorTools.DrawEvents("On Finished", pa, pa.onFinished);
 	}
 }

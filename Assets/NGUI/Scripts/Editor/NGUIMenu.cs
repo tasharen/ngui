@@ -37,8 +37,9 @@ static public class NGUIMenu
 
 		if (go != null)
 		{
+#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 			Undo.RegisterSceneUndo("Add a Sprite");
-
+#endif
 			UISprite sprite = NGUITools.AddWidget<UISprite>(go);
 			sprite.name = "Sprite";
 			sprite.atlas = NGUISettings.atlas;
@@ -73,8 +74,9 @@ static public class NGUIMenu
 
 		if (go != null)
 		{
+#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 			Undo.RegisterSceneUndo("Add a Label");
-
+#endif
 			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
 			lbl.name = "Label";
 			lbl.font = NGUISettings.font;
@@ -98,8 +100,9 @@ static public class NGUIMenu
 
 		if (go != null)
 		{
+#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 			Undo.RegisterSceneUndo("Add a Texture");
-
+#endif
 			UITexture tex = NGUITools.AddWidget<UITexture>(go);
 			tex.name = "Texture";
 			tex.pivot = NGUISettings.pivot;

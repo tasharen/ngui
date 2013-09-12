@@ -298,7 +298,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 			// Add the scripts
 			go.AddComponent<UIButton>().tweenTarget = bg.gameObject;
-			go.AddComponent<UIButtonSound>();
+			go.AddComponent<UIPlaySound>();
 
 			Selection.activeGameObject = go;
 		}
@@ -355,7 +355,7 @@ public class UICreateWidgetWizard : EditorWindow
 			ib.hoverSprite		= mImage1;
 			ib.pressedSprite	= mImage2;
 			ib.disabledSprite	= mImage3;
-			go.AddComponent<UIButtonSound>();
+			go.AddComponent<UIPlaySound>();
 
 			Selection.activeGameObject = go;
 		}
@@ -417,7 +417,7 @@ public class UICreateWidgetWizard : EditorWindow
 			go.AddComponent<UIToggle>().activeSprite = fg;
 			go.AddComponent<UIButton>().tweenTarget = bg.gameObject;
 			go.AddComponent<UIButtonScale>().tweenTarget = bg.transform;
-			go.AddComponent<UIButtonSound>();
+			go.AddComponent<UIPlaySound>();
 
 			Selection.activeGameObject = go;
 		}
@@ -703,7 +703,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 			// Add the scripts
 			go.AddComponent<UIButton>().tweenTarget = sprite.gameObject;
-			go.AddComponent<UIButtonSound>();
+			go.AddComponent<UIPlaySound>();
 
 			Selection.activeGameObject = go;
 		}
@@ -728,7 +728,7 @@ public class UICreateWidgetWizard : EditorWindow
 		// Load the saved preferences
 		if (!mLoaded) { mLoaded = true; Load(); }
 
-		EditorGUIUtility.LookLikeControls(80f);
+		EditorGUIUtility.labelWidth = (80f);
 		GameObject go = NGUIEditorTools.SelectedRoot();
 
 		if (go == null)

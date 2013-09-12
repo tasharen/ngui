@@ -8,60 +8,60 @@ using AnimationOrTween;
 using System.Collections.Generic;
 
 /// <summary>
-/// Attaching this to an object lets you activate tweener components on other objects.
+/// Play the specified animation on click.
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/Interaction/Button Tween")]
-public class UIButtonTween : MonoBehaviour
+[AddComponentMenu("NGUI/Interaction/Play Animation")]
+public class UIPlayAnimation : MonoBehaviour
 {
 	/// <summary>
-	/// Target on which there is one or more tween.
+	/// Target animation to activate.
 	/// </summary>
 
-	public GameObject tweenTarget;
+	public Animation target;
 
 	/// <summary>
-	/// If there are multiple tweens, you can choose which ones get activated by changing their group.
+	/// Optional clip name, if the animation has more than one clip.
 	/// </summary>
 
-	public int tweenGroup = 0;
+	public string clipName;
 
 	/// <summary>
-	/// Which event will trigger the tween.
+	/// Which event will trigger the animation.
 	/// </summary>
 
 	public Trigger trigger = Trigger.OnClick;
 
 	/// <summary>
-	/// Direction to tween in.
+	/// Which direction to animate in.
 	/// </summary>
 
 	public Direction playDirection = Direction.Forward;
 
 	/// <summary>
-	/// Whether the tween will be reset to the start or end when activated. If not, it will continue from where it currently is.
+	/// Whether the animation's position will be reset on play or will continue from where it left off.
 	/// </summary>
 
 	public bool resetOnPlay = false;
 
 	/// <summary>
-	/// What to do if the tweenTarget game object is currently disabled.
+	/// Whether the selected object (this button) will be cleared when the animation gets activated.
+	/// </summary>
+
+	public bool clearSelection = false;
+
+	/// <summary>
+	/// What to do if the target game object is currently disabled.
 	/// </summary>
 
 	public EnableCondition ifDisabledOnPlay = EnableCondition.DoNothing;
 
 	/// <summary>
-	/// What to do with the tweenTarget after the tween finishes.
+	/// What to do with the target when the animation finishes.
 	/// </summary>
 
 	public DisableCondition disableWhenFinished = DisableCondition.DoNotDisable;
-
-	/// <summary>
-	/// Whether the tweens on the child game objects will be considered.
-	/// </summary>
-
-	public bool includeChildren = false;
 
 	/// <summary>
 	/// Event delegates called when the animation finishes.
@@ -73,7 +73,6 @@ public class UIButtonTween : MonoBehaviour
 	[HideInInspector][SerializeField] GameObject eventReceiver;
 	[HideInInspector][SerializeField] string callWhenFinished;
 
-	UITweener[] mTweens;
 	bool mStarted = false;
 	bool mHighlighted = false;
 	int mActive = 0;
@@ -91,13 +90,13 @@ public class UIButtonTween : MonoBehaviour
 		}
 	}
 
-	void Start()
+	void Start ()
 	{
 		mStarted = true;
 
-		if (tweenTarget == null)
+		if (target == null)
 		{
-			tweenTarget = gameObject;
+			target = GetComponentInChildren<Animation>();
 #if UNITY_EDITOR
 			UnityEditor.EditorUtility.SetDirty(this);
 #endif
@@ -117,7 +116,7 @@ public class UIButtonTween : MonoBehaviour
 	{
 		if (enabled)
 		{
-			if (trigger == Trigger.OnHover ||
+			if ( trigger == Trigger.OnHover ||
 				(trigger == Trigger.OnHoverTrue && isOver) ||
 				(trigger == Trigger.OnHoverFalse && !isOver))
 			{
@@ -131,7 +130,7 @@ public class UIButtonTween : MonoBehaviour
 	{
 		if (enabled)
 		{
-			if (trigger == Trigger.OnPress ||
+			if ( trigger == Trigger.OnPress ||
 				(trigger == Trigger.OnPressTrue && isPressed) ||
 				(trigger == Trigger.OnPressFalse && !isPressed))
 			{
@@ -182,96 +181,31 @@ public class UIButtonTween : MonoBehaviour
 		}
 	}
 
-	void Update ()
-	{
-#if UNITY_EDITOR
-		if (!Application.isPlaying) return;
-#endif
-		if (disableWhenFinished != DisableCondition.DoNotDisable && mTweens != null)
-		{
-			bool isFinished = true;
-			bool properDirection = true;
-
-			for (int i = 0, imax = mTweens.Length; i < imax; ++i)
-			{
-				UITweener tw = mTweens[i];
-				if (tw.tweenGroup != tweenGroup) continue;
-
-				if (tw.enabled)
-				{
-					isFinished = false;
-					break;
-				}
-				else if ((int)tw.direction != (int)disableWhenFinished)
-				{
-					properDirection = false;
-				}
-			}
-
-			if (isFinished)
-			{
-				if (properDirection) NGUITools.SetActive(tweenTarget, false);
-				mTweens = null;
-			}
-		}
-	}
-
 	/// <summary>
-	/// Activate the tweeners.
+	/// Start playing the animation.
 	/// </summary>
 
 	public void Play (bool forward)
 	{
-		mActive = 0;
-		GameObject go = (tweenTarget == null) ? gameObject : tweenTarget;
-
-		if (!NGUITools.GetActive(go))
+		if (target != null)
 		{
-			// If the object is disabled, don't do anything
-			if (ifDisabledOnPlay != EnableCondition.EnableThenPlay) return;
+			mActive = 0;
 
-			// Enable the game object before tweening it
-			NGUITools.SetActive(go, true);
-		}
+			if (clearSelection && UICamera.selectedObject == gameObject)
+				UICamera.selectedObject = null;
 
-		// Gather the tweening components
-		mTweens = includeChildren ? go.GetComponentsInChildren<UITweener>() : go.GetComponents<UITweener>();
+			int pd = -(int)playDirection;
+			Direction dir = forward ? playDirection : ((Direction)pd);
+			ActiveAnimation anim = ActiveAnimation.Play(target, clipName, dir, ifDisabledOnPlay, disableWhenFinished);
 
-		if (mTweens.Length == 0)
-		{
-			// No tweeners found -- should we disable the object?
-			if (disableWhenFinished != DisableCondition.DoNotDisable)
-				NGUITools.SetActive(tweenTarget, false);
-		}
-		else
-		{
-			bool activated = false;
-			if (playDirection == Direction.Reverse) forward = !forward;
-
-			// Run through all located tween components
-			for (int i = 0, imax = mTweens.Length; i < imax; ++i)
+			if (anim != null)
 			{
-				UITweener tw = mTweens[i];
+				if (resetOnPlay) anim.Reset();
 
-				// If the tweener's group matches, we can work with it
-				if (tw.tweenGroup == tweenGroup)
+				for (int i = 0; i < onFinished.Count; ++i)
 				{
-					// Ensure that the game objects are enabled
-					if (!activated && !NGUITools.GetActive(go))
-					{
-						activated = true;
-						NGUITools.SetActive(go, true);
-					}
-
 					++mActive;
-
-					// Toggle or activate the tween component
-					if (playDirection == Direction.Toggle) tw.Toggle();
-					else tw.Play(forward);
-					if (resetOnPlay) tw.Reset();
-
-					// Listen for tween finished messages
-					EventDelegate.Add(tw.onFinished, OnFinished, true);
+					EventDelegate.Add(anim.onFinished, OnFinished, true);
 				}
 			}
 		}
@@ -286,7 +220,7 @@ public class UIButtonTween : MonoBehaviour
 		if (--mActive == 0)
 		{
 			EventDelegate.Execute(onFinished);
-			
+
 			// Legacy functionality
 			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
 				eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);

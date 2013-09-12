@@ -12,7 +12,7 @@ public class TweenVolumeEditor : UITweenerEditor
 	public override void OnInspectorGUI ()
 	{
 		GUILayout.Space(6f);
-		EditorGUIUtility.LookLikeControls(120f);
+		EditorGUIUtility.labelWidth = (120f);
 
 		TweenVolume tw = target as TweenVolume;
 		GUI.changed = false;

@@ -9,8 +9,8 @@ using UnityEngine;
 /// Plays the specified sound.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/Button Sound")]
-public class UIButtonSound : MonoBehaviour
+[AddComponentMenu("NGUI/Interaction/Play Sound")]
+public class UIPlaySound : MonoBehaviour
 {
 	public enum Trigger
 	{

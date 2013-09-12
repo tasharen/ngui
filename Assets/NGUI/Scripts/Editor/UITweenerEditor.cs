@@ -12,7 +12,7 @@ public class UITweenerEditor : Editor
 	public override void OnInspectorGUI ()
 	{
 		GUILayout.Space(6f);
-		EditorGUIUtility.LookLikeControls(120f);
+		EditorGUIUtility.labelWidth = (120f);
 		base.OnInspectorGUI();
 		DrawCommonProperties();
 	}
@@ -58,7 +58,7 @@ public class UITweenerEditor : Editor
 			NGUIEditorTools.EndContents();
 		}
 
-		EditorGUIUtility.LookLikeControls(80f);
+		EditorGUIUtility.labelWidth = (80f);
 		NGUIEditorTools.DrawEvents("On Finished", tw, tw.onFinished);
 	}
 }

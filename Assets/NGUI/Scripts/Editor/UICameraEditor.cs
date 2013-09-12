@@ -8,4 +8,11 @@ using UnityEditor;
 
 [CanEditMultipleObjects]
 [CustomEditor(typeof(UICamera))]
-public class UICameraEditor : Editor { }
+public class UICameraEditor : Editor
+{
+	public override void OnInspectorGUI ()
+	{
+		EditorGUIUtility.labelWidth = 140f;
+		base.OnInspectorGUI();
+	}
+}

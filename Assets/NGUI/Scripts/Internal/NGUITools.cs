@@ -351,6 +351,9 @@ static public class NGUITools
 	{
 		GameObject go = new GameObject();
 
+#if UNITY_EDITOR && !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+		UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
+#endif
 		if (parent != null)
 		{
 			Transform t = go.transform;
@@ -370,6 +373,10 @@ static public class NGUITools
 	static public GameObject AddChild (GameObject parent, GameObject prefab)
 	{
 		GameObject go = GameObject.Instantiate(prefab) as GameObject;
+
+#if UNITY_EDITOR && !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+		UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
+#endif
 
 		if (go != null && parent != null)
 		{

@@ -12,7 +12,7 @@ public class TweenPositionEditor : UITweenerEditor
 	public override void OnInspectorGUI ()
 	{
 		GUILayout.Space(6f);
-		EditorGUIUtility.LookLikeControls(120f);
+		EditorGUIUtility.labelWidth = (120f);
 
 		TweenPosition tw = target as TweenPosition;
 		GUI.changed = false;

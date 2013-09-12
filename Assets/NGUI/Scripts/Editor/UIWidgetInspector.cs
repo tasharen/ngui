@@ -143,10 +143,7 @@ public class UIWidgetInspector : Editor
 				mBlueDot.Draw(rect, GUIContent.none, id);
 			}
 		}
-		else
-		{
-			mGreyDot.Draw(rect, GUIContent.none, id);
-		}
+		else mGreyDot.Draw(rect, GUIContent.none, id);
 	}
 
 	/// <summary>
@@ -213,9 +210,7 @@ public class UIWidgetInspector : Editor
 		}
 	}
 
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2 && !UNITY_4_3
-	void OnDisable() { UnityEditor.Tools.hidden = false; }
-#endif
+	void OnDisable () { NGUIEditorTools.HideMoveTool(false); }
 
 	/// <summary>
 	/// Draw the on-screen selection, knobs, and handle all interaction logic.
@@ -223,9 +218,7 @@ public class UIWidgetInspector : Editor
 
 	public void OnSceneGUI ()
 	{
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2 && !UNITY_4_3
-		UnityEditor.Tools.hidden = UnityEditor.Tools.current == UnityEditor.Tool.Move;
-#endif
+		NGUIEditorTools.HideMoveTool(true);
 		if (!UIWidget.showHandles) return;
 
 		mWidget = target as UIWidget;
@@ -753,7 +746,7 @@ public class UIWidgetInspector : Editor
 
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.LookLikeControls(80f);
+		EditorGUIUtility.labelWidth = (80f);
 		EditorGUILayout.Space();
 
 		// Check to see if we can draw the widget's default properties to begin with

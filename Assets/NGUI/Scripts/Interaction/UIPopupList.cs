@@ -313,13 +313,13 @@ public class UIPopupList : UIWidgetContainer
 		UIEventListener listener = lbl.gameObject.GetComponent<UIEventListener>();
 		value = listener.parameter as string;
 
-		UIButtonSound[] sounds = GetComponents<UIButtonSound>();
+		UIPlaySound[] sounds = GetComponents<UIPlaySound>();
 
 		for (int i = 0, imax = sounds.Length; i < imax; ++i)
 		{
-			UIButtonSound snd = sounds[i];
+			UIPlaySound snd = sounds[i];
 
-			if (snd.trigger == UIButtonSound.Trigger.OnClick)
+			if (snd.trigger == UIPlaySound.Trigger.OnClick)
 			{
 				NGUITools.PlaySound(snd.audioClip, snd.volume, 1f);
 			}

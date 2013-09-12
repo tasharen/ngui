@@ -17,7 +17,7 @@ public class UIToggleInspector : UIWidgetContainerEditor
 
 	public override void OnInspectorGUI ()
 	{
-		EditorGUIUtility.LookLikeControls(80f);
+		EditorGUIUtility.labelWidth = (80f);
 		UIToggle toggle = target as UIToggle;
 
 		GUILayout.Space(6f);

@@ -59,7 +59,7 @@ public class SpriteSelector : ScriptableWizard
 
 	void OnGUI ()
 	{
-		EditorGUIUtility.LookLikeControls(80f);
+		EditorGUIUtility.labelWidth = (80f);
 
 		if (mAtlas == null)
 		{
