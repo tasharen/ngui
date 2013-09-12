@@ -18,7 +18,7 @@ public class TweenRotationEditor : UITweenerEditor
 		GUI.changed = false;
 
 		Vector3 from = EditorGUILayout.Vector3Field("From", tw.from);
-		Vector3 to = EditorGUILayout.Vector3Field("From", tw.to);
+		Vector3 to = EditorGUILayout.Vector3Field("To", tw.to);
 
 		if (GUI.changed)
 		{

@@ -295,6 +295,12 @@ public abstract class UITweener : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Play the tween.
+	/// </summary>
+
+	public void Play () { Play(true); }
+
+	/// <summary>
 	/// Manually activate the tweening process, reversing it if necessary.
 	/// </summary>
 

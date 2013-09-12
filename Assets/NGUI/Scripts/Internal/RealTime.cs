@@ -53,6 +53,7 @@ public class RealTime : MonoBehaviour
 		GameObject go = new GameObject("_RealTime");
 		DontDestroyOnLoad(go);
 		mInst = go.AddComponent<RealTime>();
+		mInst.mRealTime = Time.realtimeSinceStartup;
 	}
 
 	void Update ()
