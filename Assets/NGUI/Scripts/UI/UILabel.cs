@@ -210,11 +210,13 @@ public class UILabel : UIWidget
 		}
 	}
 
+#if UNITY_EDITOR
 	/// <summary>
 	/// Labels can't be resized manually if the overflow method is set to 'resize'.
 	/// </summary>
 
 	public override bool canResize { get { return mOverflow != Overflow.ResizeFreely; } }
+#endif
 
 	/// <summary>
 	/// Maximum width of the label in pixels.
