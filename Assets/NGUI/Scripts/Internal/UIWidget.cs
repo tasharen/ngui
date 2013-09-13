@@ -293,6 +293,12 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Whether the widget has some geometry that can be drawn.
+	/// </summary>
+
+	public bool hasVertices { get { return mGeom != null && mGeom.hasVertices; } }
+
+	/// <summary>
 	/// Helper function that calculates the relative offset based on the current pivot.
 	/// X = 0 (left) to 1 (right)
 	/// Y = 0 (bottom) to 1 (top)
@@ -404,6 +410,29 @@ public abstract class UIWidget : MonoBehaviour
 		if (left.mDepth > right.mDepth) return 1;
 		if (left.mDepth < right.mDepth) return -1;
 		return 0;
+	}
+
+	/// <summary>
+	/// Calculate the widget's bounds, optionally making them relative to the specified transform.
+	/// </summary>
+
+	public Bounds CalculateBounds (Transform relativeParent = null)
+	{
+		if (relativeParent == null)
+		{
+			Vector3[] corners = localCorners;
+			Bounds b = new Bounds(corners[0], Vector3.zero);
+			for (int j = 1; j < 4; ++j) b.Encapsulate(corners[j]);
+			return b;
+		}
+		else
+		{
+			Matrix4x4 toLocal = relativeParent.worldToLocalMatrix;
+			Vector3[] corners = worldCorners;
+			Bounds b = new Bounds(corners[0], Vector3.zero);
+			for (int j = 1; j < 4; ++j) b.Encapsulate(toLocal.MultiplyPoint3x4(corners[j]));
+			return b;
+		}
 	}
 
 	/// <summary>
@@ -837,8 +866,6 @@ public abstract class UIWidget : MonoBehaviour
 		}
 		return false;
 	}
-
-	public bool hasVertices { get { return mGeom != null && mGeom.hasVertices; } }
 
 	/// <summary>
 	/// Append the local geometry buffers to the specified ones.

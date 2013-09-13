@@ -32,16 +32,10 @@ public class UIStretch : MonoBehaviour
 	public Camera uiCamera = null;
 
 	/// <summary>
-	/// Widget used to determine the container's bounds. Overwrites the camera-based anchoring if the value was specified.
+	/// Object used to determine the container's bounds. Overwrites the camera-based anchoring if the value was specified.
 	/// </summary>
 
-	public UIWidget widgetContainer = null;
-
-	/// <summary>
-	/// Panel used to determine the container's bounds. Overwrites the widget-based anchoring if the value was specified.
-	/// </summary>
-
-	public UIPanel panelContainer = null;
+	public GameObject container = null;
 
 	/// <summary>
 	/// Stretching style.
@@ -69,6 +63,9 @@ public class UIStretch : MonoBehaviour
 
 	public Vector2 initialSize = Vector2.one;
 
+	// Deprecated legacy functionality
+	[HideInInspector][SerializeField] UIWidget widgetContainer;
+
 	Transform mTrans;
 	UIRoot mRoot;
 	Animation mAnim;
@@ -83,6 +80,15 @@ public class UIStretch : MonoBehaviour
 
 	void Start ()
 	{
+		if (container == null && widgetContainer != null)
+		{
+			container = widgetContainer.gameObject;
+			widgetContainer = null;
+#if UNITY_EDITOR
+			UnityEditor.EditorUtility.SetDirty(this);
+#endif
+		}
+
 		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
 		mRoot = NGUITools.FindInParents<UIRoot>(gameObject);
 		Update();
@@ -94,34 +100,46 @@ public class UIStretch : MonoBehaviour
 
 		if (style != Style.None)
 		{
+			UIWidget wc = (container == null) ? null : container.GetComponent<UIWidget>();
+			UIPanel pc = (container == null && wc == null) ? null : container.GetComponent<UIPanel>();
 			float adjustment = 1f;
 
-			if (panelContainer != null)
+			if (wc != null)
 			{
-				if (panelContainer.clipping == UIDrawCall.Clipping.None)
+				Bounds b = wc.CalculateBounds(transform.parent);
+
+				mRect.x = b.min.x;
+				mRect.y = b.min.y;
+
+				mRect.width = b.size.x;
+				mRect.height = b.size.y;
+			}
+			else if (pc != null)
+			{
+				if (pc.clipping == UIDrawCall.Clipping.None)
 				{
 					// Panel has no clipping -- just use the screen's dimensions
-					mRect.xMin = -Screen.width * 0.5f;
-					mRect.yMin = -Screen.height * 0.5f;
+					float ratio = (mRoot != null) ? (float)mRoot.activeHeight / Screen.height * 0.5f : 0.5f;
+					mRect.xMin = -Screen.width * ratio;
+					mRect.yMin = -Screen.height * ratio;
 					mRect.xMax = -mRect.xMin;
 					mRect.yMax = -mRect.yMin;
 				}
 				else
 				{
-					// Panel has clipping -- use it as the rect
-					Vector4 pos = panelContainer.clipRange;
+					// Panel has clipping -- use it as the mRect
+					Vector4 pos = pc.clipRange;
 					mRect.x = pos.x - (pos.z * 0.5f);
 					mRect.y = pos.y - (pos.w * 0.5f);
 					mRect.width = pos.z;
 					mRect.height = pos.w;
 				}
 			}
-			else if (widgetContainer != null)
+			else if (container != null)
 			{
-				// Widget is used -- use its bounds as the container's bounds
 				Transform root = transform.parent;
-				Bounds b = (root != null) ? NGUIMath.CalculateRelativeWidgetBounds(root, widgetContainer.cachedTransform) :
-					NGUIMath.CalculateRelativeWidgetBounds(widgetContainer.cachedTransform);
+				Bounds b = (root != null) ? NGUIMath.CalculateRelativeWidgetBounds(root, container.transform) :
+					NGUIMath.CalculateRelativeWidgetBounds(container.transform);
 
 				mRect.x = b.min.x;
 				mRect.y = b.min.y;
@@ -132,7 +150,6 @@ public class UIStretch : MonoBehaviour
 			else if (uiCamera != null)
 			{
 				mRect = uiCamera.pixelRect;
-				if (mRoot != null) adjustment = mRoot.pixelSizeAdjustment;
 			}
 			else return;
 
