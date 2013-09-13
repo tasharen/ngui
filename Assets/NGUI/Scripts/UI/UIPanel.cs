@@ -795,14 +795,14 @@ public class UIPanel : MonoBehaviour
 			{
 				if (pan != w.panel || mat != w.material)
 				{
-					if (pan != null && mVerts.size != 0)
+					if (pan != null && mat != null && mVerts.size != 0)
 						pan.SubmitDrawCall(index++, mat);
 
 					pan = w.panel;
 					mat = w.material;
 				}
 
-				if (pan != null)
+				if (pan != null && mat != null)
 				{
 					w.renderQueue = index;
 					if (pan.generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
