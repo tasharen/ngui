@@ -553,9 +553,10 @@ public class UILabel : UIWidget
 		mChanged = true;
 		hasChanged = false;
 
+		float invSize = 1f / mFont.pixelSize;
 		float printSize = Mathf.Abs(legacyMode ? cachedTransform.localScale.x : mFont.size);
-		float lw = legacyMode ? (mMaxLineWidth != 0 ? mMaxLineWidth : 1000000) : width;
-		float lh = legacyMode ? (mMaxLineHeight != 0 ? mMaxLineHeight : 1000000) : height;
+		float lw = legacyMode ? (mMaxLineWidth != 0 ? mMaxLineWidth * invSize : 1000000) : width * invSize;
+		float lh = legacyMode ? (mMaxLineHeight != 0 ? mMaxLineHeight * invSize : 1000000) : height * invSize;
 
 		if (printSize > 0f)
 		{
@@ -599,12 +600,12 @@ public class UILabel : UIWidget
 
 				if (mOverflow == Overflow.ResizeFreely)
 				{
-					mWidth = Mathf.RoundToInt(mSize.x);
-					mHeight = Mathf.RoundToInt(mSize.y);
+					mWidth = Mathf.RoundToInt(mSize.x * mFont.pixelSize);
+					mHeight = Mathf.RoundToInt(mSize.y * mFont.pixelSize);
 				}
 				else if (mOverflow == Overflow.ResizeHeight)
 				{
-					mHeight = Mathf.RoundToInt(mSize.y);
+					mHeight = Mathf.RoundToInt(mSize.y * mFont.pixelSize);
 				}
 				else if (mOverflow == Overflow.ShrinkContent && !fits)
 				{
@@ -615,8 +616,8 @@ public class UILabel : UIWidget
 				// Upgrade to the new system
 				if (legacyMode)
 				{
-					width = Mathf.RoundToInt(mSize.x);
-					height = Mathf.RoundToInt(mSize.y);
+					width = Mathf.RoundToInt(mSize.x * mFont.pixelSize);
+					height = Mathf.RoundToInt(mSize.y * mFont.pixelSize);
 					cachedTransform.localScale = Vector3.one;
 				}
 				break;
@@ -701,7 +702,8 @@ public class UILabel : UIWidget
 		if (font.premultipliedAlpha) col = NGUITools.ApplyPMA(col);
 
 		string text = processedText;
-		int w = Mathf.RoundToInt(width / mScale);
+		float scale = mScale * mFont.pixelSize;
+		int w = Mathf.RoundToInt(width / scale);
 		int start = verts.size;
 
 		// Print the text into the buffers
@@ -723,9 +725,9 @@ public class UILabel : UIWidget
 		float fy = Mathf.Lerp(mHeight, 0f, po.y);
 
 		// Center vertically
-		fy += Mathf.Lerp(mSize.y * mScale - mHeight, 0f, po.y);
+		fy += Mathf.Lerp(mSize.y * scale - mHeight, 0f, po.y);
 
-		if (mScale == 1f)
+		if (scale == 1f)
 		{
 			for (int i = start; i < verts.size; ++i)
 			{
@@ -737,8 +739,8 @@ public class UILabel : UIWidget
 		{
 			for (int i = start; i < verts.size; ++i)
 			{
-				verts.buffer[i].x = fx + verts.buffer[i].x * mScale;
-				verts.buffer[i].y = fy + verts.buffer[i].y * mScale;
+				verts.buffer[i].x = fx + verts.buffer[i].x * scale;
+				verts.buffer[i].y = fy + verts.buffer[i].y * scale;
 			}
 		}
 
@@ -746,7 +748,7 @@ public class UILabel : UIWidget
 		if (effectStyle != Effect.None)
 		{
 			int end = verts.size;
-			float pixel = 1f / mFont.pixelSize;
+			float pixel = mFont.pixelSize;
 			fx = pixel * mEffectDistance.x;
 			fy = pixel * mEffectDistance.y;
 
