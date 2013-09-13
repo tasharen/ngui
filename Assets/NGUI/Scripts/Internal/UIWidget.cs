@@ -3,10 +3,6 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
-#if UNITY_3_5 || UNITY_4_0
-#define OLD_UNITY
-#endif
-
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -54,12 +50,8 @@ public abstract class UIWidget : MonoBehaviour
 	Quaternion mDiffRot;
 	Vector3 mDiffScale;
 	Matrix4x4 mLocalToPanel;
-#if OLD_UNITY
-	int mVisibleFlag = -1;
-#else
 	bool mVisibleByPanel = true;
 	float mLastAlpha = 0f;
-#endif
 	int mDrawnIndex = -1;
 
 	/// <summary>
@@ -82,11 +74,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Whether the widget is visible.
 	/// </summary>
 
-#if OLD_UNITY
-	public bool isVisible { get { return finalAlpha > 0.001f; } }
-#else
 	public bool isVisible { get { return mVisibleByPanel && finalAlpha > 0.001f; } }
-#endif
 
 	/// <summary>
 	/// Widget's width in pixels.
@@ -357,14 +345,6 @@ public abstract class UIWidget : MonoBehaviour
 
 	public UIPanel panel { get { if (mPanel == null) CreatePanel(); return mPanel; } set { mPanel = value; } }
 
-#if OLD_UNITY
-	/// <summary>
-	/// Flag set by the UIPanel and used in optimization checks.
-	/// </summary>
-
-	public int visibleFlag { get { return mVisibleFlag; } set { mVisibleFlag = value; } }
-#endif
-
 	/// <summary>
 	/// TODO: Do not use this, it's obsolete.
 	/// </summary>
@@ -540,26 +520,6 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		if (mPanel != null)
 		{
-#if OLD_UNITY
-			// This code allows drag & dropping of widgets onto different panels in the editor.
-			bool valid = true;
-			Transform t = cachedTransform.parent;
-
-			// Run through the parents and see if this widget is still parented to the transform
-			while (t != null)
-			{
-				if (t == mPanel.cachedTransform) break;
-				if (!mPanel.WatchesTransform(t)) { valid = false; break; }
-				t = t.parent;
-			}
-
-			// This widget is no longer parented to the same panel. Remove it and re-add it to a new one.
-			if (!valid)
-			{
-				RemoveFromPanel();
-				CreatePanel();
-			}
-#else
 			UIPanel p = UIPanel.Find(cachedTransform);
 
 			if (mPanel != p)
@@ -567,7 +527,6 @@ public abstract class UIWidget : MonoBehaviour
 				RemoveFromPanel();
 				CreatePanel();
 			}
-#endif
 		}
 	}
 
@@ -658,7 +617,6 @@ public abstract class UIWidget : MonoBehaviour
 	void OnDestroy () { RemoveFromPanel(); }
 
 #if UNITY_EDITOR
-
 	static int mHandles = -1;
 
 	/// <summary>
@@ -715,11 +673,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-#if OLD_UNITY
-		if (mVisibleFlag != 0 && mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos)
-#else
 		if (isVisible && mPanel != null)
-#endif
 		{
 			if (UnityEditor.Selection.activeGameObject == gameObject && showHandles) return;
 
@@ -740,15 +694,40 @@ public abstract class UIWidget : MonoBehaviour
 			Gizmos.DrawCube(center, size);
 		}
 	}
+#endif // UNITY_EDITOR
+
+#if UNITY_3_5 || UNITY_4_0
+	Vector3 mOldPos;
+	Quaternion mOldRot;
+	Vector3 mOldScale;
 #endif
 
-#if OLD_UNITY
 	/// <summary>
-	/// Update the widget and fill its geometry if necessary. Returns whether something was changed.
+	/// Whether the transform has changed since the last time it was checked.
 	/// </summary>
 
-	public bool UpdateGeometry (UIPanel p, ref Matrix4x4 worldToPanel, bool parentMoved, bool generateNormals)
+	bool HasTransformChanged ()
+	{
+#if UNITY_3_5 || UNITY_4_0
+		Transform t = cachedTransform;
+		
+		if (t.position != mOldPos || t.rotation != mOldRot || t.lossyScale != mOldScale)
+		{
+			mOldPos = t.position;
+			mOldRot = t.rotation;
+			mOldScale = t.lossyScale;
+			return true;
+		}
 #else
+		if (cachedTransform.hasChanged)
+		{
+		    mTrans.hasChanged = false;
+		    return true;
+		}
+#endif
+		return false;
+	}
+
 	bool mForceVisible = false;
 	Vector3 mOldV0;
 	Vector3 mOldV1;
@@ -758,22 +737,18 @@ public abstract class UIWidget : MonoBehaviour
 	/// </summary>
 
 	public bool UpdateGeometry (UIPanel p, bool forceVisible)
-#endif
 	{
 		if (material != null && p != null)
 		{
 			mPanel = p;
 			bool hasMatrix = false;
-#if !OLD_UNITY
 			float final = finalAlpha;
 			bool visibleByAlpha = (final > 0.001f);
 			bool visibleByPanel = forceVisible || mVisibleByPanel;
 
 			// Has transform moved?
-			if (cachedTransform.hasChanged)
+			if (HasTransformChanged())
 			{
-				mTrans.hasChanged = false;
-				
 				// Check to see if the widget has moved relative to the panel that manages it
 #if UNITY_EDITOR
 				if (!mPanel.widgetsAreStatic || !Application.isPlaying)
@@ -831,7 +806,7 @@ public abstract class UIWidget : MonoBehaviour
 			// Has the alpha changed?
 			if (mVisibleByPanel && mLastAlpha != final) mChanged = true;
 			mLastAlpha = final;
-#endif
+
 			if (mChanged)
 			{
 				mChanged = false;
@@ -857,12 +832,6 @@ public abstract class UIWidget : MonoBehaviour
 					return true;
 				}
 			}
-#if OLD_UNITY
-			else if (parentMoved && mGeom.hasVertices)
-			{
-				mGeom.ApplyTransform(p.worldToLocal * cachedTransform.localToWorldMatrix);
-			}
-#endif
 		}
 		return false;
 	}

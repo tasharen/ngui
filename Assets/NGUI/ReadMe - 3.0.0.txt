@@ -40,8 +40,12 @@ PLEASE BACK UP YOUR PROJECT BEFORE UPDATING!
 3.0.0 is a major changeset. You will need to open and re-save all of your scenes and prefabs after updating!
 After updating, expect some things to no longer work the same way they used to. Widgets scale is no longer
 used as its size, so any code that you had relying on this will need to change to use 'width' and 'height'.
+You can also expect compile errors related to delegate usage. Check this page for helpful upgrade info:
+http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 
 3.0.0:
+- NEW: Changed the way widgets get batched, properly fixing all remaining Z/depth issues.
+- NEW: Draw calls are now automatically split up as needed (no more sandwiching issues!)
 - NEW: Re-designed the way widget width & height gets specified. The values are now explicit, and scale is no longer used.
 - NEW: It's now possible to have clipped panels in 3D and not have them break when tilting the camera.
 - NEW: It's now possible to nest widgets.
@@ -54,6 +58,7 @@ used as its size, so any code that you had relying on this will need to change t
 - NEW: Added a simple EventDelegate class and improved all generic components to use it.
 - NEW: Added a Widget Container class that can be used to easily select and move groups of widgets (think: buttons, windows).
 - NEW: Added the RealTime helper class that removed IgnoreTimeScale. Usage: RealTime.time, RealTime.deltaTime.
+- NEW: Improved the inspector look of just about every component.
 - FIX: Labels will now again align vertically properly.
 
 2.7.0:
