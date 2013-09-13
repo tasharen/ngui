@@ -32,35 +32,40 @@ public class UIDrawCall : MonoBehaviour
 	Vector4			mClipRange;		// Clipping, if used
 	Vector2			mClipSoft;		// Clipping softness
 	Material		mMat;			// Instantiated material
-	Material		mDepthMat;		// Depth-writing material, created if necessary
 	int[]			mIndices;		// Cached indices
 
-	bool mUseDepth = false;
+	bool mDirty = false;
 	bool mReset = true;
 	bool mEven = true;
-	int mDepth = 0;
+	int mRenderQueue = 0;
 
 	/// <summary>
-	/// Whether an additional pass will be created to render the geometry to the depth buffer first.
+	/// Panel managing this draw call.
 	/// </summary>
 
-	public bool depthPass { get { return mUseDepth; } set { if (mUseDepth != value) { mUseDepth = value; mReset = true; } } }
+	public UIPanel panel { get; set; }
 
 	/// <summary>
-	/// Draw order used by the draw call.
+	/// Whether the draw call needs to be re-created.
 	/// </summary>
 
-	public int depth
+	public bool isDirty { get { return mDirty; } set { mDirty = value; } }
+
+	/// <summary>
+	/// Render queue used by the draw call.
+	/// </summary>
+
+	public int renderQueue
 	{
 		get
 		{
-			return mDepth;
+			return mRenderQueue;
 		}
 		set
 		{
-			if (mDepth != value)
+			if (mRenderQueue != value)
 			{
-				mDepth = value;
+				mRenderQueue = value;
 				if (mMat != null && mSharedMat != null)
 					mMat.renderQueue = mSharedMat.renderQueue + value;
 			}
@@ -83,7 +88,7 @@ public class UIDrawCall : MonoBehaviour
 	/// Texture used by the material.
 	/// </summary>
 
-	public Texture mainTexture { get { return mMat.mainTexture; } set { mMat.mainTexture = value; } }
+	public Texture mainTexture { get { return (mMat != null) ? mMat.mainTexture : null; } set { if (mMat != null) mMat.mainTexture = value; } }
 
 	/// <summary>
 	/// The number of triangles in this draw call.
@@ -169,6 +174,19 @@ public class UIDrawCall : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Rebuild the draw call's material.
+	/// </summary>
+
+	public void RebuildMaterial ()
+	{
+		NGUITools.DestroyImmediate(mMat);
+		mMat = new Material(mSharedMat);
+		mMat.hideFlags = HideFlags.DontSave;
+		mMat.CopyPropertiesFromMaterial(mSharedMat);
+		mMat.renderQueue = mSharedMat.renderQueue + mRenderQueue;
+	}
+
+	/// <summary>
 	/// Update the renderer's materials.
 	/// </summary>
 
@@ -177,13 +195,7 @@ public class UIDrawCall : MonoBehaviour
 		bool useClipping = (mClipping != Clipping.None);
 
 		// Create a temporary material
-		if (mMat == null)
-		{
-			mMat = new Material(mSharedMat);
-			mMat.hideFlags = HideFlags.DontSave;
-			mMat.CopyPropertiesFromMaterial(mSharedMat);
-			mMat.renderQueue = mSharedMat.renderQueue + mDepth;
-		}
+		if (mMat == null) RebuildMaterial();
 
 		// If clipping should be used, we need to find a replacement shader
 		if (useClipping && mClipping != Clipping.None)
@@ -214,32 +226,7 @@ public class UIDrawCall : MonoBehaviour
 			}
 		}
 
-		// If depth pass should be used, create the depth material
-		if (mUseDepth)
-		{
-			if (mDepthMat == null)
-			{
-				Shader shader = Shader.Find("Unlit/Depth Cutout");
-				mDepthMat = new Material(shader);
-				mDepthMat.hideFlags = HideFlags.DontSave;
-			}
-			mDepthMat.mainTexture = mSharedMat.mainTexture;
-		}
-		else if (mDepthMat != null)
-		{
-			NGUITools.Destroy(mDepthMat);
-			mDepthMat = null;
-		}
-
-		if (mDepthMat != null)
-		{
-			// If we're already using this material, do nothing
-			if (mRen.sharedMaterials != null && mRen.sharedMaterials.Length == 2 && mRen.sharedMaterials[1] == mMat) return;
-
-			// Set the double material
-			mRen.sharedMaterials = new Material[] { mDepthMat, mMat };
-		}
-		else if (mRen.sharedMaterial != mMat)
+		if (mRen.sharedMaterial != mMat)
 		{
 			mRen.sharedMaterials = new Material[] { mMat };
 		}
@@ -354,6 +341,5 @@ public class UIDrawCall : MonoBehaviour
 		NGUITools.DestroyImmediate(mMesh0);
 		NGUITools.DestroyImmediate(mMesh1);
 		NGUITools.DestroyImmediate(mMat);
-		NGUITools.DestroyImmediate(mDepthMat);
 	}
 }

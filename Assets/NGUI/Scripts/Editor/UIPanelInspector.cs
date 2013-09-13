@@ -40,11 +40,7 @@ public class UIPanelInspector : Editor
 	public override void OnInspectorGUI ()
 	{
 		UIPanel panel = target as UIPanel;
-		BetterList<UIDrawCall> drawcalls = panel.drawCalls;
-		drawcalls.Sort(delegate(UIDrawCall w1, UIDrawCall w2) { return w1.depth.CompareTo(w2.depth); });
 		NGUIEditorTools.SetLabelWidth(80f);
-
-		//NGUIEditorTools.DrawSeparator();
 		EditorGUILayout.Space();
 
 		float alpha = EditorGUILayout.Slider("Alpha", panel.alpha, 0f, 1f);
@@ -63,34 +59,9 @@ public class UIPanelInspector : Editor
 		if (panel.generateNormals != norms)
 		{
 			panel.generateNormals = norms;
-			panel.UpdateDrawcalls();
+			UIPanel.SetDirty();
 			EditorUtility.SetDirty(panel);
 		}
-
-		// No one seems to know how to use this properly correctly. Solution? Removing it.
-		// If you know wtf you're doing, you're welcome to uncomment it.
-
-		//GUILayout.BeginHorizontal();
-		//bool depth = EditorGUILayout.Toggle("Depth Pass", panel.depthPass, GUILayout.Width(100f));
-		//GUILayout.Label("Doubles draw calls, saves fillrate");
-		//GUILayout.EndHorizontal();
-
-		//if (panel.depthPass != depth)
-		//{
-		//    panel.depthPass = depth;
-		//    panel.UpdateDrawcalls();
-		//    EditorUtility.SetDirty(panel);
-		//}
-
-		//if (depth)
-		//{
-		//    UICamera cam = UICamera.FindCameraForLayer(panel.gameObject.layer);
-
-		//    if (cam == null || cam.camera.isOrthoGraphic)
-		//    {
-		//        EditorGUILayout.HelpBox("Please note that depth pass will only save fillrate when used with 3D UIs, and only UIs drawn by the game camera. If you are using a separate camera for the UI, you will not see any benefit!", MessageType.Warning);
-		//    }
-		//}
 
 		GUILayout.BeginHorizontal();
 		bool sort = EditorGUILayout.Toggle("Depth Sort", panel.sortByDepth, GUILayout.Width(100f));
@@ -100,7 +71,7 @@ public class UIPanelInspector : Editor
 		if (panel.sortByDepth != sort)
 		{
 			panel.sortByDepth = sort;
-			panel.UpdateDrawcalls();
+			UIPanel.SetDirty();
 			EditorUtility.SetDirty(panel);
 		}
 
@@ -117,7 +88,7 @@ public class UIPanelInspector : Editor
 		if (panel.cullWhileDragging != cull)
 		{
 			panel.cullWhileDragging = cull;
-			panel.UpdateDrawcalls();
+			UIPanel.SetDirty();
 			EditorUtility.SetDirty(panel);
 		}
 
@@ -129,7 +100,7 @@ public class UIPanelInspector : Editor
 		if (panel.widgetsAreStatic != stat)
 		{
 			panel.widgetsAreStatic = stat;
-			panel.UpdateDrawcalls();
+			UIPanel.SetDirty();
 			EditorUtility.SetDirty(panel);
 		}
 
@@ -143,14 +114,6 @@ public class UIPanelInspector : Editor
 			panel.showInPanelTool = !panel.showInPanelTool;
 			EditorUtility.SetDirty(panel);
 			EditorWindow.FocusWindowIfItsOpen<UIPanelTool>();
-		}
-
-		UIPanel.DebugInfo di = (UIPanel.DebugInfo)EditorGUILayout.EnumPopup("Debug Info", panel.debugInfo);
-
-		if (panel.debugInfo != di)
-		{
-			panel.debugInfo = di;
-			EditorUtility.SetDirty(panel);
 		}
 
 		UIDrawCall.Clipping clipping = (UIDrawCall.Clipping)EditorGUILayout.EnumPopup("Clipping", panel.clipping);
@@ -231,13 +194,17 @@ public class UIPanelInspector : Editor
 			}
 		}
 
-		if (panel.drawCalls.size > 0 && NGUIEditorTools.DrawHeader(panel.drawCalls.size +
-			(panel.drawCalls.size == 1 ? " draw call from " : " draw calls from ") + panel.widgets.size + " widgets", "DrawCalls"))
+		int count = panel.drawCallCount;
+
+		if (count > 0 && NGUIEditorTools.DrawHeader(count + (count == 1 ? " draw call" : " draw calls"), "DrawCalls"))
 		{
 			NGUIEditorTools.BeginContents();
 			
-			foreach (UIDrawCall dc in drawcalls)
+			for (int i = 0; i < UIPanel.drawCalls.size; ++i)
 			{
+				UIDrawCall dc = UIPanel.drawCalls[i];
+				if (dc.panel != panel) continue;
+
 				EditorGUILayout.ObjectField("Material", dc.material, typeof(Material), false);
 				EditorGUILayout.LabelField("Triangles", dc.triangles.ToString());
 

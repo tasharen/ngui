@@ -701,7 +701,7 @@ public class UIDraggablePanel : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-		if (mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos)
+		if (mPanel != null)
 		{
 			Bounds b = bounds;
 			Gizmos.matrix = transform.localToWorldMatrix;

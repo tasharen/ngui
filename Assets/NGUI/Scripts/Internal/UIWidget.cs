@@ -60,6 +60,20 @@ public abstract class UIWidget : MonoBehaviour
 	bool mVisibleByPanel = true;
 	float mLastAlpha = 0f;
 #endif
+	int mDrawnIndex = -1;
+
+	/// <summary>
+	/// Internal usage -- draw call that's drawing the widget.
+	/// </summary>
+
+	//public UIDrawCall drawCall { get; set; }
+
+	/// <summary>
+	/// Internal usage -- used by the panel to get and set the order that the widgets are drawn in.
+	/// </summary>
+
+	public int renderQueue { get { return mDrawnIndex; } set { mDrawnIndex = value; } }
+
 	// Widget's generated geometry
 	UIGeometry mGeom = new UIGeometry();
 	Vector3[] mCorners = new Vector3[4];
@@ -190,7 +204,7 @@ public abstract class UIWidget : MonoBehaviour
 			if (mDepth != value)
 			{
 				mDepth = value;
-				if (mPanel != null) mPanel.MarkMaterialAsChanged(material, true);
+				UIPanel.SetDirty();
 			}
 		}
 	}
@@ -393,6 +407,22 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Mark the widget as changed so that the geometry can be rebuilt.
+	/// </summary>
+
+	void SetDirty ()
+	{
+		int index = renderQueue;
+
+		if (index == -1)
+		{
+			if (isVisible)
+				UIPanel.SetDirty();
+		}
+		else UIPanel.SetDirty(renderQueue);
+	}
+
+	/// <summary>
 	/// Remove this widget from the panel.
 	/// </summary>
 
@@ -400,8 +430,9 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		if (mPanel != null)
 		{
-			mPanel.RemoveWidget(this);
+			renderQueue = -1;
 			mPanel = null;
+			SetDirty();
 		}
 	}
 
@@ -423,7 +454,7 @@ public abstract class UIWidget : MonoBehaviour
 		// If we're in the editor, update the panel right away so its geometry gets updated.
 		if (mPanel != null && enabled && NGUITools.GetActive(gameObject) && !Application.isPlaying && material != null)
 		{
-			mPanel.AddWidget(this);
+			SetDirty();
 			CheckLayer();
 #if UNITY_EDITOR
 			// Mark the panel as dirty so it gets updated
@@ -445,8 +476,8 @@ public abstract class UIWidget : MonoBehaviour
 			if (mPanel != null)
 			{
 				CheckLayer();
-				mPanel.AddWidget(this);
 				mChanged = true;
+				UIPanel.SetDirty();
 			}
 		}
 	}
@@ -658,7 +689,7 @@ public abstract class UIWidget : MonoBehaviour
 #if OLD_UNITY
 		if (mVisibleFlag != 0 && mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos)
 #else
-		if (isVisible && mPanel != null && mPanel.debugInfo == UIPanel.DebugInfo.Gizmos)
+		if (isVisible && mPanel != null)
 #endif
 		{
 			if (UnityEditor.Selection.activeGameObject == gameObject && showHandles) return;
@@ -806,6 +837,8 @@ public abstract class UIWidget : MonoBehaviour
 		}
 		return false;
 	}
+
+	public bool hasVertices { get { return mGeom != null && mGeom.hasVertices; } }
 
 	/// <summary>
 	/// Append the local geometry buffers to the specified ones.
