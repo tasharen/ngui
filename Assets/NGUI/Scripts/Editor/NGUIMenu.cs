@@ -133,8 +133,7 @@ static public class NGUIMenu
 			ct.localPosition = Vector3.zero;
 			ct.localRotation = Quaternion.identity;
 			ct.localScale = Vector3.one;
-
-			child.AddComponent<UIPanel>().sortByDepth = true;
+			child.AddComponent<UIPanel>();
 			Selection.activeGameObject = child;
 		}
 	}

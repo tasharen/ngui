@@ -40,12 +40,6 @@ public class UIPanel : MonoBehaviour
 	public OnChangeDelegate onChange;
 
 	/// <summary>
-	/// Defaults to 'false' so that older UIs work as expected.
-	/// </summary>
-
-	public bool sortByDepth = false;
-
-	/// <summary>
 	/// Whether this panel will show up in the panel tool (set this to 'false' for dynamically created temporary panels)
 	/// </summary>
 
@@ -756,7 +750,6 @@ public class UIPanel : MonoBehaviour
 		{
 			mFullRebuild = true;
 			panel = trans.gameObject.AddComponent<UIPanel>();
-			panel.sortByDepth = true;
 			SetChildLayer(panel.cachedTransform, panel.cachedGameObject.layer);
 		}
 		return panel;

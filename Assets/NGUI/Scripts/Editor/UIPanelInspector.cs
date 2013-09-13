@@ -64,23 +64,6 @@ public class UIPanelInspector : Editor
 		}
 
 		GUILayout.BeginHorizontal();
-		bool sort = EditorGUILayout.Toggle("Depth Sort", panel.sortByDepth, GUILayout.Width(100f));
-		GUILayout.Label("Sort widgets by depth (ignore Z)");
-		GUILayout.EndHorizontal();
-
-		if (panel.sortByDepth != sort)
-		{
-			panel.sortByDepth = sort;
-			UIPanel.SetDirty();
-			EditorUtility.SetDirty(panel);
-		}
-
-		if (!sort)
-		{
-			EditorGUILayout.HelpBox("Keep the 'Depth Sort' flag turned on, unless you are working with a UI created prior to NGUI 2.7.0 and want to sort by Z in addition to Depth.", MessageType.Warning);
-		}
-
-		GUILayout.BeginHorizontal();
 		bool cull = EditorGUILayout.Toggle("Cull", panel.cullWhileDragging, GUILayout.Width(100f));
 		GUILayout.Label("Cull widgets while dragging them");
 		GUILayout.EndHorizontal();
