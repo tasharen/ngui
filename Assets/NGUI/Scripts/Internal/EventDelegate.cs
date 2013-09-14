@@ -3,7 +3,7 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
-#if UNITY_EDITOR || (!UNITY_FLASH && !UNITY_WP8)
+#if UNITY_EDITOR || (!UNITY_FLASH && !UNITY_WP8 && !UNITY_METRO)
 #define REFLECTION_SUPPORT
 #endif
 
