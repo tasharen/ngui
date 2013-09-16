@@ -303,7 +303,13 @@ static public class NGUITools
 	/// Add a collider to the game object containing one or more widgets.
 	/// </summary>
 
-	static public BoxCollider AddWidgetCollider (GameObject go, bool considerInactive = false)
+	static public BoxCollider AddWidgetCollider (GameObject go) { return AddWidgetCollider(go, false); }
+
+	/// <summary>
+	/// Add a collider to the game object containing one or more widgets.
+	/// </summary>
+
+	static public BoxCollider AddWidgetCollider (GameObject go, bool considerInactive)
 	{
 		if (go != null)
 		{

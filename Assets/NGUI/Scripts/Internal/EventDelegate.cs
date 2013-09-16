@@ -252,7 +252,13 @@ public class EventDelegate
 	/// Append a new event delegate to the list.
 	/// </summary>
 
-	static public void Add (List<EventDelegate> list, Callback callback, bool oneShot = false)
+	static public void Add (List<EventDelegate> list, Callback callback) { Add(list, callback, false); }
+
+	/// <summary>
+	/// Append a new event delegate to the list.
+	/// </summary>
+
+	static public void Add (List<EventDelegate> list, Callback callback, bool oneShot)
 	{
 		if (list != null)
 		{
@@ -277,7 +283,13 @@ public class EventDelegate
 	/// Append a new event delegate to the list.
 	/// </summary>
 
-	static public void Add (List<EventDelegate> list, EventDelegate ev, bool oneShot = false)
+	static public void Add (List<EventDelegate> list, EventDelegate ev) { Add(list, ev, false); }
+
+	/// <summary>
+	/// Append a new event delegate to the list.
+	/// </summary>
+
+	static public void Add (List<EventDelegate> list, EventDelegate ev, bool oneShot)
 	{
 		if (list != null)
 		{

@@ -546,7 +546,13 @@ public class UILabel : UIWidget
 	/// Process the raw text, called when something changes.
 	/// </summary>
 
-	void ProcessText (bool legacyMode = false)
+	void ProcessText () { ProcessText(false); }
+
+	/// <summary>
+	/// Process the raw text, called when something changes.
+	/// </summary>
+
+	void ProcessText (bool legacyMode)
 	{
 		if (mFont == null) return;
 
