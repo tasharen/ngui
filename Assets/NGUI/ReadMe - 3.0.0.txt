@@ -47,6 +47,7 @@ http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 - NEW: Changed the way widgets get batched, properly fixing all remaining Z/depth issues.
 - NEW: Draw calls are now automatically split up as needed (no more sandwiching issues!)
 - NEW: Re-designed the way widget width & height gets specified. The values are now explicit, and scale is no longer used.
+- NEW: NGUI will now automatically replace UITextures with Sprites when they get added to an atlas.
 - NEW: It's now possible to have clipped panels in 3D and not have them break when tilting the camera.
 - NEW: It's now possible to nest widgets.
 - NEW: It's now possible to have multiple widgets on the same object.
@@ -60,6 +61,9 @@ http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 - NEW: Added the RealTime helper class that removed IgnoreTimeScale. Usage: RealTime.time, RealTime.deltaTime.
 - NEW: Improved the inspector look of just about every component.
 - FIX: Labels will now again align vertically properly.
+- FIX: Atlas maker will now respect textures that were imported with a non-native size.
+- FIX: Atlas maker will no longer change so many import settings on source textures.
+- FIX: Make Pixel Perfect is now undoable.
 
 2.7.0:
 - NEW: Added a way to resolve all Depth/Z issues. Check your UIPanels and enable Depth Sorting.
