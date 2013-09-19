@@ -14,6 +14,12 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/Internal/Draw Call")]
 public class UIDrawCall : MonoBehaviour
 {
+	/// <summary>
+	/// All draw calls created by the panels.
+	/// </summary>
+
+	static public BetterList<UIDrawCall> list = new BetterList<UIDrawCall>();
+
 	public enum Clipping
 	{
 		None,

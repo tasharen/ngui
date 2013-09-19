@@ -60,6 +60,7 @@ http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 - NEW: Added a Widget Container class that can be used to easily select and move groups of widgets (think: buttons, windows).
 - NEW: Added the RealTime helper class that removed IgnoreTimeScale. Usage: RealTime.time, RealTime.deltaTime.
 - NEW: Improved the inspector look of just about every component.
+- NEW: UIPanel now shows a list of all of its draw calls and the widgets causing them.
 - FIX: Labels will now again align vertically properly.
 - FIX: Atlas maker will now respect textures that were imported with a non-native size.
 - FIX: Atlas maker will no longer change so many import settings on source textures.

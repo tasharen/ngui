@@ -177,18 +177,64 @@ public class UIPanelInspector : Editor
 			}
 		}
 
-		int count = panel.drawCallCount;
-
-		if (count > 0 && NGUIEditorTools.DrawHeader(count + (count == 1 ? " draw call" : " draw calls"), "DrawCalls"))
+		for (int i = 0; i < UIDrawCall.list.size; ++i)
 		{
-			NGUIEditorTools.BeginContents();
-			
-			for (int i = 0; i < UIPanel.drawCalls.size; ++i)
+			UIDrawCall dc = UIDrawCall.list[i];
+
+			if (dc.panel == panel && NGUIEditorTools.DrawHeader("Draw Call #" + (i + 1)))
 			{
-				UIDrawCall dc = UIPanel.drawCalls[i];
-				if (dc.panel != panel) continue;
+				NGUIEditorTools.BeginContents();
 
 				EditorGUILayout.ObjectField("Material", dc.material, typeof(Material), false);
+
+				int count = 0;
+
+				for (int b = 0; b < UIWidget.list.size; ++b)
+				{
+					UIWidget w = UIWidget.list[b];
+					if (w.renderQueue == dc.renderQueue)
+						++count;
+				}
+
+				int initial = NGUITools.GetHierarchy(panel.cachedGameObject).Length + 1;
+				string[] list = new string[count + 1];
+				list[0] = count.ToString();
+				count = 0;
+
+				for (int b = 0; b < UIWidget.list.size; ++b)
+				{
+					UIWidget w = UIWidget.list[b];
+					
+					if (w.renderQueue == dc.renderQueue)
+					{
+						list[++count] = count + ". " + NGUITools.GetHierarchy(w.cachedGameObject).Remove(0, initial);
+					}
+				}
+
+				GUILayout.BeginHorizontal();
+				int sel = EditorGUILayout.Popup("Widgets", 0, list);
+				GUILayout.Space(18f);
+				GUILayout.EndHorizontal();
+
+				if (sel != 0)
+				{
+					count = 0;
+
+					for (int b = 0; b < UIWidget.list.size; ++b)
+					{
+						UIWidget w = UIWidget.list[b];
+
+						if (w.renderQueue == dc.renderQueue)
+						{
+							if (++count == sel)
+							{
+								Selection.activeGameObject = w.gameObject;
+								break;
+							}
+						}
+					}
+				}
+
 				EditorGUILayout.LabelField("Triangles", dc.triangles.ToString());
 
 				if (clipping != UIDrawCall.Clipping.None && !dc.isClipped)
@@ -196,8 +242,9 @@ public class UIPanelInspector : Editor
 					EditorGUILayout.HelpBox("You must switch this material's shader to Unlit/Transparent Colored or Unlit/Premultiplied Colored in order for clipping to work.",
 						MessageType.Warning);
 				}
+
+				NGUIEditorTools.EndContents();
 			}
-			NGUIEditorTools.EndContents();
 		}
 	}
 }

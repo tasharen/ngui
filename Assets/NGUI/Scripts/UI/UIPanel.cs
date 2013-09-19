@@ -78,12 +78,6 @@ public class UIPanel : MonoBehaviour
 	[HideInInspector][SerializeField] Vector4 mClipRange = Vector4.zero;
 	[HideInInspector][SerializeField] Vector2 mClipSoftness = new Vector2(40f, 40f);
 
-	/// <summary>
-	/// All draw calls created by the panels.
-	/// </summary>
-
-	static public BetterList<UIDrawCall> drawCalls = new BetterList<UIDrawCall>();
-
 	// Whether a full rebuild of geometry buffers is required
 	static bool mFullRebuild = false;
 
@@ -145,9 +139,9 @@ public class UIPanel : MonoBehaviour
 			{
 				mAlpha = val;
 
-				for (int i = 0; i < drawCalls.size; ++i)
+				for (int i = 0; i < UIDrawCall.list.size; ++i)
 				{
-					UIDrawCall dc = drawCalls[i];
+					UIDrawCall dc = UIDrawCall.list[i];
 					if (dc != null && dc.panel == this)
 						dc.isDirty = true;
 				}
@@ -170,11 +164,10 @@ public class UIPanel : MonoBehaviour
 		get
 		{
 			int count = 0;
-			BetterList<UIDrawCall> drawcalls = UIPanel.drawCalls;
 
-			for (int i = 0; i < drawcalls.size; ++i)
+			for (int i = 0; i < UIDrawCall.list.size; ++i)
 			{
-				UIDrawCall dc = drawcalls[i];
+				UIDrawCall dc = UIDrawCall.list[i];
 				if (dc.panel != this) continue;
 				++count;
 			}
@@ -326,8 +319,8 @@ public class UIPanel : MonoBehaviour
 
 	static public void SetDirty (int renderQueue)
 	{
-		if (renderQueue < drawCalls.size && drawCalls[renderQueue] != null)
-			drawCalls[renderQueue].isDirty = true;
+		if (renderQueue < UIDrawCall.list.size && UIDrawCall.list[renderQueue] != null)
+			UIDrawCall.list[renderQueue].isDirty = true;
 	}
 
 	/// <summary>
@@ -336,17 +329,17 @@ public class UIPanel : MonoBehaviour
 
 	UIDrawCall GetDrawCall (int index, Material mat)
 	{
-		if (index < drawCalls.size)
+		if (index < UIDrawCall.list.size)
 		{
-			UIDrawCall dc = drawCalls.buffer[index];
+			UIDrawCall dc = UIDrawCall.list.buffer[index];
 
 			// If the material and texture match, keep using the same draw call
 			if (dc != null && dc.panel == this && dc.material == mat && dc.mainTexture == mat.mainTexture) return dc;
 
 			// Otherwise we need to destroy all the draw calls that follow
-			for (int i = drawCalls.size; i > index; )
+			for (int i = UIDrawCall.list.size; i > index; )
 			{
-				UIDrawCall rem = drawCalls.buffer[--i];
+				UIDrawCall rem = UIDrawCall.list.buffer[--i];
 				DestroyDrawCall(rem, i);
 			}
 		}
@@ -363,13 +356,12 @@ public class UIPanel : MonoBehaviour
 		go.layer = cachedGameObject.layer;
 		
 		// Create the draw call
-		UIDrawCall sc = go.AddComponent<UIDrawCall>();
-		sc.material = mat;
-		sc.renderQueue = drawCalls.size;
-		sc.panel = this;
-
-		drawCalls.Add(sc);
-		return sc;
+		UIDrawCall drawCall = go.AddComponent<UIDrawCall>();
+		drawCall.material = mat;
+		drawCall.renderQueue = UIDrawCall.list.size;
+		drawCall.panel = this;
+		UIDrawCall.list.Add(drawCall);
+		return drawCall;
 	}
 
 	/// <summary>
@@ -409,9 +401,9 @@ public class UIPanel : MonoBehaviour
 
 	void OnDisable ()
 	{
-		for (int i = drawCalls.size; i > 0; )
+		for (int i = UIDrawCall.list.size; i > 0; )
 		{
-			UIDrawCall dc = drawCalls.buffer[--i];
+			UIDrawCall dc = UIDrawCall.list.buffer[--i];
 			if (dc != null && dc.panel == this)
 				DestroyDrawCall(dc, i);
 		}
@@ -476,13 +468,13 @@ public class UIPanel : MonoBehaviour
 		UIDrawCall dc;
 		Transform dt;
 
-		for (int i = 0; i < drawCalls.size; )
+		for (int i = 0; i < UIDrawCall.list.size; )
 		{
-			dc = drawCalls.buffer[i];
+			dc = UIDrawCall.list.buffer[i];
 
 			if (dc == null)
 			{
-				drawCalls.RemoveAt(i);
+				UIDrawCall.list.RemoveAt(i);
 				continue;
 			}
 
@@ -530,9 +522,9 @@ public class UIPanel : MonoBehaviour
 		}
 		else
 		{
-			for (int i = 0; i < drawCalls.size; )
+			for (int i = 0; i < UIDrawCall.list.size; )
 			{
-				UIDrawCall dc = drawCalls[i];
+				UIDrawCall dc = UIDrawCall.list[i];
 
 				if (dc.isDirty)
 				{
@@ -568,7 +560,7 @@ public class UIPanel : MonoBehaviour
 	{
 		if (dc != null)
 		{
-			drawCalls.RemoveAt(index);
+			UIDrawCall.list.RemoveAt(index);
 			NGUITools.DestroyImmediate(dc.gameObject);
 		}
 	}
@@ -587,9 +579,9 @@ public class UIPanel : MonoBehaviour
 			mCam = (uic != null) ? uic.cachedCamera : NGUITools.FindCameraForLayer(mLayer);
 			SetChildLayer(cachedTransform, mLayer);
 
-			for (int i = 0, imax = drawCalls.size; i < imax; ++i)
+			for (int i = 0, imax = UIDrawCall.list.size; i < imax; ++i)
 			{
-				UIDrawCall dc = drawCalls[i];
+				UIDrawCall dc = UIDrawCall.list[i];
 				if (dc != null && dc.panel == this)
 					dc.gameObject.layer = mLayer;
 			}
@@ -625,9 +617,9 @@ public class UIPanel : MonoBehaviour
 				{
 					mFullRebuild = true;
 				}
-				else if (index < drawCalls.size && drawCalls[index] != null)
+				else if (index < UIDrawCall.list.size && UIDrawCall.list[index] != null)
 				{
-					drawCalls[index].isDirty = true;
+					UIDrawCall.list[index].isDirty = true;
 				}
 			}
 		}
@@ -767,8 +759,8 @@ public class UIPanel : MonoBehaviour
 
 	static void Fill ()
 	{
-		for (int i = drawCalls.size; i > 0; )
-			DestroyDrawCall(drawCalls[--i], i);
+		for (int i = UIDrawCall.list.size; i > 0; )
+			DestroyDrawCall(UIDrawCall.list[--i], i);
 
 		int index = 0;
 		UIPanel pan = null;
