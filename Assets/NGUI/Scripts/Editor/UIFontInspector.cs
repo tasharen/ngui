@@ -120,7 +120,7 @@ public class UIFontInspector : Editor
 		{
 			ComponentSelector.Draw<UIFont>(mFont.replacement, OnSelectFont);
 
-			NGUIEditorTools.DrawSeparator();
+			GUILayout.Space(6f);
 			EditorGUILayout.HelpBox("You can have one font simply point to " +
 				"another one. This is useful if you want to be " +
 				"able to quickly replace the contents of one " +
@@ -143,13 +143,20 @@ public class UIFontInspector : Editor
 #if UNITY_3_5
 			EditorGUILayout.HelpBox("Dynamic fonts require Unity 4.0 or higher.", MessageType.Error);
 #else
-			NGUIEditorTools.DrawSeparator();
 			Font fnt = EditorGUILayout.ObjectField("TTF Font", mFont.dynamicFont, typeof(Font), false) as Font;
 			
 			if (fnt != mFont.dynamicFont)
 			{
 				NGUIEditorTools.RegisterUndo("Font change", mFont);
 				mFont.dynamicFont = fnt;
+			}
+
+			Material mat = EditorGUILayout.ObjectField("Material", mFont.material, typeof(Material), false) as Material;
+
+			if (mFont.material != mat)
+			{
+				NGUIEditorTools.RegisterUndo("Font Material", mFont);
+				mFont.material = mat;
 			}
 
 			GUILayout.BeginHorizontal();
@@ -168,14 +175,6 @@ public class UIFontInspector : Editor
 			{
 				NGUIEditorTools.RegisterUndo("Font change", mFont);
 				mFont.dynamicFontStyle = style;
-			}
-
-			Material mat = EditorGUILayout.ObjectField("Material", mFont.material, typeof(Material), false) as Material;
-
-			if (mFont.material != mat)
-			{
-				NGUIEditorTools.RegisterUndo("Font Material", mFont);
-				mFont.material = mat;
 			}
 #endif
 		}

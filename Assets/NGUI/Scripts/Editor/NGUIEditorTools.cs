@@ -849,6 +849,9 @@ public class NGUIEditorTools
 		return false;
 	}
 
+	static string mEditedName = null;
+	static string mLastSprite = null;
+
 	/// <summary>
 	/// Convenience function that displays a list of sprites and returns the selected value.
 	/// </summary>
@@ -873,17 +876,46 @@ public class NGUIEditorTools
 
 			if (editable)
 			{
-				string sn = GUILayout.TextField(spriteName);
-
-				if (sn != spriteName)
+				if (!string.Equals(spriteName, mLastSprite))
 				{
-					UIAtlas.Sprite sp = atlas.GetSprite(spriteName);
+					mLastSprite = spriteName;
+					mEditedName = null;
+				}
 
-					if (sp != null)
+				string newName = GUILayout.TextField(string.IsNullOrEmpty(mEditedName) ? spriteName : mEditedName);
+
+				if (newName != spriteName)
+				{
+					mEditedName = newName;
+
+					if (GUILayout.Button("Rename", GUILayout.Width(60f)))
 					{
-						NGUIEditorTools.RegisterUndo("Edit Sprite Name", atlas);
-						sp.name = sn;
-						spriteName = sn;
+						UIAtlas.Sprite sprite = atlas.GetSprite(spriteName);
+
+						if (sprite != null)
+						{
+							NGUIEditorTools.RegisterUndo("Edit Sprite Name", atlas);
+							sprite.name = newName;
+
+							List<UISprite> sprites = FindInScene<UISprite>();
+
+							for (int i = 0; i < sprites.Count; ++i)
+							{
+								UISprite sp = sprites[i];
+
+								if (sp.atlas == atlas && sp.spriteName == spriteName)
+								{
+									NGUIEditorTools.RegisterUndo("Edit Sprite Name", sp);
+									sp.spriteName = newName;
+								}
+							}
+
+							mLastSprite = newName;
+							spriteName = newName;
+							mEditedName = null;
+
+							NGUISettings.selectedSprite = spriteName;
+						}
 					}
 				}
 			}

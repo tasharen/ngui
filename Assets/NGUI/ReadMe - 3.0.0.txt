@@ -65,6 +65,7 @@ http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 - FIX: Atlas maker will now respect textures that were imported with a non-native size.
 - FIX: Atlas maker will no longer change so many import settings on source textures.
 - FIX: Make Pixel Perfect is now undoable.
+- FIX: You can once again rename sprites in the atlas.
 
 2.7.0:
 - NEW: Added a way to resolve all Depth/Z issues. Check your UIPanels and enable Depth Sorting.
