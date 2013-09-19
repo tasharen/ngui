@@ -273,6 +273,8 @@ static public class NGUIMenu
 			Debug.Log("You must select an object in the scene hierarchy first");
 			return;
 		}
-		foreach (Transform t in Selection.transforms) NGUITools.MakePixelPerfect(t);
+		
+		foreach (Transform t in Selection.transforms)
+			NGUITools.MakePixelPerfect(t);
 	}
 }

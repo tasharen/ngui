@@ -59,7 +59,8 @@ public class UIAtlasMaker : EditorWindow
 			foreach (Object o in objects)
 			{
 				Texture tex = o as Texture;
-				if (tex != null && (NGUISettings.atlas == null || NGUISettings.atlas.texture != tex)) textures.Add(tex);
+				if (tex == null || tex.name == "Font Texture") continue;
+				if (NGUISettings.atlas == null || NGUISettings.atlas.texture != tex) textures.Add(tex);
 			}
 		}
 		return textures;
@@ -75,7 +76,7 @@ public class UIAtlasMaker : EditorWindow
 
 		foreach (Texture tex in textures)
 		{
-			Texture2D t2 = NGUIEditorTools.ImportTexture(tex, true, false);
+			Texture2D t2 = NGUIEditorTools.ImportTexture(tex, true, false, true);
 			if (t2 != null) list.Add(t2);
 		}
 		return list;
@@ -250,7 +251,7 @@ public class UIAtlasMaker : EditorWindow
 
 		foreach (Texture tex in textures)
 		{
-			Texture2D oldTex = NGUIEditorTools.ImportTexture(tex, true, false);
+			Texture2D oldTex = NGUIEditorTools.ImportTexture(tex, true, false, true);
 			if (oldTex == null) continue;
 
 			// If we aren't doing trimming, just use the texture as-is
@@ -406,7 +407,7 @@ public class UIAtlasMaker : EditorWindow
 	static void ExtractSprites (UIAtlas atlas, List<SpriteEntry> sprites)
 	{
 		// Make the atlas texture readable
-		Texture2D atlasTex = NGUIEditorTools.ImportTexture(atlas.texture, true, false);
+		Texture2D atlasTex = NGUIEditorTools.ImportTexture(atlas.texture, true, false, !atlas.premultipliedAlpha);
 
 		if (atlasTex != null)
 		{
@@ -480,7 +481,7 @@ public class UIAtlasMaker : EditorWindow
 		}
 
 		// The atlas no longer needs to be readable
-		NGUIEditorTools.ImportTexture(atlas.texture, false, false);
+		NGUIEditorTools.ImportTexture(atlas.texture, false, false, !atlas.premultipliedAlpha);
 	}
 
 	/// <summary>
@@ -519,7 +520,7 @@ public class UIAtlasMaker : EditorWindow
 		else
 		{
 			// Make the atlas readable so we can save it
-			tex = NGUIEditorTools.ImportTexture(oldPath, true, false);
+			tex = NGUIEditorTools.ImportTexture(oldPath, true, false, !atlas.premultipliedAlpha);
 		}
 
 		// Pack the sprites into this texture
@@ -532,7 +533,7 @@ public class UIAtlasMaker : EditorWindow
 			// Load the texture we just saved as a Texture2D
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh();
-			tex = NGUIEditorTools.ImportTexture(newPath, false, true);
+			tex = NGUIEditorTools.ImportTexture(newPath, false, true, !atlas.premultipliedAlpha);
 
 			// Update the atlas texture
 			if (newTexture)
@@ -548,7 +549,7 @@ public class UIAtlasMaker : EditorWindow
 		}
 		else
 		{
-			if (!newTexture) NGUIEditorTools.ImportTexture(oldPath, false, true);
+			if (!newTexture) NGUIEditorTools.ImportTexture(oldPath, false, true, !atlas.premultipliedAlpha);
 			
 			//Debug.LogError("Operation canceled: The selected sprites can't fit into the atlas.\n" +
 			//	"Keep large sprites outside the atlas (use UITexture), and/or use multiple atlases instead.");
@@ -928,6 +929,10 @@ public class UIAtlasMaker : EditorWindow
 
 					if (UIAtlasInspector.instance != null)
 						UIAtlasInspector.instance.Repaint();
+				}
+				else if (update)
+				{
+					NGUIEditorTools.UpgradeTexturesToSprites(NGUISettings.atlas);
 				}
 			}
 		}

@@ -722,13 +722,26 @@ static public class NGUITools
 		}
 		else
 		{
-			t.localPosition = Round(t.localPosition);
-			t.localScale = Round(t.localScale);
-
-			for (int i = 0, imax = t.childCount; i < imax; ++i)
+			if (t.GetComponent<UIAnchor>() == null && t.GetComponent<UIRoot>() == null)
 			{
-				MakePixelPerfect(t.GetChild(i));
+#if UNITY_EDITOR
+#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
+				UnityEditor.Undo.RegisterUndo(t, "Make Pixel-Perfect");
+#else
+				UnityEditor.Undo.RecordObjects(t, "Make Pixel-Perfect");
+#endif
+				t.localPosition = Round(t.localPosition);
+				t.localScale = Round(t.localScale);
+				UnityEditor.EditorUtility.SetDirty(t);
+#else
+				t.localPosition = Round(t.localPosition);
+				t.localScale = Round(t.localScale);
+#endif
 			}
+
+			// Recurse into children
+			for (int i = 0, imax = t.childCount; i < imax; ++i)
+				MakePixelPerfect(t.GetChild(i));
 		}
 	}
 

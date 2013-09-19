@@ -14,6 +14,8 @@ using System.Collections.Generic;
 [CustomEditor(typeof(UIWidget))]
 public class UIWidgetInspector : Editor
 {
+	static public UIWidgetInspector instance;
+
 	enum Action
 	{
 		None,
@@ -210,7 +212,11 @@ public class UIWidgetInspector : Editor
 		}
 	}
 
-	void OnDisable () { NGUIEditorTools.HideMoveTool(false); }
+	void OnDisable ()
+	{
+		NGUIEditorTools.HideMoveTool(false);
+		instance = null;
+	}
 
 	/// <summary>
 	/// Draw the on-screen selection, knobs, and handle all interaction logic.
@@ -737,6 +743,7 @@ public class UIWidgetInspector : Editor
 
 	protected virtual void OnEnable ()
 	{
+		instance = this;
 		mWidget = target as UIWidget;
 	}
 

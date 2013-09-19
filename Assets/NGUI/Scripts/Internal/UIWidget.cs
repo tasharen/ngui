@@ -346,7 +346,7 @@ public abstract class UIWidget : MonoBehaviour
 	public UIPanel panel { get { if (mPanel == null) CreatePanel(); return mPanel; } set { mPanel = value; } }
 
 	/// <summary>
-	/// TODO: Do not use this, it's obsolete.
+	/// Do not use this, it's obsolete.
 	/// </summary>
 
 	[System.Obsolete("There is no relative scale anymore. Widgets now have width and height instead")]

@@ -457,20 +457,10 @@ public class NGUIEditorTools
 		TextureImporterSettings settings = new TextureImporterSettings();
 		ti.ReadTextureSettings(settings);
 
-		if (force ||
-			settings.mipmapEnabled ||
-			!settings.readable ||
-			settings.maxTextureSize < 4096 ||
-			settings.filterMode != FilterMode.Point ||
-			settings.wrapMode != TextureWrapMode.Clamp ||
-			settings.npotScale != TextureImporterNPOTScale.None)
+		if (force || !settings.readable || settings.npotScale != TextureImporterNPOTScale.None)
 		{
-			settings.mipmapEnabled = false;
 			settings.readable = true;
-			settings.maxTextureSize = 4096;
-			settings.textureFormat = TextureImporterFormat.ARGB32;
-			settings.filterMode = FilterMode.Point;
-			settings.wrapMode = TextureWrapMode.Clamp;
+			settings.textureFormat = TextureImporterFormat.RGBA32;
 			settings.npotScale = TextureImporterNPOTScale.None;
 
 			ti.SetTextureSettings(settings);
@@ -483,7 +473,7 @@ public class NGUIEditorTools
 	/// Change the import settings of the specified texture asset, making it suitable to be used as a texture atlas.
 	/// </summary>
 
-	static bool MakeTextureAnAtlas (string path, bool force)
+	static bool MakeTextureAnAtlas (string path, bool force, bool alphaTransparency)
 	{
 		if (string.IsNullOrEmpty(path)) return false;
 		TextureImporter ti = AssetImporter.GetAtPath(path) as TextureImporter;
@@ -498,15 +488,16 @@ public class NGUIEditorTools
 			settings.wrapMode != TextureWrapMode.Clamp ||
 			settings.npotScale != TextureImporterNPOTScale.ToNearest)
 		{
-			//settings.mipmapEnabled = true;
 			settings.readable = false;
 			settings.maxTextureSize = 4096;
+			settings.wrapMode = TextureWrapMode.Clamp;
+			settings.npotScale = TextureImporterNPOTScale.ToNearest;
 			settings.textureFormat = TextureImporterFormat.RGBA32;
 			settings.filterMode = FilterMode.Trilinear;
 			settings.aniso = 4;
-			settings.wrapMode = TextureWrapMode.Clamp;
-			settings.npotScale = TextureImporterNPOTScale.ToNearest;
-
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1
+			settings.alphaIsTransparency = alphaTransparency;
+#endif
 			ti.SetTextureSettings(settings);
 			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
 		}
@@ -517,12 +508,12 @@ public class NGUIEditorTools
 	/// Fix the import settings for the specified texture, re-importing it if necessary.
 	/// </summary>
 
-	static public Texture2D ImportTexture (string path, bool forInput, bool force)
+	static public Texture2D ImportTexture (string path, bool forInput, bool force, bool alphaTransparency)
 	{
 		if (!string.IsNullOrEmpty(path))
 		{
 			if (forInput) { if (!MakeTextureReadable(path, force)) return null; }
-			else if (!MakeTextureAnAtlas(path, force)) return null;
+			else if (!MakeTextureAnAtlas(path, force, alphaTransparency)) return null;
 			//return AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
 
 			Texture2D tex = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
@@ -536,12 +527,12 @@ public class NGUIEditorTools
 	/// Fix the import settings for the specified texture, re-importing it if necessary.
 	/// </summary>
 
-	static public Texture2D ImportTexture (Texture tex, bool forInput, bool force)
+	static public Texture2D ImportTexture (Texture tex, bool forInput, bool force, bool alphaTransparency)
 	{
 		if (tex != null)
 		{
 			string path = AssetDatabase.GetAssetPath(tex.GetInstanceID());
-			return ImportTexture(path, forInput, force);
+			return ImportTexture(path, forInput, force, alphaTransparency);
 		}
 		return null;
 	}
@@ -1219,5 +1210,61 @@ public class NGUIEditorTools
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2 && !UNITY_4_3
 		UnityEditor.Tools.hidden = hide && (UnityEditor.Tools.current == UnityEditor.Tool.Move);
 #endif
+	}
+
+	/// <summary>
+	/// Automatically upgrade all of the UITextures in the scene to Sprites if they can be found within the specified atlas.
+	/// </summary>
+
+	static public void UpgradeTexturesToSprites (UIAtlas atlas)
+	{
+		if (atlas == null) return;
+
+		// Here we automatically update all UI textures to sprites if they've been added to the atlas
+		UITexture[] uits = (UITexture[])Object.FindObjectsOfType(typeof(UITexture));
+
+		if (uits.Length > 0)
+		{
+			UIWidget selectedTex = (UIWidgetInspector.instance != null && UIWidgetInspector.instance.target != null) ?
+				UIWidgetInspector.instance.target as UITexture : null;
+
+			// Determine the object instance ID of the UISprite class
+			GameObject go = EditorUtility.CreateGameObjectWithHideFlags("Temp", HideFlags.HideAndDontSave);
+			UISprite uiSprite = go.AddComponent<UISprite>();
+			SerializedObject ob = new SerializedObject(uiSprite);
+			int spriteID = ob.FindProperty("m_Script").objectReferenceInstanceIDValue;
+			NGUITools.DestroyImmediate(go);
+
+			// Run through all the UI textures and change them to sprites
+			for (int i = 0; i < uits.Length; ++i)
+			{
+				UIWidget uiTexture = uits[i];
+
+				if (uiTexture != null && uiTexture.mainTexture != null)
+				{
+					UIAtlas.Sprite atlasSprite = atlas.GetSprite(uiTexture.mainTexture.name);
+
+					if (atlasSprite != null)
+					{
+						ob = new SerializedObject(uiTexture);
+						ob.Update();
+						ob.FindProperty("m_Script").objectReferenceInstanceIDValue = spriteID;
+						ob.ApplyModifiedProperties();
+						ob.Update();
+						ob.FindProperty("mSpriteName").stringValue = uiTexture.mainTexture.name;
+						ob.FindProperty("mAtlas").objectReferenceValue = NGUISettings.atlas;
+						ob.ApplyModifiedProperties();
+					}
+				}
+			}
+
+			if (selectedTex != null)
+			{
+				// Repaint() doesn't work in this case because Unity doesn't realize that the underlying
+				// script type has changed and that a new editor script needs to be chosen.
+				//UIWidgetInspector.instance.Repaint();
+				Selection.activeGameObject = null;
+			}
+		}
 	}
 }
