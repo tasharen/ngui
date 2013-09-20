@@ -104,11 +104,6 @@ public class UIPanel : MonoBehaviour
 	// Used for SetAlphaRecursive()
 	UIPanel[] mChildPanels;
 
-#if UNITY_EDITOR
-	// Screen size, saved for gizmos, since Screen.width and Screen.height returns the Scene view's dimensions in OnDrawGizmos.
-	Vector2 mScreenSize = Vector2.one;
-#endif
-
 	/// <summary>
 	/// Cached for speed. Can't simply return 'mGo' set in Awake because this function may be called on a prefab.
 	/// </summary>
@@ -544,11 +539,7 @@ public class UIPanel : MonoBehaviour
 			UIPanel panel = list[i];
 			panel.UpdateDrawcalls();
 		}
-		
 		mFullRebuild = false;
-#if UNITY_EDITOR
-		mScreenSize = new Vector2(Screen.width, Screen.height);
-#endif
 	}
 
 	/// <summary>
@@ -871,10 +862,14 @@ public class UIPanel : MonoBehaviour
 
 #if UNITY_EDITOR
 
-	// This is necessary because Screen.height inside OnDrawGizmos will return the size of the Scene window,
-	// and we need the size of the game window in order to draw the bounds properly.
+	int mScreenWidth = 1280;
 	int mScreenHeight = 720;
-	void Update () { mScreenHeight = Screen.height; }
+	
+	void Update ()
+	{
+		mScreenWidth = Screen.width;
+		mScreenHeight = Screen.height;
+	}
 
 	/// <summary>
 	/// Draw a visible pink outline for the clipped area.
@@ -882,16 +877,18 @@ public class UIPanel : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
+		if (mCam == null || !mCam.isOrthoGraphic) return;
+
 		bool clip = (mClipping != UIDrawCall.Clipping.None);
 		Vector2 size = clip ? new Vector2(mClipRange.z, mClipRange.w) : Vector2.zero;
 
 		GameObject go = UnityEditor.Selection.activeGameObject;
 		bool selected = (go != null) && (NGUITools.FindInParents<UIPanel>(go) == this);
 
-		if (selected || clip || (mCam != null && mCam.isOrthoGraphic))
+		//if (selected || clip)
 		{
-			if (size.x == 0f) size.x = mScreenSize.x;
-			if (size.y == 0f) size.y = mScreenSize.y;
+			if (size.x == 0f) size.x = mScreenWidth;
+			if (size.y == 0f) size.y = mScreenHeight;
 
 			if (!clip)
 			{
@@ -903,8 +900,7 @@ public class UIPanel : MonoBehaviour
 
 			if (t != null)
 			{
-				Vector3 pos = new Vector2(mClipRange.x, mClipRange.y);
-
+				Vector3 pos = clip ? new Vector3(mClipRange.x, mClipRange.y) : Vector3.zero;
 				Gizmos.matrix = t.localToWorldMatrix;
 
 				if (selected)
