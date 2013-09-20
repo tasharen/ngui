@@ -30,6 +30,12 @@ public class UIDraggablePanel : MonoBehaviour
 	public delegate void OnDragFinished ();
 
 	/// <summary>
+	/// Effect to apply when dragging.
+	/// </summary>
+
+	public DragEffect dragEffect = DragEffect.MomentumAndSpring;
+
+	/// <summary>
 	/// Whether the dragging will be restricted to be within the parent panel's bounds.
 	/// </summary>
 
@@ -42,40 +48,10 @@ public class UIDraggablePanel : MonoBehaviour
 	public bool disableDragIfFits = false;
 
 	/// <summary>
-	/// Effect to apply when dragging.
-	/// </summary>
-
-	public DragEffect dragEffect = DragEffect.MomentumAndSpring;
-
-	/// <summary>
 	/// Whether the drag operation will be started smoothly, or if if it will be precise (but will have a noticeable "jump").
 	/// </summary>
 
 	public bool smoothDragStart = true;
-
-	/// <summary>
-	/// Scale value applied to the drag delta. Set X or Y to 0 to disallow dragging in that direction.
-	/// </summary>
-
-	public Vector3 scale = Vector3.one;
-
-	/// <summary>
-	/// Effect the scroll wheel will have on the momentum.
-	/// </summary>
-
-	public float scrollWheelFactor = 0f;
-
-	/// <summary>
-	/// How much momentum gets applied when the press is released after dragging.
-	/// </summary>
-
-	public float momentumAmount = 35f;
-
-	/// <summary>
-	/// Starting position of the clipped area. (0, 0) means top-left corner, (1, 1) means bottom-right.
-	/// </summary>
-
-	public Vector2 relativePositionOnReset = Vector2.zero;
 
 	/// <summary>
 	/// Whether the position will be reset to the 'startingDragAmount'. Inspector-only value.
@@ -88,6 +64,18 @@ public class UIDraggablePanel : MonoBehaviour
 	/// </summary>	
 	
 	public bool iOSDragEmulation = true;
+
+	/// <summary>
+	/// Effect the scroll wheel will have on the momentum.
+	/// </summary>
+
+	public float scrollWheelFactor = 0f;
+
+	/// <summary>
+	/// How much momentum gets applied when the press is released after dragging.
+	/// </summary>
+
+	public float momentumAmount = 35f;
 	
 	/// <summary>
 	/// Horizontal scrollbar used for visualization.
@@ -106,6 +94,18 @@ public class UIDraggablePanel : MonoBehaviour
 	/// </summary>
 
 	public ShowCondition showScrollBars = ShowCondition.OnlyIfNeeded;
+
+	/// <summary>
+	/// Scale value applied to the drag delta. Set X or Y to 0 to disallow dragging in that direction.
+	/// </summary>
+
+	public Vector3 scale = Vector3.one;
+
+	/// <summary>
+	/// Starting position of the clipped area. (0, 0) means top-left corner, (1, 1) means bottom-right.
+	/// </summary>
+
+	public Vector2 relativePositionOnReset = Vector2.zero;
 
 	/// <summary>
 	/// Event callback to trigger when the drag process finished. Can be used for additional effects, such as centering on some object.

@@ -130,8 +130,14 @@ public class UIAtlas : MonoBehaviour
 		}
 		set
 		{
-			if (mReplacement != null) mReplacement.spriteList = value;
-			else sprites = value;
+			if (mReplacement != null)
+			{
+				mReplacement.spriteList = value;
+			}
+			else
+			{
+				sprites = value;
+			}
 		}
 	}
 
@@ -272,10 +278,16 @@ public class UIAtlas : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Function used for sorting in the GetListOfSprites() function below.
+	/// Sort the list of sprites within the atlas, making them alphabetical.
 	/// </summary>
 
-	static int CompareString (string a, string b) { return a.CompareTo(b); }
+	public void SortAlphabetically ()
+	{
+		sprites.Sort(delegate(UIAtlas.Sprite s1, UIAtlas.Sprite s2) { return s1.name.CompareTo(s2.name); });
+#if UNITY_EDITOR
+		UnityEditor.EditorUtility.SetDirty(this);
+#endif
+	}
 
 	/// <summary>
 	/// Convenience function that retrieves a list of all sprite names.
@@ -291,7 +303,6 @@ public class UIAtlas : MonoBehaviour
 			Sprite s = sprites[i];
 			if (s != null && !string.IsNullOrEmpty(s.name)) list.Add(s.name);
 		}
-		//list.Sort(CompareString);
 		return list;
 	}
 
@@ -338,7 +349,6 @@ public class UIAtlas : MonoBehaviour
 				if (matches == keywords.Length) list.Add(s.name);
 			}
 		}
-		//list.Sort(CompareString);
 		return list;
 	}
 

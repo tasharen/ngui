@@ -397,6 +397,9 @@ public class UIAtlasMaker : EditorWindow
 			UIAtlas.Sprite sp = spriteList[--i];
 			if (!kept.Contains(sp)) spriteList.RemoveAt(i);
 		}
+
+		// Sort the sprites so that they are alphabetical within the atlas
+		atlas.SortAlphabetically();
 		atlas.MarkAsDirty();
 	}
 
@@ -632,9 +635,8 @@ public class UIAtlasMaker : EditorWindow
 			atlas.spriteMaterial.mainTexture = null;
 			if (!string.IsNullOrEmpty(path)) AssetDatabase.DeleteAsset(path);
 		}
-		atlas.MarkAsDirty();
 
-		Debug.Log("The atlas has been updated. Don't forget to save the scene to write the changes!");
+		atlas.MarkAsDirty();
 		Selection.activeGameObject = (NGUISettings.atlas != null) ? NGUISettings.atlas.gameObject : null;
 	}
 
@@ -936,5 +938,8 @@ public class UIAtlasMaker : EditorWindow
 				}
 			}
 		}
+
+		// Uncomment this line if you want to be able to force-sort the atlas
+		//if (NGUISettings.atlas != null && GUILayout.Button("Sort Alphabetically")) NGUISettings.atlas.SortAlphabetically();
 	}
 }

@@ -143,7 +143,7 @@ public class SpriteSelector : ScriptableWizard
 							}
 							else if (delta < 0.5f) close = true;
 						}
-						
+
 						if (Event.current.type == EventType.Repaint)
 						{
 							// On top of the button we have a checkboard grid
@@ -188,6 +188,12 @@ public class SpriteSelector : ScriptableWizard
 							}
 						}
 
+						GUI.backgroundColor = new Color(1f, 1f, 1f, 0.5f);
+						GUI.contentColor = new Color(1f, 1f, 1f, 0.7f);
+						GUI.Label(new Rect(rect.x, rect.y + rect.height, rect.width, 32f), sprite.name, "ProgressBarBack");
+						GUI.contentColor = Color.white;
+						GUI.backgroundColor = Color.white;
+
 						if (++col >= columns)
 						{
 							++offset;
@@ -198,7 +204,7 @@ public class SpriteSelector : ScriptableWizard
 				}
 				GUILayout.EndHorizontal();
 				GUILayout.Space(padded);
-				rect.y += padded;
+				rect.y += padded + 26;
 			}
 			GUILayout.EndScrollView();
 			if (close) Close();

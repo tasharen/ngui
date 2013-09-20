@@ -857,10 +857,10 @@ public class UIWidgetInspector : Editor
 
 			GUI.changed = false;
 			GUILayout.BeginHorizontal();
-			GUILayout.Label("Dimensions", GUILayout.Width(76f));
-			int width = EditorGUILayout.IntField(mWidget.width, GUILayout.MinWidth(34f));
-			GUILayout.Label("x", GUILayout.Width(10f));
-			int height = EditorGUILayout.IntField(mWidget.height, GUILayout.MinWidth(34f));
+			int width = EditorGUILayout.IntField("Dimensions", mWidget.width, GUILayout.Width(128f));
+			NGUIEditorTools.SetLabelWidth(12f);
+			int height = EditorGUILayout.IntField("x", mWidget.height, GUILayout.MinWidth(30f));
+			NGUIEditorTools.SetLabelWidth(80f);
 
 			if (GUI.changed)
 			{
