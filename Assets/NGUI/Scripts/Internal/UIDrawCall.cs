@@ -71,11 +71,43 @@ public class UIDrawCall : MonoBehaviour
 			if (mRenderQueue != value)
 			{
 				mRenderQueue = value;
+
 				if (mMat != null && mSharedMat != null)
+				{
 					mMat.renderQueue = mSharedMat.renderQueue + value;
+#if UNITY_EDITOR
+					if (mRen != null) mRen.enabled = isActive;
+#endif
+				}
 			}
 		}
 	}
+
+#if UNITY_EDITOR
+	public string keyName { get { return "Draw Call " + mRenderQueue; } }
+
+	/// <summary>
+	/// Whether the draw call is currently active.
+	/// </summary>
+
+	public bool isActive
+	{
+		get
+		{
+			return UnityEditor.EditorPrefs.GetBool(keyName);
+		}
+		set
+		{
+			UnityEditor.EditorPrefs.SetBool(keyName, value);
+			
+			if (mRen != null)
+			{
+				mRen.enabled = value;
+				UnityEditor.EditorUtility.SetDirty(gameObject);
+			}
+		}
+	}
+#endif
 
 	/// <summary>
 	/// Transform is cached for speed and efficiency.
@@ -255,6 +287,9 @@ public class UIDrawCall : MonoBehaviour
 			if (mRen == null)
 			{
 				mRen = gameObject.AddComponent<MeshRenderer>();
+#if UNITY_EDITOR
+				mRen.enabled = isActive;
+#endif
 				UpdateMaterials();
 			}
 			else if (mMat != null && mMat.mainTexture != mSharedMat.mainTexture)

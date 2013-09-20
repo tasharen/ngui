@@ -62,6 +62,7 @@ http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 - NEW: Improved the inspector look of just about every component.
 - NEW: UIPanel now shows a list of all of its draw calls and the widgets causing them.
 - NEW: Added a way to auto-normalize the depth hierarchy from the NGUI menu.
+- NEW: You can now hide explicit draw calls by collapsing the draw call fold-outs on the panel.
 - FIX: CTRL+ and CTRL- now adjust all widgets under the selected object.
 - FIX: Labels will now again align vertically properly.
 - FIX: Atlas maker will now respect textures that were imported with a non-native size.

@@ -176,10 +176,21 @@ public class UIPanelInspector : Editor
 		{
 			UIDrawCall dc = UIDrawCall.list[i];
 
-			if (dc.panel == panel && NGUIEditorTools.DrawHeader("Draw Call #" + (i + 1)))
+			if (dc.panel != panel) continue;
+
+			string key = "Draw Call " + (i + 1);
+			bool wasOn = EditorPrefs.GetBool(key, true);
+			bool shouldBeOn = NGUIEditorTools.DrawHeader(key + " of " + UIDrawCall.list.size, key);
+			
+			if (wasOn != shouldBeOn)
+			{
+				dc.isActive = shouldBeOn;
+				UnityEditor.EditorUtility.SetDirty(panel);
+			}
+
+			if (shouldBeOn)
 			{
 				NGUIEditorTools.BeginContents();
-
 				EditorGUILayout.ObjectField("Material", dc.material, typeof(Material), false);
 
 				int count = 0;
