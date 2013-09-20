@@ -14,6 +14,48 @@ using System.Collections.Generic;
 
 static public class NGUIMenu
 {
+	[MenuItem("NGUI/Selection/Bring To Front &#=")]
+	static public void BringForward2 ()
+	{
+		for (int i = 0; i < Selection.gameObjects.Length; ++i)
+			NGUITools.AdjustDepth(Selection.gameObjects[i], 1);
+		NGUIEditorTools.NormalizeDepths();
+	}
+
+	[MenuItem("NGUI/Selection/Bring To Front &#=", true)]
+	static public bool BringForward2Validation () { return (Selection.activeGameObject != null); }
+
+	[MenuItem("NGUI/Selection/Push To Back &#-")]
+	static public void PushBack2 ()
+	{
+		for (int i = 0; i < Selection.gameObjects.Length; ++i)
+			NGUITools.AdjustDepth(Selection.gameObjects[i], -1000);
+		NGUIEditorTools.NormalizeDepths();
+	}
+
+	[MenuItem("NGUI/Selection/Push To Back &#-", true)]
+	static public bool PushBack2Validation () { return (Selection.activeGameObject != null); }
+
+	[MenuItem("NGUI/Selection/Adjust Depth By +1 %=")]
+	static public void BringForward ()
+	{
+		for (int i = 0; i < Selection.gameObjects.Length; ++i)
+			NGUITools.AdjustDepth(Selection.gameObjects[i], 1);
+	}
+
+	[MenuItem("NGUI/Selection/Adjust Depth By +1 %=", true)]
+	static public bool BringForwardValidation () { return (Selection.activeGameObject != null); }
+
+	[MenuItem("NGUI/Selection/Adjust Depth By -1 %-")]
+	static public void PushBack ()
+	{
+		for (int i = 0; i < Selection.gameObjects.Length; ++i)
+			NGUITools.AdjustDepth(Selection.gameObjects[i], -1);
+	}
+
+	[MenuItem("NGUI/Selection/Adjust Depth By -1 %-", true)]
+	static public bool PushBackValidation () { return (Selection.activeGameObject != null); }
+
 	/// <summary>
 	/// Same as SelectedRoot(), but with a log message if nothing was found.
 	/// </summary>
@@ -239,43 +281,6 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Handles/Set to Green")]
 	static public void SetToGreen () { NGUISettings.colorMode = NGUISettings.ColorMode.Green; }
 
-	//[MenuItem("NGUI/Bring Selection Forward &#=")]
-	[MenuItem("NGUI/Bring Selection Forward %=")]
-	static public void BringForward ()
-	{
-		for (int i = 0; i < Selection.gameObjects.Length; ++i)
-			NGUITools.AdjustDepth(Selection.gameObjects[i], 1);
-	}
-
-	//[MenuItem("NGUI/Bring Selection Forward &#=", true)]
-	[MenuItem("NGUI/Bring Selection Forward %=", true)]
-	static public bool BringForwardValidation ()
-	{
-		return (Selection.activeGameObject != null);
-	}
-
-	//[MenuItem("NGUI/Push Selection Back &#-")]
-	[MenuItem("NGUI/Push Selection Back %-")]
-	static public void PushBack ()
-	{
-		for (int i = 0; i < Selection.gameObjects.Length; ++i)
-			NGUITools.AdjustDepth(Selection.gameObjects[i], -1);
-	}
-
-	//[MenuItem("NGUI/Push Selection Back &#-", true)]
-	[MenuItem("NGUI/Push Selection Back %-", true)]
-	static public bool PushBackValidation ()
-	{
-		return (Selection.activeGameObject != null);
-	}
-
-	//[MenuItem("NGUI/Normalize Depth Hierarchy &#0")]
-	[MenuItem("NGUI/Normalize Depth Hierarchy %0")]
-	static public void Normalize ()
-	{
-		NGUIEditorTools.NormalizeDepths();
-	}
-
 	[MenuItem("NGUI/Make Pixel Perfect &#p")]
 	static void PixelPerfectSelection ()
 	{
@@ -287,5 +292,11 @@ static public class NGUIMenu
 		
 		foreach (Transform t in Selection.transforms)
 			NGUITools.MakePixelPerfect(t);
+	}
+
+	[MenuItem("NGUI/Normalize Depth Hierarchy &#0")]
+	static public void Normalize ()
+	{
+		NGUIEditorTools.NormalizeDepths();
 	}
 }
