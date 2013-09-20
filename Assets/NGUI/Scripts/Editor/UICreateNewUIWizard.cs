@@ -100,7 +100,7 @@ public class UICreateNewUIWizard : EditorWindow
 			bool clearColor = true;
 			bool audioListener = true;
 
-			List<Camera> cameras = NGUIEditorTools.FindInScene<Camera>();
+			List<Camera> cameras = NGUIEditorTools.FindAll<Camera>();
 
 			foreach (Camera c in cameras)
 			{

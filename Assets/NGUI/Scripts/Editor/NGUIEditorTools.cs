@@ -661,7 +661,7 @@ public class NGUIEditorTools
 	/// Find all scene components, active or inactive.
 	/// </summary>
 
-	static public List<T> FindInScene<T> () where T : Component
+	static public List<T> FindAll<T> () where T : Component
 	{
 		T[] comps = Resources.FindObjectsOfTypeAll(typeof(T)) as T[];
 
@@ -897,7 +897,7 @@ public class NGUIEditorTools
 							NGUIEditorTools.RegisterUndo("Edit Sprite Name", atlas);
 							sprite.name = newName;
 
-							List<UISprite> sprites = FindInScene<UISprite>();
+							List<UISprite> sprites = FindAll<UISprite>();
 
 							for (int i = 0; i < sprites.Count; ++i)
 							{
@@ -1235,7 +1235,6 @@ public class NGUIEditorTools
 	/// <summary>
 	/// Unity 4.5+ makes it possible to hide the move tool.
 	/// </summary>
-	/// <param name="hide"></param>
 
 	static public void HideMoveTool (bool hide)
 	{
@@ -1251,11 +1250,9 @@ public class NGUIEditorTools
 	static public void UpgradeTexturesToSprites (UIAtlas atlas)
 	{
 		if (atlas == null) return;
+		List<UITexture> uits = FindAll<UITexture>();
 
-		// Here we automatically update all UI textures to sprites if they've been added to the atlas
-		UITexture[] uits = (UITexture[])Object.FindObjectsOfType(typeof(UITexture));
-
-		if (uits.Length > 0)
+		if (uits.Count > 0)
 		{
 			UIWidget selectedTex = (UIWidgetInspector.instance != null && UIWidgetInspector.instance.target != null) ?
 				UIWidgetInspector.instance.target as UITexture : null;
@@ -1268,7 +1265,7 @@ public class NGUIEditorTools
 			NGUITools.DestroyImmediate(go);
 
 			// Run through all the UI textures and change them to sprites
-			for (int i = 0; i < uits.Length; ++i)
+			for (int i = 0; i < uits.Count; ++i)
 			{
 				UIWidget uiTexture = uits[i];
 
@@ -1298,5 +1295,55 @@ public class NGUIEditorTools
 				Selection.activeGameObject = null;
 			}
 		}
+	}
+
+	/// <summary>
+	/// Normalize the depths of all the widgets in the scene, making them start from 0 and remain in order.
+	/// </summary>
+
+	static public void NormalizeDepths ()
+	{
+		List<UIWidget> widgets = new List<UIWidget>();
+
+		for (int i = 0; i < UIRoot.list.Count; ++i)
+		{
+			UIRoot root = UIRoot.list[i];
+			CollectWidgets(root.gameObject, widgets);
+		}
+
+		if (widgets.Count > 0)
+		{
+			widgets.Sort(delegate(UIWidget w1, UIWidget w2) { return w1.depth.CompareTo(w2.depth); });
+
+			int start = 0;
+			int current = widgets[0].depth;
+
+			for (int i = 0; i < widgets.Count; ++i)
+			{
+				UIWidget w = widgets[i];
+
+				if (w.depth == current)
+				{
+					w.depth = start;
+				}
+				else
+				{
+					current = w.depth;
+					w.depth = ++start;
+					UnityEditor.EditorUtility.SetDirty(w);
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Collect all of the widgets under the specified game object -- both active and inactive.
+	/// </summary>
+
+	static void CollectWidgets (GameObject go, List<UIWidget> list)
+	{
+		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>(true);
+		for (int i = 0; i < widgets.Length; ++i)
+			list.Add(widgets[i]);
 	}
 }

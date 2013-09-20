@@ -326,7 +326,7 @@ static public class NGUITools
 				box = go.AddComponent<BoxCollider>();
 			}
 
-			int depth = NGUITools.CalculateNextDepth(go);
+			int depth = NGUITools.CalculateNextDepth(go, true);
 
 			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
 			box.isTrigger = true;
@@ -406,6 +406,49 @@ static public class NGUITools
 		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
 		for (int i = 0, imax = widgets.Length; i < imax; ++i) depth = Mathf.Max(depth, widgets[i].depth);
 		return depth + 1;
+	}
+
+	/// <summary>
+	/// Gathers all widgets and calculates the depth for the next widget.
+	/// </summary>
+
+	static public int CalculateNextDepth (GameObject go, bool ignoreChildrenWithColliders)
+	{
+		if (ignoreChildrenWithColliders)
+		{
+			int depth = -1;
+			UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
+
+			for (int i = 0, imax = widgets.Length; i < imax; ++i)
+			{
+				UIWidget w = widgets[i];
+				if (w.cachedGameObject != go && w.collider != null) continue;
+				depth = Mathf.Max(depth, w.depth);
+			}
+			return depth + 1;
+		}
+		return CalculateNextDepth(go);
+	}
+
+	/// <summary>
+	/// Adjust the widgets' depth by the specified value.
+	/// </summary>
+
+	static public void AdjustDepth (GameObject go, int adjustment)
+	{
+		if (go != null)
+		{
+			UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>(true);
+
+			for (int i = 0, imax = widgets.Length; i < imax; ++i)
+			{
+				UIWidget w = widgets[i];
+				w.depth = w.depth + adjustment;
+#if UNITY_EDITOR
+				UnityEditor.EditorUtility.SetDirty(w);
+#endif
+			}
+		}
 	}
 
 	/// <summary>

@@ -156,7 +156,7 @@ public class UICameraTool : EditorWindow
 	{
 		NGUIEditorTools.SetLabelWidth(80f);
 
-		List<Camera> list = NGUIEditorTools.FindInScene<Camera>();
+		List<Camera> list = NGUIEditorTools.FindAll<Camera>();
 
 		if (list.Count > 0)
 		{

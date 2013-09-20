@@ -20,12 +20,11 @@ public class UIDrawCall : MonoBehaviour
 
 	static public BetterList<UIDrawCall> list = new BetterList<UIDrawCall>();
 
-	public enum Clipping
+	public enum Clipping : int
 	{
-		None,
-		HardClip,	// Obsolete. Used to use clip() but it's not supported by some devices.
-		AlphaClip,	// Adjust the alpha, compatible with all devices
-		SoftClip,	// Alpha-based clipping with a softened edge
+		None = 0,
+		AlphaClip = 2,	// Adjust the alpha, compatible with all devices
+		SoftClip = 3,	// Alpha-based clipping with a softened edge
 	}
 
 	Transform		mTrans;			// Cached transform
@@ -216,9 +215,8 @@ public class UIDrawCall : MonoBehaviour
 			shaderName = shaderName.Replace(soft, "");
 
 			// Try to find the new shader
-			if (mClipping == Clipping.HardClip ||
-				mClipping == Clipping.AlphaClip) shader = Shader.Find(shaderName + alpha);
-			else if (mClipping == Clipping.SoftClip) shader = Shader.Find(shaderName + soft);
+			if (mClipping == Clipping.SoftClip) shader = Shader.Find(shaderName + soft);
+			else shader = Shader.Find(shaderName + alpha);
 
 			// If there is a valid shader, assign it to the custom material
 			if (shader != null)

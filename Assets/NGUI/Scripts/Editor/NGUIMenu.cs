@@ -30,7 +30,7 @@ static public class NGUIMenu
 		return go;
 	}
 
-	[MenuItem("NGUI/Create/Sprite #&s")]
+	[MenuItem("NGUI/Create/Sprite &#s")]
 	static public void AddSprite ()
 	{
 		GameObject go = NGUIEditorTools.SelectedRoot(true);
@@ -67,7 +67,7 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Create/Label #&l")]
+	[MenuItem("NGUI/Create/Label &#l")]
 	static public void AddLabel ()
 	{
 		GameObject go = NGUIEditorTools.SelectedRoot(true);
@@ -93,7 +93,7 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Create/Texture #&t")]
+	[MenuItem("NGUI/Create/Texture &#t")]
 	static public void AddTexture ()
 	{
 		GameObject go = NGUIEditorTools.SelectedRoot(true);
@@ -138,7 +138,7 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Attach/Collider #&c")]
+	[MenuItem("NGUI/Attach/Collider &#c")]
 	static public void AddCollider ()
 	{
 		GameObject go = Selection.activeGameObject;
@@ -157,7 +157,7 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Attach/Anchor #&h")]
+	[MenuItem("NGUI/Attach/Anchor &#h")]
 	static public void AddAnchor ()
 	{
 		GameObject go = Selection.activeGameObject;
@@ -173,13 +173,13 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Open/Atlas Maker #&m")]
+	[MenuItem("NGUI/Open/Atlas Maker &#m")]
 	static public void OpenAtlasMaker ()
 	{
 		EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true);
 	}
 
-	[MenuItem("NGUI/Open/Font Maker #&f")]
+	[MenuItem("NGUI/Open/Font Maker &#f")]
 	static public void OpenFontMaker ()
 	{
 		EditorWindow.GetWindow<UIFontMaker>(false, "Font Maker", true);
@@ -239,33 +239,44 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Handles/Set to Green")]
 	static public void SetToGreen () { NGUISettings.colorMode = NGUISettings.ColorMode.Green; }
 
-	[MenuItem("NGUI/Bring Widget Forward %=")]
+	//[MenuItem("NGUI/Bring Selection Forward &#=")]
+	[MenuItem("NGUI/Bring Selection Forward %=")]
 	static public void BringForward ()
 	{
-		UIWidget w = Selection.activeGameObject.GetComponent<UIWidget>();
-		if (w != null) w.depth = w.depth + 1;
+		for (int i = 0; i < Selection.gameObjects.Length; ++i)
+			NGUITools.AdjustDepth(Selection.gameObjects[i], 1);
 	}
 
-	[MenuItem("NGUI/Bring Widget Forward %=", true)]
+	//[MenuItem("NGUI/Bring Selection Forward &#=", true)]
+	[MenuItem("NGUI/Bring Selection Forward %=", true)]
 	static public bool BringForwardValidation ()
 	{
-		return (Selection.activeGameObject != null) && Selection.activeGameObject.GetComponent<UIWidget>() != null;
+		return (Selection.activeGameObject != null);
 	}
 
-	[MenuItem("NGUI/Push Widget Back %-")]
+	//[MenuItem("NGUI/Push Selection Back &#-")]
+	[MenuItem("NGUI/Push Selection Back %-")]
 	static public void PushBack ()
 	{
-		UIWidget w = Selection.activeGameObject.GetComponent<UIWidget>();
-		if (w != null) w.depth = w.depth - 1;
+		for (int i = 0; i < Selection.gameObjects.Length; ++i)
+			NGUITools.AdjustDepth(Selection.gameObjects[i], -1);
 	}
 
-	[MenuItem("NGUI/Push Widget Back %-", true)]
+	//[MenuItem("NGUI/Push Selection Back &#-", true)]
+	[MenuItem("NGUI/Push Selection Back %-", true)]
 	static public bool PushBackValidation ()
 	{
-		return (Selection.activeGameObject != null) && Selection.activeGameObject.GetComponent<UIWidget>() != null;
+		return (Selection.activeGameObject != null);
 	}
 
-	[MenuItem("NGUI/Make Pixel Perfect #&p")]
+	//[MenuItem("NGUI/Normalize Depth Hierarchy &#0")]
+	[MenuItem("NGUI/Normalize Depth Hierarchy %0")]
+	static public void Normalize ()
+	{
+		NGUIEditorTools.NormalizeDepths();
+	}
+
+	[MenuItem("NGUI/Make Pixel Perfect &#p")]
 	static void PixelPerfectSelection ()
 	{
 		if (Selection.activeTransform == null)

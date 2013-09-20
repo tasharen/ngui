@@ -37,7 +37,7 @@ public class UIPanelTool : EditorWindow
 
 	static List<UIPanel> GetListOfPanels ()
 	{
-		List<UIPanel> panels = NGUIEditorTools.FindInScene<UIPanel>();
+		List<UIPanel> panels = NGUIEditorTools.FindAll<UIPanel>();
 
 		for (int i = panels.Count; i > 0; )
 		{

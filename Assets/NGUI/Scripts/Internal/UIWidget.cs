@@ -506,13 +506,6 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// For backwards compatibility. Use ParentHasChanged() instead.
-	/// </summary>
-
-	[System.Obsolete("Use ParentHasChanged() instead")]
-	public void CheckParent () { ParentHasChanged(); }
-
-	/// <summary>
 	/// Checks to ensure that the widget is still parented to the right panel.
 	/// </summary>
 

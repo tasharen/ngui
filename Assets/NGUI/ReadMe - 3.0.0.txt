@@ -61,11 +61,15 @@ http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 - NEW: Added the RealTime helper class that removed IgnoreTimeScale. Usage: RealTime.time, RealTime.deltaTime.
 - NEW: Improved the inspector look of just about every component.
 - NEW: UIPanel now shows a list of all of its draw calls and the widgets causing them.
+- NEW: Added a way to auto-normalize the depth hierarchy from the NGUI menu.
+- FIX: CTRL+ and CTRL- now adjust all widgets under the selected object.
 - FIX: Labels will now again align vertically properly.
 - FIX: Atlas maker will now respect textures that were imported with a non-native size.
 - FIX: Atlas maker will no longer change so many import settings on source textures.
 - FIX: Make Pixel Perfect is now undoable.
 - FIX: You can once again rename sprites in the atlas.
+- DEL: Removed the long-ago deprecated UISlicedSprite, UITiledSprite, and UIFilledSprite classes.
+- DEL: Removed the long-ago deprecated UISlicedSprite, UITiledSprite, and UIFilledSprite classes and some other legacy code.
 
 2.7.0:
 - NEW: Added a way to resolve all Depth/Z issues. Check your UIPanels and enable Depth Sorting.

@@ -162,11 +162,6 @@ public class UIPanelInspector : Editor
 #endif
 		}
 
-		if (clipping == UIDrawCall.Clipping.HardClip)
-		{
-			EditorGUILayout.HelpBox("Hard clipping has been removed due to major performance issues on certain Android devices. Alpha clipping will be used instead.", MessageType.Warning);
-		}
-
 		if (clipping != UIDrawCall.Clipping.None && !NGUIEditorTools.IsUniform(panel.transform.lossyScale))
 		{
 			EditorGUILayout.HelpBox("Clipped panels must have a uniform scale, or clipping won't work properly!", MessageType.Error);

@@ -29,7 +29,7 @@ public class UIFontMaker : EditorWindow
 	{
 		if (NGUISettings.font != null)
 		{
-			List<UILabel> labels = NGUIEditorTools.FindInScene<UILabel>();
+			List<UILabel> labels = NGUIEditorTools.FindAll<UILabel>();
 
 			foreach (UILabel lbl in labels)
 			{

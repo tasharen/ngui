@@ -67,7 +67,7 @@ public class UIFontInspector : Editor
 
 	void MarkAsChanged ()
 	{
-		List<UILabel> labels = NGUIEditorTools.FindInScene<UILabel>();
+		List<UILabel> labels = NGUIEditorTools.FindAll<UILabel>();
 
 		foreach (UILabel lbl in labels)
 		{
