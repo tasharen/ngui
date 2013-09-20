@@ -68,7 +68,6 @@ http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 - FIX: Atlas maker will no longer change so many import settings on source textures.
 - FIX: Make Pixel Perfect is now undoable.
 - FIX: You can once again rename sprites in the atlas.
-- DEL: Removed the long-ago deprecated UISlicedSprite, UITiledSprite, and UIFilledSprite classes.
 - DEL: Removed the long-ago deprecated UISlicedSprite, UITiledSprite, and UIFilledSprite classes and some other legacy code.
 
 2.7.0:
