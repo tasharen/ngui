@@ -65,6 +65,7 @@ http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 - NEW: You can now hide explicit draw calls by collapsing the draw call fold-outs on the panel.
 - NEW: Sprite selection window now shows sprite names as well.
 - NEW: Atlas maker will now automatically sort the sprites, saving them in an alphabetical order.
+- NEW: UICamera now has a better inspector, and it automatically hides properties if it's not the main one.
 - FIX: CTRL+ and CTRL- now adjust all widgets under the selected object.
 - FIX: Labels will now again align vertically properly.
 - FIX: Atlas maker will now respect textures that were imported with a non-native size.

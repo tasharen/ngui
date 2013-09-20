@@ -72,6 +72,12 @@ public class UICamera : MonoBehaviour
 	}
 
 	/// <summary>
+	/// List of all active cameras in the scene.
+	/// </summary>
+ 
+	static public List<UICamera> list = new List<UICamera>();
+
+	/// <summary>
 	/// Which layers will receive events.
 	/// </summary>
 
@@ -268,9 +274,6 @@ public class UICamera : MonoBehaviour
 
 	static public GameObject fallThrough;
 
-	// List of all active cameras in the scene
-	static List<UICamera> mList = new List<UICamera>();
-
 	// List of currently highlighted items
 	static List<Highlighted> mHighlighted = new List<Highlighted>();
 
@@ -449,10 +452,10 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			for (int i = 0; i < mList.Count; ++i)
+			for (int i = 0; i < list.Count; ++i)
 			{
 				// Invalid or inactive entry -- keep going
-				UICamera cam = mList[i];
+				UICamera cam = list[i];
 				if (cam == null || !cam.enabled || !NGUITools.GetActive(cam.gameObject)) continue;
 				return cam;
 			}
@@ -479,9 +482,9 @@ public class UICamera : MonoBehaviour
 
 	static public bool Raycast (Vector3 inPos, out RaycastHit hit)
 	{
-		for (int i = 0; i < mList.Count; ++i)
+		for (int i = 0; i < list.Count; ++i)
 		{
-			UICamera cam = mList[i];
+			UICamera cam = list[i];
 			
 			// Skip inactive scripts
 			if (!cam.enabled || !NGUITools.GetActive(cam.gameObject)) continue;
@@ -555,9 +558,9 @@ public class UICamera : MonoBehaviour
 	{
 		int layerMask = 1 << layer;
 
-		for (int i = 0; i < mList.Count; ++i)
+		for (int i = 0; i < list.Count; ++i)
 		{
-			UICamera cam = mList[i];
+			UICamera cam = list[i];
 			Camera uc = cam.cachedCamera;
 			if ((uc != null) && (uc.cullingMask & layerMask) != 0) return cam;
 		}
@@ -715,8 +718,6 @@ public class UICamera : MonoBehaviour
 
 	void Awake ()
 	{
-		mList.Add(this);
-
 #if !UNITY_3_5 && !UNITY_4_0
 		// We don't want the camera to send out any kind of mouse events
 		cachedCamera.eventMask = 0;
@@ -763,16 +764,16 @@ public class UICamera : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Remove this camera from the list.
-	/// </summary>
-
-	void OnDestroy () { mList.Remove(this); }
-
-	/// <summary>
 	/// Sort the list when enabled.
 	/// </summary>
 
-	void OnEnable () { mList.Sort(CompareFunc); }
+	void OnEnable () { list.Add(this); list.Sort(CompareFunc); }
+
+	/// <summary>
+	/// Remove this camera from the list.
+	/// </summary>
+
+	void OnDisable () { list.Remove(this); }
 
 	/// <summary>
 	/// Update the object under the mouse if we're not using touch-based input.
