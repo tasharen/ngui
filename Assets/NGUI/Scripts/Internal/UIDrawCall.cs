@@ -94,7 +94,7 @@ public class UIDrawCall : MonoBehaviour
 	{
 		get
 		{
-			return UnityEditor.EditorPrefs.GetBool(keyName);
+			return UnityEditor.EditorPrefs.GetBool(keyName, true);
 		}
 		set
 		{
