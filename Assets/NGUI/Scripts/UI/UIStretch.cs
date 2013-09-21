@@ -67,15 +67,17 @@ public class UIStretch : MonoBehaviour
 	[HideInInspector][SerializeField] UIWidget widgetContainer;
 
 	Transform mTrans;
+	UIWidget mWidget;
 	UIRoot mRoot;
 	Animation mAnim;
 	Rect mRect;
 
-	void Awake ()
+	void OnEnable ()
 	{
 		mAnim = animation;
 		mRect = new Rect();
 		mTrans = transform;
+		mWidget = GetComponent<UIWidget>();
 	}
 
 	void Start ()
@@ -163,7 +165,7 @@ public class UIStretch : MonoBehaviour
 				rectHeight *= scale;
 			}
 
-			Vector3 size = mTrans.localScale;
+			Vector3 size = mWidget != null ? new Vector3(mWidget.width, mWidget.height) : mTrans.localScale;
 
 			if (style == Style.BasedOnHeight)
 			{

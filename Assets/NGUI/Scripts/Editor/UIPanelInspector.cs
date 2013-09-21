@@ -178,7 +178,7 @@ public class UIPanelInspector : Editor
 
 			if (dc.panel != panel) continue;
 
-			string key = "Draw Call " + (i + 1);
+			string key = dc.keyName;
 			bool wasOn = EditorPrefs.GetBool(key, true);
 			bool shouldBeOn = NGUIEditorTools.DrawHeader(key + " of " + UIDrawCall.list.size, key);
 			

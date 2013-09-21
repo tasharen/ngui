@@ -932,7 +932,7 @@ public class UIAtlasMaker : EditorWindow
 					if (UIAtlasInspector.instance != null)
 						UIAtlasInspector.instance.Repaint();
 				}
-				else if (update)
+				else if (update || replace)
 				{
 					NGUIEditorTools.UpgradeTexturesToSprites(NGUISettings.atlas);
 				}

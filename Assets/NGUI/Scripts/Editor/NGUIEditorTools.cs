@@ -391,21 +391,6 @@ public class NGUIEditorTools
 			if (panels.Length > 0) go = panels[0].gameObject;
 		}
 
-		// Now find the first uniformly scaled object
-		if (go != null)
-		{
-			Transform t = go.transform;
-
-			// Find the first uniformly scaled object
-			while (!Mathf.Approximately(t.localScale.x, t.localScale.y) ||
-				   !Mathf.Approximately(t.localScale.x, t.localScale.z))
-			{
-				t = t.parent;
-				if (t == null) return (p != null) ? p.gameObject : null;
-				else go = t.gameObject;
-			}
-		}
-
 		if (createIfMissing && go == null)
 		{
 			// No object specified -- find the first panel
