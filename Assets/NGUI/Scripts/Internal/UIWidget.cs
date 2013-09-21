@@ -222,6 +222,19 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Local width and height of the widget in pixels.
+	/// </summary>
+
+	public virtual Vector2 localSize
+	{
+		get
+		{
+			Vector3[] cr = localCorners;
+			return cr[2] - cr[0];
+		}
+	}
+
+	/// <summary>
 	/// World-space corners of the widget. The order is bottom-left, top-left, top-right, bottom-right.
 	/// </summary>
 

@@ -442,6 +442,19 @@ public class UILabel : UIWidget
 		}
 	}
 
+	/// <summary>
+	/// Local size of the widget, in pixels.
+	/// </summary>
+
+	public override Vector2 localSize
+	{
+		get
+		{
+			if (hasChanged) ProcessText();
+			return base.localSize;
+		}
+	}
+
 #if DYNAMIC_FONT
 	/// <summary>
 	/// Register the font texture change listener.
