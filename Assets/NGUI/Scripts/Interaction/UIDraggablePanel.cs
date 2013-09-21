@@ -9,6 +9,7 @@ using UnityEngine;
 /// This script, when attached to a panel allows dragging of the said panel's contents efficiently by using UIDragPanelContents.
 /// </summary>
 
+[ExecuteInEditMode]
 [RequireComponent(typeof(UIPanel))]
 [AddComponentMenu("NGUI/Interaction/Draggable Panel")]
 public class UIDraggablePanel : MonoBehaviour
@@ -99,7 +100,7 @@ public class UIDraggablePanel : MonoBehaviour
 	/// Scale value applied to the drag delta. Set X or Y to 0 to disallow dragging in that direction.
 	/// </summary>
 
-	public Vector3 scale = Vector3.one;
+	public Vector3 scale = new Vector3(1f, 0f, 0f);
 
 	/// <summary>
 	/// Starting position of the clipped area. (0, 0) means top-left corner, (1, 1) means bottom-right.
@@ -225,12 +226,12 @@ public class UIDraggablePanel : MonoBehaviour
 	{
 		mTrans = transform;
 		mPanel = GetComponent<UIPanel>();
-		mPanel.onChange += OnPanelChange;
+		if (Application.isPlaying) mPanel.onChange += OnPanelChange;
 	}
 
 	void OnDestroy ()
 	{
-		if (mPanel != null)
+		if (Application.isPlaying && mPanel != null)
 			mPanel.onChange -= OnPanelChange;
 	}
 
@@ -242,18 +243,21 @@ public class UIDraggablePanel : MonoBehaviour
 
 	void Start ()
 	{
-		UpdateScrollbars(true);
-
-		if (horizontalScrollBar != null)
+		if (Application.isPlaying)
 		{
-			horizontalScrollBar.onChange.Add(new EventDelegate(OnHorizontalBar));
-			horizontalScrollBar.alpha = ((showScrollBars == ShowCondition.Always) || shouldMoveHorizontally) ? 1f : 0f;
-		}
+			UpdateScrollbars(true);
 
-		if (verticalScrollBar != null)
-		{
-			verticalScrollBar.onChange.Add(new EventDelegate(OnVerticalBar));
-			verticalScrollBar.alpha = ((showScrollBars == ShowCondition.Always) || shouldMoveVertically) ? 1f : 0f;
+			if (horizontalScrollBar != null)
+			{
+				horizontalScrollBar.onChange.Add(new EventDelegate(OnHorizontalBar));
+				horizontalScrollBar.alpha = ((showScrollBars == ShowCondition.Always) || shouldMoveHorizontally) ? 1f : 0f;
+			}
+
+			if (verticalScrollBar != null)
+			{
+				verticalScrollBar.onChange.Add(new EventDelegate(OnVerticalBar));
+				verticalScrollBar.alpha = ((showScrollBars == ShowCondition.Always) || shouldMoveVertically) ? 1f : 0f;
+			}
 		}
 	}
 

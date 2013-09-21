@@ -40,6 +40,7 @@ public class UICameraEditor : Editor
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("eventReceiverMask"), new GUIContent("Event Mask"));
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("clipRaycasts"));
+			EditorGUILayout.PropertyField(serializedObject.FindProperty("debug"));
 
 			EditorGUI.BeginDisabledGroup(!mouse.boolValue && !touch.boolValue);
 			{
