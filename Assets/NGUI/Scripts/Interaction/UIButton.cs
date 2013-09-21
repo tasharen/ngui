@@ -33,8 +33,8 @@ public class UIButton : UIButtonColor
 
 	protected override void OnEnable ()
 	{
-		Collider col = collider;
-		if (col != null) col.enabled = true;
+		//Collider col = collider;
+		//if (col != null) col.enabled = true;
 
 		if (isEnabled)
 		{
@@ -49,8 +49,8 @@ public class UIButton : UIButtonColor
 
 	protected override void OnDisable()
 	{
-		Collider col = collider;
-		if (col != null) col.enabled = false;
+		//Collider col = collider;
+		//if (col != null) col.enabled = false;
 		if (mStarted) UpdateColor(false, false);
 	}
 
@@ -85,6 +85,8 @@ public class UIButton : UIButtonColor
 		}
 		set
 		{
+			Collider col = collider;
+			if (col != null) col.enabled = value;
 			enabled = value;
 		}
 	}
