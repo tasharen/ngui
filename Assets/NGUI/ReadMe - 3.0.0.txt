@@ -1,6 +1,6 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
- Copyright © 2011-2012 Tasharen Entertainment
+ Copyright © 2011-2013 Tasharen Entertainment
                 Version 3.0.0
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
@@ -40,7 +40,9 @@ PLEASE BACK UP YOUR PROJECT BEFORE UPDATING!
 3.0.0 is a major changeset. You will need to open and re-save all of your scenes and prefabs after updating!
 After updating, expect some things to no longer work the same way they used to. Widgets scale is no longer
 used as its size, so any code that you had relying on this will need to change to use 'width' and 'height'.
-You can also expect compile errors related to delegate usage. Check this page for helpful upgrade info:
+You can also expect compile errors related to delegate usage. The following links may help you:
+
+http://www.youtube.com/watch?v=uNSZsMnhS1o&list=UUQGZdUwzE8gmvgjomZSNFJg
 http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 
 3.0.0:

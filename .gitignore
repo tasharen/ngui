@@ -28,7 +28,6 @@
 *.userprefs
 *.swc
 *.js
-*.unitypackage
 /Build
 /NGUI_doxygen_config
 /Build_Data
