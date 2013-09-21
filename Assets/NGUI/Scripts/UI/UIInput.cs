@@ -11,7 +11,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/Input (Basic)")]
+[AddComponentMenu("NGUI/UI/Input Field")]
 public class UIInput : UIWidgetContainer
 {
 	public delegate char Validator (string currentText, char nextChar);
@@ -126,10 +126,17 @@ public class UIInput : UIWidgetContainer
 #endif
 
 	/// <summary>
+	/// Convenience function, for consistency with everything else.
+	/// </summary>
+
+	[System.Obsolete("Use UIInput.value instead")]
+	public string text { get { return this.value; } set { this.value = value; } }
+
+	/// <summary>
 	/// Input field's current text value.
 	/// </summary>
 
-	public virtual string text
+	public string value
 	{
 		get
 		{
@@ -254,7 +261,7 @@ public class UIInput : UIWidgetContainer
 		
 		if (!string.IsNullOrEmpty(playerPrefsField) && PlayerPrefs.HasKey(playerPrefsField))
 		{
-			text = PlayerPrefs.GetString(playerPrefsField);
+			value = PlayerPrefs.GetString(playerPrefsField);
 		}
 	}
 
