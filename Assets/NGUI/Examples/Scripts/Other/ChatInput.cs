@@ -58,12 +58,12 @@ public class ChatInput : MonoBehaviour
 		if (textList != null)
 		{
 			// It's a good idea to strip out all symbols as we don't want user input to alter colors, add new lines, etc
-			string text = NGUITools.StripSymbols(mInput.text);
+			string text = NGUITools.StripSymbols(mInput.value);
 
 			if (!string.IsNullOrEmpty(text))
 			{
 				textList.Add(text);
-				mInput.text = "";
+				mInput.value = "";
 				mInput.selected = false;
 			}
 		}
