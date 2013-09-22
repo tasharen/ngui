@@ -198,7 +198,7 @@ public class UIPanelInspector : Editor
 				for (int b = 0; b < UIWidget.list.size; ++b)
 				{
 					UIWidget w = UIWidget.list[b];
-					if (w.renderQueue == dc.renderQueue)
+					if (w.drawCall == dc)
 						++count;
 				}
 
@@ -211,7 +211,7 @@ public class UIPanelInspector : Editor
 				{
 					UIWidget w = UIWidget.list[b];
 					
-					if (w.renderQueue == dc.renderQueue)
+					if (w.drawCall == dc)
 					{
 						list[++count] = count + ". " + NGUITools.GetHierarchy(w.cachedGameObject).Remove(0, initial);
 					}
@@ -230,13 +230,10 @@ public class UIPanelInspector : Editor
 					{
 						UIWidget w = UIWidget.list[b];
 
-						if (w.renderQueue == dc.renderQueue)
+						if (w.drawCall == dc && ++count == sel)
 						{
-							if (++count == sel)
-							{
-								Selection.activeGameObject = w.gameObject;
-								break;
-							}
+							Selection.activeGameObject = w.gameObject;
+							break;
 						}
 					}
 				}

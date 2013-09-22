@@ -52,19 +52,12 @@ public abstract class UIWidget : MonoBehaviour
 	Matrix4x4 mLocalToPanel;
 	bool mVisibleByPanel = true;
 	float mLastAlpha = 0f;
-	int mDrawnIndex = -1;
 
 	/// <summary>
 	/// Internal usage -- draw call that's drawing the widget.
 	/// </summary>
 
-	//public UIDrawCall drawCall { get; set; }
-
-	/// <summary>
-	/// Internal usage -- used by the panel to get and set the order that the widgets are drawn in.
-	/// </summary>
-
-	public int renderQueue { get { return mDrawnIndex; } set { mDrawnIndex = value; } }
+	public UIDrawCall drawCall { get; set; }
 
 	// Widget's generated geometry
 	UIGeometry mGeom = new UIGeometry();
@@ -434,14 +427,14 @@ public abstract class UIWidget : MonoBehaviour
 
 	void SetDirty ()
 	{
-		int index = renderQueue;
-
-		if (index == -1)
+		if (drawCall != null)
 		{
-			if (isVisible)
-				UIPanel.SetDirty();
+			drawCall.isDirty = true;
 		}
-		else UIPanel.SetDirty(renderQueue);
+		else if (isVisible && hasVertices)
+		{
+			UIPanel.SetDirty();
+		}
 	}
 
 	/// <summary>
@@ -452,7 +445,7 @@ public abstract class UIWidget : MonoBehaviour
 	{
 		if (mPanel != null)
 		{
-			renderQueue = -1;
+			drawCall = null;
 			mPanel = null;
 			SetDirty();
 		}
@@ -679,7 +672,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-		if (isVisible && mPanel != null)
+		if (isVisible && hasVertices && mPanel != null)
 		{
 			if (UnityEditor.Selection.activeGameObject == gameObject && showHandles) return;
 
@@ -819,18 +812,20 @@ public abstract class UIWidget : MonoBehaviour
 
 				if (isVisible)
 				{
+					bool hadVertices = mGeom.hasVertices;
 					mGeom.Clear();
 					OnFill(mGeom.verts, mGeom.uvs, mGeom.cols);
 
-					// Want to see what's being filled? Uncomment this line.
-					//Debug.Log("Fill " + name + " (" + Time.time + ")");
-
 					if (mGeom.hasVertices)
 					{
+						// Want to see what's being filled? Uncomment this line.
+						//Debug.Log("Fill " + name + " (" + Time.time + ")");
+
 						if (!hasMatrix) mLocalToPanel = p.worldToLocal * cachedTransform.localToWorldMatrix;
 						mGeom.ApplyTransform(mLocalToPanel);
+						return true;
 					}
-					return true;
+					return hadVertices;
 				}
 				else if (mGeom.hasVertices)
 				{

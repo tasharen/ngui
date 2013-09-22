@@ -420,10 +420,10 @@ public class UISprite : UIWidget
 				if (atlas.coordinates == UIAtlas.Coordinates.TexCoords)
 					r = NGUIMath.ConvertToPixels(r, tex.width, tex.height, true);
 
-				int x = Mathf.RoundToInt(r.width + sp.paddingLeft + sp.paddingRight);
+				int x = Mathf.RoundToInt(atlas.pixelSize * (r.width + sp.paddingLeft + sp.paddingRight));
 				if ((x & 1) == 1) ++x;
 
-				int y = Mathf.RoundToInt(r.height + sp.paddingTop + sp.paddingBottom);
+				int y = Mathf.RoundToInt(atlas.pixelSize * (r.height + sp.paddingTop + sp.paddingBottom));
 				if ((y & 1) == 1) ++y;
 
 				width = x;
