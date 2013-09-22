@@ -53,7 +53,7 @@ public class UIToggledObjects : MonoBehaviour
 				Set(activate[i], UIToggle.current.value);
 
 			for (int i = 0; i < deactivate.Count; ++i)
-				Set(activate[i], !UIToggle.current.value);
+				Set(deactivate[i], !UIToggle.current.value);
 		}
 	}
 
