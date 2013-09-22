@@ -615,7 +615,8 @@ public class UILabel : UIWidget
 				else mProcessedText = mText;
 
 				// Remember the final printed size
-				mSize = !string.IsNullOrEmpty(mProcessedText) ? mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.zero;
+				mSize = !string.IsNullOrEmpty(mProcessedText) ?
+					mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.zero;
 
 				if (mOverflow == Overflow.ResizeFreely)
 				{
@@ -661,23 +662,26 @@ public class UILabel : UIWidget
 			float pixelSize = font.pixelSize;
 
 			Vector3 pos = cachedTransform.localPosition;
-			pos.x = (Mathf.CeilToInt(pos.x / pixelSize * 4f) >> 2);
-			pos.y = (Mathf.CeilToInt(pos.y / pixelSize * 4f) >> 2);
+			pos.x = Mathf.RoundToInt(pos.x);
+			pos.y = Mathf.RoundToInt(pos.y);
 			pos.z = Mathf.RoundToInt(pos.z);
 
-			pos.x *= pixelSize;
-			pos.y *= pixelSize;
-
-			if (mFont != null)
-			{
-				int min = Mathf.RoundToInt(mFont.size * mFont.pixelSize);
-				if (height < min) height = min;
-			}
-
-			if (overflowMethod != Overflow.ClampContent) ProcessText(false);
-			
 			cachedTransform.localPosition = pos;
 			cachedTransform.localScale = Vector3.one;
+
+			if (mOverflow != Overflow.ResizeFreely)
+			{
+				Overflow over = mOverflow;
+				mOverflow = Overflow.ShrinkContent;
+				ProcessText(false);
+				mOverflow = over;
+
+				int minX = Mathf.RoundToInt(mSize.x * pixelSize);
+				int minY = Mathf.RoundToInt(mSize.y * pixelSize);
+
+				if (width < minX) width = minX;
+				if (height < minY) height = minY;
+			}
 		}
 		else base.MakePixelPerfect();
 	}
@@ -713,6 +717,7 @@ public class UILabel : UIWidget
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
 		if (mFont == null) return;
+
 		Pivot p = pivot;
 		int offset = verts.size;
 

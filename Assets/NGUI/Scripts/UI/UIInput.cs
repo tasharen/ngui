@@ -160,7 +160,7 @@ public class UIInput : UIWidgetContainer
 			}
 
 #if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_BLACKBERRY
-			if (mKeyboard != null) mKeyboard.text = text;
+			if (mKeyboard != null) mKeyboard.text = value;
 #endif
 			if (label != null)
 			{
@@ -394,22 +394,22 @@ public class UIInput : UIWidgetContainer
 #endif
 		if (mKeyboard != null)
 		{
-			string text = mKeyboard.text;
+			string val = mKeyboard.text;
 
-			if (mText != text)
+			if (mText != val)
 			{
 				mText = "";
 
-				for (int i = 0; i < text.Length; ++i)
+				for (int i = 0; i < val.Length; ++i)
 				{
-					char ch = text[i];
+					char ch = val[i];
 					if (validator != null) ch = validator(mText, ch);
 					if (ch != 0) mText += ch;
 				}
 
 				if (maxChars > 0 && mText.Length > maxChars) mText = mText.Substring(0, maxChars);
 				UpdateLabel();
-				if (mText != text) mKeyboard.text = mText;
+				if (mText != val) mKeyboard.text = mText;
 				SendMessage("OnInputChanged", this, SendMessageOptions.DontRequireReceiver);
 			}
 
