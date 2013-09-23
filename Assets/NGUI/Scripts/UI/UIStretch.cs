@@ -63,11 +63,18 @@ public class UIStretch : MonoBehaviour
 
 	public Vector2 initialSize = Vector2.one;
 
+	/// <summary>
+	/// Padding applied after the size of the stretched object gets calculated. This value is in pixels.
+	/// </summary>
+
+	public Vector2 borderPadding = Vector2.zero;
+
 	// Deprecated legacy functionality
 	[HideInInspector][SerializeField] UIWidget widgetContainer;
 
 	Transform mTrans;
 	UIWidget mWidget;
+	UISprite mSprite;
 	UIRoot mRoot;
 	Animation mAnim;
 	Rect mRect;
@@ -78,6 +85,7 @@ public class UIStretch : MonoBehaviour
 		mRect = new Rect();
 		mTrans = transform;
 		mWidget = GetComponent<UIWidget>();
+		mSprite = GetComponent<UISprite>();
 	}
 
 	void Start ()
@@ -166,7 +174,7 @@ public class UIStretch : MonoBehaviour
 				rectHeight *= scale;
 			}
 
-			Vector3 size = mWidget != null ? new Vector3(mWidget.width, mWidget.height) : mTrans.localScale;
+			Vector3 size = (mWidget != null) ? new Vector3(mWidget.width, mWidget.height) : mTrans.localScale;
 
 			if (style == Style.BasedOnHeight)
 			{
@@ -221,13 +229,26 @@ public class UIStretch : MonoBehaviour
 				if (style == Style.Both || style == Style.Vertical) size.y = relativeSize.y * rectHeight;
 			}
 
-			UIWidget w = mTrans.GetComponent<UIWidget>();
-
-			if (w != null)
+			if (mSprite != null)
 			{
-				w.width = Mathf.RoundToInt(size.x);
-				w.height = Mathf.RoundToInt(size.y);
+				float multiplier = (mSprite.atlas != null) ? mSprite.atlas.pixelSize : 1f;
+				size.x -= borderPadding.x * multiplier;
+				size.y -= borderPadding.y * multiplier;
+
+				mSprite.width = Mathf.RoundToInt(size.x);
+				mSprite.height = Mathf.RoundToInt(size.y);
 				size = Vector3.one;
+			}
+			else if (mWidget != null)
+			{
+				mWidget.width = Mathf.RoundToInt(size.x - borderPadding.x);
+				mWidget.height = Mathf.RoundToInt(size.y - borderPadding.y);
+				size = Vector3.one;
+			}
+			else
+			{
+				size.x += borderPadding.x;
+				size.y += borderPadding.y;
 			}
 			
 			if (mTrans.localScale != size)
