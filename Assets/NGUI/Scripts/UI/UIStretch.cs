@@ -152,6 +152,7 @@ public class UIStretch : MonoBehaviour
 			else if (uiCamera != null)
 			{
 				mRect = uiCamera.pixelRect;
+				if (mRoot != null) adjustment = mRoot.pixelSizeAdjustment;
 			}
 			else return;
 
