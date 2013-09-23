@@ -326,9 +326,9 @@ public class UICreateWidgetWizard : EditorWindow
 			go = NGUITools.AddChild(go);
 			go.name = "Image Button";
 
-			UIAtlas.Sprite sp = NGUISettings.atlas.GetSprite(mImage0);
+			UISpriteData sp = NGUISettings.atlas.GetSprite(mImage0);
 			UISprite sprite = NGUITools.AddWidget<UISprite>(go);
-			sprite.type = (sp.inner == sp.outer) ? UISprite.Type.Simple : UISprite.Type.Sliced;
+			sprite.type = sp.hasBorder ? UISprite.Type.Sliced : UISprite.Type.Simple;
 			sprite.name = "Background";
 			sprite.depth = depth;
 			sprite.atlas = NGUISettings.atlas;
@@ -520,10 +520,10 @@ public class UICreateWidgetWizard : EditorWindow
 			go.name = slider ? "Slider" : "Progress Bar";
 
 			// Background sprite
-			UIAtlas.Sprite bgs = NGUISettings.atlas.GetSprite(mSliderBG);
+			UISpriteData bgs = NGUISettings.atlas.GetSprite(mSliderBG);
 			UISprite back = (UISprite)NGUITools.AddWidget<UISprite>(go);
 
-			back.type = (bgs.inner == bgs.outer) ? UISprite.Type.Simple : UISprite.Type.Sliced;
+			back.type = bgs.hasBorder ? UISprite.Type.Sliced : UISprite.Type.Simple;
 			back.name = "Background";
 			back.depth = depth;
 			back.pivot = UIWidget.Pivot.Left;
@@ -535,9 +535,9 @@ public class UICreateWidgetWizard : EditorWindow
 			back.MakePixelPerfect();
 
 			// Foreground sprite
-			UIAtlas.Sprite fgs = NGUISettings.atlas.GetSprite(mSliderFG);
+			UISpriteData fgs = NGUISettings.atlas.GetSprite(mSliderFG);
 			UISprite front = NGUITools.AddWidget<UISprite>(go);
-			front.type = (fgs.inner == fgs.outer) ? UISprite.Type.Filled : UISprite.Type.Sliced;
+			front.type = fgs.hasBorder ? UISprite.Type.Sliced : UISprite.Type.Simple;
 			front.name = "Foreground";
 			front.pivot = UIWidget.Pivot.Left;
 			front.atlas = NGUISettings.atlas;
@@ -557,10 +557,10 @@ public class UICreateWidgetWizard : EditorWindow
 			// Thumb sprite
 			if (slider)
 			{
-				UIAtlas.Sprite tbs = NGUISettings.atlas.GetSprite(mSliderTB);
+				UISpriteData tbs = NGUISettings.atlas.GetSprite(mSliderTB);
 				UISprite thb = NGUITools.AddWidget<UISprite>(go);
 
-				thb.type = (tbs.inner == tbs.outer) ? UISprite.Type.Simple : UISprite.Type.Sliced;
+				thb.type = tbs.hasBorder ? UISprite.Type.Sliced : UISprite.Type.Simple;
 				thb.name = "Thumb";
 				thb.atlas = NGUISettings.atlas;
 				thb.spriteName = mSliderTB;
@@ -659,16 +659,11 @@ public class UICreateWidgetWizard : EditorWindow
 			go = NGUITools.AddChild(go);
 			go.name = isDropDown ? "Popup List" : "Popup Menu";
 
-			UIAtlas.Sprite sphl = NGUISettings.atlas.GetSprite(mListHL);
-			UIAtlas.Sprite spfg = NGUISettings.atlas.GetSprite(mListFG);
+			UISpriteData sphl = NGUISettings.atlas.GetSprite(mListHL);
+			UISpriteData spfg = NGUISettings.atlas.GetSprite(mListFG);
 
-			Vector2 hlPadding = new Vector2(
-				Mathf.Max(4f, sphl.inner.xMin - sphl.outer.xMin),
-				Mathf.Max(4f, sphl.inner.yMin - sphl.outer.yMin));
-
-			Vector2 fgPadding = new Vector2(
-				Mathf.Max(4f, spfg.inner.xMin - spfg.outer.xMin),
-				Mathf.Max(4f, spfg.inner.yMin - spfg.outer.yMin));
+			Vector2 hlPadding = new Vector2(Mathf.Max(4f, sphl.paddingLeft), Mathf.Max(4f, sphl.paddingTop));
+			Vector2 fgPadding = new Vector2(Mathf.Max(4f, spfg.paddingLeft), Mathf.Max(4f, spfg.paddingTop));
 
 			// Background sprite
 			UISprite sprite = NGUITools.AddSprite(go, NGUISettings.atlas, mListFG);

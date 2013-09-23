@@ -269,12 +269,12 @@ public class UIPopupList : UIWidgetContainer
 
 			mHighlightedLabel = lbl;
 
-			UIAtlas.Sprite sp = mHighlight.GetAtlasSprite();
+			UISpriteData sp = mHighlight.GetAtlasSprite();
 			if (sp == null) return;
 
 			float scaleFactor = atlas.pixelSize;
-			float offsetX = (sp.inner.xMin - sp.outer.xMin) * scaleFactor;
-			float offsetY = (sp.inner.yMin - sp.outer.yMin) * scaleFactor;
+			float offsetX = sp.borderLeft * scaleFactor;
+			float offsetY = sp.borderTop * scaleFactor;
 
 			Vector3 pos = lbl.cachedTransform.localPosition + new Vector3(-offsetX, offsetY, 1f);
 
@@ -505,10 +505,10 @@ public class UIPopupList : UIWidgetContainer
 			mHighlight.pivot = UIWidget.Pivot.TopLeft;
 			mHighlight.color = highlightColor;
 
-			UIAtlas.Sprite hlsp = mHighlight.GetAtlasSprite();
+			UISpriteData hlsp = mHighlight.GetAtlasSprite();
 			if (hlsp == null) return;
 
-			float hlspHeight = hlsp.inner.yMin - hlsp.outer.yMin;
+			float hlspHeight = hlsp.borderTop;
 			float labelHeight = font.size * font.pixelSize * textScale;
 			float x = 0f, y = -padding.y;
 			List<UILabel> labels = new List<UILabel>();
@@ -571,7 +571,7 @@ public class UIPopupList : UIWidgetContainer
 
 			// Scale the highlight sprite to envelop a single item
 			float scaleFactor = 2f * atlas.pixelSize;
-			float w = x - (bgPadding.x + padding.x) * 2f + (hlsp.inner.xMin - hlsp.outer.xMin) * scaleFactor;
+			float w = x - (bgPadding.x + padding.x) * 2f + hlsp.borderLeft * scaleFactor;
 			float h = labelHeight + hlspHeight * scaleFactor;
 			mHighlight.width = Mathf.RoundToInt(w);
 			mHighlight.height = Mathf.RoundToInt(h);

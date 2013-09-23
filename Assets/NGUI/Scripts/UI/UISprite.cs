@@ -40,13 +40,9 @@ public class UISprite : UIWidget
 	[HideInInspector][SerializeField] float mFillAmount = 1.0f;
 	[HideInInspector][SerializeField] bool mInvert = false;
 
-	protected UIAtlas.Sprite mSprite;
-	protected Rect mInner;
-	protected Rect mInnerUV;
-	protected Rect mOuter;
-	protected Rect mOuterUV;
-	protected Vector3 mScale = Vector3.one;
-
+	protected UISpriteData mSprite;
+	protected Rect mInnerUV = new Rect();
+	protected Rect mOuterUV = new Rect();
 	bool mSpriteSet = false;
 
 	/// <summary>
@@ -112,7 +108,6 @@ public class UISprite : UIWidget
 					mSpriteName = "";
 					spriteName = sprite;
 					MarkAsChanged();
-					UpdateUVs(true);
 				}
 			}
 		}
@@ -148,7 +143,6 @@ public class UISprite : UIWidget
 				mSprite = null;
 				mChanged = true;
 				mSpriteSet = false;
-				if (isValid) UpdateUVs(true);
 			}
 		}
 	}
@@ -158,18 +152,6 @@ public class UISprite : UIWidget
 	/// </summary>
 
 	public bool isValid { get { return GetAtlasSprite() != null; } }
-
-	/// <summary>
-	/// Inner set of UV coordinates.
-	/// </summary>
-
-	public Rect innerUV { get { UpdateUVs(false); return mInnerUV; } }
-
-	/// <summary>
-	/// Outer set of UV coordinates.
-	/// </summary>
-
-	public Rect outerUV { get { UpdateUVs(false); return mOuterUV; } }
 
 	/// <summary>
 	/// Whether the center part of the sprite will be filled or not. Turn it off if you want only to borders to show up.
@@ -249,20 +231,9 @@ public class UISprite : UIWidget
 		{
 			if (type == Type.Sliced)
 			{
-				UIAtlas.Sprite sp = GetAtlasSprite();
+				UISpriteData sp = GetAtlasSprite();
 				if (sp == null) return Vector2.zero;
-
-				Rect outer = sp.outer;
-				Rect inner = sp.inner;
-
-				Texture tex = mainTexture;
-
-				if (atlas.coordinates == UIAtlas.Coordinates.TexCoords && tex != null)
-				{
-					outer = NGUIMath.ConvertToPixels(outer, tex.width, tex.height, true);
-					inner = NGUIMath.ConvertToPixels(inner, tex.width, tex.height, true);
-				}
-				return new Vector4(inner.xMin - outer.xMin, outer.yMax - inner.yMax, outer.xMax - inner.xMax, inner.yMin - outer.yMin) * atlas.pixelSize;
+				return new Vector4(sp.borderLeft, sp.borderBottom, sp.borderRight, sp.borderTop);
 			}
 			return base.border;
 		}
@@ -306,7 +277,7 @@ public class UISprite : UIWidget
 	/// Retrieve the atlas sprite referenced by the spriteName field.
 	/// </summary>
 
-	public UIAtlas.Sprite GetAtlasSprite ()
+	public UISpriteData GetAtlasSprite ()
 	{
 		if (!mSpriteSet) mSprite = null;
 
@@ -314,14 +285,14 @@ public class UISprite : UIWidget
 		{
 			if (!string.IsNullOrEmpty(mSpriteName))
 			{
-				UIAtlas.Sprite sp = mAtlas.GetSprite(mSpriteName);
+				UISpriteData sp = mAtlas.GetSprite(mSpriteName);
 				if (sp == null) return null;
 				SetAtlasSprite(sp);
 			}
 
 			if (mSprite == null && mAtlas.spriteList.Count > 0)
 			{
-				UIAtlas.Sprite sp = mAtlas.spriteList[0];
+				UISpriteData sp = mAtlas.spriteList[0];
 				if (sp == null) return null;
 				SetAtlasSprite(sp);
 
@@ -332,9 +303,6 @@ public class UISprite : UIWidget
 				}
 				mSpriteName = mSprite.name;
 			}
-
-			// If the sprite has been set, update the UVs
-			if (mSprite != null) UpdateUVs(true);
 		}
 		return mSprite;
 	}
@@ -343,7 +311,7 @@ public class UISprite : UIWidget
 	/// Set the atlas sprite directly.
 	/// </summary>
 
-	protected void SetAtlasSprite (UIAtlas.Sprite sp)
+	protected void SetAtlasSprite (UISpriteData sp)
 	{
 		mChanged = true;
 		mSpriteSet = true;
@@ -361,43 +329,6 @@ public class UISprite : UIWidget
 	}
 
 	/// <summary>
-	/// Update the texture UVs used by the widget.
-	/// </summary>
-
-	virtual public void UpdateUVs (bool force)
-	{
-		if ((type == Type.Sliced || type == Type.Tiled) && cachedTransform.localScale != mScale)
-		{
-			mScale = cachedTransform.localScale;
-			mChanged = true;
-		}
-
-		if (isValid && (force
-#if UNITY_EDITOR
-			|| !Application.isPlaying && (mOuter != mSprite.outer || mInner != mSprite.inner)
-#endif
-			))
-		{
-			Texture tex = mainTexture;
-
-			if (tex != null)
-			{
-				mInner = mSprite.inner;
-				mOuter = mSprite.outer;
-
-				mInnerUV = mInner;
-				mOuterUV = mOuter;
-
-				if (atlas.coordinates == UIAtlas.Coordinates.Pixels)
-				{
-					mOuterUV = NGUIMath.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
-					mInnerUV = NGUIMath.ConvertToTexCoords(mInnerUV, tex.width, tex.height);
-				}
-			}
-		}
-	}
-
-	/// <summary>
 	/// Adjust the scale of the widget to make it pixel-perfect.
 	/// </summary>
 
@@ -411,36 +342,19 @@ public class UISprite : UIWidget
 		if (t == Type.Simple || t == Type.Filled)
 		{
 			Texture tex = mainTexture;
-			UIAtlas.Sprite sp = GetAtlasSprite();
+			UISpriteData sp = GetAtlasSprite();
 
 			if (tex != null && sp != null)
 			{
-				Rect r = sp.outer;
-
-				if (atlas.coordinates == UIAtlas.Coordinates.TexCoords)
-					r = NGUIMath.ConvertToPixels(r, tex.width, tex.height, true);
-
-				int x = Mathf.RoundToInt(atlas.pixelSize * (r.width + sp.paddingLeft + sp.paddingRight));
+				int x = Mathf.RoundToInt(atlas.pixelSize * (sp.width + sp.paddingLeft + sp.paddingRight));
+				int y = Mathf.RoundToInt(atlas.pixelSize * (sp.height + sp.paddingTop + sp.paddingBottom));
+				
 				if ((x & 1) == 1) ++x;
-
-				int y = Mathf.RoundToInt(atlas.pixelSize * (r.height + sp.paddingTop + sp.paddingBottom));
 				if ((y & 1) == 1) ++y;
 
 				width = x;
 				height = y;
 			}
-		}
-	}
-
-	/// <summary>
-	/// Set the atlas and the sprite.
-	/// </summary>
-
-	protected override void OnStart ()
-	{
-		if (mAtlas != null)
-		{
-			UpdateUVs(true);
 		}
 	}
 
@@ -457,9 +371,7 @@ public class UISprite : UIWidget
 			mSpriteSet = true;
 			mSprite = null;
 			mChanged = true;
-			UpdateUVs(true);
 		}
-		else UpdateUVs(false);
 	}
 
 	/// <summary>
@@ -468,6 +380,22 @@ public class UISprite : UIWidget
 
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
+		Texture tex = mainTexture;
+
+		if (tex != null)
+		{
+			if (mSprite == null) mSprite = atlas.GetSprite(spriteName);
+			if (mSprite == null) return;
+
+			mOuterUV.Set(mSprite.x, mSprite.y, mSprite.width, mSprite.height);
+			mInnerUV.Set(mSprite.x + mSprite.borderLeft, mSprite.y + mSprite.borderBottom,
+				mSprite.width - mSprite.borderLeft - mSprite.borderRight,
+				mSprite.height - mSprite.borderBottom - mSprite.borderTop);
+
+			mOuterUV = NGUIMath.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
+			mInnerUV = NGUIMath.ConvertToTexCoords(mInnerUV, tex.width, tex.height);
+		}
+
 		switch (type)
 		{
 			case Type.Simple:
@@ -500,41 +428,27 @@ public class UISprite : UIWidget
 	{
 		get
 		{
-			float left = 0f;
-			float bottom = 0f;
-			float right = 0f;
-			float top = 0f;
-			Rect rect = new Rect(0f, 0f, mWidth, mHeight);
-
-			if (mSprite != null)
+			if (mSprite == null)
 			{
-				left = mSprite.paddingLeft;
-				bottom = mSprite.paddingBottom;
-				right = mSprite.paddingRight;
-				top = mSprite.paddingTop;
-
-				Texture tex = mainTexture;
-
-				if (tex != null)
-				{
-					rect = mSprite.outer;
-					if (atlas.coordinates == UIAtlas.Coordinates.TexCoords)
-						rect = NGUIMath.ConvertToPixels(rect, tex.width, tex.height, true);
-				}
+				return new Vector4(0f, 0f, mWidth, mHeight);
 			}
 
+			int padLeft = mSprite.paddingLeft;
+			int padBottom = mSprite.paddingBottom;
+			int padRight = mSprite.paddingRight;
+			int padTop = mSprite.paddingTop;
+
 			Vector2 pv = pivotOffset;
-			int w = Mathf.RoundToInt(rect.width);
-			int h = Mathf.RoundToInt(rect.height);
 
-			float paddedW = ((w & 1) == 0) ? w : w + 1;
-			float paddedH = ((h & 1) == 0) ? h : h + 1;
+			int w = mSprite.width + mSprite.paddingLeft + mSprite.paddingRight;
+			int h = mSprite.height + mSprite.paddingBottom + mSprite.paddingTop;
 
-			Vector4 v = new Vector4(
-				left / paddedW,
-				bottom / paddedH,
-				(w - right) / paddedW,
-				(h - top) / paddedH);
+			if ((w & 1) == 1) ++padRight;
+			if ((h & 1) == 1) ++padTop;
+
+			float invW = 1f / w;
+			float invH = 1f / h;
+			Vector4 v = new Vector4(padLeft * invW, padBottom * invH, (w - padRight) * invW, (h - padTop) * invH);
 
 			v.x -= pv.x;
 			v.y -= pv.y;
@@ -587,9 +501,7 @@ public class UISprite : UIWidget
 
 	protected void SlicedFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
-		Texture tex = mainTexture;
-
-		if (tex == null || mOuterUV == mInnerUV)
+		if (!mSprite.hasBorder)
 		{
 			SimpleFill(verts, uvs, cols);
 			return;

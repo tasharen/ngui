@@ -89,12 +89,12 @@ static public class NGUIMenu
 			if (sprite.atlas != null)
 			{
 				string sn = EditorPrefs.GetString("NGUI Sprite", "");
-				UIAtlas.Sprite sp = sprite.atlas.GetSprite(sn);
+				UISpriteData sp = sprite.atlas.GetSprite(sn);
 
 				if (sp != null)
 				{
 					sprite.spriteName = sn;
-					if (sp.inner != sp.outer) sprite.type = UISprite.Type.Sliced;
+					if (sp.hasBorder) sprite.type = UISprite.Type.Sliced;
 				}
 			}
 			sprite.pivot = NGUISettings.pivot;

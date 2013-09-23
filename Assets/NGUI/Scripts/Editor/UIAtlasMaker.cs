@@ -13,16 +13,13 @@ using System.Collections.Generic;
 
 public class UIAtlasMaker : EditorWindow
 {
-	class SpriteEntry
+	class SpriteEntry : UISpriteData
 	{
-		public Texture2D tex;	// Sprite texture -- original texture or a temporary texture
-		public string name;		// Name of the texture, since a reference to the texture may be lost due to a bug in Unity
-		public Rect rect;		// Sprite's outer rectangle within the generated texture atlas
-		public int minX = 0;	// Padding, if any (set if the sprite is trimmed)
-		public int maxX = 0;
-		public int minY = 0;
-		public int maxY = 0;
-		public bool temporaryTexture = false;	// Whether the texture is temporary and should be deleted
+		// Sprite texture -- original texture or a temporary texture
+		public Texture2D tex;
+		
+		// Whether the texture is temporary and should be deleted
+		public bool temporaryTexture = false;
 	}
 
 	Vector2 mScroll = Vector2.zero;
@@ -95,8 +92,8 @@ public class UIAtlasMaker : EditorWindow
 		if (a == null && b != null) return -1;
 
 		// Get the total pixels used for each sprite
-		int aPixels = (int)(a.rect.height * a.rect.width);
-		int bPixels = (int)(b.rect.height * b.rect.width);
+		int aPixels = a.width * a.height;
+		int bPixels = b.width * b.height;
 
 		if (aPixels > bPixels) return -1;
 		else if (aPixels < bPixels) return 1;
@@ -149,7 +146,12 @@ public class UIAtlasMaker : EditorWindow
 
 			// Make sure that we don't shrink the textures
 			if (Mathf.RoundToInt(rect.width) != textures[i].width) return false;
-			sprites[i].rect = rect;
+
+			SpriteEntry se = sprites[i];
+			se.x = Mathf.RoundToInt(rect.x);
+			se.y = Mathf.RoundToInt(rect.y);
+			se.width = Mathf.RoundToInt(rect.width);
+			se.height = Mathf.RoundToInt(rect.height);
 		}
 		return true;
 	}
@@ -192,52 +194,21 @@ public class UIAtlasMaker : EditorWindow
 	/// Add a new sprite to the atlas, given the texture it's coming from and the packed rect within the atlas.
 	/// </summary>
 
-	static UIAtlas.Sprite AddSprite (List<UIAtlas.Sprite> sprites, SpriteEntry se)
+	static UISpriteData AddSprite (List<UISpriteData> sprites, SpriteEntry se)
 	{
-		UIAtlas.Sprite sprite = null;
-
 		// See if this sprite already exists
-		foreach (UIAtlas.Sprite sp in sprites)
+		foreach (UISpriteData sp in sprites)
 		{
 			if (sp.name == se.name)
 			{
-				sprite = sp;
-				break;
+				sp.CopyFrom(se);
+				return sp;
 			}
 		}
 
-		if (sprite != null)
-		{
-			float x0 = sprite.inner.xMin - sprite.outer.xMin;
-			float y0 = sprite.inner.yMin - sprite.outer.yMin;
-			float x1 = sprite.outer.xMax - sprite.inner.xMax;
-			float y1 = sprite.outer.yMax - sprite.inner.yMax;
-
-			sprite.outer = se.rect;
-			sprite.inner = se.rect;
-
-			sprite.inner.xMin = Mathf.Max(sprite.inner.xMin + x0, sprite.outer.xMin);
-			sprite.inner.yMin = Mathf.Max(sprite.inner.yMin + y0, sprite.outer.yMin);
-			sprite.inner.xMax = Mathf.Min(sprite.inner.xMax - x1, sprite.outer.xMax);
-			sprite.inner.yMax = Mathf.Min(sprite.inner.yMax - y1, sprite.outer.yMax);
-		}
-		else
-		{
-			sprite = new UIAtlas.Sprite();
-			sprite.name = se.name;
-			sprite.outer = se.rect;
-			sprite.inner = se.rect;
-			sprites.Add(sprite);
-		}
-
-		float width  = Mathf.Max(1f, sprite.outer.width);
-		float height = Mathf.Max(1f, sprite.outer.height);
-
-		// Sprite's padding values are relative to width and height
-		sprite.paddingLeft	 = se.minX / width;
-		sprite.paddingRight  = se.maxX / width;
-		sprite.paddingTop	 = se.maxY / height;
-		sprite.paddingBottom = se.minY / height;
+		UISpriteData sprite = new UISpriteData();
+		sprite.CopyFrom(se);
+		sprites.Add(sprite);
 		return sprite;
 	}
 
@@ -258,7 +229,10 @@ public class UIAtlasMaker : EditorWindow
 			if (!NGUISettings.atlasTrimming && !NGUISettings.atlasPMA)
 			{
 				SpriteEntry sprite = new SpriteEntry();
-				sprite.rect = new Rect(0f, 0f, oldTex.width, oldTex.height);
+				sprite.x = 0;
+				sprite.y = 0;
+				sprite.width = oldTex.width;
+				sprite.height = oldTex.height;
 				sprite.tex = oldTex;
 				sprite.name = oldTex.name;
 				sprite.temporaryTexture = false;
@@ -309,7 +283,10 @@ public class UIAtlasMaker : EditorWindow
 			if (newWidth > 0 && newHeight > 0)
 			{
 				SpriteEntry sprite = new SpriteEntry();
-				sprite.rect = new Rect(0f, 0f, oldTex.width, oldTex.height);
+				sprite.x = 0;
+				sprite.y = 0;
+				sprite.width = oldTex.width;
+				sprite.height = oldTex.height;
 
 				// If the dimensions match, then nothing was actually trimmed
 				if (!NGUISettings.atlasPMA && (newWidth == oldWidth && newHeight == oldHeight))
@@ -342,10 +319,10 @@ public class UIAtlasMaker : EditorWindow
 					sprite.tex.Apply();
 
 					// Remember the padding offset
-					sprite.minX = xmin;
-					sprite.maxX = oldWidth - newWidth - xmin;
-					sprite.minY = ymin;
-					sprite.maxY = oldHeight - newHeight - ymin;
+					sprite.paddingLeft = xmin;
+					sprite.paddingRight = oldWidth - newWidth - xmin;
+					sprite.paddingBottom = ymin;
+					sprite.paddingTop = oldHeight - newHeight - ymin;
 				}
 				list.Add(sprite);
 			}
@@ -377,24 +354,21 @@ public class UIAtlasMaker : EditorWindow
 	static void ReplaceSprites (UIAtlas atlas, List<SpriteEntry> sprites)
 	{
 		// Get the list of sprites we'll be updating
-		List<UIAtlas.Sprite> spriteList = atlas.spriteList;
-		List<UIAtlas.Sprite> kept = new List<UIAtlas.Sprite>();
-
-		// The atlas must be in pixels
-		atlas.coordinates = UIAtlas.Coordinates.Pixels;
+		List<UISpriteData> spriteList = atlas.spriteList;
+		List<UISpriteData> kept = new List<UISpriteData>();
 
 		// Run through all the textures we added and add them as sprites to the atlas
 		for (int i = 0; i < sprites.Count; ++i)
 		{
 			SpriteEntry se = sprites[i];
-			UIAtlas.Sprite sprite = AddSprite(spriteList, se);
+			UISpriteData sprite = AddSprite(spriteList, se);
 			kept.Add(sprite);
 		}
 
 		// Remove unused sprites
 		for (int i = spriteList.Count; i > 0; )
 		{
-			UIAtlas.Sprite sp = spriteList[--i];
+			UISpriteData sp = spriteList[--i];
 			if (!kept.Contains(sp)) spriteList.RemoveAt(i);
 		}
 
@@ -414,14 +388,12 @@ public class UIAtlasMaker : EditorWindow
 
 		if (atlasTex != null)
 		{
-			atlas.coordinates = UIAtlas.Coordinates.Pixels;
-
 			Color32[] oldPixels = null;
 			int oldWidth = atlasTex.width;
 			int oldHeight = atlasTex.height;
-			List<UIAtlas.Sprite> list = atlas.spriteList;
+			List<UISpriteData> list = atlas.spriteList;
 
-			foreach (UIAtlas.Sprite asp in list)
+			foreach (UISpriteData asp in list)
 			{
 				bool found = false;
 
@@ -439,19 +411,14 @@ public class UIAtlasMaker : EditorWindow
 					// Read the atlas
 					if (oldPixels == null) oldPixels = atlasTex.GetPixels32();
 
-					Rect rect = asp.outer;
-					rect.xMin = Mathf.Clamp(rect.xMin, 0f, oldWidth);
-					rect.yMin = Mathf.Clamp(rect.yMin, 0f, oldHeight);
-					rect.xMax = Mathf.Clamp(rect.xMax, 0f, oldWidth);
-					rect.yMax = Mathf.Clamp(rect.yMax, 0f, oldHeight);
+					int xmin = Mathf.Clamp(asp.x, 0, oldWidth);
+					int ymin = Mathf.Clamp(asp.y, 0, oldHeight);
+					int newWidth = Mathf.Clamp(asp.width, 0, oldWidth);
+					int newHeight = Mathf.Clamp(asp.height, 0, oldHeight);
 
-					int newWidth = Mathf.RoundToInt(rect.width);
-					int newHeight = Mathf.RoundToInt(rect.height);
 					if (newWidth == 0 || newHeight == 0) continue;
 
 					Color32[] newPixels = new Color32[newWidth * newHeight];
-					int xmin = Mathf.RoundToInt(rect.x);
-					int ymin = Mathf.RoundToInt(oldHeight - rect.yMax);
 
 					for (int y = 0; y < newHeight; ++y)
 					{
@@ -465,19 +432,15 @@ public class UIAtlasMaker : EditorWindow
 
 					// Create a new sprite
 					SpriteEntry sprite = new SpriteEntry();
-					sprite.name = asp.name;
+					sprite.CopyFrom(asp);
 					sprite.temporaryTexture = true;
 					sprite.tex = new Texture2D(newWidth, newHeight);
-					sprite.rect = new Rect(0f, 0f, newWidth, newHeight);
+					sprite.x = 0;
+					sprite.y = 0;
+					sprite.width = newWidth;
+					sprite.height = newHeight;
 					sprite.tex.SetPixels32(newPixels);
 					sprite.tex.Apply();
-
-					// Min/max coordinates are in pixels
-					sprite.minX = Mathf.RoundToInt(asp.paddingLeft * newWidth);
-					sprite.maxX = Mathf.RoundToInt(asp.paddingRight * newWidth);
-					sprite.minY = Mathf.RoundToInt(asp.paddingBottom * newHeight);
-					sprite.maxY = Mathf.RoundToInt(asp.paddingTop * newHeight);
-
 					sprites.Add(sprite);
 				}
 			}

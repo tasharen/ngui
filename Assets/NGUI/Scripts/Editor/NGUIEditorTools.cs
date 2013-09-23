@@ -664,24 +664,127 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
-	/// Draw the specified sprite.
+	/// Draw a sprite preview.
 	/// </summary>
 
-	public static void DrawSprite (Texture2D tex, Rect rect, Rect outer, Rect inner, Rect uv, Color color)
+	static public void DrawSprite (Texture2D tex, Rect rect, UISpriteData sprite, Color color)
 	{
-		DrawSprite(tex, rect, outer, inner, uv, color, null);
+		DrawSprite(tex, rect, sprite, color, null);
+	}
+
+	/// <summary>
+	/// Draw a sprite preview.
+	/// </summary>
+
+	static public void DrawSprite (Texture2D tex, Rect drawRect, UISpriteData sprite, Color color, Material mat)
+	{
+		// Create the texture rectangle that is centered inside rect.
+		Rect outerRect = drawRect;
+		outerRect.width = sprite.width;
+		outerRect.height = sprite.height;
+
+		if (sprite.width > 0)
+		{
+			float f = drawRect.width / outerRect.width;
+			outerRect.width *= f;
+			outerRect.height *= f;
+		}
+
+		if (drawRect.height > outerRect.height)
+		{
+			outerRect.y += (drawRect.height - outerRect.height) * 0.5f;
+		}
+		else if (outerRect.height > drawRect.height)
+		{
+			float f = drawRect.height / outerRect.height;
+			outerRect.width *= f;
+			outerRect.height *= f;
+		}
+
+		if (drawRect.width > outerRect.width) outerRect.x += (drawRect.width - outerRect.width) * 0.5f;
+
+		// Draw the background
+		NGUIEditorTools.DrawTiledTexture(outerRect, NGUIEditorTools.backdropTexture);
+
+		// Draw the sprite
+		GUI.color = color;
+
+		if (mat == null)
+		{
+			Rect uv = new Rect(sprite.x, sprite.y, sprite.width, sprite.height);
+			uv = NGUIMath.ConvertToTexCoords(uv, tex.width, tex.height);
+			GUI.DrawTextureWithTexCoords(outerRect, tex, uv, true);
+		}
+		else
+		{
+			// NOTE: There is an issue in Unity that prevents it from clipping the drawn preview
+			// using BeginGroup/EndGroup, and there is no way to specify a UV rect... le'suq.
+			UnityEditor.EditorGUI.DrawPreviewTexture(outerRect, tex, mat);
+		}
+
+		// Draw the border indicator lines
+		GUI.BeginGroup(outerRect);
+		{
+			tex = NGUIEditorTools.contrastTexture;
+			GUI.color = Color.white;
+
+			if (sprite.paddingLeft > 0)
+			{
+				float x0 = sprite.paddingLeft / sprite.width * outerRect.width - 1;
+				NGUIEditorTools.DrawTiledTexture(new Rect(x0, 0f, 1f, outerRect.height), tex);
+			}
+
+			if (sprite.paddingRight > 0)
+			{
+				float x1 = sprite.paddingRight / sprite.width * outerRect.width - 1;
+				NGUIEditorTools.DrawTiledTexture(new Rect(x1, 0f, 1f, outerRect.height), tex);
+			}
+
+			if (sprite.paddingBottom > 0)
+			{
+				float y0 = sprite.paddingBottom / sprite.height * outerRect.height - 1;
+				NGUIEditorTools.DrawTiledTexture(new Rect(0f, y0, outerRect.width, 1f), tex);
+			}
+
+			if (sprite.paddingTop > 0)
+			{
+				float y1 = sprite.paddingTop / sprite.height * outerRect.height - 1;
+				NGUIEditorTools.DrawTiledTexture(new Rect(0f, y1, outerRect.width, 1f), tex);
+			}
+		}
+		GUI.EndGroup();
+
+		// Draw the lines around the sprite
+		Handles.color = Color.black;
+		Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMin), new Vector3(outerRect.xMin, outerRect.yMax));
+		Handles.DrawLine(new Vector3(outerRect.xMax, outerRect.yMin), new Vector3(outerRect.xMax, outerRect.yMax));
+		Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMin), new Vector3(outerRect.xMax, outerRect.yMin));
+		Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMax), new Vector3(outerRect.xMax, outerRect.yMax));
+
+		// Sprite size label
+		string text = string.Format("Sprite Size: {0}x{1}", Mathf.RoundToInt(sprite.width), Mathf.RoundToInt(sprite.height));
+		EditorGUI.DropShadowLabel(GUILayoutUtility.GetRect(Screen.width, 18f), text);
 	}
 
 	/// <summary>
 	/// Draw the specified sprite.
 	/// </summary>
 
-	public static void DrawSprite (Texture2D tex, Rect rect, Rect outer, Rect inner, Rect uv, Color color, Material mat)
+	public static void DrawTexture (Texture2D tex, Rect rect, Rect uv, Color color)
+	{
+		DrawTexture(tex, rect, uv, color, null);
+	}
+
+	/// <summary>
+	/// Draw the specified sprite.
+	/// </summary>
+
+	public static void DrawTexture (Texture2D tex, Rect rect, Rect uv, Color color, Material mat)
 	{
 		// Create the texture rectangle that is centered inside rect.
 		Rect outerRect = rect;
-		outerRect.width = outer.width;
-		outerRect.height = outer.height;
+		outerRect.width = tex.width;
+		outerRect.height = tex.height;
 
 		if (outerRect.width > 0f)
 		{
@@ -720,38 +823,6 @@ public class NGUIEditorTools
 			UnityEditor.EditorGUI.DrawPreviewTexture(outerRect, tex, mat);
 		}
 
-		// Draw the border indicator lines
-		GUI.BeginGroup(outerRect);
-		{
-			tex = NGUIEditorTools.contrastTexture;
-			GUI.color = Color.white;
-
-			if (inner.xMin != outer.xMin)
-			{
-				float x0 = (inner.xMin - outer.xMin) / outer.width * outerRect.width - 1;
-				NGUIEditorTools.DrawTiledTexture(new Rect(x0, 0f, 1f, outerRect.height), tex);
-			}
-
-			if (inner.xMax != outer.xMax)
-			{
-				float x1 = (inner.xMax - outer.xMin) / outer.width * outerRect.width - 1;
-				NGUIEditorTools.DrawTiledTexture(new Rect(x1, 0f, 1f, outerRect.height), tex);
-			}
-
-			if (inner.yMin != outer.yMin)
-			{
-				float y0 = (inner.yMin - outer.yMin) / outer.height * outerRect.height - 1;
-				NGUIEditorTools.DrawTiledTexture(new Rect(0f, y0, outerRect.width, 1f), tex);
-			}
-
-			if (inner.yMax != outer.yMax)
-			{
-				float y1 = (inner.yMax - outer.yMin) / outer.height * outerRect.height - 1;
-				NGUIEditorTools.DrawTiledTexture(new Rect(0f, y1, outerRect.width, 1f), tex);
-			}
-		}
-		GUI.EndGroup();
-
 		// Draw the lines around the sprite
 		Handles.color = Color.black;
 		Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMin), new Vector3(outerRect.xMin, outerRect.yMax));
@@ -760,9 +831,7 @@ public class NGUIEditorTools
 		Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMax), new Vector3(outerRect.xMax, outerRect.yMax));
 
 		// Sprite size label
-		string text = string.Format("Sprite Size: {0}x{1}",
-			Mathf.RoundToInt(Mathf.Abs(outer.width)),
-			Mathf.RoundToInt(Mathf.Abs(outer.height)));
+		string text = string.Format("Texture Size: {0}x{1}", Mathf.RoundToInt(tex.width), Mathf.RoundToInt(tex.height));
 		EditorGUI.DropShadowLabel(GUILayoutUtility.GetRect(Screen.width, 18f), text);
 	}
 
@@ -875,7 +944,7 @@ public class NGUIEditorTools
 
 					if (GUILayout.Button("Rename", GUILayout.Width(60f)))
 					{
-						UIAtlas.Sprite sprite = atlas.GetSprite(spriteName);
+						UISpriteData sprite = atlas.GetSprite(spriteName);
 
 						if (sprite != null)
 						{
@@ -1256,7 +1325,7 @@ public class NGUIEditorTools
 
 				if (uiTexture != null && uiTexture.mainTexture != null)
 				{
-					UIAtlas.Sprite atlasSprite = atlas.GetSprite(uiTexture.mainTexture.name);
+					UISpriteData atlasSprite = atlas.GetSprite(uiTexture.mainTexture.name);
 
 					if (atlasSprite != null)
 					{

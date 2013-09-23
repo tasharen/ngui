@@ -116,7 +116,7 @@ public class SpriteSelector : ScriptableWizard
 
 					for (; offset < sprites.size; ++offset)
 					{
-						UIAtlas.Sprite sprite = mAtlas.GetSprite(sprites[offset]);
+						UISpriteData sprite = mAtlas.GetSprite(sprites[offset]);
 						if (sprite == null) continue;
 
 						// Button comes first
@@ -148,10 +148,8 @@ public class SpriteSelector : ScriptableWizard
 						{
 							// On top of the button we have a checkboard grid
 							NGUIEditorTools.DrawTiledTexture(rect, NGUIEditorTools.backdropTexture);
-	
-							Rect uv = sprite.outer;
-							if (mAtlas.coordinates == UIAtlas.Coordinates.Pixels)
-								uv = NGUIMath.ConvertToTexCoords(uv, tex.width, tex.height);
+							Rect uv = new Rect(sprite.x, sprite.y, sprite.width, sprite.height);
+							uv = NGUIMath.ConvertToTexCoords(uv, tex.width, tex.height);
 	
 							// Calculate the texture's scale that's needed to display the sprite in the clipped area
 							float scaleX = rect.width / uv.width;
