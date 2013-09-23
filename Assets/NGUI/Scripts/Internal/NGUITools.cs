@@ -452,6 +452,59 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Bring all of the widgets on the specified object forward.
+	/// </summary>
+
+	static public void BringForward (GameObject go)
+	{
+		AdjustDepth(go, 1000);
+		NormalizeDepths();
+	}
+
+	/// <summary>
+	/// Push all of the widgets on the specified object back, making them appear behind everything else.
+	/// </summary>
+
+	static public void PushBack (GameObject go)
+	{
+		AdjustDepth(go, -1000);
+		NormalizeDepths();
+	}
+
+	/// <summary>
+	/// Sort all visible widgets in order, adjusting the depths so that the first widget starts with the depth of '0'.
+	/// </summary>
+
+	static public void NormalizeDepths ()
+	{
+		if (UIWidget.list.size > 0)
+		{
+			UIWidget.list.Sort(delegate(UIWidget w1, UIWidget w2) { return w1.depth.CompareTo(w2.depth); });
+
+			int start = 0;
+			int current = UIWidget.list[0].depth;
+
+			for (int i = 0; i < UIWidget.list.size; ++i)
+			{
+				UIWidget w = UIWidget.list[i];
+
+				if (w.depth == current)
+				{
+					w.depth = start;
+				}
+				else
+				{
+					current = w.depth;
+					w.depth = ++start;
+				}
+#if UNITY_EDITOR
+				UnityEditor.EditorUtility.SetDirty(w);
+#endif
+			}
+		}
+	}
+
+	/// <summary>
 	/// Add a child object to the specified parent and attaches the specified script to it.
 	/// </summary>
 
