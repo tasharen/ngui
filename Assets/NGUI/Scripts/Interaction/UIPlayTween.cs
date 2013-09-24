@@ -266,9 +266,15 @@ public class UIPlayTween : MonoBehaviour
 					++mActive;
 
 					// Toggle or activate the tween component
-					if (playDirection == Direction.Toggle) tw.Toggle();
-					else tw.Play(forward);
-					if (resetOnPlay) tw.Reset();
+					if (playDirection == Direction.Toggle)
+					{
+						tw.Toggle();
+					}
+					else
+					{
+						if (resetOnPlay || !tw.enabled) tw.Reset();
+						tw.Play(forward);
+					}
 
 					// Listen for tween finished messages
 					EventDelegate.Add(tw.onFinished, OnFinished, true);
