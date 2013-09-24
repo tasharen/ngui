@@ -229,10 +229,7 @@ public class UIAtlasMaker : EditorWindow
 			if (!NGUISettings.atlasTrimming && !NGUISettings.atlasPMA)
 			{
 				SpriteEntry sprite = new SpriteEntry();
-				sprite.x = 0;
-				sprite.y = 0;
-				sprite.width = oldTex.width;
-				sprite.height = oldTex.height;
+				sprite.SetRect(0, 0, oldTex.width, oldTex.height);
 				sprite.tex = oldTex;
 				sprite.name = oldTex.name;
 				sprite.temporaryTexture = false;
@@ -319,10 +316,7 @@ public class UIAtlasMaker : EditorWindow
 					sprite.tex.Apply();
 
 					// Remember the padding offset
-					sprite.paddingLeft = xmin;
-					sprite.paddingRight = oldWidth - newWidth - xmin;
-					sprite.paddingBottom = ymin;
-					sprite.paddingTop = oldHeight - newHeight - ymin;
+					sprite.SetPadding(xmin, ymin, oldWidth - newWidth - xmin, oldHeight - newHeight - ymin);
 				}
 				list.Add(sprite);
 			}
@@ -415,7 +409,6 @@ public class UIAtlasMaker : EditorWindow
 					int ymin = Mathf.Clamp(asp.y, 0, oldHeight);
 					int newWidth = Mathf.Clamp(asp.width, 0, oldWidth);
 					int newHeight = Mathf.Clamp(asp.height, 0, oldHeight);
-
 					if (newWidth == 0 || newHeight == 0) continue;
 
 					Color32[] newPixels = new Color32[newWidth * newHeight];
@@ -424,8 +417,8 @@ public class UIAtlasMaker : EditorWindow
 					{
 						for (int x = 0; x < newWidth; ++x)
 						{
-							int newIndex = y * newWidth + x;
-							int oldIndex = (ymin + y) * oldWidth + (xmin + x);
+							int newIndex = (newHeight - 1 - y) * newWidth + x;
+							int oldIndex = (oldHeight - 1 - (ymin + y)) * oldWidth + (xmin + x);
 							newPixels[newIndex] = oldPixels[oldIndex];
 						}
 					}
@@ -433,12 +426,9 @@ public class UIAtlasMaker : EditorWindow
 					// Create a new sprite
 					SpriteEntry sprite = new SpriteEntry();
 					sprite.CopyFrom(asp);
+					sprite.SetRect(0, 0, newWidth, newHeight);
 					sprite.temporaryTexture = true;
 					sprite.tex = new Texture2D(newWidth, newHeight);
-					sprite.x = 0;
-					sprite.y = 0;
-					sprite.width = newWidth;
-					sprite.height = newHeight;
 					sprite.tex.SetPixels32(newPixels);
 					sprite.tex.Apply();
 					sprites.Add(sprite);

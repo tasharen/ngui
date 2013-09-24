@@ -501,6 +501,8 @@ public class UISprite : UIWidget
 
 	protected void SlicedFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
+		if (mSprite == null) return;
+
 		if (!mSprite.hasBorder)
 		{
 			SimpleFill(verts, uvs, cols);
