@@ -12,7 +12,8 @@ public class UIPlayTweenEditor : Editor
 	enum ResetOnPlay
 	{
 		Continue,
-		StartFromBeginning,
+		Restart,
+		RestartIfNotPlaying,
 	}
 
 	enum SelectedObject
@@ -35,9 +36,9 @@ public class UIPlayTweenEditor : Editor
 
 		AnimationOrTween.Trigger trigger = (AnimationOrTween.Trigger)EditorGUILayout.EnumPopup("Trigger condition", tw.trigger);
 		AnimationOrTween.Direction dir = (AnimationOrTween.Direction)EditorGUILayout.EnumPopup("Play direction", tw.playDirection);
-		AnimationOrTween.EnableCondition enab = (AnimationOrTween.EnableCondition)EditorGUILayout.EnumPopup("If disabled on start", tw.ifDisabledOnPlay);
-		ResetOnPlay rs = tw.resetOnPlay ? ResetOnPlay.StartFromBeginning : ResetOnPlay.Continue;
-		bool reset = (ResetOnPlay)EditorGUILayout.EnumPopup("If already playing", rs) == ResetOnPlay.StartFromBeginning;
+		AnimationOrTween.EnableCondition enab = (AnimationOrTween.EnableCondition)EditorGUILayout.EnumPopup("If target is disabled", tw.ifDisabledOnPlay);
+		ResetOnPlay rs = tw.resetOnPlay ? ResetOnPlay.Restart : (tw.resetIfDisabled ? ResetOnPlay.RestartIfNotPlaying : ResetOnPlay.Continue);
+		ResetOnPlay reset = (ResetOnPlay)EditorGUILayout.EnumPopup("If tween is present", rs);
 		AnimationOrTween.DisableCondition dis = (AnimationOrTween.DisableCondition)EditorGUILayout.EnumPopup("When finished", tw.disableWhenFinished);
 
 		if (GUI.changed)
@@ -49,7 +50,8 @@ public class UIPlayTweenEditor : Editor
 			tw.trigger = trigger;
 			tw.playDirection = dir;
 			tw.ifDisabledOnPlay = enab;
-			tw.resetOnPlay = reset;
+			tw.resetOnPlay = (reset == ResetOnPlay.Restart);
+			tw.resetIfDisabled = (reset == ResetOnPlay.RestartIfNotPlaying);
 			tw.disableWhenFinished = dis;
 			UnityEditor.EditorUtility.SetDirty(tw);
 		}

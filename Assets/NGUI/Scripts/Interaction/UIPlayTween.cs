@@ -46,6 +46,12 @@ public class UIPlayTween : MonoBehaviour
 	public bool resetOnPlay = false;
 
 	/// <summary>
+	/// Whether the tween will be reset to the start if it's disabled when activated.
+	/// </summary>
+
+	public bool resetIfDisabled = false;
+
+	/// <summary>
 	/// What to do if the tweenTarget game object is currently disabled.
 	/// </summary>
 
@@ -272,7 +278,7 @@ public class UIPlayTween : MonoBehaviour
 					}
 					else
 					{
-						if (resetOnPlay || !tw.enabled) tw.Reset();
+						if (resetOnPlay || (resetIfDisabled && !tw.enabled)) tw.Reset();
 						tw.Play(forward);
 					}
 
