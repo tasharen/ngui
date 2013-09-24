@@ -728,27 +728,27 @@ public class NGUIEditorTools
 			tex = NGUIEditorTools.contrastTexture;
 			GUI.color = Color.white;
 
-			if (sprite.paddingLeft > 0)
+			if (sprite.borderLeft > 0)
 			{
-				float x0 = sprite.paddingLeft / sprite.width * outerRect.width - 1;
+				float x0 = (float)sprite.borderLeft / sprite.width * outerRect.width - 1;
 				NGUIEditorTools.DrawTiledTexture(new Rect(x0, 0f, 1f, outerRect.height), tex);
 			}
 
-			if (sprite.paddingRight > 0)
+			if (sprite.borderRight > 0)
 			{
-				float x1 = sprite.paddingRight / sprite.width * outerRect.width - 1;
+				float x1 = (float)(sprite.width - sprite.borderRight) / sprite.width * outerRect.width - 1;
 				NGUIEditorTools.DrawTiledTexture(new Rect(x1, 0f, 1f, outerRect.height), tex);
 			}
 
-			if (sprite.paddingBottom > 0)
+			if (sprite.borderBottom > 0)
 			{
-				float y0 = sprite.paddingBottom / sprite.height * outerRect.height - 1;
+				float y0 = (float)(sprite.height - sprite.borderBottom) / sprite.height * outerRect.height - 1;
 				NGUIEditorTools.DrawTiledTexture(new Rect(0f, y0, outerRect.width, 1f), tex);
 			}
 
-			if (sprite.paddingTop > 0)
+			if (sprite.borderTop > 0)
 			{
-				float y1 = sprite.paddingTop / sprite.height * outerRect.height - 1;
+				float y1 = (float)sprite.borderTop / sprite.height * outerRect.height - 1;
 				NGUIEditorTools.DrawTiledTexture(new Rect(0f, y1, outerRect.width, 1f), tex);
 			}
 		}

@@ -388,7 +388,7 @@ public class UISprite : UIWidget
 			if (mSprite == null) return;
 
 			mOuterUV.Set(mSprite.x, mSprite.y, mSprite.width, mSprite.height);
-			mInnerUV.Set(mSprite.x + mSprite.borderLeft, mSprite.y + mSprite.borderBottom,
+			mInnerUV.Set(mSprite.x + mSprite.borderLeft, mSprite.y + mSprite.borderTop,
 				mSprite.width - mSprite.borderLeft - mSprite.borderRight,
 				mSprite.height - mSprite.borderBottom - mSprite.borderTop);
 
