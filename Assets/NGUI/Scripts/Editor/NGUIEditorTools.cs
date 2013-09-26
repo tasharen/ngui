@@ -445,7 +445,7 @@ public class NGUIEditorTools
 		if (force || !settings.readable || settings.npotScale != TextureImporterNPOTScale.None)
 		{
 			settings.readable = true;
-			settings.textureFormat = TextureImporterFormat.RGBA32;
+			settings.textureFormat = TextureImporterFormat.ARGB32;
 			settings.npotScale = TextureImporterNPOTScale.None;
 
 			ti.SetTextureSettings(settings);
@@ -477,7 +477,7 @@ public class NGUIEditorTools
 			settings.maxTextureSize = 4096;
 			settings.wrapMode = TextureWrapMode.Clamp;
 			settings.npotScale = TextureImporterNPOTScale.ToNearest;
-			settings.textureFormat = TextureImporterFormat.RGBA32;
+			settings.textureFormat = TextureImporterFormat.ARGB32;
 			settings.filterMode = FilterMode.Trilinear;
 			settings.aniso = 4;
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1
