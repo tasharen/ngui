@@ -909,7 +909,7 @@ static public class NGUITools
 #if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 				UnityEditor.Undo.RegisterUndo(t, "Make Pixel-Perfect");
 #else
-				UnityEditor.Undo.RecordObjects(t, "Make Pixel-Perfect");
+				UnityEditor.Undo.RecordObject(t, "Make Pixel-Perfect");
 #endif
 				t.localPosition = Round(t.localPosition);
 				t.localScale = Round(t.localScale);
