@@ -19,7 +19,7 @@ static public class NGUIMenu
 	{
 		for (int i = 0; i < Selection.gameObjects.Length; ++i)
 			NGUITools.AdjustDepth(Selection.gameObjects[i], 1000);
-		NGUIEditorTools.NormalizeDepths();
+		NGUITools.NormalizeDepths();
 	}
 
 	[MenuItem("NGUI/Selection/Bring To Front &#=", true)]
@@ -30,7 +30,7 @@ static public class NGUIMenu
 	{
 		for (int i = 0; i < Selection.gameObjects.Length; ++i)
 			NGUITools.AdjustDepth(Selection.gameObjects[i], -1000);
-		NGUIEditorTools.NormalizeDepths();
+		NGUITools.NormalizeDepths();
 	}
 
 	[MenuItem("NGUI/Selection/Push To Back &#-", true)]
@@ -40,7 +40,11 @@ static public class NGUIMenu
 	static public void BringForward ()
 	{
 		for (int i = 0; i < Selection.gameObjects.Length; ++i)
-			NGUITools.AdjustDepth(Selection.gameObjects[i], 1);
+		{
+			GameObject go = Selection.gameObjects[i];
+			NGUITools.AdjustDepth(go, 1);
+			NGUITools.UpdateWidgetColliderDepth(go);
+		}
 	}
 
 	[MenuItem("NGUI/Selection/Adjust Depth By +1 %=", true)]
@@ -295,8 +299,5 @@ static public class NGUIMenu
 	}
 
 	[MenuItem("NGUI/Normalize Depth Hierarchy &#0")]
-	static public void Normalize ()
-	{
-		NGUIEditorTools.NormalizeDepths();
-	}
+	static public void Normalize () { NGUITools.NormalizeDepths(); }
 }
