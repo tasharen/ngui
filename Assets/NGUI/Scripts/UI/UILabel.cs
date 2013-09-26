@@ -669,7 +669,17 @@ public class UILabel : UIWidget
 			cachedTransform.localPosition = pos;
 			cachedTransform.localScale = Vector3.one;
 
-			if (mOverflow != Overflow.ResizeFreely)
+			if (mOverflow == Overflow.ResizeFreely)
+			{
+				ProcessText(false);
+
+				int minX = Mathf.RoundToInt(mSize.x * pixelSize);
+				int minY = Mathf.RoundToInt(mSize.y * pixelSize);
+
+				if (width < minX) width = minX;
+				if (height < minY) height = minY;
+			}
+			else
 			{
 				Overflow over = mOverflow;
 				mOverflow = Overflow.ShrinkContent;

@@ -430,8 +430,8 @@ public class UIAtlas : MonoBehaviour
 				
 				sd.borderLeft = Mathf.RoundToInt(inner.xMin - outer.xMin);
 				sd.borderRight = Mathf.RoundToInt(outer.xMax - inner.xMax);
-				sd.borderBottom = Mathf.RoundToInt(inner.yMin - outer.yMin);
-				sd.borderTop = Mathf.RoundToInt(outer.yMax - inner.yMax);
+				sd.borderBottom = Mathf.RoundToInt(outer.yMax - inner.yMax);
+				sd.borderTop = Mathf.RoundToInt(inner.yMin - outer.yMin);
 
 				mSprites.Add(sd);
 			}

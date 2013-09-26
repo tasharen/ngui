@@ -18,7 +18,7 @@ static public class NGUIMenu
 	static public void BringForward2 ()
 	{
 		for (int i = 0; i < Selection.gameObjects.Length; ++i)
-			NGUITools.AdjustDepth(Selection.gameObjects[i], 1);
+			NGUITools.AdjustDepth(Selection.gameObjects[i], 1000);
 		NGUIEditorTools.NormalizeDepths();
 	}
 

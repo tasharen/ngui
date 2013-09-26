@@ -113,11 +113,11 @@ public class UIRoot : MonoBehaviour
 
 	Transform mTrans;
 
-	void Awake () { mTrans = transform; }
-	void OnEnable () { list.Add(this); }
-	void OnDisable () { list.Remove(this); }
+	protected virtual void Awake () { mTrans = transform; }
+	protected virtual void OnEnable () { list.Add(this); }
+	protected virtual void OnDisable () { list.Remove(this); }
 
-	void Start ()
+	protected virtual void Start ()
 	{
 		UIOrthoCamera oc = GetComponentInChildren<UIOrthoCamera>();
 
