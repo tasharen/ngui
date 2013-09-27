@@ -285,17 +285,17 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Handles/Set to Green")]
 	static public void SetToGreen () { NGUISettings.colorMode = NGUISettings.ColorMode.Green; }
 
-	[MenuItem("NGUI/Make Pixel Perfect &#p")]
+	[MenuItem("NGUI/Selection/Make Pixel Perfect &#p")]
 	static void PixelPerfectSelection ()
 	{
-		if (Selection.activeTransform == null)
-		{
-			Debug.Log("You must select an object in the scene hierarchy first");
-			return;
-		}
-		
 		foreach (Transform t in Selection.transforms)
 			NGUITools.MakePixelPerfect(t);
+	}
+
+	[MenuItem("NGUI/Selection/Make Pixel Perfect &#p", true)]
+	static bool PixelPerfectSelectionValidation ()
+	{
+		return (Selection.activeTransform != null);
 	}
 
 	[MenuItem("NGUI/Normalize Depth Hierarchy &#0")]

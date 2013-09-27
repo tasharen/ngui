@@ -99,4 +99,16 @@ public class UISpriteData
 		paddingTop = sd.paddingTop;
 		paddingBottom = sd.paddingBottom;
 	}
+
+	/// <summary>
+	/// Copy the border information from the specified sprite.
+	/// </summary>
+
+	public void CopyBorderFrom (UISpriteData sd)
+	{
+		borderLeft = sd.borderLeft;
+		borderRight = sd.borderRight;
+		borderTop = sd.borderTop;
+		borderBottom = sd.borderBottom;
+	}
 }

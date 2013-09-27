@@ -375,7 +375,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Extract sprites from the atlas, adding them to the list.
 	/// </summary>
 
-	static void ExtractSprites (UIAtlas atlas, List<SpriteEntry> sprites)
+	static void ExtractSprites (UIAtlas atlas, List<SpriteEntry> finalSprites)
 	{
 		// Make the atlas texture readable
 		Texture2D atlasTex = NGUIEditorTools.ImportTexture(atlas.texture, true, false, !atlas.premultipliedAlpha);
@@ -385,16 +385,17 @@ public class UIAtlasMaker : EditorWindow
 			Color32[] oldPixels = null;
 			int oldWidth = atlasTex.width;
 			int oldHeight = atlasTex.height;
-			List<UISpriteData> list = atlas.spriteList;
+			List<UISpriteData> existingSprites = atlas.spriteList;
 
-			foreach (UISpriteData asp in list)
+			foreach (UISpriteData es in existingSprites)
 			{
 				bool found = false;
 
-				foreach (SpriteEntry se in sprites)
+				foreach (SpriteEntry fs in finalSprites)
 				{
-					if (asp.name == se.name)
+					if (es.name == fs.name)
 					{
+						fs.CopyBorderFrom(es);
 						found = true;
 						break;
 					}
@@ -405,10 +406,10 @@ public class UIAtlasMaker : EditorWindow
 					// Read the atlas
 					if (oldPixels == null) oldPixels = atlasTex.GetPixels32();
 
-					int xmin = Mathf.Clamp(asp.x, 0, oldWidth);
-					int ymin = Mathf.Clamp(asp.y, 0, oldHeight);
-					int newWidth = Mathf.Clamp(asp.width, 0, oldWidth);
-					int newHeight = Mathf.Clamp(asp.height, 0, oldHeight);
+					int xmin = Mathf.Clamp(es.x, 0, oldWidth);
+					int ymin = Mathf.Clamp(es.y, 0, oldHeight);
+					int newWidth = Mathf.Clamp(es.width, 0, oldWidth);
+					int newHeight = Mathf.Clamp(es.height, 0, oldHeight);
 					if (newWidth == 0 || newHeight == 0) continue;
 
 					Color32[] newPixels = new Color32[newWidth * newHeight];
@@ -425,13 +426,13 @@ public class UIAtlasMaker : EditorWindow
 
 					// Create a new sprite
 					SpriteEntry sprite = new SpriteEntry();
-					sprite.CopyFrom(asp);
+					sprite.CopyFrom(es);
 					sprite.SetRect(0, 0, newWidth, newHeight);
 					sprite.temporaryTexture = true;
 					sprite.tex = new Texture2D(newWidth, newHeight);
 					sprite.tex.SetPixels32(newPixels);
 					sprite.tex.Apply();
-					sprites.Add(sprite);
+					finalSprites.Add(sprite);
 				}
 			}
 		}

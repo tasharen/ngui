@@ -909,34 +909,28 @@ static public class NGUITools
 	static public void MakePixelPerfect (Transform t)
 	{
 		UIWidget w = t.GetComponent<UIWidget>();
+		if (w != null) w.MakePixelPerfect();
 
-		if (w != null)
+		if (t.GetComponent<UIAnchor>() == null && t.GetComponent<UIRoot>() == null)
 		{
-			w.MakePixelPerfect();
-		}
-		else
-		{
-			if (t.GetComponent<UIAnchor>() == null && t.GetComponent<UIRoot>() == null)
-			{
 #if UNITY_EDITOR
 #if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
-				UnityEditor.Undo.RegisterUndo(t, "Make Pixel-Perfect");
+			UnityEditor.Undo.RegisterUndo(t, "Make Pixel-Perfect");
 #else
-				UnityEditor.Undo.RecordObject(t, "Make Pixel-Perfect");
+			UnityEditor.Undo.RecordObject(t, "Make Pixel-Perfect");
 #endif
-				t.localPosition = Round(t.localPosition);
-				t.localScale = Round(t.localScale);
-				UnityEditor.EditorUtility.SetDirty(t);
+			t.localPosition = Round(t.localPosition);
+			t.localScale = Round(t.localScale);
+			UnityEditor.EditorUtility.SetDirty(t);
 #else
-				t.localPosition = Round(t.localPosition);
-				t.localScale = Round(t.localScale);
+			t.localPosition = Round(t.localPosition);
+			t.localScale = Round(t.localScale);
 #endif
-			}
-
-			// Recurse into children
-			for (int i = 0, imax = t.childCount; i < imax; ++i)
-				MakePixelPerfect(t.GetChild(i));
 		}
+
+		// Recurse into children
+		for (int i = 0, imax = t.childCount; i < imax; ++i)
+			MakePixelPerfect(t.GetChild(i));
 	}
 
 	/// <summary>

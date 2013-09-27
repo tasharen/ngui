@@ -465,7 +465,9 @@ public abstract class UIWidget : MonoBehaviour
 	public virtual void MarkAsChanged ()
 	{
 		mChanged = true;
-
+#if UNITY_EDITOR
+		UnityEditor.EditorUtility.SetDirty(this);
+#endif
 		// If we're in the editor, update the panel right away so its geometry gets updated.
 		if (mPanel != null && enabled && NGUITools.GetActive(gameObject) && !Application.isPlaying && material != null)
 		{

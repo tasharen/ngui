@@ -144,7 +144,6 @@ public class UILabel : UIWidget
 #if DYNAMIC_FONT
 				if (mFont != null) mFont.Request(value);
 #endif
-				if (overflowMethod == Overflow.ShrinkContent) MakePixelPerfect();
 			}
 		}
 	}
@@ -657,7 +656,7 @@ public class UILabel : UIWidget
 
 	public override void MakePixelPerfect ()
 	{
-		if (mFont != null)
+		if (font != null)
 		{
 			float pixelSize = font.pixelSize;
 
@@ -671,13 +670,7 @@ public class UILabel : UIWidget
 
 			if (mOverflow == Overflow.ResizeFreely)
 			{
-				ProcessText(false);
-
-				int minX = Mathf.RoundToInt(mSize.x * pixelSize);
-				int minY = Mathf.RoundToInt(mSize.y * pixelSize);
-
-				if (width < minX) width = minX;
-				if (height < minY) height = minY;
+				AssumeNaturalSize();
 			}
 			else
 			{
@@ -694,6 +687,25 @@ public class UILabel : UIWidget
 			}
 		}
 		else base.MakePixelPerfect();
+	}
+
+	/// <summary>
+	/// Make the label assume its natural size.
+	/// </summary>
+
+	public void AssumeNaturalSize ()
+	{
+		if (font != null)
+		{
+			ProcessText(false);
+
+			float pixelSize = font.pixelSize;
+			int minX = Mathf.RoundToInt(mSize.x * pixelSize);
+			int minY = Mathf.RoundToInt(mSize.y * pixelSize);
+
+			if (width < minX) width = minX;
+			if (height < minY) height = minY;
+		}
 	}
 
 	/// <summary>

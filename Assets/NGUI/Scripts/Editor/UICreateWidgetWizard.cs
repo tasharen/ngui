@@ -206,7 +206,7 @@ public class UICreateWidgetWizard : EditorWindow
 			lbl.font = NGUISettings.font;
 			lbl.text = "New Label";
 			lbl.color = mColor;
-			lbl.MakePixelPerfect();
+			lbl.AssumeNaturalSize();
 			Selection.activeGameObject = lbl.gameObject;
 		}
 	}
@@ -290,7 +290,8 @@ public class UICreateWidgetWizard : EditorWindow
 				UILabel lbl = NGUITools.AddWidget<UILabel>(go);
 				lbl.font = NGUISettings.font;
 				lbl.text = go.name;
-				lbl.MakePixelPerfect();
+				lbl.AssumeNaturalSize();
+				Debug.Log(lbl.height);
 			}
 
 			// Add a collider
@@ -342,7 +343,7 @@ public class UICreateWidgetWizard : EditorWindow
 				UILabel lbl = NGUITools.AddWidget<UILabel>(go);
 				lbl.font = NGUISettings.font;
 				lbl.text = go.name;
-				lbl.MakePixelPerfect();
+				lbl.AssumeNaturalSize();
 			}
 
 			// Add a collider
@@ -407,7 +408,7 @@ public class UICreateWidgetWizard : EditorWindow
 				lbl.text = go.name;
 				lbl.pivot = UIWidget.Pivot.Left;
 				lbl.transform.localPosition = new Vector3(16f, 0f, 0f);
-				lbl.MakePixelPerfect();
+				lbl.AssumeNaturalSize();
 			}
 
 			// Add a collider
@@ -624,7 +625,7 @@ public class UICreateWidgetWizard : EditorWindow
 			lbl.supportEncoding = false;
 			lbl.width = Mathf.RoundToInt(400f - padding * 2f);
 			lbl.text = "You can type here";
-			lbl.MakePixelPerfect();
+			lbl.AssumeNaturalSize();
 
 			// Add a collider to the background
 			NGUITools.AddWidgetCollider(go);
@@ -681,7 +682,7 @@ public class UICreateWidgetWizard : EditorWindow
 			lbl.text = go.name;
 			lbl.pivot = UIWidget.Pivot.Left;
 			lbl.cachedTransform.localPosition = new Vector3(fgPadding.x, 0f, 0f);
-			lbl.MakePixelPerfect();
+			lbl.AssumeNaturalSize();
 
 			// Add a collider
 			NGUITools.AddWidgetCollider(go);
