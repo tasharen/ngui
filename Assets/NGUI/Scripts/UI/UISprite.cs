@@ -509,7 +509,7 @@ public class UISprite : UIWidget
 			return;
 		}
 
-		Vector4 br = border;
+		Vector4 br = border * atlas.pixelSize;
 		Vector2 po = pivotOffset;
 
 		float fw = 1f / mWidth;
