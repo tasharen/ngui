@@ -75,6 +75,7 @@ public class UIStretch : MonoBehaviour
 	Transform mTrans;
 	UIWidget mWidget;
 	UISprite mSprite;
+	UIPanel mPanel;
 	UIRoot mRoot;
 	Animation mAnim;
 	Rect mRect;
@@ -86,6 +87,7 @@ public class UIStretch : MonoBehaviour
 		mTrans = transform;
 		mWidget = GetComponent<UIWidget>();
 		mSprite = GetComponent<UISprite>();
+		mPanel = GetComponent<UIPanel>();
 	}
 
 	void Start ()
@@ -225,8 +227,11 @@ public class UIStretch : MonoBehaviour
 			}
 			else
 			{
-				if (style == Style.Both || style == Style.Horizontal) size.x = relativeSize.x * rectWidth;
-				if (style == Style.Both || style == Style.Vertical) size.y = relativeSize.y * rectHeight;
+				if (style == Style.Both || style == Style.Horizontal)
+					size.x = relativeSize.x * rectWidth;
+				
+				if (style == Style.Both || style == Style.Vertical)
+					size.y = relativeSize.y * rectHeight;
 			}
 
 			if (mSprite != null)
@@ -235,20 +240,44 @@ public class UIStretch : MonoBehaviour
 				size.x -= borderPadding.x * multiplier;
 				size.y -= borderPadding.y * multiplier;
 
-				mSprite.width = Mathf.RoundToInt(size.x);
-				mSprite.height = Mathf.RoundToInt(size.y);
+				if (style == Style.Both || style == Style.Horizontal)
+					mSprite.width = Mathf.RoundToInt(size.x);
+				
+				if (style == Style.Both || style == Style.Vertical)
+					mSprite.height = Mathf.RoundToInt(size.y);
+
 				size = Vector3.one;
 			}
 			else if (mWidget != null)
 			{
-				mWidget.width = Mathf.RoundToInt(size.x - borderPadding.x);
-				mWidget.height = Mathf.RoundToInt(size.y - borderPadding.y);
+				if (style == Style.Both || style == Style.Horizontal)
+					mWidget.width = Mathf.RoundToInt(size.x - borderPadding.x);
+				
+				if (style == Style.Both || style == Style.Vertical)
+					mWidget.height = Mathf.RoundToInt(size.y - borderPadding.y);
+
+				size = Vector3.one;
+			}
+			else if (mPanel != null)
+			{
+				Vector4 cr = mPanel.clipRange;
+				
+				if (style == Style.Both || style == Style.Horizontal)
+					cr.z = size.x - borderPadding.x;
+				
+				if (style == Style.Both || style == Style.Vertical)
+					cr.w = size.y - borderPadding.y;
+				
+				mPanel.clipRange = cr;
 				size = Vector3.one;
 			}
 			else
 			{
-				size.x += borderPadding.x;
-				size.y += borderPadding.y;
+				if (style == Style.Both || style == Style.Horizontal)
+					size.x -= borderPadding.x;
+				
+				if (style == Style.Both || style == Style.Vertical)
+					size.y -= borderPadding.y;
 			}
 			
 			if (mTrans.localScale != size)
