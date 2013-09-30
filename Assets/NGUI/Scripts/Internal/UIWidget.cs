@@ -388,7 +388,7 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Static widget comparison function used for Z-sorting.
+	/// Static widget comparison function used for depth sorting.
 	/// </summary>
 
 	static public int CompareFunc (UIWidget left, UIWidget right)
@@ -402,7 +402,13 @@ public abstract class UIWidget : MonoBehaviour
 	/// Calculate the widget's bounds, optionally making them relative to the specified transform.
 	/// </summary>
 
-	public Bounds CalculateBounds (Transform relativeParent = null)
+	public Bounds CalculateBounds () { return CalculateBounds(null); }
+
+	/// <summary>
+	/// Calculate the widget's bounds, optionally making them relative to the specified transform.
+	/// </summary>
+
+	public Bounds CalculateBounds (Transform relativeParent)
 	{
 		if (relativeParent == null)
 		{
@@ -415,7 +421,7 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			Matrix4x4 toLocal = relativeParent.worldToLocalMatrix;
 			Vector3[] corners = worldCorners;
-			Bounds b = new Bounds(corners[0], Vector3.zero);
+			Bounds b = new Bounds(toLocal.MultiplyPoint3x4(corners[0]), Vector3.zero);
 			for (int j = 1; j < 4; ++j) b.Encapsulate(toLocal.MultiplyPoint3x4(corners[j]));
 			return b;
 		}
