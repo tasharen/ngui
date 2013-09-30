@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-                Version 3.0.0g
+                Version 3.0.1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -45,11 +45,13 @@ You can also expect compile errors related to delegate usage. The following link
 http://www.youtube.com/watch?v=uNSZsMnhS1o&list=UUQGZdUwzE8gmvgjomZSNFJg
 http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 
-3.0.0g:
+3.0.1:
+- FIX: Variety of regression fixes from NGUI 3.0.0 that culminated into alphabetic (bug-fix) micro-updates.
 - FIX: MakePixelPerfect on selection no longer stops if it finds a UIWidget. It continues on to children.
 - FIX: Atlas Maker will keep the border setting of sprites being replaced.
 - FIX: UILabels will no longer MakePixelPerfect when their text is assigned.
 - FIX: Marking widgets as changed will now mark them as edited in Unity.
+- FIX: Sliced sprite border will again take pixel size into consideration.
 
 3.0.0:
 - NEW: Changed the way widgets get batched, properly fixing all remaining Z/depth issues.
