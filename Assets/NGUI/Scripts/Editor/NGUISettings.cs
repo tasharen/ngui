@@ -43,6 +43,7 @@ public class NGUISettings
 	static int mDynFontSize = 16;
 	static FontStyle mDynFontStyle = FontStyle.Normal;
 	static ColorMode mColorMode = ColorMode.Blue;
+	static bool mAllDCs = false;
 
 	static Object GetObject (string name)
 	{
@@ -72,6 +73,7 @@ public class NGUISettings
 		mDynFontSize	= EditorPrefs.GetInt("NGUI DynFontSize", 16);
 		mDynFontStyle	= (FontStyle)EditorPrefs.GetInt("NGUI DynFontStyle", (int)FontStyle.Normal);
 		mColorMode		= (ColorMode)EditorPrefs.GetInt("NGUI Color Mode", (int)ColorMode.Blue);
+		mAllDCs			= EditorPrefs.GetBool("NGUI All DCs", false);
 
 		if (mLayer < 0 || string.IsNullOrEmpty(LayerMask.LayerToName(mLayer))) mLayer = -1;
 
@@ -105,6 +107,7 @@ public class NGUISettings
 		EditorPrefs.SetInt("NGUI DynFontSize", mDynFontSize);
 		EditorPrefs.SetInt("NGUI DynFontStyle", (int)mDynFontStyle);
 		EditorPrefs.SetInt("NGUI Color Mode", (int)mColorMode);
+		EditorPrefs.SetBool("NGUI All DCs", mAllDCs);
 
 		SaveColor();
 	}
@@ -395,4 +398,10 @@ public class NGUISettings
 	/// </summary>
 
 	static public bool allow4096 { get { if (!mLoaded) Load(); return mAllow4096; } set { if (mAllow4096 != value) { mAllow4096 = value; Save(); } } }
+
+	/// <summary>
+	/// Whether panels will show all draw calls or just those that belong to them.
+	/// </summary>
+
+	static public bool showAllDCs { get { if (!mLoaded) Load(); return mAllDCs; } set { if (mAllDCs != value) { mAllDCs = value; Save(); } } }
 }

@@ -99,6 +99,9 @@ public class UIPanelInspector : Editor
 			EditorWindow.FocusWindowIfItsOpen<UIPanelTool>();
 		}
 
+		if (NGUISettings.showAllDCs != EditorGUILayout.Toggle("Show All", NGUISettings.showAllDCs))
+			NGUISettings.showAllDCs = !NGUISettings.showAllDCs;
+
 		UIDrawCall.Clipping clipping = (UIDrawCall.Clipping)EditorGUILayout.EnumPopup("Clipping", panel.clipping);
 
 		if (panel.clipping != clipping)
@@ -176,6 +179,8 @@ public class UIPanelInspector : Editor
 		{
 			UIDrawCall dc = UIDrawCall.list[i];
 
+			if (dc.panel != panel && !NGUISettings.showAllDCs) continue;
+
 			GUI.color = (dc.panel == panel) ? Color.white : new Color(0.8f, 0.8f, 0.8f);
 
 			string key = dc.keyName;
@@ -204,7 +209,8 @@ public class UIPanelInspector : Editor
 						++count;
 				}
 
-				int initial = NGUITools.GetHierarchy(dc.panel.cachedGameObject).Length + 1;
+				string myPath = NGUITools.GetHierarchy(dc.panel.cachedGameObject);
+				string remove = myPath + "\\";
 				string[] list = new string[count + 1];
 				list[0] = count.ToString();
 				count = 0;
@@ -215,7 +221,8 @@ public class UIPanelInspector : Editor
 					
 					if (w.drawCall == dc)
 					{
-						list[++count] = count + ". " + NGUITools.GetHierarchy(w.cachedGameObject).Remove(0, initial);
+						string path = NGUITools.GetHierarchy(w.cachedGameObject);
+						list[++count] = count + ". " + (string.Equals(path, myPath) ? w.name : path.Replace(remove, ""));
 					}
 				}
 
