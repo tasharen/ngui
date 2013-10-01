@@ -21,12 +21,48 @@ public class UIGrid : UIWidgetContainer
 		Vertical,
 	}
 
+	/// <summary>
+	/// Type of arrangement -- vertical or horizontal.
+	/// </summary>
+
 	public Arrangement arrangement = Arrangement.Horizontal;
+
+	/// <summary>
+	/// Maximum children per line.
+	/// If the arrangement is horizontal, this denotes the number of columns.
+	/// If the arrangement is vertical, this stands for the number of rows.
+	/// </summary>
+
 	public int maxPerLine = 0;
+
+	/// <summary>
+	/// The width of each of the cells.
+	/// </summary>
+
 	public float cellWidth = 200f;
+
+	/// <summary>
+	/// The height of each of the cells.
+	/// </summary>
+
 	public float cellHeight = 200f;
+
+	/// <summary>
+	/// Reposition the children on the next Update().
+	/// </summary>
+
 	public bool repositionNow = false;
+
+	/// <summary>
+	/// Whether the children will be sorted alphabetically prior to repositioning.
+	/// </summary>
+
 	public bool sorted = false;
+
+	/// <summary>
+	/// Whether to ignore the disabled children or to treat them as being present.
+	/// </summary>
+
 	public bool hideInactive = true;
 
 	bool mStarted = false;

@@ -176,7 +176,7 @@ public class UIPanelInspector : Editor
 		{
 			UIDrawCall dc = UIDrawCall.list[i];
 
-			if (dc.panel != panel) continue;
+			GUI.color = (dc.panel == panel) ? Color.white : new Color(0.8f, 0.8f, 0.8f);
 
 			string key = dc.keyName;
 			bool wasOn = EditorPrefs.GetBool(key, true);
@@ -185,11 +185,13 @@ public class UIPanelInspector : Editor
 			if (wasOn != shouldBeOn)
 			{
 				dc.isActive = shouldBeOn;
-				UnityEditor.EditorUtility.SetDirty(panel);
+				UnityEditor.EditorUtility.SetDirty(dc.panel);
 			}
 
 			if (shouldBeOn)
 			{
+				GUI.color = (dc.panel == panel) ? Color.white : new Color(0.8f, 0.8f, 0.8f);
+
 				NGUIEditorTools.BeginContents();
 				EditorGUILayout.ObjectField("Material", dc.material, typeof(Material), false);
 
@@ -202,7 +204,7 @@ public class UIPanelInspector : Editor
 						++count;
 				}
 
-				int initial = NGUITools.GetHierarchy(panel.cachedGameObject).Length + 1;
+				int initial = NGUITools.GetHierarchy(dc.panel.cachedGameObject).Length + 1;
 				string[] list = new string[count + 1];
 				list[0] = count.ToString();
 				count = 0;
@@ -238,15 +240,27 @@ public class UIPanelInspector : Editor
 					}
 				}
 
-				EditorGUILayout.LabelField("Triangles", dc.triangles.ToString());
+				GUILayout.BeginHorizontal();
+				EditorGUILayout.LabelField("Triangles", dc.triangles.ToString(), GUILayout.Width(120f));
 
-				if (clipping != UIDrawCall.Clipping.None && !dc.isClipped)
+				if (dc.panel != panel)
+				{
+					if (GUILayout.Button("Select the Panel"))
+					{
+						Selection.activeGameObject = dc.panel.gameObject;
+					}
+					GUILayout.Space(18f);
+				}
+				GUILayout.EndHorizontal();
+
+				if (dc.panel.clipping != UIDrawCall.Clipping.None && !dc.isClipped)
 				{
 					EditorGUILayout.HelpBox("You must switch this material's shader to Unlit/Transparent Colored or Unlit/Premultiplied Colored in order for clipping to work.",
 						MessageType.Warning);
 				}
 
 				NGUIEditorTools.EndContents();
+				GUI.color = Color.white;
 			}
 		}
 	}
