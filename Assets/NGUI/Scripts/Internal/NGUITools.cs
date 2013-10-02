@@ -555,7 +555,7 @@ static public class NGUITools
 
 		if (widgets.Count > 0)
 		{
-			widgets.Sort(delegate(UIWidget w1, UIWidget w2) { return w1.depth.CompareTo(w2.depth); });
+			widgets.Sort(UIWidget.CompareFunc);
 
 			int start = 0;
 			int current = widgets[0].depth;

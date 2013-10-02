@@ -203,12 +203,13 @@ public class UIPanelTool : EditorWindow
 	bool DrawRow (Entry ent, UIPanel selected, bool isChecked)
 	{
 		bool retVal = false;
-		string panelName, layer, widgetCount, drawCalls, clipping;
+		string panelName, layer, depth, widgetCount, drawCalls, clipping;
 
 		if (ent != null)
 		{
 			panelName = ent.panel.name;
 			layer = LayerMask.LayerToName(ent.panel.gameObject.layer);
+			depth = ent.panel.depth.ToString();
 			widgetCount = ent.widgets.Count.ToString();
 			drawCalls = ent.panel.drawCallCount.ToString();
 			clipping = (ent.panel.clipping != UIDrawCall.Clipping.None) ? "Yes" : "";
@@ -217,6 +218,7 @@ public class UIPanelTool : EditorWindow
 		{
 			panelName = "Panel's Name";
 			layer = "Layer";
+			depth = "DP";
 			widgetCount = "WG";
 			drawCalls = "DC";
 			clipping = "Clip";
@@ -248,6 +250,7 @@ public class UIPanelTool : EditorWindow
 		}
 
 		GUILayout.Label(layer, GUILayout.Width(ent == null ? 65f : 70f));
+		GUILayout.Label(depth, GUILayout.Width(30f));
 		GUILayout.Label(widgetCount, GUILayout.Width(30f));
 		GUILayout.Label(drawCalls, GUILayout.Width(30f));
 		GUILayout.Label(clipping, GUILayout.Width(30f));

@@ -51,6 +51,14 @@ public class UIPanelInspector : Editor
 			panel.alpha = alpha;
 		}
 
+		int depth = EditorGUILayout.IntField("Depth", panel.depth, GUILayout.Width(120f));
+
+		if (depth != panel.depth)
+		{
+			NGUIEditorTools.RegisterUndo("Panel Depth", panel);
+			panel.depth = depth;
+		}
+
 		GUILayout.BeginHorizontal();
 		bool norms = EditorGUILayout.Toggle("Normals", panel.generateNormals, GUILayout.Width(100f));
 		GUILayout.Label("Needed for lit shaders");

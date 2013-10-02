@@ -1187,7 +1187,7 @@ public class NGUIEditorTools
 				list.Add(w);
 		}
 
-		list.Sort(delegate(UIWidget w1, UIWidget w2) { return w2.depth.CompareTo(w1.depth); });
+		list.Sort(UIWidget.CompareFunc);
 		return list;
 	}
 

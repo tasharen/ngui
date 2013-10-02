@@ -382,7 +382,7 @@ public abstract class UIWidget : MonoBehaviour
 					list.Add(w);
 			}
 
-			list.Sort(delegate(UIWidget w1, UIWidget w2) { return w2.mDepth.CompareTo(w1.mDepth); });
+			list.Sort(CompareFunc);
 		}
 		return list;
 	}
@@ -393,6 +393,17 @@ public abstract class UIWidget : MonoBehaviour
 
 	static public int CompareFunc (UIWidget left, UIWidget right)
 	{
+		UIPanel p0 = left.mPanel;
+		UIPanel p1 = right.mPanel;
+		
+		if (p0 != null && p1 != null)
+		{
+			int d0 = p0.depth;
+			int d1 = p1.depth;
+			if (d0 > d1) return 1;
+			if (d0 < d1) return -1;
+		}
+
 		if (left.mDepth > right.mDepth) return 1;
 		if (left.mDepth < right.mDepth) return -1;
 		return 0;

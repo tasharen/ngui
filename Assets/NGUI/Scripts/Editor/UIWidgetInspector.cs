@@ -844,14 +844,14 @@ public class UIWidgetInspector : Editor
 				for (int i = 0; i < UIWidget.list.size; ++i)
 				{
 					UIWidget w = UIWidget.list[i];
-					if (w != null && w.depth == mWidget.depth)
-						++matchingDepths;
+					if (w != null && w.panel != null && mWidget.panel != null &&
+						w.panel.depth == mWidget.panel.depth && w.depth == mWidget.depth)
+							++matchingDepths;
 				}
 
 				if (matchingDepths > 1)
 				{
-					EditorGUILayout.HelpBox(matchingDepths + " widgets are using the depth value of " + mWidget.depth +
-						". It may not be clear what should be in front of what.", MessageType.Warning);
+					EditorGUILayout.HelpBox(matchingDepths + " widgets are sharing the depth value of " + mWidget.depth, MessageType.Info);
 				}
 			}
 
