@@ -129,8 +129,8 @@ public class UITable : UIWidgetContainer
 			}
 			else
 			{
-				pos.y = yOffset + b.extents.y - b.center.y;
-				pos.y += (b.max.y - b.min.y - bc.max.y + bc.min.y) * 0.5f - padding.y;
+				pos.y = yOffset + (b.extents.y - b.center.y);
+				pos.y -= (b.max.y - b.min.y - bc.max.y + bc.min.y) * 0.5f - padding.y;
 			}
 
 			xOffset += br.max.x - br.min.x + padding.x * 2f;
