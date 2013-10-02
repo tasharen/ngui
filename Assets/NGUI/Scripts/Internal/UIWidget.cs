@@ -194,7 +194,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// Local space corners of the widget. The order is bottom-left, top-left, top-right, bottom-right.
 	/// </summary>
 
-	public Vector3[] localCorners
+	public virtual Vector3[] localCorners
 	{
 		get
 		{
@@ -231,7 +231,7 @@ public abstract class UIWidget : MonoBehaviour
 	/// World-space corners of the widget. The order is bottom-left, top-left, top-right, bottom-right.
 	/// </summary>
 
-	public Vector3[] worldCorners
+	public virtual Vector3[] worldCorners
 	{
 		get
 		{

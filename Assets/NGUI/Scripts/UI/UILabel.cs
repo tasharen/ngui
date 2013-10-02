@@ -261,6 +261,32 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Process the label's text before returning its corners.
+	/// </summary>
+
+	public override Vector3[] localCorners
+	{
+		get
+		{
+			if (hasChanged) ProcessText();
+			return base.localCorners;
+		}
+	}
+
+	/// <summary>
+	/// Process the label's text before returning its corners.
+	/// </summary>
+
+	public override Vector3[] worldCorners
+	{
+		get
+		{
+			if (hasChanged) ProcessText();
+			return base.worldCorners;
+		}
+	}
+
+	/// <summary>
 	/// The max number of lines to be displayed for the label
 	/// </summary>
 
