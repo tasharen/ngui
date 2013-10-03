@@ -461,6 +461,19 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Calculate the game object's depth based on the widgets within, and also taking panel depth into consideration.
+	/// </summary>
+
+	static public int CalculateSortingDepth (GameObject go)
+	{
+		int depth = -1;
+		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
+		for (int i = 0, imax = widgets.Length; i < imax; ++i)
+			depth = Mathf.Max(depth, widgets[i].sortingDepth);
+		return depth + 1;
+	}
+
+	/// <summary>
 	/// Gathers all widgets and calculates the depth for the next widget.
 	/// </summary>
 
@@ -468,7 +481,8 @@ static public class NGUITools
 	{
 		int depth = -1;
 		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
-		for (int i = 0, imax = widgets.Length; i < imax; ++i) depth = Mathf.Max(depth, widgets[i].depth);
+		for (int i = 0, imax = widgets.Length; i < imax; ++i)
+			depth = Mathf.Max(depth, widgets[i].depth);
 		return depth + 1;
 	}
 

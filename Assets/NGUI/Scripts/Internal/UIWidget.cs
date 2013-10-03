@@ -191,6 +191,19 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Sorting depth order on widgets takes the depth of their panel into consideration.
+	/// This functionality is used to determine the "final" depth of the widget for drawing and raycasts.
+	/// </summary>
+
+	public int sortingDepth
+	{
+		get
+		{
+			return (mPanel != null) ? mDepth + mPanel.depth * 1000 : mDepth;
+		}
+	}
+
+	/// <summary>
 	/// Local space corners of the widget. The order is bottom-left, top-left, top-right, bottom-right.
 	/// </summary>
 
@@ -358,33 +371,30 @@ public abstract class UIWidget : MonoBehaviour
 	[System.Obsolete("There is no relative scale anymore. Widgets now have width and height instead")]
 	public Vector2 relativeSize { get { return Vector2.one; } }
 
+	// Temporary list of widgets, used in the Raycast function in order to avoid repeated allocations.
+	static BetterList<UIWidget> mTemp = new BetterList<UIWidget>();
+
 	/// <summary>
 	/// Raycast into the screen and return a list of widgets in order from closest to farthest away.
-	/// This is a slow operation and will consider ALL widgets underneath the specified game object.
+	/// This is a slow operation and will consider all active widgets.
 	/// </summary>
 
-	static public BetterList<UIWidget> Raycast (GameObject root, Vector2 mousePos)
+	static public BetterList<UIWidget> Raycast (Vector2 mousePos, Camera cam, int mask)
 	{
-		BetterList<UIWidget> list = new BetterList<UIWidget>();
-		UICamera uiCam = UICamera.FindCameraForLayer(root.layer);
-
-		if (uiCam != null)
+		mTemp.Clear();
+		
+		for (int i = list.size; i > 0; )
 		{
-			Camera cam = uiCam.cachedCamera;
-			UIWidget[] widgets = root.GetComponentsInChildren<UIWidget>();
+			UIWidget w = list[--i];
 
-			for (int i = 0; i < widgets.Length; ++i)
+			if ((mask & (1 << w.cachedGameObject.layer)) != 0 && w.mPanel != null)
 			{
-				UIWidget w = widgets[i];
-
 				Vector3[] corners = w.worldCorners;
 				if (NGUIMath.DistanceToRectangle(corners, mousePos, cam) == 0f)
-					list.Add(w);
+					mTemp.Add(w);
 			}
-
-			list.Sort(CompareFunc);
 		}
-		return list;
+		return mTemp;
 	}
 
 	/// <summary>

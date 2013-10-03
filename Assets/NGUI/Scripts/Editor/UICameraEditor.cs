@@ -15,11 +15,14 @@ public class UICameraEditor : Editor
 		UICamera cam = target as UICamera;
 		GUILayout.Space(3f);
 
+		serializedObject.Update();
+		SerializedProperty hitDetection = serializedObject.FindProperty("hitDetection");
+		int val = hitDetection.intValue;
+
 		if (UICamera.eventHandler != cam)
 		{
-			serializedObject.Update();
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("eventReceiverMask"), new GUIContent("Event Mask"));
-			EditorGUILayout.PropertyField(serializedObject.FindProperty("clipRaycasts"));
+			EditorGUILayout.PropertyField(hitDetection);
 			serializedObject.ApplyModifiedProperties();
 
 			EditorGUILayout.HelpBox("All other settings are inherited from the First Camera.", MessageType.Info);
@@ -31,15 +34,13 @@ public class UICameraEditor : Editor
 		}
 		else
 		{
-			serializedObject.Update();
-
 			SerializedProperty mouse = serializedObject.FindProperty("useMouse");
 			SerializedProperty touch = serializedObject.FindProperty("useTouch");
 			SerializedProperty keyboard = serializedObject.FindProperty("useKeyboard");
 			SerializedProperty controller = serializedObject.FindProperty("useController");
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("eventReceiverMask"), new GUIContent("Event Mask"));
-			EditorGUILayout.PropertyField(serializedObject.FindProperty("clipRaycasts"));
+			EditorGUILayout.PropertyField(hitDetection);
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("debug"));
 
 			EditorGUI.BeginDisabledGroup(!mouse.boolValue && !touch.boolValue);
@@ -131,6 +132,25 @@ public class UICameraEditor : Editor
 				NGUIEditorTools.EndContents();
 			}
 			serializedObject.ApplyModifiedProperties();
+		}
+
+		if (val != hitDetection.intValue && hitDetection.intValue == (int)UICamera.HitDetection.Widgets)
+		{
+			BoxCollider[] bcs = cam.GetComponentsInChildren<BoxCollider>();
+
+			if (bcs.Length > 0)
+			{
+				if (EditorUtility.DisplayDialog(string.Format("Remove {0} {1}?", bcs.Length, bcs.Length == 1 ?
+					"collider" : "colliders"),
+					"Colliders are not needed for Widget hit detection mode. Do you want to remove them to increase performance?",
+					"Remove", "Keep"))
+				{
+					foreach (BoxCollider bc in bcs)
+					{
+						NGUITools.DestroyImmediate(bc);
+					}
+				}
+			}
 		}
 	}
 }
