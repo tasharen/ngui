@@ -185,6 +185,9 @@ public abstract class UIWidget : MonoBehaviour
 			if (mDepth != value)
 			{
 				mDepth = value;
+#if UNITY_EDITOR
+				UnityEditor.EditorUtility.SetDirty(this);
+#endif
 				UIPanel.SetDirty();
 			}
 		}
@@ -372,30 +375,30 @@ public abstract class UIWidget : MonoBehaviour
 	public Vector2 relativeSize { get { return Vector2.one; } }
 
 	// Temporary list of widgets, used in the Raycast function in order to avoid repeated allocations.
-	static BetterList<UIWidget> mTemp = new BetterList<UIWidget>();
+	//static BetterList<UIWidget> mTemp = new BetterList<UIWidget>();
 
 	/// <summary>
 	/// Raycast into the screen and return a list of widgets in order from closest to farthest away.
 	/// This is a slow operation and will consider all active widgets.
 	/// </summary>
 
-	static public BetterList<UIWidget> Raycast (Vector2 mousePos, Camera cam, int mask)
-	{
-		mTemp.Clear();
+	//static public BetterList<UIWidget> Raycast (Vector2 mousePos, Camera cam, int mask)
+	//{
+	//    mTemp.Clear();
 		
-		for (int i = list.size; i > 0; )
-		{
-			UIWidget w = list[--i];
+	//    for (int i = list.size; i > 0; )
+	//    {
+	//        UIWidget w = list[--i];
 
-			if ((mask & (1 << w.cachedGameObject.layer)) != 0 && w.mPanel != null)
-			{
-				Vector3[] corners = w.worldCorners;
-				if (NGUIMath.DistanceToRectangle(corners, mousePos, cam) == 0f)
-					mTemp.Add(w);
-			}
-		}
-		return mTemp;
-	}
+	//        if ((mask & (1 << w.cachedGameObject.layer)) != 0 && w.mPanel != null)
+	//        {
+	//            Vector3[] corners = w.worldCorners;
+	//            if (NGUIMath.DistanceToRectangle(corners, mousePos, cam) == 0f)
+	//                mTemp.Add(w);
+	//        }
+	//    }
+	//    return mTemp;
+	//}
 
 	/// <summary>
 	/// Static widget comparison function used for depth sorting.
@@ -403,20 +406,14 @@ public abstract class UIWidget : MonoBehaviour
 
 	static public int CompareFunc (UIWidget left, UIWidget right)
 	{
-		UIPanel p0 = left.mPanel;
-		UIPanel p1 = right.mPanel;
-		
-		if (p0 != null && p1 != null)
-		{
-			int d0 = p0.depth;
-			int d1 = p1.depth;
-			if (d0 > d1) return 1;
-			if (d0 < d1) return -1;
-		}
+		int val = UIPanel.CompareFunc(left.mPanel, right.mPanel);
 
-		if (left.mDepth > right.mDepth) return 1;
-		if (left.mDepth < right.mDepth) return -1;
-		return 0;
+		if (val == 0)
+		{
+			if (left.mDepth < right.mDepth) return -1;
+			if (left.mDepth > right.mDepth) return 1;
+		}
+		return val;
 	}
 
 	/// <summary>

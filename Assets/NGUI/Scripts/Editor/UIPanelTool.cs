@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
@@ -13,6 +13,8 @@ using System.Collections.Generic;
 
 public class UIPanelTool : EditorWindow
 {
+	static public UIPanelTool instance;
+
 	class Entry
 	{
 		public UIPanel panel;
@@ -20,8 +22,7 @@ public class UIPanelTool : EditorWindow
 		public bool widgetsEnabled = false;
 		public List<UIWidget> widgets = new List<UIWidget>();
 	}
-
-	static int Compare (Entry a, Entry b) { return string.Compare(a.panel.name, b.panel.name); }
+	static int Compare (Entry a, Entry b) { return UIPanel.CompareFunc(a.panel, b.panel); }
 
 	Vector2 mScroll = Vector2.zero;
 
@@ -30,6 +31,9 @@ public class UIPanelTool : EditorWindow
 	/// </summary>
 
 	void OnSelectionChange () { Repaint(); }
+
+	void OnEnable () { instance = this; }
+	void OnDisable () { instance = null; }
 
 	/// <summary>
 	/// Collect a list of panels.
@@ -240,6 +244,8 @@ public class UIPanelTool : EditorWindow
 		GUI.contentColor = (ent == null || ent.isEnabled) ? Color.white : new Color(0.7f, 0.7f, 0.7f);
 		if (isChecked != EditorGUILayout.Toggle(isChecked, GUILayout.Width(20f))) retVal = true;
 
+		GUILayout.Label(depth, GUILayout.Width(30f));
+
 		if (GUILayout.Button(panelName, EditorStyles.label, GUILayout.MinWidth(100f)))
 		{
 			if (ent != null)
@@ -250,7 +256,6 @@ public class UIPanelTool : EditorWindow
 		}
 
 		GUILayout.Label(layer, GUILayout.Width(ent == null ? 65f : 70f));
-		GUILayout.Label(depth, GUILayout.Width(30f));
 		GUILayout.Label(widgetCount, GUILayout.Width(30f));
 		GUILayout.Label(drawCalls, GUILayout.Width(30f));
 		GUILayout.Label(clipping, GUILayout.Width(30f));

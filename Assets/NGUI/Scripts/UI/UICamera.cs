@@ -65,6 +65,16 @@ public class UICamera : MonoBehaviour
 		public bool dragStarted = false;
 	}
 
+	/// <summary>
+	/// Camera type controls how raycasts are handled by the UICamera.
+	/// </summary>
+
+	public enum EventType
+	{
+		World,	// Perform a Physics.Raycast and sort by distance to the point that was hit.
+		UI,		// Perform a Physics.Raycast and sort by widget depth.
+	}
+
 	class Highlighted
 	{
 		public GameObject go;
@@ -76,6 +86,13 @@ public class UICamera : MonoBehaviour
 	/// </summary>
  
 	static public List<UICamera> list = new List<UICamera>();
+
+	/// <summary>
+	/// Event type -- use "UI" for your user interfaces, and "World" for your game camera.
+	/// This setting changes how raycasts are handled. Raycasts have to be more complicated for UI cameras.
+	/// </summary>
+
+	public EventType eventType = EventType.UI;
 
 	/// <summary>
 	/// Which layers will receive events.
@@ -127,20 +144,6 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	public bool stickyPress = true;
-
-	public enum HitDetection
-	{
-		Colliders,	// Perform a Physics.Raycast and sort by distance to the point that was hit.
-		Widgets,	// Use math instead of physics and bubble the event to parents until a handler is found.
-		Combo,		// Perform a Physics.Raycast, but sort by widget depth instead.
-	}
-
-	/// <summary>
-	/// Which hit detection method to use. Prior to NGUI 3.0.2 the only method possible was the "colliders" method
-	/// where a Physics.Raycast was performed into the screen.
-	/// </summary>
-
-	public HitDetection hitDetection = HitDetection.Combo;
 
 	/// <summary>
 	/// Whether the tooltip will disappear as soon as the mouse moves (false) or only if the mouse moves outside of the widget's area (true).
@@ -481,6 +484,14 @@ public class UICamera : MonoBehaviour
 		return 0;
 	}
 
+	struct DepthEntry
+	{
+		public int depth;
+		public RaycastHit hit;
+	}
+
+	static DepthEntry mHit = new DepthEntry();
+	static BetterList<DepthEntry> mHits = new BetterList<DepthEntry>();
 	static RaycastHit mEmpty = new RaycastHit();
 
 	/// <summary>
@@ -511,34 +522,16 @@ public class UICamera : MonoBehaviour
 			int mask = currentCamera.cullingMask & (int)cam.eventReceiverMask;
 			float dist = (cam.rangeDistance > 0f) ? cam.rangeDistance : currentCamera.farClipPlane - currentCamera.nearClipPlane;
 
-			// If raycasts should be clipped by panels, we need to find a panel for each hit
-			if (cam.hitDetection == HitDetection.Colliders)
+			if (cam.eventType == EventType.World)
 			{
-				RaycastHit[] hits = Physics.RaycastAll(ray, dist, mask);
-
-				if (hits.Length > 1)
+				if (Physics.Raycast(ray, out hit, dist, mask))
 				{
-					System.Array.Sort(hits, delegate(RaycastHit r1, RaycastHit r2) { return r1.distance.CompareTo(r2.distance); });
-
-					for (int b = 0, bmax = hits.Length; b < bmax; ++b)
-					{
-						if (IsVisible(ref hits[b]))
-						{
-							hit = hits[b];
-							hoveredObject = hit.collider.gameObject;
-							return true;
-						}
-					}
-				}
-				else if (hits.Length == 1 && IsVisible(ref hits[0]))
-				{
-					hit = hits[0];
 					hoveredObject = hit.collider.gameObject;
 					return true;
 				}
 				continue;
 			}
-			else if (cam.hitDetection == HitDetection.Combo)
+			else if (cam.eventType == EventType.UI)
 			{
 				RaycastHit[] hits = Physics.RaycastAll(ray, dist, mask);
 
@@ -574,38 +567,10 @@ public class UICamera : MonoBehaviour
 				}
 				continue;
 			}
-			else
-			{
-				float distance = 0;
-				BetterList<UIWidget> hits = UIWidget.Raycast(inPos, cam.cachedCamera, mask);
-
-				for (int b = 0; b < hits.size; ++b)
-				{
-					UIWidget w = hits[b];
-					Plane p = new Plane(w.cachedTransform.rotation * Vector3.back, w.cachedTransform.position);
-					
-					if (p.Raycast(ray, out distance) && w.panel.IsVisible(ray.GetPoint(distance)))
-					{
-						hoveredObject = w.cachedGameObject;
-						hit = mEmpty;
-						return true;
-					}
-				}
-				continue;
-			}
 		}
 		hit = mEmpty;
 		return false;
 	}
-
-	struct DepthEntry
-	{
-		public int depth;
-		public RaycastHit hit;
-	}
-
-	static DepthEntry mHit = new DepthEntry();
-	static BetterList<DepthEntry> mHits = new BetterList<DepthEntry>();
 
 	/// <summary>
 	/// Helper function to check if the specified hit is visible by the panel.

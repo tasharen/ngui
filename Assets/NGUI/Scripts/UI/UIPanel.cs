@@ -176,8 +176,26 @@ public class UIPanel : MonoBehaviour
 
 				for (int i = 0; i < UIWidget.list.size; ++i)
 					UIWidget.list[i].MarkAsChangedLite();
+#if UNITY_EDITOR
+				UnityEditor.EditorUtility.SetDirty(this);
+#endif
+				list.Sort(CompareFunc);
 			}
 		}
+	}
+
+	/// <summary>
+	/// Function that can be used to depth-sort panels.
+	/// </summary>
+
+	static public int CompareFunc (UIPanel a, UIPanel b)
+	{
+		if (a != null && b != null)
+		{
+			if (a.mDepth < b.mDepth) return -1;
+			if (a.mDepth > b.mDepth) return 1;
+		}
+		return 0;
 	}
 
 	/// <summary>
@@ -409,6 +427,7 @@ public class UIPanel : MonoBehaviour
 	{
 		mFullRebuild = true;
 		list.Add(this);
+		list.Sort(CompareFunc);
 	}
 
 	/// <summary>

@@ -17,9 +17,17 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Selection/Bring To Front &#=")]
 	static public void BringForward2 ()
 	{
+		int val = 0;
 		for (int i = 0; i < Selection.gameObjects.Length; ++i)
-			NGUITools.AdjustDepth(Selection.gameObjects[i], 1000);
-		NGUITools.NormalizeDepths();
+			val |= NGUITools.AdjustDepth(Selection.gameObjects[i], 1000);
+
+		if ((val & 1) != 0)
+		{
+			NGUITools.NormalizePanelDepths();
+			if (UIPanelTool.instance != null)
+				UIPanelTool.instance.Repaint();
+		}
+		if ((val & 2) != 0) NGUITools.NormalizeWidgetDepths();
 	}
 
 	[MenuItem("NGUI/Selection/Bring To Front &#=", true)]
@@ -28,9 +36,17 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Selection/Push To Back &#-")]
 	static public void PushBack2 ()
 	{
+		int val = 0;
 		for (int i = 0; i < Selection.gameObjects.Length; ++i)
-			NGUITools.AdjustDepth(Selection.gameObjects[i], -1000);
-		NGUITools.NormalizeDepths();
+			val |= NGUITools.AdjustDepth(Selection.gameObjects[i], -1000);
+
+		if ((val & 1) != 0)
+		{
+			NGUITools.NormalizePanelDepths();
+			if (UIPanelTool.instance != null)
+				UIPanelTool.instance.Repaint();
+		}
+		if ((val & 2) != 0) NGUITools.NormalizeWidgetDepths();
 	}
 
 	[MenuItem("NGUI/Selection/Push To Back &#-", true)]
@@ -39,12 +55,11 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Selection/Adjust Depth By +1 %=")]
 	static public void BringForward ()
 	{
+		int val = 0;
 		for (int i = 0; i < Selection.gameObjects.Length; ++i)
-		{
-			GameObject go = Selection.gameObjects[i];
-			NGUITools.AdjustDepth(go, 1);
-			NGUITools.UpdateWidgetColliderDepth(go);
-		}
+			val |= NGUITools.AdjustDepth(Selection.gameObjects[i], 1);
+		if (((val & 1) != 0) && UIPanelTool.instance != null)
+			UIPanelTool.instance.Repaint();
 	}
 
 	[MenuItem("NGUI/Selection/Adjust Depth By +1 %=", true)]
@@ -53,8 +68,11 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Selection/Adjust Depth By -1 %-")]
 	static public void PushBack ()
 	{
+		int val = 0;
 		for (int i = 0; i < Selection.gameObjects.Length; ++i)
-			NGUITools.AdjustDepth(Selection.gameObjects[i], -1);
+			val |= NGUITools.AdjustDepth(Selection.gameObjects[i], -1);
+		if (((val & 1) != 0) && UIPanelTool.instance != null)
+			UIPanelTool.instance.Repaint();
 	}
 
 	[MenuItem("NGUI/Selection/Adjust Depth By -1 %-", true)]

@@ -51,12 +51,38 @@ public class UIPanelInspector : Editor
 			panel.alpha = alpha;
 		}
 
-		int depth = EditorGUILayout.IntField("Depth", panel.depth, GUILayout.Width(120f));
-
-		if (depth != panel.depth)
+		GUILayout.BeginHorizontal();
 		{
-			NGUIEditorTools.RegisterUndo("Panel Depth", panel);
-			panel.depth = depth;
+			EditorGUILayout.PrefixLabel("Depth");
+
+			int depth = panel.depth;
+			if (GUILayout.Button("Back", GUILayout.Width(60f))) --depth;
+			depth = EditorGUILayout.IntField(depth, GUILayout.MinWidth(20f));
+			if (GUILayout.Button("Forward", GUILayout.Width(68f))) ++depth;
+
+			if (panel.depth != depth)
+			{
+				NGUIEditorTools.RegisterUndo("Panel Depth", panel);
+				panel.depth = depth;
+
+				if (UIPanelTool.instance != null)
+					UIPanelTool.instance.Repaint();
+			}
+		}
+		GUILayout.EndHorizontal();
+
+		int matchingDepths = 0;
+
+		for (int i = 0; i < UIPanel.list.size; ++i)
+		{
+			UIPanel p = UIPanel.list[i];
+			if (p != null && panel.depth == p.depth)
+				++matchingDepths;
+		}
+
+		if (matchingDepths > 1)
+		{
+			EditorGUILayout.HelpBox(matchingDepths + " panels are sharing the depth value of " + panel.depth, MessageType.Info);
 		}
 
 		GUILayout.BeginHorizontal();
