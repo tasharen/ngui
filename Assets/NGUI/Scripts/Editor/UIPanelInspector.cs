@@ -213,21 +213,20 @@ public class UIPanelInspector : Editor
 		{
 			UIDrawCall dc = UIDrawCall.list[i];
 
-			if (dc.panel != panel && !NGUISettings.showAllDCs) continue;
-
-			GUI.color = (dc.panel == panel) ? Color.white : new Color(0.8f, 0.8f, 0.8f);
+			if (dc.panel != panel)
+			{
+				if (!NGUISettings.showAllDCs) continue;
+				if (dc.showDetails) GUI.color = new Color(0.85f, 0.85f, 0.85f);
+				else GUI.contentColor = new Color(0.85f, 0.85f, 0.85f);
+			}
+			else GUI.contentColor = Color.white;
 
 			string key = dc.keyName;
-			bool wasOn = EditorPrefs.GetBool(key, true);
-			bool shouldBeOn = NGUIEditorTools.DrawHeader(key + " of " + UIDrawCall.list.size, key);
-			
-			if (wasOn != shouldBeOn)
-			{
-				dc.isActive = shouldBeOn;
-				UnityEditor.EditorUtility.SetDirty(dc.panel);
-			}
+			string name = key + " of " + UIDrawCall.list.size;
+			if (!dc.isActive) name = name + " (HIDDEN)";
+			else if (dc.panel != panel) name = name + " (" + dc.panel.name + ")";
 
-			if (shouldBeOn)
+			if (NGUIEditorTools.DrawHeader(name, key))
 			{
 				GUI.color = (dc.panel == panel) ? Color.white : new Color(0.8f, 0.8f, 0.8f);
 
@@ -293,6 +292,14 @@ public class UIPanelInspector : Editor
 					GUILayout.Space(18f);
 				}
 				GUILayout.EndHorizontal();
+
+				bool draw = !EditorGUILayout.Toggle("Hide", !dc.isActive);
+
+				if (dc.isActive != draw)
+				{
+					dc.isActive = draw;
+					UnityEditor.EditorUtility.SetDirty(dc.panel);
+				}
 
 				if (dc.panel.clipping != UIDrawCall.Clipping.None && !dc.isClipped)
 				{
