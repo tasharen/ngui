@@ -540,7 +540,7 @@ public class UICamera : MonoBehaviour
 					for (int b = 0; b < hits.Length; ++b)
 					{
 						GameObject go = hits[b].collider.gameObject;
-						mHit.depth = NGUITools.CalculateSortingDepth(go);
+						mHit.depth = NGUITools.CalculateRaycastDepth(go);
 						mHit.hit = hits[b];
 						mHits.Add(mHit);
 					}

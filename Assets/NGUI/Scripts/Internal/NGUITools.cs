@@ -265,6 +265,25 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Find all scene components, active or inactive.
+	/// </summary>
+
+	static public List<T> FindAll<T> () where T : Component
+	{
+		T[] comps = Resources.FindObjectsOfTypeAll(typeof(T)) as T[];
+
+		List<T> list = new List<T>();
+
+		foreach (T comp in comps)
+		{
+			if (comp.gameObject.hideFlags == 0)
+				list.Add(comp);
+		}
+		return list;
+	}
+
+
+	/// <summary>
 	/// Find all active objects of specified type.
 	/// </summary>
 
@@ -444,13 +463,18 @@ static public class NGUITools
 	/// Calculate the game object's depth based on the widgets within, and also taking panel depth into consideration.
 	/// </summary>
 
-	static public int CalculateSortingDepth (GameObject go)
+	static public int CalculateRaycastDepth (GameObject go)
 	{
-		int depth = -1;
+		UIWidget w = go.GetComponent<UIWidget>();
+		if (w != null) return w.raycastDepth;
+
 		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
-		for (int i = 0, imax = widgets.Length; i < imax; ++i)
-			depth = Mathf.Max(depth, widgets[i].sortingDepth);
-		return depth + 1;
+		if (widgets.Length == 0) return 0;
+
+		int depth = widgets[0].raycastDepth;
+		for (int i = 1, imax = widgets.Length; i < imax; ++i)
+			depth = Mathf.Min(depth, widgets[i].raycastDepth);
+		return depth;
 	}
 
 	/// <summary>
@@ -556,15 +580,7 @@ static public class NGUITools
 
 	static public void NormalizeWidgetDepths ()
 	{
-		List<UIWidget> widgets = new List<UIWidget>();
-
-		for (int i = 0; i < UIRoot.list.Count; ++i)
-		{
-			UIRoot root = UIRoot.list[i];
-			UIWidget[] list = root.gameObject.GetComponentsInChildren<UIWidget>(true);
-			for (int b = 0; b < list.Length; ++b)
-				widgets.Add(list[b]);
-		}
+		List<UIWidget> widgets = FindAll<UIWidget>();
 
 		if (widgets.Count > 0)
 		{
@@ -599,15 +615,7 @@ static public class NGUITools
 
 	static public void NormalizePanelDepths ()
 	{
-		List<UIPanel> panels = new List<UIPanel>();
-
-		for (int i = 0; i < UIRoot.list.Count; ++i)
-		{
-			UIRoot root = UIRoot.list[i];
-			UIPanel[] list = root.gameObject.GetComponentsInChildren<UIPanel>(true);
-			for (int b = 0; b < list.Length; ++b)
-				panels.Add(list[b]);
-		}
+		List<UIPanel> panels = FindAll<UIPanel>();
 
 		if (panels.Count > 0)
 		{

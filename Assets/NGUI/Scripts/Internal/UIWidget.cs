@@ -194,11 +194,11 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Sorting depth order on widgets takes the depth of their panel into consideration.
+	/// Raycast depth order on widgets takes the depth of their panel into consideration.
 	/// This functionality is used to determine the "final" depth of the widget for drawing and raycasts.
 	/// </summary>
 
-	public int sortingDepth
+	public int raycastDepth
 	{
 		get
 		{

@@ -126,15 +126,18 @@ public class UIPanelInspector : Editor
 			EditorGUILayout.HelpBox("Only mark the panel as 'static' if you know FOR CERTAIN that the widgets underneath will not move, rotate, or scale. Doing this improves performance, but moving widgets around will have no effect.", MessageType.Warning);
 		}
 
+		GUILayout.BeginHorizontal();
+		if (NGUISettings.showAllDCs != EditorGUILayout.Toggle("Show All", NGUISettings.showAllDCs, GUILayout.Width(100f)))
+			NGUISettings.showAllDCs = !NGUISettings.showAllDCs;
+		GUILayout.Label("Show all draw calls");
+		GUILayout.EndHorizontal();
+
 		if (panel.showInPanelTool != EditorGUILayout.Toggle("Panel Tool", panel.showInPanelTool))
 		{
 			panel.showInPanelTool = !panel.showInPanelTool;
 			EditorUtility.SetDirty(panel);
 			EditorWindow.FocusWindowIfItsOpen<UIPanelTool>();
 		}
-
-		if (NGUISettings.showAllDCs != EditorGUILayout.Toggle("Show All", NGUISettings.showAllDCs))
-			NGUISettings.showAllDCs = !NGUISettings.showAllDCs;
 
 		UIDrawCall.Clipping clipping = (UIDrawCall.Clipping)EditorGUILayout.EnumPopup("Clipping", panel.clipping);
 

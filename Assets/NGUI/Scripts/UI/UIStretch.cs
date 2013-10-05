@@ -227,10 +227,10 @@ public class UIStretch : MonoBehaviour
 			}
 			else
 			{
-				if (style == Style.Both || style == Style.Horizontal)
+				if (style != Style.Vertical)
 					size.x = relativeSize.x * rectWidth;
-				
-				if (style == Style.Both || style == Style.Vertical)
+
+				if (style != Style.Horizontal)
 					size.y = relativeSize.y * rectHeight;
 			}
 
@@ -240,20 +240,20 @@ public class UIStretch : MonoBehaviour
 				size.x -= borderPadding.x * multiplier;
 				size.y -= borderPadding.y * multiplier;
 
-				if (style == Style.Both || style == Style.Horizontal)
+				if (style != Style.Vertical)
 					mSprite.width = Mathf.RoundToInt(size.x);
-				
-				if (style == Style.Both || style == Style.Vertical)
+
+				if (style != Style.Horizontal)
 					mSprite.height = Mathf.RoundToInt(size.y);
 
 				size = Vector3.one;
 			}
 			else if (mWidget != null)
 			{
-				if (style == Style.Both || style == Style.Horizontal)
+				if (style != Style.Vertical)
 					mWidget.width = Mathf.RoundToInt(size.x - borderPadding.x);
-				
-				if (style == Style.Both || style == Style.Vertical)
+
+				if (style != Style.Horizontal)
 					mWidget.height = Mathf.RoundToInt(size.y - borderPadding.y);
 
 				size = Vector3.one;
@@ -261,11 +261,11 @@ public class UIStretch : MonoBehaviour
 			else if (mPanel != null)
 			{
 				Vector4 cr = mPanel.clipRange;
-				
-				if (style == Style.Both || style == Style.Horizontal)
+
+				if (style != Style.Vertical)
 					cr.z = size.x - borderPadding.x;
 				
-				if (style == Style.Both || style == Style.Vertical)
+				if (style != Style.Horizontal)
 					cr.w = size.y - borderPadding.y;
 				
 				mPanel.clipRange = cr;
@@ -273,10 +273,10 @@ public class UIStretch : MonoBehaviour
 			}
 			else
 			{
-				if (style == Style.Both || style == Style.Horizontal)
+				if (style != Style.Vertical)
 					size.x -= borderPadding.x;
 				
-				if (style == Style.Both || style == Style.Vertical)
+				if (style != Style.Horizontal)
 					size.y -= borderPadding.y;
 			}
 			
