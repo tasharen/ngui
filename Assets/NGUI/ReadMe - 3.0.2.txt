@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-                Version 3.0.1
+                Version 3.0.2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -44,6 +44,17 @@ You can also expect compile errors related to delegate usage. The following link
 
 http://www.youtube.com/watch?v=uNSZsMnhS1o&list=UUQGZdUwzE8gmvgjomZSNFJg
 http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
+
+3.0.2:
+- NEW: Added a "depth" property to the panels to make it possible to easily order panels.
+- NEW: UICamera now has "world" and "UI" event types that affect how raycasts are processed.
+- NEW: Collider's Z position no longer needs to be adjusted for widgets if the UICamera is set to the "UI" event type.
+- NEW: UICamera's raycasts now go by widget and panel depth rather than by distance to the colliders.
+- NEW: UIPanels now can show all draw calls instead of just their own.
+- NEW: UIStretch can now stretch clipped panels.
+- FIX: UITable was bugged with the "Up" direction.
+- FIX: FIX: Labels will process their text before returning the corners.
+- FIX: UIAnchor was not calculating widget-related anchoring properly.
 
 3.0.1:
 - FIX: Variety of regression fixes from NGUI 3.0.0 that culminated into alphabetic (bug-fix) micro-updates.
