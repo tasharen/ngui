@@ -367,7 +367,7 @@ public class UIPanel : MonoBehaviour
 			UIDrawCall dc = UIDrawCall.list.buffer[index];
 
 			// If the material and texture match, keep using the same draw call
-			if (dc != null && dc.panel == this && dc.material == mat && dc.mainTexture == mat.mainTexture) return dc;
+			if (dc != null && dc.panel == this && dc.baseMaterial == mat && dc.mainTexture == mat.mainTexture) return dc;
 
 			// Otherwise we need to destroy all the draw calls that follow
 			for (int i = UIDrawCall.list.size; i > index; )
@@ -390,7 +390,7 @@ public class UIPanel : MonoBehaviour
 		
 		// Create the draw call
 		UIDrawCall drawCall = go.AddComponent<UIDrawCall>();
-		drawCall.material = mat;
+		drawCall.baseMaterial = mat;
 		drawCall.renderQueue = UIDrawCall.list.size;
 		drawCall.panel = this;
 		//Debug.Log("Added DC " + mat.name + " as " + UIDrawCall.list.size);

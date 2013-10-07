@@ -250,7 +250,8 @@ public class UISprite : UIWidget
 			if (type == Type.Sliced)
 			{
 				Vector4 b = border;
-				return Mathf.RoundToInt(b.x + b.z);
+				int min = Mathf.RoundToInt(b.x + b.z);
+				return ((min & 1) == 1) ? min + 1 : min;
 			}
 			return base.minWidth;
 		}
@@ -267,7 +268,8 @@ public class UISprite : UIWidget
 			if (type == Type.Sliced)
 			{
 				Vector4 b = border;
-				return Mathf.RoundToInt(b.y + b.w);
+				int min = Mathf.RoundToInt(b.y + b.w);
+				return ((min & 1) == 1) ? min + 1 : min;
 			}
 			return base.minHeight;
 		}

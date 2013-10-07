@@ -1,4 +1,4 @@
-Shader "GUI/Text Shader (SoftClip)" 
+Shader "Unlit/Text (AlphaClip)"
 {
 	Properties
 	{
@@ -15,7 +15,7 @@ Shader "GUI/Text Shader (SoftClip)"
 			"IgnoreProjector" = "True"
 			"RenderType" = "Transparent"
 		}
-		
+
 		Pass
 		{
 			Cull Off
@@ -24,18 +24,15 @@ Shader "GUI/Text Shader (SoftClip)"
 			Offset -1, -1
 			Fog { Mode Off }
 			//ColorMask RGB
-			AlphaTest Greater .01
 			Blend SrcAlpha OneMinusSrcAlpha
-
+		
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-
 			#include "UnityCG.cginc"
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
-			float2 _ClipSharpness = float2(20.0, 20.0);
 
 			struct appdata_t
 			{
@@ -64,46 +61,23 @@ Shader "GUI/Text Shader (SoftClip)"
 
 			half4 frag (v2f IN) : COLOR
 			{
-				// Softness factor
-				float2 factor = (float2(1.0, 1.0) - abs(IN.worldPos)) * _ClipSharpness;
-			
 				// Sample the texture
 				half4 col = IN.color;
 				col.a *= tex2D(_MainTex, IN.texcoord).a;
-				col.a *= clamp( min(factor.x, factor.y), 0.0, 1.0);
+
+				float2 factor = abs(IN.worldPos);
+				float val = 1.0 - max(factor.x, factor.y);
+
+				// Option 1: 'if' statement
+				if (val < 0.0) col.a = 0.0;
+
+				// Option 2: no 'if' statement -- may be faster on some devices
+				//col.a *= ceil(clamp(val, 0.0, 1.0));
 
 				return col;
 			}
 			ENDCG
 		}
 	}
-	
-	SubShader
-	{
-		LOD 100
-
-		Tags
-		{
-			"Queue" = "Transparent"
-			"IgnoreProjector" = "True"
-			"RenderType" = "Transparent"
-		}
-		
-		Pass
-		{
-			Cull Off
-			Lighting Off
-			ZWrite Off
-			Fog { Mode Off }
-			ColorMask RGB
-			AlphaTest Greater .01
-			Blend SrcAlpha OneMinusSrcAlpha
-			ColorMaterial AmbientAndDiffuse
-			
-			SetTexture [_MainTex]
-			{
-				Combine Texture * Primary
-			}
-		}
-	}
+	Fallback "Unlit/Text"
 }

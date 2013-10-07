@@ -173,26 +173,30 @@ public class UIPopupList : UIWidgetContainer
 			}
 
 #if UNITY_EDITOR
-			if (!Application.isPlaying) return;
+			if (Application.isPlaying)
 #endif
-			if (mSelectedItem != null && (trigger || textLabel == null))
 			{
-				current = this;
-
-				// Legacy functionality
-				if (mLegacyEvent != null) mLegacyEvent(mSelectedItem);
-
-				if (EventDelegate.IsValid(onChange))
+				if (mSelectedItem != null && (trigger || textLabel == null))
 				{
-					EventDelegate.Execute(onChange);
+					current = this;
+
+					// Legacy functionality
+					if (mLegacyEvent != null) mLegacyEvent(mSelectedItem);
+
+					if (EventDelegate.IsValid(onChange))
+					{
+						EventDelegate.Execute(onChange);
+					}
+					else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+					{
+						// Legacy functionality support (for backwards compatibility)
+						eventReceiver.SendMessage(functionName, mSelectedItem, SendMessageOptions.DontRequireReceiver);
+					}
+					current = null;
 				}
-				else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
-				{
-					// Legacy functionality support (for backwards compatibility)
-					eventReceiver.SendMessage(functionName, mSelectedItem, SendMessageOptions.DontRequireReceiver);
-				}
-				current = null;
 			}
+			// Clear the selection for menu items
+			if (textLabel == null) mSelectedItem = null;
 		}
 	}
 
@@ -230,17 +234,21 @@ public class UIPopupList : UIWidgetContainer
 			functionName = null;
 		}
 
-		// Automatically choose the first item
-		if (string.IsNullOrEmpty(mSelectedItem))
+		if (textLabel != null)
 		{
-			if (items.Count > 0) value = items[0];
+			// Automatically choose the first item
+			if (string.IsNullOrEmpty(mSelectedItem))
+			{
+				if (items.Count > 0) value = items[0];
+			}
+			else
+			{
+				string s = mSelectedItem;
+				mSelectedItem = null;
+				value = s;
+			}
 		}
-		else
-		{
-			string s = mSelectedItem;
-			mSelectedItem = null;
-			value = s;
-		}
+		else mSelectedItem = null;
 	}
 
 	/// <summary>
@@ -249,7 +257,7 @@ public class UIPopupList : UIWidgetContainer
 
 	void OnLocalize (Localization loc)
 	{
-		if (isLocalized && textLabel != null)
+		if (isLocalized && textLabel != null && !string.IsNullOrEmpty(mSelectedItem))
 		{
 			textLabel.text = loc.Get(mSelectedItem);
 		}

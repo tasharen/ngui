@@ -133,7 +133,13 @@ public class UIDrawCall : MonoBehaviour
 	/// Material used by this screen.
 	/// </summary>
 
-	public Material material { get { return mSharedMat; } set { mSharedMat = value; } }
+	public Material baseMaterial { get { return mSharedMat; } set { mSharedMat = value; } }
+
+	/// <summary>
+	/// Dynamically created material used by the draw call to actually draw the geometry.
+	/// </summary>
+
+	public Material dynamicMaterial { get { return mMat; } }
 
 	/// <summary>
 	/// Texture used by the material.
@@ -234,6 +240,13 @@ public class UIDrawCall : MonoBehaviour
 		mMat = new Material(mSharedMat);
 		mMat.hideFlags = HideFlags.DontSave;
 		mMat.CopyPropertiesFromMaterial(mSharedMat);
+		
+		// Automatically replace "GUI/Text Shader" with "Unlit/Text"
+		if (mMat.shader != null && mMat.shader.name == "GUI/Text Shader")
+		{
+			Shader shader = Shader.Find("Unlit/Text");
+			if (shader != null) mMat.shader = shader;
+		}
 		mMat.renderQueue = mSharedMat.renderQueue + mRenderQueue;
 	}
 
