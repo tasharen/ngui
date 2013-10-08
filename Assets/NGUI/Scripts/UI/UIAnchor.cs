@@ -129,7 +129,7 @@ public class UIAnchor : MonoBehaviour
 		
 		if (wc != null)
 		{
-			Bounds b = wc.CalculateBounds(transform.parent);
+			Bounds b = wc.CalculateBounds(container.transform.parent);
 
 			mRect.x = b.min.x;
 			mRect.y = b.min.y;
@@ -160,7 +160,7 @@ public class UIAnchor : MonoBehaviour
 		}
 		else if (container != null)
 		{
-			Transform root = transform.parent;
+			Transform root = container.transform.parent;
 			Bounds b = (root != null) ? NGUIMath.CalculateRelativeWidgetBounds(root, container.transform) :
 				NGUIMath.CalculateRelativeWidgetBounds(container.transform);
 
