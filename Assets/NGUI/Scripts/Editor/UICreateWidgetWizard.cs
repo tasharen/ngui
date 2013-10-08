@@ -291,7 +291,6 @@ public class UICreateWidgetWizard : EditorWindow
 				lbl.font = NGUISettings.font;
 				lbl.text = go.name;
 				lbl.AssumeNaturalSize();
-				Debug.Log(lbl.height);
 			}
 
 			// Add a collider

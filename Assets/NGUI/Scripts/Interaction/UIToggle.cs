@@ -174,10 +174,17 @@ public class UIToggle : UIWidgetContainer
 			// Uncheck all other toggles
 			if (group != 0 && state)
 			{
-				for (int i = 0, imax = list.size; i < imax; ++i)
+				for (int i = 0, imax = list.size; i < imax; )
 				{
 					UIToggle cb = list[i];
 					if (cb != this && cb.group == group) cb.Set(false);
+					
+					if (list.size != imax)
+					{
+						imax = list.size;
+						i = 0;
+					}
+					else ++i;
 				}
 			}
 
