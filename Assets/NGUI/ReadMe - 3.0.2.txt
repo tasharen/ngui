@@ -53,7 +53,7 @@ http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 - NEW: UIPanels now can show all draw calls instead of just their own.
 - NEW: UIStretch can now stretch clipped panels.
 - FIX: UITable was bugged with the "Up" direction.
-- FIX: FIX: Labels will process their text before returning the corners.
+- FIX: Labels will process their text before returning the corners.
 - FIX: UIAnchor was not calculating widget-related anchoring properly.
 
 3.0.1:
