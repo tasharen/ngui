@@ -57,7 +57,7 @@ public class UITexture : UIWidget
 			{
 				Material mat = material;
 				if (mat != null) mShader = mat.shader;
-				if (mShader == null) mShader = Shader.Find("Unlit/Texture");
+				if (mShader == null) mShader = Shader.Find("Unlit/Transparent Colored");
 			}
 			return mShader;
 		}
@@ -93,7 +93,6 @@ public class UITexture : UIWidget
 			if (!mCreatingMat && mDynamicMat == null)
 			{
 				mCreatingMat = true;
-
 				if (mShader == null) mShader = Shader.Find("Unlit/Transparent Colored");
 
 				Cleanup();
