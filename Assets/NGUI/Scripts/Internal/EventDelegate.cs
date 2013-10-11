@@ -62,6 +62,27 @@ public class EventDelegate
 	public EventDelegate (MonoBehaviour target, string methodName) { Set(target, methodName); }
 
 	/// <summary>
+	/// Windows 8 is retarded.
+	/// </summary>
+
+#if UNITY_METRO || UNITY_WP8
+	static string GetMethodName (Callback callback)
+	{
+		Delegate d = callback as Delegate;
+		return d.GetMethodInfo().Name;
+	}
+
+	static bool IsValid (Callback callback)
+	{
+		Delegate d = callback as Delegate;
+		return d != null && d.GetMethodInfo() != null;
+	}
+#else
+	static string GetMethodName (Callback callback) { return callback.Method.Name; }
+	static bool IsValid (Callback callback) { return callback != null && callback.Method != null; }
+#endif
+
+	/// <summary>
 	/// Equality operator.
 	/// </summary>
 
@@ -75,7 +96,7 @@ public class EventDelegate
 		if (obj is Callback)
 		{
 			Callback callback = obj as Callback;
-			return (mTarget == callback.Target && string.Equals(mMethodName, callback.Method.Name));
+			return (mTarget == callback.Target && string.Equals(mMethodName, GetMethodName(callback)));
 		}
 		
 		if (obj is EventDelegate)
@@ -101,7 +122,7 @@ public class EventDelegate
 
 	Callback Get ()
 	{
-		if (mCachedCallback == null || mCachedCallback.Target != mTarget || mCachedCallback.Method.Name != mMethodName)
+		if (mCachedCallback == null || mCachedCallback.Target != mTarget || GetMethodName(mCachedCallback) != mMethodName)
 		{
 			if (mTarget != null && !string.IsNullOrEmpty(mMethodName))
 			{
@@ -119,7 +140,7 @@ public class EventDelegate
 
 	void Set (Callback call)
 	{
-		if (call == null || call.Method == null)
+		if (call == null || !IsValid(call))
 		{
 			mTarget = null;
 			mMethodName = null;
@@ -128,7 +149,7 @@ public class EventDelegate
 		else
 		{
 			mTarget = call.Target as MonoBehaviour;
-			mMethodName = call.Method.Name;
+			mMethodName = GetMethodName(call);
 		}
 	}
 
