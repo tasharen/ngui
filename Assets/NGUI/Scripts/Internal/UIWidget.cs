@@ -374,32 +374,6 @@ public abstract class UIWidget : MonoBehaviour
 	[System.Obsolete("There is no relative scale anymore. Widgets now have width and height instead")]
 	public Vector2 relativeSize { get { return Vector2.one; } }
 
-	// Temporary list of widgets, used in the Raycast function in order to avoid repeated allocations.
-	//static BetterList<UIWidget> mTemp = new BetterList<UIWidget>();
-
-	/// <summary>
-	/// Raycast into the screen and return a list of widgets in order from closest to farthest away.
-	/// This is a slow operation and will consider all active widgets.
-	/// </summary>
-
-	//static public BetterList<UIWidget> Raycast (Vector2 mousePos, Camera cam, int mask)
-	//{
-	//    mTemp.Clear();
-		
-	//    for (int i = list.size; i > 0; )
-	//    {
-	//        UIWidget w = list[--i];
-
-	//        if ((mask & (1 << w.cachedGameObject.layer)) != 0 && w.mPanel != null)
-	//        {
-	//            Vector3[] corners = w.worldCorners;
-	//            if (NGUIMath.DistanceToRectangle(corners, mousePos, cam) == 0f)
-	//                mTemp.Add(w);
-	//        }
-	//    }
-	//    return mTemp;
-	//}
-
 	/// <summary>
 	/// Static widget comparison function used for depth sorting.
 	/// </summary>
@@ -412,6 +386,14 @@ public abstract class UIWidget : MonoBehaviour
 		{
 			if (left.mDepth < right.mDepth) return -1;
 			if (left.mDepth > right.mDepth) return 1;
+
+			Material leftMat = left.material;
+			Material rightMat = right.material;
+
+			if (leftMat == rightMat) return 0;
+			if (leftMat != null) return -1;
+			if (rightMat != null) return 1;
+			return (leftMat.GetInstanceID() < rightMat.GetInstanceID()) ? -1 : 1;
 		}
 		return val;
 	}
