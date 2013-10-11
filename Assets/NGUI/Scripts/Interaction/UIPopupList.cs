@@ -505,7 +505,6 @@ public class UIPopupList : UIWidgetContainer
 			// We need to know the size of the background sprite for padding purposes
 			Vector4 bgPadding = mBackground.border;
 			mBgBorder = bgPadding.y;
-
 			mBackground.cachedTransform.localPosition = new Vector3(0f, bgPadding.y, 0f);
 
 			// Add a sprite used for the selection
@@ -517,7 +516,8 @@ public class UIPopupList : UIWidgetContainer
 			if (hlsp == null) return;
 
 			float hlspHeight = hlsp.borderTop;
-			float labelHeight = font.size * font.pixelSize * textScale;
+			float fontHeight = font.size * font.pixelSize;
+			float labelHeight = fontHeight * textScale;
 			float x = 0f, y = -padding.y;
 			List<UILabel> labels = new List<UILabel>();
 
@@ -555,10 +555,11 @@ public class UIPopupList : UIWidgetContainer
 			}
 
 			// The triggering widget's width should be the minimum allowed width
-			x = Mathf.Max(x, bounds.size.x - (bgPadding.x + padding.x) * 2f);
+			x = Mathf.Max(x, bounds.size.x * textScale - (bgPadding.x + padding.x) * 2f);
 
-			Vector3 bcCenter = new Vector3(x * 0.5f, -labelHeight * 0.5f, 0f);
-			Vector3 bcSize = new Vector3(x, (labelHeight + padding.y), 1f);
+			float cx = x / textScale;
+			Vector3 bcCenter = new Vector3(cx * 0.5f, -fontHeight * 0.5f, 0f);
+			Vector3 bcSize = new Vector3(cx, (labelHeight + padding.y) / textScale, 1f);
 
 			// Run through all labels and add colliders
 			for (int i = 0, imax = labels.Count; i < imax; ++i)
