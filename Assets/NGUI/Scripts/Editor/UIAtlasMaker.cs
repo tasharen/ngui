@@ -89,7 +89,7 @@ public class UIAtlasMaker : EditorWindow
 		if (a == null && b != null) return 1;
 
 		// A is not null b is null a is greater so put it at the front of the list
-		if (a == null && b != null) return -1;
+		if (a != null && b == null) return -1;
 
 		// Get the total pixels used for each sprite
 		int aPixels = a.width * a.height;
@@ -690,7 +690,7 @@ public class UIAtlasMaker : EditorWindow
 			}
 		}
 
-		ComponentSelector.Draw<UIAtlas>("Select", NGUISettings.atlas, OnSelectAtlas);
+		ComponentSelector.Draw<UIAtlas>("Select", NGUISettings.atlas, OnSelectAtlas, true);
 
 		List<Texture> textures = GetSelectedTextures();
 
