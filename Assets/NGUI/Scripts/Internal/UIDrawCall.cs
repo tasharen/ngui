@@ -270,6 +270,7 @@ public class UIDrawCall : MonoBehaviour
 
 			// Figure out the normal shader's name
 			string shaderName = mSharedMat.shader.name;
+			shaderName = shaderName.Replace("GUI/Text Shader", "Unlit/Text");
 			shaderName = shaderName.Replace(alpha, "");
 			shaderName = shaderName.Replace(soft, "");
 
