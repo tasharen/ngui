@@ -3,7 +3,7 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
-#if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_BLACKBERRY
+#if !UNITY_EDITOR && (UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_BLACKBERRY)
 #define MOBILE
 #endif
 
@@ -131,14 +131,15 @@ public class UIInput : MonoBehaviour
 	protected float mPosition = 0f;
 	protected bool mDoInit = true;
 	protected UIWidget.Pivot mPivot = UIWidget.Pivot.TopLeft;
+	
+	static protected int mDrawStart = 0;
+	static protected int mDrawEnd = 0;
 
 #if MOBILE
 	static protected TouchScreenKeyboard mKeyboard;
 #else
 	static protected string mLastIME = "";
 	static protected TextEditor mEditor = null;
-	static protected int mDrawStart = 0;
-	static protected int mDrawEnd = 0;
 #endif
 
 	/// <summary>
@@ -333,7 +334,7 @@ public class UIInput : MonoBehaviour
 			{
 				mKeyboard = (inputType == InputType.Password) ?
 					TouchScreenKeyboard.Open(mValue, TouchScreenKeyboardType.Default, false, false, true) :
-					TouchScreenKeyboard.Open(mValue, (TouchScreenKeyboardType)((int)type), inputType == InputType.AutoCorrect);
+					TouchScreenKeyboard.Open(mValue, (TouchScreenKeyboardType)((int)keyboardType), inputType == InputType.AutoCorrect);
 			}
 			else
 #endif
@@ -409,9 +410,10 @@ public class UIInput : MonoBehaviour
 
 				for (int i = 0; i < val.Length; ++i)
 				{
-					char ch = val[i];
-					if (validator != null) ch = validator(mValue, ch);
-					if (ch != 0) mValue += ch;
+					char c = val[i];
+					if (onValidate != null) c = onValidate(mValue, mValue.Length, c);
+					else if (validation != Validation.None) c = Validate(mValue, mValue.Length, c);
+					if (c != 0) mValue += c;
 				}
 
 				if (characterLimit > 0 && mValue.Length > characterLimit) mValue = mValue.Substring(0, characterLimit);
@@ -423,7 +425,7 @@ public class UIInput : MonoBehaviour
 			{
 				mKeyboard = null;
 				if (!mKeyboard.wasCanceled) Submit();
-				selected = false;
+				isSelected = false;
 			}
 		}
 	}
