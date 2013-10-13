@@ -348,9 +348,9 @@ public class UIInput : MonoBehaviour
 				mEditor.content = new GUIContent(mValue);
 				mEditor.OnFocus();
 				mEditor.MoveTextEnd();
+#endif
 				mDrawStart = 0;
 				mDrawEnd = 0;
-#endif
 			}
 			UpdateLabel();
 		}
@@ -397,9 +397,6 @@ public class UIInput : MonoBehaviour
 #if MOBILE
 	void Update()
 	{
-#if UNITY_EDITOR
-		if (!Application.isPlaying) return;
-#endif
 		if (mKeyboard != null)
 		{
 			string val = mKeyboard.text;
@@ -423,8 +420,8 @@ public class UIInput : MonoBehaviour
 
 			if (mKeyboard.done)
 			{
-				mKeyboard = null;
 				if (!mKeyboard.wasCanceled) Submit();
+				mKeyboard = null;
 				isSelected = false;
 			}
 		}
