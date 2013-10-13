@@ -741,16 +741,25 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Different line wrapping functionality -- contributed by MightyM.
-	/// http://www.tasharen.com/forum/index.php?topic=1049.0
+	/// Get the end of line that would fit into a field of given width.
 	/// </summary>
 
-	public string GetEndOfLineThatFits (string text, float maxWidth, bool encoding, SymbolStyle symbolStyle)
+	public string GetEndOfLineThatFits (string text, int lineWidth, bool encoding, SymbolStyle symbolStyle)
 	{
-		if (mReplacement != null) return mReplacement.GetEndOfLineThatFits(text, maxWidth, encoding, symbolStyle);
+		int textLength = text.Length;
+		int offset = CalculateOffsetToFit(text, lineWidth, encoding, symbolStyle);
+		return text.Substring(offset, textLength - offset);
+	}
 
-		int lineWidth = Mathf.RoundToInt(maxWidth);
-		if (lineWidth < 1) return text;
+	/// <summary>
+	/// Calculate the character index offset required to print the end of the specified text.
+	/// Originally contributed by MightyM: http://www.tasharen.com/forum/index.php?topic=1049.0
+	/// </summary>
+
+	public int CalculateOffsetToFit (string text, int lineWidth, bool encoding, SymbolStyle symbolStyle)
+	{
+		if (lineWidth < 1) return 0;
+		if (mReplacement != null) return mReplacement.CalculateOffsetToFit(text, lineWidth, encoding, symbolStyle);
 
 #if DYNAMIC_FONT
 		if (mDynamicFont != null) mDynamicFont.RequestCharactersInTexture(text, mDynamicFontSize, mDynamicFontStyle);
@@ -806,7 +815,7 @@ public class UIFont : MonoBehaviour
 			remainingWidth -= glyphWidth;
 		}
 		if (remainingWidth < 0) ++currentCharacterIndex;
-		return text.Substring(currentCharacterIndex, textLength - currentCharacterIndex);
+		return currentCharacterIndex;
 	}
 
 #if DYNAMIC_FONT

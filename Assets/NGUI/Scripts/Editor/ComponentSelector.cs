@@ -24,17 +24,17 @@ public class ComponentSelector : ScriptableWizard
 	/// Draw a button + object selection combo filtering specified types.
 	/// </summary>
 
-	static public void Draw<T> (string buttonName, T obj, OnSelectionCallback cb, params GUILayoutOption[] options) where T : MonoBehaviour
+	static public void Draw<T> (string buttonName, T obj, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options) where T : MonoBehaviour
 	{
 		GUILayout.BeginHorizontal();
-		bool show = GUILayout.Button(buttonName, "DropDownButton", GUILayout.Width(76f));
+		bool show = NGUIEditorTools.DrawPrefixButton(buttonName);
 		GUILayout.BeginVertical();
 		GUILayout.Space(5f);
 
 		T o = EditorGUILayout.ObjectField(obj, typeof(T), false, options) as T;
 		GUILayout.EndVertical();
 
-		if (o != null && Selection.activeObject != o.gameObject && GUILayout.Button("Edit", GUILayout.Width(40f)))
+		if (editButton && o != null && Selection.activeObject != o.gameObject && GUILayout.Button("Edit", GUILayout.Width(40f)))
 		{
 			Selection.activeObject = o.gameObject;
 		}
@@ -47,9 +47,9 @@ public class ComponentSelector : ScriptableWizard
 	/// Draw a button + object selection combo filtering specified types.
 	/// </summary>
 
-	static public void Draw<T> (T obj, OnSelectionCallback cb, params GUILayoutOption[] options) where T : MonoBehaviour
+	static public void Draw<T> (T obj, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options) where T : MonoBehaviour
 	{
-		Draw<T>(NGUITools.GetName<T>(), obj, cb, options);
+		Draw<T>(NGUITools.GetName<T>(), obj, cb, editButton, options);
 	}
 
 	/// <summary>

@@ -118,7 +118,7 @@ public class UIFontInspector : Editor
 
 		if (mType == FontType.Reference)
 		{
-			ComponentSelector.Draw<UIFont>(mFont.replacement, OnSelectFont);
+			ComponentSelector.Draw<UIFont>(mFont.replacement, OnSelectFont, true);
 
 			GUILayout.Space(6f);
 			EditorGUILayout.HelpBox("You can have one font simply point to " +
@@ -182,13 +182,13 @@ public class UIFontInspector : Editor
 		{
 			NGUIEditorTools.DrawSeparator();
 
-			ComponentSelector.Draw<UIAtlas>(mFont.atlas, OnSelectAtlas);
+			ComponentSelector.Draw<UIAtlas>(mFont.atlas, OnSelectAtlas, true);
 
 			if (mFont.atlas != null)
 			{
 				if (mFont.bmFont.isValid)
 				{
-					NGUIEditorTools.AdvancedSpriteField(mFont.atlas, mFont.spriteName, SelectSprite, false);
+					NGUIEditorTools.DrawAdvancedSpriteField(mFont.atlas, mFont.spriteName, SelectSprite, false);
 				}
 				EditorGUILayout.Space();
 			}
@@ -348,7 +348,7 @@ public class UIFontInspector : Editor
 
 						GUILayout.BeginHorizontal();
 						GUILayout.Label(sym.sequence, GUILayout.Width(40f));
-						if (NGUIEditorTools.SimpleSpriteField(mFont.atlas, sym.spriteName, ChangeSymbolSprite))
+						if (NGUIEditorTools.DrawSpriteField(mFont.atlas, sym.spriteName, ChangeSymbolSprite))
 							mSelectedSymbol = sym;
 
 						if (GUILayout.Button("Edit", GUILayout.Width(40f)))
@@ -383,7 +383,7 @@ public class UIFontInspector : Editor
 
 					GUILayout.BeginHorizontal();
 					mSymbolSequence = EditorGUILayout.TextField(mSymbolSequence, GUILayout.Width(40f));
-					NGUIEditorTools.SimpleSpriteField(mFont.atlas, mSymbolSprite, SelectSymbolSprite);
+					NGUIEditorTools.DrawSpriteField(mFont.atlas, mSymbolSprite, SelectSymbolSprite);
 
 					bool isValid = !string.IsNullOrEmpty(mSymbolSequence) && !string.IsNullOrEmpty(mSymbolSprite);
 					GUI.backgroundColor = isValid ? Color.green : Color.grey;

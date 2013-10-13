@@ -890,6 +890,19 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Helper function that returns whether the specified MonoBehaviour is active.
+	/// </summary>
+
+	static public bool IsActive (MonoBehaviour mb)
+	{
+#if UNITY_3_5
+		return mb != null && mb.enabled && mb.gameObject.active;
+#else
+		return mb != null && mb.enabled && mb.gameObject.activeInHierarchy;
+#endif
+	}
+
+	/// <summary>
 	/// Unity4 has changed GameObject.active to GameObject.activeself.
 	/// </summary>
 
@@ -1060,48 +1073,23 @@ static public class NGUITools
 	}
 
 	/// <summary>
-	/// Clipboard access via reflection.
-	/// http://answers.unity3d.com/questions/266244/how-can-i-add-copypaste-clipboard-support-to-my-ga.html
-	/// </summary>
-
-#if UNITY_WEBPLAYER || UNITY_FLASH || UNITY_METRO
-	/// <summary>
-	/// Access to the clipboard is not supported on this platform.
-	/// </summary>
-
-	public static string clipboard
-	{
-		get { return null; }
-		set { }
-	}
-#else
-	static PropertyInfo mSystemCopyBuffer = null;
-	static PropertyInfo GetSystemCopyBufferProperty ()
-	{
-		if (mSystemCopyBuffer == null)
-		{
-			Type gui = typeof(GUIUtility);
-			mSystemCopyBuffer = gui.GetProperty("systemCopyBuffer", BindingFlags.Static | BindingFlags.NonPublic);
-		}
-		return mSystemCopyBuffer;
-	}
-
-	/// <summary>
-	/// Access to the clipboard via a hacky method of accessing Unity's internals. Won't work in the web player.
+	/// Access to the clipboard via undocumented APIs.
 	/// </summary>
 
 	public static string clipboard
 	{
 		get
 		{
-			PropertyInfo copyBuffer = GetSystemCopyBufferProperty();
-			return (copyBuffer != null) ? (string)copyBuffer.GetValue(null, null) : null;
+			TextEditor te = new TextEditor();
+			te.Paste();
+			return te.content.text;
 		}
 		set
 		{
-			PropertyInfo copyBuffer = GetSystemCopyBufferProperty();
-			if (copyBuffer != null) copyBuffer.SetValue(null, value, null);
+			TextEditor te = new TextEditor();
+			te.content = new GUIContent(value);
+			te.OnFocus();
+			te.Copy();
 		}
 	}
-#endif
 }

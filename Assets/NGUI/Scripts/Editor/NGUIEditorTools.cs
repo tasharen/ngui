@@ -356,8 +356,8 @@ public class NGUIEditorTools
 
 			// Draw the sprite selection popup
 			index = string.IsNullOrEmpty(field) ?
-				EditorGUILayout.Popup(index, list, "DropDownButton", options) :
-				EditorGUILayout.Popup(field, index, list, "DropDownButton", options);
+				DrawPrefixList(index, list, options) :
+				DrawPrefixList(field, index, list, options);
 
 			return list[index];
 		}
@@ -663,6 +663,26 @@ public class NGUIEditorTools
 		return list;
 	}
 
+	static public bool DrawPrefixButton (string text)
+	{
+		return GUILayout.Button(text, "DropDownButton", GUILayout.Width(76f));
+	}
+
+	static public bool DrawPrefixButton (string text, params GUILayoutOption[] options)
+	{
+		return GUILayout.Button(text, "DropDownButton", options);
+	}
+
+	static public int DrawPrefixList (int index, string[] list, params GUILayoutOption[] options)
+	{
+		return EditorGUILayout.Popup(index, list, "DropDownButton", options);
+	}
+
+	static public int DrawPrefixList (string text, int index, string[] list, params GUILayoutOption[] options)
+	{
+		return EditorGUILayout.Popup(text, index, list, "DropDownButton", options);
+	}
+
 	/// <summary>
 	/// Draw a sprite preview.
 	/// </summary>
@@ -839,11 +859,10 @@ public class NGUIEditorTools
 	/// Draw a sprite selection field.
 	/// </summary>
 
-	static public void SpriteField (string fieldName, UIAtlas atlas, string spriteName,
-		SpriteSelector.Callback callback, params GUILayoutOption[] options)
+	static public void DrawSpriteField (string label, UIAtlas atlas, string spriteName, SpriteSelector.Callback callback, params GUILayoutOption[] options)
 	{
 		GUILayout.BeginHorizontal();
-		GUILayout.Label(fieldName, GUILayout.Width(76f));
+		GUILayout.Label(label, GUILayout.Width(76f));
 
 		if (GUILayout.Button(spriteName, "MiniPullDown", options))
 		{
@@ -856,19 +875,19 @@ public class NGUIEditorTools
 	/// Draw a sprite selection field.
 	/// </summary>
 
-	static public void SpriteField (string fieldName, UIAtlas atlas, string spriteName, SpriteSelector.Callback callback)
+	static public void DrawSpriteField (string label, UIAtlas atlas, string spriteName, SpriteSelector.Callback callback)
 	{
-		SpriteField(fieldName, null, atlas, spriteName, callback);
+		DrawSpriteField(label, null, atlas, spriteName, callback);
 	}
 
 	/// <summary>
 	/// Draw a sprite selection field.
 	/// </summary>
 
-	static public void SpriteField (string fieldName, string caption, UIAtlas atlas, string spriteName, SpriteSelector.Callback callback)
+	static public void DrawSpriteField (string label, string caption, UIAtlas atlas, string spriteName, SpriteSelector.Callback callback)
 	{
 		GUILayout.BeginHorizontal();
-		GUILayout.Label(fieldName, GUILayout.Width(76f));
+		GUILayout.Label(label, GUILayout.Width(76f));
 
 		if (atlas.GetSprite(spriteName) == null)
 			spriteName = "";
@@ -890,12 +909,12 @@ public class NGUIEditorTools
 	/// Draw a simple sprite selection button.
 	/// </summary>
 
-	static public bool SimpleSpriteField (UIAtlas atlas, string spriteName, SpriteSelector.Callback callback, params GUILayoutOption[] options)
+	static public bool DrawSpriteField (UIAtlas atlas, string spriteName, SpriteSelector.Callback callback, params GUILayoutOption[] options)
 	{
 		if (atlas.GetSprite(spriteName) == null)
 			spriteName = "";
 
-		if (GUILayout.Button(spriteName, "DropDown", options))
+		if (NGUIEditorTools.DrawPrefixButton(spriteName, options))
 		{
 			SpriteSelector.Show(atlas, spriteName, callback);
 			return true;
@@ -907,10 +926,201 @@ public class NGUIEditorTools
 	static string mLastSprite = null;
 
 	/// <summary>
+	/// Draw a sprite selection field.
+	/// </summary>
+
+	static public void DrawSpriteField (string label, SerializedObject ob, string spriteField, params GUILayoutOption[] options)
+	{
+		DrawSpriteField(label, ob, ob.FindProperty("atlas"), ob.FindProperty(spriteField), 76f, false, options);
+	}
+
+	/// <summary>
+	/// Draw a sprite selection field.
+	/// </summary>
+
+	static public void DrawSpriteField (string label, SerializedObject ob, SerializedProperty atlas, SerializedProperty sprite, params GUILayoutOption[] options)
+	{
+		DrawSpriteField(label, ob, atlas, sprite, 76f, false, options);
+	}
+
+	/// <summary>
+	/// Draw a sprite selection field.
+	/// </summary>
+
+	static public void DrawSpriteField (string label, SerializedObject ob, SerializedProperty atlas, SerializedProperty sprite, float width, bool padded, params GUILayoutOption[] options)
+	{
+		if (atlas != null && atlas.objectReferenceValue != null)
+		{
+			GUILayout.BeginHorizontal();
+			GUILayout.Label(label, GUILayout.Width(width));
+
+			if (sprite == null)
+			{
+				GUILayout.Label("Invalid field name");
+			}
+			else
+			{
+				string spriteName = sprite.hasMultipleDifferentValues ? "-" : sprite.stringValue;
+
+				if (padded) GUILayout.BeginHorizontal();
+
+				EditorGUI.BeginDisabledGroup(atlas.hasMultipleDifferentValues);
+				{
+					if (GUILayout.Button(spriteName, "MiniPullDown", options))
+						SpriteSelector.Show(ob, sprite, atlas.objectReferenceValue as UIAtlas);
+				}
+				EditorGUI.EndDisabledGroup();
+
+				if (padded)
+				{
+					GUILayout.Space(18f);
+					GUILayout.EndHorizontal();
+				}
+			}
+			GUILayout.EndHorizontal();
+		}
+	}
+
+	/// <summary>
+	/// Draw a sprite field.
+	/// </summary>
+
+	/*static public void DrawAdvancedSpriteField (SerializedObject ob, string fieldName, params GUILayoutOption[] options)
+	{
+		DrawAdvancedSpriteField("Sprite", ob, fieldName, 76f, options);
+	}
+
+	/// <summary>
+	/// Draw a sprite field.
+	/// </summary>
+
+	static public void DrawAdvancedSpriteField (string label, SerializedObject ob, string fieldName, params GUILayoutOption[] options)
+	{
+		DrawAdvancedSpriteField(label, ob, fieldName, 76f, options);
+	}
+
+	/// <summary>
+	/// Draw a sprite field.
+	/// </summary>
+
+	static public void DrawAdvancedSpriteField (string label, SerializedObject ob, string fieldName, float width, params GUILayoutOption[] options)
+	{
+		SerializedProperty ap = ob.FindProperty("atlas");
+
+		if (ap == null)
+		{
+			EditorGUILayout.HelpBox("No atlas found", MessageType.Error);
+		}
+		else if (ap.hasMultipleDifferentValues)
+		{
+			EditorGUILayout.HelpBox("Different atlases selected", MessageType.Warning);
+		}
+		else
+		{
+			UIAtlas atlas = ap.objectReferenceValue as UIAtlas;
+
+			if (atlas != null)
+			{
+				SerializedProperty prop = ob.FindProperty(fieldName);
+				DrawAdvancedSpriteField(label, ob, prop, atlas, width, SpriteProperty.None, options);
+			}
+		}
+	}
+
+	public enum SpriteProperty
+	{
+		None,
+		Editable,
+		EditButton,
+	}
+
+	/// <summary>
+	/// Draw a sprite field.
+	/// </summary>
+
+	static public void DrawAdvancedSpriteField (string label, SerializedObject ob, SerializedProperty prop, UIAtlas atlas, float width, SpriteProperty extra, params GUILayoutOption[] options)
+	{
+		if (atlas.spriteList.Count == 0 || prop == null)
+		{
+			EditorGUILayout.HelpBox("No sprites found", MessageType.Warning);
+			return;
+		}
+
+		string spriteName = prop.stringValue;
+
+		// Sprite selection drop-down list
+		GUILayout.BeginHorizontal();
+		{
+			if (NGUIEditorTools.DrawPrefixButton(label, GUILayout.Width(width)))
+				SpriteSelector.Show(ob, prop, atlas);
+
+			if (extra == SpriteProperty.Editable && !ob.isEditingMultipleObjects)
+			{
+				if (!string.Equals(spriteName, mLastSprite))
+				{
+					mLastSprite = spriteName;
+					mEditedName = null;
+				}
+
+				string newName = GUILayout.TextField(string.IsNullOrEmpty(mEditedName) ? spriteName : mEditedName);
+
+				if (newName != spriteName)
+				{
+					mEditedName = newName;
+
+					if (GUILayout.Button("Rename", GUILayout.Width(60f)))
+					{
+						UISpriteData sprite = atlas.GetSprite(spriteName);
+
+						if (sprite != null)
+						{
+							NGUIEditorTools.RegisterUndo("Edit Sprite Name", atlas);
+							sprite.name = newName;
+
+							List<UISprite> sprites = FindAll<UISprite>();
+
+							for (int i = 0; i < sprites.Count; ++i)
+							{
+								UISprite sp = sprites[i];
+
+								if (sp.atlas == atlas && sp.spriteName == spriteName)
+								{
+									NGUIEditorTools.RegisterUndo("Edit Sprite Name", sp);
+									sp.spriteName = newName;
+								}
+							}
+
+							mLastSprite = newName;
+							spriteName = newName;
+							mEditedName = null;
+
+							NGUISettings.selectedSprite = spriteName;
+						}
+					}
+				}
+			}
+			else
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Label(spriteName, "HelpBox", GUILayout.Height(18f));
+				GUILayout.Space(18f);
+				GUILayout.EndHorizontal();
+
+				if (extra == SpriteProperty.EditButton && GUILayout.Button("Edit", GUILayout.Width(40f)))
+				{
+					NGUISettings.selectedSprite = spriteName;
+					Select(atlas.gameObject);
+				}
+			}
+		}
+		GUILayout.EndHorizontal();
+	}*/
+
+	/// <summary>
 	/// Convenience function that displays a list of sprites and returns the selected value.
 	/// </summary>
 
-	static public void AdvancedSpriteField (UIAtlas atlas, string spriteName, SpriteSelector.Callback callback, bool editable,
+	static public void DrawAdvancedSpriteField (UIAtlas atlas, string spriteName, SpriteSelector.Callback callback, bool editable,
 		params GUILayoutOption[] options)
 	{
 		// Give the user a warning if there are no sprites in the atlas
@@ -923,10 +1133,8 @@ public class NGUIEditorTools
 		// Sprite selection drop-down list
 		GUILayout.BeginHorizontal();
 		{
-			if (GUILayout.Button("Sprite", "DropDownButton", GUILayout.Width(76f)))
-			{
+			if (NGUIEditorTools.DrawPrefixButton("Sprite"))
 				SpriteSelector.Show(atlas, spriteName, callback);
-			}
 
 			if (editable)
 			{
@@ -1156,6 +1364,66 @@ public class NGUIEditorTools
 		NGUIEditorTools.BeginContents();
 		EventDelegateEditor.Field(undoObject, list, notValid, notValid);
 		NGUIEditorTools.EndContents();
+	}
+
+	/// <summary>
+	/// Helper function that draws a serialized property.
+	/// </summary>
+
+	static public SerializedProperty DrawProperty (SerializedObject serializedObject, string property, params GUILayoutOption[] options)
+	{
+		return DrawProperty(null, serializedObject, property, false, options);
+	}
+
+	/// <summary>
+	/// Helper function that draws a serialized property.
+	/// </summary>
+
+	static public SerializedProperty DrawProperty (string label, SerializedObject serializedObject, string property, params GUILayoutOption[] options)
+	{
+		return DrawProperty(label, serializedObject, property, false, options);
+	}
+
+	/// <summary>
+	/// Helper function that draws a serialized property.
+	/// </summary>
+
+	static public SerializedProperty DrawPaddedProperty (SerializedObject serializedObject, string property, params GUILayoutOption[] options)
+	{
+		return DrawProperty(null, serializedObject, property, true, options);
+	}
+
+	/// <summary>
+	/// Helper function that draws a serialized property.
+	/// </summary>
+
+	static public SerializedProperty DrawPaddedProperty (string label, SerializedObject serializedObject, string property, params GUILayoutOption[] options)
+	{
+		return DrawProperty(label, serializedObject, property, true, options);
+	}
+
+	/// <summary>
+	/// Helper function that draws a serialized property.
+	/// </summary>
+
+	static public SerializedProperty DrawProperty (string label, SerializedObject serializedObject, string property, bool padding, params GUILayoutOption[] options)
+	{
+		SerializedProperty sp = serializedObject.FindProperty(property);
+
+		if (sp != null)
+		{
+			if (padding) EditorGUILayout.BeginHorizontal();
+			
+			if (label != null) EditorGUILayout.PropertyField(sp, new GUIContent(label), options);
+			else EditorGUILayout.PropertyField(sp, options);
+
+			if (padding) 
+			{
+				GUILayout.Space(18f);
+				EditorGUILayout.EndHorizontal();
+			}
+		}
+		return sp;
 	}
 
 	/// <summary>

@@ -34,8 +34,6 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] string mText = "";
 	[HideInInspector][SerializeField] bool mEncoding = true;
 	[HideInInspector][SerializeField] int mMaxLineCount = 0; // 0 denotes unlimited
-	[HideInInspector][SerializeField] bool mPassword = false;
-	[HideInInspector][SerializeField] bool mShowLastChar = false;
 	[HideInInspector][SerializeField] Effect mEffectStyle = Effect.None;
 	[HideInInspector][SerializeField] Color mEffectColor = Color.black;
 	[HideInInspector][SerializeField] UIFont.SymbolStyle mSymbols = UIFont.SymbolStyle.Uncolored;
@@ -164,7 +162,6 @@ public class UILabel : UIWidget
 			{
 				mEncoding = value;
 				hasChanged = true;
-				if (value) mPassword = false;
 			}
 		}
 	}
@@ -255,7 +252,6 @@ public class UILabel : UIWidget
 			{
 				mMaxLineCount = (value ? 0 : 1);
 				hasChanged = true;
-				if (value) mPassword = false;
 			}
 		}
 	}
@@ -301,54 +297,8 @@ public class UILabel : UIWidget
 			if (mMaxLineCount != value)
 			{
 				mMaxLineCount = Mathf.Max(value, 0);
-				if (value != 1) mPassword = false;
 				hasChanged = true;
 				if (overflowMethod == Overflow.ShrinkContent) MakePixelPerfect();
-			}
-		}
-	}
-
-	/// <summary>
-	/// Whether the label's contents should be hidden
-	/// </summary>
-
-	public bool password
-	{
-		get
-		{
-			return mPassword;
-		}
-		set
-		{
-			if (mPassword != value)
-			{
-				if (value)
-				{
-					mMaxLineCount = 1;
-					mEncoding = false;
-				}
-				mPassword = value;
-				hasChanged = true;
-			}
-		}
-	}
-
-	/// <summary>
-	/// Whether the last character of a password field will be shown
-	/// </summary>
-
-	public bool showLastPasswordChar
-	{
-		get
-		{
-			return mShowLastChar;
-		}
-		set
-		{
-			if (mShowLastChar != value)
-			{
-				mShowLastChar = value;
-				hasChanged = true;
 			}
 		}
 	}
@@ -614,26 +564,7 @@ public class UILabel : UIWidget
 				int ph = (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight) ?
 					100000 : Mathf.RoundToInt(lh / mScale);
 
-				if (mPassword)
-				{
-					mProcessedText = "";
-
-					if (mShowLastChar)
-					{
-						for (int i = 0, imax = mText.Length - 1; i < imax; ++i)
-							mProcessedText += "*";
-						if (mText.Length > 0)
-							mProcessedText += mText[mText.Length - 1];
-					}
-					else
-					{
-						for (int i = 0, imax = mText.Length; i < imax; ++i)
-							mProcessedText += "*";
-					}
-					
-					fits = mFont.WrapText(mProcessedText, out mProcessedText, pw, ph, mMaxLineCount, false, UIFont.SymbolStyle.None);
-				}
-				else if (lw > 0f || lh > 0f)
+				if (lw > 0f || lh > 0f)
 				{
 					fits = mFont.WrapText(mText, out mProcessedText, pw, ph, mMaxLineCount, mEncoding, mSymbols);
 				}

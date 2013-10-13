@@ -288,7 +288,8 @@ public class UICamera : MonoBehaviour
 	static List<Highlighted> mHighlighted = new List<Highlighted>();
 
 	// Selected widget (for input)
-	static GameObject mSel = null;
+	static GameObject mCurrentSelection = null;
+	static GameObject mNextSelection = null;
 
 	// Mouse events
 	static MouseOrTouch[] mMouse = new MouseOrTouch[] { new MouseOrTouch(), new MouseOrTouch(), new MouseOrTouch() };
@@ -346,42 +347,61 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			return mSel;
+			return mCurrentSelection;
 		}
 		set
 		{
-			if (mSel != value)
+			if (mNextSelection != null)
 			{
-				if (mSel != null)
+				mNextSelection = value;
+			}
+			else if (mCurrentSelection != value)
+			{
+				if (mCurrentSelection != null)
 				{
-					UICamera uicam = FindCameraForLayer(mSel.layer);
+					UICamera uicam = FindCameraForLayer(mCurrentSelection.layer);
 
 					if (uicam != null)
 					{
 						current = uicam;
 						currentCamera = uicam.mCam;
-						Notify(mSel, "OnSelect", false);
-						if (uicam.useController || uicam.useKeyboard) Highlight(mSel, false);
+						Notify(mCurrentSelection, "OnSelect", false);
+						if (uicam.useController || uicam.useKeyboard) Highlight(mCurrentSelection, false);
 						current = null;
 					}
 				}
 
-				mSel = value;
+				mCurrentSelection = null;
+				mNextSelection = value;
 
-				if (mSel != null)
+				if (mNextSelection != null)
 				{
-					UICamera uicam = FindCameraForLayer(mSel.layer);
-
-					if (uicam != null)
-					{
-						current = uicam;
-						currentCamera = uicam.mCam;
-						if (uicam.useController || uicam.useKeyboard) Highlight(mSel, true);
-						Notify(mSel, "OnSelect", true);
-						current = null;
-					}
+					UICamera uicam = FindCameraForLayer(mNextSelection.layer);
+					if (uicam != null) uicam.StartCoroutine(uicam.ChangeSelection(mNextSelection));
 				}
 			}
+		}
+	}
+
+	/// <summary>
+	/// Selection change is delayed on purpose. This way selection changes during event processing won't cause
+	/// the newly selected widget to continue processing when it is it's turn. Example: pressing 'tab' on one
+	/// button selects the next button, and then it also processes its 'tab' in turn, selecting the next one.
+	/// </summary>
+
+	System.Collections.IEnumerator ChangeSelection (GameObject go)
+	{
+		yield return new WaitForEndOfFrame();
+		mCurrentSelection = go;
+		mNextSelection = null;
+
+		if (mCurrentSelection != null)
+		{
+			current = this;
+			currentCamera = mCam;
+			if (useController || useKeyboard) Highlight(mCurrentSelection, true);
+			Notify(mCurrentSelection, "OnSelect", true);
+			current = null;
 		}
 	}
 
@@ -857,11 +877,11 @@ public class UICamera : MonoBehaviour
 		if (onCustomInput != null) onCustomInput();
 
 		// Clear the selection on the cancel key, but only if mouse input is allowed
-		if (useMouse && mSel != null && ((cancelKey0 != KeyCode.None && Input.GetKeyDown(cancelKey0)) ||
+		if (useMouse && mCurrentSelection != null && ((cancelKey0 != KeyCode.None && Input.GetKeyDown(cancelKey0)) ||
 			(cancelKey1 != KeyCode.None && Input.GetKeyDown(cancelKey1)))) selectedObject = null;
 
 		// Forward the input to the selected object
-		if (mSel != null)
+		if (mCurrentSelection != null)
 		{
 			string input = Input.inputString;
 
@@ -871,13 +891,13 @@ public class UICamera : MonoBehaviour
 			if (input.Length > 0)
 			{
 				if (!stickyTooltip && mTooltip != null) ShowTooltip(false);
-				Notify(mSel, "OnInput", input);
+				Notify(mCurrentSelection, "OnInput", input);
 			}
 		}
 		else inputHasFocus = false;
 
 		// Update the keyboard and joystick events
-		if (mSel != null) ProcessOthers();
+		if (mCurrentSelection != null) ProcessOthers();
 
 		// If it's time to show a tooltip, inform the object we're hovering over
 		if (useMouse && mHover != null)
@@ -1069,14 +1089,14 @@ public class UICamera : MonoBehaviour
 		currentTouch = mController;
 
 		// If this is an input field, ignore WASD and Space key presses
-		inputHasFocus = (mSel != null && mSel.GetComponent<UIInput>() != null);
+		inputHasFocus = (mCurrentSelection != null && mCurrentSelection.GetComponent<UIInput>() != null);
 
 		bool submitKeyDown = (submitKey0 != KeyCode.None && Input.GetKeyDown(submitKey0)) || (submitKey1 != KeyCode.None && Input.GetKeyDown(submitKey1));
 		bool submitKeyUp = (submitKey0 != KeyCode.None && Input.GetKeyUp(submitKey0)) || (submitKey1 != KeyCode.None && Input.GetKeyUp(submitKey1));
 
 		if (submitKeyDown || submitKeyUp)
 		{
-			currentTouch.current = mSel;
+			currentTouch.current = mCurrentSelection;
 			ProcessTouch(submitKeyDown, submitKeyUp);
 			currentTouch.current = null;
 		}
@@ -1105,13 +1125,13 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Send out key notifications
-		if (vertical != 0) Notify(mSel, "OnKey", vertical > 0 ? KeyCode.UpArrow : KeyCode.DownArrow);
-		if (horizontal != 0) Notify(mSel, "OnKey", horizontal > 0 ? KeyCode.RightArrow : KeyCode.LeftArrow);
-		if (useKeyboard && Input.GetKeyDown(KeyCode.Tab)) Notify(mSel, "OnKey", KeyCode.Tab);
+		if (vertical != 0) Notify(mCurrentSelection, "OnKey", vertical > 0 ? KeyCode.UpArrow : KeyCode.DownArrow);
+		if (horizontal != 0) Notify(mCurrentSelection, "OnKey", horizontal > 0 ? KeyCode.RightArrow : KeyCode.LeftArrow);
+		if (useKeyboard && Input.GetKeyDown(KeyCode.Tab)) Notify(mCurrentSelection, "OnKey", KeyCode.Tab);
 
 		// Send out the cancel key notification
-		if (cancelKey0 != KeyCode.None && Input.GetKeyDown(cancelKey0)) Notify(mSel, "OnKey", KeyCode.Escape);
-		if (cancelKey1 != KeyCode.None && Input.GetKeyDown(cancelKey1)) Notify(mSel, "OnKey", KeyCode.Escape);
+		if (cancelKey0 != KeyCode.None && Input.GetKeyDown(cancelKey0)) Notify(mCurrentSelection, "OnKey", KeyCode.Escape);
+		if (cancelKey1 != KeyCode.None && Input.GetKeyDown(cancelKey1)) Notify(mCurrentSelection, "OnKey", KeyCode.Escape);
 
 		currentTouch = null;
 	}
@@ -1142,7 +1162,7 @@ public class UICamera : MonoBehaviour
 			Notify(currentTouch.pressed, "OnPress", true);
 
 			// Clear the selection
-			if (currentTouch.pressed != mSel)
+			if (currentTouch.pressed != mCurrentSelection)
 			{
 				if (mTooltip != null) ShowTooltip(false);
 				selectedObject = null;
@@ -1224,14 +1244,16 @@ public class UICamera : MonoBehaviour
 					(currentTouch.clickNotification != ClickNotification.None &&
 					currentTouch.totalDelta.magnitude < drag))
 				{
-					if (currentTouch.pressed != mSel)
+					if (currentTouch.pressed != mCurrentSelection)
 					{
-						mSel = currentTouch.pressed;
+						mNextSelection = null;
+						mCurrentSelection = currentTouch.pressed;
 						Notify(currentTouch.pressed, "OnSelect", true);
 					}
 					else
 					{
-						mSel = currentTouch.pressed;
+						mNextSelection = null;
+						mCurrentSelection = currentTouch.pressed;
 					}
 
 					// If the touch should consider clicks, send out an OnClick notification

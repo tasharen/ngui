@@ -219,7 +219,7 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			NGUIEditorTools.SpriteField("Sprite", "Sprite that will be created", NGUISettings.atlas, field, OnSprite);
+			NGUIEditorTools.DrawSpriteField("Sprite", "Sprite that will be created", NGUISettings.atlas, field, OnSprite);
 
 			if (!string.IsNullOrEmpty(field))
 			{
@@ -266,7 +266,7 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			NGUIEditorTools.SpriteField("Background", "Sliced Sprite for the background", NGUISettings.atlas, mButton, OnButton);
+			NGUIEditorTools.DrawSpriteField("Background", "Sliced Sprite for the background", NGUISettings.atlas, mButton, OnButton);
 		}
 
 		if (ShouldCreate(go, NGUISettings.atlas != null))
@@ -314,10 +314,10 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			NGUIEditorTools.SpriteField("Normal", "Normal state sprite", NGUISettings.atlas, mImage0, OnImage0);
-			NGUIEditorTools.SpriteField("Hover", "Hover state sprite", NGUISettings.atlas, mImage1, OnImage1);
-			NGUIEditorTools.SpriteField("Pressed", "Pressed state sprite", NGUISettings.atlas, mImage2, OnImage2);
-			NGUIEditorTools.SpriteField("Disabled", "Disabled state sprite", NGUISettings.atlas, mImage3, OnImage3);
+			NGUIEditorTools.DrawSpriteField("Normal", "Normal state sprite", NGUISettings.atlas, mImage0, OnImage0);
+			NGUIEditorTools.DrawSpriteField("Hover", "Hover state sprite", NGUISettings.atlas, mImage1, OnImage1);
+			NGUIEditorTools.DrawSpriteField("Pressed", "Pressed state sprite", NGUISettings.atlas, mImage2, OnImage2);
+			NGUIEditorTools.DrawSpriteField("Disabled", "Disabled state sprite", NGUISettings.atlas, mImage3, OnImage3);
 		}
 
 		if (ShouldCreate(go, NGUISettings.atlas != null))
@@ -374,8 +374,8 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			NGUIEditorTools.SpriteField("Background", "Sprite used for the background", NGUISettings.atlas, mCheckBG, OnCheckBG);
-			NGUIEditorTools.SpriteField("Checkmark", "Sprite used for the checkmark", NGUISettings.atlas, mCheck, OnCheck);
+			NGUIEditorTools.DrawSpriteField("Background", "Sprite used for the background", NGUISettings.atlas, mCheckBG, OnCheckBG);
+			NGUIEditorTools.DrawSpriteField("Checkmark", "Sprite used for the checkmark", NGUISettings.atlas, mCheck, OnCheck);
 		}
 
 		if (ShouldCreate(go, NGUISettings.atlas != null))
@@ -434,8 +434,8 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			NGUIEditorTools.SpriteField("Background", "Sprite used for the background", NGUISettings.atlas, mScrollBG, OnScrollBG);
-			NGUIEditorTools.SpriteField("Foreground", "Sprite used for the foreground (thumb)", NGUISettings.atlas, mScrollFG, OnScrollFG);
+			NGUIEditorTools.DrawSpriteField("Background", "Sprite used for the background", NGUISettings.atlas, mScrollBG, OnScrollBG);
+			NGUIEditorTools.DrawSpriteField("Foreground", "Sprite used for the foreground (thumb)", NGUISettings.atlas, mScrollFG, OnScrollFG);
 
 			GUILayout.BeginHorizontal();
 			UIScrollBar.Direction dir = (UIScrollBar.Direction)EditorGUILayout.EnumPopup("Direction", mScrollDir, GUILayout.Width(200f));
@@ -504,12 +504,12 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			NGUIEditorTools.SpriteField("Empty", "Sprite for the background (empty bar)", NGUISettings.atlas, mSliderBG, OnSliderBG);
-			NGUIEditorTools.SpriteField("Full", "Sprite for the foreground (full bar)", NGUISettings.atlas, mSliderFG, OnSliderFG);
+			NGUIEditorTools.DrawSpriteField("Empty", "Sprite for the background (empty bar)", NGUISettings.atlas, mSliderBG, OnSliderBG);
+			NGUIEditorTools.DrawSpriteField("Full", "Sprite for the foreground (full bar)", NGUISettings.atlas, mSliderFG, OnSliderFG);
 
 			if (slider)
 			{
-				NGUIEditorTools.SpriteField("Thumb", "Sprite for the thumb indicator", NGUISettings.atlas, mSliderTB, OnSliderTB);
+				NGUIEditorTools.DrawSpriteField("Thumb", "Sprite for the thumb indicator", NGUISettings.atlas, mSliderTB, OnSliderTB);
 			}
 		}
 
@@ -594,7 +594,7 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			NGUIEditorTools.SpriteField("Background", "Sliced Sprite for the background", NGUISettings.atlas, mInputBG, OnInputBG);
+			NGUIEditorTools.DrawSpriteField("Background", "Sliced Sprite for the background", NGUISettings.atlas, mInputBG, OnInputBG);
 		}
 
 		if (ShouldCreate(go, NGUISettings.atlas != null && NGUISettings.font != null))
@@ -648,9 +648,9 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (NGUISettings.atlas != null)
 		{
-			NGUIEditorTools.SpriteField("Foreground", "Foreground sprite (shown on the button)", NGUISettings.atlas, mListFG, OnListFG);
-			NGUIEditorTools.SpriteField("Background", "Background sprite (envelops the options)", NGUISettings.atlas, mListBG, OnListBG);
-			NGUIEditorTools.SpriteField("Highlight", "Sprite used to highlight the selected option", NGUISettings.atlas, mListHL, OnListHL);
+			NGUIEditorTools.DrawSpriteField("Foreground", "Foreground sprite (shown on the button)", NGUISettings.atlas, mListFG, OnListFG);
+			NGUIEditorTools.DrawSpriteField("Background", "Background sprite (envelops the options)", NGUISettings.atlas, mListBG, OnListBG);
+			NGUIEditorTools.DrawSpriteField("Highlight", "Sprite used to highlight the selected option", NGUISettings.atlas, mListHL, OnListHL);
 		}
 
 		if (ShouldCreate(go, NGUISettings.atlas != null && NGUISettings.font != null))
@@ -740,12 +740,12 @@ public class UICreateWidgetWizard : EditorWindow
 			GUILayout.Space(4f);
 
 			GUILayout.BeginHorizontal();
-			ComponentSelector.Draw<UIAtlas>(NGUISettings.atlas, OnSelectAtlas, GUILayout.Width(140f));
+			ComponentSelector.Draw<UIAtlas>(NGUISettings.atlas, OnSelectAtlas, true, GUILayout.Width(140f));
 			GUILayout.Label("Texture atlas used by widgets", GUILayout.MinWidth(10000f));
 			GUILayout.EndHorizontal();
 
 			GUILayout.BeginHorizontal();
-			ComponentSelector.Draw<UIFont>(NGUISettings.font, OnSelectFont, GUILayout.Width(140f));
+			ComponentSelector.Draw<UIFont>(NGUISettings.font, OnSelectFont, true, GUILayout.Width(140f));
 			GUILayout.Label("Font used by labels", GUILayout.MinWidth(10000f));
 			GUILayout.EndHorizontal();
 

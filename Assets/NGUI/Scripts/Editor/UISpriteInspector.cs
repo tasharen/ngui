@@ -51,9 +51,9 @@ public class UISpriteInspector : UIWidgetInspector
 	protected override bool DrawProperties ()
 	{
 		mSprite = mWidget as UISprite;
-		ComponentSelector.Draw<UIAtlas>(mSprite.atlas, OnSelectAtlas);
+		ComponentSelector.Draw<UIAtlas>(mSprite.atlas, OnSelectAtlas, true);
 		if (mSprite.atlas == null) return false;
-		NGUIEditorTools.AdvancedSpriteField(mSprite.atlas, mSprite.spriteName, SelectSprite, false);
+		NGUIEditorTools.DrawAdvancedSpriteField(mSprite.atlas, mSprite.spriteName, SelectSprite, false);
 		return true;
 	}
 

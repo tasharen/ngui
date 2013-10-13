@@ -40,7 +40,7 @@ public class UILabelInspector : UIWidgetInspector
 	protected override bool DrawProperties ()
 	{
 		mLabel = mWidget as UILabel;
-		ComponentSelector.Draw<UIFont>(mLabel.font, OnSelectFont);
+		ComponentSelector.Draw<UIFont>(mLabel.font, OnSelectFont, true);
 
 		if (mLabel.font != null)
 		{
@@ -52,20 +52,11 @@ public class UILabelInspector : UIWidgetInspector
 			UILabel.Overflow ov = (UILabel.Overflow)EditorGUILayout.EnumPopup("Overflow", mLabel.overflowMethod);
 			if (ov != mLabel.overflowMethod) { RegisterUndo(); mLabel.overflowMethod = ov; }
 
-			// Only input fields need this setting exposed, and they have their own "is password" setting, so hiding it here.
-			//GUILayout.BeginHorizontal();
-			//bool password = EditorGUILayout.Toggle("Password", mLabel.password, GUILayout.Width(100f));
-			//GUILayout.Label("- hide characters");
-			//GUILayout.EndHorizontal();
-			//if (password != mLabel.password) { RegisterUndo(); mLabel.password = password; }
-
 			GUILayout.BeginHorizontal();
 			bool encoding = EditorGUILayout.Toggle("Encoding", mLabel.supportEncoding, GUILayout.Width(100f));
 			GUILayout.Label("use emoticons and colors");
 			GUILayout.EndHorizontal();
 			if (encoding != mLabel.supportEncoding) { RegisterUndo(); mLabel.supportEncoding = encoding; }
-
-			//GUILayout.EndHorizontal();
 
 			if (encoding && mLabel.font.hasSymbols)
 			{

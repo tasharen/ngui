@@ -52,8 +52,8 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 		NGUIEditorTools.SetLabelWidth(80f);
 		mList = target as UIPopupList;
 
-		ComponentSelector.Draw<UIAtlas>(mList.atlas, OnSelectAtlas);
-		ComponentSelector.Draw<UIFont>(mList.font, OnSelectFont);
+		ComponentSelector.Draw<UIAtlas>(mList.atlas, OnSelectAtlas, true);
+		ComponentSelector.Draw<UIFont>(mList.font, OnSelectFont, true);
 
 		GUILayout.BeginHorizontal();
 		UILabel lbl = EditorGUILayout.ObjectField("Text Label", mList.textLabel, typeof(UILabel), true) as UILabel;
@@ -129,8 +129,8 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 			{
 				NGUIEditorTools.BeginContents();
 
-				NGUIEditorTools.SpriteField("Background", mList.atlas, mList.backgroundSprite, OnBackground);
-				NGUIEditorTools.SpriteField("Highlight", mList.atlas, mList.highlightSprite, OnHighlight);
+				NGUIEditorTools.DrawSpriteField("Background", mList.atlas, mList.backgroundSprite, OnBackground);
+				NGUIEditorTools.DrawSpriteField("Highlight", mList.atlas, mList.highlightSprite, OnHighlight);
 
 				EditorGUILayout.Space();
 

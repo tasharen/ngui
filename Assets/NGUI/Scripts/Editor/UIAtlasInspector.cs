@@ -122,7 +122,7 @@ public class UIAtlasInspector : Editor
 
 		if (mType == AtlasType.Reference)
 		{
-			ComponentSelector.Draw<UIAtlas>(mAtlas.replacement, OnSelectAtlas);
+			ComponentSelector.Draw<UIAtlas>(mAtlas.replacement, OnSelectAtlas, true);
 
 			GUILayout.Space(6f);
 			EditorGUILayout.HelpBox("You can have one atlas simply point to " +
@@ -206,7 +206,7 @@ public class UIAtlasInspector : Editor
 					NGUIEditorTools.BeginContents();
 
 					GUILayout.Space(3f);
-					NGUIEditorTools.AdvancedSpriteField(mAtlas, sprite.name, SelectSprite, true);
+					NGUIEditorTools.DrawAdvancedSpriteField(mAtlas, sprite.name, SelectSprite, true);
 					GUILayout.Space(6f);
 
 					GUI.changed = false;

@@ -179,8 +179,8 @@ public class UIFontMaker : EditorWindow
 				NGUISettings.fontName = GUILayout.TextField(NGUISettings.fontName);
 				GUILayout.EndHorizontal();
 
-				ComponentSelector.Draw<UIFont>("Select", NGUISettings.font, OnSelectFont);
-				ComponentSelector.Draw<UIAtlas>(NGUISettings.atlas, OnSelectAtlas);
+				ComponentSelector.Draw<UIFont>("Select", NGUISettings.font, OnSelectFont, true);
+				ComponentSelector.Draw<UIAtlas>(NGUISettings.atlas, OnSelectAtlas, true);
 				NGUIEditorTools.EndContents();
 			}
 
