@@ -569,7 +569,11 @@ public class UICamera : MonoBehaviour
 
 					for (int b = 0; b < mHits.size; ++b)
 					{
+#if UNITY_FLASH
+						if (IsVisible(mHits.buffer[b]))
+#else
 						if (IsVisible(ref mHits.buffer[b]))
+#endif
 						{
 							hit = mHits[b].hit;
 							hoveredObject = hit.collider.gameObject;
@@ -611,7 +615,11 @@ public class UICamera : MonoBehaviour
 	/// Helper function to check if the specified hit is visible by the panel.
 	/// </summary>
 
+#if UNITY_FLASH
+	static bool IsVisible (DepthEntry de)
+#else
 	static bool IsVisible (ref DepthEntry de)
+#endif
 	{
 		UIPanel panel = NGUITools.FindInParents<UIPanel>(de.hit.collider.gameObject);
 		return (panel == null || panel.IsVisible(de.hit.point));
