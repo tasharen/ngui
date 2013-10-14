@@ -875,11 +875,25 @@ public class UICamera : MonoBehaviour
 
 		current = this;
 
-		// Update mouse input
-		if (useMouse || (useTouch && mIsEditor)) ProcessMouse();
+		if (useTouch)
+		{
+			if (mIsEditor)
+			{
+				// Only process mouse events while in the editor
+				ProcessMouse();
+			}
+			else
+			{
+				// Process touch events first
+				ProcessTouches();
 
-		// Process touch input
-		if (useTouch) ProcessTouches();
+				// If we want to process mouse events, only do so if there are no active touch events,
+				// otherwise there is going to be event duplication as Unity treats touch events as mouse events.
+				if (useMouse && Input.touchCount == 0)
+					ProcessMouse();
+			}
+		}
+		else if (useMouse) ProcessMouse();
 
 		// Custom input processing
 		if (onCustomInput != null) onCustomInput();
