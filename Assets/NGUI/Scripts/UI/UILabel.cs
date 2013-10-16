@@ -914,11 +914,7 @@ public class UILabel : UIWidget
 		float fy = Mathf.Lerp(mHeight, 0f, po.y);
 
 		// Center vertically
-		fy += Mathf.Lerp(mCalculatedSize.y * scale - mHeight, 0f, po.y);
-		
-		// Ensure we're using whole numbers
-		fx = Mathf.RoundToInt(fx);
-		fy = Mathf.RoundToInt(fy);
+		fy = Mathf.RoundToInt(fy + Mathf.Lerp(mCalculatedSize.y * scale - mHeight, 0f, po.y));
 
 		if (ignoreScale || scale == 1f)
 		{
