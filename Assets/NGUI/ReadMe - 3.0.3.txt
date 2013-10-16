@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-                Version 3.0.2
+                Version 3.0.3
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -35,15 +35,21 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
  Version History
 -----------------
 
-*** WARNING ***
-PLEASE BACK UP YOUR PROJECT BEFORE UPDATING!
-3.0.0 is a major changeset. You will need to open and re-save all of your scenes and prefabs after updating!
-After updating, expect some things to no longer work the same way they used to. Widgets scale is no longer
-used as its size, so any code that you had relying on this will need to change to use 'width' and 'height'.
-You can also expect compile errors related to delegate usage. The following links may help you:
-
-http://www.youtube.com/watch?v=uNSZsMnhS1o&list=UUQGZdUwzE8gmvgjomZSNFJg
-http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
+3.0.3:
+- NEW: You no longer need to create UIFonts for dynamic fonts and can now specify font size and style directly on your labels.
+- NEW: As dynamic font-using label shrinks, it will automatically print with lower font size, maintaining its crispness.
+- NEW: You can now multi-edit sprites and labels.
+- NEW: UIInput has been redone, and now supports moving the caret as well as copy/paste keys in the editor.
+- NEW: UIInputValidator script's functionality is now a part of UIInput.
+- FIX: UICamera.selectedObject changes are now delayed until end of frame.
+- FIX: GUI/Text shader is no longer used, replaced with an Unlit/Text shader instead.
+- FIX: Added a by-material sorting clause to widgets with conflicting depth, automatically reducing draw calls.
+- FIX: Some UITextures were still mistakenly referencing the Unlit/Texture shader.
+- FIX: Mouse events will no longer be processed if there are active touch events.
+- FIX: Popup list was not respecting the text scale correctly.
+- FIX: CalculateRaycastDepth will now ignore disabled widgets.
+- FIX: WP8 compile fix.
+- DEL: UILabel no longer has the 'password' option since it never made sense to have it there to begin with.
 
 3.0.2:
 - NEW: Added a "depth" property to the panels to make it possible to easily order panels.
@@ -63,6 +69,16 @@ http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 - FIX: UILabels will no longer MakePixelPerfect when their text is assigned.
 - FIX: Marking widgets as changed will now mark them as edited in Unity.
 - FIX: Sliced sprite border will again take pixel size into consideration.
+
+*** WARNING ***
+PLEASE BACK UP YOUR PROJECT BEFORE UPDATING!
+3.0.0 is a major changeset. You will need to open and re-save all of your scenes and prefabs after updating!
+After updating, expect some things to no longer work the same way they used to. Widgets scale is no longer
+used as its size, so any code that you had relying on this will need to change to use 'width' and 'height'.
+You can also expect compile errors related to delegate usage. The following links may help you:
+
+http://www.youtube.com/watch?v=uNSZsMnhS1o&list=UUQGZdUwzE8gmvgjomZSNFJg
+http://www.tasharen.com/forum/index.php?topic=11.msg27296#msg27296
 
 3.0.0:
 - NEW: Changed the way widgets get batched, properly fixing all remaining Z/depth issues.
