@@ -21,7 +21,7 @@ public class UIImageButtonInspector : Editor
 	/// Atlas selection callback.
 	/// </summary>
 
-	void OnSelectAtlas (MonoBehaviour obj)
+	void OnSelectAtlas (Object obj)
 	{
 		if (mButton.target != null)
 		{

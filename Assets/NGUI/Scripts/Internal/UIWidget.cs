@@ -458,6 +458,12 @@ public abstract class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// This callback is sent inside the editor notifying us that some property has changed.
+	/// </summary>
+
+	protected virtual void OnValidate() { mChanged = true; }
+
+	/// <summary>
 	/// Only sets the local flag, does not notify the panel.
 	/// In most cases you will want to use MarkAsChanged() instead.
 	/// </summary>

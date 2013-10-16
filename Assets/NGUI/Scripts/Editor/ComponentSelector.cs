@@ -14,17 +14,17 @@ using System.Collections.Generic;
 
 public class ComponentSelector : ScriptableWizard
 {
-	public delegate void OnSelectionCallback (MonoBehaviour obj);
+	public delegate void OnSelectionCallback (Object obj);
 
 	System.Type mType;
 	OnSelectionCallback mCallback;
-	MonoBehaviour[] mObjects;
+	Object[] mObjects;
 
 	/// <summary>
 	/// Draw a button + object selection combo filtering specified types.
 	/// </summary>
 
-	static public void Draw<T> (string buttonName, T obj, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options) where T : MonoBehaviour
+	static public void Draw<T> (string buttonName, T obj, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options) where T : Object
 	{
 		GUILayout.BeginHorizontal();
 		bool show = NGUIEditorTools.DrawPrefixButton(buttonName);
@@ -34,9 +34,11 @@ public class ComponentSelector : ScriptableWizard
 		T o = EditorGUILayout.ObjectField(obj, typeof(T), false, options) as T;
 		GUILayout.EndVertical();
 
-		if (editButton && o != null && Selection.activeObject != o.gameObject && GUILayout.Button("Edit", GUILayout.Width(40f)))
+		if (editButton && o != null && o is MonoBehaviour)
 		{
-			Selection.activeObject = o.gameObject;
+			Component mb = o as Component;
+			if (Selection.activeObject != mb.gameObject && GUILayout.Button("Edit", GUILayout.Width(40f)))
+				Selection.activeObject = mb.gameObject;
 		}
 		GUILayout.EndHorizontal();
 		if (show) Show<T>(cb);
@@ -47,22 +49,22 @@ public class ComponentSelector : ScriptableWizard
 	/// Draw a button + object selection combo filtering specified types.
 	/// </summary>
 
-	static public void Draw<T> (T obj, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options) where T : MonoBehaviour
+	static public void Draw<T> (T obj, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options) where T : Object
 	{
-		Draw<T>(NGUITools.GetName<T>(), obj, cb, editButton, options);
+		Draw<T>(NGUITools.GetTypeName<T>(), obj, cb, editButton, options);
 	}
 
 	/// <summary>
 	/// Show the selection wizard.
 	/// </summary>
 
-	static void Show<T> (OnSelectionCallback cb) where T : MonoBehaviour
+	static public void Show<T> (OnSelectionCallback cb) where T : Object
 	{
 		System.Type type = typeof(T);
 		ComponentSelector comp = ScriptableWizard.DisplayWizard<ComponentSelector>("Select " + type.ToString());
 		comp.mType = type;
 		comp.mCallback = cb;
-		comp.mObjects = Resources.FindObjectsOfTypeAll(type) as MonoBehaviour[];
+		comp.mObjects = Resources.FindObjectsOfTypeAll(type);
 	}
 
 	/// <summary>
@@ -108,9 +110,9 @@ public class ComponentSelector : ScriptableWizard
 		}
 		else
 		{
-			MonoBehaviour sel = null;
+			Object sel = null;
 
-			foreach (MonoBehaviour o in mObjects)
+			foreach (Object o in mObjects)
 			{
 				if (DrawObject(o))
 				{
@@ -127,27 +129,31 @@ public class ComponentSelector : ScriptableWizard
 	}
 
 	/// <summary>
-	/// Draw details about the specified monobehavior in column format.
+	/// Draw details about the specified object in column format.
 	/// </summary>
 
-	bool DrawObject (MonoBehaviour mb)
+	bool DrawObject (Object ob)
 	{
 		bool retVal = false;
+		Component comp = ob as Component;
 
 		GUILayout.BeginHorizontal();
 		{
-			if (EditorUtility.IsPersistent(mb.gameObject))
-			{
-				GUILayout.Label("Prefab", "AS TextArea", GUILayout.Width(80f), GUILayout.Height(20f));
-			}
-			else
-			{
-				GUI.color = Color.grey;
-				GUILayout.Label("Object", "AS TextArea", GUILayout.Width(80f), GUILayout.Height(20f));
-			}
+			if (comp != null && EditorUtility.IsPersistent(comp.gameObject))
+				GUI.contentColor = new Color(0.6f, 0.8f, 1f);
+			
+			GUILayout.Label(NGUITools.GetTypeName(ob), "AS TextArea", GUILayout.Width(80f), GUILayout.Height(20f));
 
-			GUILayout.Label(NGUITools.GetHierarchy(mb.gameObject), "AS TextArea", GUILayout.Height(20f));
-			GUI.color = Color.white;
+			if (comp != null)
+			{
+				GUILayout.Label(NGUITools.GetHierarchy(comp.gameObject), "AS TextArea", GUILayout.Height(20f));
+			}
+			else if (ob is Font)
+			{
+				Font fnt = ob as Font;
+				GUILayout.Label(fnt.name, "AS TextArea", GUILayout.Height(20f));
+			}
+			GUI.contentColor = Color.white;
 
 			retVal = GUILayout.Button("Select", "ButtonLeft", GUILayout.Width(60f), GUILayout.Height(16f));
 		}

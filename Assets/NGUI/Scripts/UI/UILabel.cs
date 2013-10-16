@@ -30,9 +30,10 @@ public class UILabel : UIWidget
 		ResizeHeight,
 	}
 
+	[HideInInspector][SerializeField] Font mTrueTypeFont;
 	[HideInInspector][SerializeField] UIFont mFont;
 	[HideInInspector][SerializeField] string mText = "";
-	[HideInInspector][SerializeField] int mFontSize = 0;
+	[HideInInspector][SerializeField] int mFontSize = 16;
 	[HideInInspector][SerializeField] FontStyle mFontStyle = FontStyle.Normal;
 	[HideInInspector][SerializeField] bool mEncoding = true;
 	[HideInInspector][SerializeField] int mMaxLineCount = 0; // 0 denotes unlimited
@@ -49,10 +50,11 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] float mLineWidth = 0;
 	[HideInInspector][SerializeField] bool mMultiline = true;
 
+	Font mActiveTTF = null;
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
 	bool mPremultiply = false;
-	Vector2 mPrintedSize = Vector2.zero;
+	Vector2 mCalculatedSize = Vector2.zero;
 	float mScale = 1f;
 	int mLastWidth = 0;
 	int mLastHeight = 0;
@@ -85,7 +87,15 @@ public class UILabel : UIWidget
 	/// Retrieve the material used by the font.
 	/// </summary>
 
-	public override Material material { get { return (mFont != null) ? mFont.material : null; } }
+	public override Material material
+	{
+		get
+		{
+			if (mFont != null) return mFont.material;
+			if (mTrueTypeFont != null) return mTrueTypeFont.material;
+			return null;
+		}
+	}
 
 	/// <summary>
 	/// Set the font used by this label.
@@ -102,20 +112,59 @@ public class UILabel : UIWidget
 			if (mFont != value)
 			{
 #if DYNAMIC_FONT
-				if (mFont != null && mFont.dynamicFont != null)
-					mFont.dynamicFont.textureRebuildCallback -= MarkAsChanged;
-#endif
-				RemoveFromPanel();
-				mFont = value;
-				hasChanged = true;
-#if DYNAMIC_FONT
-				if (mFont != null && mFont.dynamicFont != null)
+				if (value != null && value.dynamicFont != null)
 				{
-					mFont.dynamicFont.textureRebuildCallback += MarkAsChanged;
-					mFont.Request(mText, fontSize);
+					trueTypeFont = value.dynamicFont;
+					return;
 				}
 #endif
+				if (trueTypeFont != null) trueTypeFont = null;
+				else RemoveFromPanel();
+
+				mFont = value;
+				hasChanged = true;
 				MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Set the font used by this label.
+	/// </summary>
+
+	public Font trueTypeFont
+	{
+		get
+		{
+			return mTrueTypeFont;
+		}
+		set
+		{
+			if (mTrueTypeFont != value)
+			{
+#if DYNAMIC_FONT
+				if (mActiveTTF != null)
+				{
+					mActiveTTF.textureRebuildCallback -= MarkAsChanged;
+					mActiveTTF = null;
+				}
+
+				RemoveFromPanel();
+				mTrueTypeFont = value;
+				mActiveTTF = value;
+				hasChanged = true;
+				mFont = null;
+
+				if (mActiveTTF != null)
+				{
+					mActiveTTF.textureRebuildCallback += MarkAsChanged;
+					ProcessAndRequest();
+					base.MarkAsChanged();
+				}
+#else
+				mTrueTypeFont = value;
+				mActiveTTF = value;
+#endif
 			}
 		}
 	}
@@ -141,9 +190,7 @@ public class UILabel : UIWidget
 			{
 				mText = value;
 				hasChanged = true;
-#if DYNAMIC_FONT
-				if (mFont != null) mFont.Request(value, fontSize);
-#endif
+				ProcessAndRequest();
 			}
 		}
 	}
@@ -156,13 +203,7 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-#if DYNAMIC_FONT
-			if (mFont != null)
-			{
-				if (mFontSize == 0 || !mFont.dynamicFont)
-					return mFont.defaultSize;
-			}
-#endif
+			if (mFont != null) return mFont.defaultSize;
 			return mFontSize;
 		}
 		set
@@ -173,6 +214,7 @@ public class UILabel : UIWidget
 			{
 				mFontSize = value;
 				hasChanged = true;
+				ProcessAndRequest();
 			}
 		}
 	}
@@ -185,13 +227,6 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-#if DYNAMIC_FONT
-			if (mFont != null)
-			{
-				if (mFontStyle == 0 || !mFont.dynamicFont)
-					return FontStyle.Normal;
-			}
-#endif
 			return mFontStyle;
 		}
 		set
@@ -200,18 +235,52 @@ public class UILabel : UIWidget
 			{
 				mFontStyle = value;
 				hasChanged = true;
+				ProcessAndRequest();
 			}
 		}
 	}
 
 	/// <summary>
-	/// Ensure that the font size remains valid.
+	/// Request the needed characters in the texture.
 	/// </summary>
 
-	void OnValidate ()
+	void ProcessAndRequest ()
+	{
+#if DYNAMIC_FONT
+		if (mActiveTTF != null)
+		{
+			ProcessText();
+			mActiveTTF.RequestCharactersInTexture(mText, mPrintedSize, mFontStyle);
+		}
+#endif
+	}
+
+	/// <summary>
+	/// Validate the properties.
+	/// </summary>
+
+	protected override void OnValidate ()
 	{
 		mFontSize = Mathf.Clamp(mFontSize, 0, 144);
+
+		UIFont fnt = mFont;
+		Font ttf = mTrueTypeFont;
+
+		mFont = null;
+		mTrueTypeFont = null;
+		font = fnt;
+		trueTypeFont = ttf;
 		hasChanged = true;
+
+		if (fnt != null) mFontSize = fnt.defaultSize;
+
+#if DYNAMIC_FONT
+		if (mActiveTTF != null)
+		{
+			ProcessText();
+			mActiveTTF.RequestCharactersInTexture(mText, mPrintedSize, mFontStyle);
+		}
+#endif
 	}
 
 	/// <summary>
@@ -481,7 +550,7 @@ public class UILabel : UIWidget
 		get
 		{
 			if (hasChanged) ProcessText();
-			return mPrintedSize;
+			return mCalculatedSize;
 		}
 	}
 
@@ -498,6 +567,18 @@ public class UILabel : UIWidget
 		}
 	}
 
+	/// <summary>
+	/// Whether the label has a valid font.
+	/// </summary>
+
+	bool isValid { get { return mFont != null || mTrueTypeFont != null; } }
+
+	/// <summary>
+	/// Label's active pixel size scale.
+	/// </summary>
+
+	float pixelSize { get { return (mFont != null) ? mFont.pixelSize : 1f; } }
+
 #if DYNAMIC_FONT
 	/// <summary>
 	/// Register the font texture change listener.
@@ -505,9 +586,19 @@ public class UILabel : UIWidget
 
 	protected override void OnEnable ()
 	{
-		if (mFont != null && mFont.dynamicFont != null)
-			mFont.dynamicFont.textureRebuildCallback += MarkAsChanged;
 		base.OnEnable();
+
+		// Auto-upgrade from 3.0.2 and earlier
+		if (mTrueTypeFont == null && mFont != null && mFont.isDynamic)
+		{
+			mTrueTypeFont = mFont.dynamicFont;
+			mFontSize = mFont.defaultSize;
+			mFontStyle = mFont.dynamicFontStyle;
+			mFont = null;
+		}
+
+		mActiveTTF = mTrueTypeFont;
+		if (mActiveTTF != null) mActiveTTF.textureRebuildCallback += MarkAsChanged;
 	}
 
 	/// <summary>
@@ -516,8 +607,8 @@ public class UILabel : UIWidget
 
 	protected override void OnDisable ()
 	{
-		if (mFont != null && mFont.dynamicFont != null)
-			mFont.dynamicFont.textureRebuildCallback -= MarkAsChanged;
+		if (mActiveTTF != null) mActiveTTF.textureRebuildCallback -= MarkAsChanged;
+		mActiveTTF = null;
 		base.OnDisable();
 	}
 #endif
@@ -580,11 +671,11 @@ public class UILabel : UIWidget
 		}
 
 		// Whether this is a premultiplied alpha shader
-		mPremultiply = (font != null && font.material != null && font.material.shader.name.Contains("Premultiplied"));
+		mPremultiply = (material != null && material.shader != null && material.shader.name.Contains("Premultiplied"));
 
 #if DYNAMIC_FONT
 		// Request the text within the font
-		if (mFont != null) mFont.Request(mText, fontSize);
+		if (trueTypeFont != null) trueTypeFont.RequestCharactersInTexture(mText, fontSize, fontStyle);
 #endif
 	}
 
@@ -604,28 +695,33 @@ public class UILabel : UIWidget
 
 	void ProcessText () { ProcessText(false); }
 
+	int mPrintedSize = 0;
+
 	/// <summary>
 	/// Process the raw text, called when something changes.
 	/// </summary>
 
 	void ProcessText (bool legacyMode)
 	{
-		if (mFont == null) return;
+		if (!isValid) return;
 
 		mChanged = true;
 		hasChanged = false;
 
 		int fs = fontSize;
-		float invSize = 1f / mFont.pixelSize;
-		float printSize = Mathf.Abs(legacyMode ? cachedTransform.localScale.x : fs);
+		float ps = pixelSize;
+		float invSize = 1f / ps;
+		
+		mPrintedSize = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : fs);
+		
 		float lw = legacyMode ? (mMaxLineWidth != 0 ? mMaxLineWidth * invSize : 1000000) : width * invSize;
 		float lh = legacyMode ? (mMaxLineHeight != 0 ? mMaxLineHeight * invSize : 1000000) : height * invSize;
 
-		if (printSize > 0f)
+		if (mPrintedSize > 0)
 		{
 			for (;;)
 			{
-				mScale = printSize / fs;
+				mScale = (float)mPrintedSize / fs;
 
 				bool fits = true;
 
@@ -635,34 +731,50 @@ public class UILabel : UIWidget
 
 				if (lw > 0f || lh > 0f)
 				{
-					fits = mFont.WrapText(mText, fs, out mProcessedText, pw, ph, mMaxLineCount, mEncoding, mSymbols);
+					if (mFont != null)
+					{
+						fits = mFont.WrapText(mText, fs, out mProcessedText, pw, ph, mMaxLineCount, mEncoding, mSymbols);
+					}
+					else
+					{
+						fits = NGUIText.WrapText(mText, mTrueTypeFont, fs, mFontStyle, pw, ph, mMaxLineCount, mEncoding, out mProcessedText);
+					}
 				}
 				else mProcessedText = mText;
 
 				// Remember the final printed size
-				mPrintedSize = !string.IsNullOrEmpty(mProcessedText) ?
-					mFont.CalculatePrintedSize(mProcessedText, fs, mEncoding, mSymbols) : Vector2.zero;
+				if (!string.IsNullOrEmpty(mProcessedText))
+				{
+					if (mFont != null)
+					{
+						mCalculatedSize = mFont.CalculatePrintedSize(mProcessedText, fs, mEncoding, mSymbols);
+					}
+					else
+					{
+						mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText, mTrueTypeFont, fs, mFontStyle, mEncoding);
+					}
+				}
+				else mCalculatedSize = Vector2.zero;
 
 				if (mOverflow == Overflow.ResizeFreely)
 				{
-					mWidth = Mathf.RoundToInt(mPrintedSize.x * mFont.pixelSize);
-					mHeight = Mathf.RoundToInt(mPrintedSize.y * mFont.pixelSize);
+					mWidth = Mathf.RoundToInt(mCalculatedSize.x * ps);
+					mHeight = Mathf.RoundToInt(mCalculatedSize.y * ps);
 				}
 				else if (mOverflow == Overflow.ResizeHeight)
 				{
-					mHeight = Mathf.RoundToInt(mPrintedSize.y * mFont.pixelSize);
+					mHeight = Mathf.RoundToInt(mCalculatedSize.y * ps);
 				}
 				else if (mOverflow == Overflow.ShrinkContent && !fits)
 				{
-					printSize = Mathf.Round(printSize - 1f);
-					if (printSize > 1f) continue;
+					if (--mPrintedSize > 1) continue;
 				}
 
 				// Upgrade to the new system
 				if (legacyMode)
 				{
-					width = Mathf.RoundToInt(mPrintedSize.x * mFont.pixelSize);
-					height = Mathf.RoundToInt(mPrintedSize.y * mFont.pixelSize);
+					width = Mathf.RoundToInt(mCalculatedSize.x * ps);
+					height = Mathf.RoundToInt(mCalculatedSize.y * ps);
 					cachedTransform.localScale = Vector3.one;
 				}
 				break;
@@ -684,7 +796,7 @@ public class UILabel : UIWidget
 	{
 		if (font != null)
 		{
-			float pixelSize = font.pixelSize;
+			float pixelSize = (font != null) ? font.pixelSize : 1f;
 
 			Vector3 pos = cachedTransform.localPosition;
 			pos.x = Mathf.RoundToInt(pos.x);
@@ -705,8 +817,8 @@ public class UILabel : UIWidget
 				ProcessText(false);
 				mOverflow = over;
 
-				int minX = Mathf.RoundToInt(mPrintedSize.x * pixelSize);
-				int minY = Mathf.RoundToInt(mPrintedSize.y * pixelSize);
+				int minX = Mathf.RoundToInt(mCalculatedSize.x * pixelSize);
+				int minY = Mathf.RoundToInt(mCalculatedSize.y * pixelSize);
 
 				if (width < minX) width = minX;
 				if (height < minY) height = minY;
@@ -725,9 +837,9 @@ public class UILabel : UIWidget
 		{
 			ProcessText(false);
 
-			float pixelSize = font.pixelSize;
-			int minX = Mathf.RoundToInt(mPrintedSize.x * pixelSize);
-			int minY = Mathf.RoundToInt(mPrintedSize.y * pixelSize);
+			float pixelSize = (font != null) ? font.pixelSize : 1f;
+			int minX = Mathf.RoundToInt(mCalculatedSize.x * pixelSize);
+			int minY = Mathf.RoundToInt(mCalculatedSize.y * pixelSize);
 
 			if (width < minX) width = minX;
 			if (height < minY) height = minY;
@@ -742,7 +854,7 @@ public class UILabel : UIWidget
 	{
 		Color c = mEffectColor;
 		c.a *= alpha * mPanel.alpha;
-		Color32 col = (font.premultipliedAlpha) ? NGUITools.ApplyPMA(c) : c;
+		Color32 col = (font != null && font.premultipliedAlpha) ? NGUITools.ApplyPMA(c) : c;
 
 		for (int i = start; i < end; ++i)
 		{
@@ -764,45 +876,42 @@ public class UILabel : UIWidget
 
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
-		if (mFont == null) return;
+		if (!isValid) return;
 
 		Pivot p = pivot;
 		int offset = verts.size;
 
 		Color col = color;
 		col.a *= mPanel.alpha;
-		if (font.premultipliedAlpha) col = NGUITools.ApplyPMA(col);
+		if (mFont != null && mFont.premultipliedAlpha) col = NGUITools.ApplyPMA(col);
 
 		string text = processedText;
-		float scale = mScale * mFont.pixelSize;
-		bool ignoreScale = false;
-		int size;
-		
-		if (mFont.isDynamic)
-		{
-			ignoreScale = true;
-			size = Mathf.RoundToInt(fontSize * mScale * mFont.pixelSize);
-		}
-		else
-		{
-			size = fontSize;
-		}
-		
+		float pixelSize = (mFont != null) ? mFont.pixelSize : 1f;
+		float scale = mScale * pixelSize;
+		bool ignoreScale = (mTrueTypeFont != null);
+		int size = mPrintedSize;
 		int w = ignoreScale ? width : Mathf.RoundToInt(width / scale);
 		int start = verts.size;
+
+		TextAlignment alignment = TextAlignment.Center;
 
 		// Print the text into the buffers
 		if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)
 		{
-			mFont.Print(text, size, col, verts, uvs, cols, mEncoding, mSymbols, TextAlignment.Left, w, mPremultiply);
+			alignment = TextAlignment.Left;
 		}
 		else if (p == Pivot.Right || p == Pivot.TopRight || p == Pivot.BottomRight)
 		{
-			mFont.Print(text, size, col, verts, uvs, cols, mEncoding, mSymbols, TextAlignment.Right, w, mPremultiply);
+			alignment = TextAlignment.Right;
+		}
+
+		if (mFont != null)
+		{
+			mFont.Print(text, size, col, verts, uvs, cols, mEncoding, mSymbols, alignment, w, mPremultiply);
 		}
 		else
 		{
-			mFont.Print(text, size, col, verts, uvs, cols, mEncoding, mSymbols, TextAlignment.Center, w, mPremultiply);
+			NGUIText.Print(text, mTrueTypeFont, size, fontStyle, col, mEncoding, alignment, w, mPremultiply, verts, uvs, cols);
 		}
 
 		Vector2 po = pivotOffset;
@@ -810,7 +919,11 @@ public class UILabel : UIWidget
 		float fy = Mathf.Lerp(mHeight, 0f, po.y);
 
 		// Center vertically
-		fy += Mathf.Lerp(mPrintedSize.y * scale - mHeight, 0f, po.y);
+		fy += Mathf.Lerp(mCalculatedSize.y * scale - mHeight, 0f, po.y);
+		
+		// Ensure we're using whole numbers
+		fx = Mathf.RoundToInt(fx);
+		fy = Mathf.RoundToInt(fy);
 
 		if (ignoreScale || scale == 1f)
 		{
@@ -833,7 +946,7 @@ public class UILabel : UIWidget
 		if (effectStyle != Effect.None)
 		{
 			int end = verts.size;
-			float pixel = mFont.pixelSize;
+			float pixel = pixelSize;
 			fx = pixel * mEffectDistance.x;
 			fy = pixel * mEffectDistance.y;
 

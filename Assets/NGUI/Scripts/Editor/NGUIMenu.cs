@@ -189,7 +189,7 @@ static public class NGUIMenu
 		{
 			NGUIEditorTools.RegisterUndo("Add a child UI Panel", go);
 
-			GameObject child = new GameObject(NGUITools.GetName<UIPanel>());
+			GameObject child = new GameObject(NGUITools.GetTypeName<UIPanel>());
 			child.layer = go.layer;
 
 			Transform ct = child.transform;

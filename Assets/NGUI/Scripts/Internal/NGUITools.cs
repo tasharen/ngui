@@ -308,9 +308,22 @@ static public class NGUITools
 	/// Helper function that returns the string name of the type.
 	/// </summary>
 
-	static public string GetName<T> () where T : Component
+	static public string GetTypeName<T> ()
 	{
 		string s = typeof(T).ToString();
+		if (s.StartsWith("UI")) s = s.Substring(2);
+		else if (s.StartsWith("UnityEngine.")) s = s.Substring(12);
+		return s;
+	}
+
+	/// <summary>
+	/// Helper function that returns the string name of the type.
+	/// </summary>
+
+	static public string GetTypeName (UnityEngine.Object obj)
+	{
+		if (obj == null) return "Null";
+		string s = obj.GetType().ToString();
 		if (s.StartsWith("UI")) s = s.Substring(2);
 		else if (s.StartsWith("UnityEngine.")) s = s.Substring(12);
 		return s;
@@ -555,7 +568,7 @@ static public class NGUITools
 	static public T AddChild<T> (GameObject parent) where T : Component
 	{
 		GameObject go = AddChild(parent);
-		go.name = GetName<T>();
+		go.name = GetTypeName<T>();
 		return go.AddComponent<T>();
 	}
 

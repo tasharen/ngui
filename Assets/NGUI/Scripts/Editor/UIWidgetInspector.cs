@@ -11,6 +11,7 @@ using System.Collections.Generic;
 /// Inspector class used to edit UIWidgets.
 /// </summary>
 
+[CanEditMultipleObjects]
 [CustomEditor(typeof(UIWidget))]
 public class UIWidgetInspector : Editor
 {
@@ -759,11 +760,12 @@ public class UIWidgetInspector : Editor
 		serializedObject.Update();
 
 		// Check to see if we can draw the widget's default properties to begin with
-		if (DrawProperties())
+		EditorGUI.BeginDisabledGroup(!DrawProperties());
 		{
 			DrawExtraProperties();
 			DrawCommonProperties();
 		}
+		EditorGUI.EndDisabledGroup();
 		serializedObject.ApplyModifiedProperties();
 	}
 
@@ -781,113 +783,136 @@ public class UIWidgetInspector : Editor
 
 			// Color tint
 			GUILayout.BeginHorizontal();
-			Color color = EditorGUILayout.ColorField("Color Tint", mWidget.color);
+			SerializedProperty sp = NGUIEditorTools.DrawProperty("Color Tint", serializedObject, "mColor");
 			if (GUILayout.Button("Copy", GUILayout.Width(50f)))
-				NGUISettings.color = color;
+				NGUISettings.color = sp.colorValue;
 			GUILayout.EndHorizontal();
 
 			GUILayout.BeginHorizontal();
 			NGUISettings.color = EditorGUILayout.ColorField("Clipboard", NGUISettings.color);
 			if (GUILayout.Button("Paste", GUILayout.Width(50f)))
-				color = NGUISettings.color;
+				sp.colorValue = NGUISettings.color;
 			GUILayout.EndHorizontal();
-
-			if (mWidget.color != color)
-			{
-				NGUIEditorTools.RegisterUndo("Color Change", mWidget);
-				mWidget.color = color;
-			}
-
 			GUILayout.Space(6f);
 
-#if UNITY_3_5
-			// Pivot point -- old school drop-down style
-			UIWidget.Pivot pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", mWidget.pivot);
-
-			if (mWidget.pivot != pivot)
-			{
-				NGUIEditorTools.RegisterUndo("Pivot Change", mWidget);
-				mWidget.pivot = pivot;
-			}
-#else
-			// Pivot point -- the new, more visual style
-			GUILayout.BeginHorizontal();
-			GUILayout.Label("Pivot", GUILayout.Width(76f));
-			Toggle("\u25C4", "ButtonLeft", UIWidget.Pivot.Left, true);
-			Toggle("\u25AC", "ButtonMid", UIWidget.Pivot.Center, true);
-			Toggle("\u25BA", "ButtonRight", UIWidget.Pivot.Right, true);
-			Toggle("\u25B2", "ButtonLeft", UIWidget.Pivot.Top, false);
-			Toggle("\u258C", "ButtonMid", UIWidget.Pivot.Center, false);
-			Toggle("\u25BC", "ButtonRight", UIWidget.Pivot.Bottom, false);
-			GUILayout.EndHorizontal();
-#endif
-			// Depth navigation
-			if (type != PrefabType.Prefab)
-			{
-				GUILayout.Space(2f);
-				GUILayout.BeginHorizontal();
-				{
-					EditorGUILayout.PrefixLabel("Depth");
-
-					int depth = mWidget.depth;
-					if (GUILayout.Button("Back", GUILayout.Width(60f))) --depth;
-					depth = EditorGUILayout.IntField(depth, GUILayout.MinWidth(20f));
-					if (GUILayout.Button("Forward", GUILayout.Width(68f))) ++depth;
-
-					if (mWidget.depth != depth)
-					{
-						NGUIEditorTools.RegisterUndo("Depth Change", mWidget);
-						mWidget.depth = depth;
-					}
-				}
-				GUILayout.EndHorizontal();
-
-				int matchingDepths = 0;
-
-				for (int i = 0; i < UIWidget.list.size; ++i)
-				{
-					UIWidget w = UIWidget.list[i];
-					if (w != null && w.panel != null && mWidget.panel != null &&
-						w.panel.depth == mWidget.panel.depth && w.depth == mWidget.depth)
-							++matchingDepths;
-				}
-
-				if (matchingDepths > 1)
-				{
-					EditorGUILayout.HelpBox(matchingDepths + " widgets are sharing the depth value of " + mWidget.depth, MessageType.Info);
-				}
-			}
-
-			GUI.changed = false;
-			GUILayout.BeginHorizontal();
-			int width = EditorGUILayout.IntField("Dimensions", mWidget.width, GUILayout.Width(128f));
-			NGUIEditorTools.SetLabelWidth(12f);
-			int height = EditorGUILayout.IntField("x", mWidget.height, GUILayout.MinWidth(30f));
-			NGUIEditorTools.SetLabelWidth(80f);
-
-			if (GUI.changed)
-			{
-				NGUIEditorTools.RegisterUndo("Widget Change", mWidget);
-				mWidget.width = width;
-				mWidget.height = height;
-			}
-
-			if (type != PrefabType.Prefab)
-			{
-				if (GUILayout.Button("Correct", GUILayout.Width(68f)))
-				{
-					NGUIEditorTools.RegisterUndo("Widget Change", mWidget);
-					NGUIEditorTools.RegisterUndo("Make Pixel-Perfect", mWidget.transform);
-					mWidget.MakePixelPerfect();
-				}
-			}
-			else
-			{
-				GUILayout.Space(70f);
-			}
-			GUILayout.EndHorizontal();
+			DrawPivot();
+			DrawDepth(type == PrefabType.Prefab);
+			DrawDimensions(type == PrefabType.Prefab);
 			NGUIEditorTools.EndContents();
 		}
+	}
+
+	/// <summary>
+	/// Draw widget's dimensions.
+	/// </summary>
+
+	void DrawDimensions (bool isPrefab)
+	{
+		GUILayout.BeginHorizontal();
+		NGUIEditorTools.DrawProperty("Dimensions", serializedObject, "mWidth", GUILayout.MinWidth(100f));
+		NGUIEditorTools.SetLabelWidth(12f);
+		NGUIEditorTools.DrawProperty("x", serializedObject, "mHeight", GUILayout.MinWidth(30f));
+		NGUIEditorTools.SetLabelWidth(80f);
+
+		if (isPrefab)
+		{
+			GUILayout.Space(70f);
+		}
+		else
+		{
+			if (GUILayout.Button("Correct", GUILayout.Width(68f)))
+			{
+				foreach (GameObject go in Selection.gameObjects)
+				{
+					UIWidget w = go.GetComponent<UIWidget>();
+
+					if (w != null)
+					{
+						NGUIEditorTools.RegisterUndo("Widget Change", w);
+						NGUIEditorTools.RegisterUndo("Make Pixel-Perfect", w.transform);
+						w.MakePixelPerfect();
+					}
+				}
+			}
+		}
+		GUILayout.EndHorizontal();
+	}
+
+	/// <summary>
+	/// Draw widget's depth.
+	/// </summary>
+
+	void DrawDepth (bool isPrefab)
+	{
+		if (isPrefab) return;
+
+		GUILayout.Space(2f);
+		GUILayout.BeginHorizontal();
+		{
+			EditorGUILayout.PrefixLabel("Depth");
+
+			if (GUILayout.Button("Back", GUILayout.Width(60f)))
+			{
+				foreach (GameObject go in Selection.gameObjects)
+				{
+					UIWidget w = go.GetComponent<UIWidget>();
+					if (w != null) w.depth = w.depth - 1;
+				}
+			}
+
+			NGUIEditorTools.DrawProperty("", serializedObject, "mDepth", GUILayout.MinWidth(20f));
+
+			if (GUILayout.Button("Forward", GUILayout.Width(68f)))
+			{
+				foreach (GameObject go in Selection.gameObjects)
+				{
+					UIWidget w = go.GetComponent<UIWidget>();
+					if (w != null) w.depth = w.depth + 1;
+				}
+			}
+		}
+		GUILayout.EndHorizontal();
+
+		int matchingDepths = 0;
+
+		for (int i = 0; i < UIWidget.list.size; ++i)
+		{
+			UIWidget w = UIWidget.list[i];
+			if (w != null && w.panel != null && mWidget.panel != null &&
+				w.panel.depth == mWidget.panel.depth && w.depth == mWidget.depth)
+				++matchingDepths;
+		}
+
+		if (matchingDepths > 1)
+		{
+			EditorGUILayout.HelpBox(matchingDepths + " widgets are sharing the depth value of " + mWidget.depth, MessageType.Info);
+		}
+	}
+
+	/// <summary>
+	/// Draw the widget's pivot.
+	/// </summary>
+
+	void DrawPivot ()
+	{
+#if UNITY_3_5
+		NGUIEditorTools.DrawProperty("Pivot", serializedObject, "mPivot");
+#else
+		SerializedProperty pv = serializedObject.FindProperty("mPivot");
+
+		// Pivot point -- the new, more visual style
+		GUILayout.BeginHorizontal();
+		GUILayout.Label("Pivot", GUILayout.Width(76f));
+		Toggle("\u25C4", "ButtonLeft", UIWidget.Pivot.Left, true);
+		Toggle("\u25AC", "ButtonMid", UIWidget.Pivot.Center, true);
+		Toggle("\u25BA", "ButtonRight", UIWidget.Pivot.Right, true);
+		Toggle("\u25B2", "ButtonLeft", UIWidget.Pivot.Top, false);
+		Toggle("\u258C", "ButtonMid", UIWidget.Pivot.Center, false);
+		Toggle("\u25BC", "ButtonRight", UIWidget.Pivot.Bottom, false);
+		GUILayout.EndHorizontal();
+
+		pv.enumValueIndex = (int)mWidget.pivot;
+#endif
 	}
 
 	/// <summary>

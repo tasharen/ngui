@@ -42,10 +42,22 @@ public class UIPopupList : UIWidgetContainer
 	public UIFont font;
 
 	/// <summary>
+	/// True type font used by the labels. Alternative to specifying a bitmap font ('font').
+	/// </summary>
+
+	public Font trueTypeFont;
+
+	/// <summary>
 	/// Size of the font to use for the popup list's labels.
 	/// </summary>
 
 	public int fontSize = 16;
+
+	/// <summary>
+	/// Font style used by the dynamic font.
+	/// </summary>
+
+	public FontStyle fontStyle = FontStyle.Normal;
 
 	/// <summary>
 	/// Label with text to auto-update, if any.
@@ -225,16 +237,22 @@ public class UIPopupList : UIWidgetContainer
 	}
 
 	/// <summary>
+	/// Whether the popup list is actually usable.
+	/// </summary>
+
+	bool isValid { get { return font != null || trueTypeFont != null; } }
+
+	/// <summary>
 	/// Active font size.
 	/// </summary>
 
-	int activeFontSize { get { return (font == null || font.isDynamic) ? fontSize : font.defaultSize; } }
+	int activeFontSize { get { return (trueTypeFont != null || font == null) ? fontSize : font.defaultSize; } }
 
 	/// <summary>
 	/// Font scale applied to the popup list's text.
 	/// </summary>
 
-	float activeFontScale { get { return (font == null || font.isDynamic) ? 1f : (float)fontSize / font.defaultSize; } }
+	float activeFontScale { get { return (trueTypeFont != null || font == null) ? 1f : (float)fontSize / font.defaultSize; } }
 
 	/// <summary>
 	/// Send out the selection message on start.
@@ -254,6 +272,12 @@ public class UIPopupList : UIWidgetContainer
 		{
 			fontSize = (font != null) ? Mathf.RoundToInt(font.defaultSize * textScale) : 16;
 			textScale = 0f;
+		}
+
+		if (trueTypeFont == null && font.isDynamic)
+		{
+			trueTypeFont = font.dynamicFont;
+			font = null;
 		}
 
 		if (Application.isPlaying)
@@ -497,7 +521,7 @@ public class UIPopupList : UIWidgetContainer
 
 	void OnClick()
 	{
-		if (enabled && NGUITools.GetActive(gameObject) && mChild == null && atlas != null && font != null && items.Count > 0)
+		if (enabled && NGUITools.GetActive(gameObject) && mChild == null && atlas != null && isValid && items.Count > 0)
 		{
 			mLabelList.Clear();
 
@@ -541,7 +565,8 @@ public class UIPopupList : UIWidgetContainer
 			if (hlsp == null) return;
 
 			float hlspHeight = hlsp.borderTop;
-			float fontHeight = activeFontSize * font.pixelSize;
+			float pixelSize = (font != null) ? font.pixelSize : 1f;
+			float fontHeight = activeFontSize * pixelSize;
 			float dynScale = activeFontScale;
 			float labelHeight = fontHeight * dynScale;
 			float x = 0f, y = -padding.y;
@@ -555,7 +580,9 @@ public class UIPopupList : UIWidgetContainer
 				UILabel lbl = NGUITools.AddWidget<UILabel>(mChild);
 				lbl.pivot = UIWidget.Pivot.TopLeft;
 				lbl.font = font;
+				lbl.trueTypeFont = trueTypeFont;
 				lbl.fontSize = fontSize;
+				lbl.fontStyle = fontStyle;
 				lbl.text = (isLocalized && Localization.instance != null) ? Localization.instance.Get(s) : s;
 				lbl.color = textColor;
 				lbl.cachedTransform.localPosition = new Vector3(bgPadding.x + padding.x, y, -1f);

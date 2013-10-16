@@ -37,7 +37,7 @@ public class UISprite : UIWidget
 	[HideInInspector][SerializeField] bool mFillCenter = true;
 	[HideInInspector][SerializeField] Type mType = Type.Simple;
 	[HideInInspector][SerializeField] FillDirection mFillDirection = FillDirection.Radial360;
-	[HideInInspector][SerializeField] float mFillAmount = 1.0f;
+	[HideInInspector][SerializeField][Range(0f, 1f)] float mFillAmount = 1.0f;
 	[HideInInspector][SerializeField] bool mInvert = false;
 
 	protected UISpriteData mSprite;
@@ -273,6 +273,16 @@ public class UISprite : UIWidget
 			}
 			return base.minHeight;
 		}
+	}
+
+	/// <summary>
+	/// Keep sane values.
+	/// </summary>
+
+	protected override void OnValidate ()
+	{
+		base.OnValidate();
+		mFillAmount = Mathf.Clamp01(mFillAmount);
 	}
 
 	/// <summary>

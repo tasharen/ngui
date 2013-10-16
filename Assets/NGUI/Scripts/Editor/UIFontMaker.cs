@@ -46,7 +46,7 @@ public class UIFontMaker : EditorWindow
 	/// Font selection callback.
 	/// </summary>
 
-	void OnSelectFont (MonoBehaviour obj)
+	void OnSelectFont (Object obj)
 	{
 		NGUISettings.font = obj as UIFont;
 		Repaint();
@@ -56,7 +56,7 @@ public class UIFontMaker : EditorWindow
 	/// Atlas selection callback.
 	/// </summary>
 
-	void OnSelectAtlas (MonoBehaviour obj)
+	void OnSelectAtlas (Object obj)
 	{
 		NGUISettings.atlas = obj as UIAtlas;
 		Repaint();
@@ -93,71 +93,17 @@ public class UIFontMaker : EditorWindow
 		NGUIEditorTools.BeginContents();
 
 		GUILayout.BeginHorizontal();
-		mType = (FontType)EditorGUILayout.EnumPopup("Type", mType);
+		mType = (FontType)EditorGUILayout.EnumPopup("Type", mType, GUILayout.MinWidth(200f));
 		GUILayout.Space(18f);
 		GUILayout.EndHorizontal();
 		int create = 0;
 
 		if (mType == FontType.Dynamic)
 		{
-			NGUISettings.dynamicFont = EditorGUILayout.ObjectField("Font TTF", NGUISettings.dynamicFont, typeof(Font), false) as Font;
-
-			GUILayout.BeginHorizontal();
-			NGUISettings.dynamicFontStyle = (FontStyle)EditorGUILayout.EnumPopup(NGUISettings.dynamicFontStyle);
-			GUILayout.Space(18f);
-			GUILayout.EndHorizontal();
-			NGUIEditorTools.EndContents();
-
-			if (NGUISettings.dynamicFont != null)
-			{
-				NGUIEditorTools.DrawHeader("Output", true);
-
-				NGUIEditorTools.BeginContents();
-				GUILayout.BeginHorizontal();
-				GUILayout.Label("Font Name", GUILayout.Width(76f));
-				GUI.backgroundColor = Color.white;
-				NGUISettings.fontName = GUILayout.TextField(NGUISettings.fontName);
-
-#if !UNITY_3_5
-				if (NGUISettings.dynamicFont != null)
-				{
-					GameObject go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
-
-					if (go != null)
-					{
-						if (go.GetComponent<UIFont>() != null)
-						{
-							GUI.backgroundColor = Color.red;
-							if (GUILayout.Button("Replace", GUILayout.Width(70f))) create = 1;
-						}
-						else
-						{
-							GUI.backgroundColor = Color.grey;
-							GUILayout.Button("Rename", GUILayout.Width(70f));
-						}
-					}
-					else
-					{
-						GUI.backgroundColor = Color.green;
-						if (GUILayout.Button("Create", GUILayout.Width(70f))) create = 1;
-					}
-
-					GUI.backgroundColor = Color.white;
-				}
-#endif
-				GUILayout.EndHorizontal();
-				NGUIEditorTools.EndContents();
-			}
-
 #if UNITY_3_5
-			EditorGUILayout.HelpBox("Dynamic fonts require Unity 4.0 or higher.", MessageType.Error);
+			EditorGUILayout.HelpBox("Unity 3 doesn't support dynamic fonts.", MessageType.Error);
 #else
-			// Helpful info
-			if (NGUISettings.dynamicFont == null)
-			{
-				EditorGUILayout.HelpBox("Dynamic font creation happens right in Unity. Simply specify the TrueType font to be used as source.", MessageType.Info);
-			}
-			EditorGUILayout.HelpBox("Please note that dynamic fonts can't be made a part of an atlas, and using dynamic fonts will result in at least one extra draw call.", MessageType.Warning);
+			EditorGUILayout.HelpBox("You no longer need to create a UIFont for dynamic fonts. Just reference the True Type font directly on your labels.", MessageType.Info);
 #endif
 		}
 		else
