@@ -660,7 +660,7 @@ public class UIPanel : MonoBehaviour
 	public void Refresh ()
 	{
 		mFullRebuild = true;
-		list[0].LateUpdate();
+		if (list.size > 0) list[0].LateUpdate();
 	}
 
 	/// <summary>
