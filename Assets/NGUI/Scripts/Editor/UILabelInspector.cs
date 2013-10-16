@@ -120,7 +120,10 @@ public class UILabelInspector : UIWidgetInspector
 			GUILayout.EndHorizontal();
 			GUI.skin.textField.wordWrap = false;
 #endif
-			NGUIEditorTools.DrawProperty("Overflow", serializedObject, "mOverflow");
+			SerializedProperty ov = NGUIEditorTools.DrawProperty("Overflow", serializedObject, "mOverflow");
+
+			if (ov.intValue == (int)UILabel.Overflow.ShrinkContent && ttf != null && ttf.objectReferenceValue != null)
+				NGUIEditorTools.DrawProperty("Keep crisp", serializedObject, "keepCrispWhenShrunk");
 
 			GUILayout.BeginHorizontal();
 			NGUIEditorTools.DrawProperty("Encoding", serializedObject, "mEncoding", GUILayout.Width(100f));

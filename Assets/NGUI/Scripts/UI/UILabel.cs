@@ -30,6 +30,20 @@ public class UILabel : UIWidget
 		ResizeHeight,
 	}
 
+	public enum Crispness
+	{
+		Never,
+		OnDesktop,
+		Always,
+	}
+
+	/// <summary>
+	/// Whether the label will keep its content crisp even when shrunk.
+	/// You may want to turn this off on mobile devices.
+	/// </summary>
+
+	public Crispness keepCrispWhenShrunk = Crispness.Always;
+
 	[HideInInspector][SerializeField] Font mTrueTypeFont;
 	[HideInInspector][SerializeField] UIFont mFont;
 #if !UNITY_3_5
@@ -888,8 +902,18 @@ public class UILabel : UIWidget
 		string text = processedText;
 		float pixelSize = (mFont != null) ? mFont.pixelSize : 1f;
 		float scale = mScale * pixelSize;
-		bool ignoreScale = (mTrueTypeFont != null);
-		int size = mPrintedSize;
+		bool ignoreScale = false;
+
+		if (mTrueTypeFont != null && mOverflow == Overflow.ShrinkContent && keepCrispWhenShrunk != Crispness.Never)
+		{
+#if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_BLACKBERRY
+			ignoreScale = (keepCrispWhenShrunk == Crispness.Always);
+#else
+			ignoreScale = true;
+#endif
+		}
+
+		int size = ignoreScale ? mPrintedSize : fontSize;
 		int w = ignoreScale ? width : Mathf.RoundToInt(width / scale);
 		int start = verts.size;
 
