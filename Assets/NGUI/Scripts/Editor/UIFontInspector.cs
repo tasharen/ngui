@@ -160,15 +160,15 @@ public class UIFontInspector : Editor
 			}
 
 			GUILayout.BeginHorizontal();
-			int size = EditorGUILayout.IntField("Size", mFont.dynamicFontSize, GUILayout.Width(120f));
+			int size = EditorGUILayout.IntField("Default Size", mFont.defaultSize, GUILayout.Width(120f));
 			FontStyle style = (FontStyle)EditorGUILayout.EnumPopup(mFont.dynamicFontStyle);
 			GUILayout.Space(18f);
 			GUILayout.EndHorizontal();
 
-			if (size != mFont.dynamicFontSize)
+			if (size != mFont.defaultSize)
 			{
 				NGUIEditorTools.RegisterUndo("Font change", mFont);
-				mFont.dynamicFontSize = size;
+				mFont.defaultSize = size;
 			}
 
 			if (style != mFont.dynamicFontStyle)

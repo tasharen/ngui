@@ -164,12 +164,12 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 					mList.padding = padding;
 				}
 
-				float ts = EditorGUILayout.FloatField("Text Scale", mList.textScale, GUILayout.Width(120f));
+				int ts = EditorGUILayout.IntField("Font Size", mList.fontSize, GUILayout.Width(120f));
 
-				if (mList.textScale != ts)
+				if (mList.fontSize != ts)
 				{
 					RegisterUndo();
-					mList.textScale = ts;
+					mList.fontSize = ts;
 				}
 
 				bool isAnimated = EditorGUILayout.Toggle("Animated", mList.isAnimated);

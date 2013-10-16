@@ -612,7 +612,7 @@ public class UICreateWidgetWizard : EditorWindow
 			bg.spriteName = mInputBG;
 			bg.pivot = UIWidget.Pivot.Left;
 			bg.width = 400;
-			bg.height = NGUISettings.font.size + padding * 2;
+			bg.height = NGUISettings.font.defaultSize + padding * 2;
 			bg.transform.localPosition = Vector3.zero;
 			bg.MakePixelPerfect();
 
@@ -671,7 +671,7 @@ public class UICreateWidgetWizard : EditorWindow
 			sprite.atlas = NGUISettings.atlas;
 			sprite.pivot = UIWidget.Pivot.Left;
 			sprite.width = Mathf.RoundToInt(150f + fgPadding.x * 2f);
-			sprite.height = Mathf.RoundToInt(NGUISettings.font.size + fgPadding.y * 2f);
+			sprite.height = Mathf.RoundToInt(NGUISettings.font.defaultSize + fgPadding.y * 2f);
 			sprite.transform.localPosition = Vector3.zero;
 			sprite.MakePixelPerfect();
 

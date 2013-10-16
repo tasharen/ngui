@@ -81,7 +81,7 @@ public class UITextList : MonoBehaviour
 		{
 			// Rebuild the line
 			string line;
-			textLabel.font.WrapText(ce.text, out line, textLabel.width, 100000,
+			textLabel.font.WrapText(ce.text, textLabel.fontSize, out line, textLabel.width, 100000,
 				0, textLabel.supportEncoding, textLabel.symbolStyle);
 			ce.lines = line.Split(mSeparator);
 
@@ -131,7 +131,7 @@ public class UITextList : MonoBehaviour
 			if (font != null)
 			{
 				int lines = 0;
-				int maxLines = maxHeight > 0 ? Mathf.FloorToInt(maxHeight / (textLabel.font.size * textLabel.font.pixelSize)) : 100000;
+				int maxLines = maxHeight > 0 ? Mathf.FloorToInt(maxHeight / (textLabel.fontSize * textLabel.font.pixelSize)) : 100000;
 				int offset = Mathf.RoundToInt(mScroll);
 
 				// Don't let scrolling to exceed the visible number of lines

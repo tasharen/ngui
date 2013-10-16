@@ -756,12 +756,15 @@ public class UIWidgetInspector : Editor
 		NGUIEditorTools.SetLabelWidth(80f);
 		EditorGUILayout.Space();
 
+		serializedObject.Update();
+
 		// Check to see if we can draw the widget's default properties to begin with
 		if (DrawProperties())
 		{
 			DrawExtraProperties();
 			DrawCommonProperties();
 		}
+		serializedObject.ApplyModifiedProperties();
 	}
 
 	/// <summary>

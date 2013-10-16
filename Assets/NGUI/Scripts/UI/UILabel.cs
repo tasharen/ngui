@@ -32,6 +32,8 @@ public class UILabel : UIWidget
 
 	[HideInInspector][SerializeField] UIFont mFont;
 	[HideInInspector][SerializeField] string mText = "";
+	[HideInInspector][SerializeField] int mFontSize = 0;
+	[HideInInspector][SerializeField] FontStyle mFontStyle = FontStyle.Normal;
 	[HideInInspector][SerializeField] bool mEncoding = true;
 	[HideInInspector][SerializeField] int mMaxLineCount = 0; // 0 denotes unlimited
 	[HideInInspector][SerializeField] Effect mEffectStyle = Effect.None;
@@ -50,7 +52,7 @@ public class UILabel : UIWidget
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
 	bool mPremultiply = false;
-	Vector2 mSize = Vector2.zero;
+	Vector2 mPrintedSize = Vector2.zero;
 	float mScale = 1f;
 	int mLastWidth = 0;
 	int mLastHeight = 0;
@@ -110,7 +112,7 @@ public class UILabel : UIWidget
 				if (mFont != null && mFont.dynamicFont != null)
 				{
 					mFont.dynamicFont.textureRebuildCallback += MarkAsChanged;
-					mFont.Request(mText);
+					mFont.Request(mText, fontSize);
 				}
 #endif
 				MarkAsChanged();
@@ -140,10 +142,76 @@ public class UILabel : UIWidget
 				mText = value;
 				hasChanged = true;
 #if DYNAMIC_FONT
-				if (mFont != null) mFont.Request(value);
+				if (mFont != null) mFont.Request(value, fontSize);
 #endif
 			}
 		}
+	}
+
+	/// <summary>
+	/// Dynamic font size used by the label.
+	/// </summary>
+
+	public int fontSize
+	{
+		get
+		{
+#if DYNAMIC_FONT
+			if (mFont != null)
+			{
+				if (mFontSize == 0 || !mFont.dynamicFont)
+					return mFont.defaultSize;
+			}
+#endif
+			return mFontSize;
+		}
+		set
+		{
+			value = Mathf.Clamp(value, 0, 144);
+
+			if (mFontSize != value)
+			{
+				mFontSize = value;
+				hasChanged = true;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Dynamic font style used by the label.
+	/// </summary>
+
+	public FontStyle fontStyle
+	{
+		get
+		{
+#if DYNAMIC_FONT
+			if (mFont != null)
+			{
+				if (mFontStyle == 0 || !mFont.dynamicFont)
+					return FontStyle.Normal;
+			}
+#endif
+			return mFontStyle;
+		}
+		set
+		{
+			if (mFontStyle != value)
+			{
+				mFontStyle = value;
+				hasChanged = true;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Ensure that the font size remains valid.
+	/// </summary>
+
+	void OnValidate ()
+	{
+		mFontSize = Mathf.Clamp(mFontSize, 0, 144);
+		hasChanged = true;
 	}
 
 	/// <summary>
@@ -413,7 +481,7 @@ public class UILabel : UIWidget
 		get
 		{
 			if (hasChanged) ProcessText();
-			return mSize;
+			return mPrintedSize;
 		}
 	}
 
@@ -480,7 +548,7 @@ public class UILabel : UIWidget
 
 		if (mFont != null)
 		{
-			int min = Mathf.RoundToInt(mFont.size * mFont.pixelSize);
+			int min = Mathf.RoundToInt(mFont.defaultSize * mFont.pixelSize);
 			if (height < min) height = min;
 		}
 
@@ -516,7 +584,7 @@ public class UILabel : UIWidget
 
 #if DYNAMIC_FONT
 		// Request the text within the font
-		if (mFont != null) mFont.Request(mText);
+		if (mFont != null) mFont.Request(mText, fontSize);
 #endif
 	}
 
@@ -547,8 +615,9 @@ public class UILabel : UIWidget
 		mChanged = true;
 		hasChanged = false;
 
+		int fs = fontSize;
 		float invSize = 1f / mFont.pixelSize;
-		float printSize = Mathf.Abs(legacyMode ? cachedTransform.localScale.x : mFont.size);
+		float printSize = Mathf.Abs(legacyMode ? cachedTransform.localScale.x : fs);
 		float lw = legacyMode ? (mMaxLineWidth != 0 ? mMaxLineWidth * invSize : 1000000) : width * invSize;
 		float lh = legacyMode ? (mMaxLineHeight != 0 ? mMaxLineHeight * invSize : 1000000) : height * invSize;
 
@@ -556,7 +625,7 @@ public class UILabel : UIWidget
 		{
 			for (;;)
 			{
-				mScale = printSize / mFont.size;
+				mScale = printSize / fs;
 
 				bool fits = true;
 
@@ -566,22 +635,22 @@ public class UILabel : UIWidget
 
 				if (lw > 0f || lh > 0f)
 				{
-					fits = mFont.WrapText(mText, out mProcessedText, pw, ph, mMaxLineCount, mEncoding, mSymbols);
+					fits = mFont.WrapText(mText, fs, out mProcessedText, pw, ph, mMaxLineCount, mEncoding, mSymbols);
 				}
 				else mProcessedText = mText;
 
 				// Remember the final printed size
-				mSize = !string.IsNullOrEmpty(mProcessedText) ?
-					mFont.CalculatePrintedSize(mProcessedText, mEncoding, mSymbols) : Vector2.zero;
+				mPrintedSize = !string.IsNullOrEmpty(mProcessedText) ?
+					mFont.CalculatePrintedSize(mProcessedText, fs, mEncoding, mSymbols) : Vector2.zero;
 
 				if (mOverflow == Overflow.ResizeFreely)
 				{
-					mWidth = Mathf.RoundToInt(mSize.x * mFont.pixelSize);
-					mHeight = Mathf.RoundToInt(mSize.y * mFont.pixelSize);
+					mWidth = Mathf.RoundToInt(mPrintedSize.x * mFont.pixelSize);
+					mHeight = Mathf.RoundToInt(mPrintedSize.y * mFont.pixelSize);
 				}
 				else if (mOverflow == Overflow.ResizeHeight)
 				{
-					mHeight = Mathf.RoundToInt(mSize.y * mFont.pixelSize);
+					mHeight = Mathf.RoundToInt(mPrintedSize.y * mFont.pixelSize);
 				}
 				else if (mOverflow == Overflow.ShrinkContent && !fits)
 				{
@@ -592,8 +661,8 @@ public class UILabel : UIWidget
 				// Upgrade to the new system
 				if (legacyMode)
 				{
-					width = Mathf.RoundToInt(mSize.x * mFont.pixelSize);
-					height = Mathf.RoundToInt(mSize.y * mFont.pixelSize);
+					width = Mathf.RoundToInt(mPrintedSize.x * mFont.pixelSize);
+					height = Mathf.RoundToInt(mPrintedSize.y * mFont.pixelSize);
 					cachedTransform.localScale = Vector3.one;
 				}
 				break;
@@ -636,8 +705,8 @@ public class UILabel : UIWidget
 				ProcessText(false);
 				mOverflow = over;
 
-				int minX = Mathf.RoundToInt(mSize.x * pixelSize);
-				int minY = Mathf.RoundToInt(mSize.y * pixelSize);
+				int minX = Mathf.RoundToInt(mPrintedSize.x * pixelSize);
+				int minY = Mathf.RoundToInt(mPrintedSize.y * pixelSize);
 
 				if (width < minX) width = minX;
 				if (height < minY) height = minY;
@@ -657,8 +726,8 @@ public class UILabel : UIWidget
 			ProcessText(false);
 
 			float pixelSize = font.pixelSize;
-			int minX = Mathf.RoundToInt(mSize.x * pixelSize);
-			int minY = Mathf.RoundToInt(mSize.y * pixelSize);
+			int minX = Mathf.RoundToInt(mPrintedSize.x * pixelSize);
+			int minY = Mathf.RoundToInt(mPrintedSize.y * pixelSize);
 
 			if (width < minX) width = minX;
 			if (height < minY) height = minY;
@@ -706,21 +775,34 @@ public class UILabel : UIWidget
 
 		string text = processedText;
 		float scale = mScale * mFont.pixelSize;
-		int w = Mathf.RoundToInt(width / scale);
+		bool ignoreScale = false;
+		int size;
+		
+		if (mFont.isDynamic)
+		{
+			ignoreScale = true;
+			size = Mathf.RoundToInt(fontSize * mScale * mFont.pixelSize);
+		}
+		else
+		{
+			size = fontSize;
+		}
+		
+		int w = ignoreScale ? width : Mathf.RoundToInt(width / scale);
 		int start = verts.size;
 
 		// Print the text into the buffers
 		if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)
 		{
-			mFont.Print(text, col, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Left, w, mPremultiply);
+			mFont.Print(text, size, col, verts, uvs, cols, mEncoding, mSymbols, TextAlignment.Left, w, mPremultiply);
 		}
 		else if (p == Pivot.Right || p == Pivot.TopRight || p == Pivot.BottomRight)
 		{
-			mFont.Print(text, col, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Right, w, mPremultiply);
+			mFont.Print(text, size, col, verts, uvs, cols, mEncoding, mSymbols, TextAlignment.Right, w, mPremultiply);
 		}
 		else
 		{
-			mFont.Print(text, col, verts, uvs, cols, mEncoding, mSymbols, UIFont.Alignment.Center, w, mPremultiply);
+			mFont.Print(text, size, col, verts, uvs, cols, mEncoding, mSymbols, TextAlignment.Center, w, mPremultiply);
 		}
 
 		Vector2 po = pivotOffset;
@@ -728,9 +810,9 @@ public class UILabel : UIWidget
 		float fy = Mathf.Lerp(mHeight, 0f, po.y);
 
 		// Center vertically
-		fy += Mathf.Lerp(mSize.y * scale - mHeight, 0f, po.y);
+		fy += Mathf.Lerp(mPrintedSize.y * scale - mHeight, 0f, po.y);
 
-		if (scale == 1f)
+		if (ignoreScale || scale == 1f)
 		{
 			for (int i = start; i < verts.size; ++i)
 			{

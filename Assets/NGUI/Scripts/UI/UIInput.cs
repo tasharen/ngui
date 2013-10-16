@@ -689,12 +689,12 @@ public class UIInput : MonoBehaviour
 
 						// Offset required in order to print the part leading up to the cursor
 						string visible = processed.Substring(0, Mathf.Min(mDrawEnd, processed.Length));
-						int leftMargin = label.font.CalculateOffsetToFit(visible, label.width, false, UIFont.SymbolStyle.None);
+						int leftMargin = label.font.CalculateOffsetToFit(visible, label.fontSize, label.width, false, UIFont.SymbolStyle.None);
 
 						// The cursor is no longer within bounds
 						if (selPos < leftMargin || selPos >= mDrawEnd)
 						{
-							leftMargin = label.font.CalculateOffsetToFit(left, label.width, false, UIFont.SymbolStyle.None);
+							leftMargin = label.font.CalculateOffsetToFit(left, label.fontSize, label.width, false, UIFont.SymbolStyle.None);
 
 							mDrawStart = leftMargin;
 							mDrawEnd = left.Length;

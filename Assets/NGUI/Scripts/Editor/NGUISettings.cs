@@ -40,7 +40,6 @@ public class NGUISettings
 	static Color mColor = Color.white;
 	static int mLayer = 0;
 	static Font mDynFont;
-	static int mDynFontSize = 16;
 	static FontStyle mDynFontStyle = FontStyle.Normal;
 	static ColorMode mColorMode = ColorMode.Blue;
 	static bool mAllDCs = false;
@@ -70,7 +69,6 @@ public class NGUISettings
 		mPivot			= (UIWidget.Pivot)EditorPrefs.GetInt("NGUI Pivot", (int)mPivot);
 		mLayer			= EditorPrefs.GetInt("NGUI Layer", -1);
 		mDynFont		= GetObject("NGUI DynFont") as Font;
-		mDynFontSize	= EditorPrefs.GetInt("NGUI DynFontSize", 16);
 		mDynFontStyle	= (FontStyle)EditorPrefs.GetInt("NGUI DynFontStyle", (int)FontStyle.Normal);
 		mColorMode		= (ColorMode)EditorPrefs.GetInt("NGUI Color Mode", (int)ColorMode.Blue);
 		mAllDCs			= EditorPrefs.GetBool("NGUI All DCs", false);
@@ -104,7 +102,6 @@ public class NGUISettings
 		EditorPrefs.SetInt("NGUI Pivot", (int)mPivot);
 		EditorPrefs.SetInt("NGUI Layer", mLayer);
 		EditorPrefs.SetInt("NGUI DynFont", (mDynFont != null) ? mDynFont.GetInstanceID() : -1);
-		EditorPrefs.SetInt("NGUI DynFontSize", mDynFontSize);
 		EditorPrefs.SetInt("NGUI DynFontStyle", (int)mDynFontStyle);
 		EditorPrefs.SetInt("NGUI Color Mode", (int)mColorMode);
 		EditorPrefs.SetBool("NGUI All DCs", mAllDCs);
@@ -329,12 +326,6 @@ public class NGUISettings
 	/// </summary>
 
 	static public string atlasName { get { if (!mLoaded) Load(); return mAtlasName; } set { if (mAtlasName != value) { mAtlasName = value; Save(); } } }
-
-	/// <summary>
-	/// Size of the dynamic font.
-	/// </summary>
-
-	static public int dynamicFontSize { get { if (!mLoaded) Load(); return mDynFontSize; } set { if (mDynFontSize != value) { mDynFontSize = value; Save(); } } }
 
 	/// <summary>
 	/// Dynamic font's style.

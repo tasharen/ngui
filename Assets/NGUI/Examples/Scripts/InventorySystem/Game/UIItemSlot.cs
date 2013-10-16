@@ -54,7 +54,7 @@ public abstract class UIItemSlot : MonoBehaviour
 
 			if (bi != null)
 			{
-				string t = "[" + NGUITools.EncodeColor(item.color) + "]" + item.name + "[-]\n";
+				string t = "[" + NGUIText.EncodeColor(item.color) + "]" + item.name + "[-]\n";
 
 				t += "[AFAFAF]Level " + item.itemLevel + " " + bi.slot;
 

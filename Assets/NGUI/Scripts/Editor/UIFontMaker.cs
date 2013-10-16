@@ -103,7 +103,6 @@ public class UIFontMaker : EditorWindow
 			NGUISettings.dynamicFont = EditorGUILayout.ObjectField("Font TTF", NGUISettings.dynamicFont, typeof(Font), false) as Font;
 
 			GUILayout.BeginHorizontal();
-			NGUISettings.dynamicFontSize = EditorGUILayout.IntField("Font Size", NGUISettings.dynamicFontSize, GUILayout.Width(120f));
 			NGUISettings.dynamicFontStyle = (FontStyle)EditorGUILayout.EnumPopup(NGUISettings.dynamicFontStyle);
 			GUILayout.Space(18f);
 			GUILayout.EndHorizontal();
@@ -312,7 +311,6 @@ public class UIFontMaker : EditorWindow
 			// New dynamic font
 			font.atlas = null;
 			font.dynamicFont = NGUISettings.dynamicFont;
-			font.dynamicFontSize = NGUISettings.dynamicFontSize;
 			font.dynamicFontStyle = NGUISettings.dynamicFontStyle;
 		}
 		else

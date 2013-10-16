@@ -49,31 +49,25 @@ public class UILabelInspector : UIWidgetInspector
 			text = EditorGUILayout.TextArea(mLabel.text, GUI.skin.textArea, GUILayout.Height(100f));
 			if (!text.Equals(mLabel.text)) { RegisterUndo(); mLabel.text = text; }
 
-			UILabel.Overflow ov = (UILabel.Overflow)EditorGUILayout.EnumPopup("Overflow", mLabel.overflowMethod);
-			if (ov != mLabel.overflowMethod) { RegisterUndo(); mLabel.overflowMethod = ov; }
+			if (mLabel.font != null && mLabel.font.isDynamic)
+				NGUIEditorTools.DrawProperty("Font Size", serializedObject, "mFontSize");
 
+			NGUIEditorTools.DrawProperty("Overflow", serializedObject, "mOverflow");
+			
 			GUILayout.BeginHorizontal();
-			bool encoding = EditorGUILayout.Toggle("Encoding", mLabel.supportEncoding, GUILayout.Width(100f));
+			NGUIEditorTools.DrawProperty("Encoding", serializedObject, "mEncoding", GUILayout.Width(100f));
 			GUILayout.Label("use emoticons and colors");
 			GUILayout.EndHorizontal();
-			if (encoding != mLabel.supportEncoding) { RegisterUndo(); mLabel.supportEncoding = encoding; }
 
-			if (encoding && mLabel.font.hasSymbols)
-			{
-				UIFont.SymbolStyle sym = (UIFont.SymbolStyle)EditorGUILayout.EnumPopup("Symbols", mLabel.symbolStyle, GUILayout.Width(170f));
-				if (sym != mLabel.symbolStyle) { RegisterUndo(); mLabel.symbolStyle = sym; }
-			}
+			if (mLabel.supportEncoding && mLabel.font.hasSymbols)
+				NGUIEditorTools.DrawProperty("Symbols", serializedObject, "mSymbols");
 
 			GUILayout.BeginHorizontal();
 			{
-				UILabel.Effect effect = (UILabel.Effect)EditorGUILayout.EnumPopup("Effect", mLabel.effectStyle, GUILayout.Width(170f));
-				if (effect != mLabel.effectStyle) { RegisterUndo(); mLabel.effectStyle = effect; }
+				NGUIEditorTools.DrawProperty("Effect", serializedObject, "mEffectStyle", GUILayout.Width(170f));
 
-				if (effect != UILabel.Effect.None)
-				{
-					Color c = EditorGUILayout.ColorField(mLabel.effectColor);
-					if (mLabel.effectColor != c) { RegisterUndo(); mLabel.effectColor = c; }
-				}
+				if (mLabel.effectStyle != UILabel.Effect.None)
+					NGUIEditorTools.DrawProperty("", serializedObject, "mEffectColor");
 			}
 			GUILayout.EndHorizontal();
 
