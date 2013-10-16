@@ -77,6 +77,7 @@ public class UILabel : UIWidget
 	float mScale = 1f;
 	int mLastWidth = 0;
 	int mLastHeight = 0;
+	int mPrintedSize = 0;
 
 	/// <summary>
 	/// Function used to determine if something has changed (and thus the geometry must be rebuilt)
@@ -259,6 +260,27 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Whether the label will use the printed size instead of font size when printing the label.
+	/// It's a dynamic font feature that will ensure that the text is crisp when shrunk.
+	/// </summary>
+
+	bool usePrintedSize
+	{
+		get
+		{
+			if (trueTypeFont != null && overflowMethod == Overflow.ShrinkContent && keepCrispWhenShrunk != Crispness.Never)
+			{
+#if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_BLACKBERRY
+				return (keepCrispWhenShrunk == Crispness.Always);
+#else
+				return true;
+#endif
+			}
+			return false;
+		}
+	}
+
+	/// <summary>
 	/// Request the needed characters in the texture.
 	/// </summary>
 
@@ -268,7 +290,7 @@ public class UILabel : UIWidget
 		if (mActiveTTF != null)
 		{
 			ProcessText();
-			mActiveTTF.RequestCharactersInTexture(mText, mPrintedSize, mFontStyle);
+			mActiveTTF.RequestCharactersInTexture(mText, usePrintedSize ? mPrintedSize : fontSize, mFontStyle);
 		}
 #endif
 	}
@@ -291,14 +313,7 @@ public class UILabel : UIWidget
 		hasChanged = true;
 
 		if (fnt != null) mFontSize = fnt.defaultSize;
-
-#if DYNAMIC_FONT
-		if (mActiveTTF != null)
-		{
-			ProcessText();
-			mActiveTTF.RequestCharactersInTexture(mText, mPrintedSize, mFontStyle);
-		}
-#endif
+		ProcessAndRequest();
 	}
 
 	/// <summary>
@@ -717,8 +732,6 @@ public class UILabel : UIWidget
 
 	void ProcessText () { ProcessText(false); }
 
-	int mPrintedSize = 0;
-
 	/// <summary>
 	/// Process the raw text, called when something changes.
 	/// </summary>
@@ -902,19 +915,9 @@ public class UILabel : UIWidget
 		string text = processedText;
 		float pixelSize = (mFont != null) ? mFont.pixelSize : 1f;
 		float scale = mScale * pixelSize;
-		bool ignoreScale = false;
-
-		if (mTrueTypeFont != null && mOverflow == Overflow.ShrinkContent && keepCrispWhenShrunk != Crispness.Never)
-		{
-#if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_BLACKBERRY
-			ignoreScale = (keepCrispWhenShrunk == Crispness.Always);
-#else
-			ignoreScale = true;
-#endif
-		}
-
-		int size = ignoreScale ? mPrintedSize : fontSize;
-		int w = ignoreScale ? width : Mathf.RoundToInt(width / scale);
+		bool usePS = usePrintedSize;
+		int size = usePS ? mPrintedSize : fontSize;
+		int w = usePS ? width : Mathf.RoundToInt(width / scale);
 		int start = verts.size;
 
 		TextAlignment alignment = TextAlignment.Center;
@@ -940,7 +943,7 @@ public class UILabel : UIWidget
 		// Center vertically
 		fy = Mathf.RoundToInt(fy + Mathf.Lerp(mCalculatedSize.y * scale - mHeight, 0f, po.y));
 
-		if (ignoreScale || scale == 1f)
+		if (usePS || scale == 1f)
 		{
 			for (int i = start; i < verts.size; ++i)
 			{
