@@ -389,8 +389,12 @@ static public class NGUITools
 		if (widgets.Length == 0) return 0;
 
 		int depth = widgets[0].raycastDepth;
+		
 		for (int i = 1, imax = widgets.Length; i < imax; ++i)
-			depth = Mathf.Min(depth, widgets[i].raycastDepth);
+		{
+			if (widgets[i].enabled)
+				depth = Mathf.Min(depth, widgets[i].raycastDepth);
+		}
 		return depth;
 	}
 
