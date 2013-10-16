@@ -42,7 +42,7 @@ public class UILabel : UIWidget
 	/// You may want to turn this off on mobile devices.
 	/// </summary>
 
-	public Crispness keepCrispWhenShrunk = Crispness.Always;
+	public Crispness keepCrispWhenShrunk = Crispness.OnDesktop;
 
 	[HideInInspector][SerializeField] Font mTrueTypeFont;
 	[HideInInspector][SerializeField] UIFont mFont;
