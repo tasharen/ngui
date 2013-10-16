@@ -104,6 +104,13 @@ public class UILabelInspector : UIWidgetInspector
 				GUILayout.EndHorizontal();
 			}
 
+#if UNITY_3_5
+			GUI.changed = false;
+			GUI.skin.textArea.wordWrap = true;
+			SerializedProperty textField = serializedObject.FindProperty("mText");
+			string text = EditorGUILayout.TextArea(textField.stringValue, GUI.skin.textArea, GUILayout.Height(100f));
+			if (GUI.changed) textField.stringValue = text;
+#else
 			GUI.skin.textField.wordWrap = true;
 			GUILayout.Space(-16f);
 			GUILayout.BeginHorizontal();
@@ -112,7 +119,7 @@ public class UILabelInspector : UIWidgetInspector
 			GUILayout.Space(4f);
 			GUILayout.EndHorizontal();
 			GUI.skin.textField.wordWrap = false;
-
+#endif
 			NGUIEditorTools.DrawProperty("Overflow", serializedObject, "mOverflow");
 
 			GUILayout.BeginHorizontal();

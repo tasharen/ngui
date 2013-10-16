@@ -32,7 +32,9 @@ public class UILabel : UIWidget
 
 	[HideInInspector][SerializeField] Font mTrueTypeFont;
 	[HideInInspector][SerializeField] UIFont mFont;
+#if !UNITY_3_5
 	[MultilineAttribute(6)]
+#endif
 	[HideInInspector][SerializeField] string mText = "";
 	[HideInInspector][SerializeField] int mFontSize = 16;
 	[HideInInspector][SerializeField] FontStyle mFontStyle = FontStyle.Normal;
