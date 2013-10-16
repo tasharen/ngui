@@ -105,7 +105,12 @@ public class UILabelInspector : UIWidgetInspector
 			}
 
 			GUI.skin.textField.wordWrap = true;
+			GUILayout.Space(-16f);
+			GUILayout.BeginHorizontal();
+			GUILayout.Space(4f);
 			NGUIEditorTools.DrawProperty("", serializedObject, "mText", GUILayout.Height(80f));
+			GUILayout.Space(4f);
+			GUILayout.EndHorizontal();
 			GUI.skin.textField.wordWrap = false;
 
 			NGUIEditorTools.DrawProperty("Overflow", serializedObject, "mOverflow");
