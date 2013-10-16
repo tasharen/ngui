@@ -51,7 +51,9 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] float mLineWidth = 0;
 	[HideInInspector][SerializeField] bool mMultiline = true;
 
+#if DYNAMIC_FONT
 	Font mActiveTTF = null;
+#endif
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
 	bool mPremultiply = false;
@@ -164,7 +166,6 @@ public class UILabel : UIWidget
 				}
 #else
 				mTrueTypeFont = value;
-				mActiveTTF = value;
 #endif
 			}
 		}
@@ -572,7 +573,11 @@ public class UILabel : UIWidget
 	/// Whether the label has a valid font.
 	/// </summary>
 
+#if DYNAMIC_FONT
 	bool isValid { get { return mFont != null || mTrueTypeFont != null; } }
+#else
+	bool isValid { get { return mFont != null; } }
+#endif
 
 	/// <summary>
 	/// Label's active pixel size scale.
@@ -732,28 +737,20 @@ public class UILabel : UIWidget
 
 				if (lw > 0f || lh > 0f)
 				{
-					if (mFont != null)
-					{
-						fits = mFont.WrapText(mText, fs, out mProcessedText, pw, ph, mMaxLineCount, mEncoding, mSymbols);
-					}
-					else
-					{
-						fits = NGUIText.WrapText(mText, mTrueTypeFont, fs, mFontStyle, pw, ph, mMaxLineCount, mEncoding, out mProcessedText);
-					}
+					if (mFont != null) fits = mFont.WrapText(mText, fs, out mProcessedText, pw, ph, mMaxLineCount, mEncoding, mSymbols);
+#if DYNAMIC_FONT
+					else fits = NGUIText.WrapText(mText, mTrueTypeFont, fs, mFontStyle, pw, ph, mMaxLineCount, mEncoding, out mProcessedText);
+#endif
 				}
 				else mProcessedText = mText;
 
 				// Remember the final printed size
 				if (!string.IsNullOrEmpty(mProcessedText))
 				{
-					if (mFont != null)
-					{
-						mCalculatedSize = mFont.CalculatePrintedSize(mProcessedText, fs, mEncoding, mSymbols);
-					}
-					else
-					{
-						mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText, mTrueTypeFont, fs, mFontStyle, mEncoding);
-					}
+					if (mFont != null) mCalculatedSize = mFont.CalculatePrintedSize(mProcessedText, fs, mEncoding, mSymbols);
+#if DYNAMIC_FONT
+					else mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText, mTrueTypeFont, fs, mFontStyle, mEncoding);
+#endif
 				}
 				else mCalculatedSize = Vector2.zero;
 
@@ -906,15 +903,10 @@ public class UILabel : UIWidget
 			alignment = TextAlignment.Right;
 		}
 
-		if (mFont != null)
-		{
-			mFont.Print(text, size, col, verts, uvs, cols, mEncoding, mSymbols, alignment, w, mPremultiply);
-		}
-		else
-		{
-			NGUIText.Print(text, mTrueTypeFont, size, fontStyle, col, mEncoding, alignment, w, mPremultiply, verts, uvs, cols);
-		}
-
+		if (mFont != null) mFont.Print(text, size, col, verts, uvs, cols, mEncoding, mSymbols, alignment, w, mPremultiply);
+#if DYNAMIC_FONT
+		else NGUIText.Print(text, mTrueTypeFont, size, fontStyle, col, mEncoding, alignment, w, mPremultiply, verts, uvs, cols);
+#endif
 		Vector2 po = pivotOffset;
 		float fx = Mathf.Lerp(0f, -mWidth, po.x);
 		float fy = Mathf.Lerp(mHeight, 0f, po.y);
