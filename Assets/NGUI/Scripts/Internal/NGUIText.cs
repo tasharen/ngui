@@ -17,8 +17,10 @@ using System.Text;
 static public class NGUIText
 {
 	static Color mInvisible = new Color(0f, 0f, 0f, 0f);
+#if DYNAMIC_FONT
 	static BetterList<Color> mColors = new BetterList<Color>();
 	static CharacterInfo mTempChar;
+#endif
 
 	/// <summary>
 	/// Parse a RrGgBb color encoded in the string.

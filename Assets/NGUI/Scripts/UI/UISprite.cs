@@ -37,7 +37,10 @@ public class UISprite : UIWidget
 	[HideInInspector][SerializeField] bool mFillCenter = true;
 	[HideInInspector][SerializeField] Type mType = Type.Simple;
 	[HideInInspector][SerializeField] FillDirection mFillDirection = FillDirection.Radial360;
-	[HideInInspector][SerializeField][Range(0f, 1f)] float mFillAmount = 1.0f;
+#if !UNITY_3_5
+	[Range(0f, 1f)]
+#endif
+	[HideInInspector][SerializeField] float mFillAmount = 1.0f;
 	[HideInInspector][SerializeField] bool mInvert = false;
 
 	protected UISpriteData mSprite;
