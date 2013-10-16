@@ -234,6 +234,7 @@ public class BetterList<T>
 					--size;
 					buffer[i] = default(T);
 					for (int b = i; b < size; ++b) buffer[b] = buffer[b + 1];
+					buffer[size] = default(T);
 					return true;
 				}
 			}
@@ -252,6 +253,7 @@ public class BetterList<T>
 			--size;
 			buffer[index] = default(T);
 			for (int b = index; b < size; ++b) buffer[b] = buffer[b + 1];
+			buffer[size] = default(T);
 		}
 	}
 
