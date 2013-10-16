@@ -87,7 +87,7 @@ public class UIButton : UIButtonColor
 		{
 			Collider col = collider;
 			if (col != null) col.enabled = value;
-			else enabled = value;
+			enabled = value;
 		}
 	}
 
