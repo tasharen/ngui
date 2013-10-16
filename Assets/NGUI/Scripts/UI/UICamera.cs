@@ -1318,7 +1318,7 @@ public class UICamera : MonoBehaviour
 #if UNITY_EDITOR
 	void OnGUI ()
 	{
-		if (debug && hoveredObject != null)
+		if (debug && hoveredObject != null && Application.isPlaying)
 		{
 			GUILayout.Label("Last Hit: " + NGUITools.GetHierarchy(hoveredObject).Replace("\"", ""));
 		}
