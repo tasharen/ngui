@@ -588,27 +588,6 @@ public class UIFont : MonoBehaviour
 			symbols[i].MarkAsDirty();
 	}
 
-#if DYNAMIC_FONT
-	/// <summary>
-	/// Requests the following text to be present in the font's texture. Returns whether the texture has changed.
-	/// </summary>
-
-	public void Request (string text, int size)
-	{
-		if (!string.IsNullOrEmpty(text))
-		{
-			if (mReplacement != null)
-			{
-				mReplacement.Request(text, size);
-			}
-			else if (mDynamicFont != null)
-			{
-				mDynamicFont.RequestCharactersInTexture(text, size, mDynamicFontStyle);
-			}
-		}
-	}
-#endif
-
 	/// <summary>
 	/// Get the printed size of the specified string. The returned value is in pixels.
 	/// </summary>
@@ -705,7 +684,6 @@ public class UIFont : MonoBehaviour
 
 #if DYNAMIC_FONT
 		if (isDynamic) return NGUIText.CalculateOffsetToFit(text, mDynamicFont, size, mDynamicFontStyle, lineWidth);
-
 #endif
 		int textLength = text.Length;
 		int remainingWidth = lineWidth;
@@ -782,11 +760,8 @@ public class UIFont : MonoBehaviour
 
 #if DYNAMIC_FONT
 		if (isDynamic)
-		{
 			return NGUIText.WrapText(text, mDynamicFont, size, mDynamicFontStyle, width, height, maxLines, encoding, out finalText);
-		}
 #endif
-		
 		if (width < 1 || height < 1)
 		{
 			finalText = "";

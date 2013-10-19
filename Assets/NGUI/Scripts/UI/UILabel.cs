@@ -308,11 +308,21 @@ public class UILabel : UIWidget
 
 		mFont = null;
 		mTrueTypeFont = null;
-		font = fnt;
-		trueTypeFont = ttf;
-		hasChanged = true;
 
-		if (fnt != null) mFontSize = fnt.defaultSize;
+		if (fnt != null)
+		{
+			// Auto-upgrade from 3.0.2 and earlier
+			if (fnt.isDynamic)
+			{
+				trueTypeFont = fnt.dynamicFont;
+				mFontStyle = fnt.dynamicFontStyle;
+			}
+			else font = fnt;
+			mFontSize = fnt.defaultSize;
+		}
+		else trueTypeFont = ttf;
+
+		hasChanged = true;
 		ProcessAndRequest();
 	}
 
