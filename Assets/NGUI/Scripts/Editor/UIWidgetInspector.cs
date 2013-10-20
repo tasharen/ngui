@@ -781,19 +781,22 @@ public class UIWidgetInspector : Editor
 		{
 			NGUIEditorTools.BeginContents();
 
-			// Color tint
-			GUILayout.BeginHorizontal();
-			SerializedProperty sp = NGUIEditorTools.DrawProperty("Color Tint", serializedObject, "mColor");
-			if (GUILayout.Button("Copy", GUILayout.Width(50f)))
-				NGUISettings.color = sp.colorValue;
-			GUILayout.EndHorizontal();
+			if (mWidget.GetType() != typeof(UIWidget))
+			{
+				// Color tint
+				GUILayout.BeginHorizontal();
+				SerializedProperty sp = NGUIEditorTools.DrawProperty("Color Tint", serializedObject, "mColor");
+				if (GUILayout.Button("Copy", GUILayout.Width(50f)))
+					NGUISettings.color = sp.colorValue;
+				GUILayout.EndHorizontal();
 
-			GUILayout.BeginHorizontal();
-			NGUISettings.color = EditorGUILayout.ColorField("Clipboard", NGUISettings.color);
-			if (GUILayout.Button("Paste", GUILayout.Width(50f)))
-				sp.colorValue = NGUISettings.color;
-			GUILayout.EndHorizontal();
-			GUILayout.Space(6f);
+				GUILayout.BeginHorizontal();
+				NGUISettings.color = EditorGUILayout.ColorField("Clipboard", NGUISettings.color);
+				if (GUILayout.Button("Paste", GUILayout.Width(50f)))
+					sp.colorValue = NGUISettings.color;
+				GUILayout.EndHorizontal();
+				GUILayout.Space(6f);
+			}
 
 			DrawPivot();
 			DrawDepth(type == PrefabType.Prefab);
