@@ -10,7 +10,9 @@ using System.Collections.Generic;
 /// Base class for all UI components that should be derived from when creating new widget types.
 /// </summary>
 
-public abstract class UIWidget : MonoBehaviour
+[ExecuteInEditMode]
+[AddComponentMenu("NGUI/UI/Widget")]
+public class UIWidget : MonoBehaviour
 {
 	/// <summary>
 	/// List of all the active widgets currently present in the scene.
@@ -34,8 +36,8 @@ public abstract class UIWidget : MonoBehaviour
 	// Cached and saved values
 	[HideInInspector][SerializeField] protected Color mColor = Color.white;
 	[HideInInspector][SerializeField] protected Pivot mPivot = Pivot.Center;
-	[HideInInspector][SerializeField] protected int mWidth = 0;
-	[HideInInspector][SerializeField] protected int mHeight = 0;
+	[HideInInspector][SerializeField] protected int mWidth = 100;
+	[HideInInspector][SerializeField] protected int mHeight = 100;
 	[HideInInspector][SerializeField] protected int mDepth = 0;
 
 	protected GameObject mGo;
@@ -481,13 +483,13 @@ public abstract class UIWidget : MonoBehaviour
 		UnityEditor.EditorUtility.SetDirty(this);
 #endif
 		// If we're in the editor, update the panel right away so its geometry gets updated.
-		if (mPanel != null && enabled && NGUITools.GetActive(gameObject) && !Application.isPlaying && material != null)
+		if (mPanel != null && enabled && NGUITools.GetActive(gameObject) && !Application.isPlaying)
 		{
 			SetDirty();
 			CheckLayer();
 #if UNITY_EDITOR
 			// Mark the panel as dirty so it gets updated
-			UnityEditor.EditorUtility.SetDirty(mPanel.gameObject);
+			if (material != null) UnityEditor.EditorUtility.SetDirty(mPanel.gameObject);
 #endif
 		}
 	}
@@ -498,7 +500,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	public void CreatePanel ()
 	{
-		if (mPanel == null && enabled && NGUITools.GetActive(gameObject) && material != null)
+		if (mPanel == null && enabled && NGUITools.GetActive(gameObject))
 		{
 			mPanel = UIPanel.Find(cachedTransform, mStarted);
 
@@ -506,7 +508,7 @@ public abstract class UIWidget : MonoBehaviour
 			{
 				CheckLayer();
 				mChanged = true;
-				UIPanel.SetDirty();
+				if (material != null) UIPanel.SetDirty();
 			}
 		}
 	}
@@ -564,7 +566,7 @@ public abstract class UIWidget : MonoBehaviour
 		mPanel = null;
 
 		// Prior to NGUI 2.7.0 width and height was specified as transform's local scale
-		if (mWidth == 0 && mHeight == 0)
+		if (mWidth == 100 && mHeight == 100 && cachedTransform.localScale.magnitude > 8f)
 		{
 			UpgradeFrom265();
 			cachedTransform.localScale = Vector3.one;
@@ -686,7 +688,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-		if (isVisible && hasVertices && mPanel != null)
+		if (isVisible && NGUITools.IsActive(this))
 		{
 			if (UnityEditor.Selection.activeGameObject == gameObject && showHandles) return;
 
@@ -751,7 +753,7 @@ public abstract class UIWidget : MonoBehaviour
 
 	public bool UpdateGeometry (UIPanel p, bool forceVisible)
 	{
-		if (material != null && p != null)
+		if (p != null)
 		{
 			mPanel = p;
 			bool hasMatrix = false;
@@ -824,7 +826,7 @@ public abstract class UIWidget : MonoBehaviour
 			{
 				mChanged = false;
 
-				if (isVisible)
+				if (material != null && isVisible)
 				{
 					bool hadVertices = mGeom.hasVertices;
 					mGeom.Clear();

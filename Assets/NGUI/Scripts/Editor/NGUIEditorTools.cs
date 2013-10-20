@@ -996,6 +996,8 @@ public class NGUIEditorTools
 	static public void DrawAdvancedSpriteField (UIAtlas atlas, string spriteName, SpriteSelector.Callback callback, bool editable,
 		params GUILayoutOption[] options)
 	{
+		if (atlas == null) return;
+
 		// Give the user a warning if there are no sprites in the atlas
 		if (atlas.spriteList.Count == 0)
 		{
@@ -1341,7 +1343,7 @@ public class NGUIEditorTools
 		GameObject go = null;
 		BetterList<UIWidget> widgets = SceneViewRaycast(pos);
 
-		if (inFront)
+		if (!inFront)
 		{
 			if (widgets.size > 0)
 			{
