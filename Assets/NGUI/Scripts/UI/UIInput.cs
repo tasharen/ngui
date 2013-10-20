@@ -318,7 +318,7 @@ public class UIInput : MonoBehaviour
 
 		if (mDoInit) Init();
 
-		if (label != null && label.font != null && NGUITools.IsActive(this))
+		if (label != null && label.bitmapFont != null && NGUITools.IsActive(this))
 		{
 			label.color = activeTextColor;
 #if MOBILE
@@ -644,7 +644,7 @@ public class UIInput : MonoBehaviour
 
 	protected void UpdateLabel ()
 	{
-		if (label != null && label.font != null)
+		if (label != null && label.bitmapFont != null)
 		{
 			if (mDoInit) Init();
 			bool selected = isSelected;
@@ -689,12 +689,12 @@ public class UIInput : MonoBehaviour
 
 						// Offset required in order to print the part leading up to the cursor
 						string visible = processed.Substring(0, Mathf.Min(mDrawEnd, processed.Length));
-						int leftMargin = label.font.CalculateOffsetToFit(visible, label.fontSize, label.width, false, UIFont.SymbolStyle.None);
+						int leftMargin = label.bitmapFont.CalculateOffsetToFit(visible, label.fontSize, label.width, false, UIFont.SymbolStyle.None);
 
 						// The cursor is no longer within bounds
 						if (selPos < leftMargin || selPos >= mDrawEnd)
 						{
-							leftMargin = label.font.CalculateOffsetToFit(left, label.fontSize, label.width, false, UIFont.SymbolStyle.None);
+							leftMargin = label.bitmapFont.CalculateOffsetToFit(left, label.fontSize, label.width, false, UIFont.SymbolStyle.None);
 
 							mDrawStart = leftMargin;
 							mDrawEnd = left.Length;

@@ -379,11 +379,11 @@ public class UIAtlas : MonoBehaviour
 		{
 			UILabel lbl = labels[i];
 
-			if (lbl.font != null && CheckIfRelated(this, lbl.font.atlas))
+			if (lbl.bitmapFont != null && CheckIfRelated(this, lbl.bitmapFont.atlas))
 			{
-				UIFont font = lbl.font;
-				lbl.font = null;
-				lbl.font = font;
+				UIFont font = lbl.bitmapFont;
+				lbl.bitmapFont = null;
+				lbl.bitmapFont = font;
 #if UNITY_EDITOR
 				UnityEditor.EditorUtility.SetDirty(lbl);
 #endif

@@ -24,7 +24,7 @@ public class UIPanelInspector : Editor
 			{
 				if (e.keyCode == KeyCode.Escape)
 				{
-					Tools.current = Tool.Move;
+					UnityEditor.Tools.current = Tool.Move;
 					Selection.activeGameObject = null;
 					e.Use();
 				}

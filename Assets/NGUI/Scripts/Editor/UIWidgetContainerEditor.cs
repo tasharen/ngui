@@ -33,7 +33,7 @@ public class UIWidgetContainerEditor : Editor
 	public void OnSceneGUI ()
 	{
 		NGUIEditorTools.HideMoveTool(true);
-		if (Tools.current != Tool.Move) return;
+		if (UnityEditor.Tools.current != Tool.Move) return;
 
 		MonoBehaviour mb = target as MonoBehaviour;
 		if (mb.GetComponent<UIWidget>() != null) return;

@@ -130,7 +130,7 @@ public class UILabelInspector : UIWidgetInspector
 			GUILayout.Label("use emoticons and colors");
 			GUILayout.EndHorizontal();
 
-			if (mLabel.supportEncoding && mLabel.font != null && mLabel.font.hasSymbols)
+			if (mLabel.supportEncoding && mLabel.bitmapFont != null && mLabel.bitmapFont.hasSymbols)
 				NGUIEditorTools.DrawProperty("Symbols", serializedObject, "mSymbols");
 
 			GUILayout.BeginHorizontal();

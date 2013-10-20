@@ -71,10 +71,10 @@ public class UIFontInspector : Editor
 
 		foreach (UILabel lbl in labels)
 		{
-			if (UIFont.CheckIfRelated(lbl.font, mFont))
+			if (UIFont.CheckIfRelated(lbl.bitmapFont, mFont))
 			{
-				lbl.font = null;
-				lbl.font = mFont;
+				lbl.bitmapFont = null;
+				lbl.bitmapFont = mFont;
 			}
 		}
 	}

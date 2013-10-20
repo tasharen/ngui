@@ -117,11 +117,14 @@ public class UILabel : UIWidget
 		}
 	}
 
+	[Obsolete("Use UILabel.bitmapFont instead")]
+	public UIFont font { get { return bitmapFont; } set { bitmapFont = value; } }
+
 	/// <summary>
 	/// Set the font used by this label.
 	/// </summary>
 
-	public UIFont font
+	public UIFont bitmapFont
 	{
 		get
 		{
@@ -317,7 +320,7 @@ public class UILabel : UIWidget
 				trueTypeFont = fnt.dynamicFont;
 				mFontStyle = fnt.dynamicFontStyle;
 			}
-			else font = fnt;
+			else bitmapFont = fnt;
 			mFontSize = fnt.defaultSize;
 		}
 		else trueTypeFont = ttf;
@@ -831,9 +834,9 @@ public class UILabel : UIWidget
 
 	public override void MakePixelPerfect ()
 	{
-		if (font != null)
+		if (bitmapFont != null)
 		{
-			float pixelSize = (font != null) ? font.pixelSize : 1f;
+			float pixelSize = (bitmapFont != null) ? bitmapFont.pixelSize : 1f;
 
 			Vector3 pos = cachedTransform.localPosition;
 			pos.x = Mathf.RoundToInt(pos.x);
@@ -870,11 +873,11 @@ public class UILabel : UIWidget
 
 	public void AssumeNaturalSize ()
 	{
-		if (font != null)
+		if (bitmapFont != null)
 		{
 			ProcessText(false);
 
-			float pixelSize = (font != null) ? font.pixelSize : 1f;
+			float pixelSize = (bitmapFont != null) ? bitmapFont.pixelSize : 1f;
 			int minX = Mathf.RoundToInt(mCalculatedSize.x * pixelSize);
 			int minY = Mathf.RoundToInt(mCalculatedSize.y * pixelSize);
 
@@ -891,7 +894,7 @@ public class UILabel : UIWidget
 	{
 		Color c = mEffectColor;
 		c.a *= alpha * mPanel.alpha;
-		Color32 col = (font != null && font.premultipliedAlpha) ? NGUITools.ApplyPMA(c) : c;
+		Color32 col = (bitmapFont != null && bitmapFont.premultipliedAlpha) ? NGUITools.ApplyPMA(c) : c;
 
 		for (int i = start; i < end; ++i)
 		{

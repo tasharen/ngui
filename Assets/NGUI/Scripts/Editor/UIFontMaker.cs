@@ -33,10 +33,10 @@ public class UIFontMaker : EditorWindow
 
 			foreach (UILabel lbl in labels)
 			{
-				if (lbl.font == NGUISettings.font)
+				if (lbl.bitmapFont == NGUISettings.font)
 				{
-					lbl.font = null;
-					lbl.font = NGUISettings.font;
+					lbl.bitmapFont = null;
+					lbl.bitmapFont = NGUISettings.font;
 				}
 			}
 		}

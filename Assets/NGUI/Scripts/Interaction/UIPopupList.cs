@@ -579,7 +579,7 @@ public class UIPopupList : UIWidgetContainer
 
 				UILabel lbl = NGUITools.AddWidget<UILabel>(mChild);
 				lbl.pivot = UIWidget.Pivot.TopLeft;
-				lbl.font = font;
+				lbl.bitmapFont = font;
 				lbl.trueTypeFont = trueTypeFont;
 				lbl.fontSize = fontSize;
 				lbl.fontStyle = fontStyle;

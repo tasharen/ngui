@@ -54,11 +54,11 @@ public class UIAtlasInspector : Editor
 
 		foreach (UILabel lbl in labels)
 		{
-			if (lbl.font != null && UIAtlas.CheckIfRelated(lbl.font.atlas, mAtlas) && lbl.font.UsesSprite(sprite.name))
+			if (lbl.bitmapFont != null && UIAtlas.CheckIfRelated(lbl.bitmapFont.atlas, mAtlas) && lbl.bitmapFont.UsesSprite(sprite.name))
 			{
-				UIFont font = lbl.font;
-				lbl.font = null;
-				lbl.font = font;
+				UIFont font = lbl.bitmapFont;
+				lbl.bitmapFont = null;
+				lbl.bitmapFont = font;
 				EditorUtility.SetDirty(lbl);
 			}
 		}

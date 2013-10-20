@@ -203,7 +203,7 @@ public class UICreateWidgetWizard : EditorWindow
 		if (ShouldCreate(go, NGUISettings.font != null))
 		{
 			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
-			lbl.font = NGUISettings.font;
+			lbl.bitmapFont = NGUISettings.font;
 			lbl.text = "New Label";
 			lbl.color = mColor;
 			lbl.AssumeNaturalSize();
@@ -288,7 +288,7 @@ public class UICreateWidgetWizard : EditorWindow
 			if (NGUISettings.font != null)
 			{
 				UILabel lbl = NGUITools.AddWidget<UILabel>(go);
-				lbl.font = NGUISettings.font;
+				lbl.bitmapFont = NGUISettings.font;
 				lbl.text = go.name;
 				lbl.AssumeNaturalSize();
 			}
@@ -340,7 +340,7 @@ public class UICreateWidgetWizard : EditorWindow
 			if (NGUISettings.font != null)
 			{
 				UILabel lbl = NGUITools.AddWidget<UILabel>(go);
-				lbl.font = NGUISettings.font;
+				lbl.bitmapFont = NGUISettings.font;
 				lbl.text = go.name;
 				lbl.AssumeNaturalSize();
 			}
@@ -403,7 +403,7 @@ public class UICreateWidgetWizard : EditorWindow
 			if (NGUISettings.font != null)
 			{
 				UILabel lbl = NGUITools.AddWidget<UILabel>(go);
-				lbl.font = NGUISettings.font;
+				lbl.bitmapFont = NGUISettings.font;
 				lbl.text = go.name;
 				lbl.pivot = UIWidget.Pivot.Left;
 				lbl.transform.localPosition = new Vector3(16f, 0f, 0f);
@@ -617,7 +617,7 @@ public class UICreateWidgetWizard : EditorWindow
 			bg.MakePixelPerfect();
 
 			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
-			lbl.font = NGUISettings.font;
+			lbl.bitmapFont = NGUISettings.font;
 			lbl.pivot = UIWidget.Pivot.Left;
 			lbl.transform.localPosition = new Vector3(padding, 0f, 0f);
 			lbl.multiLine = false;
@@ -677,7 +677,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 			// Text label
 			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
-			lbl.font = NGUISettings.font;
+			lbl.bitmapFont = NGUISettings.font;
 			lbl.text = go.name;
 			lbl.pivot = UIWidget.Pivot.Left;
 			lbl.cachedTransform.localPosition = new Vector3(fgPadding.x, 0f, 0f);
