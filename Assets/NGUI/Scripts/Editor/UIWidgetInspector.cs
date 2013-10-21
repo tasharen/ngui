@@ -903,18 +903,24 @@ public class UIWidgetInspector : Editor
 #else
 		SerializedProperty pv = serializedObject.FindProperty("mPivot");
 
-		// Pivot point -- the new, more visual style
-		GUILayout.BeginHorizontal();
-		GUILayout.Label("Pivot", GUILayout.Width(76f));
-		Toggle("\u25C4", "ButtonLeft", UIWidget.Pivot.Left, true);
-		Toggle("\u25AC", "ButtonMid", UIWidget.Pivot.Center, true);
-		Toggle("\u25BA", "ButtonRight", UIWidget.Pivot.Right, true);
-		Toggle("\u25B2", "ButtonLeft", UIWidget.Pivot.Top, false);
-		Toggle("\u258C", "ButtonMid", UIWidget.Pivot.Center, false);
-		Toggle("\u25BC", "ButtonRight", UIWidget.Pivot.Bottom, false);
-		GUILayout.EndHorizontal();
-
-		pv.enumValueIndex = (int)mWidget.pivot;
+		if (pv.hasMultipleDifferentValues)
+		{
+			NGUIEditorTools.DrawProperty("Pivot", serializedObject, "mPivot");
+		}
+		else
+		{
+			// Pivot point -- the new, more visual style
+			GUILayout.BeginHorizontal();
+			GUILayout.Label("Pivot", GUILayout.Width(76f));
+			Toggle("\u25C4", "ButtonLeft", UIWidget.Pivot.Left, true);
+			Toggle("\u25AC", "ButtonMid", UIWidget.Pivot.Center, true);
+			Toggle("\u25BA", "ButtonRight", UIWidget.Pivot.Right, true);
+			Toggle("\u25B2", "ButtonLeft", UIWidget.Pivot.Top, false);
+			Toggle("\u258C", "ButtonMid", UIWidget.Pivot.Center, false);
+			Toggle("\u25BC", "ButtonRight", UIWidget.Pivot.Bottom, false);
+			GUILayout.EndHorizontal();
+			pv.enumValueIndex = (int)mWidget.pivot;
+		}
 #endif
 	}
 

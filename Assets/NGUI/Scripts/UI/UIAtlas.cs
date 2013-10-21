@@ -16,7 +16,7 @@ public class UIAtlas : MonoBehaviour
 {
 	// Legacy functionality, removed in 3.0. Do not use.
 	[System.Serializable]
-	public class Sprite
+	class Sprite
 	{
 		public string name = "Unity Bug";
 		public Rect outer = new Rect(0f, 0f, 1f, 1f);
