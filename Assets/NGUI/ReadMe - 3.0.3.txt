@@ -37,10 +37,11 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 
 3.0.3:
 - NEW: You no longer need to create UIFonts for dynamic fonts and can now specify font size and style directly on your labels.
-- NEW: As dynamic font-using label shrinks, it will automatically print with lower font size, maintaining its crispness.
+- NEW: As dynamic font-using label shrinks, it can automatically print with lower font size, maintaining its crispness.
 - NEW: You can now multi-edit sprites and labels.
 - NEW: UIInput has been redone, and now supports moving the caret as well as copy/paste keys in the editor.
 - NEW: UIInputValidator script's functionality is now a part of UIInput.
+- NEW: You can now create invisible widgets in case you want a simple way of intercepting events.
 - FIX: UICamera.selectedObject changes are now delayed until end of frame.
 - FIX: GUI/Text shader is no longer used, replaced with an Unlit/Text shader instead.
 - FIX: Added a by-material sorting clause to widgets with conflicting depth, automatically reducing draw calls.
@@ -49,7 +50,9 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: Popup list was not respecting the text scale correctly.
 - FIX: CalculateRaycastDepth will now ignore disabled widgets.
 - FIX: WP8 compile fix.
+- EDT: UILabel.font is now UILabel.bitmapFont, for clarity.
 - DEL: UILabel no longer has the 'password' option since it never made sense to have it there to begin with.
+- DEL: Got rid of the UpdateManager. It really should have been killed 2 years ago.
 
 3.0.2:
 - NEW: Added a "depth" property to the panels to make it possible to easily order panels.
