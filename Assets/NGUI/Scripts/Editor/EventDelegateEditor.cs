@@ -99,10 +99,18 @@ public static class EventDelegateEditor
 		GUI.changed = false;
 		bool retVal = false;
 		MonoBehaviour target = null;
+		bool remove = false;
 
-		if (removeButton && del.target != null)
+		if (removeButton && (del.target != null || del.isValid))
 		{
-			target = EditorGUILayout.ObjectField("Notify", del.target, typeof(MonoBehaviour), true) as MonoBehaviour;
+			if (del.target == null && del.isValid)
+			{
+				EditorGUILayout.LabelField("Notify", del.ToString());
+			}
+			else
+			{
+				target = EditorGUILayout.ObjectField("Notify", del.target, typeof(MonoBehaviour), true) as MonoBehaviour;
+			}
 
 			GUILayout.Space(-20f);
 			GUILayout.BeginHorizontal();
@@ -115,6 +123,7 @@ public static class EventDelegateEditor
 #endif
 			{
 				target = null;
+				remove = true;
 			}
 			GUILayout.EndHorizontal();
 		}
@@ -123,7 +132,13 @@ public static class EventDelegateEditor
 			target = EditorGUILayout.ObjectField("Notify", del.target, typeof(MonoBehaviour), true) as MonoBehaviour;
 		}
 
-		if (del.target != target)
+		if (remove)
+		{
+			NGUIEditorTools.RegisterUndo("Delegate Selection", undoObject);
+			del.Clear();
+			EditorUtility.SetDirty(undoObject);
+		}
+		else if (del.target != target)
 		{
 			NGUIEditorTools.RegisterUndo("Delegate Selection", undoObject);
 			del.target = target;
@@ -187,7 +202,7 @@ public static class EventDelegateEditor
 		{
 			EventDelegate del = list[i];
 
-			if (del == null || del.target == null)
+			if (del == null || !del.isValid)
 			{
 				list.RemoveAt(i);
 				continue;
@@ -196,15 +211,15 @@ public static class EventDelegateEditor
 			Field(undoObject, del);
 			EditorGUILayout.Space();
 
-			if (del.target == null)
+			if (!del.isValid)
 			{
 				list.RemoveAt(i);
 				continue;
 			}
 			else
 			{
-				targetPresent = true;
-				if (del.isValid) isValid = true;
+				if (del.target != null) targetPresent = true;
+				isValid = true;
 			}
 			++i;
 		}

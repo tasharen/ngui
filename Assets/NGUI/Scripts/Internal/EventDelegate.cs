@@ -32,30 +32,31 @@ public class EventDelegate
 
 	public delegate void Callback();
 	Callback mCachedCallback;
+	bool mRawDelegate = false;
 
 	/// <summary>
 	/// Event delegate's target object.
 	/// </summary>
 
-	public MonoBehaviour target { get { return mTarget; } set { mTarget = value; mCachedCallback = null; } }
+	public MonoBehaviour target { get { return mTarget; } set { mTarget = value; mCachedCallback = null; mRawDelegate = false; } }
 
 	/// <summary>
 	/// Event delegate's method name.
 	/// </summary>
 
-	public string methodName { get { return mMethodName; } set { mMethodName = value; mCachedCallback = null; } }
+	public string methodName { get { return mMethodName; } set { mMethodName = value; mCachedCallback = null; mRawDelegate = false; } }
 
 	/// <summary>
 	/// Whether this delegate's values have been set.
 	/// </summary>
 
-	public bool isValid { get { return mTarget != null && !string.IsNullOrEmpty(mMethodName); } }
+	public bool isValid { get { return (mRawDelegate && mCachedCallback != null) || (mTarget != null && !string.IsNullOrEmpty(mMethodName)); } }
 
 	/// <summary>
 	/// Whether the target script is actually enabled.
 	/// </summary>
 
-	public bool isEnabled { get { return mTarget != null && mTarget.enabled; } }
+	public bool isEnabled { get { return (mRawDelegate && mCachedCallback != null) || (mTarget != null && mTarget.enabled); } }
 
 	public EventDelegate () { }
 	public EventDelegate (Callback call) { Set(call); }
@@ -96,6 +97,7 @@ public class EventDelegate
 		if (obj is Callback)
 		{
 			Callback callback = obj as Callback;
+			if (callback.Equals(mCachedCallback)) return true;
 			return (mTarget == callback.Target && string.Equals(mMethodName, GetMethodName(callback)));
 		}
 		
@@ -115,14 +117,14 @@ public class EventDelegate
 
 	public override int GetHashCode () { return s_Hash; }
 
-#if REFLECTION_SUPPORT
 	/// <summary>
 	/// Convert the saved target and method name into an actual delegate.
 	/// </summary>
 
 	Callback Get ()
 	{
-		if (mCachedCallback == null || mCachedCallback.Target != mTarget || GetMethodName(mCachedCallback) != mMethodName)
+#if REFLECTION_SUPPORT
+		if (!mRawDelegate && (mCachedCallback == null || mCachedCallback.Target != mTarget || GetMethodName(mCachedCallback) != mMethodName))
 		{
 			if (mTarget != null && !string.IsNullOrEmpty(mMethodName))
 			{
@@ -130,9 +132,9 @@ public class EventDelegate
 			}
 			else return null;
 		}
+#endif
 		return mCachedCallback;
 	}
-#endif
 
 	/// <summary>
 	/// Set the delegate callback directly.
@@ -145,11 +147,23 @@ public class EventDelegate
 			mTarget = null;
 			mMethodName = null;
 			mCachedCallback = null;
+			mRawDelegate = false;
 		}
 		else
 		{
 			mTarget = call.Target as MonoBehaviour;
-			mMethodName = GetMethodName(call);
+
+			if (mTarget == null)
+			{
+				mRawDelegate = true;
+				mCachedCallback = call;
+				mMethodName = null;
+			}
+			else
+			{
+				mMethodName = GetMethodName(call);
+				mRawDelegate = false;
+			}
 		}
 	}
 
@@ -162,6 +176,7 @@ public class EventDelegate
 		this.mTarget = target;
 		this.mMethodName = methodName;
 		mCachedCallback = null;
+		mRawDelegate = false;
 	}
 
 	/// <summary>
@@ -175,24 +190,34 @@ public class EventDelegate
 		if (Application.isPlaying)
 #endif
 		{
-#if REFLECTION_SUPPORT
 			Callback call = Get();
-			
+
 			if (call != null)
 			{
 				call();
 				return true;
 			}
-#else
+#if !REFLECTION_SUPPORT
 			if (isValid)
 			{
 				mTarget.SendMessage(mMethodName, SendMessageOptions.DontRequireReceiver);
 				return true;
 			}
-
 #endif
 		}
 		return false;
+	}
+
+	/// <summary>
+	/// Clear the event delegate.
+	/// </summary>
+
+	public void Clear ()
+	{
+		mTarget = null;
+		mMethodName = null;
+		mRawDelegate = false;
+		mCachedCallback = null;
 	}
 
 	/// <summary>
@@ -201,14 +226,16 @@ public class EventDelegate
 
 	public override string ToString ()
 	{
-		if (mTarget != null && !string.IsNullOrEmpty(methodName))
+		if (mTarget != null)
 		{
 			string typeName = mTarget.GetType().ToString();
 			int period = typeName.LastIndexOf('.');
 			if (period > 0) typeName = typeName.Substring(period + 1);
-			return typeName + "." + methodName;
+
+			if (!string.IsNullOrEmpty(methodName)) return typeName + "." + methodName;
+			else return typeName + ".[delegate]";
 		}
-		return null;
+		return mRawDelegate ? "[delegate]" : null;
 	}
 
 	/// <summary>

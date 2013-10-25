@@ -253,6 +253,7 @@ public class UISprite : UIWidget
 			if (type == Type.Sliced)
 			{
 				Vector4 b = border;
+				if (atlas != null) b *= atlas.pixelSize;
 				int min = Mathf.RoundToInt(b.x + b.z);
 				return ((min & 1) == 1) ? min + 1 : min;
 			}
@@ -271,6 +272,7 @@ public class UISprite : UIWidget
 			if (type == Type.Sliced)
 			{
 				Vector4 b = border;
+				if (atlas != null) b *= atlas.pixelSize;
 				int min = Mathf.RoundToInt(b.y + b.w);
 				return ((min & 1) == 1) ? min + 1 : min;
 			}
