@@ -104,22 +104,24 @@ public class UILabelInspector : UIWidgetInspector
 				GUILayout.EndHorizontal();
 			}
 
+			bool ww = GUI.skin.textField.wordWrap;
+			GUI.skin.textField.wordWrap = true;
 #if UNITY_3_5
 			GUI.changed = false;
-			GUI.skin.textArea.wordWrap = true;
 			SerializedProperty textField = serializedObject.FindProperty("mText");
 			string text = EditorGUILayout.TextArea(textField.stringValue, GUI.skin.textArea, GUILayout.Height(100f));
 			if (GUI.changed) textField.stringValue = text;
 #else
-			GUI.skin.textField.wordWrap = true;
+#if UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 			GUILayout.Space(-16f);
+#endif
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(4f);
 			NGUIEditorTools.DrawProperty("", serializedObject, "mText", GUILayout.Height(80f));
 			GUILayout.Space(4f);
 			GUILayout.EndHorizontal();
-			GUI.skin.textField.wordWrap = false;
 #endif
+			GUI.skin.textField.wordWrap = ww;
 			SerializedProperty ov = NGUIEditorTools.DrawProperty("Overflow", serializedObject, "mOverflow");
 
 			if (ov.intValue == (int)UILabel.Overflow.ShrinkContent && ttf != null && ttf.objectReferenceValue != null)
