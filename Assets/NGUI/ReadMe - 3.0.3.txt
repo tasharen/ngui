@@ -42,6 +42,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: UIInput has been redone, and now supports moving the caret as well as copy/paste keys in the editor.
 - NEW: UIInputValidator script's functionality is now a part of UIInput.
 - NEW: You can now create invisible widgets in case you want a simple way of intercepting events.
+- NEW: You can now use anonymous delegates with the EventDelegate.
 - FIX: UICamera.selectedObject changes are now delayed until end of frame.
 - FIX: GUI/Text shader is no longer used, replaced with an Unlit/Text shader instead.
 - FIX: Added a by-material sorting clause to widgets with conflicting depth, automatically reducing draw calls.
