@@ -78,6 +78,7 @@ public class UILabel : UIWidget
 	int mLastWidth = 0;
 	int mLastHeight = 0;
 	int mPrintedSize = 0;
+	bool mUseDynamicFont = false;
 
 	/// <summary>
 	/// Function used to determine if something has changed (and thus the geometry must be rebuilt)
@@ -312,18 +313,33 @@ public class UILabel : UIWidget
 		mFont = null;
 		mTrueTypeFont = null;
 
-		if (fnt != null)
+		if (ttf != null && (fnt == null || !mUseDynamicFont))
+		{
+			bitmapFont = null;
+			trueTypeFont = ttf;
+			mUseDynamicFont = true;
+		}
+		else if (fnt != null)
 		{
 			// Auto-upgrade from 3.0.2 and earlier
 			if (fnt.isDynamic)
 			{
 				trueTypeFont = fnt.dynamicFont;
 				mFontStyle = fnt.dynamicFontStyle;
+				mUseDynamicFont = true;
 			}
-			else bitmapFont = fnt;
+			else
+			{
+				bitmapFont = fnt;
+				mUseDynamicFont = false;
+			}
 			mFontSize = fnt.defaultSize;
 		}
-		else trueTypeFont = ttf;
+		else
+		{
+			trueTypeFont = ttf;
+			mUseDynamicFont = true;
+		}
 
 		hasChanged = true;
 		ProcessAndRequest();
@@ -1001,5 +1017,18 @@ public class UILabel : UIWidget
 				ApplyShadow(verts, uvs, cols, offset, end, -fx, -fy);
 			}
 		}
+	}
+
+	/// <summary>
+	/// Calculate the offset necessary to fit the specified text. Helper function.
+	/// </summary>
+
+	public int CalculateOffsetToFit (string text)
+	{
+		if (bitmapFont != null)
+		{
+			return bitmapFont.CalculateOffsetToFit(text, fontSize, width, false, UIFont.SymbolStyle.None);
+		}
+		return NGUIText.CalculateOffsetToFit(text, trueTypeFont, fontSize, fontStyle, width);
 	}
 }
