@@ -1178,7 +1178,7 @@ public class UICamera : MonoBehaviour
 			Notify(currentTouch.pressed, "OnPress", false);
 			currentTouch.pressed = currentTouch.current;
 			currentTouch.dragged = currentTouch.current;
-			currentTouch.clickNotification = isMouse ? ClickNotification.BasedOnDelta : ClickNotification.Always;
+			currentTouch.clickNotification = ClickNotification.BasedOnDelta;
 			currentTouch.totalDelta = Vector2.zero;
 			currentTouch.dragStarted = false;
 			Notify(currentTouch.pressed, "OnPress", true);
