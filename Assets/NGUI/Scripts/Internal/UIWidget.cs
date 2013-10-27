@@ -40,6 +40,12 @@ public class UIWidget : MonoBehaviour
 	[HideInInspector][SerializeField] protected int mHeight = 100;
 	[HideInInspector][SerializeField] protected int mDepth = 0;
 
+	/// <summary>
+	/// If set to 'true', the box collider's dimensions will be adjusted to always match the widget whenever it resizes.
+	/// </summary>
+
+	public bool autoResizeBoxCollider = false;
+	
 	protected GameObject mGo;
 	protected Transform mTrans;
 	protected UIPanel mPanel;
@@ -89,6 +95,7 @@ public class UIWidget : MonoBehaviour
 			if (mWidth != value)
 			{
 				mWidth = value;
+				if (autoResizeBoxCollider) ResizeCollider();
 				MarkAsChanged();
 			}
 		}
@@ -112,6 +119,7 @@ public class UIWidget : MonoBehaviour
 			if (mHeight != value)
 			{
 				mHeight = value;
+				if (autoResizeBoxCollider) ResizeCollider();
 				MarkAsChanged();
 			}
 		}
@@ -377,6 +385,29 @@ public class UIWidget : MonoBehaviour
 	public Vector2 relativeSize { get { return Vector2.one; } }
 
 	/// <summary>
+	/// Convenience function that returns 'true' if the widget has a box collider.
+	/// </summary>
+
+	public bool hasBoxCollider
+	{
+		get
+		{
+			BoxCollider box = collider as BoxCollider;
+			return (box != null);
+		}
+	}
+
+	/// <summary>
+	/// Adjust the widget's collider size to match the widget's dimensions.
+	/// </summary>
+
+	void ResizeCollider ()
+	{
+		BoxCollider box = collider as BoxCollider;
+		if (box != null) NGUITools.UpdateWidgetCollider(box);
+	}
+
+	/// <summary>
 	/// Static widget comparison function used for depth sorting.
 	/// </summary>
 
@@ -463,7 +494,11 @@ public class UIWidget : MonoBehaviour
 	/// This callback is sent inside the editor notifying us that some property has changed.
 	/// </summary>
 
-	protected virtual void OnValidate() { mChanged = true; }
+	protected virtual void OnValidate()
+	{
+		mChanged = true;
+		if (autoResizeBoxCollider) ResizeCollider();
+	}
 
 	/// <summary>
 	/// Only sets the local flag, does not notify the panel.

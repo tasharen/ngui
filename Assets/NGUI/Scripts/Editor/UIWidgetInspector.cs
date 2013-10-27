@@ -801,6 +801,14 @@ public class UIWidgetInspector : Editor
 			DrawPivot();
 			DrawDepth(type == PrefabType.Prefab);
 			DrawDimensions(type == PrefabType.Prefab);
+
+			if (serializedObject.isEditingMultipleObjects || mWidget.hasBoxCollider)
+			{
+				GUILayout.BeginHorizontal();
+				NGUIEditorTools.DrawProperty("Box Collider", serializedObject, "autoResizeBoxCollider", GUILayout.Width(100f));
+				GUILayout.Label("auto-adjust to match");
+				GUILayout.EndHorizontal();
+			}
 			NGUIEditorTools.EndContents();
 		}
 	}
