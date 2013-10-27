@@ -98,7 +98,7 @@ public static class EventDelegateEditor
 		bool prev = GUI.changed;
 		GUI.changed = false;
 		bool retVal = false;
-		MonoBehaviour target = null;
+		MonoBehaviour target = del.target;
 		bool remove = false;
 
 		if (removeButton && (del.target != null || del.isValid))
@@ -202,7 +202,7 @@ public static class EventDelegateEditor
 		{
 			EventDelegate del = list[i];
 
-			if (del == null || !del.isValid)
+			if (del == null || (del.target == null && !del.isValid))
 			{
 				list.RemoveAt(i);
 				continue;
@@ -211,7 +211,7 @@ public static class EventDelegateEditor
 			Field(undoObject, del);
 			EditorGUILayout.Space();
 
-			if (!del.isValid)
+			if (del.target == null && !del.isValid)
 			{
 				list.RemoveAt(i);
 				continue;
@@ -227,7 +227,7 @@ public static class EventDelegateEditor
 		// Draw a new delegate
 		EventDelegate newDel = new EventDelegate();
 		Field(undoObject, newDel);
-		
+
 		if (newDel.target != null)
 		{
 			targetPresent = true;
