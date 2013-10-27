@@ -1029,6 +1029,10 @@ public class UILabel : UIWidget
 		{
 			return bitmapFont.CalculateOffsetToFit(text, fontSize, width, false, UIFont.SymbolStyle.None);
 		}
+#if DYNAMIC_FONT
 		return NGUIText.CalculateOffsetToFit(text, trueTypeFont, fontSize, fontStyle, width);
+#else
+		return 0;
+#endif
 	}
 }
