@@ -604,9 +604,11 @@ public class UIInput : MonoBehaviour
 	{
 		if (NGUITools.IsActive(this))
 		{
+			current = this;
 			mValue = value;
 			EventDelegate.Execute(onSubmit);
 			SaveToPlayerPrefs(mValue);
+			current = null;
 		}
 	}
 
