@@ -148,6 +148,9 @@ public class UIInput : MonoBehaviour
 
 	public string defaultText { get { return mDefaultText; } set { mDefaultText = value; } }
 
+	[System.Obsolete("Use UIInput.value instead")]
+	public string text { get { return this.value; } set { this.value = value; } }
+
 	/// <summary>
 	/// Input field's current text value.
 	/// </summary>

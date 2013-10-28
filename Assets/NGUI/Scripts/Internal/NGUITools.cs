@@ -997,7 +997,7 @@ static public class NGUITools
 	/// Access to the clipboard via undocumented APIs.
 	/// </summary>
 
-	public static string clipboard
+	static public string clipboard
 	{
 		get
 		{
@@ -1013,4 +1013,13 @@ static public class NGUITools
 			te.Copy();
 		}
 	}
+
+	[System.Obsolete("Use NGUIText.EncodeColor instead")]
+	static public string EncodeColor (Color c) { return NGUIText.EncodeColor(c); }
+
+	[System.Obsolete("Use NGUIText.ParseColor instead")]
+	static public Color ParseColor (string text, int offset) { return NGUIText.ParseColor(text, offset); }
+
+	[System.Obsolete("Use NGUIText.StripSymbols instead")]
+	static public string StripSymbols (string text) { return NGUIText.StripSymbols(text); }
 }

@@ -370,6 +370,13 @@ public class UIFont : MonoBehaviour
 	public bool isValid { get { return mFont.isValid; } }
 #endif
 
+	[System.Obsolete("Use UIFont.defaultSize instead")]
+	public int size
+	{
+		get { return defaultSize; }
+		set { defaultSize = value; }
+	}
+
 	/// <summary>
 	/// Pixel-perfect size of this font.
 	/// </summary>
