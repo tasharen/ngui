@@ -423,7 +423,10 @@ public class UIInput : MonoBehaviour
 
 			if (mKeyboard.done)
 			{
-				if (!mKeyboard.wasCanceled) Submit();
+#if !UNITY_3_5
+				if (!mKeyboard.wasCanceled)
+#endif
+					Submit();
 				mKeyboard = null;
 				isSelected = false;
 			}
