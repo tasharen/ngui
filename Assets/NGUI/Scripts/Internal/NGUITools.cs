@@ -445,7 +445,13 @@ static public class NGUITools
 
 			if (panel != null)
 			{
-				panel.depth = panel.depth + adjustment;
+				UIPanel[] panels = go.GetComponentsInChildren<UIPanel>(true);
+				
+				for (int i = 0; i < panels.Length; ++i)
+				{
+					UIPanel p = panels[i];
+					p.depth = p.depth + adjustment;
+				}
 				return 1;
 			}
 			else
