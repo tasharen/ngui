@@ -561,8 +561,12 @@ public class UICamera : MonoBehaviour
 					{
 						GameObject go = hits[b].collider.gameObject;
 						mHit.depth = NGUITools.CalculateRaycastDepth(go);
-						mHit.hit = hits[b];
-						mHits.Add(mHit);
+
+						if (mHit.depth != int.MaxValue)
+						{
+							mHit.hit = hits[b];
+							mHits.Add(mHit);
+						}
 					}
 
 					mHits.Sort(delegate(DepthEntry r1, DepthEntry r2) { return r2.depth.CompareTo(r1.depth); });

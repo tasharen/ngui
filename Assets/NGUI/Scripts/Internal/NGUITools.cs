@@ -388,9 +388,9 @@ static public class NGUITools
 		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
 		if (widgets.Length == 0) return 0;
 
-		int depth = widgets[0].raycastDepth;
+		int depth = int.MaxValue;
 		
-		for (int i = 1, imax = widgets.Length; i < imax; ++i)
+		for (int i = 0, imax = widgets.Length; i < imax; ++i)
 		{
 			if (widgets[i].enabled)
 				depth = Mathf.Min(depth, widgets[i].raycastDepth);
