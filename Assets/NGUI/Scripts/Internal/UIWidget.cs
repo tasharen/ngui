@@ -403,8 +403,11 @@ public class UIWidget : MonoBehaviour
 
 	void ResizeCollider ()
 	{
-		BoxCollider box = collider as BoxCollider;
-		if (box != null) NGUITools.UpdateWidgetCollider(box);
+		if (NGUITools.IsActive(this))
+		{
+			BoxCollider box = collider as BoxCollider;
+			if (box != null) NGUITools.UpdateWidgetCollider(box, true);
+		}
 	}
 
 	/// <summary>

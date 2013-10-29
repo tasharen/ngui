@@ -400,7 +400,7 @@ public class UIInput : MonoBehaviour
 #if MOBILE
 	void Update()
 	{
-		if (mKeyboard != null)
+		if (mKeyboard != null && isSelected && NGUITools.IsActive(this))
 		{
 			string val = mKeyboard.text;
 
