@@ -411,12 +411,7 @@ static public class NGUIText
 			else previousChar = ch;
 		}
 
-		if (start < offset)
-		{
-			int len = Mathf.Clamp(offset - start, 0, text.Length - start);
-			sb.Append(text.Substring(start, len));
-			offset = textLength;
-		}
+		if (start < offset) sb.Append(text.Substring(start, offset - start));
 		finalText = sb.ToString();
 		return (!multiline || offset == textLength || (maxLines > 0 && lineCount <= maxLines));
 	}
