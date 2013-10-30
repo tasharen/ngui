@@ -18,7 +18,7 @@ using UnityEditor;
 [CustomEditor(typeof(UILabel))]
 public class UILabelInspector : UIWidgetInspector
 {
-	enum FontType
+	public enum FontType
 	{
 		Bitmap,
 		Dynamic,

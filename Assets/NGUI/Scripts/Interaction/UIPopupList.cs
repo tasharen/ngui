@@ -39,7 +39,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Font used by the labels.
 	/// </summary>
 
-	public UIFont font;
+	public UIFont bitmapFont;
 
 	/// <summary>
 	/// True type font used by the labels. Alternative to specifying a bitmap font ('font').
@@ -146,6 +146,7 @@ public class UIPopupList : UIWidgetContainer
 	[HideInInspector][SerializeField] GameObject eventReceiver;
 	[HideInInspector][SerializeField] string functionName = "OnSelectionChange";
 	[HideInInspector][SerializeField] float textScale = 0f;
+	[HideInInspector][SerializeField] UIFont font; // Use 'bitmapFont' instead
 
 	public delegate void LegacyEvent (string val);
 	LegacyEvent mLegacyEvent;
@@ -240,19 +241,53 @@ public class UIPopupList : UIWidgetContainer
 	/// Whether the popup list is actually usable.
 	/// </summary>
 
-	bool isValid { get { return font != null || trueTypeFont != null; } }
+	bool isValid { get { return bitmapFont != null || trueTypeFont != null; } }
 
 	/// <summary>
 	/// Active font size.
 	/// </summary>
 
-	int activeFontSize { get { return (trueTypeFont != null || font == null) ? fontSize : font.defaultSize; } }
+	int activeFontSize { get { return (trueTypeFont != null || bitmapFont == null) ? fontSize : bitmapFont.defaultSize; } }
 
 	/// <summary>
 	/// Font scale applied to the popup list's text.
 	/// </summary>
 
-	float activeFontScale { get { return (trueTypeFont != null || font == null) ? 1f : (float)fontSize / font.defaultSize; } }
+	float activeFontScale { get { return (trueTypeFont != null || bitmapFont == null) ? 1f : (float)fontSize / bitmapFont.defaultSize; } }
+
+	/// <summary>
+	/// Remove legacy functionality.
+	/// </summary>
+
+	void OnEnable ()
+	{
+		if (EventDelegate.IsValid(onChange))
+		{
+			eventReceiver = null;
+			functionName = null;
+		}
+
+		// 'textScale' is no longer used
+		if (textScale != 0f)
+		{
+			fontSize = (bitmapFont != null) ? Mathf.RoundToInt(bitmapFont.defaultSize * textScale) : 16;
+			textScale = 0f;
+		}
+
+		// 'font' is no longer used
+		if (font != null)
+		{
+			if (bitmapFont == null) bitmapFont = font;
+			font = null;
+		}
+
+		// Auto-upgrade to the true type font
+		if (trueTypeFont == null && bitmapFont != null && bitmapFont.isDynamic)
+		{
+			trueTypeFont = bitmapFont.dynamicFont;
+			bitmapFont = null;
+		}
+	}
 
 	/// <summary>
 	/// Send out the selection message on start.
@@ -260,26 +295,6 @@ public class UIPopupList : UIWidgetContainer
 
 	void Start ()
 	{
-		// Remove legacy functionality
-		if (EventDelegate.IsValid(onChange))
-		{
-			eventReceiver = null;
-			functionName = null;
-		}
-
-		// textScale is no longer used
-		if (textScale != 0f)
-		{
-			fontSize = (font != null) ? Mathf.RoundToInt(font.defaultSize * textScale) : 16;
-			textScale = 0f;
-		}
-
-		if (trueTypeFont == null && font.isDynamic)
-		{
-			trueTypeFont = font.dynamicFont;
-			font = null;
-		}
-
 		if (Application.isPlaying)
 		{
 			if (textLabel != null)
@@ -565,7 +580,7 @@ public class UIPopupList : UIWidgetContainer
 			if (hlsp == null) return;
 
 			float hlspHeight = hlsp.borderTop;
-			float pixelSize = (font != null) ? font.pixelSize : 1f;
+			float pixelSize = (bitmapFont != null) ? bitmapFont.pixelSize : 1f;
 			float fontHeight = activeFontSize * pixelSize;
 			float dynScale = activeFontScale;
 			float labelHeight = fontHeight * dynScale;
@@ -579,7 +594,7 @@ public class UIPopupList : UIWidgetContainer
 
 				UILabel lbl = NGUITools.AddWidget<UILabel>(mChild);
 				lbl.pivot = UIWidget.Pivot.TopLeft;
-				lbl.bitmapFont = font;
+				lbl.bitmapFont = bitmapFont;
 				lbl.trueTypeFont = trueTypeFont;
 				lbl.fontSize = fontSize;
 				lbl.fontStyle = fontStyle;

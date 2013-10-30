@@ -143,7 +143,7 @@ static public class NGUIMenu
 #endif
 			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
 			lbl.name = "Label";
-			lbl.bitmapFont = NGUISettings.font;
+			lbl.bitmapFont = NGUISettings.bitmapFont;
 			lbl.text = "New Label";
 			lbl.pivot = NGUISettings.pivot;
 			lbl.width = 120;

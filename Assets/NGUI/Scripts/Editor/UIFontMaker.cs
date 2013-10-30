@@ -27,16 +27,16 @@ public class UIFontMaker : EditorWindow
 
 	void MarkAsChanged ()
 	{
-		if (NGUISettings.font != null)
+		if (NGUISettings.bitmapFont != null)
 		{
 			List<UILabel> labels = NGUIEditorTools.FindAll<UILabel>();
 
 			foreach (UILabel lbl in labels)
 			{
-				if (lbl.bitmapFont == NGUISettings.font)
+				if (lbl.bitmapFont == NGUISettings.bitmapFont)
 				{
 					lbl.bitmapFont = null;
-					lbl.bitmapFont = NGUISettings.font;
+					lbl.bitmapFont = NGUISettings.bitmapFont;
 				}
 			}
 		}
@@ -48,7 +48,7 @@ public class UIFontMaker : EditorWindow
 
 	void OnSelectFont (Object obj)
 	{
-		NGUISettings.font = obj as UIFont;
+		NGUISettings.bitmapFont = obj as UIFont;
 		Repaint();
 	}
 
@@ -77,10 +77,10 @@ public class UIFontMaker : EditorWindow
 		string prefabPath = "";
 		string matPath = "";
 
-		if (NGUISettings.font != null && NGUISettings.font.name == NGUISettings.fontName)
+		if (NGUISettings.bitmapFont != null && NGUISettings.bitmapFont.name == NGUISettings.fontName)
 		{
-			prefabPath = AssetDatabase.GetAssetPath(NGUISettings.font.gameObject.GetInstanceID());
-			if (NGUISettings.font.material != null) matPath = AssetDatabase.GetAssetPath(NGUISettings.font.material.GetInstanceID());
+			prefabPath = AssetDatabase.GetAssetPath(NGUISettings.bitmapFont.gameObject.GetInstanceID());
+			if (NGUISettings.bitmapFont.material != null) matPath = AssetDatabase.GetAssetPath(NGUISettings.bitmapFont.material.GetInstanceID());
 		}
 
 		// Assume default values if needed
@@ -124,7 +124,7 @@ public class UIFontMaker : EditorWindow
 				NGUISettings.fontName = GUILayout.TextField(NGUISettings.fontName);
 				GUILayout.EndHorizontal();
 
-				ComponentSelector.Draw<UIFont>("Select", NGUISettings.font, OnSelectFont, true);
+				ComponentSelector.Draw<UIFont>("Select", NGUISettings.bitmapFont, OnSelectFont, true);
 				ComponentSelector.Draw<UIAtlas>(NGUISettings.atlas, OnSelectAtlas, true);
 				NGUIEditorTools.EndContents();
 			}
@@ -228,8 +228,8 @@ public class UIFontMaker : EditorWindow
 
 					// Create a new game object for the font
 					go = new GameObject(NGUISettings.fontName);
-					NGUISettings.font = go.AddComponent<UIFont>();
-					CreateFont(NGUISettings.font, create, mat);
+					NGUISettings.bitmapFont = go.AddComponent<UIFont>();
+					CreateFont(NGUISettings.bitmapFont, create, mat);
 
 					// Update the prefab
 					PrefabUtility.ReplacePrefab(go, prefab);
@@ -238,12 +238,12 @@ public class UIFontMaker : EditorWindow
 
 					// Select the atlas
 					go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
-					NGUISettings.font = go.GetComponent<UIFont>();
+					NGUISettings.bitmapFont = go.GetComponent<UIFont>();
 				}
 				else
 				{
-					NGUISettings.font = go.GetComponent<UIFont>();
-					CreateFont(NGUISettings.font, create, mat);
+					NGUISettings.bitmapFont = go.GetComponent<UIFont>();
+					CreateFont(NGUISettings.bitmapFont, create, mat);
 				}
 				MarkAsChanged();
 			}
@@ -256,7 +256,7 @@ public class UIFontMaker : EditorWindow
 		{
 			// New dynamic font
 			font.atlas = null;
-			font.dynamicFont = NGUISettings.dynamicFont;
+			font.dynamicFont = NGUISettings.trueTypeFont;
 			font.dynamicFontStyle = NGUISettings.dynamicFontStyle;
 		}
 		else

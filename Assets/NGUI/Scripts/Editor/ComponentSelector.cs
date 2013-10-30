@@ -28,11 +28,7 @@ public class ComponentSelector : ScriptableWizard
 	{
 		GUILayout.BeginHorizontal();
 		bool show = NGUIEditorTools.DrawPrefixButton(buttonName);
-		GUILayout.BeginVertical();
-		GUILayout.Space(5f);
-
 		T o = EditorGUILayout.ObjectField(obj, typeof(T), false, options) as T;
-		GUILayout.EndVertical();
 
 		if (editButton && o != null && o is MonoBehaviour)
 		{

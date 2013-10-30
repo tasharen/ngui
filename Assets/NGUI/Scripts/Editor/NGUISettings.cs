@@ -22,7 +22,7 @@ public class NGUISettings
 	}
 
 	static bool mLoaded = false;
-	static UIFont mFont;
+	static UIFont mBitFont;
 	static UIAtlas mAtlas;
 	static UIWidget.Pivot mPivot = UIWidget.Pivot.Center;
 	static TextAsset mFontData;
@@ -43,6 +43,7 @@ public class NGUISettings
 	static FontStyle mDynFontStyle = FontStyle.Normal;
 	static ColorMode mColorMode = ColorMode.Blue;
 	static bool mAllDCs = false;
+	static int mFontSize = 16;
 
 	static Object GetObject (string name)
 	{
@@ -59,7 +60,7 @@ public class NGUISettings
 		mSpriteName		= EditorPrefs.GetString("NGUI Selected Sprite");
 		mFontData		= GetObject("NGUI Font Asset") as TextAsset;
 		mFontTexture	= GetObject("NGUI Font Texture") as Texture2D;
-		mFont			= GetObject("NGUI Font") as UIFont;
+		mBitFont		= GetObject("NGUI Font") as UIFont;
 		mAtlas			= GetObject("NGUI Atlas") as UIAtlas;
 		mAtlasPadding	= EditorPrefs.GetInt("NGUI Atlas Padding", 1);
 		mAtlasTrimming	= EditorPrefs.GetBool("NGUI Atlas Trimming", true);
@@ -72,6 +73,7 @@ public class NGUISettings
 		mDynFontStyle	= (FontStyle)EditorPrefs.GetInt("NGUI DynFontStyle", (int)FontStyle.Normal);
 		mColorMode		= (ColorMode)EditorPrefs.GetInt("NGUI Color Mode", (int)ColorMode.Blue);
 		mAllDCs			= EditorPrefs.GetBool("NGUI All DCs", false);
+		mFontSize		= EditorPrefs.GetInt("NGUI Font Size", 16);
 
 		if (mLayer < 0 || string.IsNullOrEmpty(LayerMask.LayerToName(mLayer))) mLayer = -1;
 
@@ -92,7 +94,7 @@ public class NGUISettings
 		EditorPrefs.SetString("NGUI Selected Sprite", mSpriteName);
 		EditorPrefs.SetInt("NGUI Font Asset", (mFontData != null) ? mFontData.GetInstanceID() : -1);
 		EditorPrefs.SetInt("NGUI Font Texture", (mFontTexture != null) ? mFontTexture.GetInstanceID() : -1);
-		EditorPrefs.SetInt("NGUI Font", (mFont != null) ? mFont.GetInstanceID() : -1);
+		EditorPrefs.SetInt("NGUI Font", (mBitFont != null) ? mBitFont.GetInstanceID() : -1);
 		EditorPrefs.SetInt("NGUI Atlas", (mAtlas != null) ? mAtlas.GetInstanceID() : -1);
 		EditorPrefs.SetInt("NGUI Atlas Padding", mAtlasPadding);
 		EditorPrefs.SetBool("NGUI Atlas Trimming", mAtlasTrimming);
@@ -105,6 +107,7 @@ public class NGUISettings
 		EditorPrefs.SetInt("NGUI DynFontStyle", (int)mDynFontStyle);
 		EditorPrefs.SetInt("NGUI Color Mode", (int)mColorMode);
 		EditorPrefs.SetBool("NGUI All DCs", mAllDCs);
+		EditorPrefs.SetInt("NGUI Font Size", mFontSize);
 
 		SaveColor();
 	}
@@ -178,19 +181,19 @@ public class NGUISettings
 	/// Default bitmap font used by NGUI.
 	/// </summary>
 
-	static public UIFont font
+	static public UIFont bitmapFont
 	{
 		get
 		{
 			if (!mLoaded) Load();
-			return mFont;
+			return mBitFont;
 		}
 		set
 		{
-			if (mFont != value)
+			if (mBitFont != value)
 			{
-				mFont = value;
-				mFontName = (mFont != null) ? mFont.name : "New Font";
+				mBitFont = value;
+				mFontName = (mBitFont != null) ? mBitFont.name : "New Font";
 				Save();
 			}
 		}
@@ -200,7 +203,7 @@ public class NGUISettings
 	/// Default dynamic font used by NGUI.
 	/// </summary>
 
-	static public Font dynamicFont
+	static public Font trueTypeFont
 	{
 		get
 		{
@@ -213,6 +216,40 @@ public class NGUISettings
 			{
 				mDynFont = value;
 				mFontName = (mDynFont != null) ? mDynFont.name : "New Font";
+				Save();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Whether we have a font to work with.
+	/// </summary>
+
+	static public bool hasFont { get { return mBitFont != null || mDynFont != null; } }
+
+	/// <summary>
+	/// Ambiguous helper function.
+	/// </summary>
+
+	static public UnityEngine.Object ambigiousFont { get { return (mBitFont != null) ? (UnityEngine.Object)mBitFont : (UnityEngine.Object)mDynFont; } }
+
+	/// <summary>
+	/// Default font size used by NGUI.
+	/// </summary>
+
+	static public int fontSize
+	{
+		get
+		{
+			if (!mLoaded) Load();
+			if (mDynFont == null && mBitFont != null) return mBitFont.defaultSize;
+			return mFontSize;
+		}
+		set
+		{
+			if (fontSize != value)
+			{
+				mFontSize = value;
 				Save();
 			}
 		}

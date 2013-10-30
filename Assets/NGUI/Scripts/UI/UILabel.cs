@@ -193,6 +193,24 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Ambiguous helper function.
+	/// </summary>
+
+	public UnityEngine.Object ambigiousFont
+	{
+		get
+		{
+			return (mFont != null) ? (UnityEngine.Object)mFont : (UnityEngine.Object)mTrueTypeFont;
+		}
+		set
+		{
+			UIFont bf = value as UIFont;
+			if (bf != null) bitmapFont = bf;
+			else trueTypeFont = value as Font;
+		}
+	}
+
+	/// <summary>
 	/// Text that's being displayed by the label.
 	/// </summary>
 
@@ -850,7 +868,7 @@ public class UILabel : UIWidget
 
 	public override void MakePixelPerfect ()
 	{
-		if (bitmapFont != null)
+		if (ambigiousFont != null)
 		{
 			float pixelSize = (bitmapFont != null) ? bitmapFont.pixelSize : 1f;
 
@@ -889,16 +907,12 @@ public class UILabel : UIWidget
 
 	public void AssumeNaturalSize ()
 	{
-		if (bitmapFont != null)
+		if (ambigiousFont != null)
 		{
 			ProcessText(false);
-
 			float pixelSize = (bitmapFont != null) ? bitmapFont.pixelSize : 1f;
-			int minX = Mathf.RoundToInt(mCalculatedSize.x * pixelSize);
-			int minY = Mathf.RoundToInt(mCalculatedSize.y * pixelSize);
-
-			if (width < minX) width = minX;
-			if (height < minY) height = minY;
+			width = Mathf.RoundToInt(mCalculatedSize.x * pixelSize);
+			height = Mathf.RoundToInt(mCalculatedSize.y * pixelSize);
 		}
 	}
 
