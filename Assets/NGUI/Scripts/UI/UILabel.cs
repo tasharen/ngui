@@ -308,13 +308,13 @@ public class UILabel : UIWidget
 
 	void ProcessAndRequest ()
 	{
-#if DYNAMIC_FONT
-		if (mActiveTTF != null)
+		if (ambigiousFont != null)
 		{
 			ProcessText();
-			mActiveTTF.RequestCharactersInTexture(mText, usePrintedSize ? mPrintedSize : fontSize, mFontStyle);
-		}
+#if DYNAMIC_FONT
+			if (mActiveTTF != null) mActiveTTF.RequestCharactersInTexture(mText, usePrintedSize ? mPrintedSize : fontSize, mFontStyle);
 #endif
+		}
 	}
 
 	/// <summary>
