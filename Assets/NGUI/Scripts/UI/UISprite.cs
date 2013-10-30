@@ -255,7 +255,7 @@ public class UISprite : UIWidget
 				Vector4 b = border;
 				if (atlas != null) b *= atlas.pixelSize;
 				int min = Mathf.RoundToInt(b.x + b.z);
-				return ((min & 1) == 1) ? min + 1 : min;
+				return Mathf.Max(base.minWidth, ((min & 1) == 1) ? min + 1 : min);
 			}
 			return base.minWidth;
 		}
@@ -274,7 +274,7 @@ public class UISprite : UIWidget
 				Vector4 b = border;
 				if (atlas != null) b *= atlas.pixelSize;
 				int min = Mathf.RoundToInt(b.y + b.w);
-				return ((min & 1) == 1) ? min + 1 : min;
+				return Mathf.Max(base.minHeight, ((min & 1) == 1) ? min + 1 : min);
 			}
 			return base.minHeight;
 		}
