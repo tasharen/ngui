@@ -70,13 +70,13 @@ public class EventDelegate
 	static string GetMethodName (Callback callback)
 	{
 		System.Delegate d = callback as System.Delegate;
-		return d.GetMethodInfo().Name;
+		return d.Method.Name;
 	}
 
 	static bool IsValid (Callback callback)
 	{
 		System.Delegate d = callback as System.Delegate;
-		return d != null && d.GetMethodInfo() != null;
+		return d != null && d.Method != null;
 	}
 #else
 	static string GetMethodName (Callback callback) { return callback.Method.Name; }

@@ -146,7 +146,6 @@ public class UILabel : UIWidget
 				else RemoveFromPanel();
 
 				mFont = value;
-				hasChanged = true;
 				MarkAsChanged();
 			}
 		}
@@ -167,24 +166,15 @@ public class UILabel : UIWidget
 			if (mTrueTypeFont != value)
 			{
 #if DYNAMIC_FONT
-				if (mActiveTTF != null)
-				{
-					mActiveTTF.textureRebuildCallback -= MarkAsChanged;
-					mActiveTTF = null;
-				}
-
+				SetActiveFont(null);
 				RemoveFromPanel();
 				mTrueTypeFont = value;
-				mActiveTTF = value;
 				hasChanged = true;
 				mFont = null;
-
+				SetActiveFont(value);
+				ProcessAndRequest();
 				if (mActiveTTF != null)
-				{
-					mActiveTTF.textureRebuildCallback += MarkAsChanged;
-					ProcessAndRequest();
 					base.MarkAsChanged();
-				}
 #else
 				mTrueTypeFont = value;
 #endif
@@ -224,8 +214,12 @@ public class UILabel : UIWidget
 		{
 			if (string.IsNullOrEmpty(value))
 			{
-				if (!string.IsNullOrEmpty(mText)) mText = "";
-				hasChanged = true;
+				if (!string.IsNullOrEmpty(mText))
+				{
+					mText = "";
+					hasChanged = true;
+					ProcessAndRequest();
+				}
 			}
 			else if (mText != value)
 			{
@@ -330,6 +324,7 @@ public class UILabel : UIWidget
 
 		mFont = null;
 		mTrueTypeFont = null;
+		SetActiveFont(null);
 
 		if (ttf != null && (fnt == null || !mUseDynamicFont))
 		{
@@ -680,9 +675,7 @@ public class UILabel : UIWidget
 			mFontStyle = mFont.dynamicFontStyle;
 			mFont = null;
 		}
-
-		mActiveTTF = mTrueTypeFont;
-		if (mActiveTTF != null) mActiveTTF.textureRebuildCallback += MarkAsChanged;
+		SetActiveFont(mTrueTypeFont);
 	}
 
 	/// <summary>
@@ -691,9 +684,26 @@ public class UILabel : UIWidget
 
 	protected override void OnDisable ()
 	{
-		if (mActiveTTF != null) mActiveTTF.textureRebuildCallback -= MarkAsChanged;
-		mActiveTTF = null;
+		SetActiveFont(null);
 		base.OnDisable();
+	}
+
+	/// <summary>
+	/// Set the active font, correctly setting and clearing callbacks.
+	/// </summary>
+
+	protected void SetActiveFont (Font fnt)
+	{
+		if (mActiveTTF != fnt)
+		{
+			if (mActiveTTF != null)
+				mActiveTTF.textureRebuildCallback -= MarkAsChanged;
+
+			mActiveTTF = fnt;
+
+			if (mActiveTTF != null)
+				mActiveTTF.textureRebuildCallback += MarkAsChanged;
+		}
 	}
 #endif
 
