@@ -324,8 +324,9 @@ public class UILabel : UIWidget
 
 		mFont = null;
 		mTrueTypeFont = null;
+#if DYNAMIC_FONT
 		SetActiveFont(null);
-
+#endif
 		if (ttf != null && (fnt == null || !mUseDynamicFont))
 		{
 			bitmapFont = null;
