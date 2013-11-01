@@ -391,6 +391,7 @@ public class UIInput : MonoBehaviour
 		}
 		
 		selection = null;
+		UpdateLabel();
 	}
 
 	/// <summary>
