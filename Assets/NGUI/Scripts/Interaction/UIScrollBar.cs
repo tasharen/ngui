@@ -198,13 +198,13 @@ public class UIScrollBar : UIWidgetContainer
 			if (mFG != null)
 			{
 				mFG.alpha = value;
-				NGUITools.SetActiveSelf(mFG.gameObject, (mFG.alpha > 0.001f));
+				if (mFG.collider != null) mFG.collider.enabled = mFG.alpha > 0.001f;
 			}
 
 			if (mBG != null)
 			{
 				mBG.alpha = value;
-				NGUITools.SetActiveSelf(mBG.gameObject, (mBG.alpha > 0.001f));
+				if (mBG.collider != null) mBG.collider.enabled = mBG.alpha > 0.001f;
 			}
 		}
 	}

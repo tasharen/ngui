@@ -2,6 +2,7 @@
 *.sln
 *.csproj
 /Temp
+/Ignore
 /obj
 /Library/AnnotationManager
 /Library/assetDatabase3

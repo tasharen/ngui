@@ -249,13 +249,13 @@ public class UIDraggablePanel : MonoBehaviour
 
 			if (horizontalScrollBar != null)
 			{
-				horizontalScrollBar.onChange.Add(new EventDelegate(OnHorizontalBar));
+				EventDelegate.Add(horizontalScrollBar.onChange, OnHorizontalBar);
 				horizontalScrollBar.alpha = ((showScrollBars == ShowCondition.Always) || shouldMoveHorizontally) ? 1f : 0f;
 			}
 
 			if (verticalScrollBar != null)
 			{
-				verticalScrollBar.onChange.Add(new EventDelegate(OnVerticalBar));
+				EventDelegate.Add(verticalScrollBar.onChange, OnVerticalBar);
 				verticalScrollBar.alpha = ((showScrollBars == ShowCondition.Always) || shouldMoveVertically) ? 1f : 0f;
 			}
 		}
