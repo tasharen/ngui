@@ -369,10 +369,9 @@ public class UIScrollBar : UIWidgetContainer
 				mFG.pivot = UIWidget.Pivot.Left;
 				mBG.pivot = UIWidget.Pivot.Left;
 				mBG.cachedTransform.localPosition = Vector3.zero;
-				mFG.cachedTransform.localPosition = new Vector3(bg.x - fg.x + (bgs.x - fgs.x) * val, 0f, 0f);
+				mFG.cachedTransform.localPosition = new Vector3(Mathf.RoundToInt(bg.x - fg.x + (bgs.x - fgs.x) * val), 0f, 0f);
 				mFG.width = Mathf.RoundToInt(fgs.x + fg.x + fg.z);
 				mFG.height = Mathf.RoundToInt(fgs.y + fg.y + fg.w);
-				if (val < 0.999f && val > 0.001f) mFG.MakePixelPerfect();
 				if (mFG.collider != null) NGUITools.AddWidgetCollider(mFG.gameObject);
 			}
 			else
@@ -382,10 +381,9 @@ public class UIScrollBar : UIWidgetContainer
 				mFG.pivot = UIWidget.Pivot.Top;
 				mBG.pivot = UIWidget.Pivot.Top;
 				mBG.cachedTransform.localPosition = Vector3.zero;
-				mFG.cachedTransform.localPosition = new Vector3(0f, -bg.y + fg.y - (bgs.y - fgs.y) * val, 0f);
+				mFG.cachedTransform.localPosition = new Vector3(0f, Mathf.RoundToInt(-bg.y + fg.y - (bgs.y - fgs.y) * val), 0f);
 				mFG.width = Mathf.RoundToInt(fgs.x + fg.x + fg.z);
 				mFG.height = Mathf.RoundToInt(fgs.y + fg.y + fg.w);
-				if (val < 0.999f && val > 0.001f) mFG.MakePixelPerfect();
 				if (mFG.collider != null) NGUITools.AddWidgetCollider(mFG.gameObject);
 			}
 		}
