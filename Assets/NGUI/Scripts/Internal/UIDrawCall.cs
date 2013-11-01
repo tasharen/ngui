@@ -83,6 +83,19 @@ public class UIDrawCall : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Final render queue used to draw the draw call's geometry.
+	/// </summary>
+
+	public int finalRenderQueue
+	{
+		get
+		{
+			if (mMat != null) return mMat.renderQueue;
+			return ((mSharedMat != null) ? mSharedMat.renderQueue : 3000) + mRenderQueue;
+		}
+	}
+
 #if UNITY_EDITOR
 	public string keyName { get { return "Draw Call " + (1 + mRenderQueue); } }
 
@@ -97,7 +110,6 @@ public class UIDrawCall : MonoBehaviour
 		get
 		{
 			return mActive;
-			//return UnityEditor.EditorPrefs.GetBool(keyName, true);
 		}
 		set
 		{
@@ -111,13 +123,6 @@ public class UIDrawCall : MonoBehaviour
 					UnityEditor.EditorUtility.SetDirty(gameObject);
 				}
 			}
-			//UnityEditor.EditorPrefs.SetBool(keyName, value);
-			
-			//if (mRen != null)
-			//{
-			//    mRen.enabled = value;
-			//    UnityEditor.EditorUtility.SetDirty(gameObject);
-			//}
 		}
 	}
 	bool mActive = true;
