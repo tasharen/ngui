@@ -450,9 +450,7 @@ public class UIInput : MonoBehaviour
 			}
 
 			// Process input
-			string input = Input.inputString;
-			if (!string.IsNullOrEmpty(input))
-				Append(input);
+			Append(Input.inputString);
 
 			if (mLastIME != Input.compositionString)
 			{
@@ -623,6 +621,8 @@ public class UIInput : MonoBehaviour
 
 	protected virtual void Append (string input)
 	{
+		if (string.IsNullOrEmpty(input)) return;
+
 		for (int i = 0, imax = input.Length; i < imax; ++i)
 		{
 			char c = input[i];
