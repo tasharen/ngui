@@ -120,9 +120,6 @@ public class UIInput : MonoBehaviour
 
 	public OnValidate onValidate;
 
-	[System.Obsolete("Use UIInput.onValidate instead")]
-	public OnValidate validator { get { return onValidate; } set { onValidate = value; } }
-
 	/// <summary>
 	/// Input field's value.
 	/// </summary>
