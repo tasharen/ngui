@@ -500,6 +500,8 @@ public class UIWidget : MonoBehaviour
 	protected virtual void OnValidate()
 	{
 		mChanged = true;
+		if (mWidth < minWidth) mWidth = minWidth;
+		if (mHeight < minHeight) mHeight = minHeight;
 		if (autoResizeBoxCollider) ResizeCollider();
 	}
 

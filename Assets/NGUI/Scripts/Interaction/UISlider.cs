@@ -96,13 +96,41 @@ public class UISlider : UIWidgetContainer
 	/// Change the full size of the slider, in case you need to.
 	/// </summary>
 
-	public Vector2 fullSize { get { return mSize; } set { if (mSize != value) { mSize = value; ForceUpdate(); } } }
+	public Vector2 fullSize
+	{
+		get
+		{
+			return mSize;
+		}
+		set
+		{
+			if (mSize != value)
+			{
+				mSize = value;
+
+				if (foreground != null)
+				{
+					UIWidget w = foreground.GetComponent<UIWidget>();
+
+					if (w != null)
+					{
+						w.width = Mathf.RoundToInt(value.x);
+						w.height = Mathf.RoundToInt(value.y);
+						Vector3[] wc = w.localCorners;
+						mCenter = Vector3.Lerp(wc[0], wc[2], 0.5f);
+					}
+					else mCenter = foreground.localPosition + (Vector3)value * 0.5f;
+				}
+				ForceUpdate();
+			}
+		}
+	}
 
 	/// <summary>
 	/// Initialize the cached values.
 	/// </summary>
 
-	void Init ()
+	public void Init ()
 	{
 		mInitDone = true;
 
