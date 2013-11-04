@@ -90,9 +90,11 @@ public class EventDelegate
 		System.Delegate d = callback as System.Delegate;
 		return d != null && d.GetMethodInfo() != null;
 	}
-#else
+#elif REFLECTION_SUPPORT
 	static string GetMethodName (Callback callback) { return callback.Method.Name; }
 	static bool IsValid (Callback callback) { return callback != null && callback.Method != null; }
+#else
+	static bool IsValid (Callback callback) { return callback != null; }
 #endif
 
 	/// <summary>
@@ -109,8 +111,14 @@ public class EventDelegate
 		if (obj is Callback)
 		{
 			Callback callback = obj as Callback;
+#if REFLECTION_SUPPORT
 			if (callback.Equals(mCachedCallback)) return true;
 			return (mTarget == callback.Target && string.Equals(mMethodName, GetMethodName(callback)));
+#elif UNITY_FLASH
+			return (callback == mCachedCallback);
+#else
+			return callback.Equals(mCachedCallback);
+#endif
 		}
 		
 		if (obj is EventDelegate)
@@ -163,6 +171,7 @@ public class EventDelegate
 		}
 		else
 		{
+#if REFLECTION_SUPPORT
 			mTarget = call.Target as MonoBehaviour;
 
 			if (mTarget == null)
@@ -176,6 +185,12 @@ public class EventDelegate
 				mMethodName = GetMethodName(call);
 				mRawDelegate = false;
 			}
+#else
+			mRawDelegate = true;
+			mCachedCallback = call;
+			mMethodName = null;
+			mTarget = null;
+#endif
 		}
 	}
 
