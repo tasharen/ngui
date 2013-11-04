@@ -29,8 +29,8 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 
 	void OnEnable ()
 	{
-		SerializedProperty bit = serializedObject.FindProperty("font");
-		mType = (bit != null && bit.objectReferenceValue != null) ? FontType.Bitmap : FontType.Dynamic;
+		SerializedProperty bit = serializedObject.FindProperty("bitmapFont");
+		mType = (bit.objectReferenceValue != null) ? FontType.Bitmap : FontType.Dynamic;
 	}
 
 	void RegisterUndo ()
@@ -61,7 +61,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 	void OnBitmapFont (Object obj)
 	{
 		serializedObject.Update();
-		SerializedProperty sp = serializedObject.FindProperty("font");
+		SerializedProperty sp = serializedObject.FindProperty("bitmapFont");
 		sp.objectReferenceValue = obj;
 		serializedObject.ApplyModifiedProperties();
 	}
@@ -200,7 +200,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 					}
 					else
 					{
-						serializedObject.FindProperty("font").objectReferenceValue = null;
+						serializedObject.FindProperty("bitmapFont").objectReferenceValue = null;
 					}
 				}
 #else
@@ -209,7 +209,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 
 				if (mType == FontType.Bitmap)
 				{
-					NGUIEditorTools.DrawProperty("", serializedObject, "font", GUILayout.MinWidth(40f));
+					NGUIEditorTools.DrawProperty("", serializedObject, "bitmapFont", GUILayout.MinWidth(40f));
 				}
 				else
 				{

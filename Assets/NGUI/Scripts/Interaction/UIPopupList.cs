@@ -267,6 +267,23 @@ public class UIPopupList : UIWidgetContainer
 			functionName = null;
 		}
 
+		// 'font' is no longer used
+		if (font != null)
+		{
+			if (font.isDynamic)
+			{
+				trueTypeFont = font.dynamicFont;
+				fontStyle = font.dynamicFontStyle;
+				mUseDynamicFont = true;
+			}
+			else if (bitmapFont == null)
+			{
+				bitmapFont = font;
+				mUseDynamicFont = false;
+			}
+			font = null;
+		}
+
 		// 'textScale' is no longer used
 		if (textScale != 0f)
 		{
@@ -274,18 +291,50 @@ public class UIPopupList : UIWidgetContainer
 			textScale = 0f;
 		}
 
-		// 'font' is no longer used
-		if (font != null)
-		{
-			if (bitmapFont == null) bitmapFont = font;
-			font = null;
-		}
-
 		// Auto-upgrade to the true type font
 		if (trueTypeFont == null && bitmapFont != null && bitmapFont.isDynamic)
 		{
 			trueTypeFont = bitmapFont.dynamicFont;
 			bitmapFont = null;
+		}
+	}
+
+	bool mUseDynamicFont = false;
+
+	void OnValidate ()
+	{
+		Font ttf = trueTypeFont;
+		UIFont fnt = bitmapFont;
+
+		bitmapFont = null;
+		trueTypeFont = null;
+
+		if (ttf != null && (fnt == null || !mUseDynamicFont))
+		{
+			bitmapFont = null;
+			trueTypeFont = ttf;
+			mUseDynamicFont = true;
+		}
+		else if (fnt != null)
+		{
+			// Auto-upgrade from 3.0.2 and earlier
+			if (fnt.isDynamic)
+			{
+				trueTypeFont = fnt.dynamicFont;
+				fontStyle = fnt.dynamicFontStyle;
+				mUseDynamicFont = true;
+			}
+			else
+			{
+				bitmapFont = fnt;
+				mUseDynamicFont = false;
+			}
+			fontSize = fnt.defaultSize;
+		}
+		else
+		{
+			trueTypeFont = ttf;
+			mUseDynamicFont = true;
 		}
 	}
 

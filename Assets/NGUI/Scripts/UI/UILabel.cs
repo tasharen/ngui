@@ -905,6 +905,17 @@ public class UILabel : UIWidget
 				int minX = Mathf.RoundToInt(mCalculatedSize.x * pixelSize);
 				int minY = Mathf.RoundToInt(mCalculatedSize.y * pixelSize);
 
+				if (bitmapFont != null)
+				{
+					minX = Mathf.Max(bitmapFont.defaultSize);
+					minY = Mathf.Max(bitmapFont.defaultSize);
+				}
+				else
+				{
+					minX = Mathf.Max(base.minWidth);
+					minY = Mathf.Max(base.minHeight);
+				}
+
 				if (width < minX) width = minX;
 				if (height < minY) height = minY;
 			}
