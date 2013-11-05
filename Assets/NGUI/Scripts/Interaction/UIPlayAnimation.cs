@@ -75,7 +75,6 @@ public class UIPlayAnimation : MonoBehaviour
 
 	bool mStarted = false;
 	bool mHighlighted = false;
-	int mActive = 0;
 
 	void Awake ()
 	{
@@ -189,8 +188,6 @@ public class UIPlayAnimation : MonoBehaviour
 	{
 		if (target != null)
 		{
-			mActive = 0;
-
 			if (clearSelection && UICamera.selectedObject == gameObject)
 				UICamera.selectedObject = null;
 
@@ -204,7 +201,6 @@ public class UIPlayAnimation : MonoBehaviour
 
 				for (int i = 0; i < onFinished.Count; ++i)
 				{
-					++mActive;
 					EventDelegate.Add(anim.onFinished, OnFinished, true);
 				}
 			}
@@ -217,15 +213,12 @@ public class UIPlayAnimation : MonoBehaviour
 
 	void OnFinished ()
 	{
-		if (--mActive == 0)
-		{
-			EventDelegate.Execute(onFinished);
+		EventDelegate.Execute(onFinished);
 
-			// Legacy functionality
-			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
-				eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
+		// Legacy functionality
+		if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
+			eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
 
-			eventReceiver = null;
-		}
+		eventReceiver = null;
 	}
 }

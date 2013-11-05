@@ -176,6 +176,8 @@ public class UIInput : MonoBehaviour
 			if (!Application.isPlaying) return;
 #endif
 			if (mDoInit) Init();
+			mDrawStart = 0;
+			mDrawEnd = 0;
 #if MOBILE
 			if (isSelected && mKeyboard != null)
 				mKeyboard.text = value;
