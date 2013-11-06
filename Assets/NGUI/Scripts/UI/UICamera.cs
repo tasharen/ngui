@@ -769,12 +769,20 @@ public class UICamera : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Get the details of the specified mouse button.
+	/// </summary>
+
+	static public MouseOrTouch GetMouse (int button) { return mMouse[button]; }
+
+	/// <summary>
 	/// Get or create a touch event.
 	/// </summary>
 
 	static public MouseOrTouch GetTouch (int id)
 	{
 		MouseOrTouch touch = null;
+
+		if (id < 0) return GetMouse(-id - 1);
 
 		if (!mTouches.TryGetValue(id, out touch))
 		{
