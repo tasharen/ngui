@@ -156,7 +156,7 @@ public class UIDraggablePanel : MonoBehaviour
 	/// Whether the panel should be able to move horizontally (contents don't fit).
 	/// </summary>
 
-	public bool shouldMoveHorizontally
+	public virtual bool shouldMoveHorizontally
 	{
 		get
 		{
@@ -170,7 +170,7 @@ public class UIDraggablePanel : MonoBehaviour
 	/// Whether the panel should be able to move vertically (contents don't fit).
 	/// </summary>
 
-	public bool shouldMoveVertically
+	public virtual bool shouldMoveVertically
 	{
 		get
 		{
@@ -184,7 +184,7 @@ public class UIDraggablePanel : MonoBehaviour
 	/// Whether the contents of the panel should actually be draggable depends on whether they currently fit or not.
 	/// </summary>
 
-	bool shouldMove
+	protected virtual bool shouldMove
 	{
 		get
 		{
@@ -302,7 +302,7 @@ public class UIDraggablePanel : MonoBehaviour
 	/// Update the values of the associated scroll bars.
 	/// </summary>
 
-	public void UpdateScrollbars (bool recalculateBounds)
+	public virtual void UpdateScrollbars (bool recalculateBounds)
 	{
 		if (mPanel == null) return;
 
@@ -372,7 +372,7 @@ public class UIDraggablePanel : MonoBehaviour
 	/// (0, 0) is the top-left corner, (1, 1) is the bottom-right.
 	/// </summary>
 
-	public void SetDragAmount (float x, float y, bool updateScrollbars)
+	public virtual void SetDragAmount (float x, float y, bool updateScrollbars)
 	{
 		DisableSpring();
 
@@ -467,7 +467,7 @@ public class UIDraggablePanel : MonoBehaviour
 	/// Move the panel by the specified amount.
 	/// </summary>
 
-	public void MoveRelative (Vector3 relative)
+	public virtual void MoveRelative (Vector3 relative)
 	{
 		mTrans.localPosition += relative;
 		Vector4 cr = mPanel.clipRange;

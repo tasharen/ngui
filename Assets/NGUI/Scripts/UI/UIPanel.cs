@@ -667,7 +667,7 @@ public class UIPanel : MonoBehaviour
 	/// Calculate the offset needed to be constrained within the panel's bounds.
 	/// </summary>
 
-	public Vector3 CalculateConstrainOffset (Vector2 min, Vector2 max)
+	public virtual Vector3 CalculateConstrainOffset (Vector2 min, Vector2 max)
 	{
 		float offsetX = clipRange.z * 0.5f;
 		float offsetY = clipRange.w * 0.5f;
