@@ -147,13 +147,17 @@ static public class NGUIText
 			for (int i = 0, imax = text.Length; i < imax; )
 			{
 				char c = text[i];
-				int retVal = ParseSymbol(text, i);
 
-				if (retVal != 0)
+				if (c == '[')
 				{
-					text = text.Remove(i, retVal);
-					imax = text.Length;
-					continue;
+					int retVal = ParseSymbol(text, i);
+
+					if (retVal != 0)
+					{
+						text = text.Remove(i, retVal);
+						imax = text.Length;
+						continue;
+					}
 				}
 				++i;
 			}
