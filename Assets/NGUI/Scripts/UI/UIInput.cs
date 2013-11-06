@@ -115,6 +115,12 @@ public class UIInput : MonoBehaviour
 	public List<EventDelegate> onSubmit = new List<EventDelegate>();
 
 	/// <summary>
+	/// Event delegates triggered when the input field's text changes for any reason.
+	/// </summary>
+
+	public List<EventDelegate> onChange = new List<EventDelegate>();
+
+	/// <summary>
 	/// Custom validation callback.
 	/// </summary>
 
@@ -188,6 +194,7 @@ public class UIInput : MonoBehaviour
 				if (isSelected && mKeyboard != null) mKeyboard.text = value;
 				SaveToPlayerPrefs(mValue);
 				UpdateLabel();
+				ExecuteOnChange();
 			}
 #else
 			if (isSelected && mEditor != null)
@@ -196,6 +203,7 @@ public class UIInput : MonoBehaviour
 				{
 					mEditor.content.text = value;
 					UpdateLabel();
+					ExecuteOnChange();
 					return;
 				}
 			}
@@ -213,6 +221,7 @@ public class UIInput : MonoBehaviour
 				}
 				SaveToPlayerPrefs(mValue);
 				UpdateLabel();
+				ExecuteOnChange();
 			}
 #endif
 		}
@@ -419,8 +428,12 @@ public class UIInput : MonoBehaviour
 					if (c != 0) mValue += c;
 				}
 
-				if (characterLimit > 0 && mValue.Length > characterLimit) mValue = mValue.Substring(0, characterLimit);
+				if (characterLimit > 0 && mValue.Length > characterLimit)
+					mValue = mValue.Substring(0, characterLimit);
+				
 				UpdateLabel();
+				ExecuteOnChange();
+
 				if (mValue != val) mKeyboard.text = mValue;
 			}
 
@@ -458,6 +471,7 @@ public class UIInput : MonoBehaviour
 			{
 				mLastIME = Input.compositionString;
 				UpdateLabel();
+				ExecuteOnChange();
 			}
 		}
 	}
@@ -489,6 +503,7 @@ public class UIInput : MonoBehaviour
 				ev.Use();
 				mEditor.Backspace();
 				UpdateLabel();
+				ExecuteOnChange();
 				return true;
 			}
 
@@ -497,6 +512,7 @@ public class UIInput : MonoBehaviour
 				ev.Use();
 				mEditor.Delete();
 				UpdateLabel();
+				ExecuteOnChange();
 				return true;
 			}
 
@@ -585,6 +601,7 @@ public class UIInput : MonoBehaviour
 					{
 						mEditor.Insert(c);
 						UpdateLabel();
+						ExecuteOnChange();
 					}
 				}
 				else
@@ -592,6 +609,7 @@ public class UIInput : MonoBehaviour
 					Submit();
 					isSelected = false;
 					UpdateLabel();
+					ExecuteOnChange();
 				}
 				return true;
 			}
@@ -646,6 +664,7 @@ public class UIInput : MonoBehaviour
 			}
 		}
 		UpdateLabel();
+		ExecuteOnChange();
 	}
 #endif
 
@@ -809,5 +828,19 @@ public class UIInput : MonoBehaviour
 			}
 		}
 		return (char)0;
+	}
+
+	/// <summary>
+	/// Execute the OnChange callback.
+	/// </summary>
+
+	protected void ExecuteOnChange ()
+	{
+		if (EventDelegate.IsValid(onChange))
+		{
+			current = this;
+			EventDelegate.Execute(onChange);
+			current = null;
+		}
 	}
 }
