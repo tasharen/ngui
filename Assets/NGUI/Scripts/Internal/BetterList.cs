@@ -278,29 +278,17 @@ public class BetterList<T>
 
 	public T[] ToArray () { Trim(); return buffer; }
 
+	public class Comparer : System.Collections.IComparer
+	{
+		System.Comparison<T> mCompare;
+		public Comparer (System.Comparison<T> comparer) { mCompare = comparer; }
+		public int Compare (object x, object y) { return mCompare((T)x, (T)y); }
+	}
+
 	/// <summary>
 	/// List.Sort equivalent.
 	/// </summary>
 
-	public void Sort (System.Comparison<T> comparer)
-	{
-		bool changed = true;
-
-		while (changed)
-		{
-			changed = false;
-
-			for (int i = 1; i < size; ++i)
-			{
-				if (comparer.Invoke(buffer[i - 1], buffer[i]) > 0)
-				{
-					T temp = buffer[i];
-					buffer[i] = buffer[i - 1];
-					buffer[i - 1] = temp;
-					changed = true;
-				}
-			}
-		}
-	}
+	public void Sort (System.Comparison<T> comparer) { System.Array.Sort(buffer, 0, size, new Comparer(comparer)); }
 #endif
 }

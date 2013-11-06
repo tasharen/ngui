@@ -500,6 +500,14 @@ public class UIWidget : MonoBehaviour
 	protected virtual void OnValidate()
 	{
 		mChanged = true;
+		
+		// Prior to NGUI 2.7.0 width and height was specified as transform's local scale
+		if (mWidth == 100 && mHeight == 100 && cachedTransform.localScale.magnitude > 8f)
+		{
+			UpgradeFrom265();
+			cachedTransform.localScale = Vector3.one;
+		}
+		
 		if (mWidth < minWidth) mWidth = minWidth;
 		if (mHeight < minHeight) mHeight = minHeight;
 		if (autoResizeBoxCollider) ResizeCollider();
@@ -922,13 +930,13 @@ public class UIWidget : MonoBehaviour
 	/// Minimum allowed width for this widget.
 	/// </summary>
 
-	virtual public int minWidth { get { return 4; } }
+	virtual public int minWidth { get { return 2; } }
 
 	/// <summary>
 	/// Minimum allowed height for this widget.
 	/// </summary>
 
-	virtual public int minHeight { get { return 4; } }
+	virtual public int minHeight { get { return 2; } }
 
 	/// <summary>
 	/// Dimensions of the sprite's border, if any.
