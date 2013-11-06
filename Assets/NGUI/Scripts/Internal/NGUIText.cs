@@ -53,7 +53,7 @@ static public class NGUIText
 	{
 		int length = text.Length;
 
-		if (index + 2 < length)
+		if (index + 2 < length && text[index] == '[')
 		{
 			if (text[index + 1] == '-')
 			{
@@ -99,7 +99,7 @@ static public class NGUIText
 
 		int length = text.Length;
 
-		if (index + 2 < length)
+		if (index + 2 < length && text[index] == '[')
 		{
 			if (text[index + 1] == '-')
 			{
@@ -147,17 +147,13 @@ static public class NGUIText
 			for (int i = 0, imax = text.Length; i < imax; )
 			{
 				char c = text[i];
+				int retVal = ParseSymbol(text, i);
 
-				if (c == '[')
+				if (retVal != 0)
 				{
-					int retVal = ParseSymbol(text, i);
-
-					if (retVal != 0)
-					{
-						text = text.Remove(i, retVal);
-						imax = text.Length;
-						continue;
-					}
+					text = text.Remove(i, retVal);
+					imax = text.Length;
+					continue;
 				}
 				++i;
 			}
