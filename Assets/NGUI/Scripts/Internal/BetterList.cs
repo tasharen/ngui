@@ -278,7 +278,7 @@ public class BetterList<T>
 
 	public T[] ToArray () { Trim(); return buffer; }
 
-	public class Comparer : System.Collections.IComparer
+	class Comparer : System.Collections.IComparer
 	{
 		System.Comparison<T> mCompare;
 		public Comparer (System.Comparison<T> comparer) { mCompare = comparer; }
