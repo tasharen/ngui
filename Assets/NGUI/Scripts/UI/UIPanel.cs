@@ -917,34 +917,31 @@ public class UIPanel : MonoBehaviour
 		GameObject go = UnityEditor.Selection.activeGameObject;
 		bool selected = (go != null) && (NGUITools.FindInParents<UIPanel>(go) == this);
 
-		//if (selected || clip)
+		if (size.x == 0f) size.x = mScreenWidth;
+		if (size.y == 0f) size.y = mScreenHeight;
+
+		if (!clip)
 		{
-			if (size.x == 0f) size.x = mScreenWidth;
-			if (size.y == 0f) size.y = mScreenHeight;
+			UIRoot root = NGUITools.FindInParents<UIRoot>(cachedGameObject);
+			if (root != null) size *= root.GetPixelSizeAdjustment(mScreenHeight);
+		}
 
-			if (!clip)
+		Transform t = clip ? transform : (mCam != null ? mCam.transform : null);
+
+		if (t != null)
+		{
+			Vector3 pos = clip ? new Vector3(mClipRange.x, mClipRange.y) : Vector3.zero;
+			Gizmos.matrix = t.localToWorldMatrix;
+
+			if (selected)
 			{
-				UIRoot root = NGUITools.FindInParents<UIRoot>(cachedGameObject);
-				if (root != null) size *= root.GetPixelSizeAdjustment(mScreenHeight);
+				Gizmos.color = new Color(1f, 0f, 0.5f);
+				Gizmos.DrawWireCube(pos, size);
 			}
-
-			Transform t = clip ? transform : (mCam != null ? mCam.transform : null);
-
-			if (t != null)
+			else
 			{
-				Vector3 pos = clip ? new Vector3(mClipRange.x, mClipRange.y) : Vector3.zero;
-				Gizmos.matrix = t.localToWorldMatrix;
-
-				if (selected)
-				{
-					Gizmos.color = new Color(1f, 0f, 0.5f);
-					Gizmos.DrawWireCube(pos, size);
-				}
-				else
-				{
-					Gizmos.color = new Color(0.5f, 0f, 0.5f);
-					Gizmos.DrawWireCube(pos, size);
-				}
+				Gizmos.color = new Color(0.5f, 0f, 0.5f);
+				Gizmos.DrawWireCube(pos, size);
 			}
 		}
 	}
