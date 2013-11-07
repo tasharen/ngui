@@ -1397,28 +1397,6 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
-	/// Select the next widget or container.
-	/// </summary>
-
-	static public bool SelectWidgetOrContainer (GameObject go, Vector2 pos, bool inFront)
-	{
-		if (!SelectWidget(go, pos, inFront))
-		{
-			if (inFront)
-			{
-				UIWidgetContainer wc = NGUITools.FindInParents<UIWidgetContainer>(go);
-
-				if (wc != null && wc.gameObject != go)
-				{
-					Selection.activeGameObject = wc.gameObject;
-					return true;
-				}
-			}
-		}
-		return true;
-	}
-
-	/// <summary>
 	/// Unity 4.3 changed the way LookLikeControls works.
 	/// </summary>
 
