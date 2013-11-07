@@ -457,16 +457,16 @@ public class UIWidgetInspector : Editor
 
 						if (e.button == 1)
 						{
-							// Right-click: Select the widget below
-							NGUIEditorTools.SelectWidgetOrContainer(mWidget.gameObject, e.mousePosition, false);
+							// Right-click: Open a context menu listing all widgets underneath
+							NGUIEditorTools.ShowSpriteSelectionMenu(e.mousePosition);
 							handled = true;
 						}
 						else if (mAction == Action.None)
 						{
 							if (mAllowSelection)
 							{
-								// Left-click: Select the widget above
-								NGUIEditorTools.SelectWidgetOrContainer(mWidget.gameObject, e.mousePosition, true);
+								// Left-click: Select the topmost widget
+								NGUIEditorTools.SelectWidget(e.mousePosition);
 								handled = true;
 							}
 						}
