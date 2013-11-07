@@ -1335,6 +1335,12 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
+	/// Select the topmost widget underneath the specified screen coordinate.
+	/// </summary>
+
+	static public bool SelectWidget (Vector2 pos, bool inFront) { return SelectWidget(null, pos, inFront); }
+
+	/// <summary>
 	/// Select the next widget in line.
 	/// </summary>
 
@@ -1342,27 +1348,40 @@ public class NGUIEditorTools
 	{
 		GameObject go = null;
 		BetterList<UIWidget> widgets = SceneViewRaycast(pos);
+		if (widgets == null || widgets.size == 0) return false;
+		bool found = false;
 
 		if (!inFront)
 		{
-			if (widgets.size > 0)
+			for (int i = 0; i < widgets.size; ++i)
 			{
-				for (int i = 0; i < widgets.size; ++i)
+				UIWidget w = widgets[i];
+
+				if (w.cachedGameObject == start)
 				{
-					UIWidget w = widgets[i];
-					if (w.cachedGameObject == start) break;
-					go = w.cachedGameObject;
+					found = true;
+					break;
 				}
+				go = w.cachedGameObject;
 			}
+
+			if (!found) go = widgets[0].cachedGameObject;
 		}
 		else
 		{
 			for (int i = widgets.size; i > 0; )
 			{
 				UIWidget w = widgets[--i];
-				if (w.cachedGameObject == start) break;
+
+				if (w.cachedGameObject == start)
+				{
+					found = true;
+					break;
+				}
 				go = w.cachedGameObject;
 			}
+
+			if (!found) go = widgets[widgets.size - 1].cachedGameObject;
 		}
 
 		if (go != null && go != start)
