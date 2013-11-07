@@ -289,6 +289,6 @@ public class BetterList<T>
 	/// List.Sort equivalent.
 	/// </summary>
 
-	public void Sort (System.Comparison<T> comparer) { System.Array.Sort(buffer, 0, size, new Comparer(comparer)); }
+	public void Sort (System.Comparison<T> comparer) { if (size > 0) System.Array.Sort(buffer, 0, size, new Comparer(comparer)); }
 #endif
 }
