@@ -814,7 +814,11 @@ public class UICamera : MonoBehaviour
 			Application.platform == RuntimePlatform.IPhonePlayer
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1
 			|| Application.platform == RuntimePlatform.WP8Player
+#if UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3
 			|| Application.platform == RuntimePlatform.BB10Player
+#else
+			|| Application.platform == RuntimePlatform.BlackBerryPlayer
+#endif
 #endif
 			)
 		{
