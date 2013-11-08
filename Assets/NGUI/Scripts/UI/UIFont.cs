@@ -126,7 +126,7 @@ public class UIFont : MonoBehaviour
 			if (mReplacement != null) return mReplacement.material;
 
 			if (mAtlas != null) return mAtlas.spriteMaterial;
-			
+
 			if (mMat != null)
 			{
 				if (mDynamicFont != null && mMat != mDynamicFont.material)
@@ -831,7 +831,7 @@ public class UIFont : MonoBehaviour
 
 			// See if there is a symbol matching this text
 			BMSymbol symbol = useSymbols ? MatchSymbol(text, offset, textLength) : null;
-			
+
 			// Calculate how wide this symbol or character is going to be
 			int glyphWidth = mSpacingX;
 
@@ -914,7 +914,7 @@ public class UIFont : MonoBehaviour
 
 		if (start < offset) sb.Append(text.Substring(start, offset - start));
 		finalText = sb.ToString();
-		return (!multiline || offset == textLength || (maxLines > 0 && lineCount <= maxLines));
+		return ((offset == textLength) && ((!multiline && lineCount == 1) || lineCount <= maxLineCount));
 	}
 
 	/// <summary>
