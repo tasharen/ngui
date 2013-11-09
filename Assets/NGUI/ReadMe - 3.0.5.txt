@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-                Version 3.0.4
+                Version 3.0.5
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,23 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.5
+- NEW: Added a way to set Localization's language using specified name and dictionary combo
+- NEW: Added UIInput.onChange that gets called whenever the input field's text changes for any reason.
+- NEW: Right-clicking in the scene view with a UI element selected now presents the hierarchy list underneath.
+- FIX: Widget selection logic had a bug in it that would select the wrong widget in some cases.
+- FIX: Label "Max Lines" setting now works correctly with the "Shrink Content" overflow setting.
+- FIX: Draggable panel now uses whole numbers, keeping itself pixel-perfect.
+- FIX: UIPlayAnimation will now work fine with multiple OnFinished calls.
+- FIX: Made UITextList work with dynamic font-using labels.
+- FIX: Popup list was not serializing dynamic fonts correctly.
+- FIX: UILabel will no longer use minimum size of zero.
+- FIX: Color symbols were not recognized quite right.
+- FIX: BetterList.Sort now uses Array.Sort.
+- FIX: Removed warnings in Unity 4.5.
+- FIX: Null check on UIInput.Append.
+- FIX: Flash platform compile fixes.
 
 3.0.4 (merged 3.0.3 letter updates)
 - NEW: UIPanel will now show the render queue number used to draw the geometry.
