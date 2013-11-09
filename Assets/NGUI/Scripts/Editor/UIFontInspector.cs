@@ -215,7 +215,7 @@ public class UIFontInspector : Editor
 				{
 					NGUIEditorTools.RegisterUndo("Import Font Data", mFont);
 					BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), data.bytes);
-					mFont.MarkAsDirty();
+					mFont.MarkAsChanged();
 					resetWidthHeight = true;
 					Debug.Log("Imported " + mFont.bmFont.glyphCount + " characters");
 				}
@@ -364,7 +364,7 @@ public class UIFontInspector : Editor
 							mSymbolSequence = sym.sequence;
 							mSymbolSprite = sym.spriteName;
 							symbols.Remove(sym);
-							mFont.MarkAsDirty();
+							mFont.MarkAsChanged();
 						}
 						GUI.backgroundColor = Color.white;
 						GUILayout.EndHorizontal();
@@ -388,7 +388,7 @@ public class UIFontInspector : Editor
 					{
 						NGUIEditorTools.RegisterUndo("Add symbol", mFont);
 						mFont.AddSymbol(mSymbolSequence, mSymbolSprite);
-						mFont.MarkAsDirty();
+						mFont.MarkAsChanged();
 						mSymbolSequence = "";
 						mSymbolSprite = "";
 					}
@@ -428,7 +428,7 @@ public class UIFontInspector : Editor
 			NGUIEditorTools.RegisterUndo("Change symbol", mFont);
 			mSelectedSymbol.spriteName = spriteName;
 			Repaint();
-			mFont.MarkAsDirty();
+			mFont.MarkAsChanged();
 		}
 	}
 

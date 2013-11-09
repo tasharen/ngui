@@ -154,7 +154,7 @@ public class UIAtlasInspector : Editor
 			// Ensure that this atlas has valid import settings
 			if (mAtlas.texture != null) NGUIEditorTools.ImportTexture(mAtlas.texture, false, false, !mAtlas.premultipliedAlpha);
 
-			mAtlas.MarkAsDirty();
+			mAtlas.MarkAsChanged();
 		}
 
 		if (mat != null)
@@ -169,7 +169,7 @@ public class UIAtlasInspector : Editor
 				NGUIEditorTools.RegisterUndo("Import Sprites", mAtlas);
 				NGUIJson.LoadSpriteData(mAtlas, ta);
 				if (sprite != null) sprite = mAtlas.GetSprite(sprite.name);
-				mAtlas.MarkAsDirty();
+				mAtlas.MarkAsChanged();
 			}
 
 			float pixelSize = EditorGUILayout.FloatField("Pixel Size", mAtlas.pixelSize, GUILayout.Width(120f));

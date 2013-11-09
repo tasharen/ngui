@@ -110,7 +110,7 @@ public class UIFont : MonoBehaviour
 
 				mPMA = -1;
 				mAtlas = value;
-				MarkAsDirty();
+				MarkAsChanged();
 			}
 		}
 	}
@@ -152,7 +152,7 @@ public class UIFont : MonoBehaviour
 			{
 				mPMA = -1;
 				mMat = value;
-				MarkAsDirty();
+				MarkAsChanged();
 			}
 		}
 	}
@@ -188,7 +188,7 @@ public class UIFont : MonoBehaviour
 				if (mPixelSize != val)
 				{
 					mPixelSize = val;
-					MarkAsDirty();
+					MarkAsChanged();
 				}
 			}
 		}
@@ -283,7 +283,7 @@ public class UIFont : MonoBehaviour
 			else if (sprite == null && mUVRect != value)
 			{
 				mUVRect = value;
-				MarkAsDirty();
+				MarkAsChanged();
 			}
 		}
 	}
@@ -307,7 +307,7 @@ public class UIFont : MonoBehaviour
 			else if (mFont.spriteName != value)
 			{
 				mFont.spriteName = value;
-				MarkAsDirty();
+				MarkAsChanged();
 			}
 		}
 	}
@@ -331,7 +331,7 @@ public class UIFont : MonoBehaviour
 			else if (mSpacingX != value)
 			{
 				mSpacingX = value;
-				MarkAsDirty();
+				MarkAsChanged();
 			}
 		}
 	}
@@ -355,7 +355,7 @@ public class UIFont : MonoBehaviour
 			else if (mSpacingY != value)
 			{
 				mSpacingY = value;
-				MarkAsDirty();
+				MarkAsChanged();
 			}
 		}
 	}
@@ -420,7 +420,7 @@ public class UIFont : MonoBehaviour
 				}
 
 				for (int i = 0, imax = mSymbols.Count; i < imax; ++i)
-					symbols[i].MarkAsDirty();
+					symbols[i].MarkAsChanged();
 			}
 			return mSprite;
 		}
@@ -446,9 +446,9 @@ public class UIFont : MonoBehaviour
 			if (mReplacement != rep)
 			{
 				if (rep != null && rep.replacement == this) rep.replacement = null;
-				if (mReplacement != null) MarkAsDirty();
+				if (mReplacement != null) MarkAsChanged();
 				mReplacement = rep;
-				MarkAsDirty();
+				MarkAsChanged();
 			}
 		}
 	}
@@ -479,7 +479,7 @@ public class UIFont : MonoBehaviour
 			{
 				if (mDynamicFont != null) material = null;
 				mDynamicFont = value;
-				MarkAsDirty();
+				MarkAsChanged();
 			}
 		}
 	}
@@ -503,7 +503,7 @@ public class UIFont : MonoBehaviour
 			else if (mDynamicFontStyle != value)
 			{
 				mDynamicFontStyle = value;
-				MarkAsDirty();
+				MarkAsChanged();
 			}
 		}
 	}
@@ -568,12 +568,12 @@ public class UIFont : MonoBehaviour
 	/// Refresh all labels that use this font.
 	/// </summary>
 
-	public void MarkAsDirty ()
+	public void MarkAsChanged ()
 	{
 #if UNITY_EDITOR
 		UnityEditor.EditorUtility.SetDirty(gameObject);
 #endif
-		if (mReplacement != null) mReplacement.MarkAsDirty();
+		if (mReplacement != null) mReplacement.MarkAsChanged();
 
 		mSprite = null;
 		UILabel[] labels = NGUITools.FindActive<UILabel>();
@@ -592,7 +592,7 @@ public class UIFont : MonoBehaviour
 
 		// Clear all symbols
 		for (int i = 0, imax = mSymbols.Count; i < imax; ++i)
-			symbols[i].MarkAsDirty();
+			symbols[i].MarkAsChanged();
 	}
 
 	/// <summary>
@@ -1176,7 +1176,7 @@ public class UIFont : MonoBehaviour
 	{
 		BMSymbol symbol = GetSymbol(sequence, true);
 		symbol.spriteName = spriteName;
-		MarkAsDirty();
+		MarkAsChanged();
 	}
 
 	/// <summary>
@@ -1187,7 +1187,7 @@ public class UIFont : MonoBehaviour
 	{
 		BMSymbol symbol = GetSymbol(sequence, false);
 		if (symbol != null) symbols.Remove(symbol);
-		MarkAsDirty();
+		MarkAsChanged();
 	}
 
 	/// <summary>
@@ -1198,7 +1198,7 @@ public class UIFont : MonoBehaviour
 	{
 		BMSymbol symbol = GetSymbol(before, false);
 		if (symbol != null) symbol.sequence = after;
-		MarkAsDirty();
+		MarkAsChanged();
 	}
 
 	/// <summary>
