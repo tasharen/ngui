@@ -301,7 +301,8 @@ static public class NGUIText
 			return false;
 		}
 
-		int maxLineCount = (maxLines > 0) ? maxLines : 999999;
+		if (maxLines > 0) height = Mathf.Min(height, size * maxLines);
+		int maxLineCount = (maxLines > 0) ? maxLines : 1000000;
 		maxLineCount = Mathf.Min(maxLineCount, height / size);
 
 		if (maxLineCount == 0)
@@ -320,7 +321,6 @@ static public class NGUIText
 		int start = 0;
 		int offset = 0;
 		bool lineIsEmpty = true;
-		bool multiline = (maxLines != 1);
 		int lineCount = 1;
 
 		// Run through all characters
@@ -331,7 +331,7 @@ static public class NGUIText
 			// New line character -- start a new line
 			if (ch == '\n')
 			{
-				if (!multiline || lineCount == maxLineCount) break;
+				if (lineCount == maxLineCount) break;
 				remainingWidth = width;
 
 				// Add the previous word to the final string
@@ -367,12 +367,12 @@ static public class NGUIText
 			if (remainingWidth < 0)
 			{
 				// Can't start a new line
-				if (lineIsEmpty || !multiline || lineCount == maxLineCount)
+				if (lineIsEmpty || lineCount == maxLineCount)
 				{
 					// This is the first word on the line -- add it up to the character that fits
 					sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
 
-					if (!multiline || lineCount == maxLineCount)
+					if (lineCount++ == maxLineCount)
 					{
 						start = offset;
 						break;
@@ -381,7 +381,6 @@ static public class NGUIText
 
 					// Start a brand-new line
 					lineIsEmpty = true;
-					++lineCount;
 
 					if (ch == ' ')
 					{
@@ -406,8 +405,7 @@ static public class NGUIText
 					offset = start - 1;
 					previousChar = 0;
 
-					if (!multiline || lineCount == maxLineCount) break;
-					++lineCount;
+					if (lineCount++ == maxLineCount) break;
 					EndLine(ref sb);
 					continue;
 				}
@@ -417,7 +415,7 @@ static public class NGUIText
 
 		if (start < offset) sb.Append(text.Substring(start, offset - start));
 		finalText = sb.ToString();
-		return (!multiline || offset == textLength || (maxLines > 0 && lineCount <= maxLines));
+		return (offset == textLength) || (lineCount <= Mathf.Min(maxLines, maxLineCount));
 	}
 
 	/// <summary>
