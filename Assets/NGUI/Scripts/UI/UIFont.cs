@@ -756,6 +756,7 @@ public class UIFont : MonoBehaviour
 
 	/// <summary>
 	/// Text wrapping functionality. The 'width' and 'height' should be in pixels.
+	/// Returns 'true' if the specified text was able to fit into the provided dimensions, 'false' otherwise.
 	/// </summary>
 
 	public bool WrapText (string text, int size, out string finalText, int width, int height, int maxLines, bool encoding, SymbolStyle symbolStyle)
@@ -775,7 +776,9 @@ public class UIFont : MonoBehaviour
 			return false;
 		}
 
-		int maxLineCount = (maxLines > 0) ? maxLines : 999999;
+		if (maxLines > 0) height = Mathf.Min(height, size * maxLines);
+
+		int maxLineCount = (maxLines > 0) ? maxLines : 1000000;
 		maxLineCount = Mathf.Min(maxLineCount, height / size);
 
 		if (maxLineCount == 0)
@@ -790,9 +793,8 @@ public class UIFont : MonoBehaviour
 		int previousChar = 0;
 		int start = 0;
 		int offset = 0;
-		bool lineIsEmpty = true;
-		bool multiline = (maxLines != 1);
 		int lineCount = 1;
+		bool lineIsEmpty = true;
 		bool useSymbols = encoding && symbolStyle != SymbolStyle.None && hasSymbols;
 
 		// Run through all characters
@@ -803,7 +805,7 @@ public class UIFont : MonoBehaviour
 			// New line character -- start a new line
 			if (ch == '\n')
 			{
-				if (!multiline || lineCount == maxLineCount) break;
+				if (lineCount == maxLineCount) break;
 				remainingWidth = width;
 
 				// Add the previous word to the final string
@@ -857,12 +859,12 @@ public class UIFont : MonoBehaviour
 			if (remainingWidth < 0)
 			{
 				// Can't start a new line
-				if (lineIsEmpty || !multiline || lineCount == maxLineCount)
+				if (lineIsEmpty || lineCount == maxLineCount)
 				{
 					// This is the first word on the line -- add it up to the character that fits
 					sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
 
-					if (!multiline || lineCount == maxLineCount)
+					if (lineCount++ == maxLineCount)
 					{
 						start = offset;
 						break;
@@ -871,7 +873,6 @@ public class UIFont : MonoBehaviour
 
 					// Start a brand-new line
 					lineIsEmpty = true;
-					++lineCount;
 
 					if (ch == ' ')
 					{
@@ -896,8 +897,7 @@ public class UIFont : MonoBehaviour
 					offset = start - 1;
 					previousChar = 0;
 
-					if (!multiline || lineCount == maxLineCount) break;
-					++lineCount;
+					if (lineCount++ == maxLineCount) break;
 					NGUIText.EndLine(ref sb);
 					continue;
 				}
@@ -914,7 +914,7 @@ public class UIFont : MonoBehaviour
 
 		if (start < offset) sb.Append(text.Substring(start, offset - start));
 		finalText = sb.ToString();
-		return ((offset == textLength) && ((!multiline && lineCount == 1) || lineCount <= maxLineCount));
+		return (offset == textLength) || (lineCount <= Mathf.Min(maxLines, maxLineCount));
 	}
 
 	/// <summary>
