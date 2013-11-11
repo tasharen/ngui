@@ -99,9 +99,12 @@ public class UILabelInspector : UIWidgetInspector
 					EditorGUI.BeginDisabledGroup(ttf.hasMultipleDifferentValues);
 					NGUIEditorTools.DrawProperty("Font Size", serializedObject, "mFontSize", GUILayout.Width(142f));
 					NGUIEditorTools.DrawProperty("", serializedObject, "mFontStyle", GUILayout.MinWidth(40f));
+					GUILayout.Space(18f);
 					EditorGUI.EndDisabledGroup();
 				}
 				GUILayout.EndHorizontal();
+
+				NGUIEditorTools.DrawProperty("Material", serializedObject, "mMaterial");
 			}
 
 			bool ww = GUI.skin.textField.wordWrap;

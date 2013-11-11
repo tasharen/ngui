@@ -457,7 +457,7 @@ public class UIFont : MonoBehaviour
 	/// Whether the font is dynamic.
 	/// </summary>
 
-	public bool isDynamic { get { return (mDynamicFont != null); } }
+	public bool isDynamic { get { return (mReplacement != null) ? mReplacement.isDynamic : (mDynamicFont != null); } }
 
 	/// <summary>
 	/// Get or set the dynamic font source.
@@ -922,12 +922,15 @@ public class UIFont : MonoBehaviour
 	/// Note: 'lineWidth' parameter should be in pixels.
 	/// </summary>
 
-	public void Print (string text, int size, Color32 color, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols,
-		bool encoding, SymbolStyle symbolStyle, TextAlignment alignment, int lineWidth, bool premultiply)
+	public void Print (string text, int size, Color32 color, bool encoding, SymbolStyle symbolStyle,
+		TextAlignment alignment, int lineWidth, bool premultiply,
+		BetterList<Vector3> verts,
+		BetterList<Vector2> uvs,
+		BetterList<Color32> cols)
 	{
 		if (mReplacement != null)
 		{
-			mReplacement.Print(text, size, color, verts, uvs, cols, encoding, symbolStyle, alignment, lineWidth, premultiply);
+			mReplacement.Print(text, size, color, encoding, symbolStyle, alignment, lineWidth, premultiply, verts, uvs, cols);
 		}
 		else if (text != null)
 		{
@@ -1029,34 +1032,7 @@ public class UIFont : MonoBehaviour
 					x += mSpacingX + glyph.advance;
 					prev = c;
 
-					if (glyph.channel == 0 || glyph.channel == 15)
-					{
-						for (int b = 0; b < 4; ++b) cols.Add(color);
-					}
-					else
-					{
-						// Packed fonts come as alpha masks in each of the RGBA channels.
-						// In order to use it we need to use a special shader.
-						//
-						// Limitations:
-						// - Effects (drop shadow, outline) will not work.
-						// - Should not be a part of the atlas (eastern fonts rarely are anyway).
-						// - Lower color precision
-
-						Color col = color;
-
-						col *= 0.49f;
-
-						switch (glyph.channel)
-						{
-							case 1: col.b += 0.51f; break;
-							case 2: col.g += 0.51f; break;
-							case 4: col.r += 0.51f; break;
-							case 8: col.a += 0.51f; break;
-						}
-
-						for (int b = 0; b < 4; ++b) cols.Add(col);
-					}
+					for (int b = 0; b < 4; ++b) cols.Add(color);
 				}
 				else
 				{

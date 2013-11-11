@@ -54,11 +54,14 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] FontStyle mFontStyle = FontStyle.Normal;
 	[HideInInspector][SerializeField] bool mEncoding = true;
 	[HideInInspector][SerializeField] int mMaxLineCount = 0; // 0 denotes unlimited
+	[HideInInspector][SerializeField] bool mGradient = false;
+	[HideInInspector][SerializeField] Color mSecondaryColor = Color.white;
 	[HideInInspector][SerializeField] Effect mEffectStyle = Effect.None;
 	[HideInInspector][SerializeField] Color mEffectColor = Color.black;
 	[HideInInspector][SerializeField] UIFont.SymbolStyle mSymbols = UIFont.SymbolStyle.Uncolored;
 	[HideInInspector][SerializeField] Vector2 mEffectDistance = Vector2.one;
 	[HideInInspector][SerializeField] Overflow mOverflow = Overflow.ShrinkContent;
+	[HideInInspector][SerializeField] Material mMaterial;
 
 	// Obsolete values
 	[HideInInspector][SerializeField] bool mShrinkToFit = false;
@@ -112,9 +115,19 @@ public class UILabel : UIWidget
 	{
 		get
 		{
+			if (mMaterial != null) return mMaterial;
 			if (mFont != null) return mFont.material;
 			if (mTrueTypeFont != null) return mTrueTypeFont.material;
 			return null;
+		}
+		set
+		{
+			if (mMaterial != value)
+			{
+				MarkAsChanged();
+				mMaterial = value;
+				MarkAsChanged();
+			}
 		}
 	}
 
@@ -997,7 +1010,7 @@ public class UILabel : UIWidget
 			alignment = TextAlignment.Right;
 		}
 
-		if (mFont != null) mFont.Print(text, size, col, verts, uvs, cols, mEncoding, mSymbols, alignment, w, mPremultiply);
+		if (mFont != null) mFont.Print(text, size, col, mEncoding, mSymbols, alignment, w, mPremultiply, verts, uvs, cols);
 #if DYNAMIC_FONT
 		else NGUIText.Print(text, mTrueTypeFont, size, fontStyle, col, mEncoding, alignment, w, mPremultiply, verts, uvs, cols);
 #endif
