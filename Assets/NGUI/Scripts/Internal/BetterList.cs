@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 /// <summary>
 /// This improved version of the System.Collections.Generic.List that doesn't release the buffer on Clear(), resulting in better performance and less garbage collection.
@@ -116,6 +117,8 @@ public class BetterList<T>
 	/// For 'foreach' functionality.
 	/// </summary>
 
+	[DebuggerHidden]
+	[DebuggerStepThrough]
 	public IEnumerator<T> GetEnumerator ()
 	{
 		if (buffer != null)
@@ -130,7 +133,8 @@ public class BetterList<T>
 	/// <summary>
 	/// Convenience function. I recommend using .buffer instead.
 	/// </summary>
-	
+
+	[DebuggerHidden]
 	public T this[int i]
 	{
 		get { return buffer[i]; }

@@ -144,6 +144,27 @@ public class UIWidget : MonoBehaviour
 	public float finalAlpha { get { if (mPanel == null) CreatePanel(); return (mPanel != null) ? mColor.a * mPanel.alpha : mColor.a; } }
 
 	/// <summary>
+	/// Change the pivot point and do not attempt to keep the widget in the same place by adjusting its transform.
+	/// </summary>
+
+	public Pivot rawPivot
+	{
+		get
+		{
+			return mPivot;
+		}
+		set
+		{
+			if (mPivot != value)
+			{
+				mPivot = value;
+				if (autoResizeBoxCollider) ResizeCollider();
+				MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
 	/// Set or get the value that specifies where the widget's pivot point should be.
 	/// </summary>
 
