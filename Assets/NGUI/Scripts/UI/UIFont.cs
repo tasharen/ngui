@@ -917,20 +917,22 @@ public class UIFont : MonoBehaviour
 		return (offset == textLength) || (lineCount <= Mathf.Min(maxLines, maxLineCount));
 	}
 
+	static Color32 s_c0, s_c1;
+
 	/// <summary>
 	/// Print the specified text into the buffers.
 	/// Note: 'lineWidth' parameter should be in pixels.
 	/// </summary>
 
-	public void Print (string text, int size, Color32 color, bool encoding, SymbolStyle symbolStyle,
-		TextAlignment alignment, int lineWidth, bool premultiply,
+	public void Print (string text, int size, Color tint, bool gradient, Color gradientBottom, Color gradientTop,
+		bool encoding, SymbolStyle symbolStyle, TextAlignment alignment, int lineWidth, bool premultiply,
 		BetterList<Vector3> verts,
 		BetterList<Vector2> uvs,
 		BetterList<Color32> cols)
 	{
 		if (mReplacement != null)
 		{
-			mReplacement.Print(text, size, color, encoding, symbolStyle, alignment, lineWidth, premultiply, verts, uvs, cols);
+			mReplacement.Print(text, size, tint, gradient, gradientBottom, gradientTop, encoding, symbolStyle, alignment, lineWidth, premultiply, verts, uvs, cols);
 		}
 		else if (text != null)
 		{
@@ -943,13 +945,12 @@ public class UIFont : MonoBehaviour
 #if DYNAMIC_FONT
 			if (isDynamic)
 			{
-				NGUIText.Print(text, dynamicFont, size, mDynamicFontStyle, color, encoding,
+				NGUIText.Print(text, dynamicFont, size, mDynamicFontStyle, tint, gradient, gradientBottom, gradientTop, encoding,
 					alignment, lineWidth, premultiply, verts, uvs, cols);
 				return;
 			}
 #endif
-			mColors.Clear();
-			mColors.Add(color);
+			mColors.Add(Color.white);
 
 			int fs = size;
 			int indexOffset = verts.size;
@@ -960,6 +961,9 @@ public class UIFont : MonoBehaviour
 			int lineHeight = (fs + mSpacingY);
 			Vector3 v0 = Vector3.zero, v1 = Vector3.zero;
 			Vector2 u0 = Vector2.zero, u1 = Vector2.zero;
+			Color gb = tint * gradientBottom;
+			Color gt = tint * gradientTop;
+			Color32 uc = tint;
 
 			float invX = uvRect.width / mFont.texWidth;
 			float invY = mUVRect.height / mFont.texHeight;
@@ -995,7 +999,14 @@ public class UIFont : MonoBehaviour
 
 				if (encoding && NGUIText.ParseSymbol(text, ref i, mColors, premultiply))
 				{
-					color = mColors[mColors.size - 1];
+					Color fc = tint * mColors[mColors.size - 1];
+					uc = tint;
+
+					if (gradient)
+					{
+						gb = gradientBottom * fc;
+						gt = gradientTop * fc;
+					}
 					--i;
 					continue;
 				}
@@ -1032,7 +1043,23 @@ public class UIFont : MonoBehaviour
 					x += mSpacingX + glyph.advance;
 					prev = c;
 
-					for (int b = 0; b < 4; ++b) cols.Add(color);
+					if (gradient)
+					{
+						float min = size - glyph.offsetY;
+						float max = min - glyph.height;
+
+						min /= size;
+						max /= size;
+
+						s_c0 = Color.Lerp(gb, gt, min);
+						s_c1 = Color.Lerp(gb, gt, max);
+
+						cols.Add(s_c0);
+						cols.Add(s_c1);
+						cols.Add(s_c1);
+						cols.Add(s_c0);
+					}
+					else for (int b = 0; b < 4; ++b) cols.Add(uc);
 				}
 				else
 				{
@@ -1055,12 +1082,12 @@ public class UIFont : MonoBehaviour
 
 					if (symbolStyle == SymbolStyle.Colored)
 					{
-						for (int b = 0; b < 4; ++b) cols.Add(color);
+						for (int b = 0; b < 4; ++b) cols.Add(uc);
 					}
 					else
 					{
 						Color32 col = Color.white;
-						col.a = color.a;
+						col.a = uc.a;
 						for (int b = 0; b < 4; ++b) cols.Add(col);
 					}
 				}
@@ -1081,6 +1108,7 @@ public class UIFont : MonoBehaviour
 				NGUIText.Align(verts, indexOffset, alignment, x, lineWidth);
 				indexOffset = verts.size;
 			}
+			mColors.Clear();
 		}
 	}
 

@@ -54,14 +54,15 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] FontStyle mFontStyle = FontStyle.Normal;
 	[HideInInspector][SerializeField] bool mEncoding = true;
 	[HideInInspector][SerializeField] int mMaxLineCount = 0; // 0 denotes unlimited
-	[HideInInspector][SerializeField] bool mGradient = false;
-	[HideInInspector][SerializeField] Color mSecondaryColor = Color.white;
+	[HideInInspector][SerializeField] Color mGradientBottom = Color.grey;
 	[HideInInspector][SerializeField] Effect mEffectStyle = Effect.None;
 	[HideInInspector][SerializeField] Color mEffectColor = Color.black;
 	[HideInInspector][SerializeField] UIFont.SymbolStyle mSymbols = UIFont.SymbolStyle.Uncolored;
 	[HideInInspector][SerializeField] Vector2 mEffectDistance = Vector2.one;
 	[HideInInspector][SerializeField] Overflow mOverflow = Overflow.ShrinkContent;
 	[HideInInspector][SerializeField] Material mMaterial;
+	[HideInInspector][SerializeField] bool mApplyGradient = false;
+	[HideInInspector][SerializeField] Color mGradientTop = Color.white;
 
 	// Obsolete values
 	[HideInInspector][SerializeField] bool mShrinkToFit = false;
@@ -284,6 +285,66 @@ public class UILabel : UIWidget
 				mFontStyle = value;
 				hasChanged = true;
 				ProcessAndRequest();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Whether a gradient will be applied.
+	/// </summary>
+
+	public bool applyGradient
+	{
+		get
+		{
+			return mApplyGradient;
+		}
+		set
+		{
+			if (mApplyGradient != value)
+			{
+				mApplyGradient = value;
+				MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Top gradient color.
+	/// </summary>
+
+	public Color gradientTop
+	{
+		get
+		{
+			return mGradientTop;
+		}
+		set
+		{
+			if (mGradientBottom != value)
+			{
+				mGradientBottom = value;
+				if (mApplyGradient) MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Bottom gradient color.
+	/// </summary>
+
+	public Color gradientBottom
+	{
+		get
+		{
+			return mGradientBottom;
+		}
+		set
+		{
+			if (mGradientBottom != value)
+			{
+				mGradientBottom = value;
+				if (mApplyGradient) MarkAsChanged();
 			}
 		}
 	}
@@ -1010,9 +1071,11 @@ public class UILabel : UIWidget
 			alignment = TextAlignment.Right;
 		}
 
-		if (mFont != null) mFont.Print(text, size, col, mEncoding, mSymbols, alignment, w, mPremultiply, verts, uvs, cols);
+		if (mFont != null) mFont.Print(text, size, col, mApplyGradient, mGradientBottom, mGradientTop, mEncoding,
+			mSymbols, alignment, w, mPremultiply, verts, uvs, cols);
 #if DYNAMIC_FONT
-		else NGUIText.Print(text, mTrueTypeFont, size, fontStyle, col, mEncoding, alignment, w, mPremultiply, verts, uvs, cols);
+		else NGUIText.Print(text, mTrueTypeFont, size, fontStyle, col, mApplyGradient, mGradientBottom, mGradientTop, mEncoding,
+			alignment, w, mPremultiply, verts, uvs, cols);
 #endif
 		Vector2 po = pivotOffset;
 		float fx = Mathf.Lerp(0f, -mWidth, po.x);

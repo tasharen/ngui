@@ -418,11 +418,14 @@ static public class NGUIText
 		return (offset == textLength) || (lineCount <= Mathf.Min(maxLines, maxLineCount));
 	}
 
+	static Color32 s_c0, s_c1;
+
 	/// <summary>
 	/// Print the specified text into the buffers.
 	/// </summary>
 
-	static public void Print (string text, Font font, int size, FontStyle style, Color32 color,
+	static public void Print (string text, Font font, int size, FontStyle style,
+		Color tint, bool gradient, Color gradientBottom, Color gradientTop,
 		bool encoding, TextAlignment alignment, int lineWidth, bool premultiply,
 		BetterList<Vector3> verts,
 		BetterList<Vector2> uvs,
@@ -440,17 +443,19 @@ static public class NGUIText
 		// Ensure that the text we're about to print exists in the font's texture
 		font.RequestCharactersInTexture(text, size, style);
 
-		// Start with the specified color
-		mColors.Add(color);
+		// Start with the white tint
+		mColors.Add(Color.white);
 
-		int indexOffset = verts.size;
-		int maxX = 0;
 		int x = 0;
 		int y = 0;
+		int maxX = 0;
 		int lineHeight = size;
+		int indexOffset = verts.size;
 		Vector3 v0 = Vector3.zero, v1 = Vector3.zero;
 		Vector2 u0 = Vector2.zero, u1 = Vector2.zero;
-
+		Color gb = tint * gradientBottom;
+		Color gt = tint * gradientTop;
+		Color32 uc = tint;
 		int textLength = text.Length;
 
 		for (int i = 0; i < textLength; ++i)
@@ -474,9 +479,17 @@ static public class NGUIText
 
 			if (c < ' ') continue;
 
+			// Color changing symbol
 			if (encoding && ParseSymbol(text, ref i, mColors, premultiply))
 			{
-				color = mColors[mColors.size - 1];
+				Color fc = tint * mColors[mColors.size - 1];
+				uc = tint;
+
+				if (gradient)
+				{
+					gb = gradientBottom * fc;
+					gt = gradientTop * fc;
+				}
 				--i;
 				continue;
 			}
@@ -497,7 +510,23 @@ static public class NGUIText
 
 			x += (int)mTempChar.width;
 
-			for (int b = 0; b < 4; ++b) cols.Add(color);
+			if (gradient)
+			{
+				float min = size - (-mTempChar.vert.yMax + baseline);
+				float max = min - (mTempChar.vert.height);
+
+				min /= size;
+				max /= size;
+
+				s_c0 = Color.Lerp(gb, gt, min);
+				s_c1 = Color.Lerp(gb, gt, max);
+
+				cols.Add(s_c0);
+				cols.Add(s_c0);
+				cols.Add(s_c1);
+				cols.Add(s_c1);
+			}
+			else for (int b = 0; b < 4; ++b) cols.Add(uc);
 
 			if (mTempChar.flipped)
 			{

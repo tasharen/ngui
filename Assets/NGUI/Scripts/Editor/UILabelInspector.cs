@@ -50,6 +50,10 @@ public class UILabelInspector : UIWidgetInspector
 		serializedObject.ApplyModifiedProperties();
 	}
 
+	/// <summary>
+	/// Draw the label's properties.
+	/// </summary>
+
 	protected override bool DrawProperties ()
 	{
 		mLabel = mWidget as UILabel;
@@ -130,19 +134,34 @@ public class UILabelInspector : UIWidgetInspector
 			if (ov.intValue == (int)UILabel.Overflow.ShrinkContent && ttf != null && ttf.objectReferenceValue != null)
 				NGUIEditorTools.DrawProperty("Keep crisp", serializedObject, "keepCrispWhenShrunk");
 
+			NGUIEditorTools.DrawProperty("Max Lines", serializedObject, "mMaxLineCount", GUILayout.Width(110f));
+
 			GUILayout.BeginHorizontal();
 			NGUIEditorTools.DrawProperty("Encoding", serializedObject, "mEncoding", GUILayout.Width(100f));
 			GUILayout.Label("use emoticons and colors");
 			GUILayout.EndHorizontal();
 
+			GUILayout.BeginHorizontal();
+			SerializedProperty gr = NGUIEditorTools.DrawProperty("Gradient", serializedObject, "mApplyGradient", GUILayout.Width(100f));
+			if (gr.hasMultipleDifferentValues || gr.boolValue)
+			{
+				NGUIEditorTools.DrawProperty("", serializedObject, "mGradientBottom");
+				NGUIEditorTools.DrawProperty("", serializedObject, "mGradientTop");
+			}
+			GUILayout.EndHorizontal();
+
+			GUILayout.Space(4f);
+
 			if (mLabel.supportEncoding && mLabel.bitmapFont != null && mLabel.bitmapFont.hasSymbols)
 				NGUIEditorTools.DrawProperty("Symbols", serializedObject, "mSymbols");
 
 			GUILayout.BeginHorizontal();
-			SerializedProperty sp = NGUIEditorTools.DrawProperty("Effect", serializedObject, "mEffectStyle", GUILayout.Width(170f));
-			if (sp.hasMultipleDifferentValues || sp.boolValue)
-				NGUIEditorTools.DrawProperty("", serializedObject, "mEffectColor", GUILayout.MinWidth(40f));
+			SerializedProperty sp = NGUIEditorTools.DrawProperty("Effect", serializedObject, "mEffectStyle", GUILayout.MinWidth(170f));
+			GUILayout.Space(18f);
 			GUILayout.EndHorizontal();
+
+			if (sp.hasMultipleDifferentValues || sp.boolValue)
+				NGUIEditorTools.DrawProperty("Effect Color", serializedObject, "mEffectColor", GUILayout.MinWidth(30f));
 
 			if (sp.hasMultipleDifferentValues || sp.boolValue)
 			{
@@ -155,8 +174,6 @@ public class UILabelInspector : UIWidgetInspector
 				NGUIEditorTools.SetLabelWidth(80f);
 				GUILayout.EndHorizontal();
 			}
-
-			NGUIEditorTools.DrawProperty("Max Lines", serializedObject, "mMaxLineCount", GUILayout.Width(110f));
 		}
 		EditorGUI.EndDisabledGroup();
 		return isValid;
