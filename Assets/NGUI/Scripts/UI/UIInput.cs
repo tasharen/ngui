@@ -232,7 +232,7 @@ public class UIInput : MonoBehaviour
 	/// </summary>
 
 #if MOBILE
-	protected bool needsTextCursor { get { return (isSelected && mKeyboard == null); } }
+	protected bool needsTextCursor { get { return (isSelected && mKeyboard != null); } }
 #else
 	protected bool needsTextCursor { get { return isSelected; } }
 #endif

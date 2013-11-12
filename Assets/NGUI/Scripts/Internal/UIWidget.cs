@@ -685,6 +685,12 @@ public class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Mark the UI as changed when returning from paused state.
+	/// </summary>
+
+	void OnApplicationPause (bool paused) { if (!paused) MarkAsChanged(); }
+
+	/// <summary>
 	/// Clear references.
 	/// </summary>
 
