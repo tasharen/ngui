@@ -368,7 +368,7 @@ public class UIAtlasMaker : EditorWindow
 
 		// Sort the sprites so that they are alphabetical within the atlas
 		atlas.SortAlphabetically();
-		atlas.MarkAsDirty();
+		atlas.MarkAsChanged();
 	}
 
 	/// <summary>
@@ -590,7 +590,7 @@ public class UIAtlasMaker : EditorWindow
 			if (!string.IsNullOrEmpty(path)) AssetDatabase.DeleteAsset(path);
 		}
 
-		atlas.MarkAsDirty();
+		atlas.MarkAsChanged();
 		Selection.activeGameObject = (NGUISettings.atlas != null) ? NGUISettings.atlas.gameObject : null;
 	}
 

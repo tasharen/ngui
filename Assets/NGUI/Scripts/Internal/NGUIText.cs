@@ -301,7 +301,8 @@ static public class NGUIText
 			return false;
 		}
 
-		int maxLineCount = (maxLines > 0) ? maxLines : 999999;
+		if (maxLines > 0) height = Mathf.Min(height, size * maxLines);
+		int maxLineCount = (maxLines > 0) ? maxLines : 1000000;
 		maxLineCount = Mathf.Min(maxLineCount, height / size);
 
 		if (maxLineCount == 0)
@@ -320,7 +321,6 @@ static public class NGUIText
 		int start = 0;
 		int offset = 0;
 		bool lineIsEmpty = true;
-		bool multiline = (maxLines != 1);
 		int lineCount = 1;
 
 		// Run through all characters
@@ -331,7 +331,7 @@ static public class NGUIText
 			// New line character -- start a new line
 			if (ch == '\n')
 			{
-				if (!multiline || lineCount == maxLineCount) break;
+				if (lineCount == maxLineCount) break;
 				remainingWidth = width;
 
 				// Add the previous word to the final string
@@ -367,12 +367,12 @@ static public class NGUIText
 			if (remainingWidth < 0)
 			{
 				// Can't start a new line
-				if (lineIsEmpty || !multiline || lineCount == maxLineCount)
+				if (lineIsEmpty || lineCount == maxLineCount)
 				{
 					// This is the first word on the line -- add it up to the character that fits
 					sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
 
-					if (!multiline || lineCount == maxLineCount)
+					if (lineCount++ == maxLineCount)
 					{
 						start = offset;
 						break;
@@ -381,7 +381,6 @@ static public class NGUIText
 
 					// Start a brand-new line
 					lineIsEmpty = true;
-					++lineCount;
 
 					if (ch == ' ')
 					{
@@ -406,8 +405,7 @@ static public class NGUIText
 					offset = start - 1;
 					previousChar = 0;
 
-					if (!multiline || lineCount == maxLineCount) break;
-					++lineCount;
+					if (lineCount++ == maxLineCount) break;
 					EndLine(ref sb);
 					continue;
 				}
@@ -417,14 +415,17 @@ static public class NGUIText
 
 		if (start < offset) sb.Append(text.Substring(start, offset - start));
 		finalText = sb.ToString();
-		return (!multiline || offset == textLength || (maxLines > 0 && lineCount <= maxLines));
+		return (offset == textLength) || (lineCount <= Mathf.Min(maxLines, maxLineCount));
 	}
+
+	static Color32 s_c0, s_c1;
 
 	/// <summary>
 	/// Print the specified text into the buffers.
 	/// </summary>
 
-	static public void Print (string text, Font font, int size, FontStyle style, Color32 color,
+	static public void Print (string text, Font font, int size, FontStyle style,
+		Color tint, bool gradient, Color gradientBottom, Color gradientTop,
 		bool encoding, TextAlignment alignment, int lineWidth, bool premultiply,
 		BetterList<Vector3> verts,
 		BetterList<Vector2> uvs,
@@ -442,17 +443,19 @@ static public class NGUIText
 		// Ensure that the text we're about to print exists in the font's texture
 		font.RequestCharactersInTexture(text, size, style);
 
-		// Start with the specified color
-		mColors.Add(color);
+		// Start with the white tint
+		mColors.Add(Color.white);
 
-		int indexOffset = verts.size;
-		int maxX = 0;
 		int x = 0;
 		int y = 0;
+		int maxX = 0;
 		int lineHeight = size;
+		int indexOffset = verts.size;
 		Vector3 v0 = Vector3.zero, v1 = Vector3.zero;
 		Vector2 u0 = Vector2.zero, u1 = Vector2.zero;
-
+		Color gb = tint * gradientBottom;
+		Color gt = tint * gradientTop;
+		Color32 uc = tint;
 		int textLength = text.Length;
 
 		for (int i = 0; i < textLength; ++i)
@@ -476,9 +479,17 @@ static public class NGUIText
 
 			if (c < ' ') continue;
 
+			// Color changing symbol
 			if (encoding && ParseSymbol(text, ref i, mColors, premultiply))
 			{
-				color = mColors[mColors.size - 1];
+				Color fc = tint * mColors[mColors.size - 1];
+				uc = tint;
+
+				if (gradient)
+				{
+					gb = gradientBottom * fc;
+					gt = gradientTop * fc;
+				}
 				--i;
 				continue;
 			}
@@ -499,7 +510,23 @@ static public class NGUIText
 
 			x += (int)mTempChar.width;
 
-			for (int b = 0; b < 4; ++b) cols.Add(color);
+			if (gradient)
+			{
+				float min = size - (-mTempChar.vert.yMax + baseline);
+				float max = min - (mTempChar.vert.height);
+
+				min /= size;
+				max /= size;
+
+				s_c0 = Color.Lerp(gb, gt, min);
+				s_c1 = Color.Lerp(gb, gt, max);
+
+				cols.Add(s_c0);
+				cols.Add(s_c0);
+				cols.Add(s_c1);
+				cols.Add(s_c1);
+			}
+			else for (int b = 0; b < 4; ++b) cols.Add(uc);
 
 			if (mTempChar.flipped)
 			{

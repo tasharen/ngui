@@ -86,10 +86,10 @@ public class UIAtlas : MonoBehaviour
 				}
 				else
 				{
-					MarkAsDirty();
+					MarkAsChanged();
 					mPMA = -1;
 					material = value;
-					MarkAsDirty();
+					MarkAsChanged();
 				}
 			}
 		}
@@ -169,7 +169,7 @@ public class UIAtlas : MonoBehaviour
 				if (mPixelSize != val)
 				{
 					mPixelSize = val;
-					MarkAsDirty();
+					MarkAsChanged();
 				}
 			}
 		}
@@ -195,9 +195,9 @@ public class UIAtlas : MonoBehaviour
 			if (mReplacement != rep)
 			{
 				if (rep != null && rep.replacement == this) rep.replacement = null;
-				if (mReplacement != null) MarkAsDirty();
+				if (mReplacement != null) MarkAsChanged();
 				mReplacement = rep;
-				MarkAsDirty();
+				MarkAsChanged();
 			}
 		}
 	}
@@ -332,12 +332,12 @@ public class UIAtlas : MonoBehaviour
 	/// Mark all widgets associated with this atlas as having changed.
 	/// </summary>
 
-	public void MarkAsDirty ()
+	public void MarkAsChanged ()
 	{
 #if UNITY_EDITOR
 		UnityEditor.EditorUtility.SetDirty(gameObject);
 #endif
-		if (mReplacement != null) mReplacement.MarkAsDirty();
+		if (mReplacement != null) mReplacement.MarkAsChanged();
 
 		UISprite[] list = NGUITools.FindActive<UISprite>();
 

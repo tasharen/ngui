@@ -313,7 +313,6 @@ public class UICamera : MonoBehaviour
 	Camera mCam = null;
 	LayerMask mLayerMask;
 	float mTooltipTime = 0f;
-	bool mIsEditor = false;
 
 	/// <summary>
 	/// Helper function that determines if this script should be handling the events.
@@ -814,7 +813,11 @@ public class UICamera : MonoBehaviour
 			Application.platform == RuntimePlatform.IPhonePlayer
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1
 			|| Application.platform == RuntimePlatform.WP8Player
+#if UNITY_4_0 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3
 			|| Application.platform == RuntimePlatform.BB10Player
+#else
+			|| Application.platform == RuntimePlatform.BlackBerryPlayer
+#endif
 #endif
 			)
 		{
@@ -834,11 +837,6 @@ public class UICamera : MonoBehaviour
 			useTouch = false;
 			useKeyboard = false;
 			useController = true;
-		}
-		else if (Application.platform == RuntimePlatform.WindowsEditor ||
-				 Application.platform == RuntimePlatform.OSXEditor)
-		{
-			mIsEditor = true;
 		}
 
 		// Save the starting mouse position
@@ -889,21 +887,13 @@ public class UICamera : MonoBehaviour
 
 		if (useTouch)
 		{
-			if (mIsEditor)
-			{
-				// Only process mouse events while in the editor
-				ProcessMouse();
-			}
-			else
-			{
-				// Process touch events first
-				ProcessTouches();
+			// Process touch events first
+			ProcessTouches ();
 
-				// If we want to process mouse events, only do so if there are no active touch events,
-				// otherwise there is going to be event duplication as Unity treats touch events as mouse events.
-				if (useMouse && Input.touchCount == 0)
-					ProcessMouse();
-			}
+			// If we want to process mouse events, only do so if there are no active touch events,
+			// otherwise there is going to be event duplication as Unity treats touch events as mouse events.
+			if (useMouse && Input.touchCount == 0)
+				ProcessMouse();
 		}
 		else if (useMouse) ProcessMouse();
 

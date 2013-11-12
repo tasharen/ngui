@@ -654,6 +654,28 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Finds the specified component on the game object or one of its parents.
+	/// </summary>
+
+	static public T FindInParents<T> (Transform trans) where T : Component
+	{
+		if (trans == null) return null;
+		object comp = trans.GetComponent<T>();
+
+		if (comp == null)
+		{
+			Transform t = trans.transform.parent;
+
+			while (t != null && comp == null)
+			{
+				comp = t.gameObject.GetComponent<T>();
+				t = t.parent;
+			}
+		}
+		return (T)comp;
+	}
+
+	/// <summary>
 	/// Destroy the specified object, immediately if in edit mode.
 	/// </summary>
 

@@ -457,16 +457,16 @@ public class UIWidgetInspector : Editor
 
 						if (e.button == 1)
 						{
-							// Right-click: Select the widget below
-							NGUIEditorTools.SelectWidgetOrContainer(mWidget.gameObject, e.mousePosition, false);
+							// Right-click: Open a context menu listing all widgets underneath
+							NGUIEditorTools.ShowSpriteSelectionMenu(e.mousePosition);
 							handled = true;
 						}
 						else if (mAction == Action.None)
 						{
 							if (mAllowSelection)
 							{
-								// Left-click: Select the widget above
-								NGUIEditorTools.SelectWidgetOrContainer(mWidget.gameObject, e.mousePosition, true);
+								// Left-click: Select the topmost widget
+								NGUIEditorTools.SelectWidget(e.mousePosition);
 								handled = true;
 							}
 						}
@@ -770,6 +770,18 @@ public class UIWidgetInspector : Editor
 	}
 
 	/// <summary>
+	/// By default all non-widgets should use their color.
+	/// </summary>
+
+	protected virtual bool drawColor
+	{
+		get
+		{
+			return (target.GetType() != typeof(UIWidget));
+		}
+	}
+
+	/// <summary>
 	/// All widgets have depth, color and make pixel-perfect options
 	/// </summary>
 
@@ -781,11 +793,12 @@ public class UIWidgetInspector : Editor
 		{
 			NGUIEditorTools.BeginContents();
 
-			if (mWidget.GetType() != typeof(UIWidget))
+			if (drawColor)
 			{
+#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1
 				// Color tint
 				GUILayout.BeginHorizontal();
-				SerializedProperty sp = NGUIEditorTools.DrawProperty("Color Tint", serializedObject, "mColor");
+				SerializedProperty sp = NGUIEditorTools.DrawProperty("Color", serializedObject, "mColor");
 				if (GUILayout.Button("Copy", GUILayout.Width(50f)))
 					NGUISettings.color = sp.colorValue;
 				GUILayout.EndHorizontal();
@@ -796,6 +809,9 @@ public class UIWidgetInspector : Editor
 					sp.colorValue = NGUISettings.color;
 				GUILayout.EndHorizontal();
 				GUILayout.Space(6f);
+#else
+				NGUIEditorTools.DrawProperty("Color", serializedObject, "mColor");
+#endif
 			}
 
 			DrawPivot();

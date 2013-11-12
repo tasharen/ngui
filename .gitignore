@@ -20,6 +20,8 @@
 *.suo
 /Assets/Test
 /Assets/Test.meta
+/Assets/Ignore
+/Assets/Ignore.meta
 *.unityproj
 /Assets/Standard Assets
 /Assets/Standard Assets.meta

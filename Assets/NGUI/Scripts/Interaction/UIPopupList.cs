@@ -657,7 +657,7 @@ public class UIPopupList : UIWidgetContainer
 
 				y -= labelHeight;
 				y -= padding.y;
-				x = Mathf.Max(x, labelHeight);
+				x = Mathf.Max(x, lbl.printedSize.x);
 
 				// Add an event listener
 				UIEventListener listener = UIEventListener.Get(lbl.gameObject);
