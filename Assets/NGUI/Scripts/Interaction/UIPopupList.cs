@@ -322,6 +322,7 @@ public class UIPopupList : UIWidgetContainer
 			{
 				trueTypeFont = fnt.dynamicFont;
 				fontStyle = fnt.dynamicFontStyle;
+				fontSize = fnt.defaultSize;
 				mUseDynamicFont = true;
 			}
 			else
@@ -329,7 +330,6 @@ public class UIPopupList : UIWidgetContainer
 				bitmapFont = fnt;
 				mUseDynamicFont = false;
 			}
-			fontSize = fnt.defaultSize;
 		}
 		else
 		{
@@ -634,6 +634,7 @@ public class UIPopupList : UIWidgetContainer
 			float dynScale = activeFontScale;
 			float labelHeight = fontHeight * dynScale;
 			float x = 0f, y = -padding.y;
+			int labelFontSize = (bitmapFont != null) ? bitmapFont.defaultSize : fontSize;
 			List<UILabel> labels = new List<UILabel>();
 
 			// Run through all items and create labels for each one
@@ -645,7 +646,7 @@ public class UIPopupList : UIWidgetContainer
 				lbl.pivot = UIWidget.Pivot.TopLeft;
 				lbl.bitmapFont = bitmapFont;
 				lbl.trueTypeFont = trueTypeFont;
-				lbl.fontSize = fontSize;
+				lbl.fontSize = labelFontSize;
 				lbl.fontStyle = fontStyle;
 				lbl.text = (isLocalized && Localization.instance != null) ? Localization.instance.Get(s) : s;
 				lbl.color = textColor;
