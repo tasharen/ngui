@@ -938,6 +938,7 @@ public class UILabel : UIWidget
 
 				bool fits = true;
 
+				// TODO: Make fonts try to be crisp when printing with a fixed size UIRoot (account for pixelSizeAdjustment).
 				NGUIText.current.lineWidth = (mOverflow == Overflow.ResizeFreely) ? 100000 : Mathf.RoundToInt(lw / mScale);
 				NGUIText.current.lineHeight = (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight) ?
 					100000 : Mathf.RoundToInt(lh / mScale);

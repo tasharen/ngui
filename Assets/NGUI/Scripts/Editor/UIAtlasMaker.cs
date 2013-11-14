@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 public class UIAtlasMaker : EditorWindow
 {
-	class SpriteEntry : UISpriteData
+	public class SpriteEntry : UISpriteData
 	{
 		// Sprite texture -- original texture or a temporary texture
 		public Texture2D tex;
@@ -567,7 +567,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Update the sprite atlas, keeping only the sprites that are on the specified list.
 	/// </summary>
 
-	static void UpdateAtlas (UIAtlas atlas, List<SpriteEntry> sprites)
+	static public void UpdateAtlas (UIAtlas atlas, List<SpriteEntry> sprites)
 	{
 		if (sprites.Count > 0)
 		{

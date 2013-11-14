@@ -230,6 +230,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 				}
 				GUILayout.EndHorizontal();
 			}
+			else NGUIEditorTools.DrawProperty("Font Size", serializedObject, "fontSize", GUILayout.Width(142f));
 
 			NGUIEditorTools.DrawProperty("Text Color", serializedObject, "textColor");
 
