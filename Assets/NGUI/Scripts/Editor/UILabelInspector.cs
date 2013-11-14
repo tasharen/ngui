@@ -134,6 +134,15 @@ public class UILabelInspector : UIWidgetInspector
 			if (ov.intValue == (int)UILabel.Overflow.ShrinkContent && ttf != null && ttf.objectReferenceValue != null)
 				NGUIEditorTools.DrawProperty("Keep crisp", serializedObject, "keepCrispWhenShrunk");
 
+			GUILayout.BeginHorizontal();
+			GUILayout.Label("Spacing", GUILayout.Width(56f));
+			NGUIEditorTools.SetLabelWidth(20f);
+			NGUIEditorTools.DrawProperty("X", serializedObject, "mSpacingX", GUILayout.MinWidth(40f));
+			NGUIEditorTools.DrawProperty("Y", serializedObject, "mSpacingY", GUILayout.MinWidth(40f));
+			GUILayout.Space(18f);
+			NGUIEditorTools.SetLabelWidth(80f);
+			GUILayout.EndHorizontal();
+
 			NGUIEditorTools.DrawProperty("Max Lines", serializedObject, "mMaxLineCount", GUILayout.Width(110f));
 
 			GUILayout.BeginHorizontal();
