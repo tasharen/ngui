@@ -408,6 +408,8 @@ public class UIAtlasMaker : EditorWindow
 
 					int xmin = Mathf.Clamp(es.x, 0, oldWidth);
 					int ymin = Mathf.Clamp(es.y, 0, oldHeight);
+					int xmax = Mathf.Min(xmin + es.width, oldWidth - 1);
+					int ymax = Mathf.Min(ymin + es.height, oldWidth - 1);
 					int newWidth = Mathf.Clamp(es.width, 0, oldWidth);
 					int newHeight = Mathf.Clamp(es.height, 0, oldHeight);
 					if (newWidth == 0 || newHeight == 0) continue;
@@ -416,10 +418,17 @@ public class UIAtlasMaker : EditorWindow
 
 					for (int y = 0; y < newHeight; ++y)
 					{
+						int cy = ymin + y;
+						if (cy > ymax) cy = ymax;
+
 						for (int x = 0; x < newWidth; ++x)
 						{
+							int cx = xmin + x;
+							if (cx > xmax) cx = xmax;
+
 							int newIndex = (newHeight - 1 - y) * newWidth + x;
-							int oldIndex = (oldHeight - 1 - (ymin + y)) * oldWidth + (xmin + x);
+							int oldIndex = (oldHeight - 1 - cy) * oldWidth + cx;
+
 							newPixels[newIndex] = oldPixels[oldIndex];
 						}
 					}
