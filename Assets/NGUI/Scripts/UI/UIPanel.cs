@@ -138,7 +138,7 @@ public class UIPanel : MonoBehaviour
 				for (int i = 0; i < UIDrawCall.list.size; ++i)
 				{
 					UIDrawCall dc = UIDrawCall.list[i];
-					if (dc != null && dc.panel == this)
+					if (dc != null && dc.manager == this)
 						dc.isDirty = true;
 				}
 
@@ -211,7 +211,7 @@ public class UIPanel : MonoBehaviour
 			for (int i = 0; i < UIDrawCall.list.size; ++i)
 			{
 				UIDrawCall dc = UIDrawCall.list[i];
-				if (dc.panel != this) continue;
+				if (dc.manager != this) continue;
 				++count;
 			}
 			return count;
@@ -367,7 +367,7 @@ public class UIPanel : MonoBehaviour
 			UIDrawCall dc = UIDrawCall.list.buffer[index];
 
 			// If the material and texture match, keep using the same draw call
-			if (dc != null && dc.panel == this && dc.baseMaterial == mat && dc.mainTexture == mat.mainTexture) return dc;
+			if (dc != null && dc.manager == this && dc.baseMaterial == mat && dc.mainTexture == mat.mainTexture) return dc;
 
 			// Otherwise we need to destroy all the draw calls that follow
 			for (int i = UIDrawCall.list.size; i > index; )
@@ -392,7 +392,7 @@ public class UIPanel : MonoBehaviour
 		UIDrawCall drawCall = go.AddComponent<UIDrawCall>();
 		drawCall.baseMaterial = mat;
 		drawCall.renderQueue = UIDrawCall.list.size;
-		drawCall.panel = this;
+		drawCall.manager = this;
 		//Debug.Log("Added DC " + mat.name + " as " + UIDrawCall.list.size);
 		UIDrawCall.list.Add(drawCall);
 		return drawCall;
@@ -439,7 +439,7 @@ public class UIPanel : MonoBehaviour
 		for (int i = UIDrawCall.list.size; i > 0; )
 		{
 			UIDrawCall dc = UIDrawCall.list.buffer[--i];
-			if (dc != null && dc.panel == this)
+			if (dc != null && dc.manager == this)
 				DestroyDrawCall(dc, i);
 		}
 		list.Remove(this);
@@ -513,7 +513,7 @@ public class UIPanel : MonoBehaviour
 				continue;
 			}
 
-			if (dc.panel == this)
+			if (dc.manager == this)
 			{
 				dc.clipping = mClipping;
 				dc.clipRange = range;
@@ -614,7 +614,7 @@ public class UIPanel : MonoBehaviour
 			for (int i = 0, imax = UIDrawCall.list.size; i < imax; ++i)
 			{
 				UIDrawCall dc = UIDrawCall.list[i];
-				if (dc != null && dc.panel == this)
+				if (dc != null && dc.manager == this)
 					dc.gameObject.layer = mLayer;
 			}
 		}
@@ -642,15 +642,52 @@ public class UIPanel : MonoBehaviour
 			if (w.enabled && w.panel == this && w.UpdateGeometry(this, forceVisible))
 			{
 				changed = true;
-				if (mFullRebuild) continue;
-				UIDrawCall dc = w.drawCall;
-				if (dc != null) dc.isDirty = true;
-				else mFullRebuild = true;
+				
+				if (!mFullRebuild)
+				{
+					if (w.drawCall != null)
+					{
+						w.drawCall.isDirty = true;
+					}
+					else
+					{
+						// Find an existing draw call, if possible
+						w.drawCall = GetExistingDrawCall(w.material, w.raycastDepth);
+							
+						if (w.drawCall != null)
+						{
+							w.drawCall.isDirty = true;
+						}
+						else
+						{
+							mFullRebuild = true;
+							Debug.LogWarning("Full rebuild!");
+						}
+					}
+				}
 			}
 		}
 
 		// Inform the changed event listeners
 		if (changed && onChange != null) onChange();
+	}
+
+	/// <summary>
+	/// Find a draw call if it already exists.
+	/// </summary>
+
+	UIDrawCall GetExistingDrawCall (Material mat, int depth)
+	{
+		for (int i = 0; i < UIDrawCall.list.size; ++i )
+		{
+			UIDrawCall dc = UIDrawCall.list.buffer[i];
+
+			if (dc.depthStart <= depth && dc.depthEnd >= depth && dc.baseMaterial == mat)
+			{
+				return dc;
+			}
+		}
+		return null;
 	}
 
 	/// <summary>
@@ -818,8 +855,22 @@ public class UIPanel : MonoBehaviour
 
 				if (pan != null && mat != null)
 				{
-					if (dc == null) dc = pan.GetDrawCall(index++, mat);
+					if (dc == null)
+					{
+						dc = pan.GetDrawCall(index++, mat);
+						dc.depthStart = w.raycastDepth;
+						dc.depthEnd = dc.depthStart;
+						dc.panel = pan;
+					}
+					else
+					{
+						int rd = w.raycastDepth;
+						if (rd < dc.depthStart) dc.depthStart = rd;
+						if (rd > dc.depthEnd) dc.depthEnd = rd;
+					}
+
 					w.drawCall = dc;
+
 					if (pan.generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
 					else w.WriteToBuffers(mVerts, mUvs, mCols, null, null);
 				}
@@ -870,7 +921,7 @@ public class UIPanel : MonoBehaviour
 				{
 					if (w.isVisible && w.hasVertices)
 					{
-						if (dc.panel.generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
+						if (dc.manager.generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
 						else w.WriteToBuffers(mVerts, mUvs, mCols, null, null);
 					}
 					else w.drawCall = null;
@@ -880,7 +931,7 @@ public class UIPanel : MonoBehaviour
 
 			if (mVerts.size != 0)
 			{
-				dc.Set(mVerts, dc.panel.generateNormals ? mNorms : null, dc.panel.generateNormals ? mTans : null, mUvs, mCols);
+				dc.Set(mVerts, dc.manager.generateNormals ? mNorms : null, dc.manager.generateNormals ? mTans : null, mUvs, mCols);
 				mVerts.Clear();
 				mNorms.Clear();
 				mTans.Clear();

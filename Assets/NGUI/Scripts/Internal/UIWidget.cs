@@ -65,7 +65,9 @@ public class UIWidget : MonoBehaviour
 	/// Internal usage -- draw call that's drawing the widget.
 	/// </summary>
 
-	public UIDrawCall drawCall { get; set; }
+	[HideInInspector]
+	[System.NonSerialized]
+	public UIDrawCall drawCall;
 
 	// Widget's generated geometry
 	UIGeometry mGeom = new UIGeometry();
@@ -508,9 +510,9 @@ public class UIWidget : MonoBehaviour
 	{
 		if (mPanel != null)
 		{
+			SetDirty();
 			drawCall = null;
 			mPanel = null;
-			SetDirty();
 		}
 	}
 

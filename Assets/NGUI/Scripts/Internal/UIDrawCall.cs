@@ -27,6 +27,22 @@ public class UIDrawCall : MonoBehaviour
 		SoftClip = 3,	// Alpha-based clipping with a softened edge
 	}
 
+	[HideInInspector]
+	[System.NonSerialized]
+	public int depthStart = int.MaxValue;
+
+	[HideInInspector]
+	[System.NonSerialized]
+	public int depthEnd = int.MinValue;
+
+	[HideInInspector]
+	[System.NonSerialized]
+	public UIPanel manager;
+
+	[HideInInspector]
+	[System.NonSerialized]
+	public UIPanel panel;
+
 	Transform		mTrans;			// Cached transform
 	Material		mSharedMat;		// Material used by this screen
 	Mesh			mMesh0;			// First generated mesh
@@ -43,12 +59,6 @@ public class UIDrawCall : MonoBehaviour
 	bool mReset = true;
 	bool mEven = true;
 	int mRenderQueue = 0;
-
-	/// <summary>
-	/// Panel managing this draw call.
-	/// </summary>
-
-	public UIPanel panel { get; set; }
 
 	/// <summary>
 	/// Whether the draw call needs to be re-created.
@@ -402,6 +412,17 @@ public class UIDrawCall : MonoBehaviour
 			if (mClipSoft.y > 0f) sharpness.y = mClipRange.w / mClipSoft.y;
 			mMat.SetVector("_ClipSharpness", sharpness);
 		}
+	}
+
+	/// <summary>
+	/// Clear all references.
+	/// </summary>
+
+	void OnDisable ()
+	{
+		depthStart = int.MaxValue;
+		depthEnd = int.MinValue;
+		panel = null;
 	}
 
 	/// <summary>

@@ -222,7 +222,7 @@ public class UIPanelInspector : Editor
 		{
 			UIDrawCall dc = UIDrawCall.list[i];
 
-			if (dc.panel != panel)
+			if (dc.manager != panel)
 			{
 				if (!NGUISettings.showAllDCs) continue;
 				if (dc.showDetails) GUI.color = new Color(0.85f, 0.85f, 0.85f);
@@ -233,11 +233,11 @@ public class UIPanelInspector : Editor
 			string key = dc.keyName;
 			string name = key + " of " + UIDrawCall.list.size;
 			if (!dc.isActive) name = name + " (HIDDEN)";
-			else if (dc.panel != panel) name = name + " (" + dc.panel.name + ")";
+			else if (dc.manager != panel) name = name + " (" + dc.manager.name + ")";
 
 			if (NGUIEditorTools.DrawHeader(name, key))
 			{
-				GUI.color = (dc.panel == panel) ? Color.white : new Color(0.8f, 0.8f, 0.8f);
+				GUI.color = (dc.manager == panel) ? Color.white : new Color(0.8f, 0.8f, 0.8f);
 
 				NGUIEditorTools.BeginContents();
 				EditorGUILayout.ObjectField("Material", dc.baseMaterial, typeof(Material), false);
@@ -251,7 +251,7 @@ public class UIPanelInspector : Editor
 						++count;
 				}
 
-				string myPath = NGUITools.GetHierarchy(dc.panel.cachedGameObject);
+				string myPath = NGUITools.GetHierarchy(dc.manager.cachedGameObject);
 				string remove = myPath + "\\";
 				string[] list = new string[count + 1];
 				list[0] = count.ToString();
@@ -298,23 +298,23 @@ public class UIPanelInspector : Editor
 				if (dc.isActive != draw)
 				{
 					dc.isActive = draw;
-					UnityEditor.EditorUtility.SetDirty(dc.panel);
+					UnityEditor.EditorUtility.SetDirty(dc.manager);
 				}
 
 				GUILayout.BeginHorizontal();
 				EditorGUILayout.LabelField("Triangles", dc.triangles.ToString(), GUILayout.Width(120f));
 
-				if (dc.panel != panel)
+				if (dc.manager != panel)
 				{
 					if (GUILayout.Button("Select the Panel"))
 					{
-						Selection.activeGameObject = dc.panel.gameObject;
+						Selection.activeGameObject = dc.manager.gameObject;
 					}
 					GUILayout.Space(18f);
 				}
 				GUILayout.EndHorizontal();
 
-				if (dc.panel.clipping != UIDrawCall.Clipping.None && !dc.isClipped)
+				if (dc.manager.clipping != UIDrawCall.Clipping.None && !dc.isClipped)
 				{
 					EditorGUILayout.HelpBox("You must switch this material's shader to Unlit/Transparent Colored or Unlit/Premultiplied Colored in order for clipping to work.",
 						MessageType.Warning);
