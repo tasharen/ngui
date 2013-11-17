@@ -804,11 +804,6 @@ public class UICamera : MonoBehaviour
 
 	void Awake ()
 	{
-#if !UNITY_3_5 && !UNITY_4_0
-		// We don't want the camera to send out any kind of mouse events
-		cachedCamera.eventMask = 0;
-#endif
-
 		if (Application.platform == RuntimePlatform.Android ||
 			Application.platform == RuntimePlatform.IPhonePlayer
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1
@@ -859,6 +854,18 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	void OnDisable () { list.Remove(this); }
+
+#if !UNITY_3_5 && !UNITY_4_0
+	/// <summary>
+	/// We don't want the camera to send out any kind of mouse events.
+	/// </summary>
+	
+	void Start ()
+	{
+		cachedCamera.eventMask = 0;
+		cachedCamera.transparencySortMode = TransparencySortMode.Orthographic;
+	}
+#endif
 
 	/// <summary>
 	/// Update the object under the mouse if we're not using touch-based input.
