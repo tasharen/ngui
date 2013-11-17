@@ -282,17 +282,52 @@ public class BetterList<T>
 
 	public T[] ToArray () { Trim(); return buffer; }
 
-	class Comparer : System.Collections.IComparer
-	{
-		System.Comparison<T> mCompare;
-		public Comparer (System.Comparison<T> comparer) { mCompare = comparer; }
-		public int Compare (object x, object y) { return mCompare((T)x, (T)y); }
-	}
+	//class Comparer : System.Collections.IComparer
+	//{
+	//    public System.Comparison<T> func;
+	//    public int Compare (object x, object y) { return func((T)x, (T)y); }
+	//}
+
+	//Comparer mComp = new Comparer();
 
 	/// <summary>
-	/// List.Sort equivalent.
+	/// List.Sort equivalent. Doing Array.Sort causes GC allocations.
 	/// </summary>
 
-	public void Sort (System.Comparison<T> comparer) { if (size > 0) System.Array.Sort(buffer, 0, size, new Comparer(comparer)); }
+	//public void Sort (System.Comparison<T> comparer)
+	//{
+	//    if (size > 0)
+	//    {
+	//        mComp.func = comparer;
+	//        System.Array.Sort(buffer, 0, size, mComp);
+	//    }
+	//}
+
+	/// <summary>
+	/// List.Sort equivalent. Manual sorting causes no GC allocations.
+	/// </summary>
+
+	[DebuggerHidden]
+	[DebuggerStepThrough]
+	public void Sort (System.Comparison<T> comparer)
+	{
+		bool changed = true;
+
+		while (changed)
+		{
+			changed = false;
+
+			for (int i = 1; i < size; ++i)
+			{
+				if (comparer.Invoke(buffer[i - 1], buffer[i]) > 0)
+				{
+					T temp = buffer[i];
+					buffer[i] = buffer[i - 1];
+					buffer[i - 1] = temp;
+					changed = true;
+				}
+			}
+		}
+	}
 #endif
 }

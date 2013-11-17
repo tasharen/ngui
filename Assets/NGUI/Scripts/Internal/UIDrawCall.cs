@@ -342,37 +342,20 @@ public class UIDrawCall : MonoBehaviour
 
 			if (verts.size < 65000)
 			{
-				int indexCount = (count >> 1) * 3;
-				bool rebuildIndices = (mIndices == null || mIndices.Length != indexCount);
-
 				// Populate the index buffer
-				if (rebuildIndices)
-				{
-					// It takes 6 indices to draw a quad of 4 vertices
-					mIndices = new int[indexCount];
-					int index = 0;
-
-					for (int i = 0; i < count; i += 4)
-					{
-						mIndices[index++] = i;
-						mIndices[index++] = i + 1;
-						mIndices[index++] = i + 2;
-
-						mIndices[index++] = i + 2;
-						mIndices[index++] = i + 3;
-						mIndices[index++] = i;
-					}
-				}
+				int indexCount = (count >> 1) * 3;
+				bool setIndices = (mIndices == null || mIndices.Length != indexCount);
+				if (setIndices) mIndices = GenerateCachedIndexBuffer(count, indexCount);
 
 				// Set the mesh values
-				Mesh mesh = GetMesh(ref rebuildIndices, verts.size);
-				mesh.vertices = verts.ToArray();
-				if (norms != null) mesh.normals = norms.ToArray();
-				if (tans != null) mesh.tangents = tans.ToArray();
-				mesh.uv = uvs.ToArray();
-				mesh.colors32 = cols.ToArray();
-				if (rebuildIndices) mesh.triangles = mIndices;
-				mesh.RecalculateBounds();
+				Mesh mesh = GetMesh(ref setIndices, verts.size);
+				mesh.vertices = verts.buffer;
+				if (norms != null) mesh.normals = norms.buffer;
+				if (tans != null) mesh.tangents = tans.buffer;
+				mesh.uv = uvs.buffer;
+				mesh.colors32 = cols.buffer;
+				if (setIndices) mesh.triangles = mIndices;
+				//mesh.RecalculateBounds();
 				mFilter.mesh = mesh;
 			}
 			else
@@ -386,6 +369,41 @@ public class UIDrawCall : MonoBehaviour
 			if (mFilter.mesh != null) mFilter.mesh.Clear();
 			Debug.LogError("UIWidgets must fill the buffer with 4 vertices per quad. Found " + count);
 		}
+	}
+
+	const int maxIndexBufferCache = 10;
+	static List<int[]> mCache = new List<int[]>(maxIndexBufferCache);
+
+	/// <summary>
+	/// Generates a new index buffer for the specified number of vertices (or reuses an existing one).
+	/// </summary>
+
+	int[] GenerateCachedIndexBuffer (int vertexCount, int indexCount)
+	{
+		for (int i = 0, imax = mCache.Count; i < imax; ++i)
+		{
+			int[] ids = mCache[i];
+			if (ids != null && ids.Length == indexCount)
+				return ids;
+		}
+
+		int[] rv = new int[indexCount];
+		int index = 0;
+
+		for (int i = 0; i < vertexCount; i += 4)
+		{
+			rv[index++] = i;
+			rv[index++] = i + 1;
+			rv[index++] = i + 2;
+
+			rv[index++] = i + 2;
+			rv[index++] = i + 3;
+			rv[index++] = i;
+		}
+
+		if (mCache.Count > maxIndexBufferCache) mCache.RemoveAt(0);
+		mCache.Add(rv);
+		return rv;
 	}
 
 	/// <summary>

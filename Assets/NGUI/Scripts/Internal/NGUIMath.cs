@@ -390,7 +390,7 @@ static public class NGUIMath
 
 	static public Bounds CalculateRelativeWidgetBounds (Transform root, Transform child, bool considerInactive)
 	{
-		UIWidget[] widgets = child.GetComponentsInChildren<UIWidget>(considerInactive) as UIWidget[];
+		UIWidget[] widgets = child.GetComponentsInChildren<UIWidget>(considerInactive);
 
 		if (widgets.Length > 0)
 		{
