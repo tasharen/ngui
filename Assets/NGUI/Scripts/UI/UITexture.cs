@@ -148,8 +148,6 @@ public class UITexture : UIWidget
 		}
 		set
 		{
-			RemoveFromPanel();
-
 			Material mat = material;
 
 			if (mat != null)
@@ -158,9 +156,6 @@ public class UITexture : UIWidget
 				mTexture = value;
 				mat.mainTexture = value;
 				MarkAsChangedLite();
-
-				if (enabled) CreatePanel();
-				if (mPanel != null) mPanel.Refresh();
 			}
 		}
 	}

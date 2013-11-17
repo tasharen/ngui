@@ -339,6 +339,10 @@ public class UIScrollBar : UIWidgetContainer
 
 	void Update() { if (mIsDirty) ForceUpdate(); }
 
+	// Reducing memory allocation in the ForceUpdate() function below
+	static Vector2 mTemp1 = new Vector2();
+	static Vector2 mTemp2 = new Vector2();
+
 	/// <summary>
 	/// Update the value of the scroll bar.
 	/// </summary>
@@ -356,7 +360,7 @@ public class UIScrollBar : UIWidgetContainer
 			Vector4 fg = mFG.border;
 
 			// Space available for the background
-			Vector2 bgs = new Vector2(
+			mTemp1 = new Vector2(
 				Mathf.Max(0f, mBG.width - bg.x - bg.z),
 				Mathf.Max(0f, mBG.height - bg.y - bg.w));
 
@@ -364,26 +368,24 @@ public class UIScrollBar : UIWidgetContainer
 
 			if (mDir == Direction.Horizontal)
 			{
-				Vector2 fgs = new Vector2(bgs.x * mSize, bgs.y);
-
+				mTemp2 = new Vector2(mTemp1.x * mSize, mTemp1.y);
 				mFG.pivot = UIWidget.Pivot.Left;
 				mBG.pivot = UIWidget.Pivot.Left;
 				mBG.cachedTransform.localPosition = Vector3.zero;
-				mFG.cachedTransform.localPosition = new Vector3(Mathf.RoundToInt(bg.x - fg.x + (bgs.x - fgs.x) * val), 0f, 0f);
-				mFG.width = Mathf.RoundToInt(fgs.x + fg.x + fg.z);
-				mFG.height = Mathf.RoundToInt(fgs.y + fg.y + fg.w);
+				mFG.cachedTransform.localPosition = new Vector3(Mathf.RoundToInt(bg.x - fg.x + (mTemp1.x - mTemp2.x) * val), 0f, 0f);
+				mFG.width = Mathf.RoundToInt(mTemp2.x + fg.x + fg.z);
+				mFG.height = Mathf.RoundToInt(mTemp2.y + fg.y + fg.w);
 				if (mFG.collider != null) NGUITools.AddWidgetCollider(mFG.gameObject);
 			}
 			else
 			{
-				Vector2 fgs = new Vector2(bgs.x, bgs.y * mSize);
-
+				mTemp2 = new Vector2(mTemp1.x, mTemp1.y * mSize);
 				mFG.pivot = UIWidget.Pivot.Top;
 				mBG.pivot = UIWidget.Pivot.Top;
 				mBG.cachedTransform.localPosition = Vector3.zero;
-				mFG.cachedTransform.localPosition = new Vector3(0f, Mathf.RoundToInt(-bg.y + fg.y - (bgs.y - fgs.y) * val), 0f);
-				mFG.width = Mathf.RoundToInt(fgs.x + fg.x + fg.z);
-				mFG.height = Mathf.RoundToInt(fgs.y + fg.y + fg.w);
+				mFG.cachedTransform.localPosition = new Vector3(0f, Mathf.RoundToInt(-bg.y + fg.y - (mTemp1.y - mTemp2.y) * val), 0f);
+				mFG.width = Mathf.RoundToInt(mTemp2.x + fg.x + fg.z);
+				mFG.height = Mathf.RoundToInt(mTemp2.y + fg.y + fg.w);
 				if (mFG.collider != null) NGUITools.AddWidgetCollider(mFG.gameObject);
 			}
 		}

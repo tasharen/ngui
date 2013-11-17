@@ -435,6 +435,10 @@ public class UISprite : UIWidget
 
 #region Various fill functions
 
+	// Static variables to reduce garbage collection
+	static Vector2[] mTemp1 = new Vector2[4];
+	static Vector2[] mTemp2 = new Vector2[4];
+
 	/// <summary>
 	/// Sprite's dimensions used for drawing. X = left, Y = bottom, Z = right, W = top.
 	/// This function automatically adds 1 pixel on the edge if the sprite's dimensions are not even.
@@ -532,28 +536,28 @@ public class UISprite : UIWidget
 		float fw = 1f / mWidth;
 		float fh = 1f / mHeight;
 
-		Vector2[] v = new Vector2[4];
-		v[0] = new Vector2(mSprite.paddingLeft * fw, mSprite.paddingBottom * fh);
-		v[3] = new Vector2(1f - mSprite.paddingRight * fw, 1f - mSprite.paddingTop * fh);
+		mTemp1[0].x = mSprite.paddingLeft * fw;
+		mTemp1[0].y = mSprite.paddingBottom * fh;
+		mTemp1[3].x = 1f - mSprite.paddingRight * fw;
+		mTemp1[3].y = 1f - mSprite.paddingTop * fh;
 
-		v[1].x = v[0].x + fw * br.x;
-		v[1].y = v[0].y + fh * br.y;
-		v[2].x = v[3].x - fw * br.z;
-		v[2].y = v[3].y - fh * br.w;
+		mTemp1[1].x = mTemp1[0].x + fw * br.x;
+		mTemp1[1].y = mTemp1[0].y + fh * br.y;
+		mTemp1[2].x = mTemp1[3].x - fw * br.z;
+		mTemp1[2].y = mTemp1[3].y - fh * br.w;
 
 		for (int i = 0; i < 4; ++i)
 		{
-			v[i].x -= po.x;
-			v[i].y -= po.y;
-			v[i].x *= mWidth;
-			v[i].y *= mHeight;
+			mTemp1[i].x -= po.x;
+			mTemp1[i].y -= po.y;
+			mTemp1[i].x *= mWidth;
+			mTemp1[i].y *= mHeight;
 		}
 
-		Vector2[] u = new Vector2[4];
-		u[0] = new Vector2(mOuterUV.xMin, mOuterUV.yMin);
-		u[1] = new Vector2(mInnerUV.xMin, mInnerUV.yMin);
-		u[2] = new Vector2(mInnerUV.xMax, mInnerUV.yMax);
-		u[3] = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
+		mTemp2[0] = new Vector2(mOuterUV.xMin, mOuterUV.yMin);
+		mTemp2[1] = new Vector2(mInnerUV.xMin, mInnerUV.yMin);
+		mTemp2[2] = new Vector2(mInnerUV.xMax, mInnerUV.yMax);
+		mTemp2[3] = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
 
 		Color colF = color;
 		colF.a *= mPanel.alpha;
@@ -569,15 +573,15 @@ public class UISprite : UIWidget
 
 				int y2 = y + 1;
 
-				verts.Add(new Vector3(v[x].x, v[y].y));
-				verts.Add(new Vector3(v[x].x, v[y2].y));
-				verts.Add(new Vector3(v[x2].x, v[y2].y));
-				verts.Add(new Vector3(v[x2].x, v[y].y));
+				verts.Add(new Vector3(mTemp1[x].x, mTemp1[y].y));
+				verts.Add(new Vector3(mTemp1[x].x, mTemp1[y2].y));
+				verts.Add(new Vector3(mTemp1[x2].x, mTemp1[y2].y));
+				verts.Add(new Vector3(mTemp1[x2].x, mTemp1[y].y));
 
-				uvs.Add(new Vector2(u[x].x, u[y].y));
-				uvs.Add(new Vector2(u[x].x, u[y2].y));
-				uvs.Add(new Vector2(u[x2].x, u[y2].y));
-				uvs.Add(new Vector2(u[x2].x, u[y].y));
+				uvs.Add(new Vector2(mTemp2[x].x, mTemp2[y].y));
+				uvs.Add(new Vector2(mTemp2[x].x, mTemp2[y2].y));
+				uvs.Add(new Vector2(mTemp2[x2].x, mTemp2[y2].y));
+				uvs.Add(new Vector2(mTemp2[x2].x, mTemp2[y].y));
 
 				cols.Add(col);
 				cols.Add(col);
@@ -678,10 +682,6 @@ public class UISprite : UIWidget
 		Color colF = color;
 		colF.a *= mPanel.alpha;
 		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
-
-		Vector2[] xy = new Vector2[4];
-		Vector2[] uv = new Vector2[4];
-
 		Vector4 v = drawingDimensions;
 
 		float tx0 = mOuterUV.xMin;
@@ -724,26 +724,26 @@ public class UISprite : UIWidget
 			}
 		}
 
-		xy[0] = new Vector2(v.x, v.y);
-		xy[1] = new Vector2(v.x, v.w);
-		xy[2] = new Vector2(v.z, v.w);
-		xy[3] = new Vector2(v.z, v.y);
+		mTemp1[0] = new Vector2(v.x, v.y);
+		mTemp1[1] = new Vector2(v.x, v.w);
+		mTemp1[2] = new Vector2(v.z, v.w);
+		mTemp1[3] = new Vector2(v.z, v.y);
 
-		uv[0] = new Vector2(tx0, ty0);
-		uv[1] = new Vector2(tx0, ty1);
-		uv[2] = new Vector2(tx1, ty1);
-		uv[3] = new Vector2(tx1, ty0);
+		mTemp2[0] = new Vector2(tx0, ty0);
+		mTemp2[1] = new Vector2(tx0, ty1);
+		mTemp2[2] = new Vector2(tx1, ty1);
+		mTemp2[3] = new Vector2(tx1, ty0);
 
 		if (mFillAmount < 1f)
 		{
 			if (mFillDirection == FillDirection.Radial90)
 			{
-				if (RadialCut(xy, uv, mFillAmount, mInvert, 0))
+				if (RadialCut(mTemp1, mTemp2, mFillAmount, mInvert, 0))
 				{
 					for (int i = 0; i < 4; ++i)
 					{
-						verts.Add(xy[i]);
-						uvs.Add(uv[i]);
+						verts.Add(mTemp1[i]);
+						uvs.Add(mTemp2[i]);
 						cols.Add(col);
 					}
 				}
@@ -762,34 +762,34 @@ public class UISprite : UIWidget
 					if (side == 0) { fx0 = 0f; fx1 = 0.5f; }
 					else { fx0 = 0.5f; fx1 = 1f; }
 
-					xy[0].x = Mathf.Lerp(v.x, v.z, fx0);
-					xy[1].x = xy[0].x;
-					xy[2].x = Mathf.Lerp(v.x, v.z, fx1);
-					xy[3].x = xy[2].x;
+					mTemp1[0].x = Mathf.Lerp(v.x, v.z, fx0);
+					mTemp1[1].x = mTemp1[0].x;
+					mTemp1[2].x = Mathf.Lerp(v.x, v.z, fx1);
+					mTemp1[3].x = mTemp1[2].x;
 
-					xy[0].y = Mathf.Lerp(v.y, v.w, fy0);
-					xy[1].y = Mathf.Lerp(v.y, v.w, fy1);
-					xy[2].y = xy[1].y;
-					xy[3].y = xy[0].y;
+					mTemp1[0].y = Mathf.Lerp(v.y, v.w, fy0);
+					mTemp1[1].y = Mathf.Lerp(v.y, v.w, fy1);
+					mTemp1[2].y = mTemp1[1].y;
+					mTemp1[3].y = mTemp1[0].y;
 
-					uv[0].x = Mathf.Lerp(tx0, tx1, fx0);
-					uv[1].x = uv[0].x;
-					uv[2].x = Mathf.Lerp(tx0, tx1, fx1);
-					uv[3].x = uv[2].x;
+					mTemp2[0].x = Mathf.Lerp(tx0, tx1, fx0);
+					mTemp2[1].x = mTemp2[0].x;
+					mTemp2[2].x = Mathf.Lerp(tx0, tx1, fx1);
+					mTemp2[3].x = mTemp2[2].x;
 
-					uv[0].y = Mathf.Lerp(ty0, ty1, fy0);
-					uv[1].y = Mathf.Lerp(ty0, ty1, fy1);
-					uv[2].y = uv[1].y;
-					uv[3].y = uv[0].y;
+					mTemp2[0].y = Mathf.Lerp(ty0, ty1, fy0);
+					mTemp2[1].y = Mathf.Lerp(ty0, ty1, fy1);
+					mTemp2[2].y = mTemp2[1].y;
+					mTemp2[3].y = mTemp2[0].y;
 
 					float val = !mInvert ? fillAmount * 2f - side : mFillAmount * 2f - (1 - side);
 
-					if (RadialCut(xy, uv, Mathf.Clamp01(val), !mInvert, NGUIMath.RepeatIndex(side + 3, 4)))
+					if (RadialCut(mTemp1, mTemp2, Mathf.Clamp01(val), !mInvert, NGUIMath.RepeatIndex(side + 3, 4)))
 					{
 						for (int i = 0; i < 4; ++i)
 						{
-							verts.Add(xy[i]);
-							uvs.Add(uv[i]);
+							verts.Add(mTemp1[i]);
+							uvs.Add(mTemp2[i]);
 							cols.Add(col);
 						}
 					}
@@ -809,36 +809,36 @@ public class UISprite : UIWidget
 					if (corner == 0 || corner == 3) { fy0 = 0f; fy1 = 0.5f; }
 					else { fy0 = 0.5f; fy1 = 1f; }
 
-					xy[0].x = Mathf.Lerp(v.x, v.z, fx0);
-					xy[1].x = xy[0].x;
-					xy[2].x = Mathf.Lerp(v.x, v.z, fx1);
-					xy[3].x = xy[2].x;
+					mTemp1[0].x = Mathf.Lerp(v.x, v.z, fx0);
+					mTemp1[1].x = mTemp1[0].x;
+					mTemp1[2].x = Mathf.Lerp(v.x, v.z, fx1);
+					mTemp1[3].x = mTemp1[2].x;
 
-					xy[0].y = Mathf.Lerp(v.y, v.w, fy0);
-					xy[1].y = Mathf.Lerp(v.y, v.w, fy1);
-					xy[2].y = xy[1].y;
-					xy[3].y = xy[0].y;
+					mTemp1[0].y = Mathf.Lerp(v.y, v.w, fy0);
+					mTemp1[1].y = Mathf.Lerp(v.y, v.w, fy1);
+					mTemp1[2].y = mTemp1[1].y;
+					mTemp1[3].y = mTemp1[0].y;
 
-					uv[0].x = Mathf.Lerp(tx0, tx1, fx0);
-					uv[1].x = uv[0].x;
-					uv[2].x = Mathf.Lerp(tx0, tx1, fx1);
-					uv[3].x = uv[2].x;
+					mTemp2[0].x = Mathf.Lerp(tx0, tx1, fx0);
+					mTemp2[1].x = mTemp2[0].x;
+					mTemp2[2].x = Mathf.Lerp(tx0, tx1, fx1);
+					mTemp2[3].x = mTemp2[2].x;
 
-					uv[0].y = Mathf.Lerp(ty0, ty1, fy0);
-					uv[1].y = Mathf.Lerp(ty0, ty1, fy1);
-					uv[2].y = uv[1].y;
-					uv[3].y = uv[0].y;
+					mTemp2[0].y = Mathf.Lerp(ty0, ty1, fy0);
+					mTemp2[1].y = Mathf.Lerp(ty0, ty1, fy1);
+					mTemp2[2].y = mTemp2[1].y;
+					mTemp2[3].y = mTemp2[0].y;
 
 					float val = mInvert ?
 						mFillAmount * 4f - NGUIMath.RepeatIndex(corner + 2, 4) :
 						mFillAmount * 4f - (3 - NGUIMath.RepeatIndex(corner + 2, 4));
 
-					if (RadialCut(xy, uv, Mathf.Clamp01(val), mInvert, NGUIMath.RepeatIndex(corner + 2, 4)))
+					if (RadialCut(mTemp1, mTemp2, Mathf.Clamp01(val), mInvert, NGUIMath.RepeatIndex(corner + 2, 4)))
 					{
 						for (int i = 0; i < 4; ++i)
 						{
-							verts.Add(xy[i]);
-							uvs.Add(uv[i]);
+							verts.Add(mTemp1[i]);
+							uvs.Add(mTemp2[i]);
 							cols.Add(col);
 						}
 					}
@@ -850,8 +850,8 @@ public class UISprite : UIWidget
 		// Fill the buffer with the quad for the sprite
 		for (int i = 0; i < 4; ++i)
 		{
-			verts.Add(xy[i]);
-			uvs.Add(uv[i]);
+			verts.Add(mTemp1[i]);
+			uvs.Add(mTemp2[i]);
 			cols.Add(col);
 		}
 	}
