@@ -104,26 +104,7 @@ static public class NGUIMenu
 #if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 			Undo.RegisterSceneUndo("Add a Sprite");
 #endif
-			UISprite sprite = NGUITools.AddWidget<UISprite>(go);
-			sprite.name = "Sprite";
-			sprite.atlas = NGUISettings.atlas;
-
-			if (sprite.atlas != null)
-			{
-				string sn = EditorPrefs.GetString("NGUI Sprite", "");
-				UISpriteData sp = sprite.atlas.GetSprite(sn);
-
-				if (sp != null)
-				{
-					sprite.spriteName = sn;
-					if (sp.hasBorder) sprite.type = UISprite.Type.Sliced;
-				}
-			}
-			sprite.pivot = NGUISettings.pivot;
-			sprite.width = 100;
-			sprite.height = 100;
-			sprite.MakePixelPerfect();
-			Selection.activeGameObject = sprite.gameObject;
+			Selection.activeGameObject = NGUISettings.AddSprite(go).gameObject;
 		}
 		else
 		{
@@ -141,15 +122,7 @@ static public class NGUIMenu
 #if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 			Undo.RegisterSceneUndo("Add a Label");
 #endif
-			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
-			lbl.name = "Label";
-			lbl.bitmapFont = NGUISettings.bitmapFont;
-			lbl.text = "New Label";
-			lbl.pivot = NGUISettings.pivot;
-			lbl.width = 120;
-			lbl.height = 30;
-			lbl.MakePixelPerfect();
-			Selection.activeGameObject = lbl.gameObject;
+			Selection.activeGameObject = NGUISettings.AddLabel(go).gameObject;
 		}
 		else
 		{
@@ -167,12 +140,7 @@ static public class NGUIMenu
 #if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 			Undo.RegisterSceneUndo("Add a Texture");
 #endif
-			UITexture tex = NGUITools.AddWidget<UITexture>(go);
-			tex.name = "Texture";
-			tex.pivot = NGUISettings.pivot;
-			tex.width = 100;
-			tex.height = 100;
-			Selection.activeGameObject = tex.gameObject;
+			Selection.activeGameObject = NGUISettings.AddTexture(go).gameObject;
 		}
 		else
 		{
@@ -190,12 +158,7 @@ static public class NGUIMenu
 #if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 			Undo.RegisterSceneUndo("Add a Widget");
 #endif
-			UIWidget w = NGUITools.AddWidget<UIWidget>(go);
-			w.name = "Widget";
-			w.pivot = NGUISettings.pivot;
-			w.width = 100;
-			w.height = 100;
-			Selection.activeGameObject = w.gameObject;
+			Selection.activeGameObject = NGUISettings.AddWidget(go).gameObject;
 		}
 		else
 		{

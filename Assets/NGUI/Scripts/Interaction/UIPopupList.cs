@@ -48,6 +48,35 @@ public class UIPopupList : UIWidgetContainer
 	public Font trueTypeFont;
 
 	/// <summary>
+	/// Font used by the popup list. Conveniently wraps both dynamic and bitmap fonts into one property.
+	/// </summary>
+
+	public Object ambigiousFont
+	{
+		get
+		{
+			if (trueTypeFont != null) return trueTypeFont;
+			if (bitmapFont != null) return bitmapFont;
+			return font;
+		}
+		set
+		{
+			if (value is Font)
+			{
+				trueTypeFont = value as Font;
+				bitmapFont = null;
+				font = null;
+			}
+			else if (value is UIFont)
+			{
+				bitmapFont = value as UIFont;
+				trueTypeFont = null;
+				font = null;
+			}
+		}
+	}
+
+	/// <summary>
 	/// Size of the font to use for the popup list's labels.
 	/// </summary>
 

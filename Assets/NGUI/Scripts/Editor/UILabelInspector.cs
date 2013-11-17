@@ -40,6 +40,7 @@ public class UILabelInspector : UIWidgetInspector
 		SerializedProperty sp = serializedObject.FindProperty("mFont");
 		sp.objectReferenceValue = obj;
 		serializedObject.ApplyModifiedProperties();
+		NGUISettings.ambigiousFont = obj;
 	}
 
 	void OnDynamicFont (Object obj)
@@ -48,6 +49,7 @@ public class UILabelInspector : UIWidgetInspector
 		SerializedProperty sp = serializedObject.FindProperty("mTrueTypeFont");
 		sp.objectReferenceValue = obj;
 		serializedObject.ApplyModifiedProperties();
+		NGUISettings.ambigiousFont = obj;
 	}
 
 	/// <summary>
@@ -84,12 +86,22 @@ public class UILabelInspector : UIWidgetInspector
 		if (mType == FontType.Bitmap)
 		{
 			fnt = NGUIEditorTools.DrawProperty("", serializedObject, "mFont", GUILayout.MinWidth(40f));
-			if (fnt.objectReferenceValue != null) isValid = true;
+			
+			if (fnt.objectReferenceValue != null)
+			{
+				NGUISettings.ambigiousFont = fnt.objectReferenceValue;
+				isValid = true;
+			}
 		}
 		else
 		{
 			ttf = NGUIEditorTools.DrawProperty("", serializedObject, "mTrueTypeFont", GUILayout.MinWidth(40f));
-			if (ttf.objectReferenceValue != null) isValid = true;
+
+			if (ttf.objectReferenceValue != null)
+			{
+				NGUISettings.ambigiousFont = ttf.objectReferenceValue;
+				isValid = true;
+			}
 		}
 
 		GUILayout.EndHorizontal();
@@ -101,8 +113,13 @@ public class UILabelInspector : UIWidgetInspector
 				GUILayout.BeginHorizontal();
 				{
 					EditorGUI.BeginDisabledGroup(ttf.hasMultipleDifferentValues);
-					NGUIEditorTools.DrawProperty("Font Size", serializedObject, "mFontSize", GUILayout.Width(142f));
-					NGUIEditorTools.DrawProperty("", serializedObject, "mFontStyle", GUILayout.MinWidth(40f));
+					
+					SerializedProperty prop = NGUIEditorTools.DrawProperty("Font Size", serializedObject, "mFontSize", GUILayout.Width(142f));
+					NGUISettings.fontSize = prop.intValue;
+					
+					prop = NGUIEditorTools.DrawProperty("", serializedObject, "mFontStyle", GUILayout.MinWidth(40f));
+					NGUISettings.fontStyle = (FontStyle)prop.intValue;
+					
 					GUILayout.Space(18f);
 					EditorGUI.EndDisabledGroup();
 				}
@@ -130,6 +147,7 @@ public class UILabelInspector : UIWidgetInspector
 #endif
 			GUI.skin.textField.wordWrap = ww;
 			SerializedProperty ov = NGUIEditorTools.DrawProperty("Overflow", serializedObject, "mOverflow");
+			NGUISettings.overflowStyle = (UILabel.Overflow)ov.intValue;
 
 			if (ov.intValue == (int)UILabel.Overflow.ShrinkContent && ttf != null && ttf.objectReferenceValue != null)
 				NGUIEditorTools.DrawProperty("Keep crisp", serializedObject, "keepCrispWhenShrunk");

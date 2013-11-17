@@ -101,7 +101,7 @@ public class ComponentSelector : ScriptableWizard
 	void OnGUI ()
 	{
 		NGUIEditorTools.SetLabelWidth(80f);
-		GUILayout.Label("Select a " + mType, "LODLevelNotifyText");
+		GUILayout.Label("Select a " + GetName(mType), "LODLevelNotifyText");
 		NGUIEditorTools.DrawSeparator();
 
 		if (mObjects.Length == 0)

@@ -1567,4 +1567,35 @@ public class NGUIEditorTools
 	/// </summary>
 
 	static void OnMenuSelect (object go) { Selection.activeGameObject = (GameObject)go; }
+
+	/// <summary>
+	/// Load the asset at the specified path.
+	/// </summary>
+
+	static public Object LoadAsset (string path)
+	{
+		if (string.IsNullOrEmpty(path)) return null;
+		return AssetDatabase.LoadMainAssetAtPath(path);
+	}
+
+	/// <summary>
+	/// Convenience function to load an asset of specified type, given the full path to it.
+	/// </summary>
+
+	static public T LoadAsset<T> (string path) where T: Object
+	{
+		Object obj = LoadAsset(path);
+		if (obj == null) return null;
+		if (obj.GetType() == typeof(T)) return obj as T;
+
+		if (typeof(T).IsSubclassOf(typeof(Component)))
+		{
+			if (obj.GetType() == typeof(GameObject))
+			{
+				GameObject go = obj as GameObject;
+				return go.GetComponent(typeof(T)) as T;
+			}
+		}
+		return null;
+	}
 }
