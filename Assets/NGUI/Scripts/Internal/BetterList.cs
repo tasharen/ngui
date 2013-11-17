@@ -307,29 +307,42 @@ public class BetterList<T>
 	/// List.Sort equivalent. Manual sorting causes no GC allocations.
 	/// </summary>
 
-	public delegate int CompareFunc (T left, T right);
-
 	[DebuggerHidden]
 	[DebuggerStepThrough]
 	public void Sort (CompareFunc comparer)
 	{
+		int start = 0;
+		int max = size - 1;
 		bool changed = true;
 
 		while (changed)
 		{
 			changed = false;
 
-			for (int i = 1; i < size; ++i)
+			for (int i = start; i < max; ++i)
 			{
-				if (comparer(buffer[i - 1], buffer[i]) > 0)
+				// Compare the two values
+				if (comparer(buffer[i], buffer[i + 1]) > 0)
 				{
+					// Swap the values
 					T temp = buffer[i];
-					buffer[i] = buffer[i - 1];
-					buffer[i - 1] = temp;
+					buffer[i] = buffer[i + 1];
+					buffer[i + 1] = temp;
 					changed = true;
+				}
+				else if (!changed)
+				{
+					// Nothing has changed -- we can start here next time
+					start = (i == 0) ? 0 : i - 1;
 				}
 			}
 		}
 	}
+
+	/// <summary>
+	/// Comparison function should return -1 if left is less than right, 1 if left is greater than right, and 0 if they match.
+	/// </summary>
+
+	public delegate int CompareFunc (T left, T right);
 #endif
 }
