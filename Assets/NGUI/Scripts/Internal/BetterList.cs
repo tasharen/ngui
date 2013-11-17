@@ -307,9 +307,11 @@ public class BetterList<T>
 	/// List.Sort equivalent. Manual sorting causes no GC allocations.
 	/// </summary>
 
+	public delegate int CompareFunc (T left, T right);
+
 	[DebuggerHidden]
 	[DebuggerStepThrough]
-	public void Sort (System.Comparison<T> comparer)
+	public void Sort (CompareFunc comparer)
 	{
 		bool changed = true;
 
@@ -319,7 +321,7 @@ public class BetterList<T>
 
 			for (int i = 1; i < size; ++i)
 			{
-				if (comparer.Invoke(buffer[i - 1], buffer[i]) > 0)
+				if (comparer(buffer[i - 1], buffer[i]) > 0)
 				{
 					T temp = buffer[i];
 					buffer[i] = buffer[i - 1];
