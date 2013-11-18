@@ -87,6 +87,15 @@ public class UICamera : MonoBehaviour
  
 	static public List<UICamera> list = new List<UICamera>();
 
+	public delegate void OnScreenResize ();
+
+	/// <summary>
+	/// Delegate triggered when the screen size changes for any reason.
+	/// Subscribe to it if you don't want to compare Screen.width and Screen.height each frame.
+	/// </summary>
+
+	static public OnScreenResize onScreenResize;
+
 	/// <summary>
 	/// Event type -- use "UI" for your user interfaces, and "World" for your game camera.
 	/// This setting changes how raycasts are handled. Raycasts have to be more complicated for UI cameras.
@@ -305,6 +314,10 @@ public class UICamera : MonoBehaviour
 
 	// List of currently active touches
 	static Dictionary<int, MouseOrTouch> mTouches = new Dictionary<int, MouseOrTouch>();
+
+	// Used to detect screen dimension changes
+	static int mWidth = 0;
+	static int mHeight = 0;
 
 	// Tooltip widget (mouse only)
 	GameObject mTooltip = null;
@@ -804,6 +817,9 @@ public class UICamera : MonoBehaviour
 
 	void Awake ()
 	{
+		mWidth = Screen.width;
+		mHeight = Screen.height;
+
 		if (Application.platform == RuntimePlatform.Android ||
 			Application.platform == RuntimePlatform.IPhonePlayer
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1
@@ -896,6 +912,17 @@ public class UICamera : MonoBehaviour
 		if (!Application.isPlaying || !handlesEvents) return;
 
 		current = this;
+
+		int w = Screen.width;
+		int h = Screen.height;
+
+		if (w != mWidth || h != mHeight)
+		{
+			mWidth = w;
+			mHeight = h;
+			if (onScreenResize != null)
+				onScreenResize();
+		}
 
 		if (useTouch)
 		{

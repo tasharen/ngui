@@ -84,7 +84,10 @@ public class UIAnchor : MonoBehaviour
 	{
 		mTrans = transform;
 		mAnim = animation;
+		UICamera.onScreenResize += Update;
 	}
+
+	void OnDestroy () { UICamera.onScreenResize -= Update; }
 
 	/// <summary>
 	/// Automatically find the camera responsible for drawing the widgets under this object.
@@ -126,7 +129,7 @@ public class UIAnchor : MonoBehaviour
 
 		UIWidget wc = (container == null) ? null : container.GetComponent<UIWidget>();
 		UIPanel pc = (container == null && wc == null) ? null : container.GetComponent<UIPanel>();
-		
+
 		if (wc != null)
 		{
 			Bounds b = wc.CalculateBounds(container.transform.parent);
@@ -234,6 +237,6 @@ public class UIAnchor : MonoBehaviour
 
 		// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
 		if (mTrans.position != v) mTrans.position = v;
-		if (runOnlyOnce && Application.isPlaying) Destroy(this);
+		if (runOnlyOnce && Application.isPlaying) enabled = false;
 	}
 }

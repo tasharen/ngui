@@ -80,7 +80,7 @@ public class UIStretch : MonoBehaviour
 	Animation mAnim;
 	Rect mRect;
 
-	void OnEnable ()
+	void Awake ()
 	{
 		mAnim = animation;
 		mRect = new Rect();
@@ -88,7 +88,11 @@ public class UIStretch : MonoBehaviour
 		mWidget = GetComponent<UIWidget>();
 		mSprite = GetComponent<UISprite>();
 		mPanel = GetComponent<UIPanel>();
+
+		UICamera.onScreenResize += Update;
 	}
+
+	void OnDestroy () { UICamera.onScreenResize -= Update; }
 
 	void Start ()
 	{
@@ -283,7 +287,7 @@ public class UIStretch : MonoBehaviour
 			if (mTrans.localScale != size)
 				mTrans.localScale = size;
 
-			if (runOnlyOnce && Application.isPlaying) Destroy(this);
+			if (runOnlyOnce && Application.isPlaying) enabled = false;
 		}
 	}
 }
