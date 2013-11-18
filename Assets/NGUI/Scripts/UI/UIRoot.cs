@@ -133,6 +133,10 @@ public class UIRoot : MonoBehaviour
 
 	void Update ()
 	{
+#if UNITY_EDITOR
+		if (!Application.isPlaying && gameObject.layer != 0)
+			UnityEditor.EditorPrefs.SetInt("NGUI Layer", gameObject.layer);
+#endif
 		if (mTrans != null)
 		{
 			float calcActiveHeight = activeHeight;

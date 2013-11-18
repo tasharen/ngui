@@ -224,7 +224,7 @@ public class NGUISettings
 			int layer = GetInt("NGUI Layer", -1);
 			if (layer == -1) layer = LayerMask.NameToLayer("UI");
 			if (layer == -1) layer = LayerMask.NameToLayer("2D UI");
-			return (layer == -1) ? 0 : layer;
+			return (layer == -1) ? 9 : layer;
 		}
 		set
 		{
@@ -379,7 +379,7 @@ public class NGUISettings
 		w.height = Mathf.Max(20, GetInt("NGUI Font Height", 16));
 		w.fontStyle = fontStyle;
 		w.fontSize = fontSize;
-		w.MakePixelPerfect();
+		w.AssumeNaturalSize();
 		return w;
 	}
 }

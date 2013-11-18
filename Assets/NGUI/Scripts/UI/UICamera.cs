@@ -864,7 +864,12 @@ public class UICamera : MonoBehaviour
 	{
 		cachedCamera.eventMask = 0;
 		cachedCamera.transparencySortMode = TransparencySortMode.Orthographic;
+		if (debug) NGUIDebug.debugRaycast = true;
 	}
+#endif
+
+#if UNITY_EDITOR
+	void OnValidate () { NGUIDebug.debugRaycast = debug; }
 #endif
 
 	/// <summary>
@@ -1323,14 +1328,4 @@ public class UICamera : MonoBehaviour
 		Notify(mTooltip, "OnTooltip", val);
 		if (!val) mTooltip = null;
 	}
-
-#if UNITY_EDITOR
-	void OnGUI ()
-	{
-		if (debug && hoveredObject != null && Application.isPlaying)
-		{
-			GUILayout.Label("Last Hit: " + NGUITools.GetHierarchy(hoveredObject).Replace("\"", ""));
-		}
-	}
-#endif
 }

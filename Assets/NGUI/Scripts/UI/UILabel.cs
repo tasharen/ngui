@@ -75,6 +75,7 @@ public class UILabel : UIWidget
 
 #if DYNAMIC_FONT
 	Font mActiveTTF = null;
+	UIRoot mRoot;
 #endif
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
@@ -418,14 +419,17 @@ public class UILabel : UIWidget
 
 	void ProcessAndRequest ()
 	{
-		if (ambigiousFont != null)
+		if (mAllowProcessing && ambigiousFont != null)
 		{
 			ProcessText();
 #if DYNAMIC_FONT
-			if (mActiveTTF != null) mActiveTTF.RequestCharactersInTexture(mText, usePrintedSize ? mPrintedSize : fontSize, mFontStyle);
+			if (mActiveTTF != null) NGUIText.RequestCharactersInTexture(mActiveTTF, mText);
 #endif
 		}
 	}
+
+	// Used to ensure that we don't process font more than once inside OnValidate function below
+	bool mAllowProcessing = true;
 
 	/// <summary>
 	/// Validate the properties.
@@ -433,13 +437,13 @@ public class UILabel : UIWidget
 
 	protected override void OnValidate ()
 	{
-		mFontSize = Mathf.Clamp(mFontSize, 0, 144);
-
 		UIFont fnt = mFont;
 		Font ttf = mTrueTypeFont;
 
 		mFont = null;
 		mTrueTypeFont = null;
+		mAllowProcessing = false;
+
 #if DYNAMIC_FONT
 		SetActiveFont(null);
 #endif
@@ -472,6 +476,7 @@ public class UILabel : UIWidget
 		}
 
 		hasChanged = true;
+		mAllowProcessing = true;
 		ProcessAndRequest();
 	}
 
@@ -792,6 +797,7 @@ public class UILabel : UIWidget
 			mFontStyle = mFont.dynamicFontStyle;
 			mFont = null;
 		}
+		mRoot = NGUITools.FindInParents<UIRoot>(gameObject);
 		SetActiveFont(mTrueTypeFont);
 	}
 
@@ -886,7 +892,7 @@ public class UILabel : UIWidget
 
 #if DYNAMIC_FONT
 		// Request the text within the font
-		if (trueTypeFont != null) trueTypeFont.RequestCharactersInTexture(mText, fontSize, fontStyle);
+		ProcessAndRequest();
 #endif
 	}
 
@@ -905,7 +911,7 @@ public class UILabel : UIWidget
 	/// </summary>
 
 	void ProcessText () { ProcessText(false); }
-
+	
 	/// <summary>
 	/// Process the raw text, called when something changes.
 	/// </summary>
@@ -917,18 +923,18 @@ public class UILabel : UIWidget
 		mChanged = true;
 		hasChanged = false;
 
-		UpdateNGUIText();
-
-		float invFS = 1f / fontSize;
+		int fs = fontSize;
+		float invFS = 1f / fs;
 		float ps = pixelSize;
 		float invSize = 1f / ps;
-
-		mPrintedSize = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : NGUIText.current.size);
-		
-		float lw = legacyMode ? (mMaxLineWidth != 0 ? mMaxLineWidth * invSize : 1000000) : width * invSize;
+		float lw = legacyMode ? (mMaxLineWidth  != 0 ? mMaxLineWidth  * invSize : 1000000) : width  * invSize;
 		float lh = legacyMode ? (mMaxLineHeight != 0 ? mMaxLineHeight * invSize : 1000000) : height * invSize;
 
-		NGUIText.current.size = fontSize;
+		mScale = 1f;
+		mPrintedSize = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : fs);
+
+		NGUIText.current.size = fs;
+		UpdateNGUIText();
 
 		if (mPrintedSize > 0)
 		{
@@ -938,10 +944,9 @@ public class UILabel : UIWidget
 
 				bool fits = true;
 
-				// TODO: Make fonts try to be crisp when printing with a fixed size UIRoot (account for pixelSizeAdjustment).
-				NGUIText.current.lineWidth = (mOverflow == Overflow.ResizeFreely) ? 100000 : Mathf.RoundToInt(lw / mScale);
+				NGUIText.current.lineWidth  = (mOverflow == Overflow.ResizeFreely) ? 1000000 : Mathf.RoundToInt(lw / mScale);
 				NGUIText.current.lineHeight = (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight) ?
-					100000 : Mathf.RoundToInt(lh / mScale);
+					1000000 : Mathf.RoundToInt(lh / mScale);
 
 				if (lw > 0f || lh > 0f)
 				{
@@ -1116,7 +1121,7 @@ public class UILabel : UIWidget
 		float fx = Mathf.Lerp(0f, -mWidth, po.x);
 		float fy = Mathf.Lerp(mHeight, 0f, po.y);
 
-		// Center vertically
+		// Align vertically
 		fy = Mathf.RoundToInt(fy + Mathf.Lerp(mCalculatedSize.y * scale - mHeight, 0f, po.y));
 
 		if (usePS || scale == 1f)
@@ -1213,7 +1218,7 @@ public class UILabel : UIWidget
 
 	public void UpdateNGUIText ()
 	{
-		NGUIText.current.size = mFontSize;
+		NGUIText.current.size = fontSize;
 		NGUIText.current.style = mFontStyle;
 		NGUIText.current.lineWidth = mWidth;
 		NGUIText.current.lineHeight = mHeight;
@@ -1225,6 +1230,7 @@ public class UILabel : UIWidget
 		NGUIText.current.symbolStyle = mSymbols;
 		NGUIText.current.spacingX = mSpacingX;
 		NGUIText.current.spacingY = mSpacingY;
+		NGUIText.current.pixelDensity = (usePrintedSize && mRoot != null) ? 1f / mRoot.pixelSizeAdjustment : 1f;
 
 		Pivot p = pivot;
 

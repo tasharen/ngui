@@ -203,13 +203,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 		if (ShouldCreate(go, NGUISettings.ambigiousFont != null))
 		{
-			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
-			lbl.ambigiousFont = NGUISettings.ambigiousFont;
-			lbl.fontSize = NGUISettings.fontSize;
-			lbl.text = "New Label";
-			lbl.color = mColor;
-			lbl.AssumeNaturalSize();
-			Selection.activeGameObject = lbl.gameObject;
+			Selection.activeGameObject = NGUISettings.AddLabel(go).gameObject;
 		}
 	}
 
