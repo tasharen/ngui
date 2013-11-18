@@ -319,14 +319,32 @@ public class UIWidgetInspector : Editor
 		{
 			case EventType.Repaint:
 			{
-				Handles.BeginGUI();
+				Vector3 bottomLeft = HandleUtility.WorldToGUIPoint(corners[0]);
+				Vector3 topRight = HandleUtility.WorldToGUIPoint(corners[2]);
+				Vector3 diff = topRight - bottomLeft;
+
+				if (diff.x > 100f && -diff.y > 100f)
 				{
-					for (int i = 0; i < 8; ++i)
+					Handles.BeginGUI();
 					{
-						DrawKnob(worldPos[i], mWidget.pivot == mPivots[i], mWidget.canResize, id);
+						for (int i = 0; i < 8; ++i)
+						{
+							DrawKnob(worldPos[i], mWidget.pivot == mPivots[i], mWidget.canResize, id);
+						}
 					}
+					Handles.EndGUI();
 				}
-				Handles.EndGUI();
+				else if (diff.x > 20f && -diff.y > 20f)
+				{
+					Handles.BeginGUI();
+					{
+						for (int i = 0; i < 4; ++i)
+						{
+							DrawKnob(worldPos[i], mWidget.pivot == mPivots[i], mWidget.canResize, id);
+						}
+					}
+					Handles.EndGUI();
+				}
 			}
 			break;
 
