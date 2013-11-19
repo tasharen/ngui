@@ -783,7 +783,7 @@ public class UICreateWidgetWizard : EditorWindow
 			}
 			mType = (UILabelInspector.FontType)EditorGUILayout.EnumPopup(mType, GUILayout.Width(62f));
 #else
-			NGUISettings.ambigiousFont = EditorGUILayout.ObjectField(NGUISettings.bitmapFont, typeof(UIFont), false, GUILayout.Width(140f));
+			NGUISettings.ambigiousFont = EditorGUILayout.ObjectField(NGUISettings.ambigiousFont, typeof(UIFont), false, GUILayout.Width(140f));
 #endif
 			GUILayout.Label("size", GUILayout.Width(30f));
 			EditorGUI.BeginDisabledGroup(mType == UILabelInspector.FontType.Bitmap);
