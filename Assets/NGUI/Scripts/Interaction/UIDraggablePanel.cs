@@ -55,12 +55,6 @@ public class UIDraggablePanel : MonoBehaviour
 	public bool smoothDragStart = true;
 
 	/// <summary>
-	/// Whether the position will be reset to the 'startingDragAmount'. Inspector-only value.
-	/// </summary>
-
-	public bool repositionClipping = false;
-	
-	/// <summary>
 	/// Whether to use iOS drag emulation, where the content only drags at half the speed of the touch/mouse movement when the content edge is within the clipping area.
 	/// </summary>	
 	
@@ -321,17 +315,14 @@ public class UIDraggablePanel : MonoBehaviour
 			Vector2 bmin = b.min;
 			Vector2 bmax = b.max;
 
-			if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
-			{
-				Vector2 soft = mPanel.clipSoftness;
-				bmin -= soft;
-				bmax += soft;
-			}
-
 			if (horizontalScrollBar != null && bmax.x > bmin.x)
 			{
 				Vector4 clip = mPanel.clipRange;
 				float extents = clip.z * 0.5f;
+
+				if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
+					extents -= mPanel.clipSoftness.x;
+
 				float min = clip.x - extents - b.min.x;
 				float max = b.max.x - extents - clip.x;
 
@@ -350,6 +341,10 @@ public class UIDraggablePanel : MonoBehaviour
 			{
 				Vector4 clip = mPanel.clipRange;
 				float extents = clip.w * 0.5f;
+
+				if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
+					extents -= mPanel.clipSoftness.y;
+
 				float min = clip.y - extents - bmin.y;
 				float max = bmax.y - extents - clip.y;
 
@@ -395,6 +390,14 @@ public class UIDraggablePanel : MonoBehaviour
 		float bottom = b.min.y + hy;
 		float top = b.max.y - hy;
 
+		if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
+		{
+			left -= mPanel.clipSoftness.x;
+			right += mPanel.clipSoftness.x;
+			bottom -= mPanel.clipSoftness.y;
+			top += mPanel.clipSoftness.y;
+		}
+
 		// Calculate the offset based on the scroll value
 		float ox = Mathf.Lerp(left, right, x);
 		float oy = Mathf.Lerp(top, bottom, y);
@@ -426,6 +429,7 @@ public class UIDraggablePanel : MonoBehaviour
 	/// Another option is to populate the panel's contents, reset its position, then call this function to reposition the clipping.
 	/// </summary>
 
+	[ContextMenu("Reset Clipping Position")]
 	public void ResetPosition()
 	{
 		// Invalidate the bounds
@@ -645,14 +649,6 @@ public class UIDraggablePanel : MonoBehaviour
 
 	void LateUpdate ()
 	{
-		// Inspector functionality
-		if (repositionClipping)
-		{
-			repositionClipping = false;
-			mCalculatedBounds = false;
-			SetDragAmount(relativePositionOnReset.x, relativePositionOnReset.y, true);
-		}
-
 		if (!Application.isPlaying) return;
 		float delta = RealTime.deltaTime;
 
