@@ -395,14 +395,6 @@ public class UIDraggablePanel : MonoBehaviour
 		float bottom = b.min.y + hy;
 		float top = b.max.y - hy;
 
-		if (mPanel.clipping == UIDrawCall.Clipping.SoftClip)
-		{
-			left -= mPanel.clipSoftness.x;
-			right += mPanel.clipSoftness.x;
-			bottom -= mPanel.clipSoftness.y;
-			top += mPanel.clipSoftness.y;
-		}
-
 		// Calculate the offset based on the scroll value
 		float ox = Mathf.Lerp(left, right, x);
 		float oy = Mathf.Lerp(top, bottom, y);
@@ -420,8 +412,8 @@ public class UIDraggablePanel : MonoBehaviour
 		}
 
 		// Update the clipping offset
-		cr.x = ox;
-		cr.y = oy;
+		if (scale.x != 0f) cr.x = ox;
+		if (scale.y != 0f) cr.y = oy;
 		mPanel.clipRange = cr;
 
 		// Update the scrollbars, reflecting this change
