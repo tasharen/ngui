@@ -172,8 +172,8 @@ public class UILabelInspector : UIWidgetInspector
 			SerializedProperty gr = NGUIEditorTools.DrawProperty("Gradient", serializedObject, "mApplyGradient", GUILayout.Width(100f));
 			if (gr.hasMultipleDifferentValues || gr.boolValue)
 			{
-				NGUIEditorTools.DrawProperty("", serializedObject, "mGradientBottom");
-				NGUIEditorTools.DrawProperty("", serializedObject, "mGradientTop");
+				NGUIEditorTools.DrawProperty("", serializedObject, "mGradientBottom", GUILayout.MinWidth(40f));
+				NGUIEditorTools.DrawProperty("", serializedObject, "mGradientTop", GUILayout.MinWidth(40f));
 			}
 			GUILayout.EndHorizontal();
 
