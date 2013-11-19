@@ -62,15 +62,6 @@ public class UIWidgetInspector : Editor
 	UIWidget.Pivot mDragPivot = UIWidget.Pivot.Center;
 
 	/// <summary>
-	/// Register an Undo command with the Unity editor.
-	/// </summary>
-
-	void RegisterUndo ()
-	{
-		NGUIEditorTools.RegisterUndo("Widget Change", mWidget);
-	}
-
-	/// <summary>
 	/// Raycast into the screen.
 	/// </summary>
 
@@ -314,7 +305,6 @@ public class UIWidgetInspector : Editor
 			else SetCursorRect(rect, MouseCursor.Arrow);
 		}
 #endif
-
 		switch (type)
 		{
 			case EventType.Repaint:

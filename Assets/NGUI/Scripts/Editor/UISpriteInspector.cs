@@ -25,6 +25,7 @@ public class UISpriteInspector : UIWidgetInspector
 		SerializedProperty sp = serializedObject.FindProperty("mAtlas");
 		sp.objectReferenceValue = obj;
 		serializedObject.ApplyModifiedProperties();
+		NGUISettings.atlas = obj as UIAtlas;
 	}
 
 	/// <summary>
@@ -37,6 +38,7 @@ public class UISpriteInspector : UIWidgetInspector
 		SerializedProperty sp = serializedObject.FindProperty("mSpriteName");
 		sp.stringValue = spriteName;
 		serializedObject.ApplyModifiedProperties();
+		NGUISettings.selectedSprite = spriteName;
 	}
 
 	/// <summary>

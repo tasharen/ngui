@@ -45,7 +45,7 @@ public class UITextureInspector : UIWidgetInspector
 				mTex.shader = shader;
 			}
 
-			Texture tex = EditorGUILayout.ObjectField("Texture", mTex.mainTexture, typeof(Texture), false) as Texture;
+			Texture tex = EditorGUILayout.ObjectField("Texture", mTex.mainTexture, typeof(Texture), false, GUILayout.Width(140f)) as Texture;
 
 			if (mTex.mainTexture != tex)
 			{
