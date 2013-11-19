@@ -346,9 +346,34 @@ public class UIDrawCall : MonoBehaviour
 
 				// Set the mesh values
 				Mesh mesh = GetMesh(ref setIndices, verts.size);
-				mesh.vertices = verts.buffer;
-				if (norms != null) mesh.normals = norms.buffer;
-				if (tans != null) mesh.tangents = tans.buffer;
+
+				bool trim = false;
+
+				if (norms != null)
+				{
+					if (norms.buffer.Length != verts.buffer.Length)
+						trim = true;
+				}
+
+				if (tans != null)
+				{
+					if (tans.buffer.Length != verts.buffer.Length)
+						trim = true;
+				}
+
+				if (trim)
+				{
+					mesh.vertices = verts.ToArray();
+					if (norms != null) mesh.normals = norms.ToArray();
+					if (tans != null) mesh.tangents = tans.ToArray();
+				}
+				else
+				{
+					mesh.vertices = verts.buffer;
+					if (norms != null) mesh.normals = norms.buffer;
+					if (tans != null) mesh.tangents = tans.buffer;
+				}
+
 				mesh.uv = uvs.buffer;
 				mesh.colors32 = cols.buffer;
 				if (setIndices) mesh.triangles = mIndices;
