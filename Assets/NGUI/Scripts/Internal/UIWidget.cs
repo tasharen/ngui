@@ -837,6 +837,7 @@ public class UIWidget : MonoBehaviour
 			float final = finalAlpha;
 			bool visibleByAlpha = (final > 0.001f);
 			bool visibleByPanel = forceVisible || mVisibleByPanel;
+			bool moved = false;
 
 			// Has transform moved?
 			if (HasTransformChanged())
@@ -869,7 +870,7 @@ public class UIWidget : MonoBehaviour
 					if (Vector3.SqrMagnitude(mOldV0 - v0) > 0.000001f ||
 						Vector3.SqrMagnitude(mOldV1 - v1) > 0.000001f)
 					{
-						mChanged = true;
+						moved = true;
 						mOldV0 = v0;
 						mOldV1 = v1;
 					}
@@ -925,6 +926,12 @@ public class UIWidget : MonoBehaviour
 					mGeom.Clear();
 					return true;
 				}
+			}
+			else if (moved && mGeom.hasVertices)
+			{
+				if (!hasMatrix) mLocalToPanel = p.worldToLocal * cachedTransform.localToWorldMatrix;
+				mGeom.ApplyTransform(mLocalToPanel);
+				return true;
 			}
 		}
 		return false;
