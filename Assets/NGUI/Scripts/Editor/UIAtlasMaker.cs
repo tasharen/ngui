@@ -204,7 +204,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Add a new sprite to the atlas, given the texture it's coming from and the packed rect within the atlas.
 	/// </summary>
 
-	static UISpriteData AddSprite (List<UISpriteData> sprites, SpriteEntry se)
+	static public UISpriteData AddSprite (List<UISpriteData> sprites, SpriteEntry se)
 	{
 		// See if this sprite already exists
 		foreach (UISpriteData sp in sprites)
@@ -226,7 +226,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Create a list of sprites using the specified list of textures.
 	/// </summary>
 
-	static List<SpriteEntry> CreateSprites (List<Texture> textures)
+	static public List<SpriteEntry> CreateSprites (List<Texture> textures)
 	{
 		List<SpriteEntry> list = new List<SpriteEntry>();
 
@@ -338,7 +338,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Release all temporary textures created for the sprites.
 	/// </summary>
 
-	static void ReleaseSprites (List<SpriteEntry> sprites)
+	static public void ReleaseSprites (List<SpriteEntry> sprites)
 	{
 		foreach (SpriteEntry se in sprites)
 		{
@@ -355,7 +355,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Replace the sprites within the atlas.
 	/// </summary>
 
-	static void ReplaceSprites (UIAtlas atlas, List<SpriteEntry> sprites)
+	static public void ReplaceSprites (UIAtlas atlas, List<SpriteEntry> sprites)
 	{
 		// Get the list of sprites we'll be updating
 		List<UISpriteData> spriteList = atlas.spriteList;
@@ -385,7 +385,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Extract sprites from the atlas, adding them to the list.
 	/// </summary>
 
-	static void ExtractSprites (UIAtlas atlas, List<SpriteEntry> finalSprites)
+	static public void ExtractSprites (UIAtlas atlas, List<SpriteEntry> finalSprites)
 	{
 		// Make the atlas texture readable
 		Texture2D atlasTex = NGUIEditorTools.ImportTexture(atlas.texture, true, false, !atlas.premultipliedAlpha);
@@ -464,7 +464,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Combine all sprites into a single texture and save it to disk.
 	/// </summary>
 
-	static bool UpdateTexture (UIAtlas atlas, List<SpriteEntry> sprites)
+	static public bool UpdateTexture (UIAtlas atlas, List<SpriteEntry> sprites)
 	{
 		// Get the texture for the atlas
 		Texture2D tex = atlas.texture as Texture2D;
