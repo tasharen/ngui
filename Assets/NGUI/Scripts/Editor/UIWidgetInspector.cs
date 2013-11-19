@@ -322,8 +322,9 @@ public class UIWidgetInspector : Editor
 				Vector3 bottomLeft = HandleUtility.WorldToGUIPoint(corners[0]);
 				Vector3 topRight = HandleUtility.WorldToGUIPoint(corners[2]);
 				Vector3 diff = topRight - bottomLeft;
+				float mag = diff.magnitude;
 
-				if (diff.x > 100f && -diff.y > 100f)
+				if (mag > 140f)
 				{
 					Handles.BeginGUI();
 					{
@@ -334,7 +335,7 @@ public class UIWidgetInspector : Editor
 					}
 					Handles.EndGUI();
 				}
-				else if (diff.x > 20f && -diff.y > 20f)
+				else if (mag > 40f)
 				{
 					Handles.BeginGUI();
 					{

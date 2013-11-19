@@ -75,8 +75,8 @@ public class UIPanel : MonoBehaviour
 
 	// Clipping rectangle
 	[HideInInspector][SerializeField] UIDrawCall.Clipping mClipping = UIDrawCall.Clipping.None;
-	[HideInInspector][SerializeField] Vector4 mClipRange = Vector4.zero;
-	[HideInInspector][SerializeField] Vector2 mClipSoftness = new Vector2(40f, 40f);
+	[HideInInspector][SerializeField] Vector4 mClipRange = new Vector4(0f, 0f, 300f, 200f);
+	[HideInInspector][SerializeField] Vector2 mClipSoftness = new Vector2(4f, 4f);
 	[HideInInspector][SerializeField] int mDepth = 0;
 
 	// Whether a full rebuild of geometry buffers is required
@@ -661,7 +661,6 @@ public class UIPanel : MonoBehaviour
 						else
 						{
 							mFullRebuild = true;
-							Debug.LogWarning("Full rebuild!");
 						}
 					}
 				}

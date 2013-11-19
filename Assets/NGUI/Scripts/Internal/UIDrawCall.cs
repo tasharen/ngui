@@ -59,6 +59,7 @@ public class UIDrawCall : MonoBehaviour
 	bool mReset = true;
 	bool mEven = true;
 	int mRenderQueue = 0;
+	Clipping mLastClip = Clipping.None;
 
 	/// <summary>
 	/// Whether the draw call needs to be re-created.
@@ -271,14 +272,11 @@ public class UIDrawCall : MonoBehaviour
 
 	void UpdateMaterials ()
 	{
-		bool useClipping = (mClipping != Clipping.None);
-
-		// Create a temporary material
-		if (mMat == null) RebuildMaterial();
-
 		// If clipping should be used, we need to find a replacement shader
-		if (useClipping && mClipping != Clipping.None)
+		if (mMat == null || mClipping != mLastClip)
 		{
+			RebuildMaterial();
+			mLastClip = mClipping;
 			Shader shader = null;
 			const string alpha	= " (AlphaClip)";
 			const string soft	= " (SoftClip)";
@@ -291,7 +289,8 @@ public class UIDrawCall : MonoBehaviour
 
 			// Try to find the new shader
 			if (mClipping == Clipping.SoftClip) shader = Shader.Find(shaderName + soft);
-			else shader = Shader.Find(shaderName + alpha);
+			else if (mClipping == Clipping.AlphaClip) shader = Shader.Find(shaderName + alpha);
+			else shader = Shader.Find(shaderName);
 
 			// If there is a valid shader, assign it to the custom material
 			if (shader != null)
@@ -300,15 +299,13 @@ public class UIDrawCall : MonoBehaviour
 			}
 			else
 			{
-				mClipping = Clipping.None;
 				Debug.LogError(shaderName + " doesn't have a clipped shader version for " + mClipping);
+				mClipping = Clipping.None;
 			}
 		}
 
 		if (mRen.sharedMaterial != mMat)
-		{
 			mRen.sharedMaterials = new Material[] { mMat };
-		}
 	}
 
 	/// <summary>
