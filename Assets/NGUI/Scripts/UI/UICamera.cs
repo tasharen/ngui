@@ -686,7 +686,7 @@ public class UICamera : MonoBehaviour
 
 	static int GetDirection (string axis)
 	{
-		float time = Time.realtimeSinceStartup;
+		float time = RealTime.time;
 
 		if (mNextEvent < time)
 		{
@@ -968,7 +968,7 @@ public class UICamera : MonoBehaviour
 			float scroll = Input.GetAxis(scrollAxisName);
 			if (scroll != 0f) Notify(mHover, "OnScroll", scroll);
 
-			if (showTooltips && mTooltipTime != 0f && (mTooltipTime < Time.realtimeSinceStartup ||
+			if (showTooltips && mTooltipTime != 0f && (mTooltipTime < RealTime.time ||
 				Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
 			{
 				mTooltip = mHover;
@@ -1043,7 +1043,7 @@ public class UICamera : MonoBehaviour
 			if (mTooltipTime != 0f)
 			{
 				// Delay the tooltip
-				mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
+				mTooltipTime = RealTime.time + tooltipDelay;
 			}
 			else if (mTooltip != null)
 			{
@@ -1084,7 +1084,7 @@ public class UICamera : MonoBehaviour
 		// If nothing is pressed and there is an object under the touch, highlight it
 		if (useMouse && !isPressed && mHover != mMouse[0].current)
 		{
-			mTooltipTime = Time.realtimeSinceStartup + tooltipDelay;
+			mTooltipTime = RealTime.time + tooltipDelay;
 			mHover = mMouse[0].current;
 			Highlight(mHover, true);
 		}
@@ -1128,7 +1128,7 @@ public class UICamera : MonoBehaviour
 			else if (currentTouch.pressed != null) currentCamera = currentTouch.pressedCam;
 
 			// Double-tap support
-			if (input.tapCount > 1) currentTouch.clickTime = Time.realtimeSinceStartup;
+			if (input.tapCount > 1) currentTouch.clickTime = RealTime.time;
 
 			// Process the events from this touch
 			ProcessTouch(pressed, unpressed);
@@ -1322,7 +1322,7 @@ public class UICamera : MonoBehaviour
 					// If the touch should consider clicks, send out an OnClick notification
 					if (currentTouch.clickNotification != ClickNotification.None)
 					{
-						float time = Time.realtimeSinceStartup;
+						float time = RealTime.time;
 
 						Notify(currentTouch.pressed, "OnClick", null);
 

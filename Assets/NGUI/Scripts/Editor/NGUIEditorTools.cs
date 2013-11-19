@@ -1527,11 +1527,29 @@ public class NGUIEditorTools
 		BetterList<UIWidget> widgets = NGUIEditorTools.SceneViewRaycast(screenPos);
 		BetterList<UIWidgetContainer> containers = new BetterList<UIWidgetContainer>();
 		BetterList<MenuEntry> entries = new BetterList<MenuEntry>();
+		BetterList<UIPanel> panels = new BetterList<UIPanel>();
+
+		bool divider = false;
 
 		// Process widgets and their containers in the raycast order
 		for (int i = 0; i < widgets.size; ++i)
 		{
 			UIWidget w = widgets[i];
+
+			UIPanel panel = w.panel;
+
+			if (panel != null && !panels.Contains(panel))
+			{
+				panels.Add(panel);
+
+				if (!divider)
+				{
+					entries.Add(null);
+					divider = true;
+				}
+				entries.Add(new MenuEntry(panel.name + " (panel)", panel.gameObject));
+			}
+
 			UIWidgetContainer wc = NGUITools.FindInParents<UIWidgetContainer>(w.cachedGameObject);
 
 			// If we get a new container, we should add it to the list
@@ -1542,14 +1560,18 @@ public class NGUIEditorTools
 				// Only proceed if there is no widget on the container
 				if (wc.gameObject != w.cachedGameObject)
 				{
-					if (i != 0) entries.Add(null);
+					if (!divider)
+					{
+						entries.Add(null);
+						divider = true;
+					}
 					entries.Add(new MenuEntry(wc.name + " (container)", wc.gameObject));
-					entries.Add(null);
 				}
 			}
 
 			string name = (i + 1 == widgets.size) ? (w.name + " (top-most)") : w.name;
 			entries.Add(new MenuEntry(name, w.gameObject));
+			divider = false;
 		}
 
 		// Add widgets to the menu in the reverse order so that they are shown with the top-most widget first (on top)

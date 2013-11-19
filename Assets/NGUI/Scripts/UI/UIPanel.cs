@@ -265,7 +265,7 @@ public class UIPanel : MonoBehaviour
 		{
 			if (mClipRange != value)
 			{
-				mCullTime = (mCullTime == 0f) ? 0.001f : Time.realtimeSinceStartup + 0.15f;
+				mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
 				mClipRange = value;
 				mMatrixTime = 0f;
 				UpdateDrawcalls();
@@ -278,6 +278,33 @@ public class UIPanel : MonoBehaviour
 	/// </summary>
 
 	public Vector2 clipSoftness { get { return mClipSoftness; } set { if (mClipSoftness != value) { mClipSoftness = value; UpdateDrawcalls(); } } }
+
+	// Temporary variable to avoid GC allocation
+	static Vector3[] mCorners = new Vector3[4];
+
+	/// <summary>
+	/// World-space corners of the panel's clipping rectangle. The order is bottom-left, top-left, top-right, bottom-right.
+	/// </summary>
+
+	public Vector3[] worldCorners
+	{
+		get
+		{
+			float x0 = mClipRange.x - 0.5f * mClipRange.z;
+			float y0 = mClipRange.y - 0.5f * mClipRange.w;
+			float x1 = x0 + mClipRange.z;
+			float y1 = y0 + mClipRange.w;
+
+			Transform wt = cachedTransform;
+
+			mCorners[0] = wt.TransformPoint(x0, y0, 0f);
+			mCorners[1] = wt.TransformPoint(x0, y1, 0f);
+			mCorners[2] = wt.TransformPoint(x1, y1, 0f);
+			mCorners[3] = wt.TransformPoint(x1, y0, 0f);
+
+			return mCorners;
+		}
+	}
 
 	/// <summary>
 	/// Returns whether the specified rectangle is visible by the panel. The coordinates must be in world space.
@@ -985,8 +1012,31 @@ public class UIPanel : MonoBehaviour
 
 			if (selected)
 			{
-				Gizmos.color = new Color(1f, 0f, 0.5f);
-				Gizmos.DrawWireCube(pos, size);
+				if (mClipping == UIDrawCall.Clipping.SoftClip)
+				{
+					if (UnityEditor.Selection.activeGameObject == gameObject)
+					{
+						Gizmos.color = new Color(1f, 0f, 0.5f);
+						size.x -= mClipSoftness.x * 2f;
+						size.y -= mClipSoftness.y * 2f;
+						Gizmos.DrawWireCube(pos, size);
+					}
+					else
+					{
+						Gizmos.color = new Color(0.5f, 0f, 0.5f);
+						Gizmos.DrawWireCube(pos, size);
+
+						Gizmos.color = new Color(1f, 0f, 0.5f);
+						size.x -= mClipSoftness.x * 2f;
+						size.y -= mClipSoftness.y * 2f;
+						Gizmos.DrawWireCube(pos, size);
+					}
+				}
+				else
+				{
+					Gizmos.color = new Color(1f, 0f, 0.5f);
+					Gizmos.DrawWireCube(pos, size);
+				}
 			}
 			else
 			{
