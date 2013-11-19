@@ -68,7 +68,6 @@ public class UICenterOnChild : MonoBehaviour
 
 		// Calculate the panel's center in world coordinates
 		Vector3[] corners = mDrag.panel.worldCorners;
-		GameObject panelGO = mDrag.panel.cachedGameObject;
 		Vector3 panelCenter = (corners[2] + corners[0]) * 0.5f;
 
 		// Offset this value by the momentum
