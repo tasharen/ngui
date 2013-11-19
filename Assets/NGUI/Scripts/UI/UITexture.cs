@@ -13,7 +13,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/Texture")]
+[AddComponentMenu("NGUI/UI/NGUI Texture")]
 public class UITexture : UIWidget
 {
 	[HideInInspector][SerializeField] Rect mRect = new Rect(0f, 0f, 1f, 1f);

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/Widget")]
+[AddComponentMenu("NGUI/UI/NGUI Widget")]
 public class UIWidget : MonoBehaviour
 {
 	/// <summary>

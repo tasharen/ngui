@@ -11,7 +11,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/Sprite")]
+[AddComponentMenu("NGUI/UI/NGUI Sprite")]
 public class UISprite : UIWidget
 {
 	public enum Type

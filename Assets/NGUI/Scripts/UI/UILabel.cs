@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System;
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/Label")]
+[AddComponentMenu("NGUI/UI/NGUI Label")]
 public class UILabel : UIWidget
 {
 	public enum Effect
