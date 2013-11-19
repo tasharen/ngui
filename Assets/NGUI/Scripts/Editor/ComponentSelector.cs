@@ -91,7 +91,11 @@ public class ComponentSelector : ScriptableWizard
 			}
 			comp.mObjects = list.ToArray();
 		}
+#if UNITY_3_5
+		else comp.mObjects = Resources.FindObjectsOfTypeAll(typeof(T));
+#else
 		else comp.mObjects = Resources.FindObjectsOfTypeAll<T>();
+#endif
 	}
 
 	/// <summary>

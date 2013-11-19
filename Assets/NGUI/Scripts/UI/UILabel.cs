@@ -1230,8 +1230,11 @@ public class UILabel : UIWidget
 		NGUIText.current.symbolStyle = mSymbols;
 		NGUIText.current.spacingX = mSpacingX;
 		NGUIText.current.spacingY = mSpacingY;
+#if DYNAMIC_FONT
 		NGUIText.current.pixelDensity = (usePrintedSize && mRoot != null) ? 1f / mRoot.pixelSizeAdjustment : 1f;
-
+#else
+		NGUIText.current.pixelDensity = 1f;
+#endif
 		Pivot p = pivot;
 
 		if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)
