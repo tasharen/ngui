@@ -38,6 +38,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 3.0.6
 - NEW: Labels can now have gradients.
 - NEW: Clipped panels now have handles you can drag around instead of adjusting clipping in inspector.
+- NEW: Added a new widget type capable of drawing Unity 4.3 sprites.
 - NEW: Added UIToggle.GetActiveToggle.
 - NEW: You can now specify a material on dynamic font-using UILabels.
 - NEW: You can now specify character spacing on labels, and it works with both bitmap and dynamic fonts.
@@ -57,6 +58,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: Anchors and stretch scripts set to "run only once" will still respond to screen size changes.
 - FIX: Switching panel to clipped mode then back should refresh the shader correctly.
 - FIX: Moving widgets around no longer causes their buffers to get rebuilt. Just re-transformed.
+- FIX: Added extra code to ensure that draw calls won't get orphaned.
 - FIX: More Win8 tweaks.
 
 3.0.5
