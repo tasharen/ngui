@@ -320,12 +320,9 @@ public class UIDrawCall : MonoBehaviour
 			{
 				mDynamicMat.shader = shader;
 			}
-			else
+			else if (mClipping != Clipping.None)
 			{
-				if (mClipping != Clipping.None)
-				{
-					Debug.LogError(shaderName + " doesn't have a clipped shader version for " + mClipping);
-				}
+				Debug.LogError(shaderName + " doesn't have a clipped shader version for " + mClipping);
 				mClipping = Clipping.None;
 			}
 		}

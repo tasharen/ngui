@@ -112,6 +112,9 @@ public class UISprite : UIWidget
 					spriteName = sprite;
 					MarkAsChanged();
 				}
+
+				// Make sure the panel knows that the draw calls may have changed
+				UIPanel.RebuildDrawCalls(false);
 			}
 		}
 	}
@@ -280,6 +283,7 @@ public class UISprite : UIWidget
 		}
 	}
 
+#if UNITY_EDITOR
 	/// <summary>
 	/// Keep sane values.
 	/// </summary>
@@ -289,6 +293,7 @@ public class UISprite : UIWidget
 		base.OnValidate();
 		mFillAmount = Mathf.Clamp01(mFillAmount);
 	}
+#endif
 
 	/// <summary>
 	/// Retrieve the atlas sprite referenced by the spriteName field.

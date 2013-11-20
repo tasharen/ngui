@@ -177,16 +177,6 @@ public class UITexture : UIWidget
 	}
 
 	/// <summary>
-	/// Re-assign the sprite texture to the material.
-	/// </summary>
-
-	protected override void OnValidate ()
-	{
-		base.OnValidate();
-		UIPanel.RebuildDrawCalls(true);
-	}
-
-	/// <summary>
 	/// Adjust the scale of the widget to make it pixel-perfect.
 	/// </summary>
 

@@ -419,7 +419,10 @@ public class UILabel : UIWidget
 
 	void ProcessAndRequest ()
 	{
-		if (mAllowProcessing && ambigiousFont != null)
+#if UNITY_EDITOR
+		if (!mAllowProcessing) return;
+#endif
+		if (ambigiousFont != null)
 		{
 			ProcessText();
 #if DYNAMIC_FONT
@@ -428,6 +431,7 @@ public class UILabel : UIWidget
 		}
 	}
 
+#if UNITY_EDITOR
 	// Used to ensure that we don't process font more than once inside OnValidate function below
 	bool mAllowProcessing = true;
 
@@ -437,6 +441,8 @@ public class UILabel : UIWidget
 
 	protected override void OnValidate ()
 	{
+		base.OnValidate();
+
 		UIFont fnt = mFont;
 		Font ttf = mTrueTypeFont;
 
@@ -479,6 +485,7 @@ public class UILabel : UIWidget
 		mAllowProcessing = true;
 		ProcessAndRequest();
 	}
+#endif
 
 	/// <summary>
 	/// Whether this label will support color encoding in the format of [RRGGBB] and new line in the form of a "\\n" string.

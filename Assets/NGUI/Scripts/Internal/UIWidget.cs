@@ -528,10 +528,18 @@ public class UIWidget : MonoBehaviour
 		if (mPanel != null)
 		{
 			SetDirty();
-			drawCall = null;
 			mPanel = null;
 		}
+		drawCall = null;
+#if UNITY_EDITOR
+		mOldTex = null;
+		mOldShader = null;
+#endif
 	}
+
+#if UNITY_EDITOR
+	Texture mOldTex;
+	Shader mOldShader;
 
 	/// <summary>
 	/// This callback is sent inside the editor notifying us that some property has changed.
@@ -551,7 +559,16 @@ public class UIWidget : MonoBehaviour
 		if (mWidth < minWidth) mWidth = minWidth;
 		if (mHeight < minHeight) mHeight = minHeight;
 		if (autoResizeBoxCollider) ResizeCollider();
+
+		// If the texture is changing, we need to make sure to rebuild the draw calls
+		if (mOldTex != mainTexture || mOldShader != shader)
+		{
+			mOldTex = mainTexture;
+			mOldShader = shader;
+			UIPanel.RebuildDrawCalls(true);
+		}
 	}
+#endif
 
 	/// <summary>
 	/// Only sets the local flag, does not notify the panel.
