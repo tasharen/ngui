@@ -248,6 +248,9 @@ static public class NGUITools
 				}
 				box = go.AddComponent<BoxCollider>();
 				box.isTrigger = true;
+
+				UIWidget widget = go.GetComponent<UIWidget>();
+				if (widget != null) widget.autoResizeBoxCollider = true;
 			}
 
 			UpdateWidgetCollider(box, considerInactive);

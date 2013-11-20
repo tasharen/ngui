@@ -332,7 +332,7 @@ public class NGUISettings
 	static public UIWidget AddWidget (GameObject go)
 	{
 		UIWidget w = NGUITools.AddWidget<UIWidget>(go);
-		w.name = "Widget";
+		w.name = "Container";
 		w.pivot = pivot;
 		w.width = 100;
 		w.height = 100;
@@ -410,6 +410,8 @@ public class NGUISettings
 		w.height = Mathf.Max(20, GetInt("NGUI Font Height", 16));
 		w.fontStyle = fontStyle;
 		w.fontSize = fontSize;
+		w.applyGradient = true;
+		w.gradientBottom = new Color(0.7f, 0.7f, 0.7f);
 		w.AssumeNaturalSize();
 		return w;
 	}

@@ -1576,6 +1576,9 @@ public class NGUIEditorTools
 			divider = false;
 		}
 
+		// Common items used by NGUI
+		NGUIContextMenu.AddCommonItems();
+
 		// Add widgets to the menu in the reverse order so that they are shown with the top-most widget first (on top)
 		for (int i = entries.size; i > 0; )
 		{

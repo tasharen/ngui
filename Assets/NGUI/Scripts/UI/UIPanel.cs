@@ -287,18 +287,39 @@ public class UIPanel : MonoBehaviour
 	{
 		get
 		{
-			float x0 = mClipRange.x - 0.5f * mClipRange.z;
-			float y0 = mClipRange.y - 0.5f * mClipRange.w;
-			float x1 = x0 + mClipRange.z;
-			float y1 = y0 + mClipRange.w;
+			if (mClipping == UIDrawCall.Clipping.None)
+			{
+				Vector2 size = GetSize();
 
-			Transform wt = cachedTransform;
+				float x0 = -0.5f * size.x;
+				float y0 = -0.5f * size.y;
+				float x1 = x0 + size.x;
+				float y1 = y0 + size.y;
 
-			mCorners[0] = wt.TransformPoint(x0, y0, 0f);
-			mCorners[1] = wt.TransformPoint(x0, y1, 0f);
-			mCorners[2] = wt.TransformPoint(x1, y1, 0f);
-			mCorners[3] = wt.TransformPoint(x1, y0, 0f);
+				Transform wt = (mCam != null) ? mCam.transform : null;
 
+				if (wt != null)
+				{
+					mCorners[0] = wt.TransformPoint(x0, y0, 0f);
+					mCorners[1] = wt.TransformPoint(x0, y1, 0f);
+					mCorners[2] = wt.TransformPoint(x1, y1, 0f);
+					mCorners[3] = wt.TransformPoint(x1, y0, 0f);
+				}
+			}
+			else
+			{
+				float x0 = mClipRange.x - 0.5f * mClipRange.z;
+				float y0 = mClipRange.y - 0.5f * mClipRange.w;
+				float x1 = x0 + mClipRange.z;
+				float y1 = y0 + mClipRange.w;
+
+				Transform wt = cachedTransform;
+
+				mCorners[0] = wt.TransformPoint(x0, y0, 0f);
+				mCorners[1] = wt.TransformPoint(x0, y1, 0f);
+				mCorners[2] = wt.TransformPoint(x1, y1, 0f);
+				mCorners[3] = wt.TransformPoint(x1, y0, 0f);
+			}
 			return mCorners;
 		}
 	}
@@ -1006,6 +1027,26 @@ public class UIPanel : MonoBehaviour
 		return false;
 	}
 
+	/// <summary>
+	/// Panel's size -- which is either the clipping rect, or the screen dimensions.
+	/// </summary>
+
+	Vector2 GetSize ()
+	{
+		bool clip = (mClipping != UIDrawCall.Clipping.None);
+#if UNITY_EDITOR
+		Vector2 size = clip ? new Vector2(mClipRange.z, mClipRange.w) : new Vector2(mScreenWidth, mScreenHeight);
+#else
+		Vector2 size = clip ? new Vector2(mClipRange.z, mClipRange.w) : new Vector2(Screen.width, Screen.height);
+#endif
+		if (!clip)
+		{
+			UIRoot root = NGUITools.FindInParents<UIRoot>(cachedGameObject);
+			if (root != null) size *= root.GetPixelSizeAdjustment(mScreenHeight);
+		}
+		return size;
+	}
+
 #if UNITY_EDITOR
 
 	int mScreenWidth = 1280;
@@ -1025,20 +1066,10 @@ public class UIPanel : MonoBehaviour
 	{
 		if (mCam == null || !mCam.isOrthoGraphic) return;
 
-		bool clip = (mClipping != UIDrawCall.Clipping.None);
-		Vector2 size = clip ? new Vector2(mClipRange.z, mClipRange.w) : Vector2.zero;
-
+		Vector2 size = GetSize();
 		GameObject go = UnityEditor.Selection.activeGameObject;
 		bool selected = (go != null) && (NGUITools.FindInParents<UIPanel>(go) == this);
-
-		if (size.x == 0f) size.x = mScreenWidth;
-		if (size.y == 0f) size.y = mScreenHeight;
-
-		if (!clip)
-		{
-			UIRoot root = NGUITools.FindInParents<UIRoot>(cachedGameObject);
-			if (root != null) size *= root.GetPixelSizeAdjustment(mScreenHeight);
-		}
+		bool clip = (mClipping != UIDrawCall.Clipping.None);
 
 		Transform t = clip ? transform : (mCam != null ? mCam.transform : null);
 

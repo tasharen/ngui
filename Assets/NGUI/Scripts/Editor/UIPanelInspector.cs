@@ -31,16 +31,30 @@ public class UIPanelInspector : Editor
 	Vector3 mStartRot = Vector3.zero;
 	Vector3 mStartDir = Vector3.right;
 	UIWidget.Pivot mDragPivot = UIWidget.Pivot.Center;
-	GUIStyle mStyle = null;
+	GUIStyle mStyle0 = null;
+	GUIStyle mStyle1 = null;
 
 	void OnEnable () { mPanel = target as UIPanel; }
 
+	/// <summary>
+	/// Helper function that draws draggable knobs.
+	/// </summary>
+
 	void DrawKnob (Vector4 point, int id)
 	{
-		if (mStyle == null) mStyle = "sv_label_7";
+		if (mStyle0 == null) mStyle0 = "sv_label_0";
+		if (mStyle1 == null) mStyle1 = "sv_label_7";
 		Vector2 screenPoint = HandleUtility.WorldToGUIPoint(point);
 		Rect rect = new Rect(screenPoint.x - 7f, screenPoint.y - 7f, 14f, 14f);
-		mStyle.Draw(rect, GUIContent.none, id);
+
+		if (mPanel.clipping == UIDrawCall.Clipping.None)
+		{
+			mStyle0.Draw(rect, GUIContent.none, id);
+		}
+		else
+		{
+			mStyle1.Draw(rect, GUIContent.none, id);
+		}
 	}
 
 	/// <summary>
@@ -49,15 +63,6 @@ public class UIPanelInspector : Editor
 
 	public void OnSceneGUI ()
 	{
-		if (mPanel.clipping == UIDrawCall.Clipping.None)
-		{
-			NGUIEditorTools.HideMoveTool(false);
-			return;
-		}
-
-		NGUIEditorTools.HideMoveTool(true);
-		if (!UIWidget.showHandles) return;
-
 		Event e = Event.current;
 		int id = GUIUtility.GetControlID(s_Hash, FocusType.Passive);
 		EventType type = e.GetTypeForControl(id);

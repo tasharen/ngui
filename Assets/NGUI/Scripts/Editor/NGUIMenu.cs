@@ -14,6 +14,19 @@ using System.Collections.Generic;
 
 static public class NGUIMenu
 {
+	[MenuItem("CONTEXT/UIWidget/Help")]
+	static void ShowHelp (UnityEditor.MenuCommand command) { ShowHelp(command.context.GetType()); }
+
+	/// <summary>
+	/// Show help for the specific topic.
+	/// </summary>
+
+	static public void ShowHelp (Type type)
+	{
+		// TODO: Navigate to a more context-appropriate URL
+		Application.OpenURL("http://www.tasharen.com/forum/index.php?board=1.0");
+	}
+
 	[MenuItem("NGUI/Selection/Bring To Front &#=")]
 	static public void BringForward2 ()
 	{
@@ -233,13 +246,15 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Open/Atlas Maker &#m")]
+	[MenuItem("NGUI/Open/Atlas Maker")]
+	[MenuItem("Assets/NGUI/Open Atlas Maker", false, 0)]
 	static public void OpenAtlasMaker ()
 	{
 		EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true);
 	}
 
-	[MenuItem("NGUI/Open/Font Maker &#f")]
+	[MenuItem("NGUI/Open/Font Maker")]
+	[MenuItem("Assets/NGUI/Open Bitmap Font Maker", false, 0)]
 	static public void OpenFontMaker ()
 	{
 		EditorWindow.GetWindow<UIFontMaker>(false, "Font Maker", true);
@@ -252,6 +267,7 @@ static public class NGUIMenu
 	}
 
 	[MenuItem("NGUI/Open/UI Wizard")]
+	[MenuItem("Assets/NGUI/Open UI Wizard", false, 0)]
 	static public void CreateUIWizard ()
 	{
 		EditorWindow.GetWindow<UICreateNewUIWizard>(false, "UI Tool", true);
