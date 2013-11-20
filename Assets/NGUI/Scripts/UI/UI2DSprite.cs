@@ -13,71 +13,52 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/NGUI Texture")]
-public class UITexture : UIWidget
+[AddComponentMenu("NGUI/UI/NGUI Unity2D Sprite")]
+public class UI2DSprite : UIWidget
 {
-	[HideInInspector][SerializeField] Rect mRect = new Rect(0f, 0f, 1f, 1f);
-	[HideInInspector][SerializeField] Shader mShader;
-	[HideInInspector][SerializeField] Texture mTexture;
+	[HideInInspector][SerializeField] Sprite mSprite;
 	[HideInInspector][SerializeField] Material mMat;
+	[HideInInspector][SerializeField] Shader mShader;
 
-	bool mCreatingMat = false;
-	Material mDynamicMat = null;
 	int mPMA = -1;
 
 	/// <summary>
-	/// UV rectangle used by the texture.
+	/// UnityEngine.Sprite drawn by this widget.
 	/// </summary>
 
-	public Rect uvRect
+	public Sprite sprite2D
 	{
 		get
 		{
-			return mRect;
+			return mSprite;
 		}
 		set
 		{
-			if (mRect != value)
+			if (mSprite != value)
 			{
-				mRect = value;
-				MarkAsChanged();
+				mSprite = value;
+				if (drawCall != null) drawCall.mainTexture = mainTexture;
+				MarkAsChangedLite();
 			}
 		}
 	}
 
 	/// <summary>
-	/// Shader used by the texture when creating a dynamic material (when the texture was specified, but the material was not).
+	/// Re-assign the sprite texture to the material.
 	/// </summary>
 
-	public Shader shader
+	protected override void OnValidate ()
 	{
-		get
+		base.OnValidate();
+
+		if (drawCall != null)
 		{
-			if (mShader == null)
-			{
-				Material mat = material;
-				if (mat != null) mShader = mat.shader;
-				if (mShader == null) mShader = Shader.Find("Unlit/Transparent Colored");
-			}
-			return mShader;
-		}
-		set
-		{
-			if (mShader != value)
-			{
-				mShader = value;
-				Material mat = material;
-				if (mat != null) mat.shader = value;
-				mPMA = -1;
-			}
+			drawCall.baseMaterial = material;
+			drawCall.mainTexture = mainTexture;
+			drawCall.shader = shader;
+			drawCall.RebuildMaterial();
 		}
 	}
-
-	/// <summary>
-	/// Whether the texture has created its material dynamically.
-	/// </summary>
-
-	public bool hasDynamicMaterial { get { return mDynamicMat != null; } }
 
 	/// <summary>
 	/// Automatically destroy the dynamically-created material.
@@ -87,33 +68,59 @@ public class UITexture : UIWidget
 	{
 		get
 		{
-			if (mMat != null) return mMat;
-			if (mTexture == null) return null;
-			if (mDynamicMat != null) return mDynamicMat;
-
-			if (!mCreatingMat && mDynamicMat == null)
-			{
-				mCreatingMat = true;
-				if (mShader == null) mShader = Shader.Find("Unlit/Transparent Colored");
-
-				Cleanup();
-
-				mDynamicMat = new Material(mShader);
-				mDynamicMat.hideFlags = HideFlags.DontSave;
-				mDynamicMat.mainTexture = mTexture;
-				mPMA = 0;
-				mCreatingMat = false;
-			}
-			return mDynamicMat;
+			return mMat;
 		}
 		set
 		{
 			if (mMat != value)
 			{
-				Cleanup();
+				MarkAsChanged();
+				drawCall = null;
+				mPanel = null;
 				mMat = value;
 				mPMA = -1;
 				MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Texture used by the UITexture. You can set it directly, without the need to specify a material.
+	/// </summary>
+
+	public override Texture mainTexture
+	{
+		get
+		{
+			if (mSprite != null) return mSprite.texture;
+			if (mMat != null) return mMat.mainTexture;
+			return null;
+		}
+	}
+
+	/// <summary>
+	/// Shader used by the texture when creating a dynamic material (when the texture was specified, but the material was not).
+	/// </summary>
+
+	public override Shader shader
+	{
+		get
+		{
+			if (mMat != null) return mMat.shader;
+			if (mShader == null) mShader = Shader.Find("Unlit/Transparent Colored");
+			return mShader;
+		}
+		set
+		{
+			if (mShader != value)
+			{
+				mShader = value;
+
+				if (mMat == null)
+				{
+					mPMA = -1;
+					MarkAsChanged();
+				}
 			}
 		}
 	}
@@ -128,36 +135,10 @@ public class UITexture : UIWidget
 		{
 			if (mPMA == -1)
 			{
-				Material mat = material;
-				mPMA = (mat != null && mat.shader != null && mat.shader.name.Contains("Premultiplied")) ? 1 : 0;
+				Shader sh = shader;
+				mPMA = (sh != null && sh.name.Contains("Premultiplied")) ? 1 : 0;
 			}
 			return (mPMA == 1);
-		}
-	}
-
-	/// <summary>
-	/// Texture used by the UITexture. You can set it directly, without the need to specify a material.
-	/// </summary>
-
-	public override Texture mainTexture
-	{
-		get
-		{
-			if (mMat != null) return mMat.mainTexture;
-			if (mTexture != null) return mTexture;
-			return null;
-		}
-		set
-		{
-			Material mat = material;
-
-			if (mat != null)
-			{
-				mPanel = null;
-				mTexture = value;
-				mat.mainTexture = value;
-				MarkAsChangedLite();
-			}
 		}
 	}
 
@@ -207,17 +188,27 @@ public class UITexture : UIWidget
 	}
 
 	/// <summary>
-	/// Clean up.
+	/// Texture rectangle.
 	/// </summary>
 
-	void OnDestroy () { Cleanup(); }
-
-	void Cleanup ()
+	public Rect uvRect
 	{
-		if (mDynamicMat != null)
+		get
 		{
-			NGUITools.Destroy(mDynamicMat);
-			mDynamicMat = null;
+			Texture tex = mainTexture;
+
+			if (tex != null)
+			{
+				Rect rect = mSprite.textureRect;
+
+				rect.xMin /= tex.width;
+				rect.xMax /= tex.width;
+				rect.yMin /= tex.height;
+				rect.yMax /= tex.height;
+
+				return rect;
+			}
+			return new Rect(0f, 0f, 1f, 1f);
 		}
 	}
 
@@ -252,18 +243,18 @@ public class UITexture : UIWidget
 		Color colF = color;
 		colF.a *= mPanel.alpha;
 		Color32 col = premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
-
 		Vector4 v = drawingDimensions;
+		Rect rect = uvRect;
 
 		verts.Add(new Vector3(v.x, v.y));
 		verts.Add(new Vector3(v.x, v.w));
 		verts.Add(new Vector3(v.z, v.w));
 		verts.Add(new Vector3(v.z, v.y));
 
-		uvs.Add(new Vector2(mRect.xMin, mRect.yMin));
-		uvs.Add(new Vector2(mRect.xMin, mRect.yMax));
-		uvs.Add(new Vector2(mRect.xMax, mRect.yMax));
-		uvs.Add(new Vector2(mRect.xMax, mRect.yMin));
+		uvs.Add(new Vector2(rect.xMin, rect.yMin));
+		uvs.Add(new Vector2(rect.xMin, rect.yMax));
+		uvs.Add(new Vector2(rect.xMax, rect.yMax));
+		uvs.Add(new Vector2(rect.xMax, rect.yMin));
 
 		cols.Add(col);
 		cols.Add(col);

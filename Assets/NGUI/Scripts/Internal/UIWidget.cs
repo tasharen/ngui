@@ -395,6 +395,23 @@ public class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Shader is used to create a dynamic material if the widget has no material to work with.
+	/// </summary>
+
+	public virtual Shader shader
+	{
+		get
+		{
+			Material mat = material;
+			return (mat != null) ? mat.shader : null;
+		}
+		set
+		{
+			throw new System.NotImplementedException(GetType() + " has no shader setter");
+		}
+	}
+
+	/// <summary>
 	/// Returns the UI panel responsible for this widget.
 	/// </summary>
 
@@ -904,7 +921,7 @@ public class UIWidget : MonoBehaviour
 			{
 				mChanged = false;
 
-				if (material != null && isVisible)
+				if (isVisible && shader != null)
 				{
 					bool hadVertices = mGeom.hasVertices;
 					mGeom.Clear();

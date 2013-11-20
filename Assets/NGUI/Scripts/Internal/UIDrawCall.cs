@@ -43,16 +43,19 @@ public class UIDrawCall : MonoBehaviour
 	[System.NonSerialized]
 	public UIPanel panel;
 
-	Transform		mTrans;			// Cached transform
-	Material		mSharedMat;		// Material used by this screen
-	Mesh			mMesh0;			// First generated mesh
-	Mesh			mMesh1;			// Second generated mesh
-	MeshFilter		mFilter;		// Mesh filter for this draw call
-	MeshRenderer	mRen;			// Mesh renderer for this screen
+	Material		mMaterial;		// Material used by this screen
+	Texture			mTexture;		// Main texture used by the material
+	Shader			mShader;		// Shader used by the dynamically created material
 	Clipping		mClipping;		// Clipping mode
 	Vector4			mClipRange;		// Clipping, if used
 	Vector2			mClipSoft;		// Clipping softness
-	Material		mMat;			// Instantiated material
+
+	Transform		mTrans;			// Cached transform
+	Mesh			mMesh0;			// First generated mesh
+	Mesh			mMesh1;			// Second generated mesh
+	MeshFilter		mFilter;		// Mesh filter for this draw call
+	MeshRenderer	mRenderer;		// Mesh renderer for this screen
+	Material		mDynamicMat;	// Instantiated material
 	int[]			mIndices;		// Cached indices
 
 	bool mDirty = false;
@@ -83,11 +86,11 @@ public class UIDrawCall : MonoBehaviour
 			{
 				mRenderQueue = value;
 
-				if (mMat != null && mSharedMat != null)
+				if (mDynamicMat != null)
 				{
-					mMat.renderQueue = mSharedMat.renderQueue + value;
+					mDynamicMat.renderQueue = ((mMaterial != null) ? mMaterial.renderQueue : 3000) + value;
 #if UNITY_EDITOR
-					if (mRen != null) mRen.enabled = isActive;
+					if (mRenderer != null) mRenderer.enabled = isActive;
 #endif
 				}
 			}
@@ -102,8 +105,8 @@ public class UIDrawCall : MonoBehaviour
 	{
 		get
 		{
-			if (mMat != null) return mMat.renderQueue;
-			return ((mSharedMat != null) ? mSharedMat.renderQueue : 3000) + mRenderQueue;
+			if (mDynamicMat != null) return mDynamicMat.renderQueue;
+			return ((mMaterial != null) ? mMaterial.renderQueue : 3000) + mRenderQueue;
 		}
 	}
 
@@ -128,9 +131,9 @@ public class UIDrawCall : MonoBehaviour
 			{
 				mActive = value;
 
-				if (mRen != null)
+				if (mRenderer != null)
 				{
-					mRen.enabled = value;
+					mRenderer.enabled = value;
 					UnityEditor.EditorUtility.SetDirty(gameObject);
 				}
 			}
@@ -149,19 +152,47 @@ public class UIDrawCall : MonoBehaviour
 	/// Material used by this screen.
 	/// </summary>
 
-	public Material baseMaterial { get { return mSharedMat; } set { mSharedMat = value; } }
+	public Material baseMaterial { get { return mMaterial; } set { mMaterial = value; } }
 
 	/// <summary>
 	/// Dynamically created material used by the draw call to actually draw the geometry.
 	/// </summary>
 
-	public Material dynamicMaterial { get { return mMat; } }
+	public Material dynamicMaterial { get { return mDynamicMat; } }
 
 	/// <summary>
 	/// Texture used by the material.
 	/// </summary>
 
-	public Texture mainTexture { get { return (mMat != null) ? mMat.mainTexture : null; } set { if (mMat != null) mMat.mainTexture = value; } }
+	public Texture mainTexture
+	{
+		get
+		{
+			return mTexture;
+		}
+		set
+		{
+			mTexture = value;
+			if (mDynamicMat != null) mDynamicMat.mainTexture = value;
+		}
+	}
+
+	/// <summary>
+	/// Shader used by the material.
+	/// </summary>
+
+	public Shader shader
+	{
+		get
+		{
+			return mShader;
+		}
+		set
+		{
+			mShader = value;
+			if (mDynamicMat != null) mDynamicMat.shader = value;
+		}
+	}
 
 	/// <summary>
 	/// The number of triangles in this draw call.
@@ -215,7 +246,7 @@ public class UIDrawCall : MonoBehaviour
 			{
 				mMesh0 = new Mesh();
 				mMesh0.hideFlags = HideFlags.DontSave;
-				mMesh0.name = "Mesh0 for " + mSharedMat.name;
+				mMesh0.name = (mMaterial != null) ? "Mesh0 for " + mMaterial.name : "Mesh0";
 #if !UNITY_3_5
 				mMesh0.MarkDynamic();
 #endif
@@ -232,7 +263,7 @@ public class UIDrawCall : MonoBehaviour
 		{
 			mMesh1 = new Mesh();
 			mMesh1.hideFlags = HideFlags.DontSave;
-			mMesh1.name = "Mesh1 for " + mSharedMat.name;
+			mMesh1.name = (mMaterial != null) ? "Mesh1 for " + mMaterial.name : "Mesh1";
 #if !UNITY_3_5
 			mMesh1.MarkDynamic();
 #endif
@@ -247,23 +278,86 @@ public class UIDrawCall : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Create an appropriate material for the draw call.
+	/// </summary>
+
+	void CreateMaterial ()
+	{
+		const string alpha = " (AlphaClip)";
+		const string soft = " (SoftClip)";
+		string shaderName = (mMaterial != null) ? mShader.name :
+			((mMaterial != null) ? mMaterial.shader.name : "Unlit/Transparent Colored");
+
+		// Figure out the normal shader's name
+		shaderName = shaderName.Replace("GUI/Text Shader", "Unlit/Text");
+		shaderName = shaderName.Replace(alpha, "");
+		shaderName = shaderName.Replace(soft, "");
+
+		// Try to find the new shader
+		Shader shader;
+
+		if (mClipping == Clipping.SoftClip)
+		{
+			shader = Shader.Find(shaderName + soft);
+		}
+		else if (mClipping == Clipping.AlphaClip)
+		{
+			shader = Shader.Find(shaderName + alpha);
+		}
+		else // No clipping
+		{
+			shader = (mShader != null) ? mShader : Shader.Find(shaderName);
+		}
+
+		if (mMaterial != null)
+		{
+			mDynamicMat = new Material(mMaterial);
+			mDynamicMat.hideFlags = HideFlags.DontSave;
+			mDynamicMat.CopyPropertiesFromMaterial(mMaterial);
+
+			// If there is a valid shader, assign it to the custom material
+			if (shader != null)
+			{
+				mDynamicMat.shader = shader;
+			}
+			else
+			{
+				if (mClipping != Clipping.None)
+				{
+					Debug.LogError(shaderName + " doesn't have a clipped shader version for " + mClipping);
+				}
+				mClipping = Clipping.None;
+			}
+		}
+		else
+		{
+			mDynamicMat = new Material(shader);
+			mDynamicMat.hideFlags = HideFlags.DontSave;
+		}
+	}
+
+	/// <summary>
 	/// Rebuild the draw call's material.
 	/// </summary>
 
-	public void RebuildMaterial ()
+	public Material RebuildMaterial ()
 	{
-		NGUITools.DestroyImmediate(mMat);
-		mMat = new Material(mSharedMat);
-		mMat.hideFlags = HideFlags.DontSave;
-		mMat.CopyPropertiesFromMaterial(mSharedMat);
-		
-		// Automatically replace "GUI/Text Shader" with "Unlit/Text"
-		if (mMat.shader != null && mMat.shader.name == "GUI/Text Shader")
-		{
-			Shader shader = Shader.Find("Unlit/Text");
-			if (shader != null) mMat.shader = shader;
-		}
-		mMat.renderQueue = mSharedMat.renderQueue + mRenderQueue;
+		// Destroy the old material
+		NGUITools.DestroyImmediate(mDynamicMat);
+
+		// Create a new material
+		CreateMaterial();
+
+		// Material's render queue generally begins at 3000
+		mDynamicMat.renderQueue = ((mMaterial != null) ? mMaterial.renderQueue : 3000) + mRenderQueue;
+		mLastClip = mClipping;
+
+		// Assign the main texture
+		if (mTexture != null) mDynamicMat.mainTexture = mTexture;
+
+		// Update the renderer
+		if (mRenderer != null) mRenderer.sharedMaterials = new Material[] { mDynamicMat };
+		return mDynamicMat;
 	}
 
 	/// <summary>
@@ -273,39 +367,17 @@ public class UIDrawCall : MonoBehaviour
 	void UpdateMaterials ()
 	{
 		// If clipping should be used, we need to find a replacement shader
-		if (mMat == null || mClipping != mLastClip)
+		if (mDynamicMat == null || mClipping != mLastClip)
 		{
 			RebuildMaterial();
-			mLastClip = mClipping;
-			Shader shader = null;
-			const string alpha	= " (AlphaClip)";
-			const string soft	= " (SoftClip)";
-
-			// Figure out the normal shader's name
-			string shaderName = mSharedMat.shader.name;
-			shaderName = shaderName.Replace("GUI/Text Shader", "Unlit/Text");
-			shaderName = shaderName.Replace(alpha, "");
-			shaderName = shaderName.Replace(soft, "");
-
-			// Try to find the new shader
-			if (mClipping == Clipping.SoftClip) shader = Shader.Find(shaderName + soft);
-			else if (mClipping == Clipping.AlphaClip) shader = Shader.Find(shaderName + alpha);
-			else shader = Shader.Find(shaderName);
-
-			// If there is a valid shader, assign it to the custom material
-			if (shader != null)
-			{
-				mMat.shader = shader;
-			}
-			else
-			{
-				Debug.LogError(shaderName + " doesn't have a clipped shader version for " + mClipping);
-				mClipping = Clipping.None;
-			}
 		}
-
-		if (mRen.sharedMaterial != mMat)
-			mRen.sharedMaterials = new Material[] { mMat };
+		else if (mRenderer.sharedMaterial != mDynamicMat)
+		{
+#if UNITY_EDITOR
+			Debug.LogError("Hmm... This point got hit!");
+#endif
+			mRenderer.sharedMaterials = new Material[] { mDynamicMat };
+		}
 	}
 
 	/// <summary>
@@ -322,18 +394,14 @@ public class UIDrawCall : MonoBehaviour
 			// Cache all components
 			if (mFilter == null) mFilter = gameObject.GetComponent<MeshFilter>();
 			if (mFilter == null) mFilter = gameObject.AddComponent<MeshFilter>();
-			if (mRen == null) mRen = gameObject.GetComponent<MeshRenderer>();
+			if (mRenderer == null) mRenderer = gameObject.GetComponent<MeshRenderer>();
 
-			if (mRen == null)
+			if (mRenderer == null)
 			{
-				mRen = gameObject.AddComponent<MeshRenderer>();
+				mRenderer = gameObject.AddComponent<MeshRenderer>();
 #if UNITY_EDITOR
-				mRen.enabled = isActive;
+				mRenderer.enabled = isActive;
 #endif
-				UpdateMaterials();
-			}
-			else if (mMat != null && mMat.mainTexture != mSharedMat.mainTexture)
-			{
 				UpdateMaterials();
 			}
 
@@ -442,15 +510,15 @@ public class UIDrawCall : MonoBehaviour
 			UpdateMaterials();
 		}
 
-		if (mMat != null && isClipped)
+		if (mDynamicMat != null && isClipped)
 		{
-			mMat.mainTextureOffset = new Vector2(-mClipRange.x / mClipRange.z, -mClipRange.y / mClipRange.w);
-			mMat.mainTextureScale = new Vector2(1f / mClipRange.z, 1f / mClipRange.w);
+			mDynamicMat.mainTextureOffset = new Vector2(-mClipRange.x / mClipRange.z, -mClipRange.y / mClipRange.w);
+			mDynamicMat.mainTextureScale = new Vector2(1f / mClipRange.z, 1f / mClipRange.w);
 
 			Vector2 sharpness = new Vector2(1000.0f, 1000.0f);
 			if (mClipSoft.x > 0f) sharpness.x = mClipRange.z / mClipSoft.x;
 			if (mClipSoft.y > 0f) sharpness.y = mClipRange.w / mClipSoft.y;
-			mMat.SetVector("_ClipSharpness", sharpness);
+			mDynamicMat.SetVector("_ClipSharpness", sharpness);
 		}
 	}
 
@@ -473,6 +541,6 @@ public class UIDrawCall : MonoBehaviour
 	{
 		NGUITools.DestroyImmediate(mMesh0);
 		NGUITools.DestroyImmediate(mMesh1);
-		NGUITools.DestroyImmediate(mMat);
+		NGUITools.DestroyImmediate(mDynamicMat);
 	}
 }

@@ -387,14 +387,17 @@ public class UIPanel : MonoBehaviour
 	/// Get a draw call at the specified index position.
 	/// </summary>
 
-	UIDrawCall GetDrawCall (int index, Material mat)
+	UIDrawCall GetDrawCall (int index, Material mat, Texture tex, Shader shader)
 	{
 		if (index < UIDrawCall.list.size)
 		{
 			UIDrawCall dc = UIDrawCall.list.buffer[index];
 
 			// If the material and texture match, keep using the same draw call
-			if (dc != null && dc.manager == this && dc.baseMaterial == mat && dc.mainTexture == mat.mainTexture) return dc;
+			if (dc != null && dc.manager == this &&
+				dc.baseMaterial == mat &&
+				dc.mainTexture == tex &&
+				dc.shader == shader) return dc;
 
 			// Otherwise we need to destroy all the draw calls that follow
 			for (int i = UIDrawCall.list.size; i > index; )
@@ -406,9 +409,10 @@ public class UIPanel : MonoBehaviour
 
 #if UNITY_EDITOR
 		// If we're in the editor, create the game object with hide flags set right away
-		GameObject go = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags("_UIDrawCall [" + mat.name + "]",
-			//HideFlags.DontSave | HideFlags.NotEditable);
-			HideFlags.HideAndDontSave);
+		GameObject go = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags("_UIDrawCall [" +
+			(mat != null ? mat.name : "null") + "]",
+			HideFlags.DontSave | HideFlags.NotEditable);
+			//HideFlags.HideAndDontSave);
 #else
 		GameObject go = new GameObject("_UIDrawCall [" + mat.name + "]");
 		DontDestroyOnLoad(go);
@@ -418,6 +422,8 @@ public class UIPanel : MonoBehaviour
 		// Create the draw call
 		UIDrawCall drawCall = go.AddComponent<UIDrawCall>();
 		drawCall.baseMaterial = mat;
+		drawCall.mainTexture = tex;
+		drawCall.shader = shader;
 		drawCall.renderQueue = UIDrawCall.list.size;
 		drawCall.manager = this;
 		//Debug.Log("Added DC " + mat.name + " as " + UIDrawCall.list.size);
@@ -853,6 +859,8 @@ public class UIPanel : MonoBehaviour
 		int index = 0;
 		UIPanel pan = null;
 		Material mat = null;
+		Texture tex = null;
+		Shader sdr = null;
 		UIDrawCall dc = null;
 
 		for (int i = 0; i < UIWidget.list.size; )
@@ -867,7 +875,10 @@ public class UIPanel : MonoBehaviour
 
 			if (w.isVisible && w.hasVertices)
 			{
-				if (pan != w.panel || mat != w.material)
+				Texture tx = w.mainTexture;
+				Shader sd = w.shader;
+
+				if (pan != w.panel || mat != w.material || tex != tx || sdr != sd)
 				{
 					if (pan != null && mat != null && mVerts.size != 0)
 					{
@@ -877,13 +888,15 @@ public class UIPanel : MonoBehaviour
 
 					pan = w.panel;
 					mat = w.material;
+					tex = tx;
+					sdr = sd;
 				}
 
-				if (pan != null && mat != null)
+				if (pan != null && (mat != null || sdr != null))
 				{
 					if (dc == null)
 					{
-						dc = pan.GetDrawCall(index++, mat);
+						dc = pan.GetDrawCall(index++, mat, tex, sdr);
 						dc.depthStart = w.raycastDepth;
 						dc.depthEnd = dc.depthStart;
 						dc.panel = pan;

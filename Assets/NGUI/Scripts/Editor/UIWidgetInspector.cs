@@ -858,7 +858,7 @@ public class UIWidgetInspector : Editor
 		}
 		else
 		{
-			if (GUILayout.Button("Correct", GUILayout.Width(68f)))
+			if (GUILayout.Button("Adjust", GUILayout.Width(68f)))
 			{
 				foreach (GameObject go in Selection.gameObjects)
 				{

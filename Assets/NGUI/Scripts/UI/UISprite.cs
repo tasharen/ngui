@@ -392,7 +392,7 @@ public class UISprite : UIWidget
 	}
 
 	/// <summary>
-	/// Virtual function called by the UIScreen that fills the buffers.
+	/// Virtual function called by the UIPanel that fills the buffers.
 	/// </summary>
 
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
