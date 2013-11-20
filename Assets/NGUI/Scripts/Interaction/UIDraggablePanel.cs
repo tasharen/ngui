@@ -549,10 +549,13 @@ public class UIDraggablePanel : MonoBehaviour
 			else
 			{
 				if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None && dragEffect == DragEffect.MomentumAndSpring)
-				{
 					RestrictWithinBounds(false);
+
+				if (!smoothDragStart || mDragStarted)
+				{
+					if (onDragFinished != null)
+						onDragFinished();
 				}
-				if (onDragFinished != null) onDragFinished();
 			}
 		}
 	}

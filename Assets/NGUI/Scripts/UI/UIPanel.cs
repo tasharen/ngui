@@ -472,6 +472,14 @@ public class UIPanel : MonoBehaviour
 
 	void OnEnable ()
 	{
+		// Apparently having a rigidbody helps
+		if (rigidbody == null)
+		{
+			Rigidbody rb = gameObject.AddComponent<Rigidbody>();
+			rb.isKinematic = true;
+			rb.useGravity = false;
+		}
+
 		mRebuild = true;
 		mSort = true;
 		list.Add(this);
