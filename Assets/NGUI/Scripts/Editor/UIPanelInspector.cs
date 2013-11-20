@@ -389,7 +389,7 @@ public class UIPanelInspector : Editor
 		if (mPanel.generateNormals != norms)
 		{
 			mPanel.generateNormals = norms;
-			UIPanel.SetDirty();
+			UIPanel.RebuildDrawCalls(true);
 			EditorUtility.SetDirty(mPanel);
 		}
 
@@ -401,7 +401,7 @@ public class UIPanelInspector : Editor
 		if (mPanel.cullWhileDragging != cull)
 		{
 			mPanel.cullWhileDragging = cull;
-			UIPanel.SetDirty();
+			UIPanel.RebuildDrawCalls(true);
 			EditorUtility.SetDirty(mPanel);
 		}
 
@@ -413,7 +413,7 @@ public class UIPanelInspector : Editor
 		if (mPanel.widgetsAreStatic != stat)
 		{
 			mPanel.widgetsAreStatic = stat;
-			UIPanel.SetDirty();
+			UIPanel.RebuildDrawCalls(true);
 			EditorUtility.SetDirty(mPanel);
 		}
 

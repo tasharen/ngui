@@ -243,8 +243,7 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (ShouldCreate(go, true))
 		{
-			UITexture tex = NGUITools.AddWidget<UITexture>(go);
-			Selection.activeGameObject = tex.gameObject;
+			Selection.activeGameObject = NGUISettings.AddTexture(go).gameObject;
 		}
 	}
 

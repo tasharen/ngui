@@ -205,6 +205,20 @@ public class NGUISettings
 		set { Set("NGUI Atlas", value); }
 	}
 
+	static public Texture texture
+	{
+		get { return Get<Texture>("NGUI Texture", null); }
+		set { Set("NGUI Texture", value); }
+	}
+
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+	static public Sprite sprite2D
+	{
+		get { return Get<Sprite>("NGUI Sprite2D", null); }
+		set { Set("NGUI Sprite2D", value); }
+	}
+#endif
+
 	static public string selectedSprite
 	{
 		get { return GetString("NGUI Sprite", null); }
@@ -319,7 +333,7 @@ public class NGUISettings
 	{
 		UIWidget w = NGUITools.AddWidget<UIWidget>(go);
 		w.name = "Widget";
-		w.pivot = GetEnum("NGUI Pivot", UIWidget.Pivot.Center);
+		w.pivot = pivot;
 		w.width = 100;
 		w.height = 100;
 		return w;
@@ -333,12 +347,29 @@ public class NGUISettings
 	{
 		UITexture w = NGUITools.AddWidget<UITexture>(go);
 		w.name = "Texture";
-		w.pivot = GetEnum("NGUI Pivot", UIWidget.Pivot.Center);
+		w.pivot = pivot;
+		w.mainTexture = texture;
 		w.width = 100;
 		w.height = 100;
 		return w;
 	}
 
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+	/// <summary>
+	/// Convenience method -- add a UnityEngine.Sprite.
+	/// </summary>
+
+	static public UI2DSprite Add2DSprite (GameObject go)
+	{
+		UI2DSprite w = NGUITools.AddWidget<UI2DSprite>(go);
+		w.name = "2D Sprite";
+		w.pivot = pivot;
+		w.sprite2D = sprite2D;
+		w.width = 100;
+		w.height = 100;
+		return w;
+	}
+#endif
 	/// <summary>
 	/// Convenience method -- add a sprite.
 	/// </summary>
@@ -347,8 +378,8 @@ public class NGUISettings
 	{
 		UISprite w = NGUITools.AddWidget<UISprite>(go);
 		w.name = "Sprite";
-		w.atlas = Get<UIAtlas>("NGUI Atlas", null);
-		w.spriteName = GetString("NGUI Sprite", null);
+		w.atlas = atlas;
+		w.spriteName = selectedSprite;
 
 		if (w.atlas != null && !string.IsNullOrEmpty(w.spriteName))
 		{
@@ -357,7 +388,7 @@ public class NGUISettings
 				w.type = UISprite.Type.Sliced;
 		}
 
-		w.pivot = GetEnum("NGUI Pivot", UIWidget.Pivot.Center);
+		w.pivot = pivot;
 		w.width = 100;
 		w.height = 100;
 		w.MakePixelPerfect();
@@ -374,7 +405,7 @@ public class NGUISettings
 		w.name = "Label";
 		w.ambigiousFont = ambigiousFont;
 		w.text = "New Label";
-		w.pivot = GetEnum("NGUI Pivot", UIWidget.Pivot.Center);
+		w.pivot = pivot;
 		w.width = 120;
 		w.height = Mathf.Max(20, GetInt("NGUI Font Height", 16));
 		w.fontStyle = fontStyle;

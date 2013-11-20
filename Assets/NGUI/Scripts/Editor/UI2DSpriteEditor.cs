@@ -3,6 +3,8 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -26,6 +28,9 @@ public class UI2DSpriteEditor : UIWidgetInspector
 	protected override bool DrawProperties ()
 	{
 		SerializedProperty sp = NGUIEditorTools.DrawProperty("2D Sprite", serializedObject, "mSprite");
+
+		NGUISettings.sprite2D = sp.objectReferenceValue as Sprite;
+
 		NGUIEditorTools.DrawProperty("Material", serializedObject, "mMat");
 
 		if (mSprite.material == null || serializedObject.isEditingMultipleObjects)
@@ -57,3 +62,4 @@ public class UI2DSpriteEditor : UIWidgetInspector
 		}
 	}
 }
+#endif

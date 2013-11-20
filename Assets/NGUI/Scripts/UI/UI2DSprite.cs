@@ -3,6 +3,8 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -37,31 +39,13 @@ public class UI2DSprite : UIWidget
 			if (mSprite != value)
 			{
 				mSprite = value;
-				if (drawCall != null) drawCall.mainTexture = mainTexture;
-				MarkAsChangedLite();
+				RemoveFromPanel();
 			}
 		}
 	}
 
 	/// <summary>
-	/// Re-assign the sprite texture to the material.
-	/// </summary>
-
-	protected override void OnValidate ()
-	{
-		base.OnValidate();
-
-		if (drawCall != null)
-		{
-			drawCall.baseMaterial = material;
-			drawCall.mainTexture = mainTexture;
-			drawCall.shader = shader;
-			drawCall.RebuildMaterial();
-		}
-	}
-
-	/// <summary>
-	/// Automatically destroy the dynamically-created material.
+	/// Material used by the widget.
 	/// </summary>
 
 	public override Material material
@@ -81,20 +65,6 @@ public class UI2DSprite : UIWidget
 				mPMA = -1;
 				MarkAsChanged();
 			}
-		}
-	}
-
-	/// <summary>
-	/// Texture used by the UITexture. You can set it directly, without the need to specify a material.
-	/// </summary>
-
-	public override Texture mainTexture
-	{
-		get
-		{
-			if (mSprite != null) return mSprite.texture;
-			if (mMat != null) return mMat.mainTexture;
-			return null;
 		}
 	}
 
@@ -122,6 +92,20 @@ public class UI2DSprite : UIWidget
 					MarkAsChanged();
 				}
 			}
+		}
+	}
+	
+	/// <summary>
+	/// Texture used by the UITexture. You can set it directly, without the need to specify a material.
+	/// </summary>
+
+	public override Texture mainTexture
+	{
+		get
+		{
+			if (mSprite != null) return mSprite.texture;
+			if (mMat != null) return mMat.mainTexture;
+			return null;
 		}
 	}
 
@@ -213,6 +197,16 @@ public class UI2DSprite : UIWidget
 	}
 
 	/// <summary>
+	/// Re-assign the sprite texture to the material.
+	/// </summary>
+
+	protected override void OnValidate ()
+	{
+		base.OnValidate();
+		UIPanel.RebuildDrawCalls(true);
+	}
+
+	/// <summary>
 	/// Adjust the scale of the widget to make it pixel-perfect.
 	/// </summary>
 
@@ -262,3 +256,4 @@ public class UI2DSprite : UIWidget
 		cols.Add(col);
 	}
 }
+#endif

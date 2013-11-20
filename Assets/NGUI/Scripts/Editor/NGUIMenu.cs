@@ -148,6 +148,16 @@ static public class NGUIMenu
 		}
 	}
 
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+	[MenuItem("NGUI/Create/Unity 2D Sprite &#r")]
+	static public void AddSprite2D ()
+	{
+		GameObject go = NGUIEditorTools.SelectedRoot(true);
+		if (go != null) Selection.activeGameObject = NGUISettings.Add2DSprite(go).gameObject;
+		else Debug.Log("You must select a game object first.");
+	}
+#endif
+
 	[MenuItem("NGUI/Create/Widget &#w")]
 	static public void AddWidget ()
 	{

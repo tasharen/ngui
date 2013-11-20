@@ -80,7 +80,8 @@ public class UIPanel : MonoBehaviour
 	[HideInInspector][SerializeField] int mDepth = 0;
 
 	// Whether a full rebuild of geometry buffers is required
-	static bool mFullRebuild = false;
+	static bool mRebuild = false;
+	static bool mSort = false;
 
 	// Cached in order to reduce memory allocations
 	static BetterList<Vector3> mVerts = new BetterList<Vector3>();
@@ -166,7 +167,8 @@ public class UIPanel : MonoBehaviour
 			if (mDepth != value)
 			{
 				mDepth = value;
-				mFullRebuild = true;
+				mRebuild = true;
+				mSort = true;
 
 				for (int i = 0; i < UIDrawCall.list.size; ++i)
 				{
@@ -206,15 +208,10 @@ public class UIPanel : MonoBehaviour
 	{
 		get
 		{
-			int count = 0;
-
-			for (int i = 0; i < UIDrawCall.list.size; ++i)
-			{
-				UIDrawCall dc = UIDrawCall.list[i];
-				if (dc.manager != this) continue;
-				++count;
-			}
-			return count;
+			for (int i = mDrawCalls.size; i > 0; )
+				if (!mDrawCalls.buffer[--i])
+					mDrawCalls.RemoveAt(i);
+			return mDrawCalls.size;
 		}
 	}
 
@@ -378,10 +375,10 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Mark the panel's content as changed and in need of being rebuilt.
+	/// Causes all draw calls to be re-created on the next update.
 	/// </summary>
 
-	static public void SetDirty () { mFullRebuild = true; }
+	static public void RebuildDrawCalls (bool sort) { mRebuild = true; if (sort) mSort = true; }
 
 	/// <summary>
 	/// Get a draw call at the specified index position.
@@ -403,18 +400,29 @@ public class UIPanel : MonoBehaviour
 			for (int i = UIDrawCall.list.size; i > index; )
 			{
 				UIDrawCall rem = UIDrawCall.list.buffer[--i];
-				DestroyDrawCall(rem, i);
+				
+				if (rem != null)
+				{
+					UIDrawCall.list.RemoveAt(i);
+					NGUITools.DestroyImmediate(rem.gameObject);
+				}
 			}
 		}
 
 #if UNITY_EDITOR
+		string name;
+
+		if (tex != null) name = tex.name;
+		else if (shader != null) name = shader.name;
+		else if (mat != null) name = mat.name;
+		else name = "";
+
 		// If we're in the editor, create the game object with hide flags set right away
-		GameObject go = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags("_UIDrawCall [" +
-			(mat != null ? mat.name : "null") + "]",
-			HideFlags.DontSave | HideFlags.NotEditable);
-			//HideFlags.HideAndDontSave);
+		GameObject go = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags("_UIDrawCall [" + name + "]",
+			//HideFlags.DontSave | HideFlags.NotEditable);
+			HideFlags.HideAndDontSave);
 #else
-		GameObject go = new GameObject("_UIDrawCall [" + mat.name + "]");
+		GameObject go = new GameObject();
 		DontDestroyOnLoad(go);
 #endif
 		go.layer = cachedGameObject.layer;
@@ -427,6 +435,12 @@ public class UIPanel : MonoBehaviour
 		drawCall.renderQueue = UIDrawCall.list.size;
 		drawCall.manager = this;
 		//Debug.Log("Added DC " + mat.name + " as " + UIDrawCall.list.size);
+
+		for (int i = mDrawCalls.size; i > 0; )
+			if (!mDrawCalls.buffer[--i])
+				mDrawCalls.RemoveAt(i);
+
+		mDrawCalls.Add(drawCall);
 		UIDrawCall.list.Add(drawCall);
 		return drawCall;
 	}
@@ -458,10 +472,13 @@ public class UIPanel : MonoBehaviour
 
 	void OnEnable ()
 	{
-		mFullRebuild = true;
+		mRebuild = true;
+		mSort = true;
 		list.Add(this);
 		list.Sort(CompareFunc);
 	}
+
+	BetterList<UIDrawCall> mDrawCalls = new BetterList<UIDrawCall>();
 
 	/// <summary>
 	/// Destroy all draw calls we've created when this script gets disabled.
@@ -469,12 +486,17 @@ public class UIPanel : MonoBehaviour
 
 	void OnDisable ()
 	{
-		for (int i = UIDrawCall.list.size; i > 0; )
+		for (int i = mDrawCalls.size; i > 0; )
 		{
-			UIDrawCall dc = UIDrawCall.list.buffer[--i];
-			if (dc != null && dc.manager == this)
-				DestroyDrawCall(dc, i);
+			UIDrawCall dc = mDrawCalls.buffer[--i];
+			
+			if (dc != null)
+			{
+				UIDrawCall.list.Remove(dc);
+				NGUITools.DestroyImmediate(dc.gameObject);
+			}
 		}
+		mDrawCalls.Clear();
 		list.Remove(this);
 	}
 
@@ -536,30 +558,26 @@ public class UIPanel : MonoBehaviour
 		UIDrawCall dc;
 		Transform dt;
 
-		for (int i = 0; i < UIDrawCall.list.size; )
+		for (int i = mDrawCalls.size; i > 0; )
 		{
-			dc = UIDrawCall.list.buffer[i];
+			dc = mDrawCalls.buffer[--i];
 
 			if (dc == null)
 			{
-				UIDrawCall.list.RemoveAt(i);
+				mDrawCalls.RemoveAt(i);
 				continue;
 			}
 
-			if (dc.manager == this)
-			{
-				dc.clipping = mClipping;
-				dc.clipRange = range;
-				dc.clipSoftness = mClipSoftness;
+			dc.clipping = mClipping;
+			dc.clipRange = range;
+			dc.clipSoftness = mClipSoftness;
 
-				// Set the draw call's transform to match the panel's.
-				// Note that parenting directly to the panel causes unity to crash as soon as you hit Play.
-				dt = dc.transform;
-				dt.position = t.position;
-				dt.rotation = t.rotation;
-				dt.localScale = t.lossyScale;
-			}
-			++i;
+			// Set the draw call's transform to match the panel's.
+			// Note that parenting directly to the panel causes unity to crash as soon as you hit Play.
+			dt = dc.transform;
+			dt.position = t.position;
+			dt.rotation = t.rotation;
+			dt.localScale = t.lossyScale;
 		}
 	}
 
@@ -582,10 +600,13 @@ public class UIPanel : MonoBehaviour
 			panel.UpdateWidgets();
 		}
 
-		// Fill the draw calls for all of the changed materials
-		if (mFullRebuild)
+		if (mSort)
 		{
 			UIWidget.list.Sort(UIWidget.CompareFunc);
+			Fill();
+		}
+		else if (mRebuild)
+		{
 			Fill();
 		}
 		else
@@ -594,11 +615,17 @@ public class UIPanel : MonoBehaviour
 			{
 				UIDrawCall dc = UIDrawCall.list[i];
 
-				if (dc.isDirty)
+				if (!dc)
+				{
+					UIDrawCall.list.RemoveAt(i);
+					continue;
+				}
+				else if (dc.isDirty)
 				{
 					if (!Fill(dc))
 					{
-						DestroyDrawCall(dc, i);
+						UIDrawCall.list.RemoveAt(i);
+						NGUITools.DestroyImmediate(dc.gameObject);
 						continue;
 					}
 				}
@@ -612,22 +639,9 @@ public class UIPanel : MonoBehaviour
 			UIPanel panel = list[i];
 			panel.UpdateDrawcalls();
 		}
-		mFullRebuild = false;
-	}
 
-	/// <summary>
-	/// Destroy the specified draw call.
-	/// NOTE: Future optimization can be caching these at run-time instead of destroying them.
-	/// </summary>
-
-	static void DestroyDrawCall (UIDrawCall dc, int index)
-	{
-		if (dc != null)
-		{
-			//Debug.Log("Destroyed DC " + dc.material.name + " as " + dc.renderQueue);
-			UIDrawCall.list.RemoveAt(index);
-			NGUITools.DestroyImmediate(dc.gameObject);
-		}
+		mRebuild = false;
+		mSort = false;
 	}
 
 	/// <summary>
@@ -644,11 +658,10 @@ public class UIPanel : MonoBehaviour
 			mCam = (uic != null) ? uic.cachedCamera : NGUITools.FindCameraForLayer(mLayer);
 			SetChildLayer(cachedTransform, mLayer);
 
-			for (int i = 0, imax = UIDrawCall.list.size; i < imax; ++i)
+			for (int i = 0, imax = mDrawCalls.size; i < imax; ++i)
 			{
-				UIDrawCall dc = UIDrawCall.list[i];
-				if (dc != null && dc.manager == this)
-					dc.gameObject.layer = mLayer;
+				UIDrawCall dc = mDrawCalls[i];
+				if (dc != null) dc.gameObject.layer = mLayer;
 			}
 		}
 	}
@@ -676,7 +689,7 @@ public class UIPanel : MonoBehaviour
 			{
 				changed = true;
 				
-				if (!mFullRebuild)
+				if (!mRebuild)
 				{
 					if (w.drawCall != null)
 					{
@@ -693,7 +706,7 @@ public class UIPanel : MonoBehaviour
 						}
 						else
 						{
-							mFullRebuild = true;
+							mRebuild = true;
 						}
 					}
 				}
@@ -728,7 +741,7 @@ public class UIPanel : MonoBehaviour
 
 	public void Refresh ()
 	{
-		mFullRebuild = true;
+		mRebuild = true;
 		if (list.size > 0) list[0].LateUpdate();
 	}
 
@@ -834,7 +847,7 @@ public class UIPanel : MonoBehaviour
 
 		if (createIfMissing && panel == null && trans != origin)
 		{
-			mFullRebuild = true;
+			mRebuild = true;
 			panel = trans.gameObject.AddComponent<UIPanel>();
 			SetChildLayer(panel.cachedTransform, panel.cachedGameObject.layer);
 		}
@@ -851,10 +864,13 @@ public class UIPanel : MonoBehaviour
 	/// Fill the geometry fully, processing all widgets and re-creating all draw calls.
 	/// </summary>
 
-	static void Fill ()
+	static public void Fill ()
 	{
 		for (int i = UIDrawCall.list.size; i > 0; )
-			DestroyDrawCall(UIDrawCall.list[--i], i);
+		{
+			UIDrawCall draw = UIDrawCall.list[--i];
+			if (draw != null) NGUITools.DestroyImmediate(draw.gameObject);
+		}
 
 		int index = 0;
 		UIPanel pan = null;
@@ -875,24 +891,26 @@ public class UIPanel : MonoBehaviour
 
 			if (w.isVisible && w.hasVertices)
 			{
+				UIPanel pn = w.panel;
+				Material mt = w.material;
 				Texture tx = w.mainTexture;
 				Shader sd = w.shader;
 
-				if (pan != w.panel || mat != w.material || tex != tx || sdr != sd)
+				if (pan != pn || mat != mt || tex != tx || sdr != sd)
 				{
-					if (pan != null && mat != null && mVerts.size != 0)
+					if (pan != null && mVerts.size != 0)
 					{
 						pan.SubmitDrawCall(dc);
 						dc = null;
 					}
 
-					pan = w.panel;
-					mat = w.material;
+					pan = pn;
+					mat = mt;
 					tex = tx;
 					sdr = sd;
 				}
 
-				if (pan != null && (mat != null || sdr != null))
+				if (pan != null && (mat != null || sdr != null || tex != null))
 				{
 					if (dc == null)
 					{
@@ -917,9 +935,7 @@ public class UIPanel : MonoBehaviour
 			else w.drawCall = null;
 			++i;
 		}
-
-		if (mVerts.size != 0)
-			pan.SubmitDrawCall(dc);
+		if (mVerts.size != 0) pan.SubmitDrawCall(dc);
 	}
 
 	/// <summary>

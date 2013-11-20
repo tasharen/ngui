@@ -221,7 +221,7 @@ public class UIWidget : MonoBehaviour
 #if UNITY_EDITOR
 				UnityEditor.EditorUtility.SetDirty(this);
 #endif
-				UIPanel.SetDirty();
+				UIPanel.RebuildDrawCalls(true);
 			}
 		}
 	}
@@ -515,7 +515,7 @@ public class UIWidget : MonoBehaviour
 		}
 		else if (isVisible && hasVertices)
 		{
-			UIPanel.SetDirty();
+			UIPanel.RebuildDrawCalls(true);
 		}
 	}
 
@@ -596,7 +596,7 @@ public class UIWidget : MonoBehaviour
 			{
 				CheckLayer();
 				mChanged = true;
-				if (material != null) UIPanel.SetDirty();
+				if (material != null) UIPanel.RebuildDrawCalls(true);
 			}
 		}
 	}

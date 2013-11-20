@@ -415,35 +415,31 @@ public class UIDrawCall : MonoBehaviour
 				// Set the mesh values
 				Mesh mesh = GetMesh(ref setIndices, verts.size);
 
-				bool trim = false;
-
-				if (norms != null)
-				{
-					if (norms.buffer.Length != verts.buffer.Length)
-						trim = true;
-				}
-
-				if (tans != null)
-				{
-					if (tans.buffer.Length != verts.buffer.Length)
-						trim = true;
-				}
+				// If the buffer length doesn't match, we need to trim all buffers
+				bool trim = (uvs.buffer.Length != verts.buffer.Length) ||
+					(cols.buffer.Length != verts.buffer.Length) ||
+					(norms != null && norms.buffer.Length != verts.buffer.Length) ||
+					(tans != null && tans.buffer.Length != verts.buffer.Length);
 
 				if (trim)
 				{
 					mesh.vertices = verts.ToArray();
+					mesh.uv = uvs.ToArray();
+					mesh.colors32 = cols.ToArray();
+
 					if (norms != null) mesh.normals = norms.ToArray();
 					if (tans != null) mesh.tangents = tans.ToArray();
 				}
 				else
 				{
 					mesh.vertices = verts.buffer;
+					mesh.uv = uvs.buffer;
+					mesh.colors32 = cols.buffer;
+
 					if (norms != null) mesh.normals = norms.buffer;
 					if (tans != null) mesh.tangents = tans.buffer;
 				}
 
-				mesh.uv = uvs.buffer;
-				mesh.colors32 = cols.buffer;
 				if (setIndices) mesh.triangles = mIndices;
 				//mesh.RecalculateBounds();
 				mFilter.mesh = mesh;
@@ -539,6 +535,7 @@ public class UIDrawCall : MonoBehaviour
 
 	void OnDestroy ()
 	{
+		list.Remove(this);
 		NGUITools.DestroyImmediate(mMesh0);
 		NGUITools.DestroyImmediate(mMesh1);
 		NGUITools.DestroyImmediate(mDynamicMat);

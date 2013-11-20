@@ -1608,7 +1608,9 @@ public class NGUIEditorTools
 	{
 		Object obj = LoadAsset(path);
 		if (obj == null) return null;
-		if (obj.GetType() == typeof(T)) return obj as T;
+
+		T val = obj as T;
+		if (val != null) return val;
 
 		if (typeof(T).IsSubclassOf(typeof(Component)))
 		{

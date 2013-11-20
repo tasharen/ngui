@@ -17,29 +17,51 @@ using System.Collections.Generic;
 public class UITexture : UIWidget
 {
 	[HideInInspector][SerializeField] Rect mRect = new Rect(0f, 0f, 1f, 1f);
-	[HideInInspector][SerializeField] Shader mShader;
 	[HideInInspector][SerializeField] Texture mTexture;
 	[HideInInspector][SerializeField] Material mMat;
+	[HideInInspector][SerializeField] Shader mShader;
 
-	bool mCreatingMat = false;
-	Material mDynamicMat = null;
 	int mPMA = -1;
 
 	/// <summary>
-	/// UV rectangle used by the texture.
+	/// Texture used by the UITexture. You can set it directly, without the need to specify a material.
 	/// </summary>
 
-	public Rect uvRect
+	public override Texture mainTexture
 	{
 		get
 		{
-			return mRect;
+			return mTexture;
 		}
 		set
 		{
-			if (mRect != value)
+			if (mTexture != value)
 			{
-				mRect = value;
+				mTexture = value;
+				RemoveFromPanel();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Material used by the widget.
+	/// </summary>
+
+	public override Material material
+	{
+		get
+		{
+			return mMat;
+		}
+		set
+		{
+			if (mMat != value)
+			{
+				MarkAsChanged();
+				drawCall = null;
+				mPanel = null;
+				mMat = value;
+				mPMA = -1;
 				MarkAsChanged();
 			}
 		}
@@ -49,16 +71,12 @@ public class UITexture : UIWidget
 	/// Shader used by the texture when creating a dynamic material (when the texture was specified, but the material was not).
 	/// </summary>
 
-	public Shader shader
+	public override Shader shader
 	{
 		get
 		{
-			if (mShader == null)
-			{
-				Material mat = material;
-				if (mat != null) mShader = mat.shader;
-				if (mShader == null) mShader = Shader.Find("Unlit/Transparent Colored");
-			}
+			if (mMat != null) return mMat.shader;
+			if (mShader == null) mShader = Shader.Find("Unlit/Transparent Colored");
 			return mShader;
 		}
 		set
@@ -66,54 +84,12 @@ public class UITexture : UIWidget
 			if (mShader != value)
 			{
 				mShader = value;
-				Material mat = material;
-				if (mat != null) mat.shader = value;
-				mPMA = -1;
-			}
-		}
-	}
 
-	/// <summary>
-	/// Whether the texture has created its material dynamically.
-	/// </summary>
-
-	public bool hasDynamicMaterial { get { return mDynamicMat != null; } }
-
-	/// <summary>
-	/// Automatically destroy the dynamically-created material.
-	/// </summary>
-
-	public override Material material
-	{
-		get
-		{
-			if (mMat != null) return mMat;
-			if (mTexture == null) return null;
-			if (mDynamicMat != null) return mDynamicMat;
-
-			if (!mCreatingMat && mDynamicMat == null)
-			{
-				mCreatingMat = true;
-				if (mShader == null) mShader = Shader.Find("Unlit/Transparent Colored");
-
-				Cleanup();
-
-				mDynamicMat = new Material(mShader);
-				mDynamicMat.hideFlags = HideFlags.DontSave;
-				mDynamicMat.mainTexture = mTexture;
-				mPMA = 0;
-				mCreatingMat = false;
-			}
-			return mDynamicMat;
-		}
-		set
-		{
-			if (mMat != value)
-			{
-				Cleanup();
-				mMat = value;
-				mPMA = -1;
-				MarkAsChanged();
+				if (mMat == null)
+				{
+					mPMA = -1;
+					MarkAsChanged();
+				}
 			}
 		}
 	}
@@ -136,27 +112,21 @@ public class UITexture : UIWidget
 	}
 
 	/// <summary>
-	/// Texture used by the UITexture. You can set it directly, without the need to specify a material.
+	/// UV rectangle used by the texture.
 	/// </summary>
 
-	public override Texture mainTexture
+	public Rect uvRect
 	{
 		get
 		{
-			if (mMat != null) return mMat.mainTexture;
-			if (mTexture != null) return mTexture;
-			return null;
+			return mRect;
 		}
 		set
 		{
-			Material mat = material;
-
-			if (mat != null)
+			if (mRect != value)
 			{
-				mPanel = null;
-				mTexture = value;
-				mat.mainTexture = value;
-				MarkAsChangedLite();
+				mRect = value;
+				MarkAsChanged();
 			}
 		}
 	}
@@ -207,18 +177,13 @@ public class UITexture : UIWidget
 	}
 
 	/// <summary>
-	/// Clean up.
+	/// Re-assign the sprite texture to the material.
 	/// </summary>
 
-	void OnDestroy () { Cleanup(); }
-
-	void Cleanup ()
+	protected override void OnValidate ()
 	{
-		if (mDynamicMat != null)
-		{
-			NGUITools.Destroy(mDynamicMat);
-			mDynamicMat = null;
-		}
+		base.OnValidate();
+		UIPanel.RebuildDrawCalls(true);
 	}
 
 	/// <summary>
