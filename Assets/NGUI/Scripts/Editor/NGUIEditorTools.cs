@@ -1051,6 +1051,7 @@ public class NGUIEditorTools
 							spriteName = newName;
 							mEditedName = null;
 
+							NGUISettings.atlas = atlas;
 							NGUISettings.selectedSprite = spriteName;
 						}
 					}
@@ -1065,6 +1066,7 @@ public class NGUIEditorTools
 
 				if (GUILayout.Button("Edit", GUILayout.Width(40f)))
 				{
+					NGUISettings.atlas = atlas;
 					NGUISettings.selectedSprite = spriteName;
 					Select(atlas.gameObject);
 				}

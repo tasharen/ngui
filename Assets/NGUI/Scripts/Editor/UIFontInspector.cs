@@ -330,6 +330,7 @@ public class UIFontInspector : Editor
 						{
 							if (mFont.atlas != null)
 							{
+								NGUISettings.atlas = mFont.atlas;
 								NGUISettings.selectedSprite = sym.spriteName;
 								NGUIEditorTools.Select(mFont.atlas.gameObject);
 							}

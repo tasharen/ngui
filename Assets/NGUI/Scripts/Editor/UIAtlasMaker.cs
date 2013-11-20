@@ -24,6 +24,7 @@ public class UIAtlasMaker : EditorWindow
 
 	Vector2 mScroll = Vector2.zero;
 	List<string> mDelNames = new List<string>();
+	UIAtlas mLastAtlas;
 
 	/// <summary>
 	/// Atlas selection callback.
@@ -619,6 +620,12 @@ public class UIAtlasMaker : EditorWindow
 
 	void OnGUI ()
 	{
+		if (mLastAtlas != NGUISettings.atlas)
+		{
+			mLastAtlas = NGUISettings.atlas;
+			atlasName = (NGUISettings.atlas != null) ? NGUISettings.atlas.name : "New Atlas";
+		}
+
 		bool create = false;
 		bool update = false;
 		bool replace = false;

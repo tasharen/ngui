@@ -56,7 +56,9 @@ public class UISpriteInspector : UIWidgetInspector
 		{
 			if (atlas != null)
 			{
-				NGUIEditorTools.Select((atlas.objectReferenceValue as UIAtlas).gameObject);
+				UIAtlas atl = atlas.objectReferenceValue as UIAtlas;
+				NGUISettings.atlas = atl;
+				NGUIEditorTools.Select(atl.gameObject);
 			}
 		}
 		GUILayout.EndHorizontal();
