@@ -418,7 +418,7 @@ public class UIDrawCall : MonoBehaviour
 					(norms != null && norms.buffer.Length != verts.buffer.Length) ||
 					(tans != null && tans.buffer.Length != verts.buffer.Length);
 
-				if (trim)
+				if (trim || verts.buffer.Length > 65000)
 				{
 					mesh.vertices = verts.ToArray();
 					mesh.uv = uvs.ToArray();
