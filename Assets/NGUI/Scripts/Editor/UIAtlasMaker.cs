@@ -420,9 +420,10 @@ public class UIAtlasMaker : EditorWindow
 					int xmin = Mathf.Clamp(es.x, 0, oldWidth);
 					int ymin = Mathf.Clamp(es.y, 0, oldHeight);
 					int xmax = Mathf.Min(xmin + es.width, oldWidth - 1);
-					int ymax = Mathf.Min(ymin + es.height, oldWidth - 1);
+					int ymax = Mathf.Min(ymin + es.height, oldHeight - 1);
 					int newWidth = Mathf.Clamp(es.width, 0, oldWidth);
 					int newHeight = Mathf.Clamp(es.height, 0, oldHeight);
+
 					if (newWidth == 0 || newHeight == 0) continue;
 
 					Color32[] newPixels = new Color32[newWidth * newHeight];
