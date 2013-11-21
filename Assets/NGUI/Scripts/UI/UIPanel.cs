@@ -1073,7 +1073,11 @@ public class UIPanel : MonoBehaviour
 		if (!clip)
 		{
 			UIRoot root = NGUITools.FindInParents<UIRoot>(cachedGameObject);
+#if UNITY_EDITOR
 			if (root != null) size *= root.GetPixelSizeAdjustment(mScreenHeight);
+#else
+			if (root != null) size *= root.GetPixelSizeAdjustment(Screen.height);
+#endif
 		}
 		return size;
 	}
