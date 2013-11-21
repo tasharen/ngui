@@ -114,7 +114,7 @@ public class UISprite : UIWidget
 				}
 
 				// Make sure the panel knows that the draw calls may have changed
-				UIPanel.RebuildDrawCalls(false);
+				UIPanel.RebuildAllDrawCalls(false);
 			}
 		}
 	}
@@ -512,7 +512,7 @@ public class UISprite : UIWidget
 		uvs.Add(new Vector2(uv1.x, uv0.y));
 
 		Color colF = color;
-		colF.a *= mPanel.alpha;
+		colF.a *= mPanel.finalAlpha;
 		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 		
 		cols.Add(col);
@@ -565,7 +565,7 @@ public class UISprite : UIWidget
 		mTemp2[3] = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
 
 		Color colF = color;
-		colF.a *= mPanel.alpha;
+		colF.a *= mPanel.finalAlpha;
 		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 
 		for (int x = 0; x < 3; ++x)
@@ -618,7 +618,7 @@ public class UISprite : UIWidget
 		}
 
 		Color colF = color;
-		colF.a *= mPanel.alpha;
+		colF.a *= mPanel.finalAlpha;
 		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 
 		Vector2 pv = pivotOffset;
@@ -685,7 +685,7 @@ public class UISprite : UIWidget
 		if (mFillAmount < 0.001f) return;
 
 		Color colF = color;
-		colF.a *= mPanel.alpha;
+		colF.a *= mPanel.finalAlpha;
 		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 		Vector4 v = drawingDimensions;
 

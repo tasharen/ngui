@@ -93,18 +93,20 @@ public class UIPanel : MonoBehaviour
 	GameObject mGo;
 	Transform mTrans;
 	Camera mCam;
-	int mLayer = -1;
+	UIPanel mParent;
+	bool mFindParent = true;
 	float mCullTime = 0f;
 	float mUpdateTime = 0f;
 	float mMatrixTime = 0f;
+	int mLayer = -1;
 
 	// Values used for visibility checks
 	static float[] mTemp = new float[4];
 	Vector2 mMin = Vector2.zero;
 	Vector2 mMax = Vector2.zero;
 
-	// Used for SetAlphaRecursive()
-	UIPanel[] mChildPanels;
+	// List of all the draw calls created by this panel
+	BetterList<UIDrawCall> mDrawCalls = new BetterList<UIDrawCall>();
 
 	/// <summary>
 	/// Cached for speed. Can't simply return 'mGo' set in Awake because this function may be called on a prefab.
@@ -117,6 +119,24 @@ public class UIPanel : MonoBehaviour
 	/// </summary>
 
 	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
+
+	/// <summary>
+	/// Parent panel is used to determine cumulative alpha.
+	/// </summary>
+
+	public UIPanel parent
+	{
+		get
+		{
+			if (mFindParent)
+			{
+				mFindParent = false;
+				Transform t = cachedTransform.parent;
+				mParent = (t != null) ? NGUITools.FindInParents<UIPanel>(t) : null;
+			}
+			return mParent;
+		}
+	}
 
 	/// <summary>
 	/// Panel's alpha affects everything drawn by the panel.
@@ -135,22 +155,16 @@ public class UIPanel : MonoBehaviour
 			if (mAlpha != val)
 			{
 				mAlpha = val;
-
-				for (int i = 0; i < UIDrawCall.list.size; ++i)
-				{
-					UIDrawCall dc = UIDrawCall.list[i];
-					if (dc != null && dc.manager == this)
-						dc.isDirty = true;
-				}
-
-				for (int i = 0; i < UIWidget.list.size; ++i)
-				{
-					UIWidget w = UIWidget.list[i];
-					if (w.panel == this) w.MarkAsChangedLite();
-				}
+				SetDirty();
 			}
 		}
 	}
+
+	/// <summary>
+	/// Final alpha, taking all parent panels into consideration.
+	/// </summary>
+
+	public float finalAlpha { get { return (parent != null) ? mParent.alpha * mAlpha : mAlpha; } }
 
 	/// <summary>
 	/// Panels can have their own depth value that will change the order with which everything they manage gets drawn.
@@ -213,18 +227,6 @@ public class UIPanel : MonoBehaviour
 					mDrawCalls.RemoveAt(i);
 			return mDrawCalls.size;
 		}
-	}
-
-	/// <summary>
-	/// Recursively set the alpha for this panel and all of its children.
-	/// </summary>
-
-	public void SetAlphaRecursive (float val, bool rebuildList)
-	{
-		if (rebuildList || mChildPanels == null)
-			mChildPanels = GetComponentsInChildren<UIPanel>(true);
-		for (int i = 0, imax = mChildPanels.Length; i < imax; ++i)
-			mChildPanels[i].alpha = val;
 	}
 
 	/// <summary>
@@ -399,7 +401,35 @@ public class UIPanel : MonoBehaviour
 	/// Causes all draw calls to be re-created on the next update.
 	/// </summary>
 
-	static public void RebuildDrawCalls (bool sort) { mRebuild = true; if (sort) mSort = true; }
+	static public void RebuildAllDrawCalls (bool sort) { mRebuild = true; if (sort) mSort = true; }
+
+	/// <summary>
+	/// Invalidate the panel's draw calls, forcing them to be rebuilt on the next update.
+	/// This call also affects all child panels.
+	/// </summary>
+
+	public void SetDirty ()
+	{
+		for (int i = 0; i < UIDrawCall.list.size; ++i)
+		{
+			UIDrawCall dc = UIDrawCall.list[i];
+			if (dc != null && dc.manager == this)
+				dc.isDirty = true;
+		}
+
+		for (int i = 0; i < UIWidget.list.size; ++i)
+		{
+			UIWidget w = UIWidget.list[i];
+			if (w.panel == this) w.MarkAsChangedLite();
+		}
+
+		for (int i = 0; i < list.size; ++i)
+		{
+			UIPanel p = list[i];
+			if (p != null && p != this && p.parent == this)
+				p.SetDirty();
+		}
+	}
 
 	/// <summary>
 	/// Get a draw call at the specified index position.
@@ -501,13 +531,12 @@ public class UIPanel : MonoBehaviour
 			rb.useGravity = false;
 		}
 
+		mFindParent = true;
 		mRebuild = true;
 		mSort = true;
 		list.Add(this);
 		list.Sort(CompareFunc);
 	}
-
-	BetterList<UIDrawCall> mDrawCalls = new BetterList<UIDrawCall>();
 
 	/// <summary>
 	/// Destroy all draw calls we've created when this script gets disabled.
@@ -515,6 +544,8 @@ public class UIPanel : MonoBehaviour
 
 	void OnDisable ()
 	{
+		mParent = null;
+
 		for (int i = mDrawCalls.size; i > 0; )
 		{
 			UIDrawCall dc = mDrawCalls.buffer[--i];

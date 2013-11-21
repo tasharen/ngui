@@ -1078,7 +1078,7 @@ public class UILabel : UIWidget
 	void ApplyShadow (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols, int start, int end, float x, float y)
 	{
 		Color c = mEffectColor;
-		c.a *= alpha * mPanel.alpha;
+		c.a *= alpha * mPanel.finalAlpha;
 		Color32 col = (bitmapFont != null && bitmapFont.premultipliedAlpha) ? NGUITools.ApplyPMA(c) : c;
 
 		for (int i = start; i < end; ++i)
@@ -1106,7 +1106,7 @@ public class UILabel : UIWidget
 		int offset = verts.size;
 
 		Color col = color;
-		col.a *= mPanel.alpha;
+		col.a *= mPanel.finalAlpha;
 		if (mFont != null && mFont.premultipliedAlpha) col = NGUITools.ApplyPMA(col);
 
 		string text = processedText;

@@ -131,7 +131,7 @@ public class UIWidget : MonoBehaviour
 	/// Color used by the widget.
 	/// </summary>
 
-	public Color color { get { return mColor; } set { if (!mColor.Equals(value)) { mColor = value; mChanged = true; } } }
+	public Color color { get { return mColor; } set { if (mColor != value) { mColor = value; mChanged = true; } } }
 
 	/// <summary>
 	/// Widget's alpha -- a convenience method.
@@ -143,7 +143,14 @@ public class UIWidget : MonoBehaviour
 	/// Widget's final alpha, after taking the panel's alpha into account.
 	/// </summary>
 
-	public float finalAlpha { get { if (mPanel == null) CreatePanel(); return (mPanel != null) ? mColor.a * mPanel.alpha : mColor.a; } }
+	public float finalAlpha
+	{
+		get
+		{
+			if (mPanel == null) CreatePanel();
+			return (mPanel != null) ? mColor.a * mPanel.finalAlpha : mColor.a;
+		}
+	}
 
 	/// <summary>
 	/// Change the pivot point and do not attempt to keep the widget in the same place by adjusting its transform.
@@ -221,7 +228,7 @@ public class UIWidget : MonoBehaviour
 #if UNITY_EDITOR
 				UnityEditor.EditorUtility.SetDirty(this);
 #endif
-				UIPanel.RebuildDrawCalls(true);
+				UIPanel.RebuildAllDrawCalls(true);
 			}
 		}
 	}
@@ -515,7 +522,7 @@ public class UIWidget : MonoBehaviour
 		}
 		else if (isVisible && hasVertices)
 		{
-			UIPanel.RebuildDrawCalls(true);
+			UIPanel.RebuildAllDrawCalls(true);
 		}
 	}
 
@@ -565,7 +572,7 @@ public class UIWidget : MonoBehaviour
 		{
 			mOldTex = mainTexture;
 			mOldShader = shader;
-			UIPanel.RebuildDrawCalls(true);
+			UIPanel.RebuildAllDrawCalls(true);
 		}
 	}
 #endif
@@ -613,7 +620,7 @@ public class UIWidget : MonoBehaviour
 			{
 				CheckLayer();
 				mChanged = true;
-				if (material != null) UIPanel.RebuildDrawCalls(true);
+				if (material != null) UIPanel.RebuildAllDrawCalls(true);
 			}
 		}
 	}
