@@ -15,7 +15,36 @@ using System.Collections.Generic;
 static public class NGUIMenu
 {
 	[MenuItem("CONTEXT/UIWidget/Help")]
-	static void ShowHelp (UnityEditor.MenuCommand command) { ShowHelp(command.context.GetType()); }
+	static void ShowHelpMenu (UnityEditor.MenuCommand command) { ShowHelp(command.context); }
+
+	[MenuItem("CONTEXT/UIButton/Help")]
+	static void ShowButtonHelp (UnityEditor.MenuCommand command) { ShowHelp(typeof(UIButton)); }
+
+	[MenuItem("CONTEXT/UIToggle/Help")]
+	static void ShowToggleHelp (UnityEditor.MenuCommand command) { ShowHelp(typeof(UIToggle)); }
+
+	[MenuItem("CONTEXT/UIRoot/Help")]
+	static void ShowRootHelp (UnityEditor.MenuCommand command) { ShowHelp(typeof(UIRoot)); }
+
+	/// <summary>
+	/// Show help for the specific topic.
+	/// </summary>
+
+	static public void ShowHelp (object obj)
+	{
+		if (obj is GameObject)
+		{
+			GameObject go = obj as GameObject;
+			UIWidget widget = go.GetComponent<UIWidget>();
+
+			if (widget != null)
+			{
+				ShowHelp(widget.GetType());
+				return;
+			}
+		}
+		ShowHelp(obj.GetType());
+	}
 
 	/// <summary>
 	/// Show help for the specific topic.
@@ -23,8 +52,44 @@ static public class NGUIMenu
 
 	static public void ShowHelp (Type type)
 	{
-		// TODO: Navigate to a more context-appropriate URL
-		Application.OpenURL("http://www.tasharen.com/forum/index.php?board=1.0");
+		if (type == typeof(UIWidget))
+		{
+			Application.OpenURL("http://www.tasharen.com/forum/index.php?topic=6702");
+		}
+		else if (type == typeof(UITexture))
+		{
+			Application.OpenURL("http://www.tasharen.com/forum/index.php?topic=6703");
+		}
+		else if (type == typeof(UISprite))
+		{
+			Application.OpenURL("http://www.tasharen.com/forum/index.php?topic=6704");
+		}
+		else if (type == typeof(UIPanel))
+		{
+			Application.OpenURL("http://www.tasharen.com/forum/index.php?topic=6705");
+		}
+		else if (type == typeof(UILabel))
+		{
+			Application.OpenURL("http://www.tasharen.com/forum/index.php?topic=6706");
+		}
+		else if (type == typeof(UIButton))
+		{
+			Application.OpenURL("http://www.tasharen.com/forum/index.php?topic=6708");
+		}
+		else if (type == typeof(UIToggle))
+		{
+			Application.OpenURL("http://www.tasharen.com/forum/index.php?topic=6709");
+		}
+		else if (type == typeof(UIRoot))
+		{
+			Application.OpenURL("http://www.tasharen.com/forum/index.php?topic=6710");
+		}
+		else
+		{
+			// TODO: Navigate to a more context-appropriate URL
+			Application.OpenURL("http://www.tasharen.com/forum/index.php?board=1.0");
+			Debug.Log(type);
+		}
 	}
 
 	[MenuItem("NGUI/Selection/Bring To Front &#=")]

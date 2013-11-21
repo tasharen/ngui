@@ -197,7 +197,7 @@ public static class NGUIContextMenu
 		go.AddComponent<UIStretch>();
 	}
 
-	static void OnHelp (object obj) { NGUIMenu.ShowHelp(obj.GetType()); }
+	static void OnHelp (object obj) { NGUIMenu.ShowHelp(obj); }
 	static void OnMakePixelPerfect (object obj) { NGUITools.MakePixelPerfect(obj as Transform); }
 	static void OnBoxCollider (object obj) { NGUITools.AddWidgetCollider(obj as GameObject); }
 	static void OnDelete (object obj)

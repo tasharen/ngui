@@ -298,9 +298,22 @@ static public class NGUITools
 		if (box != null)
 		{
 			GameObject go = box.gameObject;
-			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
-			box.center = b.center;
-			box.size = new Vector3(b.size.x, b.size.y, 0f);
+			UIWidget w = go.GetComponent<UIWidget>();
+
+			if (w != null)
+			{
+				Vector3[] corners = w.localCorners;
+				Vector3 center = (corners[2] + corners[0]) * 0.5f;
+				Vector3 size = (corners[2] - corners[0]);
+				box.center = center;
+				box.size = size;
+			}
+			else
+			{
+				Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
+				box.center = b.center;
+				box.size = new Vector3(b.size.x, b.size.y, 0f);
+			}
 #if UNITY_EDITOR
 			UnityEditor.EditorUtility.SetDirty(box);
 #endif
