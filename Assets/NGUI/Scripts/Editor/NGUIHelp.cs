@@ -38,24 +38,36 @@ static public class NGUIHelp
 	[MenuItem("CONTEXT/UISlider/Help")]
 	static void ShowSliderHelp (UnityEditor.MenuCommand command) { Show(typeof(UISlider)); }
 
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+	[MenuItem("CONTEXT/UI2DSprite/Help")]
+	static void ShowSprite2DHelp (UnityEditor.MenuCommand command) { Show(typeof(UI2DSprite)); }
+#endif
+
+	[MenuItem("CONTEXT/UIScrollBar/Help")]
+	static void ShowScrollBarHelp (UnityEditor.MenuCommand command) { Show(typeof(UIScrollBar)); }
+
 	/// <summary>
 	/// Get the URL pointing to the documentation for the specified component.
 	/// </summary>
 
 	static public string GetHelpURL (Type type)
 	{
-		if (type == typeof(UIWidget))	return "http://www.tasharen.com/forum/index.php?topic=6702";
-		if (type == typeof(UITexture))	return "http://www.tasharen.com/forum/index.php?topic=6703";
-		if (type == typeof(UISprite))	return "http://www.tasharen.com/forum/index.php?topic=6704";
-		if (type == typeof(UIPanel))	return "http://www.tasharen.com/forum/index.php?topic=6705";
-		if (type == typeof(UILabel))	return "http://www.tasharen.com/forum/index.php?topic=6706";
-		if (type == typeof(UIButton))	return "http://www.tasharen.com/forum/index.php?topic=6708";
-		if (type == typeof(UIToggle))	return "http://www.tasharen.com/forum/index.php?topic=6709";
-		if (type == typeof(UIRoot))		return "http://www.tasharen.com/forum/index.php?topic=6710";
-		if (type == typeof(UICamera))	return "http://www.tasharen.com/forum/index.php?topic=6711";
-		if (type == typeof(UIAnchor))	return "http://www.tasharen.com/forum/index.php?topic=6712";
-		if (type == typeof(UIStretch))	return "http://www.tasharen.com/forum/index.php?topic=6713";
-		if (type == typeof(UISlider))	return "http://www.tasharen.com/forum/index.php?topic=6715";
+		if (type == typeof(UIWidget))		return "http://www.tasharen.com/forum/index.php?topic=6702";
+		if (type == typeof(UITexture))		return "http://www.tasharen.com/forum/index.php?topic=6703";
+		if (type == typeof(UISprite))		return "http://www.tasharen.com/forum/index.php?topic=6704";
+		if (type == typeof(UIPanel))		return "http://www.tasharen.com/forum/index.php?topic=6705";
+		if (type == typeof(UILabel))		return "http://www.tasharen.com/forum/index.php?topic=6706";
+		if (type == typeof(UIButton))		return "http://www.tasharen.com/forum/index.php?topic=6708";
+		if (type == typeof(UIToggle))		return "http://www.tasharen.com/forum/index.php?topic=6709";
+		if (type == typeof(UIRoot))			return "http://www.tasharen.com/forum/index.php?topic=6710";
+		if (type == typeof(UICamera))		return "http://www.tasharen.com/forum/index.php?topic=6711";
+		if (type == typeof(UIAnchor))		return "http://www.tasharen.com/forum/index.php?topic=6712";
+		if (type == typeof(UIStretch))		return "http://www.tasharen.com/forum/index.php?topic=6713";
+		if (type == typeof(UISlider))		return "http://www.tasharen.com/forum/index.php?topic=6715";
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+		if (type == typeof(UI2DSprite))		return "http://www.tasharen.com/forum/index.php?topic=6729";
+#endif
+		if (type == typeof(UIScrollBar))	return "http://www.tasharen.com/forum/index.php?topic=6733";
 		return null;
 	}
 

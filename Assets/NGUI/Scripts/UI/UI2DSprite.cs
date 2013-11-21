@@ -9,9 +9,10 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// If you don't have or don't wish to create an atlas, you can simply use this script to draw a texture.
-/// Keep in mind though that this will create an extra draw call with each UITexture present, so it's
-/// best to use it only for backgrounds or temporary visible widgets.
+/// 2D Sprite is capable of drawing sprites added in Unity 4.3. When importing your textures,
+/// import them as Sprites and you will be able to draw them with this widget.
+/// If you provide a Packing Tag in your import settings, your sprites will get automatically
+/// packed into an atlas for you, so creating an atlas beforehand is not necessary.
 /// </summary>
 
 [ExecuteInEditMode]

@@ -1254,4 +1254,21 @@ public class UILabel : UIWidget
 		}
 		else NGUIText.current.alignment = TextAlignment.Center;
 	}
+
+	/// <summary>
+	/// Convenience function, in case you wanted to associate UISlider or UIScrollBar's
+	/// OnValueChanged function in inspector with a label.
+	/// </summary>
+
+	public void SetCurrentPercent ()
+	{
+		if (UISlider.current != null)
+		{
+			text = Mathf.RoundToInt(UISlider.current.value * 100f) + "%";
+		}
+		else if (UIScrollBar.current != null)
+		{
+			text = Mathf.RoundToInt(UIScrollBar.current.value * 100f) + "%";
+		}
+	}
 }

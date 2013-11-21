@@ -39,8 +39,8 @@ public class UIScrollBar : UIWidgetContainer
 	public OnDragFinished onDragFinished;
 	public delegate void OnDragFinished ();
 
-	[HideInInspector][SerializeField] UISprite mBG;
-	[HideInInspector][SerializeField] UISprite mFG;
+	[HideInInspector][SerializeField] UIWidget mBG;
+	[HideInInspector][SerializeField] UIWidget mFG;
 	[HideInInspector][SerializeField] Direction mDir = Direction.Horizontal;
 	[HideInInspector][SerializeField] bool mInverted = false;
 	[HideInInspector][SerializeField] float mScroll = 0f;
@@ -50,6 +50,8 @@ public class UIScrollBar : UIWidgetContainer
 	bool mIsDirty = false;
 	Camera mCam;
 	Vector2 mScreenPos = Vector2.zero;
+	Vector3 mStartingPos = Vector3.zero;
+	Vector2 mStartingSize = Vector2.zero;
 
 	/// <summary>
 	/// Cached for speed.
@@ -64,16 +66,16 @@ public class UIScrollBar : UIWidgetContainer
 	public Camera cachedCamera { get { if (mCam == null) mCam = NGUITools.FindCameraForLayer(gameObject.layer); return mCam; } }
 
 	/// <summary>
-	/// Sprite used for the background.
+	/// Widget used for the foreground.
 	/// </summary>
 
-	public UISprite background { get { return mBG; } set { if (mBG != value) { mBG = value; mIsDirty = true; } } }
+	public UIWidget foreground { get { return mFG; } set { if (mFG != value) { mFG = value; mIsDirty = true; } } }
 
 	/// <summary>
-	/// Sprite used for the foreground.
+	/// Widget used for the background.
 	/// </summary>
 
-	public UISprite foreground { get { return mFG; } set { if (mFG != value) { mFG = value; mIsDirty = true; } } }
+	public UIWidget background { get { return mBG; } set { if (mBG != value) { mBG = value; mIsDirty = true; } } }
 
 	/// <summary>
 	/// The scroll bar's direction.
@@ -91,25 +93,6 @@ public class UIScrollBar : UIWidgetContainer
 			{
 				mDir = value;
 				mIsDirty = true;
-
-				// Since the direction is changing, see if we need to swap width with height (for convenience)
-				if (mBG != null)
-				{
-					int width = mBG.width;
-					int height = mBG.height;
-
-					if ((mDir == Direction.Vertical   && width > height) ||
-						(mDir == Direction.Horizontal && width < height))
-					{
-						mBG.width = height;
-						mBG.height = width;
-						ForceUpdate();
-
-						// Update the colliders as well
-						if (mBG.collider != null) NGUITools.AddWidgetCollider(mBG.gameObject);
-						if (mFG.collider != null) NGUITools.AddWidgetCollider(mFG.gameObject);
-					}
-				}
 			}
 		}
 	}
@@ -191,7 +174,7 @@ public class UIScrollBar : UIWidgetContainer
 		{
 			if (mFG != null) return mFG.alpha;
 			if (mBG != null) return mBG.alpha;
-			return 0f;
+			return 1f;
 		}
 		set
 		{
@@ -215,28 +198,13 @@ public class UIScrollBar : UIWidgetContainer
 
 	void CenterOnPos (Vector2 localPos)
 	{
-		if (mBG == null || mFG == null) return;
+		if (mFG == null) return;
 
-		// Background's bounds
-		Bounds bg = NGUIMath.CalculateRelativeInnerBounds(cachedTransform, mBG);
-		Bounds fg = NGUIMath.CalculateRelativeInnerBounds(cachedTransform, mFG);
+		float val = (mDir == Direction.Horizontal) ?
+			(localPos.x - (mStartingPos.x - mStartingSize.x + mFG.width) * 0.5f) / (mStartingSize.x - mFG.width) :
+			(localPos.y - (mStartingPos.y - mStartingSize.y + mFG.height) * 0.5f) / (mStartingSize.y - mFG.height);
 
-		if (mDir == Direction.Horizontal)
-		{
-			float size = bg.size.x - fg.size.x;
-			float offset = size * 0.5f;
-			float min = bg.center.x - offset;
-			float val = (size > 0f) ? (localPos.x - min) / size : 0f;
-			value = mInverted ? 1f - val : val;
-		}
-		else
-		{
-			float size = bg.size.y - fg.size.y;
-			float offset = size * 0.5f;
-			float min = bg.center.y - offset;
-			float val = (size > 0f) ? 1f - (localPos.y - min) / size : 0f;
-			value = mInverted ? 1f - val : val;
-		}
+		value = Mathf.Clamp01((mInverted ? 1f - val : val));
 	}
 
 	/// <summary>
@@ -310,18 +278,31 @@ public class UIScrollBar : UIWidgetContainer
 
 	void Start ()
 	{
-		if (background != null && background.collider != null)
+		if (mFG != null)
 		{
-			UIEventListener listener = UIEventListener.Get(background.gameObject);
-			listener.onPress += OnPressBackground;
-			listener.onDrag += OnDragBackground;
+			mStartingSize = new Vector2(mFG.width, mFG.height);
+			mFG.pivot = UIWidget.Pivot.Center;
+			mStartingPos = mFG.cachedTransform.localPosition;
+		}
+		else
+		{
+			Debug.LogWarning("Scroll bar needs a foreground widget to work with", this);
+			enabled = false;
+			return;
 		}
 
-		if (foreground != null && foreground.collider != null)
+		GameObject bg = (mBG != null && mBG.collider != null) ? mBG.gameObject : gameObject;
+		UIEventListener bgl = UIEventListener.Get(bg);
+		bgl.onPress += OnPressBackground;
+		bgl.onDrag += OnDragBackground;
+		mBG.autoResizeBoxCollider = true;
+
+		if (mFG.collider != null && mFG.gameObject != gameObject)
 		{
-			UIEventListener listener = UIEventListener.Get(foreground.gameObject);
-			listener.onPress += OnPressForeground;
-			listener.onDrag += OnDragForeground;
+			UIEventListener fgl = UIEventListener.Get(mFG.gameObject);
+			fgl.onPress += OnPressForeground;
+			fgl.onDrag += OnDragForeground;
+			mFG.autoResizeBoxCollider = true;
 		}
 
 		if (onChange != null)
@@ -339,9 +320,11 @@ public class UIScrollBar : UIWidgetContainer
 
 	void Update() { if (mIsDirty) ForceUpdate(); }
 
-	// Reducing memory allocation in the ForceUpdate() function below
-	static Vector2 mTemp1 = new Vector2();
-	static Vector2 mTemp2 = new Vector2();
+	/// <summary>
+	/// Invalidate the scroll bar.
+	/// </summary>
+
+	void OnValidate () { mIsDirty = true; }
 
 	/// <summary>
 	/// Update the value of the scroll bar.
@@ -351,43 +334,29 @@ public class UIScrollBar : UIWidgetContainer
 	{
 		mIsDirty = false;
 
-		if (mBG != null && mFG != null)
+		if (mFG != null)
 		{
 			mSize = Mathf.Clamp01(mSize);
 			mScroll = Mathf.Clamp01(mScroll);
 
-			Vector4 bg = mBG.border;
-			Vector4 fg = mFG.border;
-
-			// Space available for the background
-			mTemp1 = new Vector2(
-				Mathf.Max(0f, mBG.width - bg.x - bg.z),
-				Mathf.Max(0f, mBG.height - bg.y - bg.w));
-
 			float val = mInverted ? 1f - mScroll : mScroll;
+			Vector3 pos = mStartingPos;
 
 			if (mDir == Direction.Horizontal)
 			{
-				mTemp2 = new Vector2(mTemp1.x * mSize, mTemp1.y);
-				mFG.pivot = UIWidget.Pivot.Left;
-				mBG.pivot = UIWidget.Pivot.Left;
-				mBG.cachedTransform.localPosition = Vector3.zero;
-				mFG.cachedTransform.localPosition = new Vector3(Mathf.RoundToInt(bg.x - fg.x + (mTemp1.x - mTemp2.x) * val), 0f, 0f);
-				mFG.width = Mathf.RoundToInt(mTemp2.x + fg.x + fg.z);
-				mFG.height = Mathf.RoundToInt(mTemp2.y + fg.y + fg.w);
-				if (mFG.collider != null) NGUITools.AddWidgetCollider(mFG.gameObject);
+				int size = Mathf.RoundToInt(mStartingSize.x * mSize);
+				mFG.width = ((size & 1) == 1) ? size + 1 : size;
+				float diff = (mStartingSize.x - mFG.width) * 0.5f;
+				pos.x = Mathf.Round(Mathf.Lerp(pos.x - diff, pos.x + diff, val));
 			}
 			else
 			{
-				mTemp2 = new Vector2(mTemp1.x, mTemp1.y * mSize);
-				mFG.pivot = UIWidget.Pivot.Top;
-				mBG.pivot = UIWidget.Pivot.Top;
-				mBG.cachedTransform.localPosition = Vector3.zero;
-				mFG.cachedTransform.localPosition = new Vector3(0f, Mathf.RoundToInt(-bg.y + fg.y - (mTemp1.y - mTemp2.y) * val), 0f);
-				mFG.width = Mathf.RoundToInt(mTemp2.x + fg.x + fg.z);
-				mFG.height = Mathf.RoundToInt(mTemp2.y + fg.y + fg.w);
-				if (mFG.collider != null) NGUITools.AddWidgetCollider(mFG.gameObject);
+				int size = Mathf.RoundToInt(mStartingSize.y * mSize);
+				mFG.height = ((size & 1) == 1) ? size + 1 : size;
+				float diff = (mStartingSize.y - mFG.height) * 0.5f;
+				pos.y = Mathf.Round(Mathf.Lerp(pos.y - diff, pos.y + diff, val));
 			}
+			mFG.cachedTransform.localPosition = pos;
 		}
 	}
 }

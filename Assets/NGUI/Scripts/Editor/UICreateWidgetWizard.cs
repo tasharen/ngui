@@ -466,8 +466,8 @@ public class UICreateWidgetWizard : EditorWindow
 			fg.spriteName = mScrollFG;
 
 			UIScrollBar sb = go.AddComponent<UIScrollBar>();
-			sb.background = bg;
 			sb.foreground = fg;
+			sb.background = bg;
 			sb.direction = mScrollDir;
 			sb.barSize = 0.3f;
 			sb.value = 0.3f;
