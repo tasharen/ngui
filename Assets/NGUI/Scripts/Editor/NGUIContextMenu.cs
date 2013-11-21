@@ -151,7 +151,9 @@ public static class NGUIContextMenu
 				NGUIContextMenu.AddSeparator("Add/");
 				AddChildWidget("Add/Invisible Widget", false, NGUISettings.AddWidget);
 				AddChildWidget("Add/Simple Texture", false, NGUISettings.AddTexture);
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 				AddChildWidget("Add/Unity 2D Sprite", false, NGUISettings.Add2DSprite);
+#endif
 			}
 			else
 			{
@@ -160,14 +162,16 @@ public static class NGUIContextMenu
 				NGUIContextMenu.AddSeparator("Add/");
 				AddChildWidget("Add/Invisible Widget/Child", false, NGUISettings.AddWidget);
 				AddChildWidget("Add/Simple Texture/Child", false, NGUISettings.AddTexture);
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 				AddChildWidget("Add/Unity 2D Sprite/Child", false, NGUISettings.Add2DSprite);
-
+#endif
 				AddSiblingWidget("Add/Sprite/Sibling", false, NGUISettings.AddSprite);
 				AddSiblingWidget("Add/Label/Sibling", false, NGUISettings.AddLabel);
 				AddSiblingWidget("Add/Invisible Widget/Sibling", false, NGUISettings.AddWidget);
 				AddSiblingWidget("Add/Simple Texture/Sibling", false, NGUISettings.AddTexture);
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 				AddSiblingWidget("Add/Unity 2D Sprite/Sibling", false, NGUISettings.Add2DSprite);
-
+#endif
 				NGUIContextMenu.AddSeparator("Add/");
 
 				bool anchor = target.GetComponent<UIAnchor>() != null;
@@ -182,6 +186,7 @@ public static class NGUIContextMenu
 				AddItem("Add/Button Script", false, delegate(object obj) { target.AddComponent<UIButton>(); }, null);
 				AddItem("Add/Toggle Script", false, delegate(object obj) { target.AddComponent<UIToggle>(); }, null);
 				AddItem("Add/Slider Script", false, delegate(object obj) { target.AddComponent<UISlider>(); }, null);
+				AddItem("Add/Scroll Bar Script", false, delegate(object obj) { target.AddComponent<UIScrollBar>(); }, null);
 			}
 
 			AddHelp(target, false);

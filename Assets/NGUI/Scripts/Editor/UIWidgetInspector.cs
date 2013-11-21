@@ -934,9 +934,6 @@ public class UIWidgetInspector : Editor
 
 	void DrawPivot ()
 	{
-#if UNITY_3_5
-		NGUIEditorTools.DrawProperty("Pivot", serializedObject, "mPivot");
-#else
 		SerializedProperty pv = serializedObject.FindProperty("mPivot");
 
 		if (pv.hasMultipleDifferentValues)
@@ -948,16 +945,22 @@ public class UIWidgetInspector : Editor
 			// Pivot point -- the new, more visual style
 			GUILayout.BeginHorizontal();
 			GUILayout.Label("Pivot", GUILayout.Width(76f));
+#if !UNITY_3_5
 			Toggle("\u25C4", "ButtonLeft", UIWidget.Pivot.Left, true);
 			Toggle("\u25AC", "ButtonMid", UIWidget.Pivot.Center, true);
 			Toggle("\u25BA", "ButtonRight", UIWidget.Pivot.Right, true);
+#else
+			Toggle("<", "ButtonLeft", UIWidget.Pivot.Left, true);
+			Toggle("|", "ButtonMid", UIWidget.Pivot.Center, true);
+			Toggle(">", "ButtonRight", UIWidget.Pivot.Right, true);
+#endif
 			Toggle("\u25B2", "ButtonLeft", UIWidget.Pivot.Top, false);
 			Toggle("\u258C", "ButtonMid", UIWidget.Pivot.Center, false);
 			Toggle("\u25BC", "ButtonRight", UIWidget.Pivot.Bottom, false);
+
 			GUILayout.EndHorizontal();
 			pv.enumValueIndex = (int)mWidget.pivot;
 		}
-#endif
 	}
 
 	/// <summary>
