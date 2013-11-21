@@ -1532,13 +1532,17 @@ public class NGUIEditorTools
 		BetterList<UIPanel> panels = new BetterList<UIPanel>();
 
 		bool divider = false;
+		UIWidget topWidget = null;
+		UIPanel topPanel = null;
 
 		// Process widgets and their containers in the raycast order
 		for (int i = 0; i < widgets.size; ++i)
 		{
 			UIWidget w = widgets[i];
+			if (topWidget == null) topWidget = w;
 
 			UIPanel panel = w.panel;
+			if (topPanel == null) topPanel = panel;
 
 			if (panel != null && !panels.Contains(panel))
 			{
@@ -1577,24 +1581,25 @@ public class NGUIEditorTools
 		}
 
 		// Common items used by NGUI
-		NGUIContextMenu.AddCommonItems();
+		NGUIContextMenu.AddCommonItems(Selection.activeGameObject);
 
 		// Add widgets to the menu in the reverse order so that they are shown with the top-most widget first (on top)
 		for (int i = entries.size; i > 0; )
 		{
 			MenuEntry ent = entries[--i];
-			if (ent != null) NGUIContextMenu.AddItem(ent.name, Selection.activeGameObject == ent.go, OnMenuSelect, ent.go);
-			else NGUIContextMenu.AddSeparator("");
+
+			if (ent != null)
+			{
+				NGUIContextMenu.AddItem(ent.name, Selection.activeGameObject == ent.go,
+					delegate(object go) { Selection.activeGameObject = (GameObject)go; }, ent.go);
+			}
+			else if (!divider)
+			{
+				NGUIContextMenu.AddSeparator("");
+			}
 		}
 		NGUIContextMenu.Show();
 	}
-
-	/// <summary>
-	/// Menu item that selects a game object.
-	/// </summary>
-
-	static void OnMenuSelect (object go) { Selection.activeGameObject = (GameObject)go; }
-
 	/// <summary>
 	/// Load the asset at the specified path.
 	/// </summary>

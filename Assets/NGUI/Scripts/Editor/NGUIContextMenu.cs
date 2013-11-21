@@ -121,30 +121,27 @@ public static class NGUIContextMenu
 	/// Add commonly NGUI context menu options.
 	/// </summary>
 
-	static public void AddCommonItems ()
+	static public void AddCommonItems (GameObject target)
 	{
-		if (Selection.activeGameObject != null)
+		if (target != null)
 		{
-			UIWidget widget = Selection.activeGameObject.GetComponent<UIWidget>();
+			UIWidget widget = target.GetComponent<UIWidget>();
 
 			if (widget != null)
 			{
 				AddItem("Widget/Make Pixel-Perfect", false, OnMakePixelPerfect, Selection.activeTransform);
 
-				if (Selection.activeGameObject.GetComponent<BoxCollider>() != null)
+				if (target.GetComponent<BoxCollider>() != null)
 				{
-					AddItem("Widget/Reset Collider Size", false, OnBoxCollider, Selection.activeGameObject);
+					AddItem("Widget/Reset Collider Size", false, OnBoxCollider, target);
 				}
 				else
 				{
-					AddItem("Widget/Add Box Collider", false, OnBoxCollider, Selection.activeGameObject);
+					AddItem("Widget/Add Box Collider", false, OnBoxCollider, target);
 				}
 
 				NGUIContextMenu.AddSeparator("Widget/");
-				AddItem("Widget/Help", false, OnHelp, Selection.activeGameObject);
-
-				NGUIContextMenu.AddSeparator("Widget/");
-				AddItem("Widget/Delete", false, OnDelete, Selection.activeGameObject);
+				AddItem("Widget/Delete", false, OnDelete, target);
 			}
 
 			if (Selection.activeTransform.parent == null || widget == null)
@@ -171,33 +168,54 @@ public static class NGUIContextMenu
 				AddSiblingWidget("Add/Simple Texture/Sibling", false, NGUISettings.AddTexture);
 				AddSiblingWidget("Add/Unity 2D Sprite/Sibling", false, NGUISettings.Add2DSprite);
 
-				bool anchor = Selection.activeGameObject.GetComponent<UIAnchor>() != null;
-				bool stretch = Selection.activeGameObject.GetComponent<UIStretch>() != null;
+				NGUIContextMenu.AddSeparator("Add/");
+
+				bool anchor = target.GetComponent<UIAnchor>() != null;
+				bool stretch = target.GetComponent<UIStretch>() != null;
 
 				if (!anchor || !stretch)
 				{
-					NGUIContextMenu.AddSeparator("Add/");
-					if (!anchor) AddItem("Add/Anchor Script", false, AddAnchor, Selection.activeGameObject);
-					if (!stretch) AddItem("Add/Stretch Script", false, AddStretch, Selection.activeGameObject);
+					if (!anchor) AddItem("Add/Anchor Script", false, delegate(object obj) { target.AddComponent<UIAnchor>(); }, null);
+					if (!stretch) AddItem("Add/Stretch Script", false, delegate(object obj) { target.AddComponent<UIStretch>(); }, null);
 				}
+
+				AddItem("Add/Button Script", false, delegate(object obj) { target.AddComponent<UIButton>(); }, null);
+				AddItem("Add/Toggle Script", false, delegate(object obj) { target.AddComponent<UIToggle>(); }, null);
+				AddItem("Add/Slider Script", false, delegate(object obj) { target.AddComponent<UISlider>(); }, null);
 			}
+
+			AddHelp(target, false);
 			NGUIContextMenu.AddSeparator("");
 		}
 	}
 
-	static void AddAnchor (object obj)
+	/// <summary>
+	/// Add help options based on the components present on the specified game object.
+	/// </summary>
+
+	static public void AddHelp (GameObject go, bool addSeparator)
 	{
-		GameObject go = obj as GameObject;
-		go.AddComponent<UIAnchor>();
+		MonoBehaviour[] comps = Selection.activeGameObject.GetComponents<MonoBehaviour>();
+
+		for (int i = 0; i < comps.Length; ++i)
+		{
+			System.Type type = comps[i].GetType();
+			string url = NGUIHelp.GetHelpURL(type);
+			
+			if (url != null)
+			{
+				if (addSeparator)
+				{
+					addSeparator = false;
+					AddSeparator("");
+				}
+
+				AddItem("Help/" + type, false, delegate(object obj) { Application.OpenURL(url); }, null);
+			}
+		}
 	}
 
-	static void AddStretch (object obj)
-	{
-		GameObject go = obj as GameObject;
-		go.AddComponent<UIStretch>();
-	}
-
-	static void OnHelp (object obj) { NGUIMenu.ShowHelp(obj); }
+	static void OnHelp (object obj) { NGUIHelp.Show(obj); }
 	static void OnMakePixelPerfect (object obj) { NGUITools.MakePixelPerfect(obj as Transform); }
 	static void OnBoxCollider (object obj) { NGUITools.AddWidgetCollider(obj as GameObject); }
 	static void OnDelete (object obj)

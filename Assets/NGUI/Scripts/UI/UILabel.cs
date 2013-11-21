@@ -552,7 +552,7 @@ public class UILabel : UIWidget
 	/// Labels can't be resized manually if the overflow method is set to 'resize'.
 	/// </summary>
 
-	public override bool canResize { get { return mOverflow != Overflow.ResizeFreely; } }
+	public override bool canResize { get { return mOverflow != Overflow.ResizeFreely && base.canResize; } }
 #endif
 
 	/// <summary>

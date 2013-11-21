@@ -302,7 +302,8 @@ public class UIWidgetInspector : Editor
 
 		Action actionUnderMouse = mAction;
 		Vector3[] handles = GetHandles(mWidget.worldCorners);
-		UIWidget.Pivot pivotUnderMouse = GetPivotUnderMouse(handles, e, mWidget.canResize, ref actionUnderMouse);
+		bool canResize = mWidget.canResize;
+		UIWidget.Pivot pivotUnderMouse = GetPivotUnderMouse(handles, e, canResize, ref actionUnderMouse);
 
 		Handles.color = handlesColor;
 		Handles.DrawLine(handles[0], handles[1]);
@@ -325,7 +326,7 @@ public class UIWidgetInspector : Editor
 					{
 						for (int i = 0; i < 8; ++i)
 						{
-							DrawKnob(handles[i], mWidget.pivot == pivotPoints[i], mWidget.canResize, id);
+							DrawKnob(handles[i], mWidget.pivot == pivotPoints[i], canResize, id);
 						}
 					}
 					Handles.EndGUI();
@@ -336,7 +337,7 @@ public class UIWidgetInspector : Editor
 					{
 						for (int i = 0; i < 4; ++i)
 						{
-							DrawKnob(handles[i], mWidget.pivot == pivotPoints[i], mWidget.canResize, id);
+							DrawKnob(handles[i], mWidget.pivot == pivotPoints[i], canResize, id);
 						}
 					}
 					Handles.EndGUI();

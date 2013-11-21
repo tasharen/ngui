@@ -54,10 +54,11 @@ public class UIAnchor : MonoBehaviour
 	public bool halfPixelOffset = true;
 
 	/// <summary>
-	/// If set to 'true', UIAnchor will execute once, then will be removed. Useful if your screen resolution never changes.
+	/// If set to 'true', UIAnchor will execute once, then will be disabled.
+	/// Screen size changes will still cause the anchor to update itself, even if it's disabled.
 	/// </summary>
 
-	public bool runOnlyOnce = false;
+	public bool runOnlyOnce = true;
 
 	/// <summary>
 	/// Relative offset value, if any. For example "0.25" with 'side' set to Left, means 25% from the left side.

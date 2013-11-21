@@ -854,9 +854,6 @@ public class UICamera : MonoBehaviour
 		mMouse[0].pos.x = Input.mousePosition.x;
 		mMouse[0].pos.y = Input.mousePosition.y;
 		lastTouchPosition = mMouse[0].pos;
-
-		// If no event receiver mask was specified, use the camera's mask
-		if (eventReceiverMask == -1) eventReceiverMask = cachedCamera.cullingMask;
 	}
 
 	/// <summary>
