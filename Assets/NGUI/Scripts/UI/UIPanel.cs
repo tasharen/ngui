@@ -1099,7 +1099,7 @@ public class UIPanel : MonoBehaviour
 
 	void OnDrawGizmos ()
 	{
-		if (mCam == null || !mCam.isOrthoGraphic) return;
+		if (mCam == null) return;
 
 		Vector2 size = GetSize();
 		GameObject go = UnityEditor.Selection.activeGameObject;
