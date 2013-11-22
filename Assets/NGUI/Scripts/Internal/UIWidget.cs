@@ -870,111 +870,114 @@ public class UIWidget : MonoBehaviour
 	/// Update the widget and fill its geometry if necessary. Returns whether something was changed.
 	/// </summary>
 
-	public bool UpdateGeometry (UIPanel p, bool forceVisible)
+	public bool UpdateGeometry (bool forceVisible)
 	{
-		if (p != null)
+		bool hasMatrix = false;
+		float final = finalAlpha;
+		bool visibleByAlpha = (final > 0.001f);
+		bool visibleByPanel = forceVisible || mVisibleByPanel;
+		bool moved = false;
+
+		// Check to see if the widget has moved relative to the panel that manages it
+		if (HasTransformChanged())
 		{
-			mPanel = p;
-			bool hasMatrix = false;
-			float final = finalAlpha;
-			bool visibleByAlpha = (final > 0.001f);
-			bool visibleByPanel = forceVisible || mVisibleByPanel;
-			bool moved = false;
-
-			// Has transform moved?
-			if (HasTransformChanged())
-			{
-				// Check to see if the widget has moved relative to the panel that manages it
 #if UNITY_EDITOR
-				if (!mPanel.widgetsAreStatic || !Application.isPlaying)
+			// When an object is dragged from Project view to Scene view, its Z is... odd, to say the least. Force it if possible.
+			if (!Application.isPlaying && hideFlags == HideFlags.HideInHierarchy && mPanel.cachedTransform == cachedTransform.parent)
+			{
+				Vector3 pos = cachedTransform.localPosition;
+				pos.z = 0f;
+				cachedTransform.localPosition = pos;
+			}
+
+			if (!mPanel.widgetsAreStatic || !Application.isPlaying)
 #else
-				if (!mPanel.widgetsAreStatic)
+			if (!mPanel.widgetsAreStatic)
 #endif
+			{
+				mLocalToPanel = mPanel.worldToLocal * cachedTransform.localToWorldMatrix;
+				hasMatrix = true;
+
+				Vector2 offset = pivotOffset;
+
+				float x0 = -offset.x * mWidth;
+				float y0 = -offset.y * mHeight;
+				float x1 = x0 + mWidth;
+				float y1 = y0 + mHeight;
+
+				Transform wt = cachedTransform;
+
+				Vector3 v0 = wt.TransformPoint(x0, y0, 0f);
+				Vector3 v1 = wt.TransformPoint(x1, y1, 0f);
+
+				v0 = mPanel.worldToLocal.MultiplyPoint3x4(v0);
+				v1 = mPanel.worldToLocal.MultiplyPoint3x4(v1);
+
+				if (Vector3.SqrMagnitude(mOldV0 - v0) > 0.000001f ||
+					Vector3.SqrMagnitude(mOldV1 - v1) > 0.000001f)
 				{
-					mLocalToPanel = p.worldToLocal * cachedTransform.localToWorldMatrix;
-					hasMatrix = true;
-
-					Vector2 offset = pivotOffset;
-
-					float x0 = -offset.x * mWidth;
-					float y0 = -offset.y * mHeight;
-					float x1 = x0 + mWidth;
-					float y1 = y0 + mHeight;
-
-					Transform wt = cachedTransform;
-
-					Vector3 v0 = wt.TransformPoint(x0, y0, 0f);
-					Vector3 v1 = wt.TransformPoint(x1, y1, 0f);
-
-					v0 = p.worldToLocal.MultiplyPoint3x4(v0);
-					v1 = p.worldToLocal.MultiplyPoint3x4(v1);
-
-					if (Vector3.SqrMagnitude(mOldV0 - v0) > 0.000001f ||
-						Vector3.SqrMagnitude(mOldV1 - v1) > 0.000001f)
-					{
-						moved = true;
-						mOldV0 = v0;
-						mOldV1 = v1;
-					}
-				}
-
-				// Is the widget visible by the panel?
-				if (visibleByAlpha || mForceVisible != forceVisible)
-				{
-					mForceVisible = forceVisible;
-					visibleByPanel = forceVisible || mPanel.IsVisible(this);
+					moved = true;
+					mOldV0 = v0;
+					mOldV1 = v1;
 				}
 			}
-			else if (visibleByAlpha && mForceVisible != forceVisible)
+
+			// Is the widget visible by the panel?
+			if (visibleByAlpha || mForceVisible != forceVisible)
 			{
 				mForceVisible = forceVisible;
-				visibleByPanel = mPanel.IsVisible(this);
+				visibleByPanel = forceVisible || mPanel.IsVisible(this);
 			}
+		}
+		else if (visibleByAlpha && mForceVisible != forceVisible)
+		{
+			mForceVisible = forceVisible;
+			visibleByPanel = mPanel.IsVisible(this);
+		}
 
-			// Is the visibility changing?
-			if (mVisibleByPanel != visibleByPanel)
+		// Is the visibility changing?
+		if (mVisibleByPanel != visibleByPanel)
+		{
+			mVisibleByPanel = visibleByPanel;
+			mChanged = true;
+		}
+
+		// Has the alpha changed?
+		if (mVisibleByPanel && mLastAlpha != final) mChanged = true;
+		mLastAlpha = final;
+
+		if (mChanged)
+		{
+			mChanged = false;
+
+			if (isVisible && shader != null)
 			{
-				mVisibleByPanel = visibleByPanel;
-				mChanged = true;
-			}
+				bool hadVertices = mGeom.hasVertices;
+				mGeom.Clear();
+				OnFill(mGeom.verts, mGeom.uvs, mGeom.cols);
 
-			// Has the alpha changed?
-			if (mVisibleByPanel && mLastAlpha != final) mChanged = true;
-			mLastAlpha = final;
-
-			if (mChanged)
-			{
-				mChanged = false;
-
-				if (isVisible && shader != null)
+				if (mGeom.hasVertices)
 				{
-					bool hadVertices = mGeom.hasVertices;
-					mGeom.Clear();
-					OnFill(mGeom.verts, mGeom.uvs, mGeom.cols);
+					// Want to see what's being filled? Uncomment this line.
+					//Debug.Log("Fill " + name + " (" + Time.time + ")");
 
-					if (mGeom.hasVertices)
-					{
-						// Want to see what's being filled? Uncomment this line.
-						//Debug.Log("Fill " + name + " (" + Time.time + ")");
-
-						if (!hasMatrix) mLocalToPanel = p.worldToLocal * cachedTransform.localToWorldMatrix;
-						mGeom.ApplyTransform(mLocalToPanel);
-						return true;
-					}
-					return hadVertices;
-				}
-				else if (mGeom.hasVertices)
-				{
-					mGeom.Clear();
+					if (!hasMatrix) mLocalToPanel = mPanel.worldToLocal * cachedTransform.localToWorldMatrix;
+					mGeom.ApplyTransform(mLocalToPanel);
 					return true;
 				}
+				return hadVertices;
 			}
-			else if (moved && mGeom.hasVertices)
+			else if (mGeom.hasVertices)
 			{
-				if (!hasMatrix) mLocalToPanel = p.worldToLocal * cachedTransform.localToWorldMatrix;
-				mGeom.ApplyTransform(mLocalToPanel);
+				mGeom.Clear();
 				return true;
 			}
+		}
+		else if (moved && mGeom.hasVertices)
+		{
+			if (!hasMatrix) mLocalToPanel = mPanel.worldToLocal * cachedTransform.localToWorldMatrix;
+			mGeom.ApplyTransform(mLocalToPanel);
+			return true;
 		}
 		return false;
 	}

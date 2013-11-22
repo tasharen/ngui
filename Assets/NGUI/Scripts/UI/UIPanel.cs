@@ -745,7 +745,7 @@ public class UIPanel : MonoBehaviour
 			UIWidget w = UIWidget.list[i];
 
 			// If the widget is visible, update it
-			if (w.enabled && w.panel == this && w.UpdateGeometry(this, forceVisible))
+			if (w.enabled && w.panel == this && w.UpdateGeometry(forceVisible))
 			{
 				changed = true;
 				
@@ -931,11 +931,11 @@ public class UIPanel : MonoBehaviour
 				cam.orthographicSize = 1;
 				cam.nearClipPlane = -10;
 				cam.farClipPlane = 10;
-				cam.clearFlags = (Camera.mainCamera != null) ? CameraClearFlags.Depth : CameraClearFlags.Color;
+				cam.clearFlags = (Camera.main != null) ? CameraClearFlags.Depth : CameraClearFlags.Color;
 				cam.cullingMask = (1 << root.gameObject.layer);
 
-				if (Camera.mainCamera != null)
-					Camera.mainCamera.cullingMask = (Camera.mainCamera.cullingMask & (~cam.cullingMask));
+				if (Camera.main != null)
+					Camera.main.cullingMask = (Camera.main.cullingMask & (~cam.cullingMask));
 
 				UIAnchor anch = NGUITools.AddChild<UIAnchor>(cam.gameObject);
 				panel = NGUITools.AddChild<UIPanel>(anch.gameObject);
@@ -943,6 +943,7 @@ public class UIPanel : MonoBehaviour
 
 			trans.parent = panel.transform;
 			trans.localScale = Vector3.one;
+			trans.localPosition = Vector3.zero;
 			SetChildLayer(panel.cachedTransform, panel.cachedGameObject.layer);
 		}
 		return panel;
