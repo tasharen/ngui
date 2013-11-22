@@ -32,7 +32,7 @@ public class UIRoot : MonoBehaviour
 	/// Type of scaling used by the UIRoot.
 	/// </summary>
 
-	public Scaling scalingStyle = Scaling.FixedSize;
+	public Scaling scalingStyle = Scaling.PixelPerfect;
 
 	/// <summary>
 	/// Height of the screen when the scaling style is set to FixedSize.

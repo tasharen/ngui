@@ -908,7 +908,41 @@ public class UIPanel : MonoBehaviour
 		if (createIfMissing && panel == null && trans != origin)
 		{
 			mRebuild = true;
-			panel = trans.gameObject.AddComponent<UIPanel>();
+
+			UIRoot root = NGUITools.FindInParents<UIRoot>(origin.gameObject);
+
+			if (root == null && UIRoot.list.Count > 0)
+				root = UIRoot.list[0];
+
+			if (root == null)
+			{
+				GameObject go = new GameObject("UI Root");
+				go.layer = origin.gameObject.layer;
+				root = go.AddComponent<UIRoot>();
+			}
+
+			panel = root.GetComponentInChildren<UIPanel>();
+
+			if (panel == null)
+			{
+				Camera cam = NGUITools.AddChild<Camera>(root.gameObject);
+				cam.gameObject.AddComponent<UICamera>();
+				cam.orthographic = true;
+				cam.orthographicSize = 1;
+				cam.nearClipPlane = -10;
+				cam.farClipPlane = 10;
+				cam.clearFlags = (Camera.mainCamera != null) ? CameraClearFlags.Depth : CameraClearFlags.Color;
+				cam.cullingMask = (1 << root.gameObject.layer);
+
+				if (Camera.mainCamera != null)
+					Camera.mainCamera.cullingMask = (Camera.mainCamera.cullingMask & (~cam.cullingMask));
+
+				UIAnchor anch = NGUITools.AddChild<UIAnchor>(cam.gameObject);
+				panel = NGUITools.AddChild<UIPanel>(anch.gameObject);
+			}
+
+			trans.parent = panel.transform;
+			trans.localScale = Vector3.one;
 			SetChildLayer(panel.cachedTransform, panel.cachedGameObject.layer);
 		}
 		return panel;
