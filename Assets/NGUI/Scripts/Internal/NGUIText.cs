@@ -560,7 +560,7 @@ static public class NGUIText
 			if (current.encoding && ParseSymbol(text, ref i, mColors, current.premultiply))
 			{
 				Color fc = current.tint * mColors[mColors.size - 1];
-				uc = current.tint;
+				uc = fc;
 
 				if (current.gradient)
 				{

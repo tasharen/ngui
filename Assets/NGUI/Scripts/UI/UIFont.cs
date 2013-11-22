@@ -937,7 +937,7 @@ public class UIFont : MonoBehaviour
 				if (NGUIText.current.encoding && NGUIText.ParseSymbol(text, ref i, mColors, NGUIText.current.premultiply))
 				{
 					Color fc = NGUIText.current.tint * mColors[mColors.size - 1];
-					uc = NGUIText.current.tint;
+					uc = fc;
 
 					if (NGUIText.current.gradient)
 					{

@@ -46,6 +46,9 @@ static public class NGUIHelp
 	[MenuItem("CONTEXT/UIScrollBar/Help")]
 	static void ShowScrollBarHelp (UnityEditor.MenuCommand command) { Show(typeof(UIScrollBar)); }
 
+	[MenuItem("CONTEXT/UIProgressBar/Help")]
+	static void ShowProgressBarHelp (UnityEditor.MenuCommand command) { Show(typeof(UIProgressBar)); }
+
 	/// <summary>
 	/// Get the URL pointing to the documentation for the specified component.
 	/// </summary>
