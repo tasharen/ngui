@@ -108,7 +108,7 @@ public class UIButton : UIButtonColor
 			Color c = shouldBeEnabled ? defaultColor : disabledColor;
 			TweenColor tc = TweenColor.Begin(tweenTarget, 0.15f, c);
 
-			if (immediate)
+			if (tc != null && immediate)
 			{
 				tc.color = c;
 				tc.enabled = false;

@@ -1256,19 +1256,15 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
-	/// Convenience function, in case you wanted to associate UISlider or UIScrollBar's
+	/// Convenience function, in case you wanted to associate progress bar, slider or scroll bar's
 	/// OnValueChanged function in inspector with a label.
 	/// </summary>
 
 	public void SetCurrentPercent ()
 	{
-		if (UISlider.current != null)
+		if (UIProgressBar.current != null)
 		{
-			text = Mathf.RoundToInt(UISlider.current.value * 100f) + "%";
-		}
-		else if (UIScrollBar.current != null)
-		{
-			text = Mathf.RoundToInt(UIScrollBar.current.value * 100f) + "%";
+			text = Mathf.RoundToInt(UIProgressBar.current.value * 100f) + "%";
 		}
 	}
 }

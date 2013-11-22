@@ -53,7 +53,7 @@ public class UICreateWidgetWizard : EditorWindow
 	static Color mColor = Color.white;
 	static bool mLoaded = false;
 	static bool mScrollCL = true;
-	static UIScrollBar.Direction mScrollDir = UIScrollBar.Direction.Horizontal;
+	static UIScrollBar.FillDirection mFillDir = UIScrollBar.FillDirection.LeftToRight;
 
 	/// <summary>
 	/// Save the specified string into player prefs.
@@ -87,7 +87,7 @@ public class UICreateWidgetWizard : EditorWindow
 		EditorPrefs.SetInt("NGUI Widget Type", (int)mWidgetType);
 		EditorPrefs.SetInt("NGUI Color", NGUIMath.ColorToInt(mColor));
 		EditorPrefs.SetBool("NGUI ScrollCL", mScrollCL);
-		EditorPrefs.SetInt("NGUI Scroll Dir", (int)mScrollDir);
+		EditorPrefs.SetInt("NGUI Fill Dir", (int)mFillDir);
 
 		SaveString("NGUI Button", mButton);
 		SaveString("NGUI Image 0", mImage0);
@@ -115,7 +115,7 @@ public class UICreateWidgetWizard : EditorWindow
 	static void Load ()
 	{
 		mWidgetType = (WidgetType)EditorPrefs.GetInt("NGUI Widget Type", 0);
-		mScrollDir = (UIScrollBar.Direction)EditorPrefs.GetInt("NGUI Scroll Dir", 0);
+		mFillDir = (UIScrollBar.FillDirection)EditorPrefs.GetInt("NGUI Fill Dir", 0);
 
 		int color = EditorPrefs.GetInt("NGUI Color", -1);
 		if (color != -1) mColor = NGUIMath.IntToColor(color);
@@ -427,16 +427,16 @@ public class UICreateWidgetWizard : EditorWindow
 			NGUIEditorTools.DrawSpriteField("Foreground", "Sprite used for the foreground (thumb)", NGUISettings.atlas, mScrollFG, OnScrollFG, GUILayout.Width(120f));
 
 			GUILayout.BeginHorizontal();
-			UIScrollBar.Direction dir = (UIScrollBar.Direction)EditorGUILayout.EnumPopup("Direction", mScrollDir, GUILayout.Width(200f));
+			UIScrollBar.FillDirection dir = (UIScrollBar.FillDirection)EditorGUILayout.EnumPopup("Direction", mFillDir, GUILayout.Width(200f));
 			GUILayout.Space(20f);
 			GUILayout.Label("Add colliders?", GUILayout.Width(90f));
 			bool draggable = EditorGUILayout.Toggle(mScrollCL);
 			GUILayout.EndHorizontal();
 
-			if (mScrollCL != draggable || mScrollDir != dir)
+			if (mScrollCL != draggable || mFillDir != dir)
 			{
 				mScrollCL = draggable;
-				mScrollDir = dir;
+				mFillDir = dir;
 				Save();
 			}
 		}
@@ -466,9 +466,9 @@ public class UICreateWidgetWizard : EditorWindow
 			fg.spriteName = mScrollFG;
 
 			UIScrollBar sb = go.AddComponent<UIScrollBar>();
-			sb.foreground = fg;
-			sb.background = bg;
-			sb.direction = mScrollDir;
+			sb.foregroundWidget = fg;
+			sb.backgroundWidget = bg;
+			sb.fillDirection = mFillDir;
 			sb.barSize = 0.3f;
 			sb.value = 0.3f;
 			sb.ForceUpdate();
@@ -541,7 +541,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 			// Add the slider script
 			UISlider uiSlider = go.AddComponent<UISlider>();
-			uiSlider.foreground = front.transform;
+			uiSlider.foregroundWidget = front;
 
 			// Thumb sprite
 			if (slider)

@@ -1486,7 +1486,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 53}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: .5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 62}
@@ -1512,7 +1512,7 @@ Transform:
   m_GameObject: {fileID: 55}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: .00380952377, y: .00380952377, z: .00380952377}
+  m_LocalScale: {x: .00431034481, y: .00431034481, z: .00431034481}
   m_Children:
   - {fileID: 105}
   m_Father: {fileID: 0}
@@ -1770,13 +1770,16 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3c8d596c16f05d949922ef16347e4cc9, type: 1}
   m_Name: 
-  onChange: []
   mBG: {fileID: 127}
   mFG: {fileID: 126}
-  mDir: 1
-  mInverted: 0
-  mScroll: 0
+  mValue: 0
+  mFill: 3
+  numberOfSteps: 0
+  onChange: []
   mSize: 1
+  mScroll: 0
+  mDir: 2
+  mInverted: 0
 --- !u!114 &126
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1787,7 +1790,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 1}
   m_Name: 
-  mColor: {r: 1, g: .873963535, b: .731343269, a: 0}
+  mColor: {r: 1, g: .873963535, b: .731343269, a: 1}
   mPivot: 1
   mWidth: 14
   mHeight: 296
@@ -1810,7 +1813,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 1}
   m_Name: 
-  mColor: {r: .425373137, g: .341568261, b: .263477385, a: 0}
+  mColor: {r: .425373137, g: .341568261, b: .263477385, a: 1}
   mPivot: 1
   mWidth: 22
   mHeight: 304
@@ -1970,7 +1973,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 0f5e030a8cdc292438f880d3ec49ef64, type: 2}
   mText: Click on any quest to expand it
-  mFontSize: 16
+  mFontSize: 18
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -2031,7 +2034,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 29056518aafb01b49a5b08faf8e30cff, type: 2}
   mText: Close
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -2251,7 +2254,7 @@ MonoBehaviour:
     You wish. Apparently most wolves have been born with horrific genetic abnormalities,
     because you seem to be getting only one eye per 10 corpses, and they are not shared
     with the rest of your group. Fun times!'
-  mFontSize: 16
+  mFontSize: 18
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -2316,7 +2319,7 @@ MonoBehaviour:
     thousand hapless creatures to get up to this level. What''s a couple more, right?
     Today''s games really need some more imagination... How about something that does
     [990000]not[-] involve killing? No? Too hard?'
-  mFontSize: 16
+  mFontSize: 18
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -2528,7 +2531,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 29056518aafb01b49a5b08faf8e30cff, type: 2}
   mText: '[66FA33][40][-] Exciting Delivery Quest'
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 1
@@ -2594,7 +2597,7 @@ MonoBehaviour:
     deliver this package himself, so he decided that you should do it instead. I'm
     sure you will be amply rewarded. Right? Oh just think of all the phat lewtz you're
     going to get for completing this quest...
-  mFontSize: 16
+  mFontSize: 18
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -2651,7 +2654,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 29056518aafb01b49a5b08faf8e30cff, type: 2}
   mText: '[FFFF66][42][-] Bazillionth Kill Quest'
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 1
@@ -2737,7 +2740,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 29056518aafb01b49a5b08faf8e30cff, type: 2}
   mText: '[FF6333][46][-] Mind-Blowing Gathering Task'
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 1
@@ -2976,8 +2979,8 @@ MonoBehaviour:
   m_Name: 
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
-  mWidth: 1060
-  mHeight: 530
+  mWidth: 937
+  mHeight: 469
   mDepth: 0
   autoResizeBoxCollider: 0
   mRect:
@@ -3140,17 +3143,17 @@ MonoBehaviour:
   widgetsAreStatic: 0
   cullWhileDragging: 0
   worldToLocal:
-    e00: 262.5
+    e00: 232
     e01: 0
     e02: 0
     e03: 0
     e10: 0
-    e11: 262.5
+    e11: 232
     e12: 0
-    e13: 0
+    e13: -.5
     e20: 0
     e21: 0
-    e22: 262.5
+    e22: 232
     e23: 0
     e30: 0
     e31: 0
@@ -3176,17 +3179,17 @@ MonoBehaviour:
   widgetsAreStatic: 0
   cullWhileDragging: 0
   worldToLocal:
-    e00: 262.5
+    e00: 232
     e01: 0
     e02: 0
     e03: 0
     e10: 0
-    e11: 262.5
+    e11: 232
     e12: 0
-    e13: -20
+    e13: -20.5
     e20: 0
     e21: 0
-    e22: 262.5
+    e22: 232
     e23: 0
     e30: 0
     e31: 0
@@ -3212,17 +3215,17 @@ MonoBehaviour:
   widgetsAreStatic: 0
   cullWhileDragging: 0
   worldToLocal:
-    e00: 262.5
+    e00: 232
     e01: 0
     e02: 0
     e03: 0
     e10: 0
-    e11: 262.5
+    e11: 232
     e12: 0
-    e13: 0
+    e13: -.5
     e20: 0
     e21: 0
-    e22: 262.5
+    e22: 232
     e23: 0
     e30: 0
     e31: 0

@@ -713,7 +713,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 53}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -.5, y: .5, z: 0}
+  m_LocalPosition: {x: 0, y: .5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 62}
@@ -739,7 +739,7 @@ Transform:
   m_GameObject: {fileID: 55}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: .00277777785, y: .00277777785, z: .00277777785}
+  m_LocalScale: {x: .00431034481, y: .00431034481, z: .00431034481}
   m_Children:
   - {fileID: 105}
   m_Father: {fileID: 0}
@@ -1103,8 +1103,8 @@ MonoBehaviour:
   m_Name: 
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
-  mWidth: 1454
-  mHeight: 727
+  mWidth: 937
+  mHeight: 469
   mDepth: -15
   autoResizeBoxCollider: 0
   mRect:
@@ -1267,17 +1267,17 @@ MonoBehaviour:
   widgetsAreStatic: 0
   cullWhileDragging: 0
   worldToLocal:
-    e00: 360
+    e00: 232
     e01: 0
     e02: 0
-    e03: .5
+    e03: 0
     e10: 0
-    e11: 360
+    e11: 232
     e12: 0
     e13: -.5
     e20: 0
     e21: 0
-    e22: 360
+    e22: 232
     e23: 0
     e30: 0
     e31: 0
@@ -1303,17 +1303,17 @@ MonoBehaviour:
   widgetsAreStatic: 0
   cullWhileDragging: 0
   worldToLocal:
-    e00: 360
+    e00: 232
     e01: 0
     e02: 0
-    e03: .5
+    e03: 0
     e10: 0
-    e11: 360
+    e11: 232
     e12: 0
     e13: -.5
     e20: 0
     e21: 0
-    e22: 360
+    e22: 232
     e23: 0
     e30: 0
     e31: 0
@@ -1515,7 +1515,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 29056518aafb01b49a5b08faf8e30cff, type: 2}
   mText: Tab 1
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -1661,7 +1661,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 29056518aafb01b49a5b08faf8e30cff, type: 2}
   mText: Tab 2
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -2245,7 +2245,7 @@ Transform:
   m_GameObject: {fileID: 1615681835}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -193, y: 119, z: 0}
-  m_LocalScale: {x: 20, y: 20, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 539465780}
 --- !u!114 &1615681837
@@ -2260,8 +2260,8 @@ MonoBehaviour:
   m_Name: 
   mColor: {r: .24626863, g: .182598874, b: .112107359, a: 1}
   mPivot: 0
-  mWidth: 0
-  mHeight: 0
+  mWidth: 396
+  mHeight: 140
   mDepth: 13
   autoResizeBoxCollider: 0
   keepCrispWhenShrunk: 1
@@ -2274,7 +2274,7 @@ MonoBehaviour:
 
 
     The same [335500]UICheckbox[-] script gets re-used to create tabs.'
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -2290,7 +2290,7 @@ MonoBehaviour:
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
-  mMaxLineWidth: 396
+  mMaxLineWidth: 0
   mMaxLineHeight: 0
   mLineWidth: 0
   mMultiline: 1
@@ -2345,7 +2345,7 @@ MonoBehaviour:
 
     You can put anything you want here. It''s just a game object. Click on the second
     tab to reveal more information.'
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -2389,7 +2389,7 @@ Transform:
   m_GameObject: {fileID: 1957765546}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 147, y: -76, z: 0}
-  m_LocalScale: {x: 100, y: 100, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 539465780}
 --- !u!114 &1957765548
@@ -2404,8 +2404,8 @@ MonoBehaviour:
   m_Name: 
   mColor: {r: .186567187, g: .129664809, b: .0751837939, a: 1}
   mPivot: 4
-  mWidth: 0
-  mHeight: 0
+  mWidth: 100
+  mHeight: 100
   mDepth: 14
   autoResizeBoxCollider: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
