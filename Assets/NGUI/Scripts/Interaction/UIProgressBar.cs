@@ -164,6 +164,20 @@ public class UIProgressBar : UIWidgetContainer
 	}
 
 	/// <summary>
+	/// The starting position of the foreground sprite gets saved when the script starts up.
+	/// You can adjust it after the fact by using this property.
+	/// </summary>
+
+	public Vector3 startingForegroundPosition { get { return mStartingPos; } set { mStartingPos = value; } }
+
+	/// <summary>
+	/// The starting size of the foreground sprite gets saved when the script starts up.
+	/// You can adjust it after the fact by using this property.
+	/// </summary>
+
+	public Vector2 startingForegroundSize { get { return mStartingSize; } set { mStartingSize = value; } }
+
+	/// <summary>
 	/// Whether the progress bar is horizontal in nature. Convenience function.
 	/// </summary>
 
