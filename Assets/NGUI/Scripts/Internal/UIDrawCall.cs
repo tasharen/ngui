@@ -51,8 +51,7 @@ public class UIDrawCall : MonoBehaviour
 	Vector2			mClipSoft;		// Clipping softness
 
 	Transform		mTrans;			// Cached transform
-	Mesh			mMesh0;			// First generated mesh
-	Mesh			mMesh1;			// Second generated mesh
+	Mesh			mMesh;			// First generated mesh
 	MeshFilter		mFilter;		// Mesh filter for this draw call
 	MeshRenderer	mRenderer;		// Mesh renderer for this screen
 	Material		mDynamicMat;	// Instantiated material
@@ -60,7 +59,6 @@ public class UIDrawCall : MonoBehaviour
 
 	bool mDirty = false;
 	bool mReset = true;
-	bool mEven = true;
 	int mRenderQueue = 0;
 	Clipping mLastClip = Clipping.None;
 
@@ -198,14 +196,7 @@ public class UIDrawCall : MonoBehaviour
 	/// The number of triangles in this draw call.
 	/// </summary>
 
-	public int triangles
-	{
-		get
-		{
-			Mesh mesh = mEven ? mMesh0 : mMesh1;
-			return (mesh != null) ? mesh.vertexCount >> 1 : 0;
-		}
-	}
+	public int triangles { get { return (mMesh != null) ? mMesh.vertexCount >> 1 : 0; } }
 
 	/// <summary>
 	/// Whether the draw call is currently using a clipped shader.
@@ -230,52 +221,6 @@ public class UIDrawCall : MonoBehaviour
 	/// </summary>
 
 	public Vector2 clipSoftness { get { return mClipSoft; } set { mClipSoft = value; } }
-
-	/// <summary>
-	/// Returns a mesh for writing into. The mesh is double-buffered as it gets the best performance on iOS devices.
-	/// http://forum.unity3d.com/threads/118723-Huge-performance-loss-in-Mesh.CreateVBO-for-dynamic-meshes-IOS
-	/// </summary>
-
-	Mesh GetMesh (ref bool rebuildIndices, int vertexCount)
-	{
-		mEven = !mEven;
-
-		if (mEven)
-		{
-			if (mMesh0 == null)
-			{
-				mMesh0 = new Mesh();
-				mMesh0.hideFlags = HideFlags.DontSave;
-				mMesh0.name = (mMaterial != null) ? "Mesh0 for " + mMaterial.name : "Mesh0";
-#if !UNITY_3_5
-				mMesh0.MarkDynamic();
-#endif
-				rebuildIndices = true;
-			}
-			else if (rebuildIndices || mMesh0.vertexCount != vertexCount)
-			{
-				rebuildIndices = true;
-				mMesh0.Clear();
-			}
-			return mMesh0;
-		}
-		else if (mMesh1 == null)
-		{
-			mMesh1 = new Mesh();
-			mMesh1.hideFlags = HideFlags.DontSave;
-			mMesh1.name = (mMaterial != null) ? "Mesh1 for " + mMaterial.name : "Mesh1";
-#if !UNITY_3_5
-			mMesh1.MarkDynamic();
-#endif
-			rebuildIndices = true;
-		}
-		else if (rebuildIndices || mMesh1.vertexCount != vertexCount)
-		{
-			rebuildIndices = true;
-			mMesh1.Clear();
-		}
-		return mMesh1;
-	}
 
 	/// <summary>
 	/// Create an appropriate material for the draw call.
@@ -409,8 +354,17 @@ public class UIDrawCall : MonoBehaviour
 				bool setIndices = (mIndices == null || mIndices.Length != indexCount);
 				if (setIndices) mIndices = GenerateCachedIndexBuffer(count, indexCount);
 
-				// Set the mesh values
-				Mesh mesh = GetMesh(ref setIndices, verts.size);
+				// Create the mesh
+				if (mMesh == null)
+				{
+					mMesh = new Mesh();
+					mMesh.hideFlags = HideFlags.DontSave;
+					mMesh.name = (mMaterial != null) ? "Mesh0 for " + mMaterial.name : "Mesh0";
+#if !UNITY_3_5
+					mMesh.MarkDynamic();
+#endif
+					setIndices = true;
+				}
 
 				// If the buffer length doesn't match, we need to trim all buffers
 				bool trim = (uvs.buffer.Length != verts.buffer.Length) ||
@@ -420,26 +374,38 @@ public class UIDrawCall : MonoBehaviour
 
 				if (trim || verts.buffer.Length > 65000)
 				{
-					mesh.vertices = verts.ToArray();
-					mesh.uv = uvs.ToArray();
-					mesh.colors32 = cols.ToArray();
+					if (trim || mMesh.vertexCount != verts.size)
+					{
+						mMesh.Clear();
+						setIndices = true;
+					}
 
-					if (norms != null) mesh.normals = norms.ToArray();
-					if (tans != null) mesh.tangents = tans.ToArray();
+					mMesh.vertices = verts.ToArray();
+					mMesh.uv = uvs.ToArray();
+					mMesh.colors32 = cols.ToArray();
+
+					if (norms != null) mMesh.normals = norms.ToArray();
+					if (tans != null) mMesh.tangents = tans.ToArray();
 				}
 				else
 				{
-					mesh.vertices = verts.buffer;
-					mesh.uv = uvs.buffer;
-					mesh.colors32 = cols.buffer;
+					if (mMesh.vertexCount != verts.buffer.Length)
+					{
+						mMesh.Clear();
+						setIndices = true;
+					}
 
-					if (norms != null) mesh.normals = norms.buffer;
-					if (tans != null) mesh.tangents = tans.buffer;
+					mMesh.vertices = verts.buffer;
+					mMesh.uv = uvs.buffer;
+					mMesh.colors32 = cols.buffer;
+
+					if (norms != null) mMesh.normals = norms.buffer;
+					if (tans != null) mMesh.tangents = tans.buffer;
 				}
 
-				if (setIndices) mesh.triangles = mIndices;
+				if (setIndices) mMesh.triangles = mIndices;
 				//mesh.RecalculateBounds();
-				mFilter.mesh = mesh;
+				mFilter.mesh = mMesh;
 			}
 			else
 			{
@@ -533,8 +499,7 @@ public class UIDrawCall : MonoBehaviour
 	void OnDestroy ()
 	{
 		list.Remove(this);
-		NGUITools.DestroyImmediate(mMesh0);
-		NGUITools.DestroyImmediate(mMesh1);
+		NGUITools.DestroyImmediate(mMesh);
 		NGUITools.DestroyImmediate(mDynamicMat);
 	}
 }
