@@ -200,11 +200,20 @@ public class UIScrollBar : UIWidgetContainer
 	{
 		if (mFG == null) return;
 
-		float val = (mDir == Direction.Horizontal) ?
-			(localPos.x - (mStartingPos.x - mStartingSize.x + mFG.width) * 0.5f) / (mStartingSize.x - mFG.width) :
-			(localPos.y - (mStartingPos.y - mStartingSize.y + mFG.height) * 0.5f) / (mStartingSize.y - mFG.height);
-
-		value = Mathf.Clamp01((mInverted ? 1f - val : val));
+		if (mDir == Direction.Horizontal)
+		{
+			float range = (mStartingSize.x - mFG.width);
+			float min = mStartingPos.x - range * 0.5f;
+			float val = (localPos.x - min) / range;
+			value = Mathf.Clamp01((mInverted ? 1f - val : val));
+		}
+		else
+		{
+			float range = (mStartingSize.y - mFG.height);
+			float min = mStartingPos.y - range * 0.5f;
+			float val = (localPos.y - min) / range;
+			value = Mathf.Clamp01((mInverted ? 1f - val : val));
+		}
 	}
 
 	/// <summary>
