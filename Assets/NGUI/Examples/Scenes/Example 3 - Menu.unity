@@ -928,6 +928,7 @@ GameObject:
   - 114: {fileID: 250}
   - 111: {fileID: 165}
   - 114: {fileID: 255}
+  - 54: {fileID: 258}
   m_Layer: 0
   m_Name: Panel - Options
   m_TagString: Untagged
@@ -2529,7 +2530,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Bloom and Lens Flares
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -2954,7 +2955,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Mouse
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -2985,9 +2986,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57e428c9b6087304da439ec665b56a2d, type: 1}
   m_Name: 
   atlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
-  bitmapFont: {fileID: 0}
+  bitmapFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   trueTypeFont: {fileID: 0}
-  fontSize: 16
+  fontSize: 28
   fontStyle: 0
   textLabel: {fileID: 191}
   backgroundSprite: Light
@@ -3007,8 +3008,8 @@ MonoBehaviour:
   mSelectedItem: Mouse
   eventReceiver: {fileID: 0}
   functionName: OnSelectionChange
-  textScale: 1
-  font: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
+  textScale: 0
+  font: {fileID: 0}
 --- !u!114 &193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3057,7 +3058,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Controls
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3097,7 +3098,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Difficulty
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3156,9 +3157,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57e428c9b6087304da439ec665b56a2d, type: 1}
   m_Name: 
   atlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
-  bitmapFont: {fileID: 0}
+  bitmapFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   trueTypeFont: {fileID: 0}
-  fontSize: 16
+  fontSize: 28
   fontStyle: 0
   textLabel: {fileID: 200}
   backgroundSprite: Light
@@ -3179,8 +3180,8 @@ MonoBehaviour:
   mSelectedItem: Normal
   eventReceiver: {fileID: 0}
   functionName: OnSelectionChange
-  textScale: 1
-  font: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
+  textScale: 0
+  font: {fileID: 0}
 --- !u!114 &200
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3201,7 +3202,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Normal
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3254,7 +3255,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15cc9c62605319f4a9b20b15918913fa, type: 1}
   m_Name: 
-  tweenTarget: {fileID: 0}
+  tweenTarget: {fileID: 32}
   hover: {r: .342657328, g: 1, b: 0, a: 1}
   pressed: {r: .5, g: .5, b: .5, a: 1}
   duration: .200000003
@@ -3291,14 +3292,17 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c20815eb3063c24290a61b7020a1836, type: 1}
   m_Name: 
-  foreground: {fileID: 103}
-  thumb: {fileID: 102}
-  direction: 0
+  mBG: {fileID: 0}
+  mFG: {fileID: 205}
+  mValue: 1
+  mFill: 0
   numberOfSteps: 0
   onChange: []
+  thumb: {fileID: 102}
+  foreground: {fileID: 103}
   rawValue: 1
-  eventReceiver: {fileID: 0}
-  functionName: OnSliderChange
+  direction: 2
+  mInverted: 0
 --- !u!114 &205
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3365,7 +3369,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Voice
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3405,7 +3409,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Sound
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3481,14 +3485,17 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c20815eb3063c24290a61b7020a1836, type: 1}
   m_Name: 
-  foreground: {fileID: 110}
-  thumb: {fileID: 111}
-  direction: 0
+  mBG: {fileID: 0}
+  mFG: {fileID: 210}
+  mValue: 1
+  mFill: 0
   numberOfSteps: 0
   onChange: []
+  thumb: {fileID: 111}
+  foreground: {fileID: 110}
   rawValue: 1
-  eventReceiver: {fileID: 0}
-  functionName: OnSliderChange
+  direction: 2
+  mInverted: 0
 --- !u!114 &212
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3522,7 +3529,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15cc9c62605319f4a9b20b15918913fa, type: 1}
   m_Name: 
-  tweenTarget: {fileID: 0}
+  tweenTarget: {fileID: 41}
   hover: {r: .342657328, g: 1, b: 0, a: 1}
   pressed: {r: .5, g: .5, b: .5, a: 1}
   duration: .200000003
@@ -3536,7 +3543,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15cc9c62605319f4a9b20b15918913fa, type: 1}
   m_Name: 
-  tweenTarget: {fileID: 0}
+  tweenTarget: {fileID: 44}
   hover: {r: .342657328, g: 1, b: 0, a: 1}
   pressed: {r: .5, g: .5, b: .5, a: 1}
   duration: .200000003
@@ -3573,14 +3580,17 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c20815eb3063c24290a61b7020a1836, type: 1}
   m_Name: 
-  foreground: {fileID: 115}
-  thumb: {fileID: 114}
-  direction: 0
+  mBG: {fileID: 0}
+  mFG: {fileID: 217}
+  mValue: 1
+  mFill: 0
   numberOfSteps: 0
   onChange: []
+  thumb: {fileID: 114}
+  foreground: {fileID: 115}
   rawValue: 1
-  eventReceiver: {fileID: 0}
-  functionName: OnSliderChange
+  direction: 2
+  mInverted: 0
 --- !u!114 &217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3693,7 +3703,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Options
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3733,7 +3743,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Music
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3867,7 +3877,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Done
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -4560,6 +4570,21 @@ Rigidbody:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 60}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: .0500000007
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!54 &258
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 57}
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0

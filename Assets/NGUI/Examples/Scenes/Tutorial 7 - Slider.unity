@@ -494,7 +494,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 10}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -.5, y: .5, z: 0}
+  m_LocalPosition: {x: 0, y: .5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 31}
@@ -519,7 +519,7 @@ Transform:
   m_GameObject: {fileID: 12}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: .00277777785, y: .00277777785, z: .00277777785}
+  m_LocalScale: {x: .00431034481, y: .00431034481, z: .00431034481}
   m_Children:
   - {fileID: 33}
   m_Father: {fileID: 0}
@@ -875,17 +875,17 @@ MonoBehaviour:
   widgetsAreStatic: 0
   cullWhileDragging: 0
   worldToLocal:
-    e00: 360
+    e00: 232
     e01: 0
     e02: 0
-    e03: .5
+    e03: 0
     e10: 0
-    e11: 360
+    e11: 232
     e12: 0
     e13: -.5
     e20: 0
     e21: 0
-    e22: 360
+    e22: 232
     e23: 0
     e30: 0
     e31: 0
@@ -1042,7 +1042,7 @@ MonoBehaviour:
 
     If you want your slider to moves in increments, specify the desired [99ff00]Number
     of Steps[-] on the [99ff00]UISlider[-].'
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -1082,7 +1082,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: 'Tutorial 7: Slider'
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -1149,7 +1149,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15cc9c62605319f4a9b20b15918913fa, type: 1}
   m_Name: 
-  tweenTarget: {fileID: 0}
+  tweenTarget: {fileID: 17}
   hover: {r: .50746268, g: .50746268, b: .50746268, a: 1}
   pressed: {r: .282352954, g: .282352954, b: .282352954, a: 1}
   duration: .200000003
@@ -1163,7 +1163,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15cc9c62605319f4a9b20b15918913fa, type: 1}
   m_Name: 
-  tweenTarget: {fileID: 0}
+  tweenTarget: {fileID: 18}
   hover: {r: .50746268, g: .50746268, b: .50746268, a: 1}
   pressed: {r: .282352954, g: .282352954, b: .282352954, a: 1}
   duration: .200000003
@@ -1224,7 +1224,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Drag Me
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -1300,14 +1300,17 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c20815eb3063c24290a61b7020a1836, type: 1}
   m_Name: 
-  foreground: {fileID: 43}
-  thumb: {fileID: 39}
-  direction: 1
+  mBG: {fileID: 0}
+  mFG: {fileID: 75}
+  mValue: 1
+  mFill: 2
   numberOfSteps: 0
   onChange: []
+  thumb: {fileID: 39}
+  foreground: {fileID: 43}
   rawValue: 1
-  eventReceiver: {fileID: 0}
-  functionName: OnSliderChange
+  direction: 2
+  mInverted: 0
 --- !u!114 &77
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1318,14 +1321,17 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c20815eb3063c24290a61b7020a1836, type: 1}
   m_Name: 
-  foreground: {fileID: 46}
-  thumb: {fileID: 40}
-  direction: 0
+  mBG: {fileID: 0}
+  mFG: {fileID: 78}
+  mValue: 1
+  mFill: 0
   numberOfSteps: 0
   onChange: []
+  thumb: {fileID: 40}
+  foreground: {fileID: 46}
   rawValue: 1
-  eventReceiver: {fileID: 0}
-  functionName: OnSliderChange
+  direction: 2
+  mInverted: 0
 --- !u!114 &78
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1392,7 +1398,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Drag Me
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0

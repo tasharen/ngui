@@ -296,7 +296,7 @@ public class UIProgressBar : UIWidgetContainer
 		UIEventListener bgl = UIEventListener.Get(bg);
 		bgl.onPress += OnPressBackground;
 		bgl.onDrag += OnDragBackground;
-		mBG.autoResizeBoxCollider = true;
+		if (mBG != null) mBG.autoResizeBoxCollider = true;
 
 		if (mFG.collider != null && mFG.gameObject != gameObject)
 		{
@@ -343,7 +343,8 @@ public class UIProgressBar : UIWidgetContainer
 	{
 		Upgrade();
 		mIsDirty = true;
-		mValue = Mathf.Clamp01(mValue);
+		float val = Mathf.Clamp01(mValue);
+		if (mValue != val) mValue = val;
 		if (numberOfSteps < 0) numberOfSteps = 0;
 		else if (numberOfSteps > 20) numberOfSteps = 20;
 	}
