@@ -44,6 +44,7 @@ public class UIProgressBar : UIWidgetContainer
 	protected Transform mTrans;
 	protected bool mIsDirty = false;
 	protected Camera mCam;
+	protected UISprite mSprite;
 	protected Vector2 mScreenPos = Vector2.zero;
 	protected Vector3 mStartingPos = Vector3.zero;
 	protected Vector2 mStartingSize = Vector2.zero;
@@ -281,6 +282,7 @@ public class UIProgressBar : UIWidgetContainer
 #endif
 		if (mFG != null)
 		{
+			mSprite = mFG as UISprite;
 			mFG.pivot = UIWidget.Pivot.Center;
 			mStartingSize = new Vector2(mFG.width, mFG.height);
 			mStartingPos = mFG.cachedTransform.localPosition;
@@ -384,9 +386,25 @@ public class UIProgressBar : UIWidgetContainer
 			if (isHorizontal)
 			{
 				int size = Mathf.RoundToInt(mStartingSize.x * value);
-				mFG.width = ((size & 1) == 1) ? size + 1 : size;
-				float offset = (mStartingSize.x - mFG.width) * 0.5f;
-				pos.x = isInverted ? pos.x + offset : pos.x - offset;
+
+				if (mSprite != null && mSprite.type == UISprite.Type.Filled)
+				{
+					mSprite.fillDirection = UISprite.FillDirection.Horizontal;
+					mSprite.invert = isInverted;
+					mSprite.fillAmount = value;
+				}
+				else
+				{
+					mFG.width = ((size & 1) == 1) ? size + 1 : size;
+					float offset = (mStartingSize.x - mFG.width) * 0.5f;
+					pos.x = isInverted ? pos.x + offset : pos.x - offset;
+				}
+			}
+			else if (mSprite != null && mSprite.type == UISprite.Type.Filled)
+			{
+				mSprite.fillDirection = UISprite.FillDirection.Vertical;
+				mSprite.invert = isInverted;
+				mSprite.fillAmount = value;
 			}
 			else
 			{
