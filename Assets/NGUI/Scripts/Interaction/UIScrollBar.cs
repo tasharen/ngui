@@ -90,6 +90,21 @@ public class UIScrollBar : UIProgressBar
 	}
 
 	/// <summary>
+	/// Make the scroll bar's foreground react to press events.
+	/// </summary>
+
+	protected override void OnStart ()
+	{
+		if (mFG != null && mFG.collider != null && mFG.gameObject != gameObject)
+		{
+			UIEventListener fgl = UIEventListener.Get(mFG.gameObject);
+			fgl.onPress += OnPressForeground;
+			fgl.onDrag += OnDragForeground;
+			mFG.autoResizeBoxCollider = true;
+		}
+	}
+
+	/// <summary>
 	/// Move the scroll bar to be centered on the specified position.
 	/// </summary>
 

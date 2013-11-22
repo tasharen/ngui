@@ -187,6 +187,7 @@ public static class NGUIContextMenu
 				AddItem("Add/Toggle Script", false, delegate(object obj) { target.AddComponent<UIToggle>(); }, null);
 				AddItem("Add/Slider Script", false, delegate(object obj) { target.AddComponent<UISlider>(); }, null);
 				AddItem("Add/Scroll Bar Script", false, delegate(object obj) { target.AddComponent<UIScrollBar>(); }, null);
+				AddItem("Add/Progress Bar Script", false, delegate(object obj) { target.AddComponent<UISlider>(); }, null);
 			}
 
 			AddHelp(target, false);

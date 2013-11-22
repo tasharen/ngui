@@ -298,14 +298,6 @@ public class UIProgressBar : UIWidgetContainer
 		bgl.onDrag += OnDragBackground;
 		if (mBG != null) mBG.autoResizeBoxCollider = true;
 
-		if (mFG.collider != null && mFG.gameObject != gameObject)
-		{
-			UIEventListener fgl = UIEventListener.Get(mFG.gameObject);
-			fgl.onPress += OnPressForeground;
-			fgl.onDrag += OnDragForeground;
-			mFG.autoResizeBoxCollider = true;
-		}
-
 		OnStart();
 
 		if (onChange != null)

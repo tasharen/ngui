@@ -46,7 +46,7 @@ GameObject:
   - 114: {fileID: 11400016}
   - 114: {fileID: 11400000}
   m_Layer: 8
-  m_Name: Wooden - Fancy Progress Bar
+  m_Name: Wooden - Colored Progress Bar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -96,7 +96,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100004}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0, z: 0}
+  m_LocalPosition: {x: 15, y: 174, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 400002}
@@ -179,10 +179,10 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 1}
   m_Name: 
-  mColor: {r: 1, g: 1, b: 1, a: 1}
+  mColor: {r: .850746274, g: .723597646, b: .48886165, a: 1}
   mPivot: 4
   mWidth: 290
-  mHeight: 20
+  mHeight: 12
   mDepth: 1
   autoResizeBoxCollider: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
@@ -247,7 +247,7 @@ MonoBehaviour:
   mColor: {r: .313432813, g: .313432813, b: .313432813, a: 1}
   mPivot: 4
   mWidth: 300
-  mHeight: 30
+  mHeight: 22
   mDepth: 0
   autoResizeBoxCollider: 1
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
