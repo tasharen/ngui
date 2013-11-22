@@ -80,61 +80,52 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 		NGUIEditorTools.SetLabelWidth(80f);
 		mList = target as UIPopupList;
 
-		UILabel lbl = EditorGUILayout.ObjectField("Text Label", mList.textLabel, typeof(UILabel), true) as UILabel;
-
-		if (mList.textLabel != lbl)
-		{
-			RegisterUndo();
-			mList.textLabel = lbl;
-			if (lbl != null) lbl.text = mList.value;
-		}
-
-		if (mList.textLabel == null)
+		SerializedProperty sp = NGUIEditorTools.DrawProperty("Text Label", serializedObject, "textLabel");
+		
+		if (sp.objectReferenceValue == null)
 		{
 			EditorGUILayout.HelpBox("This popup list has no label to update, so it will behave like a menu.", MessageType.Info);
 		}
 
-		if (mList.atlas != null)
+		GUILayout.BeginHorizontal();
+		GUILayout.Space(6f);
+		GUILayout.Label("Options");
+		GUILayout.EndHorizontal();
+
+		string text = "";
+		foreach (string s in mList.items) text += s + "\n";
+
+		GUILayout.Space(-14f);
+		GUILayout.BeginHorizontal();
+		GUILayout.Space(84f);
+		string modified = EditorGUILayout.TextArea(text, GUILayout.Height(100f));
+		GUILayout.EndHorizontal();
+
+		if (modified != text)
 		{
-			GUILayout.BeginHorizontal();
-			GUILayout.Space(6f);
-			GUILayout.Label("Options");
-			GUILayout.EndHorizontal();
+			RegisterUndo();
+			string[] split = modified.Split(new char[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
+			mList.items.Clear();
+			foreach (string s in split) mList.items.Add(s);
 
-			string text = "";
-			foreach (string s in mList.items) text += s + "\n";
-
-			GUILayout.Space(-14f);
-			GUILayout.BeginHorizontal();
-			GUILayout.Space(84f);
-			string modified = EditorGUILayout.TextArea(text, GUILayout.Height(100f));
-			GUILayout.EndHorizontal();
-
-			if (modified != text)
+			if (string.IsNullOrEmpty(mList.value) || !mList.items.Contains(mList.value))
 			{
-				RegisterUndo();
-				string[] split = modified.Split(new char[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
-				mList.items.Clear();
-				foreach (string s in split) mList.items.Add(s);
-
-				if (string.IsNullOrEmpty(mList.value) || !mList.items.Contains(mList.value))
-				{
-					mList.value = mList.items.Count > 0 ? mList.items[0] : "";
-				}
+				mList.value = mList.items.Count > 0 ? mList.items[0] : "";
 			}
-
-			GUI.changed = false;
-			string sel = NGUIEditorTools.DrawList("Default", mList.items.ToArray(), mList.value);
-			if (GUI.changed) serializedObject.FindProperty("mSelectedItem").stringValue = sel;
-
-			NGUIEditorTools.DrawProperty("Position", serializedObject, "position");
-			NGUIEditorTools.DrawProperty("Localized", serializedObject, "isLocalized");
-
-			DrawAtlas();
-			DrawFont();
-
-			NGUIEditorTools.DrawEvents("On Value Change", mList, mList.onChange);
 		}
+
+		GUI.changed = false;
+		string sel = NGUIEditorTools.DrawList("Default", mList.items.ToArray(), mList.value);
+		if (GUI.changed) serializedObject.FindProperty("mSelectedItem").stringValue = sel;
+
+		NGUIEditorTools.DrawProperty("Position", serializedObject, "position");
+		NGUIEditorTools.DrawProperty("Localized", serializedObject, "isLocalized");
+
+		DrawAtlas();
+		DrawFont();
+
+		NGUIEditorTools.DrawEvents("On Value Change", mList, mList.onChange);
+
 		serializedObject.ApplyModifiedProperties();
 	}
 

@@ -146,48 +146,46 @@ public static class NGUIContextMenu
 
 			if (Selection.activeTransform.parent == null || widget == null)
 			{
-				AddChildWidget("Add/Sprite", false, NGUISettings.AddSprite);
-				AddChildWidget("Add/Label", false, NGUISettings.AddLabel);
-				NGUIContextMenu.AddSeparator("Add/");
-				AddChildWidget("Add/Invisible Widget", false, NGUISettings.AddWidget);
-				AddChildWidget("Add/Simple Texture", false, NGUISettings.AddTexture);
+				AddChildWidget("Create/Sprite", false, NGUISettings.AddSprite);
+				AddChildWidget("Create/Label", false, NGUISettings.AddLabel);
+				AddChildWidget("Create/Invisible Widget", false, NGUISettings.AddWidget);
+				AddChildWidget("Create/Simple Texture", false, NGUISettings.AddTexture);
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
-				AddChildWidget("Add/Unity 2D Sprite", false, NGUISettings.Add2DSprite);
+				AddChildWidget("Create/Unity 2D Sprite", false, NGUISettings.Add2DSprite);
 #endif
 			}
 			else
 			{
-				AddChildWidget("Add/Sprite/Child", false, NGUISettings.AddSprite);
-				AddChildWidget("Add/Label/Child", false, NGUISettings.AddLabel);
-				NGUIContextMenu.AddSeparator("Add/");
-				AddChildWidget("Add/Invisible Widget/Child", false, NGUISettings.AddWidget);
-				AddChildWidget("Add/Simple Texture/Child", false, NGUISettings.AddTexture);
+				AddChildWidget("Create/Sprite/Child", false, NGUISettings.AddSprite);
+				AddChildWidget("Create/Label/Child", false, NGUISettings.AddLabel);
+				AddChildWidget("Create/Invisible Widget/Child", false, NGUISettings.AddWidget);
+				AddChildWidget("Create/Simple Texture/Child", false, NGUISettings.AddTexture);
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
-				AddChildWidget("Add/Unity 2D Sprite/Child", false, NGUISettings.Add2DSprite);
+				AddChildWidget("Create/Unity 2D Sprite/Child", false, NGUISettings.Add2DSprite);
 #endif
-				AddSiblingWidget("Add/Sprite/Sibling", false, NGUISettings.AddSprite);
-				AddSiblingWidget("Add/Label/Sibling", false, NGUISettings.AddLabel);
-				AddSiblingWidget("Add/Invisible Widget/Sibling", false, NGUISettings.AddWidget);
-				AddSiblingWidget("Add/Simple Texture/Sibling", false, NGUISettings.AddTexture);
+				AddSiblingWidget("Create/Sprite/Sibling", false, NGUISettings.AddSprite);
+				AddSiblingWidget("Create/Label/Sibling", false, NGUISettings.AddLabel);
+				AddSiblingWidget("Create/Invisible Widget/Sibling", false, NGUISettings.AddWidget);
+				AddSiblingWidget("Create/Simple Texture/Sibling", false, NGUISettings.AddTexture);
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 				AddSiblingWidget("Add/Unity 2D Sprite/Sibling", false, NGUISettings.Add2DSprite);
 #endif
-				NGUIContextMenu.AddSeparator("Add/");
-
-				bool anchor = target.GetComponent<UIAnchor>() != null;
-				bool stretch = target.GetComponent<UIStretch>() != null;
-
-				if (!anchor || !stretch)
-				{
-					if (!anchor) AddItem("Add/Anchor Script", false, delegate(object obj) { target.AddComponent<UIAnchor>(); }, null);
-					if (!stretch) AddItem("Add/Stretch Script", false, delegate(object obj) { target.AddComponent<UIStretch>(); }, null);
-				}
-
-				AddItem("Add/Button Script", false, delegate(object obj) { target.AddComponent<UIButton>(); }, null);
-				AddItem("Add/Toggle Script", false, delegate(object obj) { target.AddComponent<UIToggle>(); }, null);
-				AddItem("Add/Slider Script", false, delegate(object obj) { target.AddComponent<UISlider>(); }, null);
-				AddItem("Add/Scroll Bar Script", false, delegate(object obj) { target.AddComponent<UIScrollBar>(); }, null);
-				AddItem("Add/Progress Bar Script", false, delegate(object obj) { target.AddComponent<UISlider>(); }, null);
+				AddItem("Attach/Button Script", false, delegate(object obj) { target.AddComponent<UIButton>(); }, null);
+				AddItem("Attach/Toggle Script", false, delegate(object obj) { target.AddComponent<UIToggle>(); }, null);
+				AddItem("Attach/Slider Script", false, delegate(object obj) { target.AddComponent<UISlider>(); }, null);
+				AddItem("Attach/Scroll Bar Script", false, delegate(object obj) { target.AddComponent<UIScrollBar>(); }, null);
+				AddItem("Attach/Progress Bar Script", false, delegate(object obj) { target.AddComponent<UISlider>(); }, null);
+				AddItem("Attach/Popup List Script", false, delegate(object obj) { target.AddComponent<UIPopupList>(); }, null);
+				AddItem("Attach/Input Field Script", false, delegate(object obj) { target.AddComponent<UIInput>(); }, null);
+				NGUIContextMenu.AddSeparator("Attach/");
+				if (target.GetComponent<UIAnchor>() == null) AddItem("Attach/Anchor Script", false, delegate(object obj) { target.AddComponent<UIAnchor>(); }, null);
+				if (target.GetComponent<UIStretch>() == null) AddItem("Attach/Stretch Script", false, delegate(object obj) { target.AddComponent<UIStretch>(); }, null);
+				AddItem("Attach/Grid Script", false, delegate(object obj) { target.AddComponent<UIGrid>(); }, null);
+				AddItem("Attach/Table Script", false, delegate(object obj) { target.AddComponent<UITable>(); }, null);
+				NGUIContextMenu.AddSeparator("Attach/");
+				AddItem("Attach/Play Tween Script", false, delegate(object obj) { target.AddComponent<UIPlayTween>(); }, null);
+				AddItem("Attach/Play Animation Script", false, delegate(object obj) { target.AddComponent<UIPlayAnimation>(); }, null);
+				AddItem("Attach/Play Sound Script", false, delegate(object obj) { target.AddComponent<UIPlaySound>(); }, null);
 			}
 
 			AddHelp(target, false);

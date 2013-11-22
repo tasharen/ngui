@@ -15,39 +15,75 @@ using System.Collections.Generic;
 static public class NGUIHelp
 {
 	[MenuItem("CONTEXT/UIWidget/Help")]
-	static void ShowHelpMenu (UnityEditor.MenuCommand command) { Show(command.context); }
+	static void ShowHelp1 (UnityEditor.MenuCommand command) { Show(command.context); }
 
 	[MenuItem("CONTEXT/UIButton/Help")]
-	static void ShowButtonHelp (UnityEditor.MenuCommand command) { Show(typeof(UIButton)); }
+	static void ShowHelp2 (UnityEditor.MenuCommand command) { Show(typeof(UIButton)); }
 
 	[MenuItem("CONTEXT/UIToggle/Help")]
-	static void ShowToggleHelp (UnityEditor.MenuCommand command) { Show(typeof(UIToggle)); }
+	static void ShowHelp3 (UnityEditor.MenuCommand command) { Show(typeof(UIToggle)); }
 
 	[MenuItem("CONTEXT/UIRoot/Help")]
-	static void ShowRootHelp (UnityEditor.MenuCommand command) { Show(typeof(UIRoot)); }
+	static void ShowHelp4 (UnityEditor.MenuCommand command) { Show(typeof(UIRoot)); }
 
 	[MenuItem("CONTEXT/UICamera/Help")]
-	static void ShowCameraHelp (UnityEditor.MenuCommand command) { Show(typeof(UICamera)); }
+	static void ShowHelp5 (UnityEditor.MenuCommand command) { Show(typeof(UICamera)); }
 
 	[MenuItem("CONTEXT/UIAnchor/Help")]
-	static void ShowAnchorHelp (UnityEditor.MenuCommand command) { Show(typeof(UIAnchor)); }
+	static void ShowHelp6 (UnityEditor.MenuCommand command) { Show(typeof(UIAnchor)); }
 
 	[MenuItem("CONTEXT/UIStretch/Help")]
-	static void ShowStretchHelp (UnityEditor.MenuCommand command) { Show(typeof(UIStretch)); }
+	static void ShowHelp7 (UnityEditor.MenuCommand command) { Show(typeof(UIStretch)); }
 
 	[MenuItem("CONTEXT/UISlider/Help")]
-	static void ShowSliderHelp (UnityEditor.MenuCommand command) { Show(typeof(UISlider)); }
+	static void ShowHelp8 (UnityEditor.MenuCommand command) { Show(typeof(UISlider)); }
 
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 	[MenuItem("CONTEXT/UI2DSprite/Help")]
-	static void ShowSprite2DHelp (UnityEditor.MenuCommand command) { Show(typeof(UI2DSprite)); }
+	static void ShowHelp9 (UnityEditor.MenuCommand command) { Show(typeof(UI2DSprite)); }
 #endif
 
 	[MenuItem("CONTEXT/UIScrollBar/Help")]
-	static void ShowScrollBarHelp (UnityEditor.MenuCommand command) { Show(typeof(UIScrollBar)); }
+	static void ShowHelp10 (UnityEditor.MenuCommand command) { Show(typeof(UIScrollBar)); }
 
 	[MenuItem("CONTEXT/UIProgressBar/Help")]
-	static void ShowProgressBarHelp (UnityEditor.MenuCommand command) { Show(typeof(UIProgressBar)); }
+	static void ShowHelp11 (UnityEditor.MenuCommand command) { Show(typeof(UIProgressBar)); }
+
+	[MenuItem("CONTEXT/UIPopupList/Help")]
+	static void ShowHelp12 (UnityEditor.MenuCommand command) { Show(typeof(UIPopupList)); }
+
+	[MenuItem("CONTEXT/UIInputField/Help")]
+	static void ShowHelp13 (UnityEditor.MenuCommand command) { Show(typeof(UIInput)); }
+
+	[MenuItem("CONTEXT/UIInputField/Help")]
+	static void ShowHelp14 (UnityEditor.MenuCommand command) { Show(typeof(UIInput)); }
+
+	[MenuItem("CONTEXT/UIGrid/Help")]
+	static void ShowHelp15 (UnityEditor.MenuCommand command) { Show(typeof(UIGrid)); }
+
+	[MenuItem("CONTEXT/UITable/Help")]
+	static void ShowHelp16 (UnityEditor.MenuCommand command) { Show(typeof(UITable)); }
+
+	[MenuItem("CONTEXT/UIPlayTween/Help")]
+	static void ShowHelp17 (UnityEditor.MenuCommand command) { Show(typeof(UIPlayTween)); }
+
+	[MenuItem("CONTEXT/UIPlayAnimation/Help")]
+	static void ShowHelp18 (UnityEditor.MenuCommand command) { Show(typeof(UIPlayAnimation)); }
+
+	[MenuItem("CONTEXT/UIPlaySound/Help")]
+	static void ShowHelp19 (UnityEditor.MenuCommand command) { Show(typeof(UIPlaySound)); }
+
+	[MenuItem("CONTEXT/UIDraggablePanel/Help")]
+	static void ShowHelp20 (UnityEditor.MenuCommand command) { Show(typeof(UIDraggablePanel)); }
+
+	[MenuItem("CONTEXT/UIDragPanelContents/Help")]
+	static void ShowHelp21 (UnityEditor.MenuCommand command) { Show(typeof(UIDragPanelContents)); }
+
+	[MenuItem("CONTEXT/UICenterOnChild/Help")]
+	static void ShowHelp22 (UnityEditor.MenuCommand command) { Show(typeof(UICenterOnChild)); }
+
+	[MenuItem("CONTEXT/UICenterOnClick/Help")]
+	static void ShowHelp23 (UnityEditor.MenuCommand command) { Show(typeof(UICenterOnClick)); }
 
 	/// <summary>
 	/// Get the URL pointing to the documentation for the specified component.
@@ -71,6 +107,7 @@ static public class NGUIHelp
 		if (type == typeof(UI2DSprite))		return "http://www.tasharen.com/forum/index.php?topic=6729";
 #endif
 		if (type == typeof(UIScrollBar))	return "http://www.tasharen.com/forum/index.php?topic=6733";
+		if (type == typeof(UIProgressBar))	return "http://www.tasharen.com/forum/index.php?topic=6738";
 		return null;
 	}
 
