@@ -882,14 +882,6 @@ public class UIWidget : MonoBehaviour
 		if (HasTransformChanged())
 		{
 #if UNITY_EDITOR
-			// When an object is dragged from Project view to Scene view, its Z is... odd, to say the least. Force it if possible.
-			if (!Application.isPlaying && hideFlags == HideFlags.HideInHierarchy && mPanel.cachedTransform == cachedTransform.parent)
-			{
-				Vector3 pos = cachedTransform.localPosition;
-				pos.z = 0f;
-				cachedTransform.localPosition = pos;
-			}
-
 			if (!mPanel.widgetsAreStatic || !Application.isPlaying)
 #else
 			if (!mPanel.widgetsAreStatic)

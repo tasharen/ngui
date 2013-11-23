@@ -745,8 +745,45 @@ public class UIPanel : MonoBehaviour
 			UIWidget w = UIWidget.list[i];
 
 			// If the widget is visible, update it
-			if (w.enabled && w.panel == this && w.UpdateGeometry(forceVisible))
+			if (w.panel == this && w.enabled)
 			{
+#if UNITY_EDITOR
+				// When an object is dragged from Project view to Scene view, its Z is...
+				// odd, to say the least. Force it if possible.
+				if (!Application.isPlaying)
+				{
+					Transform t = w.cachedTransform;
+
+					if (t.hideFlags != HideFlags.HideInHierarchy)
+					{
+						t = (t.parent != null && t.parent.hideFlags == HideFlags.HideInHierarchy) ?
+							t.parent : null;
+					}
+
+					if (t != null)
+					{
+						for (; ; )
+						{
+							if (t.parent == null) break;
+							if (t.parent.hideFlags == HideFlags.HideInHierarchy) t = t.parent;
+							else break;
+						}
+
+						if (t != null)
+						{
+							Vector3 pos = t.localPosition;
+
+							if (pos.z != 0f)
+							{
+								pos.z = 0f;
+								t.localPosition = pos;
+							}
+						}
+					}
+				}
+#endif
+				if (!w.UpdateGeometry(forceVisible)) continue;
+
 				changed = true;
 				
 				if (!mRebuild)
