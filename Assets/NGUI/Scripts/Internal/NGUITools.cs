@@ -352,8 +352,7 @@ static public class NGUITools
 	static public GameObject AddChild (GameObject parent)
 	{
 		GameObject go = new GameObject();
-
-#if UNITY_EDITOR && !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+#if UNITY_EDITOR
 		UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
 #endif
 		if (parent != null)
@@ -466,6 +465,9 @@ static public class NGUITools
 				for (int i = 0; i < panels.Length; ++i)
 				{
 					UIPanel p = panels[i];
+#if UNITY_EDITOR
+					UnityEditor.Undo.RegisterUndo(p, "Depth Change");
+#endif
 					p.depth = p.depth + adjustment;
 				}
 				return 1;
@@ -477,6 +479,9 @@ static public class NGUITools
 				for (int i = 0, imax = widgets.Length; i < imax; ++i)
 				{
 					UIWidget w = widgets[i];
+#if UNITY_EDITOR
+					UnityEditor.Undo.RegisterUndo(w, "Depth Change");
+#endif
 					w.depth = w.depth + adjustment;
 				}
 				return 2;

@@ -1590,8 +1590,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 255.000031, y: 76, z: 0}
-  m_Center: {x: 0, y: 0, z: -1}
+  m_Size: {x: 256, y: 76, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &112
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1794,7 +1794,7 @@ MonoBehaviour:
   mPivot: 1
   mWidth: 14
   mHeight: 296
-  mDepth: 10
+  mDepth: 9
   autoResizeBoxCollider: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Button
@@ -1817,7 +1817,7 @@ MonoBehaviour:
   mPivot: 1
   mWidth: 22
   mHeight: 304
-  mDepth: 9
+  mDepth: 8
   autoResizeBoxCollider: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Highlight - Shadowed
@@ -2245,7 +2245,7 @@ MonoBehaviour:
   mPivot: 0
   mWidth: 390
   mHeight: 108
-  mDepth: 10
+  mDepth: 13
   autoResizeBoxCollider: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
@@ -2310,7 +2310,7 @@ MonoBehaviour:
   mPivot: 0
   mWidth: 390
   mHeight: 90
-  mDepth: 10
+  mDepth: 13
   autoResizeBoxCollider: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
@@ -2521,11 +2521,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9d0b5f3bbe925a408bd595c79d0bf63, type: 1}
   m_Name: 
-  mColor: {r: .223880589, g: .131370068, b: .0451102704, a: 1}
+  mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 0
   mWidth: 244
   mHeight: 20
-  mDepth: 11
+  mDepth: 14
   autoResizeBoxCollider: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
@@ -2535,15 +2535,15 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 1
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
-  mEffectStyle: 0
+  mGradientBottom: {r: .694029808, g: .561029792, b: .42470479, a: 1}
+  mEffectStyle: 1
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
   mEffectDistance: {x: 1, y: 1}
   mOverflow: 2
   mMaterial: {fileID: 0}
-  mApplyGradient: 0
-  mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mApplyGradient: 1
+  mGradientTop: {r: 1, g: .935206413, b: .865671575, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -2561,11 +2561,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 1}
   m_Name: 
-  mColor: {r: .179104507, g: .0842844695, b: 0, a: .576470613}
+  mColor: {r: .23880595, g: .145401165, b: .0623746924, a: 1}
   mPivot: 0
   mWidth: 400
   mHeight: 30
-  mDepth: 8
+  mDepth: 12
   autoResizeBoxCollider: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Row Outline
@@ -2588,7 +2588,7 @@ MonoBehaviour:
   mPivot: 0
   mWidth: 390
   mHeight: 90
-  mDepth: 10
+  mDepth: 13
   autoResizeBoxCollider: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
@@ -2632,7 +2632,6 @@ MonoBehaviour:
   sorted: 1
   hideInactive: 1
   keepWithinPanel: 1
-  repositionNow: 0
   padding: {x: 0, y: 4}
 --- !u!114 &160
 MonoBehaviour:
@@ -2644,11 +2643,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9d0b5f3bbe925a408bd595c79d0bf63, type: 1}
   m_Name: 
-  mColor: {r: .223880589, g: .131370068, b: .0451102704, a: 1}
+  mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 0
   mWidth: 218
   mHeight: 20
-  mDepth: 11
+  mDepth: 14
   autoResizeBoxCollider: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
@@ -2658,15 +2657,15 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 1
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
-  mEffectStyle: 0
+  mGradientBottom: {r: .694029808, g: .561029792, b: .42470479, a: 1}
+  mEffectStyle: 1
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
   mEffectDistance: {x: 1, y: 1}
   mOverflow: 2
   mMaterial: {fileID: 0}
-  mApplyGradient: 0
-  mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mApplyGradient: 1
+  mGradientTop: {r: 1, g: .935206413, b: .865671575, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -2684,11 +2683,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 1}
   m_Name: 
-  mColor: {r: .179104507, g: .0842844695, b: 0, a: .576470613}
+  mColor: {r: .23880595, g: .145401165, b: .0623746924, a: 1}
   mPivot: 0
   mWidth: 400
   mHeight: 30
-  mDepth: 8
+  mDepth: 12
   autoResizeBoxCollider: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Row Outline
@@ -2707,11 +2706,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 1}
   m_Name: 
-  mColor: {r: .179104507, g: .0842844695, b: 0, a: .576470613}
+  mColor: {r: .23880595, g: .145401165, b: .0623746924, a: 1}
   mPivot: 0
   mWidth: 400
   mHeight: 30
-  mDepth: 8
+  mDepth: 12
   autoResizeBoxCollider: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Row Outline
@@ -2730,11 +2729,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9d0b5f3bbe925a408bd595c79d0bf63, type: 1}
   m_Name: 
-  mColor: {r: .223880589, g: .131370068, b: .0451102704, a: 1}
+  mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 0
   mWidth: 293
   mHeight: 20
-  mDepth: 11
+  mDepth: 14
   autoResizeBoxCollider: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
@@ -2744,15 +2743,15 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 1
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
-  mEffectStyle: 0
+  mGradientBottom: {r: .694029808, g: .561029792, b: .42470482, a: 1}
+  mEffectStyle: 1
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
   mEffectDistance: {x: 1, y: 1}
   mOverflow: 2
   mMaterial: {fileID: 0}
-  mApplyGradient: 0
-  mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mApplyGradient: 1
+  mGradientTop: {r: 1, g: .935206354, b: .865671635, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -2935,7 +2934,7 @@ MonoBehaviour:
   mPivot: 4
   mWidth: 256
   mHeight: 76
-  mDepth: 4
+  mDepth: 11
   autoResizeBoxCollider: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: NGUI
@@ -2958,7 +2957,7 @@ MonoBehaviour:
   mPivot: 4
   mWidth: 292
   mHeight: 116
-  mDepth: 3
+  mDepth: 10
   autoResizeBoxCollider: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Glow - Outer

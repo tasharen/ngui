@@ -127,22 +127,40 @@ public static class NGUIContextMenu
 		{
 			UIWidget widget = target.GetComponent<UIWidget>();
 
+			string myName = string.Format("Selected {0}", (widget != null) ? NGUITools.GetTypeName(widget) : "Object");
+
+			AddItem(myName + "/Bring to Front", false,
+				delegate(object obj) { NGUITools.BringForward(Selection.activeGameObject); }, null);
+
+			AddItem(myName + "/Push to Back", false,
+				delegate(object obj) { NGUITools.PushBack(Selection.activeGameObject); }, null);
+
+			AddItem(myName + "/Nudge Forward", false,
+				delegate(object obj) { NGUITools.AdjustDepth(Selection.activeGameObject, 1); }, null);
+
+			AddItem(myName + "/Nudge Back", false,
+				delegate(object obj) { NGUITools.AdjustDepth(Selection.activeGameObject, -1); }, null);
+
 			if (widget != null)
 			{
-				AddItem("Widget/Make Pixel-Perfect", false, OnMakePixelPerfect, Selection.activeTransform);
+				NGUIContextMenu.AddSeparator(myName + "/");
+
+				AddItem(myName + "/Make Pixel-Perfect", false, OnMakePixelPerfect, Selection.activeTransform);
 
 				if (target.GetComponent<BoxCollider>() != null)
 				{
-					AddItem("Widget/Reset Collider Size", false, OnBoxCollider, target);
+					AddItem(myName + "/Reset Collider Size", false, OnBoxCollider, target);
 				}
 				else
 				{
-					AddItem("Widget/Add Box Collider", false, OnBoxCollider, target);
+					AddItem(myName + "/Add Box Collider", false, OnBoxCollider, target);
 				}
 
-				NGUIContextMenu.AddSeparator("Widget/");
-				AddItem("Widget/Delete", false, OnDelete, target);
+				NGUIContextMenu.AddSeparator(myName + "/");
+				AddItem(myName + "/Delete", false, OnDelete, target);
 			}
+
+			NGUIContextMenu.AddSeparator("");
 
 			if (Selection.activeTransform.parent != null && widget != null)
 			{
@@ -171,6 +189,13 @@ public static class NGUIContextMenu
 				AddChildWidget("Create/Unity 2D Sprite", false, NGUISettings.Add2DSprite);
 #endif
 			}
+
+			NGUIContextMenu.AddSeparator("Create/");
+			AddItem("Create/Anchor", false, AddChild<UIAnchor>, target);
+			AddItem("Create/Panel", false, AddChild<UIPanel>, target);
+			AddItem("Create/Grid", false, AddChild<UIGrid>, target);
+			AddItem("Create/Table", false, AddChild<UITable>, target);
+			//AddItem("Create/Scroll View", false, CreateScrollView, target);
 			
 			AddItem("Attach/Button Script", false, delegate(object obj) { target.AddComponent<UIButton>(); }, null);
 			AddItem("Attach/Toggle Script", false, delegate(object obj) { target.AddComponent<UIToggle>(); }, null);
@@ -189,10 +214,18 @@ public static class NGUIContextMenu
 			AddItem("Attach/Play Tween Script", false, delegate(object obj) { target.AddComponent<UIPlayTween>(); }, null);
 			AddItem("Attach/Play Animation Script", false, delegate(object obj) { target.AddComponent<UIPlayAnimation>(); }, null);
 			AddItem("Attach/Play Sound Script", false, delegate(object obj) { target.AddComponent<UIPlaySound>(); }, null);
-
-			AddHelp(target, false);
-			NGUIContextMenu.AddSeparator("");
 		}
+	}
+
+	/// <summary>
+	/// Helper function for menu creation.
+	/// </summary>
+
+	static void AddChild<T> (object obj) where T : MonoBehaviour
+	{
+		GameObject go = obj as GameObject;
+		T t = NGUITools.AddChild<T>(go);
+		Selection.activeGameObject = t.gameObject;
 	}
 
 	/// <summary>
@@ -202,6 +235,8 @@ public static class NGUIContextMenu
 	static public void AddHelp (GameObject go, bool addSeparator)
 	{
 		MonoBehaviour[] comps = Selection.activeGameObject.GetComponents<MonoBehaviour>();
+
+		bool addedSomething = false;
 
 		for (int i = 0; i < comps.Length; ++i)
 		{
@@ -217,8 +252,12 @@ public static class NGUIContextMenu
 				}
 
 				AddItem("Help/" + type, false, delegate(object obj) { Application.OpenURL(url); }, null);
+				addedSomething = true;
 			}
 		}
+
+		if (addedSomething) AddSeparator("Help/");
+		AddItem("Help/All Topics", false, delegate(object obj) { NGUIHelp.Show(); }, null);
 	}
 
 	static void OnHelp (object obj) { NGUIHelp.Show(obj); }

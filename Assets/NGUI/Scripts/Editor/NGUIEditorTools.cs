@@ -1590,14 +1590,15 @@ public class NGUIEditorTools
 
 			if (ent != null)
 			{
-				NGUIContextMenu.AddItem(ent.name, Selection.activeGameObject == ent.go,
+				NGUIContextMenu.AddItem("Select/" + ent.name, Selection.activeGameObject == ent.go,
 					delegate(object go) { Selection.activeGameObject = (GameObject)go; }, ent.go);
 			}
 			else if (!divider)
 			{
-				NGUIContextMenu.AddSeparator("");
+				NGUIContextMenu.AddSeparator("Select/");
 			}
 		}
+		NGUIContextMenu.AddHelp(Selection.activeGameObject, true);
 		NGUIContextMenu.Show();
 	}
 	/// <summary>

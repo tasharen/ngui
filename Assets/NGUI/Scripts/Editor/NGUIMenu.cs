@@ -176,16 +176,26 @@ static public class NGUIMenu
 		}
 	}
 
+	[MenuItem("NGUI/Create/Anchor")]
+	static void AddAnchor2 () { Add<UIAnchor>(); }
+
 	[MenuItem("NGUI/Create/Panel")]
-	static public void AddPanel ()
+	static void AddPanel () { Add<UIPanel>(); }
+
+	[MenuItem("NGUI/Create/Grid")]
+	static void AddGrid () { Add<UIGrid>(); }
+
+	[MenuItem("NGUI/Create/Table")]
+	static void AddTable () { Add<UITable>(); }
+
+	static void Add<T> () where T : MonoBehaviour
 	{
 		GameObject go = SelectedRoot();
 
 		if (NGUIEditorTools.WillLosePrefab(go))
 		{
-			NGUIEditorTools.RegisterUndo("Add a child UI Panel", go);
-
-			GameObject child = new GameObject(NGUITools.GetTypeName<UIPanel>());
+			GameObject child = NGUITools.AddChild(go);
+			child.name = NGUITools.GetTypeName<T>();
 			child.layer = go.layer;
 
 			Transform ct = child.transform;
@@ -193,7 +203,7 @@ static public class NGUIMenu
 			ct.localPosition = Vector3.zero;
 			ct.localRotation = Quaternion.identity;
 			ct.localScale = Vector3.one;
-			child.AddComponent<UIPanel>();
+			child.AddComponent<T>();
 			Selection.activeGameObject = child;
 		}
 	}
@@ -317,4 +327,7 @@ static public class NGUIMenu
 
 	[MenuItem("NGUI/Normalize Depth Hierarchy &#0")]
 	static public void Normalize () { NGUITools.NormalizeDepths(); }
+
+	[MenuItem("NGUI/Help")]
+	static public void Help () { NGUIHelp.Show(); }
 }

@@ -35,6 +35,12 @@ public class NGUISettings
 	static public void SetInt (string name, int val) { EditorPrefs.SetInt(name, val); }
 
 	/// <summary>
+	/// Save the specified float value in settings.
+	/// </summary>
+
+	static public void SetFloat (string name, float val) { EditorPrefs.SetFloat(name, val); }
+
+	/// <summary>
 	/// Save the specified string value in settings.
 	/// </summary>
 
@@ -92,6 +98,12 @@ public class NGUISettings
 	/// </summary>
 
 	static public int GetInt (string name, int defaultValue) { return EditorPrefs.GetInt(name, defaultValue); }
+
+	/// <summary>
+	/// Get the previously saved float value.
+	/// </summary>
+
+	static public float GetFloat (string name, float defaultValue) { return EditorPrefs.GetFloat(name, defaultValue); }
 
 	/// <summary>
 	/// Get the previously saved string value.
@@ -414,5 +426,69 @@ public class NGUISettings
 		w.gradientBottom = new Color(0.7f, 0.7f, 0.7f);
 		w.AssumeNaturalSize();
 		return w;
+	}
+
+	/// <summary>
+	/// Copy the specified widget's style.
+	/// </summary>
+
+	static public void CopyStyle (UIWidget widget)
+	{
+		SetColor("Widget Color", widget.color);
+		SetEnum("Widget Pivot", widget.pivot);
+		if (widget is UILabel) CopyLabelStyle(widget as UILabel);
+	}
+
+	/// <summary>
+	/// Paste the specified widget's style.
+	/// </summary>
+
+	static public void PasteStyle (UIWidget widget)
+	{
+		widget.color = GetColor("Widget Color", widget.color);
+		widget.pivot = GetEnum<UIWidget.Pivot>("Widget Pivot", widget.pivot);
+		if (widget is UILabel) PasteLabelStyle(widget as UILabel);
+	}
+
+	/// <summary>
+	/// Copy the specified label's style.
+	/// </summary>
+
+	static void CopyLabelStyle (UILabel lbl)
+	{
+		SetEnum("Overflow", lbl.overflowMethod);
+		SetInt("SpacingX", lbl.spacingX);
+		SetInt("SpacingY", lbl.spacingY);
+		SetInt("MaxLines", lbl.maxLineCount);
+		SetBool("Encoding", lbl.supportEncoding);
+		SetBool("Gradient", lbl.applyGradient);
+		SetColor("Gradient B", lbl.gradientBottom);
+		SetColor("Gradient T", lbl.gradientTop);
+		SetEnum("Effect", lbl.effectStyle);
+		SetColor("Effect C", lbl.effectColor);
+		SetFloat("Effect X", lbl.effectDistance.x);
+		SetFloat("Effect Y", lbl.effectDistance.y);
+	}
+
+	/// <summary>
+	/// Paste the specified label's style.
+	/// </summary>
+
+	static void PasteLabelStyle (UILabel lbl)
+	{
+		lbl.overflowMethod = GetEnum<UILabel.Overflow>("Overflow", lbl.overflowMethod);
+		lbl.spacingX = GetInt("SpacingX", lbl.spacingX);
+		lbl.spacingY = GetInt("SpacingY", lbl.spacingY);
+		lbl.maxLineCount = GetInt("MaxLines", lbl.maxLineCount);
+		lbl.supportEncoding = GetBool("Encoding", lbl.supportEncoding);
+		lbl.applyGradient = GetBool("Gradient", lbl.applyGradient);
+		lbl.gradientBottom = GetColor("Gradient B", lbl.gradientBottom);
+		lbl.gradientTop = GetColor("Gradient T", lbl.gradientTop);
+		lbl.effectStyle = GetEnum<UILabel.Effect>("Effect", lbl.effectStyle);
+		lbl.effectColor = GetColor("Effect C", lbl.effectColor);
+
+		float x = GetFloat("Effect X", lbl.effectDistance.x);
+		float y = GetFloat("Effect Y", lbl.effectDistance.y);
+		lbl.effectDistance = new Vector2(x, y);
 	}
 }

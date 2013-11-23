@@ -324,9 +324,9 @@ public class UILabel : UIWidget
 		}
 		set
 		{
-			if (mGradientBottom != value)
+			if (mGradientTop != value)
 			{
-				mGradientBottom = value;
+				mGradientTop = value;
 				if (mApplyGradient) MarkAsChanged();
 			}
 		}
