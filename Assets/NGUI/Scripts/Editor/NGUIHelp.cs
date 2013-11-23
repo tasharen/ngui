@@ -94,13 +94,20 @@ static public class NGUIHelp
 	[MenuItem("CONTEXT/UICenterOnClick/Help")]
 	static void ShowHelp23 (MenuCommand command) { Show(typeof(UICenterOnClick)); }
 
+	[MenuItem("CONTEXT/UITweener/Help")]
+	[MenuItem("CONTEXT/UIPlayTween/Help")]
+	static void ShowHelp24 (MenuCommand command) { Show(typeof(UITweener)); }
+
+	[MenuItem("CONTEXT/ActiveAnimation/Help")]
+	[MenuItem("CONTEXT/UIPlayAnimation/Help")]
+	static void ShowHelp25 (MenuCommand command) { Show(typeof(UIPlayAnimation)); }
+
 	/// <summary>
 	/// Get the URL pointing to the documentation for the specified component.
 	/// </summary>
 
 	static public string GetHelpURL (Type type)
 	{
-		if (type == typeof(UIWidget))		return "http://www.tasharen.com/forum/index.php?topic=6702";
 		if (type == typeof(UITexture))		return "http://www.tasharen.com/forum/index.php?topic=6703";
 		if (type == typeof(UISprite))		return "http://www.tasharen.com/forum/index.php?topic=6704";
 		if (type == typeof(UIPanel))		return "http://www.tasharen.com/forum/index.php?topic=6705";
@@ -120,6 +127,18 @@ static public class NGUIHelp
 		if (type == typeof(UIPopupList))	return "http://www.tasharen.com/forum/index.php?topic=6751";
 		if (type == typeof(UIInput))		return "http://www.tasharen.com/forum/index.php?topic=6752";
 		if (type == typeof(UIKeyBinding))	return "http://www.tasharen.com/forum/index.php?topic=6753";
+		if (type == typeof(UIGrid))			return "http://www.tasharen.com/forum/index.php?topic=6756";
+		if (type == typeof(UITable))		return "http://www.tasharen.com/forum/index.php?topic=6758";
+		
+		if (type == typeof(ActiveAnimation) || type == typeof(UIPlayAnimation))
+			return "http://www.tasharen.com/forum/index.php?topic=6762";
+
+		if (type.IsSubclassOf(typeof(UIWidget)))
+			return "http://www.tasharen.com/forum/index.php?topic=6702";
+
+		if (type == typeof(UIPlayTween) || type.IsSubclassOf(typeof(UITweener)))
+			return "http://www.tasharen.com/forum/index.php?topic=6760";
+
 		return null;
 	}
 

@@ -772,12 +772,12 @@ public class UIPanel : MonoBehaviour
 						if (t != null)
 						{
 							Vector3 pos = t.localPosition;
+							pos.x = Mathf.Round(pos.x);
+							pos.y = Mathf.Round(pos.y);
+							pos.z = 0f;
 
-							if (pos.z != 0f)
-							{
-								pos.z = 0f;
+							if (Vector3.SqrMagnitude(t.localPosition - pos) > 0.0001f)
 								t.localPosition = pos;
-							}
 						}
 					}
 				}

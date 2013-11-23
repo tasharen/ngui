@@ -14,6 +14,8 @@ using System.Collections.Generic;
 
 static public class NGUIMenu
 {
+#region Selection
+
 	[MenuItem("NGUI/Selection/Bring To Front &#=")]
 	static public void BringForward2 ()
 	{
@@ -93,6 +95,22 @@ static public class NGUIMenu
 		}
 		return go;
 	}
+
+	[MenuItem("NGUI/Selection/Make Pixel Perfect &#p")]
+	static void PixelPerfectSelection ()
+	{
+		foreach (Transform t in Selection.transforms)
+			NGUITools.MakePixelPerfect(t);
+	}
+
+	[MenuItem("NGUI/Selection/Make Pixel Perfect &#p", true)]
+	static bool PixelPerfectSelectionValidation ()
+	{
+		return (Selection.activeTransform != null);
+	}
+
+#endregion
+#region Create
 
 	[MenuItem("NGUI/Create/Sprite &#s")]
 	static public void AddSprite ()
@@ -176,6 +194,9 @@ static public class NGUIMenu
 		}
 	}
 
+	[MenuItem("NGUI/Create/")]
+	static void AddBreaker123 () {}
+
 	[MenuItem("NGUI/Create/Anchor")]
 	static void AddAnchor2 () { Add<UIAnchor>(); }
 
@@ -208,6 +229,9 @@ static public class NGUIMenu
 		}
 	}
 
+#endregion
+#region Attach
+
 	[MenuItem("NGUI/Attach/Collider &#c")]
 	static public void AddCollider ()
 	{
@@ -227,21 +251,124 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Attach/Anchor &#h")]
-	static public void AddAnchor ()
+	static void AddIfMissing<T> () where T : Component
 	{
 		GameObject go = Selection.activeGameObject;
-
-		if (go != null)
-		{
-			NGUIEditorTools.RegisterUndo("Add an Anchor", go);
-			if (go.GetComponent<UIAnchor>() == null) go.AddComponent<UIAnchor>();
-		}
-		else
-		{
-			Debug.Log("You must select a game object first.");
-		}
+		if (go != null) go.AddMissingComponent<T>();
+		else Debug.Log("You must select a game object first.");
 	}
+
+	static bool Exists<T> () where T : Component
+	{
+		GameObject go = Selection.activeGameObject;
+		if (go != null) return go.GetComponent<T>() != null;
+		return false;
+	}
+
+	[MenuItem("NGUI/Attach/Anchor")]
+	static public void Add1 () { AddIfMissing<UIAnchor>(); }
+
+	[MenuItem("NGUI/Attach/Anchor", true)]
+	static public bool Add1a () { return !Exists<UIAnchor>(); }
+
+	[MenuItem("NGUI/Attach/Stretch")]
+	static public void Add2 () { AddIfMissing<UIStretch>(); }
+
+	[MenuItem("NGUI/Attach/Stretch", true)]
+	static public bool Add2a () { return !Exists<UIStretch>(); }
+
+	[MenuItem("NGUI/Attach/")]
+	static public void Add3s () {}
+
+	[MenuItem("NGUI/Attach/Button Script")]
+	static public void Add3 () { AddIfMissing<UIButton>(); }
+
+	[MenuItem("NGUI/Attach/Toggle Script")]
+	static public void Add4 () { AddIfMissing<UIToggle>(); }
+
+	[MenuItem("NGUI/Attach/Slider Script")]
+	static public void Add5 () { AddIfMissing<UISlider>(); }
+
+	[MenuItem("NGUI/Attach/Scroll Bar Script")]
+	static public void Add6 () { AddIfMissing<UIScrollBar>(); }
+
+	[MenuItem("NGUI/Attach/Progress Bar Script")]
+	static public void Add7 () { AddIfMissing<UIProgressBar>(); }
+
+	[MenuItem("NGUI/Attach/Popup List Script")]
+	static public void Add8 () { AddIfMissing<UIPopupList>(); }
+
+	[MenuItem("NGUI/Attach/Input Field Script")]
+	static public void Add9 () { AddIfMissing<UIInput>(); }
+	
+	[MenuItem("NGUI/Attach/Key Binding Script")]
+	static public void Add10 () { AddIfMissing<UIKeyBinding>(); }
+
+	[MenuItem("NGUI/Attach/Play Tween Script")]
+	static public void Add11 () { AddIfMissing<UIPlayTween>(); }
+
+	[MenuItem("NGUI/Attach/Play Animation Script")]
+	static public void Add12 () { AddIfMissing<UIPlayAnimation>(); }
+
+#endregion
+#region Tweens
+
+	[MenuItem("NGUI/Tween/Alpha")]
+	static void Tween1 () { if (Selection.activeGameObject != null) Selection.activeGameObject.AddMissingComponent<TweenAlpha>(); }
+
+	[MenuItem("NGUI/Tween/Alpha", true)]
+	static bool Tween1a () { return (Selection.activeGameObject != null) && (Selection.activeGameObject.GetComponent<UIWidget>() != null); }
+
+	[MenuItem("NGUI/Tween/Color")]
+	static void Tween2 () { if (Selection.activeGameObject != null) Selection.activeGameObject.AddMissingComponent<TweenColor>(); }
+
+	[MenuItem("NGUI/Tween/Color", true)]
+	static bool Tween2a () { return (Selection.activeGameObject != null) && (Selection.activeGameObject.GetComponent<UIWidget>() != null); }
+
+	[MenuItem("NGUI/Tween/Width")]
+	static void Tween3 () { if (Selection.activeGameObject != null) Selection.activeGameObject.AddMissingComponent<TweenWidth>(); }
+
+	[MenuItem("NGUI/Tween/Width", true)]
+	static bool Tween3a () { return (Selection.activeGameObject != null) && (Selection.activeGameObject.GetComponent<UIWidget>() != null); }
+
+	[MenuItem("NGUI/Tween/Height")]
+	static void Tween4 () { if (Selection.activeGameObject != null) Selection.activeGameObject.AddMissingComponent<TweenHeight>(); }
+
+	[MenuItem("NGUI/Tween/Height", true)]
+	static bool Tween4a () { return (Selection.activeGameObject != null) && (Selection.activeGameObject.GetComponent<UIWidget>() != null); }
+
+	[MenuItem("NGUI/Tween/Position")]
+	static void Tween5 () { if (Selection.activeGameObject != null) Selection.activeGameObject.AddMissingComponent<TweenPosition>(); }
+
+	[MenuItem("NGUI/Tween/Rotation")]
+	static void Tween6 () { if (Selection.activeGameObject != null) Selection.activeGameObject.AddMissingComponent<TweenRotation>(); }
+
+	[MenuItem("NGUI/Tween/Scale")]
+	static void Tween7 () { if (Selection.activeGameObject != null) Selection.activeGameObject.AddMissingComponent<TweenScale>(); }
+
+	[MenuItem("NGUI/Tween/Transform")]
+	static void Tween8 () { if (Selection.activeGameObject != null) Selection.activeGameObject.AddMissingComponent<TweenTransform>(); }
+
+	[MenuItem("NGUI/Tween/Volume")]
+	static void Tween9 () { if (Selection.activeGameObject != null) Selection.activeGameObject.AddMissingComponent<TweenVolume>(); }
+
+	[MenuItem("NGUI/Tween/Volume", true)]
+	static bool Tween9a () { return (Selection.activeGameObject != null) && (Selection.activeGameObject.GetComponent<AudioSource>() != null); }
+
+	[MenuItem("NGUI/Tween/Field of View")]
+	static void Tween10 () { if (Selection.activeGameObject != null) Selection.activeGameObject.AddMissingComponent<TweenFOV>(); }
+
+	[MenuItem("NGUI/Tween/Field of View", true)]
+	static bool Tween10a () { return (Selection.activeGameObject != null) && (Selection.activeGameObject.GetComponent<Camera>() != null); }
+
+	[MenuItem("NGUI/Tween/Orthographic Size")]
+	static void Tween11 () { if (Selection.activeGameObject != null) Selection.activeGameObject.AddMissingComponent<TweenOrthoSize>(); }
+
+	[MenuItem("NGUI/Tween/Orthographic Size", true)]
+	static bool Tween11a () { return (Selection.activeGameObject != null) && (Selection.activeGameObject.GetComponent<Camera>() != null); }
+
+#endregion
+#region Open
 
 	[MenuItem("NGUI/Open/Atlas Maker")]
 	[MenuItem("Assets/NGUI/Open Atlas Maker", false, 0)]
@@ -282,6 +409,9 @@ static public class NGUIMenu
 		EditorWindow.GetWindow<UICameraTool>(false, "Camera Tool", true);
 	}
 
+#endregion
+#region Handles
+
 	[MenuItem("NGUI/Handles/Turn On", true)]
 	static public bool TurnHandlesOnCheck () { return !UIWidget.showHandlesWithMoveTool; }
 
@@ -312,21 +442,13 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Handles/Set to Green")]
 	static public void SetToGreen () { NGUISettings.colorMode = NGUISettings.ColorMode.Green; }
 
-	[MenuItem("NGUI/Selection/Make Pixel Perfect &#p")]
-	static void PixelPerfectSelection ()
-	{
-		foreach (Transform t in Selection.transforms)
-			NGUITools.MakePixelPerfect(t);
-	}
-
-	[MenuItem("NGUI/Selection/Make Pixel Perfect &#p", true)]
-	static bool PixelPerfectSelectionValidation ()
-	{
-		return (Selection.activeTransform != null);
-	}
+#endregion
 
 	[MenuItem("NGUI/Normalize Depth Hierarchy &#0")]
 	static public void Normalize () { NGUITools.NormalizeDepths(); }
+
+	[MenuItem("NGUI/")]
+	static void Breaker () { }
 
 	[MenuItem("NGUI/Help")]
 	static public void Help () { NGUIHelp.Show(); }

@@ -1071,4 +1071,23 @@ static public class NGUITools
 
 	[System.Obsolete("Use NGUIText.StripSymbols instead")]
 	static public string StripSymbols (string text) { return NGUIText.StripSymbols(text); }
+
+	/// <summary>
+	/// Extension for the game object that checks to see if the component already exists before adding a new one.
+	/// If the component is already present it will be returned instead.
+	/// </summary>
+
+	static public T AddMissingComponent<T> (this GameObject go) where T : Component
+	{
+		T comp = go.GetComponent<T>();
+		if (comp == null)
+		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+				UnityEditor.Undo.RegisterUndo(go, "Add " + typeof(T));
+#endif
+			comp = go.AddComponent<T>();
+		}
+		return comp;
+	}
 }

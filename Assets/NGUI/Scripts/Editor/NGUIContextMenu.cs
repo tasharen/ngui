@@ -208,13 +208,50 @@ public static class NGUIContextMenu
 			if (target.GetComponent<UIAnchor>() == null) AddItem("Attach/Anchor Script", false, delegate(object obj) { target.AddComponent<UIAnchor>(); }, null);
 			if (target.GetComponent<UIStretch>() == null) AddItem("Attach/Stretch Script", false, delegate(object obj) { target.AddComponent<UIStretch>(); }, null);
 			AddItem("Attach/Key Binding Script", false, delegate(object obj) { target.AddComponent<UIKeyBinding>(); }, null);
-			AddItem("Attach/Grid Script", false, delegate(object obj) { target.AddComponent<UIGrid>(); }, null);
-			AddItem("Attach/Table Script", false, delegate(object obj) { target.AddComponent<UITable>(); }, null);
 			NGUIContextMenu.AddSeparator("Attach/");
+
 			AddItem("Attach/Play Tween Script", false, delegate(object obj) { target.AddComponent<UIPlayTween>(); }, null);
 			AddItem("Attach/Play Animation Script", false, delegate(object obj) { target.AddComponent<UIPlayAnimation>(); }, null);
 			AddItem("Attach/Play Sound Script", false, delegate(object obj) { target.AddComponent<UIPlaySound>(); }, null);
+
+			if (widget != null)
+			{
+				AddMissingItem<TweenAlpha>(target, "Tween/Alpha");
+				AddMissingItem<TweenColor>(target, "Tween/Color");
+				AddMissingItem<TweenWidth>(target, "Tween/Width");
+				AddMissingItem<TweenHeight>(target, "Tween/Height");
+			}
+			else if (target.GetComponent<UIPanel>() != null)
+			{
+				AddMissingItem<TweenAlpha>(target, "Tween/Alpha");
+			}
+
+			NGUIContextMenu.AddSeparator("Tween/");
+
+			AddMissingItem<TweenPosition>(target, "Tween/Position");
+			AddMissingItem<TweenRotation>(target, "Tween/Rotation");
+			AddMissingItem<TweenScale>(target, "Tween/Scale");
+			AddMissingItem<TweenTransform>(target, "Tween/Transform");
+
+			if (target.GetComponent<AudioSource>() != null)
+				AddMissingItem<TweenVolume>(target, "Tween/Volume");
+
+			if (target.GetComponent<Camera>() != null)
+			{
+				AddMissingItem<TweenFOV>(target, "Tween/Field of View");
+				AddMissingItem<TweenOrthoSize>(target, "Tween/Orthographic Size");
+			}
 		}
+	}
+
+	/// <summary>
+	/// Helper function.
+	/// </summary>
+
+	static void AddMissingItem<T> (GameObject target, string name) where T : MonoBehaviour
+	{
+		if (target.GetComponent<T>() == null)
+			AddItem(name, false, delegate(object obj) { target.AddComponent<T>(); }, null);
 	}
 
 	/// <summary>
