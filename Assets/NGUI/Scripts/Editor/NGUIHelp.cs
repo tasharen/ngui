@@ -52,11 +52,11 @@ static public class NGUIHelp
 	[MenuItem("CONTEXT/UIPopupList/Help")]
 	static void ShowHelp12 (UnityEditor.MenuCommand command) { Show(typeof(UIPopupList)); }
 
-	[MenuItem("CONTEXT/UIInputField/Help")]
+	[MenuItem("CONTEXT/UIInput/Help")]
 	static void ShowHelp13 (UnityEditor.MenuCommand command) { Show(typeof(UIInput)); }
 
-	[MenuItem("CONTEXT/UIInputField/Help")]
-	static void ShowHelp14 (UnityEditor.MenuCommand command) { Show(typeof(UIInput)); }
+	[MenuItem("CONTEXT/UIKeyBinding/Help")]
+	static void ShowHelp14 (UnityEditor.MenuCommand command) { Show(typeof(UIKeyBinding)); }
 
 	[MenuItem("CONTEXT/UIGrid/Help")]
 	static void ShowHelp15 (UnityEditor.MenuCommand command) { Show(typeof(UIGrid)); }
