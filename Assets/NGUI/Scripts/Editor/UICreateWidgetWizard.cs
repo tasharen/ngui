@@ -686,7 +686,7 @@ public class UICreateWidgetWizard : EditorWindow
 			list.backgroundSprite = mListBG;
 			list.highlightSprite = mListHL;
 			list.padding = hlPadding;
-			if (isDropDown) list.textLabel = lbl;
+			if (isDropDown) EventDelegate.Add(list.onChange, lbl.SetCurrentSelection);
 			for (int i = 0; i < 5; ++i) list.items.Add(isDropDown ? ("List Option " + i) : ("Menu Option " + i));
 
 			// Add the scripts

@@ -31,6 +31,23 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 	{
 		SerializedProperty bit = serializedObject.FindProperty("bitmapFont");
 		mType = (bit.objectReferenceValue != null) ? FontType.Bitmap : FontType.Dynamic;
+		mList = target as UIPopupList;
+
+		if (mList.ambigiousFont == null)
+		{
+			mList.ambigiousFont = NGUISettings.ambigiousFont;
+			mList.fontSize = NGUISettings.fontSize;
+			mList.fontStyle = NGUISettings.fontStyle;
+			EditorUtility.SetDirty(mList);
+		}
+
+		if (mList.atlas == null)
+		{
+			mList.atlas = NGUISettings.atlas;
+			mList.backgroundSprite = NGUISettings.selectedSprite;
+			mList.highlightSprite = NGUISettings.selectedSprite;
+			EditorUtility.SetDirty(mList);
+		}
 	}
 
 	void RegisterUndo ()
@@ -42,6 +59,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 	{
 		RegisterUndo();
 		mList.atlas = obj as UIAtlas;
+		NGUISettings.atlas = mList.atlas;
 	}
 
 	void OnBackground (string spriteName)
@@ -64,6 +82,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 		SerializedProperty sp = serializedObject.FindProperty("bitmapFont");
 		sp.objectReferenceValue = obj;
 		serializedObject.ApplyModifiedProperties();
+		NGUISettings.ambigiousFont = obj;
 	}
 
 	void OnDynamicFont (Object obj)
@@ -72,20 +91,13 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 		SerializedProperty sp = serializedObject.FindProperty("trueTypeFont");
 		sp.objectReferenceValue = obj;
 		serializedObject.ApplyModifiedProperties();
+		NGUISettings.ambigiousFont = obj;
 	}
 
 	public override void OnInspectorGUI ()
 	{
 		serializedObject.Update();
 		NGUIEditorTools.SetLabelWidth(80f);
-		mList = target as UIPopupList;
-
-		SerializedProperty sp = NGUIEditorTools.DrawProperty("Text Label", serializedObject, "textLabel");
-		
-		if (sp.objectReferenceValue == null)
-		{
-			EditorGUILayout.HelpBox("This popup list has no label to update, so it will behave like a menu.", MessageType.Info);
-		}
 
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(6f);

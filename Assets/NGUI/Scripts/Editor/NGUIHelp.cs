@@ -108,6 +108,7 @@ static public class NGUIHelp
 #endif
 		if (type == typeof(UIScrollBar))	return "http://www.tasharen.com/forum/index.php?topic=6733";
 		if (type == typeof(UIProgressBar))	return "http://www.tasharen.com/forum/index.php?topic=6738";
+		if (type == typeof(UIPopupList))	return "http://www.tasharen.com/forum/index.php?topic=6751";
 		return null;
 	}
 

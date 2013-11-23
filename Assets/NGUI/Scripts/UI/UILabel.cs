@@ -414,80 +414,6 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
-	/// Request the needed characters in the texture.
-	/// </summary>
-
-	void ProcessAndRequest ()
-	{
-#if UNITY_EDITOR
-		if (!mAllowProcessing) return;
-#endif
-		if (ambigiousFont != null)
-		{
-			ProcessText();
-#if DYNAMIC_FONT
-			if (mActiveTTF != null) NGUIText.RequestCharactersInTexture(mActiveTTF, mText);
-#endif
-		}
-	}
-
-#if UNITY_EDITOR
-	// Used to ensure that we don't process font more than once inside OnValidate function below
-	bool mAllowProcessing = true;
-
-	/// <summary>
-	/// Validate the properties.
-	/// </summary>
-
-	protected override void OnValidate ()
-	{
-		base.OnValidate();
-
-		UIFont fnt = mFont;
-		Font ttf = mTrueTypeFont;
-
-		mFont = null;
-		mTrueTypeFont = null;
-		mAllowProcessing = false;
-
-#if DYNAMIC_FONT
-		SetActiveFont(null);
-#endif
-		if (ttf != null && (fnt == null || !mUseDynamicFont))
-		{
-			bitmapFont = null;
-			trueTypeFont = ttf;
-			mUseDynamicFont = true;
-		}
-		else if (fnt != null)
-		{
-			// Auto-upgrade from 3.0.2 and earlier
-			if (fnt.isDynamic)
-			{
-				trueTypeFont = fnt.dynamicFont;
-				mFontStyle = fnt.dynamicFontStyle;
-				mUseDynamicFont = true;
-			}
-			else
-			{
-				bitmapFont = fnt;
-				mUseDynamicFont = false;
-			}
-			mFontSize = fnt.defaultSize;
-		}
-		else
-		{
-			trueTypeFont = ttf;
-			mUseDynamicFont = true;
-		}
-
-		hasChanged = true;
-		mAllowProcessing = true;
-		ProcessAndRequest();
-	}
-#endif
-
-	/// <summary>
 	/// Whether this label will support color encoding in the format of [RRGGBB] and new line in the form of a "\\n" string.
 	/// </summary>
 
@@ -874,6 +800,80 @@ public class UILabel : UIWidget
 		if (GetComponent<BoxCollider>() != null)
 			NGUITools.AddWidgetCollider(gameObject, true);
 	}
+
+	/// <summary>
+	/// Request the needed characters in the texture.
+	/// </summary>
+
+	void ProcessAndRequest ()
+	{
+#if UNITY_EDITOR
+		if (!mAllowProcessing) return;
+#endif
+		if (ambigiousFont != null)
+		{
+			ProcessText();
+#if DYNAMIC_FONT
+			if (mActiveTTF != null) NGUIText.RequestCharactersInTexture(mActiveTTF, mText);
+#endif
+		}
+	}
+
+#if UNITY_EDITOR
+	// Used to ensure that we don't process font more than once inside OnValidate function below
+	bool mAllowProcessing = true;
+
+	/// <summary>
+	/// Validate the properties.
+	/// </summary>
+
+	protected override void OnValidate ()
+	{
+		base.OnValidate();
+
+		UIFont fnt = mFont;
+		Font ttf = mTrueTypeFont;
+
+		mFont = null;
+		mTrueTypeFont = null;
+		mAllowProcessing = false;
+
+#if DYNAMIC_FONT
+		SetActiveFont(null);
+#endif
+		if (ttf != null && (fnt == null || !mUseDynamicFont))
+		{
+			bitmapFont = null;
+			trueTypeFont = ttf;
+			mUseDynamicFont = true;
+		}
+		else if (fnt != null)
+		{
+			// Auto-upgrade from 3.0.2 and earlier
+			if (fnt.isDynamic)
+			{
+				trueTypeFont = fnt.dynamicFont;
+				mFontStyle = fnt.dynamicFontStyle;
+				mUseDynamicFont = true;
+			}
+			else
+			{
+				bitmapFont = fnt;
+				mUseDynamicFont = false;
+			}
+			mFontSize = fnt.defaultSize;
+		}
+		else
+		{
+			trueTypeFont = ttf;
+			mUseDynamicFont = true;
+		}
+
+		hasChanged = true;
+		mAllowProcessing = true;
+		ProcessAndRequest();
+	}
+#endif
 
 	/// <summary>
 	/// Determine start-up values.
@@ -1265,6 +1265,21 @@ public class UILabel : UIWidget
 		if (UIProgressBar.current != null)
 		{
 			text = Mathf.RoundToInt(UIProgressBar.current.value * 100f) + "%";
+		}
+	}
+
+	/// <summary>
+	/// Convenience function, in case you wanted to automatically set some label's text
+	/// by selecting a value in the UIPopupList.
+	/// </summary>
+
+	public void SetCurrentSelection ()
+	{
+		if (UIPopupList.current != null)
+		{
+			text = UIPopupList.current.isLocalized ?
+				Localization.Localize(UIPopupList.current.value) :
+				UIPopupList.current.value;
 		}
 	}
 }
