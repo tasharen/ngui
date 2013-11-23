@@ -407,7 +407,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 14}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -.5, y: .5, z: 0}
+  m_LocalPosition: {x: 0, y: .5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 27}
@@ -432,7 +432,7 @@ Transform:
   m_GameObject: {fileID: 16}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: .00277777785, y: .00277777785, z: .00277777785}
+  m_LocalScale: {x: .00431034481, y: .00431034481, z: .00431034481}
   m_Children:
   - {fileID: 29}
   m_Father: {fileID: 0}
@@ -574,7 +574,7 @@ MonoBehaviour:
     to the [99FF33]Text Label[-].\r\n\r\nIf you wish to be notified when the list's
     selection changes, you can create your event listeners by specifying an [99FF33]Event
     Receiver[-] target and the function to call."
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -637,7 +637,6 @@ MonoBehaviour:
   trueTypeFont: {fileID: 0}
   fontSize: 20
   fontStyle: 0
-  textLabel: {fileID: 43}
   backgroundSprite: Light
   highlightSprite: Light
   position: 0
@@ -655,12 +654,19 @@ MonoBehaviour:
   highlightColor: {r: .588235319, g: .992156863, b: .200000003, a: 1}
   isAnimated: 1
   isLocalized: 0
-  onChange: []
+  onChange:
+  - mTarget: {fileID: 43}
+    mMethodName: SetCurrentSelection
+    oneShot: 0
+  - mTarget: {fileID: 37}
+    mMethodName: SetSpriteBySelection
+    oneShot: 0
   mSelectedItem: White
-  eventReceiver: {fileID: 5}
-  functionName: OnSelectionChange
+  eventReceiver: {fileID: 0}
+  functionName: 
   textScale: 0
   font: {fileID: 0}
+  textLabel: {fileID: 0}
 --- !u!114 &43
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -681,7 +687,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: ac44b8a25154a9d40a172ab5851e0986, type: 2}
   mText: White
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -744,7 +750,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: 'Tutorial 11: Popup List'
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -786,7 +792,7 @@ MonoBehaviour:
   mText: You can use the Widget Wizard to create a [99FF33]Popup List[-]. This popup
     will intelligently expand above the widget if it's on the lower part of the screen,
     or below the widget if it's on the upper part.
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -844,17 +850,17 @@ MonoBehaviour:
   widgetsAreStatic: 0
   cullWhileDragging: 0
   worldToLocal:
-    e00: 360
+    e00: 232
     e01: 0
     e02: 0
-    e03: .5
+    e03: 0
     e10: 0
-    e11: 360
+    e11: 232
     e12: 0
     e13: -.5
     e20: 0
     e21: 0
-    e22: 360
+    e22: 232
     e23: 0
     e30: 0
     e31: 0

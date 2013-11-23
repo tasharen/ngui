@@ -1771,7 +1771,6 @@ MonoBehaviour:
   trueTypeFont: {fileID: 0}
   fontSize: 20
   fontStyle: 0
-  textLabel: {fileID: 117}
   backgroundSprite: Button
   highlightSprite: Button
   position: 0
@@ -1783,12 +1782,16 @@ MonoBehaviour:
   highlightColor: {r: .596078455, g: 1, b: .200000003, a: 1}
   isAnimated: 1
   isLocalized: 1
-  onChange: []
+  onChange:
+  - mTarget: {fileID: 117}
+    mMethodName: SetCurrentSelection
+    oneShot: 0
   mSelectedItem: Language
   eventReceiver: {fileID: 0}
-  functionName: OnSelectionChange
+  functionName: 
   textScale: 0
   font: {fileID: 0}
+  textLabel: {fileID: 0}
 --- !u!114 &117
 MonoBehaviour:
   m_ObjectHideFlags: 0
