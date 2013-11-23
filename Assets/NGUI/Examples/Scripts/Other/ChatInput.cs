@@ -12,7 +12,6 @@ public class ChatInput : MonoBehaviour
 	public bool fillWithDummyData = false;
 
 	UIInput mInput;
-	bool mIgnoreNextEnter = false;
 
 	/// <summary>
 	/// Add some dummy text to the text list.
@@ -21,6 +20,7 @@ public class ChatInput : MonoBehaviour
 	void Start ()
 	{
 		mInput = GetComponent<UIInput>();
+		mInput.label.maxLineCount = 1;
 
 		if (fillWithDummyData && textList != null)
 		{
@@ -29,23 +29,6 @@ public class ChatInput : MonoBehaviour
 				textList.Add(((i % 2 == 0) ? "[FFFFFF]" : "[AAAAAA]") +
 					"This is an example paragraph for the text list, testing line " + i + "[-]");
 			}
-		}
-	}
-
-	/// <summary>
-	/// Pressing 'enter' should immediately give focus to the input field.
-	/// </summary>
-
-	void Update ()
-	{
-		if (Input.GetKeyUp(KeyCode.Return))
-		{
-			if (!mIgnoreNextEnter && !mInput.isSelected)
-			{
-				mInput.label.maxLineCount = 1;
-				mInput.isSelected = true;
-			}
-			mIgnoreNextEnter = false;
 		}
 	}
 
@@ -67,6 +50,5 @@ public class ChatInput : MonoBehaviour
 				mInput.isSelected = false;
 			}
 		}
-		mIgnoreNextEnter = true;
 	}
 }

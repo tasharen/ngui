@@ -109,6 +109,8 @@ static public class NGUIHelp
 		if (type == typeof(UIScrollBar))	return "http://www.tasharen.com/forum/index.php?topic=6733";
 		if (type == typeof(UIProgressBar))	return "http://www.tasharen.com/forum/index.php?topic=6738";
 		if (type == typeof(UIPopupList))	return "http://www.tasharen.com/forum/index.php?topic=6751";
+		if (type == typeof(UIInput))		return "http://www.tasharen.com/forum/index.php?topic=6752";
+		if (type == typeof(UIKeyBinding))	return "http://www.tasharen.com/forum/index.php?topic=6753";
 		return null;
 	}
 

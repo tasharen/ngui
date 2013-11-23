@@ -606,7 +606,9 @@ public class UIInput : MonoBehaviour
 				}
 				else
 				{
+					UICamera.currentKey = ev.keyCode;
 					Submit();
+					UICamera.currentKey = KeyCode.None;
 					isSelected = false;
 					UpdateLabel();
 					ExecuteOnChange();

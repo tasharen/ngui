@@ -270,6 +270,12 @@ public class UICamera : MonoBehaviour
 	static public int currentTouchID = -1;
 
 	/// <summary>
+	/// Key that triggered the event, if any.
+	/// </summary>
+
+	static public KeyCode currentKey = KeyCode.None;
+
+	/// <summary>
 	/// Current touch, set before any event function gets called.
 	/// </summary>
 
@@ -937,8 +943,19 @@ public class UICamera : MonoBehaviour
 		if (onCustomInput != null) onCustomInput();
 
 		// Clear the selection on the cancel key, but only if mouse input is allowed
-		if (useMouse && mCurrentSelection != null && ((cancelKey0 != KeyCode.None && Input.GetKeyDown(cancelKey0)) ||
-			(cancelKey1 != KeyCode.None && Input.GetKeyDown(cancelKey1)))) selectedObject = null;
+		if (useMouse && mCurrentSelection != null)
+		{
+			if (cancelKey0 != KeyCode.None && Input.GetKeyDown(cancelKey0))
+			{
+				currentKey = cancelKey0;
+				selectedObject = null;
+			}
+			else if (cancelKey1 != KeyCode.None && Input.GetKeyDown(cancelKey1))
+			{
+				currentKey = cancelKey1;
+				selectedObject = null;
+			}
+		}
 
 		// Forward the input to the selected object
 		if (mCurrentSelection != null)
@@ -1067,6 +1084,7 @@ public class UICamera : MonoBehaviour
 	
 				currentTouch = mMouse[i];
 				currentTouchID = -1 - i;
+				currentKey = KeyCode.Mouse0 + i;
 	
 				// We don't want to update the last camera while there is a touch happening
 				if (pressed) currentTouch.pressedCam = currentCamera;
@@ -1074,6 +1092,7 @@ public class UICamera : MonoBehaviour
 	
 				// Process the mouse events
 				ProcessTouch(pressed, unpressed);
+				currentKey = KeyCode.None;
 			}
 			currentTouch = null;
 		}
@@ -1151,8 +1170,32 @@ public class UICamera : MonoBehaviour
 		// If this is an input field, ignore WASD and Space key presses
 		inputHasFocus = (mCurrentSelection != null && mCurrentSelection.GetComponent<UIInput>() != null);
 
-		bool submitKeyDown = (submitKey0 != KeyCode.None && Input.GetKeyDown(submitKey0)) || (submitKey1 != KeyCode.None && Input.GetKeyDown(submitKey1));
-		bool submitKeyUp = (submitKey0 != KeyCode.None && Input.GetKeyUp(submitKey0)) || (submitKey1 != KeyCode.None && Input.GetKeyUp(submitKey1));
+		bool submitKeyDown = false;
+		bool submitKeyUp = false;
+
+		if (submitKey0 != KeyCode.None && Input.GetKeyDown(submitKey0))
+		{
+			currentKey = submitKey0;
+			submitKeyDown = true;
+		}
+
+		if (submitKey1 != KeyCode.None && Input.GetKeyDown(submitKey1))
+		{
+			currentKey = submitKey1;
+			submitKeyDown = true;
+		}
+
+		if (submitKey0 != KeyCode.None && Input.GetKeyUp(submitKey0))
+		{
+			currentKey = submitKey0;
+			submitKeyUp = true;
+		}
+
+		if (submitKey1 != KeyCode.None && Input.GetKeyUp(submitKey1))
+		{
+			currentKey = submitKey1;
+			submitKeyUp = true;
+		}
 
 		if (submitKeyDown || submitKeyUp)
 		{
@@ -1187,13 +1230,28 @@ public class UICamera : MonoBehaviour
 		// Send out key notifications
 		if (vertical != 0) Notify(mCurrentSelection, "OnKey", vertical > 0 ? KeyCode.UpArrow : KeyCode.DownArrow);
 		if (horizontal != 0) Notify(mCurrentSelection, "OnKey", horizontal > 0 ? KeyCode.RightArrow : KeyCode.LeftArrow);
-		if (useKeyboard && Input.GetKeyDown(KeyCode.Tab)) Notify(mCurrentSelection, "OnKey", KeyCode.Tab);
+		
+		if (useKeyboard && Input.GetKeyDown(KeyCode.Tab))
+		{
+			currentKey = KeyCode.Tab;
+			Notify(mCurrentSelection, "OnKey", KeyCode.Tab);
+		}
 
 		// Send out the cancel key notification
-		if (cancelKey0 != KeyCode.None && Input.GetKeyDown(cancelKey0)) Notify(mCurrentSelection, "OnKey", KeyCode.Escape);
-		if (cancelKey1 != KeyCode.None && Input.GetKeyDown(cancelKey1)) Notify(mCurrentSelection, "OnKey", KeyCode.Escape);
+		if (cancelKey0 != KeyCode.None && Input.GetKeyDown(cancelKey0))
+		{
+			currentKey = cancelKey0;
+			Notify(mCurrentSelection, "OnKey", KeyCode.Escape);
+		}
+
+		if (cancelKey1 != KeyCode.None && Input.GetKeyDown(cancelKey1))
+		{
+			currentKey = cancelKey1;
+			Notify(mCurrentSelection, "OnKey", KeyCode.Escape);
+		}
 
 		currentTouch = null;
+		currentKey = KeyCode.None;
 	}
 
 	/// <summary>
