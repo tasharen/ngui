@@ -36,6 +36,13 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
 
 3.0.6
+- NEW: NGUI now has new written documentation.
+- NEW: NGUI now has an abundance of context-sensitive help. Just right click on an NGUI component and choose the Help option.
+- NEW: NGUI now has robust context menus letting you add, create and modify widgets by right-clicking on stuff in the Scene View.
+- NEW: You can now find an assortment of ready-made controls ready to be drag & dropped into your scenes (search for "Wooden").
+- NEW: You can now drag & drop GUI prefabs from your Project Folder right into the Scene View. No need to create the UI beforehand.
+- NEW: You can now copy/paste label styles by right-clicking the UILabel script in Inspector.
+- NEW: Redesigned the draggable panel class a bit, and renamed it to UIScrollView. UIDragPanelContents is now UIDragScrollView.
 - NEW: Labels can now have gradients.
 - NEW: Clipped panels now have handles you can drag around instead of adjusting clipping in inspector.
 - NEW: Added a new widget type capable of drawing Unity 4.3 sprites.
@@ -44,6 +51,10 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: You can now specify character spacing on labels, and it works with both bitmap and dynamic fonts.
 - NEW: Labels set to maintain their crispness will now take UIRoot's size into account, resulting in crisp labels with fixed size UIs.
 - NEW: Added a simple script that makes it possible to center a scrollable panel on a child when clicked on.
+- NEW: Redesigned the scroll bar and the slider components. They now also derive from a new common class (Progress Bar).
+- NEW: UIButtonKeyBinding has been replaced with UIKeyBinding and its functionality has been enhanced.
+- FIX: Panels will now add rigidbodies to themselves since Unity 4.3 mentions it should improve performance.
+- FIX: UIScrollView's movement restriction now makes sense (no more weird 'scale')
 - FIX: Draggable panels should no longer move on Play.
 - FIX: Improved performance by reducing GC allocations and mesh assignments.
 - FIX: Typewriter and text list scripts can now be used with dynamic fonts.
@@ -59,7 +70,11 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: Switching panel to clipped mode then back should refresh the shader correctly.
 - FIX: Moving widgets around no longer causes their buffers to get rebuilt. Just re-transformed.
 - FIX: Added extra code to ensure that draw calls won't get orphaned.
+- FIX: Panel alpha is now cumulative (parents affect children).
+- FIX: Got rid of old double-buffering code that was causing issues.
 - FIX: More Win8 tweaks.
+- DEL: UIPopupList no longer has a 'textLabel' option. Instead use label's SetCurrentSelection for OnValueChanged.
+- DEL: UIGrid and UITable no longer have 'repositionNow' member variable. Right-click it to execute it instead.
 
 3.0.5
 - NEW: Added a way to set Localization's language using specified name and dictionary combo
