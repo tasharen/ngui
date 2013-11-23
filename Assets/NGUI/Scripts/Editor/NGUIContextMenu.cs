@@ -144,21 +144,31 @@ public static class NGUIContextMenu
 				AddItem("Widget/Delete", false, OnDelete, target);
 			}
 
-			AddChildWidget("Create/Sprite/Child", false, NGUISettings.AddSprite);
-			AddChildWidget("Create/Label/Child", false, NGUISettings.AddLabel);
-			AddChildWidget("Create/Invisible Widget/Child", false, NGUISettings.AddWidget);
-			AddChildWidget("Create/Simple Texture/Child", false, NGUISettings.AddTexture);
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
-			AddChildWidget("Create/Unity 2D Sprite/Child", false, NGUISettings.Add2DSprite);
-#endif
 			if (Selection.activeTransform.parent != null && widget != null)
 			{
+				AddChildWidget("Create/Sprite/Child", false, NGUISettings.AddSprite);
+				AddChildWidget("Create/Label/Child", false, NGUISettings.AddLabel);
+				AddChildWidget("Create/Invisible Widget/Child", false, NGUISettings.AddWidget);
+				AddChildWidget("Create/Simple Texture/Child", false, NGUISettings.AddTexture);
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+				AddChildWidget("Create/Unity 2D Sprite/Child", false, NGUISettings.Add2DSprite);
+#endif
 				AddSiblingWidget("Create/Sprite/Sibling", false, NGUISettings.AddSprite);
 				AddSiblingWidget("Create/Label/Sibling", false, NGUISettings.AddLabel);
 				AddSiblingWidget("Create/Invisible Widget/Sibling", false, NGUISettings.AddWidget);
 				AddSiblingWidget("Create/Simple Texture/Sibling", false, NGUISettings.AddTexture);
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 				AddSiblingWidget("Add/Unity 2D Sprite/Sibling", false, NGUISettings.Add2DSprite);
+#endif
+			}
+			else
+			{
+				AddChildWidget("Create/Sprite", false, NGUISettings.AddSprite);
+				AddChildWidget("Create/Label", false, NGUISettings.AddLabel);
+				AddChildWidget("Create/Invisible Widget", false, NGUISettings.AddWidget);
+				AddChildWidget("Create/Simple Texture", false, NGUISettings.AddTexture);
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+				AddChildWidget("Create/Unity 2D Sprite", false, NGUISettings.Add2DSprite);
 #endif
 			}
 			
