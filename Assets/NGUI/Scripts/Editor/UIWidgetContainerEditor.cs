@@ -107,12 +107,12 @@ public class UIWidgetContainerEditor : Editor
 			Vector2[] screenPos = new Vector2[8];
 			for (int i = 0; i < 8; ++i) screenPos[i] = HandleUtility.WorldToGUIPoint(worldPos[i]);
 
-			Bounds b = new Bounds(screenPos[0], Vector3.zero);
-			for (int i = 1; i < 8; ++i) b.Encapsulate(screenPos[i]);
+			bounds = new Bounds(screenPos[0], Vector3.zero);
+			for (int i = 1; i < 8; ++i) bounds.Encapsulate(screenPos[i]);
 
 			// Change the cursor to a move arrow when it's within the screen rectangle
-			Vector2 min = b.min;
-			Vector2 max = b.max;
+			Vector2 min = bounds.min;
+			Vector2 max = bounds.max;
 			Rect rect = new Rect(min.x, min.y, max.x - min.x, max.y - min.y);
 			UIWidgetInspector.SetCursorRect(rect, isWithinRect ? MouseCursor.MoveArrow : MouseCursor.Arrow);
 #endif
