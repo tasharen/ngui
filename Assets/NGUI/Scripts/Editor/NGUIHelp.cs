@@ -14,6 +14,12 @@ using System.Collections.Generic;
 
 static public class NGUIHelp
 {
+	[MenuItem("Help/NGUI Documentation")]
+	static void ShowHelp0 (UnityEditor.MenuCommand command)
+	{
+		Application.OpenURL("http://www.tasharen.com/forum/index.php?topic=6754");
+	}
+
 	[MenuItem("CONTEXT/UIWidget/Help")]
 	static void ShowHelp1 (UnityEditor.MenuCommand command) { Show(command.context); }
 
