@@ -357,7 +357,7 @@ public static class NGUIContextMenu
 	{
 		GameObject go = obj as GameObject;
 		Selection.activeGameObject = go.transform.parent.gameObject;
-#if UNITY_3_5
+#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 		NGUITools.Destroy(go);
 #else
 		Undo.DestroyObjectImmediate(go);
