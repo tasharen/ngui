@@ -32,7 +32,7 @@ public class UITable : UIWidgetContainer
 	public Vector2 padding = Vector2.zero;
 
 	UIPanel mPanel;
-	UIDraggablePanel mDrag;
+	UIScrollView mDrag;
 	bool mInitDone = false;
 	bool mReposition = false;
 	List<Transform> mChildren = new List<Transform>();
@@ -210,7 +210,7 @@ public class UITable : UIWidgetContainer
 		if (keepWithinPanel)
 		{
 			mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
-			mDrag = NGUITools.FindInParents<UIDraggablePanel>(gameObject);
+			mDrag = NGUITools.FindInParents<UIScrollView>(gameObject);
 		}
 	}
 

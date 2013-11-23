@@ -151,7 +151,7 @@ public class UIGrid : UIWidgetContainer
 			}
 		}
 
-		UIDraggablePanel drag = NGUITools.FindInParents<UIDraggablePanel>(gameObject);
+		UIScrollView drag = NGUITools.FindInParents<UIScrollView>(gameObject);
 		if (drag != null) drag.UpdateScrollbars(true);
 	}
 }

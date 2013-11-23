@@ -109,6 +109,21 @@ public class UIPanel : MonoBehaviour
 	BetterList<UIDrawCall> mDrawCalls = new BetterList<UIDrawCall>();
 
 	/// <summary>
+	/// Helper property that returns the first unused depth value.
+	/// </summary>
+
+	static public int nextUnusedDepth
+	{
+		get
+		{
+			int highest = int.MinValue;
+			for (int i = 0; i < list.size; ++i)
+				highest = Mathf.Max(highest, list[i].depth);
+			return (highest == int.MinValue) ? 0 : highest + 1;
+		}
+	}
+
+	/// <summary>
 	/// Cached for speed. Can't simply return 'mGo' set in Awake because this function may be called on a prefab.
 	/// </summary>
 

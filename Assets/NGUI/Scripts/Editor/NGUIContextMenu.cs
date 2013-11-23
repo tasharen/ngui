@@ -151,15 +151,10 @@ public static class NGUIContextMenu
 				{
 					AddItem(myName + "/Reset Collider Size", false, OnBoxCollider, target);
 				}
-				else
-				{
-					AddItem(myName + "/Add Box Collider", false, OnBoxCollider, target);
-				}
-
-				NGUIContextMenu.AddSeparator(myName + "/");
-				AddItem(myName + "/Delete", false, OnDelete, target);
 			}
 
+			NGUIContextMenu.AddSeparator(myName + "/");
+			AddItem(myName + "/Delete", false, OnDelete, target);
 			NGUIContextMenu.AddSeparator("");
 
 			if (Selection.activeTransform.parent != null && widget != null)
@@ -191,28 +186,65 @@ public static class NGUIContextMenu
 			}
 
 			NGUIContextMenu.AddSeparator("Create/");
+
 			AddItem("Create/Anchor", false, AddChild<UIAnchor>, target);
-			AddItem("Create/Panel", false, AddChild<UIPanel>, target);
+			AddItem("Create/Panel", false, AddPanel, target);
+			AddItem("Create/Scroll View", false, AddScrollView, target);
 			AddItem("Create/Grid", false, AddChild<UIGrid>, target);
 			AddItem("Create/Table", false, AddChild<UITable>, target);
-			//AddItem("Create/Scroll View", false, CreateScrollView, target);
-			
-			AddItem("Attach/Button Script", false, delegate(object obj) { target.AddComponent<UIButton>(); }, null);
-			AddItem("Attach/Toggle Script", false, delegate(object obj) { target.AddComponent<UIToggle>(); }, null);
-			AddItem("Attach/Slider Script", false, delegate(object obj) { target.AddComponent<UISlider>(); }, null);
-			AddItem("Attach/Scroll Bar Script", false, delegate(object obj) { target.AddComponent<UIScrollBar>(); }, null);
-			AddItem("Attach/Progress Bar Script", false, delegate(object obj) { target.AddComponent<UISlider>(); }, null);
-			AddItem("Attach/Popup List Script", false, delegate(object obj) { target.AddComponent<UIPopupList>(); }, null);
-			AddItem("Attach/Input Field Script", false, delegate(object obj) { target.AddComponent<UIInput>(); }, null);
-			NGUIContextMenu.AddSeparator("Attach/");
-			if (target.GetComponent<UIAnchor>() == null) AddItem("Attach/Anchor Script", false, delegate(object obj) { target.AddComponent<UIAnchor>(); }, null);
-			if (target.GetComponent<UIStretch>() == null) AddItem("Attach/Stretch Script", false, delegate(object obj) { target.AddComponent<UIStretch>(); }, null);
-			AddItem("Attach/Key Binding Script", false, delegate(object obj) { target.AddComponent<UIKeyBinding>(); }, null);
-			NGUIContextMenu.AddSeparator("Attach/");
 
-			AddItem("Attach/Play Tween Script", false, delegate(object obj) { target.AddComponent<UIPlayTween>(); }, null);
-			AddItem("Attach/Play Animation Script", false, delegate(object obj) { target.AddComponent<UIPlayAnimation>(); }, null);
-			AddItem("Attach/Play Sound Script", false, delegate(object obj) { target.AddComponent<UIPlaySound>(); }, null);
+			if (target.GetComponent<UIPanel>() != null)
+			{
+				if (target.GetComponent<UIScrollView>() == null)
+				{
+					AddItem("Attach/Scroll View", false, delegate(object obj) { target.AddComponent<UIScrollView>(); }, null);
+					NGUIContextMenu.AddSeparator("Attach/");
+				}
+			}
+			else if (target.collider == null)
+			{
+				AddItem("Attach/Box Collider", false, delegate(object obj) { NGUITools.AddWidgetCollider(target); }, null);
+				NGUIContextMenu.AddSeparator("Attach/");
+			}
+
+			if (target.collider != null)
+			{
+				if (target.GetComponent<UIDragScrollView>() == null)
+				{
+					for (int i = 0; i < UIPanel.list.size; ++i)
+					{
+						UIPanel pan = UIPanel.list[i];
+						if (pan.clipping == UIDrawCall.Clipping.None) continue;
+	
+						UIScrollView dr = pan.GetComponent<UIScrollView>();
+						if (dr == null) continue;
+
+						AddItem("Attach/Drag Scroll View", false, delegate(object obj)
+							{ target.AddComponent<UIDragScrollView>().scrollView = dr; }, null);
+						
+						NGUIContextMenu.AddSeparator("Attach/");
+						break;
+					}
+				}
+
+				AddItem("Attach/Button Script", false, delegate(object obj) { target.AddComponent<UIButton>(); }, null);
+				AddItem("Attach/Toggle Script", false, delegate(object obj) { target.AddComponent<UIToggle>(); }, null);
+				AddItem("Attach/Slider Script", false, delegate(object obj) { target.AddComponent<UISlider>(); }, null);
+				AddItem("Attach/Scroll Bar Script", false, delegate(object obj) { target.AddComponent<UIScrollBar>(); }, null);
+				AddItem("Attach/Progress Bar Script", false, delegate(object obj) { target.AddComponent<UISlider>(); }, null);
+				AddItem("Attach/Popup List Script", false, delegate(object obj) { target.AddComponent<UIPopupList>(); }, null);
+				AddItem("Attach/Input Field Script", false, delegate(object obj) { target.AddComponent<UIInput>(); }, null);
+				NGUIContextMenu.AddSeparator("Attach/");
+				if (target.GetComponent<UIAnchor>() == null) AddItem("Attach/Anchor Script", false, delegate(object obj) { target.AddComponent<UIAnchor>(); }, null);
+				if (target.GetComponent<UIStretch>() == null) AddItem("Attach/Stretch Script", false, delegate(object obj) { target.AddComponent<UIStretch>(); }, null);
+				AddItem("Attach/Key Binding Script", false, delegate(object obj) { target.AddComponent<UIKeyBinding>(); }, null);
+
+				NGUIContextMenu.AddSeparator("Attach/");
+
+				AddItem("Attach/Play Tween Script", false, delegate(object obj) { target.AddComponent<UIPlayTween>(); }, null);
+				AddItem("Attach/Play Animation Script", false, delegate(object obj) { target.AddComponent<UIPlayAnimation>(); }, null);
+				AddItem("Attach/Play Sound Script", false, delegate(object obj) { target.AddComponent<UIPlaySound>(); }, null);
+			}
 
 			if (widget != null)
 			{
@@ -263,6 +295,27 @@ public static class NGUIContextMenu
 		GameObject go = obj as GameObject;
 		T t = NGUITools.AddChild<T>(go);
 		Selection.activeGameObject = t.gameObject;
+	}
+
+	/// <summary>
+	/// Helper function for menu creation.
+	/// </summary>
+
+	static void AddPanel (object obj)
+	{
+		UIPanel panel = NGUISettings.AddPanel(obj as GameObject);
+		Selection.activeGameObject = panel.gameObject;
+	}
+
+	/// <summary>
+	/// Helper function for menu creation.
+	/// </summary>
+
+	static void AddScrollView (object obj)
+	{
+		UIPanel panel = NGUISettings.AddPanel(obj as GameObject);
+		panel.clipping = UIDrawCall.Clipping.SoftClip;
+		Selection.activeGameObject = panel.gameObject;
 	}
 
 	/// <summary>

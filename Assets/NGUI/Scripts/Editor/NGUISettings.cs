@@ -429,6 +429,19 @@ public class NGUISettings
 	}
 
 	/// <summary>
+	/// Convenience method -- add a new panel.
+	/// </summary>
+
+	static public UIPanel AddPanel (GameObject go)
+	{
+		if (go == null) return null;
+		int depth = UIPanel.nextUnusedDepth;
+		UIPanel panel = NGUITools.AddChild<UIPanel>(go);
+		panel.depth = depth;
+		return panel;
+	}
+
+	/// <summary>
 	/// Copy the specified widget's style.
 	/// </summary>
 

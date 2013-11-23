@@ -1486,7 +1486,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 53}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: .5, z: 0}
+  m_LocalPosition: {x: -.50000006, y: .5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 62}
@@ -1728,6 +1728,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d81807633ea807d4c8e3fff7e10c6000, type: 1}
   m_Name: 
+  movement: 1
   dragEffect: 2
   restrictWithinPanel: 1
   disableDragIfFits: 1
@@ -1738,8 +1739,9 @@ MonoBehaviour:
   horizontalScrollBar: {fileID: 0}
   verticalScrollBar: {fileID: 125}
   showScrollBars: 1
-  scale: {x: 0, y: 1, z: 0}
+  customMovement: {x: 1, y: 0}
   relativePositionOnReset: {x: 0, y: 0}
+  scale: {x: 0, y: 0, z: 0}
 --- !u!114 &123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1836,7 +1838,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f02842fa4878db54f9587ff4de7d9f2d, type: 1}
   m_Name: 
-  draggablePanel: {fileID: 122}
+  scrollView: {fileID: 122}
+  draggablePanel: {fileID: 0}
 --- !u!114 &129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1865,7 +1868,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f02842fa4878db54f9587ff4de7d9f2d, type: 1}
   m_Name: 
-  draggablePanel: {fileID: 122}
+  scrollView: {fileID: 122}
+  draggablePanel: {fileID: 0}
 --- !u!114 &131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1876,7 +1880,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f02842fa4878db54f9587ff4de7d9f2d, type: 1}
   m_Name: 
-  draggablePanel: {fileID: 122}
+  scrollView: {fileID: 122}
+  draggablePanel: {fileID: 0}
 --- !u!114 &132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1887,7 +1892,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f02842fa4878db54f9587ff4de7d9f2d, type: 1}
   m_Name: 
-  draggablePanel: {fileID: 122}
+  scrollView: {fileID: 122}
+  draggablePanel: {fileID: 0}
 --- !u!114 &133
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3145,7 +3151,7 @@ MonoBehaviour:
     e00: 232
     e01: 0
     e02: 0
-    e03: 0
+    e03: .50000006
     e10: 0
     e11: 232
     e12: 0
@@ -3181,7 +3187,7 @@ MonoBehaviour:
     e00: 232
     e01: 0
     e02: 0
-    e03: 0
+    e03: .50000006
     e10: 0
     e11: 232
     e12: 0
@@ -3217,7 +3223,7 @@ MonoBehaviour:
     e00: 232
     e01: 0
     e02: 0
-    e03: 0
+    e03: .50000006
     e10: 0
     e11: 232
     e12: 0

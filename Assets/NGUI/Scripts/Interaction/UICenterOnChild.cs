@@ -25,7 +25,7 @@ public class UICenterOnChild : MonoBehaviour
 
 	public SpringPanel.OnFinished onFinished;
 
-	UIDraggablePanel mDrag;
+	UIScrollView mDrag;
 	GameObject mCenteredObject;
 
 	/// <summary>
@@ -45,11 +45,11 @@ public class UICenterOnChild : MonoBehaviour
 	{
 		if (mDrag == null)
 		{
-			mDrag = NGUITools.FindInParents<UIDraggablePanel>(gameObject);
+			mDrag = NGUITools.FindInParents<UIScrollView>(gameObject);
 
 			if (mDrag == null)
 			{
-				Debug.LogWarning(GetType() + " requires " + typeof(UIDraggablePanel) + " on a parent object in order to work", this);
+				Debug.LogWarning(GetType() + " requires " + typeof(UIScrollView) + " on a parent object in order to work", this);
 				enabled = false;
 				return;
 			}
@@ -109,10 +109,10 @@ public class UICenterOnChild : MonoBehaviour
 			Vector3 cc = panelTrans.InverseTransformPoint(panelCenter);
 			Vector3 localOffset = cp - cc;
 
-			// Offset shouldn't occur if blocked by a zeroed-out scale
-			if (mDrag.scale.x == 0f) localOffset.x = 0f;
-			if (mDrag.scale.y == 0f) localOffset.y = 0f;
-			if (mDrag.scale.z == 0f) localOffset.z = 0f;
+			// Offset shouldn't occur if blocked
+			if (!mDrag.canMoveHorizontally) localOffset.x = 0f;
+			if (!mDrag.canMoveVertically) localOffset.y = 0f;
+			localOffset.z = 0f;
 
 			// Spring the panel to this calculated position
 			SpringPanel.Begin(mDrag.panel.cachedGameObject,

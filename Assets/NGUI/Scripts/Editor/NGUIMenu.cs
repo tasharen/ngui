@@ -80,21 +80,7 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Selection/Adjust Depth By -1 %-", true)]
 	static public bool PushBackValidation () { return (Selection.activeGameObject != null); }
 
-	/// <summary>
-	/// Same as SelectedRoot(), but with a log message if nothing was found.
-	/// </summary>
-
-	static public GameObject SelectedRoot ()
-	{
-		GameObject go = NGUIEditorTools.SelectedRoot();
-
-		if (go == null)
-		{
-			Debug.Log("No UI found. You can create a new one easily by using the UI creation wizard.\nOpening it for your convenience.");
-			CreateUIWizard();
-		}
-		return go;
-	}
+	static public GameObject SelectedRoot () { return NGUIEditorTools.SelectedRoot(); }
 
 	[MenuItem("NGUI/Selection/Make Pixel Perfect &#p")]
 	static void PixelPerfectSelection ()
@@ -201,7 +187,20 @@ static public class NGUIMenu
 	static void AddAnchor2 () { Add<UIAnchor>(); }
 
 	[MenuItem("NGUI/Create/Panel")]
-	static void AddPanel () { Add<UIPanel>(); }
+	static void AddPanel ()
+	{
+		UIPanel panel = NGUISettings.AddPanel(SelectedRoot());
+		Selection.activeGameObject = (panel == null) ? NGUIEditorTools.SelectedRoot(true) : panel.gameObject;
+	}
+
+	[MenuItem("NGUI/Create/Scroll View")]
+	static void AddScrollView ()
+	{
+		UIPanel panel = NGUISettings.AddPanel(SelectedRoot());
+		if (panel == null) panel = NGUIEditorTools.SelectedRoot(true).GetComponent<UIPanel>();
+		panel.clipping = UIDrawCall.Clipping.SoftClip;
+		Selection.activeGameObject = panel.gameObject;
+	}
 
 	[MenuItem("NGUI/Create/Grid")]
 	static void AddGrid () { Add<UIGrid>(); }
@@ -209,24 +208,11 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Create/Table")]
 	static void AddTable () { Add<UITable>(); }
 
-	static void Add<T> () where T : MonoBehaviour
+	static T Add<T> () where T : MonoBehaviour
 	{
-		GameObject go = SelectedRoot();
-
-		if (NGUIEditorTools.WillLosePrefab(go))
-		{
-			GameObject child = NGUITools.AddChild(go);
-			child.name = NGUITools.GetTypeName<T>();
-			child.layer = go.layer;
-
-			Transform ct = child.transform;
-			ct.parent = go.transform;
-			ct.localPosition = Vector3.zero;
-			ct.localRotation = Quaternion.identity;
-			ct.localScale = Vector3.one;
-			child.AddComponent<T>();
-			Selection.activeGameObject = child;
-		}
+		T t = NGUITools.AddChild<T>(SelectedRoot());
+		Selection.activeGameObject = t.gameObject;
+		return t;
 	}
 
 #endregion

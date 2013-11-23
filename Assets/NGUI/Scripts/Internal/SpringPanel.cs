@@ -22,7 +22,7 @@ public class SpringPanel : MonoBehaviour
 	UIPanel mPanel;
 	Transform mTrans;
 	float mThreshold = 0f;
-	UIDraggablePanel mDrag;
+	UIScrollView mDrag;
 
 	/// <summary>
 	/// Cache the transform.
@@ -31,7 +31,7 @@ public class SpringPanel : MonoBehaviour
 	void Start ()
 	{
 		mPanel = GetComponent<UIPanel>();
-		mDrag = GetComponent<UIDraggablePanel>();
+		mDrag = GetComponent<UIScrollView>();
 		mTrans = transform;
 	}
 

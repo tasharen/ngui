@@ -82,11 +82,11 @@ static public class NGUIHelp
 	[MenuItem("CONTEXT/UIPlaySound/Help")]
 	static void ShowHelp19 (MenuCommand command) { Show(typeof(UIPlaySound)); }
 
-	[MenuItem("CONTEXT/UIDraggablePanel/Help")]
-	static void ShowHelp20 (MenuCommand command) { Show(typeof(UIDraggablePanel)); }
+	[MenuItem("CONTEXT/UIScrollView/Help")]
+	static void ShowHelp20 (MenuCommand command) { Show(typeof(UIScrollView)); }
 
-	[MenuItem("CONTEXT/UIDragPanelContents/Help")]
-	static void ShowHelp21 (MenuCommand command) { Show(typeof(UIDragPanelContents)); }
+	[MenuItem("CONTEXT/UIDragScrollView/Help")]
+	static void ShowHelp21 (MenuCommand command) { Show(typeof(UIDragScrollView)); }
 
 	[MenuItem("CONTEXT/UICenterOnChild/Help")]
 	static void ShowHelp22 (MenuCommand command) { Show(typeof(UICenterOnChild)); }
@@ -101,6 +101,10 @@ static public class NGUIHelp
 	[MenuItem("CONTEXT/ActiveAnimation/Help")]
 	[MenuItem("CONTEXT/UIPlayAnimation/Help")]
 	static void ShowHelp25 (MenuCommand command) { Show(typeof(UIPlayAnimation)); }
+
+	[MenuItem("CONTEXT/UIScrollView/Help")]
+	[MenuItem("CONTEXT/UIDragScrollView/Help")]
+	static void ShowHelp26 (MenuCommand command) { Show(typeof(UIScrollView)); }
 
 	/// <summary>
 	/// Get the URL pointing to the documentation for the specified component.
@@ -132,6 +136,9 @@ static public class NGUIHelp
 		
 		if (type == typeof(ActiveAnimation) || type == typeof(UIPlayAnimation))
 			return "http://www.tasharen.com/forum/index.php?topic=6762";
+
+		if (type == typeof(UIScrollView) || type == typeof(UIDragScrollView))
+			return "http://www.tasharen.com/forum/index.php?topic=6763";
 
 		if (type.IsSubclassOf(typeof(UIWidget)))
 			return "http://www.tasharen.com/forum/index.php?topic=6702";
