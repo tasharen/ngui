@@ -352,7 +352,7 @@ static public class NGUITools
 	static public void RegisterUndo (UnityEngine.Object obj, string name)
 	{
 #if UNITY_EDITOR
- #if UNITY_3_5
+ #if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 		UnityEditor.Undo.RegisterUndo(obj, name);
  #else
 		UnityEditor.Undo.RecordObject(obj, name);
