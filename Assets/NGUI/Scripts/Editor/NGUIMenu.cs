@@ -215,6 +215,12 @@ static public class NGUIMenu
 		return t;
 	}
 
+	[MenuItem("NGUI/Create/2D UI")]
+	static void Create2D () { Selection.activeGameObject = NGUIEditorTools.SelectedRoot(true); }
+
+	[MenuItem("NGUI/Create/2D UI", true)]
+	static bool Create2Da () { return UIRoot.list.Count == 0; }
+
 #endregion
 #region Attach
 
