@@ -401,7 +401,7 @@ public class NGUIEditorTools
 			}
 
 			// No UI present -- create a new one
-			if (go == null) go = UICreateNewUIWizard.CreateNewUI();
+			if (go == null) go = UICreateNewUIWizard.CreateNewUI(UICreateNewUIWizard.CameraType.Simple2D);
 		}
 		return go;
 	}

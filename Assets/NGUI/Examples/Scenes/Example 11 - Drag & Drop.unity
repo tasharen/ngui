@@ -916,7 +916,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 16a2d4ace59bac64dbcf4085964b38eb, type: 2}
   mText: 'Example: Drag & Drop'
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -985,7 +985,7 @@ MonoBehaviour:
     You can also use [66BBFF]DragDropContainer[-] script attached to any collider
     in order to turn it into a container capable of holding draggable items. The bottom
     bar is one such container, but you could easily add more.'
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0

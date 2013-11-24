@@ -815,6 +815,8 @@ public class UICreateWidgetWizard : EditorWindow
 				case WidgetType.PopupMenu:		CreatePopup(go, false); break;
 				case WidgetType.ScrollBar:		CreateScrollBar(go); break;
 			}
+
+			EditorGUILayout.HelpBox("Widget Tool has become far less useful with NGUI 3.0.6. Search the Project view for 'Control', then simply drag & drop one of them into your Scene View.", MessageType.Warning);
 		}
 	}
 }
