@@ -449,6 +449,22 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Convenience method that works without warnings in both Unity 3 and 4.
+	/// </summary>
+
+	static public void RegisterUndo (UnityEngine.Object obj, string name)
+	{
+#if UNITY_EDITOR
+ #if UNITY_3_5
+		UnityEditor.Undo.RegisterUndo(obj, name);
+ #else
+		UnityEditor.Undo.RecordObject(obj, name);
+ #endif
+		UnityEditor.EditorUtility.SetDirty(obj);
+#endif
+	}
+
+	/// <summary>
 	/// Adjust the widgets' depth by the specified value.
 	/// </summary>
 
@@ -466,7 +482,7 @@ static public class NGUITools
 				{
 					UIPanel p = panels[i];
 #if UNITY_EDITOR
-					UnityEditor.Undo.RegisterUndo(p, "Depth Change");
+					RegisterUndo(p, "Depth Change");
 #endif
 					p.depth = p.depth + adjustment;
 				}
@@ -480,7 +496,7 @@ static public class NGUITools
 				{
 					UIWidget w = widgets[i];
 #if UNITY_EDITOR
-					UnityEditor.Undo.RegisterUndo(w, "Depth Change");
+					RegisterUndo(w, "Depth Change");
 #endif
 					w.depth = w.depth + adjustment;
 				}
@@ -939,18 +955,10 @@ static public class NGUITools
 		if (t.GetComponent<UIAnchor>() == null && t.GetComponent<UIRoot>() == null)
 		{
 #if UNITY_EDITOR
-#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
-			UnityEditor.Undo.RegisterUndo(t, "Make Pixel-Perfect");
-#else
-			UnityEditor.Undo.RecordObject(t, "Make Pixel-Perfect");
+			RegisterUndo(t, "Make Pixel-Perfect");
 #endif
 			t.localPosition = Round(t.localPosition);
 			t.localScale = Round(t.localScale);
-			UnityEditor.EditorUtility.SetDirty(t);
-#else
-			t.localPosition = Round(t.localPosition);
-			t.localScale = Round(t.localScale);
-#endif
 		}
 
 		// Recurse into children
@@ -1084,7 +1092,7 @@ static public class NGUITools
 		{
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
-				UnityEditor.Undo.RegisterUndo(go, "Add " + typeof(T));
+				RegisterUndo(go, "Add " + typeof(T));
 #endif
 			comp = go.AddComponent<T>();
 		}
