@@ -26,7 +26,7 @@ public class UISlider : UIProgressBar
 	/// </summary>
 
 	public Transform thumb;
-
+	
 	// Deprecated functionality. Use 'foregroundWidget' instead.
 	[HideInInspector][SerializeField] Transform foreground;
 
@@ -97,15 +97,33 @@ public class UISlider : UIProgressBar
 
 			if (isHorizontal)
 			{
-				thumb.position = isInverted ?
-					Vector3.Lerp(corners[0], corners[1], 0.5f) :
-					Vector3.Lerp(corners[2], corners[3], 0.5f);
+				if (mSprite != null && mSprite.type == UISprite.Type.Filled)
+				{
+					Vector3 v0 = Vector3.Lerp(corners[0], corners[1], 0.5f);
+					Vector3 v1 = Vector3.Lerp(corners[2], corners[3], 0.5f);
+					thumb.position = Vector3.Lerp(v0, v1, isInverted ? 1f - value : value);
+				}
+				else
+				{
+					thumb.position = isInverted ?
+						Vector3.Lerp(corners[0], corners[1], 0.5f) :
+						Vector3.Lerp(corners[2], corners[3], 0.5f);
+				}
 			}
 			else
 			{
-				thumb.position = isInverted ?
-					Vector3.Lerp(corners[0], corners[3], 0.5f) :
-					Vector3.Lerp(corners[1], corners[2], 0.5f);
+				if (mSprite != null && mSprite.type == UISprite.Type.Filled)
+				{
+					Vector3 v0 = Vector3.Lerp(corners[0], corners[3], 0.5f);
+					Vector3 v1 = Vector3.Lerp(corners[1], corners[2], 0.5f);
+					thumb.position = Vector3.Lerp(v0, v1, isInverted ? 1f - value : value);
+				}
+				else
+				{
+					thumb.position = isInverted ?
+						Vector3.Lerp(corners[0], corners[3], 0.5f) :
+						Vector3.Lerp(corners[1], corners[2], 0.5f);
+				}
 			}
 		}
 	}

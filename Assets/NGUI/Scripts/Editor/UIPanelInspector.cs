@@ -6,7 +6,6 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
-using Action = UIWidgetInspector.Action;
 
 [CustomEditor(typeof(UIPanel))]
 public class UIPanelInspector : Editor
@@ -20,8 +19,8 @@ public class UIPanelInspector : Editor
 	static int s_Hash = "PanelHash".GetHashCode();
 
 	UIPanel mPanel;
-	Action mAction = Action.None;
-	Action mActionUnderMouse = Action.None;
+	UIWidgetInspector.Action mAction = UIWidgetInspector.Action.None;
+	UIWidgetInspector.Action mActionUnderMouse = UIWidgetInspector.Action.None;
 	bool mAllowSelection = true;
 
 	Vector3 mStartPos = Vector3.zero;
@@ -71,7 +70,7 @@ public class UIPanelInspector : Editor
 		Vector3[] handles = UIWidgetInspector.GetHandles(mPanel.worldCorners);
 
 		// Time to figure out what kind of action is underneath the mouse
-		Action actionUnderMouse = mAction;
+		UIWidgetInspector.Action actionUnderMouse = mAction;
 		bool canResize = (mPanel.clipping != UIDrawCall.Clipping.None);
 		UIWidget.Pivot pivotUnderMouse = UIWidgetInspector.GetPivotUnderMouse(handles, e, canResize, ref actionUnderMouse);
 
@@ -118,7 +117,8 @@ public class UIPanelInspector : Editor
 						e.Use();
 					}
 				}
-				else if (e.button == 0 && actionUnderMouse != Action.None && UIWidgetInspector.Raycast(handles, out mStartDrag))
+				else if (e.button == 0 && actionUnderMouse != UIWidgetInspector.Action.None &&
+					UIWidgetInspector.Raycast(handles, out mStartDrag))
 				{
 					mStartPos = t.position;
 					mStartRot = t.localRotation.eulerAngles;
@@ -149,7 +149,7 @@ public class UIPanelInspector : Editor
 							NGUIEditorTools.ShowSpriteSelectionMenu(e.mousePosition);
 							handled = true;
 						}
-						else if (mAction == Action.None)
+						else if (mAction == UIWidgetInspector.Action.None)
 						{
 							if (mAllowSelection)
 							{
@@ -173,8 +173,8 @@ public class UIPanelInspector : Editor
 					}
 
 					// Clear the actions
-					mActionUnderMouse = Action.None;
-					mAction = Action.None;
+					mActionUnderMouse = UIWidgetInspector.Action.None;
+					mAction = UIWidgetInspector.Action.None;
 				}
 				else if (mAllowSelection)
 				{
@@ -195,29 +195,29 @@ public class UIPanelInspector : Editor
 				{
 					e.Use();
 
-					if (mAction != Action.None || mActionUnderMouse != Action.None)
+					if (mAction != UIWidgetInspector.Action.None || mActionUnderMouse != UIWidgetInspector.Action.None)
 					{
 						Vector3 pos;
 
 						if (UIWidgetInspector.Raycast(handles, out pos))
 						{
-							if (mAction == Action.None && mActionUnderMouse != Action.None)
+							if (mAction == UIWidgetInspector.Action.None && mActionUnderMouse != UIWidgetInspector.Action.None)
 							{
 								// Wait until the mouse moves by more than a few pixels
 								if (dragStarted)
 								{
-									if (mActionUnderMouse == Action.Move)
+									if (mActionUnderMouse == UIWidgetInspector.Action.Move)
 									{
 										mStartPos = t.position;
 										NGUIEditorTools.RegisterUndo("Move panel", t);
 									}
-									else if (mActionUnderMouse == Action.Rotate)
+									else if (mActionUnderMouse == UIWidgetInspector.Action.Rotate)
 									{
 										mStartRot = t.localRotation.eulerAngles;
 										mStartDir = mStartDrag - t.position;
 										NGUIEditorTools.RegisterUndo("Rotate panel", t);
 									}
-									else if (mActionUnderMouse == Action.Scale)
+									else if (mActionUnderMouse == UIWidgetInspector.Action.Scale)
 									{
 										mStartPos = t.localPosition;
 										mStartCR = mPanel.clipRange;
@@ -229,9 +229,9 @@ public class UIPanelInspector : Editor
 								}
 							}
 
-							if (mAction != Action.None)
+							if (mAction != UIWidgetInspector.Action.None)
 							{
-								if (mAction == Action.Move)
+								if (mAction == UIWidgetInspector.Action.Move)
 								{
 									t.position = mStartPos + (pos - mStartDrag);
 									pos = t.localPosition;
@@ -240,7 +240,7 @@ public class UIPanelInspector : Editor
 									pos.z = Mathf.Round(pos.z);
 									t.localPosition = pos;
 								}
-								else if (mAction == Action.Rotate)
+								else if (mAction == UIWidgetInspector.Action.Rotate)
 								{
 									Vector3 dir = pos - t.position;
 									float angle = Vector3.Angle(mStartDir, dir);
@@ -255,7 +255,7 @@ public class UIPanelInspector : Editor
 										t.localRotation = Quaternion.Euler(mStartRot.x, mStartRot.y, angle);
 									}
 								}
-								else if (mAction == Action.Scale)
+								else if (mAction == UIWidgetInspector.Action.Scale)
 								{
 									// World-space delta since the drag started
 									Vector3 delta = pos - mStartDrag;
@@ -304,17 +304,17 @@ public class UIPanelInspector : Editor
 				{
 					if (GUIUtility.hotControl == id)
 					{
-						if (mAction != Action.None)
+						if (mAction != UIWidgetInspector.Action.None)
 						{
-							if (mAction == Action.Move)
+							if (mAction == UIWidgetInspector.Action.Move)
 							{
 								t.position = mStartPos;
 							}
-							else if (mAction == Action.Rotate)
+							else if (mAction == UIWidgetInspector.Action.Rotate)
 							{
 								t.localRotation = Quaternion.Euler(mStartRot);
 							}
-							else if (mAction == Action.Scale)
+							else if (mAction == UIWidgetInspector.Action.Scale)
 							{
 								t.position = mStartPos;
 								mPanel.clipRange = mStartCR;
@@ -324,8 +324,8 @@ public class UIPanelInspector : Editor
 						GUIUtility.hotControl = 0;
 						GUIUtility.keyboardControl = 0;
 
-						mActionUnderMouse = Action.None;
-						mAction = Action.None;
+						mActionUnderMouse = UIWidgetInspector.Action.None;
+						mAction = UIWidgetInspector.Action.None;
 						e.Use();
 					}
 					else Selection.activeGameObject = null;

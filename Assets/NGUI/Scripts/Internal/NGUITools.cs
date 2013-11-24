@@ -346,6 +346,22 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Convenience method that works without warnings in both Unity 3 and 4.
+	/// </summary>
+
+	static public void RegisterUndo (UnityEngine.Object obj, string name)
+	{
+#if UNITY_EDITOR
+ #if UNITY_3_5
+		UnityEditor.Undo.RegisterUndo(obj, name);
+ #else
+		UnityEditor.Undo.RecordObject(obj, name);
+ #endif
+		UnityEditor.EditorUtility.SetDirty(obj);
+#endif
+	}
+
+	/// <summary>
 	/// Add a new child game object.
 	/// </summary>
 
@@ -446,22 +462,6 @@ static public class NGUITools
 			return depth + 1;
 		}
 		return CalculateNextDepth(go);
-	}
-
-	/// <summary>
-	/// Convenience method that works without warnings in both Unity 3 and 4.
-	/// </summary>
-
-	static public void RegisterUndo (UnityEngine.Object obj, string name)
-	{
-#if UNITY_EDITOR
- #if UNITY_3_5
-		UnityEditor.Undo.RegisterUndo(obj, name);
- #else
-		UnityEditor.Undo.RecordObject(obj, name);
- #endif
-		UnityEditor.EditorUtility.SetDirty(obj);
-#endif
 	}
 
 	/// <summary>
