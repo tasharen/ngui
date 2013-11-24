@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-                Version 3.0.6
+            Version 3.0.6 rc3
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -39,6 +39,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: NGUI now has new written documentation.
 - NEW: NGUI now has an abundance of context-sensitive help. Just right click on an NGUI component and choose the Help option.
 - NEW: NGUI now has robust context menus letting you add, create and modify widgets by right-clicking on stuff in the Scene View.
+- NEW: Added snapping support for widget placement. Edge selection restricted to siblings and parent.
 - NEW: You can now find an assortment of ready-made controls ready to be drag & dropped into your scenes (search for "Wooden").
 - NEW: You can now drag & drop GUI prefabs from your Project Folder right into the Scene View. No need to create the UI beforehand.
 - NEW: You can now copy/paste label styles by right-clicking the UILabel script in Inspector.
