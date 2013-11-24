@@ -396,6 +396,7 @@ public class UIWidgetInspector : Editor
 								{
 									if (mActionUnderMouse == Action.Move)
 									{
+										NGUISnap.Recalculate(mWidget);
 										mStartPos = t.position;
 										NGUIEditorTools.RegisterUndo("Move widget", t);
 									}
@@ -423,11 +424,8 @@ public class UIWidgetInspector : Editor
 								if (mAction == Action.Move)
 								{
 									t.position = mStartPos + (pos - mStartDrag);
-									pos = t.localPosition;
-									pos.x = Mathf.Round(pos.x);
-									pos.y = Mathf.Round(pos.y);
-									pos.z = Mathf.Round(pos.z);
-									t.localPosition = pos;
+									t.localPosition = NGUISnap.Snap(t.localPosition, mWidget.localCorners,
+										e.modifiers != EventModifiers.Control);
 								}
 								else if (mAction == Action.Rotate)
 								{
@@ -439,8 +437,8 @@ public class UIWidgetInspector : Editor
 										float dot = Vector3.Dot(Vector3.Cross(mStartDir, dir), t.forward);
 										if (dot < 0f) angle = -angle;
 										angle = mStartRot.z + angle;
-										if (e.modifiers != EventModifiers.Shift) angle = Mathf.Round(angle / 15f) * 15f;
-										else angle = Mathf.Round(angle);
+										angle = (NGUISnap.allow && e.modifiers != EventModifiers.Control) ?
+											Mathf.Round(angle / 15f) * 15f : Mathf.Round(angle);
 										t.localRotation = Quaternion.Euler(mStartRot.x, mStartRot.y, angle);
 									}
 								}

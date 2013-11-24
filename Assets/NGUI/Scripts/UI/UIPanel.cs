@@ -297,6 +297,61 @@ public class UIPanel : MonoBehaviour
 	static Vector3[] mCorners = new Vector3[4];
 
 	/// <summary>
+	/// Local-space corners of the panel's clipping rectangle. The order is bottom-left, top-left, top-right, bottom-right.
+	/// </summary>
+
+	public Vector3[] localCorners
+	{
+		get
+		{
+			if (mClipping == UIDrawCall.Clipping.None)
+			{
+				Vector2 size = GetSize();
+
+				float x0 = -0.5f * size.x;
+				float y0 = -0.5f * size.y;
+				float x1 = x0 + size.x;
+				float y1 = y0 + size.y;
+
+				Transform wt = (mCam != null) ? mCam.transform : null;
+
+				if (wt != null)
+				{
+					mCorners[0] = wt.TransformPoint(x0, y0, 0f);
+					mCorners[1] = wt.TransformPoint(x0, y1, 0f);
+					mCorners[2] = wt.TransformPoint(x1, y1, 0f);
+					mCorners[3] = wt.TransformPoint(x1, y0, 0f);
+
+					wt = cachedTransform;
+
+					for (int i = 0; i < 4; ++i)
+						mCorners[i] = wt.InverseTransformPoint(mCorners[i]);
+				}
+				else
+				{
+					mCorners[0] = new Vector3(x0, y0);
+					mCorners[1] = new Vector3(x0, y1);
+					mCorners[2] = new Vector3(x1, y1);
+					mCorners[3] = new Vector3(x1, y0);
+				}
+			}
+			else
+			{
+				float x0 = mClipRange.x - 0.5f * mClipRange.z;
+				float y0 = mClipRange.y - 0.5f * mClipRange.w;
+				float x1 = x0 + mClipRange.z;
+				float y1 = y0 + mClipRange.w;
+
+				mCorners[0] = new Vector3(x0, y0);
+				mCorners[1] = new Vector3(x0, y1);
+				mCorners[2] = new Vector3(x1, y1);
+				mCorners[3] = new Vector3(x1, y0);
+			}
+			return mCorners;
+		}
+	}
+
+	/// <summary>
 	/// World-space corners of the panel's clipping rectangle. The order is bottom-left, top-left, top-right, bottom-right.
 	/// </summary>
 

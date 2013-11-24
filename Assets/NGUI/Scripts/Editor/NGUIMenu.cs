@@ -398,41 +398,57 @@ static public class NGUIMenu
 #endregion
 #region Handles
 
-	[MenuItem("NGUI/Handles/Turn On", true)]
+	[MenuItem("NGUI/Options/Handles/Turn On", true)]
 	static public bool TurnHandlesOnCheck () { return !UIWidget.showHandlesWithMoveTool; }
 
-	[MenuItem("NGUI/Handles/Turn On")]
+	[MenuItem("NGUI/Options/Handles/Turn On")]
 	static public void TurnHandlesOn () { UIWidget.showHandlesWithMoveTool = true; }
 
-	[MenuItem("NGUI/Handles/Turn Off", true)]
+	[MenuItem("NGUI/Options/Handles/Turn Off", true)]
 	static public bool TurnHandlesOffCheck () { return UIWidget.showHandlesWithMoveTool; }
 
-	[MenuItem("NGUI/Handles/Turn Off")]
+	[MenuItem("NGUI/Options/Handles/Turn Off")]
 	static public void TurnHandlesOff () { UIWidget.showHandlesWithMoveTool = false; }
 
-	[MenuItem("NGUI/Handles/Set to Blue", true)]
+	[MenuItem("NGUI/Options/Handles/Set to Blue", true)]
 	static public bool SetToBlueCheck () { return UIWidget.showHandlesWithMoveTool && NGUISettings.colorMode != NGUISettings.ColorMode.Blue; }
 
-	[MenuItem("NGUI/Handles/Set to Blue")]
+	[MenuItem("NGUI/Options/Handles/Set to Blue")]
 	static public void SetToBlue () { NGUISettings.colorMode = NGUISettings.ColorMode.Blue; }
 
-	[MenuItem("NGUI/Handles/Set to Orange", true)]
+	[MenuItem("NGUI/Options/Handles/Set to Orange", true)]
 	static public bool SetToOrangeCheck () { return UIWidget.showHandlesWithMoveTool && NGUISettings.colorMode != NGUISettings.ColorMode.Orange; }
 
-	[MenuItem("NGUI/Handles/Set to Orange")]
+	[MenuItem("NGUI/Options/Handles/Set to Orange")]
 	static public void SetToOrange () { NGUISettings.colorMode = NGUISettings.ColorMode.Orange; }
 
 	[MenuItem("NGUI/Handles/Set to Green", true)]
 	static public bool SetToGreenCheck () { return UIWidget.showHandlesWithMoveTool && NGUISettings.colorMode != NGUISettings.ColorMode.Green; }
 
-	[MenuItem("NGUI/Handles/Set to Green")]
+	[MenuItem("NGUI/Options/Handles/Set to Green")]
 	static public void SetToGreen () { NGUISettings.colorMode = NGUISettings.ColorMode.Green; }
+
+#endregion
+
+#region Snapping
+	
+	[MenuItem("NGUI/Options/Snapping/Turn On", true)]
+	static public bool TurnSnapOnCheck () { return !NGUISnap.allow; }
+
+	[MenuItem("NGUI/Options/Snapping/Turn On")]
+	static public void TurnSnapOn () { NGUISnap.allow = true; }
+
+	[MenuItem("NGUI/Options/Snapping/Turn Off", true)]
+	static public bool TurnSnapOffCheck () { return NGUISnap.allow; }
+
+	[MenuItem("NGUI/Options/Snapping/Turn Off")]
+	static public void TurnSnapOff () { NGUISnap.allow = false; }
 
 #endregion
 
 	[MenuItem("NGUI/Normalize Depth Hierarchy &#0")]
 	static public void Normalize () { NGUITools.NormalizeDepths(); }
-
+	
 	[MenuItem("NGUI/")]
 	static void Breaker () { }
 

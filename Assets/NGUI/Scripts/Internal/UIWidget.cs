@@ -261,10 +261,10 @@ public class UIWidget : MonoBehaviour
 			float x1 = x0 + mWidth;
 			float y1 = y0 + mHeight;
 
-			mCorners[0] = new Vector3(x0, y0, 0f);
-			mCorners[1] = new Vector3(x0, y1, 0f);
-			mCorners[2] = new Vector3(x1, y1, 0f);
-			mCorners[3] = new Vector3(x1, y0, 0f);
+			mCorners[0] = new Vector3(x0, y0);
+			mCorners[1] = new Vector3(x0, y1);
+			mCorners[2] = new Vector3(x1, y1);
+			mCorners[3] = new Vector3(x1, y0);
 
 			return mCorners;
 		}

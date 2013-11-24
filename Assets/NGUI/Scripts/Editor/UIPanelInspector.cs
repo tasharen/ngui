@@ -208,6 +208,7 @@ public class UIPanelInspector : Editor
 								{
 									if (mActionUnderMouse == UIWidgetInspector.Action.Move)
 									{
+										NGUISnap.Recalculate(mPanel);
 										mStartPos = t.position;
 										NGUIEditorTools.RegisterUndo("Move panel", t);
 									}
@@ -234,11 +235,8 @@ public class UIPanelInspector : Editor
 								if (mAction == UIWidgetInspector.Action.Move)
 								{
 									t.position = mStartPos + (pos - mStartDrag);
-									pos = t.localPosition;
-									pos.x = Mathf.Round(pos.x);
-									pos.y = Mathf.Round(pos.y);
-									pos.z = Mathf.Round(pos.z);
-									t.localPosition = pos;
+									t.localPosition = NGUISnap.Snap(t.localPosition, mPanel.localCorners,
+										e.modifiers != EventModifiers.Control);
 								}
 								else if (mAction == UIWidgetInspector.Action.Rotate)
 								{
@@ -250,8 +248,8 @@ public class UIPanelInspector : Editor
 										float dot = Vector3.Dot(Vector3.Cross(mStartDir, dir), t.forward);
 										if (dot < 0f) angle = -angle;
 										angle = mStartRot.z + angle;
-										if (e.modifiers != EventModifiers.Shift) angle = Mathf.Round(angle / 15f) * 15f;
-										else angle = Mathf.Round(angle);
+										angle = (NGUISnap.allow && e.modifiers != EventModifiers.Control) ?
+											Mathf.Round(angle / 15f) * 15f : Mathf.Round(angle);
 										t.localRotation = Quaternion.Euler(mStartRot.x, mStartRot.y, angle);
 									}
 								}
