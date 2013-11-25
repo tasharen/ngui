@@ -365,11 +365,17 @@ static public class NGUITools
 	/// Add a new child game object.
 	/// </summary>
 
-	static public GameObject AddChild (GameObject parent)
+	static public GameObject AddChild (GameObject parent) { return AddChild(parent, true); }
+
+	/// <summary>
+	/// Add a new child game object.
+	/// </summary>
+
+	static public GameObject AddChild (GameObject parent, bool undo)
 	{
 		GameObject go = new GameObject();
 #if UNITY_EDITOR
-		UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
+		if (undo) UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
 #endif
 		if (parent != null)
 		{
@@ -615,6 +621,17 @@ static public class NGUITools
 	static public T AddChild<T> (GameObject parent) where T : Component
 	{
 		GameObject go = AddChild(parent);
+		go.name = GetTypeName<T>();
+		return go.AddComponent<T>();
+	}
+
+	/// <summary>
+	/// Add a child object to the specified parent and attaches the specified script to it.
+	/// </summary>
+
+	static public T AddChild<T> (GameObject parent, bool undo) where T : Component
+	{
+		GameObject go = AddChild(parent, undo);
 		go.name = GetTypeName<T>();
 		return go.AddComponent<T>();
 	}

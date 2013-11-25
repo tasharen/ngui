@@ -1023,7 +1023,8 @@ public class UIPanel : MonoBehaviour
 
 			if (root == null)
 			{
-				GameObject go = new GameObject("UI Root");
+				GameObject go = NGUITools.AddChild(null, false);
+				go.name = "UI Root";
 				go.layer = origin.gameObject.layer;
 				root = go.AddComponent<UIRoot>();
 			}
@@ -1032,7 +1033,7 @@ public class UIPanel : MonoBehaviour
 
 			if (panel == null)
 			{
-				Camera cam = NGUITools.AddChild<Camera>(root.gameObject);
+				Camera cam = NGUITools.AddChild<Camera>(root.gameObject, false);
 				cam.gameObject.AddComponent<UICamera>();
 				cam.orthographic = true;
 				cam.orthographicSize = 1;
@@ -1044,8 +1045,11 @@ public class UIPanel : MonoBehaviour
 				if (Camera.main != null)
 					Camera.main.cullingMask = (Camera.main.cullingMask & (~cam.cullingMask));
 
-				UIAnchor anch = NGUITools.AddChild<UIAnchor>(cam.gameObject);
-				panel = NGUITools.AddChild<UIPanel>(anch.gameObject);
+				UIAnchor anch = NGUITools.AddChild<UIAnchor>(cam.gameObject, false);
+				panel = NGUITools.AddChild<UIPanel>(anch.gameObject, false);
+#if UNITY_EDITOR
+				UnityEditor.Selection.activeGameObject = panel.gameObject;
+#endif
 			}
 
 			trans.parent = panel.transform;
