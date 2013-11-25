@@ -90,10 +90,12 @@ public class UIStretch : MonoBehaviour
 		mSprite = GetComponent<UISprite>();
 		mPanel = GetComponent<UIPanel>();
 
-		UICamera.onScreenResize += Update;
+		UICamera.onScreenResize += ScreenSizeChanged;
 	}
 
-	void OnDestroy () { UICamera.onScreenResize -= Update; }
+	void OnDestroy () { UICamera.onScreenResize -= ScreenSizeChanged; }
+
+	void ScreenSizeChanged () { if (runOnlyOnce) Update(); }
 
 	void Start ()
 	{

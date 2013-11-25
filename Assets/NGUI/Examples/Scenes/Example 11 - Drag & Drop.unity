@@ -301,7 +301,7 @@ GameObject:
   - 4: {fileID: 61}
   - 114: {fileID: 111}
   - 65: {fileID: 75}
-  - 114: {fileID: 97}
+  - 114: {fileID: 37}
   m_Layer: 8
   m_Name: DragDropContainer
   m_TagString: Untagged
@@ -434,6 +434,17 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &37
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 29}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c33bc83ab81ec0c44976c6fb1d44e55a, type: 1}
+  m_Name: 
+  reparentTarget: {fileID: 57}
 --- !u!4 &40
 Transform:
   m_ObjectHideFlags: 0
@@ -984,7 +995,7 @@ MonoBehaviour:
 
     You can also use [66BBFF]DragDropContainer[-] script attached to any collider
     in order to turn it into a container capable of holding draggable items. The bottom
-    bar is one such container, but you could easily add more.'
+    bar is one such container, but you can easily add more.'
   mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
@@ -1140,16 +1151,6 @@ MonoBehaviour:
   m_Name: 
   target: {fileID: 0}
   speed: .5
---- !u!114 &97
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 29}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c33bc83ab81ec0c44976c6fb1d44e55a, type: 1}
-  m_Name: 
 --- !u!114 &98
 MonoBehaviour:
   m_ObjectHideFlags: 0

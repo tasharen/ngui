@@ -85,10 +85,12 @@ public class UIAnchor : MonoBehaviour
 	{
 		mTrans = transform;
 		mAnim = animation;
-		UICamera.onScreenResize += Update;
+		UICamera.onScreenResize += ScreenSizeChanged;
 	}
 
-	void OnDestroy () { UICamera.onScreenResize -= Update; }
+	void OnDestroy () { UICamera.onScreenResize -= ScreenSizeChanged; }
+
+	void ScreenSizeChanged () { if (runOnlyOnce) Update(); }
 
 	/// <summary>
 	/// Automatically find the camera responsible for drawing the widgets under this object.
