@@ -9,6 +9,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 400000}
   - 114: {fileID: 11400002}
+  - 114: {fileID: 11400010}
   m_Layer: 8
   m_Name: Label
   m_TagString: Untagged
@@ -54,7 +55,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100002}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -182, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 400000}
@@ -99,8 +100,8 @@ MonoBehaviour:
   m_Name: 
   mColor: {r: .23880595, g: .197638646, b: .121185109, a: 1}
   mPivot: 4
-  mWidth: 92
-  mHeight: 20
+  mWidth: 142
+  mHeight: 32
   mDepth: 5
   autoResizeBoxCollider: 0
   keepCrispWhenShrunk: 1
@@ -178,6 +179,24 @@ MonoBehaviour:
   hover: {x: 1.03999996, y: 1.03999996, z: 1.03999996}
   pressed: {x: 1, y: 1, z: 1}
   duration: .200000003
+--- !u!114 &11400010
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94b5bd8d2e1bcbe4580036799fb6ca41, type: 1}
+  m_Name: 
+  uiCamera: {fileID: 0}
+  container: {fileID: 100002}
+  style: 3
+  runOnlyOnce: 1
+  relativeSize: {x: 1, y: 1}
+  initialSize: {x: 1, y: 1}
+  borderPadding: {x: 8, y: 8}
+  widgetContainer: {fileID: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
