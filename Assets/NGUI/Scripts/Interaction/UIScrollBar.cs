@@ -10,147 +10,30 @@ using System.Collections.Generic;
 /// Scroll bar functionality.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/Scroll Bar")]
-public class UIScrollBar : UIWidgetContainer
+[ExecuteInEditMode]
+[AddComponentMenu("NGUI/Interaction/NGUI Scroll Bar")]
+public class UIScrollBar : UIProgressBar
 {
-	public enum Direction
+	enum Direction
 	{
 		Horizontal,
 		Vertical,
-	};
+		Upgraded,
+	}
 
-	/// <summary>
-	/// Current scroll bar. This value is set prior to the callback function being triggered.
-	/// </summary>
+	// Size of the scroll bar
+	[HideInInspector][SerializeField] protected float mSize = 1f;
 
-	static public UIScrollBar current;
-
-	/// <summary>
-	/// Callbacks triggered when the scroll bar's value changes.
-	/// </summary>
-
-	public List<EventDelegate> onChange = new List<EventDelegate>();
-
-	/// <summary>
-	/// Delegate triggered when the scroll bar stops being dragged.
-	/// Useful for things like centering on the closest valid object, for example.
-	/// </summary>
-
-	public OnDragFinished onDragFinished;
-	public delegate void OnDragFinished ();
-
-	[HideInInspector][SerializeField] UISprite mBG;
-	[HideInInspector][SerializeField] UISprite mFG;
-	[HideInInspector][SerializeField] Direction mDir = Direction.Horizontal;
-	[HideInInspector][SerializeField] bool mInverted = false;
+	// Deprecated functionality
 	[HideInInspector][SerializeField] float mScroll = 0f;
-	[HideInInspector][SerializeField] float mSize = 1f;
-
-	Transform mTrans;
-	bool mIsDirty = false;
-	Camera mCam;
-	Vector2 mScreenPos = Vector2.zero;
-
-	/// <summary>
-	/// Cached for speed.
-	/// </summary>
-
-	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
-
-	/// <summary>
-	/// Camera used to draw the scroll bar.
-	/// </summary>
-
-	public Camera cachedCamera { get { if (mCam == null) mCam = NGUITools.FindCameraForLayer(gameObject.layer); return mCam; } }
-
-	/// <summary>
-	/// Sprite used for the background.
-	/// </summary>
-
-	public UISprite background { get { return mBG; } set { if (mBG != value) { mBG = value; mIsDirty = true; } } }
-
-	/// <summary>
-	/// Sprite used for the foreground.
-	/// </summary>
-
-	public UISprite foreground { get { return mFG; } set { if (mFG != value) { mFG = value; mIsDirty = true; } } }
-
-	/// <summary>
-	/// The scroll bar's direction.
-	/// </summary>
-
-	public Direction direction
-	{
-		get
-		{
-			return mDir;
-		}
-		set
-		{
-			if (mDir != value)
-			{
-				mDir = value;
-				mIsDirty = true;
-
-				// Since the direction is changing, see if we need to swap width with height (for convenience)
-				if (mBG != null)
-				{
-					int width = mBG.width;
-					int height = mBG.height;
-
-					if ((mDir == Direction.Vertical   && width > height) ||
-						(mDir == Direction.Horizontal && width < height))
-					{
-						mBG.width = height;
-						mBG.height = width;
-						ForceUpdate();
-
-						// Update the colliders as well
-						if (mBG.collider != null) NGUITools.AddWidgetCollider(mBG.gameObject);
-						if (mFG.collider != null) NGUITools.AddWidgetCollider(mFG.gameObject);
-					}
-				}
-			}
-		}
-	}
-
-	/// <summary>
-	/// Whether the movement direction is flipped.
-	/// </summary>
-
-	public bool inverted { get { return mInverted; } set { if (mInverted != value) { mInverted = value; mIsDirty = true; } } }
-
-	/// <summary>
-	/// Modifiable value for the scroll bar, 0-1 range.
-	/// </summary>
-
-	public float value
-	{
-		get
-		{
-			return mScroll;
-		}
-		set
-		{
-			float val = Mathf.Clamp01(value);
-
-			if (mScroll != val)
-			{
-				mScroll = val;
-				mIsDirty = true;
-				
-				if (onChange != null)
-				{
-					current = this;
-					EventDelegate.Execute(onChange);
-					current = null;
-				}
-			}
-		}
-	}
+	[HideInInspector][SerializeField] Direction mDir = Direction.Upgraded;
+	[HideInInspector][SerializeField] bool mInverted = false;
 
 	[System.Obsolete("Use 'value' instead")]
 	public float scrollValue { get { return this.value; } set { this.value = value; } }
+	
+	[System.Obsolete("Use 'fillDirection' instead")]
+	public bool inverted { get { return isInverted; } set { } }
 
 	/// <summary>
 	/// The size of the foreground bar in percent (0-1 range).
@@ -182,30 +65,42 @@ public class UIScrollBar : UIWidgetContainer
 	}
 
 	/// <summary>
-	/// Allows to easily change the scroll bar's alpha, affecting both the foreground and the background sprite at once.
+	/// Upgrade from legacy functionality.
 	/// </summary>
 
-	public float alpha
+	protected override void Upgrade ()
 	{
-		get
+		if (mDir != Direction.Upgraded)
 		{
-			if (mFG != null) return mFG.alpha;
-			if (mBG != null) return mBG.alpha;
-			return 0f;
-		}
-		set
-		{
-			if (mFG != null)
-			{
-				mFG.alpha = value;
-				if (mFG.collider != null) mFG.collider.enabled = mFG.alpha > 0.001f;
-			}
+			mValue = mScroll;
 
-			if (mBG != null)
+			if (mDir == Direction.Horizontal)
 			{
-				mBG.alpha = value;
-				if (mBG.collider != null) mBG.collider.enabled = mBG.alpha > 0.001f;
+				mFill = mInverted ? FillDirection.RightToLeft : FillDirection.LeftToRight;
 			}
+			else
+			{
+				mFill = mInverted ? FillDirection.BottomToTop : FillDirection.TopToBottom;
+			}
+			mDir = Direction.Upgraded;
+#if UNITY_EDITOR
+			UnityEditor.EditorUtility.SetDirty(this);
+#endif
+		}
+	}
+
+	/// <summary>
+	/// Make the scroll bar's foreground react to press events.
+	/// </summary>
+
+	protected override void OnStart ()
+	{
+		if (mFG != null && mFG.collider != null && mFG.gameObject != gameObject)
+		{
+			UIEventListener fgl = UIEventListener.Get(mFG.gameObject);
+			fgl.onPress += OnPressForeground;
+			fgl.onDrag += OnDragForeground;
+			mFG.autoResizeBoxCollider = true;
 		}
 	}
 
@@ -213,179 +108,55 @@ public class UIScrollBar : UIWidgetContainer
 	/// Move the scroll bar to be centered on the specified position.
 	/// </summary>
 
-	void CenterOnPos (Vector2 localPos)
+	protected override void CenterOnPos (Vector2 localPos)
 	{
-		if (mBG == null || mFG == null) return;
+		if (mFG == null) return;
 
-		// Background's bounds
-		Bounds bg = NGUIMath.CalculateRelativeInnerBounds(cachedTransform, mBG);
-		Bounds fg = NGUIMath.CalculateRelativeInnerBounds(cachedTransform, mFG);
-
-		if (mDir == Direction.Horizontal)
+		if (isHorizontal)
 		{
-			float size = bg.size.x - fg.size.x;
-			float offset = size * 0.5f;
-			float min = bg.center.x - offset;
-			float val = (size > 0f) ? (localPos.x - min) / size : 0f;
-			value = mInverted ? 1f - val : val;
+			float range = (mStartingSize.x - mFG.width);
+			float min = mStartingPos.x - range * 0.5f;
+			float val = (localPos.x - min) / range;
+			value = Mathf.Clamp01((isInverted ? 1f - val : val));
 		}
 		else
 		{
-			float size = bg.size.y - fg.size.y;
-			float offset = size * 0.5f;
-			float min = bg.center.y - offset;
-			float val = (size > 0f) ? 1f - (localPos.y - min) / size : 0f;
-			value = mInverted ? 1f - val : val;
+			float range = (mStartingSize.y - mFG.height);
+			float min = mStartingPos.y - range * 0.5f;
+			float val = (localPos.y - min) / range;
+			value = Mathf.Clamp01((isInverted ? 1f - val : val));
 		}
 	}
-
-	/// <summary>
-	/// Drag the scroll bar by the specified on-screen amount.
-	/// </summary>
-
-	void Reposition (Vector2 screenPos)
-	{
-		// Create a plane
-		Transform trans = cachedTransform;
-		Plane plane = new Plane(trans.rotation * Vector3.back, trans.position);
-
-		// If the ray doesn't hit the plane, do nothing
-		float dist;
-		Ray ray = cachedCamera.ScreenPointToRay(screenPos);
-		if (!plane.Raycast(ray, out dist)) return;
-
-		// Transform the point from world space to local space
-		CenterOnPos(trans.InverseTransformPoint(ray.GetPoint(dist)));
-	}
-
-	/// <summary>
-	/// Position the scroll bar to be under the current touch.
-	/// </summary>
-
-	void OnPressBackground (GameObject go, bool isPressed)
-	{
-		mCam = UICamera.currentCamera;
-		Reposition(UICamera.lastTouchPosition);
-		if (!isPressed && onDragFinished != null) onDragFinished();
-	}
-
-	/// <summary>
-	/// Position the scroll bar to be under the current touch.
-	/// </summary>
-
-	void OnDragBackground (GameObject go, Vector2 delta)
-	{
-		mCam = UICamera.currentCamera;
-		Reposition(UICamera.lastTouchPosition);
-	}
-
-	/// <summary>
-	/// Save the position of the foreground on press.
-	/// </summary>
-
-	void OnPressForeground (GameObject go, bool isPressed)
-	{
-		if (isPressed)
-		{
-			mCam = UICamera.currentCamera;
-			Bounds b = NGUIMath.CalculateAbsoluteWidgetBounds(mFG.cachedTransform);
-			mScreenPos = mCam.WorldToScreenPoint(b.center);
-		}
-		else if (onDragFinished != null) onDragFinished();
-	}
-
-	/// <summary>
-	/// Drag the scroll bar in the specified direction.
-	/// </summary>
-
-	void OnDragForeground (GameObject go, Vector2 delta)
-	{
-		mCam = UICamera.currentCamera;
-		Reposition(mScreenPos + UICamera.currentTouch.totalDelta);
-	}
-
-	/// <summary>
-	/// Register the event listeners.
-	/// </summary>
-
-	void Start ()
-	{
-		if (background != null && background.collider != null)
-		{
-			UIEventListener listener = UIEventListener.Get(background.gameObject);
-			listener.onPress += OnPressBackground;
-			listener.onDrag += OnDragBackground;
-		}
-
-		if (foreground != null && foreground.collider != null)
-		{
-			UIEventListener listener = UIEventListener.Get(foreground.gameObject);
-			listener.onPress += OnPressForeground;
-			listener.onDrag += OnDragForeground;
-		}
-
-		if (onChange != null)
-		{
-			current = this;
-			EventDelegate.Execute(onChange);
-			current = null;
-		}
-		ForceUpdate();
-	}
-
-	/// <summary>
-	/// Update the value of the scroll bar if necessary.
-	/// </summary>
-
-	void Update() { if (mIsDirty) ForceUpdate(); }
 
 	/// <summary>
 	/// Update the value of the scroll bar.
 	/// </summary>
 
-	public void ForceUpdate ()
+	public override void ForceUpdate ()
 	{
 		mIsDirty = false;
 
-		if (mBG != null && mFG != null)
+		if (mFG != null)
 		{
 			mSize = Mathf.Clamp01(mSize);
-			mScroll = Mathf.Clamp01(mScroll);
+			float val = isInverted ? 1f - value : value;
+			Vector3 pos = mStartingPos;
 
-			Vector4 bg = mBG.border;
-			Vector4 fg = mFG.border;
-
-			// Space available for the background
-			Vector2 bgs = new Vector2(
-				Mathf.Max(0f, mBG.width - bg.x - bg.z),
-				Mathf.Max(0f, mBG.height - bg.y - bg.w));
-
-			float val = mInverted ? 1f - mScroll : mScroll;
-
-			if (mDir == Direction.Horizontal)
+			if (isHorizontal)
 			{
-				Vector2 fgs = new Vector2(bgs.x * mSize, bgs.y);
-
-				mFG.pivot = UIWidget.Pivot.Left;
-				mBG.pivot = UIWidget.Pivot.Left;
-				mBG.cachedTransform.localPosition = Vector3.zero;
-				mFG.cachedTransform.localPosition = new Vector3(Mathf.RoundToInt(bg.x - fg.x + (bgs.x - fgs.x) * val), 0f, 0f);
-				mFG.width = Mathf.RoundToInt(fgs.x + fg.x + fg.z);
-				mFG.height = Mathf.RoundToInt(fgs.y + fg.y + fg.w);
-				if (mFG.collider != null) NGUITools.AddWidgetCollider(mFG.gameObject);
+				int size = Mathf.RoundToInt(mStartingSize.x * mSize);
+				mFG.width = ((size & 1) == 1) ? size + 1 : size;
+				float diff = (mStartingSize.x - mFG.width) * 0.5f;
+				pos.x = Mathf.Round(Mathf.Lerp(pos.x - diff, pos.x + diff, val));
 			}
 			else
 			{
-				Vector2 fgs = new Vector2(bgs.x, bgs.y * mSize);
-
-				mFG.pivot = UIWidget.Pivot.Top;
-				mBG.pivot = UIWidget.Pivot.Top;
-				mBG.cachedTransform.localPosition = Vector3.zero;
-				mFG.cachedTransform.localPosition = new Vector3(0f, Mathf.RoundToInt(-bg.y + fg.y - (bgs.y - fgs.y) * val), 0f);
-				mFG.width = Mathf.RoundToInt(fgs.x + fg.x + fg.z);
-				mFG.height = Mathf.RoundToInt(fgs.y + fg.y + fg.w);
-				if (mFG.collider != null) NGUITools.AddWidgetCollider(mFG.gameObject);
+				int size = Mathf.RoundToInt(mStartingSize.y * mSize);
+				mFG.height = ((size & 1) == 1) ? size + 1 : size;
+				float diff = (mStartingSize.y - mFG.height) * 0.5f;
+				pos.y = Mathf.Round(Mathf.Lerp(pos.y - diff, pos.y + diff, val));
 			}
+			mFG.cachedTransform.localPosition = pos;
 		}
 	}
 }

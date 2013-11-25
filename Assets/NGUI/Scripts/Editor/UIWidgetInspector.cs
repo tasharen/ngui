@@ -17,7 +17,7 @@ public class UIWidgetInspector : Editor
 {
 	static public UIWidgetInspector instance;
 
-	enum Action
+	public enum Action
 	{
 		None,
 		Move,
@@ -39,7 +39,7 @@ public class UIWidgetInspector : Editor
 	static GUIStyle mGreyDot = null;
 	static MouseCursor mCursor = MouseCursor.Arrow;
 
-	static UIWidget.Pivot[] mPivots =
+	static public UIWidget.Pivot[] pivotPoints =
 	{
 		UIWidget.Pivot.BottomLeft,
 		UIWidget.Pivot.TopLeft,
@@ -60,15 +60,6 @@ public class UIWidgetInspector : Editor
 	Vector3 mStartRot = Vector3.zero;
 	Vector3 mStartDir = Vector3.right;
 	UIWidget.Pivot mDragPivot = UIWidget.Pivot.Center;
-
-	/// <summary>
-	/// Register an Undo command with the Unity editor.
-	/// </summary>
-
-	void RegisterUndo ()
-	{
-		NGUIEditorTools.RegisterUndo("Widget Change", mWidget);
-	}
 
 	/// <summary>
 	/// Raycast into the screen.
@@ -150,24 +141,10 @@ public class UIWidgetInspector : Editor
 	}
 
 	/// <summary>
-	/// Whether the mouse position is within one of the specified rectangles.
-	/// </summary>
-
-	static bool IsMouseOverRect (Vector2 mouse, List<Rect> rects)
-	{
-		for (int i = 0; i < rects.Count; ++i)
-		{
-			Rect r = rects[i];
-			if (r.Contains(mouse)) return true;
-		}
-		return false;
-	}
-
-	/// <summary>
 	/// Screen-space distance from the mouse position to the specified world position.
 	/// </summary>
 
-	static float GetScreenDistance (Vector3 worldPos, Vector2 mousePos)
+	static public float GetScreenDistance (Vector3 worldPos, Vector2 mousePos)
 	{
 		Vector2 screenPos = HandleUtility.WorldToGUIPoint(worldPos);
 		return Vector2.Distance(mousePos, screenPos);
@@ -177,7 +154,7 @@ public class UIWidgetInspector : Editor
 	/// Closest screen-space distance from the mouse position to one of the specified world points.
 	/// </summary>
 
-	static float GetScreenDistance (Vector3[] worldPoints, Vector2 mousePos, out int index)
+	static public float GetScreenDistance (Vector3[] worldPoints, Vector2 mousePos, out int index)
 	{
 		float min = float.MaxValue;
 		index = 0;
@@ -220,63 +197,52 @@ public class UIWidgetInspector : Editor
 	}
 
 	/// <summary>
-	/// Draw the on-screen selection, knobs, and handle all interaction logic.
+	/// Convert the specified 4 corners into 8 pivot points (adding left, right, top, and bottom).
 	/// </summary>
 
-	public void OnSceneGUI ()
+	static public Vector3[] GetHandles (Vector3[] corners)
 	{
-		NGUIEditorTools.HideMoveTool(true);
-		if (!UIWidget.showHandles) return;
+		Vector3[] v = new Vector3[8];
 
-		mWidget = target as UIWidget;
+		v[0] = corners[0];
+		v[1] = corners[1];
+		v[2] = corners[2];
+		v[3] = corners[3];
 
-		Transform t = mWidget.cachedTransform;
+		v[4] = (corners[0] + corners[1]) * 0.5f;
+		v[5] = (corners[1] + corners[2]) * 0.5f;
+		v[6] = (corners[2] + corners[3]) * 0.5f;
+		v[7] = (corners[0] + corners[3]) * 0.5f;
 
-		Event e = Event.current;
-		int id = GUIUtility.GetControlID(s_Hash, FocusType.Passive);
-		EventType type = e.GetTypeForControl(id);
+		return v;
+	}
 
-		Vector3[] corners = mWidget.worldCorners;
-		
-		Handles.color = handlesColor;
-		Handles.DrawLine(corners[0], corners[1]);
-		Handles.DrawLine(corners[1], corners[2]);
-		Handles.DrawLine(corners[2], corners[3]);
-		Handles.DrawLine(corners[0], corners[3]);
+	/// <summary>
+	/// Determine what kind of pivot point is under the mouse and update the cursor accordingly.
+	/// </summary>
 
-		Vector3[] worldPos = new Vector3[8];
-		
-		worldPos[0] = corners[0];
-		worldPos[1] = corners[1];
-		worldPos[2] = corners[2];
-		worldPos[3] = corners[3];
-
-		worldPos[4] = (corners[0] + corners[1]) * 0.5f;
-		worldPos[5] = (corners[1] + corners[2]) * 0.5f;
-		worldPos[6] = (corners[2] + corners[3]) * 0.5f;
-		worldPos[7] = (corners[0] + corners[3]) * 0.5f;
-
+	static public UIWidget.Pivot GetPivotUnderMouse (Vector3[] worldPos, Event e, bool canResize, ref Action action)
+	{
 		// Time to figure out what kind of action is underneath the mouse
-		Action actionUnderMouse = mAction;
 		UIWidget.Pivot pivotUnderMouse = UIWidget.Pivot.Center;
 
-		if (actionUnderMouse == Action.None)
+		if (action == Action.None)
 		{
 			int index = 0;
 			float dist = GetScreenDistance(worldPos, e.mousePosition, out index);
 
-			if (mWidget.canResize && dist < 10f)
+			if (canResize && dist < 10f)
 			{
-				pivotUnderMouse = mPivots[index];
-				actionUnderMouse = Action.Scale;
+				pivotUnderMouse = pivotPoints[index];
+				action = Action.Scale;
 			}
-			else if (e.modifiers == 0 && NGUIEditorTools.SceneViewDistanceToRectangle(corners, e.mousePosition) == 0f)
+			else if (e.modifiers == 0 && NGUIEditorTools.SceneViewDistanceToRectangle(worldPos, e.mousePosition) == 0f)
 			{
-				actionUnderMouse = Action.Move;
+				action = Action.Move;
 			}
 			else if (dist < 30f)
 			{
-				actionUnderMouse = Action.Rotate;
+				action = Action.Rotate;
 			}
 		}
 
@@ -299,34 +265,83 @@ public class UIWidgetInspector : Editor
 
 			Rect rect = new Rect(min.x, min.y, max.x - min.x, max.y - min.y);
 
-			if (actionUnderMouse == Action.Rotate)
+			if (action == Action.Rotate)
 			{
 				SetCursorRect(rect, MouseCursor.RotateArrow);
 			}
-			else if (actionUnderMouse == Action.Move)
+			else if (action == Action.Move)
 			{
 				SetCursorRect(rect, MouseCursor.MoveArrow);
 			}
-			else if (actionUnderMouse == Action.Scale)
+			else if (action == Action.Scale)
 			{
 				SetCursorRect(rect, MouseCursor.ScaleArrow);
 			}
 			else SetCursorRect(rect, MouseCursor.Arrow);
 		}
 #endif
+		return pivotUnderMouse;
+	}
 
+	/// <summary>
+	/// Draw the on-screen selection, knobs, and handle all interaction logic.
+	/// </summary>
+
+	public void OnSceneGUI ()
+	{
+		NGUIEditorTools.HideMoveTool(true);
+		if (!UIWidget.showHandles) return;
+
+		mWidget = target as UIWidget;
+
+		Transform t = mWidget.cachedTransform;
+
+		Event e = Event.current;
+		int id = GUIUtility.GetControlID(s_Hash, FocusType.Passive);
+		EventType type = e.GetTypeForControl(id);
+
+		Action actionUnderMouse = mAction;
+		Vector3[] handles = GetHandles(mWidget.worldCorners);
+		bool canResize = mWidget.canResize;
+		UIWidget.Pivot pivotUnderMouse = GetPivotUnderMouse(handles, e, canResize, ref actionUnderMouse);
+
+		Handles.color = handlesColor;
+		Handles.DrawLine(handles[0], handles[1]);
+		Handles.DrawLine(handles[1], handles[2]);
+		Handles.DrawLine(handles[2], handles[3]);
+		Handles.DrawLine(handles[0], handles[3]);
+		
 		switch (type)
 		{
 			case EventType.Repaint:
 			{
-				Handles.BeginGUI();
+				Vector3 bottomLeft = HandleUtility.WorldToGUIPoint(handles[0]);
+				Vector3 topRight = HandleUtility.WorldToGUIPoint(handles[2]);
+				Vector3 diff = topRight - bottomLeft;
+				float mag = diff.magnitude;
+
+				if (mag > 140f)
 				{
-					for (int i = 0; i < 8; ++i)
+					Handles.BeginGUI();
 					{
-						DrawKnob(worldPos[i], mWidget.pivot == mPivots[i], mWidget.canResize, id);
+						for (int i = 0; i < 8; ++i)
+						{
+							DrawKnob(handles[i], mWidget.pivot == pivotPoints[i], canResize, id);
+						}
 					}
+					Handles.EndGUI();
 				}
-				Handles.EndGUI();
+				else if (mag > 40f)
+				{
+					Handles.BeginGUI();
+					{
+						for (int i = 0; i < 4; ++i)
+						{
+							DrawKnob(handles[i], mWidget.pivot == pivotPoints[i], canResize, id);
+						}
+					}
+					Handles.EndGUI();
+				}
 			}
 			break;
 
@@ -343,7 +358,7 @@ public class UIWidgetInspector : Editor
 						e.Use();
 					}
 				}
-				else if (e.button == 0 && actionUnderMouse != Action.None && Raycast(corners, out mStartDrag))
+				else if (e.button == 0 && actionUnderMouse != Action.None && Raycast(handles, out mStartDrag))
 				{
 					mStartPos = t.position;
 					mStartRot = t.localRotation.eulerAngles;
@@ -372,7 +387,7 @@ public class UIWidgetInspector : Editor
 					{
 						Vector3 pos;
 
-						if (Raycast(corners, out pos))
+						if (Raycast(handles, out pos))
 						{
 							if (mAction == Action.None && mActionUnderMouse != Action.None)
 							{
@@ -381,6 +396,7 @@ public class UIWidgetInspector : Editor
 								{
 									if (mActionUnderMouse == Action.Move)
 									{
+										NGUISnap.Recalculate(mWidget);
 										mStartPos = t.position;
 										NGUIEditorTools.RegisterUndo("Move widget", t);
 									}
@@ -408,11 +424,8 @@ public class UIWidgetInspector : Editor
 								if (mAction == Action.Move)
 								{
 									t.position = mStartPos + (pos - mStartDrag);
-									pos = t.localPosition;
-									pos.x = Mathf.Round(pos.x);
-									pos.y = Mathf.Round(pos.y);
-									pos.z = Mathf.Round(pos.z);
-									t.localPosition = pos;
+									t.localPosition = NGUISnap.Snap(t.localPosition, mWidget.localCorners,
+										e.modifiers != EventModifiers.Control);
 								}
 								else if (mAction == Action.Rotate)
 								{
@@ -424,8 +437,8 @@ public class UIWidgetInspector : Editor
 										float dot = Vector3.Dot(Vector3.Cross(mStartDir, dir), t.forward);
 										if (dot < 0f) angle = -angle;
 										angle = mStartRot.z + angle;
-										if (e.modifiers != EventModifiers.Shift) angle = Mathf.Round(angle / 15f) * 15f;
-										else angle = Mathf.Round(angle);
+										angle = (NGUISnap.allow && e.modifiers != EventModifiers.Control) ?
+											Mathf.Round(angle / 15f) * 15f : Mathf.Round(angle);
 										t.localRotation = Quaternion.Euler(mStartRot.x, mStartRot.y, angle);
 									}
 								}
@@ -435,7 +448,7 @@ public class UIWidgetInspector : Editor
 									Vector3 delta = pos - mStartDrag;
 
 									// Adjust the widget's position and scale based on the delta, restricted by the pivot
-									AdjustPosAndScale(mWidget, mStartPos, mStartWidth, mStartHeight, delta, mDragPivot);
+									AdjustWidget(mWidget, mStartPos, mStartWidth, mStartHeight, delta, mDragPivot);
 								}
 							}
 						}
@@ -473,8 +486,6 @@ public class UIWidgetInspector : Editor
 						else
 						{
 							// Finished dragging something
-							mAction = Action.None;
-							mActionUnderMouse = Action.None;
 							Vector3 pos = t.localPosition;
 							pos.x = Mathf.Round(pos.x);
 							pos.y = Mathf.Round(pos.y);
@@ -483,13 +494,12 @@ public class UIWidgetInspector : Editor
 							handled = true;
 						}
 
-						if (handled)
-						{
-							mActionUnderMouse = Action.None;
-							mAction = Action.None;
-							e.Use();
-						}
+						if (handled) e.Use();
 					}
+
+					// Clear the actions
+					mActionUnderMouse = Action.None;
+					mAction = Action.None;
 				}
 				else if (mAllowSelection)
 				{
@@ -567,10 +577,10 @@ public class UIWidgetInspector : Editor
 	}
 
 	/// <summary>
-	/// Adjust the transform's position and scale.
+	/// Adjust the widget's position and size.
 	/// </summary>
 
-	static void AdjustPosAndScale (UIWidget w, Vector3 startLocalPos, int width, int height, Vector3 worldDelta, UIWidget.Pivot pivot)
+	static void AdjustWidget (UIWidget w, Vector3 startLocalPos, int width, int height, Vector3 worldDelta, UIWidget.Pivot pivot)
 	{
 		Transform t = w.cachedTransform;
 		Transform parent = t.parent;
@@ -847,7 +857,7 @@ public class UIWidgetInspector : Editor
 		}
 		else
 		{
-			if (GUILayout.Button("Correct", GUILayout.Width(68f)))
+			if (GUILayout.Button("Snap", GUILayout.Width(68f)))
 			{
 				foreach (GameObject go in Selection.gameObjects)
 				{
@@ -922,13 +932,11 @@ public class UIWidgetInspector : Editor
 
 	void DrawPivot ()
 	{
-#if UNITY_3_5
-		NGUIEditorTools.DrawProperty("Pivot", serializedObject, "mPivot");
-#else
 		SerializedProperty pv = serializedObject.FindProperty("mPivot");
 
 		if (pv.hasMultipleDifferentValues)
 		{
+			// TODO: Doing this doesn't keep the widget's position where it was. Another approach is needed.
 			NGUIEditorTools.DrawProperty("Pivot", serializedObject, "mPivot");
 		}
 		else
@@ -936,16 +944,22 @@ public class UIWidgetInspector : Editor
 			// Pivot point -- the new, more visual style
 			GUILayout.BeginHorizontal();
 			GUILayout.Label("Pivot", GUILayout.Width(76f));
+#if !UNITY_3_5
 			Toggle("\u25C4", "ButtonLeft", UIWidget.Pivot.Left, true);
 			Toggle("\u25AC", "ButtonMid", UIWidget.Pivot.Center, true);
 			Toggle("\u25BA", "ButtonRight", UIWidget.Pivot.Right, true);
+#else
+			Toggle("<", "ButtonLeft", UIWidget.Pivot.Left, true);
+			Toggle("|", "ButtonMid", UIWidget.Pivot.Center, true);
+			Toggle(">", "ButtonRight", UIWidget.Pivot.Right, true);
+#endif
 			Toggle("\u25B2", "ButtonLeft", UIWidget.Pivot.Top, false);
 			Toggle("\u258C", "ButtonMid", UIWidget.Pivot.Center, false);
 			Toggle("\u25BC", "ButtonRight", UIWidget.Pivot.Bottom, false);
+
 			GUILayout.EndHorizontal();
 			pv.enumValueIndex = (int)mWidget.pivot;
 		}
-#endif
 	}
 
 	/// <summary>

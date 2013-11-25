@@ -34,7 +34,6 @@ public class UICreateWidgetWizard : EditorWindow
 	}
 
 	static WidgetType mWidgetType = WidgetType.Button;
-	static string mSprite = "";
 	static string mButton = "";
 	static string mImage0 = "";
 	static string mImage1 = "";
@@ -54,7 +53,7 @@ public class UICreateWidgetWizard : EditorWindow
 	static Color mColor = Color.white;
 	static bool mLoaded = false;
 	static bool mScrollCL = true;
-	static UIScrollBar.Direction mScrollDir = UIScrollBar.Direction.Horizontal;
+	static UIScrollBar.FillDirection mFillDir = UIScrollBar.FillDirection.LeftToRight;
 
 	/// <summary>
 	/// Save the specified string into player prefs.
@@ -88,9 +87,8 @@ public class UICreateWidgetWizard : EditorWindow
 		EditorPrefs.SetInt("NGUI Widget Type", (int)mWidgetType);
 		EditorPrefs.SetInt("NGUI Color", NGUIMath.ColorToInt(mColor));
 		EditorPrefs.SetBool("NGUI ScrollCL", mScrollCL);
-		EditorPrefs.SetInt("NGUI Scroll Dir", (int)mScrollDir);
+		EditorPrefs.SetInt("NGUI Fill Dir", (int)mFillDir);
 
-		SaveString("NGUI Sprite", mSprite);
 		SaveString("NGUI Button", mButton);
 		SaveString("NGUI Image 0", mImage0);
 		SaveString("NGUI Image 1", mImage1);
@@ -117,12 +115,11 @@ public class UICreateWidgetWizard : EditorWindow
 	static void Load ()
 	{
 		mWidgetType = (WidgetType)EditorPrefs.GetInt("NGUI Widget Type", 0);
-		mScrollDir = (UIScrollBar.Direction)EditorPrefs.GetInt("NGUI Scroll Dir", 0);
+		mFillDir = (UIScrollBar.FillDirection)EditorPrefs.GetInt("NGUI Fill Dir", 0);
 
 		int color = EditorPrefs.GetInt("NGUI Color", -1);
 		if (color != -1) mColor = NGUIMath.IntToColor(color);
 
-		mSprite		= LoadString("NGUI Sprite");
 		mButton		= LoadString("NGUI Button");
 		mImage0		= LoadString("NGUI Image 0");
 		mImage1		= LoadString("NGUI Image 1");
@@ -158,7 +155,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 	void OnSelectFont (Object obj)
 	{
-		NGUISettings.bitmapFont = obj as UIFont;
+		NGUISettings.ambigiousFont = obj as UIFont;
 		Repaint();
 	}
 
@@ -206,13 +203,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 		if (ShouldCreate(go, NGUISettings.ambigiousFont != null))
 		{
-			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
-			lbl.ambigiousFont = NGUISettings.ambigiousFont;
-			lbl.fontSize = NGUISettings.fontSize;
-			lbl.text = "New Label";
-			lbl.color = mColor;
-			lbl.AssumeNaturalSize();
-			Selection.activeGameObject = lbl.gameObject;
+			Selection.activeGameObject = NGUISettings.AddLabel(go).gameObject;
 		}
 	}
 
@@ -220,13 +211,13 @@ public class UICreateWidgetWizard : EditorWindow
 	/// Sprite creation function.
 	/// </summary>
 
-	void CreateSprite (GameObject go, string field)
+	void CreateSprite (GameObject go)
 	{
 		if (NGUISettings.atlas != null)
 		{
-			NGUIEditorTools.DrawSpriteField("Sprite", "Sprite that will be created", NGUISettings.atlas, field, OnSprite, GUILayout.Width(120f));
+			NGUIEditorTools.DrawSpriteField("Sprite", "Sprite that will be created", NGUISettings.atlas, NGUISettings.selectedSprite, OnSprite, GUILayout.Width(120f));
 
-			if (!string.IsNullOrEmpty(field))
+			if (!string.IsNullOrEmpty(NGUISettings.selectedSprite))
 			{
 				GUILayout.BeginHorizontal();
 				NGUISettings.pivot = (UIWidget.Pivot)EditorGUILayout.EnumPopup("Pivot", NGUISettings.pivot, GUILayout.Width(200f));
@@ -238,17 +229,11 @@ public class UICreateWidgetWizard : EditorWindow
 
 		if (ShouldCreate(go, NGUISettings.atlas != null))
 		{
-			UISprite sprite = NGUITools.AddWidget<UISprite>(go);
-			sprite.name = sprite.name + " (" + field + ")";
-			sprite.atlas = NGUISettings.atlas;
-			sprite.spriteName = field;
-			sprite.pivot = NGUISettings.pivot;
-			sprite.MakePixelPerfect();
-			Selection.activeGameObject = sprite.gameObject;
+			Selection.activeGameObject = NGUISettings.AddSprite(go).gameObject;
 		}
 	}
 
-	void OnSprite (string val) { mSprite = val; Save(); Repaint(); }
+	void OnSprite (string val) { NGUISettings.selectedSprite = val; Repaint(); }
 
 	/// <summary>
 	/// UI Texture doesn't do anything other than creating the widget.
@@ -258,8 +243,7 @@ public class UICreateWidgetWizard : EditorWindow
 	{
 		if (ShouldCreate(go, true))
 		{
-			UITexture tex = NGUITools.AddWidget<UITexture>(go);
-			Selection.activeGameObject = tex.gameObject;
+			Selection.activeGameObject = NGUISettings.AddTexture(go).gameObject;
 		}
 	}
 
@@ -443,16 +427,16 @@ public class UICreateWidgetWizard : EditorWindow
 			NGUIEditorTools.DrawSpriteField("Foreground", "Sprite used for the foreground (thumb)", NGUISettings.atlas, mScrollFG, OnScrollFG, GUILayout.Width(120f));
 
 			GUILayout.BeginHorizontal();
-			UIScrollBar.Direction dir = (UIScrollBar.Direction)EditorGUILayout.EnumPopup("Direction", mScrollDir, GUILayout.Width(200f));
+			UIScrollBar.FillDirection dir = (UIScrollBar.FillDirection)EditorGUILayout.EnumPopup("Direction", mFillDir, GUILayout.Width(200f));
 			GUILayout.Space(20f);
 			GUILayout.Label("Add colliders?", GUILayout.Width(90f));
 			bool draggable = EditorGUILayout.Toggle(mScrollCL);
 			GUILayout.EndHorizontal();
 
-			if (mScrollCL != draggable || mScrollDir != dir)
+			if (mScrollCL != draggable || mFillDir != dir)
 			{
 				mScrollCL = draggable;
-				mScrollDir = dir;
+				mFillDir = dir;
 				Save();
 			}
 		}
@@ -482,9 +466,9 @@ public class UICreateWidgetWizard : EditorWindow
 			fg.spriteName = mScrollFG;
 
 			UIScrollBar sb = go.AddComponent<UIScrollBar>();
-			sb.background = bg;
-			sb.foreground = fg;
-			sb.direction = mScrollDir;
+			sb.foregroundWidget = fg;
+			sb.backgroundWidget = bg;
+			sb.fillDirection = mFillDir;
 			sb.barSize = 0.3f;
 			sb.value = 0.3f;
 			sb.ForceUpdate();
@@ -557,7 +541,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 			// Add the slider script
 			UISlider uiSlider = go.AddComponent<UISlider>();
-			uiSlider.foreground = front.transform;
+			uiSlider.foregroundWidget = front;
 
 			// Thumb sprite
 			if (slider)
@@ -684,6 +668,7 @@ public class UICreateWidgetWizard : EditorWindow
 			UILabel lbl = NGUITools.AddWidget<UILabel>(go);
 			lbl.ambigiousFont = NGUISettings.ambigiousFont;
 			lbl.fontSize = NGUISettings.fontSize;
+			lbl.fontStyle = NGUISettings.fontStyle;
 			lbl.text = go.name;
 			lbl.pivot = UIWidget.Pivot.Left;
 			lbl.cachedTransform.localPosition = new Vector3(fgPadding.x, 0f, 0f);
@@ -695,13 +680,13 @@ public class UICreateWidgetWizard : EditorWindow
 			// Add the popup list
 			UIPopupList list = go.AddComponent<UIPopupList>();
 			list.atlas = NGUISettings.atlas;
-			if (NGUISettings.bitmapFont != null) list.bitmapFont = NGUISettings.bitmapFont;
-			else list.trueTypeFont = NGUISettings.trueTypeFont;
+			list.ambigiousFont = NGUISettings.ambigiousFont;
 			list.fontSize = NGUISettings.fontSize;
+			list.fontStyle = NGUISettings.fontStyle;
 			list.backgroundSprite = mListBG;
 			list.highlightSprite = mListHL;
 			list.padding = hlPadding;
-			if (isDropDown) list.textLabel = lbl;
+			if (isDropDown) EventDelegate.Add(list.onChange, lbl.SetCurrentSelection);
 			for (int i = 0; i < 5; ++i) list.items.Add(isDropDown ? ("List Option " + i) : ("Menu Option " + i));
 
 			// Add the scripts
@@ -728,17 +713,7 @@ public class UICreateWidgetWizard : EditorWindow
 	UILabelInspector.FontType mType = UILabelInspector.FontType.Bitmap;
 #endif
 
-	void OnBitmapFont (Object obj)
-	{
-		NGUISettings.bitmapFont = obj as UIFont;
-		NGUISettings.trueTypeFont = null;
-	}
-
-	void OnDynamicFont (Object obj)
-	{
-		NGUISettings.trueTypeFont = obj as Font;
-		NGUISettings.bitmapFont = null;
-	}
+	void OnFont (Object obj) { NGUISettings.ambigiousFont = obj; }
 
 	/// <summary>
 	/// Draw the custom wizard.
@@ -752,7 +727,8 @@ public class UICreateWidgetWizard : EditorWindow
 			mLoaded = true;
 			Load();
 #if DYNAMIC_FONT
-			mType = (NGUISettings.bitmapFont != null) ? UILabelInspector.FontType.Bitmap : UILabelInspector.FontType.Dynamic;
+			Object font = NGUISettings.ambigiousFont;
+			mType = ((font != null) && (font is UIFont)) ? UILabelInspector.FontType.Bitmap : UILabelInspector.FontType.Dynamic;
 #else
 			mType = UILabelInspector.FontType.Bitmap;
 #endif
@@ -785,11 +761,11 @@ public class UICreateWidgetWizard : EditorWindow
 			{
 				if (mType == UILabelInspector.FontType.Bitmap)
 				{
-					ComponentSelector.Show<UIFont>(OnBitmapFont);
+					ComponentSelector.Show<UIFont>(OnFont);
 				}
 				else
 				{
-					ComponentSelector.Show<Font>(OnDynamicFont);
+					ComponentSelector.Show<Font>(OnFont);
 				}
 			}
 
@@ -798,18 +774,15 @@ public class UICreateWidgetWizard : EditorWindow
 
 			if (mType == UILabelInspector.FontType.Dynamic)
 			{
-				NGUISettings.trueTypeFont = (Font)EditorGUILayout.ObjectField(NGUISettings.trueTypeFont, typeof(Font), false, GUILayout.Width(140f));
-				if (GUI.changed) NGUISettings.bitmapFont = null;
+				NGUISettings.ambigiousFont = EditorGUILayout.ObjectField(NGUISettings.ambigiousFont, typeof(Font), false, GUILayout.Width(140f));
 			}
 			else
 			{
-				NGUISettings.bitmapFont = (UIFont)EditorGUILayout.ObjectField(NGUISettings.bitmapFont, typeof(UIFont), false, GUILayout.Width(140f));
-				if (GUI.changed) NGUISettings.trueTypeFont = null;
+				NGUISettings.ambigiousFont = EditorGUILayout.ObjectField(NGUISettings.ambigiousFont, typeof(UIFont), false, GUILayout.Width(140f));
 			}
 			mType = (UILabelInspector.FontType)EditorGUILayout.EnumPopup(mType, GUILayout.Width(62f));
 #else
-			NGUISettings.bitmapFont = (UIFont)EditorGUILayout.ObjectField(NGUISettings.bitmapFont, typeof(UIFont), false, GUILayout.Width(140f));
-			mType = UILabelInspector.FontType.Bitmap;
+			NGUISettings.ambigiousFont = EditorGUILayout.ObjectField(NGUISettings.ambigiousFont, typeof(UIFont), false, GUILayout.Width(140f));
 #endif
 			GUILayout.Label("size", GUILayout.Width(30f));
 			EditorGUI.BeginDisabledGroup(mType == UILabelInspector.FontType.Bitmap);
@@ -830,7 +803,7 @@ public class UICreateWidgetWizard : EditorWindow
 			switch (mWidgetType)
 			{
 				case WidgetType.Label:			CreateLabel(go); break;
-				case WidgetType.Sprite:			CreateSprite(go, mSprite); break;
+				case WidgetType.Sprite:			CreateSprite(go); break;
 				case WidgetType.Texture:		CreateSimpleTexture(go); break;
 				case WidgetType.Button:			CreateButton(go); break;
 				case WidgetType.ImageButton:	CreateImageButton(go); break;
@@ -842,6 +815,8 @@ public class UICreateWidgetWizard : EditorWindow
 				case WidgetType.PopupMenu:		CreatePopup(go, false); break;
 				case WidgetType.ScrollBar:		CreateScrollBar(go); break;
 			}
+
+			EditorGUILayout.HelpBox("Widget Tool has become far less useful with NGUI 3.0.6. Search the Project view for 'Control', then simply drag & drop one of them into your Scene View.", MessageType.Warning);
 		}
 	}
 }

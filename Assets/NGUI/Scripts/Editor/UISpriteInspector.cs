@@ -25,6 +25,7 @@ public class UISpriteInspector : UIWidgetInspector
 		SerializedProperty sp = serializedObject.FindProperty("mAtlas");
 		sp.objectReferenceValue = obj;
 		serializedObject.ApplyModifiedProperties();
+		NGUISettings.atlas = obj as UIAtlas;
 	}
 
 	/// <summary>
@@ -37,6 +38,7 @@ public class UISpriteInspector : UIWidgetInspector
 		SerializedProperty sp = serializedObject.FindProperty("mSpriteName");
 		sp.stringValue = spriteName;
 		serializedObject.ApplyModifiedProperties();
+		NGUISettings.selectedSprite = spriteName;
 	}
 
 	/// <summary>
@@ -54,7 +56,9 @@ public class UISpriteInspector : UIWidgetInspector
 		{
 			if (atlas != null)
 			{
-				NGUIEditorTools.Select((atlas.objectReferenceValue as UIAtlas).gameObject);
+				UIAtlas atl = atlas.objectReferenceValue as UIAtlas;
+				NGUISettings.atlas = atl;
+				NGUIEditorTools.Select(atl.gameObject);
 			}
 		}
 		GUILayout.EndHorizontal();

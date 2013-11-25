@@ -20,6 +20,14 @@ public class ComponentSelector : ScriptableWizard
 	OnSelectionCallback mCallback;
 	Object[] mObjects;
 
+	static string GetName (System.Type t)
+	{
+		string s = t.ToString();
+		s = s.Replace("UnityEngine.", "");
+		if (s.StartsWith("UI")) s = s.Substring(2);
+		return s;
+	}
+
 	/// <summary>
 	/// Draw a button + object selection combo filtering specified types.
 	/// </summary>
@@ -57,10 +65,33 @@ public class ComponentSelector : ScriptableWizard
 	static public void Show<T> (OnSelectionCallback cb) where T : Object
 	{
 		System.Type type = typeof(T);
-		ComponentSelector comp = ScriptableWizard.DisplayWizard<ComponentSelector>("Select " + type.ToString());
+		ComponentSelector comp = ScriptableWizard.DisplayWizard<ComponentSelector>("Select a " + GetName(type));
 		comp.mType = type;
 		comp.mCallback = cb;
-		comp.mObjects = Resources.FindObjectsOfTypeAll(type);
+
+		if (type == typeof(UIAtlas) || type == typeof(UIFont))
+		{
+			BetterList<T> list = new BetterList<T>();
+			string[] paths = AssetDatabase.GetAllAssetPaths();
+
+			for (int i = 0; i < paths.Length; ++i)
+			{
+				string path = paths[i];
+				
+				if (path.EndsWith(".prefab", System.StringComparison.OrdinalIgnoreCase))
+				{
+					GameObject obj = AssetDatabase.LoadMainAssetAtPath(path) as GameObject;
+
+					if (obj != null && PrefabUtility.GetPrefabType(obj) == PrefabType.Prefab)
+					{
+						T t = obj.GetComponent(typeof(T)) as T;
+						if (t != null) list.Add(t);
+					}
+				}
+			}
+			comp.mObjects = list.ToArray();
+		}
+		else comp.mObjects = Resources.FindObjectsOfTypeAll(typeof(T));
 	}
 
 	/// <summary>
@@ -70,12 +101,12 @@ public class ComponentSelector : ScriptableWizard
 	void OnGUI ()
 	{
 		NGUIEditorTools.SetLabelWidth(80f);
-		GUILayout.Label("Recently used components", "LODLevelNotifyText");
+		GUILayout.Label("Select a " + GetName(mType), "LODLevelNotifyText");
 		NGUIEditorTools.DrawSeparator();
 
 		if (mObjects.Length == 0)
 		{
-			EditorGUILayout.HelpBox("No recently used " + mType.ToString() + " components found.\nTry drag & dropping one instead, or creating a new one.", MessageType.Info);
+			EditorGUILayout.HelpBox("No " + GetName(mType) + " components found.\nTry creating a new one.", MessageType.Info);
 
 			bool isDone = false;
 

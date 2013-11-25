@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -44,7 +44,7 @@ public class DragDropItem : MonoBehaviour
 		if (container != null)
 		{
 			// Container found -- parent this object to the container
-			mTrans.parent = container.transform;
+			mTrans.parent = (container.reparentTarget != null) ? container.reparentTarget : container.transform;
 
 			Vector3 pos = mTrans.localPosition;
 			pos.z = 0f;
@@ -57,8 +57,8 @@ public class DragDropItem : MonoBehaviour
 		}
 
 		// Restore the depth
-		UIWidget[] widgets = GetComponentsInChildren<UIWidget>();
-		for (int i = 0; i < widgets.Length; ++i) widgets[i].depth = widgets[i].depth - 100;
+		//UIWidget[] widgets = GetComponentsInChildren<UIWidget>();
+		//for (int i = 0; i < widgets.Length; ++i) widgets[i].depth = widgets[i].depth - 100;
 
 		// Notify the table of this change
 		UpdateTable();
@@ -97,8 +97,8 @@ public class DragDropItem : MonoBehaviour
 				mTrans.localPosition = pos;
 
 				// Inflate the depth so that the dragged item appears in front of everything else
-				UIWidget[] widgets = GetComponentsInChildren<UIWidget>();
-				for (int i = 0; i < widgets.Length; ++i) widgets[i].depth = widgets[i].depth + 100;
+				//UIWidget[] widgets = GetComponentsInChildren<UIWidget>();
+				//for (int i = 0; i < widgets.Length; ++i) widgets[i].depth = widgets[i].depth + 100;
 
 				NGUITools.MarkParentAsChanged(gameObject);
 			}
@@ -130,21 +130,17 @@ public class DragDropItem : MonoBehaviour
 					UICamera.current.stickyPress = true;
 				}
 			}
-			else
+			else if (mSticky)
 			{
-				mPressed = false;
-
-				if (mSticky)
-				{
-					mSticky = false;
-					UICamera.current.stickyPress = false;
-				}
+				mSticky = false;
+				UICamera.current.stickyPress = false;
 			}
 
 			mIsDragging = false;
 			Collider col = collider;
 			if (col != null) col.enabled = !isPressed;
 			if (!isPressed) Drop();
+			mPressed = isPressed;
 		}
 	}
 }

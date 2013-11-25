@@ -48,6 +48,35 @@ public class UIPopupList : UIWidgetContainer
 	public Font trueTypeFont;
 
 	/// <summary>
+	/// Font used by the popup list. Conveniently wraps both dynamic and bitmap fonts into one property.
+	/// </summary>
+
+	public Object ambigiousFont
+	{
+		get
+		{
+			if (trueTypeFont != null) return trueTypeFont;
+			if (bitmapFont != null) return bitmapFont;
+			return font;
+		}
+		set
+		{
+			if (value is Font)
+			{
+				trueTypeFont = value as Font;
+				bitmapFont = null;
+				font = null;
+			}
+			else if (value is UIFont)
+			{
+				bitmapFont = value as UIFont;
+				trueTypeFont = null;
+				font = null;
+			}
+		}
+	}
+
+	/// <summary>
 	/// Size of the font to use for the popup list's labels.
 	/// </summary>
 
@@ -58,12 +87,6 @@ public class UIPopupList : UIWidgetContainer
 	/// </summary>
 
 	public FontStyle fontStyle = FontStyle.Normal;
-
-	/// <summary>
-	/// Label with text to auto-update, if any.
-	/// </summary>
-
-	public UILabel textLabel;
 
 	/// <summary>
 	/// Name of the sprite used to create the popup's background.
@@ -111,7 +134,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Color tint applied to the highlighter.
 	/// </summary>
 
-	public Color highlightColor = new Color(152f / 255f, 1f, 51f / 255f, 1f);
+	public Color highlightColor = new Color(225f / 255f, 200f / 255f, 150f / 255f, 1f);
 
 	/// <summary>
 	/// Whether the popup list is animated or not. Disable for better performance.
@@ -148,6 +171,12 @@ public class UIPopupList : UIWidgetContainer
 	[HideInInspector][SerializeField] float textScale = 0f;
 	[HideInInspector][SerializeField] UIFont font; // Use 'bitmapFont' instead
 
+	// This functionality is no longer needed as the same can be achieved by choosing a
+	// OnValueChange notification targeting a label's SetCurrentSelection function.
+	// If your code was list.textLabel = myLabel, change it to:
+	// EventDelegate.Add(list.onChange, lbl.SetCurrentSelection);
+	[HideInInspector][SerializeField] UILabel textLabel;
+
 	public delegate void LegacyEvent (string val);
 	LegacyEvent mLegacyEvent;
 
@@ -172,47 +201,13 @@ public class UIPopupList : UIWidgetContainer
 		}
 		set
 		{
-			bool trigger = false;
-
-			if (mSelectedItem != value)
-			{
-				mSelectedItem = value;
-				if (mSelectedItem == null) return;
+			mSelectedItem = value;
+			if (mSelectedItem == null) return;
 #if UNITY_EDITOR
-				if (!Application.isPlaying) return;
+			if (!Application.isPlaying) return;
 #endif
-				if (textLabel != null)
-				{
-					textLabel.text = (isLocalized) ? Localization.Localize(value) : value;
-				}
-				trigger = true;
-			}
-
-#if UNITY_EDITOR
-			if (Application.isPlaying)
-#endif
-			{
-				if (mSelectedItem != null && (trigger || textLabel == null))
-				{
-					current = this;
-
-					// Legacy functionality
-					if (mLegacyEvent != null) mLegacyEvent(mSelectedItem);
-
-					if (EventDelegate.IsValid(onChange))
-					{
-						EventDelegate.Execute(onChange);
-					}
-					else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
-					{
-						// Legacy functionality support (for backwards compatibility)
-						eventReceiver.SendMessage(functionName, mSelectedItem, SendMessageOptions.DontRequireReceiver);
-					}
-					current = null;
-				}
-			}
-			// Clear the selection for menu items
-			if (textLabel == null) mSelectedItem = null;
+			if (mSelectedItem != null)
+				TriggerCallbacks();
 		}
 	}
 
@@ -254,6 +249,29 @@ public class UIPopupList : UIWidgetContainer
 	/// </summary>
 
 	float activeFontScale { get { return (trueTypeFont != null || bitmapFont == null) ? 1f : (float)fontSize / bitmapFont.defaultSize; } }
+
+	/// <summary>
+	/// Trigger all event notification callbacks.
+	/// </summary>
+
+	protected void TriggerCallbacks ()
+	{
+		current = this;
+
+		// Legacy functionality
+		if (mLegacyEvent != null) mLegacyEvent(mSelectedItem);
+
+		if (EventDelegate.IsValid(onChange))
+		{
+			EventDelegate.Execute(onChange);
+		}
+		else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+		{
+			// Legacy functionality support (for backwards compatibility)
+			eventReceiver.SendMessage(functionName, mSelectedItem, SendMessageOptions.DontRequireReceiver);
+		}
+		current = null;
+	}
 
 	/// <summary>
 	/// Remove legacy functionality.
@@ -322,6 +340,7 @@ public class UIPopupList : UIWidgetContainer
 			{
 				trueTypeFont = fnt.dynamicFont;
 				fontStyle = fnt.dynamicFontStyle;
+				fontSize = fnt.defaultSize;
 				mUseDynamicFont = true;
 			}
 			else
@@ -329,7 +348,6 @@ public class UIPopupList : UIWidgetContainer
 				bitmapFont = fnt;
 				mUseDynamicFont = false;
 			}
-			fontSize = fnt.defaultSize;
 		}
 		else
 		{
@@ -344,23 +362,29 @@ public class UIPopupList : UIWidgetContainer
 
 	void Start ()
 	{
+		// Auto-upgrade legacy functionality
+		if (textLabel != null)
+		{
+			EventDelegate.Add(onChange, textLabel.SetCurrentSelection);
+			textLabel = null;
+#if UNITY_EDITOR
+			UnityEditor.EditorUtility.SetDirty(this);
+#endif
+		}
+
 		if (Application.isPlaying)
 		{
-			if (textLabel != null)
+			// Automatically choose the first item
+			if (string.IsNullOrEmpty(mSelectedItem))
 			{
-				// Automatically choose the first item
-				if (string.IsNullOrEmpty(mSelectedItem))
-				{
-					if (items.Count > 0) value = items[0];
-				}
-				else
-				{
-					string s = mSelectedItem;
-					mSelectedItem = null;
-					value = s;
-				}
+				if (items.Count > 0) value = items[0];
 			}
-			else mSelectedItem = null;
+			else
+			{
+				string s = mSelectedItem;
+				mSelectedItem = null;
+				value = s;
+			}
 		}
 	}
 
@@ -368,13 +392,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Localize the text label.
 	/// </summary>
 
-	void OnLocalize (Localization loc)
-	{
-		if (isLocalized && textLabel != null && !string.IsNullOrEmpty(mSelectedItem))
-		{
-			textLabel.text = loc.Get(mSelectedItem);
-		}
-	}
+	void OnLocalize (Localization loc) { if (isLocalized) TriggerCallbacks(); }
 
 	/// <summary>
 	/// Visibly highlight the specified transform by moving the highlight sprite to be over it.
@@ -634,6 +652,7 @@ public class UIPopupList : UIWidgetContainer
 			float dynScale = activeFontScale;
 			float labelHeight = fontHeight * dynScale;
 			float x = 0f, y = -padding.y;
+			int labelFontSize = (bitmapFont != null) ? bitmapFont.defaultSize : fontSize;
 			List<UILabel> labels = new List<UILabel>();
 
 			// Run through all items and create labels for each one
@@ -645,7 +664,7 @@ public class UIPopupList : UIWidgetContainer
 				lbl.pivot = UIWidget.Pivot.TopLeft;
 				lbl.bitmapFont = bitmapFont;
 				lbl.trueTypeFont = trueTypeFont;
-				lbl.fontSize = fontSize;
+				lbl.fontSize = labelFontSize;
 				lbl.fontStyle = fontStyle;
 				lbl.text = (isLocalized && Localization.instance != null) ? Localization.instance.Get(s) : s;
 				lbl.color = textColor;

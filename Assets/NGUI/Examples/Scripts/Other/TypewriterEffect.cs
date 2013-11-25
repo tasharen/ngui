@@ -21,9 +21,8 @@ public class TypewriterEffect : MonoBehaviour
 		{
 			mLabel = GetComponent<UILabel>();
 			mLabel.supportEncoding = false;
-			mLabel.symbolStyle = UIFont.SymbolStyle.None;
-			mLabel.bitmapFont.WrapText(mLabel.text, mLabel.fontSize, out mText, mLabel.width, mLabel.height,
-				mLabel.maxLineCount, false, UIFont.SymbolStyle.None);
+			mLabel.symbolStyle = NGUIText.SymbolStyle.None;
+			mText = mLabel.processedText;
 		}
 
 		if (mOffset < mText.Length)

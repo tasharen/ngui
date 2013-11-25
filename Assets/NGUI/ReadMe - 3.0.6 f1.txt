@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-                Version 3.0.5
+            Version 3.0.6 f1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -34,6 +34,48 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.6
+- NEW: NGUI now has new written documentation.
+- NEW: NGUI now has an abundance of context-sensitive help. Just right click on an NGUI component and choose the Help option.
+- NEW: NGUI now has robust context menus letting you add, create and modify widgets by right-clicking on stuff in the Scene View.
+- NEW: Added snapping support for widget placement. Edge selection restricted to siblings and parent.
+- NEW: You can now find an assortment of ready-made controls ready to be drag & dropped into your scenes (search for "Wooden").
+- NEW: You can now drag & drop GUI prefabs from your Project Folder right into the Scene View. No need to create the UI beforehand.
+- NEW: You can now copy/paste label styles by right-clicking the UILabel script in Inspector.
+- NEW: Redesigned the draggable panel class a bit, and renamed it to UIScrollView. UIDragPanelContents is now UIDragScrollView.
+- NEW: Labels can now have gradients.
+- NEW: Clipped panels now have handles you can drag around instead of adjusting clipping in inspector.
+- NEW: Added a new widget type capable of drawing Unity 4.3 sprites.
+- NEW: Added UIToggle.GetActiveToggle.
+- NEW: You can now specify a material on dynamic font-using UILabels.
+- NEW: You can now specify character spacing on labels, and it works with both bitmap and dynamic fonts.
+- NEW: Labels set to maintain their crispness will now take UIRoot's size into account, resulting in crisp labels with fixed size UIs.
+- NEW: Added a simple script that makes it possible to center a scrollable panel on a child when clicked on.
+- NEW: Redesigned the scroll bar and the slider components. They now also derive from a new common class (Progress Bar).
+- NEW: UIButtonKeyBinding has been replaced with UIKeyBinding and its functionality has been enhanced.
+- FIX: Panels will now add rigidbodies to themselves since Unity 4.3 mentions it should improve performance.
+- FIX: UIScrollView's movement restriction now makes sense (no more weird 'scale')
+- FIX: Draggable panels should no longer move on Play.
+- FIX: Improved performance by reducing GC allocations and mesh assignments.
+- FIX: Typewriter and text list scripts can now be used with dynamic fonts.
+- FIX: Reference atlas references should no longer get broken when modifying sprites.
+- FIX: Popup list now offers a way to change the font's size even for fixed size fonts.
+- FIX: Popup list was not enveloping the content correctly.
+- FIX: Atlas and font selector will now show all existing assets, not just recently used ones.
+- FIX: Atlas maker should no longer throw an exception when trying to edit old atlases (SciFi etc).
+- FIX: Enabling and disabling widgets will no longer cause the draw call list to be rebuilt unless it's necessary.
+- FIX: Improving the process of NGUI remembering the last used values.
+- FIX: Drag handles will now hide if there is not enough space to draw them.
+- FIX: Anchors and stretch scripts set to "run only once" will still respond to screen size changes.
+- FIX: Switching panel to clipped mode then back should refresh the shader correctly.
+- FIX: Moving widgets around no longer causes their buffers to get rebuilt. Just re-transformed.
+- FIX: Added extra code to ensure that draw calls won't get orphaned.
+- FIX: Panel alpha is now cumulative (parents affect children).
+- FIX: Got rid of old double-buffering code that was causing issues.
+- FIX: More Win8 tweaks.
+- DEL: UIPopupList no longer has a 'textLabel' option. Instead use label's SetCurrentSelection for OnValueChanged.
+- DEL: UIGrid and UITable no longer have 'repositionNow' member variable. Right-click it to execute it instead.
 
 3.0.5
 - NEW: Added a way to set Localization's language using specified name and dictionary combo

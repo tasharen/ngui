@@ -248,6 +248,9 @@ static public class NGUITools
 				}
 				box = go.AddComponent<BoxCollider>();
 				box.isTrigger = true;
+
+				UIWidget widget = go.GetComponent<UIWidget>();
+				if (widget != null) widget.autoResizeBoxCollider = true;
 			}
 
 			UpdateWidgetCollider(box, considerInactive);
@@ -295,9 +298,22 @@ static public class NGUITools
 		if (box != null)
 		{
 			GameObject go = box.gameObject;
-			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
-			box.center = b.center;
-			box.size = new Vector3(b.size.x, b.size.y, 0f);
+			UIWidget w = go.GetComponent<UIWidget>();
+
+			if (w != null)
+			{
+				Vector3[] corners = w.localCorners;
+				Vector3 center = (corners[2] + corners[0]) * 0.5f;
+				Vector3 size = (corners[2] - corners[0]);
+				box.center = center;
+				box.size = size;
+			}
+			else
+			{
+				Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
+				box.center = b.center;
+				box.size = new Vector3(b.size.x, b.size.y, 0f);
+			}
 #if UNITY_EDITOR
 			UnityEditor.EditorUtility.SetDirty(box);
 #endif
@@ -330,15 +346,36 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Convenience method that works without warnings in both Unity 3 and 4.
+	/// </summary>
+
+	static public void RegisterUndo (UnityEngine.Object obj, string name)
+	{
+#if UNITY_EDITOR
+ #if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
+		UnityEditor.Undo.RegisterUndo(obj, name);
+ #else
+		UnityEditor.Undo.RecordObject(obj, name);
+ #endif
+		UnityEditor.EditorUtility.SetDirty(obj);
+#endif
+	}
+
+	/// <summary>
 	/// Add a new child game object.
 	/// </summary>
 
-	static public GameObject AddChild (GameObject parent)
+	static public GameObject AddChild (GameObject parent) { return AddChild(parent, true); }
+
+	/// <summary>
+	/// Add a new child game object.
+	/// </summary>
+
+	static public GameObject AddChild (GameObject parent, bool undo)
 	{
 		GameObject go = new GameObject();
-
-#if UNITY_EDITOR && !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
-		UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
+#if UNITY_EDITOR
+		if (undo) UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
 #endif
 		if (parent != null)
 		{
@@ -450,6 +487,9 @@ static public class NGUITools
 				for (int i = 0; i < panels.Length; ++i)
 				{
 					UIPanel p = panels[i];
+#if UNITY_EDITOR
+					RegisterUndo(p, "Depth Change");
+#endif
 					p.depth = p.depth + adjustment;
 				}
 				return 1;
@@ -461,6 +501,9 @@ static public class NGUITools
 				for (int i = 0, imax = widgets.Length; i < imax; ++i)
 				{
 					UIWidget w = widgets[i];
+#if UNITY_EDITOR
+					RegisterUndo(w, "Depth Change");
+#endif
 					w.depth = w.depth + adjustment;
 				}
 				return 2;
@@ -578,6 +621,17 @@ static public class NGUITools
 	static public T AddChild<T> (GameObject parent) where T : Component
 	{
 		GameObject go = AddChild(parent);
+		go.name = GetTypeName<T>();
+		return go.AddComponent<T>();
+	}
+
+	/// <summary>
+	/// Add a child object to the specified parent and attaches the specified script to it.
+	/// </summary>
+
+	static public T AddChild<T> (GameObject parent, bool undo) where T : Component
+	{
+		GameObject go = AddChild(parent, undo);
 		go.name = GetTypeName<T>();
 		return go.AddComponent<T>();
 	}
@@ -918,18 +972,10 @@ static public class NGUITools
 		if (t.GetComponent<UIAnchor>() == null && t.GetComponent<UIRoot>() == null)
 		{
 #if UNITY_EDITOR
-#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
-			UnityEditor.Undo.RegisterUndo(t, "Make Pixel-Perfect");
-#else
-			UnityEditor.Undo.RecordObject(t, "Make Pixel-Perfect");
+			RegisterUndo(t, "Make Pixel-Perfect");
 #endif
 			t.localPosition = Round(t.localPosition);
 			t.localScale = Round(t.localScale);
-			UnityEditor.EditorUtility.SetDirty(t);
-#else
-			t.localPosition = Round(t.localPosition);
-			t.localScale = Round(t.localScale);
-#endif
 		}
 
 		// Recurse into children
@@ -1050,4 +1096,23 @@ static public class NGUITools
 
 	[System.Obsolete("Use NGUIText.StripSymbols instead")]
 	static public string StripSymbols (string text) { return NGUIText.StripSymbols(text); }
+
+	/// <summary>
+	/// Extension for the game object that checks to see if the component already exists before adding a new one.
+	/// If the component is already present it will be returned instead.
+	/// </summary>
+
+	static public T AddMissingComponent<T> (this GameObject go) where T : Component
+	{
+		T comp = go.GetComponent<T>();
+		if (comp == null)
+		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+				RegisterUndo(go, "Add " + typeof(T));
+#endif
+			comp = go.AddComponent<T>();
+		}
+		return comp;
+	}
 }

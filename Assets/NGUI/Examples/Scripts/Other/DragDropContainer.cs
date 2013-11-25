@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2012 Tasharen Entertainment
+// Copyright ï¿½ 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -8,5 +8,5 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Examples/Drag and Drop Container")]
 public class DragDropContainer : MonoBehaviour
 {
-	// No code here. Attaching this script simply identifies it as a container for the DragDropObject script.
+	public Transform reparentTarget;
 }

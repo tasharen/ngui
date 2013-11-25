@@ -401,7 +401,7 @@ public class NGUIEditorTools
 			}
 
 			// No UI present -- create a new one
-			if (go == null) go = UICreateNewUIWizard.CreateNewUI();
+			if (go == null) go = UICreateNewUIWizard.CreateNewUI(UICreateNewUIWizard.CameraType.Simple2D);
 		}
 		return go;
 	}
@@ -1051,6 +1051,7 @@ public class NGUIEditorTools
 							spriteName = newName;
 							mEditedName = null;
 
+							NGUISettings.atlas = atlas;
 							NGUISettings.selectedSprite = spriteName;
 						}
 					}
@@ -1065,6 +1066,7 @@ public class NGUIEditorTools
 
 				if (GUILayout.Button("Edit", GUILayout.Width(40f)))
 				{
+					NGUISettings.atlas = atlas;
 					NGUISettings.selectedSprite = spriteName;
 					Select(atlas.gameObject);
 				}
@@ -1527,11 +1529,33 @@ public class NGUIEditorTools
 		BetterList<UIWidget> widgets = NGUIEditorTools.SceneViewRaycast(screenPos);
 		BetterList<UIWidgetContainer> containers = new BetterList<UIWidgetContainer>();
 		BetterList<MenuEntry> entries = new BetterList<MenuEntry>();
+		BetterList<UIPanel> panels = new BetterList<UIPanel>();
+
+		bool divider = false;
+		UIWidget topWidget = null;
+		UIPanel topPanel = null;
 
 		// Process widgets and their containers in the raycast order
 		for (int i = 0; i < widgets.size; ++i)
 		{
 			UIWidget w = widgets[i];
+			if (topWidget == null) topWidget = w;
+
+			UIPanel panel = w.panel;
+			if (topPanel == null) topPanel = panel;
+
+			if (panel != null && !panels.Contains(panel))
+			{
+				panels.Add(panel);
+
+				if (!divider)
+				{
+					entries.Add(null);
+					divider = true;
+				}
+				entries.Add(new MenuEntry(panel.name + " (panel)", panel.gameObject));
+			}
+
 			UIWidgetContainer wc = NGUITools.FindInParents<UIWidgetContainer>(w.cachedGameObject);
 
 			// If we get a new container, we should add it to the list
@@ -1542,29 +1566,71 @@ public class NGUIEditorTools
 				// Only proceed if there is no widget on the container
 				if (wc.gameObject != w.cachedGameObject)
 				{
-					if (i != 0) entries.Add(null);
+					if (!divider)
+					{
+						entries.Add(null);
+						divider = true;
+					}
 					entries.Add(new MenuEntry(wc.name + " (container)", wc.gameObject));
-					entries.Add(null);
 				}
 			}
 
 			string name = (i + 1 == widgets.size) ? (w.name + " (top-most)") : w.name;
 			entries.Add(new MenuEntry(name, w.gameObject));
+			divider = false;
 		}
+
+		// Common items used by NGUI
+		NGUIContextMenu.AddCommonItems(Selection.activeGameObject);
 
 		// Add widgets to the menu in the reverse order so that they are shown with the top-most widget first (on top)
 		for (int i = entries.size; i > 0; )
 		{
 			MenuEntry ent = entries[--i];
-			if (ent != null) NGUIContextMenu.AddItem(ent.name, Selection.activeGameObject == ent.go, OnMenuSelect, ent.go);
-			else NGUIContextMenu.AddSeparator("");
+
+			if (ent != null)
+			{
+				NGUIContextMenu.AddItem("Select/" + ent.name, Selection.activeGameObject == ent.go,
+					delegate(object go) { Selection.activeGameObject = (GameObject)go; }, ent.go);
+			}
+			else if (!divider)
+			{
+				NGUIContextMenu.AddSeparator("Select/");
+			}
 		}
+		NGUIContextMenu.AddHelp(Selection.activeGameObject, true);
 		NGUIContextMenu.Show();
+	}
+	/// <summary>
+	/// Load the asset at the specified path.
+	/// </summary>
+
+	static public Object LoadAsset (string path)
+	{
+		if (string.IsNullOrEmpty(path)) return null;
+		return AssetDatabase.LoadMainAssetAtPath(path);
 	}
 
 	/// <summary>
-	/// Menu item that selects a game object.
+	/// Convenience function to load an asset of specified type, given the full path to it.
 	/// </summary>
 
-	static void OnMenuSelect (object go) { Selection.activeGameObject = (GameObject)go; }
+	static public T LoadAsset<T> (string path) where T: Object
+	{
+		Object obj = LoadAsset(path);
+		if (obj == null) return null;
+
+		T val = obj as T;
+		if (val != null) return val;
+
+		if (typeof(T).IsSubclassOf(typeof(Component)))
+		{
+			if (obj.GetType() == typeof(GameObject))
+			{
+				GameObject go = obj as GameObject;
+				return go.GetComponent(typeof(T)) as T;
+			}
+		}
+		return null;
+	}
 }

@@ -42,10 +42,11 @@ public class UIAtlasInspector : Editor
 
 		foreach (UISprite sp in sprites)
 		{
-			if (sp.spriteName == sprite.name)
+			if (UIAtlas.CheckIfRelated(sp.atlas, mAtlas) && sp.spriteName == sprite.name)
 			{
+				UIAtlas atl = sp.atlas;
 				sp.atlas = null;
-				sp.atlas = mAtlas;
+				sp.atlas = atl;
 				EditorUtility.SetDirty(sp);
 			}
 		}

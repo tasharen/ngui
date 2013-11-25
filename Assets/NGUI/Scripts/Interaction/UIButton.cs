@@ -47,12 +47,12 @@ public class UIButton : UIButtonColor
 		else UpdateColor(false, true);
 	}
 
-	protected override void OnDisable()
-	{
-		//Collider col = collider;
-		//if (col != null) col.enabled = false;
-		if (mStarted) UpdateColor(false, false);
-	}
+	//protected override void OnDisable()
+	//{
+	//    //Collider col = collider;
+	//    //if (col != null) col.enabled = false;
+	//    if (mStarted) UpdateColor(false, false);
+	//}
 
 	public override void OnHover (bool isOver) { if (isEnabled) base.OnHover(isOver); }
 	public override void OnPress (bool isPressed) { if (isEnabled) base.OnPress(isPressed); }
@@ -108,7 +108,7 @@ public class UIButton : UIButtonColor
 			Color c = shouldBeEnabled ? defaultColor : disabledColor;
 			TweenColor tc = TweenColor.Begin(tweenTarget, 0.15f, c);
 
-			if (immediate)
+			if (tc != null && immediate)
 			{
 				tc.color = c;
 				tc.enabled = false;

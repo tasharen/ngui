@@ -278,27 +278,6 @@ public class UIFontInspector : Editor
 		// The font must be valid at this point for the rest of the options to show up
 		if (mFont.isDynamic || mFont.bmFont.isValid)
 		{
-			// Font spacing
-			GUILayout.BeginHorizontal();
-			{
-				NGUIEditorTools.SetLabelWidth(0f);
-				GUILayout.Label("Spacing", GUILayout.Width(60f));
-				GUILayout.Label("X", GUILayout.Width(12f));
-				int x = EditorGUILayout.IntField(mFont.horizontalSpacing);
-				GUILayout.Label("Y", GUILayout.Width(12f));
-				int y = EditorGUILayout.IntField(mFont.verticalSpacing);
-				GUILayout.Space(18f);
-				NGUIEditorTools.SetLabelWidth(80f);
-
-				if (mFont.horizontalSpacing != x || mFont.verticalSpacing != y)
-				{
-					NGUIEditorTools.RegisterUndo("Font Spacing", mFont);
-					mFont.horizontalSpacing = x;
-					mFont.verticalSpacing = y;
-				}
-			}
-			GUILayout.EndHorizontal();
-
 			if (mFont.atlas == null)
 			{
 				mView = View.Font;
@@ -351,6 +330,7 @@ public class UIFontInspector : Editor
 						{
 							if (mFont.atlas != null)
 							{
+								NGUISettings.atlas = mFont.atlas;
 								NGUISettings.selectedSprite = sym.spriteName;
 								NGUIEditorTools.Select(mFont.atlas.gameObject);
 							}

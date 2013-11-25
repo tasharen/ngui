@@ -11,7 +11,6 @@ using System.Collections.Generic;
 /// If you want the cells to automatically set their scale based on the dimensions of their content, take a look at UITable.
 /// </summary>
 
-[ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/Grid")]
 public class UIGrid : UIWidgetContainer
 {
@@ -48,12 +47,6 @@ public class UIGrid : UIWidgetContainer
 	public float cellHeight = 200f;
 
 	/// <summary>
-	/// Reposition the children on the next Update().
-	/// </summary>
-
-	public bool repositionNow = false;
-
-	/// <summary>
 	/// Whether the children will be sorted alphabetically prior to repositioning.
 	/// </summary>
 
@@ -65,24 +58,26 @@ public class UIGrid : UIWidgetContainer
 
 	public bool hideInactive = true;
 
+	/// <summary>
+	/// Reposition the children on the next Update().
+	/// </summary>
+
+	public bool repositionNow { set { if (value) { mReposition = true; enabled = true; } } }
+
 	bool mStarted = false;
+	bool mReposition = false;
 
 	void Start ()
 	{
 		mStarted = true;
-#if UNITY_EDITOR
-		if (Application.isPlaying)
-#endif
 		Reposition();
+		enabled = false;
 	}
 
 	void Update ()
 	{
-		if (repositionNow)
-		{
-			repositionNow = false;
-			Reposition();
-		}
+		if (mReposition) Reposition();
+		enabled = false;
 	}
 
 	static public int SortByName (Transform a, Transform b) { return string.Compare(a.name, b.name); }
@@ -91,14 +86,16 @@ public class UIGrid : UIWidgetContainer
 	/// Recalculate the position of all elements within the grid, sorting them alphabetically if necessary.
 	/// </summary>
 
+	[ContextMenu("Execute")]
 	public void Reposition ()
 	{
-		if (!mStarted)
+		if (Application.isPlaying && !mStarted)
 		{
-			repositionNow = true;
+			mReposition = true;
 			return;
 		}
 
+		mReposition = false;
 		Transform myTrans = transform;
 
 		int x = 0;
@@ -154,7 +151,7 @@ public class UIGrid : UIWidgetContainer
 			}
 		}
 
-		UIDraggablePanel drag = NGUITools.FindInParents<UIDraggablePanel>(gameObject);
+		UIScrollView drag = NGUITools.FindInParents<UIScrollView>(gameObject);
 		if (drag != null) drag.UpdateScrollbars(true);
 	}
 }

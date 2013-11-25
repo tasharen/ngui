@@ -84,23 +84,11 @@ public class UITextList : MonoBehaviour
 		if (textLabel != null && textLabel.ambigiousFont != null)
 		{
 			// Rebuild the line
-			string line;
-
-			if (textLabel.bitmapFont != null)
-			{
-				textLabel.bitmapFont.WrapText(ce.text, textLabel.fontSize, out line, textLabel.width, 100000,
-					0, textLabel.supportEncoding, textLabel.symbolStyle);
-			}
-			else
-			{
-#if DYNAMIC_FONT
-				NGUIText.WrapText(ce.text, textLabel.trueTypeFont, textLabel.fontSize, textLabel.fontStyle, textLabel.width, 100000,
-					0, textLabel.supportEncoding, out line);
-#else
-				return;
-#endif
-			}
-
+			textLabel.overflowMethod = UILabel.Overflow.ResizeHeight;
+			string before = textLabel.text;
+			textLabel.text = text;
+			string line = textLabel.processedText;
+			textLabel.text = before;
 			ce.lines = line.Split(mSeparator);
 
 			// Recalculate the total number of lines
