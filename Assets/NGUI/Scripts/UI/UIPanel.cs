@@ -1011,8 +1011,8 @@ public class UIPanel : MonoBehaviour
 			if (trans.parent == null) break;
 			trans = trans.parent;
 		}
-
-		if (createIfMissing && panel == null && trans != origin)
+		
+		if (createIfMissing && panel == null)
 		{
 			mRebuild = true;
 
