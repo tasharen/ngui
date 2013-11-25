@@ -21,7 +21,7 @@ static public class NGUIHelp
 	static void CopyStyle (MenuCommand command) { NGUISettings.CopyStyle(command.context as UIWidget); }
 
 	[MenuItem("CONTEXT/UIWidget/Paste Style")]
-	static void PasteStyle (MenuCommand command) { NGUISettings.CopyStyle(command.context as UIWidget); }
+	static void PasteStyle (MenuCommand command) { NGUISettings.PasteStyle(command.context as UIWidget); }
 
 	[MenuItem("CONTEXT/UIWidget/Help")]
 	static void ShowHelp1 (MenuCommand command) { Show(command.context); }

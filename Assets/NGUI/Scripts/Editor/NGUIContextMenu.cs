@@ -171,7 +171,7 @@ public static class NGUIContextMenu
 				AddSiblingWidget("Create/Invisible Widget/Sibling", false, NGUISettings.AddWidget);
 				AddSiblingWidget("Create/Simple Texture/Sibling", false, NGUISettings.AddTexture);
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
-				AddSiblingWidget("Add/Unity 2D Sprite/Sibling", false, NGUISettings.Add2DSprite);
+				AddSiblingWidget("Create/Unity 2D Sprite/Sibling", false, NGUISettings.Add2DSprite);
 #endif
 			}
 			else

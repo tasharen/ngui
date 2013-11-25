@@ -591,6 +591,7 @@ public class UIWidget : MonoBehaviour
 
 	public virtual void MarkAsChanged ()
 	{
+		if (this == null) return;
 		mChanged = true;
 #if UNITY_EDITOR
 		UnityEditor.EditorUtility.SetDirty(this);

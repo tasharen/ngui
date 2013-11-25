@@ -37,6 +37,7 @@ public class UIWidgetContainerEditor : Editor
 
 		MonoBehaviour mb = target as MonoBehaviour;
 		if (mb.GetComponent<UIWidget>() != null) return;
+		if (mb.GetComponent<UIPanel>() != null) return;
 
 		Transform t = mb.transform;
 		UIWidget[] widgets = t.GetComponentsInChildren<UIWidget>();
