@@ -404,7 +404,7 @@ public class UIDrawCall : MonoBehaviour
 				}
 
 				if (setIndices) mMesh.triangles = mIndices;
-				//mesh.RecalculateBounds();
+				if (mClipping != Clipping.None) mMesh.RecalculateBounds();
 				mFilter.mesh = mMesh;
 			}
 			else

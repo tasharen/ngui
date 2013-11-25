@@ -303,7 +303,9 @@ public static class NGUIContextMenu
 
 	static void AddPanel (object obj)
 	{
-		UIPanel panel = NGUISettings.AddPanel(obj as GameObject);
+		GameObject go = obj as GameObject;
+		if (go.GetComponent<UIWidget>() != null) go = go.transform.parent.gameObject;
+		UIPanel panel = NGUISettings.AddPanel(go);
 		Selection.activeGameObject = panel.gameObject;
 	}
 
@@ -313,8 +315,12 @@ public static class NGUIContextMenu
 
 	static void AddScrollView (object obj)
 	{
-		UIPanel panel = NGUISettings.AddPanel(obj as GameObject);
+		GameObject go = obj as GameObject;
+		if (go.GetComponent<UIWidget>() != null) go = go.transform.parent.gameObject;
+		go.name = "Scroll View";
+		UIPanel panel = NGUISettings.AddPanel(go);
 		panel.clipping = UIDrawCall.Clipping.SoftClip;
+		panel.gameObject.AddComponent<UIScrollView>();
 		Selection.activeGameObject = panel.gameObject;
 	}
 
