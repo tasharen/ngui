@@ -492,13 +492,6 @@ public class UIPanelInspector : Editor
 					EditorUtility.SetDirty(mPanel);
 				}
 			}
-
-#if !UNITY_3_5 && !UNITY_4_0 && (UNITY_ANDROID || UNITY_IPHONE || UNITY_WP8 || UNITY_BLACKBERRY)
-			if (PlayerSettings.targetGlesGraphics == TargetGlesGraphics.OpenGLES_1_x)
-			{
-				EditorGUILayout.HelpBox("Clipping requires shader support!\n\nOpen File -> Build Settings -> Player Settings -> Other Settings, then set:\n\n- Graphics Level: OpenGL ES 2.0.", MessageType.Error);
-			}
-#endif
 		}
 
 		if (clipping != UIDrawCall.Clipping.None && !NGUIEditorTools.IsUniform(mPanel.transform.lossyScale))
@@ -511,9 +504,11 @@ public class UIPanelInspector : Editor
 			}
 		}
 
-		for (int i = 0; i < UIDrawCall.list.size; ++i)
+		BetterList<UIDrawCall> dcs = UIDrawCall.activeList;
+
+		for (int i = 0; i < dcs.size; ++i)
 		{
-			UIDrawCall dc = UIDrawCall.list[i];
+			UIDrawCall dc = dcs[i];
 
 			if (dc.manager != mPanel)
 			{
@@ -524,7 +519,7 @@ public class UIPanelInspector : Editor
 			else GUI.contentColor = Color.white;
 
 			string key = dc.keyName;
-			string name = key + " of " + UIDrawCall.list.size;
+			string name = key + " of " + dcs.size;
 			if (!dc.isActive) name = name + " (HIDDEN)";
 			else if (dc.manager != mPanel) name = name + " (" + dc.manager.name + ")";
 

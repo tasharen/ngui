@@ -106,6 +106,9 @@ static public class NGUIHelp
 	[MenuItem("CONTEXT/UIDragScrollView/Help")]
 	static void ShowHelp26 (MenuCommand command) { Show(typeof(UIScrollView)); }
 
+	[MenuItem("CONTEXT/UIPanel/Help")]
+	static void ShowHelp27 (MenuCommand command) { Show(typeof(UIPanel)); }
+
 	/// <summary>
 	/// Get the URL pointing to the documentation for the specified component.
 	/// </summary>

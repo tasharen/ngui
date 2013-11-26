@@ -522,7 +522,7 @@ public class UIWidget : MonoBehaviour
 		}
 		else if (isVisible && hasVertices)
 		{
-			UIPanel.RebuildAllDrawCalls(true);
+			drawCall = UIPanel.InsertWidget(this);
 		}
 	}
 
@@ -532,12 +532,8 @@ public class UIWidget : MonoBehaviour
 
 	protected void RemoveFromPanel ()
 	{
-		if (mPanel != null)
-		{
-			SetDirty();
-			mPanel = null;
-		}
-		drawCall = null;
+		UIPanel.RemoveWidget(this);
+		mPanel = null;
 #if UNITY_EDITOR
 		mOldTex = null;
 		mOldShader = null;
@@ -573,7 +569,8 @@ public class UIWidget : MonoBehaviour
 		{
 			mOldTex = mainTexture;
 			mOldShader = shader;
-			UIPanel.RebuildAllDrawCalls(true);
+			UIPanel.RemoveWidget(this);
+			drawCall = UIPanel.InsertWidget(this);
 		}
 	}
 #endif
@@ -620,9 +617,26 @@ public class UIWidget : MonoBehaviour
 
 			if (mPanel != null)
 			{
+				int rd = raycastDepth;
+				bool inserted = false;
+
+				// Try to insert this widget at the appropriate location within the list
+				for (int i = 0; i < list.size; ++i)
+				{
+					if (list[i].raycastDepth > rd)
+					{
+						list.Insert(i, this);
+						inserted = true;
+						break;
+					}
+				}
+
+				// Add this widget to the end of the list if it's not already there
+				if (!inserted) list.Add(this);
+
 				CheckLayer();
 				mChanged = true;
-				if (material != null) UIPanel.RebuildAllDrawCalls(true);
+				drawCall = UIPanel.InsertWidget(this);
 			}
 		}
 	}
@@ -675,7 +689,6 @@ public class UIWidget : MonoBehaviour
 
 	protected virtual void OnEnable ()
 	{
-		list.Add(this);
 		mChanged = true;
 		mPanel = null;
 
