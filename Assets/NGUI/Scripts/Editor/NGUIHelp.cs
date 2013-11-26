@@ -143,7 +143,7 @@ static public class NGUIHelp
 		if (type == typeof(UIScrollView) || type == typeof(UIDragScrollView))
 			return "http://www.tasharen.com/forum/index.php?topic=6763";
 
-		if (type.IsSubclassOf(typeof(UIWidget)))
+		if (type == typeof(UIWidget) || type.IsSubclassOf(typeof(UIWidget)))
 			return "http://www.tasharen.com/forum/index.php?topic=6702";
 
 		if (type == typeof(UIPlayTween) || type.IsSubclassOf(typeof(UITweener)))
