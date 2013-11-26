@@ -3,7 +3,7 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
-//#define SHOW_HIDDEN_OBJECTS
+#define SHOW_HIDDEN_OBJECTS
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -39,6 +39,7 @@ public class UIDrawCall : MonoBehaviour
 		None = 0,
 		AlphaClip = 2,	// Adjust the alpha, compatible with all devices
 		SoftClip = 3,	// Alpha-based clipping with a softened edge
+		Invisible = 4,	// No actual clipping, but does have an area
 	}
 
 	[HideInInspector]
@@ -507,7 +508,7 @@ public class UIDrawCall : MonoBehaviour
 			UpdateMaterials();
 		}
 
-		if (mDynamicMat != null && isClipped)
+		if (mDynamicMat != null && isClipped && mClipping != Clipping.Invisible)
 		{
 			mDynamicMat.mainTextureOffset = new Vector2(-mClipRange.x / mClipRange.z, -mClipRange.y / mClipRange.w);
 			mDynamicMat.mainTextureScale = new Vector2(1f / mClipRange.z, 1f / mClipRange.w);

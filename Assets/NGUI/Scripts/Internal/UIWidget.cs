@@ -534,6 +534,7 @@ public class UIWidget : MonoBehaviour
 	{
 		UIPanel.RemoveWidget(this);
 		mPanel = null;
+		list.Remove(this);
 #if UNITY_EDITOR
 		mOldTex = null;
 		mOldShader = null;

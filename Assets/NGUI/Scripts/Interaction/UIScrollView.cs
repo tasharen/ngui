@@ -266,8 +266,9 @@ public class UIScrollView : MonoBehaviour
 	{
 		mTrans = transform;
 		mPanel = GetComponent<UIPanel>();
+
 		if (mPanel.clipping == UIDrawCall.Clipping.None)
-			mPanel.clipping = UIDrawCall.Clipping.SoftClip;
+			mPanel.clipping = UIDrawCall.Clipping.Invisible;
 		
 		// Auto-upgrade
 		if (movement != Movement.Custom && scale.sqrMagnitude > 0.001f)
