@@ -698,6 +698,8 @@ public class NGUIEditorTools
 
 	static public void DrawSprite (Texture2D tex, Rect drawRect, UISpriteData sprite, Color color, Material mat)
 	{
+		if (!tex) return;
+
 		// Create the texture rectangle that is centered inside rect.
 		Rect outerRect = drawRect;
 		outerRect.width = sprite.width;

@@ -117,18 +117,8 @@ public class UIAtlasMaker : EditorWindow
 #endif
 
 #if UNITY_ANDROID || UNITY_IPHONE
-#if !UNITY_3_5 && !UNITY_4_0
-		if (PlayerSettings.targetGlesGraphics == TargetGlesGraphics.OpenGLES_1_x)
-		{
-			maxSize = Mathf.Min(maxSize, 1024);
-		}
-		else
+		maxSize = Mathf.Min(maxSize, NGUISettings.allow4096 ? 4096 : 2048);
 #endif
-		{
-			maxSize = Mathf.Min(maxSize, NGUISettings.allow4096 ? 4096 : 2048);
-		}
-#endif
-
 		if (NGUISettings.unityPacking)
 		{
 			for (int i = 0; i < sprites.Count; ++i) textures[i] = sprites[i].tex;

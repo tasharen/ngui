@@ -186,7 +186,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	public void Play (bool forward)
 	{
-		if (target != null)
+		if (target)
 		{
 			if (clearSelection && UICamera.selectedObject == gameObject)
 				UICamera.selectedObject = null;
