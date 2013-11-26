@@ -387,7 +387,10 @@ public static class NGUIContextMenu
 	static public void AddSeparator (string path)
 	{
 		if (mMenu == null) mMenu = new GenericMenu();
-		mMenu.AddSeparator(path);
+
+		// For some weird reason adding separators on OSX causes the entire menu to be disabled. Wtf?
+		if (Application.platform != RuntimePlatform.OSXEditor)
+			mMenu.AddSeparator(path);
 	}
 
 	/// <summary>
