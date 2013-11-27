@@ -2620,7 +2620,31 @@ MonoBehaviour:
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mReplacement: {fileID: 0}
   mPixelSize: 1
-  mSymbols: []
+  mSymbols:
+  - sequence: :)
+    spriteName: Emoticon - Smile
+  - sequence: :(
+    spriteName: Emoticon - Frown
+  - sequence: <_<
+    spriteName: Emoticon - Smirk
+  - sequence: '>_<'
+    spriteName: Emoticon - Angry
+  - sequence: x_x
+    spriteName: Emoticon - Skull
+  - sequence: :D
+    spriteName: Emoticon - Laugh
+  - sequence: -_-
+    spriteName: Emoticon - Annoyed
+  - sequence: o.o
+    spriteName: Emoticon - Dead
+  - sequence: (A)
+    spriteName: Button A
+  - sequence: (B)
+    spriteName: Button B
+  - sequence: (X)
+    spriteName: Button X
+  - sequence: (Y)
+    spriteName: Button Y
   mDynamicFont: {fileID: 0}
   mDynamicFontSize: 16
   mDynamicFontStyle: 0
