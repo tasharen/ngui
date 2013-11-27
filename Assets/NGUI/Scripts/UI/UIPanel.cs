@@ -752,6 +752,8 @@ public class UIPanel : MonoBehaviour
 
 	static public UIDrawCall InsertWidget (UIWidget w)
 	{
+		UIPanel p = w.panel;
+		if (p == null) return null;
 		Material mat = w.material;
 		int depth = w.raycastDepth;
 		BetterList<UIDrawCall> dcs = UIDrawCall.activeList;
@@ -759,6 +761,7 @@ public class UIPanel : MonoBehaviour
 		for (int i = 0; i < dcs.size; ++i)
 		{
 			UIDrawCall dc = dcs.buffer[i];
+			if (dc.manager != p) continue;
 			int dcStart = (i == 0) ? int.MinValue : dcs.buffer[i-1].depthEnd + 1;
 			int dcEnd = (i + 1 == dcs.size) ? int.MaxValue : dcs.buffer[i+1].depthStart - 1;
 			
