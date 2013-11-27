@@ -373,22 +373,92 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
+	/// Extract the specified sprite from the atlas.
+	/// </summary>
+
+	static public SpriteEntry ExtractSprite (UIAtlas atlas, string spriteName)
+	{
+		if (atlas.texture == null) return null;
+		UISpriteData sd = atlas.GetSprite(spriteName);
+		if (sd == null) return null;
+
+		Texture2D tex = NGUIEditorTools.ImportTexture(atlas.texture, true, false, !atlas.premultipliedAlpha);
+		SpriteEntry se = ExtractSprite(sd, tex);
+		NGUIEditorTools.ImportTexture(atlas.texture, false, false, !atlas.premultipliedAlpha);
+		return se;
+	}
+
+	/// <summary>
+	/// Extract the specified sprite from the atlas texture.
+	/// </summary>
+
+	static SpriteEntry ExtractSprite (UISpriteData es, Texture2D tex)
+	{
+		return ExtractSprite(es, tex.GetPixels32(), tex.width, tex.height);
+	}
+
+	/// <summary>
+	/// Extract the specified sprite from the atlas texture.
+	/// </summary>
+
+	static SpriteEntry ExtractSprite (UISpriteData es, Color32[] oldPixels, int oldWidth, int oldHeight)
+	{
+		int xmin = Mathf.Clamp(es.x, 0, oldWidth);
+		int ymin = Mathf.Clamp(es.y, 0, oldHeight);
+		int xmax = Mathf.Min(xmin + es.width, oldWidth - 1);
+		int ymax = Mathf.Min(ymin + es.height, oldHeight - 1);
+		int newWidth = Mathf.Clamp(es.width, 0, oldWidth);
+		int newHeight = Mathf.Clamp(es.height, 0, oldHeight);
+
+		if (newWidth == 0 || newHeight == 0) return null;
+
+		Color32[] newPixels = new Color32[newWidth * newHeight];
+
+		for (int y = 0; y < newHeight; ++y)
+		{
+			int cy = ymin + y;
+			if (cy > ymax) cy = ymax;
+
+			for (int x = 0; x < newWidth; ++x)
+			{
+				int cx = xmin + x;
+				if (cx > xmax) cx = xmax;
+
+				int newIndex = (newHeight - 1 - y) * newWidth + x;
+				int oldIndex = (oldHeight - 1 - cy) * oldWidth + cx;
+
+				newPixels[newIndex] = oldPixels[oldIndex];
+			}
+		}
+
+		// Create a new sprite
+		SpriteEntry sprite = new SpriteEntry();
+		sprite.CopyFrom(es);
+		sprite.SetRect(0, 0, newWidth, newHeight);
+		sprite.temporaryTexture = true;
+		sprite.tex = new Texture2D(newWidth, newHeight);
+		sprite.tex.SetPixels32(newPixels);
+		sprite.tex.Apply();
+		return sprite;
+	}
+
+	/// <summary>
 	/// Extract sprites from the atlas, adding them to the list.
 	/// </summary>
 
 	static public void ExtractSprites (UIAtlas atlas, List<SpriteEntry> finalSprites)
 	{
 		// Make the atlas texture readable
-		Texture2D atlasTex = NGUIEditorTools.ImportTexture(atlas.texture, true, false, !atlas.premultipliedAlpha);
+		Texture2D tex = NGUIEditorTools.ImportTexture(atlas.texture, true, false, !atlas.premultipliedAlpha);
 
-		if (atlasTex != null)
+		if (tex != null)
 		{
-			Color32[] oldPixels = null;
-			int oldWidth = atlasTex.width;
-			int oldHeight = atlasTex.height;
-			List<UISpriteData> existingSprites = atlas.spriteList;
+			Color32[] pixels = null;
+			int width = tex.width;
+			int height = tex.height;
+			List<UISpriteData> sprites = atlas.spriteList;
 
-			foreach (UISpriteData es in existingSprites)
+			foreach (UISpriteData es in sprites)
 			{
 				bool found = false;
 
@@ -404,46 +474,9 @@ public class UIAtlasMaker : EditorWindow
 
 				if (!found)
 				{
-					// Read the atlas
-					if (oldPixels == null) oldPixels = atlasTex.GetPixels32();
-
-					int xmin = Mathf.Clamp(es.x, 0, oldWidth);
-					int ymin = Mathf.Clamp(es.y, 0, oldHeight);
-					int xmax = Mathf.Min(xmin + es.width, oldWidth - 1);
-					int ymax = Mathf.Min(ymin + es.height, oldHeight - 1);
-					int newWidth = Mathf.Clamp(es.width, 0, oldWidth);
-					int newHeight = Mathf.Clamp(es.height, 0, oldHeight);
-
-					if (newWidth == 0 || newHeight == 0) continue;
-
-					Color32[] newPixels = new Color32[newWidth * newHeight];
-
-					for (int y = 0; y < newHeight; ++y)
-					{
-						int cy = ymin + y;
-						if (cy > ymax) cy = ymax;
-
-						for (int x = 0; x < newWidth; ++x)
-						{
-							int cx = xmin + x;
-							if (cx > xmax) cx = xmax;
-
-							int newIndex = (newHeight - 1 - y) * newWidth + x;
-							int oldIndex = (oldHeight - 1 - cy) * oldWidth + cx;
-
-							newPixels[newIndex] = oldPixels[oldIndex];
-						}
-					}
-
-					// Create a new sprite
-					SpriteEntry sprite = new SpriteEntry();
-					sprite.CopyFrom(es);
-					sprite.SetRect(0, 0, newWidth, newHeight);
-					sprite.temporaryTexture = true;
-					sprite.tex = new Texture2D(newWidth, newHeight);
-					sprite.tex.SetPixels32(newPixels);
-					sprite.tex.Apply();
-					finalSprites.Add(sprite);
+					if (pixels == null) pixels = tex.GetPixels32();
+					SpriteEntry sprite = ExtractSprite(es, pixels, width, height);
+					if (sprite != null) finalSprites.Add(sprite);
 				}
 			}
 		}
