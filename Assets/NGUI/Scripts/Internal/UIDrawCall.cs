@@ -263,7 +263,7 @@ public class UIDrawCall : MonoBehaviour
 	{
 		const string alpha = " (AlphaClip)";
 		const string soft = " (SoftClip)";
-		string shaderName = (mMaterial != null) ? mShader.name :
+		string shaderName = (mShader != null) ? mShader.name :
 			((mMaterial != null) ? mMaterial.shader.name : "Unlit/Transparent Colored");
 
 		// Figure out the normal shader's name
