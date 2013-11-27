@@ -122,8 +122,9 @@ public class UIAtlas : MonoBehaviour
 	{
 		get
 		{
+			if (mReplacement != null) return mReplacement.spriteList;
 			if (mSprites.Count == 0) Upgrade();
-			return (mReplacement != null) ? mReplacement.spriteList : mSprites;
+			return mSprites;
 		}
 		set
 		{
@@ -397,6 +398,8 @@ public class UIAtlas : MonoBehaviour
 
 	bool Upgrade ()
 	{
+		if (mReplacement != null) return mReplacement.Upgrade();
+
 		if (mSprites.Count == 0 && sprites.Count > 0)
 		{
 			Texture tex = material.mainTexture;

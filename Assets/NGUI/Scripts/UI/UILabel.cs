@@ -85,7 +85,9 @@ public class UILabel : UIWidget
 	int mLastWidth = 0;
 	int mLastHeight = 0;
 	int mPrintedSize = 0;
+#if UNITY_EDITOR
 	bool mUseDynamicFont = false;
+#endif
 
 	/// <summary>
 	/// Function used to determine if something has changed (and thus the geometry must be rebuilt)
