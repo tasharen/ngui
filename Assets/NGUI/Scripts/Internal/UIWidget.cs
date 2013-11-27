@@ -612,7 +612,7 @@ public class UIWidget : MonoBehaviour
 
 	public void CreatePanel ()
 	{
-		if (mPanel == null && enabled && NGUITools.GetActive(gameObject))
+		if (mStarted && mPanel == null && enabled && NGUITools.GetActive(gameObject))
 		{
 			mPanel = UIPanel.Find(cachedTransform, mStarted);
 
