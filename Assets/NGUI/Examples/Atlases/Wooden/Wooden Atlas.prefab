@@ -98,19 +98,6 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Button A
-    x: 488
-    y: 258
-    width: 20
-    height: 20
-    borderLeft: 0
-    borderRight: 0
-    borderTop: 0
-    borderBottom: 0
-    paddingLeft: 0
-    paddingRight: 0
-    paddingTop: 0
-    paddingBottom: 0
-  - name: Button B
     x: 50
     y: 3
     width: 20
@@ -123,9 +110,22 @@ MonoBehaviour:
     paddingRight: 0
     paddingTop: 0
     paddingBottom: 0
+  - name: Button B
+    x: 488
+    y: 258
+    width: 20
+    height: 20
+    borderLeft: 0
+    borderRight: 0
+    borderTop: 0
+    borderBottom: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
   - name: Button X
-    x: 79
-    y: 32
+    x: 208
+    y: 106
     width: 20
     height: 20
     borderLeft: 0
@@ -163,8 +163,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 5
   - name: Emoticon - Angry
-    x: 229
-    y: 106
+    x: 79
+    y: 11
     width: 20
     height: 20
     borderLeft: 0
@@ -176,8 +176,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Annoyed
-    x: 208
-    y: 106
+    x: 100
+    y: 11
     width: 20
     height: 20
     borderLeft: 0
@@ -189,8 +189,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Dead
-    x: 229
-    y: 138
+    x: 79
+    y: 32
     width: 20
     height: 20
     borderLeft: 0
@@ -202,8 +202,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Frown
-    x: 208
-    y: 138
+    x: 229
+    y: 106
     width: 20
     height: 20
     borderLeft: 0
@@ -229,7 +229,7 @@ MonoBehaviour:
     paddingBottom: 0
   - name: Emoticon - Rambo
     x: 208
-    y: 159
+    y: 85
     width: 20
     height: 20
     borderLeft: 0
@@ -241,8 +241,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Skull
-    x: 100
-    y: 11
+    x: 229
+    y: 138
     width: 20
     height: 20
     borderLeft: 0
@@ -255,7 +255,7 @@ MonoBehaviour:
     paddingBottom: 0
   - name: Emoticon - Smile
     x: 208
-    y: 85
+    y: 138
     width: 20
     height: 20
     borderLeft: 0
@@ -267,8 +267,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Smirk
-    x: 79
-    y: 11
+    x: 208
+    y: 159
     width: 20
     height: 20
     borderLeft: 0
@@ -281,7 +281,7 @@ MonoBehaviour:
     paddingBottom: 0
   - name: Flag-FR
     x: 127
-    y: 74
+    y: 127
     width: 80
     height: 52
     borderLeft: 0
@@ -294,7 +294,7 @@ MonoBehaviour:
     paddingBottom: 9
   - name: Flag-US
     x: 127
-    y: 127
+    y: 74
     width: 80
     height: 52
     borderLeft: 0
@@ -410,19 +410,6 @@ MonoBehaviour:
     paddingTop: 1
     paddingBottom: 1
   - name: Stripes 1
-    x: 256
-    y: 267
-    width: 34
-    height: 34
-    borderLeft: 1
-    borderRight: 1
-    borderTop: 1
-    borderBottom: 1
-    paddingLeft: 0
-    paddingRight: 0
-    paddingTop: 0
-    paddingBottom: 0
-  - name: Stripes 2
     x: 326
     y: 267
     width: 34
@@ -435,8 +422,21 @@ MonoBehaviour:
     paddingRight: 0
     paddingTop: 0
     paddingBottom: 0
-  - name: Stripes 3
+  - name: Stripes 2
     x: 291
+    y: 267
+    width: 34
+    height: 34
+    borderLeft: 1
+    borderRight: 1
+    borderTop: 1
+    borderBottom: 1
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: Stripes 3
+    x: 256
     y: 267
     width: 34
     height: 34
