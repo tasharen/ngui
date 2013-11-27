@@ -305,6 +305,7 @@ static public class NGUITools
 				Vector3[] corners = w.localCorners;
 				Vector3 center = (corners[2] + corners[0]) * 0.5f;
 				Vector3 size = (corners[2] - corners[0]);
+				size.z = 1f;
 				box.center = center;
 				box.size = size;
 			}
@@ -312,7 +313,7 @@ static public class NGUITools
 			{
 				Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
 				box.center = b.center;
-				box.size = new Vector3(b.size.x, b.size.y, 0f);
+				box.size = new Vector3(b.size.x, b.size.y, 1f);
 			}
 #if UNITY_EDITOR
 			UnityEditor.EditorUtility.SetDirty(box);
