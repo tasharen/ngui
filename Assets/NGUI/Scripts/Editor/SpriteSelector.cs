@@ -84,6 +84,7 @@ public class SpriteSelector : ScriptableWizard
 
 			GUILayout.Space(10f);
 			mPos = GUILayout.BeginScrollView(mPos);
+			int rows = 1;
 
 			while (offset < sprites.size)
 			{
@@ -181,7 +182,9 @@ public class SpriteSelector : ScriptableWizard
 				GUILayout.EndHorizontal();
 				GUILayout.Space(padded);
 				rect.y += padded + 26;
+				++rows;
 			}
+			GUILayout.Space(rows * 26);
 			GUILayout.EndScrollView();
 			if (close) Close();
 		}
