@@ -224,6 +224,7 @@ public class UIWidget : MonoBehaviour
 		{
 			if (mDepth != value)
 			{
+				RemoveFromPanel();
 				mDepth = value;
 #if UNITY_EDITOR
 				UnityEditor.EditorUtility.SetDirty(this);
