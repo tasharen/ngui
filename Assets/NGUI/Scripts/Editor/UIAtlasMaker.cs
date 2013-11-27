@@ -394,7 +394,7 @@ public class UIAtlasMaker : EditorWindow
 
 	static SpriteEntry ExtractSprite (UISpriteData es, Texture2D tex)
 	{
-		return ExtractSprite(es, tex.GetPixels32(), tex.width, tex.height);
+		return (tex != null) ? ExtractSprite(es, tex.GetPixels32(), tex.width, tex.height) : null;
 	}
 
 	/// <summary>
@@ -448,6 +448,8 @@ public class UIAtlasMaker : EditorWindow
 
 	static public void ExtractSprites (UIAtlas atlas, List<SpriteEntry> finalSprites)
 	{
+		ShowProgress(0f);
+
 		// Make the atlas texture readable
 		Texture2D tex = NGUIEditorTools.ImportTexture(atlas.texture, true, false, !atlas.premultipliedAlpha);
 
@@ -457,9 +459,13 @@ public class UIAtlasMaker : EditorWindow
 			int width = tex.width;
 			int height = tex.height;
 			List<UISpriteData> sprites = atlas.spriteList;
+			float count = sprites.Count;
+			int index = 0;
 
 			foreach (UISpriteData es in sprites)
 			{
+				ShowProgress((index++) / count);
+
 				bool found = false;
 
 				foreach (SpriteEntry fs in finalSprites)
@@ -483,6 +489,7 @@ public class UIAtlasMaker : EditorWindow
 
 		// The atlas no longer needs to be readable
 		NGUIEditorTools.ImportTexture(atlas.texture, false, false, !atlas.premultipliedAlpha);
+		ShowProgress(1f);
 	}
 
 	/// <summary>
@@ -562,6 +569,15 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
+	/// Show a progress bar.
+	/// </summary>
+
+	static public void ShowProgress (float val)
+	{
+		EditorUtility.DisplayProgressBar("Updating", "Updating the atlas, please wait...", val);
+	}
+
+	/// <summary>
 	/// Add the specified texture to the atlas, or update an existing one.
 	/// </summary>
 
@@ -605,6 +621,7 @@ public class UIAtlasMaker : EditorWindow
 		{
 			UpdateAtlas(NGUISettings.atlas, sprites);
 		}
+		EditorUtility.ClearProgressBar();
 	}
 
 	/// <summary>
