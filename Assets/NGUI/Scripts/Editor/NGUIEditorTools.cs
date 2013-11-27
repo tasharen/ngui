@@ -868,7 +868,9 @@ public class NGUIEditorTools
 
 		if (GUILayout.Button(spriteName, "MiniPullDown", options))
 		{
-			SpriteSelector.Show(atlas, spriteName, callback);
+			NGUISettings.atlas = atlas;
+			NGUISettings.selectedSprite = spriteName;
+			SpriteSelector.Show(callback);
 		}
 		GUILayout.EndHorizontal();
 	}
@@ -884,7 +886,9 @@ public class NGUIEditorTools
 
 		if (GUILayout.Button(spriteName, "MiniPullDown", options))
 		{
-			SpriteSelector.Show(atlas, spriteName, callback);
+			NGUISettings.atlas = atlas;
+			NGUISettings.selectedSprite = spriteName;
+			SpriteSelector.Show(callback);
 		}
 		GUILayout.Space(18f);
 		GUILayout.EndHorizontal();
@@ -904,7 +908,9 @@ public class NGUIEditorTools
 
 		if (GUILayout.Button(spriteName, "MiniPullDown", options))
 		{
-			SpriteSelector.Show(atlas, spriteName, callback);
+			NGUISettings.atlas = atlas;
+			NGUISettings.selectedSprite = spriteName;
+			SpriteSelector.Show(callback);
 		}
 		
 		if (!string.IsNullOrEmpty(caption))
@@ -926,7 +932,9 @@ public class NGUIEditorTools
 
 		if (NGUIEditorTools.DrawPrefixButton(spriteName, options))
 		{
-			SpriteSelector.Show(atlas, spriteName, callback);
+			NGUISettings.atlas = atlas;
+			NGUISettings.selectedSprite = spriteName;
+			SpriteSelector.Show(callback);
 			return true;
 		}
 		return false;
@@ -1011,7 +1019,11 @@ public class NGUIEditorTools
 		GUILayout.BeginHorizontal();
 		{
 			if (NGUIEditorTools.DrawPrefixButton("Sprite"))
-				SpriteSelector.Show(atlas, spriteName, callback);
+			{
+				NGUISettings.atlas = atlas;
+				NGUISettings.selectedSprite = spriteName;
+				SpriteSelector.Show(callback);
+			}
 
 			if (editable)
 			{
@@ -1075,6 +1087,47 @@ public class NGUIEditorTools
 			}
 		}
 		GUILayout.EndHorizontal();
+	}
+
+	static public void RepaintSprites ()
+	{
+		if (UIAtlasInspector.instance != null)
+			UIAtlasInspector.instance.Repaint();
+
+		if (UIAtlasMaker.instance != null)
+			UIAtlasMaker.instance.Repaint();
+
+		if (SpriteSelector.instance != null)
+			SpriteSelector.instance.Repaint();
+	}
+
+	/// <summary>
+	/// Select the specified sprite within the currently selected atlas.
+	/// </summary>
+
+	static public void SelectSprite (string spriteName)
+	{
+		if (NGUISettings.atlas != null)
+		{
+			NGUISettings.selectedSprite = spriteName;
+			NGUIEditorTools.Select(NGUISettings.atlas.gameObject);
+			RepaintSprites();
+		}
+	}
+
+	/// <summary>
+	/// Select the specified atlas and sprite.
+	/// </summary>
+
+	static public void SelectSprite (UIAtlas atlas, string spriteName)
+	{
+		if (atlas != null)
+		{
+			NGUISettings.atlas = atlas;
+			NGUISettings.selectedSprite = spriteName;
+			NGUIEditorTools.Select(atlas.gameObject);
+			RepaintSprites();
+		}
 	}
 
 	/// <summary>

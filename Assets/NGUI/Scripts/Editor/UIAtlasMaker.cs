@@ -13,6 +13,8 @@ using System.Collections.Generic;
 
 public class UIAtlasMaker : EditorWindow
 {
+	static public UIAtlasMaker instance;
+
 	public class SpriteEntry : UISpriteData
 	{
 		// Sprite texture -- original texture or a temporary texture
@@ -25,6 +27,9 @@ public class UIAtlasMaker : EditorWindow
 	Vector2 mScroll = Vector2.zero;
 	List<string> mDelNames = new List<string>();
 	UIAtlas mLastAtlas;
+
+	void OnEnable () { instance = this; }
+	void OnDisable () { instance = null; }
 
 	/// <summary>
 	/// Atlas selection callback.
@@ -621,7 +626,6 @@ public class UIAtlasMaker : EditorWindow
 		{
 			UpdateAtlas(NGUISettings.atlas, sprites);
 		}
-		EditorUtility.ClearProgressBar();
 	}
 
 	/// <summary>
@@ -641,6 +645,7 @@ public class UIAtlasMaker : EditorWindow
 
 			// Release the temporary textures
 			ReleaseSprites(sprites);
+			EditorUtility.ClearProgressBar();
 			return;
 		}
 		else
@@ -653,6 +658,7 @@ public class UIAtlasMaker : EditorWindow
 
 		atlas.MarkAsChanged();
 		Selection.activeGameObject = (NGUISettings.atlas != null) ? NGUISettings.atlas.gameObject : null;
+		EditorUtility.ClearProgressBar();
 	}
 
 	/// <summary>
@@ -847,6 +853,10 @@ public class UIAtlasMaker : EditorWindow
 			}
 			else
 			{
+				if (GUILayout.Button("View Sprites"))
+				{
+					SpriteSelector.ShowSelected();
+				}
 				EditorGUILayout.HelpBox("You can reveal more options by selecting one or more textures in the Project View window.", MessageType.Info);
 			}
 		}
@@ -941,21 +951,19 @@ public class UIAtlasMaker : EditorWindow
 					}
 					UpdateAtlas(NGUISettings.atlas, sprites);
 					mDelNames.Clear();
+					NGUIEditorTools.RepaintSprites();
 				}
 				else if (update) UpdateAtlas(textures, true);
 				else if (replace) UpdateAtlas(textures, false);
 
 				if (NGUISettings.atlas != null && !string.IsNullOrEmpty(selection))
 				{
-					NGUISettings.selectedSprite = selection;
-					Selection.activeGameObject = NGUISettings.atlas.gameObject;
-
-					if (UIAtlasInspector.instance != null)
-						UIAtlasInspector.instance.Repaint();
+					NGUIEditorTools.SelectSprite(selection);
 				}
 				else if (update || replace)
 				{
 					NGUIEditorTools.UpgradeTexturesToSprites(NGUISettings.atlas);
+					NGUIEditorTools.RepaintSprites();
 				}
 			}
 		}
