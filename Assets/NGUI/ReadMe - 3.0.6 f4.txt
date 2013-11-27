@@ -1,12 +1,14 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-            Version 3.0.6 f3
+            Version 3.0.6 f4
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
 
 Thank you for buying NGUI!
+
+Documentation can be found here: http://www.tasharen.com/forum/index.php?topic=6754.0
 
 If you have any questions, suggestions, comments or feature requests, please
 drop by the NGUI forum, found here: http://www.tasharen.com/forum/index.php?board=1.0
@@ -27,7 +29,7 @@ If you have a Standard Edition:
  Support, documentation, and tutorials
 ---------------------------------------
 
-All can be found here: http://www.tasharen.com/?page_id=197
+All can be found here: http://www.tasharen.com/forum/index.php?topic=6754.0
 
 Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.com/forum/index.php?topic=6
 
