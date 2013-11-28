@@ -131,13 +131,43 @@ public class UIWidget : MonoBehaviour
 	/// Color used by the widget.
 	/// </summary>
 
-	public Color color { get { return mColor; } set { if (mColor != value) { mColor = value; mChanged = true; } } }
+	public Color color
+	{
+		get
+		{
+			return mColor;
+		}
+		set
+		{
+			if (mColor != value)
+			{
+				mColor = value;
+				mChanged = true;
+			}
+		}
+	}
 
 	/// <summary>
 	/// Widget's alpha -- a convenience method.
 	/// </summary>
 
-	public float alpha { get { return mColor.a; } set { Color c = mColor; c.a = value; color = c; } }
+	public float alpha
+	{
+		get
+		{
+			return mColor.a;
+		}
+		set
+		{
+			Color c = mColor;
+
+			if (c.a != value)
+			{
+				c.a = value;
+				color = c;
+			}
+		}
+	}
 
 	/// <summary>
 	/// Widget's final alpha, after taking the panel's alpha into account.
@@ -243,6 +273,7 @@ public class UIWidget : MonoBehaviour
 	{
 		get
 		{
+			if (mPanel == null) CreatePanel();
 			return (mPanel != null) ? mDepth + mPanel.depth * 1000 : mDepth;
 		}
 	}
@@ -692,7 +723,6 @@ public class UIWidget : MonoBehaviour
 	protected virtual void OnEnable ()
 	{
 		mChanged = true;
-		mPanel = null;
 
 		// Prior to NGUI 2.7.0 width and height was specified as transform's local scale
 		if (mWidth == 100 && mHeight == 100 && cachedTransform.localScale.magnitude > 8f)
@@ -754,11 +784,7 @@ public class UIWidget : MonoBehaviour
 	/// Clear references.
 	/// </summary>
 
-	protected virtual void OnDisable ()
-	{
-		list.Remove(this);
-		RemoveFromPanel();
-	}
+	protected virtual void OnDisable () { RemoveFromPanel(); }
 
 	/// <summary>
 	/// Unregister this widget.

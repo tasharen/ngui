@@ -127,8 +127,13 @@ public class UIButtonColor : UIWidgetContainer
 				}
 				else
 				{
-					Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " has nothing for UIButtonColor to color", this);
-					enabled = false;
+					tweenTarget = null;
+
+					if (Application.isPlaying)
+					{
+						Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " has nothing for UIButtonColor to color", this);
+						enabled = false;
+					}
 				}
 			}
 		}

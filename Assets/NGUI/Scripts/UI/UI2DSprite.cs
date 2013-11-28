@@ -66,9 +66,7 @@ public class UI2DSprite : UIWidget
 		{
 			if (mMat != value)
 			{
-				MarkAsChanged();
-				drawCall = null;
-				mPanel = null;
+				RemoveFromPanel();
 				mMat = value;
 				mPMA = -1;
 				MarkAsChanged();
@@ -92,6 +90,7 @@ public class UI2DSprite : UIWidget
 		{
 			if (mShader != value)
 			{
+				RemoveFromPanel();
 				mShader = value;
 
 				if (mMat == null)
