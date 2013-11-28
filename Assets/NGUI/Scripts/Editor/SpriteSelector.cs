@@ -109,12 +109,12 @@ public class SpriteSelector : ScriptableWizard
 									if (mSprite != null)
 									{
 										NGUIEditorTools.RegisterUndo("Atlas Selection", mSprite);
-										NGUIEditorTools.SelectSprite(sprite.name);
 										mSprite.MakePixelPerfect();
 										EditorUtility.SetDirty(mSprite.gameObject);
 									}
 
-									NGUIEditorTools.SelectSprite(sprite.name);
+									NGUISettings.selectedSprite = sprite.name;
+									NGUIEditorTools.RepaintSprites();
 									if (mCallback != null) mCallback(sprite.name);
 								}
 								else if (delta < 0.5f) close = true;

@@ -47,6 +47,12 @@ public class UIGrid : UIWidgetContainer
 	public float cellHeight = 200f;
 
 	/// <summary>
+	/// Whether the grid will smoothly animate its children into the correct place.
+	/// </summary>
+
+	public bool animateSmoothly = false;
+
+	/// <summary>
 	/// Whether the children will be sorted alphabetically prior to repositioning.
 	/// </summary>
 
@@ -70,7 +76,10 @@ public class UIGrid : UIWidgetContainer
 	void Start ()
 	{
 		mStarted = true;
+		bool smooth = animateSmoothly;
+		animateSmoothly = false;
 		Reposition();
+		animateSmoothly = smooth;
 		enabled = false;
 	}
 
@@ -119,9 +128,15 @@ public class UIGrid : UIWidgetContainer
 				if (!NGUITools.GetActive(t.gameObject) && hideInactive) continue;
 
 				float depth = t.localPosition.z;
-				t.localPosition = (arrangement == Arrangement.Horizontal) ?
+				Vector3 pos = (arrangement == Arrangement.Horizontal) ?
 					new Vector3(cellWidth * x, -cellHeight * y, depth) :
 					new Vector3(cellWidth * y, -cellHeight * x, depth);
+
+				if (animateSmoothly && Application.isPlaying)
+				{
+					SpringPosition.Begin(t.gameObject, pos, 15f);
+				}
+				else t.localPosition = pos;
 
 				if (++x >= maxPerLine && maxPerLine > 0)
 				{
@@ -139,9 +154,15 @@ public class UIGrid : UIWidgetContainer
 				if (!NGUITools.GetActive(t.gameObject) && hideInactive) continue;
 
 				float depth = t.localPosition.z;
-				t.localPosition = (arrangement == Arrangement.Horizontal) ?
+				Vector3 pos = (arrangement == Arrangement.Horizontal) ?
 					new Vector3(cellWidth * x, -cellHeight * y, depth) :
 					new Vector3(cellWidth * y, -cellHeight * x, depth);
+
+				if (animateSmoothly && Application.isPlaying)
+				{
+					SpringPosition.Begin(t.gameObject, pos, 15f);
+				}
+				else t.localPosition = pos;
 
 				if (++x >= maxPerLine && maxPerLine > 0)
 				{
