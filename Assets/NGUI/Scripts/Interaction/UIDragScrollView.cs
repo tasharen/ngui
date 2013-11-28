@@ -23,12 +23,14 @@ public class UIDragScrollView : MonoBehaviour
 	[HideInInspector][SerializeField] UIScrollView draggablePanel;
 
 	Transform mTrans;
+	UIScrollView mScroll;
+	bool mAutoFind = false;
 
 	/// <summary>
 	/// Automatically find the scroll view if possible.
 	/// </summary>
 
-	void Start ()
+	void OnEnable ()
 	{
 		mTrans = transform;
 
@@ -40,8 +42,17 @@ public class UIDragScrollView : MonoBehaviour
 		}
 
 		// If the scroll view is on a parent, don't try to remember it (as we want it to be dynamic in case of re-parenting)
-		UIScrollView view = NGUITools.FindInParents<UIScrollView>(mTrans);
-		if (scrollView == view) scrollView = null;
+		UIScrollView sv = NGUITools.FindInParents<UIScrollView>(mTrans);
+		
+		if (scrollView == null)
+		{
+			scrollView = sv;
+			mAutoFind = true;
+		}
+		else if (scrollView == sv)
+		{
+			mAutoFind = true;
+		}
 	}
 
 	/// <summary>
@@ -50,17 +61,10 @@ public class UIDragScrollView : MonoBehaviour
 
 	void OnPress (bool pressed)
 	{
-		if (enabled && NGUITools.GetActive(gameObject))
+		if (scrollView && enabled && NGUITools.GetActive(gameObject))
 		{
-			if (scrollView)
-			{
-				scrollView.Press(pressed);
-			}
-			else
-			{
-				UIScrollView view = NGUITools.FindInParents<UIScrollView>(mTrans);
-				if (view != null) view.Press(pressed);
-			}
+			scrollView.Press(pressed);
+			if (!pressed && mAutoFind) scrollView = NGUITools.FindInParents<UIScrollView>(mTrans);
 		}
 	}
 
@@ -70,18 +74,8 @@ public class UIDragScrollView : MonoBehaviour
 
 	void OnDrag (Vector2 delta)
 	{
-		if (enabled && NGUITools.GetActive(gameObject))
-		{
-			if (scrollView)
-			{
-				scrollView.Drag();
-			}
-			else
-			{
-				UIScrollView view = NGUITools.FindInParents<UIScrollView>(mTrans);
-				if (view != null) view.Drag();
-			}
-		}
+		if (scrollView && enabled && NGUITools.GetActive(gameObject))
+			scrollView.Drag();
 	}
 
 	/// <summary>
@@ -90,17 +84,7 @@ public class UIDragScrollView : MonoBehaviour
 
 	void OnScroll (float delta)
 	{
-		if (enabled && NGUITools.GetActive(gameObject))
-		{
-			if (scrollView)
-			{
-				scrollView.Scroll(delta);
-			}
-			else
-			{
-				UIScrollView view = NGUITools.FindInParents<UIScrollView>(mTrans);
-				if (view != null) view.Scroll(delta);
-			}
-		}
+		if (scrollView && enabled && NGUITools.GetActive(gameObject))
+			scrollView.Scroll(delta);
 	}
 }
