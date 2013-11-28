@@ -430,9 +430,12 @@ public class UIDrawCall : MonoBehaviour
 				{
 					mIndices = GenerateCachedIndexBuffer(count, indexCount);
 					mMesh.triangles = mIndices;
+					mMesh.RecalculateBounds();
 				}
-
-				if (mClipping != Clipping.None) mMesh.RecalculateBounds();
+				else if (mClipping != Clipping.None)
+				{
+					mMesh.RecalculateBounds();
+				}
 				mFilter.mesh = mMesh;
 			}
 			else
