@@ -15,31 +15,71 @@ public class DragDropItem : MonoBehaviour
 	public GameObject prefab;
 
 	Transform mTrans;
-	bool mPressed = false;
-	int mTouchID = 0;
-	bool mIsDragging = false;
-	bool mSticky = false;
 	Transform mParent;
+	Collider mCollider;
+	UIRoot mRoot;
+	int mTouchID = int.MinValue;
 
 	/// <summary>
-	/// Update the table, if there is one.
+	/// Cache the transform.
 	/// </summary>
 
-	void UpdateTable ()
+	void Awake ()
 	{
-		UITable table = NGUITools.FindInParents<UITable>(gameObject);
-		if (table != null) table.repositionNow = true;
+		mTrans = transform;
+		mCollider = collider;
 	}
 
 	/// <summary>
-	/// Drop the dragged object.
+	/// Start the dragging operation.
 	/// </summary>
 
-	void Drop ()
+	void OnDragStart ()
 	{
+		if (!enabled || mTouchID != int.MinValue) return;
+
+		// Disable the collider so that it doesn't intercept events
+		if (mCollider != null) mCollider.enabled = false;
+
+		mTouchID = UICamera.currentTouchID;
+		mParent = mTrans.parent;
+		mRoot = NGUITools.FindInParents<UIRoot>(mTrans.gameObject);
+
+		if (DragDropRoot.root != null)
+			mTrans.parent = DragDropRoot.root;
+
+		Vector3 pos = mTrans.localPosition;
+		pos.z = 0f;
+		mTrans.localPosition = pos;
+
+		// Notify the widgets that the parent has changed
+		NGUITools.MarkParentAsChanged(gameObject);
+	}
+
+	/// <summary>
+	/// Perform the dragging.
+	/// </summary>
+
+	void OnDrag (Vector2 delta)
+	{
+		if (!enabled || mTouchID != UICamera.currentTouchID) return;
+		mTrans.localPosition += (Vector3)delta * mRoot.pixelSizeAdjustment;
+	}
+
+	/// <summary>
+	/// Notification sent when the drag event has ended.
+	/// </summary>
+
+	void OnDragEnd ()
+	{
+		if (!enabled || mTouchID != UICamera.currentTouchID) return;
+		mTouchID = int.MinValue;
+
+		// Enable the collider again
+		if (mCollider != null) mCollider.enabled = true;
+
 		// Is there a droppable container?
-		Collider col = UICamera.lastHit.collider;
-		DragDropContainer container = (col != null) ? col.gameObject.GetComponent<DragDropContainer>() : null;
+		DragDropContainer container = (UICamera.hoveredObject != null) ? UICamera.hoveredObject.GetComponent<DragDropContainer>() : null;
 
 		if (container != null)
 		{
@@ -56,91 +96,15 @@ public class DragDropItem : MonoBehaviour
 			mTrans.parent = mParent;
 		}
 
-		// Restore the depth
-		//UIWidget[] widgets = GetComponentsInChildren<UIWidget>();
-		//for (int i = 0; i < widgets.Length; ++i) widgets[i].depth = widgets[i].depth - 100;
-
 		// Notify the table of this change
-		UpdateTable();
+		UITable table = NGUITools.FindInParents<UITable>(gameObject);
+		if (table != null) table.repositionNow = true;
 
-		// Make all widgets update their parents
+		// Notify the grid as well, if we have one
+		UIGrid grid = NGUITools.FindInParents<UIGrid>(gameObject);
+		if (grid != null) grid.repositionNow = true;
+
+		// Notify the widgets that the parent has changed
 		NGUITools.MarkParentAsChanged(gameObject);
-	}
-
-	/// <summary>
-	/// Cache the transform.
-	/// </summary>
-
-	void Awake () { mTrans = transform; }
-	
-	UIRoot mRoot;
-
-	/// <summary>
-	/// Start the drag event and perform the dragging.
-	/// </summary>
-
-	void OnDrag (Vector2 delta)
-	{
-		if (mPressed && UICamera.currentTouchID == mTouchID && enabled)
-		{
-			if (!mIsDragging)
-			{
-				mIsDragging = true;
-				mParent = mTrans.parent;
-				mRoot = NGUITools.FindInParents<UIRoot>(mTrans.gameObject);
-				
-				if (DragDropRoot.root != null)
-					mTrans.parent = DragDropRoot.root;
-
-				Vector3 pos = mTrans.localPosition;
-				pos.z = 0f;
-				mTrans.localPosition = pos;
-
-				// Inflate the depth so that the dragged item appears in front of everything else
-				//UIWidget[] widgets = GetComponentsInChildren<UIWidget>();
-				//for (int i = 0; i < widgets.Length; ++i) widgets[i].depth = widgets[i].depth + 100;
-
-				NGUITools.MarkParentAsChanged(gameObject);
-			}
-			else
-			{
-				mTrans.localPosition += (Vector3)delta * mRoot.pixelSizeAdjustment;
-			}
-		}
-	}
-
-	/// <summary>
-	/// Start or stop the drag operation.
-	/// </summary>
-
-	void OnPress (bool isPressed)
-	{
-		if (enabled)
-		{
-			if (isPressed)
-			{
-				if (mPressed) return;
-
-				mPressed = true;
-				mTouchID = UICamera.currentTouchID;
-
-				if (!UICamera.current.stickyPress)
-				{
-					mSticky = true;
-					UICamera.current.stickyPress = true;
-				}
-			}
-			else if (mSticky)
-			{
-				mSticky = false;
-				UICamera.current.stickyPress = false;
-			}
-
-			mIsDragging = false;
-			Collider col = collider;
-			if (col != null) col.enabled = !isPressed;
-			if (!isPressed) Drop();
-			mPressed = isPressed;
-		}
 	}
 }
