@@ -81,7 +81,7 @@ static public class NGUITools
 
 		if (clip != null && volume > 0.01f)
 		{
-			if (mListener == null)
+			if (mListener == null || !NGUITools.IsActive(mListener))
 			{
 				mListener = GameObject.FindObjectOfType(typeof(AudioListener)) as AudioListener;
 
@@ -305,7 +305,6 @@ static public class NGUITools
 				Vector3[] corners = w.localCorners;
 				Vector3 center = (corners[2] + corners[0]) * 0.5f;
 				Vector3 size = (corners[2] - corners[0]);
-				size.z = 1f;
 				box.center = center;
 				box.size = size;
 			}
@@ -313,7 +312,7 @@ static public class NGUITools
 			{
 				Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
 				box.center = b.center;
-				box.size = new Vector3(b.size.x, b.size.y, 1f);
+				box.size = new Vector3(b.size.x, b.size.y, 0f);
 			}
 #if UNITY_EDITOR
 			UnityEditor.EditorUtility.SetDirty(box);
@@ -897,7 +896,7 @@ static public class NGUITools
 	/// Helper function that returns whether the specified MonoBehaviour is active.
 	/// </summary>
 
-	static public bool IsActive (MonoBehaviour mb)
+	static public bool IsActive (Behaviour mb)
 	{
 #if UNITY_3_5
 		return mb != null && mb.enabled && mb.gameObject.active;
