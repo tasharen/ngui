@@ -409,6 +409,12 @@ static public class NGUIMenu
 		EditorWindow.GetWindow<UIPanelTool>(false, "Panel Tool", true);
 	}
 
+	[MenuItem("NGUI/Open/Draw Call Tool", false, 9)]
+	static public void OpenDCTool ()
+	{
+		EditorWindow.GetWindow<UIDrawCallViewer>(false, "Draw Call Tool", true);
+	}
+
 	[MenuItem("NGUI/Open/Camera Tool", false, 9)]
 	static public void OpenCameraWizard ()
 	{

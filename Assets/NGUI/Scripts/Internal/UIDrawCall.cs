@@ -39,7 +39,7 @@ public class UIDrawCall : MonoBehaviour
 		None = 0,
 		AlphaClip = 2,	// Adjust the alpha, compatible with all devices
 		SoftClip = 3,	// Alpha-based clipping with a softened edge
-		Invisible = 4,	// No actual clipping, but does have an area
+		ConstrainButDontClip = 4,	// No actual clipping, but does have an area
 	}
 
 	[HideInInspector]
@@ -57,6 +57,10 @@ public class UIDrawCall : MonoBehaviour
 	[HideInInspector]
 	[System.NonSerialized]
 	public UIPanel panel;
+
+	[HideInInspector]
+	[System.NonSerialized]
+	public bool alwaysOnScreen = false;
 
 	Material		mMaterial;		// Material used by this screen
 	Texture			mTexture;		// Main texture used by the material
@@ -430,12 +434,8 @@ public class UIDrawCall : MonoBehaviour
 				{
 					mIndices = GenerateCachedIndexBuffer(count, indexCount);
 					mMesh.triangles = mIndices;
-					mMesh.RecalculateBounds();
 				}
-				else if (mClipping != Clipping.None)
-				{
-					mMesh.RecalculateBounds();
-				}
+				if (!alwaysOnScreen) mMesh.RecalculateBounds();
 				mFilter.mesh = mMesh;
 			}
 			else
@@ -511,7 +511,7 @@ public class UIDrawCall : MonoBehaviour
 			UpdateMaterials();
 		}
 
-		if (mDynamicMat != null && isClipped && mClipping != Clipping.Invisible)
+		if (mDynamicMat != null && isClipped && mClipping != Clipping.ConstrainButDontClip)
 		{
 			mDynamicMat.mainTextureOffset = new Vector2(-mClipRange.x / mClipRange.z, -mClipRange.y / mClipRange.w);
 			mDynamicMat.mainTextureScale = new Vector2(1f / mClipRange.z, 1f / mClipRange.w);

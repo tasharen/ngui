@@ -65,6 +65,13 @@ public class UIPanel : MonoBehaviour
 	public bool cullWhileDragging = false;
 
 	/// <summary>
+	/// Optimization flag. Makes the assumption that the panel's geometry
+	/// will always be on screen and the bounds don't need to be re-calculated.
+	/// </summary>
+
+	public bool alwaysOnScreen = false;
+
+	/// <summary>
 	/// Matrix that will transform the specified world coordinates to relative-to-panel coordinates.
 	/// </summary>
 
@@ -1046,6 +1053,7 @@ public class UIPanel : MonoBehaviour
 	void SubmitDrawCall (UIDrawCall dc)
 	{
 		dc.clipping = clipping;
+		dc.alwaysOnScreen = alwaysOnScreen && (clipping == UIDrawCall.Clipping.None || clipping == UIDrawCall.Clipping.ConstrainButDontClip);
 		dc.Set(mVerts, generateNormals ? mNorms : null, generateNormals ? mTans : null, mUvs, mCols);
 		mVerts.Clear();
 		mNorms.Clear();
