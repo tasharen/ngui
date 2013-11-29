@@ -723,6 +723,7 @@ public class UIWidget : MonoBehaviour
 	protected virtual void OnEnable ()
 	{
 		mChanged = true;
+		RemoveFromPanel();
 
 		// Prior to NGUI 2.7.0 width and height was specified as transform's local scale
 		if (mWidth == 100 && mHeight == 100 && cachedTransform.localScale.magnitude > 8f)
