@@ -19,9 +19,15 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/NGUI Unity2D Sprite")]
 public class UI2DSprite : UIWidget
 {
-	[HideInInspector][SerializeField] Sprite mSprite;
+	[HideInInspector][SerializeField] UnityEngine.Sprite mSprite;
 	[HideInInspector][SerializeField] Material mMat;
 	[HideInInspector][SerializeField] Shader mShader;
+
+	/// <summary>
+	/// To be used with animations.
+	/// </summary>
+
+	public UnityEngine.Sprite nextSprite;
 
 	int mPMA = -1;
 
@@ -29,7 +35,7 @@ public class UI2DSprite : UIWidget
 	/// UnityEngine.Sprite drawn by this widget.
 	/// </summary>
 
-	public Sprite sprite2D
+	public UnityEngine.Sprite sprite2D
 	{
 		get
 		{
@@ -40,6 +46,7 @@ public class UI2DSprite : UIWidget
 			if (mSprite != value)
 			{
 				mSprite = value;
+				nextSprite = null;
 				RemoveFromPanel();
 			}
 		}
@@ -59,9 +66,7 @@ public class UI2DSprite : UIWidget
 		{
 			if (mMat != value)
 			{
-				MarkAsChanged();
-				drawCall = null;
-				mPanel = null;
+				RemoveFromPanel();
 				mMat = value;
 				mPMA = -1;
 				MarkAsChanged();
@@ -85,6 +90,7 @@ public class UI2DSprite : UIWidget
 		{
 			if (mShader != value)
 			{
+				RemoveFromPanel();
 				mShader = value;
 
 				if (mMat == null)
@@ -195,6 +201,21 @@ public class UI2DSprite : UIWidget
 			}
 			return new Rect(0f, 0f, 1f, 1f);
 		}
+	}
+
+	/// <summary>
+	/// Update the sprite in case it was animated.
+	/// </summary>
+
+	public override void Update()
+	{
+		if (nextSprite != null)
+		{
+			if (nextSprite != mSprite)
+				sprite2D = nextSprite;
+			nextSprite = null;
+		}
+ 		base.Update();
 	}
 
 	/// <summary>

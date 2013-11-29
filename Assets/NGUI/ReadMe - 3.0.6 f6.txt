@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-            Version 3.0.6 f5
+            Version 3.0.6 f6
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -59,6 +59,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: Added the ability to extract sprites from the atlas.
 - NEW: Added a progress bar to the atlas maker when it's updating the atlas.
 - NEW: You can edit and delete sprites within the sprite selector window via right-click.
+- NEW: Created a separate Draw Call Tool window instead of displaying draw calls on the panels.
 - FIX: Sprite selection is now cohesive and updates the atlas maker, sprite selector, and inspector.
 - FIX: Sprite selection window should now handle large lists of sprites better.
 - FIX: Panels will now add rigidbodies to themselves since Unity 4.3 mentions it should improve performance.

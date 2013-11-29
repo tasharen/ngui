@@ -10,12 +10,6 @@ using System.Collections.Generic;
 [CustomEditor(typeof(UIPanel))]
 public class UIPanelInspector : Editor
 {
-	enum Visibility
-	{
-		Visible,
-		Hidden,
-	}
-
 	static int s_Hash = "PanelHash".GetHashCode();
 
 	UIPanel mPanel;
@@ -381,61 +375,7 @@ public class UIPanelInspector : Editor
 
 		if (matchingDepths > 1)
 		{
-			EditorGUILayout.HelpBox(matchingDepths + " panels are sharing the depth value of " + mPanel.depth, MessageType.Info);
-		}
-
-		GUILayout.BeginHorizontal();
-		bool norms = EditorGUILayout.Toggle("Normals", mPanel.generateNormals, GUILayout.Width(100f));
-		GUILayout.Label("Needed for lit shaders");
-		GUILayout.EndHorizontal();
-
-		if (mPanel.generateNormals != norms)
-		{
-			mPanel.generateNormals = norms;
-			UIPanel.RebuildAllDrawCalls(true);
-			EditorUtility.SetDirty(mPanel);
-		}
-
-		GUILayout.BeginHorizontal();
-		bool cull = EditorGUILayout.Toggle("Cull", mPanel.cullWhileDragging, GUILayout.Width(100f));
-		GUILayout.Label("Cull widgets while dragging them");
-		GUILayout.EndHorizontal();
-
-		if (mPanel.cullWhileDragging != cull)
-		{
-			mPanel.cullWhileDragging = cull;
-			UIPanel.RebuildAllDrawCalls(true);
-			EditorUtility.SetDirty(mPanel);
-		}
-
-		GUILayout.BeginHorizontal();
-		bool stat = EditorGUILayout.Toggle("Static", mPanel.widgetsAreStatic, GUILayout.Width(100f));
-		GUILayout.Label("Check if widgets won't move");
-		GUILayout.EndHorizontal();
-
-		if (mPanel.widgetsAreStatic != stat)
-		{
-			mPanel.widgetsAreStatic = stat;
-			UIPanel.RebuildAllDrawCalls(true);
-			EditorUtility.SetDirty(mPanel);
-		}
-
-		if (stat)
-		{
-			EditorGUILayout.HelpBox("Only mark the panel as 'static' if you know FOR CERTAIN that the widgets underneath will not move, rotate, or scale. Doing this improves performance, but moving widgets around will have no effect.", MessageType.Warning);
-		}
-
-		GUILayout.BeginHorizontal();
-		if (NGUISettings.showAllDCs != EditorGUILayout.Toggle("Show All", NGUISettings.showAllDCs, GUILayout.Width(100f)))
-			NGUISettings.showAllDCs = !NGUISettings.showAllDCs;
-		GUILayout.Label("Show all draw calls");
-		GUILayout.EndHorizontal();
-
-		if (mPanel.showInPanelTool != EditorGUILayout.Toggle("Panel Tool", mPanel.showInPanelTool))
-		{
-			mPanel.showInPanelTool = !mPanel.showInPanelTool;
-			EditorUtility.SetDirty(mPanel);
-			EditorWindow.FocusWindowIfItsOpen<UIPanelTool>();
+			EditorGUILayout.HelpBox(matchingDepths + " panels are sharing the depth value of " + mPanel.depth, MessageType.Warning);
 		}
 
 		UIDrawCall.Clipping clipping = (UIDrawCall.Clipping)EditorGUILayout.EnumPopup("Clipping", mPanel.clipping);
@@ -497,119 +437,96 @@ public class UIPanelInspector : Editor
 		if (clipping != UIDrawCall.Clipping.None && !NGUIEditorTools.IsUniform(mPanel.transform.lossyScale))
 		{
 			EditorGUILayout.HelpBox("Clipped panels must have a uniform scale, or clipping won't work properly!", MessageType.Error);
-			
+
 			if (GUILayout.Button("Auto-fix"))
 			{
 				NGUIEditorTools.FixUniform(mPanel.gameObject);
 			}
 		}
 
-		BetterList<UIDrawCall> dcs = UIDrawCall.activeList;
-
-		for (int i = 0; i < dcs.size; ++i)
+		if (NGUIEditorTools.DrawHeader("Advanced Options"))
 		{
-			UIDrawCall dc = dcs[i];
+			NGUIEditorTools.BeginContents();
 
-			if (dc.manager != mPanel)
+			GUILayout.BeginHorizontal();
+			bool norms = EditorGUILayout.Toggle("Normals", mPanel.generateNormals, GUILayout.Width(100f));
+			GUILayout.Label("Needed for lit shaders", GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
+
+			if (mPanel.generateNormals != norms)
 			{
-				if (!NGUISettings.showAllDCs) continue;
-				if (dc.showDetails) GUI.color = new Color(0.85f, 0.85f, 0.85f);
-				else GUI.contentColor = new Color(0.85f, 0.85f, 0.85f);
+				mPanel.generateNormals = norms;
+				UIPanel.RebuildAllDrawCalls(true);
+				EditorUtility.SetDirty(mPanel);
 			}
-			else GUI.contentColor = Color.white;
 
-			string key = dc.keyName;
-			string name = key + " of " + dcs.size;
-			if (!dc.isActive) name = name + " (HIDDEN)";
-			else if (dc.manager != mPanel) name = name + " (" + dc.manager.name + ")";
+			GUILayout.BeginHorizontal();
+			bool cull = EditorGUILayout.Toggle("Cull", mPanel.cullWhileDragging, GUILayout.Width(100f));
+			GUILayout.Label("Cull widgets while dragging them", GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
 
-			if (NGUIEditorTools.DrawHeader(name, key))
+			if (mPanel.cullWhileDragging != cull)
 			{
-				GUI.color = (dc.manager == mPanel) ? Color.white : new Color(0.8f, 0.8f, 0.8f);
+				mPanel.cullWhileDragging = cull;
+				UIPanel.RebuildAllDrawCalls(true);
+				EditorUtility.SetDirty(mPanel);
+			}
 
-				NGUIEditorTools.BeginContents();
-				EditorGUILayout.ObjectField("Material", dc.baseMaterial, typeof(Material), false);
+			GUILayout.BeginHorizontal();
+			bool alw = EditorGUILayout.Toggle("Visible", mPanel.alwaysOnScreen, GUILayout.Width(100f));
+			GUILayout.Label("Check if widgets never go off-screen", GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
 
-				int count = 0;
+			if (mPanel.alwaysOnScreen != alw)
+			{
+				mPanel.alwaysOnScreen = alw;
+				UIPanel.RebuildAllDrawCalls(true);
+				EditorUtility.SetDirty(mPanel);
+			}
 
-				for (int b = 0; b < UIWidget.list.size; ++b)
-				{
-					UIWidget w = UIWidget.list[b];
-					if (w.drawCall == dc)
-						++count;
-				}
+			GUILayout.BeginHorizontal();
+			bool stat = EditorGUILayout.Toggle("Static", mPanel.widgetsAreStatic, GUILayout.Width(100f));
+			GUILayout.Label("Check if widgets won't move", GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
 
-				string myPath = NGUITools.GetHierarchy(dc.manager.cachedGameObject);
-				string remove = myPath + "\\";
-				string[] list = new string[count + 1];
-				list[0] = count.ToString();
-				count = 0;
+			if (mPanel.widgetsAreStatic != stat)
+			{
+				mPanel.widgetsAreStatic = stat;
+				UIPanel.RebuildAllDrawCalls(true);
+				EditorUtility.SetDirty(mPanel);
+			}
 
-				for (int b = 0; b < UIWidget.list.size; ++b)
-				{
-					UIWidget w = UIWidget.list[b];
-					
-					if (w.drawCall == dc)
-					{
-						string path = NGUITools.GetHierarchy(w.cachedGameObject);
-						list[++count] = count + ". " + (string.Equals(path, myPath) ? w.name : path.Replace(remove, ""));
-					}
-				}
+			if (stat)
+			{
+				EditorGUILayout.HelpBox("Only mark the panel as 'static' if you know FOR CERTAIN that the widgets underneath will not move, rotate, or scale. Doing this improves performance, but moving widgets around will have no effect.", MessageType.Warning);
+			}
 
-				GUILayout.BeginHorizontal();
-				int sel = EditorGUILayout.Popup("Widgets", 0, list);
-				GUILayout.Space(18f);
-				GUILayout.EndHorizontal();
+			GUILayout.BeginHorizontal();
+			bool tool = EditorGUILayout.Toggle("Panel Tool", mPanel.showInPanelTool, GUILayout.Width(100f));
+			GUILayout.Label("Show in panel tool");
+			GUILayout.EndHorizontal();
 
-				if (sel != 0)
-				{
-					count = 0;
+			if (mPanel.showInPanelTool != tool)
+			{
+				mPanel.showInPanelTool = !mPanel.showInPanelTool;
+				EditorUtility.SetDirty(mPanel);
+				EditorWindow.FocusWindowIfItsOpen<UIPanelTool>();
+			}
+			NGUIEditorTools.EndContents();
+		}
 
-					for (int b = 0; b < UIWidget.list.size; ++b)
-					{
-						UIWidget w = UIWidget.list[b];
+		if (GUILayout.Button("Show Draw Calls"))
+		{
+			NGUISettings.showAllDCs = false;
 
-						if (w.drawCall == dc && ++count == sel)
-						{
-							Selection.activeGameObject = w.gameObject;
-							break;
-						}
-					}
-				}
-
-				GUILayout.BeginHorizontal();
-				EditorGUILayout.LabelField("Render Q", dc.finalRenderQueue.ToString(), GUILayout.Width(120f));
-				bool draw = (Visibility)EditorGUILayout.EnumPopup(dc.isActive ? Visibility.Visible : Visibility.Hidden) == Visibility.Visible;
-				GUILayout.Space(18f);
-				GUILayout.EndHorizontal();
-
-				if (dc.isActive != draw)
-				{
-					dc.isActive = draw;
-					UnityEditor.EditorUtility.SetDirty(dc.manager);
-				}
-
-				GUILayout.BeginHorizontal();
-				EditorGUILayout.LabelField("Triangles", dc.triangles.ToString(), GUILayout.Width(120f));
-
-				if (dc.manager != mPanel)
-				{
-					if (GUILayout.Button("Select the Panel"))
-					{
-						Selection.activeGameObject = dc.manager.gameObject;
-					}
-					GUILayout.Space(18f);
-				}
-				GUILayout.EndHorizontal();
-
-				if (dc.manager.clipping != UIDrawCall.Clipping.None && !dc.isClipped)
-				{
-					EditorGUILayout.HelpBox("You must switch this material's shader to Unlit/Transparent Colored or Unlit/Premultiplied Colored in order for clipping to work.",
-						MessageType.Warning);
-				}
-
-				NGUIEditorTools.EndContents();
-				GUI.color = Color.white;
+			if (UIDrawCallViewer.instance != null)
+			{
+				UIDrawCallViewer.instance.Focus();
+				UIDrawCallViewer.instance.Repaint();
+			}
+			else
+			{
+				EditorWindow.GetWindow<UIDrawCallViewer>(false, "Draw Call Tool", true);
 			}
 		}
 	}

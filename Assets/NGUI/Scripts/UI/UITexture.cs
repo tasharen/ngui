@@ -57,9 +57,7 @@ public class UITexture : UIWidget
 		{
 			if (mMat != value)
 			{
-				MarkAsChanged();
-				drawCall = null;
-				mPanel = null;
+				RemoveFromPanel();
 				mMat = value;
 				mPMA = -1;
 				MarkAsChanged();
