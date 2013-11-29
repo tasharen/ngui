@@ -604,7 +604,7 @@ public class UILabel : UIWidget
 		}
 		set
 		{
-			if (!mEffectColor.Equals(value))
+			if (mEffectColor != value)
 			{
 				mEffectColor = value;
 				if (mEffectStyle != Effect.None) hasChanged = true;

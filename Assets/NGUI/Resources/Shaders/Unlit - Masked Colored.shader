@@ -2,7 +2,7 @@ Shader "Unlit/Masked Colored"
 {
 	Properties
 	{
-		_MainTex ("Base (RGB) Mask (A)", 2D) = "white" {}
+		_MainTex ("Base (RGB) Mask (A)", 2D) = "black" {}
 		_Color ("Tint Color", Color) = (1,1,1,1)
 	}
 	
