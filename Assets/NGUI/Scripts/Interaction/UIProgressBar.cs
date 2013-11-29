@@ -193,7 +193,7 @@ public class UIProgressBar : UIWidgetContainer
 	/// Drag the scroll bar by the specified on-screen amount.
 	/// </summary>
 
-	protected void Reposition (Vector2 screenPos)
+	protected void SetByPosition (Vector2 screenPos)
 	{
 		// Create a plane
 		Transform trans = cachedTransform;
@@ -215,7 +215,7 @@ public class UIProgressBar : UIWidgetContainer
 	protected void OnPressBackground (GameObject go, bool isPressed)
 	{
 		mCam = UICamera.currentCamera;
-		Reposition(UICamera.lastTouchPosition);
+		SetByPosition(UICamera.lastTouchPosition);
 		if (!isPressed && onDragFinished != null) onDragFinished();
 	}
 
@@ -226,7 +226,7 @@ public class UIProgressBar : UIWidgetContainer
 	protected void OnDragBackground (GameObject go, Vector2 delta)
 	{
 		mCam = UICamera.currentCamera;
-		Reposition(UICamera.lastTouchPosition);
+		SetByPosition(UICamera.lastTouchPosition);
 	}
 
 	/// <summary>
@@ -257,7 +257,7 @@ public class UIProgressBar : UIWidgetContainer
 	protected void OnDragForeground (GameObject go, Vector2 delta)
 	{
 		mCam = UICamera.currentCamera;
-		Reposition(mScreenPos + UICamera.currentTouch.totalDelta);
+		SetByPosition(mScreenPos + UICamera.currentTouch.totalDelta);
 	}
 
 	/// <summary>
