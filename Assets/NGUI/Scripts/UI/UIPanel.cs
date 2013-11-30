@@ -386,6 +386,48 @@ public class UIPanel : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Get horizontal bounds points relative to the specified transform.
+	/// </summary>
+
+	public float GetHorizontal (Transform relativeTo, float relative, int absolute)
+	{
+		Vector2 size = GetSize();
+
+		float x0 = -0.5f * size.x;
+		float y0 = -0.5f * size.y;
+		float x1 = x0 + size.x;
+		float y1 = y0 + size.y;
+		float center = (y0 + y1) * 0.5f;
+
+		Transform wt = cachedTransform;
+		Vector3 v0 = relativeTo.InverseTransformPoint(wt.TransformPoint(x0, center, 0f));
+		Vector3 v1 = relativeTo.InverseTransformPoint(wt.TransformPoint(x1, center, 0f));
+
+		return Mathf.Round(Mathf.Lerp(v0.x, v1.x, relative)) + absolute;
+	}
+
+	/// <summary>
+	/// Get vertical bounds points relative to the specified transform.
+	/// </summary>
+
+	public float GetVertical (Transform relativeTo, float relative, int absolute)
+	{
+		Vector2 size = GetSize();
+
+		float x0 = -0.5f * size.x;
+		float y0 = -0.5f * size.y;
+		float x1 = x0 + size.x;
+		float y1 = y0 + size.y;
+		float center = (x0 + x1) * 0.5f;
+
+		Transform wt = cachedTransform;
+		Vector3 v0 = relativeTo.InverseTransformPoint(wt.TransformPoint(center, y0, 0f));
+		Vector3 v1 = relativeTo.InverseTransformPoint(wt.TransformPoint(center, y1, 0f));
+
+		return Mathf.Round(Mathf.Lerp(v0.y, v1.y, relative)) + absolute;
+	}
+
+	/// <summary>
 	/// Returns whether the specified rectangle is visible by the panel. The coordinates must be in world space.
 	/// </summary>
 
@@ -1116,7 +1158,7 @@ public class UIPanel : MonoBehaviour
 	{
 		bool clip = (mClipping != UIDrawCall.Clipping.None);
 #if UNITY_EDITOR
-		Vector2 size = clip ? new Vector2(mClipRange.z, mClipRange.w) : new Vector2(mScreenWidth, mScreenHeight);
+		Vector2 size = clip ? new Vector2(mClipRange.z, mClipRange.w) : GetMainGameViewSize();
 #else
 		Vector2 size = clip ? new Vector2(mClipRange.z, mClipRange.w) : new Vector2(Screen.width, Screen.height);
 #endif
@@ -1124,7 +1166,7 @@ public class UIPanel : MonoBehaviour
 		{
 			UIRoot root = NGUITools.FindInParents<UIRoot>(cachedGameObject);
 #if UNITY_EDITOR
-			if (root != null) size *= root.GetPixelSizeAdjustment(mScreenHeight);
+			if (root != null) size *= root.GetPixelSizeAdjustment(Mathf.RoundToInt(size.y));
 #else
 			if (root != null) size *= root.GetPixelSizeAdjustment(Screen.height);
 #endif
@@ -1134,13 +1176,21 @@ public class UIPanel : MonoBehaviour
 
 #if UNITY_EDITOR
 
-	int mScreenWidth = 1280;
-	int mScreenHeight = 720;
-	
-	void Update ()
+	static System.Reflection.MethodInfo s_GetSizeOfMainGameView;
+
+	/// <summary>
+	/// Major hax to get the size of the game view window.
+	/// </summary>
+
+	static Vector2 GetMainGameViewSize ()
 	{
-		mScreenWidth = Screen.width;
-		mScreenHeight = Screen.height;
+		if (s_GetSizeOfMainGameView == null)
+		{
+			System.Type type = System.Type.GetType("UnityEditor.GameView,UnityEditor");
+			s_GetSizeOfMainGameView = type.GetMethod("GetSizeOfMainGameView",
+				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+		}
+		return (Vector2)s_GetSizeOfMainGameView.Invoke(null, null);
 	}
 
 	/// <summary>

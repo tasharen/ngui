@@ -78,10 +78,16 @@ public class UIWidget : MonoBehaviour
 	bool mVisibleByPanel = true;
 	float mLastAlpha = 0f;
 	int mUpdateFrame = -1;
+
 	UIWidget mAnchorLW;
 	UIWidget mAnchorRW;
 	UIWidget mAnchorBW;
 	UIWidget mAnchorTW;
+
+	UIPanel mAnchorLP;
+	UIPanel mAnchorRP;
+	UIPanel mAnchorBP;
+	UIPanel mAnchorTP;
 
 	/// <summary>
 	/// Internal usage -- draw call that's drawing the widget.
@@ -670,10 +676,7 @@ public class UIWidget : MonoBehaviour
 			cachedTransform.localScale = Vector3.one;
 		}
 
-		mAnchorLW = mAnchorL ? mAnchorL.GetComponent<UIWidget>() : null;
-		mAnchorRW = mAnchorR ? mAnchorR.GetComponent<UIWidget>() : null;
-		mAnchorBW = mAnchorB ? mAnchorB.GetComponent<UIWidget>() : null;
-		mAnchorTW = mAnchorT ? mAnchorT.GetComponent<UIWidget>() : null;
+		CacheAnchorComponents();
 
 		if (mWidth < minWidth) mWidth = minWidth;
 		if (mHeight < minHeight) mHeight = minHeight;
@@ -839,13 +842,26 @@ public class UIWidget : MonoBehaviour
 	{
 		mStarted = true;
 
+		CacheAnchorComponents();
+		OnStart();
+		CreatePanel();
+	}
+
+	/// <summary>
+	/// Cache all components related to anchoring.
+	/// </summary>
+
+	void CacheAnchorComponents ()
+	{
 		mAnchorLW = mAnchorL ? mAnchorL.GetComponent<UIWidget>() : null;
 		mAnchorRW = mAnchorR ? mAnchorR.GetComponent<UIWidget>() : null;
 		mAnchorBW = mAnchorB ? mAnchorB.GetComponent<UIWidget>() : null;
 		mAnchorTW = mAnchorT ? mAnchorT.GetComponent<UIWidget>() : null;
 
-		OnStart();
-		CreatePanel();
+		mAnchorLP = mAnchorL ? mAnchorL.GetComponent<UIPanel>() : null;
+		mAnchorRP = mAnchorR ? mAnchorR.GetComponent<UIPanel>() : null;
+		mAnchorBP = mAnchorB ? mAnchorB.GetComponent<UIPanel>() : null;
+		mAnchorTP = mAnchorT ? mAnchorT.GetComponent<UIPanel>() : null;
 	}
 
 	/// <summary>
@@ -905,30 +921,54 @@ public class UIWidget : MonoBehaviour
 
 			if (mAnchorL)
 			{
-				lt = (mAnchorLW != null) ?
-					mAnchorLW.GetHorizontal(p, mAnchorLR, mAnchorLA) :
-					t.InverseTransformPoint(mAnchorL.position).x;
+				if (mAnchorLW != null)
+				{
+					lt = mAnchorLW.GetHorizontal(p, mAnchorLR, mAnchorLA);
+				}
+				else if (mAnchorLP != null)
+				{
+					lt = mAnchorLP.GetHorizontal(p, mAnchorLR, mAnchorLA);
+				}
+				else lt = t.InverseTransformPoint(mAnchorL.position).x;
 			}
 
 			if (mAnchorB)
 			{
-				bt = (mAnchorBW != null) ?
-					mAnchorBW.GetVertical(p, mAnchorBR, mAnchorBA) :
-					t.InverseTransformPoint(mAnchorB.position).x;
+				if (mAnchorBW != null)
+				{
+					bt = mAnchorBW.GetVertical(p, mAnchorBR, mAnchorBA);
+				}
+				else if (mAnchorBP != null)
+				{
+					bt = mAnchorBP.GetVertical(p, mAnchorBR, mAnchorBA);
+				}
+				else bt = t.InverseTransformPoint(mAnchorB.position).y;
 			}
 
 			if (mAnchorR)
 			{
-				rt = (mAnchorRW != null) ?
-					mAnchorRW.GetHorizontal(p, mAnchorRR, mAnchorRA) :
-					t.InverseTransformPoint(mAnchorR.position).x;
+				if (mAnchorRW != null)
+				{
+					rt = mAnchorRW.GetHorizontal(p, mAnchorRR, mAnchorRA);
+				}
+				else if (mAnchorRP != null)
+				{
+					rt = mAnchorRP.GetHorizontal(p, mAnchorRR, mAnchorRA);
+				}
+				else rt = t.InverseTransformPoint(mAnchorR.position).x;
 			}
 
 			if (mAnchorT)
 			{
-				tt = (mAnchorTW != null) ?
-					mAnchorTW.GetVertical(p, mAnchorTR, mAnchorTA) :
-					t.InverseTransformPoint(mAnchorT.position).x;
+				if (mAnchorTW != null)
+				{
+					tt = mAnchorTW.GetVertical(p, mAnchorTR, mAnchorTA);
+				}
+				else if (mAnchorTP != null)
+				{
+					tt = mAnchorTP.GetVertical(p, mAnchorTR, mAnchorTA);
+				}
+				else tt = t.InverseTransformPoint(mAnchorT.position).y;
 			}
 
 			Vector3 newPos = new Vector3(
@@ -936,6 +976,9 @@ public class UIWidget : MonoBehaviour
 				Mathf.Round(Mathf.Lerp(bt, tt, po.y)), lp.z);
 			int w = Mathf.RoundToInt(rt - lt);
 			int h = Mathf.RoundToInt(tt - bt);
+
+			if (w < minWidth) w = minWidth;
+			if (h < minHeight) h = minHeight;
 
 			if (po.x == 0.5f && ((w & 1) == 1)) ++w;
 			if (po.y == 0.5f && ((h & 1) == 1)) ++h;
