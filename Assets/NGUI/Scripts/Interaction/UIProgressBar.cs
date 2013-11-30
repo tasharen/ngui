@@ -36,6 +36,12 @@ public class UIProgressBar : UIWidgetContainer
 	public OnDragFinished onDragFinished;
 	public delegate void OnDragFinished ();
 
+	/// <summary>
+	/// Object that acts as a thumb.
+	/// </summary>
+
+	public Transform thumb;
+
 	[HideInInspector][SerializeField] protected UIWidget mBG;
 	[HideInInspector][SerializeField] protected UIWidget mFG;
 	[HideInInspector][SerializeField] protected float mValue = 1f;
@@ -160,6 +166,17 @@ public class UIProgressBar : UIWidgetContainer
 				mBG.alpha = value;
 				if (mBG.collider != null) mBG.collider.enabled = mBG.alpha > 0.001f;
 			}
+
+			if (thumb != null)
+			{
+				UIWidget w = thumb.GetComponent<UIWidget>();
+				
+				if (w != null)
+				{
+					w.alpha = value;
+					if (w.collider != null) w.collider.enabled = w.alpha > 0.001f;
+				}
+			}
 		}
 	}
 
@@ -174,74 +191,6 @@ public class UIProgressBar : UIWidgetContainer
 	/// </summary>
 
 	protected bool isInverted { get { return (mFill == FillDirection.RightToLeft || mFill == FillDirection.TopToBottom); } }
-
-	/// <summary>
-	/// Position the scroll bar to be under the current touch.
-	/// </summary>
-
-	protected void OnPressBackground (GameObject go, bool isPressed)
-	{
-		mCam = UICamera.currentCamera;
-		value = ScreenToValue(UICamera.lastTouchPosition);
-		if (!isPressed && onDragFinished != null) onDragFinished();
-	}
-
-	/// <summary>
-	/// Position the scroll bar to be under the current touch.
-	/// </summary>
-
-	protected void OnDragBackground (GameObject go, Vector2 delta)
-	{
-		mCam = UICamera.currentCamera;
-		value = ScreenToValue(UICamera.lastTouchPosition);
-	}
-
-	/// <summary>
-	/// Save the position of the foreground on press.
-	/// </summary>
-
-	protected void OnPressForeground (GameObject go, bool isPressed)
-	{
-		if (isPressed)
-		{
-			mOffset = (mFG == null) ? 0f :
-				value - ScreenToValue(UICamera.lastTouchPosition);
-		}
-		else if (onDragFinished != null) onDragFinished();
-	}
-
-	/// <summary>
-	/// Drag the scroll bar in the specified direction.
-	/// </summary>
-
-	protected void OnDragForeground (GameObject go, Vector2 delta)
-	{
-		mCam = UICamera.currentCamera;
-		value = mOffset + ScreenToValue(UICamera.lastTouchPosition);
-	}
-
-	/// <summary>
-	/// Watch for key events and adjust the value accordingly.
-	/// </summary>
-
-	protected void OnKey (KeyCode key)
-	{
-		if (enabled)
-		{
-			float step = (numberOfSteps > 1f) ? 1f / (numberOfSteps - 1) : 0.125f;
-
-			if (fillDirection == FillDirection.LeftToRight || fillDirection == FillDirection.RightToLeft)
-			{
-				if (key == KeyCode.LeftArrow) value = mValue - step;
-				else if (key == KeyCode.RightArrow) value = mValue + step;
-			}
-			else
-			{
-				if (key == KeyCode.DownArrow) value = mValue - step;
-				else if (key == KeyCode.UpArrow) value = mValue + step;
-			}
-		}
-	}
 
 	/// <summary>
 	/// Register the event listeners.
@@ -262,10 +211,6 @@ public class UIProgressBar : UIWidgetContainer
 				return;
 			}
 
-			GameObject bg = (mBG != null && mBG.collider != null) ? mBG.gameObject : gameObject;
-			UIEventListener bgl = UIEventListener.Get(bg);
-			bgl.onPress += OnPressBackground;
-			bgl.onDrag += OnDragBackground;
 			if (mBG != null) mBG.autoResizeBoxCollider = true;
 
 			OnStart();
@@ -279,6 +224,12 @@ public class UIProgressBar : UIWidgetContainer
 		}
 		ForceUpdate();
 	}
+
+	/// <summary>
+	/// Used to upgrade from legacy functionality.
+	/// </summary>
+
+	protected virtual void Upgrade () { }
 
 	/// <summary>
 	/// Functionality for derived classes.
@@ -313,12 +264,6 @@ public class UIProgressBar : UIWidgetContainer
 		else if (numberOfSteps > 20) numberOfSteps = 20;
 		ForceUpdate();
 	}
-
-	/// <summary>
-	/// Used to upgrade from legacy functionality.
-	/// </summary>
-
-	protected virtual void Upgrade () { }
 
 	/// <summary>
 	/// Drag the scroll bar by the specified on-screen amount.
@@ -401,6 +346,28 @@ public class UIProgressBar : UIWidgetContainer
 					new Vector4(0f, 1f - value, 1f, 1f) :
 					new Vector4(0f, 0f, 1f, value);
 			}
+		}
+
+		if (thumb != null && (mFG != null || mBG != null))
+		{
+			Vector3[] corners = (mFG != null) ? mFG.worldCorners : mBG.worldCorners;
+			Vector3 pos;
+
+			if (isHorizontal)
+			{
+				Vector3 v0 = Vector3.Lerp(corners[0], corners[1], 0.5f);
+				Vector3 v1 = Vector3.Lerp(corners[2], corners[3], 0.5f);
+				pos = Vector3.Lerp(v0, v1, isInverted ? 1f - value : value);
+			}
+			else
+			{
+				Vector3 v0 = Vector3.Lerp(corners[0], corners[3], 0.5f);
+				Vector3 v1 = Vector3.Lerp(corners[1], corners[2], 0.5f);
+				pos = Vector3.Lerp(v0, v1, isInverted ? 1f - value : value);
+			}
+
+			if (Vector3.Magnitude(thumb.position - pos) > 0.00001f)
+				thumb.position = pos;
 		}
 	}
 }

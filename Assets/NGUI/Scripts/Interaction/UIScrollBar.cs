@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/NGUI Scroll Bar")]
-public class UIScrollBar : UIProgressBar
+public class UIScrollBar : UISlider
 {
 	enum Direction
 	{
@@ -27,13 +27,9 @@ public class UIScrollBar : UIProgressBar
 	// Deprecated functionality
 	[HideInInspector][SerializeField] float mScroll = 0f;
 	[HideInInspector][SerializeField] Direction mDir = Direction.Upgraded;
-	[HideInInspector][SerializeField] bool mInverted = false;
 
 	[System.Obsolete("Use 'value' instead")]
 	public float scrollValue { get { return this.value; } set { this.value = value; } }
-	
-	[System.Obsolete("Use 'fillDirection' instead")]
-	public bool inverted { get { return isInverted; } set { } }
 
 	/// <summary>
 	/// The size of the foreground bar in percent (0-1 range).
@@ -96,6 +92,8 @@ public class UIScrollBar : UIProgressBar
 
 	protected override void OnStart ()
 	{
+		base.OnStart();
+
 		if (mFG != null && mFG.collider != null && mFG.gameObject != gameObject)
 		{
 			UIEventListener fgl = UIEventListener.Get(mFG.gameObject);
@@ -137,7 +135,7 @@ public class UIScrollBar : UIProgressBar
 					(localPos.y - val0) / (val1 - val0);
 			}
 		}
-		return value;
+		return base.LocalToValue(localPos);
 	}
 
 	/// <summary>
@@ -146,10 +144,10 @@ public class UIScrollBar : UIProgressBar
 
 	public override void ForceUpdate ()
 	{
-		mIsDirty = false;
-
 		if (mFG != null)
 		{
+			mIsDirty = false;
+
 			float halfSize = Mathf.Clamp01(mSize) * 0.5f;
 			float pos = Mathf.Lerp(halfSize, 1f - halfSize, value);
 			float val0 = pos - halfSize;
@@ -160,13 +158,32 @@ public class UIScrollBar : UIProgressBar
 				mFG.drawRegion = isInverted ?
 					new Vector4(1f - val1, 0f, 1f - val0, 1f) :
 					new Vector4(val0, 0f, val1, 1f);
+
+				if (thumb != null)
+				{
+					Vector4 dr = mFG.drawingDimensions;
+					Vector3 v = new Vector3(
+						Mathf.Lerp(dr.x, dr.z, 0.5f),
+						Mathf.Lerp(dr.y, dr.w, 0.5f));
+					thumb.position = mFG.cachedTransform.TransformPoint(v);
+				}
 			}
 			else
 			{
 				mFG.drawRegion = isInverted ?
 					new Vector4(0f, 1f - val1, 1f, 1f - val0) :
 					new Vector4(0f, val0, 1f, val1);
+
+				if (thumb != null)
+				{
+					Vector4 dr = mFG.drawingDimensions;
+					Vector3 v = new Vector3(
+						Mathf.Lerp(dr.x, dr.z, 0.5f),
+						Mathf.Lerp(dr.y, dr.w, 0.5f));
+					thumb.position = mFG.cachedTransform.TransformPoint(v);
+				}
 			}
 		}
+		else base.ForceUpdate();
 	}
 }
