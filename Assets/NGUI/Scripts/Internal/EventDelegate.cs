@@ -215,25 +215,33 @@ public class EventDelegate
 
 	public bool Execute ()
 	{
-#if UNITY_EDITOR
-		if (Application.isPlaying)
-#endif
-		{
-			Callback call = Get();
+		Callback call = Get();
 
-			if (call != null)
+		if (call != null)
+		{
+#if UNITY_EDITOR
+			if (Application.isPlaying)
 			{
 				call();
-				return true;
 			}
-#if !REFLECTION_SUPPORT
-			if (isValid)
+			else if (call.Target != null)
 			{
-				mTarget.SendMessage(mMethodName, SendMessageOptions.DontRequireReceiver);
-				return true;
+				System.Type type = call.Target.GetType();
+				object[] objs = type.GetCustomAttributes(typeof(ExecuteInEditMode), true);
+				if (objs != null && objs.Length > 0) call();
 			}
+#else
+			call();
 #endif
+			return true;
 		}
+#if !REFLECTION_SUPPORT
+		if (isValid)
+		{
+			mTarget.SendMessage(mMethodName, SendMessageOptions.DontRequireReceiver);
+			return true;
+		}
+#endif
 		return false;
 	}
 

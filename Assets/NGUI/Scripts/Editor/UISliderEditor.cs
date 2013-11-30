@@ -10,8 +10,4 @@ using UnityEditor;
 [CustomEditor(typeof(UISlider))]
 public class UISliderEditor : UIProgressBarEditor
 {
-	protected override void OnDrawExtraFields ()
-	{
-		NGUIEditorTools.DrawProperty("Thumb", serializedObject, "thumb");
-	}
 }

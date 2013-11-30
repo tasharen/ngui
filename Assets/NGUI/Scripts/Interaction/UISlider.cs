@@ -7,7 +7,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// Extended progress bar that has a draggable thumb.
+/// Extended progress bar that has backwards compatibility logic and adds interaction support.
 /// </summary>
 
 [ExecuteInEditMode]
@@ -21,19 +21,13 @@ public class UISlider : UIProgressBar
 		Upgraded,
 	}
 
-	/// <summary>
-	/// Object that acts as a thumb.
-	/// </summary>
-
-	public Transform thumb;
-	
 	// Deprecated functionality. Use 'foregroundWidget' instead.
 	[HideInInspector][SerializeField] Transform foreground;
 
 	// Deprecated functionality
 	[HideInInspector][SerializeField] float rawValue = 1f; // Use 'value'
 	[HideInInspector][SerializeField] Direction direction = Direction.Upgraded; // Use 'fillDirection'
-	[HideInInspector][SerializeField] bool mInverted = false;
+	[HideInInspector][SerializeField] protected bool mInverted = false;
 
 	[System.Obsolete("Use 'value' instead")]
 	public float sliderValue { get { return this.value; } set { this.value = value; } }
@@ -70,12 +64,17 @@ public class UISlider : UIProgressBar
 	}
 
 	/// <summary>
-	/// Make sure the thumb also responds to events.
+	/// Register an event listener.
 	/// </summary>
 
 	protected override void OnStart ()
 	{
-		if (thumb != null && thumb.collider != null)
+		GameObject bg = (mBG != null && mBG.collider != null) ? mBG.gameObject : gameObject;
+		UIEventListener bgl = UIEventListener.Get(bg);
+		bgl.onPress += OnPressBackground;
+		bgl.onDrag += OnDragBackground;
+
+		if (thumb != null && thumb.collider != null && (mFG == null || thumb != mFG.cachedTransform))
 		{
 			UIEventListener fgl = UIEventListener.Get(thumb.gameObject);
 			fgl.onPress += OnPressForeground;
@@ -84,46 +83,69 @@ public class UISlider : UIProgressBar
 	}
 
 	/// <summary>
-	/// Update the slider's foreground and position the thumb accordingly.
+	/// Position the scroll bar to be under the current touch.
 	/// </summary>
 
-	public override void ForceUpdate ()
+	protected void OnPressBackground (GameObject go, bool isPressed)
 	{
-		base.ForceUpdate();
+		mCam = UICamera.currentCamera;
+		value = ScreenToValue(UICamera.lastTouchPosition);
+		if (!isPressed && onDragFinished != null) onDragFinished();
+	}
 
-		if (mFG != null && thumb != null)
+	/// <summary>
+	/// Position the scroll bar to be under the current touch.
+	/// </summary>
+
+	protected void OnDragBackground (GameObject go, Vector2 delta)
+	{
+		mCam = UICamera.currentCamera;
+		value = ScreenToValue(UICamera.lastTouchPosition);
+	}
+
+	/// <summary>
+	/// Save the position of the foreground on press.
+	/// </summary>
+
+	protected void OnPressForeground (GameObject go, bool isPressed)
+	{
+		if (isPressed)
 		{
-			Vector3[] corners = mFG.worldCorners;
+			mOffset = (mFG == null) ? 0f :
+				value - ScreenToValue(UICamera.lastTouchPosition);
+		}
+		else if (onDragFinished != null) onDragFinished();
+	}
 
-			if (isHorizontal)
+	/// <summary>
+	/// Drag the scroll bar in the specified direction.
+	/// </summary>
+
+	protected void OnDragForeground (GameObject go, Vector2 delta)
+	{
+		mCam = UICamera.currentCamera;
+		value = mOffset + ScreenToValue(UICamera.lastTouchPosition);
+	}
+
+	/// <summary>
+	/// Watch for key events and adjust the value accordingly.
+	/// </summary>
+
+	protected void OnKey (KeyCode key)
+	{
+		if (enabled)
+		{
+			float step = (numberOfSteps > 1f) ? 1f / (numberOfSteps - 1) : 0.125f;
+
+			if (fillDirection == FillDirection.LeftToRight || fillDirection == FillDirection.RightToLeft)
 			{
-				if (mSprite != null && mSprite.type == UISprite.Type.Filled)
-				{
-					Vector3 v0 = Vector3.Lerp(corners[0], corners[1], 0.5f);
-					Vector3 v1 = Vector3.Lerp(corners[2], corners[3], 0.5f);
-					thumb.position = Vector3.Lerp(v0, v1, isInverted ? 1f - value : value);
-				}
-				else
-				{
-					thumb.position = isInverted ?
-						Vector3.Lerp(corners[0], corners[1], 0.5f) :
-						Vector3.Lerp(corners[2], corners[3], 0.5f);
-				}
+				if (key == KeyCode.LeftArrow) value = mValue - step;
+				else if (key == KeyCode.RightArrow) value = mValue + step;
 			}
 			else
 			{
-				if (mSprite != null && mSprite.type == UISprite.Type.Filled)
-				{
-					Vector3 v0 = Vector3.Lerp(corners[0], corners[3], 0.5f);
-					Vector3 v1 = Vector3.Lerp(corners[1], corners[2], 0.5f);
-					thumb.position = Vector3.Lerp(v0, v1, isInverted ? 1f - value : value);
-				}
-				else
-				{
-					thumb.position = isInverted ?
-						Vector3.Lerp(corners[0], corners[3], 0.5f) :
-						Vector3.Lerp(corners[1], corners[2], 0.5f);
-				}
+				if (key == KeyCode.DownArrow) value = mValue - step;
+				else if (key == KeyCode.UpArrow) value = mValue + step;
 			}
 		}
 	}
