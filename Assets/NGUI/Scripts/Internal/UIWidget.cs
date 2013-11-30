@@ -41,10 +41,10 @@ public class UIWidget : MonoBehaviour
 	[HideInInspector][SerializeField] protected int mDepth = 0;
 
 	// Anchor points
-	[HideInInspector][SerializeField] UIWidget mAnchorL;
-	[HideInInspector][SerializeField] UIWidget mAnchorR;
-	[HideInInspector][SerializeField] UIWidget mAnchorB;
-	[HideInInspector][SerializeField] UIWidget mAnchorT;
+	[HideInInspector][SerializeField] Transform mAnchorL;
+	[HideInInspector][SerializeField] Transform mAnchorR;
+	[HideInInspector][SerializeField] Transform mAnchorB;
+	[HideInInspector][SerializeField] Transform mAnchorT;
 
 	// Each anchor has a relative and an absolute value used to calculate final offset
 	[HideInInspector][SerializeField] float mAnchorLR = 0f;
@@ -78,6 +78,10 @@ public class UIWidget : MonoBehaviour
 	bool mVisibleByPanel = true;
 	float mLastAlpha = 0f;
 	int mUpdateFrame = -1;
+	UIWidget mAnchorLW;
+	UIWidget mAnchorRW;
+	UIWidget mAnchorBW;
+	UIWidget mAnchorTW;
 
 	/// <summary>
 	/// Internal usage -- draw call that's drawing the widget.
@@ -666,6 +670,11 @@ public class UIWidget : MonoBehaviour
 			cachedTransform.localScale = Vector3.one;
 		}
 
+		mAnchorLW = mAnchorL ? mAnchorL.GetComponent<UIWidget>() : null;
+		mAnchorRW = mAnchorR ? mAnchorR.GetComponent<UIWidget>() : null;
+		mAnchorBW = mAnchorB ? mAnchorB.GetComponent<UIWidget>() : null;
+		mAnchorTW = mAnchorT ? mAnchorT.GetComponent<UIWidget>() : null;
+
 		if (mWidth < minWidth) mWidth = minWidth;
 		if (mHeight < minHeight) mHeight = minHeight;
 		if (autoResizeBoxCollider) ResizeCollider();
@@ -829,6 +838,12 @@ public class UIWidget : MonoBehaviour
 	void Start ()
 	{
 		mStarted = true;
+
+		mAnchorLW = mAnchorL ? mAnchorL.GetComponent<UIWidget>() : null;
+		mAnchorRW = mAnchorR ? mAnchorR.GetComponent<UIWidget>() : null;
+		mAnchorBW = mAnchorB ? mAnchorB.GetComponent<UIWidget>() : null;
+		mAnchorTW = mAnchorT ? mAnchorT.GetComponent<UIWidget>() : null;
+
 		OnStart();
 		CreatePanel();
 	}
@@ -845,32 +860,32 @@ public class UIWidget : MonoBehaviour
 
 		bool anchored = false;
 
-		if (mAnchorL != null)
+		if (mAnchorL)
 		{
 			anchored = true;
-			if (mAnchorL.mUpdateFrame != frame)
-				mAnchorL.Update();
+			if (mAnchorLW != null && mAnchorLW.mUpdateFrame != frame)
+				mAnchorLW.Update();
 		}
 		
-		if (mAnchorR != null)
+		if (mAnchorR)
 		{
 			anchored = true;
-			if (mAnchorR.mUpdateFrame != frame)
-				mAnchorR.Update();
+			if (mAnchorRW != null && mAnchorRW.mUpdateFrame != frame)
+				mAnchorRW.Update();
 		}
 		
-		if (mAnchorT != null)
+		if (mAnchorT)
 		{
 			anchored = true;
-			if (mAnchorT.mUpdateFrame != frame)
-				mAnchorT.Update();
+			if (mAnchorTW != null && mAnchorTW.mUpdateFrame != frame)
+				mAnchorTW.Update();
 		}
 		
-		if (mAnchorB != null)
+		if (mAnchorB)
 		{
 			anchored = true;
-			if (mAnchorB.mUpdateFrame != frame)
-				mAnchorB.Update();
+			if (mAnchorBW != null && mAnchorBW.mUpdateFrame != frame)
+				mAnchorBW.Update();
 		}
 
 		// Call the virtual update function
@@ -888,10 +903,33 @@ public class UIWidget : MonoBehaviour
 			float rt = lt + mWidth;
 			float tt = bt + mHeight;
 
-			if (mAnchorL != null) lt = mAnchorL.GetHorizontal(p, mAnchorLR, mAnchorLA);
-			if (mAnchorB != null) bt = mAnchorB.GetVertical(p, mAnchorBR, mAnchorBA);
-			if (mAnchorR != null) rt = mAnchorR.GetHorizontal(p, mAnchorRR, mAnchorRA);
-			if (mAnchorT != null) tt = mAnchorT.GetVertical(p, mAnchorTR, mAnchorTA);
+			if (mAnchorL)
+			{
+				lt = (mAnchorLW != null) ?
+					mAnchorLW.GetHorizontal(p, mAnchorLR, mAnchorLA) :
+					t.InverseTransformPoint(mAnchorL.position).x;
+			}
+
+			if (mAnchorB)
+			{
+				bt = (mAnchorBW != null) ?
+					mAnchorBW.GetVertical(p, mAnchorBR, mAnchorBA) :
+					t.InverseTransformPoint(mAnchorB.position).x;
+			}
+
+			if (mAnchorR)
+			{
+				rt = (mAnchorRW != null) ?
+					mAnchorRW.GetHorizontal(p, mAnchorRR, mAnchorRA) :
+					t.InverseTransformPoint(mAnchorR.position).x;
+			}
+
+			if (mAnchorT)
+			{
+				tt = (mAnchorTW != null) ?
+					mAnchorTW.GetVertical(p, mAnchorTR, mAnchorTA) :
+					t.InverseTransformPoint(mAnchorT.position).x;
+			}
 
 			Vector3 newPos = new Vector3(
 				Mathf.Round(Mathf.Lerp(lt, rt, po.x)),
