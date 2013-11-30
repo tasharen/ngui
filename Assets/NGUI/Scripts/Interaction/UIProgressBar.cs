@@ -45,9 +45,7 @@ public class UIProgressBar : UIWidgetContainer
 	protected bool mIsDirty = false;
 	protected Camera mCam;
 	protected UISprite mSprite;
-	protected Vector2 mScreenPos = Vector2.zero;
-	protected Vector3 mStartingPos = Vector3.zero;
-	protected Vector2 mStartingSize = Vector2.zero;
+	protected float mOffset = 0f;
 
 	/// <summary>
 	/// Number of steps the slider should be divided into. For example 5 means possible values of 0, 0.25, 0.5, 0.75, and 1.0.
@@ -101,6 +99,7 @@ public class UIProgressBar : UIWidgetContainer
 			{
 				mFill = value;
 				mIsDirty = true;
+				if (!Application.isPlaying) ForceUpdate();
 			}
 		}
 	}
@@ -124,13 +123,14 @@ public class UIProgressBar : UIWidgetContainer
 			{
 				mValue = val;
 				mIsDirty = true;
-				
-				if (onChange != null)
+
+				if (EventDelegate.IsValid(onChange))
 				{
 					current = this;
 					EventDelegate.Execute(onChange);
 					current = null;
 				}
+				if (!Application.isPlaying) ForceUpdate();
 			}
 		}
 	}
@@ -164,20 +164,6 @@ public class UIProgressBar : UIWidgetContainer
 	}
 
 	/// <summary>
-	/// The starting position of the foreground sprite gets saved when the script starts up.
-	/// You can adjust it after the fact by using this property.
-	/// </summary>
-
-	public Vector3 startingForegroundPosition { get { return mStartingPos; } set { mStartingPos = value; } }
-
-	/// <summary>
-	/// The starting size of the foreground sprite gets saved when the script starts up.
-	/// You can adjust it after the fact by using this property.
-	/// </summary>
-
-	public Vector2 startingForegroundSize { get { return mStartingSize; } set { mStartingSize = value; } }
-
-	/// <summary>
 	/// Whether the progress bar is horizontal in nature. Convenience function.
 	/// </summary>
 
@@ -190,32 +176,13 @@ public class UIProgressBar : UIWidgetContainer
 	protected bool isInverted { get { return (mFill == FillDirection.RightToLeft || mFill == FillDirection.TopToBottom); } }
 
 	/// <summary>
-	/// Drag the scroll bar by the specified on-screen amount.
-	/// </summary>
-
-	protected void SetByPosition (Vector2 screenPos)
-	{
-		// Create a plane
-		Transform trans = cachedTransform;
-		Plane plane = new Plane(trans.rotation * Vector3.back, trans.position);
-
-		// If the ray doesn't hit the plane, do nothing
-		float dist;
-		Ray ray = cachedCamera.ScreenPointToRay(screenPos);
-		if (!plane.Raycast(ray, out dist)) return;
-
-		// Transform the point from world space to local space
-		CenterOnPos(trans.InverseTransformPoint(ray.GetPoint(dist)));
-	}
-
-	/// <summary>
 	/// Position the scroll bar to be under the current touch.
 	/// </summary>
 
 	protected void OnPressBackground (GameObject go, bool isPressed)
 	{
 		mCam = UICamera.currentCamera;
-		SetByPosition(UICamera.lastTouchPosition);
+		value = ScreenToValue(UICamera.lastTouchPosition);
 		if (!isPressed && onDragFinished != null) onDragFinished();
 	}
 
@@ -226,7 +193,7 @@ public class UIProgressBar : UIWidgetContainer
 	protected void OnDragBackground (GameObject go, Vector2 delta)
 	{
 		mCam = UICamera.currentCamera;
-		SetByPosition(UICamera.lastTouchPosition);
+		value = ScreenToValue(UICamera.lastTouchPosition);
 	}
 
 	/// <summary>
@@ -237,15 +204,8 @@ public class UIProgressBar : UIWidgetContainer
 	{
 		if (isPressed)
 		{
-			mCam = UICamera.currentCamera;
-			UIWidget w = go.GetComponent<UIWidget>();
-
-			if (w != null)
-			{
-				Vector3[] corners = w.worldCorners;
-				mScreenPos = mCam.WorldToScreenPoint(Vector3.Lerp(corners[0], corners[2], 0.5f));
-			}
-			else mScreenPos = mCam.WorldToScreenPoint(go.transform.position);
+			mOffset = (mFG == null) ? 0f :
+				value - ScreenToValue(UICamera.lastTouchPosition);
 		}
 		else if (onDragFinished != null) onDragFinished();
 	}
@@ -257,7 +217,7 @@ public class UIProgressBar : UIWidgetContainer
 	protected void OnDragForeground (GameObject go, Vector2 delta)
 	{
 		mCam = UICamera.currentCamera;
-		SetByPosition(mScreenPos + UICamera.currentTouch.totalDelta);
+		value = mOffset + ScreenToValue(UICamera.lastTouchPosition);
 	}
 
 	/// <summary>
@@ -291,36 +251,31 @@ public class UIProgressBar : UIWidgetContainer
 	{
 		Upgrade();
 
-#if UNITY_EDITOR
-		if (!Application.isPlaying) return;
-#endif
-		if (mFG != null)
-		{
-			mSprite = mFG as UISprite;
-			mFG.pivot = UIWidget.Pivot.Center;
-			mStartingSize = new Vector2(mFG.width, mFG.height);
-			mStartingPos = mFG.cachedTransform.localPosition;
-		}
-		else
-		{
-			Debug.LogWarning("Progress bar needs a foreground widget to work with", this);
-			enabled = false;
-			return;
-		}
+		mSprite = mFG as UISprite;
 
-		GameObject bg = (mBG != null && mBG.collider != null) ? mBG.gameObject : gameObject;
-		UIEventListener bgl = UIEventListener.Get(bg);
-		bgl.onPress += OnPressBackground;
-		bgl.onDrag += OnDragBackground;
-		if (mBG != null) mBG.autoResizeBoxCollider = true;
-
-		OnStart();
-
-		if (onChange != null)
+		if (Application.isPlaying)
 		{
-			current = this;
-			EventDelegate.Execute(onChange);
-			current = null;
+			if (mFG == null)
+			{
+				Debug.LogWarning("Progress bar needs a foreground widget to work with", this);
+				enabled = false;
+				return;
+			}
+
+			GameObject bg = (mBG != null && mBG.collider != null) ? mBG.gameObject : gameObject;
+			UIEventListener bgl = UIEventListener.Get(bg);
+			bgl.onPress += OnPressBackground;
+			bgl.onDrag += OnDragBackground;
+			if (mBG != null) mBG.autoResizeBoxCollider = true;
+
+			OnStart();
+
+			if (onChange != null)
+			{
+				current = this;
+				EventDelegate.Execute(onChange);
+				current = null;
+			}
 		}
 		ForceUpdate();
 	}
@@ -351,10 +306,12 @@ public class UIProgressBar : UIWidgetContainer
 	{
 		Upgrade();
 		mIsDirty = true;
+		mSprite = mFG as UISprite;
 		float val = Mathf.Clamp01(mValue);
 		if (mValue != val) mValue = val;
 		if (numberOfSteps < 0) numberOfSteps = 0;
 		else if (numberOfSteps > 20) numberOfSteps = 20;
+		ForceUpdate();
 	}
 
 	/// <summary>
@@ -364,25 +321,47 @@ public class UIProgressBar : UIWidgetContainer
 	protected virtual void Upgrade () { }
 
 	/// <summary>
-	/// Move the scroll bar to be centered on the specified position.
+	/// Drag the scroll bar by the specified on-screen amount.
 	/// </summary>
 
-	protected virtual void CenterOnPos (Vector2 localPos)
+	protected float ScreenToValue (Vector2 screenPos)
 	{
-		if (mFG == null) return;
+		// Create a plane
+		Transform trans = cachedTransform;
+		Plane plane = new Plane(trans.rotation * Vector3.back, trans.position);
 
-		if (isHorizontal)
+		// If the ray doesn't hit the plane, do nothing
+		float dist;
+		Ray ray = cachedCamera.ScreenPointToRay(screenPos);
+		if (!plane.Raycast(ray, out dist)) return value;
+
+		// Transform the point from world space to local space
+		return LocalToValue(trans.InverseTransformPoint(ray.GetPoint(dist)));
+	}
+
+	/// <summary>
+	/// Calculate the value of the progress bar given the specified local position.
+	/// </summary>
+
+	protected virtual float LocalToValue (Vector2 localPos)
+	{
+		if (mFG != null)
 		{
-			float left = mStartingPos.x - mStartingSize.x * 0.5f;
-			float diff = (localPos.x - left) / mStartingSize.x;
-			value = Mathf.Clamp01(isInverted ? 1f - diff : diff);
+			Vector3[] corners = mFG.localCorners;
+			Vector3 size = (corners[2] - corners[0]);
+
+			if (isHorizontal)
+			{
+				float diff = (localPos.x - corners[0].x) / size.x;
+				return Mathf.Clamp01(isInverted ? 1f - diff : diff);
+			}
+			else
+			{
+				float diff = (localPos.y - corners[0].y) / size.y;
+				return Mathf.Clamp01(isInverted ? 1f - diff : diff);
+			}
 		}
-		else
-		{
-			float bottom = mStartingPos.y - mStartingSize.y * 0.5f;
-			float diff = (localPos.y - bottom) / mStartingSize.y;
-			value = Mathf.Clamp01(isInverted ? 1f - diff : diff);
-		}
+		return value;
 	}
 
 	/// <summary>
@@ -395,12 +374,8 @@ public class UIProgressBar : UIWidgetContainer
 
 		if (mFG != null)
 		{
-			Vector3 pos = mStartingPos;
-
 			if (isHorizontal)
 			{
-				int size = Mathf.RoundToInt(mStartingSize.x * value);
-
 				if (mSprite != null && mSprite.type == UISprite.Type.Filled)
 				{
 					mSprite.fillDirection = UISprite.FillDirection.Horizontal;
@@ -409,9 +384,9 @@ public class UIProgressBar : UIWidgetContainer
 				}
 				else
 				{
-					mFG.width = ((size & 1) == 1) ? size + 1 : size;
-					float offset = (mStartingSize.x - mFG.width) * 0.5f;
-					pos.x = isInverted ? pos.x + offset : pos.x - offset;
+					mFG.drawRegion = isInverted ?
+						new Vector4(1f - value, 0f, 1f, 1f) :
+						new Vector4(0f, 0f, value, 1f);
 				}
 			}
 			else if (mSprite != null && mSprite.type == UISprite.Type.Filled)
@@ -422,12 +397,10 @@ public class UIProgressBar : UIWidgetContainer
 			}
 			else
 			{
-				int size = Mathf.RoundToInt(mStartingSize.y * value);
-				mFG.height = ((size & 1) == 1) ? size + 1 : size;
-				float offset = (mStartingSize.y - mFG.height) * 0.5f;
-				pos.y = isInverted ? pos.y + offset : pos.y - offset;
+				mFG.drawRegion = isInverted ?
+					new Vector4(0f, 1f - value, 1f, 1f) :
+					new Vector4(0f, 0f, 1f, value);
 			}
-			mFG.cachedTransform.localPosition = pos;
 		}
 	}
 }

@@ -55,6 +55,7 @@ public class UICamera : MonoBehaviour
 	public class MouseOrTouch
 	{
 		public Vector2 pos;				// Current position of the mouse or touch event
+		public Vector2 lastPos;			// Previous position of the mouse or touch event
 		public Vector2 delta;			// Delta since last update
 		public Vector2 totalDelta;		// Delta since the event started being tracked
 
@@ -861,6 +862,12 @@ public class UICamera : MonoBehaviour
 		// Save the starting mouse position
 		mMouse[0].pos.x = Input.mousePosition.x;
 		mMouse[0].pos.y = Input.mousePosition.y;
+
+		for (int i = 1; i < 3; ++i)
+		{
+			mMouse[i].pos = mMouse[0].pos;
+			mMouse[i].lastPos = mMouse[0].pos;
+		}
 		lastTouchPosition = mMouse[0].pos;
 	}
 
@@ -903,12 +910,7 @@ public class UICamera : MonoBehaviour
 		{
 			if (!Raycast(Input.mousePosition, out lastHit)) hoveredObject = fallThrough;
 			if (hoveredObject == null) hoveredObject = genericEventHandler;
-			
-			for (int i = 0; i < 3; ++i)
-			{
-				mMouse[i].last = mMouse[i].current;
-				mMouse[i].current = hoveredObject;
-			}
+			for (int i = 0; i < 3; ++i) mMouse[i].current = hoveredObject;
 		}
 	}
 
@@ -1005,43 +1007,19 @@ public class UICamera : MonoBehaviour
 
 	public void ProcessMouse ()
 	{
-		bool updateRaycast = (useMouse && Time.timeScale < 0.9f);
-
-		if (!updateRaycast)
-		{
-			for (int i = 0; i < 3; ++i)
-			{
-				if (Input.GetMouseButton(i) || Input.GetMouseButtonUp(i))
-				{
-					updateRaycast = true;
-					break;
-				}
-			}
-		}
+		lastTouchPosition = Input.mousePosition;
+		bool highlightChanged = (mMouse[0].last != mMouse[0].current);
 
 		// Update the position and delta
-		mMouse[0].pos = Input.mousePosition;
-		mMouse[0].delta = mMouse[0].pos - lastTouchPosition;
-
-		bool posChanged = (mMouse[0].pos != lastTouchPosition);
-		lastTouchPosition = mMouse[0].pos;
-
-		// Update the object under the mouse
-		if (updateRaycast)
-		{
-			if (!Raycast(Input.mousePosition, out lastHit)) hoveredObject = fallThrough;
-			if (hoveredObject == null) hoveredObject = genericEventHandler;
-			mMouse[0].last = mMouse[0].current;
-			mMouse[0].current = hoveredObject;
-		}
+		mMouse[0].delta = lastTouchPosition - mMouse[0].pos;
+		mMouse[0].pos = lastTouchPosition;
+		bool posChanged = mMouse[0].delta.sqrMagnitude > 0.001f;
 
 		// Propagate the updates to the other mouse buttons
 		for (int i = 1; i < 3; ++i)
 		{
 			mMouse[i].pos = mMouse[0].pos;
 			mMouse[i].delta = mMouse[0].delta;
-			mMouse[i].last = mMouse[0].last;
-			mMouse[i].current = mMouse[0].current;
 		}
 
 		// Is any button currently pressed?
@@ -1061,7 +1039,7 @@ public class UICamera : MonoBehaviour
 			// A button was pressed -- cancel the tooltip
 			mTooltipTime = 0f;
 		}
-		else if (useMouse && posChanged && (!stickyTooltip || mMouse[0].last != mMouse[0].current))
+		else if (useMouse && posChanged && (!stickyTooltip || highlightChanged))
 		{
 			if (mTooltipTime != 0f)
 			{
@@ -1076,7 +1054,7 @@ public class UICamera : MonoBehaviour
 		}
 
 		// The button was released over a different object -- remove the highlight from the previous
-		if (useMouse && !isPressed && mHover != null && mMouse[0].last != mMouse[0].current)
+		if (useMouse && !isPressed && mHover != null && highlightChanged)
 		{
 			if (mTooltip != null) ShowTooltip(false);
 			Highlight(mHover, false);
@@ -1107,15 +1085,16 @@ public class UICamera : MonoBehaviour
 		}
 
 		// If nothing is pressed and there is an object under the touch, highlight it
-		if (useMouse && !isPressed && mMouse[0].last != mMouse[0].current)
+		if (useMouse && !isPressed && highlightChanged)
 		{
 			mTooltipTime = RealTime.time + tooltipDelay;
 			mHover = mMouse[0].current;
 			Highlight(mHover, true);
 		}
 
-		// Clear the references
-		for (int i = 0; i < 3; ++i) mMouse[i].last = null;
+		// Update the last value
+		mMouse[0].last = mMouse[0].current;
+		for (int i = 1; i < 3; ++i) mMouse[i].last = mMouse[0].last;
 	}
 
 	/// <summary>

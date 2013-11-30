@@ -552,6 +552,19 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Process the label's text before returning its drawing dimensions.
+	/// </summary>
+
+	public override Vector4 drawingDimensions
+	{
+		get
+		{
+			if (hasChanged) ProcessText();
+			return base.drawingDimensions;
+		}
+	}
+
+	/// <summary>
 	/// The max number of lines to be displayed for the label
 	/// </summary>
 
@@ -874,6 +887,7 @@ public class UILabel : UIWidget
 		hasChanged = true;
 		mAllowProcessing = true;
 		ProcessAndRequest();
+		if (autoResizeBoxCollider) ResizeCollider();
 	}
 #endif
 

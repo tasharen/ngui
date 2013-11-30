@@ -96,6 +96,16 @@ public class UISpriteInspector : UIWidgetInspector
 			}
 		}
 		EditorGUI.EndDisabledGroup();
+
+		//GUI.changed = false;
+		//Vector4 draw = EditorGUILayout.Vector4Field("Draw Region", mWidget.drawRegion);
+
+		//if (GUI.changed)
+		//{
+		//    NGUIEditorTools.RegisterUndo("Draw Region", mWidget);
+		//    mWidget.drawRegion = draw;
+		//}
+
 		GUILayout.Space(4f);
 	}
 
