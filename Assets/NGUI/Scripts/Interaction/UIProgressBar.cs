@@ -351,23 +351,41 @@ public class UIProgressBar : UIWidgetContainer
 		if (thumb != null && (mFG != null || mBG != null))
 		{
 			Vector3[] corners = (mFG != null) ? mFG.worldCorners : mBG.worldCorners;
-			Vector3 pos;
 
 			if (isHorizontal)
 			{
 				Vector3 v0 = Vector3.Lerp(corners[0], corners[1], 0.5f);
 				Vector3 v1 = Vector3.Lerp(corners[2], corners[3], 0.5f);
-				pos = Vector3.Lerp(v0, v1, isInverted ? 1f - value : value);
+				SetThumbPosition(Vector3.Lerp(v0, v1, isInverted ? 1f - value : value));
 			}
 			else
 			{
 				Vector3 v0 = Vector3.Lerp(corners[0], corners[3], 0.5f);
 				Vector3 v1 = Vector3.Lerp(corners[1], corners[2], 0.5f);
-				pos = Vector3.Lerp(v0, v1, isInverted ? 1f - value : value);
+				SetThumbPosition(Vector3.Lerp(v0, v1, isInverted ? 1f - value : value));
 			}
-
-			if (Vector3.Magnitude(thumb.position - pos) > 0.00001f)
-				thumb.position = pos;
 		}
+	}
+
+	/// <summary>
+	/// Set the position of the thumb to the specified world coordinates.
+	/// </summary>
+
+	protected void SetThumbPosition (Vector3 worldPos)
+	{
+		Transform t = thumb.parent;
+
+		if (t != null)
+		{
+			worldPos = t.InverseTransformPoint(worldPos);
+			worldPos.x = Mathf.Round(worldPos.x);
+			worldPos.y = Mathf.Round(worldPos.y);
+			worldPos.z = 0f;
+
+			if (Vector3.Distance(thumb.localPosition, worldPos) > 0.001f)
+				thumb.localPosition = worldPos;
+		}
+		else if (Vector3.Distance(thumb.position, worldPos) > 0.00001f)
+			thumb.position = worldPos;
 	}
 }

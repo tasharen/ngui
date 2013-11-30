@@ -86,7 +86,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100004}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 145, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 400002}
@@ -124,13 +124,13 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c20815eb3063c24290a61b7020a1836, type: 1}
   m_Name: 
+  thumb: {fileID: 400004}
   mBG: {fileID: 11400006}
   mFG: {fileID: 11400004}
   mValue: 1
   mFill: 0
   numberOfSteps: 0
   onChange: []
-  thumb: {fileID: 400004}
   foreground: {fileID: 0}
   rawValue: 1
   direction: 2

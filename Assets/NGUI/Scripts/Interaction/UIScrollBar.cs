@@ -158,30 +158,21 @@ public class UIScrollBar : UISlider
 				mFG.drawRegion = isInverted ?
 					new Vector4(1f - val1, 0f, 1f - val0, 1f) :
 					new Vector4(val0, 0f, val1, 1f);
-
-				if (thumb != null)
-				{
-					Vector4 dr = mFG.drawingDimensions;
-					Vector3 v = new Vector3(
-						Mathf.Lerp(dr.x, dr.z, 0.5f),
-						Mathf.Lerp(dr.y, dr.w, 0.5f));
-					thumb.position = mFG.cachedTransform.TransformPoint(v);
-				}
 			}
 			else
 			{
 				mFG.drawRegion = isInverted ?
 					new Vector4(0f, 1f - val1, 1f, 1f - val0) :
 					new Vector4(0f, val0, 1f, val1);
+			}
 
-				if (thumb != null)
-				{
-					Vector4 dr = mFG.drawingDimensions;
-					Vector3 v = new Vector3(
-						Mathf.Lerp(dr.x, dr.z, 0.5f),
-						Mathf.Lerp(dr.y, dr.w, 0.5f));
-					thumb.position = mFG.cachedTransform.TransformPoint(v);
-				}
+			if (thumb != null)
+			{
+				Vector4 dr = mFG.drawingDimensions;
+				Vector3 v = new Vector3(
+					Mathf.Lerp(dr.x, dr.z, 0.5f),
+					Mathf.Lerp(dr.y, dr.w, 0.5f));
+				SetThumbPosition(mFG.cachedTransform.TransformPoint(v));
 			}
 		}
 		else base.ForceUpdate();
