@@ -837,6 +837,77 @@ public class UIWidgetInspector : Editor
 			}
 			NGUIEditorTools.EndContents();
 		}
+
+		if (NGUIEditorTools.DrawHeader("Anchors"))
+		{
+			NGUIEditorTools.BeginContents();
+#if UNITY_3_5
+			string horizontal = "<>";
+#else
+			string horizontal = "\u25C4\u25BA";
+#endif
+			string vertical = "\u25B2\u25BC";
+			float space = 38f;
+			NGUIEditorTools.SetLabelWidth(62f);
+
+			SerializedProperty sp = NGUIEditorTools.DrawProperty("Left", serializedObject, "mAnchorL");
+
+			if (sp.objectReferenceValue != null || sp.hasMultipleDifferentValues)
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Space(space);
+				GUILayout.Label(horizontal, GUILayout.Width(24f));
+				NGUIEditorTools.DrawProperty("", serializedObject, "mAnchorLR", GUILayout.MinWidth(30f));
+				GUILayout.Label("+", GUILayout.Width(12f));
+				NGUIEditorTools.DrawProperty("", serializedObject, "mAnchorLA", GUILayout.MinWidth(30f));
+				GUILayout.Space(18f);
+				GUILayout.EndHorizontal();
+			}
+
+			sp = NGUIEditorTools.DrawProperty("Right", serializedObject, "mAnchorR");
+
+			if (sp.objectReferenceValue != null || sp.hasMultipleDifferentValues)
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Space(space);
+				GUILayout.Label(horizontal, GUILayout.Width(24f));
+				NGUIEditorTools.DrawProperty("", serializedObject, "mAnchorRR", GUILayout.MinWidth(30f));
+				GUILayout.Label("+", GUILayout.Width(12f));
+				NGUIEditorTools.DrawProperty("", serializedObject, "mAnchorRA", GUILayout.MinWidth(30f));
+				GUILayout.Space(18f);
+				GUILayout.EndHorizontal();
+			}
+
+			sp = NGUIEditorTools.DrawProperty("Bottom", serializedObject, "mAnchorB");
+
+			if (sp.objectReferenceValue != null || sp.hasMultipleDifferentValues)
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Space(space);
+				GUILayout.Label(vertical, GUILayout.Width(24f));
+				NGUIEditorTools.DrawProperty("", serializedObject, "mAnchorBR", GUILayout.MinWidth(30f));
+				GUILayout.Label("+", GUILayout.Width(12f));
+				NGUIEditorTools.DrawProperty("", serializedObject, "mAnchorBA", GUILayout.MinWidth(30f));
+				GUILayout.Space(18f);
+				GUILayout.EndHorizontal();
+			}
+
+			sp = NGUIEditorTools.DrawProperty("Top", serializedObject, "mAnchorT");
+
+			if (sp.objectReferenceValue != null || sp.hasMultipleDifferentValues)
+			{
+				GUILayout.BeginHorizontal();
+				GUILayout.Space(space);
+				GUILayout.Label(vertical, GUILayout.Width(24f));
+				NGUIEditorTools.DrawProperty("", serializedObject, "mAnchorTR", GUILayout.MinWidth(30f));
+				GUILayout.Label("+", GUILayout.Width(12f));
+				NGUIEditorTools.DrawProperty("", serializedObject, "mAnchorTA", GUILayout.MinWidth(30f));
+				GUILayout.Space(18f);
+				GUILayout.EndHorizontal();
+			}
+
+			NGUIEditorTools.EndContents();
+		}
 	}
 
 	/// <summary>

@@ -384,9 +384,9 @@ public class UISprite : UIWidget
 	/// Update the UV coordinates.
 	/// </summary>
 
-	public override void Update ()
+	protected override void OnUpdate ()
 	{
-		base.Update();
+		base.OnUpdate();
 
 		if (mChanged || !mSpriteSet)
 		{

@@ -194,7 +194,7 @@ public class UI2DSprite : UIWidget
 	/// Update the sprite in case it was animated.
 	/// </summary>
 
-	public override void Update()
+	protected override void OnUpdate ()
 	{
 		if (nextSprite != null)
 		{
@@ -202,7 +202,7 @@ public class UI2DSprite : UIWidget
 				sprite2D = nextSprite;
 			nextSprite = null;
 		}
- 		base.Update();
+		base.OnUpdate();
 	}
 
 	/// <summary>

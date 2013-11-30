@@ -40,7 +40,54 @@ public class UIWidget : MonoBehaviour
 	[HideInInspector][SerializeField] protected int mHeight = 100;
 	[HideInInspector][SerializeField] protected int mDepth = 0;
 
+	// Anchor points
+	[HideInInspector][SerializeField] UIWidget mAnchorL;
+	[HideInInspector][SerializeField] UIWidget mAnchorR;
+	[HideInInspector][SerializeField] UIWidget mAnchorB;
+	[HideInInspector][SerializeField] UIWidget mAnchorT;
+
+	// Each anchor has a relative and an absolute value used to calculate final offset
+	[HideInInspector][SerializeField] float mAnchorLR = 0f;
+	[HideInInspector][SerializeField] float mAnchorBR = 0f;
+	[HideInInspector][SerializeField] float mAnchorRR = 1f;
+	[HideInInspector][SerializeField] float mAnchorTR = 1f;
+	[HideInInspector][SerializeField] int mAnchorLA = 0;
+	[HideInInspector][SerializeField] int mAnchorBA = 0;
+	[HideInInspector][SerializeField] int mAnchorRA = 0;
+	[HideInInspector][SerializeField] int mAnchorTA = 0;
+
+	/// <summary>
+	/// If set to 'true', the box collider's dimensions will be adjusted to always match the widget whenever it resizes.
+	/// </summary>
+
+	public bool autoResizeBoxCollider = false;
+	
+	protected GameObject mGo;
+	protected Transform mTrans;
+	protected UIPanel mPanel;
+
+	protected bool mChanged = true;
+	protected bool mPlayMode = true;
 	protected Vector4 mDrawRegion = new Vector4(0f, 0f, 1f, 1f);
+
+	bool mStarted = false;
+	Vector3 mDiffPos;
+	Quaternion mDiffRot;
+	Vector3 mDiffScale;
+	Matrix4x4 mLocalToPanel;
+	bool mVisibleByPanel = true;
+	float mLastAlpha = 0f;
+	int mUpdateFrame = -1;
+
+	/// <summary>
+	/// Internal usage -- draw call that's drawing the widget.
+	/// </summary>
+
+	[HideInInspector][System.NonSerialized] public UIDrawCall drawCall;
+
+	// Widget's generated geometry
+	protected UIGeometry mGeom = new UIGeometry();
+	protected Vector3[] mCorners = new Vector3[4];
 
 	/// <summary>
 	/// Draw region alters how the widget looks without modifying the widget's rectangle.
@@ -65,39 +112,6 @@ public class UIWidget : MonoBehaviour
 			}
 		}
 	}
-
-	/// <summary>
-	/// If set to 'true', the box collider's dimensions will be adjusted to always match the widget whenever it resizes.
-	/// </summary>
-
-	public bool autoResizeBoxCollider = false;
-	
-	protected GameObject mGo;
-	protected Transform mTrans;
-	protected UIPanel mPanel;
-
-	protected bool mChanged = true;
-	protected bool mPlayMode = true;
-
-	bool mStarted = false;
-	Vector3 mDiffPos;
-	Quaternion mDiffRot;
-	Vector3 mDiffScale;
-	Matrix4x4 mLocalToPanel;
-	bool mVisibleByPanel = true;
-	float mLastAlpha = 0f;
-
-	/// <summary>
-	/// Internal usage -- draw call that's drawing the widget.
-	/// </summary>
-
-	[HideInInspector]
-	[System.NonSerialized]
-	public UIDrawCall drawCall;
-
-	// Widget's generated geometry
-	protected UIGeometry mGeom = new UIGeometry();
-	protected Vector3[] mCorners = new Vector3[4];
 
 	/// <summary>
 	/// Whether the widget is visible.
@@ -494,6 +508,48 @@ public class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Get horizontal bounds points relative to the specified transform.
+	/// </summary>
+
+	protected virtual float GetHorizontal (Transform relativeTo, float relative, int absolute)
+	{
+		Vector2 offset = pivotOffset;
+
+		float x0 = -offset.x * mWidth;
+		float y0 = -offset.y * mHeight;
+		float x1 = x0 + mWidth;
+		float y1 = y0 + mHeight;
+		float center = (y0 + y1) * 0.5f;
+
+		Transform wt = cachedTransform;
+		Vector3 v0 = relativeTo.InverseTransformPoint(wt.TransformPoint(x0, center, 0f));
+		Vector3 v1 = relativeTo.InverseTransformPoint(wt.TransformPoint(x1, center, 0f));
+
+		return Mathf.Round(Mathf.Lerp(v0.x, v1.x, relative)) + absolute;
+	}
+
+	/// <summary>
+	/// Get vertical bounds points relative to the specified transform.
+	/// </summary>
+
+	protected virtual float GetVertical (Transform relativeTo, float relative, int absolute)
+	{
+		Vector2 offset = pivotOffset;
+
+		float x0 = -offset.x * mWidth;
+		float y0 = -offset.y * mHeight;
+		float x1 = x0 + mWidth;
+		float y1 = y0 + mHeight;
+		float center = (x0 + x1) * 0.5f;
+
+		Transform wt = cachedTransform;
+		Vector3 v0 = relativeTo.InverseTransformPoint(wt.TransformPoint(center, y0, 0f));
+		Vector3 v1 = relativeTo.InverseTransformPoint(wt.TransformPoint(center, y1, 0f));
+
+		return Mathf.Round(Mathf.Lerp(v0.y, v1.y, relative)) + absolute;
+	}
+
+	/// <summary>
 	/// Adjust the widget's collider size to match the widget's dimensions.
 	/// </summary>
 
@@ -644,7 +700,7 @@ public class UIWidget : MonoBehaviour
 		UnityEditor.EditorUtility.SetDirty(this);
 #endif
 		// If we're in the editor, update the panel right away so its geometry gets updated.
-		if (mPanel != null && enabled && NGUITools.GetActive(gameObject) && !Application.isPlaying)
+		if (mPanel != null && enabled && NGUITools.GetActive(gameObject) && !mPlayMode)
 		{
 			SetDirty();
 			CheckLayer();
@@ -778,17 +834,101 @@ public class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Update ensures that it's executed no more than once per frame.
+	/// </summary>
+
+	public void Update ()
+	{
+		int frame = Time.frameCount;
+		if (frame == mUpdateFrame) return;
+		mUpdateFrame = frame;
+
+		bool anchored = false;
+
+		if (mAnchorL != null)
+		{
+			anchored = true;
+			if (mAnchorL.mUpdateFrame != frame)
+				mAnchorL.Update();
+		}
+		
+		if (mAnchorR != null)
+		{
+			anchored = true;
+			if (mAnchorR.mUpdateFrame != frame)
+				mAnchorR.Update();
+		}
+		
+		if (mAnchorT != null)
+		{
+			anchored = true;
+			if (mAnchorT.mUpdateFrame != frame)
+				mAnchorT.Update();
+		}
+		
+		if (mAnchorB != null)
+		{
+			anchored = true;
+			if (mAnchorB.mUpdateFrame != frame)
+				mAnchorB.Update();
+		}
+
+		// Call the virtual update function
+		OnUpdate();
+
+		if (anchored)
+		{
+			Transform t = cachedTransform;
+			Transform p = t.parent;
+			Vector2 po = pivotOffset;
+			Vector3 lp = t.localPosition;
+
+			float lt = lp.x - po.x * mWidth;
+			float bt = lp.y - po.y * mHeight;
+			float rt = lt + mWidth;
+			float tt = bt + mHeight;
+
+			if (mAnchorL != null) lt = mAnchorL.GetHorizontal(p, mAnchorLR, mAnchorLA);
+			if (mAnchorB != null) bt = mAnchorB.GetVertical(p, mAnchorBR, mAnchorBA);
+			if (mAnchorR != null) rt = mAnchorR.GetHorizontal(p, mAnchorRR, mAnchorRA);
+			if (mAnchorT != null) tt = mAnchorT.GetVertical(p, mAnchorTR, mAnchorTA);
+
+			Vector3 newPos = new Vector3(
+				Mathf.Round(Mathf.Lerp(lt, rt, po.x)),
+				Mathf.Round(Mathf.Lerp(bt, tt, po.y)), lp.z);
+			int w = Mathf.RoundToInt(rt - lt);
+			int h = Mathf.RoundToInt(tt - bt);
+
+			if (po.x == 0.5f && ((w & 1) == 1)) ++w;
+			if (po.y == 0.5f && ((h & 1) == 1)) ++h;
+
+			if (Vector3.SqrMagnitude(lp - newPos) > 0.001f)
+			{
+				cachedTransform.localPosition = newPos;
+				mChanged = true;
+			}
+
+			if (mWidth != w || mHeight != h)
+			{
+				mWidth = w;
+				mHeight = h;
+				mChanged = true;
+			}
+		}
+	}
+
+	/// <summary>
 	/// Ensure that we have a panel to work with. The reason the panel isn't added in OnEnable()
 	/// is because OnEnable() is called right after Awake(), which is a problem when the widget
 	/// is brought in on a prefab object as it happens before it gets parented.
 	/// </summary>
 
-	public virtual void Update ()
+	protected virtual void OnUpdate ()
 	{
 		// Ensure we have a panel to work with by now
 		if (mPanel == null) CreatePanel();
 #if UNITY_EDITOR
-		else if (!Application.isPlaying) ParentHasChanged();
+		else if (!mPlayMode) ParentHasChanged();
 #endif
 	}
 
@@ -942,7 +1082,7 @@ public class UIWidget : MonoBehaviour
 		if (HasTransformChanged())
 		{
 #if UNITY_EDITOR
-			if (!mPanel.widgetsAreStatic || !Application.isPlaying)
+			if (!mPanel.widgetsAreStatic || !mPlayMode)
 #else
 			if (!mPanel.widgetsAreStatic)
 #endif

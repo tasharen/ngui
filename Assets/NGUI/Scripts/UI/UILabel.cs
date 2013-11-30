@@ -552,6 +552,26 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Get horizontal bounds points relative to the specified transform.
+	/// </summary>
+
+	protected override float GetHorizontal (Transform relativeTo, float relative, int absolute)
+	{
+		if (hasChanged) ProcessText();
+		return base.GetHorizontal(relativeTo, relative, absolute);
+	}
+
+	/// <summary>
+	/// Get vertical bounds points relative to the specified transform.
+	/// </summary>
+
+	protected override float GetVertical (Transform relativeTo, float relative, int absolute)
+	{
+		if (hasChanged) ProcessText();
+		return base.GetVertical(relativeTo, relative, absolute);
+	}
+
+	/// <summary>
 	/// Process the label's text before returning its drawing dimensions.
 	/// </summary>
 
