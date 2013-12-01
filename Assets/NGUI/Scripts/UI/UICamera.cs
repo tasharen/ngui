@@ -335,6 +335,7 @@ public class UICamera : MonoBehaviour
 	Camera mCam = null;
 	LayerMask mLayerMask;
 	float mTooltipTime = 0f;
+	float mNextRaycast = 0f;
 
 	/// <summary>
 	/// Helper function that determines if this script should be handling the events.
@@ -901,20 +902,6 @@ public class UICamera : MonoBehaviour
 #endif
 
 	/// <summary>
-	/// Update the object under the mouse if we're not using touch-based input.
-	/// </summary>
-
-	void FixedUpdate ()
-	{
-		if (useMouse && Application.isPlaying && handlesEvents)
-		{
-			if (!Raycast(Input.mousePosition, out lastHit)) hoveredObject = fallThrough;
-			if (hoveredObject == null) hoveredObject = genericEventHandler;
-			for (int i = 0; i < 3; ++i) mMouse[i].current = hoveredObject;
-		}
-	}
-
-	/// <summary>
 	/// Check the input and send out appropriate events.
 	/// </summary>
 
@@ -1007,6 +994,15 @@ public class UICamera : MonoBehaviour
 
 	public void ProcessMouse ()
 	{
+		// No need to perform raycasts every frame
+		if (mNextRaycast < RealTime.time)
+		{
+			mNextRaycast = RealTime.time + 0.02f;
+			if (!Raycast(Input.mousePosition, out lastHit)) hoveredObject = fallThrough;
+			if (hoveredObject == null) hoveredObject = genericEventHandler;
+			for (int i = 0; i < 3; ++i) mMouse[i].current = hoveredObject;
+		}
+
 		lastTouchPosition = Input.mousePosition;
 		bool highlightChanged = (mMouse[0].last != mMouse[0].current);
 

@@ -48,7 +48,7 @@ public class UITooltip : MonoBehaviour
 	{
 		if (mCurrent != mTarget)
 		{
-			mCurrent = Mathf.Lerp(mCurrent, mTarget, Time.deltaTime * appearSpeed);
+			mCurrent = Mathf.Lerp(mCurrent, mTarget, RealTime.deltaTime * appearSpeed);
 			if (Mathf.Abs(mCurrent - mTarget) < 0.001f) mCurrent = mTarget;
 			SetAlpha(mCurrent * mCurrent);
 
