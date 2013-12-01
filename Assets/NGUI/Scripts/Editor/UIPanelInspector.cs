@@ -37,20 +37,20 @@ public class UIPanelInspector : UIRectEditor
 	/// Helper function that draws draggable knobs.
 	/// </summary>
 
-	void DrawKnob (Vector4 point, int id)
+	void DrawKnob (Vector4 point, int id, bool canResize)
 	{
 		if (mStyle0 == null) mStyle0 = "sv_label_0";
 		if (mStyle1 == null) mStyle1 = "sv_label_7";
 		Vector2 screenPoint = HandleUtility.WorldToGUIPoint(point);
 		Rect rect = new Rect(screenPoint.x - 7f, screenPoint.y - 7f, 14f, 14f);
 
-		if (mPanel.clipping == UIDrawCall.Clipping.None)
+		if (canResize)
 		{
-			mStyle0.Draw(rect, GUIContent.none, id);
+			mStyle1.Draw(rect, GUIContent.none, id);
 		}
 		else
 		{
-			mStyle1.Draw(rect, GUIContent.none, id);
+			mStyle0.Draw(rect, GUIContent.none, id);
 		}
 	}
 
@@ -69,16 +69,27 @@ public class UIPanelInspector : UIRectEditor
 
 		// Time to figure out what kind of action is underneath the mouse
 		UIWidgetInspector.Action actionUnderMouse = mAction;
-		bool canResize = (mPanel.clipping != UIDrawCall.Clipping.None);
-		bool[] resizable = new bool[8];
-		for (int i = 0; i < 8; ++i) resizable[i] = canResize;
-		UIWidget.Pivot pivotUnderMouse = UIWidgetInspector.GetPivotUnderMouse(handles, e, resizable, ref actionUnderMouse);
 
 		Handles.color = new Color(0.5f, 0f, 0.5f);
 		Handles.DrawLine(handles[0], handles[1]);
 		Handles.DrawLine(handles[1], handles[2]);
 		Handles.DrawLine(handles[2], handles[3]);
 		Handles.DrawLine(handles[0], handles[3]);
+
+		bool canResize = (mPanel.clipping != UIDrawCall.Clipping.None);
+		bool[] resizable = new bool[8];
+
+		resizable[4] = canResize && mPanel.leftAnchor.target == null;	// left
+		resizable[5] = canResize && mPanel.topAnchor.target == null;	// top
+		resizable[6] = canResize && mPanel.rightAnchor.target == null;	// right
+		resizable[7] = canResize && mPanel.bottomAnchor.target == null;	// bottom
+
+		resizable[0] = resizable[7] && resizable[4]; // bottom-left
+		resizable[1] = resizable[5] && resizable[4]; // top-left
+		resizable[2] = resizable[5] && resizable[6]; // top-right
+		resizable[3] = resizable[7] && resizable[6]; // bottom-right
+
+		UIWidget.Pivot pivotUnderMouse = UIWidgetInspector.GetPivotUnderMouse(handles, e, resizable, ref actionUnderMouse);
 
 		switch (type)
 		{
@@ -92,13 +103,13 @@ public class UIPanelInspector : UIRectEditor
 				if (mag > 140f)
 				{
 					Handles.BeginGUI();
-					for (int i = 0; i < 8; ++i) DrawKnob(handles[i], id);
+					for (int i = 0; i < 8; ++i) DrawKnob(handles[i], id, resizable[i]);
 					Handles.EndGUI();
 				}
 				else if (mag > 40f)
 				{
 					Handles.BeginGUI();
-					for (int i = 0; i < 4; ++i) DrawKnob(handles[i], id);
+					for (int i = 0; i < 4; ++i) DrawKnob(handles[i], id, resizable[i]);
 					Handles.EndGUI();
 				}
 			}
