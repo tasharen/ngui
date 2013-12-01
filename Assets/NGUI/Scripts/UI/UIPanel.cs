@@ -16,7 +16,7 @@ using System.Collections.Generic;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/NGUI Panel")]
-public class UIPanel : MonoBehaviour
+public class UIPanel : UIRect
 {
 	/// <summary>
 	/// List of active panels.
@@ -96,8 +96,6 @@ public class UIPanel : MonoBehaviour
 	static BetterList<Vector2> mUvs = new BetterList<Vector2>();
 	static BetterList<Color32> mCols = new BetterList<Color32>();
 
-	GameObject mGo;
-	Transform mTrans;
 	Camera mCam;
 	UIPanel mParent;
 	bool mFindParent = true;
@@ -125,18 +123,6 @@ public class UIPanel : MonoBehaviour
 			return (highest == int.MinValue) ? 0 : highest + 1;
 		}
 	}
-
-	/// <summary>
-	/// Cached for speed. Can't simply return 'mGo' set in Awake because this function may be called on a prefab.
-	/// </summary>
-
-	public GameObject cachedGameObject { get { if (mGo == null) mGo = gameObject; return mGo; } }
-
-	/// <summary>
-	/// Cached for speed. Can't simply return 'mTrans' set in Awake because this function may be called on a prefab.
-	/// </summary>
-
-	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
 
 	/// <summary>
 	/// Parent panel is used to determine cumulative alpha.
@@ -389,12 +375,13 @@ public class UIPanel : MonoBehaviour
 	/// Get horizontal bounds points relative to the specified transform.
 	/// </summary>
 
-	public float GetHorizontal (Transform relativeTo, float relative, int absolute)
+	public override float GetHorizontal (Transform relativeTo, float relative, int absolute)
 	{
 		Vector2 size = GetSize();
 
-		float x0 = -0.5f * size.x;
-		float y0 = -0.5f * size.y;
+		Vector4 cr = clipRange;
+		float x0 = cr.x - 0.5f * size.x;
+		float y0 = cr.y - 0.5f * size.y;
 		float x1 = x0 + size.x;
 		float y1 = y0 + size.y;
 		float center = (y0 + y1) * 0.5f;
@@ -415,12 +402,13 @@ public class UIPanel : MonoBehaviour
 	/// Get vertical bounds points relative to the specified transform.
 	/// </summary>
 
-	public float GetVertical (Transform relativeTo, float relative, int absolute)
+	public override float GetVertical (Transform relativeTo, float relative, int absolute)
 	{
 		Vector2 size = GetSize();
 
-		float x0 = -0.5f * size.x;
-		float y0 = -0.5f * size.y;
+		Vector4 cr = clipRange;
+		float x0 = cr.x - 0.5f * size.x;
+		float y0 = cr.y - 0.5f * size.y;
 		float x1 = x0 + size.x;
 		float y1 = y0 + size.y;
 		float center = (x0 + x1) * 0.5f;
@@ -562,7 +550,7 @@ public class UIPanel : MonoBehaviour
 	/// Layer is used to ensure that if it changes, widgets get moved as well.
 	/// </summary>
 
-	void Start ()
+	protected override void OnStart ()
 	{
 		mLayer = mGo.layer;
 		UICamera uic = UICamera.FindCameraForLayer(mLayer);
@@ -655,6 +643,15 @@ public class UIPanel : MonoBehaviour
 			range.y += 0.5f;
 		}
 		UIDrawCall.Update(this);
+	}
+
+	/// <summary>
+	/// Update the edges after the anchors have been updated.
+	/// </summary>
+
+	protected override void OnUpdate ()
+	{
+		//throw new System.NotImplementedException();
 	}
 
 	/// <summary>

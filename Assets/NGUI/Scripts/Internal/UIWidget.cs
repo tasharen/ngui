@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/NGUI Widget")]
-public class UIWidget : MonoBehaviour
+public class UIWidget : UIRect
 {
 	/// <summary>
 	/// List of all the active widgets currently present in the scene.
@@ -40,57 +40,13 @@ public class UIWidget : MonoBehaviour
 	[HideInInspector][SerializeField] protected int mHeight = 100;
 	[HideInInspector][SerializeField] protected int mDepth = 0;
 
-	[System.Serializable]
-	public class AnchorPoint
-	{
-		public Transform target;
-		public float relative = 0f;
-		public int absolute = 0;
-
-		[System.NonSerialized]
-		public UIWidget widget;
-
-		[System.NonSerialized]
-		public UIPanel panel;
-
-		public AnchorPoint () { }
-		public AnchorPoint (float relative) { this.relative = relative; }
-	}
-
-	/// <summary>
-	/// Left side anchor.
-	/// </summary>
-
-	public AnchorPoint leftAnchor = new AnchorPoint();
-
-	/// <summary>
-	/// Right side anchor.
-	/// </summary>
-
-	public AnchorPoint rightAnchor = new AnchorPoint(1f);
-
-	/// <summary>
-	/// Bottom side anchor.
-	/// </summary>
-
-	public AnchorPoint bottomAnchor = new AnchorPoint();
-
-	/// <summary>
-	/// Top side anchor.
-	/// </summary>
-
-	public AnchorPoint topAnchor = new AnchorPoint(1f);
-
 	/// <summary>
 	/// If set to 'true', the box collider's dimensions will be adjusted to always match the widget whenever it resizes.
 	/// </summary>
 
 	public bool autoResizeBoxCollider = false;
 	
-	protected GameObject mGo;
-	protected Transform mTrans;
 	protected UIPanel mPanel;
-
 	protected bool mChanged = true;
 	protected bool mPlayMode = true;
 	protected Vector4 mDrawRegion = new Vector4(0f, 0f, 1f, 1f);
@@ -102,7 +58,6 @@ public class UIWidget : MonoBehaviour
 	Matrix4x4 mLocalToPanel;
 	bool mVisibleByPanel = true;
 	float mLastAlpha = 0f;
-	int mUpdateFrame = -1;
 
 	/// <summary>
 	/// Internal usage -- draw call that's drawing the widget.
@@ -143,6 +98,12 @@ public class UIWidget : MonoBehaviour
 	/// </summary>
 
 	public bool isVisible { get { return mVisibleByPanel && finalAlpha > 0.001f; } }
+
+	/// <summary>
+	/// Pivot offset in relative coordinates. Bottom-left is (0, 0). Top-right is (1, 1).
+	/// </summary>
+
+	public Vector2 pivotOffset { get { return NGUIMath.GetPivotOffset(pivot); } }
 
 	/// <summary>
 	/// Widget's width in pixels.
@@ -437,26 +398,6 @@ public class UIWidget : MonoBehaviour
 	public bool hasVertices { get { return mGeom != null && mGeom.hasVertices; } }
 
 	/// <summary>
-	/// Helper function that calculates the relative offset based on the current pivot.
-	/// X = 0 (left) to 1 (right)
-	/// Y = 0 (bottom) to 1 (top)
-	/// </summary>
-
-	public Vector2 pivotOffset { get { return NGUIMath.GetPivotOffset(pivot); } }
-
-	/// <summary>
-	/// Game object gets cached for speed. Can't simply return 'mGo' set in Awake because this function may be called on a prefab.
-	/// </summary>
-
-	public GameObject cachedGameObject { get { if (mGo == null) mGo = gameObject; return mGo; } }
-
-	/// <summary>
-	/// Transform gets cached for speed. Can't simply return 'mTrans' set in Awake because this function may be called on a prefab.
-	/// </summary>
-
-	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
-
-	/// <summary>
 	/// Material used by the widget.
 	/// </summary>
 
@@ -536,7 +477,7 @@ public class UIWidget : MonoBehaviour
 	/// Get horizontal bounds points relative to the specified transform.
 	/// </summary>
 
-	protected virtual float GetHorizontal (Transform relativeTo, float relative, int absolute)
+	public override float GetHorizontal (Transform relativeTo, float relative, int absolute)
 	{
 		Vector2 offset = pivotOffset;
 
@@ -562,7 +503,7 @@ public class UIWidget : MonoBehaviour
 	/// Get vertical bounds points relative to the specified transform.
 	/// </summary>
 
-	protected virtual float GetVertical (Transform relativeTo, float relative, int absolute)
+	public override float GetVertical (Transform relativeTo, float relative, int absolute)
 	{
 		Vector2 offset = pivotOffset;
 
@@ -689,8 +630,9 @@ public class UIWidget : MonoBehaviour
 	/// This callback is sent inside the editor notifying us that some property has changed.
 	/// </summary>
 
-	protected virtual void OnValidate()
+	protected override void OnValidate()
 	{
+		base.OnValidate();
 		mChanged = true;
 
 		// Prior to NGUI 2.7.0 width and height was specified as transform's local scale
@@ -700,8 +642,6 @@ public class UIWidget : MonoBehaviour
 			UpgradeFrom265();
 			cachedTransform.localScale = Vector3.one;
 		}
-
-		UpdateAnchors();
 
 		if (mWidth < minWidth) mWidth = minWidth;
 		if (mHeight < minHeight) mHeight = minHeight;
@@ -860,70 +800,19 @@ public class UIWidget : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Set the depth, call the virtual start function, and sure we have a panel to work with.
+	/// Virtual Start() functionality for widgets.
 	/// </summary>
 
-	void Start ()
-	{
-		mStarted = true;
-		UpdateAnchors();
-		OnStart();
-		CreatePanel();
-	}
+	protected override void OnStart () { mStarted = true; CreatePanel(); }
 
 	/// <summary>
-	/// Helper function used in CacheAnchorReferences().
+	/// Ensure that we have a panel to work with. The reason the panel isn't added in OnEnable()
+	/// is because OnEnable() is called right after Awake(), which is a problem when the widget
+	/// is brought in on a prefab object as it happens before it gets parented.
 	/// </summary>
 
-	static void UpdateAnchor (AnchorPoint anchor)
+	protected override void OnUpdate ()
 	{
-		if (anchor.target)
-		{
-			anchor.widget = anchor.target.GetComponent<UIWidget>();
-			anchor.panel = anchor.target.GetComponent<UIPanel>();
-		}
-		else
-		{
-			anchor.widget = null;
-			anchor.panel = null;
-		}
-	}
-
-	/// <summary>
-	/// Cache all components related to anchoring. Be sure to call this function if setting anchors after the initial Start().
-	/// </summary>
-
-	public void UpdateAnchors ()
-	{
-		UpdateAnchor(leftAnchor);
-		UpdateAnchor(rightAnchor);
-		UpdateAnchor(bottomAnchor);
-		UpdateAnchor(topAnchor);
-	}
-
-	/// <summary>
-	/// Update ensures that it's executed no more than once per frame.
-	/// </summary>
-
-	public void Update ()
-	{
-		int frame = Time.frameCount;
-		if (frame == mUpdateFrame) return;
-		mUpdateFrame = frame;
-
-		// Exit early if anchors are not used
-		if (leftAnchor.target == null && rightAnchor.target == null && bottomAnchor.target == null && topAnchor.target == null)
-		{
-			OnUpdate();
-			return;
-		}
-
-		// In case some component gets destroyed, the anchor reference should get cleared
-		if (leftAnchor.target	!= null && !leftAnchor.target)		leftAnchor.target	= null;
-		if (rightAnchor.target	!= null && !rightAnchor.target)		rightAnchor.target	= null;
-		if (bottomAnchor.target != null && !bottomAnchor.target)	bottomAnchor.target = null;
-		if (topAnchor.target	!= null && !topAnchor.target)		topAnchor.target	= null;
-
 		float lt, bt, rt, tt;
 		Transform trans = cachedTransform;
 		Transform parent = trans.parent;
@@ -933,69 +822,38 @@ public class UIWidget : MonoBehaviour
 		// Left anchor point
 		if (leftAnchor.target)
 		{
-			if (leftAnchor.widget != null)
-			{
-				if (leftAnchor.widget.mUpdateFrame != frame) leftAnchor.widget.Update();
-				lt = leftAnchor.widget.GetHorizontal(parent, leftAnchor.relative, leftAnchor.absolute);
-			}
-			else if (leftAnchor.panel != null)
-			{
-				lt = leftAnchor.panel.GetHorizontal(parent, leftAnchor.relative, leftAnchor.absolute);
-			}
-			else lt = trans.InverseTransformPoint(leftAnchor.target.position).x;
+			lt = (leftAnchor.rect != null) ?
+				leftAnchor.rect.GetHorizontal(parent, leftAnchor.relative, leftAnchor.absolute) :
+				trans.InverseTransformPoint(leftAnchor.target.position).x;
 		}
 		else lt = pos.x - pvt.x * mWidth;
 
 		// Bottom anchor point
 		if (bottomAnchor.target)
 		{
-			if (bottomAnchor.widget != null)
-			{
-				if (bottomAnchor.widget.mUpdateFrame != frame) bottomAnchor.widget.Update();
-				bt = bottomAnchor.widget.GetVertical(parent, bottomAnchor.relative, bottomAnchor.absolute);
-			}
-			else if (bottomAnchor.panel != null)
-			{
-				bt = bottomAnchor.panel.GetVertical(parent, bottomAnchor.relative, bottomAnchor.absolute);
-			}
-			else bt = trans.InverseTransformPoint(bottomAnchor.target.position).y;
+			bt = (bottomAnchor.rect != null) ?
+				bottomAnchor.rect.GetVertical(parent, bottomAnchor.relative, bottomAnchor.absolute) :
+				trans.InverseTransformPoint(bottomAnchor.target.position).y;
 		}
 		else bt = pos.y - pvt.y * mHeight;
 
 		// Right anchor point
 		if (rightAnchor.target)
 		{
-			if (rightAnchor.widget != null)
-			{
-				if (rightAnchor.widget.mUpdateFrame != frame) rightAnchor.widget.Update();
-				rt = rightAnchor.widget.GetHorizontal(parent, rightAnchor.relative, rightAnchor.absolute);
-			}
-			else if (rightAnchor.panel != null)
-			{
-				rt = rightAnchor.panel.GetHorizontal(parent, rightAnchor.relative, rightAnchor.absolute);
-			}
-			else rt = trans.InverseTransformPoint(rightAnchor.target.position).x;
+			rt = (rightAnchor.rect != null) ?
+				rightAnchor.rect.GetHorizontal(parent, rightAnchor.relative, rightAnchor.absolute) :
+				trans.InverseTransformPoint(rightAnchor.target.position).x;
 		}
 		else rt = pos.x - pvt.x * mWidth + mWidth;
 
 		// Top anchor point
 		if (topAnchor.target)
 		{
-			if (topAnchor.widget != null)
-			{
-				if (topAnchor.widget.mUpdateFrame != frame) topAnchor.widget.Update();
-				tt = topAnchor.widget.GetVertical(parent, topAnchor.relative, topAnchor.absolute);
-			}
-			else if (topAnchor.panel != null)
-			{
-				tt = topAnchor.panel.GetVertical(parent, topAnchor.relative, topAnchor.absolute);
-			}
-			else tt = trans.InverseTransformPoint(topAnchor.target.position).y;
+			tt = (topAnchor.rect != null) ?
+				topAnchor.rect.GetVertical(parent, topAnchor.relative, topAnchor.absolute) :
+				trans.InverseTransformPoint(topAnchor.target.position).y;
 		}
 		else tt = pos.y - pvt.y * mHeight + mHeight;
-
-		// Call the virtual update function
-		OnUpdate();
 
 		// Calculate the new position, width and height
 		Vector3 newPos = new Vector3(
@@ -1026,16 +884,7 @@ public class UIWidget : MonoBehaviour
 			mHeight = h;
 			mChanged = true;
 		}
-	}
 
-	/// <summary>
-	/// Ensure that we have a panel to work with. The reason the panel isn't added in OnEnable()
-	/// is because OnEnable() is called right after Awake(), which is a problem when the widget
-	/// is brought in on a prefab object as it happens before it gets parented.
-	/// </summary>
-
-	protected virtual void OnUpdate ()
-	{
 		// Ensure we have a panel to work with by now
 		if (mPanel == null) CreatePanel();
 #if UNITY_EDITOR
@@ -1327,12 +1176,6 @@ public class UIWidget : MonoBehaviour
 	/// </summary>
 
 	virtual public Vector4 border { get { return Vector4.zero; } }
-
-	/// <summary>
-	/// Virtual Start() functionality for widgets.
-	/// </summary>
-
-	virtual protected void OnStart () { }
 
 	/// <summary>
 	/// Virtual function called by the UIPanel that fills the buffers.

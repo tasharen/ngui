@@ -555,7 +555,7 @@ public class UILabel : UIWidget
 	/// Get horizontal bounds points relative to the specified transform.
 	/// </summary>
 
-	protected override float GetHorizontal (Transform relativeTo, float relative, int absolute)
+	public override float GetHorizontal (Transform relativeTo, float relative, int absolute)
 	{
 		if (hasChanged) ProcessText();
 		return base.GetHorizontal(relativeTo, relative, absolute);
@@ -565,7 +565,7 @@ public class UILabel : UIWidget
 	/// Get vertical bounds points relative to the specified transform.
 	/// </summary>
 
-	protected override float GetVertical (Transform relativeTo, float relative, int absolute)
+	public override float GetVertical (Transform relativeTo, float relative, int absolute)
 	{
 		if (hasChanged) ProcessText();
 		return base.GetVertical(relativeTo, relative, absolute);
@@ -917,6 +917,8 @@ public class UILabel : UIWidget
 
 	protected override void OnStart ()
 	{
+		base.OnStart();
+
 		// Legacy support
 		if (mLineWidth > 0f)
 		{

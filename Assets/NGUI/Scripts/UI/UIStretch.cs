@@ -147,11 +147,11 @@ public class UIStretch : MonoBehaviour
 				else
 				{
 					// Panel has clipping -- use it as the mRect
-					Vector4 pos = pc.clipRange;
-					mRect.x = pos.x - (pos.z * 0.5f);
-					mRect.y = pos.y - (pos.w * 0.5f);
-					mRect.width = pos.z;
-					mRect.height = pos.w;
+					Vector4 cr = pc.clipRange;
+					mRect.x = cr.x - (cr.z * 0.5f);
+					mRect.y = cr.y - (cr.w * 0.5f);
+					mRect.width = cr.z;
+					mRect.height = cr.w;
 				}
 			}
 			else if (container != null)
