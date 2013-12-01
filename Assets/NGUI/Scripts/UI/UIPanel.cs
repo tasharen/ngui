@@ -400,9 +400,14 @@ public class UIPanel : MonoBehaviour
 		float center = (y0 + y1) * 0.5f;
 
 		Transform wt = cachedTransform;
-		Vector3 v0 = relativeTo.InverseTransformPoint(wt.TransformPoint(x0, center, 0f));
-		Vector3 v1 = relativeTo.InverseTransformPoint(wt.TransformPoint(x1, center, 0f));
+		Vector3 v0 = wt.TransformPoint(x0, center, 0f);
+		Vector3 v1 = wt.TransformPoint(x1, center, 0f);
 
+		if (relativeTo != null)
+		{
+			v0 = relativeTo.InverseTransformPoint(v0);
+			v1 = relativeTo.InverseTransformPoint(v1);
+		}
 		return Mathf.Round(Mathf.Lerp(v0.x, v1.x, relative)) + absolute;
 	}
 
@@ -421,9 +426,14 @@ public class UIPanel : MonoBehaviour
 		float center = (x0 + x1) * 0.5f;
 
 		Transform wt = cachedTransform;
-		Vector3 v0 = relativeTo.InverseTransformPoint(wt.TransformPoint(center, y0, 0f));
-		Vector3 v1 = relativeTo.InverseTransformPoint(wt.TransformPoint(center, y1, 0f));
+		Vector3 v0 = wt.TransformPoint(center, y0, 0f);
+		Vector3 v1 = wt.TransformPoint(center, y1, 0f);
 
+		if (relativeTo != null)
+		{
+			v0 = relativeTo.InverseTransformPoint(v0);
+			v1 = relativeTo.InverseTransformPoint(v1);
+		}
 		return Mathf.Round(Mathf.Lerp(v0.y, v1.y, relative)) + absolute;
 	}
 

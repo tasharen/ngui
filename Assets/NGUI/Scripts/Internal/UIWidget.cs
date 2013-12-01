@@ -40,21 +40,46 @@ public class UIWidget : MonoBehaviour
 	[HideInInspector][SerializeField] protected int mHeight = 100;
 	[HideInInspector][SerializeField] protected int mDepth = 0;
 
-	// Anchor points
-	[HideInInspector][SerializeField] Transform mAnchorL;
-	[HideInInspector][SerializeField] Transform mAnchorR;
-	[HideInInspector][SerializeField] Transform mAnchorB;
-	[HideInInspector][SerializeField] Transform mAnchorT;
+	[System.Serializable]
+	public class AnchorPoint
+	{
+		public Transform target;
+		public float relative = 0f;
+		public int absolute = 0;
 
-	// Each anchor has a relative and an absolute value used to calculate final offset
-	[HideInInspector][SerializeField] float mAnchorLR = 0f;
-	[HideInInspector][SerializeField] float mAnchorBR = 0f;
-	[HideInInspector][SerializeField] float mAnchorRR = 1f;
-	[HideInInspector][SerializeField] float mAnchorTR = 1f;
-	[HideInInspector][SerializeField] int mAnchorLA = 0;
-	[HideInInspector][SerializeField] int mAnchorBA = 0;
-	[HideInInspector][SerializeField] int mAnchorRA = 0;
-	[HideInInspector][SerializeField] int mAnchorTA = 0;
+		[System.NonSerialized]
+		public UIWidget widget;
+
+		[System.NonSerialized]
+		public UIPanel panel;
+
+		public AnchorPoint () { }
+		public AnchorPoint (float relative) { this.relative = relative; }
+	}
+
+	/// <summary>
+	/// Left side anchor.
+	/// </summary>
+
+	public AnchorPoint leftAnchor = new AnchorPoint();
+
+	/// <summary>
+	/// Right side anchor.
+	/// </summary>
+
+	public AnchorPoint rightAnchor = new AnchorPoint(1f);
+
+	/// <summary>
+	/// Bottom side anchor.
+	/// </summary>
+
+	public AnchorPoint bottomAnchor = new AnchorPoint();
+
+	/// <summary>
+	/// Top side anchor.
+	/// </summary>
+
+	public AnchorPoint topAnchor = new AnchorPoint(1f);
 
 	/// <summary>
 	/// If set to 'true', the box collider's dimensions will be adjusted to always match the widget whenever it resizes.
@@ -78,16 +103,6 @@ public class UIWidget : MonoBehaviour
 	bool mVisibleByPanel = true;
 	float mLastAlpha = 0f;
 	int mUpdateFrame = -1;
-
-	UIWidget mAnchorLW;
-	UIWidget mAnchorRW;
-	UIWidget mAnchorBW;
-	UIWidget mAnchorTW;
-
-	UIPanel mAnchorLP;
-	UIPanel mAnchorRP;
-	UIPanel mAnchorBP;
-	UIPanel mAnchorTP;
 
 	/// <summary>
 	/// Internal usage -- draw call that's drawing the widget.
@@ -532,9 +547,14 @@ public class UIWidget : MonoBehaviour
 		float center = (y0 + y1) * 0.5f;
 
 		Transform wt = cachedTransform;
-		Vector3 v0 = relativeTo.InverseTransformPoint(wt.TransformPoint(x0, center, 0f));
-		Vector3 v1 = relativeTo.InverseTransformPoint(wt.TransformPoint(x1, center, 0f));
+		Vector3 v0 = wt.TransformPoint(x0, center, 0f);
+		Vector3 v1 = wt.TransformPoint(x1, center, 0f);
 
+		if (relativeTo != null)
+		{
+			v0 = relativeTo.InverseTransformPoint(v0);
+			v1 = relativeTo.InverseTransformPoint(v1);
+		}
 		return Mathf.Round(Mathf.Lerp(v0.x, v1.x, relative)) + absolute;
 	}
 
@@ -553,9 +573,14 @@ public class UIWidget : MonoBehaviour
 		float center = (x0 + x1) * 0.5f;
 
 		Transform wt = cachedTransform;
-		Vector3 v0 = relativeTo.InverseTransformPoint(wt.TransformPoint(center, y0, 0f));
-		Vector3 v1 = relativeTo.InverseTransformPoint(wt.TransformPoint(center, y1, 0f));
+		Vector3 v0 = wt.TransformPoint(center, y0, 0f);
+		Vector3 v1 = wt.TransformPoint(center, y1, 0f);
 
+		if (relativeTo != null)
+		{
+			v0 = relativeTo.InverseTransformPoint(v0);
+			v1 = relativeTo.InverseTransformPoint(v1);
+		}
 		return Mathf.Round(Mathf.Lerp(v0.y, v1.y, relative)) + absolute;
 	}
 
@@ -676,7 +701,7 @@ public class UIWidget : MonoBehaviour
 			cachedTransform.localScale = Vector3.one;
 		}
 
-		CacheAnchorComponents();
+		UpdateAnchors();
 
 		if (mWidth < minWidth) mWidth = minWidth;
 		if (mHeight < minHeight) mHeight = minHeight;
@@ -841,27 +866,39 @@ public class UIWidget : MonoBehaviour
 	void Start ()
 	{
 		mStarted = true;
-
-		CacheAnchorComponents();
+		UpdateAnchors();
 		OnStart();
 		CreatePanel();
 	}
 
 	/// <summary>
-	/// Cache all components related to anchoring.
+	/// Helper function used in CacheAnchorReferences().
 	/// </summary>
 
-	void CacheAnchorComponents ()
+	static void UpdateAnchor (AnchorPoint anchor)
 	{
-		mAnchorLW = mAnchorL ? mAnchorL.GetComponent<UIWidget>() : null;
-		mAnchorRW = mAnchorR ? mAnchorR.GetComponent<UIWidget>() : null;
-		mAnchorBW = mAnchorB ? mAnchorB.GetComponent<UIWidget>() : null;
-		mAnchorTW = mAnchorT ? mAnchorT.GetComponent<UIWidget>() : null;
+		if (anchor.target)
+		{
+			anchor.widget = anchor.target.GetComponent<UIWidget>();
+			anchor.panel = anchor.target.GetComponent<UIPanel>();
+		}
+		else
+		{
+			anchor.widget = null;
+			anchor.panel = null;
+		}
+	}
 
-		mAnchorLP = mAnchorL ? mAnchorL.GetComponent<UIPanel>() : null;
-		mAnchorRP = mAnchorR ? mAnchorR.GetComponent<UIPanel>() : null;
-		mAnchorBP = mAnchorB ? mAnchorB.GetComponent<UIPanel>() : null;
-		mAnchorTP = mAnchorT ? mAnchorT.GetComponent<UIPanel>() : null;
+	/// <summary>
+	/// Cache all components related to anchoring. Be sure to call this function if setting anchors after the initial Start().
+	/// </summary>
+
+	public void UpdateAnchors ()
+	{
+		UpdateAnchor(leftAnchor);
+		UpdateAnchor(rightAnchor);
+		UpdateAnchor(bottomAnchor);
+		UpdateAnchor(topAnchor);
 	}
 
 	/// <summary>
@@ -874,127 +911,120 @@ public class UIWidget : MonoBehaviour
 		if (frame == mUpdateFrame) return;
 		mUpdateFrame = frame;
 
-		bool anchored = false;
+		// Exit early if anchors are not used
+		if (leftAnchor.target == null && rightAnchor.target == null && bottomAnchor.target == null && topAnchor.target == null)
+		{
+			OnUpdate();
+			return;
+		}
 
-		if (mAnchorL)
+		// In case some component gets destroyed, the anchor reference should get cleared
+		if (leftAnchor.target	!= null && !leftAnchor.target)		leftAnchor.target	= null;
+		if (rightAnchor.target	!= null && !rightAnchor.target)		rightAnchor.target	= null;
+		if (bottomAnchor.target != null && !bottomAnchor.target)	bottomAnchor.target = null;
+		if (topAnchor.target	!= null && !topAnchor.target)		topAnchor.target	= null;
+
+		float lt, bt, rt, tt;
+		Transform trans = cachedTransform;
+		Transform parent = trans.parent;
+		Vector3 pos = trans.localPosition;
+		Vector2 pvt = pivotOffset;
+
+		// Left anchor point
+		if (leftAnchor.target)
 		{
-			anchored = true;
-			if (mAnchorLW != null && mAnchorLW.mUpdateFrame != frame)
-				mAnchorLW.Update();
+			if (leftAnchor.widget != null)
+			{
+				if (leftAnchor.widget.mUpdateFrame != frame) leftAnchor.widget.Update();
+				lt = leftAnchor.widget.GetHorizontal(parent, leftAnchor.relative, leftAnchor.absolute);
+			}
+			else if (leftAnchor.panel != null)
+			{
+				lt = leftAnchor.panel.GetHorizontal(parent, leftAnchor.relative, leftAnchor.absolute);
+			}
+			else lt = trans.InverseTransformPoint(leftAnchor.target.position).x;
 		}
-		
-		if (mAnchorR)
+		else lt = pos.x - pvt.x * mWidth;
+
+		// Bottom anchor point
+		if (bottomAnchor.target)
 		{
-			anchored = true;
-			if (mAnchorRW != null && mAnchorRW.mUpdateFrame != frame)
-				mAnchorRW.Update();
+			if (bottomAnchor.widget != null)
+			{
+				if (bottomAnchor.widget.mUpdateFrame != frame) bottomAnchor.widget.Update();
+				bt = bottomAnchor.widget.GetVertical(parent, bottomAnchor.relative, bottomAnchor.absolute);
+			}
+			else if (bottomAnchor.panel != null)
+			{
+				bt = bottomAnchor.panel.GetVertical(parent, bottomAnchor.relative, bottomAnchor.absolute);
+			}
+			else bt = trans.InverseTransformPoint(bottomAnchor.target.position).y;
 		}
-		
-		if (mAnchorT)
+		else bt = pos.y - pvt.y * mHeight;
+
+		// Right anchor point
+		if (rightAnchor.target)
 		{
-			anchored = true;
-			if (mAnchorTW != null && mAnchorTW.mUpdateFrame != frame)
-				mAnchorTW.Update();
+			if (rightAnchor.widget != null)
+			{
+				if (rightAnchor.widget.mUpdateFrame != frame) rightAnchor.widget.Update();
+				rt = rightAnchor.widget.GetHorizontal(parent, rightAnchor.relative, rightAnchor.absolute);
+			}
+			else if (rightAnchor.panel != null)
+			{
+				rt = rightAnchor.panel.GetHorizontal(parent, rightAnchor.relative, rightAnchor.absolute);
+			}
+			else rt = trans.InverseTransformPoint(rightAnchor.target.position).x;
 		}
-		
-		if (mAnchorB)
+		else rt = pos.x - pvt.x * mWidth + mWidth;
+
+		// Top anchor point
+		if (topAnchor.target)
 		{
-			anchored = true;
-			if (mAnchorBW != null && mAnchorBW.mUpdateFrame != frame)
-				mAnchorBW.Update();
+			if (topAnchor.widget != null)
+			{
+				if (topAnchor.widget.mUpdateFrame != frame) topAnchor.widget.Update();
+				tt = topAnchor.widget.GetVertical(parent, topAnchor.relative, topAnchor.absolute);
+			}
+			else if (topAnchor.panel != null)
+			{
+				tt = topAnchor.panel.GetVertical(parent, topAnchor.relative, topAnchor.absolute);
+			}
+			else tt = trans.InverseTransformPoint(topAnchor.target.position).y;
 		}
+		else tt = pos.y - pvt.y * mHeight + mHeight;
 
 		// Call the virtual update function
 		OnUpdate();
 
-		if (anchored)
+		// Calculate the new position, width and height
+		Vector3 newPos = new Vector3(
+			Mathf.Round(Mathf.Lerp(lt, rt, pvt.x)),
+			Mathf.Round(Mathf.Lerp(bt, tt, pvt.y)), pos.z);
+		int w = Mathf.RoundToInt(rt - lt);
+		int h = Mathf.RoundToInt(tt - bt);
+
+		// Don't let the width and height get too small
+		if (w < minWidth) w = minWidth;
+		if (h < minHeight) h = minHeight;
+
+		// Centered widgets need to have dimensions that are dividable by two
+		if (pvt.x == 0.5f && ((w & 1) == 1)) ++w;
+		if (pvt.y == 0.5f && ((h & 1) == 1)) ++h;
+
+		// Update the position if it has changed
+		if (Vector3.SqrMagnitude(pos - newPos) > 0.001f)
 		{
-			Transform t = cachedTransform;
-			Transform p = t.parent;
-			Vector2 po = pivotOffset;
-			Vector3 lp = t.localPosition;
+			cachedTransform.localPosition = newPos;
+			mChanged = true;
+		}
 
-			float lt = lp.x - po.x * mWidth;
-			float bt = lp.y - po.y * mHeight;
-			float rt = lt + mWidth;
-			float tt = bt + mHeight;
-
-			if (mAnchorL)
-			{
-				if (mAnchorLW != null)
-				{
-					lt = mAnchorLW.GetHorizontal(p, mAnchorLR, mAnchorLA);
-				}
-				else if (mAnchorLP != null)
-				{
-					lt = mAnchorLP.GetHorizontal(p, mAnchorLR, mAnchorLA);
-				}
-				else lt = t.InverseTransformPoint(mAnchorL.position).x;
-			}
-
-			if (mAnchorB)
-			{
-				if (mAnchorBW != null)
-				{
-					bt = mAnchorBW.GetVertical(p, mAnchorBR, mAnchorBA);
-				}
-				else if (mAnchorBP != null)
-				{
-					bt = mAnchorBP.GetVertical(p, mAnchorBR, mAnchorBA);
-				}
-				else bt = t.InverseTransformPoint(mAnchorB.position).y;
-			}
-
-			if (mAnchorR)
-			{
-				if (mAnchorRW != null)
-				{
-					rt = mAnchorRW.GetHorizontal(p, mAnchorRR, mAnchorRA);
-				}
-				else if (mAnchorRP != null)
-				{
-					rt = mAnchorRP.GetHorizontal(p, mAnchorRR, mAnchorRA);
-				}
-				else rt = t.InverseTransformPoint(mAnchorR.position).x;
-			}
-
-			if (mAnchorT)
-			{
-				if (mAnchorTW != null)
-				{
-					tt = mAnchorTW.GetVertical(p, mAnchorTR, mAnchorTA);
-				}
-				else if (mAnchorTP != null)
-				{
-					tt = mAnchorTP.GetVertical(p, mAnchorTR, mAnchorTA);
-				}
-				else tt = t.InverseTransformPoint(mAnchorT.position).y;
-			}
-
-			Vector3 newPos = new Vector3(
-				Mathf.Round(Mathf.Lerp(lt, rt, po.x)),
-				Mathf.Round(Mathf.Lerp(bt, tt, po.y)), lp.z);
-			int w = Mathf.RoundToInt(rt - lt);
-			int h = Mathf.RoundToInt(tt - bt);
-
-			if (w < minWidth) w = minWidth;
-			if (h < minHeight) h = minHeight;
-
-			if (po.x == 0.5f && ((w & 1) == 1)) ++w;
-			if (po.y == 0.5f && ((h & 1) == 1)) ++h;
-
-			if (Vector3.SqrMagnitude(lp - newPos) > 0.001f)
-			{
-				cachedTransform.localPosition = newPos;
-				mChanged = true;
-			}
-
-			if (mWidth != w || mHeight != h)
-			{
-				mWidth = w;
-				mHeight = h;
-				mChanged = true;
-			}
+		// Update the width and height if it has changed
+		if (mWidth != w || mHeight != h)
+		{
+			mWidth = w;
+			mHeight = h;
+			mChanged = true;
 		}
 	}
 
