@@ -71,10 +71,10 @@ public class SpringPanel : MonoBehaviour
         mTrans.localPosition = after;
 
         Vector3 offset = after - before;
-        Vector4 cr = mPanel.clipRange;
+        Vector2 cr = mPanel.clipOffset;
         cr.x -= offset.x;
         cr.y -= offset.y;
-        mPanel.clipRange = cr;
+		mPanel.clipOffset = cr;
 
         if (mDrag != null) mDrag.UpdateScrollbars(false);
         if (trigger && onFinished != null) onFinished();

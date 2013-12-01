@@ -157,7 +157,7 @@ public class UIAnchor : MonoBehaviour
 			else
 			{
 				// Panel has clipping -- use it as the mRect
-				Vector4 pos = pc.clipRange;
+				Vector4 pos = pc.finalClipRegion;
 				mRect.x = pos.x - (pos.z * 0.5f);
 				mRect.y = pos.y - (pos.w * 0.5f);
 				mRect.width = pos.z;

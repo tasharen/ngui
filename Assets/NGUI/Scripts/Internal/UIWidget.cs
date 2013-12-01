@@ -806,9 +806,7 @@ public class UIWidget : UIRect
 	protected override void OnStart () { mStarted = true; CreatePanel(); }
 
 	/// <summary>
-	/// Ensure that we have a panel to work with. The reason the panel isn't added in OnEnable()
-	/// is because OnEnable() is called right after Awake(), which is a problem when the widget
-	/// is brought in on a prefab object as it happens before it gets parented.
+	/// Update the anchored edges and ensure the widget is registered with a panel.
 	/// </summary>
 
 	protected override void OnUpdate ()

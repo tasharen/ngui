@@ -744,7 +744,7 @@ public class UIDrawCall : MonoBehaviour
 
 		if (panel.clipping != UIDrawCall.Clipping.None)
 		{
-			Vector4 cr = panel.clipRange;
+			Vector4 cr = panel.finalClipRegion;
 			range = new Vector4(cr.x, cr.y, cr.z * 0.5f, cr.w * 0.5f);
 		}
 

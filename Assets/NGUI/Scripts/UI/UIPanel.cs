@@ -103,6 +103,7 @@ public class UIPanel : UIRect
 	float mUpdateTime = 0f;
 	float mMatrixTime = 0f;
 	int mLayer = -1;
+	Vector2 mClipOffset = Vector2.zero;
 
 	// Values used for visibility checks
 	static float[] mTemp = new float[4];
@@ -214,6 +215,18 @@ public class UIPanel : UIRect
 	}
 
 	/// <summary>
+	/// Panel's width in pixels.
+	/// </summary>
+
+	public float width { get { return GetSize().x; } }
+
+	/// <summary>
+	/// Panel's height in pixels.
+	/// </summary>
+
+	public float height { get { return GetSize().y; } }
+
+	/// <summary>
 	/// Number of draw calls produced by this panel.
 	/// </summary>
 
@@ -235,16 +248,64 @@ public class UIPanel : UIRect
 			{
 				mClipping = value;
 				mMatrixTime = 0f;
-				UpdateDrawcalls();
+#if UNITY_EDITOR
+				if (!Application.isPlaying) UIDrawCall.Update(this);
+#endif
+			}
+		}
+	}
+
+	/// <summary>
+	/// Clipping area offset used to make it possible to move clipped panels (scroll views) efficiently.
+	/// Scroll views move by adjusting the clip offset by one value, and the transform position by the inverse.
+	/// This makes it possible to not have to rebuild the geometry, greatly improving performance.
+	/// </summary>
+
+	public Vector2 clipOffset
+	{
+		get
+		{
+			return mClipOffset;
+		}
+		set
+		{
+			if (Mathf.Abs(mClipOffset.x - value.x) > 0.001f ||
+				Mathf.Abs(mClipOffset.y - value.y) > 0.001f)
+			{
+				mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
+				mClipOffset = value;
+				mMatrixTime = 0f;
+#if UNITY_EDITOR
+				if (!Application.isPlaying) UIDrawCall.Update(this);
+#endif
 			}
 		}
 	}
 
 	/// <summary>
 	/// Clipping position (XY) and size (ZW).
+	/// Note that you should not be modifying this property at run-time to reposition the clipping. Adjust clipOffset instead.
 	/// </summary>
 
+	[System.Obsolete("Use 'finalClipRegion' or 'baseClipRegion' instead")]
 	public Vector4 clipRange
+	{
+		get
+		{
+			return baseClipRegion;
+		}
+		set
+		{
+			baseClipRegion = value;
+		}
+	}
+
+	/// <summary>
+	/// Clipping position (XY) and size (ZW).
+	/// Note that you should not be modifying this property at run-time to reposition the clipping. Adjust clipOffset instead.
+	/// </summary>
+
+	public Vector4 baseClipRegion
 	{
 		get
 		{
@@ -252,13 +313,30 @@ public class UIPanel : UIRect
 		}
 		set
 		{
-			if (mClipRange != value)
+			if (Mathf.Abs(mClipRange.x - value.x) > 0.001f ||
+				Mathf.Abs(mClipRange.y - value.y) > 0.001f ||
+				Mathf.Abs(mClipRange.z - value.z) > 0.001f ||
+				Mathf.Abs(mClipRange.w - value.w) > 0.001f)
 			{
 				mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
 				mClipRange = value;
 				mMatrixTime = 0f;
-				UpdateDrawcalls();
+#if UNITY_EDITOR
+				if (!Application.isPlaying) UIDrawCall.Update(this);
+#endif
 			}
+		}
+	}
+
+	/// <summary>
+	/// Final clipping region after the offset has been taken into consideration.
+	/// </summary>
+
+	public Vector4 finalClipRegion
+	{
+		get
+		{
+			return new Vector4(mClipRange.x + mClipOffset.x, mClipRange.y + mClipOffset.y, mClipRange.z, mClipRange.w);
 		}
 	}
 
@@ -266,7 +344,23 @@ public class UIPanel : UIRect
 	/// Clipping softness is used if the clipped style is set to "Soft".
 	/// </summary>
 
-	public Vector2 clipSoftness { get { return mClipSoftness; } set { if (mClipSoftness != value) { mClipSoftness = value; UpdateDrawcalls(); } } }
+	public Vector2 clipSoftness
+	{
+		get
+		{
+			return mClipSoftness;
+		}
+		set
+		{
+			if (mClipSoftness != value)
+			{
+				mClipSoftness = value;
+#if UNITY_EDITOR
+				if (!Application.isPlaying) UIDrawCall.Update(this);
+#endif
+			}
+		}
+	}
 
 	// Temporary variable to avoid GC allocation
 	static Vector3[] mCorners = new Vector3[4];
@@ -312,8 +406,8 @@ public class UIPanel : UIRect
 			}
 			else
 			{
-				float x0 = mClipRange.x - 0.5f * mClipRange.z;
-				float y0 = mClipRange.y - 0.5f * mClipRange.w;
+				float x0 = mClipOffset.x + mClipRange.x - 0.5f * mClipRange.z;
+				float y0 = mClipOffset.y + mClipRange.y - 0.5f * mClipRange.w;
 				float x1 = x0 + mClipRange.z;
 				float y1 = y0 + mClipRange.w;
 
@@ -355,8 +449,8 @@ public class UIPanel : UIRect
 			}
 			else
 			{
-				float x0 = mClipRange.x - 0.5f * mClipRange.z;
-				float y0 = mClipRange.y - 0.5f * mClipRange.w;
+				float x0 = mClipOffset.x + mClipRange.x - 0.5f * mClipRange.z;
+				float y0 = mClipOffset.y + mClipRange.y - 0.5f * mClipRange.w;
 				float x1 = x0 + mClipRange.z;
 				float y1 = y0 + mClipRange.w;
 
@@ -379,7 +473,7 @@ public class UIPanel : UIRect
 	{
 		Vector2 size = GetSize();
 
-		Vector4 cr = (mClipping != UIDrawCall.Clipping.None) ? clipRange : Vector4.zero;
+		Vector2 cr = (mClipping != UIDrawCall.Clipping.None) ? (Vector2)mClipRange + mClipOffset : Vector2.zero;
 		float x0 = cr.x - 0.5f * size.x;
 		float y0 = cr.y - 0.5f * size.y;
 		float x1 = x0 + size.x;
@@ -406,7 +500,7 @@ public class UIPanel : UIRect
 	{
 		Vector2 size = GetSize();
 
-		Vector4 cr = (mClipping != UIDrawCall.Clipping.None) ? clipRange : Vector4.zero;
+		Vector2 cr = (mClipping != UIDrawCall.Clipping.None) ? (Vector2)mClipRange + mClipOffset : Vector2.zero;
 		float x0 = cr.x - 0.5f * size.x;
 		float y0 = cr.y - 0.5f * size.y;
 		float x1 = x0 + size.x;
@@ -609,40 +703,15 @@ public class UIPanel : UIRect
 
 				size *= 0.5f;
 
-				mMin.x = mClipRange.x - size.x;
-				mMin.y = mClipRange.y - size.y;
-				mMax.x = mClipRange.x + size.x;
-				mMax.y = mClipRange.y + size.y;
+				float x = mClipOffset.x + mClipRange.x;
+				float y = mClipOffset.y + mClipRange.y;
+
+				mMin.x = x - size.x;
+				mMin.y = y - size.y;
+				mMax.x = x + size.x;
+				mMax.y = y + size.y;
 			}
 		}
-	}
-
-	/// <summary>
-	/// Update the clipping rect in the shaders and draw calls' positions.
-	/// </summary>
-
-	void UpdateDrawcalls ()
-	{
-		Vector4 range = Vector4.zero;
-
-		if (mClipping != UIDrawCall.Clipping.None)
-		{
-			range = new Vector4(mClipRange.x, mClipRange.y, mClipRange.z * 0.5f, mClipRange.w * 0.5f);
-		}
-
-		if (range.z == 0f) range.z = Screen.width * 0.5f;
-		if (range.w == 0f) range.w = Screen.height * 0.5f;
-
-		RuntimePlatform platform = Application.platform;
-
-		if (platform == RuntimePlatform.WindowsPlayer ||
-			platform == RuntimePlatform.WindowsWebPlayer ||
-			platform == RuntimePlatform.WindowsEditor)
-		{
-			range.x -= 0.5f;
-			range.y += 0.5f;
-		}
-		UIDrawCall.Update(this);
 	}
 
 	/// <summary>
@@ -651,7 +720,74 @@ public class UIPanel : UIRect
 
 	protected override void OnUpdate ()
 	{
-		//throw new System.NotImplementedException();
+		// No clipping = no edges to anchor
+		if (mClipping == UIDrawCall.Clipping.None) return;
+
+		Transform trans = cachedTransform;
+		Transform parent = trans.parent;
+
+		Vector2 size = GetSize();
+
+		float lt, bt, rt, tt;
+		bool anchored = false;
+
+		// Left anchor point
+		if (leftAnchor.target)
+		{
+			anchored = true;
+			lt = (leftAnchor.rect != null) ?
+				leftAnchor.rect.GetHorizontal(parent, leftAnchor.relative, leftAnchor.absolute) :
+				trans.InverseTransformPoint(leftAnchor.target.position).x;
+		}
+		else lt = mClipRange.x - 0.5f * size.x;
+
+		// Bottom anchor point
+		if (bottomAnchor.target)
+		{
+			anchored = true;
+			bt = (bottomAnchor.rect != null) ?
+				bottomAnchor.rect.GetVertical(parent, bottomAnchor.relative, bottomAnchor.absolute) :
+				trans.InverseTransformPoint(bottomAnchor.target.position).y;
+		}
+		else bt = mClipRange.y - 0.5f * size.y;
+
+		// Right anchor point
+		if (rightAnchor.target)
+		{
+			anchored = true;
+			rt = (rightAnchor.rect != null) ?
+				rightAnchor.rect.GetHorizontal(parent, rightAnchor.relative, rightAnchor.absolute) :
+				trans.InverseTransformPoint(rightAnchor.target.position).x;
+		}
+		else rt = mClipRange.x + 0.5f * size.x;
+
+		// Top anchor point
+		if (topAnchor.target)
+		{
+			anchored = true;
+			tt = (topAnchor.rect != null) ?
+				topAnchor.rect.GetVertical(parent, topAnchor.relative, topAnchor.absolute) :
+				trans.InverseTransformPoint(topAnchor.target.position).y;
+		}
+		else tt = mClipRange.y + 0.5f * size.y;
+
+		if (anchored)
+		{
+			// Calculate the new position, width and height
+			float newX = Mathf.Lerp(lt, rt, 0.5f);
+			float newY = Mathf.Lerp(bt, tt, 0.5f);
+			float w = rt - lt;
+			float h = tt - bt;
+
+			float minx = Mathf.Max(20f, mClipSoftness.x);
+			float miny = Mathf.Max(20f, mClipSoftness.y);
+
+			if (w < minx) w = minx;
+			if (h < miny) h = miny;
+
+			// Update the clipping range
+			baseClipRegion = new Vector4(newX, newY, w, h);
+		}
 	}
 
 	/// <summary>
@@ -695,11 +831,7 @@ public class UIPanel : UIRect
 		}
 
 		// Update the clipping rects
-		for (int i = 0; i < list.size; ++i)
-		{
-			UIPanel panel = list[i];
-			panel.UpdateDrawcalls();
-		}
+		for (int i = 0; i < list.size; ++i) UIDrawCall.Update(list[i]);
 		mRebuild = false;
 	}
 
@@ -873,13 +1005,13 @@ public class UIPanel : UIRect
 
 	public virtual Vector3 CalculateConstrainOffset (Vector2 min, Vector2 max)
 	{
-		float offsetX = clipRange.z * 0.5f;
-		float offsetY = clipRange.w * 0.5f;
+		float offsetX = mClipRange.z * 0.5f;
+		float offsetY = mClipRange.w * 0.5f;
 
 		Vector2 minRect = new Vector2(min.x, min.y);
 		Vector2 maxRect = new Vector2(max.x, max.y);
-		Vector2 minArea = new Vector2(clipRange.x - offsetX, clipRange.y - offsetY);
-		Vector2 maxArea = new Vector2(clipRange.x + offsetX, clipRange.y + offsetY);
+		Vector2 minArea = new Vector2(mClipOffset.x + mClipRange.x - offsetX, mClipOffset.y + mClipRange.y - offsetY);
+		Vector2 maxArea = new Vector2(mClipOffset.x + mClipRange.x + offsetX, mClipOffset.y + mClipRange.y + offsetY);
 
 		if (clipping == UIDrawCall.Clipping.SoftClip)
 		{
@@ -1217,7 +1349,7 @@ public class UIPanel : UIRect
 
 		if (t != null)
 		{
-			Vector3 pos = clip ? new Vector3(mClipRange.x, mClipRange.y) : Vector3.zero;
+			Vector3 pos = clip ? new Vector3(mClipOffset.x + mClipRange.x, mClipOffset.y + mClipRange.y) : Vector3.zero;
 			Gizmos.matrix = t.localToWorldMatrix;
 
 			if (selected)

@@ -147,7 +147,7 @@ public class UIStretch : MonoBehaviour
 				else
 				{
 					// Panel has clipping -- use it as the mRect
-					Vector4 cr = pc.clipRange;
+					Vector4 cr = pc.finalClipRegion;
 					mRect.x = cr.x - (cr.z * 0.5f);
 					mRect.y = cr.y - (cr.w * 0.5f);
 					mRect.width = cr.z;
@@ -267,15 +267,15 @@ public class UIStretch : MonoBehaviour
 			}
 			else if (mPanel != null)
 			{
-				Vector4 cr = mPanel.clipRange;
+				Vector4 cr = mPanel.baseClipRegion;
 
 				if (style != Style.Vertical)
 					cr.z = size.x - borderPadding.x;
 				
 				if (style != Style.Horizontal)
 					cr.w = size.y - borderPadding.y;
-				
-				mPanel.clipRange = cr;
+
+				mPanel.baseClipRegion = cr;
 				size = Vector3.one;
 			}
 			else

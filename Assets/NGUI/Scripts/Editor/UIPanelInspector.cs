@@ -134,7 +134,7 @@ public class UIPanelInspector : UIRectEditor
 					mStartPos = t.position;
 					mStartRot = t.localRotation.eulerAngles;
 					mStartDir = mStartDrag - t.position;
-					mStartCR = mPanel.clipRange;
+					mStartCR = mPanel.baseClipRegion;
 					mDragPivot = pivotUnderMouse;
 					mActionUnderMouse = actionUnderMouse;
 					GUIUtility.hotControl = GUIUtility.keyboardControl = id;
@@ -232,7 +232,7 @@ public class UIPanelInspector : UIRectEditor
 									else if (mActionUnderMouse == UIWidgetInspector.Action.Scale)
 									{
 										mStartPos = t.localPosition;
-										mStartCR = mPanel.clipRange;
+										mStartCR = mPanel.baseClipRegion;
 										mDragPivot = pivotUnderMouse;
 										NGUIEditorTools.RegisterUndo("Scale panel", t);
 										NGUIEditorTools.RegisterUndo("Scale panel", mPanel);
@@ -326,7 +326,7 @@ public class UIPanelInspector : UIRectEditor
 							else if (mAction == UIWidgetInspector.Action.Scale)
 							{
 								t.position = mStartPos;
-								mPanel.clipRange = mStartCR;
+								mPanel.baseClipRegion = mStartCR;
 							}
 						}
 
@@ -402,7 +402,7 @@ public class UIPanelInspector : UIRectEditor
 
 		if (mPanel.clipping != UIDrawCall.Clipping.None)
 		{
-			Vector4 range = mPanel.clipRange;
+			Vector4 range = mPanel.baseClipRegion;
 
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(80f);
@@ -422,10 +422,10 @@ public class UIPanelInspector : UIRectEditor
 			range.z = size.x;
 			range.w = size.y;
 
-			if (mPanel.clipRange != range)
+			if (mPanel.baseClipRegion != range)
 			{
 				NGUIEditorTools.RegisterUndo("Clipping Change", mPanel);
-				mPanel.clipRange = range;
+				mPanel.baseClipRegion = range;
 				EditorUtility.SetDirty(mPanel);
 			}
 
@@ -627,10 +627,10 @@ public class UIPanelInspector : UIRectEditor
 	static void AdjustClipping (UIPanel p, Vector4 cr, int left, int top, int right, int bottom)
 	{
 		// Make adjustment values dividable by two since the clipping is centered
-		right	= ((right >> 1) << 1);
-		left	= ((left >> 1) << 1);
+		right	= ((right  >> 1) << 1);
+		left	= ((left   >> 1) << 1);
 		bottom	= ((bottom >> 1) << 1);
-		top		= ((top >> 1) << 1);
+		top		= ((top    >> 1) << 1);
 
 		int x = Mathf.RoundToInt(cr.x + (left + right) * 0.5f);
 		int y = Mathf.RoundToInt(cr.y + (top + bottom) * 0.5f);
@@ -645,9 +645,9 @@ public class UIPanelInspector : UIRectEditor
 		if (width < minx) width = minx;
 		if (height < miny) height = miny;
 
-		width  = ((width  >> 1) << 1);
-		height = ((height >> 1) << 1);
+		if ((width  & 1) == 1) ++width;
+		if ((height & 1) == 1) ++height;
 
-		p.clipRange = new Vector4(x, y, width, height);
+		p.baseClipRegion = new Vector4(x, y, width, height);
 	}
 }
