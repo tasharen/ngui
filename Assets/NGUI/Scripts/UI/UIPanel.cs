@@ -379,7 +379,7 @@ public class UIPanel : UIRect
 	{
 		Vector2 size = GetSize();
 
-		Vector4 cr = clipRange;
+		Vector4 cr = (mClipping != UIDrawCall.Clipping.None) ? clipRange : Vector4.zero;
 		float x0 = cr.x - 0.5f * size.x;
 		float y0 = cr.y - 0.5f * size.y;
 		float x1 = x0 + size.x;
@@ -406,7 +406,7 @@ public class UIPanel : UIRect
 	{
 		Vector2 size = GetSize();
 
-		Vector4 cr = clipRange;
+		Vector4 cr = (mClipping != UIDrawCall.Clipping.None) ? clipRange : Vector4.zero;
 		float x0 = cr.x - 0.5f * size.x;
 		float y0 = cr.y - 0.5f * size.y;
 		float x1 = x0 + size.x;
