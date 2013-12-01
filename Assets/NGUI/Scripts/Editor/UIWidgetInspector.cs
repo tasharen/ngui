@@ -197,7 +197,7 @@ public class UIWidgetInspector : Editor
 	}
 
 	/// <summary>
-	/// Convert the specified 4 corners into 8 pivot points (adding left, right, top, and bottom).
+	/// Convert the specified 4 corners into 8 pivot points (adding left, top, right, bottom -- in that order).
 	/// </summary>
 
 	static public Vector3[] GetHandles (Vector3[] corners)
@@ -221,8 +221,20 @@ public class UIWidgetInspector : Editor
 	/// Determine what kind of pivot point is under the mouse and update the cursor accordingly.
 	/// </summary>
 
-	static public UIWidget.Pivot GetPivotUnderMouse (Vector3[] worldPos, Event e, bool canResize, ref Action action)
+	static public UIWidget.Pivot GetPivotUnderMouse (Vector3[] worldPos, Event e, bool[] resizable, ref Action action)
 	{
+		bool movable = true;
+
+		// If any point is not resizable, then the widget can't be moved
+		for (int i = 0; i < resizable.Length; ++i)
+		{
+			if (!resizable[i])
+			{
+				movable = false;
+				break;
+			}
+		}
+
 		// Time to figure out what kind of action is underneath the mouse
 		UIWidget.Pivot pivotUnderMouse = UIWidget.Pivot.Center;
 
@@ -230,15 +242,16 @@ public class UIWidgetInspector : Editor
 		{
 			int index = 0;
 			float dist = GetScreenDistance(worldPos, e.mousePosition, out index);
+			bool alt = (e.modifiers & EventModifiers.Alt) != 0;
 
-			if (canResize && dist < 10f)
+			if (resizable[index] && dist < 10f)
 			{
 				pivotUnderMouse = pivotPoints[index];
 				action = Action.Scale;
 			}
-			else if (e.modifiers == 0 && NGUIEditorTools.SceneViewDistanceToRectangle(worldPos, e.mousePosition) == 0f)
+			else if (!alt && NGUIEditorTools.SceneViewDistanceToRectangle(worldPos, e.mousePosition) == 0f)
 			{
-				action = Action.Move;
+				action = movable ? Action.Move : Action.Rotate;
 			}
 			else if (dist < 30f)
 			{
@@ -302,14 +315,27 @@ public class UIWidgetInspector : Editor
 
 		Action actionUnderMouse = mAction;
 		Vector3[] handles = GetHandles(mWidget.worldCorners);
-		bool canResize = mWidget.canResize;
-		UIWidget.Pivot pivotUnderMouse = GetPivotUnderMouse(handles, e, canResize, ref actionUnderMouse);
-
+		
 		Handles.color = handlesColor;
 		Handles.DrawLine(handles[0], handles[1]);
 		Handles.DrawLine(handles[1], handles[2]);
 		Handles.DrawLine(handles[2], handles[3]);
 		Handles.DrawLine(handles[0], handles[3]);
+
+		bool canResize = mWidget.canResize;
+		bool[] resizable = new bool[8];
+
+		resizable[4] = canResize && mWidget.leftAnchor.target == null;		// left
+		resizable[5] = canResize && mWidget.topAnchor.target == null;		// top
+		resizable[6] = canResize && mWidget.rightAnchor.target == null;		// right
+		resizable[7] = canResize && mWidget.bottomAnchor.target == null;	// bottom
+
+		resizable[0] = resizable[7] && resizable[4]; // bottom-left
+		resizable[1] = resizable[5] && resizable[4]; // top-left
+		resizable[2] = resizable[5] && resizable[6]; // top-right
+		resizable[3] = resizable[7] && resizable[6]; // bottom-right
+
+		UIWidget.Pivot pivotUnderMouse = GetPivotUnderMouse(handles, e, resizable, ref actionUnderMouse);
 		
 		switch (type)
 		{
@@ -326,7 +352,7 @@ public class UIWidgetInspector : Editor
 					{
 						for (int i = 0; i < 8; ++i)
 						{
-							DrawKnob(handles[i], mWidget.pivot == pivotPoints[i], canResize, id);
+							DrawKnob(handles[i], mWidget.pivot == pivotPoints[i], resizable[i], id);
 						}
 					}
 					Handles.EndGUI();
@@ -337,7 +363,7 @@ public class UIWidgetInspector : Editor
 					{
 						for (int i = 0; i < 4; ++i)
 						{
-							DrawKnob(handles[i], mWidget.pivot == pivotPoints[i], canResize, id);
+							DrawKnob(handles[i], mWidget.pivot == pivotPoints[i], resizable[i], id);
 						}
 					}
 					Handles.EndGUI();

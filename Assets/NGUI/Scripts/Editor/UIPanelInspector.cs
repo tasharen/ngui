@@ -66,7 +66,9 @@ public class UIPanelInspector : Editor
 		// Time to figure out what kind of action is underneath the mouse
 		UIWidgetInspector.Action actionUnderMouse = mAction;
 		bool canResize = (mPanel.clipping != UIDrawCall.Clipping.None);
-		UIWidget.Pivot pivotUnderMouse = UIWidgetInspector.GetPivotUnderMouse(handles, e, canResize, ref actionUnderMouse);
+		bool[] resizable = new bool[8];
+		for (int i = 0; i < 8; ++i) resizable[i] = canResize;
+		UIWidget.Pivot pivotUnderMouse = UIWidgetInspector.GetPivotUnderMouse(handles, e, resizable, ref actionUnderMouse);
 
 		Handles.color = new Color(0.5f, 0f, 0.5f);
 		Handles.DrawLine(handles[0], handles[1]);
