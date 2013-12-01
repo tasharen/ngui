@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 [CanEditMultipleObjects]
 [CustomEditor(typeof(UIWidget))]
-public class UIWidgetInspector : Editor
+public class UIWidgetInspector : UIRectEditor
 {
 	static public UIWidgetInspector instance;
 
@@ -785,27 +785,6 @@ public class UIWidgetInspector : Editor
 	}
 
 	/// <summary>
-	/// Draw the inspector widget.
-	/// </summary>
-
-	public override void OnInspectorGUI ()
-	{
-		NGUIEditorTools.SetLabelWidth(80f);
-		EditorGUILayout.Space();
-
-		serializedObject.Update();
-
-		// Check to see if we can draw the widget's default properties to begin with
-		EditorGUI.BeginDisabledGroup(!DrawProperties());
-		{
-			DrawExtraProperties();
-			DrawCommonProperties();
-		}
-		EditorGUI.EndDisabledGroup();
-		serializedObject.ApplyModifiedProperties();
-	}
-
-	/// <summary>
 	/// By default all non-widgets should use their color.
 	/// </summary>
 
@@ -821,7 +800,7 @@ public class UIWidgetInspector : Editor
 	/// All widgets have depth, color and make pixel-perfect options
 	/// </summary>
 
-	protected void DrawCommonProperties ()
+	protected override void DrawCustomProperties ()
 	{
 		PrefabType type = PrefabUtility.GetPrefabType(mWidget.gameObject);
 
@@ -861,77 +840,6 @@ public class UIWidgetInspector : Editor
 				GUILayout.Label("auto-adjust to match");
 				GUILayout.EndHorizontal();
 			}
-			NGUIEditorTools.EndContents();
-		}
-
-		if (NGUIEditorTools.DrawHeader("Anchors"))
-		{
-			NGUIEditorTools.BeginContents();
-#if UNITY_3_5
-			string horizontal = "<>";
-#else
-			string horizontal = "\u25C4\u25BA";
-#endif
-			string vertical = "\u25B2\u25BC";
-			float space = 38f;
-			NGUIEditorTools.SetLabelWidth(62f);
-
-			SerializedProperty sp = NGUIEditorTools.DrawProperty("Left", serializedObject, "leftAnchor.target");
-
-			if (sp.objectReferenceValue != null || sp.hasMultipleDifferentValues)
-			{
-				GUILayout.BeginHorizontal();
-				GUILayout.Space(space);
-				GUILayout.Label(horizontal, GUILayout.Width(24f));
-				NGUIEditorTools.DrawProperty("", serializedObject, "leftAnchor.relative", GUILayout.MinWidth(30f));
-				GUILayout.Label("+", GUILayout.Width(12f));
-				NGUIEditorTools.DrawProperty("", serializedObject, "leftAnchor.absolute", GUILayout.MinWidth(30f));
-				GUILayout.Space(18f);
-				GUILayout.EndHorizontal();
-			}
-
-			sp = NGUIEditorTools.DrawProperty("Right", serializedObject, "rightAnchor.target");
-
-			if (sp.objectReferenceValue != null || sp.hasMultipleDifferentValues)
-			{
-				GUILayout.BeginHorizontal();
-				GUILayout.Space(space);
-				GUILayout.Label(horizontal, GUILayout.Width(24f));
-				NGUIEditorTools.DrawProperty("", serializedObject, "rightAnchor.relative", GUILayout.MinWidth(30f));
-				GUILayout.Label("+", GUILayout.Width(12f));
-				NGUIEditorTools.DrawProperty("", serializedObject, "rightAnchor.absolute", GUILayout.MinWidth(30f));
-				GUILayout.Space(18f);
-				GUILayout.EndHorizontal();
-			}
-
-			sp = NGUIEditorTools.DrawProperty("Bottom", serializedObject, "bottomAnchor.target");
-
-			if (sp.objectReferenceValue != null || sp.hasMultipleDifferentValues)
-			{
-				GUILayout.BeginHorizontal();
-				GUILayout.Space(space);
-				GUILayout.Label(vertical, GUILayout.Width(24f));
-				NGUIEditorTools.DrawProperty("", serializedObject, "bottomAnchor.relative", GUILayout.MinWidth(30f));
-				GUILayout.Label("+", GUILayout.Width(12f));
-				NGUIEditorTools.DrawProperty("", serializedObject, "bottomAnchor.absolute", GUILayout.MinWidth(30f));
-				GUILayout.Space(18f);
-				GUILayout.EndHorizontal();
-			}
-
-			sp = NGUIEditorTools.DrawProperty("Top", serializedObject, "topAnchor.target");
-
-			if (sp.objectReferenceValue != null || sp.hasMultipleDifferentValues)
-			{
-				GUILayout.BeginHorizontal();
-				GUILayout.Space(space);
-				GUILayout.Label(vertical, GUILayout.Width(24f));
-				NGUIEditorTools.DrawProperty("", serializedObject, "topAnchor.relative", GUILayout.MinWidth(30f));
-				GUILayout.Label("+", GUILayout.Width(12f));
-				NGUIEditorTools.DrawProperty("", serializedObject, "topAnchor.absolute", GUILayout.MinWidth(30f));
-				GUILayout.Space(18f);
-				GUILayout.EndHorizontal();
-			}
-
 			NGUIEditorTools.EndContents();
 		}
 	}
@@ -1167,12 +1075,4 @@ public class UIWidgetInspector : Editor
 			mWidget.pivot = pivot;
 		}
 	}
-
-	/// <summary>
-	/// Any and all derived functionality.
-	/// </summary>
-
-	protected virtual void OnInit() { }
-	protected virtual bool DrawProperties () { return true; }
-	protected virtual void DrawExtraProperties () { }
 }

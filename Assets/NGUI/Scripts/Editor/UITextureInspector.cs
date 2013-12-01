@@ -23,7 +23,7 @@ public class UITextureInspector : UIWidgetInspector
 		mTex = target as UITexture;
 	}
 
-	protected override bool DrawProperties ()
+	protected override bool ShouldDrawProperties ()
 	{
 		SerializedProperty sp = NGUIEditorTools.DrawProperty("Texture", serializedObject, "mTexture");
 		NGUIEditorTools.DrawProperty("Material", serializedObject, "mMat");

@@ -56,7 +56,7 @@ public class UILabelInspector : UIWidgetInspector
 	/// Draw the label's properties.
 	/// </summary>
 
-	protected override bool DrawProperties ()
+	protected override bool ShouldDrawProperties ()
 	{
 		mLabel = mWidget as UILabel;
 

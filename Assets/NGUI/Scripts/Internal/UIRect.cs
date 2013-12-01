@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
@@ -82,7 +82,7 @@ public abstract class UIRect : MonoBehaviour
 	/// Set anchor rect references on start.
 	/// </summary>
 
-	protected void Start () { UpdateAnchors(); }
+	protected void Start () { UpdateAnchors(); OnStart(); }
 
 	/// <summary>
 	/// Rectangles need to update in a specific order -- parents before children.

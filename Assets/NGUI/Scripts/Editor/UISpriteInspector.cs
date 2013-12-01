@@ -45,7 +45,7 @@ public class UISpriteInspector : UIWidgetInspector
 	/// Draw the atlas and sprite selection fields.
 	/// </summary>
 
-	protected override bool DrawProperties ()
+	protected override bool ShouldDrawProperties ()
 	{
 		GUILayout.BeginHorizontal();
 		if (NGUIEditorTools.DrawPrefixButton("Atlas"))
@@ -72,7 +72,7 @@ public class UISpriteInspector : UIWidgetInspector
 	/// Sprites's custom properties based on the type.
 	/// </summary>
 
-	protected override void DrawExtraProperties ()
+	protected override void DrawCustomProperties ()
 	{
 		GUILayout.Space(6f);
 
@@ -107,6 +107,7 @@ public class UISpriteInspector : UIWidgetInspector
 		//}
 
 		GUILayout.Space(4f);
+		base.DrawCustomProperties();
 	}
 
 	/// <summary>

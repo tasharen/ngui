@@ -7,8 +7,12 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
+/// <summary>
+/// Editor class used to view panels.
+/// </summary>
+
 [CustomEditor(typeof(UIPanel))]
-public class UIPanelInspector : Editor
+public class UIPanelInspector : UIRectEditor
 {
 	static int s_Hash = "PanelHash".GetHashCode();
 
@@ -333,11 +337,8 @@ public class UIPanelInspector : Editor
 	/// Draw the inspector widget.
 	/// </summary>
 
-	public override void OnInspectorGUI ()
+	protected override bool ShouldDrawProperties ()
 	{
-		NGUIEditorTools.SetLabelWidth(80f);
-		EditorGUILayout.Space();
-
 		float alpha = EditorGUILayout.Slider("Alpha", mPanel.alpha, 0f, 1f);
 
 		if (alpha != mPanel.alpha)
@@ -516,7 +517,17 @@ public class UIPanelInspector : Editor
 			}
 			NGUIEditorTools.EndContents();
 		}
+		return true;
+	}
 
+	/// <summary>
+	/// Add the "Show draw calls" button at the very end.
+	/// </summary>
+
+	protected override void DrawFinalProperties ()
+	{
+		base.DrawFinalProperties();
+		
 		if (GUILayout.Button("Show Draw Calls"))
 		{
 			NGUISettings.showAllDCs = false;
