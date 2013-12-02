@@ -217,7 +217,7 @@ public class UIRectEditor : Editor
 
 		if (IsRect(sp))
 		{
-			NGUIEditorTools.DrawProperty("+", serializedObject, name + ".relative", GUILayout.Width(80f));
+			NGUIEditorTools.DrawProperty(" ", serializedObject, name + ".relative", GUILayout.Width(80f));
 			GUILayout.Label("* target's " + suffix);
 			GUILayout.EndHorizontal();
 
@@ -261,7 +261,7 @@ public class UIRectEditor : Editor
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Space(50f);
-				NGUIEditorTools.DrawProperty("+", serializedObject, name + ".relative", GUILayout.Width(80f));
+				NGUIEditorTools.DrawProperty(" ", serializedObject, name + ".relative", GUILayout.Width(80f));
 				GUILayout.Label("* target's " + suffix);
 				GUILayout.EndHorizontal();
 			}
