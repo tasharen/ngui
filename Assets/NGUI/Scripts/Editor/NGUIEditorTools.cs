@@ -1359,6 +1359,36 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
+	/// Helper function that draws a serialized property.
+	/// </summary>
+
+	static public void DrawProperty (string label, SerializedProperty sp, params GUILayoutOption[] options)
+	{
+		DrawProperty(label, sp, true, options);
+	}
+
+	/// <summary>
+	/// Helper function that draws a serialized property.
+	/// </summary>
+
+	static public void DrawProperty (string label, SerializedProperty sp, bool padding, params GUILayoutOption[] options)
+	{
+		if (sp != null)
+		{
+			if (padding) EditorGUILayout.BeginHorizontal();
+
+			if (label != null) EditorGUILayout.PropertyField(sp, new GUIContent(label), options);
+			else EditorGUILayout.PropertyField(sp, options);
+
+			if (padding)
+			{
+				GUILayout.Space(18f);
+				EditorGUILayout.EndHorizontal();
+			}
+		}
+	}
+
+	/// <summary>
 	/// Determine the distance from the mouse position to the world rectangle specified by the 4 points.
 	/// </summary>
 

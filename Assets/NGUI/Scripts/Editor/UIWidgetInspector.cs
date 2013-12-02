@@ -778,8 +778,9 @@ public class UIWidgetInspector : UIRectEditor
 	/// Cache the reference.
 	/// </summary>
 
-	protected virtual void OnEnable ()
+	protected override void OnEnable ()
 	{
+		base.OnEnable();
 		instance = this;
 		mWidget = target as UIWidget;
 	}

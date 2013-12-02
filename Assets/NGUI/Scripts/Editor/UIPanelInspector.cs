@@ -31,7 +31,7 @@ public class UIPanelInspector : UIRectEditor
 	GUIStyle mStyle0 = null;
 	GUIStyle mStyle1 = null;
 
-	void OnEnable () { mPanel = target as UIPanel; }
+	protected override void OnEnable () { base.OnEnable(); mPanel = target as UIPanel; }
 
 	/// <summary>
 	/// Helper function that draws draggable knobs.
