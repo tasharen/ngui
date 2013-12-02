@@ -1357,7 +1357,25 @@ public class UIPanel : UIRect
 			}
 			else
 			{
-				Gizmos.color = new Color(0.5f, 0f, 0.5f);
+				Color color = new Color(0.5f, 0f, 0.5f);
+
+				if (UnityEditor.Selection.activeGameObject != null)
+				{
+					UIRect rect = UnityEditor.Selection.activeGameObject.GetComponent<UIRect>();
+					
+					if (rect != null)
+					{
+						if (rect.leftAnchor.target == cachedTransform &&
+							rect.rightAnchor.target == cachedTransform &&
+							rect.bottomAnchor.target == cachedTransform &&
+							rect.topAnchor.target == cachedTransform)
+						{
+							color = new Color(1f, 1f, 0f, 0.7f);
+						}
+					}
+				}
+
+				Gizmos.color = color;
 				Gizmos.DrawWireCube(pos, size);
 			}
 		}
