@@ -305,7 +305,7 @@ public class UIWidget : UIRect
 	/// Local space corners of the widget. The order is bottom-left, top-left, top-right, bottom-right.
 	/// </summary>
 
-	public virtual Vector3[] localCorners
+	public override Vector3[] localCorners
 	{
 		get
 		{
@@ -342,7 +342,7 @@ public class UIWidget : UIRect
 	/// World-space corners of the widget. The order is bottom-left, top-left, top-right, bottom-right.
 	/// </summary>
 
-	public virtual Vector3[] worldCorners
+	public override Vector3[] worldCorners
 	{
 		get
 		{

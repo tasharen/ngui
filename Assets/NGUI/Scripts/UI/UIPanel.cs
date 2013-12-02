@@ -356,7 +356,7 @@ public class UIPanel : UIRect
 	/// Local-space corners of the panel's clipping rectangle. The order is bottom-left, top-left, top-right, bottom-right.
 	/// </summary>
 
-	public Vector3[] localCorners
+	public override Vector3[] localCorners
 	{
 		get
 		{
@@ -411,7 +411,7 @@ public class UIPanel : UIRect
 	/// World-space corners of the panel's clipping rectangle. The order is bottom-left, top-left, top-right, bottom-right.
 	/// </summary>
 
-	public Vector3[] worldCorners
+	public override Vector3[] worldCorners
 	{
 		get
 		{

@@ -79,6 +79,18 @@ public abstract class UIRect : MonoBehaviour
 	public abstract float finalAlpha { get; }
 
 	/// <summary>
+	/// Local-space corners of the UI rectangle. The order is bottom-left, top-left, top-right, bottom-right.
+	/// </summary>
+
+	public abstract Vector3[] localCorners { get; }
+
+	/// <summary>
+	/// World-space corners of the UI rectangle. The order is bottom-left, top-left, top-right, bottom-right.
+	/// </summary>
+
+	public abstract Vector3[] worldCorners { get; }
+
+	/// <summary>
 	/// Sets the local 'changed' flag, indicating that some parent value(s) are now be different, such as alpha for example.
 	/// </summary>
 
