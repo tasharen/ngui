@@ -45,9 +45,10 @@ public class UI2DSprite : UIWidget
 		{
 			if (mSprite != value)
 			{
+				RemoveFromPanel();
 				mSprite = value;
 				nextSprite = null;
-				RemoveFromPanel();
+				MarkAsChanged();
 			}
 		}
 	}

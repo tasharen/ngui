@@ -37,8 +37,9 @@ public class UITexture : UIWidget
 		{
 			if (mTexture != value)
 			{
-				mTexture = value;
 				RemoveFromPanel();
+				mTexture = value;
+				MarkAsChanged();
 			}
 		}
 	}
