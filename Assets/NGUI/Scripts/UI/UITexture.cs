@@ -190,7 +190,7 @@ public class UITexture : UIWidget
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
 		Color colF = color;
-		colF.a *= mPanel.finalAlpha;
+		colF.a = finalAlpha;
 		Color32 col = premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 
 		Vector4 v = drawingDimensions;

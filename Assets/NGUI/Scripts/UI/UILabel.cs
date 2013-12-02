@@ -75,7 +75,6 @@ public class UILabel : UIWidget
 
 #if DYNAMIC_FONT
 	Font mActiveTTF = null;
-	UIRoot mRoot;
 #endif
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
@@ -765,7 +764,6 @@ public class UILabel : UIWidget
 			mFontStyle = mFont.dynamicFontStyle;
 			mFont = null;
 		}
-		mRoot = NGUITools.FindInParents<UIRoot>(gameObject);
 		SetActiveFont(mTrueTypeFont);
 	}
 
@@ -1116,7 +1114,7 @@ public class UILabel : UIWidget
 	void ApplyShadow (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols, int start, int end, float x, float y)
 	{
 		Color c = mEffectColor;
-		c.a *= alpha * mPanel.finalAlpha;
+		c.a *= finalAlpha;
 		Color32 col = (bitmapFont != null && bitmapFont.premultipliedAlpha) ? NGUITools.ApplyPMA(c) : c;
 
 		for (int i = start; i < end; ++i)
@@ -1144,7 +1142,7 @@ public class UILabel : UIWidget
 		int offset = verts.size;
 
 		Color col = color;
-		col.a *= mPanel.finalAlpha;
+		col.a = finalAlpha;
 		if (mFont != null && mFont.premultipliedAlpha) col = NGUITools.ApplyPMA(col);
 
 		string text = processedText;

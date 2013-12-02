@@ -47,7 +47,6 @@ public class UIWidget : UIRect
 	public bool autoResizeBoxCollider = false;
 	
 	protected UIPanel mPanel;
-	protected bool mChanged = true;
 	protected bool mPlayMode = true;
 	protected Vector4 mDrawRegion = new Vector4(0f, 0f, 1f, 1f);
 
@@ -167,8 +166,9 @@ public class UIWidget : UIRect
 		{
 			if (mColor != value)
 			{
+				bool alphaChange = (mColor.a != value.a);
 				mColor = value;
-				mChanged = true;
+				Invalidate(alphaChange);
 			}
 		}
 	}
@@ -185,12 +185,10 @@ public class UIWidget : UIRect
 		}
 		set
 		{
-			Color c = mColor;
-
-			if (c.a != value)
+			if (mColor.a != value)
 			{
-				c.a = value;
-				color = c;
+				mColor.a = value;
+				Invalidate(true);
 			}
 		}
 	}
@@ -199,12 +197,11 @@ public class UIWidget : UIRect
 	/// Widget's final alpha, after taking the panel's alpha into account.
 	/// </summary>
 
-	public float finalAlpha
+	public override float finalAlpha
 	{
 		get
 		{
-			if (mPanel == null) CreatePanel();
-			return (mPanel != null) ? mColor.a * mPanel.finalAlpha : mColor.a;
+			return (mParent != null) ? mParent.finalAlpha * mColor.a : mColor.a;
 		}
 	}
 
@@ -633,7 +630,6 @@ public class UIWidget : UIRect
 	protected override void OnValidate()
 	{
 		base.OnValidate();
-		mChanged = true;
 
 		// Prior to NGUI 2.7.0 width and height was specified as transform's local scale
 		if ((mWidth == 100 || mWidth == minWidth) &&
@@ -657,13 +653,6 @@ public class UIWidget : UIRect
 		}
 	}
 #endif
-
-	/// <summary>
-	/// Only sets the local flag, does not notify the panel.
-	/// In most cases you will want to use MarkAsChanged() instead.
-	/// </summary>
-
-	public void MarkAsChangedLite () { mChanged = true; }
 
 	/// <summary>
 	/// Tell the panel responsible for the widget that something has changed and the buffers need to be rebuilt.
@@ -718,7 +707,7 @@ public class UIWidget : UIRect
 				if (!inserted) list.Add(this);
 
 				CheckLayer();
-				mChanged = true;
+				Invalidate(true);
 				drawCall = UIPanel.InsertWidget(this);
 			}
 		}
@@ -742,8 +731,10 @@ public class UIWidget : UIRect
 	/// Checks to ensure that the widget is still parented to the right panel.
 	/// </summary>
 
-	public void ParentHasChanged ()
+	public override void ParentHasChanged ()
 	{
+		base.ParentHasChanged();
+
 		if (mPanel != null)
 		{
 			UIPanel p = UIPanel.Find(cachedTransform);
@@ -770,9 +761,9 @@ public class UIWidget : UIRect
 	/// Mark the widget and the panel as having been changed.
 	/// </summary>
 
-	protected virtual void OnEnable ()
+	protected override void OnEnable ()
 	{
-		mChanged = true;
+		base.OnEnable();
 		RemoveFromPanel();
 
 		// Prior to NGUI 2.7.0 width and height was specified as transform's local scale
@@ -809,7 +800,7 @@ public class UIWidget : UIRect
 	/// Update the anchored edges and ensure the widget is registered with a panel.
 	/// </summary>
 
-	protected override void OnUpdate ()
+	protected override void OnAnchor ()
 	{
 		float lt, bt, rt, tt;
 		Transform trans = cachedTransform;
@@ -882,8 +873,14 @@ public class UIWidget : UIRect
 			mHeight = h;
 			mChanged = true;
 		}
+	}
 
-		// Ensure we have a panel to work with by now
+	/// <summary>
+	/// Ensure we have a panel to work with.
+	/// </summary>
+
+	protected override void OnUpdate ()
+	{
 		if (mPanel == null) CreatePanel();
 #if UNITY_EDITOR
 		else if (!mPlayMode) ParentHasChanged();
@@ -900,7 +897,11 @@ public class UIWidget : UIRect
 	/// Clear references.
 	/// </summary>
 
-	protected virtual void OnDisable () { RemoveFromPanel(); }
+	protected override void OnDisable ()
+	{
+		RemoveFromPanel();
+		base.OnDisable();
+	}
 
 	/// <summary>
 	/// Unregister this widget.

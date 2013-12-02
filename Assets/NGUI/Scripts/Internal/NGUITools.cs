@@ -1060,9 +1060,9 @@ static public class NGUITools
 
 	static public void MarkParentAsChanged (GameObject go)
 	{
-		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
-		for (int i = 0, imax = widgets.Length; i < imax; ++i)
-			widgets[i].ParentHasChanged();
+		UIRect[] rects = go.GetComponentsInChildren<UIRect>();
+		for (int i = 0, imax = rects.Length; i < imax; ++i)
+			rects[i].ParentHasChanged();
 	}
 
 	/// <summary>

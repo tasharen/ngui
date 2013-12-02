@@ -828,6 +828,21 @@ public class UIWidgetInspector : UIRectEditor
 				NGUIEditorTools.DrawProperty("Color", serializedObject, "mColor");
 #endif
 			}
+			else if (serializedObject.isEditingMultipleObjects)
+			{
+				NGUIEditorTools.DrawProperty("Alpha", serializedObject, "mColor.a", GUILayout.Width(120f));
+			}
+			else
+			{
+				GUI.changed = false;
+				float alpha = EditorGUILayout.Slider("Alpha", mWidget.alpha, 0f, 1f);
+				
+				if (GUI.changed)
+				{
+					NGUIEditorTools.RegisterUndo("Alpha change", mWidget);
+					mWidget.alpha = alpha;
+				}
+			}
 
 			DrawPivot();
 			DrawDepth(type == PrefabType.Prefab);

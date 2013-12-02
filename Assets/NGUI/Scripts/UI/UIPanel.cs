@@ -97,8 +97,6 @@ public class UIPanel : UIRect
 	static BetterList<Color32> mCols = new BetterList<Color32>();
 
 	Camera mCam;
-	UIPanel mParent;
-	bool mFindParent = true;
 	float mCullTime = 0f;
 	float mUpdateTime = 0f;
 	float mMatrixTime = 0f;
@@ -122,24 +120,6 @@ public class UIPanel : UIRect
 			for (int i = 0; i < list.size; ++i)
 				highest = Mathf.Max(highest, list[i].depth);
 			return (highest == int.MinValue) ? 0 : highest + 1;
-		}
-	}
-
-	/// <summary>
-	/// Parent panel is used to determine cumulative alpha.
-	/// </summary>
-
-	public UIPanel parent
-	{
-		get
-		{
-			if (mFindParent)
-			{
-				mFindParent = false;
-				Transform t = cachedTransform.parent;
-				mParent = (t != null) ? NGUITools.FindInParents<UIPanel>(t) : null;
-			}
-			return mParent;
 		}
 	}
 
@@ -169,7 +149,13 @@ public class UIPanel : UIRect
 	/// Final alpha, taking all parent panels into consideration.
 	/// </summary>
 
-	public float finalAlpha { get { return (parent != null) ? mParent.alpha * mAlpha : mAlpha; } }
+	public override float finalAlpha
+	{
+		get
+		{
+			return (mParent != null) ? mParent.finalAlpha * mAlpha : mAlpha;
+		}
+	}
 
 	/// <summary>
 	/// Panels can have their own depth value that will change the order with which everything they manage gets drawn.
@@ -191,11 +177,12 @@ public class UIPanel : UIRect
 				UIDrawCall.SetDirty();
 
 				for (int i = 0; i < UIWidget.list.size; ++i)
-					UIWidget.list[i].MarkAsChangedLite();
+					UIWidget.list[i].Invalidate(false);
 #if UNITY_EDITOR
 				UnityEditor.EditorUtility.SetDirty(this);
 #endif
 				list.Sort(CompareFunc);
+				UIWidget.list.Sort(UIWidget.CompareFunc);
 			}
 		}
 	}
@@ -609,25 +596,13 @@ public class UIPanel : UIRect
 
 	/// <summary>
 	/// Invalidate the panel's draw calls, forcing them to be rebuilt on the next update.
-	/// This call also affects all child panels.
+	/// This call also affects all children.
 	/// </summary>
 
 	public void SetDirty ()
 	{
 		UIDrawCall.SetDirty(this);
-
-		for (int i = 0; i < UIWidget.list.size; ++i)
-		{
-			UIWidget w = UIWidget.list[i];
-			if (w.panel == this) w.MarkAsChangedLite();
-		}
-
-		for (int i = 0; i < list.size; ++i)
-		{
-			UIPanel p = list[i];
-			if (p != null && p != this && p.parent == this)
-				p.SetDirty();
-		}
+		Invalidate(true);
 	}
 
 	/// <summary>
@@ -655,8 +630,10 @@ public class UIPanel : UIRect
 	/// Mark all widgets as having been changed so the draw calls get re-created.
 	/// </summary>
 
-	void OnEnable ()
+	protected override void OnEnable ()
 	{
+		base.OnEnable();
+
 		// Apparently having a rigidbody helps
 		if (rigidbody == null)
 		{
@@ -665,7 +642,6 @@ public class UIPanel : UIRect
 			rb.useGravity = false;
 		}
 
-		mFindParent = true;
 		mRebuild = true;
 		list.Add(this);
 		list.Sort(CompareFunc);
@@ -675,12 +651,12 @@ public class UIPanel : UIRect
 	/// Destroy all draw calls we've created when this script gets disabled.
 	/// </summary>
 
-	void OnDisable ()
+	protected override void OnDisable ()
 	{
-		mParent = null;
 		UIDrawCall.Destroy(this);
 		list.Remove(this);
 		if (list.size == 0) UIDrawCall.ReleaseAll();
+		base.OnDisable();
 	}
 
 	/// <summary>
@@ -718,7 +694,7 @@ public class UIPanel : UIRect
 	/// Update the edges after the anchors have been updated.
 	/// </summary>
 
-	protected override void OnUpdate ()
+	protected override void OnAnchor ()
 	{
 		// No clipping = no edges to anchor
 		if (mClipping == UIDrawCall.Clipping.None) return;
@@ -1303,11 +1279,10 @@ public class UIPanel : UIRect
 #endif
 		if (!clip)
 		{
-			UIRoot root = NGUITools.FindInParents<UIRoot>(cachedGameObject);
 #if UNITY_EDITOR
-			if (root != null) size *= root.GetPixelSizeAdjustment(Mathf.RoundToInt(size.y));
+			if (mRoot != null) size *= mRoot.GetPixelSizeAdjustment(Mathf.RoundToInt(size.y));
 #else
-			if (root != null) size *= root.GetPixelSizeAdjustment(Screen.height);
+			if (mRoot != null) size *= mRoot.GetPixelSizeAdjustment(Screen.height);
 #endif
 		}
 		return size;

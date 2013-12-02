@@ -541,7 +541,7 @@ public class UISprite : UIWidget
 		uvs.Add(new Vector2(uv1.x, uv0.y));
 
 		Color colF = color;
-		colF.a *= mPanel.finalAlpha;
+		colF.a = finalAlpha;
 		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 		
 		cols.Add(col);
@@ -583,7 +583,7 @@ public class UISprite : UIWidget
 		mTempUVs[3] = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
 
 		Color colF = color;
-		colF.a *= mPanel.finalAlpha;
+		colF.a = finalAlpha;
 		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 
 		for (int x = 0; x < 3; ++x)
@@ -628,7 +628,7 @@ public class UISprite : UIWidget
 		size *= atlas.pixelSize;
 
 		Color colF = color;
-		colF.a *= mPanel.finalAlpha;
+		colF.a = finalAlpha;
 		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 
 		float x0 = dr.x;
@@ -690,7 +690,7 @@ public class UISprite : UIWidget
 		if (mFillAmount < 0.001f) return;
 
 		Color colF = color;
-		colF.a *= mPanel.finalAlpha;
+		colF.a = finalAlpha;
 		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
 		Vector4 v = drawingDimensions;
 

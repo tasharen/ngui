@@ -7,6 +7,7 @@ using UnityEngine;
 
 /// <summary>
 /// Abstract UI rectangle containing functionality common to both panels and widgets.
+/// A UI rectangle contains 4 anchor points (one for each side), and it ensures that they are updated in the proper order.
 /// </summary>
 
 public abstract class UIRect : MonoBehaviour
@@ -49,8 +50,13 @@ public abstract class UIRect : MonoBehaviour
 
 	public AnchorPoint topAnchor = new AnchorPoint(1f);
 
+	protected UIRoot mRoot;
 	protected GameObject mGo;
 	protected Transform mTrans;
+	protected UIRect mParent;
+	protected BetterList<UIRect> mChildren = new BetterList<UIRect>();
+	protected bool mChanged = true;
+	protected float mFinalAlpha = 0f;
 
 	int mUpdateFrame = -1;
 
@@ -67,6 +73,24 @@ public abstract class UIRect : MonoBehaviour
 	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
 
 	/// <summary>
+	/// Alpha property is exposed so that it's possible to make it cumulative.
+	/// </summary>
+
+	public abstract float finalAlpha { get; }
+
+	/// <summary>
+	/// Sets the local 'changed' flag, indicating that some parent value(s) are now be different, such as alpha for example.
+	/// </summary>
+
+	public void Invalidate (bool includeChildren)
+	{
+		mChanged = true;
+		if (includeChildren)
+			for (int i = 0; i < mChildren.size; ++i)
+				mChildren.buffer[i].Invalidate(true);
+	}
+
+	/// <summary>
 	/// Get horizontal bounds points relative to the specified transform.
 	/// </summary>
 
@@ -79,10 +103,38 @@ public abstract class UIRect : MonoBehaviour
 	public abstract float GetVertical (Transform relativeTo, float relative, int absolute);
 
 	/// <summary>
+	/// Automatically find the parent rectangle.
+	/// </summary>
+
+	protected virtual void OnEnable ()
+	{
+		mChanged = true;
+		mParent = NGUITools.FindInParents<UIRect>(cachedTransform.parent);
+		if (mParent != null && mParent.mRoot) mRoot = mParent.mRoot;
+		else mRoot = NGUITools.FindInParents<UIRoot>(cachedTransform);
+		if (mParent != null) mParent.mChildren.Add(this);
+	}
+
+	/// <summary>
+	/// Clear the parent rectangle reference.
+	/// </summary>
+
+	protected virtual void OnDisable ()
+	{
+		if (mParent) mParent.mChildren.Remove(this);
+		mParent = null;
+		mRoot = null;
+	}
+
+	/// <summary>
 	/// Set anchor rect references on start.
 	/// </summary>
 
-	protected void Start () { UpdateAnchors(); OnStart(); }
+	protected void Start ()
+	{
+		CacheAnchors();
+		OnStart();
+	}
 
 	/// <summary>
 	/// Rectangles need to update in a specific order -- parents before children.
@@ -96,26 +148,76 @@ public abstract class UIRect : MonoBehaviour
 		if (mUpdateFrame != frame)
 		{
 			mUpdateFrame = frame;
+			bool anchored = false;
 
-			if (leftAnchor.rect		!= null && leftAnchor.rect.mUpdateFrame		!= frame) leftAnchor.rect.Update();
-			if (bottomAnchor.rect	!= null && bottomAnchor.rect.mUpdateFrame	!= frame) bottomAnchor.rect.Update();
-			if (rightAnchor.rect	!= null && rightAnchor.rect.mUpdateFrame	!= frame) rightAnchor.rect.Update();
-			if (topAnchor.rect		!= null && topAnchor.rect.mUpdateFrame		!= frame) topAnchor.rect.Update();
+			if (leftAnchor.rect != null)
+			{
+				anchored = true;
+				if (leftAnchor.rect.mUpdateFrame != frame)
+					leftAnchor.rect.Update();
+			}
+			
+			if (bottomAnchor.rect != null)
+			{
+				anchored = true;
+				if (bottomAnchor.rect.mUpdateFrame != frame)
+					bottomAnchor.rect.Update();
+			}
+			
+			if (rightAnchor.rect != null)
+			{
+				anchored = true;
+				if (rightAnchor.rect.mUpdateFrame != frame)
+					rightAnchor.rect.Update();
+			}
+			
+			if (topAnchor.rect != null)
+			{
+				anchored = true;
+				if (topAnchor.rect.mUpdateFrame != frame)
+					topAnchor.rect.Update();
+			}
 
+			// Update the dimensions using anchors
+			if (anchored) OnAnchor();
+
+			// Continue with the update
 			OnUpdate();
 		}
 	}
 
 	/// <summary>
+	/// Update the dimensions of the rectangle using anchor points.
+	/// </summary>
+
+	protected abstract void OnAnchor ();
+
+	/// <summary>
 	/// Ensure that all rect references are set correctly on the anchors.
 	/// </summary>
 
-	protected void UpdateAnchors ()
+	protected void CacheAnchors ()
 	{
 		leftAnchor.rect		= (leftAnchor.target)	? leftAnchor.target.GetComponent<UIRect>()	 : null;
 		bottomAnchor.rect	= (bottomAnchor.target) ? bottomAnchor.target.GetComponent<UIRect>() : null;
 		rightAnchor.rect	= (rightAnchor.target)	? rightAnchor.target.GetComponent<UIRect>()	 : null;
 		topAnchor.rect		= (topAnchor.target)	? topAnchor.target.GetComponent<UIRect>()	 : null;
+	}
+
+	/// <summary>
+	/// Call this function when the rectangle's parent has changed.
+	/// </summary>
+
+	public virtual void ParentHasChanged ()
+	{
+		UIRect parent = NGUITools.FindInParents<UIRect>(cachedTransform.parent);
+
+		if (mParent != parent)
+		{
+			if (mParent) mParent.mChildren.Remove(this);
+			mParent = parent;
+			if (mParent) mParent.mChildren.Add(this);
+		}
 	}
 
 	/// <summary>
@@ -128,13 +230,17 @@ public abstract class UIRect : MonoBehaviour
 	/// Abstract update functionality, ensured to happen after the targeting anchors have been updated.
 	/// </summary>
 
-	protected abstract void OnUpdate ();
+	protected virtual void OnUpdate () { }
 
 #if UNITY_EDITOR
 	/// <summary>
 	/// This callback is sent inside the editor notifying us that some property has changed.
 	/// </summary>
 
-	protected virtual void OnValidate() { UpdateAnchors(); }
+	protected virtual void OnValidate()
+	{
+		CacheAnchors();
+		Invalidate(true);
+	}
 #endif
 }
