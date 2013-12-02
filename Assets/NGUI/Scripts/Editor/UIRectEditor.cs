@@ -140,7 +140,7 @@ public class UIRectEditor : Editor
 		
 		SerializedProperty sp = serializedObject.FindProperty("leftAnchor.target");
 		Object before = sp.objectReferenceValue;
-		NGUIEditorTools.DrawProperty("Target", sp, GUILayout.MinWidth(30f));
+		NGUIEditorTools.DrawProperty("Target", sp, false);
 		Object after = sp.objectReferenceValue;
 		serializedObject.FindProperty("rightAnchor.target").objectReferenceValue = after;
 		serializedObject.FindProperty("bottomAnchor.target").objectReferenceValue = after;
@@ -184,7 +184,7 @@ public class UIRectEditor : Editor
 		
 		SerializedProperty sp = serializedObject.FindProperty("leftAnchor.target");
 		Object before = sp.objectReferenceValue;
-		NGUIEditorTools.DrawProperty("Target", sp, GUILayout.MinWidth(30f));
+		NGUIEditorTools.DrawProperty("Target", sp, false);
 		Object after = sp.objectReferenceValue;
 		serializedObject.FindProperty("rightAnchor.target").objectReferenceValue = after;
 		serializedObject.FindProperty("bottomAnchor.target").objectReferenceValue = after;
