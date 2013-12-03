@@ -61,6 +61,7 @@ public class UIDragScrollView : MonoBehaviour
 		{
 			mAutoFind = true;
 		}
+		mScroll = scrollView;
 	}
 
 	/// <summary>
@@ -75,10 +76,22 @@ public class UIDragScrollView : MonoBehaviour
 
 	void OnPress (bool pressed)
 	{
+		// If the scroll view has been set manually, don't try to find it again
+		if (mAutoFind && mScroll != scrollView)
+		{
+			mScroll = scrollView;
+			mAutoFind = false;
+		}
+
 		if (scrollView && enabled && NGUITools.GetActive(gameObject))
 		{
 			scrollView.Press(pressed);
-			if (!pressed && mAutoFind) scrollView = NGUITools.FindInParents<UIScrollView>(mTrans);
+			
+			if (!pressed && mAutoFind)
+			{
+				scrollView = NGUITools.FindInParents<UIScrollView>(mTrans);
+				mScroll = scrollView;
+			}
 		}
 	}
 
