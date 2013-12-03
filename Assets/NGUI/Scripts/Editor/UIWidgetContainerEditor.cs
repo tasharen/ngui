@@ -84,11 +84,11 @@ public class UIWidgetContainerEditor : Editor
 			for (int i = 0; i < 4; ++i)
 				corners[i] = localToWorld.MultiplyPoint3x4(corners[i]);
 
-			Handles.color = UIWidgetInspector.handlesColor;
-			Handles.DrawLine(corners[0], corners[1]);
-			Handles.DrawLine(corners[1], corners[2]);
-			Handles.DrawLine(corners[2], corners[3]);
-			Handles.DrawLine(corners[0], corners[3]);
+			Color handlesColor = UIWidgetInspector.handlesColor;
+			NGUIHandles.DrawShadowedLine(handles, handles[0], handles[1], handlesColor);
+			NGUIHandles.DrawShadowedLine(handles, handles[1], handles[2], handlesColor);
+			NGUIHandles.DrawShadowedLine(handles, handles[2], handles[3], handlesColor);
+			NGUIHandles.DrawShadowedLine(handles, handles[0], handles[3], handlesColor);
 
 			handles = new Vector3[8];
 
@@ -125,14 +125,13 @@ public class UIWidgetContainerEditor : Editor
 			case EventType.Repaint:
 			{
 				Vector3 v0 = HandleUtility.WorldToGUIPoint(handles[0]);
-				Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
 				Vector3 v2 = HandleUtility.WorldToGUIPoint(handles[2]);
-				Vector3 v3 = HandleUtility.WorldToGUIPoint(handles[3]);
 
-				float diagonal = (v2 - v0).magnitude;
-
-				if (diagonal > 60f)
+				if ((v2 - v0).magnitude > 60f)
 				{
+					Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
+					Vector3 v3 = HandleUtility.WorldToGUIPoint(handles[3]);
+
 					Handles.BeginGUI();
 					{
 						for (int i = 0; i < 4; ++i)

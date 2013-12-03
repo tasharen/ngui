@@ -1321,7 +1321,7 @@ public class UIPanel : UIRect
 	/// Panel's size -- which is either the clipping rect, or the screen dimensions.
 	/// </summary>
 
-	Vector2 GetViewSize ()
+	public Vector2 GetViewSize ()
 	{
 		bool clip = (mClipping != UIDrawCall.Clipping.None);
 #if UNITY_EDITOR

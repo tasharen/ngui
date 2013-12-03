@@ -25,13 +25,13 @@ public class UILabelInspector : UIWidgetInspector
 	}
 
 	UILabel mLabel;
-	FontType mType;
+	FontType mFontType;
 
 	protected override void OnEnable ()
 	{
 		base.OnEnable();
 		SerializedProperty bit = serializedObject.FindProperty("mFont");
-		mType = (bit != null && bit.objectReferenceValue != null) ? FontType.Bitmap : FontType.Dynamic;
+		mFontType = (bit != null && bit.objectReferenceValue != null) ? FontType.Bitmap : FontType.Dynamic;
 	}
 
 	void OnBitmapFont (Object obj)
@@ -64,7 +64,7 @@ public class UILabelInspector : UIWidgetInspector
 		
 		if (NGUIEditorTools.DrawPrefixButton("Font"))
 		{
-			if (mType == FontType.Bitmap)
+			if (mFontType == FontType.Bitmap)
 			{
 				ComponentSelector.Show<UIFont>(OnBitmapFont);
 			}
@@ -75,7 +75,7 @@ public class UILabelInspector : UIWidgetInspector
 		}
 
 #if DYNAMIC_FONT
-		mType = (FontType)EditorGUILayout.EnumPopup(mType, GUILayout.Width(62f));
+		mFontType = (FontType)EditorGUILayout.EnumPopup(mFontType, GUILayout.Width(62f));
 #else
 		mType = FontType.Bitmap;
 #endif
@@ -83,7 +83,7 @@ public class UILabelInspector : UIWidgetInspector
 		SerializedProperty fnt = null;
 		SerializedProperty ttf = null;
 
-		if (mType == FontType.Bitmap)
+		if (mFontType == FontType.Bitmap)
 		{
 			fnt = NGUIEditorTools.DrawProperty("", serializedObject, "mFont", GUILayout.MinWidth(40f));
 			

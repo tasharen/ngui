@@ -71,18 +71,26 @@ public class UIPanelInspector : UIRectEditor
 		// Time to figure out what kind of action is underneath the mouse
 		UIWidgetInspector.Action actionUnderMouse = mAction;
 
-		Handles.color = new Color(0.5f, 0f, 0.5f);
-		Handles.DrawLine(handles[0], handles[1]);
-		Handles.DrawLine(handles[1], handles[2]);
-		Handles.DrawLine(handles[2], handles[3]);
-		Handles.DrawLine(handles[0], handles[3]);
+		Color handlesColor = new Color(0.5f, 0f, 0.5f);
+		NGUIHandles.DrawShadowedLine(handles, handles[0], handles[1], handlesColor);
+		NGUIHandles.DrawShadowedLine(handles, handles[1], handles[2], handlesColor);
+		NGUIHandles.DrawShadowedLine(handles, handles[2], handles[3], handlesColor);
+		NGUIHandles.DrawShadowedLine(handles, handles[0], handles[3], handlesColor);
 
-		if (mPanel.isAnchored)
+		if (mPanel.isAnchored && mAction == UIWidgetInspector.Action.None)
 		{
 			UIWidgetInspector.DrawAnchor(mPanel.leftAnchor, mPanel.cachedTransform, handles, Vector3.left, 0, 1, id);
 			UIWidgetInspector.DrawAnchor(mPanel.rightAnchor, mPanel.cachedTransform, handles, Vector3.right, 2, 3, id);
 			UIWidgetInspector.DrawAnchor(mPanel.bottomAnchor, mPanel.cachedTransform, handles, Vector3.down, 0, 3, id);
 			UIWidgetInspector.DrawAnchor(mPanel.topAnchor, mPanel.cachedTransform, handles, Vector3.up, 1, 2, id);
+		}
+
+		if (type == EventType.Repaint)
+		{
+			bool showDetails = (mAction == UIWidgetInspector.Action.Scale) || NGUISettings.drawGuides;
+			if (mAction == UIWidgetInspector.Action.None && e.modifiers == EventModifiers.Control) showDetails = true;
+			if (mPanel.parent == null) showDetails = true;
+			if (showDetails) NGUIHandles.DrawSize(handles, Mathf.RoundToInt(mPanel.width), Mathf.RoundToInt(mPanel.height));
 		}
 
 		bool canResize = (mPanel.clipping != UIDrawCall.Clipping.None);
@@ -105,14 +113,13 @@ public class UIPanelInspector : UIRectEditor
 			case EventType.Repaint:
 			{
 				Vector3 v0 = HandleUtility.WorldToGUIPoint(handles[0]);
-				Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
 				Vector3 v2 = HandleUtility.WorldToGUIPoint(handles[2]);
-				Vector3 v3 = HandleUtility.WorldToGUIPoint(handles[3]);
 
-				float diagonal = (v2 - v0).magnitude;
-
-				if (diagonal > 60f)
+				if ((v2 - v0).magnitude > 60f)
 				{
+					Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
+					Vector3 v3 = HandleUtility.WorldToGUIPoint(handles[3]);
+
 					Handles.BeginGUI();
 					{
 						for (int i = 0; i < 4; ++i)

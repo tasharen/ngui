@@ -330,8 +330,7 @@ public class UIWidgetInspector : UIRectEditor
 				theirPos = ray.GetPoint(dist);
 			}
 
-			Handles.color = Color.yellow;
-			Handles.DrawLine(myPos, theirPos);
+			NGUIHandles.DrawShadowedLine(myCorners, myPos, theirPos, Color.yellow);
 
 			if (Event.current.GetTypeForControl(id) == EventType.Repaint)
 			{
@@ -352,8 +351,6 @@ public class UIWidgetInspector : UIRectEditor
 
 				if ((isHorizontal && mag > 60f) || (!isHorizontal && mag > 30f))
 				{
-					screenPoint = HandleUtility.WorldToGUIPoint((myPos + theirPos) * 0.5f);
-
 					int val = anchor.absolute;
 
 					if (anchor.rect != null)
@@ -363,16 +360,10 @@ public class UIWidgetInspector : UIRectEditor
 						f *= (i0 == 0) ? anchor.relative : anchor.relative - 1f;
 						val += Mathf.RoundToInt(f);
 					}
-					string text = val.ToString();
 
-					GUI.color = new Color(0f, 0f, 0f, 0.5f);
-					GUI.Label(new Rect(screenPoint.x - 29f, screenPoint.y - 9f, 60f, 20f), text, "RL FooterButton");
-					GUI.Label(new Rect(screenPoint.x - 29f, screenPoint.y - 11f, 60f, 20f), text, "RL FooterButton");
-					GUI.Label(new Rect(screenPoint.x - 31f, screenPoint.y - 11f, 60f, 20f), text, "RL FooterButton");
-					GUI.Label(new Rect(screenPoint.x - 31f, screenPoint.y - 9f, 60f, 20f), text, "RL FooterButton");
-					
+					GUI.color = Color.yellow;
+					NGUIHandles.DrawCenteredLabel((myPos + theirPos) * 0.5f, val.ToString());
 					GUI.color = Color.white;
-					GUI.Label(new Rect(screenPoint.x - 30f, screenPoint.y - 10f, 60f, 20f), text, "RL FooterButton");
 				}
 				Handles.EndGUI();
 			}
@@ -399,18 +390,26 @@ public class UIWidgetInspector : UIRectEditor
 		Action actionUnderMouse = mAction;
 		Vector3[] handles = GetHandles(mWidget.worldCorners);
 		
-		Handles.color = handlesColor;
-		Handles.DrawLine(handles[0], handles[1]);
-		Handles.DrawLine(handles[1], handles[2]);
-		Handles.DrawLine(handles[2], handles[3]);
-		Handles.DrawLine(handles[0], handles[3]);
+		NGUIHandles.DrawShadowedLine(handles, handles[0], handles[1], handlesColor);
+		NGUIHandles.DrawShadowedLine(handles, handles[1], handles[2], handlesColor);
+		NGUIHandles.DrawShadowedLine(handles, handles[2], handles[3], handlesColor);
+		NGUIHandles.DrawShadowedLine(handles, handles[0], handles[3], handlesColor);
 
-		if (mWidget.isAnchored)
+		// If the widget is anchored, draw the anchors
+		if (mWidget.isAnchored && mAction == UIWidgetInspector.Action.None)
 		{
 			DrawAnchor(mWidget.leftAnchor, mWidget.cachedTransform, handles, Vector3.left, 0, 1, id);
 			DrawAnchor(mWidget.rightAnchor, mWidget.cachedTransform, handles, Vector3.right, 2, 3, id);
 			DrawAnchor(mWidget.bottomAnchor, mWidget.cachedTransform, handles, Vector3.down, 0, 3, id);
 			DrawAnchor(mWidget.topAnchor, mWidget.cachedTransform, handles, Vector3.up, 1, 2, id);
+		}
+
+		if (type == EventType.Repaint)
+		{
+			bool showDetails = (mAction == UIWidgetInspector.Action.Scale) || NGUISettings.drawGuides;
+			if (mAction == UIWidgetInspector.Action.None && e.modifiers == EventModifiers.Control) showDetails = true;
+			if (mWidget.parent == null) showDetails = true;
+			if (showDetails) NGUIHandles.DrawSize(handles, mWidget.width, mWidget.height);
 		}
 
 		bool canResize = mWidget.canResize;
@@ -433,14 +432,13 @@ public class UIWidgetInspector : UIRectEditor
 			case EventType.Repaint:
 			{
 				Vector3 v0 = HandleUtility.WorldToGUIPoint(handles[0]);
-				Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
 				Vector3 v2 = HandleUtility.WorldToGUIPoint(handles[2]);
-				Vector3 v3 = HandleUtility.WorldToGUIPoint(handles[3]);
 				
-				float diagonal = (v2 - v0).magnitude;
-
-				if (diagonal > 60f)
+				if ((v2 - v0).magnitude > 60f)
 				{
+					Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
+					Vector3 v3 = HandleUtility.WorldToGUIPoint(handles[3]);
+
 					Handles.BeginGUI();
 					{
 						for (int i = 0; i < 4; ++i)

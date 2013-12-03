@@ -335,6 +335,12 @@ public class NGUISettings
 		get { return GetBool("NGUI DCs", true); }
 		set { SetBool("NGUI DCs", value); }
 	}
+
+	static public bool drawGuides
+	{
+		get { return GetBool("NGUI Guides", false); }
+		set { SetBool("NGUI Guides", value); }
+	}
 #endregion
 
 	/// <summary>

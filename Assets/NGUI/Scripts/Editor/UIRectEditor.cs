@@ -23,7 +23,7 @@ public class UIRectEditor : Editor
 		Advanced,
 	}
 
-	AnchorType mType = AnchorType.None;
+	AnchorType mAnchorType = AnchorType.None;
 
 	/// <summary>
 	/// Determine the initial anchor type.
@@ -33,7 +33,7 @@ public class UIRectEditor : Editor
 	{
 		if (serializedObject.isEditingMultipleObjects)
 		{
-			mType = AnchorType.Advanced;
+			mAnchorType = AnchorType.Advanced;
 		}
 		else
 		{
@@ -45,18 +45,18 @@ public class UIRectEditor : Editor
 			{
 				if (rect.leftAnchor.target == null)
 				{
-					mType = AnchorType.None;
+					mAnchorType = AnchorType.None;
 				}
 				else if (rect.leftAnchor.relative == 0f &&
 						rect.rightAnchor.relative == 1f &&
 						rect.bottomAnchor.relative == 0f &&
 						rect.topAnchor.relative == 1f)
 				{
-					mType = AnchorType.Padded;
+					mAnchorType = AnchorType.Padded;
 				}
-				else mType = AnchorType.Unified;
+				else mAnchorType = AnchorType.Unified;
 			}
-			else mType = AnchorType.Advanced;
+			else mAnchorType = AnchorType.Advanced;
 		}
 	}
 
@@ -94,7 +94,7 @@ public class UIRectEditor : Editor
 			NGUIEditorTools.SetLabelWidth(62f);
 
 			GUILayout.BeginHorizontal();
-			AnchorType type = (AnchorType)EditorGUILayout.EnumPopup("Type", mType);
+			AnchorType type = (AnchorType)EditorGUILayout.EnumPopup("Type", mAnchorType);
 			GUILayout.Space(18f);
 			GUILayout.EndHorizontal();
 
@@ -104,15 +104,15 @@ public class UIRectEditor : Editor
 			}
 			else if (type == AnchorType.Unified)
 			{
-				if (mType != type) UpdateAnchors(true);
+				if (mAnchorType != type) UpdateAnchors(true);
 				DrawRelativeAnchors();
 			}
 			else if (type == AnchorType.Padded)
 			{
-				if (mType != type) UpdateAnchors(false);
+				if (mAnchorType != type) UpdateAnchors(false);
 				DrawPaddedAnchors();
 			}
-			else if (mType != type)
+			else if (mAnchorType != type)
 			{
 				// No anchors needed -- clear the references
 				serializedObject.FindProperty("leftAnchor.target").objectReferenceValue = null;
@@ -125,7 +125,7 @@ public class UIRectEditor : Editor
 				serializedObject.FindProperty("rightAnchor.relative").floatValue = 1f;
 				serializedObject.FindProperty("topAnchor.relative").floatValue = 1f;
 			}
-			mType = type;
+			mAnchorType = type;
 			NGUIEditorTools.EndContents();
 		}
 	}

@@ -478,6 +478,18 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Options/Snapping/Turn Off", true, 10)]
 	static public bool TurnSnapOffCheck () { return NGUISnap.allow; }
 
+	[MenuItem("NGUI/Options/Guides/Always On", false, 10)]
+	static public void TurnGuidesOn () { NGUISettings.drawGuides = true; }
+
+	[MenuItem("NGUI/Options/Guides/Always On", true, 10)]
+	static public bool TurnGuidesOnCheck () { return !NGUISettings.drawGuides; }
+
+	[MenuItem("NGUI/Options/Guides/Only When Needed", false, 10)]
+	static public void TurnGuidesOff () { NGUISettings.drawGuides = false; }
+
+	[MenuItem("NGUI/Options/Guides/Only When Needed", true, 10)]
+	static public bool TurnGuidesOffCheck () { return NGUISettings.drawGuides; }
+
 #endregion
 
 	[MenuItem("NGUI/Normalize Depth Hierarchy &#0", false, 11)]

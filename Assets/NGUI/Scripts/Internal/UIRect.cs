@@ -61,6 +61,12 @@ public abstract class UIRect : MonoBehaviour
 	int mUpdateFrame = -1;
 
 	/// <summary>
+	/// Rectangle's parent, if any.
+	/// </summary>
+
+	public UIRect parent { get { return mParent; } }
+
+	/// <summary>
 	/// Game object gets cached for speed. Can't simply return 'mGo' set in Awake because this function may be called on a prefab.
 	/// </summary>
 
