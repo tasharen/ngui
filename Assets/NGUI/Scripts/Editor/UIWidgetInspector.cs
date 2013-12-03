@@ -432,29 +432,30 @@ public class UIWidgetInspector : UIRectEditor
 		{
 			case EventType.Repaint:
 			{
-				Vector3 bottomLeft = HandleUtility.WorldToGUIPoint(handles[0]);
-				Vector3 topRight = HandleUtility.WorldToGUIPoint(handles[2]);
-				Vector3 diff = topRight - bottomLeft;
-				float mag = diff.magnitude;
+				Vector3 v0 = HandleUtility.WorldToGUIPoint(handles[0]);
+				Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
+				Vector3 v2 = HandleUtility.WorldToGUIPoint(handles[2]);
+				Vector3 v3 = HandleUtility.WorldToGUIPoint(handles[3]);
+				
+				float diagonal = (v2 - v0).magnitude;
 
-				if (mag > 140f)
-				{
-					Handles.BeginGUI();
-					{
-						for (int i = 0; i < 8; ++i)
-						{
-							DrawKnob(handles[i], mWidget.pivot == pivotPoints[i], resizable[i], id);
-						}
-					}
-					Handles.EndGUI();
-				}
-				else if (mag > 40f)
+				if (diagonal > 60f)
 				{
 					Handles.BeginGUI();
 					{
 						for (int i = 0; i < 4; ++i)
-						{
 							DrawKnob(handles[i], mWidget.pivot == pivotPoints[i], resizable[i], id);
+
+						if (Mathf.Abs(v1.y - v0.y) > 80f)
+						{
+							DrawKnob(handles[4], mWidget.pivot == pivotPoints[4], resizable[4], id);
+							DrawKnob(handles[6], mWidget.pivot == pivotPoints[6], resizable[6], id);
+						}
+
+						if (Mathf.Abs(v3.x - v0.x) > 80f)
+						{
+							DrawKnob(handles[5], mWidget.pivot == pivotPoints[5], resizable[5], id);
+							DrawKnob(handles[7], mWidget.pivot == pivotPoints[7], resizable[7], id);
 						}
 					}
 					Handles.EndGUI();

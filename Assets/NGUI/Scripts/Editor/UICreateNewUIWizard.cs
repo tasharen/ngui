@@ -148,21 +148,9 @@ public class UICreateNewUIWizard : EditorWindow
 			// Add a UI Camera for event handling
 			cam.gameObject.AddComponent<UICamera>();
 
-			if (type == CameraType.Simple2D)
-			{
-				// Anchor is useful to have
-				UIAnchor anchor = NGUITools.AddChild<UIAnchor>(cam.gameObject);
-				anchor.uiCamera = cam;
-
-				// And finally -- the first UI panel
-				UIPanel panel = NGUITools.AddChild<UIPanel>(anchor.gameObject);
-				Selection.activeGameObject = panel.gameObject;
-			}
-			else
-			{
-				UIPanel panel = NGUITools.AddChild<UIPanel>(root);
-				Selection.activeGameObject = panel.gameObject;
-			}
+			// Add a panel
+			UIPanel panel = NGUITools.AddChild<UIPanel>(root);
+			Selection.activeGameObject = panel.gameObject;
 		}
 		return Selection.activeGameObject;
 	}

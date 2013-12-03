@@ -48,7 +48,7 @@ public class UIWidgetContainerEditor : Editor
 		EventType type = e.GetTypeForControl(id);
 		bool isWithinRect = false;
 		Vector3[] corners = null;
-		Vector3[] worldPos = null;
+		Vector3[] handles = null;
 
 		if (widgets.Length > 0)
 		{
@@ -90,24 +90,24 @@ public class UIWidgetContainerEditor : Editor
 			Handles.DrawLine(corners[2], corners[3]);
 			Handles.DrawLine(corners[0], corners[3]);
 
-			worldPos = new Vector3[8];
+			handles = new Vector3[8];
 
-			worldPos[0] = corners[0];
-			worldPos[1] = corners[1];
-			worldPos[2] = corners[2];
-			worldPos[3] = corners[3];
+			handles[0] = corners[0];
+			handles[1] = corners[1];
+			handles[2] = corners[2];
+			handles[3] = corners[3];
 
-			worldPos[4] = (corners[0] + corners[1]) * 0.5f;
-			worldPos[5] = (corners[1] + corners[2]) * 0.5f;
-			worldPos[6] = (corners[2] + corners[3]) * 0.5f;
-			worldPos[7] = (corners[0] + corners[3]) * 0.5f;
+			handles[4] = (corners[0] + corners[1]) * 0.5f;
+			handles[5] = (corners[1] + corners[2]) * 0.5f;
+			handles[6] = (corners[2] + corners[3]) * 0.5f;
+			handles[7] = (corners[0] + corners[3]) * 0.5f;
 
 			isWithinRect = mIsDragging || (e.modifiers == 0 &&
 				NGUIEditorTools.SceneViewDistanceToRectangle(corners, e.mousePosition) == 0f);
 #if !UNITY_3_5
 			// Change the mouse cursor to a more appropriate one
 			Vector2[] screenPos = new Vector2[8];
-			for (int i = 0; i < 8; ++i) screenPos[i] = HandleUtility.WorldToGUIPoint(worldPos[i]);
+			for (int i = 0; i < 8; ++i) screenPos[i] = HandleUtility.WorldToGUIPoint(handles[i]);
 
 			bounds = new Bounds(screenPos[0], Vector3.zero);
 			for (int i = 1; i < 8; ++i) bounds.Encapsulate(screenPos[i]);
@@ -124,17 +124,34 @@ public class UIWidgetContainerEditor : Editor
 		{
 			case EventType.Repaint:
 			{
-				Handles.BeginGUI();
+				Vector3 v0 = HandleUtility.WorldToGUIPoint(handles[0]);
+				Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
+				Vector3 v2 = HandleUtility.WorldToGUIPoint(handles[2]);
+				Vector3 v3 = HandleUtility.WorldToGUIPoint(handles[3]);
+
+				float diagonal = (v2 - v0).magnitude;
+
+				if (diagonal > 60f)
 				{
-					if (worldPos != null)
+					Handles.BeginGUI();
 					{
-						for (int i = 0; i < 8; ++i)
+						for (int i = 0; i < 4; ++i)
+							UIWidgetInspector.DrawKnob(handles[i], false, false, id);
+
+						if (Mathf.Abs(v1.y - v0.y) > 80f)
 						{
-							UIWidgetInspector.DrawKnob(worldPos[i], false, false, id);
+							UIWidgetInspector.DrawKnob(handles[4], false, false, id);
+							UIWidgetInspector.DrawKnob(handles[6], false, false, id);
+						}
+
+						if (Mathf.Abs(v3.x - v0.x) > 80f)
+						{
+							UIWidgetInspector.DrawKnob(handles[5], false, false, id);
+							UIWidgetInspector.DrawKnob(handles[7], false, false, id);
 						}
 					}
+					Handles.EndGUI();
 				}
-				Handles.EndGUI();
 			}
 			break;
 

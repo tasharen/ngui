@@ -104,21 +104,32 @@ public class UIPanelInspector : UIRectEditor
 		{
 			case EventType.Repaint:
 			{
-				Vector3 bottomLeft = HandleUtility.WorldToGUIPoint(handles[0]);
-				Vector3 topRight = HandleUtility.WorldToGUIPoint(handles[2]);
-				Vector3 diff = topRight - bottomLeft;
-				float mag = diff.magnitude;
+				Vector3 v0 = HandleUtility.WorldToGUIPoint(handles[0]);
+				Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
+				Vector3 v2 = HandleUtility.WorldToGUIPoint(handles[2]);
+				Vector3 v3 = HandleUtility.WorldToGUIPoint(handles[3]);
 
-				if (mag > 140f)
+				float diagonal = (v2 - v0).magnitude;
+
+				if (diagonal > 60f)
 				{
 					Handles.BeginGUI();
-					for (int i = 0; i < 8; ++i) DrawKnob(handles[i], id, resizable[i]);
-					Handles.EndGUI();
-				}
-				else if (mag > 40f)
-				{
-					Handles.BeginGUI();
-					for (int i = 0; i < 4; ++i) DrawKnob(handles[i], id, resizable[i]);
+					{
+						for (int i = 0; i < 4; ++i)
+							DrawKnob(handles[i], id, resizable[i]);
+
+						if (Mathf.Abs(v1.y - v0.y) > 80f)
+						{
+							DrawKnob(handles[4], id, resizable[4]);
+							DrawKnob(handles[6], id, resizable[6]);
+						}
+
+						if (Mathf.Abs(v3.x - v0.x) > 80f)
+						{
+							DrawKnob(handles[5], id, resizable[5]);
+							DrawKnob(handles[7], id, resizable[7]);
+						}
+					}
 					Handles.EndGUI();
 				}
 			}
