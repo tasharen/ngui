@@ -34,6 +34,7 @@ public class UIWidgetInspector : UIRectEditor
 	static protected bool mUseShader = false;
 	static GUIStyle mBlueDot = null;
 	static GUIStyle mYellowDot = null;
+	static GUIStyle mRedDot = null;
 	static GUIStyle mOrangeDot = null;
 	static GUIStyle mGreenDot = null;
 	static GUIStyle mGreyDot = null;
@@ -106,6 +107,7 @@ public class UIWidgetInspector : UIRectEditor
 		if (mGreenDot == null) mGreenDot = "sv_label_3";
 		if (mYellowDot == null) mYellowDot = "sv_label_4";
 		if (mOrangeDot == null) mOrangeDot = "sv_label_5";
+		if (mRedDot == null) mRedDot = "sv_label_6";
 
 		Vector2 screenPoint = HandleUtility.WorldToGUIPoint(point);
 
@@ -115,7 +117,7 @@ public class UIWidgetInspector : UIRectEditor
 		{
 			if (NGUISettings.colorMode == NGUISettings.ColorMode.Orange)
 			{
-				mYellowDot.Draw(rect, GUIContent.none, id);
+				mRedDot.Draw(rect, GUIContent.none, id);
 			}
 			else
 			{
@@ -297,6 +299,86 @@ public class UIWidgetInspector : UIRectEditor
 	}
 
 	/// <summary>
+	/// Draw the specified anchor point.
+	/// </summary>
+
+	static public void DrawAnchor (UIRect.AnchorPoint anchor, Transform myTrans, Vector3[] myCorners, Vector3 dir, int i0, int i1, int id)
+	{
+		if (anchor.target)
+		{
+			if (Quaternion.Angle(anchor.target.rotation, myTrans.rotation) > 1f) return;
+
+			Vector3 myPos = (myCorners[i0] + myCorners[i1]) * 0.5f;
+			Vector3 theirPos;
+
+			if (anchor.rect == null)
+			{
+				theirPos = anchor.target.position;
+			}
+			else
+			{
+				Vector3[] otherCorners = anchor.rect.worldCorners;
+				Vector3 back = myTrans.InverseTransformDirection(Vector3.back);
+				Plane plane = new Plane(otherCorners[i0], otherCorners[i1], otherCorners[i0] + back);
+
+				dir = myTrans.TransformDirection(dir);
+				Ray ray = new Ray(myPos, dir);
+
+				float dist;
+				if (!plane.Raycast(ray, out dist)) return;
+				theirPos = ray.GetPoint(dist);
+			}
+
+			Handles.color = Color.yellow;
+			Handles.DrawLine(myPos, theirPos);
+
+			if (Event.current.GetTypeForControl(id) == EventType.Repaint)
+			{
+				Vector2 screenPoint = HandleUtility.WorldToGUIPoint(theirPos);
+				Rect rect = new Rect(screenPoint.x - 7f, screenPoint.y - 7f, 14f, 14f);
+				if (mYellowDot == null) mYellowDot = "sv_label_4";
+				
+				Handles.BeginGUI();
+				
+				mYellowDot.Draw(rect, GUIContent.none, id);
+
+				Vector3 v0 = HandleUtility.WorldToGUIPoint(myPos);
+				Vector3 v1 = HandleUtility.WorldToGUIPoint(theirPos);
+
+				Vector3 diff = v1 - v0;
+				bool isHorizontal = Mathf.Abs(diff.x) > Mathf.Abs(diff.y);
+				float mag = diff.magnitude;
+
+				if ((isHorizontal && mag > 60f) || (!isHorizontal && mag > 30f))
+				{
+					screenPoint = HandleUtility.WorldToGUIPoint((myPos + theirPos) * 0.5f);
+
+					int val = anchor.absolute;
+
+					if (anchor.rect != null)
+					{
+						Vector3[] corners = anchor.rect.localCorners;
+						float f = isHorizontal ? corners[3].x - corners[0].x : corners[1].y - corners[0].y;
+						f *= (i0 == 0) ? anchor.relative : anchor.relative - 1f;
+						val += Mathf.RoundToInt(f);
+					}
+					string text = val.ToString();
+
+					GUI.color = new Color(0f, 0f, 0f, 0.5f);
+					GUI.Label(new Rect(screenPoint.x - 29f, screenPoint.y - 9f, 60f, 20f), text, "RL FooterButton");
+					GUI.Label(new Rect(screenPoint.x - 29f, screenPoint.y - 11f, 60f, 20f), text, "RL FooterButton");
+					GUI.Label(new Rect(screenPoint.x - 31f, screenPoint.y - 11f, 60f, 20f), text, "RL FooterButton");
+					GUI.Label(new Rect(screenPoint.x - 31f, screenPoint.y - 9f, 60f, 20f), text, "RL FooterButton");
+					
+					GUI.color = Color.white;
+					GUI.Label(new Rect(screenPoint.x - 30f, screenPoint.y - 10f, 60f, 20f), text, "RL FooterButton");
+				}
+				Handles.EndGUI();
+			}
+		}
+	}
+
+	/// <summary>
 	/// Draw the on-screen selection, knobs, and handle all interaction logic.
 	/// </summary>
 
@@ -321,6 +403,14 @@ public class UIWidgetInspector : UIRectEditor
 		Handles.DrawLine(handles[1], handles[2]);
 		Handles.DrawLine(handles[2], handles[3]);
 		Handles.DrawLine(handles[0], handles[3]);
+
+		if (mWidget.isAnchored)
+		{
+			DrawAnchor(mWidget.leftAnchor, mWidget.cachedTransform, handles, Vector3.left, 0, 1, id);
+			DrawAnchor(mWidget.rightAnchor, mWidget.cachedTransform, handles, Vector3.right, 2, 3, id);
+			DrawAnchor(mWidget.bottomAnchor, mWidget.cachedTransform, handles, Vector3.down, 0, 3, id);
+			DrawAnchor(mWidget.topAnchor, mWidget.cachedTransform, handles, Vector3.up, 1, 2, id);
+		}
 
 		bool canResize = mWidget.canResize;
 		bool[] resizable = new bool[8];

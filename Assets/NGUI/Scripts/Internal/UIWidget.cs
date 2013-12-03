@@ -972,21 +972,6 @@ public class UIWidget : UIRect
 
 			Color outline = new Color(1f, 1f, 1f, 0.2f);
 
-			if (UnityEditor.Selection.activeGameObject != null)
-			{
-				UIRect rect = UnityEditor.Selection.activeGameObject.GetComponent<UIRect>();
-				if (rect != null)
-				{
-					if (rect.leftAnchor.target == cachedTransform &&
-						rect.rightAnchor.target == cachedTransform &&
-						rect.bottomAnchor.target == cachedTransform &&
-						rect.topAnchor.target == cachedTransform)
-					{
-						outline = new Color(1f, 1f, 0f, 0.7f);
-					}
-				}
-			}
-
 			Vector2 offset = pivotOffset;
 			Vector3 center = new Vector3(mWidth * (0.5f - offset.x), mHeight * (0.5f - offset.y), -mDepth * 0.25f);
 			Vector3 size = new Vector3(mWidth, mHeight, 1f);

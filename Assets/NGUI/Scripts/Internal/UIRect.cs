@@ -73,6 +73,18 @@ public abstract class UIRect : MonoBehaviour
 	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
 
 	/// <summary>
+	/// Returns 'true' if the widget is currently anchored on any side.
+	/// </summary>
+
+	public bool isAnchored
+	{
+		get
+		{
+			return leftAnchor.target || rightAnchor.target || topAnchor.target || bottomAnchor.target;
+		}
+	}
+
+	/// <summary>
 	/// Alpha property is exposed so that it's possible to make it cumulative.
 	/// </summary>
 

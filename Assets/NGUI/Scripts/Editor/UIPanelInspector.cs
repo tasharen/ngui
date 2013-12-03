@@ -76,6 +76,14 @@ public class UIPanelInspector : UIRectEditor
 		Handles.DrawLine(handles[2], handles[3]);
 		Handles.DrawLine(handles[0], handles[3]);
 
+		if (mPanel.isAnchored)
+		{
+			UIWidgetInspector.DrawAnchor(mPanel.leftAnchor, mPanel.cachedTransform, handles, Vector3.left, 0, 1, id);
+			UIWidgetInspector.DrawAnchor(mPanel.rightAnchor, mPanel.cachedTransform, handles, Vector3.right, 2, 3, id);
+			UIWidgetInspector.DrawAnchor(mPanel.bottomAnchor, mPanel.cachedTransform, handles, Vector3.down, 0, 3, id);
+			UIWidgetInspector.DrawAnchor(mPanel.topAnchor, mPanel.cachedTransform, handles, Vector3.up, 1, 2, id);
+		}
+
 		bool canResize = (mPanel.clipping != UIDrawCall.Clipping.None);
 		bool[] resizable = new bool[8];
 
