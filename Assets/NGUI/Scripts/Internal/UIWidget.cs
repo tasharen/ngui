@@ -493,7 +493,7 @@ public class UIWidget : UIRect
 			v0 = relativeTo.InverseTransformPoint(v0);
 			v1 = relativeTo.InverseTransformPoint(v1);
 		}
-		return Mathf.Round(Mathf.Lerp(v0.x, v1.x, relative)) + absolute;
+		return Mathf.Floor(Mathf.Lerp(v0.x, v1.x, relative) + 0.5f) + absolute;
 	}
 
 	/// <summary>
@@ -519,7 +519,7 @@ public class UIWidget : UIRect
 			v0 = relativeTo.InverseTransformPoint(v0);
 			v1 = relativeTo.InverseTransformPoint(v1);
 		}
-		return Mathf.Round(Mathf.Lerp(v0.y, v1.y, relative)) + absolute;
+		return Mathf.Floor(Mathf.Lerp(v0.y, v1.y, relative) + 0.5f) + absolute;
 	}
 
 	/// <summary>
@@ -845,19 +845,13 @@ public class UIWidget : UIRect
 		else tt = pos.y - pvt.y * mHeight + mHeight;
 
 		// Calculate the new position, width and height
-		Vector3 newPos = new Vector3(
-			Mathf.Round(Mathf.Lerp(lt, rt, pvt.x)),
-			Mathf.Round(Mathf.Lerp(bt, tt, pvt.y)), pos.z);
-		int w = Mathf.RoundToInt(rt - lt);
-		int h = Mathf.RoundToInt(tt - bt);
+		Vector3 newPos = new Vector3(Mathf.Lerp(lt, rt, pvt.x), Mathf.Lerp(bt, tt, pvt.y), pos.z);
+		int w = Mathf.FloorToInt(rt - lt + 0.5f);
+		int h = Mathf.FloorToInt(tt - bt + 0.5f);
 
 		// Don't let the width and height get too small
 		if (w < minWidth) w = minWidth;
 		if (h < minHeight) h = minHeight;
-
-		// Centered widgets need to have dimensions that are dividable by two
-		if (pvt.x == 0.5f && ((w & 1) == 1)) ++w;
-		if (pvt.y == 0.5f && ((h & 1) == 1)) ++h;
 
 		// Update the position if it has changed
 		if (Vector3.SqrMagnitude(pos - newPos) > 0.001f)

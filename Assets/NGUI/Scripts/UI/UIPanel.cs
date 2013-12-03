@@ -107,6 +107,7 @@ public class UIPanel : UIRect
 	static float[] mTemp = new float[4];
 	Vector2 mMin = Vector2.zero;
 	Vector2 mMax = Vector2.zero;
+	bool mHalfPixelOffset = false;
 
 	/// <summary>
 	/// Helper property that returns the first unused depth value.
@@ -205,13 +206,40 @@ public class UIPanel : UIRect
 	/// Panel's width in pixels.
 	/// </summary>
 
-	public float width { get { return GetSize().x; } }
+	public float width { get { return GetViewSize().x; } }
 
 	/// <summary>
 	/// Panel's height in pixels.
 	/// </summary>
 
-	public float height { get { return GetSize().y; } }
+	public float height { get { return GetViewSize().y; } }
+
+	/// <summary>
+	/// Whether the panel's drawn geometry needs to be offset by a half-pixel.
+	/// </summary>
+
+	public bool halfPixelOffset { get { return mHalfPixelOffset; } }
+
+	/// <summary>
+	/// Position to be used for draw calls. Takes DirectX 9's half-pixel offset into consideration.
+	/// </summary>
+
+	public Vector3 drawCallPosition
+	{
+		get
+		{
+			Vector3 pos = cachedTransform.position;
+
+			if (mHalfPixelOffset && mCam != null && mCam.isOrthoGraphic)
+			{
+				Vector2 size = GetWindowSize();
+				float mod = (1f / size.y) / mCam.orthographicSize;
+				pos.x += mod;
+				pos.y -= mod;
+			}
+			return pos;
+		}
+	}
 
 	/// <summary>
 	/// Number of draw calls produced by this panel.
@@ -362,7 +390,7 @@ public class UIPanel : UIRect
 		{
 			if (mClipping == UIDrawCall.Clipping.None)
 			{
-				Vector2 size = GetSize();
+				Vector2 size = GetViewSize();
 
 				float x0 = -0.5f * size.x;
 				float y0 = -0.5f * size.y;
@@ -417,7 +445,7 @@ public class UIPanel : UIRect
 		{
 			if (mClipping == UIDrawCall.Clipping.None)
 			{
-				Vector2 size = GetSize();
+				Vector2 size = GetViewSize();
 
 				float x0 = -0.5f * size.x;
 				float y0 = -0.5f * size.y;
@@ -458,7 +486,7 @@ public class UIPanel : UIRect
 
 	public override float GetHorizontal (Transform relativeTo, float relative, int absolute)
 	{
-		Vector2 size = GetSize();
+		Vector2 size = GetViewSize();
 
 		Vector2 cr = (mClipping != UIDrawCall.Clipping.None) ? (Vector2)mClipRange + mClipOffset : Vector2.zero;
 		float x0 = cr.x - 0.5f * size.x;
@@ -476,7 +504,7 @@ public class UIPanel : UIRect
 			v0 = relativeTo.InverseTransformPoint(v0);
 			v1 = relativeTo.InverseTransformPoint(v1);
 		}
-		return Mathf.Round(Mathf.Lerp(v0.x, v1.x, relative)) + absolute;
+		return Mathf.Floor(Mathf.Lerp(v0.x, v1.x, relative) + 0.5f) + absolute;
 	}
 
 	/// <summary>
@@ -485,7 +513,7 @@ public class UIPanel : UIRect
 
 	public override float GetVertical (Transform relativeTo, float relative, int absolute)
 	{
-		Vector2 size = GetSize();
+		Vector2 size = GetViewSize();
 
 		Vector2 cr = (mClipping != UIDrawCall.Clipping.None) ? (Vector2)mClipRange + mClipOffset : Vector2.zero;
 		float x0 = cr.x - 0.5f * size.x;
@@ -503,7 +531,7 @@ public class UIPanel : UIRect
 			v0 = relativeTo.InverseTransformPoint(v0);
 			v1 = relativeTo.InverseTransformPoint(v1);
 		}
-		return Mathf.Round(Mathf.Lerp(v0.y, v1.y, relative)) + absolute;
+		return Mathf.Floor(Mathf.Lerp(v0.y, v1.y, relative) + 0.5f) + absolute;
 	}
 
 	/// <summary>
@@ -613,6 +641,14 @@ public class UIPanel : UIRect
 	{
 		mGo = gameObject;
 		mTrans = transform;
+
+		mHalfPixelOffset = (Application.platform == RuntimePlatform.WindowsPlayer ||
+			Application.platform == RuntimePlatform.XBOX360 ||
+			Application.platform == RuntimePlatform.WindowsWebPlayer ||
+			Application.platform == RuntimePlatform.WindowsEditor);
+
+		// Only DirectX 9 needs the half-pixel offset
+		if (mHalfPixelOffset) mHalfPixelOffset = (SystemInfo.graphicsShaderLevel < 40);
 	}
 
 	/// <summary>
@@ -702,7 +738,7 @@ public class UIPanel : UIRect
 		Transform trans = cachedTransform;
 		Transform parent = trans.parent;
 
-		Vector2 size = GetSize();
+		Vector2 size = GetViewSize();
 
 		float lt, bt, rt, tt;
 		bool anchored = false;
@@ -1266,10 +1302,26 @@ public class UIPanel : UIRect
 	}
 
 	/// <summary>
+	/// Get the size of the game window in pixels.
+	/// </summary>
+
+	Vector2 GetWindowSize ()
+	{
+#if UNITY_EDITOR
+		Vector2 size = GetMainGameViewSize();
+		if (mRoot != null) size *= mRoot.GetPixelSizeAdjustment(Mathf.RoundToInt(size.y));
+#else
+		Vector2 size = new Vector2(Screen.width, Screen.height);
+		if (mRoot != null) size *= mRoot.GetPixelSizeAdjustment(Screen.height);
+#endif
+		return size;
+	}
+
+	/// <summary>
 	/// Panel's size -- which is either the clipping rect, or the screen dimensions.
 	/// </summary>
 
-	Vector2 GetSize ()
+	Vector2 GetViewSize ()
 	{
 		bool clip = (mClipping != UIDrawCall.Clipping.None);
 #if UNITY_EDITOR
@@ -1315,7 +1367,7 @@ public class UIPanel : UIRect
 	{
 		if (mCam == null) return;
 
-		Vector2 size = GetSize();
+		Vector2 size = GetViewSize();
 		GameObject go = UnityEditor.Selection.activeGameObject;
 		bool selected = (go != null) && (NGUITools.FindInParents<UIPanel>(go) == this);
 		bool clip = (mClipping != UIDrawCall.Clipping.None);

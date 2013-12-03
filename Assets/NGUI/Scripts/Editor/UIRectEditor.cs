@@ -344,7 +344,7 @@ public class UIRectEditor : Editor
 		{
 			// Anchored to a simple transform
 			Vector3 remotePos = parent.InverseTransformPoint(anchor.target.position);
-			anchor.absolute = Mathf.RoundToInt(localPos.x - remotePos.x);
+			anchor.absolute = Mathf.FloorToInt(localPos.x - remotePos.x + 0.5f);
 			anchor.relative = right ? 1f : 0f;
 		}
 		else
@@ -365,7 +365,8 @@ public class UIRectEditor : Editor
 			else
 			{
 				anchor.relative = right ? 1f : 0f;
-				anchor.absolute = Mathf.RoundToInt(localPos.x - remotePos.x);
+				float val = localPos.x - remotePos.x;
+				anchor.absolute = Mathf.FloorToInt(val + 0.5f);
 			}
 		}
 	}
@@ -398,7 +399,7 @@ public class UIRectEditor : Editor
 		{
 			// Anchored to a simple transform
 			Vector3 remotePos = parent.InverseTransformPoint(anchor.target.position);
-			anchor.absolute = Mathf.RoundToInt(localPos.y - remotePos.y);
+			anchor.absolute = Mathf.FloorToInt(localPos.y - remotePos.y + 0.5f);
 			anchor.relative = top ? 1f : 0f;
 		}
 		else
@@ -418,8 +419,9 @@ public class UIRectEditor : Editor
 			}
 			else
 			{
+				float val = localPos.y - remotePos.y;
 				anchor.relative = top ? 1f : 0f;
-				anchor.absolute = Mathf.RoundToInt(localPos.y - remotePos.y);
+				anchor.absolute = Mathf.FloorToInt(val + 0.5f);
 			}
 		}
 	}

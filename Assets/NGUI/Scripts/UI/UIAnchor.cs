@@ -26,8 +26,6 @@ public class UIAnchor : MonoBehaviour
 		Center,
 	}
 
-	bool mNeedsHalfPixelOffset = false;
-
 	/// <summary>
 	/// Camera used to determine the anchor bounds. Set automatically if none was specified.
 	/// </summary>
@@ -45,13 +43,6 @@ public class UIAnchor : MonoBehaviour
 	/// </summary>
 
 	public Side side = Side.Center;
-
-	/// <summary>
-	/// Whether a half-pixel offset will be applied on windows machines. Most of the time you'll want to leave this as 'true'.
-	/// This value is only used if the widget and panel containers were not specified.
-	/// </summary>
-
-	public bool halfPixelOffset = true;
 
 	/// <summary>
 	/// If set to 'true', UIAnchor will execute once, then will be disabled.
@@ -108,14 +99,6 @@ public class UIAnchor : MonoBehaviour
 		}
 
 		mRoot = NGUITools.FindInParents<UIRoot>(gameObject);
-		mNeedsHalfPixelOffset = (Application.platform == RuntimePlatform.WindowsPlayer ||
-			Application.platform == RuntimePlatform.XBOX360 ||
-			Application.platform == RuntimePlatform.WindowsWebPlayer ||
-			Application.platform == RuntimePlatform.WindowsEditor);
-
-		// Only DirectX 9 needs the half-pixel offset
-		if (mNeedsHalfPixelOffset) mNeedsHalfPixelOffset = (SystemInfo.graphicsShaderLevel < 40);
-
 		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
 		Update();
 	}
@@ -210,12 +193,6 @@ public class UIAnchor : MonoBehaviour
 			{
 				v.x = Mathf.Round(v.x);
 				v.y = Mathf.Round(v.y);
-
-				if (halfPixelOffset && mNeedsHalfPixelOffset)
-				{
-					v.x -= 0.5f;
-					v.y += 0.5f;
-				}
 			}
 
 			v.z = uiCamera.WorldToScreenPoint(mTrans.position).z;

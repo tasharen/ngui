@@ -739,7 +739,6 @@ public class UIDrawCall : MonoBehaviour
 	static public void Update (UIPanel panel)
 	{
 		Transform pt = panel.cachedTransform;
-
 		Vector4 range = Vector4.zero;
 
 		if (panel.clipping != UIDrawCall.Clipping.None)
@@ -751,11 +750,7 @@ public class UIDrawCall : MonoBehaviour
 		if (range.z == 0f) range.z = Screen.width * 0.5f;
 		if (range.w == 0f) range.w = Screen.height * 0.5f;
 
-		RuntimePlatform platform = Application.platform;
-
-		if (platform == RuntimePlatform.WindowsPlayer ||
-			platform == RuntimePlatform.WindowsWebPlayer ||
-			platform == RuntimePlatform.WindowsEditor)
+		if (panel.halfPixelOffset)
 		{
 			range.x -= 0.5f;
 			range.y += 0.5f;
@@ -772,7 +767,7 @@ public class UIDrawCall : MonoBehaviour
 				dc.clipSoftness = panel.clipSoftness;
 				
 				Transform dt = dc.cachedTransform;
-				dt.position = pt.position;
+				dt.position = panel.drawCallPosition;
 				dt.rotation = pt.rotation;
 				dt.localScale = pt.lossyScale;
 			}
