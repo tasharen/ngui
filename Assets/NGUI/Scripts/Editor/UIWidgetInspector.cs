@@ -515,8 +515,6 @@ public class UIWidgetInspector : UIRectEditor
 									if (mActionUnderMouse == Action.Move)
 									{
 										NGUISnap.Recalculate(mWidget);
-										mLocalPos = t.localPosition;
-										mWorldPos = t.position;
 										NGUIEditorTools.RegisterUndo("Move widget", t);
 									}
 									else if (mActionUnderMouse == Action.Rotate)
@@ -527,8 +525,6 @@ public class UIWidgetInspector : UIRectEditor
 									}
 									else if (mActionUnderMouse == Action.Scale)
 									{
-										mLocalPos = t.localPosition;
-										mWorldPos = t.position;
 										mStartWidth = mWidget.width;
 										mStartHeight = mWidget.height;
 										mDragPivot = pivotUnderMouse;

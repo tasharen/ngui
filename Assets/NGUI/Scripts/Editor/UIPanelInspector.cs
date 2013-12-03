@@ -230,8 +230,6 @@ public class UIPanelInspector : UIRectEditor
 									if (mActionUnderMouse == UIWidgetInspector.Action.Move)
 									{
 										NGUISnap.Recalculate(mPanel);
-										mWorldPos = t.position;
-										mLocalPos = t.localPosition;
 										NGUIEditorTools.RegisterUndo("Move panel", t);
 									}
 									else if (mActionUnderMouse == UIWidgetInspector.Action.Rotate)
@@ -242,8 +240,6 @@ public class UIPanelInspector : UIRectEditor
 									}
 									else if (mActionUnderMouse == UIWidgetInspector.Action.Scale)
 									{
-										mWorldPos = t.position;
-										mLocalPos = t.localPosition;
 										mStartCR = mPanel.baseClipRegion;
 										mDragPivot = pivotUnderMouse;
 										NGUIEditorTools.RegisterUndo("Scale panel", t);
