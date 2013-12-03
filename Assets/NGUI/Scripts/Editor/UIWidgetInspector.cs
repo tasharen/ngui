@@ -53,7 +53,8 @@ public class UIWidgetInspector : UIRectEditor
 	};
 
 	static int s_Hash = "WidgetHash".GetHashCode();
-	Vector3 mStartPos = Vector3.zero;
+	Vector3 mLocalPos = Vector3.zero;
+	Vector3 mWorldPos = Vector3.zero;
 	int mStartWidth = 0;
 	int mStartHeight = 0;
 	Vector3 mStartDrag = Vector3.zero;
@@ -337,13 +338,13 @@ public class UIWidgetInspector : UIRectEditor
 				Vector2 screenPoint = HandleUtility.WorldToGUIPoint(theirPos);
 				Rect rect = new Rect(screenPoint.x - 7f, screenPoint.y - 7f, 14f, 14f);
 				if (mYellowDot == null) mYellowDot = "sv_label_4";
-				
-				Handles.BeginGUI();
-				
-				mYellowDot.Draw(rect, GUIContent.none, id);
 
 				Vector3 v0 = HandleUtility.WorldToGUIPoint(myPos);
 				Vector3 v1 = HandleUtility.WorldToGUIPoint(theirPos);
+
+				Handles.BeginGUI();
+				
+				mYellowDot.Draw(rect, GUIContent.none, id);
 
 				Vector3 diff = v1 - v0;
 				bool isHorizontal = Mathf.Abs(diff.x) > Mathf.Abs(diff.y);
@@ -476,7 +477,8 @@ public class UIWidgetInspector : UIRectEditor
 				}
 				else if (e.button == 0 && actionUnderMouse != Action.None && Raycast(handles, out mStartDrag))
 				{
-					mStartPos = t.position;
+					mWorldPos = t.position;
+					mLocalPos = t.localPosition;
 					mStartRot = t.localRotation.eulerAngles;
 					mStartDir = mStartDrag - t.position;
 					mStartWidth = mWidget.width;
@@ -513,7 +515,8 @@ public class UIWidgetInspector : UIRectEditor
 									if (mActionUnderMouse == Action.Move)
 									{
 										NGUISnap.Recalculate(mWidget);
-										mStartPos = t.position;
+										mLocalPos = t.localPosition;
+										mWorldPos = t.position;
 										NGUIEditorTools.RegisterUndo("Move widget", t);
 									}
 									else if (mActionUnderMouse == Action.Rotate)
@@ -524,7 +527,8 @@ public class UIWidgetInspector : UIRectEditor
 									}
 									else if (mActionUnderMouse == Action.Scale)
 									{
-										mStartPos = t.localPosition;
+										mLocalPos = t.localPosition;
+										mWorldPos = t.position;
 										mStartWidth = mWidget.width;
 										mStartHeight = mWidget.height;
 										mDragPivot = pivotUnderMouse;
@@ -539,7 +543,7 @@ public class UIWidgetInspector : UIRectEditor
 							{
 								if (mAction == Action.Move)
 								{
-									t.position = mStartPos + (pos - mStartDrag);
+									t.position = mWorldPos + (pos - mStartDrag);
 									t.localPosition = NGUISnap.Snap(t.localPosition, mWidget.localCorners,
 										e.modifiers != EventModifiers.Control);
 								}
@@ -564,7 +568,7 @@ public class UIWidgetInspector : UIRectEditor
 									Vector3 delta = pos - mStartDrag;
 
 									// Adjust the widget's position and scale based on the delta, restricted by the pivot
-									AdjustWidget(mWidget, mStartPos, mStartWidth, mStartHeight, delta, mDragPivot);
+									AdjustWidget(mWidget, mLocalPos, mStartWidth, mStartHeight, delta, mDragPivot);
 								}
 							}
 						}
@@ -664,7 +668,7 @@ public class UIWidgetInspector : UIRectEditor
 						{
 							if (mAction == Action.Move)
 							{
-								t.position = mStartPos;
+								t.position = mWorldPos;
 							}
 							else if (mAction == Action.Rotate)
 							{
@@ -672,7 +676,7 @@ public class UIWidgetInspector : UIRectEditor
 							}
 							else if (mAction == Action.Scale)
 							{
-								t.position = mStartPos;
+								t.position = mWorldPos;
 								mWidget.width = mStartWidth;
 								mWidget.height = mStartHeight;
 							}

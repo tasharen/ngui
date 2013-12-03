@@ -21,7 +21,8 @@ public class UIPanelInspector : UIRectEditor
 	UIWidgetInspector.Action mActionUnderMouse = UIWidgetInspector.Action.None;
 	bool mAllowSelection = true;
 
-	Vector3 mStartPos = Vector3.zero;
+	Vector3 mLocalPos = Vector3.zero;
+	Vector3 mWorldPos = Vector3.zero;
 	Vector4 mStartCR = Vector4.zero;
 	Vector3 mStartDrag = Vector3.zero;
 	Vector2 mStartMouse = Vector2.zero;
@@ -139,7 +140,8 @@ public class UIPanelInspector : UIRectEditor
 				else if (e.button == 0 && actionUnderMouse != UIWidgetInspector.Action.None &&
 					UIWidgetInspector.Raycast(handles, out mStartDrag))
 				{
-					mStartPos = t.position;
+					mWorldPos = t.position;
+					mLocalPos = t.localPosition;
 					mStartRot = t.localRotation.eulerAngles;
 					mStartDir = mStartDrag - t.position;
 					mStartCR = mPanel.baseClipRegion;
@@ -228,7 +230,8 @@ public class UIPanelInspector : UIRectEditor
 									if (mActionUnderMouse == UIWidgetInspector.Action.Move)
 									{
 										NGUISnap.Recalculate(mPanel);
-										mStartPos = t.position;
+										mWorldPos = t.position;
+										mLocalPos = t.localPosition;
 										NGUIEditorTools.RegisterUndo("Move panel", t);
 									}
 									else if (mActionUnderMouse == UIWidgetInspector.Action.Rotate)
@@ -239,7 +242,8 @@ public class UIPanelInspector : UIRectEditor
 									}
 									else if (mActionUnderMouse == UIWidgetInspector.Action.Scale)
 									{
-										mStartPos = t.localPosition;
+										mWorldPos = t.position;
+										mLocalPos = t.localPosition;
 										mStartCR = mPanel.baseClipRegion;
 										mDragPivot = pivotUnderMouse;
 										NGUIEditorTools.RegisterUndo("Scale panel", t);
@@ -253,7 +257,7 @@ public class UIPanelInspector : UIRectEditor
 							{
 								if (mAction == UIWidgetInspector.Action.Move)
 								{
-									t.position = mStartPos + (pos - mStartDrag);
+									t.position = mWorldPos + (pos - mStartDrag);
 									t.localPosition = NGUISnap.Snap(t.localPosition, mPanel.localCorners,
 										e.modifiers != EventModifiers.Control);
 								}
@@ -278,7 +282,7 @@ public class UIPanelInspector : UIRectEditor
 									Vector3 delta = pos - mStartDrag;
 
 									// Adjust the widget's position and scale based on the delta, restricted by the pivot
-									AdjustClipping(mPanel, mStartPos, mStartCR, delta, mDragPivot);
+									AdjustClipping(mPanel, mLocalPos, mStartCR, delta, mDragPivot);
 								}
 							}
 						}
@@ -325,7 +329,7 @@ public class UIPanelInspector : UIRectEditor
 						{
 							if (mAction == UIWidgetInspector.Action.Move)
 							{
-								t.position = mStartPos;
+								t.position = mWorldPos;
 							}
 							else if (mAction == UIWidgetInspector.Action.Rotate)
 							{
@@ -333,7 +337,7 @@ public class UIPanelInspector : UIRectEditor
 							}
 							else if (mAction == UIWidgetInspector.Action.Scale)
 							{
-								t.position = mStartPos;
+								t.position = mWorldPos;
 								mPanel.baseClipRegion = mStartCR;
 							}
 						}

@@ -18,8 +18,8 @@ public class UIRectEditor : Editor
 	enum AnchorType
 	{
 		None,
-		Padding,
-		Relative,
+		Padded,
+		Unified,
 		Advanced,
 	}
 
@@ -52,9 +52,9 @@ public class UIRectEditor : Editor
 						rect.bottomAnchor.relative == 0f &&
 						rect.topAnchor.relative == 1f)
 				{
-					mType = AnchorType.Padding;
+					mType = AnchorType.Padded;
 				}
-				else mType = AnchorType.Relative;
+				else mType = AnchorType.Unified;
 			}
 			else mType = AnchorType.Advanced;
 		}
@@ -102,12 +102,12 @@ public class UIRectEditor : Editor
 			{
 				DrawAdvancedAnchors();
 			}
-			else if (type == AnchorType.Relative)
+			else if (type == AnchorType.Unified)
 			{
 				if (mType != type) UpdateAnchors(true);
 				DrawRelativeAnchors();
 			}
-			else if (type == AnchorType.Padding)
+			else if (type == AnchorType.Padded)
 			{
 				if (mType != type) UpdateAnchors(false);
 				DrawPaddedAnchors();
