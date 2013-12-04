@@ -81,6 +81,7 @@ public class UIDrawCall : MonoBehaviour
 	bool mReset = true;
 	int mRenderQueue = 0;
 	Clipping mLastClip = Clipping.None;
+	int mTriangles = 0;
 
 	/// <summary>
 	/// Whether the draw call needs to be re-created.
@@ -233,7 +234,7 @@ public class UIDrawCall : MonoBehaviour
 	/// The number of triangles in this draw call.
 	/// </summary>
 
-	public int triangles { get { return (mMesh != null) ? mMesh.vertexCount >> 1 : 0; } }
+	public int triangles { get { return (mMesh != null) ? mTriangles : 0; } }
 
 	/// <summary>
 	/// Whether the draw call is currently using a clipped shader.
@@ -399,6 +400,8 @@ public class UIDrawCall : MonoBehaviour
 				    (norms != null && norms.buffer.Length != verts.buffer.Length) ||
 				    (tans != null && tans.buffer.Length != verts.buffer.Length);
 
+				mTriangles = (verts.size >> 1);
+
 				if (trim || verts.buffer.Length > 65000)
 				{
 					if (trim || mMesh.vertexCount != verts.size)
@@ -440,6 +443,7 @@ public class UIDrawCall : MonoBehaviour
 			}
 			else
 			{
+				mTriangles = 0;
 				if (mFilter.mesh != null) mFilter.mesh.Clear();
 				Debug.LogError("Too many vertices on one panel: " + verts.size);
 			}
