@@ -84,12 +84,6 @@ public class UIWidgetContainerEditor : Editor
 			for (int i = 0; i < 4; ++i)
 				corners[i] = localToWorld.MultiplyPoint3x4(corners[i]);
 
-			Color handlesColor = UIWidgetInspector.handlesColor;
-			NGUIHandles.DrawShadowedLine(handles, handles[0], handles[1], handlesColor);
-			NGUIHandles.DrawShadowedLine(handles, handles[1], handles[2], handlesColor);
-			NGUIHandles.DrawShadowedLine(handles, handles[2], handles[3], handlesColor);
-			NGUIHandles.DrawShadowedLine(handles, handles[0], handles[3], handlesColor);
-
 			handles = new Vector3[8];
 
 			handles[0] = corners[0];
@@ -101,6 +95,12 @@ public class UIWidgetContainerEditor : Editor
 			handles[5] = (corners[1] + corners[2]) * 0.5f;
 			handles[6] = (corners[2] + corners[3]) * 0.5f;
 			handles[7] = (corners[0] + corners[3]) * 0.5f;
+
+			Color handlesColor = UIWidgetInspector.handlesColor;
+			NGUIHandles.DrawShadowedLine(handles, handles[0], handles[1], handlesColor);
+			NGUIHandles.DrawShadowedLine(handles, handles[1], handles[2], handlesColor);
+			NGUIHandles.DrawShadowedLine(handles, handles[2], handles[3], handlesColor);
+			NGUIHandles.DrawShadowedLine(handles, handles[0], handles[3], handlesColor);
 
 			isWithinRect = mIsDragging || (e.modifiers == 0 &&
 				NGUIEditorTools.SceneViewDistanceToRectangle(corners, e.mousePosition) == 0f);
