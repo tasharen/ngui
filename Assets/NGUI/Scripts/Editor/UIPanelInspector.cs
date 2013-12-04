@@ -79,10 +79,10 @@ public class UIPanelInspector : UIRectEditor
 
 		if (mPanel.isAnchored && mAction == UIWidgetInspector.Action.None)
 		{
-			UIWidgetInspector.DrawAnchor(mPanel.leftAnchor, mPanel.cachedTransform, handles, Vector3.left, 0, 1, id);
-			UIWidgetInspector.DrawAnchor(mPanel.rightAnchor, mPanel.cachedTransform, handles, Vector3.right, 2, 3, id);
-			UIWidgetInspector.DrawAnchor(mPanel.bottomAnchor, mPanel.cachedTransform, handles, Vector3.down, 0, 3, id);
-			UIWidgetInspector.DrawAnchor(mPanel.topAnchor, mPanel.cachedTransform, handles, Vector3.up, 1, 2, id);
+			UIWidgetInspector.DrawAnchor(mPanel.leftAnchor, mPanel.cachedTransform, handles, 0, id);
+			UIWidgetInspector.DrawAnchor(mPanel.topAnchor, mPanel.cachedTransform, handles, 1, id);
+			UIWidgetInspector.DrawAnchor(mPanel.rightAnchor, mPanel.cachedTransform, handles, 2, id);
+			UIWidgetInspector.DrawAnchor(mPanel.bottomAnchor, mPanel.cachedTransform, handles, 3, id);
 		}
 
 		if (type == EventType.Repaint)
@@ -127,14 +127,20 @@ public class UIPanelInspector : UIRectEditor
 
 						if (Mathf.Abs(v1.y - v0.y) > 80f)
 						{
-							DrawKnob(handles[4], id, resizable[4]);
-							DrawKnob(handles[6], id, resizable[6]);
+							if (mPanel.leftAnchor.target == null || mPanel.leftAnchor.absolute != 0)
+								DrawKnob(handles[4], id, resizable[4]);
+
+							if (mPanel.rightAnchor.target == null || mPanel.rightAnchor.absolute != 0)
+								DrawKnob(handles[6], id, resizable[6]);
 						}
 
 						if (Mathf.Abs(v3.x - v0.x) > 80f)
 						{
-							DrawKnob(handles[5], id, resizable[5]);
-							DrawKnob(handles[7], id, resizable[7]);
+							if (mPanel.topAnchor.target == null || mPanel.topAnchor.absolute != 0)
+								DrawKnob(handles[5], id, resizable[5]);
+
+							if (mPanel.bottomAnchor.target == null || mPanel.bottomAnchor.absolute != 0)
+								DrawKnob(handles[7], id, resizable[7]);
 						}
 					}
 					Handles.EndGUI();

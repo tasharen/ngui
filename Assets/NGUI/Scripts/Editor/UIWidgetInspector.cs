@@ -303,70 +303,119 @@ public class UIWidgetInspector : UIRectEditor
 	/// Draw the specified anchor point.
 	/// </summary>
 
-	static public void DrawAnchor (UIRect.AnchorPoint anchor, Transform myTrans, Vector3[] myCorners, Vector3 dir, int i0, int i1, int id)
+	static public void DrawAnchor (UIRect.AnchorPoint anchor, Transform myTrans, Vector3[] myCorners, int side, int id)
 	{
-		if (anchor.target)
+		if (!anchor.target) return;
+
+		// Only draw anchor points if both widgets are aligned
+		if (Quaternion.Angle(anchor.target.rotation, myTrans.rotation) > 1f) return;
+
+		int i0, i1;
+
+		if (side == 0)
 		{
-			if (Quaternion.Angle(anchor.target.rotation, myTrans.rotation) > 1f) return;
+			// Left
+			i0 = 0;
+			i1 = 1;
+		}
+		else if (side == 1)
+		{
+			// Top
+			i0 = 1;
+			i1 = 2;
+		}
+		else if (side == 2)
+		{
+			// Right
+			i0 = 3;
+			i1 = 2;
+		}
+		else
+		{
+			// Bottom
+			i0 = 0;
+			i1 = 3;
+		}
 
-			Vector3 myPos = (myCorners[i0] + myCorners[i1]) * 0.5f;
-			Vector3 theirPos;
+		Vector3 myPos = (myCorners[i0] + myCorners[i1]) * 0.5f;
+		Vector3 theirPos;
 
-			if (anchor.rect == null)
+		if (anchor.rect == null)
+		{
+			theirPos = anchor.target.position;
+		}
+		else
+		{
+			Vector3[] otherCorners = anchor.rect.worldCorners;
+			Vector3 v0, v1;
+
+			if (side == 0 || side == 2)
 			{
-				theirPos = anchor.target.position;
+				// Left or right
+				v0 = Vector3.Lerp(otherCorners[0], otherCorners[3], anchor.relative);
+				v1 = Vector3.Lerp(otherCorners[1], otherCorners[2], anchor.relative);
 			}
 			else
 			{
-				Vector3[] otherCorners = anchor.rect.worldCorners;
-				Vector3 back = myTrans.InverseTransformDirection(Vector3.back);
-				Plane plane = new Plane(otherCorners[i0], otherCorners[i1], otherCorners[i0] + back);
-
-				dir = myTrans.TransformDirection(dir);
-				Ray ray = new Ray(myPos, dir);
-
-				float dist;
-				if (!plane.Raycast(ray, out dist)) return;
-				theirPos = ray.GetPoint(dist);
+				// Top or bottom
+				v0 = Vector3.Lerp(otherCorners[0], otherCorners[1], anchor.relative);
+				v1 = Vector3.Lerp(otherCorners[3], otherCorners[2], anchor.relative);
 			}
 
-			NGUIHandles.DrawShadowedLine(myCorners, myPos, theirPos, Color.yellow);
+			theirPos = HandleUtility.ProjectPointLine(myPos, v0, v1);
+		}
 
-			if (Event.current.GetTypeForControl(id) == EventType.Repaint)
-			{
-				Vector2 screenPoint = HandleUtility.WorldToGUIPoint(theirPos);
-				Rect rect = new Rect(screenPoint.x - 7f, screenPoint.y - 7f, 14f, 14f);
-				if (mYellowDot == null) mYellowDot = "sv_label_4";
+		NGUIHandles.DrawShadowedLine(myCorners, myPos, theirPos, Color.yellow);
 
-				Vector3 v0 = HandleUtility.WorldToGUIPoint(myPos);
-				Vector3 v1 = HandleUtility.WorldToGUIPoint(theirPos);
+		if (Event.current.GetTypeForControl(id) == EventType.Repaint)
+		{
+			Vector2 screenPoint = HandleUtility.WorldToGUIPoint(theirPos);
+			Rect rect = new Rect(screenPoint.x - 7f, screenPoint.y - 7f, 14f, 14f);
+			if (mYellowDot == null) mYellowDot = "sv_label_4";
 
-				Handles.BeginGUI();
+			Vector3 v0 = HandleUtility.WorldToGUIPoint(myPos);
+			Vector3 v1 = HandleUtility.WorldToGUIPoint(theirPos);
+
+			Handles.BeginGUI();
 				
-				mYellowDot.Draw(rect, GUIContent.none, id);
+			mYellowDot.Draw(rect, GUIContent.none, id);
 
-				Vector3 diff = v1 - v0;
-				bool isHorizontal = Mathf.Abs(diff.x) > Mathf.Abs(diff.y);
-				float mag = diff.magnitude;
+			Vector3 diff = v1 - v0;
+			bool isHorizontal = Mathf.Abs(diff.x) > Mathf.Abs(diff.y);
+			float mag = diff.magnitude;
 
-				if ((isHorizontal && mag > 60f) || (!isHorizontal && mag > 30f))
+			if ((isHorizontal && mag > 60f) || (!isHorizontal && mag > 30f))
+			{
+				Vector3 pos = (myPos + theirPos) * 0.5f;
+				string text = anchor.absolute.ToString();
+
+				GUI.color = Color.yellow;
+
+				if (side == 0)
 				{
-					int val = anchor.absolute;
-
-					if (anchor.rect != null)
-					{
-						Vector3[] corners = anchor.rect.localCorners;
-						float f = isHorizontal ? corners[3].x - corners[0].x : corners[1].y - corners[0].y;
-						f *= (i0 == 0) ? anchor.relative : anchor.relative - 1f;
-						val += Mathf.RoundToInt(f);
-					}
-
-					GUI.color = Color.yellow;
-					NGUIHandles.DrawCenteredLabel((myPos + theirPos) * 0.5f, val.ToString());
-					GUI.color = Color.white;
+					if (theirPos.x < myPos.x)
+						NGUIHandles.DrawCenteredLabel(pos, text);
 				}
-				Handles.EndGUI();
+				else if (side == 1)
+				{
+					if (theirPos.y > myPos.y)
+						NGUIHandles.DrawCenteredLabel(pos, text);
+				}
+				else if (side == 2)
+				{
+					if (theirPos.x > myPos.x)
+						NGUIHandles.DrawCenteredLabel(pos, text);
+				}
+				else if (side == 3)
+				{
+					if (theirPos.y < myPos.y)
+						NGUIHandles.DrawCenteredLabel(pos, text);
+				}
+
+				// TODO: Don't draw relative values
+				GUI.color = Color.white;
 			}
+			Handles.EndGUI();
 		}
 	}
 
@@ -398,10 +447,10 @@ public class UIWidgetInspector : UIRectEditor
 		// If the widget is anchored, draw the anchors
 		if (mWidget.isAnchored && mAction == UIWidgetInspector.Action.None)
 		{
-			DrawAnchor(mWidget.leftAnchor, mWidget.cachedTransform, handles, Vector3.left, 0, 1, id);
-			DrawAnchor(mWidget.rightAnchor, mWidget.cachedTransform, handles, Vector3.right, 2, 3, id);
-			DrawAnchor(mWidget.bottomAnchor, mWidget.cachedTransform, handles, Vector3.down, 0, 3, id);
-			DrawAnchor(mWidget.topAnchor, mWidget.cachedTransform, handles, Vector3.up, 1, 2, id);
+			DrawAnchor(mWidget.leftAnchor, mWidget.cachedTransform, handles, 0, id);
+			DrawAnchor(mWidget.topAnchor, mWidget.cachedTransform, handles, 1, id);
+			DrawAnchor(mWidget.rightAnchor, mWidget.cachedTransform, handles, 2, id);
+			DrawAnchor(mWidget.bottomAnchor, mWidget.cachedTransform, handles, 3, id);
 		}
 
 		if (type == EventType.Repaint)
@@ -446,14 +495,20 @@ public class UIWidgetInspector : UIRectEditor
 
 						if (Mathf.Abs(v1.y - v0.y) > 80f)
 						{
-							DrawKnob(handles[4], mWidget.pivot == pivotPoints[4], resizable[4], id);
-							DrawKnob(handles[6], mWidget.pivot == pivotPoints[6], resizable[6], id);
+							if (mWidget.leftAnchor.target == null || mWidget.leftAnchor.absolute != 0)
+								DrawKnob(handles[4], mWidget.pivot == pivotPoints[4], resizable[4], id);
+
+							if (mWidget.rightAnchor.target == null || mWidget.rightAnchor.absolute != 0)
+								DrawKnob(handles[6], mWidget.pivot == pivotPoints[6], resizable[6], id);
 						}
 
 						if (Mathf.Abs(v3.x - v0.x) > 80f)
 						{
-							DrawKnob(handles[5], mWidget.pivot == pivotPoints[5], resizable[5], id);
-							DrawKnob(handles[7], mWidget.pivot == pivotPoints[7], resizable[7], id);
+							if (mWidget.topAnchor.target == null || mWidget.topAnchor.absolute != 0)
+								DrawKnob(handles[5], mWidget.pivot == pivotPoints[5], resizable[5], id);
+
+							if (mWidget.bottomAnchor.target == null || mWidget.bottomAnchor.absolute != 0)
+								DrawKnob(handles[7], mWidget.pivot == pivotPoints[7], resizable[7], id);
 						}
 					}
 					Handles.EndGUI();
