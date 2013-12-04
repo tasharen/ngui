@@ -124,32 +124,35 @@ public class UIWidgetContainerEditor : Editor
 		{
 			case EventType.Repaint:
 			{
-				Vector3 v0 = HandleUtility.WorldToGUIPoint(handles[0]);
-				Vector3 v2 = HandleUtility.WorldToGUIPoint(handles[2]);
-
-				if ((v2 - v0).magnitude > 60f)
+				if (handles != null)
 				{
-					Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
-					Vector3 v3 = HandleUtility.WorldToGUIPoint(handles[3]);
+					Vector3 v0 = HandleUtility.WorldToGUIPoint(handles[0]);
+					Vector3 v2 = HandleUtility.WorldToGUIPoint(handles[2]);
 
-					Handles.BeginGUI();
+					if ((v2 - v0).magnitude > 60f)
 					{
-						for (int i = 0; i < 4; ++i)
-							UIWidgetInspector.DrawKnob(handles[i], false, false, id);
+						Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
+						Vector3 v3 = HandleUtility.WorldToGUIPoint(handles[3]);
 
-						if (Mathf.Abs(v1.y - v0.y) > 80f)
+						Handles.BeginGUI();
 						{
-							UIWidgetInspector.DrawKnob(handles[4], false, false, id);
-							UIWidgetInspector.DrawKnob(handles[6], false, false, id);
-						}
+							for (int i = 0; i < 4; ++i)
+								UIWidgetInspector.DrawKnob(handles[i], false, false, id);
 
-						if (Mathf.Abs(v3.x - v0.x) > 80f)
-						{
-							UIWidgetInspector.DrawKnob(handles[5], false, false, id);
-							UIWidgetInspector.DrawKnob(handles[7], false, false, id);
+							if (Mathf.Abs(v1.y - v0.y) > 80f)
+							{
+								UIWidgetInspector.DrawKnob(handles[4], false, false, id);
+								UIWidgetInspector.DrawKnob(handles[6], false, false, id);
+							}
+
+							if (Mathf.Abs(v3.x - v0.x) > 80f)
+							{
+								UIWidgetInspector.DrawKnob(handles[5], false, false, id);
+								UIWidgetInspector.DrawKnob(handles[7], false, false, id);
+							}
 						}
+						Handles.EndGUI();
 					}
-					Handles.EndGUI();
 				}
 			}
 			break;
