@@ -1318,4 +1318,33 @@ public class UILabel : UIWidget
 				UIPopupList.current.value;
 		}
 	}
+
+	/// <summary>
+	/// Convenience function -- wrap the current text given the label's settings and unlimited height.
+	/// </summary>
+
+	public bool Wrap (string text, out string final) { return Wrap(text, out final, 1000000); }
+
+	/// <summary>
+	/// Convenience function -- wrap the current text given the label's settings and the given height.
+	/// </summary>
+
+	public bool Wrap (string text, out string final, int height)
+	{
+		UpdateNGUIText();
+		NGUIText.current.lineHeight = height;
+
+		if (mFont != null)
+		{
+			return mFont.WrapText(text, out final);
+		}
+#if DYNAMIC_FONT
+		else if (mTrueTypeFont != null)
+		{
+			return NGUIText.WrapText(mTrueTypeFont, text, out final);
+		}
+#endif
+		final = null;
+		return false;
+	}
 }
