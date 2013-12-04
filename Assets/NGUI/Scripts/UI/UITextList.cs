@@ -3,10 +3,6 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
-#if !UNITY_3_5 && !UNITY_FLASH
-#define DYNAMIC_FONT
-#endif
-
 using UnityEngine;
 using System.Collections.Generic;
 using System.Text;
@@ -25,11 +21,23 @@ public class UITextList : MonoBehaviour
 		Chat,
 	}
 
-	public Style style = Style.Text;
+	/// <summary>
+	/// Label the contents of which will be modified with the chat entries.
+	/// </summary>
+
 	public UILabel textLabel;
-	public float maxHeight = 0f;
-	public int maxEntries = 50;
-	public bool supportScrollWheel = true;
+
+	/// <summary>
+	/// Text style. Text entries go top to bottom. Chat entries go bottom to top.
+	/// </summary>
+
+	public Style style = Style.Text;
+
+	/// <summary>
+	/// Maximum number of chat log entries to keep before discarding them.
+	/// </summary>
+
+	public int history = 50;
 
 	// Text list is made up of paragraphs
 	protected class Paragraph
@@ -39,10 +47,17 @@ public class UITextList : MonoBehaviour
 	}
 
 	protected char[] mSeparator = new char[] { '\n' };
-	protected List<Paragraph> mParagraphs = new List<Paragraph>();
+	protected BetterList<Paragraph> mParagraphs = new BetterList<Paragraph>();
 	protected float mScroll = 0f;
-	protected bool mSelected = false;
 	protected int mTotalLines = 0;
+	protected int mLastWidth = 0;
+	protected int mLastHeight = 0;
+
+	/// <summary>
+	/// Whether the text list is usable.
+	/// </summary>
+
+	bool isValid { get { return textLabel != null && textLabel.ambigiousFont != null; } }
 
 	/// <summary>
 	/// Clear the text.
@@ -52,6 +67,61 @@ public class UITextList : MonoBehaviour
 	{
 		mParagraphs.Clear();
 		UpdateVisibleText();
+	}
+
+	/// <summary>
+	/// Automatically find the values if none were specified.
+	/// </summary>
+
+	void Awake ()
+	{
+		if (textLabel == null)
+			textLabel = GetComponentInChildren<UILabel>();
+	}
+
+	/// <summary>
+	/// Keep an eye on the size of the label, and if it changes -- rebuild everything.
+	/// </summary>
+
+	void Update ()
+	{
+		if (isValid)
+		{
+			if (textLabel.width != mLastWidth || textLabel.height != mLastHeight)
+			{
+				mLastWidth = textLabel.width;
+				mLastHeight = textLabel.height;
+				Rebuild();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Allow scrolling of the text list.
+	/// </summary>
+
+	void OnScroll (float val)
+	{
+		if (textLabel != null && textLabel.ambigiousFont != null)
+		{
+			val *= (style == Style.Chat) ? 10f : -10f;
+			mScroll = Mathf.Max(0f, mScroll + val);
+			UpdateVisibleText();
+		}
+	}
+
+	/// <summary>
+	/// Allow dragging of the text list.
+	/// </summary>
+
+	void OnDrag (Vector2 delta)
+	{
+		if (textLabel != null && textLabel.ambigiousFont != null)
+		{
+			float val = delta.y * ((style == Style.Chat) ? -1f / textLabel.fontSize : 1f / textLabel.fontSize);
+			mScroll = Mathf.Max(0f, mScroll + val);
+			UpdateVisibleText();
+		}
 	}
 
 	/// <summary>
@@ -68,7 +138,7 @@ public class UITextList : MonoBehaviour
 	{
 		Paragraph ce = null;
 
-		if (mParagraphs.Count < maxEntries)
+		if (mParagraphs.size < history)
 		{
 			ce = new Paragraph();
 		}
@@ -80,49 +150,49 @@ public class UITextList : MonoBehaviour
 
 		ce.text = text;
 		mParagraphs.Add(ce);
-		
-		if (textLabel != null && textLabel.ambigiousFont != null)
+		Rebuild();
+	}
+
+	/// <summary>
+	/// Rebuild the visible text.
+	/// </summary>
+
+	protected void Rebuild ()
+	{
+		if (isValid)
 		{
-			// Rebuild the line
-			textLabel.overflowMethod = UILabel.Overflow.ResizeHeight;
-			string before = textLabel.text;
-			textLabel.text = text;
-			string line = textLabel.processedText;
-			textLabel.text = before;
-			ce.lines = line.Split(mSeparator);
+			UIFont bitmapFont = textLabel.bitmapFont;
+
+			// TODO: Change this to alignment when that's implemented
+			textLabel.pivot = (style == Style.Chat) ? UIWidget.Pivot.BottomLeft : UIWidget.Pivot.TopLeft;
+			textLabel.overflowMethod = UILabel.Overflow.ClampContent;
+			textLabel.UpdateNGUIText();
+			NGUIText.current.lineHeight = 1000000;
+
+			mTotalLines = 0;
+
+			for (int i = 0; i < mParagraphs.size; ++i)
+			{
+				string final;
+				Paragraph p = mParagraphs.buffer[i];
+
+				if (bitmapFont != null)
+				{
+					if (!bitmapFont.WrapText(p.text, out final)) continue;
+					p.lines = final.Split('\n');
+					mTotalLines += p.lines.Length;
+				}
+			}
 
 			// Recalculate the total number of lines
 			mTotalLines = 0;
-			for (int i = 0, imax = mParagraphs.Count; i < imax; ++i)
-				mTotalLines += mParagraphs[i].lines.Length;
-		}
+			for (int i = 0, imax = mParagraphs.size; i < imax; ++i)
+				mTotalLines += mParagraphs.buffer[i].lines.Length;
 
-		// Update the visible text
-		if (updateVisible) UpdateVisibleText();
-	}
-
-	/// <summary>
-	/// Automatically find the values if none were specified.
-	/// </summary>
-
-	void Awake ()
-	{
-		if (textLabel == null) textLabel = GetComponentInChildren<UILabel>();
-
-		Collider col = collider;
-
-		if (col != null)
-		{
-			// Automatically set the width and height based on the collider
-			if (maxHeight <= 0f) maxHeight = col.bounds.size.y / transform.lossyScale.y;
+			// Update the visible text
+			UpdateVisibleText();
 		}
 	}
-
-	/// <summary>
-	/// Remember whether the widget is selected.
-	/// </summary>
-
-	void OnSelect (bool selected) { mSelected = selected; }
 
 	/// <summary>
 	/// Refill the text label based on what's currently visible.
@@ -130,79 +200,49 @@ public class UITextList : MonoBehaviour
 
 	protected void UpdateVisibleText ()
 	{
-		if (textLabel != null)
+		if (textLabel != null && textLabel.ambigiousFont != null)
 		{
-			if (textLabel.ambigiousFont != null)
+			int lines = 0;
+			int maxLines = Mathf.FloorToInt((float)textLabel.height / textLabel.fontSize);
+			int offset = Mathf.RoundToInt(mScroll);
+
+			// Don't let scrolling to exceed the visible number of lines
+			if (maxLines + offset > mTotalLines)
 			{
-				int lines = 0;
+				offset = Mathf.Max(0, mTotalLines - maxLines);
+				mScroll = offset;
+			}
 
-				int maxLines = 100000;
+			if (style == Style.Chat)
+			{
+				offset = Mathf.Max(0, mTotalLines - maxLines - offset);
+			}
 
-				if (maxHeight > 0)
+			StringBuilder final = new StringBuilder();
+
+			for (int i = 0, imax = mParagraphs.size; i < imax; ++i)
+			{
+				Paragraph p = mParagraphs.buffer[i];
+
+				for (int b = 0, bmax = p.lines.Length; b < bmax; ++b)
 				{
-					if (textLabel.bitmapFont != null)
+					string s = p.lines[b];
+
+					if (offset > 0)
 					{
-						maxLines = Mathf.FloorToInt(maxHeight / (textLabel.fontSize * textLabel.bitmapFont.pixelSize));
+						--offset;
 					}
 					else
 					{
-						maxLines = Mathf.FloorToInt(maxHeight / textLabel.fontSize);
+						if (final.Length > 0) final.Append("\n");
+						final.Append(s);
+						++lines;
+						if (lines >= maxLines) break;
 					}
 				}
-				int offset = Mathf.RoundToInt(mScroll);
-
-				// Don't let scrolling to exceed the visible number of lines
-				if (maxLines + offset > mTotalLines)
-				{
-					offset = Mathf.Max(0, mTotalLines - maxLines);
-					mScroll = offset;
-				}
-
-				if (style == Style.Chat)
-				{
-					offset = Mathf.Max(0, mTotalLines - maxLines - offset);
-				}
-
-				StringBuilder final = new StringBuilder();
-
-				for (int i = 0, imax = mParagraphs.Count; i < imax; ++i)
-				{
-					Paragraph p = mParagraphs[i];
-
-					for (int b = 0, bmax = p.lines.Length; b < bmax; ++b)
-					{
-						string s = p.lines[b];
-
-						if (offset > 0)
-						{
-							--offset;
-						}
-						else
-						{
-							if (final.Length > 0) final.Append("\n");
-							final.Append(s);
-							++lines;
-							if (lines >= maxLines) break;
-						}
-					}
-					if (lines >= maxLines) break;
-				}
-				textLabel.text = final.ToString();
+				if (lines >= maxLines) break;
 			}
-		}
-	}
-
-	/// <summary>
-	/// Allow scrolling of the text list.
-	/// </summary>
-
-	void OnScroll (float val)
-	{
-		if (mSelected && supportScrollWheel)
-		{
-			val *= (style == Style.Chat) ? 10f : -10f;
-			mScroll = Mathf.Max(0f, mScroll + val);
-			UpdateVisibleText();
+			textLabel.text = final.ToString();
 		}
 	}
 }
