@@ -37,8 +37,8 @@ public class UIDrawCall : MonoBehaviour
 	public enum Clipping : int
 	{
 		None = 0,
-		AlphaClip = 2,	// Adjust the alpha, compatible with all devices
-		SoftClip = 3,	// Alpha-based clipping with a softened edge
+		AlphaClip = 2,				// Adjust the alpha, compatible with all devices
+		SoftClip = 3,				// Alpha-based clipping with a softened edge
 		ConstrainButDontClip = 4,	// No actual clipping, but does have an area
 	}
 
@@ -79,9 +79,10 @@ public class UIDrawCall : MonoBehaviour
 	bool mRebuildMat = true;
 	bool mDirty = false;
 	bool mReset = true;
-	int mRenderQueue = 0;
+	int mRenderQueue = 3000;
 	Clipping mLastClip = Clipping.None;
 	int mTriangles = 0;
+	int mIndex = 0;
 
 	/// <summary>
 	/// Whether the draw call needs to be re-created.
@@ -107,7 +108,7 @@ public class UIDrawCall : MonoBehaviour
 
 				if (mDynamicMat != null)
 				{
-					mDynamicMat.renderQueue = ((mMaterial != null) ? mMaterial.renderQueue : 3000) + value;
+					mDynamicMat.renderQueue = value;
 #if UNITY_EDITOR
 					if (mRenderer != null) mRenderer.enabled = isActive;
 #endif
@@ -124,13 +125,12 @@ public class UIDrawCall : MonoBehaviour
 	{
 		get
 		{
-			if (mDynamicMat != null) return mDynamicMat.renderQueue;
-			return ((mMaterial != null) ? mMaterial.renderQueue : 3000) + mRenderQueue;
+			return (mDynamicMat != null) ? mDynamicMat.renderQueue : mRenderQueue;
 		}
 	}
 
 #if UNITY_EDITOR
-	public string keyName { get { return "Draw Call " + (1 + mRenderQueue); } }
+	public string keyName { get { return "Draw Call " + mIndex; } }
 
 	public bool showDetails { get { return UnityEditor.EditorPrefs.GetBool(keyName, true); } }
 
@@ -328,8 +328,7 @@ public class UIDrawCall : MonoBehaviour
 		// Create a new material
 		CreateMaterial();
 
-		// Material's render queue generally begins at 3000
-		mDynamicMat.renderQueue = ((mMaterial != null) ? mMaterial.renderQueue : 3000) + mRenderQueue;
+		mDynamicMat.renderQueue = mRenderQueue;
 		mLastClip = mClipping;
 
 		// Assign the main texture
@@ -535,6 +534,7 @@ public class UIDrawCall : MonoBehaviour
 	{
 		mRebuildMat = true;
 		mActiveList.Add(this);
+		mIndex = mActiveList.size;
 	}
 
 	/// <summary>
@@ -607,7 +607,32 @@ public class UIDrawCall : MonoBehaviour
 		dc.baseMaterial = mat;
 		dc.mainTexture = tex;
 		dc.shader = shader;
-		dc.renderQueue = mActiveList.size - 1;
+
+		int highestRQ = 0;
+
+		for (int i = 0; i < mActiveList.size - 1; ++i)
+		{
+			UIDrawCall adc = mActiveList.buffer[i];
+			if (highestRQ < adc.mRenderQueue)
+				highestRQ = adc.mRenderQueue;
+		}
+
+		if (pan.renderQueue == UIPanel.RenderQueue.Automatic)
+		{
+			if (highestRQ == 0)
+			{
+				dc.renderQueue = (mat != null) ? mat.renderQueue : 3000;
+			}
+			else dc.renderQueue = highestRQ + 1;
+		}
+		else if (pan.renderQueue == UIPanel.RenderQueue.StartAt)
+		{
+			dc.renderQueue = Mathf.Max(highestRQ + 1, pan.startingRenderQueue);
+		}
+		else
+		{
+			dc.renderQueue = pan.startingRenderQueue;
+		}
 		dc.manager = pan;
 		return dc;
 	}

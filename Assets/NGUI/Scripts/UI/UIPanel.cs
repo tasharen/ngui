@@ -31,6 +31,13 @@ public class UIPanel : UIRect
 		Geometry,
 	}
 
+	public enum RenderQueue
+	{
+		Automatic,
+		StartAt,
+		Explicit,
+	}
+
 	public delegate void OnChangeDelegate ();
 
 	/// <summary>
@@ -70,6 +77,20 @@ public class UIPanel : UIRect
 	/// </summary>
 
 	public bool alwaysOnScreen = false;
+
+	/// <summary>
+	/// By default all panels manage render queues of their draw calls themselves by incrementing them
+	/// so that the geometry is drawn in the proper order. You can alter this behaviour.
+	/// </summary>
+
+	public RenderQueue renderQueue = RenderQueue.Automatic;
+
+	/// <summary>
+	/// Render queue used by the panel. The default value of '3000' is the equivalent of "Transparent".
+	/// This property is only used if 'renderQueue' is set to something other than "Automatic".
+	/// </summary>
+
+	public int startingRenderQueue = 3000;
 
 	/// <summary>
 	/// Matrix that will transform the specified world coordinates to relative-to-panel coordinates.

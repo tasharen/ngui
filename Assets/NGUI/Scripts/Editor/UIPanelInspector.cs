@@ -32,7 +32,11 @@ public class UIPanelInspector : UIRectEditor
 	GUIStyle mStyle0 = null;
 	GUIStyle mStyle1 = null;
 
-	protected override void OnEnable () { base.OnEnable(); mPanel = target as UIPanel; }
+	protected override void OnEnable ()
+	{
+		base.OnEnable();
+		mPanel = target as UIPanel;
+	}
 
 	/// <summary>
 	/// Helper function that draws draggable knobs.
@@ -493,6 +497,33 @@ public class UIPanelInspector : UIRectEditor
 		if (NGUIEditorTools.DrawHeader("Advanced Options"))
 		{
 			NGUIEditorTools.BeginContents();
+
+			GUILayout.BeginHorizontal();
+			UIPanel.RenderQueue rq = (UIPanel.RenderQueue)EditorGUILayout.EnumPopup("Render Q", mPanel.renderQueue);
+
+			if (mPanel.renderQueue != rq)
+			{
+				mPanel.renderQueue = rq;
+				UIPanel.RebuildAllDrawCalls(true);
+				EditorUtility.SetDirty(mPanel);
+				if (UIDrawCallViewer.instance != null)
+					UIDrawCallViewer.instance.Repaint();
+			}
+
+			if (rq != UIPanel.RenderQueue.Automatic)
+			{
+				int sq = EditorGUILayout.IntField(mPanel.startingRenderQueue, GUILayout.Width(40f));
+
+				if (mPanel.startingRenderQueue != sq)
+				{
+					mPanel.startingRenderQueue = sq;
+					UIPanel.RebuildAllDrawCalls(true);
+					EditorUtility.SetDirty(mPanel);
+					if (UIDrawCallViewer.instance != null)
+						UIDrawCallViewer.instance.Repaint();
+				}
+			}
+			GUILayout.EndHorizontal();
 
 			GUILayout.BeginHorizontal();
 			bool norms = EditorGUILayout.Toggle("Normals", mPanel.generateNormals, GUILayout.Width(100f));
