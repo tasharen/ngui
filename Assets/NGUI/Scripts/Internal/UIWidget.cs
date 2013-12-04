@@ -262,7 +262,7 @@ public class UIWidget : UIRect
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Depth controls the rendering order -- lowest to highest.
 	/// </summary>

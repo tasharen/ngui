@@ -186,7 +186,6 @@ static public class NGUITools
 		return list;
 	}
 
-
 	/// <summary>
 	/// Find all active objects of specified type.
 	/// </summary>
@@ -470,6 +469,7 @@ static public class NGUITools
 
 	/// <summary>
 	/// Adjust the widgets' depth by the specified value.
+	/// Returns '0' if nothing was adjusted, '1' if panels were adjusted, and '2' if widgets were adjusted.
 	/// </summary>
 
 	static public int AdjustDepth (GameObject go, int adjustment)
@@ -548,18 +548,19 @@ static public class NGUITools
 
 	static public void NormalizeWidgetDepths ()
 	{
-		List<UIWidget> widgets = FindAll<UIWidget>();
+		UIWidget[] list = FindActive<UIWidget>();
+		int size = list.Length;
 
-		if (widgets.Count > 0)
+		if (size > 0)
 		{
-			widgets.Sort(UIWidget.CompareFunc);
+			Array.Sort(list, UIWidget.CompareFunc);
 
 			int start = 0;
-			int current = widgets[0].depth;
+			int current = list[0].depth;
 
-			for (int i = 0; i < widgets.Count; ++i)
+			for (int i = 0; i < size; ++i)
 			{
-				UIWidget w = widgets[i];
+				UIWidget w = list[i];
 
 				if (w.depth == current)
 				{
@@ -569,9 +570,6 @@ static public class NGUITools
 				{
 					current = w.depth;
 					w.depth = ++start;
-#if UNITY_EDITOR
-					UnityEditor.EditorUtility.SetDirty(w);
-#endif
 				}
 			}
 		}
@@ -583,18 +581,19 @@ static public class NGUITools
 
 	static public void NormalizePanelDepths ()
 	{
-		List<UIPanel> panels = FindAll<UIPanel>();
+		UIPanel[] list = FindActive<UIPanel>();
+		int size = list.Length;
 
-		if (panels.Count > 0)
+		if (size > 0)
 		{
-			panels.Sort(UIPanel.CompareFunc);
+			Array.Sort(list, UIPanel.CompareFunc);
 
 			int start = 0;
-			int current = panels[0].depth;
+			int current = list[0].depth;
 
-			for (int i = 0; i < panels.Count; ++i)
+			for (int i = 0; i < size; ++i)
 			{
-				UIPanel p = panels[i];
+				UIPanel p = list[i];
 
 				if (p.depth == current)
 				{
@@ -604,9 +603,6 @@ static public class NGUITools
 				{
 					current = p.depth;
 					p.depth = ++start;
-#if UNITY_EDITOR
-					UnityEditor.EditorUtility.SetDirty(p);
-#endif
 				}
 			}
 		}
