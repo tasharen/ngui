@@ -183,7 +183,7 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Create/", false, 6)]
 	static void AddBreaker123 () {}
 
-	[MenuItem("NGUI/Create/Anchor", false, 6)]
+	[MenuItem("NGUI/Create/Anchor (Legacy)", false, 6)]
 	static void AddAnchor2 () { Add<UIAnchor>(); }
 
 	[MenuItem("NGUI/Create/Panel", false, 6)]
@@ -268,20 +268,20 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Attach/Anchor", false, 7)]
-	static public void Add1 () { AddIfMissing<UIAnchor>(); }
+	//[MenuItem("NGUI/Attach/Anchor", false, 7)]
+	//static public void Add1 () { AddIfMissing<UIAnchor>(); }
 
-	[MenuItem("NGUI/Attach/Anchor", true)]
-	static public bool Add1a () { return !Exists<UIAnchor>(); }
+	//[MenuItem("NGUI/Attach/Anchor", true)]
+	//static public bool Add1a () { return !Exists<UIAnchor>(); }
 
-	[MenuItem("NGUI/Attach/Stretch", false, 7)]
-	static public void Add2 () { AddIfMissing<UIStretch>(); }
+	//[MenuItem("NGUI/Attach/Stretch (Legacy)", false, 7)]
+	//static public void Add2 () { AddIfMissing<UIStretch>(); }
 
-	[MenuItem("NGUI/Attach/Stretch", true)]
-	static public bool Add2a () { return !Exists<UIStretch>(); }
+	//[MenuItem("NGUI/Attach/Stretch (Legacy)", true)]
+	//static public bool Add2a () { return !Exists<UIStretch>(); }
 
-	[MenuItem("NGUI/Attach/", false, 7)]
-	static public void Add3s () {}
+	//[MenuItem("NGUI/Attach/", false, 7)]
+	//static public void Add3s () {}
 
 	[MenuItem("NGUI/Attach/Button Script", false, 7)]
 	static public void Add3 () { AddIfMissing<UIButton>(); }

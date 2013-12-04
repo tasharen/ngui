@@ -187,11 +187,11 @@ public static class NGUIContextMenu
 
 			NGUIContextMenu.AddSeparator("Create/");
 
-			AddItem("Create/Anchor", false, AddChild<UIAnchor>, target);
 			AddItem("Create/Panel", false, AddPanel, target);
 			AddItem("Create/Scroll View", false, AddScrollView, target);
 			AddItem("Create/Grid", false, AddChild<UIGrid>, target);
 			AddItem("Create/Table", false, AddChild<UITable>, target);
+			AddItem("Create/Anchor (Legacy)", false, AddChild<UIAnchor>, target);
 
 			if (target.GetComponent<UIPanel>() != null)
 			{

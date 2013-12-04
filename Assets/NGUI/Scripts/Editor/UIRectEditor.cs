@@ -104,7 +104,8 @@ public class UIRectEditor : Editor
 			}
 			else if (type == AnchorType.Unified)
 			{
-				if (mAnchorType != type) UpdateAnchors(true);
+				if (mAnchorType == AnchorType.None ||
+					mAnchorType == AnchorType.Padded) UpdateAnchors(true);
 				DrawRelativeAnchors();
 			}
 			else if (type == AnchorType.Padded)
