@@ -850,13 +850,20 @@ static public class NGUITools
 
 	static public void SetActive (GameObject go, bool state)
 	{
-		if (state)
+		if (go)
 		{
-			Activate(go.transform);
-		}
-		else
-		{
-			Deactivate(go.transform);
+			if (state)
+			{
+				Activate(go.transform);
+#if UNITY_EDITOR
+				if (Application.isPlaying)
+#endif
+					go.BroadcastMessage("CreatePanel", SendMessageOptions.DontRequireReceiver);
+			}
+			else
+			{
+				Deactivate(go.transform);
+			}
 		}
 	}
 
