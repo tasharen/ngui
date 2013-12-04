@@ -819,10 +819,39 @@ public class UIAtlasMaker : EditorWindow
 		GUILayout.Label("Remove empty space");
 		GUILayout.EndHorizontal();
 
-		GUILayout.BeginHorizontal();
-		NGUISettings.atlasPMA = EditorGUILayout.Toggle("PMA Shader", NGUISettings.atlasPMA, GUILayout.Width(100f));
-		GUILayout.Label("Pre-multiply color by alpha");
-		GUILayout.EndHorizontal();
+		bool fixedShader = false;
+
+		if (go != null && NGUISettings.atlas != null)
+		{
+			Material mat = NGUISettings.atlas.spriteMaterial;
+
+			if (mat != null)
+			{
+				Shader shader = mat.shader;
+
+				if (shader != null)
+				{
+					if (shader.name == "Unlit/Transparent Colored")
+					{
+						NGUISettings.atlasPMA = false;
+						fixedShader = true;
+					}
+					else if (shader.name == "Unlit/Premultiplied Colored")
+					{
+						NGUISettings.atlasPMA = true;
+						fixedShader = true;
+					}
+				}
+			}
+		}
+
+		if (!fixedShader)
+		{
+			GUILayout.BeginHorizontal();
+			NGUISettings.atlasPMA = EditorGUILayout.Toggle("PMA Shader", NGUISettings.atlasPMA, GUILayout.Width(100f));
+			GUILayout.Label("Pre-multiply color by alpha");
+			GUILayout.EndHorizontal();
+		}
 
 		GUILayout.BeginHorizontal();
 		NGUISettings.unityPacking = EditorGUILayout.Toggle("Unity Packer", NGUISettings.unityPacking, GUILayout.Width(100f));
