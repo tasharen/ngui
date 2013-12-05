@@ -260,7 +260,7 @@ public class UIPanel : UIRect
 			{
 				Vector2 size = GetWindowSize();
 				float mod = (1f / size.y) / mCam.orthographicSize;
-				return new Vector3(mod, -mod);
+				return new Vector3(-mod, mod);
 			}
 			return Vector3.zero;
 		}
