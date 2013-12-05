@@ -284,7 +284,7 @@ public class UIRectEditor : Editor
 			serializedObject.FindProperty("bottomAnchor.target").objectReferenceValue = after;
 			serializedObject.FindProperty("topAnchor.target").objectReferenceValue = after;
 
-			if (sp.objectReferenceValue != null || sp.hasMultipleDifferentValues)
+			if (after != null || sp.hasMultipleDifferentValues)
 			{
 				if (before == null && after != null) UpdateAnchors(false, true);
 
