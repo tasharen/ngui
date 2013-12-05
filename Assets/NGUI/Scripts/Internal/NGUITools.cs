@@ -81,7 +81,7 @@ static public class NGUITools
 
 		if (clip != null && volume > 0.01f)
 		{
-			if (mListener == null || !NGUITools.IsActive(mListener))
+			if (mListener == null || !NGUITools.GetActive(mListener))
 			{
 				mListener = GameObject.FindObjectOfType(typeof(AudioListener)) as AudioListener;
 
@@ -897,7 +897,21 @@ static public class NGUITools
 	/// Helper function that returns whether the specified MonoBehaviour is active.
 	/// </summary>
 
+	[System.Obsolete("Use NGUITools.GetActive instead")]
 	static public bool IsActive (Behaviour mb)
+	{
+#if UNITY_3_5
+		return mb != null && mb.enabled && mb.gameObject.active;
+#else
+		return mb != null && mb.enabled && mb.gameObject.activeInHierarchy;
+#endif
+	}
+
+	/// <summary>
+	/// Helper function that returns whether the specified MonoBehaviour is active.
+	/// </summary>
+
+	static public bool GetActive (Behaviour mb)
 	{
 #if UNITY_3_5
 		return mb != null && mb.enabled && mb.gameObject.active;
@@ -910,7 +924,7 @@ static public class NGUITools
 	/// Unity4 has changed GameObject.active to GameObject.activeself.
 	/// </summary>
 
-	static public bool GetActive(GameObject go)
+	static public bool GetActive (GameObject go)
 	{
 #if UNITY_3_5
 		return go && go.active;
@@ -923,7 +937,7 @@ static public class NGUITools
 	/// Unity4 has changed GameObject.active to GameObject.SetActive.
 	/// </summary>
 
-	static public void SetActiveSelf(GameObject go, bool state)
+	static public void SetActiveSelf (GameObject go, bool state)
 	{
 #if UNITY_3_5
 		go.active = state;

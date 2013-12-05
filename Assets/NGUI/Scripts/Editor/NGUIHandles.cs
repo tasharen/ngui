@@ -165,7 +165,11 @@ public static class NGUIHandles
 			GUI.Box(new Rect(screenPos.x - tw * 0.5f, screenPos.y - 10f, tw, 20f), "", "WinBtnInactiveMac");
 
 			GUI.color = c;
-			GUI.Label(new Rect(screenPos.x - 30f, screenPos.y - 10f, 60f, 20f), text, "RL FooterButton");
+#if UNITY_3_5
+			GUI.Label(new Rect(screenPos.x - 30f, screenPos.y - 14f, 60f, 20f), text, "PreLabel");
+#else
+			GUI.Label(new Rect(screenPos.x - 30f, screenPos.y - 10f, 60f, 20f), text, "PreLabel");
+#endif
 		}
 	}
 }

@@ -101,7 +101,7 @@ public class UIDragScrollView : MonoBehaviour
 
 	void OnDrag (Vector2 delta)
 	{
-		if (scrollView && enabled && NGUITools.GetActive(gameObject))
+		if (scrollView && NGUITools.GetActive(this))
 			scrollView.Drag();
 	}
 
@@ -111,7 +111,7 @@ public class UIDragScrollView : MonoBehaviour
 
 	void OnScroll (float delta)
 	{
-		if (scrollView && enabled && NGUITools.GetActive(gameObject))
+		if (scrollView && NGUITools.GetActive(this))
 			scrollView.Scroll(delta);
 	}
 }

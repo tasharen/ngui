@@ -528,7 +528,7 @@ public class UIWidget : UIRect
 
 	public void ResizeCollider ()
 	{
-		if (NGUITools.IsActive(this))
+		if (NGUITools.GetActive(this))
 		{
 			BoxCollider box = collider as BoxCollider;
 			if (box != null) NGUITools.UpdateWidgetCollider(box, true);
@@ -960,7 +960,7 @@ public class UIWidget : UIRect
 
 	void OnDrawGizmos ()
 	{
-		if (isVisible && NGUITools.IsActive(this))
+		if (isVisible && NGUITools.GetActive(this))
 		{
 			if (UnityEditor.Selection.activeGameObject == gameObject && showHandles) return;
 

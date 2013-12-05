@@ -93,8 +93,8 @@ public class UICamera : MonoBehaviour
 	/// <summary>
 	/// List of all active cameras in the scene.
 	/// </summary>
- 
-	static public List<UICamera> list = new List<UICamera>();
+
+	static public BetterList<UICamera> list = new BetterList<UICamera>();
 
 	public delegate void OnScreenResize ();
 
@@ -396,8 +396,11 @@ public class UICamera : MonoBehaviour
 				mCurrentSelection = null;
 				mNextSelection = value;
 
-				UICamera cam = FindCameraForLayer(mNextSelection.layer);
-				if (cam != null) cam.StartCoroutine(cam.ChangeSelection());
+				if (UICamera.list.size > 0)
+				{
+					UICamera cam = (mNextSelection != null) ? FindCameraForLayer(mNextSelection.layer) : UICamera.list[0];
+					if (cam != null) cam.StartCoroutine(cam.ChangeSelection());
+				}
 			}
 		}
 	}
@@ -501,10 +504,10 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			for (int i = 0; i < list.Count; ++i)
+			for (int i = 0; i < list.size; ++i)
 			{
 				// Invalid or inactive entry -- keep going
-				UICamera cam = list[i];
+				UICamera cam = list.buffer[i];
 				if (cam == null || !cam.enabled || !NGUITools.GetActive(cam.gameObject)) continue;
 				return cam;
 			}
@@ -539,9 +542,9 @@ public class UICamera : MonoBehaviour
 
 	static public bool Raycast (Vector3 inPos, out RaycastHit hit)
 	{
-		for (int i = 0; i < list.Count; ++i)
+		for (int i = 0; i < list.size; ++i)
 		{
-			UICamera cam = list[i];
+			UICamera cam = list.buffer[i];
 			
 			// Skip inactive scripts
 			if (!cam.enabled || !NGUITools.GetActive(cam.gameObject)) continue;
@@ -656,9 +659,9 @@ public class UICamera : MonoBehaviour
 	{
 		int layerMask = 1 << layer;
 
-		for (int i = 0; i < list.Count; ++i)
+		for (int i = 0; i < list.size; ++i)
 		{
-			UICamera cam = list[i];
+			UICamera cam = list.buffer[i];
 			Camera uc = cam.cachedCamera;
 			if ((uc != null) && (uc.cullingMask & layerMask) != 0) return cam;
 		}
