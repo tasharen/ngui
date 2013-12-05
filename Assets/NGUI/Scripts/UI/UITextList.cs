@@ -268,13 +268,19 @@ public class UITextList : MonoBehaviour
 
 				if (bitmapFont != null)
 				{
-					if (!bitmapFont.WrapText(p.text, out final)) continue;
+					if (bitmapFont.WrapText(p.text, out final))
+					{
+						p.lines = final.Split('\n');
+						mTotalLines += p.lines.Length;
+					}
 				}
 #if DYNAMIC_FONT
-				else if (!NGUIText.WrapText(textLabel.trueTypeFont, p.text, out final)) continue;
+				else if (NGUIText.WrapText(textLabel.trueTypeFont, p.text, out final))
+				{
+					p.lines = final.Split('\n');
+					mTotalLines += p.lines.Length;
+				}
 #endif
-				p.lines = final.Split('\n');
-				mTotalLines += p.lines.Length;
 			}
 
 			// Recalculate the total number of lines

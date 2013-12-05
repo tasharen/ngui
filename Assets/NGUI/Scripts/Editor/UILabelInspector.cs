@@ -77,7 +77,7 @@ public class UILabelInspector : UIWidgetInspector
 #if DYNAMIC_FONT
 		mFontType = (FontType)EditorGUILayout.EnumPopup(mFontType, GUILayout.Width(62f));
 #else
-		mType = FontType.Bitmap;
+		mFontType = FontType.Bitmap;
 #endif
 		bool isValid = false;
 		SerializedProperty fnt = null;
