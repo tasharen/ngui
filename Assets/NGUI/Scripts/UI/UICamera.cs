@@ -396,11 +396,8 @@ public class UICamera : MonoBehaviour
 				mCurrentSelection = null;
 				mNextSelection = value;
 
-				if (mNextSelection != null)
-				{
-					UICamera uicam = FindCameraForLayer(mNextSelection.layer);
-					if (uicam != null) uicam.StartCoroutine(uicam.ChangeSelection(mNextSelection));
-				}
+				UICamera cam = FindCameraForLayer(mNextSelection.layer);
+				if (cam != null) cam.StartCoroutine(cam.ChangeSelection());
 			}
 		}
 	}
@@ -411,10 +408,10 @@ public class UICamera : MonoBehaviour
 	/// button selects the next button, and then it also processes its 'tab' in turn, selecting the next one.
 	/// </summary>
 
-	System.Collections.IEnumerator ChangeSelection (GameObject go)
+	System.Collections.IEnumerator ChangeSelection ()
 	{
 		yield return new WaitForEndOfFrame();
-		mCurrentSelection = go;
+		mCurrentSelection = mNextSelection;
 		mNextSelection = null;
 
 		if (mCurrentSelection != null)
