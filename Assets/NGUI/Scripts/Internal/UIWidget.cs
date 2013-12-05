@@ -493,7 +493,7 @@ public class UIWidget : UIRect
 			v0 = relativeTo.InverseTransformPoint(v0);
 			v1 = relativeTo.InverseTransformPoint(v1);
 		}
-		return Mathf.Floor(Mathf.Lerp(v0.x, v1.x, relative) + 0.5f) + absolute;
+		return Mathf.Floor((v0.x * (1f - relative) + v1.x * relative) + 0.5f) + absolute;
 	}
 
 	/// <summary>
@@ -519,7 +519,7 @@ public class UIWidget : UIRect
 			v0 = relativeTo.InverseTransformPoint(v0);
 			v1 = relativeTo.InverseTransformPoint(v1);
 		}
-		return Mathf.Floor(Mathf.Lerp(v0.y, v1.y, relative) + 0.5f) + absolute;
+		return Mathf.Floor((v0.y * (1f - relative) + v1.y * relative) + 0.5f) + absolute;
 	}
 
 	/// <summary>
@@ -866,6 +866,7 @@ public class UIWidget : UIRect
 			mWidth = w;
 			mHeight = h;
 			mChanged = true;
+			if (autoResizeBoxCollider) ResizeCollider();
 		}
 	}
 

@@ -117,8 +117,9 @@ GameObject:
   - 4: {fileID: 78}
   - 114: {fileID: 128}
   - 54: {fileID: 130}
+  - 114: {fileID: 39}
   m_Layer: 8
-  m_Name: UIPanel - 2D UI
+  m_Name: UI Root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -135,7 +136,7 @@ GameObject:
   - 20: {fileID: 91}
   - 81: {fileID: 92}
   - 114: {fileID: 120}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 2D Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -173,6 +174,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &39
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 35}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c5ecb5660b11414fb042fb826e03b73, type: 1}
+  m_Name: 
+  scalingStyle: 0
+  manualHeight: 720
+  minimumHeight: 320
+  maximumHeight: 1536
 --- !u!1 &41
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,7 +198,7 @@ GameObject:
   - 4: {fileID: 84}
   - 114: {fileID: 124}
   m_Layer: 8
-  m_Name: UITiledSprite
+  m_Name: Stripes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -199,23 +214,7 @@ GameObject:
   - 4: {fileID: 86}
   - 114: {fileID: 125}
   m_Layer: 8
-  m_Name: UILabel - Body
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!1 &44
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 3
-  m_Component:
-  - 4: {fileID: 87}
-  - 114: {fileID: 93}
-  m_Layer: 0
-  m_Name: UIRoot
+  m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -263,8 +262,9 @@ Transform:
   m_GameObject: {fileID: 35}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: .00277777785, y: .00277777785, z: .00277777785}
   m_Children:
+  - {fileID: 79}
   - {fileID: 805691306}
   - {fileID: 427803583}
   - {fileID: 447242991}
@@ -275,7 +275,7 @@ Transform:
   - {fileID: 1589195468}
   - {fileID: 42646019}
   - {fileID: 80}
-  m_Father: {fileID: 87}
+  m_Father: {fileID: 0}
 --- !u!4 &79
 Transform:
   m_ObjectHideFlags: 0
@@ -286,7 +286,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 87}
+  m_Father: {fileID: 78}
 --- !u!4 &80
 Transform:
   m_ObjectHideFlags: 0
@@ -330,23 +330,10 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 43}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -342, y: 260, z: 0}
+  m_LocalPosition: {x: -370, y: 270, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 81}
---- !u!4 &87
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 44}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: .00277777785, y: .00277777785, z: .00277777785}
-  m_Children:
-  - {fileID: 79}
-  - {fileID: 78}
-  m_Father: {fileID: 0}
 --- !u!20 &91
 Camera:
   m_ObjectHideFlags: 0
@@ -382,20 +369,6 @@ AudioListener:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 36}
   m_Enabled: 1
---- !u!114 &93
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 44}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c5ecb5660b11414fb042fb826e03b73, type: 1}
-  m_Name: 
-  scalingStyle: 0
-  manualHeight: 800
-  minimumHeight: 320
-  maximumHeight: 1080
 --- !u!114 &95
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -655,23 +628,23 @@ MonoBehaviour:
   leftAnchor:
     target: {fileID: 81}
     relative: 0
-    absolute: 58
+    absolute: 30
   rightAnchor:
     target: {fileID: 81}
     relative: 1
-    absolute: -42
+    absolute: -30
   bottomAnchor:
     target: {fileID: 81}
     relative: 0
-    absolute: 56
+    absolute: 30
   topAnchor:
     target: {fileID: 81}
     relative: 1
-    absolute: -40
+    absolute: -30
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 0
-  mWidth: 700
-  mHeight: 504
+  mWidth: 740
+  mHeight: 540
   mDepth: -1
   autoResizeBoxCollider: 0
   keepCrispWhenShrunk: 1
@@ -706,7 +679,9 @@ MonoBehaviour:
 
 
     If you want to specify four independent anchors instead of just one, then [6699FF]Advanced[-]
-    mode is the way to go. With Advanced mode you are able to anchor each side independently.'
+    mode is the way to go. With Advanced mode you are able to anchor each side independently.
+    If you wanted a widget to stretch only horizontally, for example, you could specify
+    only Left and Right anchors, leaving Top and Bottom as nothing.'
   mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
