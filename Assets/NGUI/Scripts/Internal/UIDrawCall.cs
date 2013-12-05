@@ -774,9 +774,7 @@ public class UIDrawCall : MonoBehaviour
 		if (panel.clipping != UIDrawCall.Clipping.None)
 		{
 			Vector4 cr = panel.finalClipRegion;
-			range = isUI ?
-				new Vector4(Mathf.Round(cr.x), Mathf.Round(cr.y), cr.z * 0.5f, cr.w * 0.5f) :
-				new Vector4(cr.x, cr.y, cr.z * 0.5f, cr.w * 0.5f);
+			range = new Vector4(cr.x, cr.y, cr.z * 0.5f, cr.w * 0.5f);
 		}
 
 		if (range.z == 0f) range.z = Screen.width * 0.5f;
@@ -794,29 +792,41 @@ public class UIDrawCall : MonoBehaviour
 			
 			if (dc.manager == panel)
 			{
-				dc.clipping = panel.clipping;
-				dc.clipRange = range;
-				dc.clipSoftness = panel.clipSoftness;
-				
 				Transform dt = dc.cachedTransform;
 
 				if (isUI)
 				{
+					Vector4 myRange = range;
 					Transform parent = panel.cachedTransform.parent;
 					Vector3 pos = panel.cachedTransform.localPosition;
 
 					if (parent != null)
 					{
-						pos.x = Mathf.Round(pos.x);
-						pos.y = Mathf.Round(pos.y);
+						// We want the position to always be on even pixels so that the
+						// scroll view's contents always appear pixel-perfect.
+						float x = Mathf.Round(pos.x);
+						float y = Mathf.Round(pos.y);
+						myRange.x += pos.x - x;
+						myRange.y += pos.y - y;
+						pos.x = x;
+						pos.y = y;
 						pos = parent.TransformPoint(pos);
 					}
+					
 					dt.position = pos + panel.drawCallOffset;
+					dc.clipRange = myRange;
 				}
-				else dt.position = panel.cachedTransform.position;
-				
+				else
+				{
+					dt.position = panel.cachedTransform.position;
+					dc.clipRange = range;
+				}
+
 				dt.rotation = pt.rotation;
 				dt.localScale = pt.lossyScale;
+
+				dc.clipping = panel.clipping;
+				dc.clipSoftness = panel.clipSoftness;
 			}
 		}
 	}

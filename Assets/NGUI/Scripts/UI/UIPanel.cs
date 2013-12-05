@@ -764,6 +764,7 @@ public class UIPanel : UIRect
 		Transform parent = trans.parent;
 
 		Vector2 size = GetViewSize();
+		Vector2 offset = trans.localPosition;
 
 		float lt, bt, rt, tt;
 		bool anchored = false;
@@ -775,6 +776,7 @@ public class UIPanel : UIRect
 			lt = (leftAnchor.rect != null) ?
 				leftAnchor.rect.GetHorizontal(parent, leftAnchor.relative, leftAnchor.absolute) :
 				trans.InverseTransformPoint(leftAnchor.target.position).x;
+			lt -= offset.x + mClipOffset.x;
 		}
 		else lt = mClipRange.x - 0.5f * size.x;
 
@@ -785,6 +787,7 @@ public class UIPanel : UIRect
 			bt = (bottomAnchor.rect != null) ?
 				bottomAnchor.rect.GetVertical(parent, bottomAnchor.relative, bottomAnchor.absolute) :
 				trans.InverseTransformPoint(bottomAnchor.target.position).y;
+			bt -= offset.y + mClipOffset.y;
 		}
 		else bt = mClipRange.y - 0.5f * size.y;
 
@@ -795,6 +798,7 @@ public class UIPanel : UIRect
 			rt = (rightAnchor.rect != null) ?
 				rightAnchor.rect.GetHorizontal(parent, rightAnchor.relative, rightAnchor.absolute) :
 				trans.InverseTransformPoint(rightAnchor.target.position).x;
+			rt -= offset.x + mClipOffset.x;
 		}
 		else rt = mClipRange.x + 0.5f * size.x;
 
@@ -805,6 +809,7 @@ public class UIPanel : UIRect
 			tt = (topAnchor.rect != null) ?
 				topAnchor.rect.GetVertical(parent, topAnchor.relative, topAnchor.absolute) :
 				trans.InverseTransformPoint(topAnchor.target.position).y;
+			tt -= offset.y + mClipOffset.y;
 		}
 		else tt = mClipRange.y + 0.5f * size.y;
 
