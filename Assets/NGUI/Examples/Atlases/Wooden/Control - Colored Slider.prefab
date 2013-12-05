@@ -9,7 +9,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 400000}
   - 114: {fileID: 11400000}
-  - 114: {fileID: 11400002}
   m_Layer: 8
   m_Name: Foreground
   m_TagString: Untagged
@@ -46,7 +45,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 400004}
   - 114: {fileID: 11400008}
-  - 114: {fileID: 11400012}
   m_Layer: 8
   m_Name: Thumb
   m_TagString: Untagged
@@ -88,7 +86,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100002}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 278, y: -81, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 400000}
@@ -102,7 +100,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100004}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 148, y: 0, z: 0}
+  m_LocalPosition: {x: 38, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 400002}
@@ -140,21 +138,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 1}
   m_Name: 
   leftAnchor:
-    target: {fileID: 0}
+    target: {fileID: 400002}
     relative: 0
-    absolute: 0
+    absolute: 2
   rightAnchor:
-    target: {fileID: 0}
+    target: {fileID: 400002}
     relative: 1
-    absolute: 0
+    absolute: -2
   bottomAnchor:
-    target: {fileID: 0}
+    target: {fileID: 400002}
     relative: 0
-    absolute: 0
+    absolute: 2
   topAnchor:
-    target: {fileID: 0}
+    target: {fileID: 400002}
     relative: 1
-    absolute: 0
+    absolute: -2
   mColor: {r: .791044772, g: .686910212, b: .501782119, a: 1}
   mPivot: 4
   mWidth: 296
@@ -168,24 +166,6 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
---- !u!114 &11400002
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94b5bd8d2e1bcbe4580036799fb6ca41, type: 1}
-  m_Name: 
-  uiCamera: {fileID: 0}
-  container: {fileID: 100002}
-  style: 3
-  runOnlyOnce: 1
-  relativeSize: {x: 1, y: 1}
-  initialSize: {x: 1, y: 1}
-  borderPadding: {x: 4, y: 4}
-  widgetContainer: {fileID: 0}
 --- !u!114 &11400004
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -199,7 +179,7 @@ MonoBehaviour:
   thumb: {fileID: 400004}
   mBG: {fileID: 11400006}
   mFG: {fileID: 11400000}
-  mValue: 1
+  mValue: .629000008
   mFill: 0
   numberOfSteps: 0
   onChange:
@@ -262,19 +242,19 @@ MonoBehaviour:
   leftAnchor:
     target: {fileID: 0}
     relative: 0
-    absolute: 0
+    absolute: 182
   rightAnchor:
     target: {fileID: 0}
     relative: 1
-    absolute: 0
+    absolute: -106
   bottomAnchor:
-    target: {fileID: 0}
+    target: {fileID: 400002}
     relative: 0
-    absolute: 0
+    absolute: -4
   topAnchor:
-    target: {fileID: 0}
+    target: {fileID: 400002}
     relative: 1
-    absolute: 0
+    absolute: 4
   mColor: {r: .567164183, g: .567164183, b: .567164183, a: 1}
   mPivot: 4
   mWidth: 12
@@ -304,24 +284,6 @@ MonoBehaviour:
   duration: .200000003
   disabledColor: {r: .268656731, g: .268656731, b: .268656731, a: 1}
   onClick: []
---- !u!114 &11400012
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94b5bd8d2e1bcbe4580036799fb6ca41, type: 1}
-  m_Name: 
-  uiCamera: {fileID: 0}
-  container: {fileID: 100002}
-  style: 2
-  runOnlyOnce: 1
-  relativeSize: {x: 1, y: 1}
-  initialSize: {x: 1, y: 1}
-  borderPadding: {x: 0, y: -8}
-  widgetContainer: {fileID: 0}
 --- !u!114 &11400018
 MonoBehaviour:
   m_ObjectHideFlags: 1

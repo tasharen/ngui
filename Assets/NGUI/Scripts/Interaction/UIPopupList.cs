@@ -607,11 +607,15 @@ public class UIPopupList : UIWidgetContainer
 		{
 			mLabelList.Clear();
 
+			// Automatically locate the panel responsible for this object
+			if (mPanel == null)
+			{
+				mPanel = UIPanel.Find(transform);
+				if (mPanel == null) return;
+			}
+
 			// Disable the navigation script
 			handleEvents = true;
-
-			// Automatically locate the panel responsible for this object
-			if (mPanel == null) mPanel = UIPanel.Find(transform, true);
 
 			// Calculate the dimensions of the object triggering the popup list so we can position it below it
 			Transform myTrans = transform;

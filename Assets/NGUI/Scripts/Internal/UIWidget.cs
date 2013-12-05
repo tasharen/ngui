@@ -685,7 +685,7 @@ public class UIWidget : UIRect
 	{
 		if (mStarted && mPanel == null && enabled && NGUITools.GetActive(gameObject))
 		{
-			mPanel = UIPanel.Find(cachedTransform, mStarted);
+			mPanel = UIPanel.Find(cachedTransform, mStarted, cachedGameObject.layer);
 
 			if (mPanel != null)
 			{
@@ -737,7 +737,7 @@ public class UIWidget : UIRect
 
 		if (mPanel != null)
 		{
-			UIPanel p = UIPanel.Find(cachedTransform);
+			UIPanel p = UIPanel.Find(cachedTransform, true, cachedGameObject.layer);
 
 			if (mPanel != p)
 			{

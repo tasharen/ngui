@@ -72,7 +72,7 @@ public class UIDragObject : MonoBehaviour
 
 	void FindPanel ()
 	{
-		mPanel = (target != null) ? UIPanel.Find(target.transform, false) : null;
+		mPanel = (target != null) ? UIPanel.Find(target.transform) : null;
 		if (mPanel == null) restrictWithinPanel = false;
 	}
 

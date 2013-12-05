@@ -122,6 +122,13 @@ public static class NGUIHandles
 
 	static public void DrawLine (Plane p, Vector2 v0, Vector2 v1)
 	{
+#if UNITY_3_5
+		// Unity 3.5 exhibits a strange offset...
+		v0.x += 1f;
+		v1.x += 1f;
+		v0.y -= 1f;
+		v1.y -= 1f;
+#endif
 		Vector3 w0, w1;
 		if (ScreenToWorldPoint(p, v0, out w0) && ScreenToWorldPoint(p, v1, out w1))
 			Handles.DrawLine(w0, w1);

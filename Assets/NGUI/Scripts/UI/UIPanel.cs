@@ -883,7 +883,7 @@ public class UIPanel : UIRect
 			mLayer = mGo.layer;
 			UICamera uic = UICamera.FindCameraForLayer(mLayer);
 			mCam = (uic != null) ? uic.cachedCamera : NGUITools.FindCameraForLayer(mLayer);
-			SetChildLayer(cachedTransform, mLayer);
+			NGUITools.SetChildLayer(cachedTransform, mLayer);
 			UIDrawCall.UpdateLayer(this);
 		}
 	}
@@ -1099,96 +1099,34 @@ public class UIPanel : UIRect
 	}
 
 	/// <summary>
-	/// Helper function that recursively sets all children with widgets' game objects layers to the specified value, stopping when it hits another UIPanel.
+	/// Find the UIPanel responsible for handling the specified transform.
 	/// </summary>
 
-	static void SetChildLayer (Transform t, int layer)
-	{
-		for (int i = 0; i < t.childCount; ++i)
-		{
-			Transform child = t.GetChild(i);
-
-			if (child.GetComponent<UIPanel>() == null)
-			{
-				if (child.GetComponent<UIWidget>() != null)
-				{
-					child.gameObject.layer = layer;
-				}					
-				SetChildLayer(child, layer);
-			}
-		}
-	}
+	static public UIPanel Find (Transform trans) { return Find(trans, false, -1); }
 
 	/// <summary>
 	/// Find the UIPanel responsible for handling the specified transform.
 	/// </summary>
 
-	static public UIPanel Find (Transform trans, bool createIfMissing)
+	static public UIPanel Find (Transform trans, bool createIfMissing) { return Find(trans, createIfMissing, -1); }
+
+	/// <summary>
+	/// Find the UIPanel responsible for handling the specified transform.
+	/// </summary>
+
+	static public UIPanel Find (Transform trans, bool createIfMissing, int layer)
 	{
-		Transform origin = trans;
 		UIPanel panel = null;
 
 		while (panel == null && trans != null)
 		{
 			panel = trans.GetComponent<UIPanel>();
-			if (panel != null) break;
+			if (panel != null) return panel;
 			if (trans.parent == null) break;
 			trans = trans.parent;
 		}
-		
-		if (createIfMissing && panel == null)
-		{
-			mRebuild = true;
-
-			UIRoot root = NGUITools.FindInParents<UIRoot>(origin.gameObject);
-
-			if (root == null && UIRoot.list.Count > 0)
-				root = UIRoot.list[0];
-
-			if (root == null)
-			{
-				GameObject go = NGUITools.AddChild(null, false);
-				go.name = "UI Root";
-				go.layer = origin.gameObject.layer;
-				root = go.AddComponent<UIRoot>();
-			}
-
-			panel = root.GetComponentInChildren<UIPanel>();
-
-			if (panel == null)
-			{
-				Camera cam = NGUITools.AddChild<Camera>(root.gameObject, false);
-				cam.gameObject.AddComponent<UICamera>();
-				cam.orthographic = true;
-				cam.orthographicSize = 1;
-				cam.nearClipPlane = -10;
-				cam.farClipPlane = 10;
-				cam.clearFlags = (Camera.main != null) ? CameraClearFlags.Depth : CameraClearFlags.Color;
-				cam.cullingMask = (1 << root.gameObject.layer);
-
-				if (Camera.main != null)
-					Camera.main.cullingMask = (Camera.main.cullingMask & (~cam.cullingMask));
-
-				UIAnchor anch = NGUITools.AddChild<UIAnchor>(cam.gameObject, false);
-				panel = NGUITools.AddChild<UIPanel>(anch.gameObject, false);
-#if UNITY_EDITOR
-				UnityEditor.Selection.activeGameObject = panel.gameObject;
-#endif
-			}
-
-			trans.parent = panel.transform;
-			trans.localScale = Vector3.one;
-			trans.localPosition = Vector3.zero;
-			SetChildLayer(panel.cachedTransform, panel.cachedGameObject.layer);
-		}
-		return panel;
+		return createIfMissing ? NGUITools.CreateUI(trans, false, layer) : null;
 	}
-
-	/// <summary>
-	/// Find the UIPanel responsible for handling the specified transform, creating a new one if necessary.
-	/// </summary>
-
-	static public UIPanel Find (Transform trans) { return Find(trans, true); }
 
 	/// <summary>
 	/// Fill the geometry fully, processing all widgets and re-creating all draw calls.

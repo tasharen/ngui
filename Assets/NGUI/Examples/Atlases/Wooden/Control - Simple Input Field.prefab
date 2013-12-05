@@ -11,6 +11,7 @@ GameObject:
   - 114: {fileID: 11400000}
   - 114: {fileID: 11400006}
   - 65: {fileID: 6500000}
+  - 114: {fileID: 11400004}
   m_Layer: 8
   m_Name: Control - Simple Input Field
   m_TagString: Untagged
@@ -27,7 +28,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 400002}
   - 114: {fileID: 11400002}
-  - 114: {fileID: 11400004}
   m_Layer: 8
   m_Name: Label
   m_TagString: Untagged
@@ -42,7 +42,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -507, y: -15, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 400002}
@@ -120,21 +120,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9d0b5f3bbe925a408bd595c79d0bf63, type: 1}
   m_Name: 
   leftAnchor:
-    target: {fileID: 0}
+    target: {fileID: 400000}
     relative: 0
-    absolute: 0
+    absolute: 8
   rightAnchor:
-    target: {fileID: 0}
+    target: {fileID: 400000}
     relative: 1
-    absolute: 0
+    absolute: -8
   bottomAnchor:
-    target: {fileID: 0}
+    target: {fileID: 400000}
     relative: 0
-    absolute: 0
+    absolute: 8
   topAnchor:
-    target: {fileID: 0}
+    target: {fileID: 400000}
     relative: 1
-    absolute: 0
+    absolute: -8
   mColor: {r: 1, g: 1, b: 1, a: .403921574}
   mPivot: 0
   mWidth: 304
@@ -170,19 +170,14 @@ MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100002}
+  m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94b5bd8d2e1bcbe4580036799fb6ca41, type: 1}
+  m_Script: {fileID: 11500000, guid: 049a2bcd8df653c4d9cb9d39404363a9, type: 1}
   m_Name: 
-  uiCamera: {fileID: 0}
-  container: {fileID: 100000}
-  style: 3
-  runOnlyOnce: 1
-  relativeSize: {x: 1, y: 1}
-  initialSize: {x: 1, y: 1}
-  borderPadding: {x: 16, y: 16}
-  widgetContainer: {fileID: 0}
+  keyCode: 13
+  modifier: 0
+  action: 1
 --- !u!114 &11400006
 MonoBehaviour:
   m_ObjectHideFlags: 1
