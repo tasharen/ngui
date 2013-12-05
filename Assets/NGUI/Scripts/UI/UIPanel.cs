@@ -215,10 +215,11 @@ public class UIPanel : UIRect
 
 	static public int CompareFunc (UIPanel a, UIPanel b)
 	{
-		if (a != null && b != null)
+		if (a != b && a != null && b != null)
 		{
 			if (a.mDepth < b.mDepth) return -1;
 			if (a.mDepth > b.mDepth) return 1;
+			return (a.GetInstanceID() < b.GetInstanceID()) ? -1 : 1;
 		}
 		return 0;
 	}
