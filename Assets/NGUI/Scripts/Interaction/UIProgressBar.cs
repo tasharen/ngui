@@ -104,8 +104,7 @@ public class UIProgressBar : UIWidgetContainer
 			if (mFill != value)
 			{
 				mFill = value;
-				mIsDirty = true;
-				if (!Application.isPlaying) ForceUpdate();
+				ForceUpdate();
 			}
 		}
 	}
@@ -128,7 +127,6 @@ public class UIProgressBar : UIWidgetContainer
 			if (mValue != val)
 			{
 				mValue = val;
-				mIsDirty = true;
 
 				if (EventDelegate.IsValid(onChange))
 				{
@@ -136,7 +134,7 @@ public class UIProgressBar : UIWidgetContainer
 					EventDelegate.Execute(onChange);
 					current = null;
 				}
-				if (!Application.isPlaying) ForceUpdate();
+				ForceUpdate();
 			}
 		}
 	}

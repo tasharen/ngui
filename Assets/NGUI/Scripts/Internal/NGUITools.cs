@@ -991,13 +991,24 @@ static public class NGUITools
 #if UNITY_EDITOR
 				if (Application.isPlaying)
 #endif
-					go.BroadcastMessage("CreatePanel", SendMessageOptions.DontRequireReceiver);
+					CallCreatePanel(go.transform);
 			}
-			else
-			{
-				Deactivate(go.transform);
-			}
+			else Deactivate(go.transform);
 		}
+	}
+
+	/// <summary>
+	/// Ensure that all widgets have had their panels created, forcing the update right away rather than on the following frame.
+	/// </summary>
+
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
+	static void CallCreatePanel (Transform t)
+	{
+		UIWidget w = t.GetComponent<UIWidget>();
+		if (w != null) w.CreatePanel();
+		for (int i = 0, imax = t.childCount; i < imax; ++i)
+			CallCreatePanel(t.GetChild(i));
 	}
 
 	/// <summary>
