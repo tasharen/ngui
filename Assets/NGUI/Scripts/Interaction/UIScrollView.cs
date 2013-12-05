@@ -343,12 +343,13 @@ public class UIScrollView : MonoBehaviour
 
 	public bool RestrictWithinBounds (bool instant, bool horizontal, bool vertical)
 	{
-		Vector3 constraint = mPanel.CalculateConstrainOffset(bounds.min, bounds.max);
+		Bounds b = bounds;
+		Vector3 constraint = mPanel.CalculateConstrainOffset(b.min, b.max);
 
 		if (!horizontal) constraint.x = 0f;
 		if (!vertical) constraint.y = 0f;
 
-		if (constraint.magnitude > 0.001f)
+		if (constraint.magnitude > 1f)
 		{
 			if (!instant && dragEffect == DragEffect.MomentumAndSpring)
 			{
@@ -563,8 +564,6 @@ public class UIScrollView : MonoBehaviour
 
 	public virtual void MoveRelative (Vector3 relative)
 	{
-		relative.x = Mathf.Round(relative.x);
-		relative.y = Mathf.Round(relative.y);
 		mTrans.localPosition += relative;
 		Vector2 co = mPanel.clipOffset;
 		co.x -= relative.x;
@@ -712,7 +711,7 @@ public class UIScrollView : MonoBehaviour
 				{
 					Vector3 constraint = mPanel.CalculateConstrainOffset(bounds.min, bounds.max);
 
-					if (constraint.magnitude > 0.001f)
+					if (constraint.magnitude > 1f)
 					{
 						MoveAbsolute(offset * 0.5f);
 						mMomentum *= 0.5f;

@@ -242,23 +242,26 @@ public class UIPanel : UIRect
 	public bool halfPixelOffset { get { return mHalfPixelOffset; } }
 
 	/// <summary>
-	/// Position to be used for draw calls. Takes DirectX 9's half-pixel offset into consideration.
+	/// Whether the camera is used to draw UI geometry.
 	/// </summary>
 
-	public Vector3 drawCallPosition
+	public bool usedForUI { get { return (mCam != null && mCam.isOrthoGraphic); } }
+
+	/// <summary>
+	/// Directx9 pixel offset, used for drawing.
+	/// </summary>
+
+	public Vector3 drawCallOffset
 	{
 		get
 		{
-			Vector3 pos = cachedTransform.position;
-
 			if (mHalfPixelOffset && mCam != null && mCam.isOrthoGraphic)
 			{
 				Vector2 size = GetWindowSize();
 				float mod = (1f / size.y) / mCam.orthographicSize;
-				pos.x += mod;
-				pos.y -= mod;
+				return new Vector3(mod, -mod);
 			}
-			return pos;
+			return Vector3.zero;
 		}
 	}
 

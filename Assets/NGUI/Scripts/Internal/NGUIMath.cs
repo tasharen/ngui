@@ -410,6 +410,7 @@ static public class NGUIMath
 
 				for (int j = 0; j < 4; ++j)
 				{
+					//v = root.InverseTransformPoint(corners[j]);
 					v = toLocal.MultiplyPoint3x4(corners[j]);
 					vMax = Vector3.Max(v, vMax);
 					vMin = Vector3.Min(v, vMin);

@@ -769,11 +769,14 @@ public class UIDrawCall : MonoBehaviour
 	{
 		Transform pt = panel.cachedTransform;
 		Vector4 range = Vector4.zero;
+		bool isUI = panel.usedForUI;
 
 		if (panel.clipping != UIDrawCall.Clipping.None)
 		{
 			Vector4 cr = panel.finalClipRegion;
-			range = new Vector4(cr.x, cr.y, cr.z * 0.5f, cr.w * 0.5f);
+			range = isUI ?
+				new Vector4(Mathf.Round(cr.x), Mathf.Round(cr.y), cr.z * 0.5f, cr.w * 0.5f) :
+				new Vector4(cr.x, cr.y, cr.z * 0.5f, cr.w * 0.5f);
 		}
 
 		if (range.z == 0f) range.z = Screen.width * 0.5f;
@@ -796,7 +799,22 @@ public class UIDrawCall : MonoBehaviour
 				dc.clipSoftness = panel.clipSoftness;
 				
 				Transform dt = dc.cachedTransform;
-				dt.position = panel.drawCallPosition;
+
+				if (isUI)
+				{
+					Transform parent = panel.cachedTransform.parent;
+					Vector3 pos = panel.cachedTransform.localPosition;
+
+					if (parent != null)
+					{
+						pos.x = Mathf.Round(pos.x);
+						pos.y = Mathf.Round(pos.y);
+						pos = parent.TransformPoint(pos);
+					}
+					dt.position = pos + panel.drawCallOffset;
+				}
+				else dt.position = panel.cachedTransform.position;
+				
 				dt.rotation = pt.rotation;
 				dt.localScale = pt.lossyScale;
 			}
