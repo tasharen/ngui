@@ -37,15 +37,24 @@ public class UIButton : UIButtonColor
 		{
 			if (mStarted)
 			{
-				if (mHighlighted) base.OnEnable();
+				if (UICamera.currentScheme == UICamera.ControlScheme.Controller)
+				{
+					OnHover(UICamera.selectedObject == gameObject);
+				}
+				else if (UICamera.currentScheme == UICamera.ControlScheme.Mouse)
+				{
+					OnHover(UICamera.hoveredObject == gameObject);
+				}
 				else UpdateColor(true, false);
 			}
 		}
 		else UpdateColor(false, true);
 	}
 
-	public override void OnHover (bool isOver) { if (isEnabled) base.OnHover(isOver); }
-	public override void OnPress (bool isPressed) { if (isEnabled) base.OnPress(isPressed); }
+	protected override void OnHover (bool isOver) { if (isEnabled) base.OnHover(isOver); }
+	protected override void OnPress (bool isPressed) { if (isEnabled) base.OnPress(isPressed); }
+	protected override void OnDragOver () { if (isEnabled) base.OnDragOver(); }
+	protected override void OnDragOut () { if (isEnabled) base.OnDragOut(); }
 
 	/// <summary>
 	/// Call the listener function.

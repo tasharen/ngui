@@ -37,6 +37,13 @@ using System.Collections.Generic;
 [RequireComponent(typeof(Camera))]
 public class UICamera : MonoBehaviour
 {
+	public enum ControlScheme
+	{
+		Mouse,
+		Touch,
+		Controller,
+	}
+
 	/// <summary>
 	/// Whether the touch event will be sending out the OnClick notification at the end.
 	/// </summary>
@@ -82,12 +89,6 @@ public class UICamera : MonoBehaviour
 	{
 		World,	// Perform a Physics.Raycast and sort by distance to the point that was hit.
 		UI,		// Perform a Physics.Raycast and sort by widget depth.
-	}
-
-	class Highlighted
-	{
-		public GameObject go;
-		public int counter = 0;
 	}
 
 	/// <summary>
@@ -267,6 +268,12 @@ public class UICamera : MonoBehaviour
 	static public Camera currentCamera = null;
 
 	/// <summary>
+	/// Current control scheme. Set automatically when events arrive.
+	/// </summary>
+
+	static public ControlScheme currentScheme = ControlScheme.Mouse;
+
+	/// <summary>
 	/// ID of the touch or mouse operation prior to sending out the event. Mouse ID is '-1' for left, '-2' for right mouse button, '-3' for middle.
 	/// </summary>
 
@@ -314,9 +321,6 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	static public GameObject fallThrough;
-
-	// List of currently highlighted items
-	static List<Highlighted> mHighlighted = new List<Highlighted>();
 
 	// Selected widget (for input)
 	static GameObject mCurrentSelection = null;
@@ -401,7 +405,6 @@ public class UICamera : MonoBehaviour
 						current = uicam;
 						currentCamera = uicam.mCam;
 						Notify(mCurrentSelection, "OnSelect", false);
-						if (uicam.useController || uicam.useKeyboard) Highlight(mCurrentSelection, false);
 						current = null;
 					}
 				}
@@ -434,7 +437,6 @@ public class UICamera : MonoBehaviour
 		{
 			current = this;
 			currentCamera = mCam;
-			if (useController || useKeyboard) Highlight(mCurrentSelection, true);
 			Notify(mCurrentSelection, "OnSelect", true);
 			current = null;
 		}
@@ -489,12 +491,6 @@ public class UICamera : MonoBehaviour
 			return count;
 		}
 	}
-
-	/// <summary>
-	/// Clear the list on application quit (also when Play mode is exited)
-	/// </summary>
-
-	void OnApplicationQuit () { mHighlighted.Clear(); }
 
 	/// <summary>
 	/// Convenience function that returns the main HUD camera.
@@ -665,6 +661,21 @@ public class UICamera : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Whether the specified object should be highlighted.
+	/// </summary>
+
+	static public bool IsHighlighted (GameObject go)
+	{
+		if (UICamera.currentScheme == UICamera.ControlScheme.Mouse)
+			return (UICamera.hoveredObject == go);
+
+		if (UICamera.currentScheme == UICamera.ControlScheme.Controller)
+			return (UICamera.selectedObject == go);
+
+		return false;
+	}
+
+	/// <summary>
 	/// Find the camera responsible for handling events on objects of the specified layer.
 	/// </summary>
 
@@ -728,62 +739,6 @@ public class UICamera : MonoBehaviour
 			}
 		}
 		return 0;
-	}
-
-	/// <summary>
-	/// Returns whether the widget should be currently highlighted as far as the UICamera knows.
-	/// </summary>
-
-	static public bool IsHighlighted (GameObject go)
-	{
-		for (int i = mHighlighted.Count; i > 0; )
-		{
-			Highlighted hl = mHighlighted[--i];
-			if (hl.go == go) return true;
-		}
-		return false;
-	}
-
-	/// <summary>
-	/// Apply or remove highlighted (hovered) state from the specified object.
-	/// </summary>
-
-	static void Highlight (GameObject go, bool highlighted)
-	{
-		if (go != null)
-		{
-			for (int i = mHighlighted.Count; i > 0; )
-			{
-				Highlighted hl = mHighlighted[--i];
-
-				if (hl == null || hl.go == null)
-				{
-					mHighlighted.RemoveAt(i);
-				}
-				else if (hl.go == go)
-				{
-					if (highlighted)
-					{
-						++hl.counter;
-					}
-					else if (--hl.counter < 1)
-					{
-						mHighlighted.Remove(hl);
-						Notify(go, "OnHover", false);
-					}
-					return;
-				}
-			}
-
-			if (highlighted)
-			{
-				Highlighted hl = new Highlighted();
-				hl.go = go;
-				hl.counter = 1;
-				mHighlighted.Add(hl);
-				Notify(go, "OnHover", true);
-			}
-		}
 	}
 
 	/// <summary>
@@ -1018,6 +973,7 @@ public class UICamera : MonoBehaviour
 
 		lastTouchPosition = Input.mousePosition;
 		bool highlightChanged = (mMouse[0].last != mMouse[0].current);
+		if (highlightChanged) currentScheme = ControlScheme.Mouse;
 
 		// Update the position and delta
 		mMouse[0].delta = lastTouchPosition - mMouse[0].pos;
@@ -1038,6 +994,7 @@ public class UICamera : MonoBehaviour
 		{
 			if (Input.GetMouseButton(i))
 			{
+				currentScheme = ControlScheme.Mouse;
 				isPressed = true;
 				break;
 			}
@@ -1065,8 +1022,9 @@ public class UICamera : MonoBehaviour
 		// The button was released over a different object -- remove the highlight from the previous
 		if (useMouse && !isPressed && mHover != null && highlightChanged)
 		{
+			currentScheme = ControlScheme.Mouse;
 			if (mTooltip != null) ShowTooltip(false);
-			Highlight(mHover, false);
+			Notify(mHover, "OnHover", false);
 			mHover = null;
 		}
 
@@ -1077,7 +1035,9 @@ public class UICamera : MonoBehaviour
 			{
 				bool pressed = Input.GetMouseButtonDown(i);
 				bool unpressed = Input.GetMouseButtonUp(i);
-	
+
+				if (pressed || unpressed) currentScheme = ControlScheme.Mouse;
+
 				currentTouch = mMouse[i];
 				currentTouchID = -1 - i;
 				currentKey = KeyCode.Mouse0 + i;
@@ -1096,9 +1056,10 @@ public class UICamera : MonoBehaviour
 		// If nothing is pressed and there is an object under the touch, highlight it
 		if (useMouse && !isPressed && highlightChanged)
 		{
+			currentScheme = ControlScheme.Mouse;
 			mTooltipTime = RealTime.time + tooltipDelay;
 			mHover = mMouse[0].current;
-			Highlight(mHover, true);
+			Notify(mHover, "OnHover", true);
 		}
 
 		// Update the last value
@@ -1114,6 +1075,7 @@ public class UICamera : MonoBehaviour
 	{
 		for (int i = 0; i < Input.touchCount; ++i)
 		{
+			currentScheme = ControlScheme.Touch;
 			Touch input = Input.GetTouch(i);
 
 			currentTouchID = allowMultiTouch ? input.fingerId : 1;
@@ -1195,6 +1157,7 @@ public class UICamera : MonoBehaviour
 
 		if (submitKeyDown || submitKeyUp)
 		{
+			currentScheme = ControlScheme.Controller;
 			currentTouch.last = currentTouch.current;
 			currentTouch.current = mCurrentSelection;
 			ProcessTouch(submitKeyDown, submitKeyUp);
@@ -1225,12 +1188,22 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Send out key notifications
-		if (vertical != 0) Notify(mCurrentSelection, "OnKey", vertical > 0 ? KeyCode.UpArrow : KeyCode.DownArrow);
-		if (horizontal != 0) Notify(mCurrentSelection, "OnKey", horizontal > 0 ? KeyCode.RightArrow : KeyCode.LeftArrow);
+		if (vertical != 0)
+		{
+			currentScheme = ControlScheme.Controller;
+			Notify(mCurrentSelection, "OnKey", vertical > 0 ? KeyCode.UpArrow : KeyCode.DownArrow);
+		}
+		
+		if (horizontal != 0)
+		{
+			currentScheme = ControlScheme.Controller;
+			Notify(mCurrentSelection, "OnKey", horizontal > 0 ? KeyCode.RightArrow : KeyCode.LeftArrow);
+		}
 		
 		if (useKeyboard && Input.GetKeyDown(KeyCode.Tab))
 		{
 			currentKey = KeyCode.Tab;
+			currentScheme = ControlScheme.Controller;
 			Notify(mCurrentSelection, "OnKey", KeyCode.Tab);
 		}
 
@@ -1238,12 +1211,14 @@ public class UICamera : MonoBehaviour
 		if (cancelKey0 != KeyCode.None && Input.GetKeyDown(cancelKey0))
 		{
 			currentKey = cancelKey0;
+			currentScheme = ControlScheme.Controller;
 			Notify(mCurrentSelection, "OnKey", KeyCode.Escape);
 		}
 
 		if (cancelKey1 != KeyCode.None && Input.GetKeyDown(cancelKey1))
 		{
 			currentKey = cancelKey1;
+			currentScheme = ControlScheme.Controller;
 			Notify(mCurrentSelection, "OnKey", KeyCode.Escape);
 		}
 
@@ -1353,11 +1328,9 @@ public class UICamera : MonoBehaviour
 				// Send the notification of a touch ending
 				Notify(currentTouch.pressed, "OnPress", false);
 
-				// Send a hover message to the object, but don't add it to the list of hovered items
-				// as it's already present. This happens when the mouse is released over the same button
-				// it was pressed on, and since it already had its 'OnHover' event, it never got
-				// Highlight(false), so we simply re-notify it so it can update the visible state.
-				if (useMouse && currentTouch.pressed == mHover) Notify(currentTouch.pressed, "OnHover", true);
+				// Send a hover message to the object
+				Notify(currentTouch.current, "OnHover", true);
+				mHover = currentTouch.current;
 
 				// If the button/touch was released on the same object, consider it a click and select it
 				if (currentTouch.dragged == currentTouch.current ||
