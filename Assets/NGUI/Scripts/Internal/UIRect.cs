@@ -180,31 +180,31 @@ public abstract class UIRect : MonoBehaviour
 			mUpdateFrame = frame;
 			bool anchored = false;
 
-			if (leftAnchor.rect != null)
+			if (leftAnchor.target)
 			{
 				anchored = true;
-				if (leftAnchor.rect.mUpdateFrame != frame)
+				if (leftAnchor.rect != null && leftAnchor.rect.mUpdateFrame != frame)
 					leftAnchor.rect.Update();
 			}
-			
-			if (bottomAnchor.rect != null)
+
+			if (bottomAnchor.target)
 			{
 				anchored = true;
-				if (bottomAnchor.rect.mUpdateFrame != frame)
+				if (bottomAnchor.rect != null && bottomAnchor.rect.mUpdateFrame != frame)
 					bottomAnchor.rect.Update();
 			}
-			
-			if (rightAnchor.rect != null)
+
+			if (rightAnchor.target)
 			{
 				anchored = true;
-				if (rightAnchor.rect.mUpdateFrame != frame)
+				if (rightAnchor.rect != null && rightAnchor.rect.mUpdateFrame != frame)
 					rightAnchor.rect.Update();
 			}
-			
-			if (topAnchor.rect != null)
+
+			if (topAnchor.target)
 			{
 				anchored = true;
-				if (topAnchor.rect.mUpdateFrame != frame)
+				if (topAnchor.rect != null && topAnchor.rect.mUpdateFrame != frame)
 					topAnchor.rect.Update();
 			}
 

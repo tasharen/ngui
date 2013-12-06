@@ -813,7 +813,7 @@ public class UIWidget : UIRect
 		{
 			lt = (leftAnchor.rect != null) ?
 				leftAnchor.rect.GetHorizontal(parent, leftAnchor.relative, leftAnchor.absolute) :
-				trans.InverseTransformPoint(leftAnchor.target.position).x;
+				Mathf.Round(parent.InverseTransformPoint(leftAnchor.target.position).x);
 		}
 		else lt = pos.x - pvt.x * mWidth;
 
@@ -822,7 +822,7 @@ public class UIWidget : UIRect
 		{
 			bt = (bottomAnchor.rect != null) ?
 				bottomAnchor.rect.GetVertical(parent, bottomAnchor.relative, bottomAnchor.absolute) :
-				trans.InverseTransformPoint(bottomAnchor.target.position).y;
+				Mathf.Round(parent != null ? parent.InverseTransformPoint(bottomAnchor.target.position).y : bottomAnchor.target.position.y);
 		}
 		else bt = pos.y - pvt.y * mHeight;
 
@@ -831,7 +831,7 @@ public class UIWidget : UIRect
 		{
 			rt = (rightAnchor.rect != null) ?
 				rightAnchor.rect.GetHorizontal(parent, rightAnchor.relative, rightAnchor.absolute) :
-				trans.InverseTransformPoint(rightAnchor.target.position).x;
+				Mathf.Round(parent != null ? parent.InverseTransformPoint(rightAnchor.target.position).x : rightAnchor.target.position.x);
 		}
 		else rt = pos.x - pvt.x * mWidth + mWidth;
 
@@ -840,7 +840,7 @@ public class UIWidget : UIRect
 		{
 			tt = (topAnchor.rect != null) ?
 				topAnchor.rect.GetVertical(parent, topAnchor.relative, topAnchor.absolute) :
-				trans.InverseTransformPoint(topAnchor.target.position).y;
+				Mathf.Round(parent != null ? parent.InverseTransformPoint(topAnchor.target.position).y : topAnchor.target.position.y);
 		}
 		else tt = pos.y - pvt.y * mHeight + mHeight;
 
