@@ -39,6 +39,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 
 3.0.7
 - NEW: Created a new layout system. All widgets and panels can now anchor to each other, the screen, and even 3D game objects.
+- NEW: You can now create resizable scroll views and anchor them to UI elements.
 - NEW: Re-created the Anchor Example to use the new anchoring system.
 - NEW: Updated all controls to use the new anchoring system.
 - NEW: You can now specify an explicit Render Queue on each panel.
@@ -65,6 +66,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: NGUITools.SetActive will now automatically call CreatePanel on widgets, ensuring that there is no frame delay (read: blinking).
 - FIX: UICamera selected object change should now work multiple times per frame.
 - FIX: Added a new clause to panel depth comparison that uses panel instance IDs if the panel depth matches (to avoid depth collisions).
+- FIX: Max line count on labels should now work again.
 - DEL: OnHover is no longer sent via selection changes. Listen to OnSelect and check (UICamera.currentScheme == ControlScheme.Controller).
 - DEL: "PMA Shader" option is now going to be permanently hidden once the atlas has been created.
 - DEL: Eliminated the half-pixel offset setting from anchors.

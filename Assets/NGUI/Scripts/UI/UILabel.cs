@@ -978,9 +978,13 @@ public class UILabel : UIWidget
 
 				bool fits = true;
 
-				NGUIText.current.lineWidth  = (mOverflow == Overflow.ResizeFreely) ? 1000000 : Mathf.RoundToInt(lw / mScale);
-				NGUIText.current.lineHeight = (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight) ?
-					1000000 : Mathf.RoundToInt(lh / mScale);
+				NGUIText.current.lineWidth = (mOverflow == Overflow.ResizeFreely) ? 1000000 : Mathf.RoundToInt(lw / mScale);
+
+				if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
+				{
+					NGUIText.current.lineHeight = 1000000;
+				}
+				else NGUIText.current.lineHeight = Mathf.RoundToInt(lh / mScale);
 
 				if (lw > 0f || lh > 0f)
 				{
@@ -1264,6 +1268,7 @@ public class UILabel : UIWidget
 		NGUIText.current.symbolStyle = mSymbols;
 		NGUIText.current.spacingX = mSpacingX;
 		NGUIText.current.spacingY = mSpacingY;
+		NGUIText.current.maxLines = mMaxLineCount;
 #if DYNAMIC_FONT
 		NGUIText.current.pixelDensity = (usePrintedSize && mRoot != null) ? 1f / mRoot.pixelSizeAdjustment : 1f;
 #else
