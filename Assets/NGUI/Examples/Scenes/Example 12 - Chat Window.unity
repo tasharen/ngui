@@ -1062,7 +1062,7 @@ GameObject:
   - 65: {fileID: 1287055111}
   - 114: {fileID: 1287055113}
   m_Layer: 8
-  m_Name: Sprite
+  m_Name: Resize Corner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1089,8 +1089,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 20, y: 20, z: 0}
-  m_Center: {x: -10, y: 10, z: 0}
+  m_Size: {x: 19, y: 19, z: 0}
+  m_Center: {x: -9.5, y: 9.5, z: 0}
 --- !u!114 &1287055112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1142,8 +1142,8 @@ MonoBehaviour:
   m_Name: 
   target: {fileID: 1737164185}
   pivot: 8
-  minWidth: 100
-  minHeight: 100
+  minWidth: 200
+  minHeight: 200
 --- !u!1 &1492496946
 GameObject:
   m_ObjectHideFlags: 0

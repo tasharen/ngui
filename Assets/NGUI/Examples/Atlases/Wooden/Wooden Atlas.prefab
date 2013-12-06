@@ -267,8 +267,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Smirk
-    x: 229
-    y: 85
+    x: 488
+    y: 258
     width: 20
     height: 20
     borderLeft: 0
@@ -384,20 +384,20 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Resize Icon
-    x: 488
-    y: 258
-    width: 20
-    height: 20
+    x: 229
+    y: 86
+    width: 19
+    height: 19
     borderLeft: 0
     borderRight: 0
     borderTop: 0
     borderBottom: 0
-    paddingLeft: 0
+    paddingLeft: 1
     paddingRight: 0
-    paddingTop: 0
+    paddingTop: 1
     paddingBottom: 0
   - name: Right Bracket
-    x: 262
+    x: 256
     y: 261
     width: 5
     height: 5
@@ -410,7 +410,7 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Row Outline
-    x: 256
+    x: 262
     y: 261
     width: 5
     height: 5

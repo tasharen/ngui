@@ -812,8 +812,17 @@ static public class NGUIMath
 		int minx = Mathf.Max(minWidth, w.minWidth);
 		int miny = Mathf.Max(minHeight, w.minHeight);
 
-		if (width < minx) width = minx;
-		if (height < miny) height = miny;
+		if (width < minx)
+		{
+			startLocalPos.x += Mathf.Lerp(0f, minx - width, pivot.x);
+			width = minx;
+		}
+
+		if (height < miny)
+		{
+			startLocalPos.y -= Mathf.Lerp(miny - height, 0f, pivot.y);
+			height = miny;
+		}
 
 		t.localPosition = startLocalPos;
 		w.width = width;
