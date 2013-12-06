@@ -970,11 +970,11 @@ MonoBehaviour:
     target: {fileID: 43}
     relative: 1
     absolute: 0
-  mColor: {r: 1, g: 1, b: 1, a: .223529413}
+  mColor: {r: .522388101, g: .522388101, b: .522388101, a: .411764711}
   mPivot: 4
   mWidth: 1280
   mHeight: 720
-  mDepth: 0
+  mDepth: -1
   autoResizeBoxCollider: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Stripes 2
@@ -1287,6 +1287,8 @@ GameObject:
   m_Component:
   - 4: {fileID: 1737164184}
   - 114: {fileID: 1737164185}
+  - 114: {fileID: 1737164187}
+  - 65: {fileID: 1737164186}
   m_Layer: 8
   m_Name: Chat Window
   m_TagString: Untagged
@@ -1339,7 +1341,7 @@ MonoBehaviour:
   mWidth: 450
   mHeight: 410
   mDepth: 2
-  autoResizeBoxCollider: 0
+  autoResizeBoxCollider: 1
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Window
   mFillCenter: 1
@@ -1347,6 +1349,34 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+--- !u!65 &1737164186
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1737164183}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 440, y: 400, z: 0}
+  m_Center: {x: 1, y: -1, z: 0}
+--- !u!114 &1737164187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1737164183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b90fc8427bee38c478f5b2f6f0ae9580, type: 1}
+  m_Name: 
+  target: {fileID: 1737164184}
+  scale: {x: 1, y: 1, z: 0}
+  scrollWheelFactor: 0
+  restrictWithinPanel: 1
+  dragEffect: 2
+  momentumAmount: 35
 --- !u!1 &1905493301
 GameObject:
   m_ObjectHideFlags: 0

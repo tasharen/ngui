@@ -30,7 +30,7 @@ public class UIDragObject : MonoBehaviour
 	/// Scale value applied to the drag delta. Set X or Y to 0 to disallow dragging in that direction.
 	/// </summary>
 
-	public Vector3 scale = Vector3.one;
+	public Vector3 scale = new Vector3(1f, 1f, 0f);
 
 	/// <summary>
 	/// Effect the scroll wheel will have on the momentum.
@@ -57,6 +57,7 @@ public class UIDragObject : MonoBehaviour
 	public float momentumAmount = 35f;
 
 	Plane mPlane;
+	Vector3 mTargetPos;
 	Vector3 mLastPos;
 	UIPanel mPanel;
 	bool mPressed = false;
@@ -89,6 +90,7 @@ public class UIDragObject : MonoBehaviour
 				if (!mPressed)
 				{
 					// Remove all momentum on press
+					mTargetPos = target.position;
 					mTouchID = UICamera.currentTouchID;
 					mMomentum = Vector3.zero;
 					mPressed = true;
@@ -110,8 +112,15 @@ public class UIDragObject : MonoBehaviour
 			else if (mPressed && mTouchID == UICamera.currentTouchID)
 			{
 				mPressed = false;
-				if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None && dragEffect == DragEffect.MomentumAndSpring)
-					mPanel.ConstrainTargetToBounds(target, ref mBounds, false);
+				
+				if (restrictWithinPanel && dragEffect == DragEffect.MomentumAndSpring)
+				{
+					if (mPanel.ConstrainTargetToBounds(target, ref mBounds, false))
+					{
+						mMomentum = Vector3.zero;
+						mScroll = 0f;
+					}
+				}
 			}
 		}
 	}
@@ -149,31 +158,46 @@ public class UIDragObject : MonoBehaviour
 				}
 
 				// Adjust the momentum
-				if (dragEffect != DragEffect.None) mMomentum = Vector3.Lerp(mMomentum, mMomentum + offset * (0.01f * momentumAmount), 0.67f);
+				if (dragEffect != DragEffect.None)
+					mMomentum = Vector3.Lerp(mMomentum, mMomentum + offset * (0.01f * momentumAmount), 0.67f);
+
+				// Adjust the position and bounds
+				Vector3 before = target.localPosition;
+				Move(offset);
 
 				// We want to constrain the UI to be within bounds
 				if (restrictWithinPanel)
 				{
-					// Adjust the position and bounds
-					Vector3 localPos = target.localPosition;
-					target.position += offset;
-					mBounds.center = mBounds.center + (target.localPosition - localPos);
+					mBounds.center = mBounds.center + (target.localPosition - before);
 
-					// Constrain the UI to the bounds, and if done so, eliminate the momentum
-					if (dragEffect != DragEffect.MomentumAndSpring && mPanel.clipping != UIDrawCall.Clipping.None &&
-						mPanel.ConstrainTargetToBounds(target, ref mBounds, true))
+					// Constrain the UI to the bounds, and if done so, immediately eliminate the momentum
+					if (dragEffect != DragEffect.MomentumAndSpring && mPanel.ConstrainTargetToBounds(target, ref mBounds, true))
 					{
 						mMomentum = Vector3.zero;
 						mScroll = 0f;
 					}
 				}
-				else
-				{
-					// Adjust the position
-					target.position += offset;
-				}
 			}
 		}
+	}
+
+	/// <summary>
+	/// Move the dragged object by the specified amount.
+	/// </summary>
+
+	void Move (Vector3 worldDelta)
+	{
+		if (mPanel != null)
+		{
+			mTargetPos += worldDelta;
+			target.position = mTargetPos;
+
+			Vector3 after = target.localPosition;
+			after.x = Mathf.Round(after.x);
+			after.y = Mathf.Round(after.y);
+			target.localPosition = after;
+		}
+		else target.position += worldDelta;
 	}
 
 	/// <summary>
@@ -204,13 +228,18 @@ public class UIDragObject : MonoBehaviour
 
 				if (mPanel != null)
 				{
-					target.position += NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
+					Move(NGUIMath.SpringDampen(ref mMomentum, 9f, delta));
 
-					if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None)
+					if (restrictWithinPanel)
 					{
 						mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.cachedTransform, target);
-						
-						if (!mPanel.ConstrainTargetToBounds(target, ref mBounds, dragEffect == DragEffect.None))
+
+						if (mPanel.ConstrainTargetToBounds(target, ref mBounds, dragEffect == DragEffect.None))
+						{
+							mMomentum = Vector3.zero;
+							mScroll = 0f;
+						}
+						else
 						{
 							SpringPosition sp = target.GetComponent<SpringPosition>();
 							if (sp != null) sp.enabled = false;
@@ -219,7 +248,12 @@ public class UIDragObject : MonoBehaviour
 					return;
 				}
 			}
-			else mScroll = 0f;
+			else
+			{
+				mMomentum = Vector3.zero;
+				mScroll = 0f;
+				return;
+			}
 		}
 
 		// Dampen the momentum

@@ -376,7 +376,13 @@ public class UIPanel : UIRect
 	{
 		get
 		{
-			return new Vector4(mClipRange.x + mClipOffset.x, mClipRange.y + mClipOffset.y, mClipRange.z, mClipRange.w);
+			Vector2 size = GetViewSize();
+
+			if (mClipping != UIDrawCall.Clipping.None)
+			{
+				return new Vector4(mClipRange.x + mClipOffset.x, mClipRange.y + mClipOffset.y, size.x, size.y);
+			}
+			return new Vector4(0f, 0f, size.x, size.y);
 		}
 	}
 
@@ -1048,13 +1054,15 @@ public class UIPanel : UIRect
 
 	public virtual Vector3 CalculateConstrainOffset (Vector2 min, Vector2 max)
 	{
-		float offsetX = mClipRange.z * 0.5f;
-		float offsetY = mClipRange.w * 0.5f;
+		Vector4 cr = finalClipRegion;
+
+		float offsetX = cr.z * 0.5f;
+		float offsetY = cr.w * 0.5f;
 
 		Vector2 minRect = new Vector2(min.x, min.y);
 		Vector2 maxRect = new Vector2(max.x, max.y);
-		Vector2 minArea = new Vector2(mClipOffset.x + mClipRange.x - offsetX, mClipOffset.y + mClipRange.y - offsetY);
-		Vector2 maxArea = new Vector2(mClipOffset.x + mClipRange.x + offsetX, mClipOffset.y + mClipRange.y + offsetY);
+		Vector2 minArea = new Vector2(cr.x - offsetX, cr.y - offsetY);
+		Vector2 maxArea = new Vector2(cr.x + offsetX, cr.y + offsetY);
 
 		if (clipping == UIDrawCall.Clipping.SoftClip)
 		{
