@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-            Version 3.0.6 f7
+            Version 3.0.7 rc1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,39 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.7
+- NEW: Created a new layout system. All widgets and panels can now anchor to each other, the screen, and even 3D game objects.
+- NEW: Re-created the Anchor Example to use the new anchoring system.
+- NEW: Updated all controls to use the new anchoring system.
+- NEW: You can now specify an explicit Render Queue on each panel.
+- NEW: Improved the Text List's functionality, adding support for touch interaction and having a scroll bar.
+- NEW: Recreated the Chat Window example -- it now features a resizable chat window.
+- NEW: Recreated the Drag & Drop example, adding two scroll views resized with screen height, and the ability to move items from one to the other.
+- NEW: Holding CTRL will now show the dimensions of the selected widget in the scene view.
+- NEW: Resizing the widget now automatically displays width and height guides in the scene view.
+- NEW: Selected anchored widgets and panels now show the calculated distance in the scene view.
+- NEW: Widget alpha is now fully cumulative (parents affect children).
+- NEW: UIDragObject script now ensures that the dragged object remains pixel-perfect.
+- NEW: UIDragObject script now can restrict the widget from being dragged off-screen.
+- NEW: Added a script that makes it possible to resize a widget by dragging on its corner or side.
+- NEW: UICamera.currentScheme tells you the current control scheme -- mouse, touch, or controller.
+- NEW: Button scripts have been modified to use the new OnDragOver/Out events
+- FIX: Changing panel depth in inspector will now reflect the change correctly.
+- FIX: Atlas/font selection dialog will now make searching of the entire project optional.
+- FIX: UICamera events will once again work independently of time scale.
+- FIX: Fixed the glitch that was causing widgets to jump into the middle of nowhere sometimes when resizing them.
+- FIX: UIDragScrollView will no longer try to find the scroll view if you set it manually.
+- FIX: Enabling and disabling textures and Unity 2D sprites will now again set the correct texture.
+- FIX: Adjusting depths via shortcut keys should now work consistently.
+- FIX: Draw call viewer will now display the correct triangle count.
+- FIX: NGUITools.SetActive will now automatically call CreatePanel on widgets, ensuring that there is no frame delay (read: blinking).
+- FIX: UICamera selected object change should now work multiple times per frame.
+- FIX: Added a new clause to panel depth comparison that uses panel instance IDs if the panel depth matches (to avoid depth collisions).
+- DEL: OnHover is no longer sent via selection changes. Listen to OnSelect and check (UICamera.currentScheme == ControlScheme.Controller).
+- DEL: "PMA Shader" option is now going to be permanently hidden once the atlas has been created.
+- DEL: Eliminated the half-pixel offset setting from anchors.
+- DEL: Removed anchor and stretch scripts from the menus.
 
 3.0.6
 - NEW: NGUI now has new written documentation.
