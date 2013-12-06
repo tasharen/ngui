@@ -59,12 +59,17 @@ public class UIPanelInspector : UIRectEditor
 		}
 	}
 
+	void OnDisable () { NGUIEditorTools.HideMoveTool(false); }
+
 	/// <summary>
 	/// Handles & interaction.
 	/// </summary>
 
 	public void OnSceneGUI ()
 	{
+		NGUIEditorTools.HideMoveTool(true);
+		if (!UIWidget.showHandles) return;
+
 		Event e = Event.current;
 		int id = GUIUtility.GetControlID(s_Hash, FocusType.Passive);
 		EventType type = e.GetTypeForControl(id);

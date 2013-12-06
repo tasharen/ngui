@@ -71,6 +71,7 @@ public class UIAnchor : MonoBehaviour
 	Animation mAnim;
 	Rect mRect = new Rect();
 	UIRoot mRoot;
+	bool mStarted = false;
 
 	void Awake ()
 	{
@@ -81,7 +82,7 @@ public class UIAnchor : MonoBehaviour
 
 	void OnDestroy () { UICamera.onScreenResize -= ScreenSizeChanged; }
 
-	void ScreenSizeChanged () { if (runOnlyOnce) Update(); }
+	void ScreenSizeChanged () { if (mStarted && runOnlyOnce) Update(); }
 
 	/// <summary>
 	/// Automatically find the camera responsible for drawing the widgets under this object.
@@ -100,7 +101,10 @@ public class UIAnchor : MonoBehaviour
 
 		mRoot = NGUITools.FindInParents<UIRoot>(gameObject);
 		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
+		
 		Update();
+
+		mStarted = true;
 	}
 
 	/// <summary>

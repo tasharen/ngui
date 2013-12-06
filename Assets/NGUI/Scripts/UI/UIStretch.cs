@@ -80,6 +80,7 @@ public class UIStretch : MonoBehaviour
 	UIRoot mRoot;
 	Animation mAnim;
 	Rect mRect;
+	bool mStarted = false;
 
 	void Awake ()
 	{
@@ -95,7 +96,7 @@ public class UIStretch : MonoBehaviour
 
 	void OnDestroy () { UICamera.onScreenResize -= ScreenSizeChanged; }
 
-	void ScreenSizeChanged () { if (runOnlyOnce) Update(); }
+	void ScreenSizeChanged () { if (mStarted && runOnlyOnce) Update(); }
 
 	void Start ()
 	{
@@ -110,7 +111,10 @@ public class UIStretch : MonoBehaviour
 
 		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
 		mRoot = NGUITools.FindInParents<UIRoot>(gameObject);
+		
 		Update();
+		
+		mStarted = true;
 	}
 
 	void Update ()

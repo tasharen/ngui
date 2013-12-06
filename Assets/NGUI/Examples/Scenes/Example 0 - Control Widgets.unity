@@ -84,6 +84,7 @@ GameObject:
   - 4: {fileID: 6945082}
   - 114: {fileID: 6945084}
   - 114: {fileID: 6945086}
+  - 65: {fileID: 6945083}
   m_Layer: 8
   m_Name: Control - Simple Progress Bar
   m_TagString: Untagged
@@ -104,6 +105,18 @@ Transform:
   - {fileID: 2058880662}
   - {fileID: 701302374}
   m_Father: {fileID: 1538171773}
+--- !u!65 &6945083
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 6945081}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 300, y: 22, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6945084
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -985,6 +998,8 @@ Transform:
   m_Children:
   - {fileID: 1923018737}
   - {fileID: 1538171773}
+  - {fileID: 2108396139}
+  - {fileID: 2119813399}
   m_Father: {fileID: 0}
 --- !u!114 &333529002
 MonoBehaviour:
@@ -2314,6 +2329,7 @@ GameObject:
   - 4: {fileID: 681259089}
   - 114: {fileID: 681259092}
   - 114: {fileID: 681259093}
+  - 65: {fileID: 681259090}
   m_Layer: 8
   m_Name: Control - Colored Progress Bar
   m_TagString: Untagged
@@ -2335,6 +2351,18 @@ Transform:
   - {fileID: 1478124274}
   - {fileID: 76689714}
   m_Father: {fileID: 1538171773}
+--- !u!65 &681259090
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 681259088}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 300, y: 22, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &681259092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4503,7 +4531,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1428208433
 Transform:
   m_ObjectHideFlags: 0
@@ -4807,9 +4835,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1989359996}
+  - {fileID: 546881208}
   - {fileID: 559417564}
   - {fileID: 1105368448}
-  - {fileID: 546881208}
   - {fileID: 2075224091}
   - {fileID: 33011792}
   - {fileID: 681259089}
@@ -5881,7 +5909,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: .192156866, g: .301960796, b: .474509805, a: .0196078438}
+  m_BackGroundColor: {r: .462686539, g: .462686539, b: .462686539, a: 1}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -7042,6 +7070,72 @@ MonoBehaviour:
   rawValue: 1
   direction: 2
   mInverted: 0
+--- !u!1 &2108396138
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 3
+  m_Component:
+  - 4: {fileID: 2108396139}
+  - 114: {fileID: 2108396140}
+  m_Layer: 8
+  m_Name: BG - Stripes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2108396139
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2108396138}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 333529001}
+--- !u!114 &2108396140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2108396138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 1}
+  m_Name: 
+  leftAnchor:
+    target: {fileID: 333529001}
+    relative: 0
+    absolute: 0
+  rightAnchor:
+    target: {fileID: 333529001}
+    relative: 1
+    absolute: 0
+  bottomAnchor:
+    target: {fileID: 333529001}
+    relative: 0
+    absolute: 0
+  topAnchor:
+    target: {fileID: 333529001}
+    relative: 1
+    absolute: 0
+  mColor: {r: .343283594, g: .343283594, b: .343283594, a: .360784322}
+  mPivot: 4
+  mWidth: 1280
+  mHeight: 720
+  mDepth: -2
+  autoResizeBoxCollider: 0
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Stripes 2
+  mFillCenter: 1
+  mType: 2
+  mFillDirection: 4
+  mFillAmount: 1
+  mInvert: 0
 --- !u!1001 &2117320983
 Prefab:
   m_ObjectHideFlags: 0
@@ -7082,3 +7176,69 @@ Prefab:
   m_RootGameObject: {fileID: 545365667}
   m_IsPrefabParent: 0
   m_IsExploded: 1
+--- !u!1 &2119813398
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 3
+  m_Component:
+  - 4: {fileID: 2119813399}
+  - 114: {fileID: 2119813400}
+  m_Layer: 8
+  m_Name: BG - Vignette
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2119813399
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2119813398}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 333529001}
+--- !u!114 &2119813400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2119813398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 1}
+  m_Name: 
+  leftAnchor:
+    target: {fileID: 333529001}
+    relative: 0
+    absolute: 0
+  rightAnchor:
+    target: {fileID: 333529001}
+    relative: 1
+    absolute: 0
+  bottomAnchor:
+    target: {fileID: 333529001}
+    relative: 0
+    absolute: 0
+  topAnchor:
+    target: {fileID: 333529001}
+    relative: 1
+    absolute: 0
+  mColor: {r: 0, g: 0, b: 0, a: 1}
+  mPivot: 4
+  mWidth: 1280
+  mHeight: 720
+  mDepth: -3
+  autoResizeBoxCollider: 0
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Glow - Inner
+  mFillCenter: 1
+  mType: 1
+  mFillDirection: 4
+  mFillAmount: 1
+  mInvert: 0

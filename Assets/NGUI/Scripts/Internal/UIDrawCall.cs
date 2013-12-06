@@ -82,7 +82,9 @@ public class UIDrawCall : MonoBehaviour
 	int mRenderQueue = 3000;
 	Clipping mLastClip = Clipping.None;
 	int mTriangles = 0;
+#if UNITY_EDITOR
 	int mIndex = 0;
+#endif
 
 	/// <summary>
 	/// Whether the draw call needs to be re-created.
@@ -534,7 +536,9 @@ public class UIDrawCall : MonoBehaviour
 	{
 		mRebuildMat = true;
 		mActiveList.Add(this);
+#if UNITY_EDITOR
 		mIndex = mActiveList.size;
+#endif
 	}
 
 	/// <summary>

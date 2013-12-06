@@ -24,6 +24,12 @@ public class UITooltip : MonoBehaviour
 
 	UIWidget[] mWidgets;
 
+	/// <summary>
+	/// Whether the tooltip is currently visible.
+	/// </summary>
+
+	static public bool isVisible { get { return (mInstance != null && mInstance.mTarget == 1f); } }
+
 	void Awake () { mInstance = this; }
 	void OnDestroy () { mInstance = null; }
 
