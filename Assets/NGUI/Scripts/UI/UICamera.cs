@@ -279,6 +279,19 @@ public class UICamera : MonoBehaviour
 	static public KeyCode currentKey = KeyCode.None;
 
 	/// <summary>
+	/// Ray projected into the screen underneath the current touch.
+	/// </summary>
+
+	static public Ray currentRay
+	{
+		get
+		{
+			return (currentCamera != null && currentTouch != null) ?
+				currentCamera.ScreenPointToRay(currentTouch.pos) : new Ray();
+		}
+	}
+
+	/// <summary>
 	/// Current touch, set before any event function gets called.
 	/// </summary>
 

@@ -416,7 +416,7 @@ MonoBehaviour:
   mPivot: 3
   mWidth: 322
   mHeight: 408
-  mDepth: 0
+  mDepth: -1
   autoResizeBoxCollider: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
@@ -975,7 +975,7 @@ MonoBehaviour:
   mPivot: 4
   mWidth: 1280
   mHeight: 720
-  mDepth: -2
+  mDepth: -3
   autoResizeBoxCollider: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Glow - Inner
@@ -1041,7 +1041,7 @@ MonoBehaviour:
   mPivot: 4
   mWidth: 1280
   mHeight: 720
-  mDepth: -1
+  mDepth: -2
   autoResizeBoxCollider: 1
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Stripes 2
@@ -1050,6 +1050,100 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+--- !u!1 &1287055109
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 3
+  m_Component:
+  - 4: {fileID: 1287055110}
+  - 114: {fileID: 1287055112}
+  - 65: {fileID: 1287055111}
+  - 114: {fileID: 1287055113}
+  m_Layer: 8
+  m_Name: Sprite
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1287055110
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1287055109}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 212, y: -192, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1737164184}
+--- !u!65 &1287055111
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1287055109}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 20, y: 20, z: 0}
+  m_Center: {x: -10, y: 10, z: 0}
+--- !u!114 &1287055112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1287055109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 1}
+  m_Name: 
+  leftAnchor:
+    target: {fileID: 1737164184}
+    relative: 1
+    absolute: -33
+  rightAnchor:
+    target: {fileID: 1737164184}
+    relative: 1
+    absolute: -13
+  bottomAnchor:
+    target: {fileID: 1737164184}
+    relative: 0
+    absolute: 13
+  topAnchor:
+    target: {fileID: 1737164184}
+    relative: 0
+    absolute: 33
+  mColor: {r: 0, g: 0, b: 0, a: .337254912}
+  mPivot: 8
+  mWidth: 20
+  mHeight: 20
+  mDepth: 2
+  autoResizeBoxCollider: 1
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Resize Icon
+  mFillCenter: 1
+  mType: 0
+  mFillDirection: 4
+  mFillAmount: 1
+  mInvert: 0
+--- !u!114 &1287055113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1287055109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e85fff0758f722468e15bd6605b5173, type: 1}
+  m_Name: 
+  target: {fileID: 1737164185}
+  pivot: 8
+  minWidth: 100
+  minHeight: 100
 --- !u!1 &1492496946
 GameObject:
   m_ObjectHideFlags: 0
@@ -1375,6 +1469,7 @@ Transform:
   m_Children:
   - {fileID: 1522398042}
   - {fileID: 1705375176}
+  - {fileID: 1287055110}
   - {fileID: 799492982}
   m_Father: {fileID: 43}
 --- !u!114 &1737164185
@@ -1407,7 +1502,7 @@ MonoBehaviour:
   mPivot: 4
   mWidth: 450
   mHeight: 410
-  mDepth: 2
+  mDepth: 1
   autoResizeBoxCollider: 1
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Window
