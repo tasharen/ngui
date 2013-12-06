@@ -22,6 +22,9 @@ public abstract class UIRect : MonoBehaviour
 		[System.NonSerialized]
 		public UIRect rect;
 
+		[System.NonSerialized]
+		public Camera cam;
+
 		public AnchorPoint () { }
 		public AnchorPoint (float relative) { this.relative = relative; }
 	}
@@ -51,6 +54,7 @@ public abstract class UIRect : MonoBehaviour
 	public AnchorPoint topAnchor = new AnchorPoint(1f);
 
 	protected UIRoot mRoot;
+	protected Camera mAnchorCam;
 	protected GameObject mGo;
 	protected Transform mTrans;
 	protected UIRect mParent;
@@ -59,6 +63,7 @@ public abstract class UIRect : MonoBehaviour
 	protected float mFinalAlpha = 0f;
 
 	int mUpdateFrame = -1;
+	bool mAnchorsCached = false;
 
 	/// <summary>
 	/// Rectangle's parent, if any.
@@ -121,16 +126,25 @@ public abstract class UIRect : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Get horizontal bounds points relative to the specified transform.
+	/// Get the sides of the rectangle relative to the specified transform.
+	/// The order is left, top, right, bottom.
 	/// </summary>
 
-	public abstract float GetHorizontal (Transform relativeTo, float relative, int absolute);
+	public abstract Vector3[] GetSides (Transform relativeTo);
 
 	/// <summary>
-	/// Get vertical bounds points relative to the specified transform.
+	/// Helper function that gets the specified anchor's position relative to the chosen transform.
 	/// </summary>
 
-	public abstract float GetVertical (Transform relativeTo, float relative, int absolute);
+	protected Vector2 GetLocalPos (AnchorPoint ac, Transform trans)
+	{
+		Vector3 pos = ac.cam.WorldToScreenPoint(ac.target.position);
+		pos = mAnchorCam.ScreenToWorldPoint(pos);
+		if (trans != null) pos = trans.InverseTransformPoint(pos);
+		pos.x = Mathf.Round(pos.x);
+		pos.y = Mathf.Round(pos.y);
+		return pos;
+	}
 
 	/// <summary>
 	/// Automatically find the parent rectangle.
@@ -160,11 +174,7 @@ public abstract class UIRect : MonoBehaviour
 	/// Set anchor rect references on start.
 	/// </summary>
 
-	protected void Start ()
-	{
-		CacheAnchors();
-		OnStart();
-	}
+	protected void Start () { OnStart(); }
 
 	/// <summary>
 	/// Rectangles need to update in a specific order -- parents before children.
@@ -173,6 +183,8 @@ public abstract class UIRect : MonoBehaviour
 
 	public void Update ()
 	{
+		if (!mAnchorsCached) CacheAnchors();
+
 		int frame = Time.frameCount;
 
 		if (mUpdateFrame != frame)
@@ -228,10 +240,57 @@ public abstract class UIRect : MonoBehaviour
 
 	protected void CacheAnchors ()
 	{
+		mAnchorsCached = true;
+
 		leftAnchor.rect		= (leftAnchor.target)	? leftAnchor.target.GetComponent<UIRect>()	 : null;
 		bottomAnchor.rect	= (bottomAnchor.target) ? bottomAnchor.target.GetComponent<UIRect>() : null;
 		rightAnchor.rect	= (rightAnchor.target)	? rightAnchor.target.GetComponent<UIRect>()	 : null;
 		topAnchor.rect		= (topAnchor.target)	? topAnchor.target.GetComponent<UIRect>()	 : null;
+
+		FindCameraFor(leftAnchor);
+		FindCameraFor(bottomAnchor);
+		FindCameraFor(rightAnchor);
+		FindCameraFor(topAnchor);
+	}
+
+	/// <summary>
+	/// Helper function -- attempt to find the camera responsible for the specified anchor.
+	/// </summary>
+
+	void FindCameraFor (AnchorPoint ap)
+	{
+		// If we don't have a target or have a rectangle to work with, camera isn't needed
+		if (ap.target == null || ap.rect != null)
+		{
+			ap.cam = null;
+			mAnchorCam = null;
+		}
+		else
+		{
+			// Find the camera responsible for the target object
+			ap.cam = NGUITools.FindCameraForLayer(ap.target.gameObject.layer);
+
+			// No camera found? Clear the references
+			if (ap.cam == null)
+			{
+				ap.target = null;
+				mAnchorCam = null;
+				return;
+			}
+			
+			// Find the camera responsible for this rectangle
+			if (mAnchorCam == null)
+			{
+				mAnchorCam = NGUITools.FindCameraForLayer(cachedGameObject.layer);
+
+				// No camera found? Clear the references
+				if (mAnchorCam == null)
+				{
+					ap.target = null;
+					ap.cam = null;
+				}
+			}
+		}
 	}
 
 	/// <summary>

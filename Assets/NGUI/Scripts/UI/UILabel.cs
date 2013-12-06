@@ -551,26 +551,6 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
-	/// Get horizontal bounds points relative to the specified transform.
-	/// </summary>
-
-	public override float GetHorizontal (Transform relativeTo, float relative, int absolute)
-	{
-		if (hasChanged) ProcessText();
-		return base.GetHorizontal(relativeTo, relative, absolute);
-	}
-
-	/// <summary>
-	/// Get vertical bounds points relative to the specified transform.
-	/// </summary>
-
-	public override float GetVertical (Transform relativeTo, float relative, int absolute)
-	{
-		if (hasChanged) ProcessText();
-		return base.GetVertical(relativeTo, relative, absolute);
-	}
-
-	/// <summary>
 	/// Process the label's text before returning its drawing dimensions.
 	/// </summary>
 
@@ -795,6 +775,17 @@ public class UILabel : UIWidget
 		}
 	}
 #endif
+
+	/// <summary>
+	/// Get the sides of the rectangle relative to the specified transform.
+	/// The order is left, top, right, bottom.
+	/// </summary>
+
+	public override Vector3[] GetSides (Transform relativeTo)
+	{
+		if (hasChanged) ProcessText();
+		return base.GetSides(relativeTo);
+	}
 
 	/// <summary>
 	/// Upgrading labels is a bit different.

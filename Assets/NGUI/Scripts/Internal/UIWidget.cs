@@ -471,10 +471,11 @@ public class UIWidget : UIRect
 	}
 
 	/// <summary>
-	/// Get horizontal bounds points relative to the specified transform.
+	/// Get the sides of the rectangle relative to the specified transform.
+	/// The order is left, top, right, bottom.
 	/// </summary>
 
-	public override float GetHorizontal (Transform relativeTo, float relative, int absolute)
+	public override Vector3[] GetSides (Transform relativeTo)
 	{
 		Vector2 offset = pivotOffset;
 
@@ -482,44 +483,21 @@ public class UIWidget : UIRect
 		float y0 = -offset.y * mHeight;
 		float x1 = x0 + mWidth;
 		float y1 = y0 + mHeight;
-		float center = (y0 + y1) * 0.5f;
+		float cx = (y0 + y1) * 0.5f;
+		float cy = (x0 + x1) * 0.5f;
 
 		Transform wt = cachedTransform;
-		Vector3 v0 = wt.TransformPoint(x0, center, 0f);
-		Vector3 v1 = wt.TransformPoint(x1, center, 0f);
+		mCorners[0] = wt.TransformPoint(x0, cx, 0f);
+		mCorners[1] = wt.TransformPoint(cy, y1, 0f);
+		mCorners[2] = wt.TransformPoint(x1, cx, 0f);
+		mCorners[3] = wt.TransformPoint(cy, y0, 0f);
 
 		if (relativeTo != null)
 		{
-			v0 = relativeTo.InverseTransformPoint(v0);
-			v1 = relativeTo.InverseTransformPoint(v1);
+			for (int i = 0; i < 4; ++i)
+				mCorners[i] = relativeTo.InverseTransformPoint(mCorners[i]);
 		}
-		return Mathf.Floor((v0.x * (1f - relative) + v1.x * relative) + 0.5f) + absolute;
-	}
-
-	/// <summary>
-	/// Get vertical bounds points relative to the specified transform.
-	/// </summary>
-
-	public override float GetVertical (Transform relativeTo, float relative, int absolute)
-	{
-		Vector2 offset = pivotOffset;
-
-		float x0 = -offset.x * mWidth;
-		float y0 = -offset.y * mHeight;
-		float x1 = x0 + mWidth;
-		float y1 = y0 + mHeight;
-		float center = (x0 + x1) * 0.5f;
-
-		Transform wt = cachedTransform;
-		Vector3 v0 = wt.TransformPoint(center, y0, 0f);
-		Vector3 v1 = wt.TransformPoint(center, y1, 0f);
-
-		if (relativeTo != null)
-		{
-			v0 = relativeTo.InverseTransformPoint(v0);
-			v1 = relativeTo.InverseTransformPoint(v1);
-		}
-		return Mathf.Floor((v0.y * (1f - relative) + v1.y * relative) + 0.5f) + absolute;
+		return mCorners;
 	}
 
 	/// <summary>
@@ -808,41 +786,91 @@ public class UIWidget : UIRect
 		Vector3 pos = trans.localPosition;
 		Vector2 pvt = pivotOffset;
 
-		// Left anchor point
-		if (leftAnchor.target)
+		// Attempt to fast-path if all anchors match
+		if (leftAnchor.target == bottomAnchor.target &&
+			leftAnchor.target == rightAnchor.target &&
+			leftAnchor.target == topAnchor.target)
 		{
-			lt = (leftAnchor.rect != null) ?
-				leftAnchor.rect.GetHorizontal(parent, leftAnchor.relative, leftAnchor.absolute) :
-				Mathf.Round(parent.InverseTransformPoint(leftAnchor.target.position).x);
+			if (leftAnchor.rect != null)
+			{
+				Vector3[] sides = leftAnchor.rect.GetSides(parent);
+				lt = NGUIMath.Lerp(sides[0].x, sides[2].x, leftAnchor.relative) + leftAnchor.absolute;
+				rt = NGUIMath.Lerp(sides[0].x, sides[2].x, rightAnchor.relative) + rightAnchor.absolute;
+				bt = NGUIMath.Lerp(sides[3].y, sides[1].y, bottomAnchor.relative) + bottomAnchor.absolute;
+				tt = NGUIMath.Lerp(sides[3].y, sides[1].y, topAnchor.relative) + topAnchor.absolute;
+			}
+			else
+			{
+				// Anchored to a single transform
+				Vector2 lp = GetLocalPos(leftAnchor, parent);
+				lt = lp.x + leftAnchor.absolute;
+				bt = lp.y + bottomAnchor.absolute;
+				rt = lp.x + rightAnchor.absolute;
+				tt = lp.y + topAnchor.absolute;
+			}
 		}
-		else lt = pos.x - pvt.x * mWidth;
+		else
+		{
+			// Left anchor point
+			if (leftAnchor.target)
+			{
+				if (leftAnchor.rect != null)
+				{
+					Vector3[] sides = leftAnchor.rect.GetSides(parent);
+					lt = NGUIMath.Lerp(sides[0].x, sides[2].x, leftAnchor.relative) + leftAnchor.absolute;
+				}
+				else
+				{
+					lt = GetLocalPos(leftAnchor, parent).x + leftAnchor.absolute;
+				}
+			}
+			else lt = pos.x - pvt.x * mWidth;
 
-		// Bottom anchor point
-		if (bottomAnchor.target)
-		{
-			bt = (bottomAnchor.rect != null) ?
-				bottomAnchor.rect.GetVertical(parent, bottomAnchor.relative, bottomAnchor.absolute) :
-				Mathf.Round(parent != null ? parent.InverseTransformPoint(bottomAnchor.target.position).y : bottomAnchor.target.position.y);
-		}
-		else bt = pos.y - pvt.y * mHeight;
+			// Right anchor point
+			if (rightAnchor.target)
+			{
+				if (rightAnchor.rect != null)
+				{
+					Vector3[] sides = rightAnchor.rect.GetSides(parent);
+					rt = NGUIMath.Lerp(sides[0].x, sides[2].x, rightAnchor.relative) + rightAnchor.absolute;
+				}
+				else
+				{
+					rt = GetLocalPos(rightAnchor, parent).x + rightAnchor.absolute;
+				}
+			}
+			else rt = pos.x - pvt.x * mWidth + mWidth;
 
-		// Right anchor point
-		if (rightAnchor.target)
-		{
-			rt = (rightAnchor.rect != null) ?
-				rightAnchor.rect.GetHorizontal(parent, rightAnchor.relative, rightAnchor.absolute) :
-				Mathf.Round(parent != null ? parent.InverseTransformPoint(rightAnchor.target.position).x : rightAnchor.target.position.x);
-		}
-		else rt = pos.x - pvt.x * mWidth + mWidth;
+			// Bottom anchor point
+			if (bottomAnchor.target)
+			{
+				if (bottomAnchor.rect != null)
+				{
+					Vector3[] sides = bottomAnchor.rect.GetSides(parent);
+					bt = NGUIMath.Lerp(sides[3].y, sides[1].y, bottomAnchor.relative) + bottomAnchor.absolute;
+				}
+				else
+				{
+					bt = GetLocalPos(bottomAnchor, parent).y + bottomAnchor.absolute;
+				}
+			}
+			else bt = pos.y - pvt.y * mHeight;
 
-		// Top anchor point
-		if (topAnchor.target)
-		{
-			tt = (topAnchor.rect != null) ?
-				topAnchor.rect.GetVertical(parent, topAnchor.relative, topAnchor.absolute) :
-				Mathf.Round(parent != null ? parent.InverseTransformPoint(topAnchor.target.position).y : topAnchor.target.position.y);
+			// Top anchor point
+			if (topAnchor.target)
+			{
+				if (topAnchor.rect != null)
+				{
+					Vector3[] sides = topAnchor.rect.GetSides(parent);
+					tt = NGUIMath.Lerp(sides[3].y, sides[1].y, topAnchor.relative) + topAnchor.absolute;
+				}
+				else
+				{
+					tt = GetLocalPos(topAnchor, parent).y + topAnchor.absolute;
+				}
+			}
+			else tt = pos.y - pvt.y * mHeight + mHeight;
 		}
-		else tt = pos.y - pvt.y * mHeight + mHeight;
 
 		// Calculate the new position, width and height
 		Vector3 newPos = new Vector3(Mathf.Lerp(lt, rt, pvt.x), Mathf.Lerp(bt, tt, pvt.y), pos.z);

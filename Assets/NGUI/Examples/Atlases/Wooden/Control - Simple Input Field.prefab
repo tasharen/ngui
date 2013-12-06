@@ -11,7 +11,6 @@ GameObject:
   - 114: {fileID: 11400000}
   - 114: {fileID: 11400006}
   - 65: {fileID: 6500000}
-  - 114: {fileID: 11400004}
   m_Layer: 8
   m_Name: Control - Simple Input Field
   m_TagString: Untagged
@@ -165,19 +164,6 @@ MonoBehaviour:
   mMaxLineHeight: 0
   mLineWidth: 0
   mMultiline: 1
---- !u!114 &11400004
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 049a2bcd8df653c4d9cb9d39404363a9, type: 1}
-  m_Name: 
-  keyCode: 13
-  modifier: 0
-  action: 1
 --- !u!114 &11400006
 MonoBehaviour:
   m_ObjectHideFlags: 1

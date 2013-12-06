@@ -207,16 +207,20 @@ static public class NGUITools
 	{
 		int layerMask = 1 << layer;
 
+		for (int i = 0; i < UICamera.list.size; ++i)
+		{
+			Camera uc = UICamera.list.buffer[i].cachedCamera;
+			if ((uc != null) && (uc.cullingMask & layerMask) != 0)
+				return uc;
+		}
+
 		Camera[] cameras = NGUITools.FindActive<Camera>();
 
 		for (int i = 0, imax = cameras.Length; i < imax; ++i)
 		{
 			Camera cam = cameras[i];
-
 			if ((cam.cullingMask & layerMask) != 0)
-			{
 				return cam;
-			}
 		}
 		return null;
 	}

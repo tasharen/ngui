@@ -512,10 +512,11 @@ public class UIPanel : UIRect
 	}
 
 	/// <summary>
-	/// Get horizontal bounds points relative to the specified transform.
+	/// Get the sides of the rectangle relative to the specified transform.
+	/// The order is left, top, right, bottom.
 	/// </summary>
 
-	public override float GetHorizontal (Transform relativeTo, float relative, int absolute)
+	public override Vector3[] GetSides (Transform relativeTo)
 	{
 		Vector2 size = GetViewSize();
 
@@ -524,45 +525,21 @@ public class UIPanel : UIRect
 		float y0 = cr.y - 0.5f * size.y;
 		float x1 = x0 + size.x;
 		float y1 = y0 + size.y;
-		float center = (y0 + y1) * 0.5f;
+		float cx = (y0 + y1) * 0.5f;
+		float cy = (x0 + x1) * 0.5f;
 
 		Transform wt = cachedTransform;
-		Vector3 v0 = wt.TransformPoint(x0, center, 0f);
-		Vector3 v1 = wt.TransformPoint(x1, center, 0f);
+		mCorners[0] = wt.TransformPoint(x0, cx, 0f);
+		mCorners[1] = wt.TransformPoint(cy, y1, 0f);
+		mCorners[2] = wt.TransformPoint(x1, cx, 0f);
+		mCorners[3] = wt.TransformPoint(cy, y0, 0f);
 
 		if (relativeTo != null)
 		{
-			v0 = relativeTo.InverseTransformPoint(v0);
-			v1 = relativeTo.InverseTransformPoint(v1);
+			for (int i = 0; i < 4; ++i)
+				mCorners[i] = relativeTo.InverseTransformPoint(mCorners[i]);
 		}
-		return Mathf.Floor((v0.x * (1f - relative) + v1.x * relative) + 0.5f) + absolute;
-	}
-
-	/// <summary>
-	/// Get vertical bounds points relative to the specified transform.
-	/// </summary>
-
-	public override float GetVertical (Transform relativeTo, float relative, int absolute)
-	{
-		Vector2 size = GetViewSize();
-
-		Vector2 cr = (mClipping != UIDrawCall.Clipping.None) ? (Vector2)mClipRange + mClipOffset : Vector2.zero;
-		float x0 = cr.x - 0.5f * size.x;
-		float y0 = cr.y - 0.5f * size.y;
-		float x1 = x0 + size.x;
-		float y1 = y0 + size.y;
-		float center = (x0 + x1) * 0.5f;
-
-		Transform wt = cachedTransform;
-		Vector3 v0 = wt.TransformPoint(center, y0, 0f);
-		Vector3 v1 = wt.TransformPoint(center, y1, 0f);
-
-		if (relativeTo != null)
-		{
-			v0 = relativeTo.InverseTransformPoint(v0);
-			v1 = relativeTo.InverseTransformPoint(v1);
-		}
-		return Mathf.Floor((v0.y * (1f - relative) + v1.y * relative) + 0.5f) + absolute;
+		return mCorners;
 	}
 
 	/// <summary>
@@ -773,69 +750,121 @@ public class UIPanel : UIRect
 		Vector2 offset = trans.localPosition;
 
 		float lt, bt, rt, tt;
-		bool anchored = false;
 
-		// Left anchor point
-		if (leftAnchor.target)
+		// Attempt to fast-path if all anchors match
+		if (leftAnchor.target == bottomAnchor.target &&
+			leftAnchor.target == rightAnchor.target &&
+			leftAnchor.target == topAnchor.target)
 		{
-			anchored = true;
-			lt = (leftAnchor.rect != null) ?
-				leftAnchor.rect.GetHorizontal(parent, leftAnchor.relative, leftAnchor.absolute) :
-				trans.InverseTransformPoint(leftAnchor.target.position).x;
+			if (leftAnchor.rect != null)
+			{
+				Vector3[] sides = leftAnchor.rect.GetSides(parent);
+				lt = NGUIMath.Lerp(sides[0].x, sides[2].x, leftAnchor.relative) + leftAnchor.absolute;
+				rt = NGUIMath.Lerp(sides[0].x, sides[2].x, rightAnchor.relative) + rightAnchor.absolute;
+				bt = NGUIMath.Lerp(sides[3].y, sides[1].y, bottomAnchor.relative) + bottomAnchor.absolute;
+				tt = NGUIMath.Lerp(sides[3].y, sides[1].y, topAnchor.relative) + topAnchor.absolute;
+			}
+			else
+			{
+				// Anchored to a single transform
+				Vector2 lp = GetLocalPos(leftAnchor, parent);
+				lt = lp.x + leftAnchor.absolute;
+				bt = lp.y + bottomAnchor.absolute;
+				rt = lp.x + rightAnchor.absolute;
+				tt = lp.y + topAnchor.absolute;
+			}
+
+			// Take the offset into consideration
 			lt -= offset.x + mClipOffset.x;
-		}
-		else lt = mClipRange.x - 0.5f * size.x;
-
-		// Bottom anchor point
-		if (bottomAnchor.target)
-		{
-			anchored = true;
-			bt = (bottomAnchor.rect != null) ?
-				bottomAnchor.rect.GetVertical(parent, bottomAnchor.relative, bottomAnchor.absolute) :
-				trans.InverseTransformPoint(bottomAnchor.target.position).y;
-			bt -= offset.y + mClipOffset.y;
-		}
-		else bt = mClipRange.y - 0.5f * size.y;
-
-		// Right anchor point
-		if (rightAnchor.target)
-		{
-			anchored = true;
-			rt = (rightAnchor.rect != null) ?
-				rightAnchor.rect.GetHorizontal(parent, rightAnchor.relative, rightAnchor.absolute) :
-				trans.InverseTransformPoint(rightAnchor.target.position).x;
 			rt -= offset.x + mClipOffset.x;
-		}
-		else rt = mClipRange.x + 0.5f * size.x;
-
-		// Top anchor point
-		if (topAnchor.target)
-		{
-			anchored = true;
-			tt = (topAnchor.rect != null) ?
-				topAnchor.rect.GetVertical(parent, topAnchor.relative, topAnchor.absolute) :
-				trans.InverseTransformPoint(topAnchor.target.position).y;
+			bt -= offset.y + mClipOffset.y;
 			tt -= offset.y + mClipOffset.y;
 		}
-		else tt = mClipRange.y + 0.5f * size.y;
-
-		if (anchored)
+		else
 		{
-			// Calculate the new position, width and height
-			float newX = Mathf.Lerp(lt, rt, 0.5f);
-			float newY = Mathf.Lerp(bt, tt, 0.5f);
-			float w = rt - lt;
-			float h = tt - bt;
+			// Left anchor point
+			if (leftAnchor.target)
+			{
+				if (leftAnchor.rect != null)
+				{
+					Vector3[] sides = leftAnchor.rect.GetSides(parent);
+					lt = NGUIMath.Lerp(sides[0].x, sides[2].x, leftAnchor.relative) + leftAnchor.absolute;
+				}
+				else
+				{
+					lt = trans.InverseTransformPoint(leftAnchor.target.position).x;
+				}
 
-			float minx = Mathf.Max(20f, mClipSoftness.x);
-			float miny = Mathf.Max(20f, mClipSoftness.y);
+				lt -= offset.x + mClipOffset.x;
+			}
+			else lt = mClipRange.x - 0.5f * size.x;
 
-			if (w < minx) w = minx;
-			if (h < miny) h = miny;
+			// Right anchor point
+			if (rightAnchor.target)
+			{
+				if (rightAnchor.rect != null)
+				{
+					Vector3[] sides = rightAnchor.rect.GetSides(parent);
+					rt = NGUIMath.Lerp(sides[0].x, sides[2].x, rightAnchor.relative) + rightAnchor.absolute;
+				}
+				else
+				{
+					rt = trans.InverseTransformPoint(rightAnchor.target.position).x;
+				}
 
-			// Update the clipping range
-			baseClipRegion = new Vector4(newX, newY, w, h);
+				rt -= offset.x + mClipOffset.x;
+			}
+			else rt = mClipRange.x + 0.5f * size.x;
+
+			// Bottom anchor point
+			if (bottomAnchor.target)
+			{
+				if (bottomAnchor.rect != null)
+				{
+					Vector3[] sides = bottomAnchor.rect.GetSides(parent);
+					bt = NGUIMath.Lerp(sides[3].y, sides[1].y, bottomAnchor.relative) + bottomAnchor.absolute;
+				}
+				else
+				{
+					bt = trans.InverseTransformPoint(bottomAnchor.target.position).y;
+				}
+
+				bt -= offset.y + mClipOffset.y;
+			}
+			else bt = mClipRange.y - 0.5f * size.y;
+
+			// Top anchor point
+			if (topAnchor.target)
+			{
+				if (topAnchor.rect != null)
+				{
+					Vector3[] sides = topAnchor.rect.GetSides(parent);
+					tt = NGUIMath.Lerp(sides[3].y, sides[1].y, topAnchor.relative) + topAnchor.absolute;
+				}
+				else
+				{
+					tt = trans.InverseTransformPoint(topAnchor.target.position).y;
+				}
+
+				tt -= offset.y + mClipOffset.y;
+			}
+			else tt = mClipRange.y + 0.5f * size.y;
 		}
+
+		// Calculate the new position, width and height
+		float newX = Mathf.Lerp(lt, rt, 0.5f);
+		float newY = Mathf.Lerp(bt, tt, 0.5f);
+		float w = rt - lt;
+		float h = tt - bt;
+
+		float minx = Mathf.Max(20f, mClipSoftness.x);
+		float miny = Mathf.Max(20f, mClipSoftness.y);
+
+		if (w < minx) w = minx;
+		if (h < miny) h = miny;
+
+		// Update the clipping range
+		baseClipRegion = new Vector4(newX, newY, w, h);
 	}
 
 	/// <summary>

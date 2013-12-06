@@ -18,18 +18,24 @@ static public class NGUIMath
 	/// Lerp function that doesn't clamp the 'factor' in 0-1 range.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public float Lerp (float from, float to, float factor) { return from * (1f - factor) + to * factor; }
 
 	/// <summary>
 	/// Clamp the specified integer to be between 0 and below 'max'.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public int ClampIndex (int val, int max) { return (val < 0) ? 0 : (val < max ? val : max - 1); }
 
 	/// <summary>
 	/// Wrap the index using repeating logic, so that for example +1 past the end means index of '1'.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public int RepeatIndex (int val, int max)
 	{
 		if (max < 1) return 0;
@@ -42,6 +48,8 @@ static public class NGUIMath
 	/// Ensure that the angle is within -180 to 180 range.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public float WrapAngle (float angle)
 	{
 		while (angle > 180f) angle -= 360f;
@@ -53,12 +61,16 @@ static public class NGUIMath
 	/// In the shader, equivalent function would be 'fract'
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public float Wrap01 (float val) { return val - Mathf.FloorToInt(val); }
 
 	/// <summary>
 	/// Convert a hexadecimal character to its decimal value.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public int HexToDecimal (char ch)
 	{
 		switch (ch)
@@ -94,6 +106,8 @@ static public class NGUIMath
 	/// It's coded because int.ToString(format) syntax doesn't seem to be supported by Unity's Flash. It just silently crashes.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public char DecimalToHexChar (int num)
 	{
 		if (num > 15) return 'F';
@@ -107,6 +121,8 @@ static public class NGUIMath
 	/// string.Format("{0,6:X}", num).Replace(' ', '0') doesn't work either. It returns the format string, not the formatted value.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public string DecimalToHex (int num)
 	{
 		num &= 0xFFFFFF;
@@ -128,6 +144,8 @@ static public class NGUIMath
 	/// Convert the specified color to RGBA32 integer format.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public int ColorToInt (Color c)
 	{
 		int retVal = 0;
@@ -142,6 +160,8 @@ static public class NGUIMath
 	/// Convert the specified RGBA32 integer to Color.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public Color IntToColor (int val)
 	{
 		float inv = 1f / 255f;
@@ -157,6 +177,8 @@ static public class NGUIMath
 	/// Convert the specified integer to a human-readable string representing the binary value. Useful for debugging bytes.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public string IntToBinary (int val, int bits)
 	{
 		string final = "";
@@ -173,6 +195,8 @@ static public class NGUIMath
 	/// Convenience conversion function, allowing hex format (0xRrGgBbAa).
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public Color HexToColor (uint val)
 	{
 		return IntToColor((int)val);
@@ -246,47 +270,6 @@ static public class NGUIMath
 		rect.xMax = Mathf.RoundToInt(rect.xMax);
 		rect.yMax = Mathf.RoundToInt(rect.yMax);
 		return ConvertToTexCoords(rect, width, height);
-	}
-
-	/// <summary>
-	/// The much-dreaded half-pixel offset of DirectX9:
-	/// http://drilian.com/2008/11/25/understanding-half-pixel-and-half-texel-offsets/
-	/// </summary>
-
-	static public Vector3 ApplyHalfPixelOffset (Vector3 pos)
-	{
-		RuntimePlatform platform = Application.platform;
-
-		if (platform == RuntimePlatform.WindowsPlayer ||
-			platform == RuntimePlatform.WindowsWebPlayer ||
-			platform == RuntimePlatform.WindowsEditor ||
-			platform == RuntimePlatform.XBOX360)
-		{
-			pos.x = pos.x - 0.5f;
-			pos.y = pos.y + 0.5f;
-		}
-		return pos;
-	}
-
-	/// <summary>
-	/// Per-pixel offset taking scale into consideration.
-	/// If the scale dimension is an odd number, it won't apply the offset.
-	/// This is useful for centered sprites.
-	/// </summary>
-
-	static public Vector3 ApplyHalfPixelOffset (Vector3 pos, Vector3 scale)
-	{
-		RuntimePlatform platform = Application.platform;
-
-		if (platform == RuntimePlatform.WindowsPlayer ||
-			platform == RuntimePlatform.WindowsWebPlayer ||
-			platform == RuntimePlatform.WindowsEditor ||
-			platform == RuntimePlatform.XBOX360)
-		{
-			if (Mathf.RoundToInt(scale.x) == (Mathf.RoundToInt(scale.x * 0.5f) * 2)) pos.x = pos.x - 0.5f;
-			if (Mathf.RoundToInt(scale.y) == (Mathf.RoundToInt(scale.y * 0.5f) * 2)) pos.y = pos.y + 0.5f;
-		}
-		return pos;
 	}
 
 	/// <summary>
@@ -427,34 +410,6 @@ static public class NGUIMath
 		}
 		return new Bounds(Vector3.zero, Vector3.zero);
 	}
-
-	/// <summary>
-	/// Convenience function.
-	/// </summary>
-
-	//static public Bounds CalculateRelativeInnerBounds (Transform root, UISprite sprite)
-	//{
-	//    if (sprite.type == UISprite.Type.Sliced)
-	//    {
-	//        Vector3 vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-	//        Vector3 vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-
-	//        Matrix4x4 toLocal = root.worldToLocalMatrix;
-	//        Vector3[] corners = sprite.innerWorldCorners;
-
-	//        for (int j = 0; j < 4; ++j)
-	//        {
-	//            Vector4 v = toLocal.MultiplyPoint3x4(corners[j]);
-	//            vMax = Vector3.Max(v, vMax);
-	//            vMin = Vector3.Min(v, vMin);
-	//        }
-
-	//        Bounds b = new Bounds(vMin, Vector3.zero);
-	//        b.Encapsulate(vMax);
-	//        return b;
-	//    }
-	//    return CalculateRelativeWidgetBounds(root, sprite.cachedTransform);
-	//}
 
 	/// <summary>
 	/// This code is not framerate-independent:
