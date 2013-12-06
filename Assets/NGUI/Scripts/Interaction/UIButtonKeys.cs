@@ -26,7 +26,10 @@ public class UIButtonKeys : MonoBehaviour
 		if (startsSelected)
 		{
 			if (UICamera.selectedObject == null || !NGUITools.GetActive(UICamera.selectedObject))
+			{
+				UICamera.currentScheme = UICamera.ControlScheme.Controller;
 				UICamera.selectedObject = gameObject;
+			}
 		}
 	}
 	 

@@ -325,6 +325,7 @@ public class UICamera : MonoBehaviour
 	// Selected widget (for input)
 	static GameObject mCurrentSelection = null;
 	static GameObject mNextSelection = null;
+	static ControlScheme mNextScheme = ControlScheme.Controller;
 
 	// Mouse events
 	static MouseOrTouch[] mMouse = new MouseOrTouch[] { new MouseOrTouch(), new MouseOrTouch(), new MouseOrTouch() };
@@ -390,34 +391,44 @@ public class UICamera : MonoBehaviour
 		}
 		set
 		{
-			if (mNextSelection != null)
+			SetSelection(value, UICamera.currentScheme);
+		}
+	}
+
+	/// <summary>
+	/// Change the selection.
+	/// </summary>
+
+	static protected void SetSelection (GameObject go, ControlScheme scheme)
+	{
+		if (mNextSelection != null)
+		{
+			mNextSelection = go;
+		}
+		else if (mCurrentSelection != go)
+		{
+			if (mCurrentSelection != null)
 			{
-				mNextSelection = value;
+				UICamera uicam = FindCameraForLayer(mCurrentSelection.layer);
+
+				if (uicam != null)
+				{
+					current = uicam;
+					currentCamera = uicam.mCam;
+					UICamera.currentScheme = scheme;
+					Notify(mCurrentSelection, "OnSelect", false);
+					current = null;
+				}
 			}
-			else if (mCurrentSelection != value)
+
+			mCurrentSelection = null;
+			mNextSelection = go;
+			mNextScheme = scheme;
+
+			if (UICamera.list.size > 0)
 			{
-				if (mCurrentSelection != null)
-				{
-					UICamera uicam = FindCameraForLayer(mCurrentSelection.layer);
-
-					if (uicam != null)
-					{
-						current = uicam;
-						currentCamera = uicam.mCam;
-						UICamera.currentScheme = ControlScheme.Controller;
-						Notify(mCurrentSelection, "OnSelect", false);
-						current = null;
-					}
-				}
-
-				mCurrentSelection = null;
-				mNextSelection = value;
-
-				if (UICamera.list.size > 0)
-				{
-					UICamera cam = (mNextSelection != null) ? FindCameraForLayer(mNextSelection.layer) : UICamera.list[0];
-					if (cam != null) cam.StartCoroutine(cam.ChangeSelection());
-				}
+				UICamera cam = (mNextSelection != null) ? FindCameraForLayer(mNextSelection.layer) : UICamera.list[0];
+				if (cam != null) cam.StartCoroutine(cam.ChangeSelection());
 			}
 		}
 	}
@@ -438,7 +449,7 @@ public class UICamera : MonoBehaviour
 		{
 			current = this;
 			currentCamera = mCam;
-			UICamera.currentScheme = ControlScheme.Controller;
+			UICamera.currentScheme = mNextScheme;
 			Notify(mCurrentSelection, "OnSelect", true);
 			current = null;
 		}
@@ -913,11 +924,13 @@ public class UICamera : MonoBehaviour
 		{
 			if (cancelKey0 != KeyCode.None && Input.GetKeyDown(cancelKey0))
 			{
+				currentScheme = ControlScheme.Controller;
 				currentKey = cancelKey0;
 				selectedObject = null;
 			}
 			else if (cancelKey1 != KeyCode.None && Input.GetKeyDown(cancelKey1))
 			{
+				currentScheme = ControlScheme.Controller;
 				currentKey = cancelKey1;
 				selectedObject = null;
 			}
@@ -1257,6 +1270,7 @@ public class UICamera : MonoBehaviour
 			if (currentTouch.pressed != mCurrentSelection)
 			{
 				if (mTooltip != null) ShowTooltip(false);
+				currentScheme = ControlScheme.Touch;
 				selectedObject = null;
 			}
 		}
