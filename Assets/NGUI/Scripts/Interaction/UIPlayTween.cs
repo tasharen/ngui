@@ -81,8 +81,8 @@ public class UIPlayTween : MonoBehaviour
 
 	UITweener[] mTweens;
 	bool mStarted = false;
-	bool mHighlighted = false;
 	int mActive = 0;
+	bool mActivated = false;
 
 	void Awake ()
 	{
@@ -115,8 +115,7 @@ public class UIPlayTween : MonoBehaviour
 #if UNITY_EDITOR
 		if (!Application.isPlaying) return;
 #endif
-		if (mStarted && mHighlighted)
-			OnHover(UICamera.IsHighlighted(gameObject));
+		if (mStarted) OnHover(UICamera.IsHighlighted(gameObject));
 	}
 
 	void OnHover (bool isOver)
@@ -127,9 +126,18 @@ public class UIPlayTween : MonoBehaviour
 				(trigger == Trigger.OnHoverTrue && isOver) ||
 				(trigger == Trigger.OnHoverFalse && !isOver))
 			{
+				mActivated = isOver && (trigger == Trigger.OnHover);
 				Play(isOver);
 			}
-			mHighlighted = isOver;
+		}
+	}
+
+	void OnDragOut ()
+	{
+		if (enabled && mActivated)
+		{
+			mActivated = false;
+			Play(false);
 		}
 	}
 
@@ -141,6 +149,7 @@ public class UIPlayTween : MonoBehaviour
 				(trigger == Trigger.OnPressTrue && isPressed) ||
 				(trigger == Trigger.OnPressFalse && !isPressed))
 			{
+				mActivated = isPressed && (trigger == Trigger.OnPress);
 				Play(isPressed);
 			}
 		}
@@ -170,7 +179,8 @@ public class UIPlayTween : MonoBehaviour
 				(trigger == Trigger.OnSelectTrue && isSelected) ||
 				(trigger == Trigger.OnSelectFalse && !isSelected))
 			{
-				Play(true);
+				mActivated = isSelected && (trigger == Trigger.OnSelect);
+				Play(isSelected);
 			}
 		}
 	}

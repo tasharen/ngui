@@ -69,8 +69,8 @@ public class UIButtonColor : UIWidgetContainer
 	{
 		if (!mStarted)
 		{
-			Init();
 			mStarted = true;
+			Init();
 		}
 	}
 
@@ -173,5 +173,11 @@ public class UIButtonColor : UIWidgetContainer
 			if (!mStarted) Start();
 			TweenColor.Begin(tweenTarget, duration, mColor);
 		}
+	}
+
+	protected virtual void OnSelect (bool isSelected)
+	{
+		if (enabled && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
+			OnHover(isSelected);
 	}
 }

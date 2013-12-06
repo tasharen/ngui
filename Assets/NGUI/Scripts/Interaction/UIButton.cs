@@ -31,6 +31,27 @@ public class UIButton : UIButtonColor
 
 	public List<EventDelegate> onClick = new List<EventDelegate>();
 
+	/// <summary>
+	/// Whether the button should be enabled.
+	/// </summary>
+
+	public bool isEnabled
+	{
+		get
+		{
+			if (!enabled) return false;
+			Collider col = collider;
+			return col && col.enabled;
+		}
+		set
+		{
+			Collider col = collider;
+			if (col != null) col.enabled = value;
+			else enabled = value;
+			UpdateColor(value, false);
+		}
+	}
+
 	protected override void OnEnable ()
 	{
 		if (isEnabled)
@@ -51,10 +72,35 @@ public class UIButton : UIButtonColor
 		else UpdateColor(false, true);
 	}
 
-	protected override void OnHover (bool isOver) { if (isEnabled) base.OnHover(isOver); }
-	protected override void OnPress (bool isPressed) { if (isEnabled) base.OnPress(isPressed); }
-	protected override void OnDragOver () { if (isEnabled) base.OnDragOver(); }
-	protected override void OnDragOut () { if (isEnabled) base.OnDragOut(); }
+	protected override void OnHover (bool isOver)
+	{
+		if (isEnabled)
+			base.OnHover(isOver);
+	}
+	
+	protected override void OnPress (bool isPressed)
+	{
+		if (isEnabled)
+			base.OnPress(isPressed);
+	}
+	
+	protected override void OnDragOver ()
+	{
+		if (isEnabled && UICamera.currentTouch.pressed == gameObject)
+			base.OnDragOver();
+	}
+	
+	protected override void OnDragOut ()
+	{
+		if (isEnabled && UICamera.currentTouch.pressed == gameObject)
+			base.OnDragOut();
+	}
+
+	protected override void OnSelect (bool isSelected)
+	{
+		if (isEnabled)
+			base.OnSelect(isSelected);
+	}
 
 	/// <summary>
 	/// Call the listener function.
@@ -67,27 +113,6 @@ public class UIButton : UIButtonColor
 			current = this;
 			EventDelegate.Execute(onClick);
 			current = null;
-		}
-	}
-
-	/// <summary>
-	/// Whether the button should be enabled.
-	/// </summary>
-
-	public bool isEnabled
-	{
-		get
-		{
-			if (!enabled) return false;
-			Collider col = collider;
-			return col && col.enabled;
-		}
-		set
-		{
-			Collider col = collider;
-			if (col != null) col.enabled = value;
-			else enabled = value;
-			UpdateColor(value, false);
 		}
 	}
 

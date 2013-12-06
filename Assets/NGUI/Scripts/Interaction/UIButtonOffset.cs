@@ -19,7 +19,6 @@ public class UIButtonOffset : MonoBehaviour
 
 	Vector3 mPos;
 	bool mStarted = false;
-	bool mHighlighted = false;
 
 	void Start ()
 	{
@@ -31,7 +30,7 @@ public class UIButtonOffset : MonoBehaviour
 		}
 	}
 
-	void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
+	void OnEnable () { if (mStarted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
 	void OnDisable ()
 	{
@@ -63,7 +62,12 @@ public class UIButtonOffset : MonoBehaviour
 		{
 			if (!mStarted) Start();
 			TweenPosition.Begin(tweenTarget.gameObject, duration, isOver ? mPos + hover : mPos).method = UITweener.Method.EaseInOut;
-			mHighlighted = isOver;
 		}
+	}
+
+	void OnSelect (bool isSelected)
+	{
+		if (enabled && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
+			OnHover(isSelected);
 	}
 }

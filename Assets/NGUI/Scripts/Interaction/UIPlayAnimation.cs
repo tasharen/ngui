@@ -74,7 +74,7 @@ public class UIPlayAnimation : MonoBehaviour
 	[HideInInspector][SerializeField] string callWhenFinished;
 
 	bool mStarted = false;
-	bool mHighlighted = false;
+	bool mActivated = false;
 
 	void Awake ()
 	{
@@ -107,8 +107,7 @@ public class UIPlayAnimation : MonoBehaviour
 #if UNITY_EDITOR
 		if (!Application.isPlaying) return;
 #endif
-		if (mStarted && mHighlighted)
-			OnHover(UICamera.IsHighlighted(gameObject));
+		if (mStarted) OnHover(UICamera.IsHighlighted(gameObject));
 	}
 
 	void OnHover (bool isOver)
@@ -119,9 +118,18 @@ public class UIPlayAnimation : MonoBehaviour
 				(trigger == Trigger.OnHoverTrue && isOver) ||
 				(trigger == Trigger.OnHoverFalse && !isOver))
 			{
+				mActivated = isOver && (trigger == Trigger.OnHover);
 				Play(isOver);
 			}
-			mHighlighted = isOver;
+		}
+	}
+
+	void OnDragOut ()
+	{
+		if (enabled && mActivated)
+		{
+			mActivated = false;
+			Play(false);
 		}
 	}
 
@@ -133,6 +141,7 @@ public class UIPlayAnimation : MonoBehaviour
 				(trigger == Trigger.OnPressTrue && isPressed) ||
 				(trigger == Trigger.OnPressFalse && !isPressed))
 			{
+				mActivated = isPressed && (trigger == Trigger.OnPress);
 				Play(isPressed);
 			}
 		}
@@ -162,7 +171,8 @@ public class UIPlayAnimation : MonoBehaviour
 				(trigger == Trigger.OnSelectTrue && isSelected) ||
 				(trigger == Trigger.OnSelectFalse && !isSelected))
 			{
-				Play(true);
+				mActivated = isSelected && (trigger == Trigger.OnSelect);
+				Play(isSelected);
 			}
 		}
 	}

@@ -404,6 +404,7 @@ public class UICamera : MonoBehaviour
 					{
 						current = uicam;
 						currentCamera = uicam.mCam;
+						UICamera.currentScheme = ControlScheme.Controller;
 						Notify(mCurrentSelection, "OnSelect", false);
 						current = null;
 					}
@@ -437,6 +438,7 @@ public class UICamera : MonoBehaviour
 		{
 			current = this;
 			currentCamera = mCam;
+			UICamera.currentScheme = ControlScheme.Controller;
 			Notify(mCurrentSelection, "OnSelect", true);
 			current = null;
 		}

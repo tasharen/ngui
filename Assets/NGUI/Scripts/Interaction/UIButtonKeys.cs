@@ -26,10 +26,7 @@ public class UIButtonKeys : MonoBehaviour
 		if (startsSelected)
 		{
 			if (UICamera.selectedObject == null || !NGUITools.GetActive(UICamera.selectedObject))
-			{
 				UICamera.selectedObject = gameObject;
-				UICamera.Notify(gameObject, "OnHover", true);
-			}
 		}
 	}
 	 
@@ -74,8 +71,6 @@ public class UIButtonKeys : MonoBehaviour
 	void OnClick ()
 	{
 		if (enabled && selectOnClick != null)
-		{
 			UICamera.selectedObject = selectOnClick.gameObject;
-		}
 	}
 }

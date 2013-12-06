@@ -68,7 +68,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 75}
   - 114: {fileID: 182}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Sprite (NGUI)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -84,7 +84,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 76}
   - 111: {fileID: 161}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Checkmark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 77}
   - 111: {fileID: 162}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Animation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -116,7 +116,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 78}
   - 114: {fileID: 187}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,7 +132,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 79}
   - 114: {fileID: 188}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -148,7 +148,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 80}
   - 114: {fileID: 189}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SlicedSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -169,7 +169,7 @@ GameObject:
   - 114: {fileID: 184}
   - 114: {fileID: 183}
   - 114: {fileID: 177}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Checkbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -184,7 +184,7 @@ GameObject:
   serializedVersion: 3
   m_Component:
   - 4: {fileID: 82}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Options
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -201,7 +201,7 @@ GameObject:
   - 4: {fileID: 83}
   - 114: {fileID: 191}
   - 114: {fileID: 190}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -217,8 +217,8 @@ GameObject:
   m_Component:
   - 4: {fileID: 84}
   - 114: {fileID: 192}
-  m_Layer: 0
-  m_Name: UILabel
+  m_Layer: 9
+  m_Name: Label - Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -233,7 +233,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 85}
   - 114: {fileID: 193}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UISlicedSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -249,7 +249,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 86}
   - 114: {fileID: 194}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UILabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -272,7 +272,7 @@ GameObject:
   - 114: {fileID: 199}
   - 114: {fileID: 200}
   - 114: {fileID: 180}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Button - Options
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -288,7 +288,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 88}
   - 111: {fileID: 163}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Animation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -304,7 +304,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 89}
   - 65: {fileID: 148}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Window
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -320,7 +320,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 90}
   - 65: {fileID: 149}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Window
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -340,7 +340,7 @@ GameObject:
   - 114: {fileID: 206}
   - 114: {fileID: 207}
   - 114: {fileID: 176}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Popup List
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -356,7 +356,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 92}
   - 114: {fileID: 203}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SlicedSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -372,7 +372,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 93}
   - 114: {fileID: 204}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -388,7 +388,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 94}
   - 114: {fileID: 208}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -403,7 +403,7 @@ GameObject:
   serializedVersion: 3
   m_Component:
   - 4: {fileID: 95}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Controls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -418,7 +418,7 @@ GameObject:
   serializedVersion: 3
   m_Component:
   - 4: {fileID: 96}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Difficulty
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -434,7 +434,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 97}
   - 114: {fileID: 209}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -450,7 +450,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 98}
   - 114: {fileID: 213}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -466,7 +466,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 99}
   - 114: {fileID: 214}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: SlicedSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -486,7 +486,7 @@ GameObject:
   - 114: {fileID: 211}
   - 114: {fileID: 210}
   - 114: {fileID: 175}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Popup List
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -501,7 +501,7 @@ GameObject:
   serializedVersion: 3
   m_Component:
   - 4: {fileID: 101}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Option - Voice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -519,7 +519,7 @@ GameObject:
   - 114: {fileID: 216}
   - 65: {fileID: 152}
   - 114: {fileID: 215}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Thumb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -535,7 +535,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 103}
   - 114: {fileID: 218}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Foreground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -551,7 +551,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 104}
   - 114: {fileID: 219}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -570,7 +570,7 @@ GameObject:
   - 114: {fileID: 217}
   - 114: {fileID: 174}
   - 114: {fileID: 169}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -586,7 +586,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 106}
   - 114: {fileID: 220}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UILabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -602,7 +602,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 107}
   - 114: {fileID: 221}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UILabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -621,7 +621,7 @@ GameObject:
   - 114: {fileID: 224}
   - 114: {fileID: 172}
   - 114: {fileID: 170}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -637,7 +637,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 109}
   - 114: {fileID: 222}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -653,7 +653,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 110}
   - 114: {fileID: 223}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Foreground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -671,7 +671,7 @@ GameObject:
   - 114: {fileID: 225}
   - 65: {fileID: 155}
   - 114: {fileID: 226}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Thumb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -686,7 +686,7 @@ GameObject:
   serializedVersion: 3
   m_Component:
   - 4: {fileID: 112}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Option - Sound
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -701,7 +701,7 @@ GameObject:
   serializedVersion: 3
   m_Component:
   - 4: {fileID: 113}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Option - Music
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -719,7 +719,7 @@ GameObject:
   - 114: {fileID: 228}
   - 65: {fileID: 156}
   - 114: {fileID: 227}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Thumb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -735,7 +735,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 115}
   - 114: {fileID: 230}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Foreground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -751,7 +751,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 116}
   - 114: {fileID: 231}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -770,7 +770,7 @@ GameObject:
   - 114: {fileID: 229}
   - 114: {fileID: 173}
   - 114: {fileID: 171}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -786,7 +786,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 118}
   - 114: {fileID: 232}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UISlicedSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -802,7 +802,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 119}
   - 114: {fileID: 233}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UISlicedSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -818,7 +818,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 120}
   - 114: {fileID: 234}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UILabel - Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -834,7 +834,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 121}
   - 114: {fileID: 235}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UILabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -850,7 +850,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 122}
   - 114: {fileID: 236}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UITiledSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -866,7 +866,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 123}
   - 111: {fileID: 166}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Animation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -889,7 +889,7 @@ GameObject:
   - 114: {fileID: 202}
   - 114: {fileID: 201}
   - 114: {fileID: 178}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -905,7 +905,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 125}
   - 114: {fileID: 241}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UILabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -921,7 +921,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 126}
   - 114: {fileID: 242}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UISlicedSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -938,7 +938,7 @@ GameObject:
   - 4: {fileID: 127}
   - 114: {fileID: 263}
   - 111: {fileID: 165}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Panel - Options
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -956,24 +956,8 @@ GameObject:
   - 114: {fileID: 265}
   - 111: {fileID: 164}
   - 54: {fileID: 267}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Panel - Main
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!1 &59
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 3
-  m_Component:
-  - 4: {fileID: 129}
-  - 114: {fileID: 243}
-  m_Layer: 0
-  m_Name: Anchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -989,9 +973,7 @@ GameObject:
   - 4: {fileID: 130}
   - 20: {fileID: 145}
   - 114: {fileID: 244}
-  - 114: {fileID: 264}
-  - 54: {fileID: 268}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1007,7 +989,9 @@ GameObject:
   m_Component:
   - 4: {fileID: 131}
   - 114: {fileID: 245}
-  m_Layer: 0
+  - 114: {fileID: 270}
+  - 54: {fileID: 269}
+  m_Layer: 9
   m_Name: UI Root (3D)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1023,7 +1007,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 132}
   - 114: {fileID: 246}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UISlicedSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1039,7 +1023,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 133}
   - 114: {fileID: 247}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UILabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1060,7 +1044,7 @@ GameObject:
   - 114: {fileID: 250}
   - 114: {fileID: 251}
   - 114: {fileID: 179}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Button - Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1076,7 +1060,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 135}
   - 111: {fileID: 167}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Animation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1092,7 +1076,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 136}
   - 111: {fileID: 168}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Animation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1108,8 +1092,8 @@ GameObject:
   m_Component:
   - 4: {fileID: 137}
   - 114: {fileID: 255}
-  m_Layer: 0
-  m_Name: UISprite - Background
+  m_Layer: 9
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1129,7 +1113,7 @@ GameObject:
   - 114: {fileID: 253}
   - 114: {fileID: 252}
   - 114: {fileID: 181}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Button - Play
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1145,7 +1129,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 139}
   - 114: {fileID: 257}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UILabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1161,7 +1145,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 140}
   - 114: {fileID: 258}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UISlicedSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1177,7 +1161,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 141}
   - 114: {fileID: 259}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UITiledSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1193,8 +1177,8 @@ GameObject:
   m_Component:
   - 4: {fileID: 142}
   - 114: {fileID: 260}
-  m_Layer: 0
-  m_Name: UILabel
+  m_Layer: 9
+  m_Name: Label - Description
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1209,7 +1193,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 143}
   - 114: {fileID: 261}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UISlicedSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1225,7 +1209,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 144}
   - 114: {fileID: 262}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UISlicedSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1349,10 +1333,10 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 14}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -313, y: 230, z: 700}
+  m_LocalPosition: {x: -313, y: 230, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 130}
+  m_Father: {fileID: 131}
 --- !u!4 &85
 Transform:
   m_ObjectHideFlags: 0
@@ -1574,7 +1558,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 32}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 296, y: -1, z: 0}
+  m_LocalPosition: {x: 242, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 105}
@@ -1679,7 +1663,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 41}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 295, y: 0, z: 0}
+  m_LocalPosition: {x: 212, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 108}
@@ -1716,7 +1700,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 44}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 295, y: -1, z: -0}
+  m_LocalPosition: {x: 85, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 117}
@@ -1865,11 +1849,11 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 57}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 260, y: 0, z: 0}
+  m_LocalPosition: {x: 260, y: 0, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 90}
-  m_Father: {fileID: 129}
+  m_Father: {fileID: 131}
 --- !u!4 &128
 Transform:
   m_ObjectHideFlags: 0
@@ -1881,20 +1865,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 89}
-  m_Father: {fileID: 129}
---- !u!4 &129
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 59}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 680}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 128}
-  - {fileID: 127}
-  m_Father: {fileID: 130}
+  m_Father: {fileID: 131}
 --- !u!4 &130
 Transform:
   m_ObjectHideFlags: 0
@@ -1904,11 +1875,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -700}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 129}
-  - {fileID: 142}
-  - {fileID: 84}
-  - {fileID: 137}
+  m_Children: []
   m_Father: {fileID: 131}
 --- !u!4 &131
 Transform:
@@ -1921,6 +1888,11 @@ Transform:
   m_LocalScale: {x: .00249999994, y: .00249999994, z: .00249999994}
   m_Children:
   - {fileID: 130}
+  - {fileID: 128}
+  - {fileID: 127}
+  - {fileID: 142}
+  - {fileID: 84}
+  - {fileID: 137}
   m_Father: {fileID: 0}
 --- !u!4 &132
 Transform:
@@ -1989,10 +1961,10 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 67}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: .5, y: -.5, z: 1190}
+  m_LocalPosition: {x: .5, y: -.5, z: 490}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 130}
+  m_Father: {fileID: 131}
 --- !u!4 &138
 Transform:
   m_ObjectHideFlags: 0
@@ -2045,10 +2017,10 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 72}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -541, y: 190, z: 700}
+  m_LocalPosition: {x: -541, y: 190, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 130}
+  m_Father: {fileID: 131}
 --- !u!4 &143
 Transform:
   m_ObjectHideFlags: 0
@@ -2095,7 +2067,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 512
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_HDR: 0
@@ -2678,7 +2650,7 @@ MonoBehaviour:
   m_Name: 
   target: {fileID: 162}
   clipName: 
-  trigger: 1
+  trigger: 11
   playDirection: 1
   resetOnPlay: 0
   clearSelection: 0
@@ -2774,7 +2746,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Bloom and Lens Flares
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -2926,7 +2898,7 @@ MonoBehaviour:
 
 
     You can certainly implement the rest!'
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -2982,7 +2954,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: 'Example: Controller Input'
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3077,7 +3049,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Options
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3159,7 +3131,7 @@ MonoBehaviour:
   m_Name: 
   target: {fileID: 163}
   clipName: 
-  trigger: 1
+  trigger: 11
   playDirection: 1
   resetOnPlay: 0
   clearSelection: 0
@@ -3327,7 +3299,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Mouse
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3446,7 +3418,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Controls
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3502,7 +3474,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Difficulty
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3622,7 +3594,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Normal
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3746,14 +3718,14 @@ MonoBehaviour:
   m_Name: 
   thumb: {fileID: 102}
   mBG: {fileID: 0}
-  mFG: {fileID: 0}
-  mValue: 1
+  mFG: {fileID: 218}
+  mValue: .81099999
   mFill: 0
   numberOfSteps: 0
   onChange: []
   foreground: {fileID: 103}
   rawValue: .81099999
-  direction: 0
+  direction: 2
   mInverted: 0
 --- !u!114 &218
 MonoBehaviour:
@@ -3869,7 +3841,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Voice
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -3925,7 +3897,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Sound
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -4035,14 +4007,14 @@ MonoBehaviour:
   m_Name: 
   thumb: {fileID: 111}
   mBG: {fileID: 0}
-  mFG: {fileID: 0}
-  mValue: 1
+  mFG: {fileID: 223}
+  mValue: .712000012
   mFill: 0
   numberOfSteps: 0
   onChange: []
   foreground: {fileID: 110}
   rawValue: .712000012
-  direction: 0
+  direction: 2
   mInverted: 0
 --- !u!114 &225
 MonoBehaviour:
@@ -4162,14 +4134,14 @@ MonoBehaviour:
   m_Name: 
   thumb: {fileID: 114}
   mBG: {fileID: 0}
-  mFG: {fileID: 0}
-  mValue: 1
+  mFG: {fileID: 230}
+  mValue: .280999988
   mFill: 0
   numberOfSteps: 0
   onChange: []
   foreground: {fileID: 115}
   rawValue: .280999988
-  direction: 0
+  direction: 2
   mInverted: 0
 --- !u!114 &230
 MonoBehaviour:
@@ -4363,7 +4335,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Options
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -4419,7 +4391,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Music
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -4490,7 +4462,7 @@ MonoBehaviour:
   m_Name: 
   target: {fileID: 166}
   clipName: 
-  trigger: 1
+  trigger: 11
   playDirection: 1
   resetOnPlay: 0
   clearSelection: 0
@@ -4585,7 +4557,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Done
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -4644,23 +4616,6 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
---- !u!114 &243
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 59}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8077b76001d36d489868d20d28bddb9, type: 1}
-  m_Name: 
-  uiCamera: {fileID: 145}
-  container: {fileID: 0}
-  side: 8
-  runOnlyOnce: 0
-  relativeOffset: {x: 0, y: 0}
-  pixelOffset: {x: 0, y: 0}
-  widgetContainer: {fileID: 0}
 --- !u!114 &244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4674,7 +4629,7 @@ MonoBehaviour:
   eventType: 1
   eventReceiverMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 4294967295
   debug: 0
   useMouse: 0
   useTouch: 0
@@ -4784,7 +4739,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Exit
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -4866,7 +4821,7 @@ MonoBehaviour:
   m_Name: 
   target: {fileID: 167}
   clipName: 
-  trigger: 1
+  trigger: 11
   playDirection: 1
   resetOnPlay: 0
   clearSelection: 0
@@ -4887,7 +4842,7 @@ MonoBehaviour:
   m_Name: 
   target: {fileID: 168}
   clipName: 
-  trigger: 1
+  trigger: 11
   playDirection: 1
   resetOnPlay: 0
   clearSelection: 0
@@ -5021,7 +4976,7 @@ MonoBehaviour:
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
   mText: Play
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -5185,7 +5140,7 @@ MonoBehaviour:
 
 
     If you don''t want to use the arrow keys, just use [99FF66]WASD[-] instead.'
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
@@ -5338,61 +5293,6 @@ MonoBehaviour:
   mClipRange: {x: 0, y: 0, z: 0, w: 0}
   mClipSoftness: {x: 40, y: 40}
   mDepth: 1
---- !u!114 &264
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 60}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae942c9068183dc40a9d01f648273726, type: 1}
-  m_Name: 
-  leftAnchor:
-    target: {fileID: 0}
-    relative: 0
-    absolute: 0
-  rightAnchor:
-    target: {fileID: 0}
-    relative: 1
-    absolute: 0
-  bottomAnchor:
-    target: {fileID: 0}
-    relative: 0
-    absolute: 0
-  topAnchor:
-    target: {fileID: 0}
-    relative: 1
-    absolute: 0
-  showInPanelTool: 1
-  generateNormals: 0
-  widgetsAreStatic: 0
-  cullWhileDragging: 0
-  alwaysOnScreen: 0
-  renderQueue: 0
-  startingRenderQueue: 3000
-  worldToLocal:
-    e00: 400
-    e01: 0
-    e02: 0
-    e03: 0
-    e10: 0
-    e11: 400
-    e12: 0
-    e13: 0
-    e20: 0
-    e21: 0
-    e22: 400
-    e23: 700
-    e30: 0
-    e31: 0
-    e32: 0
-    e33: 1
-  mAlpha: 1
-  mClipping: 0
-  mClipRange: {x: 0, y: 0, z: 0, w: 0}
-  mClipSoftness: {x: 40, y: 40}
-  mDepth: 0
 --- !u!114 &265
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5430,7 +5330,7 @@ MonoBehaviour:
     e00: 393.923096
     e01: 0
     e02: -69.4592667
-    e03: -259.52298
+    e03: -256.050018
     e10: 0
     e11: 400
     e12: 0
@@ -5438,7 +5338,7 @@ MonoBehaviour:
     e20: 69.4592667
     e21: 0
     e22: 393.923096
-    e23: -25.4523659
+    e23: -45.1485214
     e30: 0
     e31: 0
     e32: 0
@@ -5478,12 +5378,12 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!54 &268
+--- !u!54 &269
 Rigidbody:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 60}
+  m_GameObject: {fileID: 61}
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
@@ -5493,3 +5393,58 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 61}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae942c9068183dc40a9d01f648273726, type: 1}
+  m_Name: 
+  leftAnchor:
+    target: {fileID: 0}
+    relative: 0
+    absolute: 0
+  rightAnchor:
+    target: {fileID: 0}
+    relative: 1
+    absolute: 0
+  bottomAnchor:
+    target: {fileID: 0}
+    relative: 0
+    absolute: 0
+  topAnchor:
+    target: {fileID: 0}
+    relative: 1
+    absolute: 0
+  showInPanelTool: 1
+  generateNormals: 0
+  widgetsAreStatic: 0
+  cullWhileDragging: 0
+  alwaysOnScreen: 0
+  renderQueue: 0
+  startingRenderQueue: 3000
+  worldToLocal:
+    e00: 400
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 400
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 400
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 1
+  mAlpha: 1
+  mClipping: 0
+  mClipRange: {x: 0, y: 0, z: 300, w: 200}
+  mClipSoftness: {x: 4, y: 4}
+  mDepth: 0

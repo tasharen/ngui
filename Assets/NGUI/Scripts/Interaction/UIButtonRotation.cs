@@ -19,7 +19,6 @@ public class UIButtonRotation : MonoBehaviour
 
 	Quaternion mRot;
 	bool mStarted = false;
-	bool mHighlighted = false;
 
 	void Start ()
 	{
@@ -31,7 +30,7 @@ public class UIButtonRotation : MonoBehaviour
 		}
 	}
 
-	void OnEnable () { if (mStarted && mHighlighted) OnHover(UICamera.IsHighlighted(gameObject)); }
+	void OnEnable () { if (mStarted) OnHover(UICamera.IsHighlighted(gameObject)); }
 
 	void OnDisable ()
 	{
@@ -62,8 +61,14 @@ public class UIButtonRotation : MonoBehaviour
 		if (enabled)
 		{
 			if (!mStarted) Start();
-			TweenRotation.Begin(tweenTarget.gameObject, duration, isOver ? mRot * Quaternion.Euler(hover) : mRot).method = UITweener.Method.EaseInOut;
-			mHighlighted = isOver;
+			TweenRotation.Begin(tweenTarget.gameObject, duration, isOver ? mRot * Quaternion.Euler(hover) :
+				mRot).method = UITweener.Method.EaseInOut;
 		}
+	}
+
+	void OnSelect (bool isSelected)
+	{
+		if (enabled && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
+			OnHover(isSelected);
 	}
 }
