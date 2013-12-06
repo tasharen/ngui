@@ -32,7 +32,7 @@ public class UIButtonKeys : MonoBehaviour
 			}
 		}
 	}
-	 
+
 	void OnKey (KeyCode key)
 	{
 		if (enabled && NGUITools.GetActive(gameObject))

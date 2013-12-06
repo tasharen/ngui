@@ -151,8 +151,7 @@ public class UIRectEditor : Editor
 			}
 			else if (type == AnchorType.Unified)
 			{
-				if (mAnchorType == AnchorType.None ||
-					mAnchorType == AnchorType.Relative) UpdateAnchors(false, true);
+				if (mAnchorType == AnchorType.None) UpdateAnchors(false, true);
 				DrawUnifiedAnchors();
 			}
 			else if (type == AnchorType.None && mAnchorType != type)
@@ -184,42 +183,50 @@ public class UIRectEditor : Editor
 
 	void DrawPaddedAnchors ()
 	{
-		GUILayout.Space(3f);
-		
 		SerializedProperty sp = serializedObject.FindProperty("leftAnchor.target");
 		Object before = sp.objectReferenceValue;
+
+		GUILayout.Space(3f);
 		NGUIEditorTools.DrawProperty("Target", sp, false);
+
 		Object after = sp.objectReferenceValue;
 		serializedObject.FindProperty("rightAnchor.target").objectReferenceValue = after;
 		serializedObject.FindProperty("bottomAnchor.target").objectReferenceValue = after;
 		serializedObject.FindProperty("topAnchor.target").objectReferenceValue = after;
 
 		if (sp.objectReferenceValue != null || sp.hasMultipleDifferentValues)
-		{
-			if (before == null && after != null) UpdateAnchors(false, false);
+			DrawSimpleAnchors(before == null && after != null);
+	}
 
-			GUILayout.Space(3f);
+	/// <summary>
+	/// Draw basic padded anchors.
+	/// </summary>
 
-			GUILayout.BeginHorizontal();
-			NGUIEditorTools.DrawProperty("Left", serializedObject, "leftAnchor.absolute", GUILayout.Width(110f));
-			GUILayout.Label("pixels");
-			GUILayout.EndHorizontal();
+	void DrawSimpleAnchors (bool reset)
+	{
+		if (reset) UpdateAnchors(false, false);
 
-			GUILayout.BeginHorizontal();
-			NGUIEditorTools.DrawProperty("Right", serializedObject, "rightAnchor.absolute", GUILayout.Width(110f));
-			GUILayout.Label("pixels");
-			GUILayout.EndHorizontal();
+		GUILayout.Space(3f);
 
-			GUILayout.BeginHorizontal();
-			NGUIEditorTools.DrawProperty("Bottom", serializedObject, "bottomAnchor.absolute", GUILayout.Width(110f));
-			GUILayout.Label("pixels");
-			GUILayout.EndHorizontal();
+		GUILayout.BeginHorizontal();
+		NGUIEditorTools.DrawProperty("Left", serializedObject, "leftAnchor.absolute", GUILayout.Width(110f));
+		GUILayout.Label("pixels");
+		GUILayout.EndHorizontal();
 
-			GUILayout.BeginHorizontal();
-			NGUIEditorTools.DrawProperty("Top", serializedObject, "topAnchor.absolute", GUILayout.Width(110f));
-			GUILayout.Label("pixels");
-			GUILayout.EndHorizontal();
-		}
+		GUILayout.BeginHorizontal();
+		NGUIEditorTools.DrawProperty("Right", serializedObject, "rightAnchor.absolute", GUILayout.Width(110f));
+		GUILayout.Label("pixels");
+		GUILayout.EndHorizontal();
+
+		GUILayout.BeginHorizontal();
+		NGUIEditorTools.DrawProperty("Bottom", serializedObject, "bottomAnchor.absolute", GUILayout.Width(110f));
+		GUILayout.Label("pixels");
+		GUILayout.EndHorizontal();
+
+		GUILayout.BeginHorizontal();
+		NGUIEditorTools.DrawProperty("Top", serializedObject, "topAnchor.absolute", GUILayout.Width(110f));
+		GUILayout.Label("pixels");
+		GUILayout.EndHorizontal();
 	}
 
 	/// <summary>
@@ -229,28 +236,28 @@ public class UIRectEditor : Editor
 	void DrawRelativeAnchors ()
 	{
 		SerializedProperty sp = serializedObject.FindProperty("leftAnchor.target");
+		Object before = sp.objectReferenceValue;
 
-		if (IsRect(sp))
+		GUILayout.Space(3f);
+		NGUIEditorTools.DrawProperty("Target", sp, false);
+
+		Object after = sp.objectReferenceValue;
+		serializedObject.FindProperty("rightAnchor.target").objectReferenceValue = after;
+		serializedObject.FindProperty("bottomAnchor.target").objectReferenceValue = after;
+		serializedObject.FindProperty("topAnchor.target").objectReferenceValue = after;
+
+		if (sp.objectReferenceValue != null || sp.hasMultipleDifferentValues)
 		{
-			GUILayout.Space(3f);
-			Object before = sp.objectReferenceValue;
-			NGUIEditorTools.DrawProperty("Target", sp, false);
-			Object after = sp.objectReferenceValue;
-			serializedObject.FindProperty("rightAnchor.target").objectReferenceValue = after;
-			serializedObject.FindProperty("bottomAnchor.target").objectReferenceValue = after;
-			serializedObject.FindProperty("topAnchor.target").objectReferenceValue = after;
-
-			if (sp.objectReferenceValue != null || sp.hasMultipleDifferentValues)
+			if (IsRect(sp))
 			{
 				if (before == null && after != null) UpdateAnchors(true, false);
-
 				DrawRelativeAnchor(sp, "Left", "leftAnchor", "width");
 				DrawRelativeAnchor(sp, "Right", "rightAnchor", "width");
 				DrawRelativeAnchor(sp, "Bottom", "bottomAnchor", "height");
 				DrawRelativeAnchor(sp, "Top", "topAnchor", "height");
 			}
+			else DrawSimpleAnchors(before == null && after != null);
 		}
-		else DrawPaddedAnchors();
 	}
 
 	/// <summary>
@@ -273,28 +280,28 @@ public class UIRectEditor : Editor
 	void DrawUnifiedAnchors ()
 	{
 		SerializedProperty sp = serializedObject.FindProperty("leftAnchor.target");
+		Object before = sp.objectReferenceValue;
+		
+		GUILayout.Space(3f);
+		NGUIEditorTools.DrawProperty("Target", sp, false);
+		
+		Object after = sp.objectReferenceValue;
+		serializedObject.FindProperty("rightAnchor.target").objectReferenceValue = after;
+		serializedObject.FindProperty("bottomAnchor.target").objectReferenceValue = after;
+		serializedObject.FindProperty("topAnchor.target").objectReferenceValue = after;
 
-		if (IsRect(sp))
+		if (after != null || sp.hasMultipleDifferentValues)
 		{
-			GUILayout.Space(3f);
-			Object before = sp.objectReferenceValue;
-			NGUIEditorTools.DrawProperty("Target", sp, false);
-			Object after = sp.objectReferenceValue;
-			serializedObject.FindProperty("rightAnchor.target").objectReferenceValue = after;
-			serializedObject.FindProperty("bottomAnchor.target").objectReferenceValue = after;
-			serializedObject.FindProperty("topAnchor.target").objectReferenceValue = after;
-
-			if (after != null || sp.hasMultipleDifferentValues)
+			if (IsRect(sp))
 			{
 				if (before == null && after != null) UpdateAnchors(false, true);
-
 				DrawUnifiedAnchor(sp, "Left", "leftAnchor", "width");
 				DrawUnifiedAnchor(sp, "Right", "rightAnchor", "width");
 				DrawUnifiedAnchor(sp, "Bottom", "bottomAnchor", "height");
 				DrawUnifiedAnchor(sp, "Top", "topAnchor", "height");
 			}
+			else DrawSimpleAnchors(before == null && after != null);
 		}
-		else DrawPaddedAnchors();
 	}
 
 	/// <summary>
