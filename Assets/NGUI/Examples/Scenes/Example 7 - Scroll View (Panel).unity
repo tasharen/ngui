@@ -2099,6 +2099,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d35d721694fa0ee48a2d14bddfcbf4a4, type: 1}
   m_Name: 
   springStrength: 8
+  nextPageThreshold: 0
 --- !u!1 &28542
 GameObject:
   m_ObjectHideFlags: 0
@@ -7877,7 +7878,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1fdca5042b1d12a4890ec1bd4f04290d, type: 1}
   m_Name: 
-  tweenTarget: {fileID: 0}
+  tweenTarget: {fileID: 1469404478}
   hover: {r: .835820913, g: .835820913, b: .835820913, a: 1}
   pressed: {r: .23880595, g: .23880595, b: .23880595, a: 1}
   duration: .200000003
