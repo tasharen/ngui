@@ -202,7 +202,7 @@ public class UIRectEditor : Editor
 	/// Draw basic padded anchors.
 	/// </summary>
 
-	void DrawSimpleAnchors (bool reset)
+	protected virtual void DrawSimpleAnchors (bool reset)
 	{
 		if (reset) UpdateAnchors(false, false);
 

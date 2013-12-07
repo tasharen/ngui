@@ -120,7 +120,7 @@ public class UIPanel : UIRect
 	Camera mCam;
 	float mCullTime = 0f;
 	float mUpdateTime = 0f;
-	float mMatrixTime = 0f;
+	int mMatrixFrame = -1;
 	int mLayer = -1;
 	Vector2 mClipOffset = Vector2.zero;
 
@@ -287,7 +287,7 @@ public class UIPanel : UIRect
 			if (mClipping != value)
 			{
 				mClipping = value;
-				mMatrixTime = 0f;
+				mMatrixFrame = -1;
 #if UNITY_EDITOR
 				if (!Application.isPlaying) UIDrawCall.Update(this);
 #endif
@@ -314,7 +314,7 @@ public class UIPanel : UIRect
 			{
 				mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
 				mClipOffset = value;
-				mMatrixTime = 0f;
+				mMatrixFrame = -1;
 #if UNITY_EDITOR
 				if (!Application.isPlaying) UIDrawCall.Update(this);
 #endif
@@ -360,7 +360,7 @@ public class UIPanel : UIRect
 			{
 				mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
 				mClipRange = value;
-				mMatrixTime = 0f;
+				mMatrixFrame = -1;
 #if UNITY_EDITOR
 				if (!Application.isPlaying) UIDrawCall.Update(this);
 #endif
@@ -603,12 +603,6 @@ public class UIPanel : UIRect
 
 	public bool IsVisible (UIWidget w)
 	{
-		if (mAlpha < 0.001f) return false;
-		if (!w.enabled || !NGUITools.GetActive(w.cachedGameObject) || w.alpha < 0.001f) return false;
-
-		// No clipping? No point in checking.
-		if (mClipping == UIDrawCall.Clipping.None) return true;
-
 		Vector3[] corners = w.worldCorners;
 		return IsVisible(corners[0], corners[1], corners[2], corners[3]);
 	}
@@ -709,28 +703,22 @@ public class UIPanel : UIRect
 
 	void UpdateTransformMatrix ()
 	{
-		if (mUpdateTime == 0f || mMatrixTime != mUpdateTime)
+		int fc = Time.frameCount;
+
+		if (mMatrixFrame != fc)
 		{
-			mMatrixTime = mUpdateTime;
+			mMatrixFrame = fc;
 			worldToLocal = cachedTransform.worldToLocalMatrix;
 
-			if (mClipping != UIDrawCall.Clipping.None)
-			{
-				Vector2 size = new Vector2(mClipRange.z, mClipRange.w);
+			Vector2 size = GetViewSize() * 0.5f;
 
-				if (size.x == 0f) size.x = (mCam == null) ? Screen.width  : mCam.pixelWidth;
-				if (size.y == 0f) size.y = (mCam == null) ? Screen.height : mCam.pixelHeight;
+			float x = mClipOffset.x + mClipRange.x;
+			float y = mClipOffset.y + mClipRange.y;
 
-				size *= 0.5f;
-
-				float x = mClipOffset.x + mClipRange.x;
-				float y = mClipOffset.y + mClipRange.y;
-
-				mMin.x = x - size.x;
-				mMin.y = y - size.y;
-				mMax.x = x + size.x;
-				mMax.y = y + size.y;
-			}
+			mMin.x = x - size.x;
+			mMin.y = y - size.y;
+			mMax.x = x + size.x;
+			mMax.y = y + size.y;
 		}
 	}
 
@@ -936,9 +924,9 @@ public class UIPanel : UIRect
 	void UpdateWidgets()
 	{
 #if UNITY_EDITOR
-		bool forceVisible = cullWhileDragging ? false : (clipping == UIDrawCall.Clipping.None) || (Application.isPlaying && mCullTime > mUpdateTime);
+		bool forceVisible = cullWhileDragging ? false : (Application.isPlaying && mCullTime > mUpdateTime);
 #else
-		bool forceVisible = cullWhileDragging ? false : (clipping == UIDrawCall.Clipping.None) || (mCullTime > mUpdateTime);
+		bool forceVisible = cullWhileDragging ? false : (mCullTime > mUpdateTime);
 #endif
 		bool changed = false;
 
@@ -985,7 +973,11 @@ public class UIPanel : UIRect
 					}
 				}
 #endif
-				if (!w.UpdateGeometry(forceVisible)) continue;
+				bool vis = forceVisible ||
+					(mClipping == UIDrawCall.Clipping.None && !w.hideIfOffScreen) ||
+					(w.cumulativeAlpha > 0.001f && IsVisible(w));
+
+				if (!w.UpdateGeometry(vis)) continue;
 
 				changed = true;
 				
@@ -1035,7 +1027,7 @@ public class UIPanel : UIRect
 			{
 				if (dc.baseMaterial == mat && dc.mainTexture == tex)
 				{
-					if (w.isVisible && w.hasVertices)
+					if (w.isVisible)
 					{
 						w.drawCall = dc;
 						dc.isDirty = true;
@@ -1196,7 +1188,7 @@ public class UIPanel : UIRect
 				continue;
 			}
 
-			if (w.isVisible && w.hasVertices)
+			if (w.isVisible)
 			{
 				UIPanel pn = w.panel;
 				Material mt = w.material;
@@ -1283,7 +1275,7 @@ public class UIPanel : UIRect
 
 				if (w.drawCall == dc)
 				{
-					if (w.isVisible && w.hasVertices)
+					if (w.isVisible)
 					{
 						if (dc.manager.generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
 						else w.WriteToBuffers(mVerts, mUvs, mCols, null, null);

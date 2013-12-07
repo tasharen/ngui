@@ -45,6 +45,12 @@ public class UIWidget : UIRect
 	/// </summary>
 
 	public bool autoResizeBoxCollider = false;
+
+	/// <summary>
+	/// Hide the widget if it happens to be off-screen.
+	/// </summary>
+
+	public bool hideIfOffScreen = false;
 	
 	protected UIPanel mPanel;
 	protected bool mPlayMode = true;
@@ -55,7 +61,7 @@ public class UIWidget : UIRect
 	Quaternion mDiffRot;
 	Vector3 mDiffScale;
 	Matrix4x4 mLocalToPanel;
-	bool mVisibleByPanel = true;
+	bool mIsVisible = true;
 	float mLastAlpha = 0f;
 
 	/// <summary>
@@ -91,12 +97,6 @@ public class UIWidget : UIRect
 			}
 		}
 	}
-
-	/// <summary>
-	/// Whether the widget is visible.
-	/// </summary>
-
-	public bool isVisible { get { return mVisibleByPanel && finalAlpha > 0.001f; } }
 
 	/// <summary>
 	/// Pivot offset in relative coordinates. Bottom-left is (0, 0). Top-right is (1, 1).
@@ -201,9 +201,28 @@ public class UIWidget : UIRect
 	{
 		get
 		{
+			if (!mIsVisible) return 0f;
 			return (mParent != null) ? mParent.finalAlpha * mColor.a : mColor.a;
 		}
 	}
+
+	/// <summary>
+	/// Same as final alpha, except it doesn't take own visibility into consideration. Used by panels.
+	/// </summary>
+
+	public float cumulativeAlpha
+	{
+		get
+		{
+			return (mParent != null) ? mParent.finalAlpha * mColor.a : mColor.a;
+		}
+	}
+
+	/// <summary>
+	/// Whether the widget is currently visible.
+	/// </summary>
+
+	public bool isVisible { get { return mIsVisible && mGeom != null && mGeom.hasVertices; } }
 
 	/// <summary>
 	/// Change the pivot point and do not attempt to keep the widget in the same place by adjusting its transform.
@@ -389,12 +408,6 @@ public class UIWidget : UIRect
 	}
 
 	/// <summary>
-	/// Whether the widget has some geometry that can be drawn.
-	/// </summary>
-
-	public bool hasVertices { get { return mGeom != null && mGeom.hasVertices; } }
-
-	/// <summary>
 	/// Material used by the widget.
 	/// </summary>
 
@@ -576,7 +589,7 @@ public class UIWidget : UIRect
 		{
 			drawCall.isDirty = true;
 		}
-		else if (isVisible && hasVertices)
+		else if (isVisible)
 		{
 			drawCall = UIPanel.InsertWidget(this);
 		}
@@ -1044,7 +1057,6 @@ public class UIWidget : UIRect
 		return false;
 	}
 
-	bool mForceVisible = false;
 	Vector3 mOldV0;
 	Vector3 mOldV1;
 
@@ -1052,13 +1064,18 @@ public class UIWidget : UIRect
 	/// Update the widget and fill its geometry if necessary. Returns whether something was changed.
 	/// </summary>
 
-	public bool UpdateGeometry (bool forceVisible)
+	public bool UpdateGeometry (bool visible)
 	{
 		bool hasMatrix = false;
 		float final = finalAlpha;
-		bool visibleByAlpha = (final > 0.001f);
-		bool visibleByPanel = forceVisible || mVisibleByPanel;
 		bool moved = false;
+
+		// Is the visibility changing?
+		if (mIsVisible != visible)
+		{
+			mChanged = true;
+			mIsVisible = visible;
+		}
 
 		// Check to see if the widget has moved relative to the panel that manages it
 		if (HasTransformChanged())
@@ -1095,36 +1112,17 @@ public class UIWidget : UIRect
 					mOldV1 = v1;
 				}
 			}
-
-			// Is the widget visible by the panel?
-			if (visibleByAlpha || mForceVisible != forceVisible)
-			{
-				mForceVisible = forceVisible;
-				visibleByPanel = forceVisible || mPanel.IsVisible(this);
-			}
-		}
-		else if (visibleByAlpha && mForceVisible != forceVisible)
-		{
-			mForceVisible = forceVisible;
-			visibleByPanel = mPanel.IsVisible(this);
-		}
-
-		// Is the visibility changing?
-		if (mVisibleByPanel != visibleByPanel)
-		{
-			mVisibleByPanel = visibleByPanel;
-			mChanged = true;
 		}
 
 		// Has the alpha changed?
-		if (mVisibleByPanel && mLastAlpha != final) mChanged = true;
+		if (visible && mLastAlpha != final) mChanged = true;
 		mLastAlpha = final;
 
 		if (mChanged)
 		{
 			mChanged = false;
 
-			if (isVisible && shader != null)
+			if (mIsVisible && finalAlpha > 0.001f && shader != null)
 			{
 				bool hadVertices = mGeom.hasVertices;
 				mGeom.Clear();

@@ -160,6 +160,7 @@ MonoBehaviour:
   mHeight: 290
   mDepth: 3
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
 --- !u!114 &11400008
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -208,6 +209,7 @@ MonoBehaviour:
   mHeight: 20
   mDepth: 2
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Button
   mFillCenter: 1
@@ -247,6 +249,7 @@ MonoBehaviour:
   mHeight: 300
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Highlight - Shadowed
   mFillCenter: 1

@@ -1063,4 +1063,22 @@ public class UIWidgetInspector : UIRectEditor
 			mWidget.pivot = pivot;
 		}
 	}
+
+	protected override void DrawSimpleAnchors (bool reset)
+	{
+		base.DrawSimpleAnchors(reset);
+
+		SerializedProperty sp = serializedObject.FindProperty("leftAnchor.target");
+		Transform trans = sp.objectReferenceValue as Transform;
+
+		if (trans != null && (trans.GetComponent<UIRect>() == null))
+		{
+			GUILayout.Space(3f);
+			GUILayout.BeginHorizontal();
+			GUILayout.Space(6f);
+			NGUIEditorTools.DrawProperty("", serializedObject, "hideIfOffScreen", GUILayout.Width(18f));
+			GUILayout.Label("Hide if off-screen", GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
+		}
+	}
 }

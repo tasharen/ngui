@@ -317,10 +317,10 @@ public static class NGUIContextMenu
 	{
 		GameObject go = obj as GameObject;
 		if (go.GetComponent<UIWidget>() != null) go = go.transform.parent.gameObject;
-		go.name = "Scroll View";
 		UIPanel panel = NGUISettings.AddPanel(go);
 		panel.clipping = UIDrawCall.Clipping.SoftClip;
 		panel.gameObject.AddComponent<UIScrollView>();
+		panel.name = "Scroll View";
 		Selection.activeGameObject = panel.gameObject;
 	}
 

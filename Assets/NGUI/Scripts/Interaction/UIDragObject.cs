@@ -45,6 +45,12 @@ public class UIDragObject : MonoBehaviour
 	public bool restrictWithinPanel = false;
 
 	/// <summary>
+	/// Rectangle to be used as the draggable object's bounds. If none specified, all widgets' bounds get added up.
+	/// </summary>
+
+	public UIRect boundsRect = null;
+
+	/// <summary>
 	/// Effect to apply when dragging.
 	/// </summary>
 
@@ -73,8 +79,29 @@ public class UIDragObject : MonoBehaviour
 
 	void FindPanel ()
 	{
-		mPanel = (target != null) ? UIPanel.Find(target.transform) : null;
+		mPanel = (target != null) ? UIPanel.Find(target.transform.parent) : null;
 		if (mPanel == null) restrictWithinPanel = false;
+	}
+
+	/// <summary>
+	/// Recalculate the bounds of the dragged content.
+	/// </summary>
+
+	void UpdateBounds ()
+	{
+		if (boundsRect)
+		{
+			Transform t = mPanel.cachedTransform;
+			Vector3[] corners = boundsRect.worldCorners;
+			Matrix4x4 toLocal = t.worldToLocalMatrix;
+			for (int i = 0; i < 4; ++i) corners[i] = toLocal.MultiplyPoint3x4(corners[i]);
+			mBounds = new Bounds(corners[0], Vector3.zero);
+			for (int i = 1; i < 4; ++i) mBounds.Encapsulate(corners[i]);
+		}
+		else
+		{
+			mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.cachedTransform, target);
+		}
 	}
 
 	/// <summary>
@@ -98,7 +125,7 @@ public class UIDragObject : MonoBehaviour
 					mScroll = 0f;
 
 					if (restrictWithinPanel && mPanel == null) FindPanel();
-					if (restrictWithinPanel) mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.cachedTransform, target);
+					if (restrictWithinPanel) UpdateBounds();
 
 					// Disable the spring movement
 					SpringPosition sp = target.GetComponent<SpringPosition>();
@@ -232,7 +259,7 @@ public class UIDragObject : MonoBehaviour
 
 					if (restrictWithinPanel)
 					{
-						mBounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.cachedTransform, target);
+						UpdateBounds();
 
 						if (mPanel.ConstrainTargetToBounds(target, ref mBounds, dragEffect == DragEffect.None))
 						{
