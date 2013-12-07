@@ -120,6 +120,20 @@ public class UIRectEditor : Editor
 
 			if (mAnchorType == AnchorType.None && type != AnchorType.None)
 			{
+				if (mTarget0 == null && mTarget1 == null && mTarget2 == null && mTarget3 == null)
+				{
+					UIRect rect = target as UIRect;
+					UIRect parent = NGUITools.FindInParents<UIRect>(rect.cachedTransform.parent);
+					
+					if (parent != null)
+					{
+						mTarget0 = parent.cachedTransform;
+						mTarget1 = parent.cachedTransform;
+						mTarget2 = parent.cachedTransform;
+						mTarget3 = parent.cachedTransform;
+					}
+				}
+
 				t0.objectReferenceValue = mTarget0;
 				t1.objectReferenceValue = mTarget1;
 				t2.objectReferenceValue = mTarget2;
