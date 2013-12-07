@@ -826,6 +826,17 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// If the label is anchored it should not auto-resize.
+	/// </summary>
+
+	protected override void OnAnchor ()
+	{
+		if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
+			mOverflow = Overflow.ShrinkContent;
+		base.OnAnchor();
+	}
+
+	/// <summary>
 	/// Request the needed characters in the texture.
 	/// </summary>
 
