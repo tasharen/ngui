@@ -480,22 +480,16 @@ public class UIRectEditor : Editor
 			else
 			{
 				// We want to choose the side with the shortest offset
-				Vector3 remotePos0 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[0], targetCorners[1], 0.5f));
-				Vector3 remotePos1 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[2], targetCorners[3], 0.5f));
+				Vector3 side0 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[0], targetCorners[1], 0.5f));
+				Vector3 side1 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[2], targetCorners[3], 0.5f));
 
-				float offset0 = localPos.x - remotePos0.x;
-				float offset1 = localPos.x - remotePos1.x;
+				float val0 = localPos.x - side0.x;
+				float val2 = localPos.x - side1.x;
+				float val1 = localPos.x - Vector3.Lerp(side0, side1, 0.5f).x;
 
-				if (chooseClosest && Mathf.Abs(offset0) > Mathf.Abs(offset1) || !chooseClosest && inverted)
-				{
-					anchor.relative = 1f;
-					anchor.absolute = Mathf.FloorToInt(offset1 + 0.5f);
-				}
-				else
-				{
-					anchor.relative = 0f;
-					anchor.absolute = Mathf.FloorToInt(offset0 + 0.5f);
-				}
+				if (chooseClosest) anchor.SetToNearest(val0, val1, val2);
+				else if (inverted) anchor.Set(1f, val2);
+				else anchor.Set(0f, val0);
 			}
 		}
 	}
@@ -550,22 +544,16 @@ public class UIRectEditor : Editor
 			else
 			{
 				// We want to choose the side with the shortest offset
-				Vector3 remotePos0 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[0], targetCorners[3], 0.5f));
-				Vector3 remotePos1 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[1], targetCorners[2], 0.5f));
+				Vector3 side0 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[0], targetCorners[3], 0.5f));
+				Vector3 side1 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[1], targetCorners[2], 0.5f));
 
-				float offset0 = localPos.y - remotePos0.y;
-				float offset1 = localPos.y - remotePos1.y;
+				float val0 = localPos.y - side0.y;
+				float val2 = localPos.y - side1.y;
+				float val1 = localPos.y - Vector3.Lerp(side0, side1, 0.5f).y;
 
-				if (chooseClosest && Mathf.Abs(offset0) > Mathf.Abs(offset1) || !chooseClosest && inverted)
-				{
-					anchor.relative = 1f;
-					anchor.absolute = Mathf.FloorToInt(offset1 + 0.5f);
-				}
-				else
-				{
-					anchor.relative = 0f;
-					anchor.absolute = Mathf.FloorToInt(offset0 + 0.5f);
-				}
+				if (chooseClosest) anchor.SetToNearest(val0, val1, val2);
+				else if (inverted) anchor.Set(1f, val2);
+				else anchor.Set(0f, val0);
 			}
 		}
 	}
