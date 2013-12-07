@@ -379,6 +379,7 @@ MonoBehaviour:
   mHeight: 76
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: NGUI
   mFillCenter: 1
@@ -418,6 +419,7 @@ MonoBehaviour:
   mHeight: 408
   mDepth: -1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 29056518aafb01b49a5b08faf8e30cff, type: 2}
@@ -640,6 +642,7 @@ MonoBehaviour:
   mHeight: 26
   mDepth: 5
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 29056518aafb01b49a5b08faf8e30cff, type: 2}
@@ -723,6 +726,7 @@ MonoBehaviour:
   mHeight: 30
   mDepth: 3
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Glow - Inner
   mFillCenter: 1
@@ -792,6 +796,7 @@ MonoBehaviour:
   mHeight: 334
   mDepth: 6
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Right Bracket
   mFillCenter: 1
@@ -894,6 +899,7 @@ MonoBehaviour:
   mHeight: 325
   mDepth: 5
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 29056518aafb01b49a5b08faf8e30cff, type: 2}
@@ -977,6 +983,7 @@ MonoBehaviour:
   mHeight: 720
   mDepth: -3
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Glow - Inner
   mFillCenter: 1
@@ -1043,6 +1050,7 @@ MonoBehaviour:
   mHeight: 720
   mDepth: -2
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Stripes 2
   mFillCenter: 1
@@ -1123,6 +1131,7 @@ MonoBehaviour:
   mHeight: 20
   mDepth: 2
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Resize Icon
   mFillCenter: 1
@@ -1203,6 +1212,7 @@ MonoBehaviour:
   mHeight: 334
   mDepth: 3
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Glow - Inner
   mFillCenter: 1
@@ -1275,6 +1285,7 @@ MonoBehaviour:
   mHeight: 30
   mDepth: 4
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Glow - Inner
   mFillCenter: 0
@@ -1406,6 +1417,7 @@ MonoBehaviour:
   mHeight: 334
   mDepth: 4
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Glow - Inner
   mFillCenter: 0
@@ -1504,6 +1516,7 @@ MonoBehaviour:
   mHeight: 410
   mDepth: 1
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Window
   mFillCenter: 1
@@ -1534,11 +1547,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90fc8427bee38c478f5b2f6f0ae9580, type: 1}
   m_Name: 
   target: {fileID: 1737164184}
-  scale: {x: 1, y: 1, z: 0}
-  scrollWheelFactor: 0
+  scrollMomentum: {x: 0, y: 0, z: 0}
   restrictWithinPanel: 1
+  contentRect: {fileID: 1737164185}
   dragEffect: 2
   momentumAmount: 35
+  scale: {x: 1, y: 1, z: 0}
+  scrollWheelFactor: 0
 --- !u!1 &1905493301
 GameObject:
   m_ObjectHideFlags: 0
@@ -1600,6 +1615,7 @@ MonoBehaviour:
   mHeight: 336
   mDepth: 7
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Button
   mFillCenter: 1
