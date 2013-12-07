@@ -63,5 +63,11 @@ public class UIButtonColorEditor : UIWidgetContainerEditor
 			button.duration = duration;
 			UnityEditor.EditorUtility.SetDirty(button);
 		}
+
+		if (GUILayout.Button("Upgrade to a Button"))
+		{
+			NGUIEditorTools.ReplaceClass(serializedObject, typeof(UIButton));
+			Selection.activeGameObject = null;
+		}
 	}
 }

@@ -17,11 +17,14 @@ static public class NGUIHelp
 	[MenuItem("Help/NGUI Documentation")]
 	static void ShowHelp0 (MenuCommand command) { Show(); }
 
-	[MenuItem("CONTEXT/UIWidget/Copy Style")]
-	static void CopyStyle (MenuCommand command) { NGUISettings.CopyStyle(command.context as UIWidget); }
+	[MenuItem("CONTEXT/UIWidget/Copy Widget")]
+	static void CopyStyle (MenuCommand command) { NGUISettings.CopyWidget(command.context as UIWidget); }
 
-	[MenuItem("CONTEXT/UIWidget/Paste Style")]
-	static void PasteStyle (MenuCommand command) { NGUISettings.PasteStyle(command.context as UIWidget); }
+	[MenuItem("CONTEXT/UIWidget/Paste Widget Values")]
+	static void PasteStyle (MenuCommand command) { NGUISettings.PasteWidget(command.context as UIWidget, true); }
+
+	[MenuItem("CONTEXT/UIWidget/Paste Widget Style")]
+	static void PasteStyle2 (MenuCommand command) { NGUISettings.PasteWidget(command.context as UIWidget, false); }
 
 	[MenuItem("CONTEXT/UIWidget/Help")]
 	static void ShowHelp1 (MenuCommand command) { Show(command.context); }

@@ -1545,6 +1545,83 @@ public class NGUIEditorTools
 	}
 
 	/// <summary>
+	/// Gets the internal class ID of the specified type.
+	/// </summary>
+
+	static public int GetClassID (System.Type type)
+	{
+		GameObject go = EditorUtility.CreateGameObjectWithHideFlags("Temp", HideFlags.HideAndDontSave);
+		Component uiSprite = go.AddComponent(type);
+		SerializedObject ob = new SerializedObject(uiSprite);
+		int classID = ob.FindProperty("m_Script").objectReferenceInstanceIDValue;
+		NGUITools.DestroyImmediate(go);
+		return classID;
+	}
+
+	/// <summary>
+	/// Gets the internal class ID of the specified type.
+	/// </summary>
+
+	static public int GetClassID<T> () where T : MonoBehaviour { return GetClassID(typeof(T)); }
+
+	/// <summary>
+	/// Convenience function that replaces the specified MonoBehaviour with one of specified type.
+	/// </summary>
+
+	static public SerializedObject ReplaceClass (MonoBehaviour mb, System.Type type)
+	{
+		int id = GetClassID(type);
+		SerializedObject ob = new SerializedObject(mb);
+		ob.Update();
+		ob.FindProperty("m_Script").objectReferenceInstanceIDValue = id;
+		ob.ApplyModifiedProperties();
+		ob.Update();
+		return ob;
+	}
+
+	/// <summary>
+	/// Convenience function that replaces the specified MonoBehaviour with one of specified class ID.
+	/// </summary>
+
+	static public SerializedObject ReplaceClass (MonoBehaviour mb, int classID)
+	{
+		SerializedObject ob = new SerializedObject(mb);
+		ob.Update();
+		ob.FindProperty("m_Script").objectReferenceInstanceIDValue = classID;
+		ob.ApplyModifiedProperties();
+		ob.Update();
+		return ob;
+	}
+
+	/// <summary>
+	/// Convenience function that replaces the specified MonoBehaviour with one of specified class ID.
+	/// </summary>
+
+	static public void ReplaceClass (SerializedObject ob, int classID)
+	{
+		ob.FindProperty("m_Script").objectReferenceInstanceIDValue = classID;
+		ob.ApplyModifiedProperties();
+		ob.Update();
+	}
+
+	/// <summary>
+	/// Convenience function that replaces the specified MonoBehaviour with one of specified class ID.
+	/// </summary>
+
+	static public void ReplaceClass (SerializedObject ob, System.Type type)
+	{
+		ob.FindProperty("m_Script").objectReferenceInstanceIDValue = GetClassID(type);
+		ob.ApplyModifiedProperties();
+		ob.Update();
+	}
+
+	/// <summary>
+	/// Convenience function that replaces the specified MonoBehaviour with one of specified type.
+	/// </summary>
+
+	static public T ReplaceClass<T> (MonoBehaviour mb) where T : MonoBehaviour { return ReplaceClass(mb, typeof(T)).targetObject as T; }
+
+	/// <summary>
 	/// Automatically upgrade all of the UITextures in the scene to Sprites if they can be found within the specified atlas.
 	/// </summary>
 
@@ -1559,11 +1636,7 @@ public class NGUIEditorTools
 				UIWidgetInspector.instance.target as UITexture : null;
 
 			// Determine the object instance ID of the UISprite class
-			GameObject go = EditorUtility.CreateGameObjectWithHideFlags("Temp", HideFlags.HideAndDontSave);
-			UISprite uiSprite = go.AddComponent<UISprite>();
-			SerializedObject ob = new SerializedObject(uiSprite);
-			int spriteID = ob.FindProperty("m_Script").objectReferenceInstanceIDValue;
-			NGUITools.DestroyImmediate(go);
+			int spriteID = GetClassID<UISprite>();
 
 			// Run through all the UI textures and change them to sprites
 			for (int i = 0; i < uits.Count; ++i)
@@ -1576,11 +1649,7 @@ public class NGUIEditorTools
 
 					if (atlasSprite != null)
 					{
-						ob = new SerializedObject(uiTexture);
-						ob.Update();
-						ob.FindProperty("m_Script").objectReferenceInstanceIDValue = spriteID;
-						ob.ApplyModifiedProperties();
-						ob.Update();
+						SerializedObject ob = ReplaceClass(uiTexture, spriteID);
 						ob.FindProperty("mSpriteName").stringValue = uiTexture.mainTexture.name;
 						ob.FindProperty("mAtlas").objectReferenceValue = NGUISettings.atlas;
 						ob.ApplyModifiedProperties();
@@ -1715,6 +1784,59 @@ public class NGUIEditorTools
 				GameObject go = obj as GameObject;
 				return go.GetComponent(typeof(T)) as T;
 			}
+		}
+		return null;
+	}
+
+	/// <summary>
+	/// Get the specified object's GUID.
+	/// </summary>
+
+	static public string ObjectToGUID (Object obj)
+	{
+		string path = AssetDatabase.GetAssetPath(obj);
+		return (!string.IsNullOrEmpty(path)) ? AssetDatabase.AssetPathToGUID(path) : null;
+	}
+
+#if !UNITY_3_5
+	static MethodInfo s_GetInstanceIDFromGUID;
+#endif
+
+	/// <summary>
+	/// Convert the specified GUID to an object reference.
+	/// </summary>
+
+	static public Object GUIDToObject (string guid)
+	{
+#if !UNITY_3_5
+		// This method is not going to be available in Unity 3.5
+		if (s_GetInstanceIDFromGUID == null)
+			s_GetInstanceIDFromGUID = typeof(AssetDatabase).GetMethod("GetInstanceIDFromGUID");
+
+		int id = (int)s_GetInstanceIDFromGUID.Invoke(null, new object[] { guid });
+		if (id != 0) return EditorUtility.InstanceIDToObject(id);
+#endif
+		string path = AssetDatabase.GUIDToAssetPath(guid);
+		if (string.IsNullOrEmpty(path)) return null;
+		return AssetDatabase.LoadAssetAtPath(path, typeof(Object));
+	}
+
+	/// <summary>
+	/// Convert the specified GUID to an object reference of specified type.
+	/// </summary>
+
+	static public T GUIDToObject<T> (string guid) where T : Object
+	{
+		Object obj = GUIDToObject(guid);
+		if (obj == null) return null;
+
+		System.Type objType = obj.GetType();
+		if (objType == typeof(T) || objType.IsSubclassOf(typeof(T))) return obj as T;
+
+		if (objType == typeof(GameObject) && typeof(T).IsSubclassOf(typeof(Component)))
+		{
+			GameObject go = obj as GameObject;
+			return go.GetComponent(typeof(T)) as T;
 		}
 		return null;
 	}

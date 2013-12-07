@@ -98,7 +98,7 @@ public class UIPanelInspector : UIRectEditor
 		{
 			bool showDetails = (mAction == UIWidgetInspector.Action.Scale) || NGUISettings.drawGuides;
 			if (mAction == UIWidgetInspector.Action.None && e.modifiers == EventModifiers.Control) showDetails = true;
-			if (mPanel.parent == null) showDetails = true;
+			if (NGUITools.GetActive(mPanel) && mPanel.parent == null) showDetails = true;
 			if (showDetails) NGUIHandles.DrawSize(handles, Mathf.RoundToInt(mPanel.width), Mathf.RoundToInt(mPanel.height));
 		}
 

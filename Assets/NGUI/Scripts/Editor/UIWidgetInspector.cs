@@ -457,7 +457,7 @@ public class UIWidgetInspector : UIRectEditor
 		{
 			bool showDetails = (mAction == UIWidgetInspector.Action.Scale) || NGUISettings.drawGuides;
 			if (mAction == UIWidgetInspector.Action.None && e.modifiers == EventModifiers.Control) showDetails = true;
-			if (mWidget.parent == null) showDetails = true;
+			if (NGUITools.GetActive(mWidget) && mWidget.parent == null) showDetails = true;
 			if (showDetails) NGUIHandles.DrawSize(handles, mWidget.width, mWidget.height);
 		}
 
