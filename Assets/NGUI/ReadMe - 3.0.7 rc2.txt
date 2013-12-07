@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-            Version 3.0.7 rc1
+            Version 3.0.7 rc2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -55,6 +55,12 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: Added a script that makes it possible to resize a widget by dragging on its corner or side.
 - NEW: UICamera.currentScheme tells you the current control scheme -- mouse, touch, or controller.
 - NEW: Button scripts have been modified to use the new OnDragOver/Out events
+- NEW: Added an option to the widget anchor to hide itself if it's off-screen.
+- NEW: Drag Object script now lets you specify an explicit bounds rectangle and has an improved inspector.
+- NEW: Added a button to UIButtonColor that can automatically replace it with a UIButton.
+- NEW: Added the ability to copy/paste all values of the sprites and labels via right-click on the component.
+- NEW: Added a "next page threshold" value to UICenterOnChild for when you want to swipe to move to the next page.
+- NEW: If the mouse events are off and touch events are on, NGUI will now fake touches using the mouse in the editor.
 - FIX: Changing panel depth in inspector will now reflect the change correctly.
 - FIX: Atlas/font selection dialog will now make searching of the entire project optional.
 - FIX: UICamera events will once again work independently of time scale.
@@ -67,6 +73,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: UICamera selected object change should now work multiple times per frame.
 - FIX: Added a new clause to panel depth comparison that uses panel instance IDs if the panel depth matches (to avoid depth collisions).
 - FIX: Max line count on labels should now work again.
+- FIX: Fixed the Drag Objects script on mobile devices. It was not applying momentum properly.
 - DEL: OnHover is no longer sent via selection changes. Listen to OnSelect and check (UICamera.currentScheme == ControlScheme.Controller).
 - DEL: "PMA Shader" option is now going to be permanently hidden once the atlas has been created.
 - DEL: Eliminated the half-pixel offset setting from anchors.
