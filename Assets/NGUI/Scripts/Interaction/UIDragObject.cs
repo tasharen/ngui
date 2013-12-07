@@ -256,45 +256,31 @@ public class UIDragObject : MonoBehaviour
 		if (target == null) return;
 		float delta = RealTime.deltaTime;
 
-		if (mPressed)
-		{
-			// Disable the spring movement
-			CancelSpring();
-			CancelMovement();
-		}
-		else
-		{
-			mMomentum -= mScroll;
-			mScroll = NGUIMath.SpringLerp(mScroll, Vector3.zero, 20f, delta);
+		mMomentum -= mScroll;
+		mScroll = NGUIMath.SpringLerp(mScroll, Vector3.zero, 20f, delta);
 
-			if (mMomentum.magnitude > 0.0001f)
+		if (!mPressed)
+		{
+			// No momentum? Exit.
+			if (mMomentum.magnitude < 0.0001f) return;
+
+			// Apply the momentum
+			if (mPanel == null) FindPanel();
+
+			Move(NGUIMath.SpringDampen(ref mMomentum, 9f, delta));
+
+			if (restrictWithinPanel && mPanel != null)
 			{
-				// Apply the momentum
-				if (mPanel == null) FindPanel();
+				UpdateBounds();
 
-				if (mPanel != null)
+				if (mPanel.ConstrainTargetToBounds(target, ref mBounds, dragEffect == DragEffect.None))
 				{
-					Move(NGUIMath.SpringDampen(ref mMomentum, 9f, delta));
-
-					if (restrictWithinPanel)
-					{
-						UpdateBounds();
-
-						if (mPanel.ConstrainTargetToBounds(target, ref mBounds, dragEffect == DragEffect.None))
-						{
-							CancelMovement();
-						}
-						else CancelSpring();
-					}
-					return;
+					CancelMovement();
 				}
-			}
-			else
-			{
-				CancelMovement();
-				return;
+				else CancelSpring();
 			}
 		}
+		else mTargetPos = (target != null) ? target.position : Vector3.zero;
 
 		// Dampen the momentum
 		NGUIMath.SpringDampen(ref mMomentum, 9f, delta);

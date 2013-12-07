@@ -434,7 +434,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 25}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 50, y: 30, z: 0}
+  m_LocalPosition: {x: 50, y: 33, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 52}
@@ -743,6 +743,7 @@ MonoBehaviour:
   mHeight: 400
   mDepth: -9
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 29056518aafb01b49a5b08faf8e30cff, type: 2}
@@ -838,6 +839,7 @@ MonoBehaviour:
   mHeight: 100
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Flat
   mFillCenter: 1
@@ -877,6 +879,7 @@ MonoBehaviour:
   mHeight: 80
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: f95e07e3d350bf748b0c42b453a69d2e, type: 2}
   mSpriteName: Orc Armor - Bracers
   mFillCenter: 1
@@ -933,6 +936,7 @@ MonoBehaviour:
   mHeight: 620
   mDepth: 2
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Window
   mFillCenter: 1
@@ -1330,6 +1334,7 @@ MonoBehaviour:
   mHeight: 80
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: f95e07e3d350bf748b0c42b453a69d2e, type: 2}
   mSpriteName: Orc Armor - Shoulders
   mFillCenter: 1
@@ -1425,6 +1430,7 @@ MonoBehaviour:
   mHeight: 100
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Flat
   mFillCenter: 1
@@ -1548,6 +1554,7 @@ MonoBehaviour:
   mHeight: 100
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Flat
   mFillCenter: 1
@@ -1675,6 +1682,7 @@ MonoBehaviour:
   mHeight: 588
   mDepth: 1
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Button
   mFillCenter: 1
@@ -1741,6 +1749,7 @@ MonoBehaviour:
   mHeight: 80
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: f95e07e3d350bf748b0c42b453a69d2e, type: 2}
   mSpriteName: Orc Armor - Bracers
   mFillCenter: 1
@@ -1807,6 +1816,7 @@ MonoBehaviour:
   mHeight: 80
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: f95e07e3d350bf748b0c42b453a69d2e, type: 2}
   mSpriteName: Orc Armor - Shoulders
   mFillCenter: 1
@@ -1873,6 +1883,7 @@ MonoBehaviour:
   mHeight: 80
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: f95e07e3d350bf748b0c42b453a69d2e, type: 2}
   mSpriteName: Orc Armor - Shoulders
   mFillCenter: 1
@@ -1939,6 +1950,7 @@ MonoBehaviour:
   mHeight: 592
   mDepth: 3
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Stripes 1
   mFillCenter: 1
@@ -2005,6 +2017,7 @@ MonoBehaviour:
   mHeight: 592
   mDepth: 3
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Stripes 1
   mFillCenter: 1
@@ -2100,6 +2113,7 @@ MonoBehaviour:
   mHeight: 100
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Flat
   mFillCenter: 1
@@ -2212,6 +2226,7 @@ MonoBehaviour:
   mHeight: 620
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
 --- !u!114 &710038381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2323,6 +2338,7 @@ MonoBehaviour:
   mHeight: 100
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Flat
   mFillCenter: 1
@@ -2446,6 +2462,7 @@ MonoBehaviour:
   mHeight: 100
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Flat
   mFillCenter: 1
@@ -2569,6 +2586,7 @@ MonoBehaviour:
   mHeight: 100
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Flat
   mFillCenter: 1
@@ -2627,7 +2645,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 830441777}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 50, y: 30, z: 0}
+  m_LocalPosition: {x: 50, y: 33, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 227252773}
@@ -2719,6 +2737,7 @@ MonoBehaviour:
   mHeight: 620
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
 --- !u!65 &848388265
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2842,6 +2861,7 @@ MonoBehaviour:
   mHeight: 100
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Flat
   mFillCenter: 1
@@ -2936,6 +2956,7 @@ MonoBehaviour:
   mHeight: 80
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: f95e07e3d350bf748b0c42b453a69d2e, type: 2}
   mSpriteName: Orc Armor - Bracers
   mFillCenter: 1
@@ -3130,6 +3151,7 @@ MonoBehaviour:
   mHeight: 80
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: f95e07e3d350bf748b0c42b453a69d2e, type: 2}
   mSpriteName: Orc Armor - Bracers
   mFillCenter: 1
@@ -3196,6 +3218,7 @@ MonoBehaviour:
   mHeight: 80
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: f95e07e3d350bf748b0c42b453a69d2e, type: 2}
   mSpriteName: Orc Armor - Bracers
   mFillCenter: 1
@@ -3262,6 +3285,7 @@ MonoBehaviour:
   mHeight: 80
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: f95e07e3d350bf748b0c42b453a69d2e, type: 2}
   mSpriteName: Orc Armor - Shoulders
   mFillCenter: 1
@@ -3357,6 +3381,7 @@ MonoBehaviour:
   mHeight: 100
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Flat
   mFillCenter: 1
@@ -3480,6 +3505,7 @@ MonoBehaviour:
   mHeight: 100
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Flat
   mFillCenter: 1
@@ -3574,6 +3600,7 @@ MonoBehaviour:
   mHeight: 80
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: f95e07e3d350bf748b0c42b453a69d2e, type: 2}
   mSpriteName: Orc Armor - Shoulders
   mFillCenter: 1
@@ -3768,6 +3795,7 @@ MonoBehaviour:
   mHeight: 80
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: f95e07e3d350bf748b0c42b453a69d2e, type: 2}
   mSpriteName: Orc Armor - Shoulders
   mFillCenter: 1
@@ -3976,6 +4004,7 @@ MonoBehaviour:
   mHeight: 598
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Highlight - Shadowed
   mFillCenter: 1
@@ -4119,6 +4148,7 @@ MonoBehaviour:
   mHeight: 598
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Highlight - Shadowed
   mFillCenter: 1
@@ -4211,6 +4241,7 @@ MonoBehaviour:
   mHeight: 620
   mDepth: 2
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Window
   mFillCenter: 1
@@ -4306,6 +4337,7 @@ MonoBehaviour:
   mHeight: 100
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Flat
   mFillCenter: 1
@@ -4474,6 +4506,7 @@ MonoBehaviour:
   mHeight: 100
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Flat
   mFillCenter: 1
@@ -4584,6 +4617,7 @@ MonoBehaviour:
   mHeight: 588
   mDepth: 1
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Button
   mFillCenter: 1
@@ -4667,6 +4701,7 @@ MonoBehaviour:
   mHeight: 80
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: f95e07e3d350bf748b0c42b453a69d2e, type: 2}
   mSpriteName: Orc Armor - Bracers
   mFillCenter: 1
