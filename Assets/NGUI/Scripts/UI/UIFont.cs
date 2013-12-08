@@ -980,23 +980,50 @@ public class UIFont : MonoBehaviour
 					x += NGUIText.current.spacingX + glyph.advance;
 					prev = c;
 
-					if (NGUIText.current.gradient)
+					if (glyph.channel == 0 || glyph.channel == 15)
 					{
-						float min = NGUIText.current.size - glyph.offsetY;
-						float max = min - glyph.height;
+						if (NGUIText.current.gradient)
+						{
+							float min = NGUIText.current.size - glyph.offsetY;
+							float max = min - glyph.height;
 
-						min /= NGUIText.current.size;
-						max /= NGUIText.current.size;
+							min /= NGUIText.current.size;
+							max /= NGUIText.current.size;
 
-						s_c0 = Color.Lerp(gb, gt, min);
-						s_c1 = Color.Lerp(gb, gt, max);
+							s_c0 = Color.Lerp(gb, gt, min);
+							s_c1 = Color.Lerp(gb, gt, max);
 
-						cols.Add(s_c0);
-						cols.Add(s_c1);
-						cols.Add(s_c1);
-						cols.Add(s_c0);
+							cols.Add(s_c0);
+							cols.Add(s_c1);
+							cols.Add(s_c1);
+							cols.Add(s_c0);
+						}
+						else for (int b = 0; b < 4; ++b) cols.Add(uc);
 					}
-					else for (int b = 0; b < 4; ++b) cols.Add(uc);
+					else
+					{
+						// Packed fonts come as alpha masks in each of the RGBA channels.
+						// In order to use it we need to use a special shader.
+						//
+						// Limitations:
+						// - Effects (drop shadow, outline) will not work.
+						// - Should not be a part of the atlas (eastern fonts rarely are anyway).
+						// - Lower color precision
+
+						Color col = uc;
+
+						col *= 0.49f;
+
+						switch (glyph.channel)
+						{
+							case 1: col.b += 0.51f; break;
+							case 2: col.g += 0.51f; break;
+							case 4: col.r += 0.51f; break;
+							case 8: col.a += 0.51f; break;
+						}
+
+						for (int b = 0; b < 4; ++b) cols.Add(col);
+					}
 				}
 				else
 				{
