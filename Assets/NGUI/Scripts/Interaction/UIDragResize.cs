@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
@@ -80,8 +80,23 @@ public class UIDragResize : MonoBehaviour
 
 			if (mPlane.Raycast(ray, out dist))
 			{
-				NGUIMath.AdjustWidget(target, mLocalPos, mWidth, mHeight,
-					ray.GetPoint(dist) - mRayPos, pivot, minWidth, minHeight);
+				Transform t = target.cachedTransform;
+				t.localPosition = mLocalPos;
+				target.width = mWidth;
+				target.height = mHeight;
+
+				// Move the widget
+				Vector3 worldDelta = ray.GetPoint(dist) - mRayPos;
+				t.position = t.position + worldDelta;
+
+				// Calculate the final delta
+				Vector3 localDelta = Quaternion.Inverse(t.localRotation) * (t.localPosition - mLocalPos);
+
+				// Restore the position
+				t.localPosition = mLocalPos;
+
+				// Adjust the widget
+				NGUIMath.ResizeWidget(target, pivot, localDelta.x, localDelta.y, minWidth, minHeight);
 			}
 		}
 	}

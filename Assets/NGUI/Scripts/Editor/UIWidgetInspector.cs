@@ -61,6 +61,10 @@ public class UIWidgetInspector : UIRectEditor
 	Vector2 mStartMouse = Vector2.zero;
 	Vector3 mStartRot = Vector3.zero;
 	Vector3 mStartDir = Vector3.right;
+	Vector2 mStartLeft = Vector2.zero;
+	Vector2 mStartRight = Vector2.zero;
+	Vector2 mStartBottom = Vector2.zero;
+	Vector2 mStartTop = Vector2.zero;
 	UIWidget.Pivot mDragPivot = UIWidget.Pivot.Center;
 
 	/// <summary>
@@ -229,14 +233,14 @@ public class UIWidgetInspector : UIRectEditor
 		bool movable = true;
 
 		// If any point is not resizable, then the widget can't be moved
-		for (int i = 0; i < resizable.Length; ++i)
-		{
-			if (!resizable[i])
-			{
-				movable = false;
-				break;
-			}
-		}
+		//for (int i = 0; i < resizable.Length; ++i)
+		//{
+		//    if (!resizable[i])
+		//    {
+		//        movable = false;
+		//        break;
+		//    }
+		//}
 
 		// Time to figure out what kind of action is underneath the mouse
 		UIWidget.Pivot pivotUnderMouse = UIWidget.Pivot.Center;
@@ -411,8 +415,6 @@ public class UIWidgetInspector : UIRectEditor
 					if (theirPos.y < myPos.y)
 						NGUIHandles.DrawCenteredLabel(pos, text);
 				}
-
-				// TODO: Don't draw relative values
 				GUI.color = Color.white;
 			}
 			Handles.EndGUI();
@@ -463,16 +465,20 @@ public class UIWidgetInspector : UIRectEditor
 
 		bool canResize = mWidget.canResize;
 		bool[] resizable = new bool[8];
+		bool rotated = Quaternion.Angle(t.localRotation, Quaternion.identity) > 0.001f;
 
-		resizable[4] = canResize && mWidget.leftAnchor.target == null;		// left
-		resizable[5] = canResize && mWidget.topAnchor.target == null;		// top
-		resizable[6] = canResize && mWidget.rightAnchor.target == null;		// right
-		resizable[7] = canResize && mWidget.bottomAnchor.target == null;	// bottom
+		resizable[4] = canResize && (!rotated || mWidget.leftAnchor.target == null);	// left
+		resizable[5] = canResize && (!rotated || mWidget.topAnchor.target == null);		// top
+		resizable[6] = canResize && (!rotated || mWidget.rightAnchor.target == null);	// right
+		resizable[7] = canResize && (!rotated || mWidget.bottomAnchor.target == null);	// bottom
 
 		resizable[0] = resizable[7] && resizable[4]; // bottom-left
 		resizable[1] = resizable[5] && resizable[4]; // top-left
 		resizable[2] = resizable[5] && resizable[6]; // top-right
 		resizable[3] = resizable[7] && resizable[6]; // bottom-right
+		
+		// TODO: Remove this
+		for (int i = 0; i < 8; ++i) resizable[i] = true;
 
 		UIWidget.Pivot pivotUnderMouse = GetPivotUnderMouse(handles, e, resizable, ref actionUnderMouse);
 		
@@ -537,6 +543,15 @@ public class UIWidgetInspector : UIRectEditor
 					mStartDir = mStartDrag - t.position;
 					mStartWidth = mWidget.width;
 					mStartHeight = mWidget.height;
+					mStartLeft.x = mWidget.leftAnchor.relative;
+					mStartLeft.y = mWidget.leftAnchor.absolute;
+					mStartRight.x = mWidget.rightAnchor.relative;
+					mStartRight.y = mWidget.rightAnchor.absolute;
+					mStartBottom.x = mWidget.bottomAnchor.relative;
+					mStartBottom.y = mWidget.bottomAnchor.absolute;
+					mStartTop.x = mWidget.topAnchor.relative;
+					mStartTop.y = mWidget.topAnchor.absolute;
+
 					mDragPivot = pivotUnderMouse;
 					mActionUnderMouse = actionUnderMouse;
 					GUIUtility.hotControl = GUIUtility.keyboardControl = id;
@@ -591,11 +606,31 @@ public class UIWidgetInspector : UIRectEditor
 
 							if (mAction != Action.None)
 							{
+								// Reset the widget before adjusting anything
+								t.position = mWorldPos;
+								mWidget.width = mStartWidth;
+								mWidget.height = mStartHeight;
+								mWidget.leftAnchor.Set(mStartLeft.x, mStartLeft.y);
+								mWidget.rightAnchor.Set(mStartRight.x, mStartRight.y);
+								mWidget.bottomAnchor.Set(mStartBottom.x, mStartBottom.y);
+								mWidget.topAnchor.Set(mStartTop.x, mStartTop.y);
+
 								if (mAction == Action.Move)
 								{
+									// Move the widget
 									t.position = mWorldPos + (pos - mStartDrag);
-									t.localPosition = NGUISnap.Snap(t.localPosition, mWidget.localCorners,
-										e.modifiers != EventModifiers.Control);
+
+									// Snap the widget
+									Vector3 after = NGUISnap.Snap(t.localPosition, mWidget.localCorners, e.modifiers != EventModifiers.Control);
+
+									// Calculate the final delta
+									Vector3 localDelta = (after - mLocalPos);
+
+									// Restore the position
+									t.position = mWorldPos;
+
+									// Adjust the widget by the delta
+									NGUIMath.MoveWidget(mWidget, localDelta.x, localDelta.y);
 								}
 								else if (mAction == Action.Rotate)
 								{
@@ -614,11 +649,17 @@ public class UIWidgetInspector : UIRectEditor
 								}
 								else if (mAction == Action.Scale)
 								{
-									// World-space delta since the drag started
-									Vector3 delta = pos - mStartDrag;
+									// Move the widget
+									t.position = mWorldPos + (pos - mStartDrag);
+
+									// Calculate the final delta
+									Vector3 localDelta = (t.localPosition - mLocalPos);
+
+									// Restore the position
+									t.position = mWorldPos;
 
 									// Adjust the widget's position and scale based on the delta, restricted by the pivot
-									NGUIMath.AdjustWidget(mWidget, mLocalPos, mStartWidth, mStartHeight, delta, mDragPivot, 2, 2);
+									NGUIMath.ResizeWidget(mWidget, mDragPivot, localDelta.x, localDelta.y, 2, 2);
 								}
 							}
 						}

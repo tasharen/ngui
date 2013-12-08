@@ -58,6 +58,46 @@ public abstract class UIRect : MonoBehaviour
 			else if (a1 < a0 && a1 < a2) Set(rel1, abs1);
 			else Set(rel2, abs2);
 		}
+
+		/// <summary>
+		/// Set the anchor's absolute coordinate relative to the specified parent.
+		/// </summary>
+
+		public void SetHorizontal (Transform parent, float localPos)
+		{
+			if (rect)
+			{
+				Vector3[] sides = rect.GetSides(parent);
+				float targetPos = Mathf.Lerp(sides[0].x, sides[2].x, relative);
+				absolute = Mathf.FloorToInt(localPos - targetPos + 0.5f);
+			}
+			else
+			{
+				Vector3 targetPos = target.position;
+				if (parent != null) targetPos = parent.InverseTransformPoint(targetPos);
+				absolute = Mathf.FloorToInt(localPos - targetPos.x + 0.5f);
+			}
+		}
+
+		/// <summary>
+		/// Set the anchor's absolute coordinate relative to the specified parent.
+		/// </summary>
+
+		public void SetVertical (Transform parent, float localPos)
+		{
+			if (rect)
+			{
+				Vector3[] sides = rect.GetSides(parent);
+				float targetPos = Mathf.Lerp(sides[3].y, sides[1].y, relative);
+				absolute = Mathf.FloorToInt(localPos - targetPos + 0.5f);
+			}
+			else
+			{
+				Vector3 targetPos = target.position;
+				if (parent != null) targetPos = parent.InverseTransformPoint(targetPos);
+				absolute = Mathf.FloorToInt(localPos - targetPos.y + 0.5f);
+			}
+		}
 	}
 
 	/// <summary>
@@ -258,6 +298,12 @@ public abstract class UIRect : MonoBehaviour
 			OnUpdate();
 		}
 	}
+
+	/// <summary>
+	/// Manually update anchored sides.
+	/// </summary>
+
+	public void UpdateAnchors () { if (isAnchored) OnAnchor(); }
 
 	/// <summary>
 	/// Update the dimensions of the rectangle using anchor points.
