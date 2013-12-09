@@ -60,7 +60,7 @@ public abstract class UIRect : MonoBehaviour
 		}
 
 		/// <summary>
-		/// Set the anchor's absolute coordinate relative to the specified parent.
+		/// Set the anchor's absolute coordinate relative to the specified parent, keeping the relative setting intact.
 		/// </summary>
 
 		public void SetHorizontal (Transform parent, float localPos)
@@ -80,7 +80,7 @@ public abstract class UIRect : MonoBehaviour
 		}
 
 		/// <summary>
-		/// Set the anchor's absolute coordinate relative to the specified parent.
+		/// Set the anchor's absolute coordinate relative to the specified parent, keeping the relative setting intact.
 		/// </summary>
 
 		public void SetVertical (Transform parent, float localPos)

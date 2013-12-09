@@ -1346,8 +1346,11 @@ public class UIPanel : UIRect
 	/// Major hax to get the size of the game view window.
 	/// </summary>
 
-	static Vector2 GetMainGameViewSize ()
+	static public Vector2 GetMainGameViewSize ()
 	{
+		if (Application.isPlaying)
+			return new Vector2(Screen.width, Screen.height);
+
 		if (s_GetSizeOfMainGameView == null)
 		{
 			System.Type type = System.Type.GetType("UnityEditor.GameView,UnityEditor");

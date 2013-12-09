@@ -318,10 +318,10 @@ public class UIRectEditor : Editor
 			if (IsRect(sp))
 			{
 				if (before == null && after != null) UpdateAnchors(false, true, true);
-				DrawUnifiedAnchor(sp, "Left", "leftAnchor", "width");
-				DrawUnifiedAnchor(sp, "Right", "rightAnchor", "width");
-				DrawUnifiedAnchor(sp, "Bottom", "bottomAnchor", "height");
-				DrawUnifiedAnchor(sp, "Top", "topAnchor", "height");
+				DrawUnifiedAnchor("Left", "leftAnchor", true);
+				DrawUnifiedAnchor("Right", "rightAnchor", true);
+				DrawUnifiedAnchor("Bottom", "bottomAnchor", false);
+				DrawUnifiedAnchor("Top", "topAnchor", false);
 			}
 			else DrawSimpleAnchors(before == null && after != null);
 		}
@@ -334,7 +334,7 @@ public class UIRectEditor : Editor
 	/// Draw the anchor when in relative mode.
 	/// </summary>
 
-	void DrawUnifiedAnchor (SerializedProperty sp, string prefix, string name, string suffix)
+	void DrawUnifiedAnchor (string prefix, string name, bool horizontal)
 	{
 		GUILayout.Space(3f);
 
@@ -343,19 +343,84 @@ public class UIRectEditor : Editor
 		GUILayout.BeginHorizontal();
 		GUILayout.Label(prefix, GUILayout.Width(44f));
 		GUILayout.Space(-2f);
-
-		NGUIEditorTools.DrawProperty(" ", serializedObject, name + ".relative", GUILayout.Width(80f));
-		GUILayout.Label("* target's " + suffix, GUILayout.MinWidth(20f));
+		DrawRelativeField(name, horizontal);
 		GUILayout.EndHorizontal();
 
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(50f);
-
 		NGUIEditorTools.DrawProperty("+", serializedObject, name + ".absolute", GUILayout.Width(80f));
 		GUILayout.Label("pixels", GUILayout.MinWidth(20f));
 		GUILayout.EndHorizontal();
 
 		NGUIEditorTools.SetLabelWidth(62f);
+	}
+
+	static string[] HorizontalList = new string[] { "Target's Left", "Target's Center", "Target's Right" };
+	static string[] VerticalList = new string[] { "Target's Bottom", "Target's Center", "Target's Top" };
+
+	/// <summary>
+	/// Helper function that draws the suffix after the relative fields.
+	/// </summary>
+
+	void DrawRelativeField (string name, bool horizontal)
+	{
+		SerializedProperty rel = serializedObject.FindProperty(name + ".relative");
+
+		float relative = rel.floatValue;
+		bool standard = (relative == 0f || relative == 0.5f || relative == 1f);
+		NGUIEditorTools.DrawProperty(" ", rel, false, GUILayout.Width(80f));
+
+		if (!standard || rel.hasMultipleDifferentValues)
+		{
+			GUILayout.Label(horizontal ? "* target's width" : "* target's height", GUILayout.MinWidth(20f));
+		}
+		else
+		{
+			int origin = 1;
+			if (relative == 0f) origin = 0;
+			if (relative == 1f) origin = 2;
+
+			int choice = horizontal ?
+				EditorGUILayout.Popup(origin, HorizontalList, GUILayout.MinWidth(20f)) :
+				EditorGUILayout.Popup(origin, VerticalList, GUILayout.MinWidth(20f));
+
+			if (origin != choice)
+			{
+				// Desired relative value
+				if (choice == 0) relative = 0f;
+				else if (choice == 2) relative = 1f;
+				else relative = 0.5f;
+
+				SerializedProperty abs = serializedObject.FindProperty(name + ".absolute");
+				SerializedProperty tar = serializedObject.FindProperty(name + ".target");
+				
+				UIRect rect = (tar.objectReferenceValue as Transform).GetComponent<UIRect>();
+				Vector3[] sides = rect.GetSides((serializedObject.targetObject as UIRect).cachedTransform);
+
+				// Calculate the current position based from the bottom-left
+				float f0, f1;
+
+				if (horizontal)
+				{
+					f0 = sides[0].x;
+					f1 = sides[2].x;
+				}
+				else
+				{
+					f0 = sides[3].y;
+					f1 = sides[1].y;
+				}
+				
+				// Final position after both relative and absolute values are taken into consideration
+				float final = Mathf.Floor(0.5f + Mathf.Lerp(f0, f1, rel.floatValue) + abs.intValue);
+
+				rel.floatValue = relative;
+				abs.intValue = Mathf.FloorToInt(final + 0.5f - Mathf.Lerp(f0, f1, relative));
+
+				serializedObject.ApplyModifiedProperties();
+				serializedObject.Update();
+			}
+		}
 	}
 
 	/// <summary>
