@@ -9,7 +9,7 @@ using UnityEngine;
 /// Attaching this script to an element of a scroll view will make it possible to center on it by clicking on it.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/Center Panel On Click")]
+[AddComponentMenu("NGUI/Interaction/Center Scroll View on Click")]
 public class UICenterOnClick : MonoBehaviour
 {
 	UIPanel mPanel;

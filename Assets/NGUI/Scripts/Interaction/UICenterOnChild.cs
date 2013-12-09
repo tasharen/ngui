@@ -10,7 +10,7 @@ using UnityEngine;
 /// Attach this script to the container that has the objects to center on as its children.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/Center Panel On Child")]
+[AddComponentMenu("NGUI/Interaction/Center Scroll View on Child")]
 public class UICenterOnChild : MonoBehaviour
 {
 	/// <summary>

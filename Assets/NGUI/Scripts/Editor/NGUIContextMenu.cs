@@ -207,25 +207,36 @@ public static class NGUIContextMenu
 				NGUIContextMenu.AddSeparator("Attach/");
 			}
 
+			bool header = false;
+			UIScrollView scrollView = NGUITools.FindInParents<UIScrollView>(target);
+
+			if (scrollView != null)
+			{
+				if (scrollView.GetComponentInChildren<UICenterOnChild>() == null)
+				{
+					AddItem("Attach/Center Scroll View on Child", false, delegate(object obj) { target.AddComponent<UICenterOnChild>(); }, null);
+					header = true;
+				}
+			}
+
 			if (target.collider != null)
 			{
-				if (target.GetComponent<UIDragScrollView>() == null)
+				if (scrollView != null)
 				{
-					for (int i = 0; i < UIPanel.list.size; ++i)
+					if (target.GetComponent<UIDragScrollView>() == null)
 					{
-						UIPanel pan = UIPanel.list[i];
-						if (pan.clipping == UIDrawCall.Clipping.None) continue;
-	
-						UIScrollView dr = pan.GetComponent<UIScrollView>();
-						if (dr == null) continue;
+						AddItem("Attach/Drag Scroll View", false, delegate(object obj) { target.AddComponent<UIDragScrollView>(); }, null);
+						header = true;
+					}
 
-						AddItem("Attach/Drag Scroll View", false, delegate(object obj)
-							{ target.AddComponent<UIDragScrollView>().scrollView = dr; }, null);
-						
-						NGUIContextMenu.AddSeparator("Attach/");
-						break;
+					if (target.GetComponent<UICenterOnClick>() == null && NGUITools.FindInParents<UICenterOnChild>(target) != null)
+					{
+						AddItem("Attach/Center Scroll View on Click", false, delegate(object obj) { target.AddComponent<UICenterOnClick>(); }, null);
+						header = true;
 					}
 				}
+
+				if (header) NGUIContextMenu.AddSeparator("Attach/");
 
 				AddItem("Attach/Button Script", false, delegate(object obj) { target.AddComponent<UIButton>(); }, null);
 				AddItem("Attach/Toggle Script", false, delegate(object obj) { target.AddComponent<UIToggle>(); }, null);
@@ -235,8 +246,27 @@ public static class NGUIContextMenu
 				AddItem("Attach/Popup List Script", false, delegate(object obj) { target.AddComponent<UIPopupList>(); }, null);
 				AddItem("Attach/Input Field Script", false, delegate(object obj) { target.AddComponent<UIInput>(); }, null);
 				NGUIContextMenu.AddSeparator("Attach/");
-				if (target.GetComponent<UIAnchor>() == null) AddItem("Attach/Anchor Script", false, delegate(object obj) { target.AddComponent<UIAnchor>(); }, null);
-				if (target.GetComponent<UIStretch>() == null) AddItem("Attach/Stretch Script", false, delegate(object obj) { target.AddComponent<UIStretch>(); }, null);
+				
+				if (target.GetComponent<UIDragResize>() == null) AddItem("Attach/Drag Resize Script", false, delegate(object obj) { target.AddComponent<UIDragResize>(); }, null);
+
+				if (target.GetComponent<UIDragScrollView>() == null)
+				{
+					for (int i = 0; i < UIPanel.list.size; ++i)
+					{
+						UIPanel pan = UIPanel.list[i];
+						if (pan.clipping == UIDrawCall.Clipping.None) continue;
+
+						UIScrollView dr = pan.GetComponent<UIScrollView>();
+						if (dr == null) continue;
+
+						AddItem("Attach/Drag Scroll View", false, delegate(object obj)
+						{ target.AddComponent<UIDragScrollView>().scrollView = dr; }, null);
+
+						header = true;
+						break;
+					}
+				}
+
 				AddItem("Attach/Key Binding Script", false, delegate(object obj) { target.AddComponent<UIKeyBinding>(); }, null);
 
 				NGUIContextMenu.AddSeparator("Attach/");
