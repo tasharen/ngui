@@ -514,69 +514,6 @@ public class UIWidget : UIRect
 	}
 
 	/// <summary>
-	/// Adjust the widget's rectangle by the specified amount.
-	/// </summary>
-
-	public void AdjustRect (float left, float bottom, float right, float top, int minWidth, int minHeight)
-	{
-		Vector2 po = pivotOffset;
-
-		int iLeft = Mathf.FloorToInt(left + 0.5f);
-		int iBottom = Mathf.FloorToInt(bottom + 0.5f);
-		int iRight = Mathf.FloorToInt(right + 0.5f);
-		int iTop = Mathf.FloorToInt(top + 0.5f);
-
-		// Centered pivot should mean having to perform even number adjustments
-		if (po.x == 0.5f)
-		{
-			iLeft = ((iLeft >> 1) << 1);
-			iRight = ((iRight >> 1) << 1);
-		}
-
-		if (po.y == 0.5f)
-		{
-			iBottom = ((iBottom >> 1) << 1);
-			iTop = ((iTop >> 1) << 1);
-		}
-
-		Vector3 offset = Vector3.zero;
-
-		// TODO: Remove this
-		minWidth = 100;
-		minHeight = 100;
-
-		int minx = Mathf.Max(minWidth, this.minWidth);
-		int miny = Mathf.Max(minHeight, this.minHeight);
-		int width = this.width + iRight - iLeft;
-		int height = this.height + iTop - iBottom;
-
-		if (width < minx)
-		{
-			if (iLeft != 0)
-			{
-				offset.x -= minx - width;
-				width = minx;
-			}
-			else width = minx;
-		}
-
-		if (height < miny)
-		{
-			if (iBottom != 0)
-			{
-				offset.y -= miny - height;
-				height = miny;
-			}
-			else height = miny;
-		}
-
-		Vector3 pos = mTrans.localPosition + offset;
-		float x0 = pos.x - po.x * this.width;
-		float y0 = pos.y - po.y * this.height;
-		SetRect(x0 + iLeft, y0 + iBottom, width, height);
-	}
-
-	/// <summary>
 	/// Set the widget's rectangle.
 	/// </summary>
 
@@ -587,23 +524,23 @@ public class UIWidget : UIRect
 		float fx = Mathf.Lerp(x, x + width, po.x);
 		float fy = Mathf.Lerp(y, y + height, po.y);
 
-		int iw = Mathf.FloorToInt(width + 0.5f);
-		int ih = Mathf.FloorToInt(height + 0.5f);
+		int finalWidth = Mathf.FloorToInt(width + 0.5f);
+		int finalHeight = Mathf.FloorToInt(height + 0.5f);
 
-		if (po.x == 0.5f) iw = ((iw >> 1) << 1);
-		if (po.y == 0.5f) ih = ((ih >> 1) << 1);
+		if (po.x == 0.5f) finalWidth = ((finalWidth >> 1) << 1);
+		if (po.y == 0.5f) finalHeight = ((finalHeight >> 1) << 1);
 
 		Transform t = cachedTransform;
 		Vector3 pos = t.localPosition;
 		pos.x = Mathf.Floor(fx + 0.5f);
 		pos.y = Mathf.Floor(fy + 0.5f);
 
-		if (iw < minWidth) iw = minWidth;
-		if (ih < minHeight) ih = minHeight;
+		if (finalWidth < minWidth) finalWidth = minWidth;
+		if (finalHeight < minHeight) finalHeight = minHeight;
 
 		t.localPosition = pos;
-		this.width = iw;
-		this.height = ih;
+		width = finalWidth;
+		height = finalHeight;
 
 		if (isAnchored)
 		{

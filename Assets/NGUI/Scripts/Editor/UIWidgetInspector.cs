@@ -499,7 +499,7 @@ public class UIWidgetInspector : UIRectEditor
 						for (int i = 0; i < 4; ++i)
 							DrawKnob(handles[i], mWidget.pivot == pivotPoints[i], resizable[i], id);
 
-						if (Mathf.Abs(v1.y - v0.y) > 80f)
+						if ((v1 - v0).magnitude > 80f)
 						{
 							if (mWidget.leftAnchor.target == null || mWidget.leftAnchor.absolute != 0)
 								DrawKnob(handles[4], mWidget.pivot == pivotPoints[4], resizable[4], id);
@@ -508,7 +508,7 @@ public class UIWidgetInspector : UIRectEditor
 								DrawKnob(handles[6], mWidget.pivot == pivotPoints[6], resizable[6], id);
 						}
 
-						if (Mathf.Abs(v3.x - v0.x) > 80f)
+						if ((v3 - v0).magnitude > 80f)
 						{
 							if (mWidget.topAnchor.target == null || mWidget.topAnchor.absolute != 0)
 								DrawKnob(handles[5], mWidget.pivot == pivotPoints[5], resizable[5], id);
