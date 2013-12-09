@@ -17,8 +17,8 @@ public class UIRectEditor : Editor
 {
 	static protected string[] PrefixName = new string[] { "Left", "Right", "Bottom", "Top" };
 	static protected string[] FieldName = new string[] { "leftAnchor", "rightAnchor", "bottomAnchor", "topAnchor" };
-	static protected string[] HorizontalList = new string[] { "Target's Left", "Target's Center", "Target's Right", "Custom" };
-	static protected string[] VerticalList = new string[] { "Target's Bottom", "Target's Center", "Target's Top", "Custom" };
+	static protected string[] HorizontalList = new string[] { "Target's Left", "Target's Center", "Target's Right", "Custom", "Set to Current Position" };
+	static protected string[] VerticalList = new string[] { "Target's Bottom", "Target's Center", "Target's Top", "Custom", "Set to Current Position" };
 	static protected bool[] IsHorizontal = new bool[] { true, true, false, false };
 
 	protected enum AnchorType
@@ -276,6 +276,36 @@ public class UIRectEditor : Editor
 			EditorGUILayout.Popup(previousOrigin, HorizontalList, GUILayout.MinWidth(110f)) :
 			EditorGUILayout.Popup(previousOrigin, VerticalList, GUILayout.MinWidth(110f));
 		EditorGUI.EndDisabledGroup();
+
+		// "Set to Current" choice
+		if (newOrigin == 4)
+		{
+			newOrigin = 3;
+
+			Vector3[] sides = targetRect.GetSides(myRect.cachedTransform);
+
+			float f0, f1;
+
+			if (IsHorizontal[index])
+			{
+				f0 = sides[0].x;
+				f1 = sides[2].x;
+			}
+			else
+			{
+				f0 = sides[3].y;
+				f1 = sides[1].y;
+			}
+
+			// Final position after both relative and absolute values are taken into consideration
+			float final = Mathf.Floor(0.5f + Mathf.Lerp(0f, f1 - f0, rel.floatValue) + abs.intValue);
+
+			rel.floatValue = final / (f1 - f0);
+			abs.intValue = 0;
+
+			serializedObject.ApplyModifiedProperties();
+			serializedObject.Update();
+		}
 
 		mCustom[index] = (newOrigin == 3);
 
