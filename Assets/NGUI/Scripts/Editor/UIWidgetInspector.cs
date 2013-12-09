@@ -230,18 +230,6 @@ public class UIWidgetInspector : UIRectEditor
 
 	static public UIWidget.Pivot GetPivotUnderMouse (Vector3[] worldPos, Event e, bool[] resizable, ref Action action)
 	{
-		bool movable = true;
-
-		// If any point is not resizable, then the widget can't be moved
-		//for (int i = 0; i < resizable.Length; ++i)
-		//{
-		//    if (!resizable[i])
-		//    {
-		//        movable = false;
-		//        break;
-		//    }
-		//}
-
 		// Time to figure out what kind of action is underneath the mouse
 		UIWidget.Pivot pivotUnderMouse = UIWidget.Pivot.Center;
 
@@ -258,7 +246,7 @@ public class UIWidgetInspector : UIRectEditor
 			}
 			else if (!alt && NGUIEditorTools.SceneViewDistanceToRectangle(worldPos, e.mousePosition) == 0f)
 			{
-				action = movable ? Action.Move : Action.Rotate;
+				action = Action.Move;
 			}
 			else if (dist < 30f)
 			{
@@ -310,9 +298,6 @@ public class UIWidgetInspector : UIRectEditor
 	static public void DrawAnchor (UIRect.AnchorPoint anchor, Transform myTrans, Vector3[] myCorners, int side, int id)
 	{
 		if (!anchor.target) return;
-
-		// Only draw anchor points if both widgets are aligned
-		if (Quaternion.Angle(anchor.target.rotation, myTrans.rotation) > 1f) return;
 
 		int i0, i1;
 
@@ -447,7 +432,7 @@ public class UIWidgetInspector : UIRectEditor
 		NGUIHandles.DrawShadowedLine(handles, handles[0], handles[3], handlesColor);
 
 		// If the widget is anchored, draw the anchors
-		if (mWidget.isAnchored && mAction == UIWidgetInspector.Action.None)
+		if (mWidget.isAnchored)
 		{
 			DrawAnchor(mWidget.leftAnchor, mWidget.cachedTransform, handles, 0, id);
 			DrawAnchor(mWidget.topAnchor, mWidget.cachedTransform, handles, 1, id);
@@ -463,23 +448,24 @@ public class UIWidgetInspector : UIRectEditor
 			if (showDetails) NGUIHandles.DrawSize(handles, mWidget.width, mWidget.height);
 		}
 
-		bool canResize = mWidget.canResize;
+		// Presence of the legacy stretch component prevents resizing
+		bool canResize = (mWidget.GetComponent<UIStretch>() == null);
 		bool[] resizable = new bool[8];
-		bool rotated = Quaternion.Angle(t.localRotation, Quaternion.identity) > 0.001f;
 
-		resizable[4] = canResize && (!rotated || mWidget.leftAnchor.target == null);	// left
-		resizable[5] = canResize && (!rotated || mWidget.topAnchor.target == null);		// top
-		resizable[6] = canResize && (!rotated || mWidget.rightAnchor.target == null);	// right
-		resizable[7] = canResize && (!rotated || mWidget.bottomAnchor.target == null);	// bottom
+		UILabel lbl = mWidget as UILabel;
+		bool autoResized = (lbl != null) && (lbl.overflowMethod == UILabel.Overflow.ResizeFreely);
+		bool autoHeight = autoResized || ((lbl != null) && (lbl.overflowMethod == UILabel.Overflow.ResizeHeight));
+
+		resizable[4] = canResize && !autoResized;	// left
+		resizable[5] = canResize && !autoHeight;	// top
+		resizable[6] = canResize && !autoResized;	// right
+		resizable[7] = canResize && !autoHeight;	// bottom
 
 		resizable[0] = resizable[7] && resizable[4]; // bottom-left
 		resizable[1] = resizable[5] && resizable[4]; // top-left
 		resizable[2] = resizable[5] && resizable[6]; // top-right
 		resizable[3] = resizable[7] && resizable[6]; // bottom-right
 		
-		// TODO: Remove this
-		for (int i = 0; i < 8; ++i) resizable[i] = true;
-
 		UIWidget.Pivot pivotUnderMouse = GetPivotUnderMouse(handles, e, resizable, ref actionUnderMouse);
 		
 		switch (type)
@@ -660,6 +646,7 @@ public class UIWidgetInspector : UIRectEditor
 
 									// Adjust the widget's position and scale based on the delta, restricted by the pivot
 									NGUIMath.ResizeWidget(mWidget, mDragPivot, localDelta.x, localDelta.y, 2, 2);
+									ReEvaluateAnchorType();
 								}
 							}
 						}

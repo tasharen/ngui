@@ -1031,12 +1031,6 @@ public class UIWidget : UIRect
 	}
 
 	/// <summary>
-	/// Whether the widget can be resized using drag handles.
-	/// </summary>
-
-	public virtual bool canResize { get { return GetComponent<UIStretch>() == null; } }
-
-	/// <summary>
 	/// Draw some selectable gizmos.
 	/// </summary>
 

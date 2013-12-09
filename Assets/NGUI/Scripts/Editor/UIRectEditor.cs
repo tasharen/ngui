@@ -42,37 +42,46 @@ public class UIRectEditor : Editor
 		}
 		else
 		{
-			UIRect rect = target as UIRect;
-
-			if (rect.leftAnchor.target == rect.rightAnchor.target &&
-				rect.leftAnchor.target == rect.bottomAnchor.target &&
-				rect.leftAnchor.target == rect.topAnchor.target)
-			{
-				if (rect.leftAnchor.target == null)
-				{
-					mAnchorType = AnchorType.None;
-				}
-				else if (rect.leftAnchor.absolute == 0 &&
-					rect.rightAnchor.absolute == 0 &&
-					rect.bottomAnchor.absolute == 0 &&
-					rect.topAnchor.absolute == 0)
-				{
-					mAnchorType = AnchorType.Relative;
-				}
-				else if (rect.leftAnchor.relative == 0f &&
-					rect.rightAnchor.relative == 1f &&
-					rect.bottomAnchor.relative == 0f &&
-					rect.topAnchor.relative == 1f)
-				{
-					mAnchorType = AnchorType.Padded;
-				}
-				else
-				{
-					mAnchorType = AnchorType.Unified;
-				}
-			}
-			else mAnchorType = AnchorType.Advanced;
+			ReEvaluateAnchorType();
 		}
+	}
+
+	/// <summary>
+	/// Manually re-evaluate the current anchor type.
+	/// </summary>
+
+	protected void ReEvaluateAnchorType ()
+	{
+		UIRect rect = target as UIRect;
+
+		if (rect.leftAnchor.target == rect.rightAnchor.target &&
+			rect.leftAnchor.target == rect.bottomAnchor.target &&
+			rect.leftAnchor.target == rect.topAnchor.target)
+		{
+			if (rect.leftAnchor.target == null)
+			{
+				mAnchorType = AnchorType.None;
+			}
+			else if (rect.leftAnchor.absolute == 0 &&
+				rect.rightAnchor.absolute == 0 &&
+				rect.bottomAnchor.absolute == 0 &&
+				rect.topAnchor.absolute == 0)
+			{
+				mAnchorType = AnchorType.Relative;
+			}
+			else if (rect.leftAnchor.relative == 0f &&
+				rect.rightAnchor.relative == 1f &&
+				rect.bottomAnchor.relative == 0f &&
+				rect.topAnchor.relative == 1f)
+			{
+				mAnchorType = AnchorType.Padded;
+			}
+			else
+			{
+				mAnchorType = AnchorType.Unified;
+			}
+		}
+		else mAnchorType = AnchorType.Advanced;
 	}
 
 	/// <summary>
