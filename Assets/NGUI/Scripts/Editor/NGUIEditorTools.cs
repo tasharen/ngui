@@ -1237,9 +1237,9 @@ public class NGUIEditorTools
 
 		GUI.changed = false;
 #if UNITY_3_5
-		if (!GUILayout.Toggle(true, text, "dragtab")) state = !state;
+		if (!GUILayout.Toggle(true, text, "dragtab", GUILayout.MinWidth(20f))) state = !state;
 #else
-		if (!GUILayout.Toggle(true, "<b><size=11>" + text + "</size></b>", "dragtab")) state = !state;
+		if (!GUILayout.Toggle(true, "<b><size=11>" + text + "</size></b>", "dragtab", GUILayout.MinWidth(20f))) state = !state;
 #endif
 		if (GUI.changed) EditorPrefs.SetBool(key, state);
 

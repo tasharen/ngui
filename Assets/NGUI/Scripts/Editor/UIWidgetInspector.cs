@@ -814,7 +814,7 @@ public class UIWidgetInspector : UIRectEditor
 #if UNITY_3_5 || UNITY_4_0 || UNITY_4_1
 				// Color tint
 				GUILayout.BeginHorizontal();
-				SerializedProperty sp = NGUIEditorTools.DrawProperty("Color", serializedObject, "mColor");
+				SerializedProperty sp = NGUIEditorTools.DrawProperty("Color", serializedObject, "mColor", GUILayout.MinWidth(20f));
 				if (GUILayout.Button("Copy", GUILayout.Width(50f)))
 					NGUISettings.color = sp.colorValue;
 				GUILayout.EndHorizontal();
@@ -826,7 +826,7 @@ public class UIWidgetInspector : UIRectEditor
 				GUILayout.EndHorizontal();
 				GUILayout.Space(6f);
 #else
-				NGUIEditorTools.DrawProperty("Color", serializedObject, "mColor");
+				NGUIEditorTools.DrawProperty("Color", serializedObject, "mColor", GUILayout.MinWidth(20f));
 #endif
 			}
 			else if (serializedObject.isEditingMultipleObjects)
@@ -909,7 +909,7 @@ public class UIWidgetInspector : UIRectEditor
 		{
 			EditorGUILayout.PrefixLabel("Depth");
 
-			if (GUILayout.Button("Back", GUILayout.Width(60f)))
+			if (GUILayout.Button("Back", GUILayout.MinWidth(46f)))
 			{
 				foreach (GameObject go in Selection.gameObjects)
 				{
@@ -920,7 +920,7 @@ public class UIWidgetInspector : UIRectEditor
 
 			NGUIEditorTools.DrawProperty("", serializedObject, "mDepth", GUILayout.MinWidth(20f));
 
-			if (GUILayout.Button("Forward", GUILayout.Width(68f)))
+			if (GUILayout.Button("Forward", GUILayout.MinWidth(60f)))
 			{
 				foreach (GameObject go in Selection.gameObjects)
 				{

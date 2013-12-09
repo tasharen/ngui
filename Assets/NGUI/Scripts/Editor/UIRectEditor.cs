@@ -159,22 +159,22 @@ public class UIRectEditor : Editor
 
 			if (type == AnchorType.Advanced)
 			{
-				if (mAnchorType == AnchorType.None) UpdateAnchors(false, true);
+				if (mAnchorType == AnchorType.None) UpdateAnchors(false, true, true);
 				DrawAdvancedAnchors();
 			}
 			else if (type == AnchorType.Relative)
 			{
-				if (mAnchorType != type) UpdateAnchors(true, false);
+				if (mAnchorType != type) UpdateAnchors(true, false, true);
 				DrawRelativeAnchors();
 			}
 			else if (type == AnchorType.Padded)
 			{
-				if (mAnchorType != type) UpdateAnchors(false, false);
+				if (mAnchorType != type) UpdateAnchors(false, false, true);
 				DrawPaddedAnchors();
 			}
 			else if (type == AnchorType.Unified)
 			{
-				if (mAnchorType == AnchorType.None) UpdateAnchors(false, true);
+				if (mAnchorType == AnchorType.None) UpdateAnchors(false, true, true);
 				DrawUnifiedAnchors();
 			}
 			else if (type == AnchorType.None && mAnchorType != type)
@@ -227,7 +227,7 @@ public class UIRectEditor : Editor
 
 	protected virtual void DrawSimpleAnchors (bool reset)
 	{
-		if (reset) UpdateAnchors(false, false);
+		if (reset) UpdateAnchors(false, false, true);
 
 		GUILayout.Space(3f);
 
@@ -273,7 +273,7 @@ public class UIRectEditor : Editor
 		{
 			if (IsRect(sp))
 			{
-				if (before == null && after != null) UpdateAnchors(true, false);
+				if (before == null && after != null) UpdateAnchors(true, false, true);
 				DrawRelativeAnchor(sp, "Left", "leftAnchor", "width");
 				DrawRelativeAnchor(sp, "Right", "rightAnchor", "width");
 				DrawRelativeAnchor(sp, "Bottom", "bottomAnchor", "height");
@@ -317,7 +317,7 @@ public class UIRectEditor : Editor
 		{
 			if (IsRect(sp))
 			{
-				if (before == null && after != null) UpdateAnchors(false, true);
+				if (before == null && after != null) UpdateAnchors(false, true, true);
 				DrawUnifiedAnchor(sp, "Left", "leftAnchor", "width");
 				DrawUnifiedAnchor(sp, "Right", "rightAnchor", "width");
 				DrawUnifiedAnchor(sp, "Bottom", "bottomAnchor", "height");
@@ -325,6 +325,9 @@ public class UIRectEditor : Editor
 			}
 			else DrawSimpleAnchors(before == null && after != null);
 		}
+
+		if (GUILayout.Button("Reset Anchor Origins", GUILayout.MinWidth(20f)))
+			UpdateAnchors(false, true, false);
 	}
 
 	/// <summary>
@@ -342,14 +345,14 @@ public class UIRectEditor : Editor
 		GUILayout.Space(-2f);
 
 		NGUIEditorTools.DrawProperty(" ", serializedObject, name + ".relative", GUILayout.Width(80f));
-		GUILayout.Label("* target's " + suffix);
+		GUILayout.Label("* target's " + suffix, GUILayout.MinWidth(20f));
 		GUILayout.EndHorizontal();
 
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(50f);
 
 		NGUIEditorTools.DrawProperty("+", serializedObject, name + ".absolute", GUILayout.Width(80f));
-		GUILayout.Label("pixels");
+		GUILayout.Label("pixels", GUILayout.MinWidth(20f));
 		GUILayout.EndHorizontal();
 
 		NGUIEditorTools.SetLabelWidth(62f);
@@ -365,6 +368,9 @@ public class UIRectEditor : Editor
 		DrawAdvancedAnchor("Right", "rightAnchor", "width");
 		DrawAdvancedAnchor("Bottom", "bottomAnchor", "height");
 		DrawAdvancedAnchor("Top", "topAnchor", "height");
+
+		if (GUILayout.Button("Reset Anchor Origins", GUILayout.MinWidth(20f)))
+			UpdateAnchors(false, true, false);
 	}
 
 	/// <summary>
@@ -416,7 +422,7 @@ public class UIRectEditor : Editor
 	/// Convenience function that switches the anchor mode and ensures that dimensions are kept intact.
 	/// </summary>
 
-	void UpdateAnchors (bool relative, bool chooseClosest)
+	void UpdateAnchors (bool relative, bool chooseClosest, bool createIfMissing)
 	{
 		serializedObject.ApplyModifiedProperties();
 
@@ -428,10 +434,18 @@ public class UIRectEditor : Editor
 
 			if (rect)
 			{
-				UpdateHorizontalAnchor(rect, rect.leftAnchor, relative, chooseClosest);
-				UpdateHorizontalAnchor(rect, rect.rightAnchor, relative, chooseClosest);
-				UpdateVerticalAnchor(rect, rect.bottomAnchor, relative, chooseClosest);
-				UpdateVerticalAnchor(rect, rect.topAnchor, relative, chooseClosest);
+				if (createIfMissing || rect.leftAnchor.target)
+					UpdateHorizontalAnchor(rect, rect.leftAnchor, relative, chooseClosest);
+
+				if (createIfMissing || rect.rightAnchor.target)
+					UpdateHorizontalAnchor(rect, rect.rightAnchor, relative, chooseClosest);
+
+				if (createIfMissing || rect.bottomAnchor.target)
+					UpdateVerticalAnchor(rect, rect.bottomAnchor, relative, chooseClosest);
+
+				if (createIfMissing || rect.topAnchor.target)
+					UpdateVerticalAnchor(rect, rect.topAnchor, relative, chooseClosest);
+				
 				UnityEditor.EditorUtility.SetDirty(rect);
 			}
 		}

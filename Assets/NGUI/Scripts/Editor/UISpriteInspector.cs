@@ -50,7 +50,7 @@ public class UISpriteInspector : UIWidgetInspector
 		GUILayout.BeginHorizontal();
 		if (NGUIEditorTools.DrawPrefixButton("Atlas"))
 			ComponentSelector.Show<UIAtlas>(OnSelectAtlas);
-		SerializedProperty atlas = NGUIEditorTools.DrawProperty("", serializedObject, "mAtlas");
+		SerializedProperty atlas = NGUIEditorTools.DrawProperty("", serializedObject, "mAtlas", GUILayout.MinWidth(20f));
 		
 		if (GUILayout.Button("Edit", GUILayout.Width(40f)))
 		{
@@ -76,23 +76,23 @@ public class UISpriteInspector : UIWidgetInspector
 	{
 		GUILayout.Space(6f);
 
-		SerializedProperty sp = NGUIEditorTools.DrawProperty("Sprite Type", serializedObject, "mType");
+		SerializedProperty sp = NGUIEditorTools.DrawProperty("Sprite Type", serializedObject, "mType", GUILayout.MinWidth(20f));
 
 		EditorGUI.BeginDisabledGroup(sp.hasMultipleDifferentValues);
 		{
 			if ((UISprite.Type)sp.intValue == UISprite.Type.Sliced)
 			{
-				NGUIEditorTools.DrawProperty("Fill Center", serializedObject, "mFillCenter");
+				NGUIEditorTools.DrawProperty("Fill Center", serializedObject, "mFillCenter", GUILayout.MinWidth(20f));
 			}
 			else if ((UISprite.Type)sp.intValue == UISprite.Type.Filled)
 			{
-				NGUIEditorTools.DrawProperty("Fill Dir", serializedObject, "mFillDirection");
+				NGUIEditorTools.DrawProperty("Fill Dir", serializedObject, "mFillDirection", GUILayout.MinWidth(20f));
 				GUILayout.BeginHorizontal();
 				GUILayout.Space(4f);
-				NGUIEditorTools.DrawProperty("Fill Amount", serializedObject, "mFillAmount");
+				NGUIEditorTools.DrawProperty("Fill Amount", serializedObject, "mFillAmount", GUILayout.MinWidth(20f));
 				GUILayout.Space(4f);
 				GUILayout.EndHorizontal();
-				NGUIEditorTools.DrawProperty("Invert Fill", serializedObject, "mInvert");
+				NGUIEditorTools.DrawProperty("Invert Fill", serializedObject, "mInvert", GUILayout.MinWidth(20f));
 			}
 		}
 		EditorGUI.EndDisabledGroup();
