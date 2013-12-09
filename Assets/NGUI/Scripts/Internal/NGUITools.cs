@@ -169,24 +169,6 @@ static public class NGUITools
 	}
 
 	/// <summary>
-	/// Find all scene components, active or inactive.
-	/// </summary>
-
-	static public List<T> FindAll<T> () where T : Component
-	{
-		T[] comps = Resources.FindObjectsOfTypeAll(typeof(T)) as T[];
-
-		List<T> list = new List<T>();
-
-		foreach (T comp in comps)
-		{
-			if (comp.gameObject.hideFlags == 0)
-				list.Add(comp);
-		}
-		return list;
-	}
-
-	/// <summary>
 	/// Find all active objects of specified type.
 	/// </summary>
 
