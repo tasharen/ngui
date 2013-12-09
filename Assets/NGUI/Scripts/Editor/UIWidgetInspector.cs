@@ -1092,14 +1092,13 @@ public class UIWidgetInspector : UIRectEditor
 		}
 	}
 
-	protected override void DrawSimpleAnchors (bool reset)
+	protected override void OnDrawFinalProperties ()
 	{
-		base.DrawSimpleAnchors(reset);
+		if (mAnchorType == AnchorType.Advanced) return;
 
 		SerializedProperty sp = serializedObject.FindProperty("leftAnchor.target");
-		Transform trans = sp.objectReferenceValue as Transform;
 
-		if (trans != null && (trans.GetComponent<UIRect>() == null))
+		if (!IsRect(sp))
 		{
 			GUILayout.Space(3f);
 			GUILayout.BeginHorizontal();
