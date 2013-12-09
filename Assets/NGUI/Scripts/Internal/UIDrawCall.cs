@@ -396,6 +396,7 @@ public class UIDrawCall : MonoBehaviour
 				}
 
 				// If the buffer length doesn't match, we need to trim all buffers
+#if !UNITY_FLASH
 				bool trim = (uvs.buffer.Length != verts.buffer.Length) ||
 				    (cols.buffer.Length != verts.buffer.Length) ||
 				    (norms != null && norms.buffer.Length != verts.buffer.Length) ||
@@ -433,7 +434,22 @@ public class UIDrawCall : MonoBehaviour
 					if (norms != null) mMesh.normals = norms.buffer;
 					if (tans != null) mMesh.tangents = tans.buffer;
 				}
+#else
+				mTriangles = (verts.size >> 1);
 
+				if (mMesh.vertexCount != verts.size)
+				{
+					mMesh.Clear();
+					setIndices = true;
+				}
+
+				mMesh.vertices = verts.ToArray();
+				mMesh.uv = uvs.ToArray();
+				mMesh.colors32 = cols.ToArray();
+
+				if (norms != null) mMesh.normals = norms.ToArray();
+				if (tans != null) mMesh.tangents = tans.ToArray();
+#endif
 				if (setIndices)
 				{
 					mIndices = GenerateCachedIndexBuffer(count, indexCount);
@@ -468,7 +484,12 @@ public class UIDrawCall : MonoBehaviour
 	}
 
 	const int maxIndexBufferCache = 10;
+
+#if UNITY_FLASH
+	List<int[]> mCache = new List<int[]>(maxIndexBufferCache);
+#else
 	static List<int[]> mCache = new List<int[]>(maxIndexBufferCache);
+#endif
 
 	/// <summary>
 	/// Generates a new index buffer for the specified number of vertices (or reuses an existing one).

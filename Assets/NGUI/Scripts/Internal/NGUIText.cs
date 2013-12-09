@@ -245,7 +245,7 @@ static public class NGUIText
 			for (int i = indexOffset; i < verts.size; ++i)
 			{
 #if UNITY_FLASH
-				verts.buffer[i] = verts.buffer[i] + new Vector2(padding, 0f);
+				verts.buffer[i] = verts.buffer[i] + new Vector3(padding, 0f);
 #else
 				verts.buffer[i] = verts.buffer[i];
 				verts.buffer[i].x += padding;

@@ -1094,7 +1094,7 @@ public class UIWidgetInspector : UIRectEditor
 
 	protected override void OnDrawFinalProperties ()
 	{
-		if (mAnchorType == AnchorType.Advanced) return;
+		if (mAnchorType == AnchorType.Advanced || !mWidget.isAnchored) return;
 
 		SerializedProperty sp = serializedObject.FindProperty("leftAnchor.target");
 
