@@ -1348,8 +1348,8 @@ public class UIPanel : UIRect
 
 	static public Vector2 GetMainGameViewSize ()
 	{
-		if (Application.isPlaying)
-			return new Vector2(Screen.width, Screen.height);
+		//if (Application.isPlaying)
+		//	return new Vector2(Screen.width, Screen.height);
 
 		if (s_GetSizeOfMainGameView == null)
 		{
