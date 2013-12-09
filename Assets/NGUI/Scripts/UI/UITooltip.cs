@@ -8,7 +8,7 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/Tooltip")]
 public class UITooltip : MonoBehaviour
 {
-	static UITooltip mInstance;
+	static protected UITooltip mInstance;
 
 	public Camera uiCamera;
 	public UILabel text;
@@ -16,13 +16,13 @@ public class UITooltip : MonoBehaviour
 	public float appearSpeed = 10f;
 	public bool scalingTransitions = true;
 
-	Transform mTrans;
-	float mTarget = 0f;
-	float mCurrent = 0f;
-	Vector3 mPos;
-	Vector3 mSize = Vector3.zero;
+	protected Transform mTrans;
+	protected float mTarget = 0f;
+	protected float mCurrent = 0f;
+	protected Vector3 mPos;
+	protected Vector3 mSize = Vector3.zero;
 
-	UIWidget[] mWidgets;
+	protected UIWidget[] mWidgets;
 
 	/// <summary>
 	/// Whether the tooltip is currently visible.
@@ -37,7 +37,7 @@ public class UITooltip : MonoBehaviour
 	/// Get a list of widgets underneath the tooltip.
 	/// </summary>
 
-	void Start ()
+	protected virtual void Start ()
 	{
 		mTrans = transform;
 		mWidgets = GetComponentsInChildren<UIWidget>();
@@ -50,7 +50,7 @@ public class UITooltip : MonoBehaviour
 	/// Update the tooltip's alpha based on the target value.
 	/// </summary>
 
-	void Update ()
+	protected virtual void Update ()
 	{
 		if (mCurrent != mTarget)
 		{
@@ -76,7 +76,7 @@ public class UITooltip : MonoBehaviour
 	/// Set the alpha of all widgets.
 	/// </summary>
 
-	void SetAlpha (float val)
+	protected virtual void SetAlpha (float val)
 	{
 		for (int i = 0, imax = mWidgets.Length; i < imax; ++i)
 		{
@@ -91,7 +91,7 @@ public class UITooltip : MonoBehaviour
 	/// Set the tooltip's text to the specified string.
 	/// </summary>
 
-	void SetText (string tooltipText)
+	protected virtual void SetText (string tooltipText)
 	{
 		if (text != null && !string.IsNullOrEmpty(tooltipText))
 		{

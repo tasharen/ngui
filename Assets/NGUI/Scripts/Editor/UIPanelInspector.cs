@@ -115,7 +115,17 @@ public class UIPanelInspector : UIRectEditor
 		resizable[2] = resizable[5] && resizable[6]; // top-right
 		resizable[3] = resizable[7] && resizable[6]; // bottom-right
 
-		UIWidget.Pivot pivotUnderMouse = UIWidgetInspector.GetPivotUnderMouse(handles, e, resizable, ref actionUnderMouse);
+		bool canMove = true;
+		for (int i = 0; i < 4; ++i)
+		{
+			if (!resizable[i])
+			{
+				canMove = false;
+				break;
+			}
+		}
+
+		UIWidget.Pivot pivotUnderMouse = UIWidgetInspector.GetPivotUnderMouse(handles, e, resizable, canMove, ref actionUnderMouse);
 
 		switch (type)
 		{

@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-            Version 3.0.7 rc2
+            Version 3.0.7 f1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -37,7 +37,16 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
  Version History
 -----------------
 
-3.0.7
+3.0.7 f1
+- NEW: Further improved the layout system's presentation, making it less daunting.
+- NEW: Enabling anchoring will automatically anchor to the first parent by default.
+- NEW: It's now possible to automatically anchor to the mid-points (sides, center).
+- NEW: Made it possible to move and scale anchored widgets.
+- FIX: Rotating a widget should no longer hide its side handles.
+- FIX: Mobile keyboard will now have the multi-line option.
+- FIX: Re-added support for packed fonts.
+
+3.0.7 rc1 & 2
 - NEW: Created a new layout system. All widgets and panels can now anchor to each other, the screen, and even 3D game objects.
 - NEW: You can now create resizable scroll views and anchor them to UI elements.
 - NEW: Re-created the Anchor Example to use the new anchoring system.

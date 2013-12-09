@@ -228,7 +228,7 @@ public class UIWidgetInspector : UIRectEditor
 	/// Determine what kind of pivot point is under the mouse and update the cursor accordingly.
 	/// </summary>
 
-	static public UIWidget.Pivot GetPivotUnderMouse (Vector3[] worldPos, Event e, bool[] resizable, ref Action action)
+	static public UIWidget.Pivot GetPivotUnderMouse (Vector3[] worldPos, Event e, bool[] resizable, bool movable, ref Action action)
 	{
 		// Time to figure out what kind of action is underneath the mouse
 		UIWidget.Pivot pivotUnderMouse = UIWidget.Pivot.Center;
@@ -246,7 +246,7 @@ public class UIWidgetInspector : UIRectEditor
 			}
 			else if (!alt && NGUIEditorTools.SceneViewDistanceToRectangle(worldPos, e.mousePosition) == 0f)
 			{
-				action = Action.Move;
+				action = movable ? Action.Move : Action.Rotate;
 			}
 			else if (dist < 30f)
 			{
@@ -466,7 +466,7 @@ public class UIWidgetInspector : UIRectEditor
 		resizable[2] = resizable[5] && resizable[6]; // top-right
 		resizable[3] = resizable[7] && resizable[6]; // bottom-right
 		
-		UIWidget.Pivot pivotUnderMouse = GetPivotUnderMouse(handles, e, resizable, ref actionUnderMouse);
+		UIWidget.Pivot pivotUnderMouse = GetPivotUnderMouse(handles, e, resizable, true, ref actionUnderMouse);
 		
 		switch (type)
 		{
