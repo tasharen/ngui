@@ -142,14 +142,17 @@ public class UIRectEditor : Editor
 
 			if (mAnchorType == AnchorType.None && type != AnchorType.None)
 			{
-				if (mTarget[0] == null && mTarget[1] == null && mTarget[2] == null && mTarget[3] == null)
+				if (type == AnchorType.Unified)
 				{
-					UIRect rect = target as UIRect;
-					UIRect parent = NGUITools.FindInParents<UIRect>(rect.cachedTransform.parent);
-					
-					if (parent != null)
-						for (int i = 0; i < 4; ++i)
-							mTarget[i] = parent.cachedTransform;
+					if (mTarget[0] == null && mTarget[1] == null && mTarget[2] == null && mTarget[3] == null)
+					{
+						UIRect rect = target as UIRect;
+						UIRect parent = NGUITools.FindInParents<UIRect>(rect.cachedTransform.parent);
+
+						if (parent != null)
+							for (int i = 0; i < 4; ++i)
+								mTarget[i] = parent.cachedTransform;
+					}
 				}
 
 				for (int i = 0; i < 4; ++i)
@@ -158,14 +161,11 @@ public class UIRectEditor : Editor
 					mTarget[i] = null;
 				}
 
-				serializedObject.ApplyModifiedProperties();
-				serializedObject.Update();
+				UpdateAnchors();
 			}
 
 			if (type == AnchorType.Advanced)
 			{
-				if (mAnchorType == AnchorType.None) UpdateAnchors(false, true, true);
-
 				DrawAnchor(0, true);
 				DrawAnchor(1, true);
 				DrawAnchor(2, true);
@@ -173,9 +173,7 @@ public class UIRectEditor : Editor
 			}
 			else if (type == AnchorType.Unified)
 			{
-				if (mAnchorType == AnchorType.None) UpdateAnchors(false, true, true);
-				
-				DrawSingleAnchorSelection(false);
+				DrawSingleAnchorSelection();
 
 				DrawAnchor(0, false);
 				DrawAnchor(1, false);
@@ -209,7 +207,7 @@ public class UIRectEditor : Editor
 	/// Draw a selection for a single target (one target sets all 4 sides)
 	/// </summary>
 
-	SerializedProperty DrawSingleAnchorSelection (bool isRelative)
+	SerializedProperty DrawSingleAnchorSelection ()
 	{
 		SerializedProperty sp = serializedObject.FindProperty("leftAnchor.target");
 		Object before = sp.objectReferenceValue;
@@ -224,8 +222,8 @@ public class UIRectEditor : Editor
 
 		if (after != null || sp.hasMultipleDifferentValues)
 		{
-			if (before == null && after != null && IsRect(sp))
-				UpdateAnchors(isRelative, true, true);
+			if (before != after && after != null)
+				UpdateAnchors();
 		}
 		return sp;
 	}
@@ -242,6 +240,7 @@ public class UIRectEditor : Editor
 		GUILayout.BeginHorizontal();
 		GUILayout.Label(PrefixName[index], GUILayout.Width(56f));
 
+		UIRect myRect = serializedObject.targetObject as UIRect;
 		string name = FieldName[index];
 
 		SerializedProperty tar = serializedObject.FindProperty(name + ".target");
@@ -250,14 +249,22 @@ public class UIRectEditor : Editor
 
 		if (targetSelection)
 		{
+			Object before = tar.objectReferenceValue;
 			NGUIEditorTools.DrawProperty("", tar, false);
+			Object after = tar.objectReferenceValue;
+
+			if (after != null || tar.hasMultipleDifferentValues)
+			{
+				if (before != after && after != null)
+					UpdateAnchor(index);
+			}
+
 			GUILayout.EndHorizontal();
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(64f);
 		}
 
 		UIRect targetRect = GetRect(tar);
-		UIRect myRect = serializedObject.targetObject as UIRect;
 		bool isRect = (targetRect != null);
 		float relative = rel.floatValue;
 		bool isCommon = !isRect || IsCommon(relative);
@@ -404,9 +411,10 @@ public class UIRectEditor : Editor
 	/// Convenience function that switches the anchor mode and ensures that dimensions are kept intact.
 	/// </summary>
 
-	void UpdateAnchors (bool relative, bool chooseClosest, bool createIfMissing)
+	void UpdateAnchors ()
 	{
 		serializedObject.ApplyModifiedProperties();
+		//serializedObject.Update();
 
 		Object[] objs = serializedObject.targetObjects;
 
@@ -416,22 +424,16 @@ public class UIRectEditor : Editor
 
 			if (rect)
 			{
-				if (createIfMissing || rect.leftAnchor.target)
-					UpdateHorizontalAnchor(rect, rect.leftAnchor, relative, chooseClosest);
-
-				if (createIfMissing || rect.rightAnchor.target)
-					UpdateHorizontalAnchor(rect, rect.rightAnchor, relative, chooseClosest);
-
-				if (createIfMissing || rect.bottomAnchor.target)
-					UpdateVerticalAnchor(rect, rect.bottomAnchor, relative, chooseClosest);
-
-				if (createIfMissing || rect.topAnchor.target)
-					UpdateVerticalAnchor(rect, rect.topAnchor, relative, chooseClosest);
+				UpdateHorizontalAnchor(rect, rect.leftAnchor);
+				UpdateHorizontalAnchor(rect, rect.rightAnchor);
+				UpdateVerticalAnchor(rect, rect.bottomAnchor);
+				UpdateVerticalAnchor(rect, rect.topAnchor);
 				
 				UnityEditor.EditorUtility.SetDirty(rect);
 			}
 		}
-
+		
+		//serializedObject.ApplyModifiedProperties();
 		serializedObject.Update();
 	}
 
@@ -439,7 +441,37 @@ public class UIRectEditor : Editor
 	/// Convenience function that switches the anchor mode and ensures that dimensions are kept intact.
 	/// </summary>
 
-	static void UpdateHorizontalAnchor (UIRect r, UIRect.AnchorPoint anchor, bool relative, bool chooseClosest)
+	void UpdateAnchor (int index)
+	{
+		serializedObject.ApplyModifiedProperties();
+		//serializedObject.Update();
+
+		Object[] objs = serializedObject.targetObjects;
+
+		for (int i = 0; i < objs.Length; ++i)
+		{
+			UIRect rect = objs[i] as UIRect;
+
+			if (rect)
+			{
+				if (index == 0) UpdateHorizontalAnchor(rect, rect.leftAnchor);
+				if (index == 1) UpdateHorizontalAnchor(rect, rect.rightAnchor);
+				if (index == 2) UpdateVerticalAnchor(rect, rect.bottomAnchor);
+				if (index == 3) UpdateVerticalAnchor(rect, rect.topAnchor);
+
+				UnityEditor.EditorUtility.SetDirty(rect);
+			}
+		}
+		
+		//serializedObject.ApplyModifiedProperties();
+		serializedObject.Update();
+	}
+
+	/// <summary>
+	/// Convenience function that switches the anchor mode and ensures that dimensions are kept intact.
+	/// </summary>
+
+	static void UpdateHorizontalAnchor (UIRect r, UIRect.AnchorPoint anchor)
 	{
 		// Update the target
 		if (anchor.target == null) return;
@@ -471,31 +503,15 @@ public class UIRectEditor : Editor
 			// Anchored to a rectangle -- must anchor to the same side
 			Vector3[] targetCorners = anchor.rect.worldCorners;
 
-			if (relative)
-			{
-				Vector3 remotePos = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[i0], targetCorners[i1], 0.5f));
-				float offset = localPos.x - remotePos.x;
-				targetCorners = anchor.rect.localCorners;
-				float remoteSize = targetCorners[3].x - targetCorners[0].x;
+			// We want to choose the side with the shortest offset
+			Vector3 side0 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[0], targetCorners[1], 0.5f));
+			Vector3 side1 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[2], targetCorners[3], 0.5f));
 
-				anchor.absolute = 0;
-				anchor.relative = offset / remoteSize;
-				if (inverted) anchor.relative += 1f;
-			}
-			else
-			{
-				// We want to choose the side with the shortest offset
-				Vector3 side0 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[0], targetCorners[1], 0.5f));
-				Vector3 side1 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[2], targetCorners[3], 0.5f));
+			float val0 = localPos.x - side0.x;
+			float val2 = localPos.x - side1.x;
+			float val1 = localPos.x - Vector3.Lerp(side0, side1, 0.5f).x;
 
-				float val0 = localPos.x - side0.x;
-				float val2 = localPos.x - side1.x;
-				float val1 = localPos.x - Vector3.Lerp(side0, side1, 0.5f).x;
-
-				if (chooseClosest) anchor.SetToNearest(val0, val1, val2);
-				else if (inverted) anchor.Set(1f, val2);
-				else anchor.Set(0f, val0);
-			}
+			anchor.SetToNearest(val0, val1, val2);
 		}
 	}
 
@@ -503,7 +519,7 @@ public class UIRectEditor : Editor
 	/// Convenience function that switches the anchor mode and ensures that dimensions are kept intact.
 	/// </summary>
 
-	static void UpdateVerticalAnchor (UIRect r, UIRect.AnchorPoint anchor, bool relative, bool chooseClosest)
+	static void UpdateVerticalAnchor (UIRect r, UIRect.AnchorPoint anchor)
 	{
 		// Update the target
 		if (anchor.target == null) return;
@@ -535,31 +551,15 @@ public class UIRectEditor : Editor
 			// Anchored to a rectangle -- must anchor to the same side
 			Vector3[] targetCorners = anchor.rect.worldCorners;
 
-			if (relative)
-			{
-				Vector3 remotePos = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[i0], targetCorners[i1], 0.5f));
-				float offset = localPos.y - remotePos.y;
-				targetCorners = anchor.rect.localCorners;
-				float remoteSize = targetCorners[1].y - targetCorners[0].y;
+			// We want to choose the side with the shortest offset
+			Vector3 side0 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[0], targetCorners[3], 0.5f));
+			Vector3 side1 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[1], targetCorners[2], 0.5f));
 
-				anchor.absolute = 0;
-				anchor.relative = offset / remoteSize;
-				if (inverted) anchor.relative += 1f;
-			}
-			else
-			{
-				// We want to choose the side with the shortest offset
-				Vector3 side0 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[0], targetCorners[3], 0.5f));
-				Vector3 side1 = parent.InverseTransformPoint(Vector3.Lerp(targetCorners[1], targetCorners[2], 0.5f));
+			float val0 = localPos.y - side0.y;
+			float val2 = localPos.y - side1.y;
+			float val1 = localPos.y - Vector3.Lerp(side0, side1, 0.5f).y;
 
-				float val0 = localPos.y - side0.y;
-				float val2 = localPos.y - side1.y;
-				float val1 = localPos.y - Vector3.Lerp(side0, side1, 0.5f).y;
-
-				if (chooseClosest) anchor.SetToNearest(val0, val1, val2);
-				else if (inverted) anchor.Set(1f, val2);
-				else anchor.Set(0f, val0);
-			}
+			anchor.SetToNearest(val0, val1, val2);
 		}
 	}
 }

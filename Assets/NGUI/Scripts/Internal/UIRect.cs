@@ -125,7 +125,7 @@ public abstract class UIRect : MonoBehaviour
 	public AnchorPoint topAnchor = new AnchorPoint(1f);
 
 	protected UIRoot mRoot;
-	protected Camera mAnchorCam;
+	protected Camera mMyCam;
 	protected GameObject mGo;
 	protected Transform mTrans;
 	protected UIRect mParent;
@@ -209,11 +209,13 @@ public abstract class UIRect : MonoBehaviour
 
 	protected Vector2 GetLocalPos (AnchorPoint ac, Transform trans)
 	{
-		Vector3 pos = ac.cam.WorldToScreenPoint(ac.target.position);
-		pos = mAnchorCam.ScreenToWorldPoint(pos);
+		if (mMyCam == null || ac.cam == null)
+			return cachedTransform.localPosition;
+
+		Vector3 pos = mMyCam.ViewportToWorldPoint(ac.cam.WorldToViewportPoint(ac.target.position));
 		if (trans != null) pos = trans.InverseTransformPoint(pos);
-		pos.x = Mathf.Round(pos.x);
-		pos.y = Mathf.Round(pos.y);
+		pos.x = Mathf.Floor(pos.x + 0.5f);
+		pos.y = Mathf.Floor(pos.y + 0.5f);
 		return pos;
 	}
 
@@ -324,6 +326,8 @@ public abstract class UIRect : MonoBehaviour
 		rightAnchor.rect	= (rightAnchor.target)	? rightAnchor.target.GetComponent<UIRect>()	 : null;
 		topAnchor.rect		= (topAnchor.target)	? topAnchor.target.GetComponent<UIRect>()	 : null;
 
+		mMyCam = NGUITools.FindCameraForLayer(cachedGameObject.layer);
+
 		FindCameraFor(leftAnchor);
 		FindCameraFor(bottomAnchor);
 		FindCameraFor(rightAnchor);
@@ -340,7 +344,6 @@ public abstract class UIRect : MonoBehaviour
 		if (ap.target == null || ap.rect != null)
 		{
 			ap.cam = null;
-			mAnchorCam = null;
 		}
 		else
 		{
@@ -351,21 +354,7 @@ public abstract class UIRect : MonoBehaviour
 			if (ap.cam == null)
 			{
 				ap.target = null;
-				mAnchorCam = null;
 				return;
-			}
-			
-			// Find the camera responsible for this rectangle
-			if (mAnchorCam == null)
-			{
-				mAnchorCam = NGUITools.FindCameraForLayer(cachedGameObject.layer);
-
-				// No camera found? Clear the references
-				if (mAnchorCam == null)
-				{
-					ap.target = null;
-					ap.cam = null;
-				}
 			}
 		}
 	}

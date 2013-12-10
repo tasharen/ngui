@@ -761,12 +761,6 @@ public class UIPanel : UIRect
 				rt = lp.x + rightAnchor.absolute;
 				tt = lp.y + topAnchor.absolute;
 			}
-
-			// Take the offset into consideration
-			lt -= offset.x + mClipOffset.x;
-			rt -= offset.x + mClipOffset.x;
-			bt -= offset.y + mClipOffset.y;
-			tt -= offset.y + mClipOffset.y;
 		}
 		else
 		{
@@ -780,10 +774,8 @@ public class UIPanel : UIRect
 				}
 				else
 				{
-					lt = trans.InverseTransformPoint(leftAnchor.target.position).x;
+					lt = GetLocalPos(leftAnchor, parent).x + leftAnchor.absolute;
 				}
-
-				lt -= offset.x + mClipOffset.x;
 			}
 			else lt = mClipRange.x - 0.5f * size.x;
 
@@ -797,10 +789,8 @@ public class UIPanel : UIRect
 				}
 				else
 				{
-					rt = trans.InverseTransformPoint(rightAnchor.target.position).x;
+					rt = GetLocalPos(rightAnchor, parent).x + rightAnchor.absolute;
 				}
-
-				rt -= offset.x + mClipOffset.x;
 			}
 			else rt = mClipRange.x + 0.5f * size.x;
 
@@ -814,10 +804,8 @@ public class UIPanel : UIRect
 				}
 				else
 				{
-					bt = trans.InverseTransformPoint(bottomAnchor.target.position).y;
+					bt = GetLocalPos(bottomAnchor, parent).y + bottomAnchor.absolute;
 				}
-
-				bt -= offset.y + mClipOffset.y;
 			}
 			else bt = mClipRange.y - 0.5f * size.y;
 
@@ -831,13 +819,17 @@ public class UIPanel : UIRect
 				}
 				else
 				{
-					tt = trans.InverseTransformPoint(topAnchor.target.position).y;
+					tt = GetLocalPos(topAnchor, parent).y + topAnchor.absolute;
 				}
-
-				tt -= offset.y + mClipOffset.y;
 			}
 			else tt = mClipRange.y + 0.5f * size.y;
 		}
+
+		// Take the offset into consideration
+		lt -= offset.x + mClipOffset.x;
+		rt -= offset.x + mClipOffset.x;
+		bt -= offset.y + mClipOffset.y;
+		tt -= offset.y + mClipOffset.y;
 
 		// Calculate the new position, width and height
 		float newX = Mathf.Lerp(lt, rt, 0.5f);
