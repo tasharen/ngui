@@ -119,7 +119,7 @@ public class UICenterOnChild : MonoBehaviour
 				if (delta.x > nextPageThreshold)
 				{
 					// Next page
-					if (index > 1)
+					if (index > 0)
 						closest = trans.GetChild(index - 1);
 				}
 				else if (delta.x < -nextPageThreshold)
