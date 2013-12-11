@@ -493,14 +493,14 @@ public class UIWidget : UIRect
 		float y0 = -offset.y * mHeight;
 		float x1 = x0 + mWidth;
 		float y1 = y0 + mHeight;
-		float cx = (y0 + y1) * 0.5f;
-		float cy = (x0 + x1) * 0.5f;
+		float cx = (x0 + x1) * 0.5f;
+		float cy = (y0 + y1) * 0.5f;
 
-		Transform wt = cachedTransform;
-		mCorners[0] = wt.TransformPoint(x0, cx, 0f);
-		mCorners[1] = wt.TransformPoint(cy, y1, 0f);
-		mCorners[2] = wt.TransformPoint(x1, cx, 0f);
-		mCorners[3] = wt.TransformPoint(cy, y0, 0f);
+		Transform trans = cachedTransform;
+		mCorners[0] = trans.TransformPoint(x0, cy, 0f);
+		mCorners[1] = trans.TransformPoint(cx, y1, 0f);
+		mCorners[2] = trans.TransformPoint(x1, cy, 0f);
+		mCorners[3] = trans.TransformPoint(cx, y0, 0f);
 
 		if (relativeTo != null)
 		{

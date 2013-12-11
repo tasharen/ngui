@@ -54,7 +54,6 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] FontStyle mFontStyle = FontStyle.Normal;
 	[HideInInspector][SerializeField] bool mEncoding = true;
 	[HideInInspector][SerializeField] int mMaxLineCount = 0; // 0 denotes unlimited
-	[HideInInspector][SerializeField] Color mGradientBottom = Color.grey;
 	[HideInInspector][SerializeField] Effect mEffectStyle = Effect.None;
 	[HideInInspector][SerializeField] Color mEffectColor = Color.black;
 	[HideInInspector][SerializeField] NGUIText.SymbolStyle mSymbols = NGUIText.SymbolStyle.Uncolored;
@@ -63,6 +62,7 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] Material mMaterial;
 	[HideInInspector][SerializeField] bool mApplyGradient = false;
 	[HideInInspector][SerializeField] Color mGradientTop = Color.white;
+	[HideInInspector][SerializeField] Color mGradientBottom = new Color(0.7f, 0.7f, 0.7f);
 	[HideInInspector][SerializeField] int mSpacingX = 0;
 	[HideInInspector][SerializeField] int mSpacingY = 0;
 

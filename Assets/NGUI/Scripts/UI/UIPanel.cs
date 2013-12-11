@@ -525,14 +525,24 @@ public class UIPanel : UIRect
 		float y0 = cr.y - 0.5f * size.y;
 		float x1 = x0 + size.x;
 		float y1 = y0 + size.y;
-		float cx = (y0 + y1) * 0.5f;
-		float cy = (x0 + x1) * 0.5f;
+		float cx = (x0 + x1) * 0.5f;
+		float cy = (y0 + y1) * 0.5f;
 
-		Transform wt = cachedTransform;
-		mCorners[0] = wt.TransformPoint(x0, cx, 0f);
-		mCorners[1] = wt.TransformPoint(cy, y1, 0f);
-		mCorners[2] = wt.TransformPoint(x1, cx, 0f);
-		mCorners[3] = wt.TransformPoint(cy, y0, 0f);
+		Transform trans = cachedTransform;
+		Matrix4x4 mat = trans.localToWorldMatrix;
+		
+		// Non-clipped panels use the screen's dimensions, so they need to ignore the position
+		if (mClipping == UIDrawCall.Clipping.None)
+		{
+			mat[12] = 0f;
+			mat[13] = 0f;
+			mat[14] = 0f;
+		}
+
+		mCorners[0] = mat.MultiplyPoint3x4(new Vector3(x0, cy));
+		mCorners[1] = mat.MultiplyPoint3x4(new Vector3(cx, y1));
+		mCorners[2] = mat.MultiplyPoint3x4(new Vector3(x1, cy));
+		mCorners[3] = mat.MultiplyPoint3x4(new Vector3(cx, y0));
 
 		if (relativeTo != null)
 		{
