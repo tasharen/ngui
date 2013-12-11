@@ -57,9 +57,6 @@ public class UIWidget : UIRect
 	protected Vector4 mDrawRegion = new Vector4(0f, 0f, 1f, 1f);
 
 	bool mStarted = false;
-	Vector3 mDiffPos;
-	Quaternion mDiffRot;
-	Vector3 mDiffScale;
 	Matrix4x4 mLocalToPanel;
 	bool mIsVisible = true;
 	float mLastAlpha = 0f;

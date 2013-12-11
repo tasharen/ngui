@@ -351,7 +351,6 @@ public class UICamera : MonoBehaviour
 
 	// Mouse input is turned off on iOS
 	Camera mCam = null;
-	LayerMask mLayerMask;
 	float mTooltipTime = 0f;
 	float mNextRaycast = 0f;
 

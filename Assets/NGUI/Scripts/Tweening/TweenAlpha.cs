@@ -20,7 +20,6 @@ public class TweenAlpha : UITweener
 	[Range(0f, 1f)] public float to = 1f;
 #endif
 
-	Transform mTrans;
 	UIWidget mWidget;
 	UIPanel mPanel;
 
