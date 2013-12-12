@@ -494,7 +494,10 @@ public class UIRectEditor : Editor
 		if (anchor.rect == null)
 		{
 			// Anchored to a simple transform
-			Vector3 remotePos = parent.InverseTransformPoint(anchor.target.position);
+			Vector3 remotePos = anchor.target.position;
+			if (anchor.cam != null) remotePos = anchor.cam.WorldToViewportPoint(remotePos);
+			if (r.anchorCamera != null) remotePos = r.anchorCamera.ViewportToWorldPoint(remotePos);
+			remotePos = parent.InverseTransformPoint(remotePos);
 			anchor.absolute = Mathf.FloorToInt(localPos.x - remotePos.x + 0.5f);
 			anchor.relative = inverted ? 1f : 0f;
 		}
@@ -542,7 +545,10 @@ public class UIRectEditor : Editor
 		if (anchor.rect == null)
 		{
 			// Anchored to a simple transform
-			Vector3 remotePos = parent.InverseTransformPoint(anchor.target.position);
+			Vector3 remotePos = anchor.target.position;
+			if (anchor.cam != null) remotePos = anchor.cam.WorldToViewportPoint(remotePos);
+			if (r.anchorCamera != null) remotePos = r.anchorCamera.ViewportToWorldPoint(remotePos);
+			remotePos = parent.InverseTransformPoint(remotePos);
 			anchor.absolute = Mathf.FloorToInt(localPos.y - remotePos.y + 0.5f);
 			anchor.relative = inverted ? 1f : 0f;
 		}

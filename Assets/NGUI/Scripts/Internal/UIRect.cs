@@ -124,7 +124,6 @@ public abstract class UIRect : MonoBehaviour
 
 	public AnchorPoint topAnchor = new AnchorPoint(1f);
 
-	protected Camera mMyCam;
 	protected GameObject mGo;
 	protected Transform mTrans;
 	protected BetterList<UIRect> mChildren = new BetterList<UIRect>();
@@ -133,6 +132,7 @@ public abstract class UIRect : MonoBehaviour
 
 	UIRoot mRoot;
 	UIRect mParent;
+	Camera mMyCam;
 	int mUpdateFrame = -1;
 	bool mAnchorsCached = false;
 	bool mParentFound = false;
@@ -149,6 +149,12 @@ public abstract class UIRect : MonoBehaviour
 	/// </summary>
 
 	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
+
+	/// <summary>
+	/// Camera used by anchors.
+	/// </summary>
+
+	public Camera anchorCamera { get { if (!mAnchorsCached) ResetAnchors(); return mMyCam; } }
 
 	/// <summary>
 	/// Get the rectangle's parent, if any.
@@ -247,7 +253,7 @@ public abstract class UIRect : MonoBehaviour
 
 	protected Vector3 GetLocalPos (AnchorPoint ac, Transform trans)
 	{
-		if (mMyCam == null || ac.cam == null)
+		if (anchorCamera == null || ac.cam == null)
 			return cachedTransform.localPosition;
 
 		Vector3 pos = mMyCam.ViewportToWorldPoint(ac.cam.WorldToViewportPoint(ac.target.position));
