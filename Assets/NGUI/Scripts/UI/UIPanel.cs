@@ -535,9 +535,15 @@ public class UIPanel : UIRect
 		// Non-clipped panels use the screen's dimensions, so they need to ignore the position
 		if (mClipping == UIDrawCall.Clipping.None)
 		{
-			mat[12] = 0f;
-			mat[13] = 0f;
-			mat[14] = 0f;
+			UIRoot rt = root;
+
+			if (rt != null)
+			{
+				Vector3 pos = rt.transform.position;
+				mat[12] = pos.x;
+				mat[13] = pos.y;
+				mat[14] = pos.z;
+			}
 		}
 
 		mCorners[0] = mat.MultiplyPoint3x4(new Vector3(x0, cy));

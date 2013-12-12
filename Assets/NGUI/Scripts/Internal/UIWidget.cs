@@ -805,6 +805,7 @@ public class UIWidget : UIRect
 			UnityEditor.EditorUtility.SetDirty(this);
 #endif
 		}
+		Update();
 	}
 
 	/// <summary>
