@@ -8,6 +8,104 @@ using UnityEditor;
 
 public static class NGUIContextMenu
 {
+	[MenuItem("Help/NGUI Documentation")]
+	static void ShowHelp0 (MenuCommand command) { NGUIHelp.Show(); }
+
+	[MenuItem("CONTEXT/UIWidget/Copy Widget")]
+	static void CopyStyle (MenuCommand command) { NGUISettings.CopyWidget(command.context as UIWidget); }
+
+	[MenuItem("CONTEXT/UIWidget/Paste Widget Values")]
+	static void PasteStyle (MenuCommand command) { NGUISettings.PasteWidget(command.context as UIWidget, true); }
+
+	[MenuItem("CONTEXT/UIWidget/Paste Widget Style")]
+	static void PasteStyle2 (MenuCommand command) { NGUISettings.PasteWidget(command.context as UIWidget, false); }
+
+	[MenuItem("CONTEXT/UIWidget/Help")]
+	static void ShowHelp1 (MenuCommand command) { NGUIHelp.Show(command.context); }
+
+	[MenuItem("CONTEXT/UIButton/Help")]
+	static void ShowHelp2 (MenuCommand command) { NGUIHelp.Show(typeof(UIButton)); }
+
+	[MenuItem("CONTEXT/UIToggle/Help")]
+	static void ShowHelp3 (MenuCommand command) { NGUIHelp.Show(typeof(UIToggle)); }
+
+	[MenuItem("CONTEXT/UIRoot/Help")]
+	static void ShowHelp4 (MenuCommand command) { NGUIHelp.Show(typeof(UIRoot)); }
+
+	[MenuItem("CONTEXT/UICamera/Help")]
+	static void ShowHelp5 (MenuCommand command) { NGUIHelp.Show(typeof(UICamera)); }
+
+	[MenuItem("CONTEXT/UIAnchor/Help")]
+	static void ShowHelp6 (MenuCommand command) { NGUIHelp.Show(typeof(UIAnchor)); }
+
+	[MenuItem("CONTEXT/UIStretch/Help")]
+	static void ShowHelp7 (MenuCommand command) { NGUIHelp.Show(typeof(UIStretch)); }
+
+	[MenuItem("CONTEXT/UISlider/Help")]
+	static void ShowHelp8 (MenuCommand command) { NGUIHelp.Show(typeof(UISlider)); }
+
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+	[MenuItem("CONTEXT/UI2DSprite/Help")]
+	static void ShowHelp9 (MenuCommand command) { NGUIHelp.Show(typeof(UI2DSprite)); }
+#endif
+
+	[MenuItem("CONTEXT/UIScrollBar/Help")]
+	static void ShowHelp10 (MenuCommand command) { NGUIHelp.Show(typeof(UIScrollBar)); }
+
+	[MenuItem("CONTEXT/UIProgressBar/Help")]
+	static void ShowHelp11 (MenuCommand command) { NGUIHelp.Show(typeof(UIProgressBar)); }
+
+	[MenuItem("CONTEXT/UIPopupList/Help")]
+	static void ShowHelp12 (MenuCommand command) { NGUIHelp.Show(typeof(UIPopupList)); }
+
+	[MenuItem("CONTEXT/UIInput/Help")]
+	static void ShowHelp13 (MenuCommand command) { NGUIHelp.Show(typeof(UIInput)); }
+
+	[MenuItem("CONTEXT/UIKeyBinding/Help")]
+	static void ShowHelp14 (MenuCommand command) { NGUIHelp.Show(typeof(UIKeyBinding)); }
+
+	[MenuItem("CONTEXT/UIGrid/Help")]
+	static void ShowHelp15 (MenuCommand command) { NGUIHelp.Show(typeof(UIGrid)); }
+
+	[MenuItem("CONTEXT/UITable/Help")]
+	static void ShowHelp16 (MenuCommand command) { NGUIHelp.Show(typeof(UITable)); }
+
+	[MenuItem("CONTEXT/UIPlayTween/Help")]
+	static void ShowHelp17 (MenuCommand command) { NGUIHelp.Show(typeof(UIPlayTween)); }
+
+	[MenuItem("CONTEXT/UIPlayAnimation/Help")]
+	static void ShowHelp18 (MenuCommand command) { NGUIHelp.Show(typeof(UIPlayAnimation)); }
+
+	[MenuItem("CONTEXT/UIPlaySound/Help")]
+	static void ShowHelp19 (MenuCommand command) { NGUIHelp.Show(typeof(UIPlaySound)); }
+
+	[MenuItem("CONTEXT/UIScrollView/Help")]
+	static void ShowHelp20 (MenuCommand command) { NGUIHelp.Show(typeof(UIScrollView)); }
+
+	[MenuItem("CONTEXT/UIDragScrollView/Help")]
+	static void ShowHelp21 (MenuCommand command) { NGUIHelp.Show(typeof(UIDragScrollView)); }
+
+	[MenuItem("CONTEXT/UICenterOnChild/Help")]
+	static void ShowHelp22 (MenuCommand command) { NGUIHelp.Show(typeof(UICenterOnChild)); }
+
+	[MenuItem("CONTEXT/UICenterOnClick/Help")]
+	static void ShowHelp23 (MenuCommand command) { NGUIHelp.Show(typeof(UICenterOnClick)); }
+
+	[MenuItem("CONTEXT/UITweener/Help")]
+	[MenuItem("CONTEXT/UIPlayTween/Help")]
+	static void ShowHelp24 (MenuCommand command) { NGUIHelp.Show(typeof(UITweener)); }
+
+	[MenuItem("CONTEXT/ActiveAnimation/Help")]
+	[MenuItem("CONTEXT/UIPlayAnimation/Help")]
+	static void ShowHelp25 (MenuCommand command) { NGUIHelp.Show(typeof(UIPlayAnimation)); }
+
+	[MenuItem("CONTEXT/UIScrollView/Help")]
+	[MenuItem("CONTEXT/UIDragScrollView/Help")]
+	static void ShowHelp26 (MenuCommand command) { NGUIHelp.Show(typeof(UIScrollView)); }
+
+	[MenuItem("CONTEXT/UIPanel/Help")]
+	static void ShowHelp27 (MenuCommand command) { NGUIHelp.Show(typeof(UIPanel)); }
+
 	public delegate UIWidget AddFunc (GameObject go);
 
 	static BetterList<string> mEntries = new BetterList<string>();
