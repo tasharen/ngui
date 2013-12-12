@@ -40,7 +40,7 @@ public class UIButtonScale : MonoBehaviour
 
 			if (tc != null)
 			{
-				tc.scale = mScale;
+				tc.value = mScale;
 				tc.enabled = false;
 			}
 		}

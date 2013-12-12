@@ -288,7 +288,7 @@ public class UIPlayTween : MonoBehaviour
 					}
 					else
 					{
-						if (resetOnPlay || (resetIfDisabled && !tw.enabled)) tw.Reset();
+						if (resetOnPlay || (resetIfDisabled && !tw.enabled)) tw.ResetToBeginning();
 						tw.Play(forward);
 					}
 

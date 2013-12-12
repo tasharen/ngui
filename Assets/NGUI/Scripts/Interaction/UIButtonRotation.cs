@@ -40,7 +40,7 @@ public class UIButtonRotation : MonoBehaviour
 
 			if (tc != null)
 			{
-				tc.rotation = mRot;
+				tc.value = mRot;
 				tc.enabled = false;
 			}
 		}

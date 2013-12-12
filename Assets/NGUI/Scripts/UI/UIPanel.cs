@@ -149,7 +149,7 @@ public class UIPanel : UIRect
 	/// Panel's alpha affects everything drawn by the panel.
 	/// </summary>
 
-	public float alpha
+	public override float alpha
 	{
 		get
 		{

@@ -135,7 +135,7 @@ public class UIButton : UIButtonColor
 
 			if (tc != null && immediate)
 			{
-				tc.color = c;
+				tc.value = c;
 				tc.enabled = false;
 			}
 		}

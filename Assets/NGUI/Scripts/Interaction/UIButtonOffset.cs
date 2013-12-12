@@ -40,7 +40,7 @@ public class UIButtonOffset : MonoBehaviour
 
 			if (tc != null)
 			{
-				tc.position = mPos;
+				tc.value = mPos;
 				tc.enabled = false;
 			}
 		}

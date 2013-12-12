@@ -139,10 +139,23 @@ public abstract class UITweener : MonoBehaviour
 	public AnimationOrTween.Direction direction { get { return mAmountPerDelta < 0f ? AnimationOrTween.Direction.Reverse : AnimationOrTween.Direction.Forward; } }
 
 	/// <summary>
+	/// This function is called by Unity when you add a component. Automatically set the starting values for convenience.
+	/// </summary>
+
+	void Reset ()
+	{
+		if (!mStarted)
+		{
+			SetStartToCurrentValue();
+			SetEndToCurrentValue();
+		}
+	}
+
+	/// <summary>
 	/// Update as soon as it's started so that there is no delay.
 	/// </summary>
 
-	void Start () { Update(); }
+	protected virtual void Start () { Update(); }
 
 	/// <summary>
 	/// Update the tweening factor and call the virtual update function.
@@ -329,7 +342,7 @@ public abstract class UITweener : MonoBehaviour
 	/// Manually reset the tweener's state to the beginning.
 	/// </summary>
 
-	public void Reset ()
+	public void ResetToBeginning ()
 	{
 		mStarted = false;
 		mFactor = (mAmountPerDelta < 0f) ? 1f : 0f;
@@ -380,6 +393,24 @@ public abstract class UITweener : MonoBehaviour
 		comp.eventReceiver = null;
 		comp.callWhenFinished = null;
 		comp.enabled = true;
+
+		if (duration <= 0f)
+		{
+			comp.Sample(1f, true);
+			comp.enabled = false;
+		}
 		return comp;
 	}
+
+	/// <summary>
+	/// Set the 'from' value to the current one.
+	/// </summary>
+
+	public virtual void SetStartToCurrentValue () { }
+
+	/// <summary>
+	/// Set the 'to' value to the current one.
+	/// </summary>
+
+	public virtual void SetEndToCurrentValue () { }
 }

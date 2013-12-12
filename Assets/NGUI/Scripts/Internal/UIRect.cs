@@ -199,6 +199,12 @@ public abstract class UIRect : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Local alpha, not relative to anything.
+	/// </summary>
+
+	public abstract float alpha { get; set; }
+
+	/// <summary>
 	/// Alpha property is exposed so that it's possible to make it cumulative.
 	/// </summary>
 
@@ -289,7 +295,7 @@ public abstract class UIRect : MonoBehaviour
 
 	public void Update ()
 	{
-		if (!mAnchorsCached) CacheAnchors();
+		if (!mAnchorsCached) ResetAnchors();
 
 		int frame = Time.frameCount;
 
@@ -350,7 +356,7 @@ public abstract class UIRect : MonoBehaviour
 	/// Ensure that all rect references are set correctly on the anchors.
 	/// </summary>
 
-	protected void CacheAnchors ()
+	public void ResetAnchors ()
 	{
 		mAnchorsCached = true;
 
@@ -428,7 +434,7 @@ public abstract class UIRect : MonoBehaviour
 
 	protected virtual void OnValidate()
 	{
-		CacheAnchors();
+		ResetAnchors();
 		Invalidate(true);
 	}
 #endif

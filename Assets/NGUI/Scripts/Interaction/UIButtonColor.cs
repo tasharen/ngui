@@ -93,7 +93,7 @@ public class UIButtonColor : UIWidgetContainer
 
 			if (tc != null)
 			{
-				tc.color = mColor;
+				tc.value = mColor;
 				tc.enabled = false;
 			}
 		}
