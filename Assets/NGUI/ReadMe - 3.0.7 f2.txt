@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-            Version 3.0.7 f1
+            Version 3.0.7 f2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,16 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.7 f2
+- NEW: You can now right-click on tweens to set the 'from' and 'to' values using the current.
+- FIX: Tweens no longer reset the object to its default value when first added (current value is now used instead).
+- FIX: Non-clipped panels will no longer use their position when calculating dimensions for anchors.
+- FIX: Panels can now use advanced anchors properly (partial anchoring).
+- FIX: Anchoring to a transform should no longer reposition the widgets and panels.
+- FIX: Cleanup of warnings that don't show up on the Windows version of Unity.
+- FIX: Button should now keep the highlighted state correctly when using controller input.
+- FIX: Unity has a bug related to input on BB10, apparently (backspace).
 
 3.0.7 f1
 - NEW: Further improved the layout system's presentation, making it less daunting.
