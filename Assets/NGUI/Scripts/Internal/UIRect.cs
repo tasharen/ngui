@@ -124,23 +124,19 @@ public abstract class UIRect : MonoBehaviour
 
 	public AnchorPoint topAnchor = new AnchorPoint(1f);
 
-	protected UIRoot mRoot;
 	protected Camera mMyCam;
 	protected GameObject mGo;
 	protected Transform mTrans;
-	protected UIRect mParent;
 	protected BetterList<UIRect> mChildren = new BetterList<UIRect>();
 	protected bool mChanged = true;
 	protected float mFinalAlpha = 0f;
 
+	UIRoot mRoot;
+	UIRect mParent;
 	int mUpdateFrame = -1;
 	bool mAnchorsCached = false;
-
-	/// <summary>
-	/// Rectangle's parent, if any.
-	/// </summary>
-
-	public UIRect parent { get { return mParent; } }
+	bool mParentFound = false;
+	bool mRootSet = false;
 
 	/// <summary>
 	/// Game object gets cached for speed. Can't simply return 'mGo' set in Awake because this function may be called on a prefab.
@@ -153,6 +149,42 @@ public abstract class UIRect : MonoBehaviour
 	/// </summary>
 
 	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
+
+	/// <summary>
+	/// Get the rectangle's parent, if any.
+	/// </summary>
+
+	public UIRect parent
+	{
+		get
+		{
+			if (!mParentFound)
+			{
+				mParentFound = true;
+				mParent = NGUITools.FindInParents<UIRect>(cachedTransform.parent);
+			}
+			return mParent;
+		}
+	}
+
+	/// <summary>
+	/// Get the root object, if any.
+	/// </summary>
+
+	public UIRoot root
+	{
+		get
+		{
+			if (parent != null) return mParent.root;
+
+			if (!mRootSet)
+			{
+				mRootSet = true;
+				mRoot = NGUITools.FindInParents<UIRoot>(cachedTransform);
+			}
+			return mRoot;
+		}
+	}
 
 	/// <summary>
 	/// Returns 'true' if the widget is currently anchored on any side.
@@ -226,10 +258,9 @@ public abstract class UIRect : MonoBehaviour
 	protected virtual void OnEnable ()
 	{
 		mChanged = true;
-		mParent = NGUITools.FindInParents<UIRect>(cachedTransform.parent);
-		if (mParent != null && mParent.mRoot) mRoot = mParent.mRoot;
-		else mRoot = NGUITools.FindInParents<UIRoot>(cachedTransform);
-		if (mParent != null) mParent.mChildren.Add(this);
+		mRootSet = false;
+		mParentFound = false;
+		if (parent != null) mParent.mChildren.Add(this);
 	}
 
 	/// <summary>
@@ -241,6 +272,8 @@ public abstract class UIRect : MonoBehaviour
 		if (mParent) mParent.mChildren.Remove(this);
 		mParent = null;
 		mRoot = null;
+		mRootSet = false;
+		mParentFound = false;
 	}
 
 	/// <summary>
@@ -365,13 +398,14 @@ public abstract class UIRect : MonoBehaviour
 
 	public virtual void ParentHasChanged ()
 	{
-		UIRect parent = NGUITools.FindInParents<UIRect>(cachedTransform.parent);
+		UIRect pt = NGUITools.FindInParents<UIRect>(cachedTransform.parent);
 
-		if (mParent != parent)
+		if (mParent != pt)
 		{
 			if (mParent) mParent.mChildren.Remove(this);
-			mParent = parent;
+			mParent = pt;
 			if (mParent) mParent.mChildren.Add(this);
+			mRootSet = false;
 		}
 	}
 

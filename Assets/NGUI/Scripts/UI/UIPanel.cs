@@ -175,7 +175,8 @@ public class UIPanel : UIRect
 	{
 		get
 		{
-			return (mParent != null) ? mParent.finalAlpha * mAlpha : mAlpha;
+			UIRect pt = parent;
+			return (pt != null) ? pt.finalAlpha * mAlpha : mAlpha;
 		}
 	}
 
@@ -1307,12 +1308,13 @@ public class UIPanel : UIRect
 
 	Vector2 GetWindowSize ()
 	{
+		UIRoot rt = root;
 #if UNITY_EDITOR
 		Vector2 size = GetMainGameViewSize();
-		if (mRoot != null) size *= mRoot.GetPixelSizeAdjustment(Mathf.RoundToInt(size.y));
+		if (rt != null) size *= rt.GetPixelSizeAdjustment(Mathf.RoundToInt(size.y));
 #else
 		Vector2 size = new Vector2(Screen.width, Screen.height);
-		if (mRoot != null) size *= mRoot.GetPixelSizeAdjustment(Screen.height);
+		if (rt != null) size *= rt.GetPixelSizeAdjustment(Screen.height);
 #endif
 		return size;
 	}
@@ -1331,10 +1333,11 @@ public class UIPanel : UIRect
 #endif
 		if (!clip)
 		{
+			UIRoot rt = root;
 #if UNITY_EDITOR
-			if (mRoot != null) size *= mRoot.GetPixelSizeAdjustment(Mathf.RoundToInt(size.y));
+			if (rt != null) size *= rt.GetPixelSizeAdjustment(Mathf.RoundToInt(size.y));
 #else
-			if (mRoot != null) size *= mRoot.GetPixelSizeAdjustment(Screen.height);
+			if (rt != null) size *= rt.GetPixelSizeAdjustment(Screen.height);
 #endif
 		}
 		return size;

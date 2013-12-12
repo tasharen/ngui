@@ -1273,7 +1273,8 @@ public class UILabel : UIWidget
 		NGUIText.current.spacingY = mSpacingY;
 		NGUIText.current.maxLines = mMaxLineCount;
 #if DYNAMIC_FONT
-		NGUIText.current.pixelDensity = (usePrintedSize && mRoot != null) ? 1f / mRoot.pixelSizeAdjustment : 1f;
+		UIRoot rt = root;
+		NGUIText.current.pixelDensity = (usePrintedSize && rt != null) ? 1f / rt.pixelSizeAdjustment : 1f;
 #else
 		NGUIText.current.pixelDensity = 1f;
 #endif

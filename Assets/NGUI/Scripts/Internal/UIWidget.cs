@@ -199,7 +199,8 @@ public class UIWidget : UIRect
 		get
 		{
 			if (!mIsVisible) return 0f;
-			return (mParent != null) ? mParent.finalAlpha * mColor.a : mColor.a;
+			UIRect pt = parent;
+			return (parent != null) ? pt.finalAlpha * mColor.a : mColor.a;
 		}
 	}
 
@@ -211,7 +212,8 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			return (mParent != null) ? mParent.finalAlpha * mColor.a : mColor.a;
+			UIRect pt = parent;
+			return (pt != null) ? pt.finalAlpha * mColor.a : mColor.a;
 		}
 	}
 
