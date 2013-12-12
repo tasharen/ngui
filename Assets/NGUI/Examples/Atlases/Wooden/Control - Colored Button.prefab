@@ -156,7 +156,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .699999988, g: .699999988, b: .699999988, a: 1}
   mEffectStyle: 1
   mEffectColor: {r: .805970132, g: .714862168, b: .553352594, a: 1}
   mSymbols: 1
@@ -165,6 +164,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 1
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .699999988, g: .699999988, b: .699999988, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0

@@ -173,8 +173,10 @@ public class UIInput : MonoBehaviour
 			if (isSelected && mKeyboard != null && mKeyboard.active)
 			{
 				string val = mKeyboard.text;
+#if !UNITY_3_5
 				if (Application.platform == RuntimePlatform.BB10Player)
 					val = val.Replace("\\b", "\b");
+#endif
 				return val;
 			}
 #else
@@ -421,11 +423,11 @@ public class UIInput : MonoBehaviour
 		if (mKeyboard != null && isSelected && NGUITools.GetActive(this))
 		{
 			string val = mKeyboard.text;
-
+#if !UNITY_3_5
 			// BB10's implementation has a bug in Unity
 			if (Application.platform == RuntimePlatform.BB10Player)
 				val = val.Replace("\\b", "\b");
-
+#endif
 			if (mValue != val)
 			{
 				mValue = "";

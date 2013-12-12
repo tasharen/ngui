@@ -1399,7 +1399,8 @@ public class UICamera : MonoBehaviour
 
 				// If the button/touch was released on the same object, consider it a click and select it
 				if (currentTouch.dragged == currentTouch.current ||
-					(currentTouch.clickNotification != ClickNotification.None &&
+					(currentScheme != ControlScheme.Controller &&
+					currentTouch.clickNotification != ClickNotification.None &&
 					currentTouch.totalDelta.magnitude < drag))
 				{
 					if (currentTouch.pressed != mCurrentSelection)

@@ -139,7 +139,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 1
-  mGradientBottom: {r: .699999988, g: .699999988, b: .699999988, a: 1}
   mEffectStyle: 1
   mEffectColor: {r: 1, g: .924253702, b: .783582091, a: .694117665}
   mSymbols: 1
@@ -148,6 +147,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .699999988, g: .699999988, b: .699999988, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -250,7 +250,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 1
-  mGradientBottom: {r: .699999988, g: .699999988, b: .699999988, a: 1}
   mEffectStyle: 1
   mEffectColor: {r: 1, g: .863359272, b: .626865685, a: .556862772}
   mSymbols: 1
@@ -259,6 +258,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 1
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .699999988, g: .699999988, b: .699999988, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0

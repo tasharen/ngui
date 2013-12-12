@@ -144,7 +144,16 @@ public class UIButtonColor : UIWidgetContainer
 		if (enabled)
 		{
 			if (!mStarted) Start();
-			TweenColor.Begin(tweenTarget, duration, isPressed ? pressed : mColor);
+			
+			if (isPressed)
+			{
+				TweenColor.Begin(tweenTarget, duration, pressed);
+			}
+			else if (UICamera.currentTouch.current == gameObject && UICamera.currentScheme == UICamera.ControlScheme.Controller)
+			{
+				TweenColor.Begin(tweenTarget, duration, hover);
+			}
+			else TweenColor.Begin(tweenTarget, duration, mColor);
 		}
 	}
 

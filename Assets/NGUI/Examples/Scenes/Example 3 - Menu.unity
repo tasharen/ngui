@@ -2434,6 +2434,7 @@ MonoBehaviour:
   mHeight: 76
   mDepth: 22
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: NGUI
   mFillCenter: 1
@@ -2545,6 +2546,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 13
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -2553,7 +2555,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -2562,6 +2563,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -2601,6 +2603,7 @@ MonoBehaviour:
   mHeight: 20
   mDepth: 15
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: X
   mFillCenter: 1
@@ -2640,6 +2643,7 @@ MonoBehaviour:
   mHeight: 30
   mDepth: 14
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Dark
   mFillCenter: 1
@@ -2690,6 +2694,7 @@ MonoBehaviour:
   mHeight: 160
   mDepth: 21
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: ac44b8a25154a9d40a172ab5851e0986, type: 2}
@@ -2705,7 +2710,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -2714,6 +2718,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -2753,6 +2758,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 2
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -2761,7 +2767,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -2770,6 +2775,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -2809,6 +2815,7 @@ MonoBehaviour:
   mHeight: 50
   mDepth: 19
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Button
   mFillCenter: 1
@@ -2848,6 +2855,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 20
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -2856,7 +2864,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -2865,6 +2872,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -2916,12 +2924,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 17}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15cc9c62605319f4a9b20b15918913fa, type: 1}
+  m_Script: {fileID: 11500000, guid: 1fdca5042b1d12a4890ec1bd4f04290d, type: 1}
   m_Name: 
   tweenTarget: {fileID: 15}
   hover: {r: .600000024, g: 1, b: .200000003, a: .858823538}
   pressed: {r: .5, g: .5, b: .5, a: .858823538}
   duration: .200000003
+  disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  onClick: []
 --- !u!114 &185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3059,6 +3069,7 @@ MonoBehaviour:
   mHeight: 34
   mDepth: 12
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Dark
   mFillCenter: 1
@@ -3098,6 +3109,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 13
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -3106,7 +3118,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -3115,6 +3126,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -3150,13 +3162,16 @@ MonoBehaviour:
   highlightColor: {r: .596078455, g: 1, b: .200000003, a: 1}
   isAnimated: 1
   isLocalized: 0
-  onChange: []
+  onChange:
+  - mTarget: {fileID: 191}
+    mMethodName: SetCurrentSelection
+    oneShot: 0
   mSelectedItem: Mouse
   eventReceiver: {fileID: 0}
   functionName: OnSelectionChange
   textScale: 0
   font: {fileID: 0}
-  textLabel: {fileID: 191}
+  textLabel: {fileID: 0}
 --- !u!114 &193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3217,6 +3232,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 13
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -3225,7 +3241,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -3234,6 +3249,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -3273,6 +3289,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 13
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -3281,7 +3298,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -3290,6 +3306,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -3354,13 +3371,16 @@ MonoBehaviour:
   highlightColor: {r: .596078455, g: 1, b: .200000003, a: 1}
   isAnimated: 1
   isLocalized: 0
-  onChange: []
+  onChange:
+  - mTarget: {fileID: 200}
+    mMethodName: SetCurrentSelection
+    oneShot: 0
   mSelectedItem: Normal
   eventReceiver: {fileID: 0}
   functionName: OnSelectionChange
   textScale: 0
   font: {fileID: 0}
-  textLabel: {fileID: 200}
+  textLabel: {fileID: 0}
 --- !u!114 &200
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3393,6 +3413,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 13
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -3401,7 +3422,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -3410,6 +3430,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -3449,6 +3470,7 @@ MonoBehaviour:
   mHeight: 34
   mDepth: 12
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Dark
   mFillCenter: 1
@@ -3502,6 +3524,7 @@ MonoBehaviour:
   mHeight: 30
   mDepth: 11
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Button
   mFillCenter: 1
@@ -3562,6 +3585,7 @@ MonoBehaviour:
   mHeight: 16
   mDepth: 10
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Light
   mFillCenter: 1
@@ -3601,6 +3625,7 @@ MonoBehaviour:
   mHeight: 20
   mDepth: 9
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Highlight
   mFillCenter: 1
@@ -3640,6 +3665,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 8
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -3648,7 +3674,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -3657,6 +3682,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -3696,6 +3722,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 8
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -3704,7 +3731,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -3713,6 +3739,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -3752,6 +3779,7 @@ MonoBehaviour:
   mHeight: 20
   mDepth: 9
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Highlight
   mFillCenter: 1
@@ -3791,6 +3819,7 @@ MonoBehaviour:
   mHeight: 16
   mDepth: 10
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Light
   mFillCenter: 1
@@ -3851,6 +3880,7 @@ MonoBehaviour:
   mHeight: 30
   mDepth: 11
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Button
   mFillCenter: 1
@@ -3918,6 +3948,7 @@ MonoBehaviour:
   mHeight: 30
   mDepth: 11
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Button
   mFillCenter: 1
@@ -3978,6 +4009,7 @@ MonoBehaviour:
   mHeight: 16
   mDepth: 10
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Light
   mFillCenter: 1
@@ -4017,6 +4049,7 @@ MonoBehaviour:
   mHeight: 20
   mDepth: 9
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Highlight
   mFillCenter: 1
@@ -4056,6 +4089,7 @@ MonoBehaviour:
   mHeight: 500
   mDepth: 3
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Dark
   mFillCenter: 1
@@ -4095,6 +4129,7 @@ MonoBehaviour:
   mHeight: 40
   mDepth: 4
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Light
   mFillCenter: 1
@@ -4134,6 +4169,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 8
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -4142,7 +4178,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -4151,6 +4186,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -4190,6 +4226,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 8
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -4198,7 +4235,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -4207,6 +4243,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -4246,6 +4283,7 @@ MonoBehaviour:
   mHeight: 457
   mDepth: 5
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Honeycomb
   mFillCenter: 1
@@ -4282,12 +4320,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 54}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15cc9c62605319f4a9b20b15918913fa, type: 1}
+  m_Script: {fileID: 11500000, guid: 1fdca5042b1d12a4890ec1bd4f04290d, type: 1}
   m_Name: 
   tweenTarget: {fileID: 56}
   hover: {r: .600000024, g: 1, b: .200000003, a: .858823538}
   pressed: {r: .5, g: .5, b: .5, a: .858823538}
   duration: .200000003
+  disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  onClick: []
 --- !u!114 &226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4356,6 +4396,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 7
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -4364,7 +4405,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -4373,6 +4413,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -4412,6 +4453,7 @@ MonoBehaviour:
   mHeight: 50
   mDepth: 6
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Button
   mFillCenter: 1
@@ -4488,7 +4530,7 @@ MonoBehaviour:
   eventReceiverMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  debug: 1
+  debug: 0
   useMouse: 1
   useTouch: 1
   allowMultiTouch: 1
@@ -4554,6 +4596,7 @@ MonoBehaviour:
   mHeight: 50
   mDepth: 19
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Button
   mFillCenter: 1
@@ -4593,6 +4636,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 20
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -4601,7 +4645,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -4610,6 +4653,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -4661,12 +4705,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 64}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15cc9c62605319f4a9b20b15918913fa, type: 1}
+  m_Script: {fileID: 11500000, guid: 1fdca5042b1d12a4890ec1bd4f04290d, type: 1}
   m_Name: 
   tweenTarget: {fileID: 62}
   hover: {r: .600000024, g: 1, b: .200000003, a: .858823538}
   pressed: {r: .5, g: .5, b: .5, a: .858823538}
   duration: .200000003
+  disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  onClick: []
 --- !u!114 &238
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4717,12 +4763,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 68}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15cc9c62605319f4a9b20b15918913fa, type: 1}
+  m_Script: {fileID: 11500000, guid: 1fdca5042b1d12a4890ec1bd4f04290d, type: 1}
   m_Name: 
   tweenTarget: {fileID: 70}
   hover: {r: .600000024, g: 1, b: .200000003, a: .858823538}
   pressed: {r: .5, g: .5, b: .5, a: .858823538}
   duration: .200000003
+  disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  onClick: []
 --- !u!114 &241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4777,6 +4825,7 @@ MonoBehaviour:
   mHeight: 4880
   mDepth: 0
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Dark
   mFillCenter: 1
@@ -4830,6 +4879,7 @@ MonoBehaviour:
   mHeight: 28
   mDepth: 20
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 7a48ea22e80d1ac4b97fdd87f9009546, type: 2}
@@ -4838,7 +4888,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -4847,6 +4896,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -4886,6 +4936,7 @@ MonoBehaviour:
   mHeight: 50
   mDepth: 19
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Button
   mFillCenter: 1
@@ -4925,6 +4976,7 @@ MonoBehaviour:
   mHeight: 457
   mDepth: 18
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Honeycomb
   mFillCenter: 1
@@ -4964,6 +5016,7 @@ MonoBehaviour:
   mHeight: 440
   mDepth: 1
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: ac44b8a25154a9d40a172ab5851e0986, type: 2}
@@ -4979,10 +5032,10 @@ MonoBehaviour:
     resulting in the best performance.
 
 
-    [99FF66]UIButtonPlayAnimation[-] lets you play animations forward or in reverse,
-    and it lets you specify the clip you wish to play. In this case, two clips are
-    used. One clip to animate the window moving forward, and another -- to animate
-    it moving away.
+    [99FF66]UIPlayAnimation[-] lets you play animations forward or in reverse, and
+    it lets you specify the clip you wish to play. In this case, two clips are used.
+    One clip to animate the window moving forward, and another -- to animate it moving
+    away.
 
 
     The animations were created right here in Unity using the built-in functionality:
@@ -4991,7 +5044,6 @@ MonoBehaviour:
   mFontStyle: 0
   mEncoding: 1
   mMaxLineCount: 0
-  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mEffectStyle: 0
   mEffectColor: {r: 0, g: 0, b: 0, a: 1}
   mSymbols: 1
@@ -5000,6 +5052,7 @@ MonoBehaviour:
   mMaterial: {fileID: 0}
   mApplyGradient: 0
   mGradientTop: {r: 1, g: 1, b: 1, a: 1}
+  mGradientBottom: {r: .5, g: .5, b: .5, a: 1}
   mSpacingX: 0
   mSpacingY: 0
   mShrinkToFit: 0
@@ -5039,6 +5092,7 @@ MonoBehaviour:
   mHeight: 40
   mDepth: 17
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Light
   mFillCenter: 1
@@ -5078,6 +5132,7 @@ MonoBehaviour:
   mHeight: 500
   mDepth: 16
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Dark
   mFillCenter: 1
