@@ -510,10 +510,11 @@ static public class NGUIText
 		float lineHeight = size + current.finalSpacingY;
 
 		// We need to know the baseline first
-		float baseline = 0f;
 		font.RequestCharactersInTexture("j", size, current.style);
 		font.GetCharacterInfo('j', out mTempChar, size, current.style);
-		baseline = size + mTempChar.vert.yMax;
+
+		// This is pretty much a hack, in case you're wondering. Unity doesn't expose a way to retrieve the baseline in a clean fashion.
+		float baseline = mTempChar.vert.yMin + (Mathf.RoundToInt(size - Mathf.Abs(mTempChar.vert.height)) >> 1);
 
 		// Ensure that the text we're about to print exists in the font's texture
 		font.RequestCharactersInTexture(text, size, current.style);
@@ -574,8 +575,8 @@ static public class NGUIText
 			if (!font.GetCharacterInfo(c, out mTempChar, size, current.style))
 				continue;
 
-			v0.x =  (x + mTempChar.vert.xMin);
-			v0.y = -(y - mTempChar.vert.yMax + baseline);
+			v0.x = x + mTempChar.vert.xMin;
+			v0.y = y + mTempChar.vert.yMax - baseline;
 			
 			v1.x = v0.x + mTempChar.vert.width;
 			v1.y = v0.y - mTempChar.vert.height;
