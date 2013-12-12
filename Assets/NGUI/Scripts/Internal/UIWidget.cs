@@ -59,6 +59,7 @@ public class UIWidget : UIRect
 	bool mStarted = false;
 	Matrix4x4 mLocalToPanel;
 	bool mIsVisible = true;
+	bool mIsInFront = true;
 	float mLastAlpha = 0f;
 
 	/// <summary>
@@ -198,7 +199,7 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			if (!mIsVisible) return 0f;
+			if (!mIsVisible || !mIsInFront) return 0f;
 			UIRect pt = parent;
 			return (parent != null) ? pt.finalAlpha * mColor.a : mColor.a;
 		}
@@ -221,7 +222,7 @@ public class UIWidget : UIRect
 	/// Whether the widget is currently visible.
 	/// </summary>
 
-	public bool isVisible { get { return mIsVisible && mGeom != null && mGeom.hasVertices; } }
+	public bool isVisible { get { return mIsVisible && mIsInFront && mGeom != null && mGeom.hasVertices; } }
 
 	/// <summary>
 	/// Change the pivot point and do not attempt to keep the widget in the same place by adjusting its transform.
@@ -851,19 +852,23 @@ public class UIWidget : UIRect
 				rt = NGUIMath.Lerp(sides[0].x, sides[2].x, rightAnchor.relative) + rightAnchor.absolute;
 				bt = NGUIMath.Lerp(sides[3].y, sides[1].y, bottomAnchor.relative) + bottomAnchor.absolute;
 				tt = NGUIMath.Lerp(sides[3].y, sides[1].y, topAnchor.relative) + topAnchor.absolute;
+				mIsInFront = true;
 			}
 			else
 			{
 				// Anchored to a single transform
-				Vector2 lp = GetLocalPos(leftAnchor, parent);
+				Vector3 lp = GetLocalPos(leftAnchor, parent);
 				lt = lp.x + leftAnchor.absolute;
 				bt = lp.y + bottomAnchor.absolute;
 				rt = lp.x + rightAnchor.absolute;
 				tt = lp.y + topAnchor.absolute;
+				mIsInFront = (!hideIfOffScreen || lp.z >= 0f);
 			}
 		}
 		else
 		{
+			mIsInFront = true;
+
 			// Left anchor point
 			if (leftAnchor.target)
 			{
@@ -938,7 +943,7 @@ public class UIWidget : UIRect
 		if (Vector3.SqrMagnitude(pos - newPos) > 0.001f)
 		{
 			cachedTransform.localPosition = newPos;
-			mChanged = true;
+			if (mIsInFront) mChanged = true;
 		}
 
 		// Update the width and height if it has changed
@@ -946,7 +951,7 @@ public class UIWidget : UIRect
 		{
 			mWidth = w;
 			mHeight = h;
-			mChanged = true;
+			if (mIsInFront) mChanged = true;
 			if (autoResizeBoxCollider) ResizeCollider();
 		}
 	}

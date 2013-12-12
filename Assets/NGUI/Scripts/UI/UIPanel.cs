@@ -593,6 +593,7 @@ public class UIPanel : UIRect
 		if (maxY < mMin.y) return false;
 		if (minX > mMax.x) return false;
 		if (minY > mMax.y) return false;
+
 		return true;
 	}
 

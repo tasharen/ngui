@@ -245,7 +245,7 @@ public abstract class UIRect : MonoBehaviour
 	/// Helper function that gets the specified anchor's position relative to the chosen transform.
 	/// </summary>
 
-	protected Vector2 GetLocalPos (AnchorPoint ac, Transform trans)
+	protected Vector3 GetLocalPos (AnchorPoint ac, Transform trans)
 	{
 		if (mMyCam == null || ac.cam == null)
 			return cachedTransform.localPosition;
