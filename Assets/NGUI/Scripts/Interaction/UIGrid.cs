@@ -14,6 +14,8 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/Interaction/Grid")]
 public class UIGrid : UIWidgetContainer
 {
+	public delegate void OnReposition ();
+
 	public enum Arrangement
 	{
 		Horizontal,
@@ -65,6 +67,12 @@ public class UIGrid : UIWidgetContainer
 	public bool hideInactive = true;
 
 	/// <summary>
+	/// Callback triggered when the grid repositions its contents.
+	/// </summary>
+
+	public OnReposition onReposition;
+
+	/// <summary>
 	/// Reposition the children on the next Update().
 	/// </summary>
 
@@ -72,9 +80,20 @@ public class UIGrid : UIWidgetContainer
 
 	bool mStarted = false;
 	bool mReposition = false;
+	UIPanel mPanel;
+	UIScrollView mDrag;
+	bool mInitDone = false;
+
+	void Init ()
+	{
+		mInitDone = true;
+		mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
+		mDrag = NGUITools.FindInParents<UIScrollView>(gameObject);
+	}
 
 	void Start ()
 	{
+		if (!mInitDone) Init();
 		mStarted = true;
 		bool smooth = animateSmoothly;
 		animateSmoothly = false;
@@ -103,6 +122,8 @@ public class UIGrid : UIWidgetContainer
 			mReposition = true;
 			return;
 		}
+
+		if (!mInitDone) Init();
 
 		mReposition = false;
 		Transform myTrans = transform;
@@ -172,7 +193,17 @@ public class UIGrid : UIWidgetContainer
 			}
 		}
 
-		UIScrollView drag = NGUITools.FindInParents<UIScrollView>(gameObject);
-		if (drag != null) drag.UpdateScrollbars(true);
+		if (mDrag != null)
+		{
+			mDrag.UpdateScrollbars(true);
+			mDrag.RestrictWithinBounds(true);
+		}
+		else if (mPanel != null)
+		{
+			mPanel.ConstrainTargetToBounds(myTrans, true);
+		}
+
+		if (onReposition != null)
+			onReposition();
 	}
 }
