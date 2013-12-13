@@ -576,7 +576,7 @@ static public class NGUIText
 				continue;
 
 			v0.x = x + mTempChar.vert.xMin;
-			v0.y = y + mTempChar.vert.yMax - baseline;
+			v0.y = mTempChar.vert.yMax - baseline - y;
 			
 			v1.x = v0.x + mTempChar.vert.width;
 			v1.y = v0.y - mTempChar.vert.height;
