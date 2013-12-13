@@ -149,7 +149,7 @@ public class UILabelInspector : UIWidgetInspector
 			SerializedProperty ov = NGUIEditorTools.DrawProperty("Overflow", serializedObject, "mOverflow");
 			NGUISettings.overflowStyle = (UILabel.Overflow)ov.intValue;
 
-			if (ov.intValue == (int)UILabel.Overflow.ShrinkContent && ttf != null && ttf.objectReferenceValue != null)
+			if (ttf != null && ttf.objectReferenceValue != null)
 				NGUIEditorTools.DrawProperty("Keep crisp", serializedObject, "keepCrispWhenShrunk");
 
 			GUILayout.BeginHorizontal();
