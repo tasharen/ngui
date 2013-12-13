@@ -222,7 +222,13 @@ public class UIWidget : UIRect
 	/// Whether the widget is currently visible.
 	/// </summary>
 
-	public bool isVisible { get { return mIsVisible && mIsInFront && mGeom != null && mGeom.hasVertices; } }
+	public bool isVisible { get { return mIsVisible && mIsInFront; } }
+
+	/// <summary>
+	/// Whether the widget has vertices to draw.
+	/// </summary>
+
+	public bool hasVertices { get { return mGeom != null && mGeom.hasVertices; } }
 
 	/// <summary>
 	/// Change the pivot point and do not attempt to keep the widget in the same place by adjusting its transform.
@@ -629,7 +635,7 @@ public class UIWidget : UIRect
 		{
 			drawCall.isDirty = true;
 		}
-		else if (isVisible)
+		else if (isVisible && hasVertices)
 		{
 			drawCall = UIPanel.InsertWidget(this);
 		}

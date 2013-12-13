@@ -1040,7 +1040,7 @@ public class UIPanel : UIRect
 					if (w.isVisible)
 					{
 						w.drawCall = dc;
-						dc.isDirty = true;
+						if (w.hasVertices) dc.isDirty = true;
 						return dc;
 					}
 				}
@@ -1198,7 +1198,7 @@ public class UIPanel : UIRect
 				continue;
 			}
 
-			if (w.isVisible)
+			if (w.isVisible && w.hasVertices)
 			{
 				UIPanel pn = w.panel;
 				Material mt = w.material;
@@ -1285,7 +1285,7 @@ public class UIPanel : UIRect
 
 				if (w.drawCall == dc)
 				{
-					if (w.isVisible)
+					if (w.isVisible && w.hasVertices)
 					{
 						if (dc.manager.generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
 						else w.WriteToBuffers(mVerts, mUvs, mCols, null, null);
