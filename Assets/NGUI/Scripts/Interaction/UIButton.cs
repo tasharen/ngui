@@ -26,6 +26,12 @@ public class UIButton : UIButtonColor
 	public Color disabledColor = Color.grey;
 
 	/// <summary>
+	/// Whether the button will highlight when you drag something over it.
+	/// </summary>
+
+	public bool dragHighlight = false;
+
+	/// <summary>
 	/// Click event listener.
 	/// </summary>
 
@@ -86,13 +92,13 @@ public class UIButton : UIButtonColor
 	
 	protected override void OnDragOver ()
 	{
-		if (isEnabled && UICamera.currentTouch.pressed == gameObject)
+		if (isEnabled && (dragHighlight || UICamera.currentTouch.pressed == gameObject))
 			base.OnDragOver();
 	}
 	
 	protected override void OnDragOut ()
 	{
-		if (isEnabled && UICamera.currentTouch.pressed == gameObject)
+		if (isEnabled && (dragHighlight || UICamera.currentTouch.pressed == gameObject))
 			base.OnDragOut();
 	}
 
