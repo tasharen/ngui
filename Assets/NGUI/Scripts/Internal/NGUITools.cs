@@ -1271,7 +1271,7 @@ static public class NGUITools
 
 	static public Vector3[] GetSides (this Camera cam)
 	{
-		return cam.GetSides(cam.nearClipPlane, null);
+		return cam.GetSides(Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f), null);
 	}
 
 	/// <summary>
@@ -1289,7 +1289,7 @@ static public class NGUITools
 
 	static public Vector3[] GetSides (this Camera cam, Transform relativeTo)
 	{
-		return cam.GetSides(cam.nearClipPlane, relativeTo);
+		return cam.GetSides(Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f), relativeTo);
 	}
 
 	/// <summary>
@@ -1317,7 +1317,7 @@ static public class NGUITools
 
 	static public Vector3[] GetWorldCorners (this Camera cam)
 	{
-		return cam.GetWorldCorners(cam.nearClipPlane, null);
+		return cam.GetWorldCorners(Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f), null);
 	}
 
 	/// <summary>
@@ -1335,7 +1335,7 @@ static public class NGUITools
 
 	static public Vector3[] GetWorldCorners (this Camera cam, Transform relativeTo)
 	{
-		return cam.GetWorldCorners(cam.nearClipPlane, relativeTo);
+		return cam.GetWorldCorners(Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f), relativeTo);
 	}
 
 	/// <summary>
