@@ -577,6 +577,18 @@ public class UIPanelInspector : UIRectEditor
 			}
 
 			GUILayout.BeginHorizontal();
+			bool off = EditorGUILayout.Toggle("Offset", mPanel.anchorOffset, GUILayout.Width(100f));
+			GUILayout.Label("Offset anchors by position", GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
+
+			if (mPanel.anchorOffset != off)
+			{
+				mPanel.anchorOffset = off;
+				UIPanel.RebuildAllDrawCalls(true);
+				EditorUtility.SetDirty(mPanel);
+			}
+
+			GUILayout.BeginHorizontal();
 			bool stat = EditorGUILayout.Toggle("Static", mPanel.widgetsAreStatic, GUILayout.Width(100f));
 			GUILayout.Label("Check if widgets won't move", GUILayout.MinWidth(20f));
 			GUILayout.EndHorizontal();

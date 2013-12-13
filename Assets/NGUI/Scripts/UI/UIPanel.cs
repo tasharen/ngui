@@ -79,6 +79,13 @@ public class UIPanel : UIRect
 	public bool alwaysOnScreen = false;
 
 	/// <summary>
+	/// By default, non-clipped panels use the camera's bounds, and the panel's position has no effect.
+	/// If you want the panel's position to actually be used with anchors, set this field to 'true'.
+	/// </summary>
+
+	public bool anchorOffset = false;
+
+	/// <summary>
 	/// By default all panels manage render queues of their draw calls themselves by incrementing them
 	/// so that the geometry is drawn in the proper order. You can alter this behaviour.
 	/// </summary>
@@ -519,7 +526,7 @@ public class UIPanel : UIRect
 
 	public override Vector3[] GetSides (Transform relativeTo)
 	{
-		if (mClipping != UIDrawCall.Clipping.None)
+		if (mClipping != UIDrawCall.Clipping.None || anchorOffset)
 		{
 			Vector2 size = GetViewSize();
 			Vector2 cr = (mClipping != UIDrawCall.Clipping.None) ? (Vector2)mClipRange + mClipOffset : Vector2.zero;
