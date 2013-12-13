@@ -1261,4 +1261,99 @@ static public class NGUITools
 		}
 		return comp;
 	}
+
+	// Temporary variable to avoid GC allocation
+	static Vector3[] mSides = new Vector3[4];
+
+	/// <summary>
+	/// Get sides relative to the specified camera. The order is left, top, right, bottom.
+	/// </summary>
+
+	static public Vector3[] GetSides (this Camera cam)
+	{
+		return cam.GetSides(cam.nearClipPlane, null);
+	}
+
+	/// <summary>
+	/// Get sides relative to the specified camera. The order is left, top, right, bottom.
+	/// </summary>
+
+	static public Vector3[] GetSides (this Camera cam, float depth)
+	{
+		return cam.GetSides(depth, null);
+	}
+
+	/// <summary>
+	/// Get sides relative to the specified camera. The order is left, top, right, bottom.
+	/// </summary>
+
+	static public Vector3[] GetSides (this Camera cam, Transform relativeTo)
+	{
+		return cam.GetSides(cam.nearClipPlane, relativeTo);
+	}
+
+	/// <summary>
+	/// Get sides relative to the specified camera. The order is left, top, right, bottom.
+	/// </summary>
+
+	static public Vector3[] GetSides (this Camera cam, float depth, Transform relativeTo)
+	{
+		mSides[0] = cam.ViewportToWorldPoint(new Vector3(0f, 0.5f, depth));
+		mSides[1] = cam.ViewportToWorldPoint(new Vector3(0.5f, 1f, depth));
+		mSides[2] = cam.ViewportToWorldPoint(new Vector3(1f, 0.5f, depth));
+		mSides[3] = cam.ViewportToWorldPoint(new Vector3(0.5f, 0f, depth));
+
+		if (relativeTo != null)
+		{
+			for (int i = 0; i < 4; ++i)
+				mSides[i] = relativeTo.InverseTransformPoint(mSides[i]);
+		}
+		return mSides;
+	}
+
+	/// <summary>
+	/// Get the camera's world-space corners. The order is bottom-left, top-left, top-right, bottom-right.
+	/// </summary>
+
+	static public Vector3[] GetWorldCorners (this Camera cam)
+	{
+		return cam.GetWorldCorners(cam.nearClipPlane, null);
+	}
+
+	/// <summary>
+	/// Get the camera's world-space corners. The order is bottom-left, top-left, top-right, bottom-right.
+	/// </summary>
+
+	static public Vector3[] GetWorldCorners (this Camera cam, float depth)
+	{
+		return cam.GetWorldCorners(depth, null);
+	}
+
+	/// <summary>
+	/// Get the camera's world-space corners. The order is bottom-left, top-left, top-right, bottom-right.
+	/// </summary>
+
+	static public Vector3[] GetWorldCorners (this Camera cam, Transform relativeTo)
+	{
+		return cam.GetWorldCorners(cam.nearClipPlane, relativeTo);
+	}
+
+	/// <summary>
+	/// Get the camera's world-space corners. The order is bottom-left, top-left, top-right, bottom-right.
+	/// </summary>
+
+	static public Vector3[] GetWorldCorners (this Camera cam, float depth, Transform relativeTo)
+	{
+		mSides[0] = cam.ViewportToWorldPoint(new Vector3(0f, 0f, depth));
+		mSides[1] = cam.ViewportToWorldPoint(new Vector3(0f, 1f, depth));
+		mSides[2] = cam.ViewportToWorldPoint(new Vector3(1f, 1f, depth));
+		mSides[3] = cam.ViewportToWorldPoint(new Vector3(1f, 0f, depth));
+
+		if (relativeTo != null)
+		{
+			for (int i = 0; i < 4; ++i)
+				mSides[i] = relativeTo.InverseTransformPoint(mSides[i]);
+		}
+		return mSides;
+	}
 }

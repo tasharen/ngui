@@ -60,6 +60,17 @@ public class UIRectEditor : Editor
 	}
 
 	/// <summary>
+	/// Pass something like leftAnchor.target to get its rectangle reference.
+	/// </summary>
+
+	static protected Camera GetCamera (SerializedProperty sp)
+	{
+		Transform target = sp.objectReferenceValue as Transform;
+		if (target == null) return null;
+		return target.camera;
+	}
+
+	/// <summary>
 	/// Determine the initial anchor type.
 	/// </summary>
 
@@ -265,12 +276,12 @@ public class UIRectEditor : Editor
 		}
 
 		UIRect targetRect = GetRect(tar);
-		bool isRect = (targetRect != null);
+		Camera targetCam = GetCamera(tar);
 		float relative = rel.floatValue;
-		bool isCommon = !isRect || IsCommon(relative);
+		bool isCommon = (targetRect == null && targetCam == null) || IsCommon(relative);
 		int previousOrigin = 1;
-		
-		if (isRect)
+
+		if (targetRect != null || targetCam != null)
 		{
 			if (mCustom[index] || !isCommon) previousOrigin = 3;
 			else if (relative == 0f) previousOrigin = 0;
@@ -278,7 +289,7 @@ public class UIRectEditor : Editor
 		}
 
 		// Draw the origin selection list
-		EditorGUI.BeginDisabledGroup(!isRect);
+		EditorGUI.BeginDisabledGroup(targetRect == null && targetCam == null);
 		int newOrigin = IsHorizontal[index] ?
 			EditorGUILayout.Popup(previousOrigin, HorizontalList, GUILayout.MinWidth(110f)) :
 			EditorGUILayout.Popup(previousOrigin, VerticalList, GUILayout.MinWidth(110f));
@@ -324,7 +335,9 @@ public class UIRectEditor : Editor
 			else if (newOrigin == 2) relative = 1f;
 			else relative = 0.5f;
 
-			Vector3[] sides = targetRect.GetSides(myRect.cachedTransform);
+			Vector3[] sides = (targetRect != null) ?
+				targetRect.GetSides(myRect.cachedTransform) :
+				targetCam.GetSides(myRect.cachedTransform);
 
 			// Calculate the current position based from the bottom-left
 			float f0, f1;
@@ -375,7 +388,9 @@ public class UIRectEditor : Editor
 
 				if (!isOutside01 && val != relative)
 				{
-					Vector3[] sides = targetRect.GetSides(myRect.cachedTransform);
+					Vector3[] sides = (targetRect != null) ?
+						targetRect.GetSides(myRect.cachedTransform) :
+						targetCam.GetSides(myRect.cachedTransform);
 
 					// Calculate the current position based from the bottom-left
 					float f0, f1;
@@ -394,7 +409,7 @@ public class UIRectEditor : Editor
 					float size = (f1 - f0);
 					int intVal = Mathf.FloorToInt(val * size + 0.5f);
 					//intVal = ((intVal >> 1) << 1);
-					rel.floatValue = intVal / size;
+					rel.floatValue = (size > 0f) ? intVal / size : 0.5f;
 				}
 			}
 			EditorGUI.EndDisabledGroup();
@@ -491,17 +506,7 @@ public class UIRectEditor : Editor
 		Vector3[] myCorners = r.worldCorners;
 		Vector3 localPos = parent.InverseTransformPoint(Vector3.Lerp(myCorners[i0], myCorners[i1], 0.5f));
 
-		if (anchor.rect == null)
-		{
-			// Anchored to a simple transform
-			Vector3 remotePos = anchor.target.position;
-			if (anchor.cam != null) remotePos = anchor.cam.WorldToViewportPoint(remotePos);
-			if (r.anchorCamera != null) remotePos = r.anchorCamera.ViewportToWorldPoint(remotePos);
-			remotePos = parent.InverseTransformPoint(remotePos);
-			anchor.absolute = Mathf.FloorToInt(localPos.x - remotePos.x + 0.5f);
-			anchor.relative = inverted ? 1f : 0f;
-		}
-		else
+		if (anchor.rect != null)
 		{
 			// Anchored to a rectangle -- must anchor to the same side
 			Vector3[] targetCorners = anchor.rect.worldCorners;
@@ -515,6 +520,28 @@ public class UIRectEditor : Editor
 			float val1 = localPos.x - Vector3.Lerp(side0, side1, 0.5f).x;
 
 			anchor.SetToNearest(val0, val1, val2);
+		}
+		else if (anchor.target.camera != null)
+		{
+			Vector3[] sides = anchor.target.camera.GetSides(parent);
+			Vector3 side0 = sides[0];
+			Vector3 side1 = sides[2];
+
+			float val0 = localPos.x - side0.x;
+			float val2 = localPos.x - side1.x;
+			float val1 = localPos.x - Vector3.Lerp(side0, side1, 0.5f).x;
+
+			anchor.SetToNearest(val0, val1, val2);
+		}
+		else
+		{
+			// Anchored to a simple transform
+			Vector3 remotePos = anchor.target.position;
+			if (anchor.targetCam != null) remotePos = anchor.targetCam.WorldToViewportPoint(remotePos);
+			if (r.anchorCamera != null) remotePos = r.anchorCamera.ViewportToWorldPoint(remotePos);
+			remotePos = parent.InverseTransformPoint(remotePos);
+			anchor.absolute = Mathf.FloorToInt(localPos.x - remotePos.x + 0.5f);
+			anchor.relative = inverted ? 1f : 0f;
 		}
 	}
 
@@ -542,17 +569,7 @@ public class UIRectEditor : Editor
 		Vector3[] myCorners = r.worldCorners;
 		Vector3 localPos = parent.InverseTransformPoint(Vector3.Lerp(myCorners[i0], myCorners[i1], 0.5f));
 
-		if (anchor.rect == null)
-		{
-			// Anchored to a simple transform
-			Vector3 remotePos = anchor.target.position;
-			if (anchor.cam != null) remotePos = anchor.cam.WorldToViewportPoint(remotePos);
-			if (r.anchorCamera != null) remotePos = r.anchorCamera.ViewportToWorldPoint(remotePos);
-			remotePos = parent.InverseTransformPoint(remotePos);
-			anchor.absolute = Mathf.FloorToInt(localPos.y - remotePos.y + 0.5f);
-			anchor.relative = inverted ? 1f : 0f;
-		}
-		else
+		if (anchor.rect != null)
 		{
 			// Anchored to a rectangle -- must anchor to the same side
 			Vector3[] targetCorners = anchor.rect.worldCorners;
@@ -566,6 +583,28 @@ public class UIRectEditor : Editor
 			float val1 = localPos.y - Vector3.Lerp(side0, side1, 0.5f).y;
 
 			anchor.SetToNearest(val0, val1, val2);
+		}
+		else if (anchor.target.camera != null)
+		{
+			Vector3[] sides = anchor.target.camera.GetSides(parent);
+			Vector3 side0 = sides[3];
+			Vector3 side1 = sides[1];
+
+			float val0 = localPos.y - side0.y;
+			float val2 = localPos.y - side1.y;
+			float val1 = localPos.y - Vector3.Lerp(side0, side1, 0.5f).y;
+
+			anchor.SetToNearest(val0, val1, val2);
+		}
+		else
+		{
+			// Anchored to a simple transform
+			Vector3 remotePos = anchor.target.position;
+			if (anchor.targetCam != null) remotePos = anchor.targetCam.WorldToViewportPoint(remotePos);
+			if (r.anchorCamera != null) remotePos = r.anchorCamera.ViewportToWorldPoint(remotePos);
+			remotePos = parent.InverseTransformPoint(remotePos);
+			anchor.absolute = Mathf.FloorToInt(localPos.y - remotePos.y + 0.5f);
+			anchor.relative = inverted ? 1f : 0f;
 		}
 	}
 }

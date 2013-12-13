@@ -519,44 +519,33 @@ public class UIPanel : UIRect
 
 	public override Vector3[] GetSides (Transform relativeTo)
 	{
-		Vector2 size = GetViewSize();
-
-		Vector2 cr = (mClipping != UIDrawCall.Clipping.None) ? (Vector2)mClipRange + mClipOffset : Vector2.zero;
-		float x0 = cr.x - 0.5f * size.x;
-		float y0 = cr.y - 0.5f * size.y;
-		float x1 = x0 + size.x;
-		float y1 = y0 + size.y;
-		float cx = (x0 + x1) * 0.5f;
-		float cy = (y0 + y1) * 0.5f;
-
-		Transform trans = cachedTransform;
-		Matrix4x4 mat = trans.localToWorldMatrix;
-		
-		// Non-clipped panels use the screen's dimensions, so they need to ignore the position
-		if (mClipping == UIDrawCall.Clipping.None)
+		if (mClipping != UIDrawCall.Clipping.None)
 		{
-			UIRoot rt = root;
+			Vector2 size = GetViewSize();
+			Vector2 cr = (mClipping != UIDrawCall.Clipping.None) ? (Vector2)mClipRange + mClipOffset : Vector2.zero;
 
-			if (rt != null)
+			float x0 = cr.x - 0.5f * size.x;
+			float y0 = cr.y - 0.5f * size.y;
+			float x1 = x0 + size.x;
+			float y1 = y0 + size.y;
+			float cx = (x0 + x1) * 0.5f;
+			float cy = (y0 + y1) * 0.5f;
+
+			Matrix4x4 mat = cachedTransform.localToWorldMatrix;
+
+			mCorners[0] = mat.MultiplyPoint3x4(new Vector3(x0, cy));
+			mCorners[1] = mat.MultiplyPoint3x4(new Vector3(cx, y1));
+			mCorners[2] = mat.MultiplyPoint3x4(new Vector3(x1, cy));
+			mCorners[3] = mat.MultiplyPoint3x4(new Vector3(cx, y0));
+
+			if (relativeTo != null)
 			{
-				Vector3 pos = rt.transform.position;
-				mat[12] = pos.x;
-				mat[13] = pos.y;
-				mat[14] = pos.z;
+				for (int i = 0; i < 4; ++i)
+					mCorners[i] = relativeTo.InverseTransformPoint(mCorners[i]);
 			}
+			return mCorners;
 		}
-
-		mCorners[0] = mat.MultiplyPoint3x4(new Vector3(x0, cy));
-		mCorners[1] = mat.MultiplyPoint3x4(new Vector3(cx, y1));
-		mCorners[2] = mat.MultiplyPoint3x4(new Vector3(x1, cy));
-		mCorners[3] = mat.MultiplyPoint3x4(new Vector3(cx, y0));
-
-		if (relativeTo != null)
-		{
-			for (int i = 0; i < 4; ++i)
-				mCorners[i] = relativeTo.InverseTransformPoint(mCorners[i]);
-		}
-		return mCorners;
+		return base.GetSides(relativeTo);
 	}
 
 	/// <summary>
@@ -762,9 +751,10 @@ public class UIPanel : UIRect
 			leftAnchor.target == rightAnchor.target &&
 			leftAnchor.target == topAnchor.target)
 		{
-			if (leftAnchor.rect != null)
+			Vector3[] sides = leftAnchor.GetSides(parent);
+
+			if (sides != null)
 			{
-				Vector3[] sides = leftAnchor.rect.GetSides(parent);
 				lt = NGUIMath.Lerp(sides[0].x, sides[2].x, leftAnchor.relative) + leftAnchor.absolute;
 				rt = NGUIMath.Lerp(sides[0].x, sides[2].x, rightAnchor.relative) + rightAnchor.absolute;
 				bt = NGUIMath.Lerp(sides[3].y, sides[1].y, bottomAnchor.relative) + bottomAnchor.absolute;
@@ -785,9 +775,10 @@ public class UIPanel : UIRect
 			// Left anchor point
 			if (leftAnchor.target)
 			{
-				if (leftAnchor.rect != null)
+				Vector3[] sides = leftAnchor.GetSides(parent);
+
+				if (sides != null)
 				{
-					Vector3[] sides = leftAnchor.rect.GetSides(parent);
 					lt = NGUIMath.Lerp(sides[0].x, sides[2].x, leftAnchor.relative) + leftAnchor.absolute;
 				}
 				else
@@ -800,9 +791,10 @@ public class UIPanel : UIRect
 			// Right anchor point
 			if (rightAnchor.target)
 			{
-				if (rightAnchor.rect != null)
+				Vector3[] sides = rightAnchor.GetSides(parent);
+
+				if (sides != null)
 				{
-					Vector3[] sides = rightAnchor.rect.GetSides(parent);
 					rt = NGUIMath.Lerp(sides[0].x, sides[2].x, rightAnchor.relative) + rightAnchor.absolute;
 				}
 				else
@@ -815,9 +807,10 @@ public class UIPanel : UIRect
 			// Bottom anchor point
 			if (bottomAnchor.target)
 			{
-				if (bottomAnchor.rect != null)
+				Vector3[] sides = bottomAnchor.GetSides(parent);
+
+				if (sides != null)
 				{
-					Vector3[] sides = bottomAnchor.rect.GetSides(parent);
 					bt = NGUIMath.Lerp(sides[3].y, sides[1].y, bottomAnchor.relative) + bottomAnchor.absolute;
 				}
 				else
@@ -830,9 +823,10 @@ public class UIPanel : UIRect
 			// Top anchor point
 			if (topAnchor.target)
 			{
-				if (topAnchor.rect != null)
+				Vector3[] sides = topAnchor.GetSides(parent);
+
+				if (sides != null)
 				{
-					Vector3[] sides = topAnchor.rect.GetSides(parent);
 					tt = NGUIMath.Lerp(sides[3].y, sides[1].y, topAnchor.relative) + topAnchor.absolute;
 				}
 				else

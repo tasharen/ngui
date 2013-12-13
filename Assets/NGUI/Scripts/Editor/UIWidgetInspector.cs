@@ -327,31 +327,41 @@ public class UIWidgetInspector : UIRectEditor
 		}
 
 		Vector3 myPos = (myCorners[i0] + myCorners[i1]) * 0.5f;
+		Vector3[] sides = null;
+
+		if (anchor.rect != null)
+		{
+			sides = anchor.rect.worldCorners;
+		}
+		else if (anchor.target.camera != null)
+		{
+			sides = anchor.target.camera.GetWorldCorners();
+		}
+
 		Vector3 theirPos;
 
-		if (anchor.rect == null)
+		if (sides != null)
 		{
-			theirPos = anchor.target.position;
-		}
-		else
-		{
-			Vector3[] otherCorners = anchor.rect.worldCorners;
 			Vector3 v0, v1;
 
 			if (side == 0 || side == 2)
 			{
 				// Left or right
-				v0 = Vector3.Lerp(otherCorners[0], otherCorners[3], anchor.relative);
-				v1 = Vector3.Lerp(otherCorners[1], otherCorners[2], anchor.relative);
+				v0 = Vector3.Lerp(sides[0], sides[3], anchor.relative);
+				v1 = Vector3.Lerp(sides[1], sides[2], anchor.relative);
 			}
 			else
 			{
 				// Top or bottom
-				v0 = Vector3.Lerp(otherCorners[0], otherCorners[1], anchor.relative);
-				v1 = Vector3.Lerp(otherCorners[3], otherCorners[2], anchor.relative);
+				v0 = Vector3.Lerp(sides[0], sides[1], anchor.relative);
+				v1 = Vector3.Lerp(sides[3], sides[2], anchor.relative);
 			}
 
 			theirPos = HandleUtility.ProjectPointLine(myPos, v0, v1);
+		}
+		else
+		{
+			theirPos = anchor.target.position;
 		}
 
 		NGUIHandles.DrawShadowedLine(myCorners, myPos, theirPos, Color.yellow);

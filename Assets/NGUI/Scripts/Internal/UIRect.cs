@@ -23,7 +23,7 @@ public abstract class UIRect : MonoBehaviour
 		public UIRect rect;
 
 		[System.NonSerialized]
-		public Camera cam;
+		public Camera targetCam;
 
 		public AnchorPoint () { }
 		public AnchorPoint (float relative) { this.relative = relative; }
@@ -97,6 +97,20 @@ public abstract class UIRect : MonoBehaviour
 				if (parent != null) targetPos = parent.InverseTransformPoint(targetPos);
 				absolute = Mathf.FloorToInt(localPos - targetPos.y + 0.5f);
 			}
+		}
+
+		/// <summary>
+		/// Convenience function that returns the sides the anchored point is anchored to.
+		/// </summary>
+
+		public Vector3[] GetSides (Transform relativeTo)
+		{
+			if (target != null)
+			{
+				if (rect != null) return rect.GetSides(relativeTo);
+				if (target.camera != null) target.camera.GetSides(relativeTo);
+			}
+			return null;
 		}
 	}
 
@@ -240,12 +254,34 @@ public abstract class UIRect : MonoBehaviour
 				mChildren.buffer[i].Invalidate(true);
 	}
 
+	// Temporary variable to avoid GC allocation
+	static Vector3[] mSides = new Vector3[4];
+
 	/// <summary>
 	/// Get the sides of the rectangle relative to the specified transform.
 	/// The order is left, top, right, bottom.
 	/// </summary>
 
-	public abstract Vector3[] GetSides (Transform relativeTo);
+	public virtual Vector3[] GetSides (Transform relativeTo)
+	{
+		if (anchorCamera != null)
+		{
+			return anchorCamera.GetSides(relativeTo);
+		}
+		else
+		{
+			Vector3 pos = cachedTransform.position;
+			for (int i = 0; i < 4; ++i)
+				mSides[i] = pos;
+
+			if (relativeTo != null)
+			{
+				for (int i = 0; i < 4; ++i)
+					mSides[i] = relativeTo.InverseTransformPoint(mSides[i]);
+			}
+			return mSides;
+		}
+	}
 
 	/// <summary>
 	/// Helper function that gets the specified anchor's position relative to the chosen transform.
@@ -253,10 +289,10 @@ public abstract class UIRect : MonoBehaviour
 
 	protected Vector3 GetLocalPos (AnchorPoint ac, Transform trans)
 	{
-		if (anchorCamera == null || ac.cam == null)
+		if (anchorCamera == null || ac.targetCam == null)
 			return cachedTransform.localPosition;
 
-		Vector3 pos = mMyCam.ViewportToWorldPoint(ac.cam.WorldToViewportPoint(ac.target.position));
+		Vector3 pos = mMyCam.ViewportToWorldPoint(ac.targetCam.WorldToViewportPoint(ac.target.position));
 		if (trans != null) pos = trans.InverseTransformPoint(pos);
 		pos.x = Mathf.Floor(pos.x + 0.5f);
 		pos.y = Mathf.Floor(pos.y + 0.5f);
@@ -388,15 +424,15 @@ public abstract class UIRect : MonoBehaviour
 		// If we don't have a target or have a rectangle to work with, camera isn't needed
 		if (ap.target == null || ap.rect != null)
 		{
-			ap.cam = null;
+			ap.targetCam = null;
 		}
 		else
 		{
 			// Find the camera responsible for the target object
-			ap.cam = NGUITools.FindCameraForLayer(ap.target.gameObject.layer);
+			ap.targetCam = NGUITools.FindCameraForLayer(ap.target.gameObject.layer);
 
 			// No camera found? Clear the references
-			if (ap.cam == null)
+			if (ap.targetCam == null)
 			{
 				ap.target = null;
 				return;

@@ -851,9 +851,10 @@ public class UIWidget : UIRect
 			leftAnchor.target == rightAnchor.target &&
 			leftAnchor.target == topAnchor.target)
 		{
-			if (leftAnchor.rect != null)
+			Vector3[] sides = leftAnchor.GetSides(parent);
+
+			if (sides != null)
 			{
-				Vector3[] sides = leftAnchor.rect.GetSides(parent);
 				lt = NGUIMath.Lerp(sides[0].x, sides[2].x, leftAnchor.relative) + leftAnchor.absolute;
 				rt = NGUIMath.Lerp(sides[0].x, sides[2].x, rightAnchor.relative) + rightAnchor.absolute;
 				bt = NGUIMath.Lerp(sides[3].y, sides[1].y, bottomAnchor.relative) + bottomAnchor.absolute;
@@ -878,9 +879,10 @@ public class UIWidget : UIRect
 			// Left anchor point
 			if (leftAnchor.target)
 			{
-				if (leftAnchor.rect != null)
+				Vector3[] sides = leftAnchor.GetSides(parent);
+
+				if (sides != null)
 				{
-					Vector3[] sides = leftAnchor.rect.GetSides(parent);
 					lt = NGUIMath.Lerp(sides[0].x, sides[2].x, leftAnchor.relative) + leftAnchor.absolute;
 				}
 				else
@@ -893,9 +895,10 @@ public class UIWidget : UIRect
 			// Right anchor point
 			if (rightAnchor.target)
 			{
-				if (rightAnchor.rect != null)
+				Vector3[] sides = rightAnchor.GetSides(parent);
+
+				if (sides != null)
 				{
-					Vector3[] sides = rightAnchor.rect.GetSides(parent);
 					rt = NGUIMath.Lerp(sides[0].x, sides[2].x, rightAnchor.relative) + rightAnchor.absolute;
 				}
 				else
@@ -908,9 +911,10 @@ public class UIWidget : UIRect
 			// Bottom anchor point
 			if (bottomAnchor.target)
 			{
-				if (bottomAnchor.rect != null)
+				Vector3[] sides = bottomAnchor.GetSides(parent);
+
+				if (sides != null)
 				{
-					Vector3[] sides = bottomAnchor.rect.GetSides(parent);
 					bt = NGUIMath.Lerp(sides[3].y, sides[1].y, bottomAnchor.relative) + bottomAnchor.absolute;
 				}
 				else
@@ -923,9 +927,10 @@ public class UIWidget : UIRect
 			// Top anchor point
 			if (topAnchor.target)
 			{
-				if (topAnchor.rect != null)
+				Vector3[] sides = topAnchor.GetSides(parent);
+
+				if (sides != null)
 				{
-					Vector3[] sides = topAnchor.rect.GetSides(parent);
 					tt = NGUIMath.Lerp(sides[3].y, sides[1].y, topAnchor.relative) + topAnchor.absolute;
 				}
 				else
