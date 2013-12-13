@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-            Version 3.0.7 f2
+            Version 3.0.7 f3
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,16 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.7 f3
+- NEW: Added an option for anchors to be offset by the panel's position.
+- NEW: Made it possible to anchor directly to a Camera, without having to use panels.
+- NEW: Made "Keep crisp" option always show up for dynamic fonts.
+- FIX: Anchoring to a 3D object at edit time will no longer move the widget's initial position.
+- FIX: Account for objects being behind the camera (and thus not visible) when anchoring to 3D game objects.
+- FIX: Invisible widgets with colliders will now auto-resize them correctly.
+- FIX: Improved how baseline is calculated (with a hack!), making fonts be positioned better.
+- FIX: Filled sprites should now ignore the padding.
 
 3.0.7 f2
 - NEW: You can now right-click on tweens to set the 'from' and 'to' values using the current.
