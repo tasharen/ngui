@@ -471,7 +471,7 @@ public class UISprite : UIWidget
 				int w = mSprite.width + padLeft + padRight;
 				int h = mSprite.height + padBottom + padTop;
 
-				if (mType != Type.Sliced)
+				if (mType != Type.Sliced && mType != Type.Tiled)
 				{
 					if ((w & 1) != 0) ++padRight;
 					if ((h & 1) != 0) ++padTop;
