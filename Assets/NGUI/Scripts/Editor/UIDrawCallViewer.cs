@@ -110,11 +110,15 @@ public class UIDrawCallViewer : EditorWindow
 
 				int count = 0;
 
-				for (int b = 0; b < UIWidget.list.size; ++b)
+				for (int a = 0; a < UIPanel.list.size; ++a)
 				{
-					UIWidget w = UIWidget.list[b];
-					if (w.drawCall == dc)
-						++count;
+					UIPanel p = UIPanel.list.buffer[a];
+
+					for (int b = 0; b < p.widgets.size; ++b)
+					{
+						UIWidget w = p.widgets.buffer[b];
+						if (w.drawCall == dc) ++count;
+					}
 				}
 
 				string myPath = NGUITools.GetHierarchy(dc.manager.cachedGameObject);
@@ -123,14 +127,19 @@ public class UIDrawCallViewer : EditorWindow
 				list[0] = count.ToString();
 				count = 0;
 
-				for (int b = 0; b < UIWidget.list.size; ++b)
+				for (int a = 0; a < UIPanel.list.size; ++a)
 				{
-					UIWidget w = UIWidget.list[b];
+					UIPanel p = UIPanel.list.buffer[a];
 
-					if (w.drawCall == dc)
+					for (int b = 0; b < p.widgets.size; ++b)
 					{
-						string path = NGUITools.GetHierarchy(w.cachedGameObject);
-						list[++count] = count + ". " + (string.Equals(path, myPath) ? w.name : path.Replace(remove, ""));
+						UIWidget w = p.widgets.buffer[b];
+
+						if (w.drawCall == dc)
+						{
+							string path = NGUITools.GetHierarchy(w.cachedGameObject);
+							list[++count] = count + ". " + (string.Equals(path, myPath) ? w.name : path.Replace(remove, ""));
+						}
 					}
 				}
 
@@ -143,14 +152,19 @@ public class UIDrawCallViewer : EditorWindow
 				{
 					count = 0;
 
-					for (int b = 0; b < UIWidget.list.size; ++b)
+					for (int a = 0; a < UIPanel.list.size; ++a)
 					{
-						UIWidget w = UIWidget.list[b];
+						UIPanel p = UIPanel.list.buffer[a];
 
-						if (w.drawCall == dc && ++count == sel)
+						for (int b = 0; b < p.widgets.size; ++b)
 						{
-							Selection.activeGameObject = w.gameObject;
-							break;
+							UIWidget w = p.widgets.buffer[b];
+
+							if (w.drawCall == dc && ++count == sel)
+							{
+								Selection.activeGameObject = w.gameObject;
+								break;
+							}
 						}
 					}
 				}

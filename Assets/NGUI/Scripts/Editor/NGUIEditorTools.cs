@@ -1408,14 +1408,18 @@ public class NGUIEditorTools
 	{
 		BetterList<UIWidget> list = new BetterList<UIWidget>();
 
-		for (int i = 0; i < UIWidget.list.size; ++i)
+		for (int i = 0; i < UIPanel.list.size; ++i)
 		{
-			UIWidget w = UIWidget.list[i];
-			Vector3[] corners = w.worldCorners;
-			if (SceneViewDistanceToRectangle(corners, mousePos) == 0f)
-				list.Add(w);
-		}
+			UIPanel p = UIPanel.list.buffer[i];
 
+			for (int b = 0; b < p.widgets.size; ++b)
+			{
+				UIWidget w = p.widgets.buffer[b];
+				Vector3[] corners = w.worldCorners;
+				if (SceneViewDistanceToRectangle(corners, mousePos) == 0f)
+					list.Add(w);
+			}
+		}
 		list.Sort(UIWidget.FullCompareFunc);
 		return list;
 	}

@@ -941,14 +941,18 @@ public class UIWidgetInspector : UIRectEditor
 		}
 		GUILayout.EndHorizontal();
 
-		int matchingDepths = 0;
+		int matchingDepths = 1;
 
-		for (int i = 0; i < UIWidget.list.size; ++i)
+		UIPanel p = mWidget.panel;
+
+		if (p != null)
 		{
-			UIWidget w = UIWidget.list[i];
-			if (w != null && w.panel != null && mWidget.panel != null &&
-				w.panel.depth == mWidget.panel.depth && w.depth == mWidget.depth)
-				++matchingDepths;
+			for (int i = 0; i < p.widgets.size; ++i)
+			{
+				UIWidget w = p.widgets[i];
+				if (w != mWidget && w.depth == mWidget.depth)
+					++matchingDepths;
+			}
 		}
 
 		if (matchingDepths > 1)

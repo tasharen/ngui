@@ -142,7 +142,13 @@ public abstract class UIRect : MonoBehaviour
 	protected Transform mTrans;
 	protected BetterList<UIRect> mChildren = new BetterList<UIRect>();
 	protected bool mChanged = true;
-	protected float mFinalAlpha = 0f;
+
+	/// <summary>
+	/// Final calculated alpha.
+	/// </summary>
+
+	[System.NonSerialized]
+	public float finalAlpha = 1f;
 
 	UIRoot mRoot;
 	UIRect mParent;
@@ -225,10 +231,10 @@ public abstract class UIRect : MonoBehaviour
 	public abstract float alpha { get; set; }
 
 	/// <summary>
-	/// Alpha property is exposed so that it's possible to make it cumulative.
+	/// Get the final cumulative alpha.
 	/// </summary>
 
-	public abstract float finalAlpha { get; }
+	public abstract float CalculateFinalAlpha (int frameID);
 
 	/// <summary>
 	/// Local-space corners of the UI rectangle. The order is bottom-left, top-left, top-right, bottom-right.
