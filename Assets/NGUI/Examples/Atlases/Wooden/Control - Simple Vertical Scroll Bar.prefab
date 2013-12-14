@@ -99,6 +99,7 @@ MonoBehaviour:
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
   duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  dragHighlight: 0
   onClick: []
 --- !u!114 &11400004
 MonoBehaviour:
@@ -155,6 +156,7 @@ MonoBehaviour:
   pressed: {r: .5, g: .5, b: .5, a: 1}
   duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  dragHighlight: 0
   onClick: []
 --- !u!114 &11400008
 MonoBehaviour:

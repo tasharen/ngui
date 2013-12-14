@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-            Version 3.0.7 f3
+            Version 3.0.8
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,12 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.8
+- NEW: All panels now manager their own draw calls rather than working with one giant list.
+- NEW: Widgets no longer have a global list, and are always managed per-panel.
+- NEW: Enabling/disabling widgets no longer affects other panels.
+- NEW: Optimization pass. Significantly reduced time spent in UIPanel.LateUpdate.
 
 3.0.7 f3
 - NEW: Added an option for anchors to be offset by the panel's position.
