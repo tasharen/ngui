@@ -77,17 +77,17 @@ public class UIDrawCall : MonoBehaviour
 	int[]			mIndices;		// Cached indices
 
 	bool mRebuildMat = true;
-	bool mDirty = false;
 	bool mReset = true;
 	int mRenderQueue = 3000;
 	Clipping mLastClip = Clipping.None;
 	int mTriangles = 0;
 
 	/// <summary>
-	/// Whether the draw call needs to be re-created.
+	/// Whether the draw call has changed recently.
 	/// </summary>
 
-	public bool isDirty { get { return mDirty; } set { mDirty = value; } }
+	[System.NonSerialized]
+	public bool isDirty = false;
 
 	/// <summary>
 	/// Render queue used by the draw call.

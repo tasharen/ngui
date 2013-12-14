@@ -977,18 +977,9 @@ public class UIPanel : UIRect
 			widgets.Sort(UIWidget.PanelCompareFunc);
 		}
 
-		for (int i = 0; i < widgets.size; )
+		for (int i = 0; i < widgets.size; ++i)
 		{
 			UIWidget w = widgets.buffer[i];
-
-			if (w == null)
-			{
-#if UNITY_EDITOR
-				Debug.LogError("This should never happen");
-#endif
-				widgets.RemoveAt(i);
-				continue;
-			}
 
 			if (w.isVisible && w.hasVertices)
 			{
@@ -1032,7 +1023,6 @@ public class UIPanel : UIRect
 				}
 			}
 			else w.drawCall = null;
-			++i;
 		}
 		if (mVerts.size != 0) SubmitDrawCall(dc);
 	}

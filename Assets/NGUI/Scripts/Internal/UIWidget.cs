@@ -657,8 +657,11 @@ public class UIWidget : UIRect
 
 	protected void RemoveFromPanel ()
 	{
-		if (panel != null) panel.RemoveWidget(this);
-		panel = null;
+		if (panel != null)
+		{
+			panel.RemoveWidget(this);
+			panel = null;
+		}
 #if UNITY_EDITOR
 		mOldTex = null;
 		mOldShader = null;
@@ -694,10 +697,14 @@ public class UIWidget : UIRect
 		{
 			mOldTex = mainTexture;
 			mOldShader = shader;
-
-			if (panel != null) panel.RemoveWidget(this);
-			CreatePanel();
 		}
+
+		if (panel != null)
+		{
+			panel.RemoveWidget(this);
+			panel = null;
+		}
+		CreatePanel();
 	}
 #endif
 
