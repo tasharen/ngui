@@ -34,6 +34,14 @@ public class UIWidget : UIRect
 	[HideInInspector][SerializeField] protected int mHeight = 100;
 	[HideInInspector][SerializeField] protected int mDepth = 0;
 
+	public delegate void OnDimensionsChanged ();
+
+	/// <summary>
+	/// Notification triggered when the widget's dimensions or position changes.
+	/// </summary>
+
+	public OnDimensionsChanged onChange;
+
 	/// <summary>
 	/// If set to 'true', the box collider's dimensions will be adjusted to always match the widget whenever it resizes.
 	/// </summary>
@@ -1101,12 +1109,10 @@ public class UIWidget : UIRect
 
 	public bool UpdateTransform (int frame)
 	{
-		if (mMoved) return true;
-
 #if UNITY_EDITOR
-		if (!panel.widgetsAreStatic || !mPlayMode)
+		if (!mMoved && !panel.widgetsAreStatic || !mPlayMode)
 #else
-		if (!mPanel.widgetsAreStatic)
+		if (!mMoved && !mPanel.widgetsAreStatic)
 #endif
 		{
 #if UNITY_3_5 || UNITY_4_0
@@ -1141,11 +1147,13 @@ public class UIWidget : UIRect
 					mMoved = true;
 					mOldV0 = v0;
 					mOldV1 = v1;
-					return true;
 				}
 			}
 		}
-		return false;
+
+		// Notify the listeners
+		if (mMoved && onChange != null) onChange();
+		return mMoved;
 	}
 
 #if UNITY_3_5 || UNITY_4_0
