@@ -425,6 +425,9 @@ public class UIPanelInspector : UIRectEditor
 
 				if (UIPanelTool.instance != null)
 					UIPanelTool.instance.Repaint();
+
+				if (UIDrawCallViewer.instance != null)
+					UIDrawCallViewer.instance.Repaint();
 			}
 		}
 		GUILayout.EndHorizontal();
@@ -519,7 +522,7 @@ public class UIPanelInspector : UIRectEditor
 			if (mPanel.renderQueue != rq)
 			{
 				mPanel.renderQueue = rq;
-				UIPanel.RebuildAllDrawCalls(true);
+				mPanel.RebuildAllDrawCalls();
 				EditorUtility.SetDirty(mPanel);
 				if (UIDrawCallViewer.instance != null)
 					UIDrawCallViewer.instance.Repaint();
@@ -532,7 +535,7 @@ public class UIPanelInspector : UIRectEditor
 				if (mPanel.startingRenderQueue != sq)
 				{
 					mPanel.startingRenderQueue = sq;
-					UIPanel.RebuildAllDrawCalls(true);
+					mPanel.RebuildAllDrawCalls();
 					EditorUtility.SetDirty(mPanel);
 					if (UIDrawCallViewer.instance != null)
 						UIDrawCallViewer.instance.Repaint();
@@ -548,7 +551,7 @@ public class UIPanelInspector : UIRectEditor
 			if (mPanel.generateNormals != norms)
 			{
 				mPanel.generateNormals = norms;
-				UIPanel.RebuildAllDrawCalls(true);
+				mPanel.RebuildAllDrawCalls();
 				EditorUtility.SetDirty(mPanel);
 			}
 
@@ -560,7 +563,7 @@ public class UIPanelInspector : UIRectEditor
 			if (mPanel.cullWhileDragging != cull)
 			{
 				mPanel.cullWhileDragging = cull;
-				UIPanel.RebuildAllDrawCalls(true);
+				mPanel.RebuildAllDrawCalls();
 				EditorUtility.SetDirty(mPanel);
 			}
 
@@ -572,7 +575,7 @@ public class UIPanelInspector : UIRectEditor
 			if (mPanel.alwaysOnScreen != alw)
 			{
 				mPanel.alwaysOnScreen = alw;
-				UIPanel.RebuildAllDrawCalls(true);
+				mPanel.RebuildAllDrawCalls();
 				EditorUtility.SetDirty(mPanel);
 			}
 
@@ -584,7 +587,7 @@ public class UIPanelInspector : UIRectEditor
 			if (mPanel.anchorOffset != off)
 			{
 				mPanel.anchorOffset = off;
-				UIPanel.RebuildAllDrawCalls(true);
+				mPanel.RebuildAllDrawCalls();
 				EditorUtility.SetDirty(mPanel);
 			}
 
@@ -596,7 +599,7 @@ public class UIPanelInspector : UIRectEditor
 			if (mPanel.widgetsAreStatic != stat)
 			{
 				mPanel.widgetsAreStatic = stat;
-				UIPanel.RebuildAllDrawCalls(true);
+				mPanel.RebuildAllDrawCalls();
 				EditorUtility.SetDirty(mPanel);
 			}
 

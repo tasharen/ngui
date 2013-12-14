@@ -41,11 +41,18 @@ public class UIDrawCallViewer : EditorWindow
 	{
 		BetterList<UIDrawCall> dcs = UIDrawCall.activeList;
 
+		dcs.Sort(delegate(UIDrawCall a, UIDrawCall b)
+		{
+			return a.finalRenderQueue.CompareTo(b.finalRenderQueue);
+		});
+
 		if (dcs.size == 0)
 		{
 			EditorGUILayout.HelpBox("No NGUI draw calls present in the scene", MessageType.Info);
 			return;
 		}
+
+		UIPanel selectedPanel = NGUITools.FindInParents<UIPanel>(Selection.activeGameObject);
 
 		GUILayout.Space(12f);
 
@@ -57,11 +64,9 @@ public class UIDrawCallViewer : EditorWindow
 
 		GUILayout.Space(6f);
 
-		UIPanel selectedPanel = NGUITools.FindInParents<UIPanel>(Selection.activeGameObject);
-
-		if (selectedPanel == null)
+		if (selectedPanel == null && !NGUISettings.showAllDCs)
 		{
-			EditorGUILayout.HelpBox("Select any object within the UI hierarchy", MessageType.Info);
+			EditorGUILayout.HelpBox("No panel selected", MessageType.Info);
 			return;
 		}
 
@@ -73,24 +78,32 @@ public class UIDrawCallViewer : EditorWindow
 		for (int i = 0; i < dcs.size; ++i)
 		{
 			UIDrawCall dc = dcs[i];
+			string key = "Draw Call " + (i + 1);
+			bool highlight = (selectedPanel == null || selectedPanel == dc.manager);
 
-			if (dc.manager != selectedPanel)
+			if (!highlight)
 			{
 				if (!NGUISettings.showAllDCs) continue;
-				if (dc.showDetails) GUI.color = new Color(0.85f, 0.85f, 0.85f);
-				else GUI.contentColor = new Color(0.85f, 0.85f, 0.85f);
+				
+				if (UnityEditor.EditorPrefs.GetBool(key, true))
+				{
+					GUI.color = new Color(0.85f, 0.85f, 0.85f);
+				}
+				else
+				{
+					GUI.contentColor = new Color(0.85f, 0.85f, 0.85f);
+				}
 			}
 			else GUI.contentColor = Color.white;
 
 			++dcCount;
-			string key = dc.keyName;
 			string name = key + " of " + dcs.size;
 			if (!dc.isActive) name = name + " (HIDDEN)";
-			else if (dc.manager != selectedPanel) name = name + " (" + dc.manager.name + ")";
+			else if (!highlight) name = name + " (" + dc.manager.name + ")";
 
 			if (NGUIEditorTools.DrawHeader(name, key))
 			{
-				GUI.color = (dc.manager == selectedPanel) ? Color.white : new Color(0.8f, 0.8f, 0.8f);
+				GUI.color = highlight ? Color.white : new Color(0.8f, 0.8f, 0.8f);
 
 				NGUIEditorTools.BeginContents();
 				EditorGUILayout.ObjectField("Material", dc.baseMaterial, typeof(Material), false);

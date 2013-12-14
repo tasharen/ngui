@@ -540,7 +540,7 @@ static public class NGUITools
 
 		if (size > 0)
 		{
-			Array.Sort(list, UIWidget.CompareFunc);
+			Array.Sort(list, UIWidget.FullCompareFunc);
 
 			int start = 0;
 			int current = list[0].depth;

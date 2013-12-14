@@ -82,9 +82,6 @@ public class UIDrawCall : MonoBehaviour
 	int mRenderQueue = 3000;
 	Clipping mLastClip = Clipping.None;
 	int mTriangles = 0;
-#if UNITY_EDITOR
-	int mIndex = 0;
-#endif
 
 	/// <summary>
 	/// Whether the draw call needs to be re-created.
@@ -132,9 +129,6 @@ public class UIDrawCall : MonoBehaviour
 	}
 
 #if UNITY_EDITOR
-	public string keyName { get { return "Draw Call " + mIndex; } }
-
-	public bool showDetails { get { return UnityEditor.EditorPrefs.GetBool(keyName, true); } }
 
 	/// <summary>
 	/// Whether the draw call is currently active.
@@ -557,9 +551,6 @@ public class UIDrawCall : MonoBehaviour
 	{
 		mRebuildMat = true;
 		mActiveList.Add(this);
-#if UNITY_EDITOR
-		mIndex = mActiveList.size;
-#endif
 	}
 
 	/// <summary>
@@ -568,8 +559,6 @@ public class UIDrawCall : MonoBehaviour
 
 	void OnDisable ()
 	{
-		mActiveList.Remove(this);
-		mInactiveList.Add(this);
 		depthStart = int.MaxValue;
 		depthEnd = int.MinValue;
 		panel = null;
@@ -585,7 +574,6 @@ public class UIDrawCall : MonoBehaviour
 
 	void OnDestroy ()
 	{
-		mInactiveList.Remove(this);
 		NGUITools.DestroyImmediate(mMesh);
 	}
 
@@ -593,23 +581,8 @@ public class UIDrawCall : MonoBehaviour
 	/// Return an existing draw call.
 	/// </summary>
 
-	static public UIDrawCall Create (int index, UIPanel panel, Material mat, Texture tex, Shader shader)
+	static public UIDrawCall Create (UIPanel panel, Material mat, Texture tex, Shader shader)
 	{
-		if (index < mActiveList.size)
-		{
-			UIDrawCall dc = mActiveList.buffer[index];
-
-			// If the material and texture match, keep using the same draw call
-			if (dc != null && dc.manager == panel &&
-				dc.baseMaterial == mat &&
-				dc.mainTexture == tex &&
-				dc.shader == shader) return dc;
-		}
-
-		// Invalidate draw calls that follow
-		for (int i = mActiveList.size; i > index; )
-			NGUITools.SetActive(mActiveList[--i].gameObject, false);
-
 #if UNITY_EDITOR
 		string name = null;
 		if (tex != null) name = tex.name;
@@ -632,32 +605,7 @@ public class UIDrawCall : MonoBehaviour
 		dc.baseMaterial = mat;
 		dc.mainTexture = tex;
 		dc.shader = shader;
-
-		int highestRQ = 0;
-
-		for (int i = 0; i < mActiveList.size - 1; ++i)
-		{
-			UIDrawCall adc = mActiveList.buffer[i];
-			if (highestRQ < adc.mRenderQueue)
-				highestRQ = adc.mRenderQueue;
-		}
-
-		if (pan.renderQueue == UIPanel.RenderQueue.Automatic)
-		{
-			if (highestRQ == 0)
-			{
-				dc.renderQueue = (mat != null) ? mat.renderQueue : 3000;
-			}
-			else dc.renderQueue = highestRQ + 1;
-		}
-		else if (pan.renderQueue == UIPanel.RenderQueue.StartAt)
-		{
-			dc.renderQueue = Mathf.Max(highestRQ + 1, pan.startingRenderQueue);
-		}
-		else
-		{
-			dc.renderQueue = pan.startingRenderQueue;
-		}
+		dc.renderQueue = pan.startingRenderQueue;
 		dc.manager = pan;
 		return dc;
 	}
@@ -674,6 +622,7 @@ public class UIDrawCall : MonoBehaviour
 		if (mInactiveList.size > 0)
 		{
 			UIDrawCall dc = mInactiveList.Pop();
+			mActiveList.Add(dc);
 			if (name != null) dc.name = name;
 			NGUITools.SetActive(dc.gameObject, true);
 			return dc;
@@ -729,29 +678,6 @@ public class UIDrawCall : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Mark all active draw calls as dirty.
-	/// </summary>
-
-	static public void SetDirty ()
-	{
-		for (int i = 0; i < mActiveList.size; ++i)
-			mActiveList[i].isDirty = true;
-	}
-
-	/// <summary>
-	/// Mark all draw calls belonging to the specified panel as dirty.
-	/// </summary>
-
-	static public void SetDirty (UIPanel panel)
-	{
-		for (int i = 0; i < mActiveList.size; ++i)
-		{
-			UIDrawCall dc = mActiveList[i];
-			if (dc.manager == panel) dc.isDirty = true;
-		}
-	}
-
-	/// <summary>
 	/// Count all draw calls managed by the specified panel.
 	/// </summary>
 
@@ -764,108 +690,23 @@ public class UIDrawCall : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Destroy all draw calls belonging to the specified panel.
-	/// </summary>
-
-	static public void Destroy (UIPanel panel)
-	{
-		for (int i = mActiveList.size; i > 0; )
-		{
-			UIDrawCall dc = mActiveList[--i];
-			if (dc.manager == panel) Destroy(dc);
-		}
-	}
-
-	/// <summary>
 	/// Destroy the specified draw call.
 	/// </summary>
 
 	static public void Destroy (UIDrawCall dc)
 	{
-		if (Application.isPlaying) NGUITools.SetActive(dc.gameObject, false);
-		else NGUITools.DestroyImmediate(dc.gameObject);
-	}
-
-	/// <summary>
-	/// Update the specified panel's draw calls.
-	/// </summary>
-
-	static public void Update (UIPanel panel)
-	{
-		Transform pt = panel.cachedTransform;
-		Vector4 range = Vector4.zero;
-		bool isUI = panel.usedForUI;
-
-		if (panel.clipping != UIDrawCall.Clipping.None)
+		if (Application.isPlaying)
 		{
-			Vector4 cr = panel.finalClipRegion;
-			range = new Vector4(cr.x, cr.y, cr.z * 0.5f, cr.w * 0.5f);
-		}
-
-		if (range.z == 0f) range.z = Screen.width * 0.5f;
-		if (range.w == 0f) range.w = Screen.height * 0.5f;
-
-		if (panel.halfPixelOffset)
-		{
-			range.x -= 0.5f;
-			range.y += 0.5f;
-		}
-
-		for (int i = 0; i < mActiveList.size; ++i)
-		{
-			UIDrawCall dc = mActiveList[i];
-			
-			if (dc.manager == panel)
+			if (mActiveList.Remove(dc))
 			{
-				Transform dt = dc.cachedTransform;
-
-				if (isUI)
-				{
-					Vector4 myRange = range;
-					Transform parent = panel.cachedTransform.parent;
-					Vector3 pos = panel.cachedTransform.localPosition;
-
-					if (parent != null)
-					{
-						// We want the position to always be on even pixels so that the
-						// scroll view's contents always appear pixel-perfect.
-						float x = Mathf.Round(pos.x);
-						float y = Mathf.Round(pos.y);
-						myRange.x += pos.x - x;
-						myRange.y += pos.y - y;
-						pos.x = x;
-						pos.y = y;
-						pos = parent.TransformPoint(pos);
-					}
-					
-					dt.position = pos + panel.drawCallOffset;
-					dc.clipRange = myRange;
-				}
-				else
-				{
-					dt.position = panel.cachedTransform.position;
-					dc.clipRange = range;
-				}
-
-				dt.rotation = pt.rotation;
-				dt.localScale = pt.lossyScale;
-
-				dc.clipping = panel.clipping;
-				dc.clipSoftness = panel.clipSoftness;
+				NGUITools.SetActive(dc.gameObject, false);
+				mInactiveList.Add(dc);
 			}
 		}
-	}
-
-	/// <summary>
-	/// Update the layer of all draw calls belonging to the specified panel.
-	/// </summary>
-
-	static public void UpdateLayer (UIPanel panel)
-	{
-		for (int i = 0; i < mActiveList.size; ++i)
+		else
 		{
-			UIDrawCall dc = mActiveList[i];
-			if (dc.manager == panel) dc.gameObject.layer = panel.cachedGameObject.layer;
+			mActiveList.Remove(dc);
+			NGUITools.DestroyImmediate(dc.gameObject);
 		}
 	}
 }

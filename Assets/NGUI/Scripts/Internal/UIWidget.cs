@@ -307,7 +307,7 @@ public class UIWidget : UIRect
 #if UNITY_EDITOR
 				UnityEditor.EditorUtility.SetDirty(this);
 #endif
-				UIPanel.RebuildAllDrawCalls(true);
+				if (mPanel != null) mPanel.RebuildAllDrawCalls();
 			}
 		}
 	}
@@ -576,24 +576,29 @@ public class UIWidget : UIRect
 	/// Static widget comparison function used for depth sorting.
 	/// </summary>
 
-	static public int CompareFunc (UIWidget left, UIWidget right)
+	static public int FullCompareFunc (UIWidget left, UIWidget right)
 	{
 		int val = UIPanel.CompareFunc(left.mPanel, right.mPanel);
+		return (val == 0) ? PanelCompareFunc(left, right) : val;
+	}
 
-		if (val == 0)
-		{
-			if (left.mDepth < right.mDepth) return -1;
-			if (left.mDepth > right.mDepth) return 1;
+	/// <summary>
+	/// Static widget comparison function used for inter-panel depth sorting.
+	/// </summary>
 
-			Material leftMat = left.material;
-			Material rightMat = right.material;
+	static public int PanelCompareFunc (UIWidget left, UIWidget right)
+	{
+		if (left.mDepth < right.mDepth) return -1;
+		if (left.mDepth > right.mDepth) return 1;
 
-			if (leftMat == rightMat) return 0;
-			if (leftMat != null) return -1;
-			if (rightMat != null) return 1;
-			return (leftMat.GetInstanceID() < rightMat.GetInstanceID()) ? -1 : 1;
-		}
-		return val;
+		Material leftMat = left.material;
+		Material rightMat = right.material;
+
+		if (leftMat == rightMat) return 0;
+		if (leftMat != null) return -1;
+		if (rightMat != null) return 1;
+
+		return (leftMat.GetInstanceID() < rightMat.GetInstanceID()) ? -1 : 1;
 	}
 
 	/// <summary>
@@ -637,7 +642,7 @@ public class UIWidget : UIRect
 		}
 		else if (isVisible && hasVertices)
 		{
-			drawCall = UIPanel.InsertWidget(this);
+			drawCall = (panel != null) ? mPanel.InsertWidget(this) : null;
 		}
 	}
 
@@ -647,7 +652,7 @@ public class UIWidget : UIRect
 
 	protected void RemoveFromPanel ()
 	{
-		UIPanel.RemoveWidget(this);
+		if (mPanel != null) mPanel.RemoveWidget(this);
 		mPanel = null;
 		list.Remove(this);
 #if UNITY_EDITOR
@@ -685,8 +690,9 @@ public class UIWidget : UIRect
 		{
 			mOldTex = mainTexture;
 			mOldShader = shader;
-			UIPanel.RemoveWidget(this);
-			drawCall = UIPanel.InsertWidget(this);
+
+			if (mPanel != null) mPanel.RemoveWidget(this);
+			drawCall = (panel != null) ? mPanel.InsertWidget(this) : null;
 		}
 	}
 #endif
@@ -729,6 +735,8 @@ public class UIWidget : UIRect
 				int rd = raycastDepth;
 				bool inserted = false;
 
+				// TODO: Is it really necessary to keep them in order in this giant list?
+				// TODO: Why not move Raycast() to the panels instead? Each panel can have their own widget list.
 				// Try to insert this widget at the appropriate location within the list
 				for (int i = 0; i < list.size; ++i)
 				{
@@ -745,7 +753,8 @@ public class UIWidget : UIRect
 
 				CheckLayer();
 				Invalidate(true);
-				drawCall = UIPanel.InsertWidget(this);
+
+				drawCall = mPanel.InsertWidget(this);
 			}
 		}
 	}

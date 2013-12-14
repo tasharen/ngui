@@ -115,7 +115,7 @@ public class UIPanel : UIRect
 	[HideInInspector][SerializeField] int mDepth = 0;
 
 	// Whether a full rebuild of geometry buffers is required
-	static bool mRebuild = false;
+	bool mRebuild = false;
 
 	// Cached in order to reduce memory allocations
 	static BetterList<Vector3> mVerts = new BetterList<Vector3>();
@@ -136,6 +136,10 @@ public class UIPanel : UIRect
 	Vector2 mMin = Vector2.zero;
 	Vector2 mMax = Vector2.zero;
 	bool mHalfPixelOffset = false;
+
+	// Each panel manages their own draw calls and widgets
+	BetterList<UIDrawCall> mDrawCalls = new BetterList<UIDrawCall>();
+	BetterList<UIWidget> mWidgets = new BetterList<UIWidget>();
 
 	/// <summary>
 	/// Helper property that returns the first unused depth value.
@@ -202,17 +206,10 @@ public class UIPanel : UIRect
 			if (mDepth != value)
 			{
 				mDepth = value;
-				mRebuild = true;
-
-				UIDrawCall.SetDirty();
-
-				for (int i = 0; i < UIWidget.list.size; ++i)
-					UIWidget.list[i].Invalidate(false);
 #if UNITY_EDITOR
 				UnityEditor.EditorUtility.SetDirty(this);
 #endif
 				list.Sort(CompareFunc);
-				UIWidget.list.Sort(UIWidget.CompareFunc);
 			}
 		}
 	}
@@ -297,7 +294,7 @@ public class UIPanel : UIRect
 				mClipping = value;
 				mMatrixFrame = -1;
 #if UNITY_EDITOR
-				if (!Application.isPlaying) UIDrawCall.Update(this);
+				if (!Application.isPlaying) UpdateDrawCalls();
 #endif
 			}
 		}
@@ -324,7 +321,7 @@ public class UIPanel : UIRect
 				mClipOffset = value;
 				mMatrixFrame = -1;
 #if UNITY_EDITOR
-				if (!Application.isPlaying) UIDrawCall.Update(this);
+				if (!Application.isPlaying) UpdateDrawCalls();
 #endif
 			}
 		}
@@ -370,7 +367,7 @@ public class UIPanel : UIRect
 				mClipRange = value;
 				mMatrixFrame = -1;
 #if UNITY_EDITOR
-				if (!Application.isPlaying) UIDrawCall.Update(this);
+				if (!Application.isPlaying) UpdateDrawCalls();
 #endif
 			}
 		}
@@ -410,7 +407,7 @@ public class UIPanel : UIRect
 			{
 				mClipSoftness = value;
 #if UNITY_EDITOR
-				if (!Application.isPlaying) UIDrawCall.Update(this);
+				if (!Application.isPlaying) UpdateDrawCalls();
 #endif
 			}
 		}
@@ -625,18 +622,8 @@ public class UIPanel : UIRect
 	/// Causes all draw calls to be re-created on the next update.
 	/// </summary>
 
-	static public void RebuildAllDrawCalls (bool sort) { mRebuild = true; }
-
-#if UNITY_EDITOR
-	
-	/// <summary>
-	/// Context menu option to force-refresh the panel, just in case.
-	/// </summary>
-
 	[ContextMenu("Force Refresh")]
-	void ForceRefresh () { mRebuild = true; }
-
-#endif
+	public void RebuildAllDrawCalls () { mRebuild = true; }
 
 	/// <summary>
 	/// Invalidate the panel's draw calls, forcing them to be rebuilt on the next update.
@@ -645,7 +632,8 @@ public class UIPanel : UIRect
 
 	public void SetDirty ()
 	{
-		UIDrawCall.SetDirty(this);
+		for (int i = 0; i < mDrawCalls.size; ++i)
+			mDrawCalls.buffer[i].isDirty = true;
 		Invalidate(true);
 	}
 
@@ -705,7 +693,9 @@ public class UIPanel : UIRect
 
 	protected override void OnDisable ()
 	{
-		UIDrawCall.Destroy(this);
+		for (int i = 0; i < mDrawCalls.size; ++i)
+			UIDrawCall.Destroy(mDrawCalls.buffer[i]);
+		mDrawCalls.Clear();
 		list.Remove(this);
 		if (list.size == 0) UIDrawCall.ReleaseAll();
 		base.OnDisable();
@@ -866,49 +856,295 @@ public class UIPanel : UIRect
 		baseClipRegion = new Vector4(newX, newY, w, h);
 	}
 
+	static int mUpdateFrame = 0;
+
 	/// <summary>
-	/// Main update function
+	/// Update all panels and draw calls.
 	/// </summary>
 
 	void LateUpdate ()
 	{
-		// Only the very first panel should be doing the update logic
-		if (list[0] != this) return;
-
-		// Update all panels
-		for (int i = 0; i < list.size; ++i)
+		if (mUpdateFrame != Time.frameCount)
 		{
-			UIPanel panel = list[i];
-			panel.mUpdateTime = RealTime.time;
-			panel.UpdateTransformMatrix();
-			panel.UpdateLayers();
-			panel.UpdateWidgets();
+			mUpdateFrame = Time.frameCount;
+
+			// Update each panel in order
+			for (int i = 0; i < list.size; ++i)
+				list[i].UpdateSelf();
+
+			int rq = 3000;
+
+			// Update all draw calls, making them draw in the right order
+			for (int i = 0; i < list.size; ++i)
+			{
+				UIPanel p = list.buffer[i];
+
+				if (p.renderQueue == RenderQueue.Automatic)
+				{
+					p.startingRenderQueue = rq;
+					p.UpdateDrawCalls();
+					rq += p.mDrawCalls.size;
+				}
+				else if (p.renderQueue == RenderQueue.StartAt)
+				{
+					p.UpdateDrawCalls();
+					if (p.mDrawCalls.size != 0)
+						rq = Mathf.Max(rq, p.startingRenderQueue + p.mDrawCalls.size);
+				}
+				else // Explicit
+				{
+					p.UpdateDrawCalls();
+					if (p.mDrawCalls.size != 0)
+						rq = Mathf.Max(rq, p.startingRenderQueue + 1);
+				}
+			}
 		}
+	}
+
+	/// <summary>
+	/// Update the panel, all of its widgets and draw calls.
+	/// </summary>
+
+	void UpdateSelf ()
+	{
+		mUpdateTime = RealTime.time;
+
+		UpdateTransformMatrix();
+		UpdateLayers();
+		UpdateWidgets();
 
 		if (mRebuild)
 		{
-			Fill();
+			mRebuild = false;
+			FillAllDrawCalls();
 		}
 		else
 		{
-			BetterList<UIDrawCall> dcs = UIDrawCall.activeList;
-
-			for (int i = 0; i < dcs.size; )
+			for (int i = 0; i < mDrawCalls.size; )
 			{
-				UIDrawCall dc = dcs.buffer[i];
+				UIDrawCall dc = mDrawCalls.buffer[i];
 
-				if (dc.isDirty && !Fill(dc))
+				if (dc.isDirty && !FillDrawCall(dc))
 				{
 					UIDrawCall.Destroy(dc);
+					mDrawCalls.RemoveAt(i);
 					continue;
 				}
 				++i;
 			}
 		}
+	}
 
-		// Update the clipping rects
-		for (int i = 0; i < list.size; ++i) UIDrawCall.Update(list[i]);
-		mRebuild = false;
+	/// <summary>
+	/// Fill the geometry fully, processing all widgets and re-creating all draw calls.
+	/// </summary>
+
+	void FillAllDrawCalls ()
+	{
+		for (int i = 0; i < mDrawCalls.size; ++i)
+			UIDrawCall.Destroy(mDrawCalls.buffer[i]);
+		mDrawCalls.Clear();
+
+		Material mat = null;
+		Texture tex = null;
+		Shader sdr = null;
+		UIDrawCall dc = null;
+
+		for (int i = 0; i < UIWidget.list.size; )
+		{
+			UIWidget w = UIWidget.list.buffer[i];
+
+			if (w == null)
+			{
+				UIWidget.list.RemoveAt(i);
+				continue;
+			}
+
+			// TODO: Loop only through local widgets
+			if (w.panel != this)
+			{
+				++i;
+				continue;
+			}
+
+			if (w.isVisible && w.hasVertices)
+			{
+				Material mt = w.material;
+				Texture tx = w.mainTexture;
+				Shader sd = w.shader;
+
+				if (mat != mt || tex != tx || sdr != sd)
+				{
+					if (mVerts.size != 0)
+					{
+						SubmitDrawCall(dc);
+						dc = null;
+					}
+
+					mat = mt;
+					tex = tx;
+					sdr = sd;
+				}
+
+				if (mat != null || sdr != null || tex != null)
+				{
+					if (dc == null)
+					{
+						dc = UIDrawCall.Create(this, mat, tex, sdr);
+						dc.depthStart = w.depth;
+						dc.depthEnd = dc.depthStart;
+						dc.panel = this;
+					}
+					else
+					{
+						int rd = w.depth;
+						if (rd < dc.depthStart) dc.depthStart = rd;
+						if (rd > dc.depthEnd) dc.depthEnd = rd;
+					}
+
+					w.drawCall = dc;
+
+					if (generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
+					else w.WriteToBuffers(mVerts, mUvs, mCols, null, null);
+				}
+			}
+			else w.drawCall = null;
+			++i;
+		}
+		if (mVerts.size != 0) SubmitDrawCall(dc);
+	}
+
+	/// <summary>
+	/// Submit the draw call using the current geometry.
+	/// </summary>
+
+	void SubmitDrawCall (UIDrawCall dc)
+	{
+		mDrawCalls.Add(dc);
+		dc.Set(mVerts, generateNormals ? mNorms : null, generateNormals ? mTans : null, mUvs, mCols);
+		mVerts.Clear();
+		mNorms.Clear();
+		mTans.Clear();
+		mUvs.Clear();
+		mCols.Clear();
+	}
+
+	/// <summary>
+	/// Fill the geometry for the specified draw call.
+	/// </summary>
+
+	bool FillDrawCall (UIDrawCall dc)
+	{
+		if (dc != null)
+		{
+			dc.isDirty = false;
+
+			for (int i = 0; i < UIWidget.list.size; )
+			{
+				UIWidget w = UIWidget.list[i];
+
+				if (w == null)
+				{
+#if UNITY_EDITOR
+					Debug.LogWarning("Point reached");
+#endif
+					UIWidget.list.RemoveAt(i);
+					continue;
+				}
+
+				if (w.drawCall == dc)
+				{
+					if (w.isVisible && w.hasVertices)
+					{
+						if (generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
+						else w.WriteToBuffers(mVerts, mUvs, mCols, null, null);
+					}
+					else w.drawCall = null;
+				}
+				++i;
+			}
+
+			if (mVerts.size != 0)
+			{
+				dc.Set(mVerts, generateNormals ? mNorms : null, generateNormals ? mTans : null, mUvs, mCols);
+				mVerts.Clear();
+				mNorms.Clear();
+				mTans.Clear();
+				mUvs.Clear();
+				mCols.Clear();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Update all draw calls associated with the panel.
+	/// </summary>
+
+	void UpdateDrawCalls ()
+	{
+		Transform trans = cachedTransform;
+		Vector4 range = Vector4.zero;
+		bool isUI = usedForUI;
+
+		if (clipping != UIDrawCall.Clipping.None)
+		{
+			Vector4 cr = finalClipRegion;
+			range = new Vector4(cr.x, cr.y, cr.z * 0.5f, cr.w * 0.5f);
+		}
+
+		if (range.z == 0f) range.z = Screen.width * 0.5f;
+		if (range.w == 0f) range.w = Screen.height * 0.5f;
+
+		if (halfPixelOffset)
+		{
+			range.x -= 0.5f;
+			range.y += 0.5f;
+		}
+
+		Vector3 pos;
+
+		// We want the position to always be on even pixels so that the
+		// panel's contents always appear pixel-perfect.
+		if (isUI)
+		{
+			Transform parent = cachedTransform.parent;
+			pos = cachedTransform.localPosition;
+
+			if (parent != null)
+			{
+				float x = Mathf.Round(pos.x);
+				float y = Mathf.Round(pos.y);
+				range.x += pos.x - x;
+				range.y += pos.y - y;
+				pos.x = x;
+				pos.y = y;
+				pos = parent.TransformPoint(pos);
+			}
+			pos += drawCallOffset;
+		}
+		else pos = trans.position;
+
+		Quaternion rot = trans.rotation;
+		Vector3 scale = trans.lossyScale;
+
+		for (int i = 0; i < mDrawCalls.size; ++i)
+		{
+			UIDrawCall dc = mDrawCalls.buffer[i];
+
+			Transform t = dc.cachedTransform;
+			t.position = pos;
+			t.rotation = rot;
+			t.localScale = scale;
+
+			dc.renderQueue = startingRenderQueue + i;
+			dc.clipping = clipping;
+			dc.clipRange = range;
+			dc.clipSoftness = mClipSoftness;
+			dc.alwaysOnScreen = alwaysOnScreen &&
+				(mClipping == UIDrawCall.Clipping.None || mClipping == UIDrawCall.Clipping.ConstrainButDontClip);
+		}
 	}
 
 	/// <summary>
@@ -924,7 +1160,9 @@ public class UIPanel : UIRect
 			UICamera uic = UICamera.FindCameraForLayer(mLayer);
 			mCam = (uic != null) ? uic.cachedCamera : NGUITools.FindCameraForLayer(mLayer);
 			NGUITools.SetChildLayer(cachedTransform, mLayer);
-			UIDrawCall.UpdateLayer(this);
+
+			for (int i = 0; i < mDrawCalls.size; ++i)
+				mDrawCalls.buffer[i].gameObject.layer = mLayer;
 		}
 	}
 
@@ -1018,21 +1256,17 @@ public class UIPanel : UIRect
 	/// because draw call creation is a delayed operation.
 	/// </summary>
 
-	static public UIDrawCall InsertWidget (UIWidget w)
+	public UIDrawCall InsertWidget (UIWidget w)
 	{
-		UIPanel p = w.panel;
-		if (p == null) return null;
 		Material mat = w.material;
 		Texture tex = w.mainTexture;
-		int depth = w.raycastDepth;
-		BetterList<UIDrawCall> dcs = UIDrawCall.activeList;
+		int depth = w.depth;
 
-		for (int i = 0; i < dcs.size; ++i)
+		for (int i = 0; i < mDrawCalls.size; ++i)
 		{
-			UIDrawCall dc = dcs.buffer[i];
-			if (dc.manager != p) continue;
-			int dcStart = (i == 0) ? int.MinValue : dcs.buffer[i - 1].depthEnd + 1;
-			int dcEnd = (i + 1 == dcs.size) ? int.MaxValue : dcs.buffer[i + 1].depthStart - 1;
+			UIDrawCall dc = mDrawCalls.buffer[i];
+			int dcStart = (i == 0) ? int.MinValue : mDrawCalls.buffer[i - 1].depthEnd + 1;
+			int dcEnd = (i + 1 == mDrawCalls.size) ? int.MaxValue : mDrawCalls.buffer[i + 1].depthStart - 1;
 
 			if (dcStart <= depth && dcEnd >= depth)
 			{
@@ -1057,11 +1291,11 @@ public class UIPanel : UIRect
 	/// Remove the widget from its current draw call, invalidating everything as needed.
 	/// </summary>
 
-	static public void RemoveWidget (UIWidget w)
+	public void RemoveWidget (UIWidget w)
 	{
 		if (w.drawCall != null)
 		{
-			int depth = w.raycastDepth;
+			int depth = w.depth;
 			if (depth == w.drawCall.depthStart || depth == w.drawCall.depthEnd)
 				mRebuild = true;
 
@@ -1172,142 +1406,6 @@ public class UIPanel : UIRect
 			trans = trans.parent;
 		}
 		return createIfMissing ? NGUITools.CreateUI(trans, false, layer) : null;
-	}
-
-	/// <summary>
-	/// Fill the geometry fully, processing all widgets and re-creating all draw calls.
-	/// </summary>
-
-	static public void Fill ()
-	{
-		UIDrawCall.ClearAll();
-
-		int index = 0;
-		UIPanel pan = null;
-		Material mat = null;
-		Texture tex = null;
-		Shader sdr = null;
-		UIDrawCall dc = null;
-
-		for (int i = 0; i < UIWidget.list.size; )
-		{
-			UIWidget w = UIWidget.list[i];
-
-			if (w == null)
-			{
-				UIWidget.list.RemoveAt(i);
-				continue;
-			}
-
-			if (w.isVisible && w.hasVertices)
-			{
-				UIPanel pn = w.panel;
-				Material mt = w.material;
-				Texture tx = w.mainTexture;
-				Shader sd = w.shader;
-
-				if (pan != pn || mat != mt || tex != tx || sdr != sd)
-				{
-					if (pan != null && mVerts.size != 0)
-					{
-						pan.SubmitDrawCall(dc);
-						dc = null;
-					}
-
-					pan = pn;
-					mat = mt;
-					tex = tx;
-					sdr = sd;
-				}
-
-				if (pan != null && (mat != null || sdr != null || tex != null))
-				{
-					if (dc == null)
-					{
-						dc = UIDrawCall.Create(index++, pan, mat, tex, sdr);
-						dc.depthStart = w.raycastDepth;
-						dc.depthEnd = dc.depthStart;
-						dc.panel = pan;
-					}
-					else
-					{
-						int rd = w.raycastDepth;
-						if (rd < dc.depthStart) dc.depthStart = rd;
-						if (rd > dc.depthEnd) dc.depthEnd = rd;
-					}
-
-					w.drawCall = dc;
-
-					if (pan.generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
-					else w.WriteToBuffers(mVerts, mUvs, mCols, null, null);
-				}
-			}
-			else w.drawCall = null;
-			++i;
-		}
-		if (mVerts.size != 0) pan.SubmitDrawCall(dc);
-	}
-
-	/// <summary>
-	/// Submit the draw call using the current geometry.
-	/// </summary>
-
-	void SubmitDrawCall (UIDrawCall dc)
-	{
-		dc.clipping = clipping;
-		dc.alwaysOnScreen = alwaysOnScreen && (clipping == UIDrawCall.Clipping.None || clipping == UIDrawCall.Clipping.ConstrainButDontClip);
-		dc.Set(mVerts, generateNormals ? mNorms : null, generateNormals ? mTans : null, mUvs, mCols);
-		mVerts.Clear();
-		mNorms.Clear();
-		mTans.Clear();
-		mUvs.Clear();
-		mCols.Clear();
-	}
-
-	/// <summary>
-	/// Fill the geometry for the specified draw call.
-	/// </summary>
-
-	static bool Fill (UIDrawCall dc)
-	{
-		if (dc != null)
-		{
-			dc.isDirty = false;
-
-			for (int i = 0; i < UIWidget.list.size; )
-			{
-				UIWidget w = UIWidget.list[i];
-
-				if (w == null)
-				{
-					UIWidget.list.RemoveAt(i);
-					continue;
-				}
-
-				if (w.drawCall == dc)
-				{
-					if (w.isVisible && w.hasVertices)
-					{
-						if (dc.manager.generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
-						else w.WriteToBuffers(mVerts, mUvs, mCols, null, null);
-					}
-					else w.drawCall = null;
-				}
-				++i;
-			}
-
-			if (mVerts.size != 0)
-			{
-				dc.Set(mVerts, dc.manager.generateNormals ? mNorms : null, dc.manager.generateNormals ? mTans : null, mUvs, mCols);
-				mVerts.Clear();
-				mNorms.Clear();
-				mTans.Clear();
-				mUvs.Clear();
-				mCols.Clear();
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/// <summary>

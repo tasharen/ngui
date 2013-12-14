@@ -112,9 +112,6 @@ public class UISprite : UIWidget
 					spriteName = sprite;
 					MarkAsChanged();
 				}
-
-				// Make sure the panel knows that the draw calls may have changed
-				UIPanel.RebuildAllDrawCalls(false);
 			}
 		}
 	}

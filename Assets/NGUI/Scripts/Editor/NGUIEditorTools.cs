@@ -1416,7 +1416,7 @@ public class NGUIEditorTools
 				list.Add(w);
 		}
 
-		list.Sort(UIWidget.CompareFunc);
+		list.Sort(UIWidget.FullCompareFunc);
 		return list;
 	}
 
