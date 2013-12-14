@@ -242,16 +242,22 @@ public abstract class UIRect : MonoBehaviour
 
 	public abstract Vector3[] worldCorners { get; }
 
+	int mLastInvalidate = 0;
+
 	/// <summary>
 	/// Sets the local 'changed' flag, indicating that some parent value(s) are now be different, such as alpha for example.
 	/// </summary>
 
 	public void Invalidate (bool includeChildren)
 	{
-		mChanged = true;
-		if (includeChildren)
-			for (int i = 0; i < mChildren.size; ++i)
-				mChildren.buffer[i].Invalidate(true);
+		if (mLastInvalidate != Time.frameCount)
+		{
+			mLastInvalidate = Time.frameCount;
+			mChanged = true;
+			if (includeChildren)
+				for (int i = 0; i < mChildren.size; ++i)
+					mChildren.buffer[i].Invalidate(true);
+		}
 	}
 
 	// Temporary variable to avoid GC allocation
