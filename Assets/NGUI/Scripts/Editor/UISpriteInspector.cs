@@ -80,7 +80,7 @@ public class UISpriteInspector : UIWidgetInspector
 
 		EditorGUI.BeginDisabledGroup(sp.hasMultipleDifferentValues);
 		{
-			if ((UISprite.Type)sp.intValue == UISprite.Type.Sliced)
+            if ((UISprite.Type)sp.intValue == UISprite.Type.Sliced)
 			{
 				NGUIEditorTools.DrawProperty("Fill Center", serializedObject, "mFillCenter", GUILayout.MinWidth(20f));
 			}
@@ -94,6 +94,24 @@ public class UISpriteInspector : UIWidgetInspector
 				GUILayout.EndHorizontal();
 				NGUIEditorTools.DrawProperty("Invert Fill", serializedObject, "mInvert", GUILayout.MinWidth(20f));
 			}
+            else if ((UISprite.Type)sp.intValue == UISprite.Type.Advanced)
+		    {
+                GUILayout.BeginVertical();
+                //NGUIEditorTools.DrawProperty("Fill Center", serializedObject, "mFillCenter");
+                GUILayout.Space(10f);
+		        NGUIEditorTools.DrawProperty("Center", serializedObject, "mCenterType");
+		        
+		        NGUIEditorTools.DrawProperty("LeftEdge", serializedObject, "mLeftEdgeType");
+		        NGUIEditorTools.DrawProperty("RightEdge", serializedObject, "mRightEdgeType");
+		        NGUIEditorTools.DrawProperty("BottomEdge", serializedObject, "mBottomEdgeType");
+                NGUIEditorTools.DrawProperty("TopEdge", serializedObject, "mTopEdgeType");
+//                NGUIEditorTools.DrawProperty("Tile Center", serializedObject, "mTileCenter");
+//                NGUIEditorTools.DrawProperty("Tile Edges", serializedObject, "mTileEdges");
+                GUILayout.EndVertical();
+		        
+		        
+		        
+		    }
 		}
 		EditorGUI.EndDisabledGroup();
 
