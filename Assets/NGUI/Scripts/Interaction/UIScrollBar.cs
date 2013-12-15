@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/Interaction/NGUI Scroll Bar")]
-public class UIScrollBar : UIProgressBar
+public class UIScrollBar : UISlider
 {
 	enum Direction
 	{
@@ -27,13 +27,9 @@ public class UIScrollBar : UIProgressBar
 	// Deprecated functionality
 	[HideInInspector][SerializeField] float mScroll = 0f;
 	[HideInInspector][SerializeField] Direction mDir = Direction.Upgraded;
-	[HideInInspector][SerializeField] bool mInverted = false;
 
 	[System.Obsolete("Use 'value' instead")]
 	public float scrollValue { get { return this.value; } set { this.value = value; } }
-	
-	[System.Obsolete("Use 'fillDirection' instead")]
-	public bool inverted { get { return isInverted; } set { } }
 
 	/// <summary>
 	/// The size of the foreground bar in percent (0-1 range).
@@ -60,6 +56,7 @@ public class UIScrollBar : UIProgressBar
 					EventDelegate.Execute(onChange);
 					current = null;
 				}
+				if (!Application.isPlaying) ForceUpdate();
 			}
 		}
 	}
@@ -95,6 +92,8 @@ public class UIScrollBar : UIProgressBar
 
 	protected override void OnStart ()
 	{
+		base.OnStart();
+
 		if (mFG != null && mFG.collider != null && mFG.gameObject != gameObject)
 		{
 			UIEventListener fgl = UIEventListener.Get(mFG.gameObject);
@@ -108,24 +107,35 @@ public class UIScrollBar : UIProgressBar
 	/// Move the scroll bar to be centered on the specified position.
 	/// </summary>
 
-	protected override void CenterOnPos (Vector2 localPos)
+	protected override float LocalToValue (Vector2 localPos)
 	{
-		if (mFG == null) return;
+		if (mFG != null)
+		{
+			float halfSize = Mathf.Clamp01(mSize) * 0.5f;
+			float val0 = halfSize;
+			float val1 = 1f - halfSize;
+			Vector3[] corners = mFG.localCorners;
 
-		if (isHorizontal)
-		{
-			float range = (mStartingSize.x - mFG.width);
-			float min = mStartingPos.x - range * 0.5f;
-			float val = (localPos.x - min) / range;
-			value = Mathf.Clamp01((isInverted ? 1f - val : val));
+			if (isHorizontal)
+			{
+				val0 = Mathf.Lerp(corners[0].x, corners[2].x, val0);
+				val1 = Mathf.Lerp(corners[0].x, corners[2].x, val1);
+
+				return isInverted ?
+					(val1 - localPos.x) / (val1 - val0) :
+					(localPos.x - val0) / (val1 - val0);
+			}
+			else
+			{
+				val0 = Mathf.Lerp(corners[0].y, corners[1].y, val0);
+				val1 = Mathf.Lerp(corners[3].y, corners[2].y, val1);
+
+				return isInverted ?
+					(val1 - localPos.y) / (val1 - val0) :
+					(localPos.y - val0) / (val1 - val0);
+			}
 		}
-		else
-		{
-			float range = (mStartingSize.y - mFG.height);
-			float min = mStartingPos.y - range * 0.5f;
-			float val = (localPos.y - min) / range;
-			value = Mathf.Clamp01((isInverted ? 1f - val : val));
-		}
+		return base.LocalToValue(localPos);
 	}
 
 	/// <summary>
@@ -134,29 +144,37 @@ public class UIScrollBar : UIProgressBar
 
 	public override void ForceUpdate ()
 	{
-		mIsDirty = false;
-
 		if (mFG != null)
 		{
-			mSize = Mathf.Clamp01(mSize);
-			float val = isInverted ? 1f - value : value;
-			Vector3 pos = mStartingPos;
+			mIsDirty = false;
+
+			float halfSize = Mathf.Clamp01(mSize) * 0.5f;
+			float pos = Mathf.Lerp(halfSize, 1f - halfSize, value);
+			float val0 = pos - halfSize;
+			float val1 = pos + halfSize;
 
 			if (isHorizontal)
 			{
-				int size = Mathf.RoundToInt(mStartingSize.x * mSize);
-				mFG.width = ((size & 1) == 1) ? size + 1 : size;
-				float diff = (mStartingSize.x - mFG.width) * 0.5f;
-				pos.x = Mathf.Round(Mathf.Lerp(pos.x - diff, pos.x + diff, val));
+				mFG.drawRegion = isInverted ?
+					new Vector4(1f - val1, 0f, 1f - val0, 1f) :
+					new Vector4(val0, 0f, val1, 1f);
 			}
 			else
 			{
-				int size = Mathf.RoundToInt(mStartingSize.y * mSize);
-				mFG.height = ((size & 1) == 1) ? size + 1 : size;
-				float diff = (mStartingSize.y - mFG.height) * 0.5f;
-				pos.y = Mathf.Round(Mathf.Lerp(pos.y - diff, pos.y + diff, val));
+				mFG.drawRegion = isInverted ?
+					new Vector4(0f, 1f - val1, 1f, 1f - val0) :
+					new Vector4(0f, val0, 1f, val1);
 			}
-			mFG.cachedTransform.localPosition = pos;
+
+			if (thumb != null)
+			{
+				Vector4 dr = mFG.drawingDimensions;
+				Vector3 v = new Vector3(
+					Mathf.Lerp(dr.x, dr.z, 0.5f),
+					Mathf.Lerp(dr.y, dr.w, 0.5f));
+				SetThumbPosition(mFG.cachedTransform.TransformPoint(v));
+			}
 		}
+		else base.ForceUpdate();
 	}
 }

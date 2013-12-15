@@ -2,7 +2,7 @@ Shader "Unlit/Additive Colored"
 {
 	Properties
 	{
-		_MainTex ("Base (RGB), Alpha (A)", 2D) = "white" {}
+		_MainTex ("Base (RGB), Alpha (A)", 2D) = "black" {}
 	}
 	
 	SubShader

@@ -122,8 +122,9 @@ public class UIAtlas : MonoBehaviour
 	{
 		get
 		{
+			if (mReplacement != null) return mReplacement.spriteList;
 			if (mSprites.Count == 0) Upgrade();
-			return (mReplacement != null) ? mReplacement.spriteList : mSprites;
+			return mSprites;
 		}
 		set
 		{
@@ -265,7 +266,7 @@ public class UIAtlas : MonoBehaviour
 
 	public BetterList<string> GetListOfSprites (string match)
 	{
-		if (mReplacement != null) return mReplacement.GetListOfSprites(match);
+		if (mReplacement) return mReplacement.GetListOfSprites(match);
 		if (string.IsNullOrEmpty(match)) return GetListOfSprites();
 
 		if (mSprites.Count == 0) Upgrade();
@@ -397,7 +398,9 @@ public class UIAtlas : MonoBehaviour
 
 	bool Upgrade ()
 	{
-		if (mSprites.Count == 0 && sprites.Count > 0)
+		if (mReplacement) return mReplacement.Upgrade();
+
+		if (mSprites.Count == 0 && sprites.Count > 0 && material)
 		{
 			Texture tex = material.mainTexture;
 			int width = (tex != null) ? tex.width : 512;

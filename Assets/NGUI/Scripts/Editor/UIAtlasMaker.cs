@@ -13,6 +13,8 @@ using System.Collections.Generic;
 
 public class UIAtlasMaker : EditorWindow
 {
+	static public UIAtlasMaker instance;
+
 	public class SpriteEntry : UISpriteData
 	{
 		// Sprite texture -- original texture or a temporary texture
@@ -25,6 +27,9 @@ public class UIAtlasMaker : EditorWindow
 	Vector2 mScroll = Vector2.zero;
 	List<string> mDelNames = new List<string>();
 	UIAtlas mLastAtlas;
+
+	void OnEnable () { instance = this; }
+	void OnDisable () { instance = null; }
 
 	/// <summary>
 	/// Atlas selection callback.
@@ -117,18 +122,8 @@ public class UIAtlasMaker : EditorWindow
 #endif
 
 #if UNITY_ANDROID || UNITY_IPHONE
-#if !UNITY_3_5 && !UNITY_4_0
-		if (PlayerSettings.targetGlesGraphics == TargetGlesGraphics.OpenGLES_1_x)
-		{
-			maxSize = Mathf.Min(maxSize, 1024);
-		}
-		else
+		maxSize = Mathf.Min(maxSize, NGUISettings.allow4096 ? 4096 : 2048);
 #endif
-		{
-			maxSize = Mathf.Min(maxSize, NGUISettings.allow4096 ? 4096 : 2048);
-		}
-#endif
-
 		if (NGUISettings.unityPacking)
 		{
 			for (int i = 0; i < sprites.Count; ++i) textures[i] = sprites[i].tex;
@@ -383,23 +378,99 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
+	/// Extract the specified sprite from the atlas.
+	/// </summary>
+
+	static public SpriteEntry ExtractSprite (UIAtlas atlas, string spriteName)
+	{
+		if (atlas.texture == null) return null;
+		UISpriteData sd = atlas.GetSprite(spriteName);
+		if (sd == null) return null;
+
+		Texture2D tex = NGUIEditorTools.ImportTexture(atlas.texture, true, false, !atlas.premultipliedAlpha);
+		SpriteEntry se = ExtractSprite(sd, tex);
+		NGUIEditorTools.ImportTexture(atlas.texture, false, false, !atlas.premultipliedAlpha);
+		return se;
+	}
+
+	/// <summary>
+	/// Extract the specified sprite from the atlas texture.
+	/// </summary>
+
+	static SpriteEntry ExtractSprite (UISpriteData es, Texture2D tex)
+	{
+		return (tex != null) ? ExtractSprite(es, tex.GetPixels32(), tex.width, tex.height) : null;
+	}
+
+	/// <summary>
+	/// Extract the specified sprite from the atlas texture.
+	/// </summary>
+
+	static SpriteEntry ExtractSprite (UISpriteData es, Color32[] oldPixels, int oldWidth, int oldHeight)
+	{
+		int xmin = Mathf.Clamp(es.x, 0, oldWidth);
+		int ymin = Mathf.Clamp(es.y, 0, oldHeight);
+		int xmax = Mathf.Min(xmin + es.width, oldWidth - 1);
+		int ymax = Mathf.Min(ymin + es.height, oldHeight - 1);
+		int newWidth = Mathf.Clamp(es.width, 0, oldWidth);
+		int newHeight = Mathf.Clamp(es.height, 0, oldHeight);
+
+		if (newWidth == 0 || newHeight == 0) return null;
+
+		Color32[] newPixels = new Color32[newWidth * newHeight];
+
+		for (int y = 0; y < newHeight; ++y)
+		{
+			int cy = ymin + y;
+			if (cy > ymax) cy = ymax;
+
+			for (int x = 0; x < newWidth; ++x)
+			{
+				int cx = xmin + x;
+				if (cx > xmax) cx = xmax;
+
+				int newIndex = (newHeight - 1 - y) * newWidth + x;
+				int oldIndex = (oldHeight - 1 - cy) * oldWidth + cx;
+
+				newPixels[newIndex] = oldPixels[oldIndex];
+			}
+		}
+
+		// Create a new sprite
+		SpriteEntry sprite = new SpriteEntry();
+		sprite.CopyFrom(es);
+		sprite.SetRect(0, 0, newWidth, newHeight);
+		sprite.temporaryTexture = true;
+		sprite.tex = new Texture2D(newWidth, newHeight);
+		sprite.tex.SetPixels32(newPixels);
+		sprite.tex.Apply();
+		return sprite;
+	}
+
+	/// <summary>
 	/// Extract sprites from the atlas, adding them to the list.
 	/// </summary>
 
 	static public void ExtractSprites (UIAtlas atlas, List<SpriteEntry> finalSprites)
 	{
+		ShowProgress(0f);
+
 		// Make the atlas texture readable
-		Texture2D atlasTex = NGUIEditorTools.ImportTexture(atlas.texture, true, false, !atlas.premultipliedAlpha);
+		Texture2D tex = NGUIEditorTools.ImportTexture(atlas.texture, true, false, !atlas.premultipliedAlpha);
 
-		if (atlasTex != null)
+		if (tex != null)
 		{
-			Color32[] oldPixels = null;
-			int oldWidth = atlasTex.width;
-			int oldHeight = atlasTex.height;
-			List<UISpriteData> existingSprites = atlas.spriteList;
+			Color32[] pixels = null;
+			int width = tex.width;
+			int height = tex.height;
+			List<UISpriteData> sprites = atlas.spriteList;
+			float count = sprites.Count;
+			int index = 0;
 
-			foreach (UISpriteData es in existingSprites)
+			foreach (UISpriteData es in sprites)
 			{
+				ShowProgress((index++) / count);
+
 				bool found = false;
 
 				foreach (SpriteEntry fs in finalSprites)
@@ -414,52 +485,16 @@ public class UIAtlasMaker : EditorWindow
 
 				if (!found)
 				{
-					// Read the atlas
-					if (oldPixels == null) oldPixels = atlasTex.GetPixels32();
-
-					int xmin = Mathf.Clamp(es.x, 0, oldWidth);
-					int ymin = Mathf.Clamp(es.y, 0, oldHeight);
-					int xmax = Mathf.Min(xmin + es.width, oldWidth - 1);
-					int ymax = Mathf.Min(ymin + es.height, oldHeight - 1);
-					int newWidth = Mathf.Clamp(es.width, 0, oldWidth);
-					int newHeight = Mathf.Clamp(es.height, 0, oldHeight);
-
-					if (newWidth == 0 || newHeight == 0) continue;
-
-					Color32[] newPixels = new Color32[newWidth * newHeight];
-
-					for (int y = 0; y < newHeight; ++y)
-					{
-						int cy = ymin + y;
-						if (cy > ymax) cy = ymax;
-
-						for (int x = 0; x < newWidth; ++x)
-						{
-							int cx = xmin + x;
-							if (cx > xmax) cx = xmax;
-
-							int newIndex = (newHeight - 1 - y) * newWidth + x;
-							int oldIndex = (oldHeight - 1 - cy) * oldWidth + cx;
-
-							newPixels[newIndex] = oldPixels[oldIndex];
-						}
-					}
-
-					// Create a new sprite
-					SpriteEntry sprite = new SpriteEntry();
-					sprite.CopyFrom(es);
-					sprite.SetRect(0, 0, newWidth, newHeight);
-					sprite.temporaryTexture = true;
-					sprite.tex = new Texture2D(newWidth, newHeight);
-					sprite.tex.SetPixels32(newPixels);
-					sprite.tex.Apply();
-					finalSprites.Add(sprite);
+					if (pixels == null) pixels = tex.GetPixels32();
+					SpriteEntry sprite = ExtractSprite(es, pixels, width, height);
+					if (sprite != null) finalSprites.Add(sprite);
 				}
 			}
 		}
 
 		// The atlas no longer needs to be readable
 		NGUIEditorTools.ImportTexture(atlas.texture, false, false, !atlas.premultipliedAlpha);
+		ShowProgress(1f);
 	}
 
 	/// <summary>
@@ -539,6 +574,15 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
+	/// Show a progress bar.
+	/// </summary>
+
+	static public void ShowProgress (float val)
+	{
+		EditorUtility.DisplayProgressBar("Updating", "Updating the atlas, please wait...", val);
+	}
+
+	/// <summary>
 	/// Add the specified texture to the atlas, or update an existing one.
 	/// </summary>
 
@@ -601,6 +645,7 @@ public class UIAtlasMaker : EditorWindow
 
 			// Release the temporary textures
 			ReleaseSprites(sprites);
+			EditorUtility.ClearProgressBar();
 			return;
 		}
 		else
@@ -613,6 +658,7 @@ public class UIAtlasMaker : EditorWindow
 
 		atlas.MarkAsChanged();
 		Selection.activeGameObject = (NGUISettings.atlas != null) ? NGUISettings.atlas.gameObject : null;
+		EditorUtility.ClearProgressBar();
 	}
 
 	/// <summary>
@@ -773,10 +819,39 @@ public class UIAtlasMaker : EditorWindow
 		GUILayout.Label("Remove empty space");
 		GUILayout.EndHorizontal();
 
-		GUILayout.BeginHorizontal();
-		NGUISettings.atlasPMA = EditorGUILayout.Toggle("PMA Shader", NGUISettings.atlasPMA, GUILayout.Width(100f));
-		GUILayout.Label("Pre-multiply color by alpha");
-		GUILayout.EndHorizontal();
+		bool fixedShader = false;
+
+		if (go != null && NGUISettings.atlas != null)
+		{
+			Material mat = NGUISettings.atlas.spriteMaterial;
+
+			if (mat != null)
+			{
+				Shader shader = mat.shader;
+
+				if (shader != null)
+				{
+					if (shader.name == "Unlit/Transparent Colored")
+					{
+						NGUISettings.atlasPMA = false;
+						fixedShader = true;
+					}
+					else if (shader.name == "Unlit/Premultiplied Colored")
+					{
+						NGUISettings.atlasPMA = true;
+						fixedShader = true;
+					}
+				}
+			}
+		}
+
+		if (!fixedShader)
+		{
+			GUILayout.BeginHorizontal();
+			NGUISettings.atlasPMA = EditorGUILayout.Toggle("PMA Shader", NGUISettings.atlasPMA, GUILayout.Width(100f));
+			GUILayout.Label("Pre-multiply color by alpha");
+			GUILayout.EndHorizontal();
+		}
 
 		GUILayout.BeginHorizontal();
 		NGUISettings.unityPacking = EditorGUILayout.Toggle("Unity Packer", NGUISettings.unityPacking, GUILayout.Width(100f));
@@ -807,6 +882,10 @@ public class UIAtlasMaker : EditorWindow
 			}
 			else
 			{
+				if (GUILayout.Button("View Sprites"))
+				{
+					SpriteSelector.ShowSelected();
+				}
 				EditorGUILayout.HelpBox("You can reveal more options by selecting one or more textures in the Project View window.", MessageType.Info);
 			}
 		}
@@ -901,21 +980,19 @@ public class UIAtlasMaker : EditorWindow
 					}
 					UpdateAtlas(NGUISettings.atlas, sprites);
 					mDelNames.Clear();
+					NGUIEditorTools.RepaintSprites();
 				}
 				else if (update) UpdateAtlas(textures, true);
 				else if (replace) UpdateAtlas(textures, false);
 
 				if (NGUISettings.atlas != null && !string.IsNullOrEmpty(selection))
 				{
-					NGUISettings.selectedSprite = selection;
-					Selection.activeGameObject = NGUISettings.atlas.gameObject;
-
-					if (UIAtlasInspector.instance != null)
-						UIAtlasInspector.instance.Repaint();
+					NGUIEditorTools.SelectSprite(selection);
 				}
 				else if (update || replace)
 				{
 					NGUIEditorTools.UpgradeTexturesToSprites(NGUISettings.atlas);
+					NGUIEditorTools.RepaintSprites();
 				}
 			}
 		}

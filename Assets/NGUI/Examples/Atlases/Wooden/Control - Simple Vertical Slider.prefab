@@ -9,7 +9,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 400000}
   - 114: {fileID: 11400006}
-  - 114: {fileID: 11400004}
   m_Layer: 8
   m_Name: Foreground
   m_TagString: Untagged
@@ -26,7 +25,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 400002}
   - 114: {fileID: 11400010}
-  - 114: {fileID: 11400002}
   - 65: {fileID: 6500000}
   - 114: {fileID: 11400000}
   m_Layer: 8
@@ -73,7 +71,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100002}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0, y: 77, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 400004}
@@ -84,7 +82,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100004}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 279, y: 7, z: 0}
+  m_LocalPosition: {x: -129, y: -21, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 400000}
@@ -130,42 +128,6 @@ MonoBehaviour:
   duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
   onClick: []
---- !u!114 &11400002
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100002}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94b5bd8d2e1bcbe4580036799fb6ca41, type: 1}
-  m_Name: 
-  uiCamera: {fileID: 0}
-  container: {fileID: 100004}
-  style: 1
-  runOnlyOnce: 1
-  relativeSize: {x: 1, y: 1}
-  initialSize: {x: 1, y: 1}
-  borderPadding: {x: -8, y: 0}
-  widgetContainer: {fileID: 0}
---- !u!114 &11400004
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94b5bd8d2e1bcbe4580036799fb6ca41, type: 1}
-  m_Name: 
-  uiCamera: {fileID: 0}
-  container: {fileID: 100004}
-  style: 3
-  runOnlyOnce: 1
-  relativeSize: {x: 1, y: 1}
-  initialSize: {x: 1, y: 1}
-  borderPadding: {x: 10, y: 10}
-  widgetContainer: {fileID: 0}
 --- !u!114 &11400006
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -176,12 +138,29 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 858a20c1b21a3f94bb5b2d3b901c9aaf, type: 1}
   m_Name: 
+  leftAnchor:
+    target: {fileID: 400004}
+    relative: 0
+    absolute: 5
+  rightAnchor:
+    target: {fileID: 400004}
+    relative: 1
+    absolute: -5
+  bottomAnchor:
+    target: {fileID: 400004}
+    relative: 0
+    absolute: 5
+  topAnchor:
+    target: {fileID: 400004}
+    relative: 1
+    absolute: -5
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
   mWidth: 20
   mHeight: 290
   mDepth: 3
   autoResizeBoxCollider: 0
+  hideIfOffScreen: 0
 --- !u!114 &11400008
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -208,12 +187,29 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 1}
   m_Name: 
+  leftAnchor:
+    target: {fileID: 400004}
+    relative: 0
+    absolute: -4
+  rightAnchor:
+    target: {fileID: 400004}
+    relative: 1
+    absolute: 4
+  bottomAnchor:
+    target: {fileID: 0}
+    relative: 0
+    absolute: 217
+  topAnchor:
+    target: {fileID: 0}
+    relative: 1
+    absolute: -63
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
   mWidth: 38
   mHeight: 20
   mDepth: 2
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Button
   mFillCenter: 1
@@ -231,12 +227,29 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b3dc54f924693f41b5cbecb267e647a, type: 1}
   m_Name: 
+  leftAnchor:
+    target: {fileID: 0}
+    relative: 0
+    absolute: 0
+  rightAnchor:
+    target: {fileID: 0}
+    relative: 1
+    absolute: 0
+  bottomAnchor:
+    target: {fileID: 0}
+    relative: 0
+    absolute: 0
+  topAnchor:
+    target: {fileID: 0}
+    relative: 1
+    absolute: 0
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
   mWidth: 30
   mHeight: 300
   mDepth: 0
   autoResizeBoxCollider: 1
+  hideIfOffScreen: 0
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mSpriteName: Highlight - Shadowed
   mFillCenter: 1
@@ -254,13 +267,13 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c20815eb3063c24290a61b7020a1836, type: 1}
   m_Name: 
+  thumb: {fileID: 400002}
   mBG: {fileID: 11400012}
   mFG: {fileID: 11400006}
-  mValue: 1
+  mValue: .765999973
   mFill: 2
   numberOfSteps: 0
   onChange: []
-  thumb: {fileID: 400002}
   foreground: {fileID: 0}
   rawValue: 1
   direction: 2

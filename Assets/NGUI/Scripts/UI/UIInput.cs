@@ -170,7 +170,15 @@ public class UIInput : MonoBehaviour
 #endif
 			if (mDoInit) Init();
 #if MOBILE
-			if (isSelected && mKeyboard != null && mKeyboard.active) return mKeyboard.text;
+			if (isSelected && mKeyboard != null && mKeyboard.active)
+			{
+				string val = mKeyboard.text;
+#if !UNITY_3_5
+				if (Application.platform == RuntimePlatform.BB10Player)
+					val = val.Replace("\\b", "\b");
+#endif
+				return val;
+			}
 #else
 			if (isSelected && mEditor != null) return mEditor.content.text;
 #endif
@@ -332,7 +340,7 @@ public class UIInput : MonoBehaviour
 
 		if (mDoInit) Init();
 
-		if (label != null && NGUITools.IsActive(this))
+		if (label != null && NGUITools.GetActive(this))
 		{
 			label.color = activeTextColor;
 #if MOBILE
@@ -348,7 +356,7 @@ public class UIInput : MonoBehaviour
 			{
 				mKeyboard = (inputType == InputType.Password) ?
 					TouchScreenKeyboard.Open(mValue, TouchScreenKeyboardType.Default, false, false, true) :
-					TouchScreenKeyboard.Open(mValue, (TouchScreenKeyboardType)((int)keyboardType), inputType == InputType.AutoCorrect);
+					TouchScreenKeyboard.Open(mValue, (TouchScreenKeyboardType)((int)keyboardType), inputType == InputType.AutoCorrect, label.multiLine);
 			}
 			else
 #endif
@@ -378,7 +386,7 @@ public class UIInput : MonoBehaviour
 	{
 		if (mDoInit) Init();
 
-		if (label != null && NGUITools.IsActive(this))
+		if (label != null && NGUITools.GetActive(this))
 		{
 			mValue = value;
 #if MOBILE
@@ -412,10 +420,14 @@ public class UIInput : MonoBehaviour
 #if MOBILE
 	void Update()
 	{
-		if (mKeyboard != null && isSelected && NGUITools.IsActive(this))
+		if (mKeyboard != null && isSelected && NGUITools.GetActive(this))
 		{
 			string val = mKeyboard.text;
-
+#if !UNITY_3_5
+			// BB10's implementation has a bug in Unity
+			if (Application.platform == RuntimePlatform.BB10Player)
+				val = val.Replace("\\b", "\b");
+#endif
 			if (mValue != val)
 			{
 				mValue = "";
@@ -454,7 +466,7 @@ public class UIInput : MonoBehaviour
 #if UNITY_EDITOR
 		if (!Application.isPlaying) return;
 #endif
-		if (isSelected && NGUITools.IsActive(this))
+		if (isSelected && NGUITools.GetActive(this))
 		{
 			if (mDoInit) Init();
 
@@ -626,7 +638,7 @@ public class UIInput : MonoBehaviour
 
 	protected void Submit ()
 	{
-		if (NGUITools.IsActive(this))
+		if (NGUITools.GetActive(this))
 		{
 			current = this;
 			mValue = value;

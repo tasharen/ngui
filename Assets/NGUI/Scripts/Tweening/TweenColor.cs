@@ -15,19 +15,32 @@ public class TweenColor : UITweener
 	public Color from = Color.white;
 	public Color to = Color.white;
 
-	Transform mTrans;
+	bool mCached = false;
 	UIWidget mWidget;
 	Material mMat;
 	Light mLight;
 
+	void Cache ()
+	{
+		mCached = true;
+		mWidget = GetComponentInChildren<UIWidget>();
+		Renderer ren = renderer;
+		if (ren != null) mMat = ren.material;
+		mLight = light;
+	}
+
+	[System.Obsolete("Use 'value' instead")]
+	public Color color { get { return this.value; } set { this.value = value; } }
+
 	/// <summary>
-	/// Current color.
+	/// Tween's current value.
 	/// </summary>
 
-	public Color color
+	public Color value
 	{
 		get
 		{
+			if (!mCached) Cache();
 			if (mWidget != null) return mWidget.color;
 			if (mLight != null) return mLight.color;
 			if (mMat != null) return mMat.color;
@@ -35,6 +48,7 @@ public class TweenColor : UITweener
 		}
 		set
 		{
+			if (!mCached) Cache();
 			if (mWidget != null) mWidget.color = value;
 			if (mMat != null) mMat.color = value;
 
@@ -47,22 +61,10 @@ public class TweenColor : UITweener
 	}
 
 	/// <summary>
-	/// Find all needed components.
+	/// Tween the value.
 	/// </summary>
 
-	void Awake ()
-	{
-		mWidget = GetComponentInChildren<UIWidget>();
-		Renderer ren = renderer;
-		if (ren != null) mMat = ren.material;
-		mLight = light;
-	}
-
-	/// <summary>
-	/// Interpolate and update the color.
-	/// </summary>
-
-	protected override void OnUpdate(float factor, bool isFinished) { color = Color.Lerp(from, to, factor); }
+	protected override void OnUpdate (float factor, bool isFinished) { value = Color.Lerp(from, to, factor); }
 
 	/// <summary>
 	/// Start the tweening operation.
@@ -74,7 +76,7 @@ public class TweenColor : UITweener
 		if (!Application.isPlaying) return null;
 #endif
 		TweenColor comp = UITweener.Begin<TweenColor>(go, duration);
-		comp.from = comp.color;
+		comp.from = comp.value;
 		comp.to = color;
 
 		if (duration <= 0f)
@@ -84,4 +86,16 @@ public class TweenColor : UITweener
 		}
 		return comp;
 	}
+
+	[ContextMenu("Set 'From' to current value")]
+	public override void SetStartToCurrentValue () { from = value; }
+
+	[ContextMenu("Set 'To' to current value")]
+	public override void SetEndToCurrentValue () { to = value; }
+
+	[ContextMenu("Assume value of 'From'")]
+	void SetCurrentValueToStart () { value = from; }
+
+	[ContextMenu("Assume value of 'To'")]
+	void SetCurrentValueToEnd () { value = to; }
 }

@@ -183,7 +183,7 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Create/", false, 6)]
 	static void AddBreaker123 () {}
 
-	[MenuItem("NGUI/Create/Anchor", false, 6)]
+	[MenuItem("NGUI/Create/Anchor (Legacy)", false, 6)]
 	static void AddAnchor2 () { Add<UIAnchor>(); }
 
 	[MenuItem("NGUI/Create/Panel", false, 6)]
@@ -199,6 +199,7 @@ static public class NGUIMenu
 		UIPanel panel = NGUISettings.AddPanel(SelectedRoot());
 		if (panel == null) panel = NGUIEditorTools.SelectedRoot(true).GetComponent<UIPanel>();
 		panel.clipping = UIDrawCall.Clipping.SoftClip;
+		panel.name = "Scroll View";
 		Selection.activeGameObject = panel.gameObject;
 	}
 
@@ -267,20 +268,20 @@ static public class NGUIMenu
 		}
 	}
 
-	[MenuItem("NGUI/Attach/Anchor", false, 7)]
-	static public void Add1 () { AddIfMissing<UIAnchor>(); }
+	//[MenuItem("NGUI/Attach/Anchor", false, 7)]
+	//static public void Add1 () { AddIfMissing<UIAnchor>(); }
 
-	[MenuItem("NGUI/Attach/Anchor", true)]
-	static public bool Add1a () { return !Exists<UIAnchor>(); }
+	//[MenuItem("NGUI/Attach/Anchor", true)]
+	//static public bool Add1a () { return !Exists<UIAnchor>(); }
 
-	[MenuItem("NGUI/Attach/Stretch", false, 7)]
-	static public void Add2 () { AddIfMissing<UIStretch>(); }
+	//[MenuItem("NGUI/Attach/Stretch (Legacy)", false, 7)]
+	//static public void Add2 () { AddIfMissing<UIStretch>(); }
 
-	[MenuItem("NGUI/Attach/Stretch", true)]
-	static public bool Add2a () { return !Exists<UIStretch>(); }
+	//[MenuItem("NGUI/Attach/Stretch (Legacy)", true)]
+	//static public bool Add2a () { return !Exists<UIStretch>(); }
 
-	[MenuItem("NGUI/Attach/", false, 7)]
-	static public void Add3s () {}
+	//[MenuItem("NGUI/Attach/", false, 7)]
+	//static public void Add3s () {}
 
 	[MenuItem("NGUI/Attach/Button Script", false, 7)]
 	static public void Add3 () { AddIfMissing<UIButton>(); }
@@ -408,6 +409,12 @@ static public class NGUIMenu
 		EditorWindow.GetWindow<UIPanelTool>(false, "Panel Tool", true);
 	}
 
+	[MenuItem("NGUI/Open/Draw Call Tool", false, 9)]
+	static public void OpenDCTool ()
+	{
+		EditorWindow.GetWindow<UIDrawCallViewer>(false, "Draw Call Tool", true);
+	}
+
 	[MenuItem("NGUI/Open/Camera Tool", false, 9)]
 	static public void OpenCameraWizard ()
 	{
@@ -470,6 +477,18 @@ static public class NGUIMenu
 
 	[MenuItem("NGUI/Options/Snapping/Turn Off", true, 10)]
 	static public bool TurnSnapOffCheck () { return NGUISnap.allow; }
+
+	[MenuItem("NGUI/Options/Guides/Always On", false, 10)]
+	static public void TurnGuidesOn () { NGUISettings.drawGuides = true; }
+
+	[MenuItem("NGUI/Options/Guides/Always On", true, 10)]
+	static public bool TurnGuidesOnCheck () { return !NGUISettings.drawGuides; }
+
+	[MenuItem("NGUI/Options/Guides/Only When Needed", false, 10)]
+	static public void TurnGuidesOff () { NGUISettings.drawGuides = false; }
+
+	[MenuItem("NGUI/Options/Guides/Only When Needed", true, 10)]
+	static public bool TurnGuidesOffCheck () { return NGUISettings.drawGuides; }
 
 #endregion
 

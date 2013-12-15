@@ -335,6 +335,12 @@ public class NGUISettings
 		get { return GetBool("NGUI DCs", true); }
 		set { SetBool("NGUI DCs", value); }
 	}
+
+	static public bool drawGuides
+	{
+		get { return GetBool("NGUI Guides", false); }
+		set { SetBool("NGUI Guides", value); }
+	}
 #endregion
 
 	/// <summary>
@@ -442,33 +448,64 @@ public class NGUISettings
 	}
 
 	/// <summary>
-	/// Copy the specified widget's style.
+	/// Copy the specified widget's parameters.
 	/// </summary>
 
-	static public void CopyStyle (UIWidget widget)
+	static public void CopyWidget (UIWidget widget)
 	{
+		SetInt("Width", widget.width);
+		SetInt("Height", widget.height);
+		SetInt("Depth", widget.depth);
 		SetColor("Widget Color", widget.color);
 		SetEnum("Widget Pivot", widget.pivot);
-		if (widget is UILabel) CopyLabelStyle(widget as UILabel);
+
+		if (widget is UIWidget) CopySprite(widget as UISprite);
+		else if (widget is UILabel) CopyLabel(widget as UILabel);
 	}
 
 	/// <summary>
 	/// Paste the specified widget's style.
 	/// </summary>
 
-	static public void PasteStyle (UIWidget widget)
+	static public void PasteWidget (UIWidget widget, bool fully)
 	{
 		widget.color = GetColor("Widget Color", widget.color);
 		widget.pivot = GetEnum<UIWidget.Pivot>("Widget Pivot", widget.pivot);
-		if (widget is UILabel) PasteLabelStyle(widget as UILabel);
+
+		if (fully)
+		{
+			widget.width = GetInt("Width", widget.width);
+			widget.height = GetInt("Height", widget.height);
+			widget.depth = GetInt("Depth", widget.depth);
+		}
+
+		if (widget is UISprite) PasteSprite(widget as UISprite, fully);
+		else if (widget is UILabel) PasteLabel(widget as UILabel, fully);
+	}
+
+	/// <summary>
+	/// Copy the specified sprite's style.
+	/// </summary>
+
+	static void CopySprite (UISprite sp)
+	{
+		SetString("Atlas", NGUIEditorTools.ObjectToGUID(sp.atlas));
+		SetString("Sprite", sp.spriteName);
+		SetEnum("Sprite Type", sp.type);
+		SetFloat("Fill", sp.fillAmount);
+		SetBool("FCenter", sp.fillCenter);
+		SetEnum("FDir", sp.fillDirection);
 	}
 
 	/// <summary>
 	/// Copy the specified label's style.
 	/// </summary>
 
-	static void CopyLabelStyle (UILabel lbl)
+	static void CopyLabel (UILabel lbl)
 	{
+		SetString("Font", NGUIEditorTools.ObjectToGUID(lbl.ambigiousFont));
+		SetInt("Font Size", lbl.fontSize);
+		SetEnum("Font Style", lbl.fontStyle);
 		SetEnum("Overflow", lbl.overflowMethod);
 		SetInt("SpacingX", lbl.spacingX);
 		SetInt("SpacingY", lbl.spacingY);
@@ -484,11 +521,44 @@ public class NGUISettings
 	}
 
 	/// <summary>
+	/// Paste the specified sprite's style.
+	/// </summary>
+
+	static void PasteSprite (UISprite sp, bool fully)
+	{
+		if (fully) sp.atlas = NGUIEditorTools.GUIDToObject<UIAtlas>(GetString("Atlas", null));
+		sp.spriteName = GetString("Sprite", sp.spriteName);
+		sp.type = GetEnum<UISprite.Type>("Sprite Type", sp.type);
+		sp.fillAmount = GetFloat("Fill", sp.fillAmount);
+		sp.fillCenter = GetBool("FCenter", sp.fillCenter);
+		sp.fillDirection = GetEnum<UISprite.FillDirection>("FDir", sp.fillDirection);
+	}
+
+	/// <summary>
 	/// Paste the specified label's style.
 	/// </summary>
 
-	static void PasteLabelStyle (UILabel lbl)
+	static void PasteLabel (UILabel lbl, bool fully)
 	{
+		if (fully)
+		{
+			Object obj = NGUIEditorTools.GUIDToObject(GetString("Font", null));
+
+			if (obj != null)
+			{
+				if (obj.GetType() == typeof(Font))
+				{
+					lbl.ambigiousFont = obj as Font;
+				}
+				else if (obj.GetType() == typeof(GameObject))
+				{
+					lbl.ambigiousFont = (obj as GameObject).GetComponent<UIFont>();
+				}
+			}
+			lbl.fontSize = GetInt("Font Size", lbl.fontSize);
+			lbl.fontStyle = GetEnum<FontStyle>("Font Style", lbl.fontStyle);
+		}
+
 		lbl.overflowMethod = GetEnum<UILabel.Overflow>("Overflow", lbl.overflowMethod);
 		lbl.spacingX = GetInt("SpacingX", lbl.spacingX);
 		lbl.spacingY = GetInt("SpacingY", lbl.spacingY);

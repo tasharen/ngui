@@ -25,7 +25,7 @@ public class UI2DSpriteEditor : UIWidgetInspector
 		mSprite = target as UI2DSprite;
 	}
 
-	protected override bool DrawProperties ()
+	protected override bool ShouldDrawProperties ()
 	{
 		SerializedProperty sp = NGUIEditorTools.DrawProperty("2D Sprite", serializedObject, "mSprite");
 

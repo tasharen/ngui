@@ -11,6 +11,8 @@ public class UIButtonEditor : UIWidgetContainerEditor
 {
 	public override void OnInspectorGUI ()
 	{
+		serializedObject.Update();
+
 		NGUIEditorTools.SetLabelWidth(80f);
 		UIButton button = target as UIButton;
 
@@ -44,27 +46,33 @@ public class UIButtonEditor : UIWidgetContainerEditor
 			}
 		}
 
-		GUI.changed = false;
-		Color hover = EditorGUILayout.ColorField("Hover", button.hover);
-		Color pressed = EditorGUILayout.ColorField("Pressed", button.pressed);
-		Color disabled = EditorGUILayout.ColorField("Disabled", button.disabledColor);
+		NGUIEditorTools.DrawProperty("Hover", serializedObject, "hover");
+		NGUIEditorTools.DrawProperty("Pressed", serializedObject, "pressed");
+		NGUIEditorTools.DrawProperty("Disabled", serializedObject, "disabledColor");
+
+		SerializedProperty sp = serializedObject.FindProperty("dragHighlight");
+		Highlight ht = sp.boolValue ? Highlight.Press : Highlight.DoNothing;
+		GUILayout.BeginHorizontal();
+		bool highlight = (Highlight)EditorGUILayout.EnumPopup("Drag Over", ht) == Highlight.Press;
+		GUILayout.Space(18f);
+		GUILayout.EndHorizontal();
+		if (sp.boolValue != highlight) sp.boolValue = highlight;
 
 		GUILayout.BeginHorizontal();
-		float duration = EditorGUILayout.FloatField("Duration", button.duration, GUILayout.Width(120f));
+		NGUIEditorTools.DrawProperty("Transition", serializedObject, "duration", GUILayout.Width(120f));
 		GUILayout.Label("seconds");
 		GUILayout.EndHorizontal();
 
+		serializedObject.ApplyModifiedProperties();
+
 		GUILayout.Space(3f);
 
-		if (GUI.changed)
-		{
-			NGUIEditorTools.RegisterUndo("Button Change", button);
-			button.hover = hover;
-			button.pressed = pressed;
-			button.disabledColor = disabled;
-			button.duration = duration;
-			UnityEditor.EditorUtility.SetDirty(button);
-		}
 		NGUIEditorTools.DrawEvents("On Click", button, button.onClick);
+	}
+
+	enum Highlight
+	{
+		DoNothing,
+		Press,
 	}
 }

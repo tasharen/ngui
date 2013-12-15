@@ -39,7 +39,7 @@ public class UIButtonColor : UIWidgetContainer
 
 	protected Color mColor;
 	protected bool mStarted = false;
-	protected bool mHighlighted = false;
+	protected UIWidget mWidget;
 
 	/// <summary>
 	/// UIButtonColor's default (starting) color. It's useful to be able to change it, just in case.
@@ -69,8 +69,8 @@ public class UIButtonColor : UIWidgetContainer
 	{
 		if (!mStarted)
 		{
-			Init();
 			mStarted = true;
+			Init();
 		}
 	}
 
@@ -79,8 +79,7 @@ public class UIButtonColor : UIWidgetContainer
 #if UNITY_EDITOR
 		if (!Application.isPlaying) return;
 #endif
-		if (mStarted && mHighlighted)
-			OnHover(UICamera.IsHighlighted(gameObject));
+		if (mStarted) OnHover(UICamera.IsHighlighted(gameObject));
 	}
 
 	protected virtual void OnDisable ()
@@ -94,7 +93,7 @@ public class UIButtonColor : UIWidgetContainer
 
 			if (tc != null)
 			{
-				tc.color = mColor;
+				tc.value = mColor;
 				tc.enabled = false;
 			}
 		}
@@ -103,11 +102,11 @@ public class UIButtonColor : UIWidgetContainer
 	protected void Init ()
 	{
 		if (tweenTarget == null) tweenTarget = gameObject;
-		UIWidget widget = tweenTarget.GetComponent<UIWidget>();
+		mWidget = tweenTarget.GetComponent<UIWidget>();
 
-		if (widget != null)
+		if (mWidget != null)
 		{
-			mColor = widget.color;
+			mColor = mWidget.color;
 		}
 		else
 		{
@@ -127,30 +126,67 @@ public class UIButtonColor : UIWidgetContainer
 				}
 				else
 				{
-					Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " has nothing for UIButtonColor to color", this);
-					enabled = false;
+					tweenTarget = null;
+
+					if (Application.isPlaying)
+					{
+						Debug.LogWarning(NGUITools.GetHierarchy(gameObject) + " has nothing for UIButtonColor to color", this);
+						enabled = false;
+					}
 				}
 			}
 		}
 		OnEnable();
 	}
 
-	public virtual void OnPress (bool isPressed)
+	protected virtual void OnPress (bool isPressed)
 	{
 		if (enabled)
 		{
 			if (!mStarted) Start();
-			TweenColor.Begin(tweenTarget, duration, isPressed ? pressed : (UICamera.IsHighlighted(gameObject) ? hover : mColor));
+			
+			if (isPressed)
+			{
+				TweenColor.Begin(tweenTarget, duration, pressed);
+			}
+			else if (UICamera.currentTouch.current == gameObject && UICamera.currentScheme == UICamera.ControlScheme.Controller)
+			{
+				TweenColor.Begin(tweenTarget, duration, hover);
+			}
+			else TweenColor.Begin(tweenTarget, duration, mColor);
 		}
 	}
 
-	public virtual void OnHover (bool isOver)
+	protected virtual void OnHover (bool isOver)
 	{
 		if (enabled)
 		{
 			if (!mStarted) Start();
 			TweenColor.Begin(tweenTarget, duration, isOver ? hover : mColor);
-			mHighlighted = isOver;
 		}
+	}
+
+	protected virtual void OnDragOver ()
+	{
+		if (enabled)
+		{
+			if (!mStarted) Start();
+			TweenColor.Begin(tweenTarget, duration, pressed);
+		}
+	}
+
+	protected virtual void OnDragOut ()
+	{
+		if (enabled)
+		{
+			if (!mStarted) Start();
+			TweenColor.Begin(tweenTarget, duration, mColor);
+		}
+	}
+
+	protected virtual void OnSelect (bool isSelected)
+	{
+		if (enabled && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
+			OnHover(isSelected);
 	}
 }

@@ -1,12 +1,14 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-            Version 3.0.6 f1
+            Version 3.0.8
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
 
 Thank you for buying NGUI!
+
+Documentation can be found here: http://www.tasharen.com/forum/index.php?topic=6754.0
 
 If you have any questions, suggestions, comments or feature requests, please
 drop by the NGUI forum, found here: http://www.tasharen.com/forum/index.php?board=1.0
@@ -27,13 +29,90 @@ If you have a Standard Edition:
  Support, documentation, and tutorials
 ---------------------------------------
 
-All can be found here: http://www.tasharen.com/?page_id=197
+All can be found here: http://www.tasharen.com/forum/index.php?topic=6754.0
 
 Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.com/forum/index.php?topic=6
 
 -----------------
  Version History
 -----------------
+
+3.0.8
+- NEW: All panels now manager their own draw calls rather than working with one giant list.
+- NEW: Widgets no longer have a global list, and are always managed per-panel.
+- NEW: Enabling/disabling widgets no longer affects other panels.
+- NEW: Optimization pass. Significantly reduced time spent in UIPanel.LateUpdate.
+
+3.0.7 f3
+- NEW: Added an option for anchors to be offset by the panel's position.
+- NEW: Made it possible to anchor directly to a Camera, without having to use panels.
+- NEW: Made "Keep crisp" option always show up for dynamic fonts.
+- FIX: Anchoring to a 3D object at edit time will no longer move the widget's initial position.
+- FIX: Account for objects being behind the camera (and thus not visible) when anchoring to 3D game objects.
+- FIX: Invisible widgets with colliders will now auto-resize them correctly.
+- FIX: Improved how baseline is calculated (with a hack!), making fonts be positioned better.
+- FIX: Filled sprites should now ignore the padding.
+
+3.0.7 f2
+- NEW: You can now right-click on tweens to set the 'from' and 'to' values using the current.
+- FIX: Tweens no longer reset the object to its default value when first added (current value is now used instead).
+- FIX: Non-clipped panels will no longer use their position when calculating dimensions for anchors.
+- FIX: Panels can now use advanced anchors properly (partial anchoring).
+- FIX: Anchoring to a transform should no longer reposition the widgets and panels.
+- FIX: Cleanup of warnings that don't show up on the Windows version of Unity.
+- FIX: Button should now keep the highlighted state correctly when using controller input.
+- FIX: Unity has a bug related to input on BB10, apparently (backspace).
+
+3.0.7 f1
+- NEW: Further improved the layout system's presentation, making it less daunting.
+- NEW: Enabling anchoring will automatically anchor to the first parent by default.
+- NEW: It's now possible to automatically anchor to the mid-points (sides, center).
+- NEW: Made it possible to move and scale anchored widgets.
+- FIX: Rotating a widget should no longer hide its side handles.
+- FIX: Mobile keyboard will now have the multi-line option.
+- FIX: Re-added support for packed fonts.
+
+3.0.7 rc1 & 2
+- NEW: Created a new layout system. All widgets and panels can now anchor to each other, the screen, and even 3D game objects.
+- NEW: You can now create resizable scroll views and anchor them to UI elements.
+- NEW: Re-created the Anchor Example to use the new anchoring system.
+- NEW: Updated all controls to use the new anchoring system.
+- NEW: You can now specify an explicit Render Queue on each panel.
+- NEW: Improved the Text List's functionality, adding support for touch interaction and having a scroll bar.
+- NEW: Recreated the Chat Window example -- it now features a resizable chat window.
+- NEW: Recreated the Drag & Drop example, adding two scroll views resized with screen height, and the ability to move items from one to the other.
+- NEW: Holding CTRL will now show the dimensions of the selected widget in the scene view.
+- NEW: Resizing the widget now automatically displays width and height guides in the scene view.
+- NEW: Selected anchored widgets and panels now show the calculated distance in the scene view.
+- NEW: Widget alpha is now fully cumulative (parents affect children).
+- NEW: UIDragObject script now ensures that the dragged object remains pixel-perfect.
+- NEW: UIDragObject script now can restrict the widget from being dragged off-screen.
+- NEW: Added a script that makes it possible to resize a widget by dragging on its corner or side.
+- NEW: UICamera.currentScheme tells you the current control scheme -- mouse, touch, or controller.
+- NEW: Button scripts have been modified to use the new OnDragOver/Out events
+- NEW: Added an option to the widget anchor to hide itself if it's off-screen.
+- NEW: Drag Object script now lets you specify an explicit bounds rectangle and has an improved inspector.
+- NEW: Added a button to UIButtonColor that can automatically replace it with a UIButton.
+- NEW: Added the ability to copy/paste all values of the sprites and labels via right-click on the component.
+- NEW: Added a "next page threshold" value to UICenterOnChild for when you want to swipe to move to the next page.
+- NEW: If the mouse events are off and touch events are on, NGUI will now fake touches using the mouse in the editor.
+- FIX: Changing panel depth in inspector will now reflect the change correctly.
+- FIX: Atlas/font selection dialog will now make searching of the entire project optional.
+- FIX: UICamera events will once again work independently of time scale.
+- FIX: Fixed the glitch that was causing widgets to jump into the middle of nowhere sometimes when resizing them.
+- FIX: UIDragScrollView will no longer try to find the scroll view if you set it manually.
+- FIX: Enabling and disabling textures and Unity 2D sprites will now again set the correct texture.
+- FIX: Adjusting depths via shortcut keys should now work consistently.
+- FIX: Draw call viewer will now display the correct triangle count.
+- FIX: NGUITools.SetActive will now automatically call CreatePanel on widgets, ensuring that there is no frame delay (read: blinking).
+- FIX: UICamera selected object change should now work multiple times per frame.
+- FIX: Added a new clause to panel depth comparison that uses panel instance IDs if the panel depth matches (to avoid depth collisions).
+- FIX: Max line count on labels should now work again.
+- FIX: Fixed the Drag Objects script on mobile devices. It was not applying momentum properly.
+- DEL: OnHover is no longer sent via selection changes. Listen to OnSelect and check (UICamera.currentScheme == ControlScheme.Controller).
+- DEL: "PMA Shader" option is now going to be permanently hidden once the atlas has been created.
+- DEL: Eliminated the half-pixel offset setting from anchors.
+- DEL: Removed anchor and stretch scripts from the menus.
 
 3.0.6
 - NEW: NGUI now has new written documentation.
@@ -54,6 +133,12 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: Added a simple script that makes it possible to center a scrollable panel on a child when clicked on.
 - NEW: Redesigned the scroll bar and the slider components. They now also derive from a new common class (Progress Bar).
 - NEW: UIButtonKeyBinding has been replaced with UIKeyBinding and its functionality has been enhanced.
+- NEW: Added the ability to extract sprites from the atlas.
+- NEW: Added a progress bar to the atlas maker when it's updating the atlas.
+- NEW: You can edit and delete sprites within the sprite selector window via right-click.
+- NEW: Created a separate Draw Call Tool window instead of displaying draw calls on the panels.
+- FIX: Sprite selection is now cohesive and updates the atlas maker, sprite selector, and inspector.
+- FIX: Sprite selection window should now handle large lists of sprites better.
 - FIX: Panels will now add rigidbodies to themselves since Unity 4.3 mentions it should improve performance.
 - FIX: UIScrollView's movement restriction now makes sense (no more weird 'scale')
 - FIX: Draggable panels should no longer move on Play.

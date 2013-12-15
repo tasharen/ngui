@@ -158,10 +158,10 @@ MonoBehaviour:
     borderRight: 0
     borderTop: 0
     borderBottom: 0
-    paddingLeft: 0
-    paddingRight: 0
-    paddingTop: 0
-    paddingBottom: 0
+    paddingLeft: 2
+    paddingRight: 3
+    paddingTop: 7
+    paddingBottom: 8
   - name: Orc Armor - Shoulders
     x: 0
     y: 212

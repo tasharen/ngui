@@ -10,7 +10,7 @@ using UnityEngine;
 /// Attach this script to the container that has the objects to center on as its children.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/Center Panel On Child")]
+[AddComponentMenu("NGUI/Interaction/Center Scroll View on Child")]
 public class UICenterOnChild : MonoBehaviour
 {
 	/// <summary>
@@ -18,6 +18,12 @@ public class UICenterOnChild : MonoBehaviour
 	/// </summary>
 
 	public float springStrength = 8f;
+
+	/// <summary>
+	/// If set to something above zero, it will be possible to move to the next page after dragging past the specified threshold.
+	/// </summary>
+
+	public float nextPageThreshold = 0f;
 
 	/// <summary>
 	/// Callback to be triggered when the centering operation completes.
@@ -38,6 +44,15 @@ public class UICenterOnChild : MonoBehaviour
 	void OnDragFinished () { if (enabled) Recenter(); }
 
 	/// <summary>
+	/// Ensure that the threshold is always positive.
+	/// </summary>
+
+	void OnValidate ()
+	{
+		nextPageThreshold = Mathf.Abs(nextPageThreshold);
+	}
+
+	/// <summary>
 	/// Recenter the draggable list on the center-most child.
 	/// </summary>
 
@@ -56,7 +71,7 @@ public class UICenterOnChild : MonoBehaviour
 			else
 			{
 				mDrag.onDragFinished = OnDragFinished;
-				
+
 				if (mDrag.horizontalScrollBar != null)
 					mDrag.horizontalScrollBar.onDragFinished = OnDragFinished;
 
@@ -77,6 +92,7 @@ public class UICenterOnChild : MonoBehaviour
 		float min = float.MaxValue;
 		Transform closest = null;
 		Transform trans = transform;
+		int index = 0;
 
 		// Determine the closest child
 		for (int i = 0, imax = trans.childCount; i < imax; ++i)
@@ -88,8 +104,33 @@ public class UICenterOnChild : MonoBehaviour
 			{
 				min = sqrDist;
 				closest = t;
+				index = i;
 			}
 		}
+
+		// If we have a touch in progress and the next page threshold set
+		if (nextPageThreshold > 0f && UICamera.currentTouch != null)
+		{
+			// If we're still on the same object
+			if (mCenteredObject != null && mCenteredObject.transform == trans.GetChild(index))
+			{
+				Vector2 delta = UICamera.currentTouch.totalDelta;
+
+				if (delta.x > nextPageThreshold)
+				{
+					// Next page
+					if (index > 0)
+						closest = trans.GetChild(index - 1);
+				}
+				else if (delta.x < -nextPageThreshold)
+				{
+					// Previous page
+					if (index < trans.childCount - 1)
+						closest = trans.GetChild(index + 1);
+				}
+			}
+		}
+
 		CenterOn(closest, panelCenter);
 	}
 

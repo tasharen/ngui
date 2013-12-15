@@ -222,6 +222,7 @@ static public class NGUIText
 		{
 			float padding = 0f;
 			float lineWidth = current.finalLineWidth;
+			int intWidth = Mathf.RoundToInt(lineWidth);
 
 			if (current.alignment == TextAlignment.Right)
 			{
@@ -236,8 +237,11 @@ static public class NGUIText
 
 				// Keep it pixel-perfect
 				int diff = Mathf.RoundToInt(lineWidth - offset);
-				if ((diff & 1) == 1) padding += 0.5f;
-				else if ((Mathf.RoundToInt(lineWidth) & 1) == 1) padding += 0.5f;
+
+				bool oddDiff = (diff & 1) == 1;
+				bool oddWidth = (intWidth & 1) == 1;
+				if ((oddDiff && !oddWidth) || (!oddDiff && oddWidth))
+					padding += 0.5f;
 			}
 
 			padding /= current.pixelDensity;
@@ -245,7 +249,7 @@ static public class NGUIText
 			for (int i = indexOffset; i < verts.size; ++i)
 			{
 #if UNITY_FLASH
-				verts.buffer[i] = verts.buffer[i] + new Vector2(padding, 0f);
+				verts.buffer[i] = verts.buffer[i] + new Vector3(padding, 0f);
 #else
 				verts.buffer[i] = verts.buffer[i];
 				verts.buffer[i].x += padding;
@@ -510,10 +514,11 @@ static public class NGUIText
 		float lineHeight = size + current.finalSpacingY;
 
 		// We need to know the baseline first
-		float baseline = 0f;
 		font.RequestCharactersInTexture("j", size, current.style);
 		font.GetCharacterInfo('j', out mTempChar, size, current.style);
-		baseline = size + mTempChar.vert.yMax;
+
+		// This is pretty much a hack, in case you're wondering. Unity doesn't expose a way to retrieve the baseline in a clean fashion.
+		float baseline = mTempChar.vert.yMin + (Mathf.RoundToInt(size - Mathf.Abs(mTempChar.vert.height)) >> 1);
 
 		// Ensure that the text we're about to print exists in the font's texture
 		font.RequestCharactersInTexture(text, size, current.style);
@@ -574,8 +579,8 @@ static public class NGUIText
 			if (!font.GetCharacterInfo(c, out mTempChar, size, current.style))
 				continue;
 
-			v0.x =  (x + mTempChar.vert.xMin);
-			v0.y = -(y - mTempChar.vert.yMax + baseline);
+			v0.x = x + mTempChar.vert.xMin;
+			v0.y = mTempChar.vert.yMax - baseline - y;
 			
 			v1.x = v0.x + mTempChar.vert.width;
 			v1.y = v0.y - mTempChar.vert.height;

@@ -7,15 +7,13 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-[CustomEditor(typeof(UIPanel))]
-public class UIPanelInspector : Editor
-{
-	enum Visibility
-	{
-		Visible,
-		Hidden,
-	}
+/// <summary>
+/// Editor class used to view panels.
+/// </summary>
 
+[CustomEditor(typeof(UIPanel))]
+public class UIPanelInspector : UIRectEditor
+{
 	static int s_Hash = "PanelHash".GetHashCode();
 
 	UIPanel mPanel;
@@ -23,7 +21,8 @@ public class UIPanelInspector : Editor
 	UIWidgetInspector.Action mActionUnderMouse = UIWidgetInspector.Action.None;
 	bool mAllowSelection = true;
 
-	Vector3 mStartPos = Vector3.zero;
+	Vector3 mLocalPos = Vector3.zero;
+	Vector3 mWorldPos = Vector3.zero;
 	Vector4 mStartCR = Vector4.zero;
 	Vector3 mStartDrag = Vector3.zero;
 	Vector2 mStartMouse = Vector2.zero;
@@ -33,28 +32,34 @@ public class UIPanelInspector : Editor
 	GUIStyle mStyle0 = null;
 	GUIStyle mStyle1 = null;
 
-	void OnEnable () { mPanel = target as UIPanel; }
+	protected override void OnEnable ()
+	{
+		base.OnEnable();
+		mPanel = target as UIPanel;
+	}
 
 	/// <summary>
 	/// Helper function that draws draggable knobs.
 	/// </summary>
 
-	void DrawKnob (Vector4 point, int id)
+	void DrawKnob (Vector4 point, int id, bool canResize)
 	{
 		if (mStyle0 == null) mStyle0 = "sv_label_0";
 		if (mStyle1 == null) mStyle1 = "sv_label_7";
 		Vector2 screenPoint = HandleUtility.WorldToGUIPoint(point);
 		Rect rect = new Rect(screenPoint.x - 7f, screenPoint.y - 7f, 14f, 14f);
 
-		if (mPanel.clipping == UIDrawCall.Clipping.None)
-		{
-			mStyle0.Draw(rect, GUIContent.none, id);
-		}
-		else
+		if (canResize)
 		{
 			mStyle1.Draw(rect, GUIContent.none, id);
 		}
+		else
+		{
+			mStyle0.Draw(rect, GUIContent.none, id);
+		}
 	}
+
+	void OnDisable () { NGUIEditorTools.HideMoveTool(false); }
 
 	/// <summary>
 	/// Handles & interaction.
@@ -62,6 +67,9 @@ public class UIPanelInspector : Editor
 
 	public void OnSceneGUI ()
 	{
+		NGUIEditorTools.HideMoveTool(true);
+		if (!UIWidget.showHandles) return;
+
 		Event e = Event.current;
 		int id = GUIUtility.GetControlID(s_Hash, FocusType.Passive);
 		EventType type = e.GetTypeForControl(id);
@@ -71,34 +79,89 @@ public class UIPanelInspector : Editor
 
 		// Time to figure out what kind of action is underneath the mouse
 		UIWidgetInspector.Action actionUnderMouse = mAction;
-		bool canResize = (mPanel.clipping != UIDrawCall.Clipping.None);
-		UIWidget.Pivot pivotUnderMouse = UIWidgetInspector.GetPivotUnderMouse(handles, e, canResize, ref actionUnderMouse);
 
-		Handles.color = new Color(0.5f, 0f, 0.5f);
-		Handles.DrawLine(handles[0], handles[1]);
-		Handles.DrawLine(handles[1], handles[2]);
-		Handles.DrawLine(handles[2], handles[3]);
-		Handles.DrawLine(handles[0], handles[3]);
+		Color handlesColor = new Color(0.5f, 0f, 0.5f);
+		NGUIHandles.DrawShadowedLine(handles, handles[0], handles[1], handlesColor);
+		NGUIHandles.DrawShadowedLine(handles, handles[1], handles[2], handlesColor);
+		NGUIHandles.DrawShadowedLine(handles, handles[2], handles[3], handlesColor);
+		NGUIHandles.DrawShadowedLine(handles, handles[0], handles[3], handlesColor);
+
+		if (mPanel.isAnchored && mAction == UIWidgetInspector.Action.None)
+		{
+			UIWidgetInspector.DrawAnchor(mPanel.leftAnchor, mPanel.cachedTransform, handles, 0, id);
+			UIWidgetInspector.DrawAnchor(mPanel.topAnchor, mPanel.cachedTransform, handles, 1, id);
+			UIWidgetInspector.DrawAnchor(mPanel.rightAnchor, mPanel.cachedTransform, handles, 2, id);
+			UIWidgetInspector.DrawAnchor(mPanel.bottomAnchor, mPanel.cachedTransform, handles, 3, id);
+		}
+
+		if (type == EventType.Repaint)
+		{
+			bool showDetails = (mAction == UIWidgetInspector.Action.Scale) || NGUISettings.drawGuides;
+			if (mAction == UIWidgetInspector.Action.None && e.modifiers == EventModifiers.Control) showDetails = true;
+			if (NGUITools.GetActive(mPanel) && mPanel.parent == null) showDetails = true;
+			if (showDetails) NGUIHandles.DrawSize(handles, Mathf.RoundToInt(mPanel.width), Mathf.RoundToInt(mPanel.height));
+		}
+
+		bool canResize = (mPanel.clipping != UIDrawCall.Clipping.None);
+		bool[] resizable = new bool[8];
+
+		resizable[4] = canResize && mPanel.leftAnchor.target == null;	// left
+		resizable[5] = canResize && mPanel.topAnchor.target == null;	// top
+		resizable[6] = canResize && mPanel.rightAnchor.target == null;	// right
+		resizable[7] = canResize && mPanel.bottomAnchor.target == null;	// bottom
+
+		resizable[0] = resizable[7] && resizable[4]; // bottom-left
+		resizable[1] = resizable[5] && resizable[4]; // top-left
+		resizable[2] = resizable[5] && resizable[6]; // top-right
+		resizable[3] = resizable[7] && resizable[6]; // bottom-right
+
+		bool canMove = true;
+		for (int i = 0; i < 4; ++i)
+		{
+			if (!resizable[i])
+			{
+				canMove = false;
+				break;
+			}
+		}
+
+		UIWidget.Pivot pivotUnderMouse = UIWidgetInspector.GetPivotUnderMouse(handles, e, resizable, canMove, ref actionUnderMouse);
 
 		switch (type)
 		{
 			case EventType.Repaint:
 			{
-				Vector3 bottomLeft = HandleUtility.WorldToGUIPoint(handles[0]);
-				Vector3 topRight = HandleUtility.WorldToGUIPoint(handles[2]);
-				Vector3 diff = topRight - bottomLeft;
-				float mag = diff.magnitude;
+				Vector3 v0 = HandleUtility.WorldToGUIPoint(handles[0]);
+				Vector3 v2 = HandleUtility.WorldToGUIPoint(handles[2]);
 
-				if (mag > 140f)
+				if ((v2 - v0).magnitude > 60f)
 				{
+					Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
+					Vector3 v3 = HandleUtility.WorldToGUIPoint(handles[3]);
+
 					Handles.BeginGUI();
-					for (int i = 0; i < 8; ++i) DrawKnob(handles[i], id);
-					Handles.EndGUI();
-				}
-				else if (mag > 40f)
-				{
-					Handles.BeginGUI();
-					for (int i = 0; i < 4; ++i) DrawKnob(handles[i], id);
+					{
+						for (int i = 0; i < 4; ++i)
+							DrawKnob(handles[i], id, resizable[i]);
+
+						if (Mathf.Abs(v1.y - v0.y) > 80f)
+						{
+							if (mPanel.leftAnchor.target == null || mPanel.leftAnchor.absolute != 0)
+								DrawKnob(handles[4], id, resizable[4]);
+
+							if (mPanel.rightAnchor.target == null || mPanel.rightAnchor.absolute != 0)
+								DrawKnob(handles[6], id, resizable[6]);
+						}
+
+						if (Mathf.Abs(v3.x - v0.x) > 80f)
+						{
+							if (mPanel.topAnchor.target == null || mPanel.topAnchor.absolute != 0)
+								DrawKnob(handles[5], id, resizable[5]);
+
+							if (mPanel.bottomAnchor.target == null || mPanel.bottomAnchor.absolute != 0)
+								DrawKnob(handles[7], id, resizable[7]);
+						}
+					}
 					Handles.EndGUI();
 				}
 			}
@@ -120,10 +183,11 @@ public class UIPanelInspector : Editor
 				else if (e.button == 0 && actionUnderMouse != UIWidgetInspector.Action.None &&
 					UIWidgetInspector.Raycast(handles, out mStartDrag))
 				{
-					mStartPos = t.position;
+					mWorldPos = t.position;
+					mLocalPos = t.localPosition;
 					mStartRot = t.localRotation.eulerAngles;
 					mStartDir = mStartDrag - t.position;
-					mStartCR = mPanel.clipRange;
+					mStartCR = mPanel.baseClipRegion;
 					mDragPivot = pivotUnderMouse;
 					mActionUnderMouse = actionUnderMouse;
 					GUIUtility.hotControl = GUIUtility.keyboardControl = id;
@@ -209,7 +273,6 @@ public class UIPanelInspector : Editor
 									if (mActionUnderMouse == UIWidgetInspector.Action.Move)
 									{
 										NGUISnap.Recalculate(mPanel);
-										mStartPos = t.position;
 										NGUIEditorTools.RegisterUndo("Move panel", t);
 									}
 									else if (mActionUnderMouse == UIWidgetInspector.Action.Rotate)
@@ -220,8 +283,7 @@ public class UIPanelInspector : Editor
 									}
 									else if (mActionUnderMouse == UIWidgetInspector.Action.Scale)
 									{
-										mStartPos = t.localPosition;
-										mStartCR = mPanel.clipRange;
+										mStartCR = mPanel.baseClipRegion;
 										mDragPivot = pivotUnderMouse;
 										NGUIEditorTools.RegisterUndo("Scale panel", t);
 										NGUIEditorTools.RegisterUndo("Scale panel", mPanel);
@@ -234,7 +296,7 @@ public class UIPanelInspector : Editor
 							{
 								if (mAction == UIWidgetInspector.Action.Move)
 								{
-									t.position = mStartPos + (pos - mStartDrag);
+									t.position = mWorldPos + (pos - mStartDrag);
 									t.localPosition = NGUISnap.Snap(t.localPosition, mPanel.localCorners,
 										e.modifiers != EventModifiers.Control);
 								}
@@ -259,7 +321,7 @@ public class UIPanelInspector : Editor
 									Vector3 delta = pos - mStartDrag;
 
 									// Adjust the widget's position and scale based on the delta, restricted by the pivot
-									AdjustClipping(mPanel, mStartPos, mStartCR, delta, mDragPivot);
+									AdjustClipping(mPanel, mLocalPos, mStartCR, delta, mDragPivot);
 								}
 							}
 						}
@@ -306,7 +368,7 @@ public class UIPanelInspector : Editor
 						{
 							if (mAction == UIWidgetInspector.Action.Move)
 							{
-								t.position = mStartPos;
+								t.position = mWorldPos;
 							}
 							else if (mAction == UIWidgetInspector.Action.Rotate)
 							{
@@ -314,8 +376,8 @@ public class UIPanelInspector : Editor
 							}
 							else if (mAction == UIWidgetInspector.Action.Scale)
 							{
-								t.position = mStartPos;
-								mPanel.clipRange = mStartCR;
+								t.position = mWorldPos;
+								mPanel.baseClipRegion = mStartCR;
 							}
 						}
 
@@ -337,11 +399,8 @@ public class UIPanelInspector : Editor
 	/// Draw the inspector widget.
 	/// </summary>
 
-	public override void OnInspectorGUI ()
+	protected override bool ShouldDrawProperties ()
 	{
-		NGUIEditorTools.SetLabelWidth(80f);
-		EditorGUILayout.Space();
-
 		float alpha = EditorGUILayout.Slider("Alpha", mPanel.alpha, 0f, 1f);
 
 		if (alpha != mPanel.alpha)
@@ -366,6 +425,9 @@ public class UIPanelInspector : Editor
 
 				if (UIPanelTool.instance != null)
 					UIPanelTool.instance.Repaint();
+
+				if (UIDrawCallViewer.instance != null)
+					UIDrawCallViewer.instance.Repaint();
 			}
 		}
 		GUILayout.EndHorizontal();
@@ -381,61 +443,7 @@ public class UIPanelInspector : Editor
 
 		if (matchingDepths > 1)
 		{
-			EditorGUILayout.HelpBox(matchingDepths + " panels are sharing the depth value of " + mPanel.depth, MessageType.Info);
-		}
-
-		GUILayout.BeginHorizontal();
-		bool norms = EditorGUILayout.Toggle("Normals", mPanel.generateNormals, GUILayout.Width(100f));
-		GUILayout.Label("Needed for lit shaders");
-		GUILayout.EndHorizontal();
-
-		if (mPanel.generateNormals != norms)
-		{
-			mPanel.generateNormals = norms;
-			UIPanel.RebuildAllDrawCalls(true);
-			EditorUtility.SetDirty(mPanel);
-		}
-
-		GUILayout.BeginHorizontal();
-		bool cull = EditorGUILayout.Toggle("Cull", mPanel.cullWhileDragging, GUILayout.Width(100f));
-		GUILayout.Label("Cull widgets while dragging them");
-		GUILayout.EndHorizontal();
-
-		if (mPanel.cullWhileDragging != cull)
-		{
-			mPanel.cullWhileDragging = cull;
-			UIPanel.RebuildAllDrawCalls(true);
-			EditorUtility.SetDirty(mPanel);
-		}
-
-		GUILayout.BeginHorizontal();
-		bool stat = EditorGUILayout.Toggle("Static", mPanel.widgetsAreStatic, GUILayout.Width(100f));
-		GUILayout.Label("Check if widgets won't move");
-		GUILayout.EndHorizontal();
-
-		if (mPanel.widgetsAreStatic != stat)
-		{
-			mPanel.widgetsAreStatic = stat;
-			UIPanel.RebuildAllDrawCalls(true);
-			EditorUtility.SetDirty(mPanel);
-		}
-
-		if (stat)
-		{
-			EditorGUILayout.HelpBox("Only mark the panel as 'static' if you know FOR CERTAIN that the widgets underneath will not move, rotate, or scale. Doing this improves performance, but moving widgets around will have no effect.", MessageType.Warning);
-		}
-
-		GUILayout.BeginHorizontal();
-		if (NGUISettings.showAllDCs != EditorGUILayout.Toggle("Show All", NGUISettings.showAllDCs, GUILayout.Width(100f)))
-			NGUISettings.showAllDCs = !NGUISettings.showAllDCs;
-		GUILayout.Label("Show all draw calls");
-		GUILayout.EndHorizontal();
-
-		if (mPanel.showInPanelTool != EditorGUILayout.Toggle("Panel Tool", mPanel.showInPanelTool))
-		{
-			mPanel.showInPanelTool = !mPanel.showInPanelTool;
-			EditorUtility.SetDirty(mPanel);
-			EditorWindow.FocusWindowIfItsOpen<UIPanelTool>();
+			EditorGUILayout.HelpBox(matchingDepths + " panels are sharing the depth value of " + mPanel.depth, MessageType.Warning);
 		}
 
 		UIDrawCall.Clipping clipping = (UIDrawCall.Clipping)EditorGUILayout.EnumPopup("Clipping", mPanel.clipping);
@@ -448,7 +456,7 @@ public class UIPanelInspector : Editor
 
 		if (mPanel.clipping != UIDrawCall.Clipping.None)
 		{
-			Vector4 range = mPanel.clipRange;
+			Vector4 range = mPanel.baseClipRegion;
 
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(80f);
@@ -468,10 +476,10 @@ public class UIPanelInspector : Editor
 			range.z = size.x;
 			range.w = size.y;
 
-			if (mPanel.clipRange != range)
+			if (mPanel.baseClipRegion != range)
 			{
 				NGUIEditorTools.RegisterUndo("Clipping Change", mPanel);
-				mPanel.clipRange = range;
+				mPanel.baseClipRegion = range;
 				EditorUtility.SetDirty(mPanel);
 			}
 
@@ -492,129 +500,150 @@ public class UIPanelInspector : Editor
 					EditorUtility.SetDirty(mPanel);
 				}
 			}
-
-#if !UNITY_3_5 && !UNITY_4_0 && (UNITY_ANDROID || UNITY_IPHONE || UNITY_WP8 || UNITY_BLACKBERRY)
-			if (PlayerSettings.targetGlesGraphics == TargetGlesGraphics.OpenGLES_1_x)
-			{
-				EditorGUILayout.HelpBox("Clipping requires shader support!\n\nOpen File -> Build Settings -> Player Settings -> Other Settings, then set:\n\n- Graphics Level: OpenGL ES 2.0.", MessageType.Error);
-			}
-#endif
 		}
 
 		if (clipping != UIDrawCall.Clipping.None && !NGUIEditorTools.IsUniform(mPanel.transform.lossyScale))
 		{
 			EditorGUILayout.HelpBox("Clipped panels must have a uniform scale, or clipping won't work properly!", MessageType.Error);
-			
+
 			if (GUILayout.Button("Auto-fix"))
 			{
 				NGUIEditorTools.FixUniform(mPanel.gameObject);
 			}
 		}
 
-		for (int i = 0; i < UIDrawCall.list.size; ++i)
+		if (NGUIEditorTools.DrawHeader("Advanced Options"))
 		{
-			UIDrawCall dc = UIDrawCall.list[i];
+			NGUIEditorTools.BeginContents();
 
-			if (dc.manager != mPanel)
+			GUILayout.BeginHorizontal();
+			UIPanel.RenderQueue rq = (UIPanel.RenderQueue)EditorGUILayout.EnumPopup("Render Q", mPanel.renderQueue);
+
+			if (mPanel.renderQueue != rq)
 			{
-				if (!NGUISettings.showAllDCs) continue;
-				if (dc.showDetails) GUI.color = new Color(0.85f, 0.85f, 0.85f);
-				else GUI.contentColor = new Color(0.85f, 0.85f, 0.85f);
+				mPanel.renderQueue = rq;
+				mPanel.RebuildAllDrawCalls();
+				EditorUtility.SetDirty(mPanel);
+				if (UIDrawCallViewer.instance != null)
+					UIDrawCallViewer.instance.Repaint();
 			}
-			else GUI.contentColor = Color.white;
 
-			string key = dc.keyName;
-			string name = key + " of " + UIDrawCall.list.size;
-			if (!dc.isActive) name = name + " (HIDDEN)";
-			else if (dc.manager != mPanel) name = name + " (" + dc.manager.name + ")";
-
-			if (NGUIEditorTools.DrawHeader(name, key))
+			if (rq != UIPanel.RenderQueue.Automatic)
 			{
-				GUI.color = (dc.manager == mPanel) ? Color.white : new Color(0.8f, 0.8f, 0.8f);
+				int sq = EditorGUILayout.IntField(mPanel.startingRenderQueue, GUILayout.Width(40f));
 
-				NGUIEditorTools.BeginContents();
-				EditorGUILayout.ObjectField("Material", dc.baseMaterial, typeof(Material), false);
-
-				int count = 0;
-
-				for (int b = 0; b < UIWidget.list.size; ++b)
+				if (mPanel.startingRenderQueue != sq)
 				{
-					UIWidget w = UIWidget.list[b];
-					if (w.drawCall == dc)
-						++count;
+					mPanel.startingRenderQueue = sq;
+					mPanel.RebuildAllDrawCalls();
+					EditorUtility.SetDirty(mPanel);
+					if (UIDrawCallViewer.instance != null)
+						UIDrawCallViewer.instance.Repaint();
 				}
+			}
+			GUILayout.EndHorizontal();
 
-				string myPath = NGUITools.GetHierarchy(dc.manager.cachedGameObject);
-				string remove = myPath + "\\";
-				string[] list = new string[count + 1];
-				list[0] = count.ToString();
-				count = 0;
+			GUILayout.BeginHorizontal();
+			bool norms = EditorGUILayout.Toggle("Normals", mPanel.generateNormals, GUILayout.Width(100f));
+			GUILayout.Label("Needed for lit shaders", GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
 
-				for (int b = 0; b < UIWidget.list.size; ++b)
-				{
-					UIWidget w = UIWidget.list[b];
-					
-					if (w.drawCall == dc)
-					{
-						string path = NGUITools.GetHierarchy(w.cachedGameObject);
-						list[++count] = count + ". " + (string.Equals(path, myPath) ? w.name : path.Replace(remove, ""));
-					}
-				}
+			if (mPanel.generateNormals != norms)
+			{
+				mPanel.generateNormals = norms;
+				mPanel.RebuildAllDrawCalls();
+				EditorUtility.SetDirty(mPanel);
+			}
 
-				GUILayout.BeginHorizontal();
-				int sel = EditorGUILayout.Popup("Widgets", 0, list);
-				GUILayout.Space(18f);
-				GUILayout.EndHorizontal();
+			GUILayout.BeginHorizontal();
+			bool cull = EditorGUILayout.Toggle("Cull", mPanel.cullWhileDragging, GUILayout.Width(100f));
+			GUILayout.Label("Cull widgets while dragging them", GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
 
-				if (sel != 0)
-				{
-					count = 0;
+			if (mPanel.cullWhileDragging != cull)
+			{
+				mPanel.cullWhileDragging = cull;
+				mPanel.RebuildAllDrawCalls();
+				EditorUtility.SetDirty(mPanel);
+			}
 
-					for (int b = 0; b < UIWidget.list.size; ++b)
-					{
-						UIWidget w = UIWidget.list[b];
+			GUILayout.BeginHorizontal();
+			bool alw = EditorGUILayout.Toggle("Visible", mPanel.alwaysOnScreen, GUILayout.Width(100f));
+			GUILayout.Label("Check if widgets never go off-screen", GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
 
-						if (w.drawCall == dc && ++count == sel)
-						{
-							Selection.activeGameObject = w.gameObject;
-							break;
-						}
-					}
-				}
+			if (mPanel.alwaysOnScreen != alw)
+			{
+				mPanel.alwaysOnScreen = alw;
+				mPanel.RebuildAllDrawCalls();
+				EditorUtility.SetDirty(mPanel);
+			}
 
-				GUILayout.BeginHorizontal();
-				EditorGUILayout.LabelField("Render Q", dc.finalRenderQueue.ToString(), GUILayout.Width(120f));
-				bool draw = (Visibility)EditorGUILayout.EnumPopup(dc.isActive ? Visibility.Visible : Visibility.Hidden) == Visibility.Visible;
-				GUILayout.Space(18f);
-				GUILayout.EndHorizontal();
+			GUILayout.BeginHorizontal();
+			bool off = EditorGUILayout.Toggle("Offset", mPanel.anchorOffset, GUILayout.Width(100f));
+			GUILayout.Label("Offset anchors by position", GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
 
-				if (dc.isActive != draw)
-				{
-					dc.isActive = draw;
-					UnityEditor.EditorUtility.SetDirty(dc.manager);
-				}
+			if (mPanel.anchorOffset != off)
+			{
+				mPanel.anchorOffset = off;
+				mPanel.RebuildAllDrawCalls();
+				EditorUtility.SetDirty(mPanel);
+			}
 
-				GUILayout.BeginHorizontal();
-				EditorGUILayout.LabelField("Triangles", dc.triangles.ToString(), GUILayout.Width(120f));
+			GUILayout.BeginHorizontal();
+			bool stat = EditorGUILayout.Toggle("Static", mPanel.widgetsAreStatic, GUILayout.Width(100f));
+			GUILayout.Label("Check if widgets won't move", GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
 
-				if (dc.manager != mPanel)
-				{
-					if (GUILayout.Button("Select the Panel"))
-					{
-						Selection.activeGameObject = dc.manager.gameObject;
-					}
-					GUILayout.Space(18f);
-				}
-				GUILayout.EndHorizontal();
+			if (mPanel.widgetsAreStatic != stat)
+			{
+				mPanel.widgetsAreStatic = stat;
+				mPanel.RebuildAllDrawCalls();
+				EditorUtility.SetDirty(mPanel);
+			}
 
-				if (dc.manager.clipping != UIDrawCall.Clipping.None && !dc.isClipped)
-				{
-					EditorGUILayout.HelpBox("You must switch this material's shader to Unlit/Transparent Colored or Unlit/Premultiplied Colored in order for clipping to work.",
-						MessageType.Warning);
-				}
+			if (stat)
+			{
+				EditorGUILayout.HelpBox("Only mark the panel as 'static' if you know FOR CERTAIN that the widgets underneath will not move, rotate, or scale. Doing this improves performance, but moving widgets around will have no effect.", MessageType.Warning);
+			}
 
-				NGUIEditorTools.EndContents();
-				GUI.color = Color.white;
+			GUILayout.BeginHorizontal();
+			bool tool = EditorGUILayout.Toggle("Panel Tool", mPanel.showInPanelTool, GUILayout.Width(100f));
+			GUILayout.Label("Show in panel tool");
+			GUILayout.EndHorizontal();
+
+			if (mPanel.showInPanelTool != tool)
+			{
+				mPanel.showInPanelTool = !mPanel.showInPanelTool;
+				EditorUtility.SetDirty(mPanel);
+				EditorWindow.FocusWindowIfItsOpen<UIPanelTool>();
+			}
+			NGUIEditorTools.EndContents();
+		}
+		return true;
+	}
+
+	/// <summary>
+	/// Add the "Show draw calls" button at the very end.
+	/// </summary>
+
+	protected override void DrawFinalProperties ()
+	{
+		base.DrawFinalProperties();
+		
+		if (GUILayout.Button("Show Draw Calls"))
+		{
+			NGUISettings.showAllDCs = false;
+
+			if (UIDrawCallViewer.instance != null)
+			{
+				UIDrawCallViewer.instance.Focus();
+				UIDrawCallViewer.instance.Repaint();
+			}
+			else
+			{
+				EditorWindow.GetWindow<UIDrawCallViewer>(false, "Draw Call Tool", true);
 			}
 		}
 	}
@@ -691,10 +720,10 @@ public class UIPanelInspector : Editor
 	static void AdjustClipping (UIPanel p, Vector4 cr, int left, int top, int right, int bottom)
 	{
 		// Make adjustment values dividable by two since the clipping is centered
-		right	= ((right >> 1) << 1);
-		left	= ((left >> 1) << 1);
+		right	= ((right  >> 1) << 1);
+		left	= ((left   >> 1) << 1);
 		bottom	= ((bottom >> 1) << 1);
-		top		= ((top >> 1) << 1);
+		top		= ((top    >> 1) << 1);
 
 		int x = Mathf.RoundToInt(cr.x + (left + right) * 0.5f);
 		int y = Mathf.RoundToInt(cr.y + (top + bottom) * 0.5f);
@@ -709,9 +738,9 @@ public class UIPanelInspector : Editor
 		if (width < minx) width = minx;
 		if (height < miny) height = miny;
 
-		width  = ((width  >> 1) << 1);
-		height = ((height >> 1) << 1);
+		if ((width  & 1) == 1) ++width;
+		if ((height & 1) == 1) ++height;
 
-		p.clipRange = new Vector4(x, y, width, height);
+		p.baseClipRegion = new Vector4(x, y, width, height);
 	}
 }

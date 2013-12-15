@@ -26,50 +26,16 @@ public class UIButton : UIButtonColor
 	public Color disabledColor = Color.grey;
 
 	/// <summary>
+	/// Whether the button will highlight when you drag something over it.
+	/// </summary>
+
+	public bool dragHighlight = false;
+
+	/// <summary>
 	/// Click event listener.
 	/// </summary>
 
 	public List<EventDelegate> onClick = new List<EventDelegate>();
-
-	protected override void OnEnable ()
-	{
-		//Collider col = collider;
-		//if (col != null) col.enabled = true;
-
-		if (isEnabled)
-		{
-			if (mStarted)
-			{
-				if (mHighlighted) base.OnEnable();
-				else UpdateColor(true, false);
-			}
-		}
-		else UpdateColor(false, true);
-	}
-
-	//protected override void OnDisable()
-	//{
-	//    //Collider col = collider;
-	//    //if (col != null) col.enabled = false;
-	//    if (mStarted) UpdateColor(false, false);
-	//}
-
-	public override void OnHover (bool isOver) { if (isEnabled) base.OnHover(isOver); }
-	public override void OnPress (bool isPressed) { if (isEnabled) base.OnPress(isPressed); }
-
-	/// <summary>
-	/// Call the listener function.
-	/// </summary>
-
-	void OnClick ()
-	{
-		if (isEnabled)
-		{
-			current = this;
-			EventDelegate.Execute(onClick);
-			current = null;
-		}
-	}
 
 	/// <summary>
 	/// Whether the button should be enabled.
@@ -87,7 +53,72 @@ public class UIButton : UIButtonColor
 		{
 			Collider col = collider;
 			if (col != null) col.enabled = value;
-			enabled = value;
+			else enabled = value;
+			UpdateColor(value, false);
+		}
+	}
+
+	protected override void OnEnable ()
+	{
+		if (isEnabled)
+		{
+			if (mStarted)
+			{
+				if (UICamera.currentScheme == UICamera.ControlScheme.Controller)
+				{
+					OnHover(UICamera.selectedObject == gameObject);
+				}
+				else if (UICamera.currentScheme == UICamera.ControlScheme.Mouse)
+				{
+					OnHover(UICamera.hoveredObject == gameObject);
+				}
+				else UpdateColor(true, false);
+			}
+		}
+		else UpdateColor(false, true);
+	}
+
+	protected override void OnHover (bool isOver)
+	{
+		if (isEnabled)
+			base.OnHover(isOver);
+	}
+	
+	protected override void OnPress (bool isPressed)
+	{
+		if (isEnabled)
+			base.OnPress(isPressed);
+	}
+	
+	protected override void OnDragOver ()
+	{
+		if (isEnabled && (dragHighlight || UICamera.currentTouch.pressed == gameObject))
+			base.OnDragOver();
+	}
+	
+	protected override void OnDragOut ()
+	{
+		if (isEnabled && (dragHighlight || UICamera.currentTouch.pressed == gameObject))
+			base.OnDragOut();
+	}
+
+	protected override void OnSelect (bool isSelected)
+	{
+		if (isEnabled)
+			base.OnSelect(isSelected);
+	}
+
+	/// <summary>
+	/// Call the listener function.
+	/// </summary>
+
+	void OnClick ()
+	{
+		if (isEnabled)
+		{
+			current = this;
+			EventDelegate.Execute(onClick);
+			current = null;
 		}
 	}
 
@@ -110,7 +141,7 @@ public class UIButton : UIButtonColor
 
 			if (tc != null && immediate)
 			{
-				tc.color = c;
+				tc.value = c;
 				tc.enabled = false;
 			}
 		}

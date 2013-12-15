@@ -18,9 +18,21 @@ public class TweenPosition : UITweener
 	Transform mTrans;
 
 	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
-	public Vector3 position { get { return cachedTransform.localPosition; } set { cachedTransform.localPosition = value; } }
 
-	protected override void OnUpdate (float factor, bool isFinished) { cachedTransform.localPosition = from * (1f - factor) + to * factor; }
+	[System.Obsolete("Use 'value' instead")]
+	public Vector3 position { get { return this.value; } set { this.value = value; } }
+
+	/// <summary>
+	/// Tween's current value.
+	/// </summary>
+
+	public Vector3 value { get { return cachedTransform.localPosition; } set { cachedTransform.localPosition = value; } }
+
+	/// <summary>
+	/// Tween the value.
+	/// </summary>
+
+	protected override void OnUpdate (float factor, bool isFinished) { value = from * (1f - factor) + to * factor; }
 
 	/// <summary>
 	/// Start the tweening operation.
@@ -29,7 +41,7 @@ public class TweenPosition : UITweener
 	static public TweenPosition Begin (GameObject go, float duration, Vector3 pos)
 	{
 		TweenPosition comp = UITweener.Begin<TweenPosition>(go, duration);
-		comp.from = comp.position;
+		comp.from = comp.value;
 		comp.to = pos;
 
 		if (duration <= 0f)
@@ -39,4 +51,16 @@ public class TweenPosition : UITweener
 		}
 		return comp;
 	}
+
+	[ContextMenu("Set 'From' to current value")]
+	public override void SetStartToCurrentValue () { from = value; }
+
+	[ContextMenu("Set 'To' to current value")]
+	public override void SetEndToCurrentValue () { to = value; }
+
+	[ContextMenu("Assume value of 'From'")]
+	void SetCurrentValueToStart () { value = from; }
+
+	[ContextMenu("Assume value of 'To'")]
+	void SetCurrentValueToEnd () { value = to; }
 }

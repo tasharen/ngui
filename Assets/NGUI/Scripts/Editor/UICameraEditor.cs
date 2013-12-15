@@ -44,7 +44,6 @@ public class UICameraEditor : Editor
 			EditorGUI.BeginDisabledGroup(!mouse.boolValue && !touch.boolValue);
 			{
 				EditorGUILayout.PropertyField(serializedObject.FindProperty("allowMultiTouch"));
-				EditorGUILayout.PropertyField(serializedObject.FindProperty("stickyPress"));
 			}
 			EditorGUI.EndDisabledGroup();
 
