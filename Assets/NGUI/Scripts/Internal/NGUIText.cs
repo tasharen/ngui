@@ -222,6 +222,7 @@ static public class NGUIText
 		{
 			float padding = 0f;
 			float lineWidth = current.finalLineWidth;
+			int intWidth = Mathf.RoundToInt(lineWidth);
 
 			if (current.alignment == TextAlignment.Right)
 			{
@@ -236,8 +237,11 @@ static public class NGUIText
 
 				// Keep it pixel-perfect
 				int diff = Mathf.RoundToInt(lineWidth - offset);
-				if ((diff & 1) == 1) padding += 0.5f;
-				else if ((Mathf.RoundToInt(lineWidth) & 1) == 1) padding += 0.5f;
+
+				bool oddDiff = (diff & 1) == 1;
+				bool oddWidth = (intWidth & 1) == 1;
+				if ((oddDiff && !oddWidth) || (!oddDiff && oddWidth))
+					padding += 0.5f;
 			}
 
 			padding /= current.pixelDensity;
