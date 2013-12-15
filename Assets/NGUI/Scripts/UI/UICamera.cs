@@ -734,7 +734,7 @@ public class UICamera : MonoBehaviour
 	{
 		float time = RealTime.time;
 
-		if (mNextEvent < time)
+		if (mNextEvent < time && !string.IsNullOrEmpty(axis))
 		{
 			float val = Input.GetAxis(axis);
 
@@ -949,7 +949,7 @@ public class UICamera : MonoBehaviour
 		// If it's time to show a tooltip, inform the object we're hovering over
 		if (useMouse && mHover != null)
 		{
-			float scroll = Input.GetAxis(scrollAxisName);
+			float scroll = !string.IsNullOrEmpty(scrollAxisName) ? Input.GetAxis(scrollAxisName) : 0f;
 			if (scroll != 0f) Notify(mHover, "OnScroll", scroll);
 
 			if (showTooltips && mTooltipTime != 0f && (mTooltipTime < RealTime.time ||
