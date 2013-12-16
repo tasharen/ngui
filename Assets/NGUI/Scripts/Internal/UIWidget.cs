@@ -1112,7 +1112,7 @@ public class UIWidget : UIRect
 #if UNITY_EDITOR
 		if (!mMoved && !panel.widgetsAreStatic || !mPlayMode)
 #else
-		if (!mMoved && !mPanel.widgetsAreStatic)
+		if (!mMoved && !panel.widgetsAreStatic)
 #endif
 		{
 #if UNITY_3_5 || UNITY_4_0

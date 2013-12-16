@@ -543,15 +543,7 @@ public class UIDrawCall : MonoBehaviour
 		}
 	}
 
-	/// <summary>
-	/// Add this draw call to the list.
-	/// </summary>
-
-	void OnEnable ()
-	{
-		mRebuildMat = true;
-		mActiveList.Add(this);
-	}
+	void OnEnable () { mRebuildMat = true; }
 
 	/// <summary>
 	/// Clear all references.
@@ -641,7 +633,9 @@ public class UIDrawCall : MonoBehaviour
 		DontDestroyOnLoad(go);
 #endif
 		// Create the draw call
-		return go.AddComponent<UIDrawCall>();
+		UIDrawCall newDC = go.AddComponent<UIDrawCall>();
+		mActiveList.Add(newDC);
+		return newDC;
 	}
 
 	/// <summary>
