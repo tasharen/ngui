@@ -149,7 +149,7 @@ public static class NGUIContextMenu
 	/// Wrapper function called by the menu that in turn calls the correct callback.
 	/// </summary>
 
-	static void AddChild (object obj)
+	static public void AddChild (object obj)
 	{
 		AddFunc func = obj as AddFunc;
 		UIWidget widget = func(Selection.activeGameObject);
@@ -160,7 +160,7 @@ public static class NGUIContextMenu
 	/// Add a new context menu entry.
 	/// </summary>
 
-	static void AddChildWidget (string item, bool isChecked, AddFunc callback)
+	static public void AddChildWidget (string item, bool isChecked, AddFunc callback)
 	{
 		if (callback != null)
 		{
@@ -184,7 +184,7 @@ public static class NGUIContextMenu
 	/// Wrapper function called by the menu that in turn calls the correct callback.
 	/// </summary>
 
-	static void AddSibling (object obj)
+	static public void AddSibling (object obj)
 	{
 		AddFunc func = obj as AddFunc;
 		UIWidget widget = func(Selection.activeTransform.parent.gameObject);
@@ -195,7 +195,7 @@ public static class NGUIContextMenu
 	/// Add a new context menu entry.
 	/// </summary>
 
-	static void AddSiblingWidget (string item, bool isChecked, AddFunc callback)
+	static public void AddSiblingWidget (string item, bool isChecked, AddFunc callback)
 	{
 		if (callback != null)
 		{
