@@ -31,7 +31,7 @@ public class UICenterOnChild : MonoBehaviour
 
 	public SpringPanel.OnFinished onFinished;
 
-	UIScrollView mDrag;
+	UIScrollView mScrollView;
 	GameObject mCenteredObject;
 
 	/// <summary>
@@ -58,11 +58,11 @@ public class UICenterOnChild : MonoBehaviour
 
 	public void Recenter ()
 	{
-		if (mDrag == null)
+		if (mScrollView == null)
 		{
-			mDrag = NGUITools.FindInParents<UIScrollView>(gameObject);
+			mScrollView = NGUITools.FindInParents<UIScrollView>(gameObject);
 
-			if (mDrag == null)
+			if (mScrollView == null)
 			{
 				Debug.LogWarning(GetType() + " requires " + typeof(UIScrollView) + " on a parent object in order to work", this);
 				enabled = false;
@@ -70,24 +70,24 @@ public class UICenterOnChild : MonoBehaviour
 			}
 			else
 			{
-				mDrag.onDragFinished = OnDragFinished;
+				mScrollView.onDragFinished = OnDragFinished;
 
-				if (mDrag.horizontalScrollBar != null)
-					mDrag.horizontalScrollBar.onDragFinished = OnDragFinished;
+				if (mScrollView.horizontalScrollBar != null)
+					mScrollView.horizontalScrollBar.onDragFinished = OnDragFinished;
 
-				if (mDrag.verticalScrollBar != null)
-					mDrag.verticalScrollBar.onDragFinished = OnDragFinished;
+				if (mScrollView.verticalScrollBar != null)
+					mScrollView.verticalScrollBar.onDragFinished = OnDragFinished;
 			}
 		}
-		if (mDrag.panel == null) return;
+		if (mScrollView.panel == null) return;
 
 		// Calculate the panel's center in world coordinates
-		Vector3[] corners = mDrag.panel.worldCorners;
+		Vector3[] corners = mScrollView.panel.worldCorners;
 		Vector3 panelCenter = (corners[2] + corners[0]) * 0.5f;
 
 		// Offset this value by the momentum
-		Vector3 pickingPoint = panelCenter - mDrag.currentMomentum * (mDrag.momentumAmount * 0.1f);
-		mDrag.currentMomentum = Vector3.zero;
+		Vector3 pickingPoint = panelCenter - mScrollView.currentMomentum * (mScrollView.momentumAmount * 0.1f);
+		mScrollView.currentMomentum = Vector3.zero;
 
 		float min = float.MaxValue;
 		Transform closest = null;
@@ -140,9 +140,9 @@ public class UICenterOnChild : MonoBehaviour
 
 	void CenterOn (Transform target, Vector3 panelCenter)
 	{
-		if (target != null && mDrag != null && mDrag.panel != null)
+		if (target != null && mScrollView != null && mScrollView.panel != null)
 		{
-			Transform panelTrans = mDrag.panel.cachedTransform;
+			Transform panelTrans = mScrollView.panel.cachedTransform;
 			mCenteredObject = target.gameObject;
 
 			// Figure out the difference between the chosen child and the panel's center in local coordinates
@@ -151,12 +151,12 @@ public class UICenterOnChild : MonoBehaviour
 			Vector3 localOffset = cp - cc;
 
 			// Offset shouldn't occur if blocked
-			if (!mDrag.canMoveHorizontally) localOffset.x = 0f;
-			if (!mDrag.canMoveVertically) localOffset.y = 0f;
+			if (!mScrollView.canMoveHorizontally) localOffset.x = 0f;
+			if (!mScrollView.canMoveVertically) localOffset.y = 0f;
 			localOffset.z = 0f;
 
 			// Spring the panel to this calculated position
-			SpringPanel.Begin(mDrag.panel.cachedGameObject,
+			SpringPanel.Begin(mScrollView.panel.cachedGameObject,
 				panelTrans.localPosition - localOffset, springStrength).onFinished = onFinished;
 		}
 		else mCenteredObject = null;
@@ -168,9 +168,9 @@ public class UICenterOnChild : MonoBehaviour
 
 	public void CenterOn (Transform target)
 	{
-		if (mDrag != null && mDrag.panel != null)
+		if (mScrollView != null && mScrollView.panel != null)
 		{
-			Vector3[] corners = mDrag.panel.worldCorners;
+			Vector3[] corners = mScrollView.panel.worldCorners;
 			Vector3 panelCenter = (corners[2] + corners[0]) * 0.5f;
 			CenterOn(target, panelCenter);
 		}

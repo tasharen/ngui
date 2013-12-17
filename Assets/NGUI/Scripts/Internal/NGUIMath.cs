@@ -315,29 +315,33 @@ static public class NGUIMath
 
 	static public Bounds CalculateAbsoluteWidgetBounds (Transform trans)
 	{
-		UIWidget[] widgets = trans.GetComponentsInChildren<UIWidget>() as UIWidget[];
-		if (widgets.Length == 0) return new Bounds(trans.position, Vector3.zero);
-
-		Vector3 vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-		Vector3 vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-
-		for (int i = 0, imax = widgets.Length; i < imax; ++i)
+		if (trans != null)
 		{
-			UIWidget w = widgets[i];
-			if (!w.enabled) continue;
+			UIWidget[] widgets = trans.GetComponentsInChildren<UIWidget>() as UIWidget[];
+			if (widgets.Length == 0) return new Bounds(trans.position, Vector3.zero);
 
-			Vector3[] corners = w.worldCorners;
+			Vector3 vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+			Vector3 vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
-			for (int j = 0; j < 4; ++j)
+			for (int i = 0, imax = widgets.Length; i < imax; ++i)
 			{
-				vMax = Vector3.Max(corners[j], vMax);
-				vMin = Vector3.Min(corners[j], vMin);
-			}
-		}
+				UIWidget w = widgets[i];
+				if (!w.enabled) continue;
 
-		Bounds b = new Bounds(vMin, Vector3.zero);
-		b.Encapsulate(vMax);
-		return b;
+				Vector3[] corners = w.worldCorners;
+
+				for (int j = 0; j < 4; ++j)
+				{
+					vMax = Vector3.Max(corners[j], vMax);
+					vMin = Vector3.Min(corners[j], vMin);
+				}
+			}
+
+			Bounds b = new Bounds(vMin, Vector3.zero);
+			b.Encapsulate(vMax);
+			return b;
+		}
+		return new Bounds(Vector3.zero, Vector3.zero);
 	}
 
 	/// <summary>
@@ -373,39 +377,42 @@ static public class NGUIMath
 
 	static public Bounds CalculateRelativeWidgetBounds (Transform root, Transform child, bool considerInactive)
 	{
-		UIWidget[] widgets = child.GetComponentsInChildren<UIWidget>(considerInactive);
-
-		if (widgets.Length > 0)
+		if (child != null)
 		{
-			Vector3 vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-			Vector3 vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+			UIWidget[] widgets = child.GetComponentsInChildren<UIWidget>(considerInactive);
 
-			Matrix4x4 toLocal = root.worldToLocalMatrix;
-			bool isSet = false;
-			Vector3 v;
-
-			for (int i = 0, imax = widgets.Length; i < imax; ++i)
+			if (widgets.Length > 0)
 			{
-				UIWidget w = widgets[i];
-				if (!considerInactive && !w.enabled) continue;
+				Vector3 vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+				Vector3 vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
-				Vector3[] corners = w.worldCorners;
+				Matrix4x4 toLocal = root.worldToLocalMatrix;
+				bool isSet = false;
+				Vector3 v;
 
-				for (int j = 0; j < 4; ++j)
+				for (int i = 0, imax = widgets.Length; i < imax; ++i)
 				{
-					//v = root.InverseTransformPoint(corners[j]);
-					v = toLocal.MultiplyPoint3x4(corners[j]);
-					vMax = Vector3.Max(v, vMax);
-					vMin = Vector3.Min(v, vMin);
-				}
-				isSet = true;
-			}
+					UIWidget w = widgets[i];
+					if (!considerInactive && !w.enabled) continue;
 
-			if (isSet)
-			{
-				Bounds b = new Bounds(vMin, Vector3.zero);
-				b.Encapsulate(vMax);
-				return b;
+					Vector3[] corners = w.worldCorners;
+
+					for (int j = 0; j < 4; ++j)
+					{
+						//v = root.InverseTransformPoint(corners[j]);
+						v = toLocal.MultiplyPoint3x4(corners[j]);
+						vMax = Vector3.Max(v, vMax);
+						vMin = Vector3.Min(v, vMin);
+					}
+					isSet = true;
+				}
+
+				if (isSet)
+				{
+					Bounds b = new Bounds(vMin, Vector3.zero);
+					b.Encapsulate(vMax);
+					return b;
+				}
 			}
 		}
 		return new Bounds(Vector3.zero, Vector3.zero);
@@ -599,6 +606,32 @@ static public class NGUIMath
 		else v.y = 0f;
 
 		return v;
+	}
+
+	/// <summary>
+	/// Helper function that converts the pivot offset to a pivot point.
+	/// </summary>
+
+	static public UIWidget.Pivot GetPivot (Vector2 offset)
+	{
+		if (offset.x == 0f)
+		{
+			if (offset.y == 0f) return UIWidget.Pivot.BottomLeft;
+			if (offset.y == 1f) return UIWidget.Pivot.TopLeft;
+			return UIWidget.Pivot.Left;
+		}
+		else if (offset.x == 1f)
+		{
+			if (offset.y == 0f) return UIWidget.Pivot.BottomRight;
+			if (offset.y == 1f) return UIWidget.Pivot.TopRight;
+			return UIWidget.Pivot.Right;
+		}
+		else
+		{
+			if (offset.y == 0f) return UIWidget.Pivot.Bottom;
+			if (offset.y == 1f) return UIWidget.Pivot.Top;
+			return UIWidget.Pivot.Center;
+		}
 	}
 
 	/// <summary>

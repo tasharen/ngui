@@ -30,6 +30,12 @@ static public class NGUIText
 
 	public class Settings
 	{
+		public BMFont bitmapFont;
+#if DYNAMIC_FONT
+		public Font dynamicFont;
+#endif
+		public GlyphInfo glyph = new GlyphInfo();
+
 		public int size = 16;
 		public float pixelDensity = 1f;
 		public FontStyle style = FontStyle.Normal;
@@ -50,11 +56,108 @@ static public class NGUIText
 		public bool premultiply = false;
 		public SymbolStyle symbolStyle;
 
-		public int finalSize { get { return Mathf.RoundToInt(size * pixelDensity); } }
-		public float finalSpacingX { get { return (spacingX * pixelDensity); } }
-		public float finalSpacingY { get { return (spacingY * pixelDensity); } }
-		public float finalLineWidth { get { return (lineWidth * pixelDensity); } }
-		public float finalLineHeight { get { return (lineHeight * pixelDensity); } }
+		public int finalSize = 0;
+		public float finalSpacingX = 0f;
+		public float finalSpacingY = 0f;
+		public float finalLineWidth = 0f;
+		public float finalLineHeight = 0f;
+
+		/// <summary>
+		/// Recalculate the 'final' values.
+		/// </summary>
+
+		public void Update()
+		{
+			finalSize = Mathf.RoundToInt(size * pixelDensity);
+			finalSpacingX = (spacingX * pixelDensity);
+			finalSpacingY = (spacingY * pixelDensity);
+			finalLineWidth = (lineWidth * pixelDensity);
+			finalLineHeight = (lineHeight * pixelDensity);
+		}
+
+		/// <summary>
+		/// Prepare to use the specified text.
+		/// </summary>
+
+		public void Prepare (string text)
+		{
+#if DYNAMIC_FONT
+			if (dynamicFont != null)
+				dynamicFont.RequestCharactersInTexture(text, finalSize, style);
+#endif
+		}
+
+		/*public GlyphInfo GetGlyph (char ch, char prev)
+		{
+			if (bitmapFont != null)
+			{
+				BMGlyph bmg = bitmapFont.GetGlyph(ch);
+
+				if (bmg != null)
+				{
+					glyph.x = bmg.offsetX;
+					glyph.y = bmg.offsetY;
+					glyph.width = bmg.width;
+					glyph.height = bmg.height;
+					glyph.advance = bmg.advance;
+					glyph.channel = bmg.channel;
+					if (prev != 0) glyph.x += bmg.GetKerning(prev);
+					return glyph;
+				}
+			}
+#if DYNAMIC_FONT
+			else if (dynamicFont != null)
+			{
+				if (dynamicFont.GetCharacterInfo(ch, out mTempChar, finalSize, style))
+				{
+					glyph.x = mTempChar.vert.xMin;
+					glyph.y = bmg.offsetY;
+					glyph.width = mTempChar.vert.width;
+					glyph.height = bmg.height;
+					glyph.advance = bmg.advance;
+					glyph.channel = bmg.channel;
+					if (prev != 0) glyph.x += bmg.GetKerning(prev);
+					return glyph;
+
+					/*v0.x = x + mTempChar.vert.xMin;
+					v1.x = v0.x + mTempChar.vert.width;
+					v0.y = mTempChar.vert.yMax - baseline - y;
+					v1.y = v0.y - mTempChar.vert.height;
+
+					u0.x = mTempChar.uv.xMin;
+					u0.y = mTempChar.uv.yMin;
+					u1.x = mTempChar.uv.xMax;
+					u1.y = mTempChar.uv.yMax;
+
+					if (mTempChar.flipped)
+					{
+						uvs.Add(new Vector2(u0.x, u0.y));
+						uvs.Add(new Vector2(u1.x, u0.y));
+						uvs.Add(new Vector2(u1.x, u1.y));
+						uvs.Add(new Vector2(u0.x, u1.y));
+					}
+					else
+					{
+						uvs.Add(new Vector2(u0.x, u0.y));
+						uvs.Add(new Vector2(u0.x, u1.y));
+						uvs.Add(new Vector2(u1.x, u1.y));
+						uvs.Add(new Vector2(u1.x, u0.y));
+					}*/
+				//}
+			//}
+//#endif
+			//return null;
+		//}
+	}
+
+	public class GlyphInfo
+	{
+		public float x = 0;
+		public float y = 0;
+		public float width = 0;
+		public float height = 0;
+		public float advance = 0;
+		public int channel = 0;
 	}
 
 	/// <summary>
@@ -256,6 +359,40 @@ static public class NGUIText
 #endif
 			}
 		}
+	}
+
+	/// <summary>
+	/// Get the index of the closest character within the provided list of values.
+	/// This function first sorts by Y, and only then by X.
+	/// </summary>
+
+	static public int GetClosestCharacter (BetterList<Vector3> verts, Vector2 pos)
+	{
+		// First sort by Y, and only then by X
+		float bestX = float.MaxValue;
+		float bestY = float.MaxValue;
+		int bestIndex = 0;
+
+		for (int i = 0; i < verts.size; ++i)
+		{
+			float diffY = Mathf.Abs(pos.y - verts[i].y);
+			if (diffY > bestY) continue;
+
+			float diffX = Mathf.Abs(pos.x - verts[i].x);
+
+			if (diffY < bestY)
+			{
+				bestY = diffY;
+				bestX = diffX;
+				bestIndex = i;
+			}
+			else if (diffX < bestX)
+			{
+				bestX = diffX;
+				bestIndex = i;
+			}
+		}
+		return bestIndex;
 	}
 
 	/// <summary>
@@ -502,6 +639,19 @@ static public class NGUIText
 	static Color32 s_c0, s_c1;
 
 	/// <summary>
+	/// Helper function that retrieves the font's baseline.
+	/// There is currently no way to retrieve this value in a clean fashion from Unity, so it's using a hack.
+	/// </summary>
+
+	static float GetBaseline (Font font)
+	{
+		int size = current.finalSize;
+		font.RequestCharactersInTexture("j", size, current.style);
+		font.GetCharacterInfo('j', out mTempChar, size, current.style);
+		return mTempChar.vert.yMin + (Mathf.RoundToInt(size - Mathf.Abs(mTempChar.vert.height)) >> 1);
+	}
+
+	/// <summary>
 	/// Print the specified text into the buffers.
 	/// </summary>
 
@@ -514,11 +664,7 @@ static public class NGUIText
 		float lineHeight = size + current.finalSpacingY;
 
 		// We need to know the baseline first
-		font.RequestCharactersInTexture("j", size, current.style);
-		font.GetCharacterInfo('j', out mTempChar, size, current.style);
-
-		// This is pretty much a hack, in case you're wondering. Unity doesn't expose a way to retrieve the baseline in a clean fashion.
-		float baseline = mTempChar.vert.yMin + (Mathf.RoundToInt(size - Mathf.Abs(mTempChar.vert.height)) >> 1);
+		float baseline = GetBaseline(font);
 
 		// Ensure that the text we're about to print exists in the font's texture
 		font.RequestCharactersInTexture(text, size, current.style);
@@ -526,13 +672,11 @@ static public class NGUIText
 		// Start with the white tint
 		mColors.Add(Color.white);
 
-		float x = 0f;
-		float y = 0f;
-		float maxX = 0f;
+		float x = 0f, y = 0f, maxX = 0f;
 		float spacingX = current.finalSpacingX;
 		float pixelSize = 1f / current.pixelDensity;
 		float sizeF = size;
-		
+
 		Vector3 v0 = Vector3.zero, v1 = Vector3.zero;
 		Vector2 u0 = Vector2.zero, u1 = Vector2.zero;
 		Color gb = current.tint * current.gradientBottom;
@@ -580,10 +724,11 @@ static public class NGUIText
 				continue;
 
 			v0.x = x + mTempChar.vert.xMin;
-			v0.y = mTempChar.vert.yMax - baseline - y;
-			
 			v1.x = v0.x + mTempChar.vert.width;
+			v0.y = mTempChar.vert.yMax - baseline - y;
 			v1.y = v0.y - mTempChar.vert.height;
+			//v0.y = -y;
+			//v1.y = -y + size;
 
 			if (pixelSize != 1f)
 			{
@@ -591,50 +736,58 @@ static public class NGUIText
 				v1 *= pixelSize;
 			}
 
-			u0.x = mTempChar.uv.xMin;
-			u0.y = mTempChar.uv.yMin;
-			u1.x = mTempChar.uv.xMax;
-			u1.y = mTempChar.uv.yMax;
-
 			x += (mTempChar.width + spacingX);
 
-			verts.Add(new Vector3(v1.x, v0.y));
 			verts.Add(new Vector3(v0.x, v0.y));
 			verts.Add(new Vector3(v0.x, v1.y));
 			verts.Add(new Vector3(v1.x, v1.y));
+			verts.Add(new Vector3(v1.x, v0.y));
 
-			if (mTempChar.flipped)
+			// Texture coordinates
+			if (uvs != null)
 			{
-				uvs.Add(new Vector2(u0.x, u1.y));
-				uvs.Add(new Vector2(u0.x, u0.y));
-				uvs.Add(new Vector2(u1.x, u0.y));
-				uvs.Add(new Vector2(u1.x, u1.y));
+				u0.x = mTempChar.uv.xMin;
+				u0.y = mTempChar.uv.yMin;
+				u1.x = mTempChar.uv.xMax;
+				u1.y = mTempChar.uv.yMax;
+
+				if (mTempChar.flipped)
+				{
+					uvs.Add(new Vector2(u0.x, u0.y));
+					uvs.Add(new Vector2(u1.x, u0.y));
+					uvs.Add(new Vector2(u1.x, u1.y));
+					uvs.Add(new Vector2(u0.x, u1.y));
+				}
+				else
+				{
+					uvs.Add(new Vector2(u0.x, u0.y));
+					uvs.Add(new Vector2(u0.x, u1.y));
+					uvs.Add(new Vector2(u1.x, u1.y));
+					uvs.Add(new Vector2(u1.x, u0.y));
+				}
 			}
-			else
+
+			// Vertex colors
+			if (cols != null)
 			{
-				uvs.Add(new Vector2(u1.x, u0.y));
-				uvs.Add(new Vector2(u0.x, u0.y));
-				uvs.Add(new Vector2(u0.x, u1.y));
-				uvs.Add(new Vector2(u1.x, u1.y));
+				if (current.gradient)
+				{
+					float min = sizeF - (-mTempChar.vert.yMax + baseline);
+					float max = min - (mTempChar.vert.height);
+
+					min /= sizeF;
+					max /= sizeF;
+
+					s_c0 = Color.Lerp(gb, gt, min);
+					s_c1 = Color.Lerp(gb, gt, max);
+
+					cols.Add(s_c0);
+					cols.Add(s_c1);
+					cols.Add(s_c1);
+					cols.Add(s_c0);
+				}
+				else for (int b = 0; b < 4; ++b) cols.Add(uc);
 			}
-
-			if (current.gradient)
-			{
-				float min = sizeF - (-mTempChar.vert.yMax + baseline);
-				float max = min - (mTempChar.vert.height);
-
-				min /= sizeF;
-				max /= sizeF;
-
-				s_c0 = Color.Lerp(gb, gt, min);
-				s_c1 = Color.Lerp(gb, gt, max);
-
-				cols.Add(s_c0);
-				cols.Add(s_c0);
-				cols.Add(s_c1);
-				cols.Add(s_c1);
-			}
-			else for (int b = 0; b < 4; ++b) cols.Add(uc);
 		}
 
 		if (current.alignment != TextAlignment.Left && indexOffset < verts.size)
@@ -643,6 +796,246 @@ static public class NGUIText
 			indexOffset = verts.size;
 		}
 		mColors.Clear();
+	}
+
+	/// <summary>
+	/// Print character positions and indices into the specified buffer. Meant to be used with the "find closest vertex" calculations.
+	/// </summary>
+
+	static public void PrintCharacterPositions (Font font, string text, BetterList<Vector3> verts, BetterList<int> indices)
+	{
+		if (font == null || string.IsNullOrEmpty(text)) return;
+
+		// Ensure that the text we're about to print exists in the font's texture
+		int fontSize = current.finalSize;
+		font.RequestCharactersInTexture(text, fontSize, current.style);
+
+		float x = 0f, y = 0f, maxX = 0f, halfSize = fontSize * 0.5f;
+		float spacingX = current.finalSpacingX;
+		float pixelSize = 1f / current.pixelDensity;
+		float lineHeight = fontSize + current.finalSpacingY;
+		int textLength = text.Length, indexOffset = verts.size;
+
+		for (int i = 0; i < textLength; ++i)
+		{
+			char c = text[i];
+
+			verts.Add(new Vector3(pixelSize * x, pixelSize * (-y - halfSize)));
+			indices.Add(i);
+
+			if (c == '\n')
+			{
+				if (x > maxX) maxX = x;
+
+				if (current.alignment != TextAlignment.Left)
+				{
+					Align(verts, indexOffset, x - spacingX);
+					indexOffset = verts.size;
+				}
+
+				x = 0;
+				y += lineHeight;
+				continue;
+			}
+			else if (c < ' ') continue;
+
+			if (current.encoding && ParseSymbol(text, ref i))
+			{
+				--i;
+				continue;
+			}
+
+			if (font.GetCharacterInfo(c, out mTempChar, fontSize, current.style))
+			{
+				x += mTempChar.width + spacingX;
+				verts.Add(new Vector3(pixelSize * x, pixelSize * (-y - halfSize)));
+				indices.Add(i + 1);
+			}
+		}
+
+		if (current.alignment != TextAlignment.Left && indexOffset < verts.size)
+			Align(verts, indexOffset, x - spacingX);
+	}
+
+	/// <summary>
+	/// Print the caret and selection vertices. Note that it's expected that 'text' has been stripped clean of symbols.
+	/// </summary>
+
+	static public void PrintCaretAndSelection (Font font, string text, int start, int end, BetterList<Vector3> caret, BetterList<Vector3> highlight)
+	{
+		if (font == null || string.IsNullOrEmpty(text)) return;
+
+		int caretPos = end;
+
+		if (start > end)
+		{
+			end = start;
+			start = caretPos;
+		}
+
+		// Ensure that the text we're about to use exists in the font's texture
+		int size = current.finalSize;
+		font.RequestCharactersInTexture(text, size, current.style);
+
+		float x = 0f, y = 0f, maxX = 0f, fs = size;
+		float lineHeight = size + current.finalSpacingY;
+		float spacingX = current.finalSpacingX;
+		float pixelSize = 1f / current.pixelDensity;
+		int caretOffset = (caret != null) ? caret.size : 0;
+		int highlightOffset = (highlight != null) ? highlight.size : 0;
+		int textLength = text.Length, index = 0;
+		bool highlighting = false, caretSet = false;
+
+		Vector2 v0 = Vector2.zero;
+		Vector2 v1 = Vector2.zero;
+		Vector2 last0 = Vector2.zero;
+		Vector2 last1 = Vector2.zero;
+
+		for (; index < textLength; ++index)
+		{
+			// Print the caret
+			if (caret != null && !caretSet && caretPos <= index)
+			{
+				caretSet = true;
+				caret.Add(new Vector3(x - 1f, -y - fs));
+				caret.Add(new Vector3(x - 1f, -y));
+				caret.Add(new Vector3(x + 1f, -y));
+				caret.Add(new Vector3(x + 1f, -y - fs));
+			}
+
+			char c = text[index];
+
+			if (c == '\n')
+			{
+				// Used for alignment purposes
+				if (x > maxX) maxX = x;
+
+				// Align the caret
+				if (caret != null && caretSet)
+				{
+					if (NGUIText.current.alignment != TextAlignment.Left)
+						NGUIText.Align(caret, caretOffset, x - NGUIText.current.spacingX);
+					caret = null;
+				}
+
+				if (highlight != null)
+				{
+					if (highlighting)
+					{
+						// Close the selection on this line
+						highlighting = false;
+						highlight.Add(last1);
+						highlight.Add(last0);
+					}
+					else if (start <= index && end > index)
+					{
+						// This must be an empty line. Add a narrow vertical highlight.
+						highlight.Add(new Vector3(x, -y - fs));
+						highlight.Add(new Vector3(x, -y));
+						highlight.Add(new Vector3(x + 2f, -y));
+						highlight.Add(new Vector3(x + 2f, -y - fs));
+					}
+
+					// Align the highlight
+					if (NGUIText.current.alignment != TextAlignment.Left && highlightOffset < highlight.size)
+					{
+						NGUIText.Align(highlight, highlightOffset, x - NGUIText.current.spacingX);
+						highlightOffset = highlight.size;
+					}
+				}
+
+				x = 0;
+				y += lineHeight;
+				continue;
+			}
+			else if (c < ' ') continue;
+
+			if (current.encoding && ParseSymbol(text, ref index, mColors, current.premultiply))
+			{
+				--index;
+				continue;
+			}
+
+			if (font.GetCharacterInfo(c, out mTempChar, size, current.style))
+			{
+				v0.x = x + mTempChar.vert.xMin;
+				v1.x = v0.x + mTempChar.vert.width;
+				v0.y = -y - fs;
+				v1.y = -y;
+
+				if (pixelSize != 1f)
+				{
+					v0 *= pixelSize;
+					v1 *= pixelSize;
+				}
+
+				x += (mTempChar.width + spacingX);
+
+				// Print the highlight
+				if (highlight != null)
+				{
+					if (start > index || end <= index)
+					{
+						if (highlighting)
+						{
+							// Finish the highlight
+							highlighting = false;
+							highlight.Add(last1);
+							highlight.Add(last0);
+						}
+					}
+					else if (!highlighting)
+					{
+						// Start the highlight
+						highlighting = true;
+						highlight.Add(new Vector3(v0.x, v0.y));
+						highlight.Add(new Vector3(v0.x, v1.y));
+					}
+				}
+
+				// Save what the character ended with
+				last0 = new Vector2(v1.x, v0.y);
+				last1 = new Vector2(v1.x, v1.y);
+			}
+		}
+
+		// Ensure we always have a caret
+		if (caret != null)
+		{
+			if (!caretSet)
+			{
+				caret.Add(new Vector3(x - 1f, -y - fs));
+				caret.Add(new Vector3(x - 1f, -y));
+				caret.Add(new Vector3(x + 1f, -y));
+				caret.Add(new Vector3(x + 1f, -y - fs));
+			}
+
+			if (NGUIText.current.alignment != TextAlignment.Left)
+				NGUIText.Align(caret, caretOffset, x - NGUIText.current.spacingX);
+		}
+
+		// Close the selection
+		if (highlight != null)
+		{
+			if (highlighting)
+			{
+				// Finish the highlight
+				highlight.Add(last1);
+				highlight.Add(last0);
+			}
+			else if (start < index && end == index)
+			{
+				// Happens when highlight ends on an empty line. Highlight it with a thin line.
+				highlight.Add(new Vector3(x, -y - fs));
+				highlight.Add(new Vector3(x, -y));
+				highlight.Add(new Vector3(x + 2f, -y));
+				highlight.Add(new Vector3(x + 2f, -y - fs));
+			}
+
+			// Align the highlight
+			if (NGUIText.current.alignment != TextAlignment.Left && highlightOffset < highlight.size)
+				NGUIText.Align(highlight, highlightOffset, x - NGUIText.current.spacingX);
+		}
 	}
 #endif // DYNAMIC_FONT
 }

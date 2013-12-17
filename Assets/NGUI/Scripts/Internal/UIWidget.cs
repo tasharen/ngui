@@ -60,11 +60,24 @@ public class UIWidget : UIRect
 
 	[System.NonSerialized]
 	public UIPanel panel;
+
+	/// <summary>
+	/// Widget's generated geometry.
+	/// </summary>
+
+	[System.NonSerialized]
+	public UIGeometry geometry = new UIGeometry();
+
+	/// <summary>
+	/// If set to 'false', the widget's OnFill function will not be called, letting you define custom geometry at will.
+	/// </summary>
+
+	[System.NonSerialized]
+	public bool fillGeometry = true;
 	
 	protected bool mPlayMode = true;
 	protected Vector4 mDrawRegion = new Vector4(0f, 0f, 1f, 1f);
 
-	bool mStarted = false;
 	Matrix4x4 mLocalToPanel;
 	bool mIsVisible = true;
 	bool mIsInFront = true;
@@ -77,8 +90,6 @@ public class UIWidget : UIRect
 
 	[HideInInspector][System.NonSerialized] public UIDrawCall drawCall;
 
-	// Widget's generated geometry
-	protected UIGeometry mGeom = new UIGeometry();
 	protected Vector3[] mCorners = new Vector3[4];
 
 	/// <summary>
@@ -177,6 +188,7 @@ public class UIWidget : UIRect
 			{
 				bool alphaChange = (mColor.a != value.a);
 				mColor = value;
+				UpdateFinalAlpha(Time.frameCount);
 				Invalidate(alphaChange);
 			}
 		}
@@ -197,6 +209,7 @@ public class UIWidget : UIRect
 			if (mColor.a != value)
 			{
 				mColor.a = value;
+				UpdateFinalAlpha(Time.frameCount);
 				Invalidate(true);
 			}
 		}
@@ -212,7 +225,7 @@ public class UIWidget : UIRect
 	/// Whether the widget has vertices to draw.
 	/// </summary>
 
-	public bool hasVertices { get { return mGeom != null && mGeom.hasVertices; } }
+	public bool hasVertices { get { return geometry != null && geometry.hasVertices; } }
 
 	/// <summary>
 	/// Change the pivot point and do not attempt to keep the widget in the same place by adjusting its transform.
@@ -508,18 +521,26 @@ public class UIWidget : UIRect
 		if (mAlphaFrameID != frameID)
 		{
 			mAlphaFrameID = frameID;
-
-			if (!mIsVisible || !mIsInFront)
-			{
-				finalAlpha = 0f;
-			}
-			else
-			{
-				UIRect pt = parent;
-				finalAlpha = (parent != null) ? pt.CalculateFinalAlpha(frameID) * mColor.a : mColor.a;
-			}
+			UpdateFinalAlpha(frameID);
 		}
 		return finalAlpha;
+	}
+
+	/// <summary>
+	/// Force-calculate the final alpha value.
+	/// </summary>
+
+	protected void UpdateFinalAlpha (int frameID)
+	{
+		if (!mIsVisible || !mIsInFront)
+		{
+			finalAlpha = 0f;
+		}
+		else
+		{
+			UIRect pt = parent;
+			finalAlpha = (parent != null) ? pt.CalculateFinalAlpha(frameID) * mColor.a : mColor.a;
+		}
 	}
 
 	/// <summary>
@@ -807,9 +828,9 @@ public class UIWidget : UIRect
 	/// Mark the widget and the panel as having been changed.
 	/// </summary>
 
-	protected override void OnEnable ()
+	protected override void OnInit ()
 	{
-		base.OnEnable();
+		base.OnInit();
 		RemoveFromPanel();
 
 		// Prior to NGUI 2.7.0 width and height was specified as transform's local scale
@@ -841,7 +862,7 @@ public class UIWidget : UIRect
 	/// Virtual Start() functionality for widgets.
 	/// </summary>
 
-	protected override void OnStart () { mStarted = true; CreatePanel(); }
+	protected override void OnStart () { CreatePanel(); }
 
 	/// <summary>
 	/// Update the anchored edges and ensure the widget is registered with a panel.
@@ -1197,11 +1218,15 @@ public class UIWidget : UIRect
 
 			if (mIsVisible && finalAlpha > 0.001f && shader != null)
 			{
-				bool hadVertices = mGeom.hasVertices;
-				mGeom.Clear();
-				OnFill(mGeom.verts, mGeom.uvs, mGeom.cols);
+				bool hadVertices = geometry.hasVertices;
 
-				if (mGeom.hasVertices)
+				if (fillGeometry)
+				{
+					geometry.Clear();
+					OnFill(geometry.verts, geometry.uvs, geometry.cols);
+				}
+
+				if (geometry.hasVertices)
 				{
 					// Want to see what's being filled? Uncomment this line.
 					//Debug.Log("Fill " + name + " (" + Time.time + ")");
@@ -1211,27 +1236,27 @@ public class UIWidget : UIRect
 						mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix;
 						mMatrixFrame = frame;
 					}
-					mGeom.ApplyTransform(mLocalToPanel);
+					geometry.ApplyTransform(mLocalToPanel);
 					mMoved = false;
 					return true;
 				}
 				return hadVertices;
 			}
-			else if (mGeom.hasVertices)
+			else if (geometry.hasVertices)
 			{
-				mGeom.Clear();
+				if (fillGeometry) geometry.Clear();
 				mMoved = false;
 				return true;
 			}
 		}
-		else if (mMoved && mGeom.hasVertices)
+		else if (mMoved && geometry.hasVertices)
 		{
 			if (mMatrixFrame != frame)
 			{
 				mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix;
 				mMatrixFrame = frame;
 			}
-			mGeom.ApplyTransform(mLocalToPanel);
+			geometry.ApplyTransform(mLocalToPanel);
 			mMoved = false;
 			return true;
 		}
@@ -1245,7 +1270,7 @@ public class UIWidget : UIRect
 
 	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color32> c, BetterList<Vector3> n, BetterList<Vector4> t)
 	{
-		mGeom.WriteToBuffers(v, u, c, n, t);
+		geometry.WriteToBuffers(v, u, c, n, t);
 	}
 
 	/// <summary>

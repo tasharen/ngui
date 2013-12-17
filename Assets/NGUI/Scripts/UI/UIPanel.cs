@@ -273,12 +273,6 @@ public class UIPanel : UIRect
 	}
 
 	/// <summary>
-	/// Number of draw calls produced by this panel.
-	/// </summary>
-
-	public int drawCallCount { get { return UIDrawCall.Count(this); } }
-
-	/// <summary>
 	/// Clipping method used by all draw calls.
 	/// </summary>
 
@@ -577,7 +571,7 @@ public class UIPanel : UIRect
 	/// Returns whether the specified rectangle is visible by the panel. The coordinates must be in world space.
 	/// </summary>
 
-	bool IsVisible (Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+	public bool IsVisible (Vector3 a, Vector3 b, Vector3 c, Vector3 d)
 	{
 		UpdateTransformMatrix();
 
@@ -633,7 +627,7 @@ public class UIPanel : UIRect
 	/// Returns whether the specified widget is visible by the panel.
 	/// </summary>
 
-	public bool IsVisible (UIWidget w)
+	public bool IsVisible (UIRect w)
 	{
 		Vector3[] corners = w.worldCorners;
 		return IsVisible(corners[0], corners[1], corners[2], corners[3]);
@@ -691,9 +685,9 @@ public class UIPanel : UIRect
 	/// Mark all widgets as having been changed so the draw calls get re-created.
 	/// </summary>
 
-	protected override void OnEnable ()
+	protected override void OnInit ()
 	{
-		base.OnEnable();
+		base.OnInit();
 
 		// Apparently having a rigidbody helps
 		if (rigidbody == null)

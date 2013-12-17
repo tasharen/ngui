@@ -626,9 +626,10 @@ public class UIFont : MonoBehaviour
 		return text.Substring(offset, textLength - offset);
 	}
 
+	static BetterList<int> mSizes = new BetterList<int>();
+
 	/// <summary>
 	/// Calculate the character index offset required to print the end of the specified text.
-	/// Originally contributed by MightyM: http://www.tasharen.com/forum/index.php?topic=1049.0
 	/// </summary>
 
 	public int CalculateOffsetToFit (string text)
@@ -645,45 +646,44 @@ public class UIFont : MonoBehaviour
 		}
 #endif
 		int textLength = text.Length;
-		int remainingWidth = NGUIText.current.lineWidth;
-		BMGlyph followingGlyph = null;
-		int currentCharacterIndex = textLength;
 		bool useSymbols = NGUIText.current.encoding && NGUIText.current.symbolStyle != NGUIText.SymbolStyle.None && hasSymbols;
+		char ch = (char)0;
+		char prev = (char)0;
 
-		while (currentCharacterIndex > 0 && remainingWidth > 0)
+		for (int i = 0, imax = text.Length; i < imax; ++i)
 		{
-			char currentCharacter = text[--currentCharacterIndex];
-
 			// See if there is a symbol matching this text
-			BMSymbol symbol = useSymbols ? MatchSymbol(text, currentCharacterIndex, textLength) : null;
-
-			// Calculate how wide this symbol or character is going to be
-			int glyphWidth = NGUIText.current.spacingX;
+			BMSymbol symbol = useSymbols ? MatchSymbol(text, i, textLength) : null;
 
 			if (symbol != null)
 			{
-				glyphWidth += symbol.advance;
+				int w = NGUIText.current.spacingX + symbol.advance;
+				mSizes.Add(w);
+				for (int b = 0, bmax = symbol.sequence.Length - 1; b < bmax; ++b)
+					mSizes.Add(0);
+				prev = (char)0;
 			}
 			else
 			{
 				// Find the glyph for this character
-				BMGlyph glyph = mFont.GetGlyph(currentCharacter);
-
-				if (glyph != null)
-				{
-					glyphWidth += glyph.advance + ((followingGlyph == null) ? 0 : followingGlyph.GetKerning(currentCharacter));
-					followingGlyph = glyph;
-				}
-				else
-				{
-					followingGlyph = null;
-					continue;
-				}
+				ch = text[i];
+				BMGlyph glyph = mFont.GetGlyph(ch);
+				int w = (glyph != null) ? NGUIText.current.spacingX + glyph.advance + glyph.GetKerning(prev) : 0;
+				mSizes.Add(w);
+				prev = ch;
 			}
-
-			// Remaining width after this glyph gets printed
-			remainingWidth -= glyphWidth;
 		}
+
+		int remainingWidth = NGUIText.current.lineWidth;
+		int currentCharacterIndex = mSizes.size;
+
+		while (currentCharacterIndex > 0 && remainingWidth > 0)
+		{
+			int w = mSizes[--currentCharacterIndex];
+			remainingWidth -= w;
+		}
+		mSizes.Clear();
+
 		if (remainingWidth < 0) ++currentCharacterIndex;
 		return currentCharacterIndex;
 	}
@@ -860,7 +860,6 @@ public class UIFont : MonoBehaviour
 
 	/// <summary>
 	/// Print the specified text into the buffers.
-	/// Note: 'lineWidth' parameter should be in pixels.
 	/// </summary>
 
 	public void Print (string text, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
@@ -891,10 +890,7 @@ public class UIFont : MonoBehaviour
 
 			int fs = NGUIText.current.size;
 			int indexOffset = verts.size;
-			int maxX = 0;
-			int x = 0;
-			int y = 0;
-			int prev = 0;
+			int x = 0, y = 0, maxX = 0, prev = 0;
 			int lineHeight = (fs + NGUIText.current.spacingY);
 			Vector3 v0 = Vector3.zero, v1 = Vector3.zero;
 			Vector2 u0 = Vector2.zero, u1 = Vector2.zero;
@@ -906,7 +902,8 @@ public class UIFont : MonoBehaviour
 			float invY = mUVRect.height / mFont.texHeight;
 
 			int textLength = text.Length;
-			bool useSymbols = NGUIText.current.encoding && NGUIText.current.symbolStyle != NGUIText.SymbolStyle.None && hasSymbols && sprite != null;
+			bool useSymbols = NGUIText.current.encoding && hasSymbols && sprite != null &&
+				NGUIText.current.symbolStyle != NGUIText.SymbolStyle.None;
 
 			for (int i = 0; i < textLength; ++i)
 			{
@@ -958,6 +955,7 @@ public class UIFont : MonoBehaviour
 
 					if (prev != 0) x += glyph.GetKerning(prev);
 
+					// Simply skip spaces
 					if (c == ' ')
 					{
 						x += NGUIText.current.spacingX + glyph.advance;
@@ -965,64 +963,73 @@ public class UIFont : MonoBehaviour
 						continue;
 					}
 
-					v0.x =  (x + glyph.offsetX);
-					v0.y = -(y + glyph.offsetY);
-
+					v0.x = (x + glyph.offsetX);
 					v1.x = v0.x + glyph.width;
+					v0.y = -(y + glyph.offsetY);
 					v1.y = v0.y - glyph.height;
-
-					u0.x = mUVRect.xMin + invX * glyph.x;
-					u0.y = mUVRect.yMax - invY * glyph.y;
-
-					u1.x = u0.x + invX * glyph.width;
-					u1.y = u0.y - invY * glyph.height;
 
 					x += NGUIText.current.spacingX + glyph.advance;
 					prev = c;
 
-					if (glyph.channel == 0 || glyph.channel == 15)
+					if (uvs != null)
 					{
-						if (NGUIText.current.gradient)
-						{
-							float min = NGUIText.current.size - glyph.offsetY;
-							float max = min - glyph.height;
+						u0.x = mUVRect.xMin + invX * glyph.x;
+						u0.y = mUVRect.yMax - invY * glyph.y;
+						u1.x = u0.x + invX * glyph.width;
+						u1.y = u0.y - invY * glyph.height;
 
-							min /= NGUIText.current.size;
-							max /= NGUIText.current.size;
-
-							s_c0 = Color.Lerp(gb, gt, min);
-							s_c1 = Color.Lerp(gb, gt, max);
-
-							cols.Add(s_c0);
-							cols.Add(s_c1);
-							cols.Add(s_c1);
-							cols.Add(s_c0);
-						}
-						else for (int b = 0; b < 4; ++b) cols.Add(uc);
+						uvs.Add(new Vector2(u1.x, u0.y));
+						uvs.Add(new Vector2(u1.x, u1.y));
+						uvs.Add(new Vector2(u0.x, u1.y));
+						uvs.Add(new Vector2(u0.x, u0.y));
 					}
-					else
+
+					if (cols != null)
 					{
-						// Packed fonts come as alpha masks in each of the RGBA channels.
-						// In order to use it we need to use a special shader.
-						//
-						// Limitations:
-						// - Effects (drop shadow, outline) will not work.
-						// - Should not be a part of the atlas (eastern fonts rarely are anyway).
-						// - Lower color precision
-
-						Color col = uc;
-
-						col *= 0.49f;
-
-						switch (glyph.channel)
+						if (glyph.channel == 0 || glyph.channel == 15)
 						{
-							case 1: col.b += 0.51f; break;
-							case 2: col.g += 0.51f; break;
-							case 4: col.r += 0.51f; break;
-							case 8: col.a += 0.51f; break;
-						}
+							if (NGUIText.current.gradient)
+							{
+								float min = NGUIText.current.size - glyph.offsetY;
+								float max = min - glyph.height;
 
-						for (int b = 0; b < 4; ++b) cols.Add(col);
+								min /= NGUIText.current.size;
+								max /= NGUIText.current.size;
+
+								s_c0 = Color.Lerp(gb, gt, min);
+								s_c1 = Color.Lerp(gb, gt, max);
+
+								cols.Add(s_c0);
+								cols.Add(s_c1);
+								cols.Add(s_c1);
+								cols.Add(s_c0);
+							}
+							else for (int b = 0; b < 4; ++b) cols.Add(uc);
+						}
+						else
+						{
+							// Packed fonts come as alpha masks in each of the RGBA channels.
+							// In order to use it we need to use a special shader.
+							//
+							// Limitations:
+							// - Effects (drop shadow, outline) will not work.
+							// - Should not be a part of the atlas (eastern fonts rarely are anyway).
+							// - Lower color precision
+
+							Color col = uc;
+
+							col *= 0.49f;
+
+							switch (glyph.channel)
+							{
+								case 1: col.b += 0.51f; break;
+								case 2: col.g += 0.51f; break;
+								case 4: col.r += 0.51f; break;
+								case 8: col.a += 0.51f; break;
+							}
+
+							for (int b = 0; b < 4; ++b) cols.Add(col);
+						}
 					}
 				}
 				else
@@ -1033,26 +1040,37 @@ public class UIFont : MonoBehaviour
 					v1.x = v0.x + symbol.width;
 					v1.y = v0.y - symbol.height;
 
-					Rect uv = symbol.uvRect;
-
-					u0.x = uv.xMin;
-					u0.y = uv.yMax;
-					u1.x = uv.xMax;
-					u1.y = uv.yMin;
-
 					x += NGUIText.current.spacingX + symbol.advance;
 					i += symbol.length - 1;
 					prev = 0;
 
-					if (NGUIText.current.symbolStyle == NGUIText.SymbolStyle.Colored)
+					if (uvs != null)
 					{
-						for (int b = 0; b < 4; ++b) cols.Add(uc);
+						Rect uv = symbol.uvRect;
+						
+						u0.x = uv.xMin;
+						u0.y = uv.yMax;
+						u1.x = uv.xMax;
+						u1.y = uv.yMin;
+
+						uvs.Add(new Vector2(u1.x, u0.y));
+						uvs.Add(new Vector2(u1.x, u1.y));
+						uvs.Add(new Vector2(u0.x, u1.y));
+						uvs.Add(new Vector2(u0.x, u0.y));
 					}
-					else
+
+					if (cols != null)
 					{
-						Color32 col = Color.white;
-						col.a = uc.a;
-						for (int b = 0; b < 4; ++b) cols.Add(col);
+						if (NGUIText.current.symbolStyle == NGUIText.SymbolStyle.Colored)
+						{
+							for (int b = 0; b < 4; ++b) cols.Add(uc);
+						}
+						else
+						{
+							Color32 col = Color.white;
+							col.a = uc.a;
+							for (int b = 0; b < 4; ++b) cols.Add(col);
+						}
 					}
 				}
 
@@ -1060,19 +1078,260 @@ public class UIFont : MonoBehaviour
 				verts.Add(new Vector3(v1.x, v1.y));
 				verts.Add(new Vector3(v0.x, v1.y));
 				verts.Add(new Vector3(v0.x, v0.y));
-
-				uvs.Add(new Vector2(u1.x, u0.y));
-				uvs.Add(new Vector2(u1.x, u1.y));
-				uvs.Add(new Vector2(u0.x, u1.y));
-				uvs.Add(new Vector2(u0.x, u0.y));
 			}
 
 			if (NGUIText.current.alignment != TextAlignment.Left && indexOffset < verts.size)
-			{
 				NGUIText.Align(verts, indexOffset, x - NGUIText.current.spacingX);
-				indexOffset = verts.size;
-			}
+
 			mColors.Clear();
+		}
+	}
+
+	/// <summary>
+	/// Print character positions and indices into the specified buffer. Meant to be used with the "find closest vertex" calculations.
+	/// </summary>
+
+	public void PrintCharacterPositions (string text, BetterList<Vector3> verts, BetterList<int> indices)
+	{
+		if (mReplacement != null)
+		{
+			mReplacement.PrintCharacterPositions(text, verts, indices);
+		}
+		else if (isValid && !string.IsNullOrEmpty(text))
+		{
+			float x = 0f, y = 0f, maxX = 0f, halfSize = NGUIText.current.size * 0.5f;
+			float lineHeight = NGUIText.current.size + NGUIText.current.spacingY;
+			int textLength = text.Length, prev = 0, indexOffset = verts.size;
+
+			for (int i = 0; i < textLength; ++i)
+			{
+				char c = text[i];
+
+				verts.Add(new Vector3(x, -y - halfSize));
+				indices.Add(i);
+
+				if (c == '\n')
+				{
+					if (x > maxX) maxX = x;
+
+					if (NGUIText.current.alignment != TextAlignment.Left)
+					{
+						NGUIText.Align(verts, indexOffset, x - NGUIText.current.spacingX);
+						indexOffset = verts.size;
+					}
+
+					x = 0;
+					y += lineHeight;
+					prev = 0;
+					continue;
+				}
+				else if (c < ' ')
+				{
+					prev = 0;
+					continue;
+				}
+
+				if (NGUIText.current.encoding && NGUIText.ParseSymbol(text, ref i))
+				{
+					--i;
+					continue;
+				}
+
+				BMGlyph glyph = mFont.GetGlyph(c);
+
+				if (glyph != null)
+				{
+					if (prev != 0) x += glyph.GetKerning(prev);
+					x += NGUIText.current.spacingX + glyph.advance;
+					verts.Add(new Vector3(x, -y - halfSize));
+					indices.Add(i + 1);
+					prev = c;
+				}
+			}
+
+			if (NGUIText.current.alignment != TextAlignment.Left && indexOffset < verts.size)
+				NGUIText.Align(verts, indexOffset, x - NGUIText.current.spacingX);
+		}
+	}
+
+	/// <summary>
+	/// Print the caret and selection vertices. Note that it's expected that 'text' has been stripped clean of symbols.
+	/// </summary>
+
+	public void PrintCaretAndSelection (string text, int start, int end, BetterList<Vector3> caret, BetterList<Vector3> highlight)
+	{
+		if (mReplacement != null)
+		{
+			mReplacement.PrintCaretAndSelection(text, start, end, caret, highlight);
+		}
+		else if (isValid)
+		{
+			int caretPos = end;
+
+			if (start > end)
+			{
+				end = start;
+				start = caretPos;
+			}
+
+			float x = 0, y = 0, maxX = 0, fs = NGUIText.current.size;
+			float lineHeight = (fs + NGUIText.current.spacingY);
+			int caretOffset = (caret != null) ? caret.size : 0;
+			int highlightOffset = (highlight != null) ? highlight.size : 0;
+			int textLength = text.Length, index = 0, prev = 0;
+			bool highlighting = false, caretSet = false;
+
+			Vector2 v0 = Vector2.zero;
+			Vector2 v1 = Vector2.zero;
+			Vector2 last0 = Vector2.zero;
+			Vector2 last1 = Vector2.zero;
+
+			for (; index < textLength; ++index)
+			{
+				// Print the caret
+				if (caret != null && !caretSet && caretPos <= index)
+				{
+					caretSet = true;
+					caret.Add(new Vector3(x - 1f, -y - fs));
+					caret.Add(new Vector3(x - 1f, -y));
+					caret.Add(new Vector3(x + 1f, -y));
+					caret.Add(new Vector3(x + 1f, -y - fs));
+				}
+
+				char c = text[index];
+
+				if (c == '\n')
+				{
+					// Used for alignment purposes
+					if (x > maxX) maxX = x;
+
+					// Align the caret
+					if (caret != null && caretSet)
+					{
+						if (NGUIText.current.alignment != TextAlignment.Left)
+							NGUIText.Align(caret, caretOffset, x - NGUIText.current.spacingX);
+						caret = null;
+					}
+
+					if (highlight != null)
+					{
+						if (highlighting)
+						{
+							// Close the selection on this line
+							highlighting = false;
+							highlight.Add(last1);
+							highlight.Add(last0);
+						}
+						else if (start <= index && end > index)
+						{
+							// This must be an empty line. Add a narrow vertical highlight.
+							highlight.Add(new Vector3(x, -y - fs));
+							highlight.Add(new Vector3(x, -y));
+							highlight.Add(new Vector3(x + 2f, -y));
+							highlight.Add(new Vector3(x + 2f, -y - fs));
+						}
+
+						// Align the highlight
+						if (NGUIText.current.alignment != TextAlignment.Left && highlightOffset < highlight.size)
+						{
+							NGUIText.Align(highlight, highlightOffset, x - NGUIText.current.spacingX);
+							highlightOffset = highlight.size;
+						}
+					}
+
+					x = 0;
+					y += lineHeight;
+					prev = 0;
+					continue;
+				}
+				else if (c < ' ')
+				{
+					prev = 0;
+					continue;
+				}
+
+				if (NGUIText.current.encoding && NGUIText.ParseSymbol(text, ref index, mColors, NGUIText.current.premultiply))
+				{
+					--index;
+					continue;
+				}
+
+				BMGlyph glyph = mFont.GetGlyph(c);
+				if (glyph == null) continue;
+				if (prev != 0) x += glyph.GetKerning(prev);
+
+				v0.x = (x + glyph.offsetX);
+				v1.x = v0.x + glyph.advance;
+				v0.y = -y - fs;
+				v1.y = -y;
+
+				x += NGUIText.current.spacingX + glyph.advance;
+				prev = c;
+
+				// Print the highlight
+				if (highlight != null)
+				{
+					if (start > index || end <= index)
+					{
+						if (highlighting)
+						{
+							// Finish the highlight
+							highlighting = false;
+							highlight.Add(last1);
+							highlight.Add(last0);
+						}
+					}
+					else if (!highlighting)
+					{
+						// Start the highlight
+						highlighting = true;
+						highlight.Add(new Vector3(v0.x, v0.y));
+						highlight.Add(new Vector3(v0.x, v1.y));
+					}
+				}
+
+				// Save what the character ended with
+				last0 = new Vector2(v1.x, v0.y);
+				last1 = new Vector2(v1.x, v1.y);
+			}
+
+			// Ensure we always have a caret
+			if (caret != null)
+			{
+				if (!caretSet)
+				{
+					caret.Add(new Vector3(x - 1f, -y - fs));
+					caret.Add(new Vector3(x - 1f, -y));
+					caret.Add(new Vector3(x + 1f, -y));
+					caret.Add(new Vector3(x + 1f, -y - fs));
+				}
+				
+				if (NGUIText.current.alignment != TextAlignment.Left)
+					NGUIText.Align(caret, caretOffset, x - NGUIText.current.spacingX);
+			}
+
+			// Close the selection
+			if (highlight != null)
+			{
+				if (highlighting)
+				{
+					// Finish the highlight
+					highlight.Add(last1);
+					highlight.Add(last0);
+				}
+				else if (start < index && end == index)
+				{
+					// Happens when highlight ends on an empty line. Highlight it with a thin line.
+					highlight.Add(new Vector3(x, -y - fs));
+					highlight.Add(new Vector3(x, -y));
+					highlight.Add(new Vector3(x + 2f, -y));
+					highlight.Add(new Vector3(x + 2f, -y - fs));
+				}
+
+				// Align the highlight
+				if (NGUIText.current.alignment != TextAlignment.Left && highlightOffset < highlight.size)
+					NGUIText.Align(highlight, highlightOffset, x - NGUIText.current.spacingX);
+			}
 		}
 	}
 

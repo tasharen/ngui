@@ -3,7 +3,7 @@
 // Copyright © 2011-2013 Tasharen Entertainment
 //----------------------------------------------
 
-//#define SHOW_HIDDEN_OBJECTS
+#define SHOW_HIDDEN_OBJECTS
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -388,9 +388,8 @@ public class UIDrawCall : MonoBehaviour
 #endif
 					setIndices = true;
 				}
-
-				// If the buffer length doesn't match, we need to trim all buffers
 #if !UNITY_FLASH
+				// If the buffer length doesn't match, we need to trim all buffers
 				bool trim = (uvs.buffer.Length != verts.buffer.Length) ||
 				    (cols.buffer.Length != verts.buffer.Length) ||
 				    (norms != null && norms.buffer.Length != verts.buffer.Length) ||

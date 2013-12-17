@@ -142,6 +142,7 @@ public abstract class UIRect : MonoBehaviour
 	protected Transform mTrans;
 	protected BetterList<UIRect> mChildren = new BetterList<UIRect>();
 	protected bool mChanged = true;
+	protected bool mStarted = false;
 
 	/// <summary>
 	/// Final calculated alpha.
@@ -315,7 +316,13 @@ public abstract class UIRect : MonoBehaviour
 	/// Automatically find the parent rectangle.
 	/// </summary>
 
-	protected virtual void OnEnable ()
+	protected void OnEnable () { if (mStarted) OnInit(); }
+
+	/// <summary>
+	/// Automatically find the parent rectangle.
+	/// </summary>
+
+	protected virtual void OnInit ()
 	{
 		mChanged = true;
 		mRootSet = false;
@@ -340,7 +347,12 @@ public abstract class UIRect : MonoBehaviour
 	/// Set anchor rect references on start.
 	/// </summary>
 
-	protected void Start () { OnStart(); }
+	protected void Start ()
+	{
+		mStarted = true;
+		OnInit();
+		OnStart();
+	}
 
 	/// <summary>
 	/// Rectangles need to update in a specific order -- parents before children.
@@ -405,6 +417,21 @@ public abstract class UIRect : MonoBehaviour
 	/// </summary>
 
 	protected abstract void OnAnchor ();
+
+	/// <summary>
+	/// Anchor this rectangle to the specified transform.
+	/// Note that this function will not keep the rectangle's current dimensions, but will instead assume the target's dimensions.
+	/// </summary>
+
+	public void SetAnchor (Transform t)
+	{
+		leftAnchor.target = t;
+		rightAnchor.target = t;
+		topAnchor.target = t;
+		bottomAnchor.target = t;
+		ResetAnchors();
+		UpdateAnchors();
+	}
 
 	/// <summary>
 	/// Ensure that all rect references are set correctly on the anchors.

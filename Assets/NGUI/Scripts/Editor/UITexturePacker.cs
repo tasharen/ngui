@@ -147,6 +147,7 @@ public class UITexturePacker
 			rect.height = (rect.height - yPadding) / height;
 			rects[i] = rect;
 		}
+		texture.Apply();
 		return rects;
 	}
 

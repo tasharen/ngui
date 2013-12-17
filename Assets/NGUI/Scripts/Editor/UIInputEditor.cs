@@ -45,6 +45,9 @@ public class UIInputEditor : UIWidgetContainerEditor
 				else EditorGUILayout.ColorField("Inactive Color", Color.white);
 			}
 			EditorGUI.EndDisabledGroup();
+
+			NGUIEditorTools.DrawProperty("Caret Color", serializedObject, "caretColor");
+			NGUIEditorTools.DrawProperty("Selection Color", serializedObject, "selectionColor");
 #if !MOBILE
 			NGUIEditorTools.DrawProperty(serializedObject, "selectOnTab");
 #endif

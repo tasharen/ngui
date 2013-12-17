@@ -23,7 +23,18 @@ public class TweenAlpha : UITweener
 
 	UIRect mRect;
 
-	public UIRect cachedRect { get { if (mRect == null) mRect = GetComponent<UIRect>(); return mRect; } }
+	public UIRect cachedRect
+	{
+		get
+		{
+			if (mRect == null)
+			{
+				mRect = GetComponent<UIRect>();
+				if (mRect == null) mRect = GetComponentInChildren<UIRect>();
+			}
+			return mRect;
+		}
+	}
 
 	[System.Obsolete("Use 'value' instead")]
 	public float alpha { get { return this.value; } set { this.value = value; } }

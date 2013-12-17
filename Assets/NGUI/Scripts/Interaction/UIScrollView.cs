@@ -158,6 +158,7 @@ public class UIScrollView : MonoBehaviour
 			if (!mCalculatedBounds)
 			{
 				mCalculatedBounds = true;
+				mTrans = transform;
 				mBounds = NGUIMath.CalculateRelativeWidgetBounds(mTrans, mTrans);
 			}
 			return mBounds;
@@ -520,14 +521,17 @@ public class UIScrollView : MonoBehaviour
 	[ContextMenu("Reset Clipping Position")]
 	public void ResetPosition()
 	{
-		// Invalidate the bounds
-		mCalculatedBounds = false;
+		if (NGUITools.GetActive(this))
+		{
+			// Invalidate the bounds
+			mCalculatedBounds = false;
 
-		// First move the position back to where it would be if the scroll bars got reset to zero
-		SetDragAmount(relativePositionOnReset.x, relativePositionOnReset.y, false);
+			// First move the position back to where it would be if the scroll bars got reset to zero
+			SetDragAmount(relativePositionOnReset.x, relativePositionOnReset.y, false);
 
-		// Next move the clipping area back and update the scroll bars
-		SetDragAmount(relativePositionOnReset.x, relativePositionOnReset.y, true);
+			// Next move the clipping area back and update the scroll bars
+			SetDragAmount(relativePositionOnReset.x, relativePositionOnReset.y, true);
+		}
 	}
 
 	/// <summary>

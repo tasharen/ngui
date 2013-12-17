@@ -9,6 +9,7 @@ using UnityEngine;
 /// Tween the object's color.
 /// </summary>
 
+[RequireComponent(typeof(UIWidget))]
 [AddComponentMenu("NGUI/Tween/Tween Color")]
 public class TweenColor : UITweener
 {
@@ -23,10 +24,12 @@ public class TweenColor : UITweener
 	void Cache ()
 	{
 		mCached = true;
-		mWidget = GetComponentInChildren<UIWidget>();
+		mWidget = GetComponent<UIWidget>();
 		Renderer ren = renderer;
 		if (ren != null) mMat = ren.material;
 		mLight = light;
+		if (mWidget == null && mMat == null && mLight == null)
+			mWidget = GetComponentInChildren<UIWidget>();
 	}
 
 	[System.Obsolete("Use 'value' instead")]

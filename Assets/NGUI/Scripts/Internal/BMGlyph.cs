@@ -30,7 +30,7 @@ public class BMGlyph
 
 	public int GetKerning (int previousChar)
 	{
-		if (kerning != null)
+		if (kerning != null && previousChar != 0)
 		{
 			for (int i = 0, imax = kerning.Count; i < imax; i += 2)
 				if (kerning[i] == previousChar)
