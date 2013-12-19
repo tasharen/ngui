@@ -257,8 +257,6 @@ public class UITextList : MonoBehaviour
 			// and then do wrapping ourselves in the 'for' loop below.
 			textLabel.UpdateNGUIText();
 			NGUIText.lineHeight = 1000000;
-
-			UIFont bitmapFont = textLabel.bitmapFont;
 			mTotalLines = 0;
 
 			for (int i = 0; i < mParagraphs.size; ++i)
@@ -266,21 +264,11 @@ public class UITextList : MonoBehaviour
 				string final;
 				Paragraph p = mParagraphs.buffer[i];
 
-				if (bitmapFont != null)
-				{
-					if (bitmapFont.WrapText(p.text, out final))
-					{
-						p.lines = final.Split('\n');
-						mTotalLines += p.lines.Length;
-					}
-				}
-#if DYNAMIC_FONT
-				else if (NGUIText.WrapText(textLabel.trueTypeFont, p.text, out final))
+				if (NGUIText.WrapText(p.text, out final))
 				{
 					p.lines = final.Split('\n');
 					mTotalLines += p.lines.Length;
 				}
-#endif
 			}
 
 			// Recalculate the total number of lines

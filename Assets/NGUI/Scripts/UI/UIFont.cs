@@ -615,247 +615,6 @@ public class UIFont : MonoBehaviour
 		return v;
 	}
 
-	/// <summary>
-	/// Get the end of line that would fit into a field of given width.
-	/// </summary>
-
-	public string GetEndOfLineThatFits (string text)
-	{
-		int textLength = text.Length;
-		int offset = CalculateOffsetToFit(text);
-		return text.Substring(offset, textLength - offset);
-	}
-
-	static BetterList<int> mSizes = new BetterList<int>();
-
-	/// <summary>
-	/// Calculate the character index offset required to print the end of the specified text.
-	/// </summary>
-
-	public int CalculateOffsetToFit (string text)
-	{
-		if (NGUIText.lineWidth < 1) return 0;
-		if (mReplacement != null) return mReplacement.CalculateOffsetToFit(text);
-
-#if DYNAMIC_FONT
-		if (isDynamic)
-		{
-			NGUIText.size = mDynamicFontSize;
-			NGUIText.style = mDynamicFontStyle;
-			return NGUIText.CalculateOffsetToFit(mDynamicFont, text);
-		}
-#endif
-		int textLength = text.Length;
-		bool useSymbols = NGUIText.encoding && NGUIText.symbolStyle != NGUIText.SymbolStyle.None && hasSymbols;
-		char ch = (char)0;
-		char prev = (char)0;
-
-		for (int i = 0, imax = text.Length; i < imax; ++i)
-		{
-			// See if there is a symbol matching this text
-			BMSymbol symbol = useSymbols ? MatchSymbol(text, i, textLength) : null;
-
-			if (symbol != null)
-			{
-				int w = NGUIText.spacingX + symbol.advance;
-				mSizes.Add(w);
-				for (int b = 0, bmax = symbol.sequence.Length - 1; b < bmax; ++b)
-					mSizes.Add(0);
-				prev = (char)0;
-			}
-			else
-			{
-				// Find the glyph for this character
-				ch = text[i];
-				BMGlyph glyph = mFont.GetGlyph(ch);
-				int w = (glyph != null) ? NGUIText.spacingX + glyph.advance + glyph.GetKerning(prev) : 0;
-				mSizes.Add(w);
-				prev = ch;
-			}
-		}
-
-		int remainingWidth = NGUIText.lineWidth;
-		int currentCharacterIndex = mSizes.size;
-
-		while (currentCharacterIndex > 0 && remainingWidth > 0)
-		{
-			int w = mSizes[--currentCharacterIndex];
-			remainingWidth -= w;
-		}
-		mSizes.Clear();
-
-		if (remainingWidth < 0) ++currentCharacterIndex;
-		return currentCharacterIndex;
-	}
-
-	/// <summary>
-	/// Text wrapping functionality. Works with settings set in NGUIText.
-	/// Returns 'true' if the specified text was able to fit into the provided dimensions, 'false' otherwise.
-	/// </summary>
-
-	public bool WrapText (string text, out string finalText)
-	{
-		if (mReplacement != null) return mReplacement.WrapText(text, out finalText);
-
-#if DYNAMIC_FONT
-		if (isDynamic)
-		{
-			NGUIText.size = mDynamicFontSize;
-			NGUIText.style = mDynamicFontStyle;
-			return NGUIText.WrapText(mDynamicFont, text, out finalText);
-		}
-#endif
-		if (NGUIText.lineWidth < 1 || NGUIText.lineHeight < 1)
-		{
-			finalText = "";
-			return false;
-		}
-
-		int height = (NGUIText.maxLines > 0) ?
-			Mathf.Min(NGUIText.lineHeight, NGUIText.size * NGUIText.maxLines) : NGUIText.lineHeight;
-
-		int maxLineCount = (NGUIText.maxLines > 0) ? NGUIText.maxLines : 1000000;
-		int sum = NGUIText.size + NGUIText.spacingY;
-		maxLineCount = (sum > 0) ? Mathf.Min(maxLineCount, height / sum) : 0;
-
-		if (maxLineCount == 0)
-		{
-			finalText = "";
-			return false;
-		}
-
-		StringBuilder sb = new StringBuilder();
-		int textLength = text.Length;
-		int remainingWidth = NGUIText.lineWidth;
-		int previousChar = 0;
-		int start = 0;
-		int offset = 0;
-		int lineCount = 1;
-		bool lineIsEmpty = true;
-		bool useSymbols = NGUIText.encoding && NGUIText.symbolStyle != NGUIText.SymbolStyle.None && hasSymbols;
-
-		// Run through all characters
-		for (; offset < textLength; ++offset)
-		{
-			char ch = text[offset];
-
-			// New line character -- start a new line
-			if (ch == '\n')
-			{
-				if (lineCount == maxLineCount) break;
-				remainingWidth = NGUIText.lineWidth;
-
-				// Add the previous word to the final string
-				if (start < offset) sb.Append(text.Substring(start, offset - start + 1));
-				else sb.Append(ch);
-
-				lineIsEmpty = true;
-				++lineCount;
-				start = offset + 1;
-				previousChar = 0;
-				continue;
-			}
-
-			// If this marks the end of a word, add it to the final string.
-			if (ch == ' ' && previousChar != ' ' && start < offset)
-			{
-				sb.Append(text.Substring(start, offset - start + 1));
-				lineIsEmpty = false;
-				start = offset + 1;
-				previousChar = ch;
-			}
-
-			// When encoded symbols such as [RrGgBb] or [-] are encountered, skip past them
-			if (NGUIText.ParseSymbol(text, ref offset)) { --offset; continue; }
-
-			// See if there is a symbol matching this text
-			BMSymbol symbol = useSymbols ? MatchSymbol(text, offset, textLength) : null;
-
-			// Calculate how wide this symbol or character is going to be
-			int glyphWidth = 0;
-
-			if (symbol != null)
-			{
-				glyphWidth = NGUIText.spacingX + symbol.advance;
-			}
-			else
-			{
-				// Find the glyph for this character
-				BMGlyph glyph = (symbol == null) ? mFont.GetGlyph(ch) : null;
-
-				if (glyph != null)
-				{
-					glyphWidth = NGUIText.spacingX +
-						((previousChar != 0) ? glyph.advance + glyph.GetKerning(previousChar) : glyph.advance);
-				}
-				else continue;
-			}
-
-			// Remaining width after this glyph gets printed
-			remainingWidth -= glyphWidth;
-
-			// Doesn't fit?
-			if (remainingWidth < 0)
-			{
-				// Can't start a new line
-				if (lineIsEmpty || lineCount == maxLineCount)
-				{
-					// This is the first word on the line -- add it up to the character that fits
-					sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
-
-					if (lineCount++ == maxLineCount)
-					{
-						start = offset;
-						break;
-					}
-					NGUIText.EndLine(ref sb);
-
-					// Start a brand-new line
-					lineIsEmpty = true;
-
-					if (ch == ' ')
-					{
-						start = offset + 1;
-						remainingWidth = NGUIText.lineWidth;
-					}
-					else
-					{
-						start = offset;
-						remainingWidth = NGUIText.lineWidth - glyphWidth;
-					}
-					previousChar = 0;
-				}
-				else
-				{
-					// Skip all spaces before the word
-					while (start < textLength && text[start] == ' ') ++start;
-
-					// Revert the position to the beginning of the word and reset the line
-					lineIsEmpty = true;
-					remainingWidth = NGUIText.lineWidth;
-					offset = start - 1;
-					previousChar = 0;
-
-					if (lineCount++ == maxLineCount) break;
-					NGUIText.EndLine(ref sb);
-					continue;
-				}
-			}
-			else previousChar = ch;
-
-			// Advance the offset past the symbol
-			if (symbol != null)
-			{
-				offset += symbol.length - 1;
-				previousChar = 0;
-			}
-		}
-
-		if (start < offset) sb.Append(text.Substring(start, offset - start));
-		finalText = sb.ToString();
-		return (offset == textLength) || (lineCount <= Mathf.Min(NGUIText.maxLines, maxLineCount));
-	}
-
 	static Color32 s_c0, s_c1;
 
 	/// <summary>
@@ -965,8 +724,8 @@ public class UIFont : MonoBehaviour
 
 					v0.x = (x + glyph.offsetX);
 					v1.x = v0.x + glyph.width;
-					v0.y = -(y + glyph.offsetY);
-					v1.y = v0.y - glyph.height;
+					v1.y = -(y + glyph.offsetY);
+					v0.y = v1.y - glyph.height;
 
 					x += NGUIText.spacingX + glyph.advance;
 					prev = c;
@@ -974,14 +733,15 @@ public class UIFont : MonoBehaviour
 					if (uvs != null)
 					{
 						u0.x = mUVRect.xMin + invX * glyph.x;
-						u0.y = mUVRect.yMax - invY * glyph.y;
 						u1.x = u0.x + invX * glyph.width;
-						u1.y = u0.y - invY * glyph.height;
 
-						uvs.Add(new Vector2(u1.x, u0.y));
-						uvs.Add(new Vector2(u1.x, u1.y));
-						uvs.Add(new Vector2(u0.x, u1.y));
+						u1.y = mUVRect.yMax - invY * glyph.y;
+						u0.y = u1.y - invY * glyph.height;
+
 						uvs.Add(new Vector2(u0.x, u0.y));
+						uvs.Add(new Vector2(u0.x, u1.y));
+						uvs.Add(new Vector2(u1.x, u1.y));
+						uvs.Add(new Vector2(u1.x, u0.y));
 					}
 
 					if (cols != null)
@@ -990,8 +750,8 @@ public class UIFont : MonoBehaviour
 						{
 							if (NGUIText.gradient)
 							{
-								float min = NGUIText.size - glyph.offsetY;
-								float max = min - glyph.height;
+								float max = NGUIText.size - glyph.offsetY;
+								float min = max - glyph.height;
 
 								min /= NGUIText.size;
 								max /= NGUIText.size;
@@ -1034,11 +794,11 @@ public class UIFont : MonoBehaviour
 				}
 				else
 				{
-					v0.x =  (x + symbol.offsetX);
-					v0.y = -(y + symbol.offsetY);
-
+					v0.x = x + symbol.offsetX;
 					v1.x = v0.x + symbol.width;
-					v1.y = v0.y - symbol.height;
+
+					v1.y = -(y + symbol.offsetY);
+					v0.y = v1.y - symbol.height;
 
 					x += NGUIText.spacingX + symbol.advance;
 					i += symbol.length - 1;
@@ -1049,14 +809,14 @@ public class UIFont : MonoBehaviour
 						Rect uv = symbol.uvRect;
 						
 						u0.x = uv.xMin;
-						u0.y = uv.yMax;
+						u0.y = uv.yMin;
 						u1.x = uv.xMax;
-						u1.y = uv.yMin;
+						u1.y = uv.yMax;
 
-						uvs.Add(new Vector2(u1.x, u0.y));
-						uvs.Add(new Vector2(u1.x, u1.y));
-						uvs.Add(new Vector2(u0.x, u1.y));
 						uvs.Add(new Vector2(u0.x, u0.y));
+						uvs.Add(new Vector2(u0.x, u1.y));
+						uvs.Add(new Vector2(u1.x, u1.y));
+						uvs.Add(new Vector2(u1.x, u0.y));
 					}
 
 					if (cols != null)
@@ -1074,10 +834,10 @@ public class UIFont : MonoBehaviour
 					}
 				}
 
-				verts.Add(new Vector3(v1.x, v0.y));
-				verts.Add(new Vector3(v1.x, v1.y));
-				verts.Add(new Vector3(v0.x, v1.y));
 				verts.Add(new Vector3(v0.x, v0.y));
+				verts.Add(new Vector3(v0.x, v1.y));
+				verts.Add(new Vector3(v1.x, v1.y));
+				verts.Add(new Vector3(v1.x, v0.y));
 			}
 
 			if (NGUIText.alignment != TextAlignment.Left && indexOffset < verts.size)
@@ -1361,7 +1121,7 @@ public class UIFont : MonoBehaviour
 	/// Retrieve the symbol at the beginning of the specified sequence, if a match is found.
 	/// </summary>
 
-	BMSymbol MatchSymbol (string text, int offset, int textLength)
+	public BMSymbol MatchSymbol (string text, int offset, int textLength)
 	{
 		// No symbols present
 		int count = mSymbols.Count;

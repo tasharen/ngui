@@ -990,10 +990,7 @@ public class UILabel : UIWidget
 
 				if (lw > 0f || lh > 0f)
 				{
-					if (mFont != null) fits = mFont.WrapText(mText, out mProcessedText);
-#if DYNAMIC_FONT
-					else fits = NGUIText.WrapText(mTrueTypeFont, mText, out mProcessedText);
-#endif
+					fits = NGUIText.WrapText(mText, out mProcessedText);
 				}
 				else mProcessedText = mText;
 
@@ -1018,7 +1015,11 @@ public class UILabel : UIWidget
 				}
 				else if (mOverflow == Overflow.ShrinkContent && !fits)
 				{
-					if (--mPrintedSize > 1) continue;
+					if (--mPrintedSize > 1)
+					{
+						NGUIText.Update();
+						continue;
+					}
 				}
 
 				// Upgrade to the new system
@@ -1417,16 +1418,7 @@ public class UILabel : UIWidget
 		UpdateNGUIText();
 		NGUIText.encoding = false;
 		NGUIText.symbolStyle = NGUIText.SymbolStyle.None;
-
-		if (bitmapFont != null)
-		{
-			return bitmapFont.CalculateOffsetToFit(text);
-		}
-#if DYNAMIC_FONT
-		return NGUIText.CalculateOffsetToFit(trueTypeFont, text);
-#else
-		return 0;
-#endif
+		return NGUIText.CalculateOffsetToFit(text);
 	}
 
 	/// <summary>
@@ -1470,19 +1462,7 @@ public class UILabel : UIWidget
 	public bool Wrap (string text, out string final, int height)
 	{
 		UpdateNGUIText(fontSize, mWidth, height);
-
-		if (mFont != null)
-		{
-			return mFont.WrapText(text, out final);
-		}
-#if DYNAMIC_FONT
-		else if (mTrueTypeFont != null)
-		{
-			return NGUIText.WrapText(mTrueTypeFont, text, out final);
-		}
-#endif
-		final = null;
-		return false;
+		return NGUIText.WrapText(text, out final);
 	}
 
 	/// <summary>
@@ -1513,18 +1493,36 @@ public class UILabel : UIWidget
 
 		if (mFont != null)
 		{
-			NGUIText.bitmapFont = mFont.bmFont;
+			NGUIText.bitmapFont = mFont;
+			
+			for (; ; )
+			{
+				UIFont fnt = NGUIText.bitmapFont.replacement;
+				if (fnt == null) break;
+				NGUIText.bitmapFont = fnt;
+			}
+
+#if DYNAMIC_FONT
+			if (NGUIText.bitmapFont.isDynamic)
+			{
+				NGUIText.dynamicFont = NGUIText.bitmapFont.dynamicFont;
+				NGUIText.bitmapFont = null;
+			}
+#endif
 		}
 #if DYNAMIC_FONT
 		else
 		{
-			NGUIText.bitmapFont = null;
 			NGUIText.dynamicFont = mTrueTypeFont;
+			NGUIText.bitmapFont = null;
 		}
-		UIRoot rt = root;
-		NGUIText.pixelDensity = (usePrintedSize && rt != null) ? 1f / rt.pixelSizeAdjustment : 1f;
-#else
-		NGUIText.pixelDensity = 1f;
+
+		if (NGUIText.dynamicFont != null)
+		{
+			UIRoot rt = root;
+			NGUIText.pixelDensity = (usePrintedSize && rt != null) ? 1f / rt.pixelSizeAdjustment : 1f;
+		}
+		else NGUIText.pixelDensity = 1f;
 #endif
 		Pivot p = pivot;
 

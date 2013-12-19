@@ -25,11 +25,11 @@ static public class NGUIText
 
 	public class GlyphInfo
 	{
-		public float x = 0;
-		public float y = 0;
-		public float width = 0;
-		public float height = 0;
-		public float advance = 0;
+		public Vector2 v0;
+		public Vector2 v1;
+		public Vector2 u0;
+		public Vector2 u1;
+		public int advance = 0;
 		public int channel = 0;
 	}
 
@@ -38,7 +38,7 @@ static public class NGUIText
 	/// this data is not passed at all, but is rather set in a single place before calling the functions that use it.
 	/// </summary>
 
-	static public BMFont bitmapFont;
+	static public UIFont bitmapFont;
 #if DYNAMIC_FONT
 	static public Font dynamicFont;
 #endif
@@ -69,6 +69,7 @@ static public class NGUIText
 	static public float finalSpacingY = 0f;
 	static public float finalLineWidth = 0f;
 	static public float finalLineHeight = 0f;
+	static public float baseline = 0f;
 
 	/// <summary>
 	/// Recalculate the 'final' values.
@@ -81,6 +82,15 @@ static public class NGUIText
 		finalSpacingY = (spacingY * pixelDensity);
 		finalLineWidth = (lineWidth * pixelDensity);
 		finalLineHeight = (lineHeight * pixelDensity);
+
+#if DYNAMIC_FONT
+		if (dynamicFont != null)
+		{
+			dynamicFont.RequestCharactersInTexture("j", finalSize, style);
+			dynamicFont.GetCharacterInfo('j', out mTempChar, finalSize, style);
+			baseline = mTempChar.vert.yMin + (Mathf.RoundToInt(size - Mathf.Abs(mTempChar.vert.height)) >> 1);
+		}
+#endif
 	}
 
 	/// <summary>
@@ -95,21 +105,63 @@ static public class NGUIText
 #endif
 	}
 
-	static public GlyphInfo GetGlyph (char ch, char prev)
+	static public BMSymbol GetSymbol (string text, int index, int textLength)
+	{
+		return (bitmapFont != null) ? bitmapFont.MatchSymbol(text, index, textLength) : null;
+	}
+
+	/// <summary>
+	/// Get the width of the specified glyph. Returns zero if the glyph could not be retrieved.
+	/// </summary>
+
+	static public float GetGlyphWidth (int ch, int prev)
 	{
 		if (bitmapFont != null)
 		{
-			BMGlyph bmg = bitmapFont.GetGlyph(ch);
+			BMGlyph bmg = bitmapFont.bmFont.GetGlyph(ch);
 
 			if (bmg != null)
 			{
-				glyph.x = bmg.offsetX;
-				glyph.y = bmg.offsetY;
-				glyph.width = bmg.width;
-				glyph.height = bmg.height;
-				glyph.advance = bmg.advance;
+				return (prev != 0) ? bmg.advance + bmg.GetKerning(prev) : bmg.advance;
+			}
+		}
+		else if (dynamicFont != null)
+		{
+			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, style))
+			{
+				return mTempChar.width;
+			}
+		}
+		return 0f;
+	}
+
+	/// <summary>
+	/// Get the specified glyph.
+	/// </summary>
+
+	static public GlyphInfo GetGlyph (int ch, int prev)
+	{
+		if (bitmapFont != null)
+		{
+			BMGlyph bmg = bitmapFont.bmFont.GetGlyph(ch);
+
+			if (bmg != null)
+			{
+				int kern = (prev != 0) ? bmg.GetKerning(prev) : 0;
+				glyph.v0.x = (prev != 0) ? bmg.offsetX + kern : bmg.offsetX;
+				glyph.v1.y = -bmg.offsetY;
+
+				glyph.v1.x = glyph.v0.x + bmg.width;
+				glyph.v0.y = glyph.v1.y - bmg.height;
+
+				glyph.u0.x = bmg.x;
+				glyph.u1.y = bmg.y;
+
+				glyph.u1.x = glyph.u1.x + bmg.width;
+				glyph.u0.y = glyph.u0.y - bmg.height;
+
+				glyph.advance = bmg.advance + kern;
 				glyph.channel = bmg.channel;
-				if (prev != 0) glyph.x += bmg.GetKerning(prev);
 				return glyph;
 			}
 		}
@@ -450,32 +502,65 @@ static public class NGUIText
 		return v;
 	}
 
+	static BetterList<float> mSizes = new BetterList<float>();
+
 	/// <summary>
 	/// Calculate the character index offset required to print the end of the specified text.
-	/// NOTE: This function assumes that the text has been stripped of all symbols.
 	/// </summary>
 
-	static public int CalculateOffsetToFit (Font font, string text)
+	static public int CalculateOffsetToFit (string text)
 	{
-		if (font == null || string.IsNullOrEmpty(text) || lineWidth < 1) return 0;
+		if (string.IsNullOrEmpty(text) || lineWidth < 1) return 0;
 
-		// Ensure we have the characters to work with
-		int size = finalSize;
-		font.RequestCharactersInTexture(text, size, style);
+		Prepare(text);
 
-		float remainingWidth = finalLineWidth;
-		int textLength = text.Length;
-		int currentCharacterIndex = textLength;
+		int textLength = text.Length, ch = 0, prev = 0;;
+		bool useSymbols = (bitmapFont != null && bitmapFont.hasSymbols) &&
+			NGUIText.encoding && NGUIText.symbolStyle != NGUIText.SymbolStyle.None;
 
-		while (currentCharacterIndex > 0 && remainingWidth > 0f)
+		for (int i = 0, imax = text.Length; i < imax; ++i)
 		{
-			char c = text[--currentCharacterIndex];
-			if (font.GetCharacterInfo(c, out mTempChar, size, style))
-				remainingWidth -= mTempChar.width;
+			// See if there is a symbol matching this text
+			BMSymbol symbol = useSymbols ? GetSymbol(text, i, textLength) : null;
+
+			if (symbol == null)
+			{
+				ch = text[i];
+				float w = GetGlyphWidth(ch, prev);
+				if (w != 0f) mSizes.Add(finalSpacingX + w);
+				prev = ch;
+			}
+			else
+			{
+				mSizes.Add(spacingX + symbol.advance);
+				for (int b = 0, bmax = symbol.sequence.Length - 1; b < bmax; ++b)
+					mSizes.Add(0);
+				prev = 0;
+			}
 		}
 
-		if (remainingWidth < 0f) ++currentCharacterIndex;
+		float remainingWidth = NGUIText.lineWidth;
+		int currentCharacterIndex = mSizes.size;
+
+		while (currentCharacterIndex > 0 && remainingWidth > 0)
+		{
+			remainingWidth -= mSizes[--currentCharacterIndex];
+		}
+		mSizes.Clear();
+
+		if (remainingWidth < 0) ++currentCharacterIndex;
 		return currentCharacterIndex;
+	}
+
+	/// <summary>
+	/// Get the end of line that would fit into a field of given width.
+	/// </summary>
+
+	static public string GetEndOfLineThatFits (string text)
+	{
+		int textLength = text.Length;
+		int offset = CalculateOffsetToFit(text);
+		return text.Substring(offset, textLength - offset);
 	}
 
 	/// <summary>
@@ -494,7 +579,7 @@ static public class NGUIText
 	/// Text wrapping functionality. The 'width' and 'height' should be in pixels.
 	/// </summary>
 
-	static public bool WrapText (Font font, string text, out string finalText)
+	static public bool WrapText (string text, out string finalText)
 	{
 		if (lineWidth < 1 || lineHeight < 1 || string.IsNullOrEmpty(text))
 		{
@@ -502,13 +587,11 @@ static public class NGUIText
 			return false;
 		}
 
-		int maxLineCount = (maxLines > 0) ? maxLines : 1000000;
 		int size = finalSize;
-		float height = (maxLines > 0) ?
-			Mathf.Min(finalLineHeight, size * maxLines) :
-			finalLineHeight;
+		float height = (maxLines > 0) ? Mathf.Min(finalLineHeight, size * maxLines) : finalLineHeight;
 
 		float sum = size + finalSpacingY;
+		int maxLineCount = (maxLines > 0) ? maxLines : 1000000;
 		maxLineCount = Mathf.FloorToInt((sum > 0) ? Mathf.Min(maxLineCount, height / sum) : 0);
 
 		if (maxLineCount == 0)
@@ -517,20 +600,15 @@ static public class NGUIText
 			return false;
 		}
 
-		// Ensure that we have the required characters to work with
-		if (font != null) font.RequestCharactersInTexture(text, size, style);
+		Prepare(text);
 
 		StringBuilder sb = new StringBuilder();
 		int textLength = text.Length;
-		float lw = finalLineWidth;
-		float remainingWidth = lw;
-		float spaceX = finalSpacingX;
-
-		int start = 0;
-		int offset = 0;
-		int lineCount = 1;
-		int previousChar = 0;
+		float remainingWidth = finalLineWidth;
+		int start = 0, offset = 0, lineCount = 1, prev = 0;
 		bool lineIsEmpty = true;
+		bool useSymbols = NGUIText.encoding && NGUIText.symbolStyle != NGUIText.SymbolStyle.None &&
+			(bitmapFont != null && bitmapFont.hasSymbols);
 
 		// Run through all characters
 		for (; offset < textLength; ++offset)
@@ -541,7 +619,7 @@ static public class NGUIText
 			if (ch == '\n')
 			{
 				if (lineCount == maxLineCount) break;
-				remainingWidth = lw;
+				remainingWidth = finalLineWidth;
 
 				// Add the previous word to the final string
 				if (start < offset) sb.Append(text.Substring(start, offset - start + 1));
@@ -550,30 +628,42 @@ static public class NGUIText
 				lineIsEmpty = true;
 				++lineCount;
 				start = offset + 1;
-				previousChar = 0;
+				prev = 0;
 				continue;
 			}
 
 			// If this marks the end of a word, add it to the final string.
-			if (ch == ' ' && previousChar != ' ' && start < offset)
+			if (ch == ' ' && prev != ' ' && start < offset)
 			{
 				sb.Append(text.Substring(start, offset - start + 1));
 				lineIsEmpty = false;
 				start = offset + 1;
-				previousChar = ch;
+				prev = ch;
 			}
 
 			// When encoded symbols such as [RrGgBb] or [-] are encountered, skip past them
 			if (ParseSymbol(text, ref offset)) { --offset; continue; }
 
-			// If the character is missing for any reason, skip it
-			if (!font.GetCharacterInfo(ch, out mTempChar, size, style)) continue;
+			// See if there is a symbol matching this text
+			BMSymbol symbol = useSymbols ? GetSymbol(text, offset, textLength) : null;
 
-			float glyphWidth = spaceX + mTempChar.width;
+			// Calculate how wide this symbol or character is going to be
+			float glyphWidth;
+
+			if (symbol == null)
+			{
+				// Find the glyph for this character
+				float w = GetGlyphWidth(ch, prev);
+				if (w == 0f) continue;
+				glyphWidth = finalSpacingX + w;
+			}
+			else glyphWidth = finalSpacingX + symbol.advance;
+
+			// Reduce the width
 			remainingWidth -= glyphWidth;
 
 			// Doesn't fit?
-			if (remainingWidth < 0)
+			if (remainingWidth < 0f)
 			{
 				// Can't start a new line
 				if (lineIsEmpty || lineCount == maxLineCount)
@@ -594,14 +684,14 @@ static public class NGUIText
 					if (ch == ' ')
 					{
 						start = offset + 1;
-						remainingWidth = lw;
+						remainingWidth = finalLineWidth;
 					}
 					else
 					{
 						start = offset;
-						remainingWidth = lw - glyphWidth;
+						remainingWidth = finalLineWidth - glyphWidth;
 					}
-					previousChar = 0;
+					prev = 0;
 				}
 				else
 				{
@@ -610,16 +700,23 @@ static public class NGUIText
 
 					// Revert the position to the beginning of the word and reset the line
 					lineIsEmpty = true;
-					remainingWidth = lw;
+					remainingWidth = finalLineWidth;
 					offset = start - 1;
-					previousChar = 0;
+					prev = 0;
 
 					if (lineCount++ == maxLineCount) break;
 					EndLine(ref sb);
 					continue;
 				}
 			}
-			else previousChar = ch;
+			else prev = ch;
+
+			// Advance the offset past the symbol
+			if (symbol != null)
+			{
+				offset += symbol.length - 1;
+				prev = 0;
+			}
 		}
 
 		if (start < offset) sb.Append(text.Substring(start, offset - start));
@@ -628,19 +725,6 @@ static public class NGUIText
 	}
 
 	static Color32 s_c0, s_c1;
-
-	/// <summary>
-	/// Helper function that retrieves the font's baseline.
-	/// There is currently no way to retrieve this value in a clean fashion from Unity, so it's using a hack.
-	/// </summary>
-
-	static float GetBaseline (Font font)
-	{
-		int size = finalSize;
-		font.RequestCharactersInTexture("j", size, style);
-		font.GetCharacterInfo('j', out mTempChar, size, style);
-		return mTempChar.vert.yMin + (Mathf.RoundToInt(size - Mathf.Abs(mTempChar.vert.height)) >> 1);
-	}
 
 	/// <summary>
 	/// Print the specified text into the buffers.
@@ -653,9 +737,6 @@ static public class NGUIText
 		int size = finalSize;
 		int indexOffset = verts.size;
 		float lineHeight = size + finalSpacingY;
-
-		// We need to know the baseline first
-		float baseline = GetBaseline(font);
 
 		// Ensure that the text we're about to print exists in the font's texture
 		font.RequestCharactersInTexture(text, size, style);
