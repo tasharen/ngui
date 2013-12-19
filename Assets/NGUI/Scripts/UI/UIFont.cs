@@ -549,8 +549,8 @@ public class UIFont : MonoBehaviour
 #if DYNAMIC_FONT
 		if (isDynamic)
 		{
-			NGUIText.current.size = mDynamicFontSize;
-			NGUIText.current.style = mDynamicFontStyle;
+			NGUIText.size = mDynamicFontSize;
+			NGUIText.style = mDynamicFontStyle;
 			return NGUIText.CalculatePrintedSize(mDynamicFont, text);
 		}
 #endif
@@ -558,15 +558,15 @@ public class UIFont : MonoBehaviour
 
 		if (mFont != null && mFont.isValid && !string.IsNullOrEmpty(text))
 		{
-			if (NGUIText.current.encoding) text = NGUIText.StripSymbols(text);
+			if (NGUIText.encoding) text = NGUIText.StripSymbols(text);
 
 			int x = 0;
 			int y = 0;
 			int prev = 0;
 			int maxX = 0;
 			int length = text.Length;
-			int lineHeight = NGUIText.current.size + NGUIText.current.spacingY;
-			bool useSymbols = NGUIText.current.encoding && NGUIText.current.symbolStyle != NGUIText.SymbolStyle.None && hasSymbols;
+			int lineHeight = NGUIText.size + NGUIText.spacingY;
+			bool useSymbols = NGUIText.encoding && NGUIText.symbolStyle != NGUIText.SymbolStyle.None && hasSymbols;
 
 			for (int i = 0; i < length; ++i)
 			{
@@ -595,14 +595,14 @@ public class UIFont : MonoBehaviour
 
 					if (glyph != null)
 					{
-						x += NGUIText.current.spacingX + ((prev != 0) ? glyph.advance + glyph.GetKerning(prev) : glyph.advance);
+						x += NGUIText.spacingX + ((prev != 0) ? glyph.advance + glyph.GetKerning(prev) : glyph.advance);
 						prev = c;
 					}
 				}
 				else
 				{
 					// Symbol found -- use it
-					x += NGUIText.current.spacingX + symbol.width;
+					x += NGUIText.spacingX + symbol.width;
 					i += symbol.length - 1;
 					prev = 0;
 				}
@@ -610,7 +610,7 @@ public class UIFont : MonoBehaviour
 
 			// Padding is always between characters, so it's one less than the number of characters
 			v.x = ((x > maxX) ? x : maxX);
-			v.y = (y + NGUIText.current.size);
+			v.y = (y + NGUIText.size);
 		}
 		return v;
 	}
@@ -634,19 +634,19 @@ public class UIFont : MonoBehaviour
 
 	public int CalculateOffsetToFit (string text)
 	{
-		if (NGUIText.current.lineWidth < 1) return 0;
+		if (NGUIText.lineWidth < 1) return 0;
 		if (mReplacement != null) return mReplacement.CalculateOffsetToFit(text);
 
 #if DYNAMIC_FONT
 		if (isDynamic)
 		{
-			NGUIText.current.size = mDynamicFontSize;
-			NGUIText.current.style = mDynamicFontStyle;
+			NGUIText.size = mDynamicFontSize;
+			NGUIText.style = mDynamicFontStyle;
 			return NGUIText.CalculateOffsetToFit(mDynamicFont, text);
 		}
 #endif
 		int textLength = text.Length;
-		bool useSymbols = NGUIText.current.encoding && NGUIText.current.symbolStyle != NGUIText.SymbolStyle.None && hasSymbols;
+		bool useSymbols = NGUIText.encoding && NGUIText.symbolStyle != NGUIText.SymbolStyle.None && hasSymbols;
 		char ch = (char)0;
 		char prev = (char)0;
 
@@ -657,7 +657,7 @@ public class UIFont : MonoBehaviour
 
 			if (symbol != null)
 			{
-				int w = NGUIText.current.spacingX + symbol.advance;
+				int w = NGUIText.spacingX + symbol.advance;
 				mSizes.Add(w);
 				for (int b = 0, bmax = symbol.sequence.Length - 1; b < bmax; ++b)
 					mSizes.Add(0);
@@ -668,13 +668,13 @@ public class UIFont : MonoBehaviour
 				// Find the glyph for this character
 				ch = text[i];
 				BMGlyph glyph = mFont.GetGlyph(ch);
-				int w = (glyph != null) ? NGUIText.current.spacingX + glyph.advance + glyph.GetKerning(prev) : 0;
+				int w = (glyph != null) ? NGUIText.spacingX + glyph.advance + glyph.GetKerning(prev) : 0;
 				mSizes.Add(w);
 				prev = ch;
 			}
 		}
 
-		int remainingWidth = NGUIText.current.lineWidth;
+		int remainingWidth = NGUIText.lineWidth;
 		int currentCharacterIndex = mSizes.size;
 
 		while (currentCharacterIndex > 0 && remainingWidth > 0)
@@ -689,7 +689,7 @@ public class UIFont : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Text wrapping functionality. Works with settings set in NGUIText.current.
+	/// Text wrapping functionality. Works with settings set in NGUIText.
 	/// Returns 'true' if the specified text was able to fit into the provided dimensions, 'false' otherwise.
 	/// </summary>
 
@@ -700,22 +700,22 @@ public class UIFont : MonoBehaviour
 #if DYNAMIC_FONT
 		if (isDynamic)
 		{
-			NGUIText.current.size = mDynamicFontSize;
-			NGUIText.current.style = mDynamicFontStyle;
+			NGUIText.size = mDynamicFontSize;
+			NGUIText.style = mDynamicFontStyle;
 			return NGUIText.WrapText(mDynamicFont, text, out finalText);
 		}
 #endif
-		if (NGUIText.current.lineWidth < 1 || NGUIText.current.lineHeight < 1)
+		if (NGUIText.lineWidth < 1 || NGUIText.lineHeight < 1)
 		{
 			finalText = "";
 			return false;
 		}
 
-		int height = (NGUIText.current.maxLines > 0) ?
-			Mathf.Min(NGUIText.current.lineHeight, NGUIText.current.size * NGUIText.current.maxLines) : NGUIText.current.lineHeight;
+		int height = (NGUIText.maxLines > 0) ?
+			Mathf.Min(NGUIText.lineHeight, NGUIText.size * NGUIText.maxLines) : NGUIText.lineHeight;
 
-		int maxLineCount = (NGUIText.current.maxLines > 0) ? NGUIText.current.maxLines : 1000000;
-		int sum = NGUIText.current.size + NGUIText.current.spacingY;
+		int maxLineCount = (NGUIText.maxLines > 0) ? NGUIText.maxLines : 1000000;
+		int sum = NGUIText.size + NGUIText.spacingY;
 		maxLineCount = (sum > 0) ? Mathf.Min(maxLineCount, height / sum) : 0;
 
 		if (maxLineCount == 0)
@@ -726,13 +726,13 @@ public class UIFont : MonoBehaviour
 
 		StringBuilder sb = new StringBuilder();
 		int textLength = text.Length;
-		int remainingWidth = NGUIText.current.lineWidth;
+		int remainingWidth = NGUIText.lineWidth;
 		int previousChar = 0;
 		int start = 0;
 		int offset = 0;
 		int lineCount = 1;
 		bool lineIsEmpty = true;
-		bool useSymbols = NGUIText.current.encoding && NGUIText.current.symbolStyle != NGUIText.SymbolStyle.None && hasSymbols;
+		bool useSymbols = NGUIText.encoding && NGUIText.symbolStyle != NGUIText.SymbolStyle.None && hasSymbols;
 
 		// Run through all characters
 		for (; offset < textLength; ++offset)
@@ -743,7 +743,7 @@ public class UIFont : MonoBehaviour
 			if (ch == '\n')
 			{
 				if (lineCount == maxLineCount) break;
-				remainingWidth = NGUIText.current.lineWidth;
+				remainingWidth = NGUIText.lineWidth;
 
 				// Add the previous word to the final string
 				if (start < offset) sb.Append(text.Substring(start, offset - start + 1));
@@ -776,7 +776,7 @@ public class UIFont : MonoBehaviour
 
 			if (symbol != null)
 			{
-				glyphWidth = NGUIText.current.spacingX + symbol.advance;
+				glyphWidth = NGUIText.spacingX + symbol.advance;
 			}
 			else
 			{
@@ -785,7 +785,7 @@ public class UIFont : MonoBehaviour
 
 				if (glyph != null)
 				{
-					glyphWidth = NGUIText.current.spacingX +
+					glyphWidth = NGUIText.spacingX +
 						((previousChar != 0) ? glyph.advance + glyph.GetKerning(previousChar) : glyph.advance);
 				}
 				else continue;
@@ -816,12 +816,12 @@ public class UIFont : MonoBehaviour
 					if (ch == ' ')
 					{
 						start = offset + 1;
-						remainingWidth = NGUIText.current.lineWidth;
+						remainingWidth = NGUIText.lineWidth;
 					}
 					else
 					{
 						start = offset;
-						remainingWidth = NGUIText.current.lineWidth - glyphWidth;
+						remainingWidth = NGUIText.lineWidth - glyphWidth;
 					}
 					previousChar = 0;
 				}
@@ -832,7 +832,7 @@ public class UIFont : MonoBehaviour
 
 					// Revert the position to the beginning of the word and reset the line
 					lineIsEmpty = true;
-					remainingWidth = NGUIText.current.lineWidth;
+					remainingWidth = NGUIText.lineWidth;
 					offset = start - 1;
 					previousChar = 0;
 
@@ -853,7 +853,7 @@ public class UIFont : MonoBehaviour
 
 		if (start < offset) sb.Append(text.Substring(start, offset - start));
 		finalText = sb.ToString();
-		return (offset == textLength) || (lineCount <= Mathf.Min(NGUIText.current.maxLines, maxLineCount));
+		return (offset == textLength) || (lineCount <= Mathf.Min(NGUIText.maxLines, maxLineCount));
 	}
 
 	static Color32 s_c0, s_c1;
@@ -880,30 +880,30 @@ public class UIFont : MonoBehaviour
 			if (isDynamic)
 			{
 				// NOTE: This shouldn't be used anymore. All dynamic font printing goes directly through NGUIText instead.
-				NGUIText.current.size = mDynamicFontSize;
-				NGUIText.current.style = mDynamicFontStyle;
+				NGUIText.size = mDynamicFontSize;
+				NGUIText.style = mDynamicFontStyle;
 				NGUIText.Print(dynamicFont, text, verts, uvs, cols);
 				return;
 			}
 #endif
 			mColors.Add(Color.white);
 
-			int fs = NGUIText.current.size;
+			int fs = NGUIText.size;
 			int indexOffset = verts.size;
 			int x = 0, y = 0, maxX = 0, prev = 0;
-			int lineHeight = (fs + NGUIText.current.spacingY);
+			int lineHeight = (fs + NGUIText.spacingY);
 			Vector3 v0 = Vector3.zero, v1 = Vector3.zero;
 			Vector2 u0 = Vector2.zero, u1 = Vector2.zero;
-			Color gb = NGUIText.current.tint * NGUIText.current.gradientBottom;
-			Color gt = NGUIText.current.tint * NGUIText.current.gradientTop;
-			Color32 uc = NGUIText.current.tint;
+			Color gb = NGUIText.tint * NGUIText.gradientBottom;
+			Color gt = NGUIText.tint * NGUIText.gradientTop;
+			Color32 uc = NGUIText.tint;
 
 			float invX = uvRect.width / mFont.texWidth;
 			float invY = mUVRect.height / mFont.texHeight;
 
 			int textLength = text.Length;
-			bool useSymbols = NGUIText.current.encoding && hasSymbols && sprite != null &&
-				NGUIText.current.symbolStyle != NGUIText.SymbolStyle.None;
+			bool useSymbols = NGUIText.encoding && hasSymbols && sprite != null &&
+				NGUIText.symbolStyle != NGUIText.SymbolStyle.None;
 
 			for (int i = 0; i < textLength; ++i)
 			{
@@ -913,9 +913,9 @@ public class UIFont : MonoBehaviour
 				{
 					if (x > maxX) maxX = x;
 
-					if (NGUIText.current.alignment != TextAlignment.Left)
+					if (NGUIText.alignment != TextAlignment.Left)
 					{
-						NGUIText.Align(verts, indexOffset, x - NGUIText.current.spacingX);
+						NGUIText.Align(verts, indexOffset, x - NGUIText.spacingX);
 						indexOffset = verts.size;
 					}
 
@@ -931,15 +931,15 @@ public class UIFont : MonoBehaviour
 					continue;
 				}
 
-				if (NGUIText.current.encoding && NGUIText.ParseSymbol(text, ref i, mColors, NGUIText.current.premultiply))
+				if (NGUIText.encoding && NGUIText.ParseSymbol(text, ref i, mColors, NGUIText.premultiply))
 				{
-					Color fc = NGUIText.current.tint * mColors[mColors.size - 1];
+					Color fc = NGUIText.tint * mColors[mColors.size - 1];
 					uc = fc;
 
-					if (NGUIText.current.gradient)
+					if (NGUIText.gradient)
 					{
-						gb = NGUIText.current.gradientBottom * fc;
-						gt = NGUIText.current.gradientTop * fc;
+						gb = NGUIText.gradientBottom * fc;
+						gt = NGUIText.gradientTop * fc;
 					}
 					--i;
 					continue;
@@ -958,7 +958,7 @@ public class UIFont : MonoBehaviour
 					// Simply skip spaces
 					if (c == ' ')
 					{
-						x += NGUIText.current.spacingX + glyph.advance;
+						x += NGUIText.spacingX + glyph.advance;
 						prev = c;
 						continue;
 					}
@@ -968,7 +968,7 @@ public class UIFont : MonoBehaviour
 					v0.y = -(y + glyph.offsetY);
 					v1.y = v0.y - glyph.height;
 
-					x += NGUIText.current.spacingX + glyph.advance;
+					x += NGUIText.spacingX + glyph.advance;
 					prev = c;
 
 					if (uvs != null)
@@ -988,13 +988,13 @@ public class UIFont : MonoBehaviour
 					{
 						if (glyph.channel == 0 || glyph.channel == 15)
 						{
-							if (NGUIText.current.gradient)
+							if (NGUIText.gradient)
 							{
-								float min = NGUIText.current.size - glyph.offsetY;
+								float min = NGUIText.size - glyph.offsetY;
 								float max = min - glyph.height;
 
-								min /= NGUIText.current.size;
-								max /= NGUIText.current.size;
+								min /= NGUIText.size;
+								max /= NGUIText.size;
 
 								s_c0 = Color.Lerp(gb, gt, min);
 								s_c1 = Color.Lerp(gb, gt, max);
@@ -1040,7 +1040,7 @@ public class UIFont : MonoBehaviour
 					v1.x = v0.x + symbol.width;
 					v1.y = v0.y - symbol.height;
 
-					x += NGUIText.current.spacingX + symbol.advance;
+					x += NGUIText.spacingX + symbol.advance;
 					i += symbol.length - 1;
 					prev = 0;
 
@@ -1061,7 +1061,7 @@ public class UIFont : MonoBehaviour
 
 					if (cols != null)
 					{
-						if (NGUIText.current.symbolStyle == NGUIText.SymbolStyle.Colored)
+						if (NGUIText.symbolStyle == NGUIText.SymbolStyle.Colored)
 						{
 							for (int b = 0; b < 4; ++b) cols.Add(uc);
 						}
@@ -1080,8 +1080,8 @@ public class UIFont : MonoBehaviour
 				verts.Add(new Vector3(v0.x, v0.y));
 			}
 
-			if (NGUIText.current.alignment != TextAlignment.Left && indexOffset < verts.size)
-				NGUIText.Align(verts, indexOffset, x - NGUIText.current.spacingX);
+			if (NGUIText.alignment != TextAlignment.Left && indexOffset < verts.size)
+				NGUIText.Align(verts, indexOffset, x - NGUIText.spacingX);
 
 			mColors.Clear();
 		}
@@ -1099,8 +1099,8 @@ public class UIFont : MonoBehaviour
 		}
 		else if (isValid && !string.IsNullOrEmpty(text))
 		{
-			float x = 0f, y = 0f, maxX = 0f, halfSize = NGUIText.current.size * 0.5f;
-			float lineHeight = NGUIText.current.size + NGUIText.current.spacingY;
+			float x = 0f, y = 0f, maxX = 0f, halfSize = NGUIText.size * 0.5f;
+			float lineHeight = NGUIText.size + NGUIText.spacingY;
 			int textLength = text.Length, prev = 0, indexOffset = verts.size;
 
 			for (int i = 0; i < textLength; ++i)
@@ -1114,9 +1114,9 @@ public class UIFont : MonoBehaviour
 				{
 					if (x > maxX) maxX = x;
 
-					if (NGUIText.current.alignment != TextAlignment.Left)
+					if (NGUIText.alignment != TextAlignment.Left)
 					{
-						NGUIText.Align(verts, indexOffset, x - NGUIText.current.spacingX);
+						NGUIText.Align(verts, indexOffset, x - NGUIText.spacingX);
 						indexOffset = verts.size;
 					}
 
@@ -1131,7 +1131,7 @@ public class UIFont : MonoBehaviour
 					continue;
 				}
 
-				if (NGUIText.current.encoding && NGUIText.ParseSymbol(text, ref i))
+				if (NGUIText.encoding && NGUIText.ParseSymbol(text, ref i))
 				{
 					--i;
 					continue;
@@ -1142,15 +1142,15 @@ public class UIFont : MonoBehaviour
 				if (glyph != null)
 				{
 					if (prev != 0) x += glyph.GetKerning(prev);
-					x += NGUIText.current.spacingX + glyph.advance;
+					x += NGUIText.spacingX + glyph.advance;
 					verts.Add(new Vector3(x, -y - halfSize));
 					indices.Add(i + 1);
 					prev = c;
 				}
 			}
 
-			if (NGUIText.current.alignment != TextAlignment.Left && indexOffset < verts.size)
-				NGUIText.Align(verts, indexOffset, x - NGUIText.current.spacingX);
+			if (NGUIText.alignment != TextAlignment.Left && indexOffset < verts.size)
+				NGUIText.Align(verts, indexOffset, x - NGUIText.spacingX);
 		}
 	}
 
@@ -1174,8 +1174,8 @@ public class UIFont : MonoBehaviour
 				start = caretPos;
 			}
 
-			float x = 0, y = 0, maxX = 0, fs = NGUIText.current.size;
-			float lineHeight = (fs + NGUIText.current.spacingY);
+			float x = 0, y = 0, maxX = 0, fs = NGUIText.size;
+			float lineHeight = (fs + NGUIText.spacingY);
 			int caretOffset = (caret != null) ? caret.size : 0;
 			int highlightOffset = (highlight != null) ? highlight.size : 0;
 			int textLength = text.Length, index = 0, prev = 0;
@@ -1208,8 +1208,8 @@ public class UIFont : MonoBehaviour
 					// Align the caret
 					if (caret != null && caretSet)
 					{
-						if (NGUIText.current.alignment != TextAlignment.Left)
-							NGUIText.Align(caret, caretOffset, x - NGUIText.current.spacingX);
+						if (NGUIText.alignment != TextAlignment.Left)
+							NGUIText.Align(caret, caretOffset, x - NGUIText.spacingX);
 						caret = null;
 					}
 
@@ -1232,9 +1232,9 @@ public class UIFont : MonoBehaviour
 						}
 
 						// Align the highlight
-						if (NGUIText.current.alignment != TextAlignment.Left && highlightOffset < highlight.size)
+						if (NGUIText.alignment != TextAlignment.Left && highlightOffset < highlight.size)
 						{
-							NGUIText.Align(highlight, highlightOffset, x - NGUIText.current.spacingX);
+							NGUIText.Align(highlight, highlightOffset, x - NGUIText.spacingX);
 							highlightOffset = highlight.size;
 						}
 					}
@@ -1250,7 +1250,7 @@ public class UIFont : MonoBehaviour
 					continue;
 				}
 
-				if (NGUIText.current.encoding && NGUIText.ParseSymbol(text, ref index, mColors, NGUIText.current.premultiply))
+				if (NGUIText.encoding && NGUIText.ParseSymbol(text, ref index, mColors, NGUIText.premultiply))
 				{
 					--index;
 					continue;
@@ -1265,7 +1265,7 @@ public class UIFont : MonoBehaviour
 				v0.y = -y - fs;
 				v1.y = -y;
 
-				x += NGUIText.current.spacingX + glyph.advance;
+				x += NGUIText.spacingX + glyph.advance;
 				prev = c;
 
 				// Print the highlight
@@ -1306,8 +1306,8 @@ public class UIFont : MonoBehaviour
 					caret.Add(new Vector3(x + 1f, -y - fs));
 				}
 				
-				if (NGUIText.current.alignment != TextAlignment.Left)
-					NGUIText.Align(caret, caretOffset, x - NGUIText.current.spacingX);
+				if (NGUIText.alignment != TextAlignment.Left)
+					NGUIText.Align(caret, caretOffset, x - NGUIText.spacingX);
 			}
 
 			// Close the selection
@@ -1329,8 +1329,8 @@ public class UIFont : MonoBehaviour
 				}
 
 				// Align the highlight
-				if (NGUIText.current.alignment != TextAlignment.Left && highlightOffset < highlight.size)
-					NGUIText.Align(highlight, highlightOffset, x - NGUIText.current.spacingX);
+				if (NGUIText.alignment != TextAlignment.Left && highlightOffset < highlight.size)
+					NGUIText.Align(highlight, highlightOffset, x - NGUIText.spacingX);
 			}
 		}
 	}

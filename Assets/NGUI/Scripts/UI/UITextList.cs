@@ -256,7 +256,7 @@ public class UITextList : MonoBehaviour
 			// over and over every paragraph, which is not ideal. It's faster to only do it once
 			// and then do wrapping ourselves in the 'for' loop below.
 			textLabel.UpdateNGUIText();
-			NGUIText.current.lineHeight = 1000000;
+			NGUIText.lineHeight = 1000000;
 
 			UIFont bitmapFont = textLabel.bitmapFont;
 			mTotalLines = 0;

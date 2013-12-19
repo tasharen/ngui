@@ -980,13 +980,13 @@ public class UILabel : UIWidget
 
 				bool fits = true;
 
-				NGUIText.current.lineWidth = (mOverflow == Overflow.ResizeFreely) ? 1000000 : Mathf.RoundToInt(lw / mScale);
+				NGUIText.lineWidth = (mOverflow == Overflow.ResizeFreely) ? 1000000 : Mathf.RoundToInt(lw / mScale);
 
 				if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
 				{
-					NGUIText.current.lineHeight = 1000000;
+					NGUIText.lineHeight = 1000000;
 				}
-				else NGUIText.current.lineHeight = Mathf.RoundToInt(lh / mScale);
+				else NGUIText.lineHeight = Mathf.RoundToInt(lh / mScale);
 
 				if (lw > 0f || lh > 0f)
 				{
@@ -1346,7 +1346,7 @@ public class UILabel : UIWidget
 
 		if (usePS) UpdateNGUIText(mPrintedSize, mWidth, mHeight);
 		else UpdateNGUIText(fontSize, Mathf.RoundToInt(mWidth / scale), mHeight);
-		NGUIText.current.tint = col;
+		NGUIText.tint = col;
 
 		if (mFont != null) mFont.Print(text, verts, uvs, cols);
 #if DYNAMIC_FONT
@@ -1415,8 +1415,8 @@ public class UILabel : UIWidget
 	public int CalculateOffsetToFit (string text)
 	{
 		UpdateNGUIText();
-		NGUIText.current.encoding = false;
-		NGUIText.current.symbolStyle = NGUIText.SymbolStyle.None;
+		NGUIText.encoding = false;
+		NGUIText.symbolStyle = NGUIText.SymbolStyle.None;
 
 		if (bitmapFont != null)
 		{
@@ -1497,47 +1497,47 @@ public class UILabel : UIWidget
 
 	public void UpdateNGUIText (int size, int lineWidth, int lineHeight)
 	{
-		NGUIText.current.size = size;
-		NGUIText.current.style = mFontStyle;
-		NGUIText.current.lineWidth = lineWidth;
-		NGUIText.current.lineHeight = lineHeight;
-		NGUIText.current.gradient = mApplyGradient;
-		NGUIText.current.gradientTop = mGradientTop;
-		NGUIText.current.gradientBottom = mGradientBottom;
-		NGUIText.current.encoding = mEncoding;
-		NGUIText.current.premultiply = mPremultiply;
-		NGUIText.current.symbolStyle = mSymbols;
-		NGUIText.current.spacingX = mSpacingX;
-		NGUIText.current.spacingY = mSpacingY;
-		NGUIText.current.maxLines = mMaxLineCount;
+		NGUIText.size = size;
+		NGUIText.style = mFontStyle;
+		NGUIText.lineWidth = lineWidth;
+		NGUIText.lineHeight = lineHeight;
+		NGUIText.gradient = mApplyGradient;
+		NGUIText.gradientTop = mGradientTop;
+		NGUIText.gradientBottom = mGradientBottom;
+		NGUIText.encoding = mEncoding;
+		NGUIText.premultiply = mPremultiply;
+		NGUIText.symbolStyle = mSymbols;
+		NGUIText.spacingX = mSpacingX;
+		NGUIText.spacingY = mSpacingY;
+		NGUIText.maxLines = mMaxLineCount;
 
 		if (mFont != null)
 		{
-			NGUIText.current.bitmapFont = mFont.bmFont;
+			NGUIText.bitmapFont = mFont.bmFont;
 		}
 #if DYNAMIC_FONT
 		else
 		{
-			NGUIText.current.bitmapFont = null;
-			NGUIText.current.dynamicFont = mTrueTypeFont;
+			NGUIText.bitmapFont = null;
+			NGUIText.dynamicFont = mTrueTypeFont;
 		}
 		UIRoot rt = root;
-		NGUIText.current.pixelDensity = (usePrintedSize && rt != null) ? 1f / rt.pixelSizeAdjustment : 1f;
+		NGUIText.pixelDensity = (usePrintedSize && rt != null) ? 1f / rt.pixelSizeAdjustment : 1f;
 #else
-		NGUIText.current.pixelDensity = 1f;
+		NGUIText.pixelDensity = 1f;
 #endif
 		Pivot p = pivot;
 
 		if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)
 		{
-			NGUIText.current.alignment = TextAlignment.Left;
+			NGUIText.alignment = TextAlignment.Left;
 		}
 		else if (p == Pivot.Right || p == Pivot.TopRight || p == Pivot.BottomRight)
 		{
-			NGUIText.current.alignment = TextAlignment.Right;
+			NGUIText.alignment = TextAlignment.Right;
 		}
-		else NGUIText.current.alignment = TextAlignment.Center;
+		else NGUIText.alignment = TextAlignment.Center;
 
-		NGUIText.current.Update();
+		NGUIText.Update();
 	}
 }
