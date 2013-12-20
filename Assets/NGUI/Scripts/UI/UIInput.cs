@@ -357,7 +357,7 @@ public class UIInput : MonoBehaviour
 			{
 				mKeyboard = (inputType == InputType.Password) ?
 					TouchScreenKeyboard.Open(mValue, TouchScreenKeyboardType.Default, false, false, true) :
-					TouchScreenKeyboard.Open(mValue, (TouchScreenKeyboardType)((int)keyboardType), inputType == InputType.AutoCorrect, label.multiLine);
+					TouchScreenKeyboard.Open(mValue, (TouchScreenKeyboardType)((int)keyboardType), inputType == InputType.AutoCorrect, label.multiLine, false, false, defaultText);
 			}
 			else
 #endif
@@ -730,12 +730,10 @@ public class UIInput : MonoBehaviour
 				}
 				else
 				{
+					UICamera.currentScheme = UICamera.ControlScheme.Controller;
 					UICamera.currentKey = ev.keyCode;
 					Submit();
 					UICamera.currentKey = KeyCode.None;
-					isSelected = false;
-					UpdateLabel();
-					ExecuteOnChange();
 				}
 				return true;
 			}
@@ -881,19 +879,19 @@ public class UIInput : MonoBehaviour
 
 	protected virtual void Cleanup ()
 	{
-		if (mHighlight != null)
+		if (mHighlight)
 		{
 			NGUITools.Destroy(mHighlight.gameObject);
 			mHighlight = null;
 		}
 
-		if (mCaret != null)
+		if (mCaret)
 		{
 			NGUITools.Destroy(mCaret.gameObject);
 			mCaret = null;
 		}
 
-		if (mBlankTex != null)
+		if (mBlankTex)
 		{
 			NGUITools.Destroy(mBlankTex);
 			mBlankTex = null;
