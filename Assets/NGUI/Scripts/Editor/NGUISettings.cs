@@ -459,7 +459,7 @@ public class NGUISettings
 		SetColor("Widget Color", widget.color);
 		SetEnum("Widget Pivot", widget.pivot);
 
-		if (widget is UIWidget) CopySprite(widget as UISprite);
+		if (widget is UISprite) CopySprite(widget as UISprite);
 		else if (widget is UILabel) CopyLabel(widget as UILabel);
 	}
 
