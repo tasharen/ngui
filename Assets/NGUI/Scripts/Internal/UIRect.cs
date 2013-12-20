@@ -178,6 +178,24 @@ public abstract class UIRect : MonoBehaviour
 	public Camera anchorCamera { get { if (!mAnchorsCached) ResetAnchors(); return mMyCam; } }
 
 	/// <summary>
+	/// Whether the rectangle is currently anchored fully on all sides.
+	/// </summary>
+
+	public bool isFullyAnchored { get { return leftAnchor.target && rightAnchor.target && topAnchor.target && bottomAnchor.target; } }
+
+	/// <summary>
+	/// Whether the rectangle is anchored horizontally.
+	/// </summary>
+
+	public bool isAnchoredHorizontally { get { return leftAnchor.target || rightAnchor.target; } }
+
+	/// <summary>
+	/// Whether the rectangle is anchored vertically.
+	/// </summary>
+
+	public bool isAnchoredVertically { get { return bottomAnchor.target || topAnchor.target; } }
+
+	/// <summary>
 	/// Get the rectangle's parent, if any.
 	/// </summary>
 

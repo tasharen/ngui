@@ -54,6 +54,25 @@ public class UIWidget : UIRect
 
 	public bool hideIfOffScreen = false;
 
+	public enum AspectRatioSource
+	{
+		Free,
+		BasedOnWidth,
+		BasedOnHeight,
+	}
+
+	/// <summary>
+	/// Whether the rectangle will attempt to maintain a specific aspect ratio.
+	/// </summary>
+
+	public AspectRatioSource keepAspectRatio = AspectRatioSource.Free;
+
+	/// <summary>
+	/// If you want the anchored rectangle to keep a specific aspect ratio, set this value.
+	/// </summary>
+
+	public float aspectRatio = 1f;
+
 	/// <summary>
 	/// Panel that's managing this widget.
 	/// </summary>
@@ -137,9 +156,13 @@ public class UIWidget : UIRect
 			int min = minWidth;
 			if (value < min) value = min;
 
-			if (mWidth != value)
+			if (mWidth != value && keepAspectRatio != AspectRatioSource.BasedOnHeight)
 			{
 				mWidth = value;
+
+				if (keepAspectRatio == AspectRatioSource.BasedOnWidth)
+					mHeight = Mathf.RoundToInt(mWidth / aspectRatio);
+
 				mMoved = true;
 				if (autoResizeBoxCollider) ResizeCollider();
 				MarkAsChanged();
@@ -162,9 +185,13 @@ public class UIWidget : UIRect
 			int min = minHeight;
 			if (value < min) value = min;
 
-			if (mHeight != value)
+			if (mHeight != value && keepAspectRatio != AspectRatioSource.BasedOnWidth)
 			{
 				mHeight = value;
+
+				if (keepAspectRatio == AspectRatioSource.BasedOnHeight)
+					mWidth = Mathf.RoundToInt(mHeight * aspectRatio);
+
 				mMoved = true;
 				if (autoResizeBoxCollider) ResizeCollider();
 				MarkAsChanged();
@@ -733,6 +760,8 @@ public class UIWidget : UIRect
 			panel.RemoveWidget(this);
 			panel = null;
 		}
+
+		aspectRatio = Mathf.Max(0.01f, aspectRatio);
 		CreatePanel();
 	}
 #endif
@@ -975,6 +1004,16 @@ public class UIWidget : UIRect
 		Vector3 newPos = new Vector3(Mathf.Lerp(lt, rt, pvt.x), Mathf.Lerp(bt, tt, pvt.y), pos.z);
 		int w = Mathf.FloorToInt(rt - lt + 0.5f);
 		int h = Mathf.FloorToInt(tt - bt + 0.5f);
+
+		// Maintain the aspect ratio if requested and possible
+		if (keepAspectRatio != AspectRatioSource.Free && aspectRatio != 0f)
+		{
+			if (keepAspectRatio == AspectRatioSource.BasedOnHeight)
+			{
+				w = Mathf.RoundToInt(h * aspectRatio);
+			}
+			else h = Mathf.RoundToInt(w / aspectRatio);
+		}
 
 		// Don't let the width and height get too small
 		if (w < minWidth) w = minWidth;

@@ -471,6 +471,20 @@ public class UIWidgetInspector : UIRectEditor
 		resizable[6] = canResize && !autoResized;	// right
 		resizable[7] = canResize && !autoHeight;	// bottom
 
+		//if (mWidget.isAnchored)
+		{
+			if (mWidget.keepAspectRatio == UIWidget.AspectRatioSource.BasedOnHeight)
+			{
+				resizable[4] = false;
+				resizable[6] = false;
+			}
+			else if (mWidget.keepAspectRatio == UIWidget.AspectRatioSource.BasedOnWidth)
+			{
+				resizable[5] = false;
+				resizable[7] = false;
+			}
+		}
+
 		resizable[0] = resizable[7] && resizable[4]; // bottom-left
 		resizable[1] = resizable[5] && resizable[4]; // top-left
 		resizable[2] = resizable[5] && resizable[6]; // top-right
@@ -859,6 +873,23 @@ public class UIWidgetInspector : UIRectEditor
 			DrawDepth(type == PrefabType.Prefab);
 			DrawDimensions(type == PrefabType.Prefab);
 
+			SerializedProperty ratio = serializedObject.FindProperty("aspectRatio");
+			SerializedProperty aspect = serializedObject.FindProperty("keepAspectRatio");
+
+			GUILayout.BeginHorizontal();
+
+			if (!aspect.hasMultipleDifferentValues && aspect.intValue == 0)
+			{
+				EditorGUI.BeginDisabledGroup(true);
+				ratio.floatValue = (float)mWidget.width / mWidget.height;
+				NGUIEditorTools.DrawProperty("Aspect Ratio", ratio, false, GUILayout.Width(130f));
+				EditorGUI.EndDisabledGroup();
+			}
+			else NGUIEditorTools.DrawProperty("Aspect Ratio", ratio, false, GUILayout.Width(130f));
+
+			NGUIEditorTools.DrawProperty("", aspect, false, GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
+
 			if (serializedObject.isEditingMultipleObjects || mWidget.hasBoxCollider)
 			{
 				GUILayout.BeginHorizontal();
@@ -877,10 +908,16 @@ public class UIWidgetInspector : UIRectEditor
 	void DrawDimensions (bool isPrefab)
 	{
 		GUILayout.BeginHorizontal();
+		
+		EditorGUI.BeginDisabledGroup(!serializedObject.isEditingMultipleObjects && mWidget.isAnchoredHorizontally);
 		NGUIEditorTools.DrawProperty("Dimensions", serializedObject, "mWidth", GUILayout.MinWidth(100f));
+		EditorGUI.EndDisabledGroup();
+
+		EditorGUI.BeginDisabledGroup(!serializedObject.isEditingMultipleObjects && mWidget.isAnchoredVertically);
 		NGUIEditorTools.SetLabelWidth(12f);
 		NGUIEditorTools.DrawProperty("x", serializedObject, "mHeight", GUILayout.MinWidth(30f));
 		NGUIEditorTools.SetLabelWidth(80f);
+		EditorGUI.EndDisabledGroup();
 
 		if (isPrefab)
 		{
@@ -888,6 +925,8 @@ public class UIWidgetInspector : UIRectEditor
 		}
 		else
 		{
+			EditorGUI.BeginDisabledGroup(!serializedObject.isEditingMultipleObjects && mWidget.isFullyAnchored);
+
 			if (GUILayout.Button("Snap", GUILayout.Width(68f)))
 			{
 				foreach (GameObject go in Selection.gameObjects)
@@ -902,6 +941,7 @@ public class UIWidgetInspector : UIRectEditor
 					}
 				}
 			}
+			EditorGUI.EndDisabledGroup();
 		}
 		GUILayout.EndHorizontal();
 	}
