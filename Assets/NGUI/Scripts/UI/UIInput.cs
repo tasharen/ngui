@@ -873,7 +873,7 @@ public class UIInput : MonoBehaviour
 	/// Ensure we've released the dynamically created resources.
 	/// </summary>
 
-	void OnDestroy () { Cleanup(); }
+	void OnDisable () { Cleanup(); }
 
 	/// <summary>
 	/// Cleanup.
@@ -1022,6 +1022,7 @@ public class UIInput : MonoBehaviour
 					if (mHighlight == null)
 					{
 						mHighlight = NGUITools.AddWidget<UITexture>(label.cachedGameObject);
+						mHighlight.name = "Input Highlight";
 						mHighlight.mainTexture = mBlankTex;
 						mHighlight.fillGeometry = false;
 						mHighlight.pivot = label.pivot;
@@ -1038,6 +1039,7 @@ public class UIInput : MonoBehaviour
 				if (mCaret == null)
 				{
 					mCaret = NGUITools.AddWidget<UITexture>(label.cachedGameObject);
+					mCaret.name = "Input Caret";
 					mCaret.mainTexture = mBlankTex;
 					mCaret.fillGeometry = false;
 					mCaret.pivot = label.pivot;
