@@ -299,12 +299,12 @@ public class UIWidget : UIRect
 		{
 			if (mDepth != value)
 			{
-				RemoveFromPanel();
+				if (panel != null) panel.RemoveWidget(this);
 				mDepth = value;
+				if (panel != null) panel.AddWidget(this);
 #if UNITY_EDITOR
 				UnityEditor.EditorUtility.SetDirty(this);
 #endif
-				if (panel != null) panel.RebuildAllDrawCalls();
 			}
 		}
 	}
@@ -668,7 +668,7 @@ public class UIWidget : UIRect
 	/// Mark the widget as changed so that the geometry can be rebuilt.
 	/// </summary>
 
-	void SetDirty ()
+	public void SetDirty ()
 	{
 		if (drawCall != null)
 		{

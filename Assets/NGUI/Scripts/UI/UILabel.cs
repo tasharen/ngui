@@ -1234,10 +1234,8 @@ public class UILabel : UIWidget
 		if (highlight != null && start != end)
 		{
 			int startingVertices = highlight.verts.size;
-			if (mFont != null) mFont.PrintCaretAndSelection(text, start, end, caret.verts, highlight.verts);
-#if DYNAMIC_FONT
-			else NGUIText.PrintCaretAndSelection(mTrueTypeFont, text, start, end, caret.verts, highlight.verts);
-#endif
+			NGUIText.PrintCaretAndSelection(text, start, end, caret.verts, highlight.verts);
+
 			if (highlight.verts.size > startingVertices)
 			{
 				ApplyOffset(highlight.verts, usePS, scale, startingVertices);
@@ -1251,13 +1249,7 @@ public class UILabel : UIWidget
 				}
 			}
 		}
-		else
-		{
-			if (mFont != null) mFont.PrintCaretAndSelection(text, start, end, caret.verts, null);
-#if DYNAMIC_FONT
-			else NGUIText.PrintCaretAndSelection(mTrueTypeFont, text, start, end, caret.verts, null);
-#endif
-		}
+		else NGUIText.PrintCaretAndSelection(text, start, end, caret.verts, null);
 
 		// Fill the caret UVs and colors
 		ApplyOffset(caret.verts, usePS, scale, startingCaretVerts);

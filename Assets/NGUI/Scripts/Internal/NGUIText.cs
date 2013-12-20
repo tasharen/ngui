@@ -773,10 +773,15 @@ static public class NGUIText
 
 				x = 0;
 				y += lineHeight;
+				prev = 0;
 				continue;
 			}
 
-			if (ch < ' ') continue;
+			if (ch < ' ')
+			{
+				prev = ch;
+				continue;
+			}
 
 			// Color changing symbol
 			if (encoding && ParseSymbol(text, ref i, mColors, premultiply))
@@ -984,6 +989,7 @@ static public class NGUIText
 
 				x = 0;
 				y += lineHeight;
+				prev = 0;
 				continue;
 			}
 			else if (ch < ' ')
@@ -1031,9 +1037,11 @@ static public class NGUIText
 	/// Print the caret and selection vertices. Note that it's expected that 'text' has been stripped clean of symbols.
 	/// </summary>
 
-	static public void PrintCaretAndSelection (Font font, string text, int start, int end, BetterList<Vector3> caret, BetterList<Vector3> highlight)
+	static public void PrintCaretAndSelection (string text, int start, int end, BetterList<Vector3> caret, BetterList<Vector3> highlight)
 	{
-		if (font == null || string.IsNullOrEmpty(text)) return;
+		if (string.IsNullOrEmpty(text)) return;
+
+		Prepare(text);
 
 		int caretPos = end;
 
@@ -1043,19 +1051,13 @@ static public class NGUIText
 			start = caretPos;
 		}
 
-		// Ensure that the text we're about to use exists in the font's texture
-		font.RequestCharactersInTexture(text, size, style);
-
 		float x = 0f, y = 0f, maxX = 0f, fs = size;
 		float lineHeight = size + spacingY;
-		float pixelSize = 1f / pixelDensity;
 		int caretOffset = (caret != null) ? caret.size : 0;
 		int highlightOffset = (highlight != null) ? highlight.size : 0;
-		int textLength = text.Length, index = 0;
+		int textLength = text.Length, index = 0, ch = 0, prev = 0;
 		bool highlighting = false, caretSet = false;
 
-		Vector2 v0 = Vector2.zero;
-		Vector2 v1 = Vector2.zero;
 		Vector2 last0 = Vector2.zero;
 		Vector2 last1 = Vector2.zero;
 
@@ -1071,9 +1073,9 @@ static public class NGUIText
 				caret.Add(new Vector3(x + 1f, -y - fs));
 			}
 
-			char c = text[index];
+			ch = text[index];
 
-			if (c == '\n')
+			if (ch == '\n')
 			{
 				// Used for alignment purposes
 				if (x > maxX) maxX = x;
@@ -1114,9 +1116,14 @@ static public class NGUIText
 
 				x = 0;
 				y += lineHeight;
+				prev = 0;
 				continue;
 			}
-			else if (c < ' ') continue;
+			else if (ch < ' ')
+			{
+				prev = 0;
+				continue;
+			}
 
 			if (encoding && ParseSymbol(text, ref index, mColors, premultiply))
 			{
@@ -1124,21 +1131,18 @@ static public class NGUIText
 				continue;
 			}
 
-			if (font.GetCharacterInfo(c, out mTempChar, size, style))
+			// See if there is a symbol matching this text
+			BMSymbol symbol = useSymbols ? GetSymbol(text, index, textLength) : null;
+			float w = (symbol != null) ? symbol.advance : GetGlyphWidth(ch, prev);
+
+			if (w != 0f)
 			{
-				v0.x = x + mTempChar.vert.xMin;
-				v1.x = v0.x + mTempChar.vert.width;
-				v0.y = -y - fs;
-				v1.y = -y;
+				float v0x = x;
+				float v1x = x + w;
+				float v0y = -y - fs;
+				float v1y = -y;
 
-				if (pixelSize != 1f)
-				{
-					v0 *= pixelSize;
-					v1 *= pixelSize;
-				}
-
-				// TODO: this is wrong
-				x += mTempChar.width + spacingX;
+				x += w + spacingX;
 
 				// Print the highlight
 				if (highlight != null)
@@ -1157,14 +1161,15 @@ static public class NGUIText
 					{
 						// Start the highlight
 						highlighting = true;
-						highlight.Add(new Vector3(v0.x, v0.y));
-						highlight.Add(new Vector3(v0.x, v1.y));
+						highlight.Add(new Vector3(v0x, v0y));
+						highlight.Add(new Vector3(v0x, v1y));
 					}
 				}
 
 				// Save what the character ended with
-				last0 = new Vector2(v1.x, v0.y);
-				last1 = new Vector2(v1.x, v1.y);
+				last0 = new Vector2(v1x, v0y);
+				last1 = new Vector2(v1x, v1y);
+				prev = ch;
 			}
 		}
 
