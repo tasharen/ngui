@@ -581,11 +581,13 @@ static public class NGUIText
 
 	static public bool WrapText (string text, out string finalText)
 	{
-		if (lineWidth < 1 || lineHeight < 1 || string.IsNullOrEmpty(text))
+		if (lineWidth < 1 || lineHeight < 1)
 		{
 			finalText = "";
 			return false;
 		}
+
+		if (string.IsNullOrEmpty(text)) text = " ";
 
 		float height = (maxLines > 0) ? Mathf.Min(lineHeight, size * maxLines) : lineHeight;
 		float sum = size + spacingY;
@@ -962,7 +964,7 @@ static public class NGUIText
 
 	static public void PrintCharacterPositions (string text, BetterList<Vector3> verts, BetterList<int> indices)
 	{
-		if (string.IsNullOrEmpty(text)) return;
+		if (string.IsNullOrEmpty(text)) text = " ";
 
 		Prepare(text);
 
@@ -1039,7 +1041,7 @@ static public class NGUIText
 
 	static public void PrintCaretAndSelection (string text, int start, int end, BetterList<Vector3> caret, BetterList<Vector3> highlight)
 	{
-		if (string.IsNullOrEmpty(text)) return;
+		if (string.IsNullOrEmpty(text)) text = " ";
 
 		Prepare(text);
 
