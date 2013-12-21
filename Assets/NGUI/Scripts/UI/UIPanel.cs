@@ -956,6 +956,16 @@ public class UIPanel : UIRect
 	}
 
 	/// <summary>
+	/// Immediately sort all child widgets.
+	/// </summary>
+
+	public void SortWidgets ()
+	{
+		mSortWidgets = false;
+		widgets.Sort(UIWidget.PanelCompareFunc);
+	}
+
+	/// <summary>
 	/// Fill the geometry fully, processing all widgets and re-creating all draw calls.
 	/// </summary>
 
@@ -970,11 +980,7 @@ public class UIPanel : UIRect
 		Shader sdr = null;
 		UIDrawCall dc = null;
 
-		if (mSortWidgets)
-		{
-			mSortWidgets = false;
-			widgets.Sort(UIWidget.PanelCompareFunc);
-		}
+		if (mSortWidgets) SortWidgets();
 
 		for (int i = 0; i < widgets.size; ++i)
 		{
@@ -1315,8 +1321,8 @@ public class UIPanel : UIRect
 
 	public void AddWidget (UIWidget w)
 	{
-		mSortWidgets = true;
 		widgets.Add(w);
+		mSortWidgets = true;
 		FindDrawCall(w);
 	}
 

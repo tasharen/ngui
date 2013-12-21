@@ -328,7 +328,17 @@ public class UIWidget : UIRect
 			{
 				if (panel != null) panel.RemoveWidget(this);
 				mDepth = value;
-				if (panel != null) panel.AddWidget(this);
+				
+				if (panel != null)
+				{
+					panel.AddWidget(this);
+
+					if (!Application.isPlaying)
+					{
+						panel.SortWidgets();
+						panel.RebuildAllDrawCalls();
+					}
+				}
 #if UNITY_EDITOR
 				UnityEditor.EditorUtility.SetDirty(this);
 #endif
