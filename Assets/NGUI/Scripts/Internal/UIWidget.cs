@@ -761,7 +761,9 @@ public class UIWidget : UIRect
 			panel = null;
 		}
 
-		aspectRatio = Mathf.Max(0.01f, aspectRatio);
+		aspectRatio = (keepAspectRatio == AspectRatioSource.Free) ?
+			(float)mWidth / mHeight : Mathf.Max(0.01f, aspectRatio);
+
 		CreatePanel();
 	}
 #endif
