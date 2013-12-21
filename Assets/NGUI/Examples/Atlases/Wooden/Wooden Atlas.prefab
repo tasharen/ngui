@@ -85,8 +85,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 140
   - name: Button
-    x: 206
-    y: 56
+    x: 238
+    y: 162
     width: 17
     height: 17
     borderLeft: 5
@@ -98,6 +98,19 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Button A
+    x: 488
+    y: 258
+    width: 20
+    height: 20
+    borderLeft: 0
+    borderRight: 0
+    borderTop: 0
+    borderBottom: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: Button B
     x: 50
     y: 3
     width: 20
@@ -110,21 +123,8 @@ MonoBehaviour:
     paddingRight: 0
     paddingTop: 0
     paddingBottom: 0
-  - name: Button B
-    x: 79
-    y: 32
-    width: 20
-    height: 20
-    borderLeft: 0
-    borderRight: 0
-    borderTop: 0
-    borderBottom: 0
-    paddingLeft: 0
-    paddingRight: 0
-    paddingTop: 0
-    paddingBottom: 0
   - name: Button X
-    x: 100
+    x: 79
     y: 32
     width: 20
     height: 20
@@ -137,8 +137,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Button Y
-    x: 79
-    y: 11
+    x: 100
+    y: 32
     width: 20
     height: 20
     borderLeft: 0
@@ -163,8 +163,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 5
   - name: Emoticon - Angry
-    x: 100
-    y: 11
+    x: 217
+    y: 117
     width: 20
     height: 20
     borderLeft: 0
@@ -176,8 +176,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Annoyed
-    x: 208
-    y: 159
+    x: 196
+    y: 117
     width: 20
     height: 20
     borderLeft: 0
@@ -189,8 +189,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Dead
-    x: 229
-    y: 159
+    x: 217
+    y: 138
     width: 20
     height: 20
     borderLeft: 0
@@ -202,7 +202,7 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Frown
-    x: 208
+    x: 196
     y: 138
     width: 20
     height: 20
@@ -215,8 +215,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Laugh
-    x: 229
-    y: 138
+    x: 217
+    y: 159
     width: 20
     height: 20
     borderLeft: 0
@@ -228,8 +228,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Rambo
-    x: 208
-    y: 106
+    x: 196
+    y: 159
     width: 20
     height: 20
     borderLeft: 0
@@ -241,8 +241,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Skull
-    x: 229
-    y: 106
+    x: 100
+    y: 11
     width: 20
     height: 20
     borderLeft: 0
@@ -254,8 +254,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Smile
-    x: 208
-    y: 85
+    x: 79
+    y: 11
     width: 20
     height: 20
     borderLeft: 0
@@ -267,8 +267,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Emoticon - Smirk
-    x: 488
-    y: 258
+    x: 127
+    y: 25
     width: 20
     height: 20
     borderLeft: 0
@@ -280,8 +280,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Flag-FR
-    x: 127
-    y: 127
+    x: 256
+    y: 204
     width: 80
     height: 52
     borderLeft: 0
@@ -294,7 +294,7 @@ MonoBehaviour:
     paddingBottom: 9
   - name: Flag-US
     x: 127
-    y: 74
+    y: 46
     width: 80
     height: 52
     borderLeft: 0
@@ -306,8 +306,8 @@ MonoBehaviour:
     paddingTop: 19
     paddingBottom: 9
   - name: Flat
-    x: 188
-    y: 56
+    x: 238
+    y: 141
     width: 17
     height: 17
     borderLeft: 5
@@ -332,8 +332,8 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Glow - Outer
-    x: 127
-    y: 13
+    x: 256
+    y: 143
     width: 60
     height: 60
     borderLeft: 26
@@ -383,9 +383,22 @@ MonoBehaviour:
     paddingRight: 0
     paddingTop: 0
     paddingBottom: 0
+  - name: notebook
+    x: 127
+    y: 99
+    width: 68
+    height: 80
+    borderLeft: 23
+    borderRight: 26
+    borderTop: 42
+    borderBottom: 31
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
   - name: Resize Icon
-    x: 229
-    y: 86
+    x: 127
+    y: 5
     width: 19
     height: 19
     borderLeft: 0
@@ -449,7 +462,7 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Stripes 2
-    x: 291
+    x: 326
     y: 267
     width: 34
     height: 34
@@ -462,7 +475,7 @@ MonoBehaviour:
     paddingTop: 0
     paddingBottom: 0
   - name: Stripes 3
-    x: 326
+    x: 291
     y: 267
     width: 34
     height: 34
