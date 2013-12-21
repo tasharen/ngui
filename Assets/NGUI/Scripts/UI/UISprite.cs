@@ -20,7 +20,6 @@ public class UISprite : UIWidget
 		Sliced,
 		Tiled,
 		Filled,
-        Advanced,
 	}
 
 	public enum FillDirection
@@ -32,24 +31,10 @@ public class UISprite : UIWidget
 		Radial360,
 	}
 
-    public enum AdvancedType
-    {
-        Sliced,
-        Tiled,
-        None
-    }
-
 	// Cached and saved values
 	[HideInInspector][SerializeField] UIAtlas mAtlas;
 	[HideInInspector][SerializeField] string mSpriteName;
 	[HideInInspector][SerializeField] bool mFillCenter = true;
-    [HideInInspector][SerializeField] AdvancedType mCenterType = AdvancedType.Sliced;
-
-    [HideInInspector][SerializeField] AdvancedType mLeftEdgeType = AdvancedType.Sliced;
-    [HideInInspector][SerializeField] AdvancedType mRightEdgeType = AdvancedType.Sliced;
-    [HideInInspector][SerializeField] AdvancedType mBottomEdgeType = AdvancedType.Sliced;
-    [HideInInspector][SerializeField] AdvancedType mTopEdgeType = AdvancedType.Sliced;
-
 	[HideInInspector][SerializeField] Type mType = Type.Simple;
 	[HideInInspector][SerializeField] FillDirection mFillDirection = FillDirection.Radial360;
 #if !UNITY_3_5
@@ -247,7 +232,7 @@ public class UISprite : UIWidget
 	{
 		get
 		{
-            if (type == Type.Sliced || type == Type.Advanced)
+			if (type == Type.Sliced)
 			{
 				UISpriteData sp = GetAtlasSprite();
 				if (sp == null) return Vector2.zero;
@@ -265,7 +250,7 @@ public class UISprite : UIWidget
 	{
 		get
 		{
-            if (type == Type.Sliced || type == Type.Advanced)
+			if (type == Type.Sliced)
 			{
 				Vector4 b = border;
 				if (atlas != null) b *= atlas.pixelSize;
@@ -284,7 +269,7 @@ public class UISprite : UIWidget
 	{
 		get
 		{
-            if (type == Type.Sliced || type == Type.Advanced)
+			if (type == Type.Sliced)
 			{
 				Vector4 b = border;
 				if (atlas != null) b *= atlas.pixelSize;
@@ -447,9 +432,6 @@ public class UISprite : UIWidget
 			case Type.Tiled:
 			TiledFill(verts, uvs, cols);
 			break;
-            case Type.Advanced:
-		    AdvancedFill(verts, uvs, cols);
-		    break;
 		}
 	}
 
@@ -545,11 +527,24 @@ public class UISprite : UIWidget
 
 		Vector4 v = drawingDimensions;
 
-        Color colF = color;
-        colF.a = finalAlpha;
-        Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
+		verts.Add(new Vector3(v.x, v.y));
+		verts.Add(new Vector3(v.x, v.w));
+		verts.Add(new Vector3(v.z, v.w));
+		verts.Add(new Vector3(v.z, v.y));
 
-        FillBuffers(v.x, v.z, v.y, v.w, uv0.x, uv1.x, uv0.y, uv1.y, col, verts, uvs, cols);
+		uvs.Add(uv0);
+		uvs.Add(new Vector2(uv0.x, uv1.y));
+		uvs.Add(uv1);
+		uvs.Add(new Vector2(uv1.x, uv0.y));
+
+		Color colF = color;
+		colF.a = finalAlpha;
+		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
+		
+		cols.Add(col);
+		cols.Add(col);
+		cols.Add(col);
+		cols.Add(col);
 	}
 
 	/// <summary>
@@ -598,7 +593,20 @@ public class UISprite : UIWidget
 
 				int y2 = y + 1;
 
-                FillBuffers(mTempPos[x].x, mTempPos[x2].x, mTempPos[y].y, mTempPos[y2].y, mTempUVs[x].x, mTempUVs[x2].x, mTempUVs[y].y, mTempUVs[y2].y, col, verts, uvs, cols);
+				verts.Add(new Vector3(mTempPos[x].x, mTempPos[y].y));
+				verts.Add(new Vector3(mTempPos[x].x, mTempPos[y2].y));
+				verts.Add(new Vector3(mTempPos[x2].x, mTempPos[y2].y));
+				verts.Add(new Vector3(mTempPos[x2].x, mTempPos[y].y));
+
+				uvs.Add(new Vector2(mTempUVs[x].x, mTempUVs[y].y));
+				uvs.Add(new Vector2(mTempUVs[x].x, mTempUVs[y2].y));
+				uvs.Add(new Vector2(mTempUVs[x2].x, mTempUVs[y2].y));
+				uvs.Add(new Vector2(mTempUVs[x2].x, mTempUVs[y].y));
+
+				cols.Add(col);
+				cols.Add(col);
+				cols.Add(col);
+				cols.Add(col);
 			}
 		}
 	}
@@ -649,183 +657,26 @@ public class UISprite : UIWidget
 					x1 = dr.z;
 				}
 
-                FillBuffers(x0, x1, y0, y1, u0, u1, v0, v1, col, verts, uvs, cols);
+				verts.Add(new Vector3(x0, y0));
+				verts.Add(new Vector3(x0, y1));
+				verts.Add(new Vector3(x1, y1));
+				verts.Add(new Vector3(x1, y0));
+
+				uvs.Add(new Vector2(u0, v0));
+				uvs.Add(new Vector2(u0, v1));
+				uvs.Add(new Vector2(u1, v1));
+				uvs.Add(new Vector2(u1, v0));
+
+				cols.Add(col);
+				cols.Add(col);
+				cols.Add(col);
+				cols.Add(col);
 
 				x0 += size.x;
 			}
 			y0 += size.y;
 		}
 	}
-
-    protected void AdvancedFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
-    {
-        if (mSprite == null) return;
-
-        if (!mSprite.hasBorder)
-        {
-            SimpleFill(verts, uvs, cols);
-            return;
-        }
-        Texture tex = material.mainTexture;
-        if (tex == null) return;
-
-        Vector4 dr = drawingDimensions;
-        Vector4 br = border * atlas.pixelSize;
-
-        var tileSize = new Vector2(mInnerUV.width * tex.width, mInnerUV.height * tex.height);
-        tileSize *= atlas.pixelSize;
-        //sanity check, or it would explode when two borders overlap.
-        if (tileSize.x < 1) tileSize.x = 1;
-        if (tileSize.y < 1) tileSize.y = 1;
-
-
-        //FillBuffers(dr.x, dr.y,dr.z,dr.w,mTempPos[0].x + br.x, mTempPos[0].y + br.y, mTempPos[3].x - br.z,mTempPos[3].y - br.w)
-        
-        
-        
-        mTempPos[0].x = dr.x;
-        mTempPos[0].y = dr.y;
-        mTempPos[3].x = dr.z;
-        mTempPos[3].y = dr.w;
-
-        mTempPos[1].x = mTempPos[0].x + br.x;
-        mTempPos[1].y = mTempPos[0].y + br.y;
-        mTempPos[2].x = mTempPos[3].x - br.z;
-        mTempPos[2].y = mTempPos[3].y - br.w;
-
-        mTempUVs[0] = new Vector2(mOuterUV.xMin, mOuterUV.yMin);
-        mTempUVs[1] = new Vector2(mInnerUV.xMin, mInnerUV.yMin);
-        mTempUVs[2] = new Vector2(mInnerUV.xMax, mInnerUV.yMax);
-        mTempUVs[3] = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
-
-        Color colF = color;
-        colF.a = finalAlpha;
-        Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;
-        
-        
-        for (int x = 0; x < 3; ++x)
-        {
-            int x2 = x + 1;
-
-            for (int y = 0; y < 3; ++y)
-            {
-                if (mCenterType == AdvancedType.None && x == 1 && y == 1) continue;
-                int y2 = y + 1;
-                if (x == 1 && y == 1) //handle center
-                {
-                    if (mCenterType == AdvancedType.Tiled)
-                    {
-                        float startPositionX = mTempPos[x].x;
-                        float endPositionX = mTempPos[x2].x;
-                        float startPositionY = mTempPos[y].y;
-                        float endPositionY = mTempPos[y2].y;
-                        float textureStartX = mTempUVs[x].x;
-                        float textureStartY = mTempUVs[y].y;
-
-                        float tileStartY = startPositionY;
-
-                        while (tileStartY < endPositionY)
-                        {
-                            float tileStartX = startPositionX;
-                            float textureEndY = mTempUVs[y2].y;
-                            float tileEndY = tileStartY + tileSize.y;
-                            if (tileEndY > endPositionY)
-                            {
-                                textureEndY = Mathf.Lerp(textureStartY, textureEndY, (endPositionY - tileStartY) / tileSize.y);
-                                tileEndY = endPositionY;
-                            }
-
-                            while (tileStartX < endPositionX)
-                            {
-                                float tileEndX = tileStartX + tileSize.x;
-                                float textureEndX = mTempUVs[x2].x;
-                                if (tileEndX > endPositionX)
-                                {
-                                    textureEndX = Mathf.Lerp(textureStartX, textureEndX, (endPositionX - tileStartX)/tileSize.x);
-                                    tileEndX = endPositionX;
-                                }
-                                FillBuffers(tileStartX, tileEndX, tileStartY, tileEndY, textureStartX, textureEndX, textureStartY, textureEndY, col, verts, uvs, cols);
-                                tileStartX += tileSize.x;
-                            }
-                            tileStartY += tileSize.y;
-                        }
-                    }
-                    else if(mCenterType == AdvancedType.Sliced)
-                    {
-                        FillBuffers(mTempPos[x].x, mTempPos[x2].x, mTempPos[y].y, mTempPos[y2].y, mTempUVs[x].x, mTempUVs[x2].x, mTempUVs[y].y, mTempUVs[y2].y, col, verts, uvs, cols);
-                    }
-                }
-                else if (x == 1)
-                {
-                    if ((y == 0 && mBottomEdgeType == AdvancedType.Tiled) || (y == 2 && mTopEdgeType == AdvancedType.Tiled))
-                    {
-                        float startPositionX = mTempPos[x].x;
-                        float endPositionX = mTempPos[x2].x;
-                        float startPositionY = mTempPos[y].y;
-                        float endPositionY = mTempPos[y2].y;
-                        float textureStartX = mTempUVs[x].x;
-                        float textureStartY = mTempUVs[y].y;
-                        float textureEndY = mTempUVs[y2].y;
-
-                        float tileStartX = startPositionX;
-
-                        while (tileStartX < endPositionX)
-                        {
-                            float tileEndX = tileStartX + tileSize.x;
-                            float textureEndX = mTempUVs[x2].x;
-                            if (tileEndX > endPositionX)
-                            {
-                                textureEndX = Mathf.Lerp(textureStartX, textureEndX, (endPositionX - tileStartX) / tileSize.x);
-                                tileEndX = endPositionX;
-                            }
-                            FillBuffers(tileStartX, tileEndX, startPositionY, endPositionY, textureStartX, textureEndX, textureStartY, textureEndY, col, verts, uvs, cols);
-                            tileStartX += tileSize.x;
-                        }
-                    }
-                    else if ((y == 0 && mBottomEdgeType == AdvancedType.Sliced) || (y == 2 && mTopEdgeType == AdvancedType.Sliced))
-                    {
-                        FillBuffers(mTempPos[x].x, mTempPos[x2].x, mTempPos[y].y, mTempPos[y2].y, mTempUVs[x].x, mTempUVs[x2].x, mTempUVs[y].y, mTempUVs[y2].y, col, verts, uvs, cols);
-                    }
-                }else if (y == 1)
-                {
-                    if ((x == 0 && mLeftEdgeType == AdvancedType.Tiled) || (x == 2 && mRightEdgeType == AdvancedType.Tiled))
-                    {
-                        float startPositionX = mTempPos[x].x;
-                        float endPositionX = mTempPos[x2].x;
-                        float startPositionY = mTempPos[y].y;
-                        float endPositionY = mTempPos[y2].y;
-
-                        float textureStartX = mTempUVs[x].x;
-                        float textureEndX = mTempUVs[x2].x;
-                        float textureStartY = mTempUVs[y].y;
-
-                        float tileStartY = startPositionY;
-
-                        while (tileStartY < endPositionY)
-                        {
-                            float textureEndY = mTempUVs[y2].y;
-                            float tileEndY = tileStartY + tileSize.y;
-                            if (tileEndY > endPositionY)
-                            {
-                                textureEndY = Mathf.Lerp(textureStartY, textureEndY, (endPositionY - tileStartY) / tileSize.y);
-                                tileEndY = endPositionY;
-                            }
-                            FillBuffers(startPositionX, endPositionX, tileStartY, tileEndY, textureStartX, textureEndX, textureStartY, textureEndY, col, verts, uvs, cols);
-                            tileStartY += tileSize.y;
-                        }
-                    }
-                    else if ((x == 0 && mLeftEdgeType == AdvancedType.Sliced) || (x == 2 && mRightEdgeType == AdvancedType.Sliced))
-                    {
-                        FillBuffers(mTempPos[x].x, mTempPos[x2].x, mTempPos[y].y, mTempPos[y2].y, mTempUVs[x].x, mTempUVs[x2].x, mTempUVs[y].y, mTempUVs[y2].y, col, verts, uvs, cols);
-                    }
-                }
-                else
-                {
-                    FillBuffers(mTempPos[x].x, mTempPos[x2].x, mTempPos[y].y, mTempPos[y2].y, mTempUVs[x].x, mTempUVs[x2].x, mTempUVs[y].y, mTempUVs[y2].y, col, verts, uvs, cols);
-                }
-            }
-        }
-    }
 
 	/// <summary>
 	/// Filled sprite fill function.
@@ -1119,28 +970,5 @@ public class UISprite : UIWidget
 			else xy[i1].x = Mathf.Lerp(xy[i0].x, xy[i2].x, cos);
 		}
 	}
-
-    void FillBuffers(float vertX1, float vertX2, float vertY1, float vertY2, float texX1, float texX2, float texY1, float texY2, Color col, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
-    {
-
-        verts.Add(new Vector3(vertX1, vertY1));
-        verts.Add(new Vector3(vertX1, vertY2));
-        verts.Add(new Vector3(vertX2, vertY2));
-        verts.Add(new Vector3(vertX2, vertY1));
-
-        uvs.Add(new Vector2(texX1, texY1));
-        uvs.Add(new Vector2(texX1, texY2));
-        uvs.Add(new Vector2(texX2, texY2));
-        uvs.Add(new Vector2(texX2, texY1));
-
-        cols.Add(col);
-        cols.Add(col);
-        cols.Add(col);
-        cols.Add(col);
-    }
-
-
-        
-
 #endregion
 }
