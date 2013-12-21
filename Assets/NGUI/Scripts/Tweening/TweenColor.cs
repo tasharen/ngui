@@ -9,7 +9,6 @@ using UnityEngine;
 /// Tween the object's color.
 /// </summary>
 
-[RequireComponent(typeof(UIWidget))]
 [AddComponentMenu("NGUI/Tween/Tween Color")]
 public class TweenColor : UITweener
 {

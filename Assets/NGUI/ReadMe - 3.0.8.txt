@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-            Version 3.0.8
+            Version 3.0.8 rc1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -38,10 +38,16 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
 
 3.0.8
-- NEW: All panels now manager their own draw calls rather than working with one giant list.
+- NEW: Input field has been redesigned and now has caret, multi-line selection, click-move, drag select, arrow key navigation, and full copy/paste.
+- NEW: Widgets now have a new "aspect ratio" field, in case you want them to keep a specific aspect ratio.
+- NEW: Community contribution (Nicki): Sliced & Tiled sprite via the Advanced sprite type setting.
+- NEW: All panels now manage their own draw calls rather than working with one giant list, improving performance.
 - NEW: Widgets no longer have a global list, and are always managed per-panel.
 - NEW: Enabling/disabling widgets no longer affects other panels.
-- NEW: Optimization pass. Significantly reduced time spent in UIPanel.LateUpdate.
+- NEW: Optimization pass. Significantly reduced the time spent in UIPanel.LateUpdate.
+- NEW: Added a delegate to the widget class that gets called when the widget's dimensions or position changes.
+- FIX: Center-aligned odd width multi-line labels will now always have pixel-perfect lines.
+- FIX: Draw calls were not added correctly to the list of active draw calls.
 
 3.0.7 f3
 - NEW: Added an option for anchors to be offset by the panel's position.

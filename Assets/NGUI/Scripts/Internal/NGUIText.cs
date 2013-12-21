@@ -82,21 +82,15 @@ static public class NGUIText
 	static public void Update (bool request)
 	{
 		finalSize = Mathf.RoundToInt(size * pixelDensity);
+		useSymbols = (bitmapFont != null && bitmapFont.hasSymbols) && encoding && symbolStyle != SymbolStyle.None;
 
 #if DYNAMIC_FONT
-		if (dynamicFont != null)
+		if (dynamicFont != null && request)
 		{
-			if (request)
-			{
-				dynamicFont.RequestCharactersInTexture("j", finalSize, style);
-				dynamicFont.GetCharacterInfo('j', out mTempChar, finalSize, style);
-				baseline = mTempChar.vert.yMax + finalSize;
-			}
-			useSymbols = false;
+			dynamicFont.RequestCharactersInTexture("j", finalSize, style);
+			dynamicFont.GetCharacterInfo('j', out mTempChar, finalSize, style);
+			baseline = mTempChar.vert.yMax + finalSize;
 		}
-		else useSymbols = (bitmapFont != null && bitmapFont.hasSymbols) && encoding && symbolStyle != SymbolStyle.None;
-#else
-		useSymbols = false;
 #endif
 	}
 
@@ -644,7 +638,7 @@ static public class NGUIText
 			}
 
 			// When encoded symbols such as [RrGgBb] or [-] are encountered, skip past them
-			if (ParseSymbol(text, ref offset)) { --offset; continue; }
+			if (encoding && ParseSymbol(text, ref offset)) { --offset; continue; }
 
 			// See if there is a symbol matching this text
 			BMSymbol symbol = useSymbols ? GetSymbol(text, offset, textLength) : null;

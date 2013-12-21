@@ -101,7 +101,7 @@ public class UITooltip : MonoBehaviour
 			// Orthographic camera positioning is trivial
 			mPos = Input.mousePosition;
 
-			if (background != null)
+			if (background != null && !background.isAnchored)
 			{
 				Transform textTrans = text.transform;
 				Vector3 offset = textTrans.localPosition;
