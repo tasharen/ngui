@@ -537,7 +537,7 @@ public class UIWidget : UIRect
 		return mCorners;
 	}
 
-	int mAlphaFrameID = 0;
+	int mAlphaFrameID = -1;
 
 	/// <summary>
 	/// Widget's final alpha, after taking the panel's alpha into account.
@@ -799,7 +799,7 @@ public class UIWidget : UIRect
 	{
 		if (mStarted && panel == null && enabled && NGUITools.GetActive(gameObject))
 		{
-			panel = UIPanel.Find(cachedTransform, mStarted, cachedGameObject.layer);
+			panel = UIPanel.Find(cachedTransform, true, cachedGameObject.layer);
 
 			if (panel != null)
 			{
@@ -1161,7 +1161,7 @@ public class UIWidget : UIRect
 		return false;
 	}
 
-	int mMatrixFrame = 0;
+	int mMatrixFrame = -1;
 	Vector3 mOldV0;
 	Vector3 mOldV1;
 

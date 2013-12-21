@@ -712,7 +712,12 @@ public class UIPanel : UIRect
 			UIDrawCall.Destroy(drawCalls.buffer[i]);
 		drawCalls.Clear();
 		list.Remove(this);
-		if (list.size == 0) UIDrawCall.ReleaseAll();
+		
+		if (list.size == 0)
+		{
+			UIDrawCall.ReleaseAll();
+			mUpdateFrame = -1;
+		}
 		base.OnDisable();
 	}
 
@@ -871,7 +876,7 @@ public class UIPanel : UIRect
 		baseClipRegion = new Vector4(newX, newY, w, h);
 	}
 
-	static int mUpdateFrame = 0;
+	static int mUpdateFrame = -1;
 
 	/// <summary>
 	/// Update all panels and draw calls.
@@ -1479,7 +1484,7 @@ public class UIPanel : UIRect
 
 #if UNITY_EDITOR
 
-	static int mSizeFrame = 0;
+	static int mSizeFrame = -1;
 	static System.Reflection.MethodInfo s_GetSizeOfMainGameView;
 	static Vector2 mGameSize = Vector2.one;
 

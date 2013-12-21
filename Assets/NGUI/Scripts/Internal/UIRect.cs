@@ -267,7 +267,7 @@ public abstract class UIRect : MonoBehaviour
 
 	public abstract Vector3[] worldCorners { get; }
 
-	int mLastInvalidate = 0;
+	int mLastInvalidate = -1;
 
 	/// <summary>
 	/// Sets the local 'changed' flag, indicating that some parent value(s) are now be different, such as alpha for example.
