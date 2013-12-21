@@ -132,6 +132,7 @@ static public class NGUIText
 				return (prev != 0) ? bmg.advance + bmg.GetKerning(prev) / pixelDensity : bmg.advance;
 			}
 		}
+#if DYNAMIC_FONT
 		else if (dynamicFont != null)
 		{
 			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, style))
@@ -139,6 +140,7 @@ static public class NGUIText
 				return Mathf.Round(mTempChar.width / pixelDensity);
 			}
 		}
+#endif
 		return 0f;
 	}
 
@@ -209,8 +211,8 @@ static public class NGUIText
 	}
 
 	static Color mInvisible = new Color(0f, 0f, 0f, 0f);
-#if DYNAMIC_FONT
 	static BetterList<Color> mColors = new BetterList<Color>();
+#if DYNAMIC_FONT
 	static CharacterInfo mTempChar;
 #endif
 
@@ -563,6 +565,7 @@ static public class NGUIText
 		return text.Substring(offset, textLength - offset);
 	}
 
+#if DYNAMIC_FONT
 	/// <summary>
 	/// Ensure that we have the requested characters present.
 	/// </summary>
@@ -574,6 +577,7 @@ static public class NGUIText
 			font.RequestCharactersInTexture(text, finalSize, style);
 		}
 	}
+#endif
 
 	/// <summary>
 	/// Text wrapping functionality. The 'width' and 'height' should be in pixels.
