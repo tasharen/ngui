@@ -492,8 +492,12 @@ public class NGUISettings
 		SetString("Atlas", NGUIEditorTools.ObjectToGUID(sp.atlas));
 		SetString("Sprite", sp.spriteName);
 		SetEnum("Sprite Type", sp.type);
+		SetEnum("Left Type", sp.leftType);
+		SetEnum("Right Type", sp.rightType);
+		SetEnum("Top Type", sp.topType);
+		SetEnum("Bottom Type", sp.bottomType);
+		SetEnum("Center Type", sp.centerType);
 		SetFloat("Fill", sp.fillAmount);
-		SetBool("FCenter", sp.fillCenter);
 		SetEnum("FDir", sp.fillDirection);
 	}
 
@@ -529,8 +533,12 @@ public class NGUISettings
 		if (fully) sp.atlas = NGUIEditorTools.GUIDToObject<UIAtlas>(GetString("Atlas", null));
 		sp.spriteName = GetString("Sprite", sp.spriteName);
 		sp.type = GetEnum<UISprite.Type>("Sprite Type", sp.type);
+		sp.leftType = GetEnum<UISprite.AdvancedType>("Left Type", UISprite.AdvancedType.Sliced);
+		sp.rightType = GetEnum<UISprite.AdvancedType>("Right Type", UISprite.AdvancedType.Sliced);
+		sp.topType = GetEnum<UISprite.AdvancedType>("Top Type", UISprite.AdvancedType.Sliced);
+		sp.bottomType = GetEnum<UISprite.AdvancedType>("Bottom Type", UISprite.AdvancedType.Sliced);
+		sp.centerType = GetEnum<UISprite.AdvancedType>("Center Type", UISprite.AdvancedType.Sliced);
 		sp.fillAmount = GetFloat("Fill", sp.fillAmount);
-		sp.fillCenter = GetBool("FCenter", sp.fillCenter);
 		sp.fillDirection = GetEnum<UISprite.FillDirection>("FDir", sp.fillDirection);
 	}
 

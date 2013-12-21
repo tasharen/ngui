@@ -82,7 +82,13 @@ public class UISpriteInspector : UIWidgetInspector
 		{
 			if ((UISprite.Type)sp.intValue == UISprite.Type.Sliced)
 			{
-				NGUIEditorTools.DrawProperty("Fill Center", serializedObject, "mFillCenter", GUILayout.MinWidth(20f));
+				sp = serializedObject.FindProperty("centerType");
+				bool val = (sp.intValue != (int)UISprite.AdvancedType.Invisible);
+
+				if (val != EditorGUILayout.Toggle("Fill Center", val))
+				{
+					sp.intValue = val ? (int)UISprite.AdvancedType.Invisible : (int)UISprite.AdvancedType.Sliced;
+				}
 			}
 			else if ((UISprite.Type)sp.intValue == UISprite.Type.Filled)
 			{
@@ -96,13 +102,11 @@ public class UISpriteInspector : UIWidgetInspector
 			}
 			else if ((UISprite.Type)sp.intValue == UISprite.Type.Advanced)
 			{
-				GUILayout.BeginVertical();
-				NGUIEditorTools.DrawProperty("  - Left", serializedObject, "mLeftEdgeType");
-				NGUIEditorTools.DrawProperty("  - Right", serializedObject, "mRightEdgeType");
-				NGUIEditorTools.DrawProperty("  - Top", serializedObject, "mTopEdgeType");
-				NGUIEditorTools.DrawProperty("  - Bottom", serializedObject, "mBottomEdgeType");
-				NGUIEditorTools.DrawProperty("  - Center", serializedObject, "mCenterType");
-				GUILayout.EndVertical();
+				NGUIEditorTools.DrawProperty("  - Left", serializedObject, "leftType");
+				NGUIEditorTools.DrawProperty("  - Right", serializedObject, "rightType");
+				NGUIEditorTools.DrawProperty("  - Top", serializedObject, "topType");
+				NGUIEditorTools.DrawProperty("  - Bottom", serializedObject, "bottomType");
+				NGUIEditorTools.DrawProperty("  - Center", serializedObject, "centerType");
 			}
 		}
 		EditorGUI.EndDisabledGroup();

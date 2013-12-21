@@ -34,15 +34,14 @@ public class UISprite : UIWidget
 
 	public enum AdvancedType
 	{
+		Invisible,
 		Sliced,
 		Tiled,
-		None
 	}
 
 	// Cached and saved values
 	[HideInInspector][SerializeField] UIAtlas mAtlas;
 	[HideInInspector][SerializeField] string mSpriteName;
-	[HideInInspector][SerializeField] bool mFillCenter = true;
 	[HideInInspector][SerializeField] Type mType = Type.Simple;
 	[HideInInspector][SerializeField] FillDirection mFillDirection = FillDirection.Radial360;
 #if !UNITY_3_5
@@ -51,22 +50,50 @@ public class UISprite : UIWidget
 	[HideInInspector][SerializeField] float mFillAmount = 1.0f;
 	[HideInInspector][SerializeField] bool mInvert = false;
 
-	[HideInInspector][SerializeField] AdvancedType mCenterType = AdvancedType.Sliced;
-	[HideInInspector][SerializeField] AdvancedType mLeftEdgeType = AdvancedType.Sliced;
-	[HideInInspector][SerializeField] AdvancedType mRightEdgeType = AdvancedType.Sliced;
-	[HideInInspector][SerializeField] AdvancedType mBottomEdgeType = AdvancedType.Sliced;
-	[HideInInspector][SerializeField] AdvancedType mTopEdgeType = AdvancedType.Sliced;
+	// Deprecated, no longer used
+	[HideInInspector][SerializeField] bool mFillCenter = true;
 
 	protected UISpriteData mSprite;
 	protected Rect mInnerUV = new Rect();
 	protected Rect mOuterUV = new Rect();
+	
 	bool mSpriteSet = false;
+
+	/// <summary>
+	/// When the sprite type is advanced, this determines whether the center is tiled or sliced.
+	/// </summary>
+
+	public AdvancedType centerType = AdvancedType.Sliced;
+
+	/// <summary>
+	/// When the sprite type is advanced, this determines whether the left edge is tiled or sliced.
+	/// </summary>
+
+	public AdvancedType leftType = AdvancedType.Sliced;
+
+	/// <summary>
+	/// When the sprite type is advanced, this determines whether the right edge is tiled or sliced.
+	/// </summary>
+
+	public AdvancedType rightType = AdvancedType.Sliced;
+
+	/// <summary>
+	/// When the sprite type is advanced, this determines whether the bottom edge is tiled or sliced.
+	/// </summary>
+
+	public AdvancedType bottomType = AdvancedType.Sliced;
+
+	/// <summary>
+	/// When the sprite type is advanced, this determines whether the top edge is tiled or sliced.
+	/// </summary>
+
+	public AdvancedType topType = AdvancedType.Sliced;
 
 	/// <summary>
 	/// How the sprite is drawn.
 	/// </summary>
 
-	virtual public Type type
+	public virtual Type type
 	{
 		get
 		{
@@ -174,7 +201,22 @@ public class UISprite : UIWidget
 	/// Whether the center part of the sprite will be filled or not. Turn it off if you want only to borders to show up.
 	/// </summary>
 
-	public bool fillCenter { get { return mFillCenter; } set { if (mFillCenter != value) { mFillCenter = value; MarkAsChanged(); } } }
+	[System.Obsolete("Use 'centerType' instead")]
+	public bool fillCenter
+	{
+		get
+		{
+			return centerType != AdvancedType.Invisible;
+		}
+		set
+		{
+			if (value != (centerType != AdvancedType.Invisible))
+			{
+				centerType = value ? AdvancedType.Sliced : AdvancedType.Invisible;
+				MarkAsChanged();
+			}
+		}
+	}
 
 	/// <summary>
 	/// Direction of the cut procedure.
@@ -392,6 +434,23 @@ public class UISprite : UIWidget
 	}
 
 	/// <summary>
+	/// Auto-upgrade.
+	/// </summary>
+
+	protected override void OnInit ()
+	{
+		if (!mFillCenter)
+		{
+			mFillCenter = true;
+			centerType = AdvancedType.Invisible;
+#if UNITY_EDITOR
+			UnityEditor.EditorUtility.SetDirty(this);
+#endif
+		}
+		base.OnInit();
+	}
+
+	/// <summary>
 	/// Update the UV coordinates.
 	/// </summary>
 
@@ -486,7 +545,7 @@ public class UISprite : UIWidget
 				int w = mSprite.width + padLeft + padRight;
 				int h = mSprite.height + padBottom + padTop;
 
-				if (mType != Type.Sliced && mType != Type.Tiled)
+				if (mType == Type.Simple || mType == Type.Filled)
 				{
 					if ((w & 1) != 0) ++padRight;
 					if ((h & 1) != 0) ++padTop;
@@ -571,8 +630,6 @@ public class UISprite : UIWidget
 
 	protected void SlicedFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
-		if (mSprite == null) return;
-
 		if (!mSprite.hasBorder)
 		{
 			SimpleFill(verts, uvs, cols);
@@ -607,7 +664,7 @@ public class UISprite : UIWidget
 
 			for (int y = 0; y < 3; ++y)
 			{
-				if (!mFillCenter && x == 1 && y == 1) continue;
+				if (centerType == AdvancedType.Invisible && x == 1 && y == 1) continue;
 
 				int y2 = y + 1;
 
@@ -995,8 +1052,6 @@ public class UISprite : UIWidget
 
 	protected void AdvancedFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
-		if (mSprite == null) return;
-
 		if (!mSprite.hasBorder)
 		{
 			SimpleFill(verts, uvs, cols);
@@ -1040,12 +1095,12 @@ public class UISprite : UIWidget
 
 			for (int y = 0; y < 3; ++y)
 			{
-				if (mCenterType == AdvancedType.None && x == 1 && y == 1) continue;
+				if (centerType == AdvancedType.Invisible && x == 1 && y == 1) continue;
 				int y2 = y + 1;
-				
-				if (x == 1 && y == 1)
+
+				if (x == 1 && y == 1) // Center
 				{
-					if (mCenterType == AdvancedType.Tiled)
+					if (centerType == AdvancedType.Tiled)
 					{
 						float startPositionX = mTempPos[x].x;
 						float endPositionX = mTempPos[x2].x;
@@ -1086,15 +1141,15 @@ public class UISprite : UIWidget
 							tileStartY += tileSize.y;
 						}
 					}
-					else if (mCenterType == AdvancedType.Sliced)
+					else if (centerType == AdvancedType.Sliced)
 					{
 						FillBuffers(mTempPos[x].x, mTempPos[x2].x, mTempPos[y].y, mTempPos[y2].y,
 							mTempUVs[x].x, mTempUVs[x2].x, mTempUVs[y].y, mTempUVs[y2].y, col, verts, uvs, cols);
 					}
 				}
-				else if (x == 1)
+				else if (x == 1) // Top or bottom
 				{
-					if ((y == 0 && mBottomEdgeType == AdvancedType.Tiled) || (y == 2 && mTopEdgeType == AdvancedType.Tiled))
+					if ((y == 0 && bottomType == AdvancedType.Tiled) || (y == 2 && topType == AdvancedType.Tiled))
 					{
 						float startPositionX = mTempPos[x].x;
 						float endPositionX = mTempPos[x2].x;
@@ -1122,15 +1177,15 @@ public class UISprite : UIWidget
 							tileStartX += tileSize.x;
 						}
 					}
-					else if ((y == 0 && mBottomEdgeType == AdvancedType.Sliced) || (y == 2 && mTopEdgeType == AdvancedType.Sliced))
+					else if ((y == 0 && bottomType == AdvancedType.Sliced) || (y == 2 && topType == AdvancedType.Sliced))
 					{
 						FillBuffers(mTempPos[x].x, mTempPos[x2].x, mTempPos[y].y, mTempPos[y2].y,
 							mTempUVs[x].x, mTempUVs[x2].x, mTempUVs[y].y, mTempUVs[y2].y, col, verts, uvs, cols);
 					}
 				}
-				else if (y == 1)
+				else if (y == 1) // Left or right
 				{
-					if ((x == 0 && mLeftEdgeType == AdvancedType.Tiled) || (x == 2 && mRightEdgeType == AdvancedType.Tiled))
+					if ((x == 0 && leftType == AdvancedType.Tiled) || (x == 2 && rightType == AdvancedType.Tiled))
 					{
 						float startPositionX = mTempPos[x].x;
 						float endPositionX = mTempPos[x2].x;
@@ -1158,13 +1213,13 @@ public class UISprite : UIWidget
 							tileStartY += tileSize.y;
 						}
 					}
-					else if ((x == 0 && mLeftEdgeType == AdvancedType.Sliced) || (x == 2 && mRightEdgeType == AdvancedType.Sliced))
+					else if ((x == 0 && leftType == AdvancedType.Sliced) || (x == 2 && rightType == AdvancedType.Sliced))
 					{
 						FillBuffers(mTempPos[x].x, mTempPos[x2].x, mTempPos[y].y, mTempPos[y2].y,
 							mTempUVs[x].x, mTempUVs[x2].x, mTempUVs[y].y, mTempUVs[y2].y, col, verts, uvs, cols);
 					}
 				}
-				else
+				else // Corner
 				{
 					FillBuffers(mTempPos[x].x, mTempPos[x2].x, mTempPos[y].y, mTempPos[y2].y,
 						mTempUVs[x].x, mTempUVs[x2].x, mTempUVs[y].y, mTempUVs[y2].y, col, verts, uvs, cols);

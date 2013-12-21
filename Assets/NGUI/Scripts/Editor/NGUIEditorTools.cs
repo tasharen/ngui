@@ -1795,11 +1795,11 @@ public class NGUIEditorTools
 
 	static public Object GUIDToObject (string guid)
 	{
+		if (string.IsNullOrEmpty(guid)) return null;
 #if !UNITY_3_5
 		// This method is not going to be available in Unity 3.5
 		if (s_GetInstanceIDFromGUID == null)
-			s_GetInstanceIDFromGUID = typeof(AssetDatabase).GetMethod("GetInstanceIDFromGUID");
-
+			s_GetInstanceIDFromGUID = typeof(AssetDatabase).GetMethod("GetInstanceIDFromGUID", BindingFlags.Static | BindingFlags.NonPublic);
 		int id = (int)s_GetInstanceIDFromGUID.Invoke(null, new object[] { guid });
 		if (id != 0) return EditorUtility.InstanceIDToObject(id);
 #endif
