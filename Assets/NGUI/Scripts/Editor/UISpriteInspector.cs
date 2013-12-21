@@ -94,6 +94,16 @@ public class UISpriteInspector : UIWidgetInspector
 				GUILayout.EndHorizontal();
 				NGUIEditorTools.DrawProperty("Invert Fill", serializedObject, "mInvert", GUILayout.MinWidth(20f));
 			}
+			else if ((UISprite.Type)sp.intValue == UISprite.Type.Advanced)
+			{
+				GUILayout.BeginVertical();
+				NGUIEditorTools.DrawProperty("  - Left", serializedObject, "mLeftEdgeType");
+				NGUIEditorTools.DrawProperty("  - Right", serializedObject, "mRightEdgeType");
+				NGUIEditorTools.DrawProperty("  - Top", serializedObject, "mTopEdgeType");
+				NGUIEditorTools.DrawProperty("  - Bottom", serializedObject, "mBottomEdgeType");
+				NGUIEditorTools.DrawProperty("  - Center", serializedObject, "mCenterType");
+				GUILayout.EndVertical();
+			}
 		}
 		EditorGUI.EndDisabledGroup();
 
