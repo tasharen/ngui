@@ -795,15 +795,17 @@ public class UIScrollView : MonoBehaviour
 		{
 			if (movement == Movement.Horizontal || movement == Movement.Unrestricted)
 			{
-				mMomentum.x -= mScroll * 0.05f;
+				mMomentum -= mTrans.TransformDirection(new Vector3(mScroll * 0.05f, 0f, 0f));
 			}
 			else if (movement == Movement.Vertical)
 			{
-				mMomentum.y -= mScroll * 0.05f;
+				mMomentum -= mTrans.TransformDirection(new Vector3(0f, mScroll * 0.05f, 0f));
 			}
 			else
 			{
-				mMomentum -= (Vector3)(customMovement * (mScroll * 0.05f));
+				mMomentum -= mTrans.TransformDirection(new Vector3(
+					mScroll * customMovement.x * 0.05f,
+					mScroll * customMovement.y * 0.05f, 0f));
 			}
 
 			if (mMomentum.magnitude > 0.0001f)
