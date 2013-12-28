@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-            Version 3.0.8 rc1
+            Version 3.0.8 f1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -48,6 +48,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: Added a delegate to the widget class that gets called when the widget's dimensions or position changes.
 - FIX: Center-aligned odd width multi-line labels will now always have pixel-perfect lines.
 - FIX: Draw calls were not added correctly to the list of active draw calls.
+- FIX: Scroll wheel scrolling is now affected by the transform's rotation properly.
 
 3.0.7 f3
 - NEW: Added an option for anchors to be offset by the panel's position.
