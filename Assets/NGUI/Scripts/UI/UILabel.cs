@@ -823,8 +823,17 @@ public class UILabel : UIWidget
 
 	protected override void OnAnchor ()
 	{
-		if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
+		if (mOverflow == Overflow.ResizeFreely)
+		{
 			mOverflow = Overflow.ShrinkContent;
+		}
+		else if (mOverflow == Overflow.ResizeHeight)
+		{
+			if (topAnchor.target != null || bottomAnchor.target != null)
+			{
+				mOverflow = Overflow.ShrinkContent;
+			}
+		}
 		base.OnAnchor();
 	}
 
