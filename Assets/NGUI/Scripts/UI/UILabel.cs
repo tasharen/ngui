@@ -825,14 +825,13 @@ public class UILabel : UIWidget
 	{
 		if (mOverflow == Overflow.ResizeFreely)
 		{
-			mOverflow = Overflow.ShrinkContent;
+			if (isFullyAnchored)
+				mOverflow = Overflow.ShrinkContent;
 		}
 		else if (mOverflow == Overflow.ResizeHeight)
 		{
-			if (topAnchor.target != null || bottomAnchor.target != null)
-			{
+			if (topAnchor.target != null && bottomAnchor.target != null)
 				mOverflow = Overflow.ShrinkContent;
-			}
 		}
 		base.OnAnchor();
 	}
