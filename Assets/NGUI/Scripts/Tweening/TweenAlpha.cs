@@ -9,7 +9,6 @@ using UnityEngine;
 /// Tween the object's alpha.
 /// </summary>
 
-[RequireComponent(typeof(UIRect))]
 [AddComponentMenu("NGUI/Tween/Tween Alpha")]
 public class TweenAlpha : UITweener
 {

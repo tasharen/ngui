@@ -287,7 +287,6 @@ static public class NGUITools
 
 			if (w != null)
 			{
-				if (!w.isVisible) return;
 				Vector4 region = w.drawingDimensions;
 				box.center = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
 				box.size = new Vector3(region.z - region.x, region.w - region.y);
