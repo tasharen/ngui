@@ -647,6 +647,8 @@ public class UIWidget : UIRect
 	/// Static widget comparison function used for depth sorting.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public int FullCompareFunc (UIWidget left, UIWidget right)
 	{
 		int val = UIPanel.CompareFunc(left.panel, right.panel);
@@ -657,6 +659,8 @@ public class UIWidget : UIRect
 	/// Static widget comparison function used for inter-panel depth sorting.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public int PanelCompareFunc (UIWidget left, UIWidget right)
 	{
 		if (left.mDepth < right.mDepth) return -1;

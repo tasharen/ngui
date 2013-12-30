@@ -1321,8 +1321,28 @@ public class UIPanel : UIRect
 
 	public void AddWidget (UIWidget w)
 	{
-		widgets.Add(w);
-		mSortWidgets = true;
+		if (widgets.size == 0)
+		{
+			widgets.Add(w);
+		}
+		else if (mSortWidgets)
+		{
+			widgets.Add(w);
+			SortWidgets();
+		}
+		else if (UIWidget.PanelCompareFunc(w, widgets[0]) == -1)
+		{
+			widgets.Insert(0, w);
+		}
+		else
+		{
+			for (int i = widgets.size; i > 0; )
+			{
+				if (UIWidget.PanelCompareFunc(w, widgets[--i]) == -1) continue;
+				widgets.Insert(i+1, w);
+				break;
+			}
+		}
 		FindDrawCall(w);
 	}
 
