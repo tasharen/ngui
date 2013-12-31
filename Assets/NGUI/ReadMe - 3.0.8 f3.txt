@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2013 Tasharen Entertainment
-            Version 3.0.8 f2
+            Version 3.0.8 f3
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,17 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.8 f3
+- FIX: Dynamic fonts should now be positioned better.
+- FIX: Fixing how fonts behave with a pixel size of non-1.
+- FIX: Sliders should no longer shrink the foreground sliced sprite beyond its minimum dimensions.
+- FIX: Couple of fixes related to how anchors work, making them work better with prefabs.
+- FIX: Grid and table scripts were updating the scroll views even though they shouldn't have been.
+- FIX: Removed the UIRect requirement from TweenAlpha.
+
+3.0.8 f2
+- FIX: Fix for widgets not adding themselves to draw calls when enabled in some cases.
 
 3.0.8
 - NEW: Input field has been redesigned and now has caret, multi-line selection, click-move, drag select, arrow key navigation, and full copy/paste.
