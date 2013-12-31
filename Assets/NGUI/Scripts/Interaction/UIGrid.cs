@@ -78,7 +78,6 @@ public class UIGrid : UIWidgetContainer
 
 	public bool repositionNow { set { if (value) { mReposition = true; enabled = true; } } }
 
-	bool mStarted = false;
 	bool mReposition = false;
 	UIPanel mPanel;
 	bool mInitDone = false;
@@ -92,7 +91,6 @@ public class UIGrid : UIWidgetContainer
 	void Start ()
 	{
 		if (!mInitDone) Init();
-		mStarted = true;
 		bool smooth = animateSmoothly;
 		animateSmoothly = false;
 		Reposition();

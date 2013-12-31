@@ -671,6 +671,10 @@ static public class NGUIMath
 			w.topAnchor.absolute += iy;
 		}
 
+#if UNITY_EDITOR
+		UnityEditor.EditorUtility.SetDirty(w);
+#endif
+
 		// If all sides were anchored, we're done
 		if (anchorCount != 0) w.UpdateAnchors();
 	}
@@ -876,5 +880,9 @@ static public class NGUIMath
 			if (w.bottomAnchor.target) w.bottomAnchor.SetVertical(t, y);
 			if (w.topAnchor.target) w.topAnchor.SetVertical(t, y + finalHeight);
 		}
+
+#if UNITY_EDITOR
+		UnityEditor.EditorUtility.SetDirty(w);
+#endif
 	}
 }

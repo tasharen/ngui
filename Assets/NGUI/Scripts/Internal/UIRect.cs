@@ -334,7 +334,11 @@ public abstract class UIRect : MonoBehaviour
 	/// Automatically find the parent rectangle.
 	/// </summary>
 
-	protected void OnEnable () { if (mStarted) OnInit(); }
+	protected void OnEnable ()
+	{
+		mAnchorsCached = false;
+		if (mStarted) OnInit();
+	}
 
 	/// <summary>
 	/// Automatically find the parent rectangle.
@@ -447,6 +451,25 @@ public abstract class UIRect : MonoBehaviour
 		rightAnchor.target = t;
 		topAnchor.target = t;
 		bottomAnchor.target = t;
+
+		ResetAnchors();
+		UpdateAnchors();
+	}
+
+	/// <summary>
+	/// Anchor this rectangle to the specified transform.
+	/// Note that this function will not keep the rectangle's current dimensions, but will instead assume the target's dimensions.
+	/// </summary>
+
+	public void SetAnchor (GameObject go)
+	{
+		Transform t = (go != null) ? go.transform : null;
+
+		leftAnchor.target = t;
+		rightAnchor.target = t;
+		topAnchor.target = t;
+		bottomAnchor.target = t;
+
 		ResetAnchors();
 		UpdateAnchors();
 	}
@@ -487,13 +510,6 @@ public abstract class UIRect : MonoBehaviour
 		{
 			// Find the camera responsible for the target object
 			ap.targetCam = NGUITools.FindCameraForLayer(ap.target.gameObject.layer);
-
-			// No camera found? Clear the references
-			if (ap.targetCam == null)
-			{
-				ap.target = null;
-				return;
-			}
 		}
 	}
 
@@ -531,7 +547,7 @@ public abstract class UIRect : MonoBehaviour
 	/// This callback is sent inside the editor notifying us that some property has changed.
 	/// </summary>
 
-	protected virtual void OnValidate()
+	protected virtual void OnValidate ()
 	{
 		ResetAnchors();
 		Invalidate(true);

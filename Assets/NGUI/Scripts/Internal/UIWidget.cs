@@ -627,6 +627,9 @@ public class UIWidget : UIRect
 			if (rightAnchor.target) rightAnchor.SetHorizontal(t, x + width);
 			if (bottomAnchor.target) bottomAnchor.SetVertical(t, y);
 			if (topAnchor.target) topAnchor.SetVertical(t, y + height);
+#if UNITY_EDITOR
+			UnityEditor.EditorUtility.SetDirty(this);
+#endif
 		}
 	}
 
