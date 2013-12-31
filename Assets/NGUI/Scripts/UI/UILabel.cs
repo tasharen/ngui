@@ -976,10 +976,6 @@ public class UILabel : UIWidget
 		NGUIText.rectWidth  = legacyMode ? (mMaxLineWidth  != 0 ? mMaxLineWidth  : 1000000) : width;
 		NGUIText.rectHeight = legacyMode ? (mMaxLineHeight != 0 ? mMaxLineHeight : 1000000) : height;
 
-		if (mOverflow == Overflow.ResizeFreely) NGUIText.rectWidth = 1000000;
-		if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
-			NGUIText.rectHeight = 1000000;
-
 		mScale = 1f;
 		mPrintedSize = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : fontSize);
 
@@ -990,6 +986,10 @@ public class UILabel : UIWidget
 		}
 
 		UpdateNGUIText(fontSize, mWidth, mHeight);
+
+		if (mOverflow == Overflow.ResizeFreely) NGUIText.rectWidth = 1000000;
+		if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
+			NGUIText.rectHeight = 1000000;
 
 		if (mPrintedSize > 0)
 		{
