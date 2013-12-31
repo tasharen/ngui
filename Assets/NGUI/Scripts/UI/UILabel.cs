@@ -1325,6 +1325,9 @@ public class UILabel : UIWidget
 		float fx = Mathf.Lerp(0f, -mWidth, po.x);
 		float fy = Mathf.Lerp(mHeight, 0f, po.y) + Mathf.Lerp(mCalculatedSize.y - mHeight, 0f, po.y);
 
+		fx = Mathf.Round(fx);
+		fy = Mathf.Round(fy);
+
 #if UNITY_FLASH
 		for (int i = start; i < verts.size; ++i)
 		{

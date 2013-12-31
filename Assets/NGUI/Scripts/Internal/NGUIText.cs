@@ -92,9 +92,23 @@ static public class NGUIText
 #if DYNAMIC_FONT
 		if (dynamicFont != null && request)
 		{
-			dynamicFont.RequestCharactersInTexture("j", finalSize, fontStyle);
-			dynamicFont.GetCharacterInfo('j', out mTempChar, finalSize, fontStyle);
-			baseline = pixelSize * (mTempChar.vert.yMax + finalSize);
+			dynamicFont.RequestCharactersInTexture(")", finalSize, fontStyle);
+				
+			if (!dynamicFont.GetCharacterInfo(')', out mTempChar, finalSize, fontStyle))
+			{
+				dynamicFont.RequestCharactersInTexture("A", finalSize, fontStyle);
+				{
+					if (!dynamicFont.GetCharacterInfo('A', out mTempChar, finalSize, fontStyle))
+					{
+						baseline = 0f;
+						return;
+					}
+				}
+			}
+
+			float y0 = mTempChar.vert.yMax;
+			float y1 = mTempChar.vert.yMin;
+			baseline = Mathf.Round(y0 + (finalSize - y0 + y1) * 0.5f);
 		}
 #endif
 	}
@@ -979,7 +993,7 @@ static public class NGUIText
 
 		Prepare(text);
 
-		float x = 0f, y = 0f, maxX = 0f, halfSize = finalSize * 0.5f;
+		float x = 0f, y = 0f, maxX = 0f, halfSize = fontSize * pixelSize * 0.5f;
 		int textLength = text.Length, indexOffset = verts.size, ch = 0, prev = 0;
 
 		for (int i = 0; i < textLength; ++i)
@@ -1063,7 +1077,7 @@ static public class NGUIText
 			start = caretPos;
 		}
 
-		float x = 0f, y = 0f, maxX = 0f, fs = finalSize;
+		float x = 0f, y = 0f, maxX = 0f, fs = fontSize * pixelSize;
 		int caretOffset = (caret != null) ? caret.size : 0;
 		int highlightOffset = (highlight != null) ? highlight.size : 0;
 		int textLength = text.Length, index = 0, ch = 0, prev = 0;
