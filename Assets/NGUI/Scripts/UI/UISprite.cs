@@ -311,6 +311,10 @@ public class UISprite : UIWidget
 				Vector4 b = border;
 				if (atlas != null) b *= atlas.pixelSize;
 				int min = Mathf.RoundToInt(b.x + b.z);
+
+				UISpriteData sp = GetAtlasSprite();
+				if (sp != null) min += sp.paddingLeft + sp.paddingRight;
+
 				return Mathf.Max(base.minWidth, ((min & 1) == 1) ? min + 1 : min);
 			}
 			return base.minWidth;
@@ -330,6 +334,10 @@ public class UISprite : UIWidget
 				Vector4 b = border;
 				if (atlas != null) b *= atlas.pixelSize;
 				int min = Mathf.RoundToInt(b.y + b.w);
+
+				UISpriteData sp = GetAtlasSprite();
+				if (sp != null) min += sp.paddingTop + sp.paddingBottom;
+
 				return Mathf.Max(base.minHeight, ((min & 1) == 1) ? min + 1 : min);
 			}
 			return base.minHeight;
@@ -567,29 +575,17 @@ public class UISprite : UIWidget
 				}
 			}
 
-			Vector4 v = new Vector4(
-				mDrawRegion.x == 0f ? x0 : Mathf.Lerp(x0, x1, mDrawRegion.x),
-				mDrawRegion.y == 0f ? y0 : Mathf.Lerp(y0, y1, mDrawRegion.y),
-				mDrawRegion.z == 1f ? x1 : Mathf.Lerp(x0, x1, mDrawRegion.z),
-				mDrawRegion.w == 1f ? y1 : Mathf.Lerp(y0, y1, mDrawRegion.w));
+			Vector4 br = border * atlas.pixelSize;
 
-			float mw = minWidth;
-			float mh = minHeight;
+			float fw = br.x + br.z;
+			float fh = br.y + br.w;
 
-			if (v.z - v.x < mw)
-			{
-				float center = (v.x + v.z) * 0.5f;
-				v.x = Mathf.Round(center - mw * 0.5f);
-				v.z = v.x + mw;
-			}
+			float vx = Mathf.Lerp(x0, x1 - fw, mDrawRegion.x);
+			float vy = Mathf.Lerp(y0, y1 - fh, mDrawRegion.y);
+			float vz = Mathf.Lerp(x0 + fw, x1, mDrawRegion.z);
+			float vw = Mathf.Lerp(y0 + fh, y1, mDrawRegion.w);
 
-			if (v.w - v.y < mh)
-			{
-				float center = (v.y + v.w) * 0.5f;
-				v.y = Mathf.Round(center - mh * 0.5f);
-				v.w = v.y + mw;
-			}
-			return v;
+			return new Vector4(vx, vy, vz, vw);
 		}
 	}
 
