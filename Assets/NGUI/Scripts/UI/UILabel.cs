@@ -83,7 +83,6 @@ public class UILabel : UIWidget
 	float mScale = 1f;
 	int mLastWidth = 0;
 	int mLastHeight = 0;
-	int mPrintedSize = 0;
 #if UNITY_EDITOR
 	bool mUseDynamicFont = false;
 #endif
@@ -977,7 +976,7 @@ public class UILabel : UIWidget
 		NGUIText.rectHeight = legacyMode ? (mMaxLineHeight != 0 ? mMaxLineHeight : 1000000) : height;
 
 		mScale = 1f;
-		mPrintedSize = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : fontSize);
+		int ps = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : fontSize);
 
 		if (NGUIText.rectWidth < 1 || NGUIText.rectHeight < 0)
 		{
@@ -991,11 +990,11 @@ public class UILabel : UIWidget
 		if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
 			NGUIText.rectHeight = 1000000;
 
-		if (mPrintedSize > 0)
+		if (ps > 0)
 		{
 			for (;;)
 			{
-				mScale = mPrintedSize * invFontSize;
+				mScale = ps * invFontSize;
 
 				NGUIText.pixelSize = pxSize * mScale;
 				NGUIText.Update(false);
@@ -1003,30 +1002,28 @@ public class UILabel : UIWidget
 				// Wrap the text
 				bool fits = NGUIText.WrapText(mText, out mProcessedText);
 
-				// Remember the final printed size
-				if (!string.IsNullOrEmpty(mProcessedText))
+				if (mOverflow == Overflow.ShrinkContent && !fits)
+				{
+					if (--ps > 1) continue;
+					else break;
+				}
+				else if (mOverflow == Overflow.ResizeFreely)
 				{
 					mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText);
-				}
-				else mCalculatedSize = Vector2.zero;
-
-				if (mOverflow == Overflow.ResizeFreely)
-				{
 					mWidth = Mathf.RoundToInt(mCalculatedSize.x);
 					mHeight = Mathf.RoundToInt(mCalculatedSize.y);
+
 					if ((mWidth & 1) == 1) ++mWidth;
 					if ((mHeight & 1) == 1) ++mHeight;
 				}
 				else if (mOverflow == Overflow.ResizeHeight)
 				{
+					mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText);
 					mHeight = Mathf.RoundToInt(mCalculatedSize.y);
 				}
-				else if (mOverflow == Overflow.ShrinkContent && !fits)
+				else
 				{
-					if (--mPrintedSize > 1)
-					{
-						continue;
-					}
+					mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText);
 				}
 
 				// Upgrade to the new system
@@ -1136,8 +1133,7 @@ public class UILabel : UIWidget
 			string text = processedText;
 			if (string.IsNullOrEmpty(text)) return 0;
 
-			if (usePrintedSize) UpdateNGUIText(mPrintedSize, mWidth, mHeight);
-			else UpdateNGUIText(fontSize, mWidth, mHeight);
+			UpdateNGUIText(fontSize, mWidth, mHeight);
 
 			NGUIText.PrintCharacterPositions(text, mTempVerts, mTempIndices);
 			
@@ -1166,8 +1162,7 @@ public class UILabel : UIWidget
 			string text = processedText;
 			if (string.IsNullOrEmpty(text)) return 0;
 
-			if (usePrintedSize) UpdateNGUIText(mPrintedSize, mWidth, mHeight);
-			else UpdateNGUIText(fontSize, mWidth, mHeight);
+			UpdateNGUIText(fontSize, mWidth, mHeight);
 
 			NGUIText.PrintCharacterPositions(text, mTempVerts, mTempIndices);
 
@@ -1219,8 +1214,7 @@ public class UILabel : UIWidget
 		if (!isValid) return;
 
 		string text = processedText;
-		if (usePrintedSize) UpdateNGUIText(mPrintedSize, mWidth, mHeight);
-		else UpdateNGUIText(fontSize, mWidth, mHeight);
+		UpdateNGUIText(fontSize, mWidth, mHeight);
 
 		int startingCaretVerts = caret.verts.size;
 		Vector2 center = new Vector2(0.5f, 0.5f);
@@ -1275,8 +1269,7 @@ public class UILabel : UIWidget
 		float pixelSize = (mFont != null) ? mFont.pixelSize : 1f;
 		int start = verts.size;
 
-		if (usePrintedSize) UpdateNGUIText(mPrintedSize, mWidth, mHeight);
-		else UpdateNGUIText(fontSize, mWidth, mHeight);
+		UpdateNGUIText(fontSize, mWidth, mHeight);
 
 		NGUIText.tint = col;
 		NGUIText.Print(text, verts, uvs, cols);
@@ -1323,7 +1316,7 @@ public class UILabel : UIWidget
 	{
 		Vector2 po = pivotOffset;
 		float fx = Mathf.Lerp(0f, -mWidth, po.x);
-		float fy = Mathf.Lerp(mHeight, 0f, po.y) + Mathf.Lerp(mCalculatedSize.y - mHeight, 0f, po.y);
+		float fy = Mathf.Lerp(mHeight, 0f, po.y) + Mathf.Lerp((mCalculatedSize.y - mHeight), 0f, po.y);
 
 		fx = Mathf.Round(fx);
 		fy = Mathf.Round(fy);
@@ -1464,10 +1457,10 @@ public class UILabel : UIWidget
 		NGUIText.maxLines = mMaxLineCount;
 		NGUIText.spacingX = mSpacingX;
 		NGUIText.spacingY = mSpacingY;
+		NGUIText.pixelSize = pixelSize * mScale;
 
 		if (mFont != null)
 		{
-			NGUIText.pixelSize = pixelSize * mScale;
 			NGUIText.bitmapFont = mFont;
 			
 			for (; ; )
@@ -1496,7 +1489,6 @@ public class UILabel : UIWidget
 		if (NGUIText.dynamicFont != null)
 		{
 			UIRoot rt = root;
-			NGUIText.pixelSize = 1f;
 			NGUIText.pixelDensity = (usePrintedSize && rt != null) ? rt.pixelSizeAdjustment : 1f;
 		}
 		else NGUIText.pixelDensity = 1f;

@@ -210,12 +210,7 @@ static public class NGUIText
 				glyph.u1.x = mTempChar.uv.xMax;
 				glyph.u1.y = mTempChar.uv.yMax;
 
-				glyph.v0.x = Mathf.Round(glyph.v0.x);
-				glyph.v0.y = Mathf.Round(glyph.v0.y);
-				glyph.v1.x = Mathf.Round(glyph.v1.x);
-				glyph.v1.y = Mathf.Round(glyph.v1.y);
-
-				glyph.advance = Mathf.Round(mTempChar.width);
+				glyph.advance = mTempChar.width;
 				glyph.channel = 0;
 				glyph.rotatedUVs = mTempChar.flipped;
 
@@ -227,6 +222,8 @@ static public class NGUIText
 					glyph.v1 *= pd;
 					glyph.advance *= pd;
 				}
+
+				glyph.advance = Mathf.Round(glyph.advance);
 				return glyph;
 			}
 		}
@@ -525,7 +522,7 @@ static public class NGUIText
 			}
 
 			v.x = ((x > maxX) ? x : maxX);
-			v.y = (y + finalSize);
+			v.y = (y + finalLineHeight);
 		}
 		return v;
 	}
@@ -608,7 +605,7 @@ static public class NGUIText
 
 	static public bool WrapText (string text, out string finalText)
 	{
-		if (rectWidth < 1 || rectHeight < 1)
+		if (rectWidth < 1 || rectHeight < 1 || finalLineHeight < 1f)
 		{
 			finalText = "";
 			return false;
@@ -618,7 +615,7 @@ static public class NGUIText
 
 		float height = (maxLines > 0) ? Mathf.Min(rectHeight, finalSize * maxLines) : rectHeight;
 		int maxLineCount = (maxLines > 0) ? maxLines : 1000000;
-		maxLineCount = Mathf.FloorToInt((finalLineHeight > 0) ? Mathf.Min(maxLineCount, height / finalLineHeight) : 0);
+		maxLineCount = Mathf.FloorToInt(Mathf.Min(maxLineCount, height / finalLineHeight) + 0.01f);
 
 		if (maxLineCount == 0)
 		{
