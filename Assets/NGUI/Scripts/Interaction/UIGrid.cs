@@ -81,14 +81,12 @@ public class UIGrid : UIWidgetContainer
 	bool mStarted = false;
 	bool mReposition = false;
 	UIPanel mPanel;
-	UIScrollView mDrag;
 	bool mInitDone = false;
 
 	void Init ()
 	{
 		mInitDone = true;
 		mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
-		mDrag = NGUITools.FindInParents<UIScrollView>(gameObject);
 	}
 
 	void Start ()
@@ -193,15 +191,8 @@ public class UIGrid : UIWidgetContainer
 			}
 		}
 
-		if (mDrag != null)
-		{
-			mDrag.UpdateScrollbars(true);
-			mDrag.RestrictWithinBounds(true);
-		}
-		else if (mPanel != null)
-		{
+		if (mPanel != null)
 			mPanel.ConstrainTargetToBounds(myTrans, true);
-		}
 
 		if (onReposition != null)
 			onReposition();

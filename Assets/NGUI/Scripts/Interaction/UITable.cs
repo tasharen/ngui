@@ -66,7 +66,6 @@ public class UITable : UIWidgetContainer
 	public OnReposition onReposition;
 
 	UIPanel mPanel;
-	UIScrollView mDrag;
 	bool mInitDone = false;
 	bool mReposition = false;
 	List<Transform> mChildren = new List<Transform>();
@@ -208,12 +207,7 @@ public class UITable : UIWidgetContainer
 		List<Transform> ch = children;
 		if (ch.Count > 0) RepositionVariableSize(ch);
 
-		if (mDrag != null)
-		{
-			mDrag.UpdateScrollbars(true);
-			mDrag.RestrictWithinBounds(true);
-		}
-		else if (mPanel != null)
+		if (mPanel != null)
 		{
 			mPanel.ConstrainTargetToBounds(myTrans, true);
 		}
@@ -240,12 +234,8 @@ public class UITable : UIWidgetContainer
 	void Init ()
 	{
 		mInitDone = true;
-
 		if (keepWithinPanel)
-		{
 			mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
-			mDrag = NGUITools.FindInParents<UIScrollView>(gameObject);
-		}
 	}
 
 	/// <summary>
