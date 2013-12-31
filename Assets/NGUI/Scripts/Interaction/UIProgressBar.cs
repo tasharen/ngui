@@ -346,7 +346,21 @@ public class UIProgressBar : UIWidgetContainer
 
 		if (thumb != null && (mFG != null || mBG != null))
 		{
-			Vector3[] corners = (mFG != null) ? mFG.worldCorners : mBG.worldCorners;
+			Vector3[] corners = (mFG != null) ? mFG.localCorners : mBG.localCorners;
+
+			Vector4 br = (mFG != null) ? mFG.border : mBG.border;
+			corners[0].x += br.x;
+			corners[1].x += br.x;
+			corners[2].x -= br.z;
+			corners[3].x -= br.z;
+
+			corners[0].y += br.y;
+			corners[1].y -= br.w;
+			corners[2].y -= br.w;
+			corners[3].y += br.y;
+
+			Transform t = (mFG != null) ? mFG.cachedTransform : mBG.cachedTransform;
+			for (int i = 0; i < 4; ++i) corners[i] = t.TransformPoint(corners[i]);
 
 			if (isHorizontal)
 			{
