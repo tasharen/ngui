@@ -193,7 +193,7 @@ public class UITable : UIWidgetContainer
 	[ContextMenu("Execute")]
 	public void Reposition ()
 	{
-		if (Application.isPlaying && !mInitDone)
+		if (Application.isPlaying && !mInitDone && NGUITools.GetActive(this))
 		{
 			mReposition = true;
 			return;

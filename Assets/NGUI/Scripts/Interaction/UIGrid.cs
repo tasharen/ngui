@@ -115,7 +115,7 @@ public class UIGrid : UIWidgetContainer
 	[ContextMenu("Execute")]
 	public void Reposition ()
 	{
-		if (Application.isPlaying && !mStarted)
+		if (Application.isPlaying && !mInitDone && NGUITools.GetActive(this))
 		{
 			mReposition = true;
 			return;
