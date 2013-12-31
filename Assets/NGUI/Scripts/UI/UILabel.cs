@@ -969,41 +969,39 @@ public class UILabel : UIWidget
 		mChanged = true;
 		hasChanged = false;
 
-		int fs = fontSize;
-		float invFS = 1f / fs;
-		float ps = pixelSize;
-		float invSize = 1f / ps;
-		float lw = legacyMode ? (mMaxLineWidth  != 0 ? mMaxLineWidth  * invSize : 1000000) : width  * invSize;
-		float lh = legacyMode ? (mMaxLineHeight != 0 ? mMaxLineHeight * invSize : 1000000) : height * invSize;
+		float pxSize = pixelSize;
+		int fontSize = this.fontSize;
+		float invFontSize = 1f / fontSize;
+		
+		NGUIText.rectWidth  = legacyMode ? (mMaxLineWidth  != 0 ? mMaxLineWidth  : 1000000) : width;
+		NGUIText.rectHeight = legacyMode ? (mMaxLineHeight != 0 ? mMaxLineHeight : 1000000) : height;
+
+		if (mOverflow == Overflow.ResizeFreely) NGUIText.rectWidth = 1000000;
+		if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
+			NGUIText.rectHeight = 1000000;
 
 		mScale = 1f;
-		mPrintedSize = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : fs);
+		mPrintedSize = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : fontSize);
 
-		UpdateNGUIText(fs, mWidth, mHeight);
+		if (NGUIText.rectWidth < 1 || NGUIText.rectHeight < 0)
+		{
+			mProcessedText = "";
+			return;
+		}
+
+		UpdateNGUIText(fontSize, mWidth, mHeight);
 
 		if (mPrintedSize > 0)
 		{
 			for (;;)
 			{
-				mScale = mPrintedSize * invFS;
+				mScale = mPrintedSize * invFontSize;
 
-				bool fits = true;
-
-				NGUIText.lineWidth = (mOverflow == Overflow.ResizeFreely) ? 1000000 : Mathf.RoundToInt(lw / mScale);
-
-				if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
-				{
-					NGUIText.lineHeight = 1000000;
-				}
-				else NGUIText.lineHeight = Mathf.RoundToInt(lh / mScale);
-
+				NGUIText.pixelSize = pxSize * mScale;
 				NGUIText.Update(false);
 
-				if (lw > 0f || lh > 0f)
-				{
-					fits = NGUIText.WrapText(mText, out mProcessedText);
-				}
-				else mProcessedText = mText;
+				// Wrap the text
+				bool fits = NGUIText.WrapText(mText, out mProcessedText);
 
 				// Remember the final printed size
 				if (!string.IsNullOrEmpty(mProcessedText))
@@ -1014,14 +1012,14 @@ public class UILabel : UIWidget
 
 				if (mOverflow == Overflow.ResizeFreely)
 				{
-					mWidth = Mathf.RoundToInt(mCalculatedSize.x * ps);
-					mHeight = Mathf.RoundToInt(mCalculatedSize.y * ps);
+					mWidth = Mathf.RoundToInt(mCalculatedSize.x);
+					mHeight = Mathf.RoundToInt(mCalculatedSize.y);
 					if ((mWidth & 1) == 1) ++mWidth;
 					if ((mHeight & 1) == 1) ++mHeight;
 				}
 				else if (mOverflow == Overflow.ResizeHeight)
 				{
-					mHeight = Mathf.RoundToInt(mCalculatedSize.y * ps);
+					mHeight = Mathf.RoundToInt(mCalculatedSize.y);
 				}
 				else if (mOverflow == Overflow.ShrinkContent && !fits)
 				{
@@ -1034,8 +1032,8 @@ public class UILabel : UIWidget
 				// Upgrade to the new system
 				if (legacyMode)
 				{
-					width = Mathf.RoundToInt(mCalculatedSize.x * ps);
-					height = Mathf.RoundToInt(mCalculatedSize.y * ps);
+					width = Mathf.RoundToInt(mCalculatedSize.x);
+					height = Mathf.RoundToInt(mCalculatedSize.y);
 					cachedTransform.localScale = Vector3.one;
 				}
 				break;
@@ -1137,18 +1135,15 @@ public class UILabel : UIWidget
 		{
 			string text = processedText;
 			if (string.IsNullOrEmpty(text)) return 0;
-			float pixelSize = (mFont != null) ? mFont.pixelSize : 1f;
-			float scale = mScale * pixelSize;
-			bool usePS = usePrintedSize;
 
-			if (usePS) UpdateNGUIText(mPrintedSize, mWidth, mHeight);
-			else UpdateNGUIText(fontSize, Mathf.RoundToInt(mWidth / scale), mHeight);
+			if (usePrintedSize) UpdateNGUIText(mPrintedSize, mWidth, mHeight);
+			else UpdateNGUIText(fontSize, mWidth, mHeight);
 
 			NGUIText.PrintCharacterPositions(text, mTempVerts, mTempIndices);
 			
 			if (mTempVerts.size > 0)
 			{
-				ApplyOffset(mTempVerts, usePS, scale, 0);
+				ApplyOffset(mTempVerts, 0);
 				int retVal = NGUIText.GetClosestCharacter(mTempVerts, localPos);
 				retVal = mTempIndices[retVal];
 
@@ -1170,18 +1165,15 @@ public class UILabel : UIWidget
 		{
 			string text = processedText;
 			if (string.IsNullOrEmpty(text)) return 0;
-			float pixelSize = (mFont != null) ? mFont.pixelSize : 1f;
-			float scale = mScale * pixelSize;
-			bool usePS = usePrintedSize;
 
-			if (usePS) UpdateNGUIText(mPrintedSize, mWidth, mHeight);
-			else UpdateNGUIText(fontSize, Mathf.RoundToInt(mWidth / scale), mHeight);
+			if (usePrintedSize) UpdateNGUIText(mPrintedSize, mWidth, mHeight);
+			else UpdateNGUIText(fontSize, mWidth, mHeight);
 
 			NGUIText.PrintCharacterPositions(text, mTempVerts, mTempIndices);
 
 			if (mTempVerts.size > 0)
 			{
-				ApplyOffset(mTempVerts, usePS, scale, 0);
+				ApplyOffset(mTempVerts, 0);
 
 				for (int i = 0; i < mTempIndices.size; ++i)
 				{
@@ -1227,12 +1219,8 @@ public class UILabel : UIWidget
 		if (!isValid) return;
 
 		string text = processedText;
-		float pixelSize = (mFont != null) ? mFont.pixelSize : 1f;
-		float scale = mScale * pixelSize;
-		bool usePS = usePrintedSize;
-
-		if (usePS) UpdateNGUIText(mPrintedSize, mWidth, mHeight);
-		else UpdateNGUIText(fontSize, Mathf.RoundToInt(mWidth / scale), mHeight);
+		if (usePrintedSize) UpdateNGUIText(mPrintedSize, mWidth, mHeight);
+		else UpdateNGUIText(fontSize, mWidth, mHeight);
 
 		int startingCaretVerts = caret.verts.size;
 		Vector2 center = new Vector2(0.5f, 0.5f);
@@ -1246,7 +1234,7 @@ public class UILabel : UIWidget
 
 			if (highlight.verts.size > startingVertices)
 			{
-				ApplyOffset(highlight.verts, usePS, scale, startingVertices);
+				ApplyOffset(highlight.verts, startingVertices);
 
 				Color32 c = new Color(highlightColor.r, highlightColor.g, highlightColor.b, highlightColor.a * alpha);
 
@@ -1260,7 +1248,7 @@ public class UILabel : UIWidget
 		else NGUIText.PrintCaretAndSelection(text, start, end, caret.verts, null);
 
 		// Fill the caret UVs and colors
-		ApplyOffset(caret.verts, usePS, scale, startingCaretVerts);
+		ApplyOffset(caret.verts, startingCaretVerts);
 		Color32 cc = new Color(caretColor.r, caretColor.g, caretColor.b, caretColor.a * alpha);
 
 		for (int i = startingCaretVerts; i < caret.verts.size; ++i)
@@ -1285,18 +1273,16 @@ public class UILabel : UIWidget
 
 		string text = processedText;
 		float pixelSize = (mFont != null) ? mFont.pixelSize : 1f;
-		float scale = mScale * pixelSize;
-		bool usePS = usePrintedSize;
 		int start = verts.size;
 
-		if (usePS) UpdateNGUIText(mPrintedSize, mWidth, mHeight);
-		else UpdateNGUIText(fontSize, Mathf.RoundToInt(mWidth / scale), mHeight);
+		if (usePrintedSize) UpdateNGUIText(mPrintedSize, mWidth, mHeight);
+		else UpdateNGUIText(fontSize, mWidth, mHeight);
 
 		NGUIText.tint = col;
 		NGUIText.Print(text, verts, uvs, cols);
 
-		// Center the content within the label
-		Vector2 pos = ApplyOffset(verts, usePS, mScale, start);
+		// Center the content within the label vertically
+		Vector2 pos = ApplyOffset(verts, start);
 
 		// Apply an effect if one was requested
 		if (effectStyle != Effect.None)
@@ -1333,48 +1319,27 @@ public class UILabel : UIWidget
 	/// Returns the offset that was applied.
 	/// </summary>
 
-	protected Vector2 ApplyOffset (BetterList<Vector3> verts, bool usePS, float scale, int start)
+	protected Vector2 ApplyOffset (BetterList<Vector3> verts, int start)
 	{
 		Vector2 po = pivotOffset;
 		float fx = Mathf.Lerp(0f, -mWidth, po.x);
-		float fy = Mathf.Lerp(mHeight, 0f, po.y) + Mathf.Lerp(mCalculatedSize.y * scale - mHeight, 0f, po.y);
+		float fy = Mathf.Lerp(mHeight, 0f, po.y) + Mathf.Lerp(mCalculatedSize.y - mHeight, 0f, po.y);
 
-		if (usePS || scale == 1f)
-		{
 #if UNITY_FLASH
-			for (int i = start; i < verts.size; ++i)
-			{
-				Vector3 buff = verts.buffer[i];
-				buff.x += fx;
-				buff.y += fy;
-				verts.buffer[i] = buff;
-			}
-#else
-			for (int i = start; i < verts.size; ++i)
-			{
-				verts.buffer[i].x += fx;
-				verts.buffer[i].y += fy;
-			}
-#endif
-		}
-		else
+		for (int i = start; i < verts.size; ++i)
 		{
-#if UNITY_FLASH
-			for (int i = start; i < verts.size; ++i)
-			{
-				Vector3 buff = verts.buffer[i];
-				buff.x = fx + verts.buffer[i].x * scale;
-				buff.y = fy + verts.buffer[i].y * scale;
-				verts.buffer[i] = buff;
-			}
-#else
-			for (int i = start; i < verts.size; ++i)
-			{
-				verts.buffer[i].x = fx + verts.buffer[i].x * scale;
-				verts.buffer[i].y = fy + verts.buffer[i].y * scale;
-			}
-#endif
+			Vector3 buff = verts.buffer[i];
+			buff.x += fx;
+			buff.y += fy;
+			verts.buffer[i] = buff;
 		}
+#else
+		for (int i = start; i < verts.size; ++i)
+		{
+			verts.buffer[i].x += fx;
+			verts.buffer[i].y += fy;
+		}
+#endif
 		return new Vector2(fx, fy);
 	}
 
@@ -1483,22 +1448,23 @@ public class UILabel : UIWidget
 
 	public void UpdateNGUIText (int size, int lineWidth, int lineHeight)
 	{
-		NGUIText.size = size;
-		NGUIText.style = mFontStyle;
-		NGUIText.lineWidth = lineWidth;
-		NGUIText.lineHeight = lineHeight;
+		NGUIText.fontSize = size;
+		NGUIText.fontStyle = mFontStyle;
+		NGUIText.rectWidth = lineWidth;
+		NGUIText.rectHeight = lineHeight;
 		NGUIText.gradient = mApplyGradient;
 		NGUIText.gradientTop = mGradientTop;
 		NGUIText.gradientBottom = mGradientBottom;
 		NGUIText.encoding = mEncoding;
 		NGUIText.premultiply = mPremultiply;
 		NGUIText.symbolStyle = mSymbols;
-		NGUIText.spacingX = Mathf.RoundToInt(mScale * mSpacingX);
-		NGUIText.spacingY = Mathf.RoundToInt(mScale * mSpacingY);
 		NGUIText.maxLines = mMaxLineCount;
+		NGUIText.spacingX = mSpacingX;
+		NGUIText.spacingY = mSpacingY;
 
 		if (mFont != null)
 		{
+			NGUIText.pixelSize = pixelSize * mScale;
 			NGUIText.bitmapFont = mFont;
 			
 			for (; ; )
@@ -1527,7 +1493,8 @@ public class UILabel : UIWidget
 		if (NGUIText.dynamicFont != null)
 		{
 			UIRoot rt = root;
-			NGUIText.pixelDensity = (usePrintedSize && rt != null) ? 1f / rt.pixelSizeAdjustment : 1f;
+			NGUIText.pixelSize = 1f;
+			NGUIText.pixelDensity = (usePrintedSize && rt != null) ? rt.pixelSizeAdjustment : 1f;
 		}
 		else NGUIText.pixelDensity = 1f;
 #endif
