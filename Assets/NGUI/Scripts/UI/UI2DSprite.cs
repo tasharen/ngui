@@ -151,9 +151,8 @@ public class UI2DSprite : UIWidget
 			float x1 = x0 + mWidth;
 			float y1 = y0 + mHeight;
 
-			Texture tex = mainTexture;
-			int w = (tex != null) ? tex.width : mWidth;
-			int h = (tex != null) ? tex.height : mHeight;
+			int w = (mSprite != null) ? Mathf.RoundToInt(mSprite.textureRect.width) : mWidth;
+			int h = (mSprite != null) ? Mathf.RoundToInt(mSprite.textureRect.height) : mHeight;
 
 			if ((w & 1) != 0) x1 -= (1f / w) * mWidth;
 			if ((h & 1) != 0) y1 -= (1f / h) * mHeight;
@@ -212,18 +211,17 @@ public class UI2DSprite : UIWidget
 
 	public override void MakePixelPerfect ()
 	{
-		Texture tex = mainTexture;
-
-		if (tex != null)
+		if (mSprite != null)
 		{
-			int x = tex.width;
-			if ((x & 1) == 1) ++x;
+			Rect rect = mSprite.textureRect;
+			int w = Mathf.RoundToInt(rect.width);
+			int h = Mathf.RoundToInt(rect.height);
 
-			int y = tex.height;
-			if ((y & 1) == 1) ++y;
+			if ((w & 1) == 1) ++w;
+			if ((h & 1) == 1) ++h;
 
-			width = x;
-			height = y;
+			width = w;
+			height = h;
 		}
 		base.MakePixelPerfect();
 	}
