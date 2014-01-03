@@ -1106,6 +1106,8 @@ public class UILabel : UIWidget
 			float pixelSize = (bitmapFont != null) ? bitmapFont.pixelSize : 1f;
 			width = Mathf.RoundToInt(mCalculatedSize.x * pixelSize);
 			height = Mathf.RoundToInt(mCalculatedSize.y * pixelSize);
+			if ((width & 1) == 1) ++width;
+			if ((height & 1) == 1) ++height;
 		}
 	}
 
