@@ -462,14 +462,10 @@ public class UIWidgetInspector : UIRectEditor
 		bool canResize = (mWidget.GetComponent<UIStretch>() == null);
 		bool[] resizable = new bool[8];
 
-		UILabel lbl = mWidget as UILabel;
-		bool autoResized = (lbl != null) && (lbl.overflowMethod == UILabel.Overflow.ResizeFreely);
-		bool autoHeight = autoResized || ((lbl != null) && (lbl.overflowMethod == UILabel.Overflow.ResizeHeight));
-
-		resizable[4] = canResize && !autoResized;	// left
-		resizable[5] = canResize && !autoHeight;	// top
-		resizable[6] = canResize && !autoResized;	// right
-		resizable[7] = canResize && !autoHeight;	// bottom
+		resizable[4] = canResize && !mWidget.isAnchoredHorizontally;	// left
+		resizable[5] = canResize && !mWidget.isAnchoredVertically;		// top
+		resizable[6] = canResize && !mWidget.isAnchoredHorizontally;	// right
+		resizable[7] = canResize && !mWidget.isAnchoredVertically;		// bottom
 
 		if (mWidget.keepAspectRatio == UIWidget.AspectRatioSource.BasedOnHeight)
 		{

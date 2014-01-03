@@ -615,7 +615,7 @@ static public class NGUIText
 			return false;
 		}
 
-		float height = (maxLines > 0) ? Mathf.Min(rectHeight, finalSize * maxLines) : rectHeight;
+		float height = (maxLines > 0) ? Mathf.Min(rectHeight, finalLineHeight * maxLines) : rectHeight;
 		int maxLineCount = (maxLines > 0) ? maxLines : 1000000;
 		maxLineCount = Mathf.FloorToInt(Mathf.Min(maxLineCount, height / finalLineHeight) + 0.01f);
 

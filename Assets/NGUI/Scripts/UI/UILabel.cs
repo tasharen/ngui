@@ -112,6 +112,26 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// Whether the rectangle is anchored horizontally.
+	/// </summary>
+
+	public override bool isAnchoredHorizontally { get { return base.isAnchoredHorizontally || mOverflow == Overflow.ResizeFreely; } }
+
+	/// <summary>
+	/// Whether the rectangle is anchored vertically.
+	/// </summary>
+
+	public override bool isAnchoredVertically
+	{
+		get
+		{
+			return base.isAnchoredVertically ||
+				mOverflow == Overflow.ResizeFreely ||
+				mOverflow == Overflow.ResizeHeight;
+		}
+	}
+
+	/// <summary>
 	/// Retrieve the material used by the font.
 	/// </summary>
 
