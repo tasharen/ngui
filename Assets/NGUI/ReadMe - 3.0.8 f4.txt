@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.0.8 f3
+            Version 3.0.8 f4
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,12 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.8 f4
+- NEW: Added a script that can animate Unity 2D sprite (UI2DSpriteAnimation).
+- FIX: Tweaks to how PlayAnimation works in regards to dragging over/out.
+- FIX: Labels will always be created with even dimensions.
+- FIX: More text printing related tweaks.
 
 3.0.8 f3
 - FIX: Dynamic fonts should now be positioned better.

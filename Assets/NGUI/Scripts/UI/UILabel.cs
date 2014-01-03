@@ -1010,8 +1010,8 @@ public class UILabel : UIWidget
 				else if (mOverflow == Overflow.ResizeFreely)
 				{
 					mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText);
-					mWidth = Mathf.RoundToInt(mCalculatedSize.x);
-					mHeight = Mathf.RoundToInt(mCalculatedSize.y);
+					mWidth = Mathf.Max(minWidth, Mathf.RoundToInt(mCalculatedSize.x));
+					mHeight = Mathf.Max(minHeight, Mathf.RoundToInt(mCalculatedSize.y));
 
 					if ((mWidth & 1) == 1) ++mWidth;
 					if ((mHeight & 1) == 1) ++mHeight;
@@ -1019,7 +1019,8 @@ public class UILabel : UIWidget
 				else if (mOverflow == Overflow.ResizeHeight)
 				{
 					mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText);
-					mHeight = Mathf.RoundToInt(mCalculatedSize.y);
+					mHeight = Mathf.Max(minHeight, Mathf.RoundToInt(mCalculatedSize.y));
+					if ((mHeight & 1) == 1) ++mHeight;
 				}
 				else
 				{
