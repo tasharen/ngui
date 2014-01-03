@@ -76,6 +76,8 @@ public class UIPlayAnimation : MonoBehaviour
 	bool mStarted = false;
 	bool mActivated = false;
 
+	bool dualState { get { return trigger == Trigger.OnPress || trigger == Trigger.OnHover; } }
+
 	void Awake ()
 	{
 		// Remove deprecated functionality if new one is used
@@ -112,92 +114,68 @@ public class UIPlayAnimation : MonoBehaviour
 
 	void OnHover (bool isOver)
 	{
-		if (enabled)
-		{
-			if ( trigger == Trigger.OnHover ||
-				(trigger == Trigger.OnHoverTrue && isOver) ||
-				(trigger == Trigger.OnHoverFalse && !isOver))
-			{
-				mActivated = isOver && (trigger == Trigger.OnHover);
-				Play(isOver);
-			}
-		}
-	}
-
-	void OnDragOut ()
-	{
-		if (enabled && mActivated)
-		{
-			mActivated = false;
-			Play(false);
-		}
+		if (!enabled) return;
+		if ( trigger == Trigger.OnHover ||
+			(trigger == Trigger.OnHoverTrue && isOver) ||
+			(trigger == Trigger.OnHoverFalse && !isOver))
+			Play(isOver, dualState);
 	}
 
 	void OnPress (bool isPressed)
 	{
-		if (enabled)
-		{
-			if ( trigger == Trigger.OnPress ||
-				(trigger == Trigger.OnPressTrue && isPressed) ||
-				(trigger == Trigger.OnPressFalse && !isPressed))
-			{
-				mActivated = isPressed && (trigger == Trigger.OnPress);
-				Play(isPressed);
-			}
-		}
+		if (!enabled) return;
+		if ( trigger == Trigger.OnPress ||
+			(trigger == Trigger.OnPressTrue && isPressed) ||
+			(trigger == Trigger.OnPressFalse && !isPressed))
+			Play(isPressed, dualState);
 	}
 
-	void OnClick ()
-	{
-		if (enabled && trigger == Trigger.OnClick)
-		{
-			Play(true);
-		}
-	}
+	void OnClick () { if (enabled && trigger == Trigger.OnClick) Play(true); }
 
-	void OnDoubleClick ()
-	{
-		if (enabled && trigger == Trigger.OnDoubleClick)
-		{
-			Play(true);
-		}
-	}
+	void OnDoubleClick () { if (enabled && trigger == Trigger.OnDoubleClick) Play(true); }
 
 	void OnSelect (bool isSelected)
 	{
-		if (enabled)
-		{
-			if (trigger == Trigger.OnSelect ||
-				(trigger == Trigger.OnSelectTrue && isSelected) ||
-				(trigger == Trigger.OnSelectFalse && !isSelected))
-			{
-				mActivated = isSelected && (trigger == Trigger.OnSelect);
-				Play(isSelected);
-			}
-		}
+		if (!enabled) return;
+		if (trigger == Trigger.OnSelect ||
+			(trigger == Trigger.OnSelectTrue && isSelected) ||
+			(trigger == Trigger.OnSelectFalse && !isSelected))
+			Play(isSelected, dualState);
 	}
 
 	void OnActivate (bool isActive)
 	{
-		if (enabled)
-		{
-			if (trigger == Trigger.OnActivate ||
-				(trigger == Trigger.OnActivateTrue && isActive) ||
-				(trigger == Trigger.OnActivateFalse && !isActive))
-			{
-				Play(isActive);
-			}
-		}
+		if (!enabled) return;
+		if (trigger == Trigger.OnActivate ||
+			(trigger == Trigger.OnActivateTrue && isActive) ||
+			(trigger == Trigger.OnActivateFalse && !isActive))
+			Play(isActive, dualState);
 	}
+
+	void OnDragOver () { if (enabled && dualState) Play(true, true); }
+
+	void OnDragOut () { if (enabled && dualState && UICamera.hoveredObject != gameObject) Play(false, true); }
+	
+	/// <summary>
+	/// Start playing the animation.
+	/// </summary>
+
+	public void Play (bool forward) { Play(forward, true); }
 
 	/// <summary>
 	/// Start playing the animation.
 	/// </summary>
 
-	public void Play (bool forward)
+	public void Play (bool forward, bool onlyIfDifferent)
 	{
 		if (target)
 		{
+			if (onlyIfDifferent)
+			{
+				if (mActivated == forward) return;
+				mActivated = forward;
+			}
+
 			if (clearSelection && UICamera.selectedObject == gameObject)
 				UICamera.selectedObject = null;
 
@@ -208,11 +186,8 @@ public class UIPlayAnimation : MonoBehaviour
 			if (anim != null)
 			{
 				if (resetOnPlay) anim.Reset();
-
 				for (int i = 0; i < onFinished.Count; ++i)
-				{
 					EventDelegate.Add(anim.onFinished, OnFinished, true);
-				}
 			}
 		}
 	}
