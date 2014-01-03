@@ -125,6 +125,10 @@ static public class NGUIText
 #endif
 	}
 
+	/// <summary>
+	/// Get the specified symbol.
+	/// </summary>
+
 	static public BMSymbol GetSymbol (string text, int index, int textLength)
 	{
 		return (bitmapFont != null) ? bitmapFont.MatchSymbol(text, index, textLength) : null;
@@ -515,7 +519,7 @@ static public class NGUIText
 				}
 				else
 				{
-					x += finalSpacingX + symbol.advance;
+					x += finalSpacingX + symbol.advance * pixelSize;
 					i += symbol.sequence.Length - 1;
 					prev = 0;
 				}
@@ -555,7 +559,7 @@ static public class NGUIText
 			}
 			else
 			{
-				mSizes.Add(finalSpacingX + symbol.advance);
+				mSizes.Add(finalSpacingX + symbol.advance * pixelSize);
 				for (int b = 0, bmax = symbol.sequence.Length - 1; b < bmax; ++b) mSizes.Add(0);
 				i += symbol.sequence.Length - 1;
 				prev = 0;
@@ -678,7 +682,7 @@ static public class NGUIText
 				if (w == 0f) continue;
 				glyphWidth = finalSpacingX + w;
 			}
-			else glyphWidth = finalSpacingX + symbol.advance;
+			else glyphWidth = finalSpacingX + symbol.advance * pixelSize;
 
 			// Reduce the width
 			remainingWidth -= glyphWidth;
@@ -927,17 +931,17 @@ static public class NGUIText
 			}
 			else // Symbol exists
 			{
-				float v0x = x + symbol.offsetX;
-				float v1x = v0x + symbol.width;
-				float v1y = -(y + symbol.offsetY);
-				float v0y = v1y - symbol.height;
+				float v0x = x + symbol.offsetX * pixelSize;
+				float v1x = v0x + symbol.width * pixelSize;
+				float v1y = -(y + symbol.offsetY * pixelSize);
+				float v0y = v1y - symbol.height * pixelSize;
 
 				verts.Add(new Vector3(v0x, v0y));
 				verts.Add(new Vector3(v0x, v1y));
 				verts.Add(new Vector3(v1x, v1y));
 				verts.Add(new Vector3(v1x, v0y));
 
-				x += finalSpacingX + symbol.advance;
+				x += finalSpacingX + symbol.advance * pixelSize;
 				i += symbol.length - 1;
 				prev = 0;
 
@@ -1044,7 +1048,7 @@ static public class NGUIText
 			}
 			else
 			{
-				x += symbol.advance + finalSpacingX;
+				x += symbol.advance * pixelSize + finalSpacingX;
 				verts.Add(new Vector3(x, -y - halfSize));
 				indices.Add(i + 1);
 				i += symbol.sequence.Length - 1;
@@ -1155,7 +1159,7 @@ static public class NGUIText
 
 			// See if there is a symbol matching this text
 			BMSymbol symbol = useSymbols ? GetSymbol(text, index, textLength) : null;
-			float w = (symbol != null) ? symbol.advance : GetGlyphWidth(ch, prev);
+			float w = (symbol != null) ? symbol.advance * pixelSize : GetGlyphWidth(ch, prev);
 
 			if (w != 0f)
 			{
