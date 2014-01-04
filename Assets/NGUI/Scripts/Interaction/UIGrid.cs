@@ -67,6 +67,12 @@ public class UIGrid : UIWidgetContainer
 	public bool hideInactive = true;
 
 	/// <summary>
+	/// Whether the parent container will be notified of the grid's changes.
+	/// </summary>
+
+	public bool keepWithinPanel = false;
+
+	/// <summary>
 	/// Callback triggered when the grid repositions its contents.
 	/// </summary>
 
@@ -189,7 +195,7 @@ public class UIGrid : UIWidgetContainer
 			}
 		}
 
-		if (mPanel != null)
+		if (keepWithinPanel && mPanel != null)
 			mPanel.ConstrainTargetToBounds(myTrans, true);
 
 		if (onReposition != null)

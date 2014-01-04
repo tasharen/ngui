@@ -207,10 +207,8 @@ public class UITable : UIWidgetContainer
 		List<Transform> ch = children;
 		if (ch.Count > 0) RepositionVariableSize(ch);
 
-		if (mPanel != null)
-		{
+		if (keepWithinPanel && mPanel != null)
 			mPanel.ConstrainTargetToBounds(myTrans, true);
-		}
 
 		if (onReposition != null)
 			onReposition();
@@ -234,8 +232,7 @@ public class UITable : UIWidgetContainer
 	void Init ()
 	{
 		mInitDone = true;
-		if (keepWithinPanel)
-			mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
+		mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
 	}
 
 	/// <summary>
