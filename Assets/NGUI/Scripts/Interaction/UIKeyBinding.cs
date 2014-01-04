@@ -104,13 +104,17 @@ public class UIKeyBinding : MonoBehaviour
 
 			if (Input.GetKeyDown(keyCode))
 			{
-				SendMessage("OnPress", true, SendMessageOptions.DontRequireReceiver);
+				UICamera.currentTouch.current = gameObject;
+				UICamera.Notify(gameObject, "OnPress", true);
+				UICamera.currentTouch.current = null;
 			}
 
 			if (Input.GetKeyUp(keyCode))
 			{
-				SendMessage("OnPress", false, SendMessageOptions.DontRequireReceiver);
-				SendMessage("OnClick", SendMessageOptions.DontRequireReceiver);
+				UICamera.currentTouch.current = gameObject;
+				UICamera.Notify(gameObject, "OnPress", false);
+				UICamera.Notify(gameObject, "OnClick", null);
+				UICamera.currentTouch.current = null;
 			}
 		}
 		else if (action == Action.Select)
