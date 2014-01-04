@@ -4,7 +4,6 @@
 //----------------------------------------------
 
 using UnityEngine;
-using System.Collections.Generic;
 
 /// <summary>
 /// Attaching this script to a widget makes it react to key events such as tab, up, down, etc.
@@ -35,36 +34,36 @@ public class UIButtonKeys : MonoBehaviour
 
 	void OnKey (KeyCode key)
 	{
-		if (enabled && NGUITools.GetActive(gameObject))
+		if (NGUITools.GetActive(this))
 		{
 			switch (key)
 			{
 			case KeyCode.LeftArrow:
-				if (selectOnLeft != null) UICamera.selectedObject = selectOnLeft.gameObject;
+				if (NGUITools.GetActive(selectOnLeft)) UICamera.selectedObject = selectOnLeft.gameObject;
 				break;
 			case KeyCode.RightArrow:
-				if (selectOnRight != null) UICamera.selectedObject = selectOnRight.gameObject;
+				if (NGUITools.GetActive(selectOnRight)) UICamera.selectedObject = selectOnRight.gameObject;
 				break;
 			case KeyCode.UpArrow:
-				if (selectOnUp != null) UICamera.selectedObject = selectOnUp.gameObject;
+				if (NGUITools.GetActive(selectOnUp)) UICamera.selectedObject = selectOnUp.gameObject;
 				break;
 			case KeyCode.DownArrow:
-				if (selectOnDown != null) UICamera.selectedObject = selectOnDown.gameObject;
+				if (NGUITools.GetActive(selectOnDown)) UICamera.selectedObject = selectOnDown.gameObject;
 				break;
 			case KeyCode.Tab:
 				if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
 				{
-					if (selectOnLeft != null) UICamera.selectedObject = selectOnLeft.gameObject;
-					else if (selectOnUp != null) UICamera.selectedObject = selectOnUp.gameObject;
-					else if (selectOnDown != null) UICamera.selectedObject = selectOnDown.gameObject;
-					else if (selectOnRight != null) UICamera.selectedObject = selectOnRight.gameObject;
+					if (NGUITools.GetActive(selectOnLeft)) UICamera.selectedObject = selectOnLeft.gameObject;
+					else if (NGUITools.GetActive(selectOnUp)) UICamera.selectedObject = selectOnUp.gameObject;
+					else if (NGUITools.GetActive(selectOnDown)) UICamera.selectedObject = selectOnDown.gameObject;
+					else if (NGUITools.GetActive(selectOnRight)) UICamera.selectedObject = selectOnRight.gameObject;
 				}
 				else
 				{
-					if (selectOnRight != null) UICamera.selectedObject = selectOnRight.gameObject;
-					else if (selectOnDown != null) UICamera.selectedObject = selectOnDown.gameObject;
-					else if (selectOnUp != null) UICamera.selectedObject = selectOnUp.gameObject;
-					else if (selectOnLeft != null) UICamera.selectedObject = selectOnLeft.gameObject;
+					if (NGUITools.GetActive(selectOnRight)) UICamera.selectedObject = selectOnRight.gameObject;
+					else if (NGUITools.GetActive(selectOnDown)) UICamera.selectedObject = selectOnDown.gameObject;
+					else if (NGUITools.GetActive(selectOnUp)) UICamera.selectedObject = selectOnUp.gameObject;
+					else if (NGUITools.GetActive(selectOnLeft)) UICamera.selectedObject = selectOnLeft.gameObject;
 				}
 				break;
 			}
@@ -73,7 +72,7 @@ public class UIButtonKeys : MonoBehaviour
 
 	void OnClick ()
 	{
-		if (enabled && selectOnClick != null)
+		if (NGUITools.GetActive(this) && NGUITools.GetActive(selectOnClick))
 			UICamera.selectedObject = selectOnClick.gameObject;
 	}
 }

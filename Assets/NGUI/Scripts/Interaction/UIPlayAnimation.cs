@@ -75,11 +75,15 @@ public class UIPlayAnimation : MonoBehaviour
 
 	bool mStarted = false;
 	bool mActivated = false;
+	bool dragHighlight = false;
 
 	bool dualState { get { return trigger == Trigger.OnPress || trigger == Trigger.OnHover; } }
 
 	void Awake ()
 	{
+		UIButton btn = GetComponent<UIButton>();
+		if (btn != null) dragHighlight = btn.dragHighlight;
+
 		// Remove deprecated functionality if new one is used
 		if (eventReceiver != null && EventDelegate.IsValid(onFinished))
 		{
@@ -130,9 +134,9 @@ public class UIPlayAnimation : MonoBehaviour
 			Play(isPressed, dualState);
 	}
 
-	void OnClick () { if (enabled && trigger == Trigger.OnClick) Play(true); }
+	void OnClick () { if (enabled && trigger == Trigger.OnClick) Play(true, false); }
 
-	void OnDoubleClick () { if (enabled && trigger == Trigger.OnDoubleClick) Play(true); }
+	void OnDoubleClick () { if (enabled && trigger == Trigger.OnDoubleClick) Play(true, false); }
 
 	void OnSelect (bool isSelected)
 	{
@@ -152,9 +156,26 @@ public class UIPlayAnimation : MonoBehaviour
 			Play(isActive, dualState);
 	}
 
-	void OnDragOver () { if (enabled && dualState) Play(true, true); }
+	void OnDragOver ()
+	{
+		if (enabled && dualState)
+		{
+			if (UICamera.currentTouch.dragged == gameObject) Play(true, true);
+			else if (dragHighlight && trigger == Trigger.OnPress) Play(true, true);
+		}
+	}
 
-	void OnDragOut () { if (enabled && dualState && UICamera.hoveredObject != gameObject) Play(false, true); }
+	void OnDragOut ()
+	{
+		if (enabled && dualState && UICamera.hoveredObject != gameObject)
+			Play(false, true);
+	}
+
+	void OnDrop (GameObject go)
+	{
+		if (enabled && trigger == Trigger.OnPress && UICamera.currentTouch.dragged != gameObject)
+			Play(false, true);
+	}
 	
 	/// <summary>
 	/// Start playing the animation.
