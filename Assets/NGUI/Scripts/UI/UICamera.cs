@@ -873,12 +873,14 @@ public class UICamera : MonoBehaviour
 	{
 		cachedCamera.eventMask = 0;
 		cachedCamera.transparencySortMode = TransparencySortMode.Orthographic;
-		if (debug) NGUIDebug.debugRaycast = true;
+		if (handlesEvents) NGUIDebug.debugRaycast = debug;
 	}
+#else
+	void Start() { if (handlesEvents) NGUIDebug.debugRaycast = handlesEvents; }
 #endif
 
 #if UNITY_EDITOR
-	void OnValidate () { NGUIDebug.debugRaycast = debug; }
+	void OnValidate () { if (handlesEvents) NGUIDebug.debugRaycast = debug; }
 #endif
 
 	/// <summary>
