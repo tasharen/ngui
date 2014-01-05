@@ -475,6 +475,33 @@ public abstract class UIRect : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Anchor this rectangle to the specified transform.
+	/// </summary>
+
+	public void SetAnchor (GameObject go, int left, int bottom, int right, int top)
+	{
+		Transform t = (go != null) ? go.transform : null;
+
+		leftAnchor.target = t;
+		rightAnchor.target = t;
+		topAnchor.target = t;
+		bottomAnchor.target = t;
+		
+		leftAnchor.relative = 0f;
+		rightAnchor.relative = 1f;
+		bottomAnchor.relative = 0f;
+		topAnchor.relative = 1f;
+
+		leftAnchor.absolute = left;
+		rightAnchor.absolute = right;
+		bottomAnchor.absolute = bottom;
+		topAnchor.absolute = top;
+
+		ResetAnchors();
+		UpdateAnchors();
+	}
+
+	/// <summary>
 	/// Ensure that all rect references are set correctly on the anchors.
 	/// </summary>
 
