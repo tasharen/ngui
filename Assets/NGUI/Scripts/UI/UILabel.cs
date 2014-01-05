@@ -81,6 +81,7 @@ public class UILabel : UIWidget
 	bool mPremultiply = false;
 	Vector2 mCalculatedSize = Vector2.zero;
 	float mScale = 1f;
+	int mPrintedSize = 0;
 	int mLastWidth = 0;
 	int mLastHeight = 0;
 #if UNITY_EDITOR
@@ -412,12 +413,13 @@ public class UILabel : UIWidget
 		}
 	}
 
+#if DYNAMIC_FONT
 	/// <summary>
 	/// Whether the label will use the printed size instead of font size when printing the label.
 	/// It's a dynamic font feature that will ensure that the text is crisp when shrunk.
 	/// </summary>
 
-	bool usePrintedSize
+	bool keepCrisp
 	{
 		get
 		{
@@ -432,6 +434,7 @@ public class UILabel : UIWidget
 			return false;
 		}
 	}
+#endif
 
 	/// <summary>
 	/// Whether this label will support color encoding in the format of [RRGGBB] and new line in the form of a "\\n" string.
@@ -988,15 +991,11 @@ public class UILabel : UIWidget
 		mChanged = true;
 		hasChanged = false;
 
-		float pxSize = pixelSize;
-		int fontSize = this.fontSize;
-		float invFontSize = 1f / fontSize;
-		
 		NGUIText.rectWidth  = legacyMode ? (mMaxLineWidth  != 0 ? mMaxLineWidth  : 1000000) : width;
 		NGUIText.rectHeight = legacyMode ? (mMaxLineHeight != 0 ? mMaxLineHeight : 1000000) : height;
 
+		mPrintedSize = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : fontSize);
 		mScale = 1f;
-		int ps = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : fontSize);
 
 		if (NGUIText.rectWidth < 1 || NGUIText.rectHeight < 0)
 		{
@@ -1004,19 +1003,33 @@ public class UILabel : UIWidget
 			return;
 		}
 
-		UpdateNGUIText(fontSize, mWidth, mHeight);
+		UpdateNGUIText(mPrintedSize, mWidth, mHeight);
 
 		if (mOverflow == Overflow.ResizeFreely) NGUIText.rectWidth = 1000000;
 		if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
 			NGUIText.rectHeight = 1000000;
 
-		if (ps > 0)
+		if (mPrintedSize > 0)
 		{
-			for (;;)
+#if DYNAMIC_FONT
+			bool adjustSize = keepCrisp;
+#endif
+			for (int ps = mPrintedSize; ps > 0; --ps)
 			{
-				mScale = ps * invFontSize;
+#if DYNAMIC_FONT
+				// Adjust either the size, or the scale
+				if (adjustSize)
+				{
+					mPrintedSize = ps;
+					NGUIText.fontSize = mPrintedSize;
+				}
+				else
+#endif
+				{
+					mScale = (float)ps / mPrintedSize;
+					NGUIText.fontScale = mScale;
+				}
 
-				NGUIText.pixelSize = pxSize * mScale;
 				NGUIText.Update(false);
 
 				// Wrap the text
@@ -1338,6 +1351,7 @@ public class UILabel : UIWidget
 	protected Vector2 ApplyOffset (BetterList<Vector3> verts, int start)
 	{
 		Vector2 po = pivotOffset;
+
 		float fx = Mathf.Lerp(0f, -mWidth, po.x);
 		float fy = Mathf.Lerp(mHeight, 0f, po.y) + Mathf.Lerp((mCalculatedSize.y - mHeight), 0f, po.y);
 
@@ -1467,7 +1481,7 @@ public class UILabel : UIWidget
 
 	public void UpdateNGUIText (int size, int lineWidth, int lineHeight)
 	{
-		NGUIText.fontSize = size;
+		NGUIText.fontSize = mPrintedSize;
 		NGUIText.fontStyle = mFontStyle;
 		NGUIText.rectWidth = lineWidth;
 		NGUIText.rectHeight = lineHeight;
@@ -1480,7 +1494,7 @@ public class UILabel : UIWidget
 		NGUIText.maxLines = mMaxLineCount;
 		NGUIText.spacingX = mSpacingX;
 		NGUIText.spacingY = mSpacingY;
-		NGUIText.pixelSize = pixelSize * mScale;
+		NGUIText.fontScale = mScale;
 
 		if (mFont != null)
 		{
@@ -1509,13 +1523,13 @@ public class UILabel : UIWidget
 			NGUIText.bitmapFont = null;
 		}
 
-		if (NGUIText.dynamicFont != null)
+		if (keepCrisp)
 		{
 			UIRoot rt = root;
-			NGUIText.pixelDensity = (usePrintedSize && rt != null) ? rt.pixelSizeAdjustment : 1f;
+			if (rt != null) NGUIText.pixelDensity = (rt != null) ? rt.pixelSizeAdjustment : 1f;
 		}
-		else NGUIText.pixelDensity = 1f;
 #endif
+
 		Pivot p = pivot;
 
 		if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)

@@ -46,7 +46,7 @@ static public class NGUIText
 	static public GlyphInfo glyph = new GlyphInfo();
 
 	static public int fontSize = 16;
-	static public float pixelSize = 1f;
+	static public float fontScale = 1f;
 	static public float pixelDensity = 1f;
 	static public FontStyle fontStyle = FontStyle.Normal;
 	static public TextAlignment alignment = TextAlignment.Left;
@@ -84,9 +84,9 @@ static public class NGUIText
 
 	static public void Update (bool request)
 	{
-		finalSize = Mathf.RoundToInt(fontSize * pixelSize / pixelDensity);
-		finalSpacingX = spacingX * pixelSize;
-		finalLineHeight = (fontSize + spacingY) * pixelSize;
+		finalSize = Mathf.RoundToInt(fontSize / pixelDensity);
+		finalSpacingX = spacingX * fontScale;
+		finalLineHeight = (fontSize + spacingY) * fontScale;
 		useSymbols = (bitmapFont != null && bitmapFont.hasSymbols) && encoding && symbolStyle != SymbolStyle.None;
 
 #if DYNAMIC_FONT
@@ -146,14 +146,14 @@ static public class NGUIText
 
 			if (bmg != null)
 			{
-				return pixelSize * ((prev != 0) ? bmg.advance + bmg.GetKerning(prev) : bmg.advance);
+				return fontScale * ((prev != 0) ? bmg.advance + bmg.GetKerning(prev) : bmg.advance);
 			}
 		}
 #if DYNAMIC_FONT
 		else if (dynamicFont != null)
 		{
 			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fontStyle))
-				return Mathf.Round(mTempChar.width * pixelSize * pixelDensity);
+				return Mathf.Round(mTempChar.width * fontScale * pixelDensity);
 		}
 #endif
 		return 0f;
@@ -188,11 +188,11 @@ static public class NGUIText
 				glyph.channel = bmg.channel;
 				glyph.rotatedUVs = false;
 
-				if (pixelSize != 1f)
+				if (fontScale != 1f)
 				{
-					glyph.v0 *= pixelSize;
-					glyph.v1 *= pixelSize;
-					glyph.advance *= pixelSize;
+					glyph.v0 *= fontScale;
+					glyph.v1 *= fontScale;
+					glyph.advance *= fontScale;
 				}
 				return glyph;
 			}
@@ -218,7 +218,7 @@ static public class NGUIText
 				glyph.channel = 0;
 				glyph.rotatedUVs = mTempChar.flipped;
 
-				float pd = pixelSize * pixelDensity;
+				float pd = fontScale * pixelDensity;
 
 				if (pd != 1f)
 				{
@@ -412,7 +412,7 @@ static public class NGUIText
 				bool oddDiff = (diff & 1) == 1;
 				bool oddWidth = (intWidth & 1) == 1;
 				if ((oddDiff && !oddWidth) || (!oddDiff && oddWidth))
-					padding += 0.5f / pixelSize;
+					padding += 0.5f / fontScale;
 			}
 
 			for (int i = indexOffset; i < verts.size; ++i)
@@ -519,7 +519,7 @@ static public class NGUIText
 				}
 				else
 				{
-					x += finalSpacingX + symbol.advance * pixelSize;
+					x += finalSpacingX + symbol.advance * fontScale;
 					i += symbol.sequence.Length - 1;
 					prev = 0;
 				}
@@ -559,7 +559,7 @@ static public class NGUIText
 			}
 			else
 			{
-				mSizes.Add(finalSpacingX + symbol.advance * pixelSize);
+				mSizes.Add(finalSpacingX + symbol.advance * fontScale);
 				for (int b = 0, bmax = symbol.sequence.Length - 1; b < bmax; ++b) mSizes.Add(0);
 				i += symbol.sequence.Length - 1;
 				prev = 0;
@@ -681,7 +681,7 @@ static public class NGUIText
 				if (w == 0f) continue;
 				glyphWidth = finalSpacingX + w;
 			}
-			else glyphWidth = finalSpacingX + symbol.advance * pixelSize;
+			else glyphWidth = finalSpacingX + symbol.advance * fontScale;
 
 			// Reduce the width
 			remainingWidth -= glyphWidth;
@@ -759,7 +759,6 @@ static public class NGUIText
 		if (string.IsNullOrEmpty(text)) return;
 
 		int indexOffset = verts.size;
-
 		Prepare(text);
 
 		// Start with the white tint
@@ -930,17 +929,17 @@ static public class NGUIText
 			}
 			else // Symbol exists
 			{
-				float v0x = x + symbol.offsetX * pixelSize;
-				float v1x = v0x + symbol.width * pixelSize;
-				float v1y = -(y + symbol.offsetY * pixelSize);
-				float v0y = v1y - symbol.height * pixelSize;
+				float v0x = x + symbol.offsetX * fontScale;
+				float v1x = v0x + symbol.width * fontScale;
+				float v1y = -(y + symbol.offsetY * fontScale);
+				float v0y = v1y - symbol.height * fontScale;
 
 				verts.Add(new Vector3(v0x, v0y));
 				verts.Add(new Vector3(v0x, v1y));
 				verts.Add(new Vector3(v1x, v1y));
 				verts.Add(new Vector3(v1x, v0y));
 
-				x += finalSpacingX + symbol.advance * pixelSize;
+				x += finalSpacingX + symbol.advance * fontScale;
 				i += symbol.length - 1;
 				prev = 0;
 
@@ -993,7 +992,7 @@ static public class NGUIText
 
 		Prepare(text);
 
-		float x = 0f, y = 0f, maxX = 0f, halfSize = fontSize * pixelSize * 0.5f;
+		float x = 0f, y = 0f, maxX = 0f, halfSize = fontSize * fontScale * 0.5f;
 		int textLength = text.Length, indexOffset = verts.size, ch = 0, prev = 0;
 
 		for (int i = 0; i < textLength; ++i)
@@ -1047,7 +1046,7 @@ static public class NGUIText
 			}
 			else
 			{
-				x += symbol.advance * pixelSize + finalSpacingX;
+				x += symbol.advance * fontScale + finalSpacingX;
 				verts.Add(new Vector3(x, -y - halfSize));
 				indices.Add(i + 1);
 				i += symbol.sequence.Length - 1;
@@ -1077,7 +1076,7 @@ static public class NGUIText
 			start = caretPos;
 		}
 
-		float x = 0f, y = 0f, maxX = 0f, fs = fontSize * pixelSize;
+		float x = 0f, y = 0f, maxX = 0f, fs = fontSize * fontScale;
 		int caretOffset = (caret != null) ? caret.size : 0;
 		int highlightOffset = (highlight != null) ? highlight.size : 0;
 		int textLength = text.Length, index = 0, ch = 0, prev = 0;
@@ -1158,7 +1157,7 @@ static public class NGUIText
 
 			// See if there is a symbol matching this text
 			BMSymbol symbol = useSymbols ? GetSymbol(text, index, textLength) : null;
-			float w = (symbol != null) ? symbol.advance * pixelSize : GetGlyphWidth(ch, prev);
+			float w = (symbol != null) ? symbol.advance * fontScale : GetGlyphWidth(ch, prev);
 
 			if (w != 0f)
 			{
