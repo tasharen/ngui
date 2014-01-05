@@ -820,6 +820,7 @@ public class UIWidget : UIRect
 
 			if (panel != null)
 			{
+				mParentFound = false;
 				panel.AddWidget(this);
 				CheckLayer();
 				Invalidate(true);

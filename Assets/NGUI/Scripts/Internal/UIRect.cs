@@ -143,6 +143,7 @@ public abstract class UIRect : MonoBehaviour
 	protected BetterList<UIRect> mChildren = new BetterList<UIRect>();
 	protected bool mChanged = true;
 	protected bool mStarted = false;
+	protected bool mParentFound = false;
 
 	/// <summary>
 	/// Final calculated alpha.
@@ -156,7 +157,6 @@ public abstract class UIRect : MonoBehaviour
 	Camera mMyCam;
 	int mUpdateFrame = -1;
 	bool mAnchorsCached = false;
-	bool mParentFound = false;
 	bool mRootSet = false;
 
 	/// <summary>
@@ -207,6 +207,7 @@ public abstract class UIRect : MonoBehaviour
 			{
 				mParentFound = true;
 				mParent = NGUITools.FindInParents<UIRect>(cachedTransform.parent);
+				Debug.Log(NGUITools.GetHierarchy(gameObject) + " -> " + (mParent != null ? mParent.name : "<null>"));
 			}
 			return mParent;
 		}
@@ -546,6 +547,7 @@ public abstract class UIRect : MonoBehaviour
 
 	public virtual void ParentHasChanged ()
 	{
+		mParentFound = false;
 		UIRect pt = NGUITools.FindInParents<UIRect>(cachedTransform.parent);
 
 		if (mParent != pt)
