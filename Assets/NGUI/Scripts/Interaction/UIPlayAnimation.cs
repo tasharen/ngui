@@ -114,6 +114,15 @@ public class UIPlayAnimation : MonoBehaviour
 		if (!Application.isPlaying) return;
 #endif
 		if (mStarted) OnHover(UICamera.IsHighlighted(gameObject));
+
+		if (UICamera.currentTouch != null)
+		{
+			if (trigger == Trigger.OnPress || trigger == Trigger.OnPressTrue)
+				mActivated = (UICamera.currentTouch.pressed == gameObject);
+
+			if (trigger == Trigger.OnHover || trigger == Trigger.OnHoverTrue)
+				mActivated = (UICamera.currentTouch.current == gameObject);
+		}
 	}
 
 	void OnHover (bool isOver)

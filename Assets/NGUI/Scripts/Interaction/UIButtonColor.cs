@@ -80,6 +80,12 @@ public class UIButtonColor : UIWidgetContainer
 		if (!Application.isPlaying) return;
 #endif
 		if (mStarted) OnHover(UICamera.IsHighlighted(gameObject));
+		
+		if (UICamera.currentTouch != null)
+		{
+			if (UICamera.currentTouch.pressed == gameObject) OnPress(true);
+			else if (UICamera.currentTouch.current == gameObject) OnHover(true);
+		}
 	}
 
 	protected virtual void OnDisable ()
