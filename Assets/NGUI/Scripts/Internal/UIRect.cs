@@ -207,7 +207,6 @@ public abstract class UIRect : MonoBehaviour
 			{
 				mParentFound = true;
 				mParent = NGUITools.FindInParents<UIRect>(cachedTransform.parent);
-				Debug.Log(NGUITools.GetHierarchy(gameObject) + " -> " + (mParent != null ? mParent.name : "<null>"));
 			}
 			return mParent;
 		}
