@@ -1027,7 +1027,7 @@ public class UILabel : UIWidget
 #endif
 				{
 					mScale = (float)ps / mPrintedSize;
-					NGUIText.fontScale = mScale;
+					NGUIText.fontScale = (bitmapFont != null) ? mScale * bitmapFont.pixelSize : mScale;
 				}
 
 				NGUIText.Update(false);
@@ -1494,7 +1494,7 @@ public class UILabel : UIWidget
 		NGUIText.maxLines = mMaxLineCount;
 		NGUIText.spacingX = mSpacingX;
 		NGUIText.spacingY = mSpacingY;
-		NGUIText.fontScale = mScale;
+		NGUIText.fontScale = (bitmapFont != null) ? mScale * bitmapFont.pixelSize : mScale;
 
 		if (mFont != null)
 		{
