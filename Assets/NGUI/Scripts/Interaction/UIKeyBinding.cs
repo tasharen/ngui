@@ -102,20 +102,21 @@ public class UIKeyBinding : MonoBehaviour
 		{
 			if (UICamera.inputHasFocus) return;
 
+			UICamera.currentTouch = UICamera.controller;
+			UICamera.currentScheme = UICamera.ControlScheme.Controller;
+			UICamera.currentTouch.current = gameObject;
+
 			if (Input.GetKeyDown(keyCode))
 			{
-				UICamera.currentTouch.current = gameObject;
 				UICamera.Notify(gameObject, "OnPress", true);
-				UICamera.currentTouch.current = null;
 			}
 
 			if (Input.GetKeyUp(keyCode))
 			{
-				UICamera.currentTouch.current = gameObject;
 				UICamera.Notify(gameObject, "OnPress", false);
 				UICamera.Notify(gameObject, "OnClick", null);
-				UICamera.currentTouch.current = null;
 			}
+			UICamera.currentTouch.current = null;
 		}
 		else if (action == Action.Select)
 		{

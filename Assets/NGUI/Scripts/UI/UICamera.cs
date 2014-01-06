@@ -334,7 +334,7 @@ public class UICamera : MonoBehaviour
 	static GameObject mHover;
 
 	// Joystick/controller/keyboard event
-	static MouseOrTouch mController = new MouseOrTouch();
+	static public MouseOrTouch controller = new MouseOrTouch();
 
 	// Used to ensure that joystick-based controls don't trigger that often
 	static float mNextEvent = 0f;
@@ -472,7 +472,7 @@ public class UICamera : MonoBehaviour
 				if (mMouse[i].pressed != null)
 					++count;
 
-			if (mController.pressed != null)
+			if (controller.pressed != null)
 				++count;
 
 			return count;
@@ -497,7 +497,7 @@ public class UICamera : MonoBehaviour
 				if (mMouse[i].dragged != null)
 					++count;
 
-			if (mController.dragged != null)
+			if (controller.dragged != null)
 				++count;
 
 			return count;
@@ -1185,7 +1185,7 @@ public class UICamera : MonoBehaviour
 	public void ProcessOthers ()
 	{
 		currentTouchID = -100;
-		currentTouch = mController;
+		currentTouch = controller;
 
 		// If this is an input field, ignore WASD and Space key presses
 		inputHasFocus = (mCurrentSelection != null && mCurrentSelection.GetComponent<UIInput>() != null);
