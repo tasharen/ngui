@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.0.8 f4
+            Version 3.0.8 f5
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,16 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.8 f5
+- NEW: Added a flag to UIDragDropItem that lets you drag a clone of the object rather than the object itself.
+- FIX: Labels limited by number of lines with resizable height were not wrapped properly.
+- FIX: Added UITable's "keep within panel" checkbox to the UIGrid as well.
+- FIX: UIButtonKeys will now respect disabled objects.
+- FIX: UIPlayAnimation will now respect UIButton's "Drag Over" state if UIButton is present.
+- FIX: UIKeyBinding will now set the UICamera.currentTouch.current properly.
+- FIX: UIWidget.CreatePanel will now also invalidate the parent reference.
+- FIX: More changes related to how dynamic text is drawn...
 
 3.0.8 f4
 - NEW: Added a script that can animate Unity 2D sprite (UI2DSpriteAnimation).
