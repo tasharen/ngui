@@ -202,7 +202,7 @@ public abstract class UITweener : MonoBehaviour
 		}
 
 		// If the factor goes out of range and this is a one-time tweening operation, disable the script
-		if ((style == Style.Once) && (mFactor > 1f || mFactor < 0f))
+		if ((style == Style.Once) && (duration == 0f || mFactor > 1f || mFactor < 0f))
 		{
 			mFactor = Mathf.Clamp01(mFactor);
 			Sample(mFactor, true);
@@ -219,7 +219,7 @@ public abstract class UITweener : MonoBehaviour
 			current = null;
 
 			// Disable this script unless the function calls above changed something
-			if (mFactor == 1f && mAmountPerDelta > 0f || mFactor == 0f && mAmountPerDelta < 0f)
+			if (duration == 0f || (mFactor == 1f && mAmountPerDelta > 0f || mFactor == 0f && mAmountPerDelta < 0f))
 				enabled = false;
 		}
 		else Sample(mFactor, false);
