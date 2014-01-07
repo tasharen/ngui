@@ -876,7 +876,7 @@ public class UICamera : MonoBehaviour
 		if (handlesEvents) NGUIDebug.debugRaycast = debug;
 	}
 #else
-	void Start() { if (handlesEvents) NGUIDebug.debugRaycast = handlesEvents; }
+	void Start () { if (handlesEvents) NGUIDebug.debugRaycast = debug; }
 #endif
 
 #if UNITY_EDITOR
