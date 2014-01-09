@@ -903,7 +903,7 @@ public class UIInput : MonoBehaviour
 	/// Submit the input field's text.
 	/// </summary>
 
-	protected void Submit ()
+	public void Submit ()
 	{
 		if (NGUITools.GetActive(this))
 		{
