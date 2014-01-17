@@ -810,8 +810,11 @@ static public class NGUITools
 	static public T FindInParents<T> (GameObject go) where T : Component
 	{
 		if (go == null) return null;
+#if UNITY_FLASH
 		object comp = go.GetComponent<T>();
-
+#else
+		T comp = go.GetComponent<T>();
+#endif
 		if (comp == null)
 		{
 			Transform t = go.transform.parent;
@@ -822,7 +825,11 @@ static public class NGUITools
 				t = t.parent;
 			}
 		}
+#if UNITY_FLASH
 		return (T)comp;
+#else
+		return comp;
+#endif
 	}
 
 	/// <summary>
@@ -832,8 +839,11 @@ static public class NGUITools
 	static public T FindInParents<T> (Transform trans) where T : Component
 	{
 		if (trans == null) return null;
+#if UNITY_FLASH
 		object comp = trans.GetComponent<T>();
-
+#else
+		T comp = trans.GetComponent<T>();
+#endif
 		if (comp == null)
 		{
 			Transform t = trans.transform.parent;
@@ -844,7 +854,11 @@ static public class NGUITools
 				t = t.parent;
 			}
 		}
+#if UNITY_FLASH
 		return (T)comp;
+#else
+		return comp;
+#endif
 	}
 
 	/// <summary>

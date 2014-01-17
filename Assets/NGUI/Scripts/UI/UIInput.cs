@@ -559,7 +559,7 @@ public class UIInput : MonoBehaviour
 				{
 					if (mSelectionStart == mSelectionEnd)
 					{
-						if (mSelectionStart + 1 >= mValue.Length) return true;
+						if (mSelectionStart >= mValue.Length) return true;
 						++mSelectionEnd;
 					}
 					Insert("");
@@ -903,7 +903,7 @@ public class UIInput : MonoBehaviour
 	/// Submit the input field's text.
 	/// </summary>
 
-	protected void Submit ()
+	public void Submit ()
 	{
 		if (NGUITools.GetActive(this))
 		{

@@ -553,7 +553,7 @@ public class UISprite : UIWidget
 				int w = mSprite.width + padLeft + padRight;
 				int h = mSprite.height + padBottom + padTop;
 
-				if (mType == Type.Simple || mType == Type.Filled)
+				if (w > 0 && h > 0 && (mType == Type.Simple || mType == Type.Filled))
 				{
 					if ((w & 1) != 0) ++padRight;
 					if ((h & 1) != 0) ++padTop;

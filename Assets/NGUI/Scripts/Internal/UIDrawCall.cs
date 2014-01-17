@@ -593,6 +593,7 @@ public class UIDrawCall : MonoBehaviour
 	{
 		UIDrawCall dc = Create(name);
 		dc.gameObject.layer = pan.cachedGameObject.layer;
+		dc.clipping = pan.clipping;
 		dc.baseMaterial = mat;
 		dc.mainTexture = tex;
 		dc.shader = shader;
