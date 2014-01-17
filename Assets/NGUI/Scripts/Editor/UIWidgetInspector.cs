@@ -632,7 +632,7 @@ public class UIWidgetInspector : UIRectEditor
 									t.position = mWorldPos;
 
 									// Adjust the widget by the delta
-									NGUIMath.MoveWidget(mWidget, localDelta.x, localDelta.y);
+									NGUIMath.MoveRect(mWidget, localDelta.x, localDelta.y);
 								}
 								else if (mAction == Action.Rotate)
 								{
@@ -730,28 +730,28 @@ public class UIWidgetInspector : UIRectEditor
 				{
 					NGUIEditorTools.RegisterUndo("Nudge widget", t);
 					NGUIEditorTools.RegisterUndo("Nudge widget", mWidget);
-					NGUIMath.MoveWidget(mWidget, 0f, 1f);
+					NGUIMath.MoveRect(mWidget, 0f, 1f);
 					e.Use();
 				}
 				else if (e.keyCode == KeyCode.DownArrow)
 				{
 					NGUIEditorTools.RegisterUndo("Nudge widget", t);
 					NGUIEditorTools.RegisterUndo("Nudge widget", mWidget);
-					NGUIMath.MoveWidget(mWidget, 0f, -1f);
+					NGUIMath.MoveRect(mWidget, 0f, -1f);
 					e.Use();
 				}
 				else if (e.keyCode == KeyCode.LeftArrow)
 				{
 					NGUIEditorTools.RegisterUndo("Nudge widget", t);
 					NGUIEditorTools.RegisterUndo("Nudge widget", mWidget);
-					NGUIMath.MoveWidget(mWidget, -1f, 0f);
+					NGUIMath.MoveRect(mWidget, -1f, 0f);
 					e.Use();
 				}
 				else if (e.keyCode == KeyCode.RightArrow)
 				{
 					NGUIEditorTools.RegisterUndo("Nudge widget", t);
 					NGUIEditorTools.RegisterUndo("Nudge widget", mWidget);
-					NGUIMath.MoveWidget(mWidget, 1f, 0f);
+					NGUIMath.MoveRect(mWidget, 1f, 0f);
 					e.Use();
 				}
 				else if (e.keyCode == KeyCode.Escape)

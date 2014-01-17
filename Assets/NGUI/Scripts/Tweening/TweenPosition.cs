@@ -16,6 +16,7 @@ public class TweenPosition : UITweener
 	public Vector3 to;
 
 	Transform mTrans;
+	UIRect mRect;
 
 	public Transform cachedTransform { get { if (mTrans == null) mTrans = transform; return mTrans; } }
 
@@ -26,7 +27,27 @@ public class TweenPosition : UITweener
 	/// Tween's current value.
 	/// </summary>
 
-	public Vector3 value { get { return cachedTransform.localPosition; } set { cachedTransform.localPosition = value; } }
+	public Vector3 value
+	{
+		get
+		{
+			return cachedTransform.localPosition;
+		}
+		set
+		{
+			if (mRect == null || !mRect.isAnchored)
+			{
+				cachedTransform.localPosition = value;
+			}
+			else
+			{
+				value -= cachedTransform.localPosition;
+				NGUIMath.MoveRect(mRect, value.x, value.y);
+			}
+		}
+	}
+
+	void Awake () { mRect = GetComponent<UIRect>(); }
 
 	/// <summary>
 	/// Tween the value.
