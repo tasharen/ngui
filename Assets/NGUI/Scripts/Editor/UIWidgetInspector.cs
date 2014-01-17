@@ -664,9 +664,6 @@ public class UIWidgetInspector : UIRectEditor
 									NGUIMath.ResizeWidget(mWidget, mDragPivot, localDelta.x, localDelta.y, 2, 2);
 									ReEvaluateAnchorType();
 								}
-
-								EditorUtility.SetDirty(mWidget);
-								EditorUtility.SetDirty(t);
 							}
 						}
 					}
@@ -731,30 +728,30 @@ public class UIWidgetInspector : UIRectEditor
 			{
 				if (e.keyCode == KeyCode.UpArrow)
 				{
-					Vector3 pos = t.localPosition;
-					pos.y += 1f;
-					t.localPosition = pos;
+					NGUIEditorTools.RegisterUndo("Nudge widget", t);
+					NGUIEditorTools.RegisterUndo("Nudge widget", mWidget);
+					NGUIMath.MoveWidget(mWidget, 0f, 1f);
 					e.Use();
 				}
 				else if (e.keyCode == KeyCode.DownArrow)
 				{
-					Vector3 pos = t.localPosition;
-					pos.y -= 1f;
-					t.localPosition = pos;
+					NGUIEditorTools.RegisterUndo("Nudge widget", t);
+					NGUIEditorTools.RegisterUndo("Nudge widget", mWidget);
+					NGUIMath.MoveWidget(mWidget, 0f, -1f);
 					e.Use();
 				}
 				else if (e.keyCode == KeyCode.LeftArrow)
 				{
-					Vector3 pos = t.localPosition;
-					pos.x -= 1f;
-					t.localPosition = pos;
+					NGUIEditorTools.RegisterUndo("Nudge widget", t);
+					NGUIEditorTools.RegisterUndo("Nudge widget", mWidget);
+					NGUIMath.MoveWidget(mWidget, -1f, 0f);
 					e.Use();
 				}
 				else if (e.keyCode == KeyCode.RightArrow)
 				{
-					Vector3 pos = t.localPosition;
-					pos.x += 1f;
-					t.localPosition = pos;
+					NGUIEditorTools.RegisterUndo("Nudge widget", t);
+					NGUIEditorTools.RegisterUndo("Nudge widget", mWidget);
+					NGUIMath.MoveWidget(mWidget, 1f, 0f);
 					e.Use();
 				}
 				else if (e.keyCode == KeyCode.Escape)
