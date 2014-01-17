@@ -292,12 +292,12 @@ public class UIProgressBar : UIWidgetContainer
 			if (isHorizontal)
 			{
 				float diff = (localPos.x - corners[0].x) / size.x;
-				return Mathf.Clamp01(isInverted ? 1f - diff : diff);
+				return isInverted ? 1f - diff : diff;
 			}
 			else
 			{
 				float diff = (localPos.y - corners[0].y) / size.y;
-				return Mathf.Clamp01(isInverted ? 1f - diff : diff);
+				return isInverted ? 1f - diff : diff;
 			}
 		}
 		return value;
