@@ -105,27 +105,17 @@ public class UIPanelInspector : UIRectEditor
 		bool canResize = (mPanel.clipping != UIDrawCall.Clipping.None);
 		bool[] resizable = new bool[8];
 
-		resizable[4] = canResize && mPanel.leftAnchor.target == null;	// left
-		resizable[5] = canResize && mPanel.topAnchor.target == null;	// top
-		resizable[6] = canResize && mPanel.rightAnchor.target == null;	// right
-		resizable[7] = canResize && mPanel.bottomAnchor.target == null;	// bottom
+		resizable[4] = canResize;	// left
+		resizable[5] = canResize;	// top
+		resizable[6] = canResize;	// right
+		resizable[7] = canResize;	// bottom
 
 		resizable[0] = resizable[7] && resizable[4]; // bottom-left
 		resizable[1] = resizable[5] && resizable[4]; // top-left
 		resizable[2] = resizable[5] && resizable[6]; // top-right
 		resizable[3] = resizable[7] && resizable[6]; // bottom-right
 
-		bool canMove = true;
-		for (int i = 0; i < 4; ++i)
-		{
-			if (!resizable[i])
-			{
-				canMove = false;
-				break;
-			}
-		}
-
-		UIWidget.Pivot pivotUnderMouse = UIWidgetInspector.GetPivotUnderMouse(handles, e, resizable, canMove, ref actionUnderMouse);
+		UIWidget.Pivot pivotUnderMouse = UIWidgetInspector.GetPivotUnderMouse(handles, e, resizable, true, ref actionUnderMouse);
 
 		switch (type)
 		{

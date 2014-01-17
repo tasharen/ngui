@@ -162,6 +162,8 @@ public class UIWidget : UIRect
 
 				if (keepAspectRatio == AspectRatioSource.BasedOnWidth)
 					mHeight = Mathf.RoundToInt(mWidth / aspectRatio);
+				else if (keepAspectRatio == AspectRatioSource.Free)
+					aspectRatio = mWidth / (float)mHeight;
 
 				mMoved = true;
 				if (autoResizeBoxCollider) ResizeCollider();
@@ -191,6 +193,8 @@ public class UIWidget : UIRect
 
 				if (keepAspectRatio == AspectRatioSource.BasedOnHeight)
 					mWidth = Mathf.RoundToInt(mHeight * aspectRatio);
+				else if (keepAspectRatio == AspectRatioSource.Free)
+					aspectRatio = mWidth / (float)mHeight;
 
 				mMoved = true;
 				if (autoResizeBoxCollider) ResizeCollider();

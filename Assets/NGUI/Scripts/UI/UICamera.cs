@@ -1335,8 +1335,10 @@ public class UICamera : MonoBehaviour
 				currentTouch.delta = currentTouch.totalDelta;
 
 				// OnDragOver is sent for consistency, so that OnDragOut is always preceded by OnDragOver
+				isDragging = true;
 				Notify(currentTouch.dragged, "OnDragStart", null);
 				Notify(currentTouch.last, "OnDragOver", currentTouch.dragged);
+				isDragging = false;
 			}
 			else if (!currentTouch.dragStarted && drag < mag)
 			{
