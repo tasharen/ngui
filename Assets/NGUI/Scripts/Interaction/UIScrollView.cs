@@ -459,6 +459,8 @@ public class UIScrollView : MonoBehaviour
 
 	public virtual void SetDragAmount (float x, float y, bool updateScrollbars)
 	{
+		if (mPanel == null) mPanel = GetComponent<UIPanel>();
+
 		DisableSpring();
 
 		Bounds b = bounds;
