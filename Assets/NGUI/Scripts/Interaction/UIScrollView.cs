@@ -844,6 +844,7 @@ public class UIScrollView : MonoBehaviour
 	{
 		if (mPanel != null)
 		{
+			if (!Application.isPlaying) mCalculatedBounds = false;
 			Bounds b = bounds;
 			Gizmos.matrix = transform.localToWorldMatrix;
 			Gizmos.color = new Color(1f, 0.4f, 0f);
