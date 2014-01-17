@@ -467,6 +467,24 @@ public class UIWidgetInspector : UIRectEditor
 		resizable[6] = canResize;	// right
 		resizable[7] = canResize;	// bottom
 
+		UILabel lbl = mWidget as UILabel;
+		
+		if (lbl != null)
+		{
+			if (lbl.overflowMethod == UILabel.Overflow.ResizeFreely)
+			{
+				resizable[4] = false;	// left
+				resizable[5] = false;	// top
+				resizable[6] = false;	// right
+				resizable[7] = false;	// bottom
+			}
+			else if (lbl.overflowMethod == UILabel.Overflow.ResizeHeight)
+			{
+				resizable[5] = false;	// top
+				resizable[7] = false;	// bottom
+			}
+		}
+
 		if (mWidget.keepAspectRatio == UIWidget.AspectRatioSource.BasedOnHeight)
 		{
 			resizable[4] = false;
