@@ -587,21 +587,17 @@ public class UIWidgetInspector : UIRectEditor
 									if (mActionUnderMouse == Action.Move)
 									{
 										NGUISnap.Recalculate(mWidget);
-										NGUIEditorTools.RegisterUndo("Move widget", t);
 									}
 									else if (mActionUnderMouse == Action.Rotate)
 									{
 										mStartRot = t.localRotation.eulerAngles;
 										mStartDir = mStartDrag - t.position;
-										NGUIEditorTools.RegisterUndo("Rotate widget", t);
 									}
 									else if (mActionUnderMouse == Action.Scale)
 									{
 										mStartWidth = mWidget.width;
 										mStartHeight = mWidget.height;
 										mDragPivot = pivotUnderMouse;
-										NGUIEditorTools.RegisterUndo("Scale widget", t);
-										NGUIEditorTools.RegisterUndo("Scale widget", mWidget);
 									}
 									mAction = actionUnderMouse;
 								}
@@ -609,6 +605,9 @@ public class UIWidgetInspector : UIRectEditor
 
 							if (mAction != Action.None)
 							{
+								NGUIEditorTools.RegisterUndo("Change widget", t);
+								NGUIEditorTools.RegisterUndo("Change widget", mWidget);
+
 								// Reset the widget before adjusting anything
 								t.position = mWorldPos;
 								mWidget.width = mStartWidth;
@@ -665,6 +664,9 @@ public class UIWidgetInspector : UIRectEditor
 									NGUIMath.ResizeWidget(mWidget, mDragPivot, localDelta.x, localDelta.y, 2, 2);
 									ReEvaluateAnchorType();
 								}
+
+								EditorUtility.SetDirty(mWidget);
+								EditorUtility.SetDirty(t);
 							}
 						}
 					}
@@ -760,22 +762,7 @@ public class UIWidgetInspector : UIRectEditor
 					if (GUIUtility.hotControl == id)
 					{
 						if (mAction != Action.None)
-						{
-							if (mAction == Action.Move)
-							{
-								t.position = mWorldPos;
-							}
-							else if (mAction == Action.Rotate)
-							{
-								t.localRotation = Quaternion.Euler(mStartRot);
-							}
-							else if (mAction == Action.Scale)
-							{
-								t.position = mWorldPos;
-								mWidget.width = mStartWidth;
-								mWidget.height = mStartHeight;
-							}
-						}
+							Undo.PerformUndo();
 
 						GUIUtility.hotControl = 0;
 						GUIUtility.keyboardControl = 0;
@@ -934,8 +921,8 @@ public class UIWidgetInspector : UIRectEditor
 
 						if (w != null)
 						{
-							NGUIEditorTools.RegisterUndo("Widget Change", w);
-							NGUIEditorTools.RegisterUndo("Make Pixel-Perfect", w.transform);
+							NGUIEditorTools.RegisterUndo("Snap Dimensions", w);
+							NGUIEditorTools.RegisterUndo("Snap Dimensions", w.transform);
 							w.MakePixelPerfect();
 						}
 					}
