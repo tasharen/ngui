@@ -106,7 +106,7 @@ public class UIDrawCallViewer : EditorWindow
 				GUI.color = highlight ? Color.white : new Color(0.8f, 0.8f, 0.8f);
 
 				NGUIEditorTools.BeginContents();
-				EditorGUILayout.ObjectField("Material", dc.baseMaterial, typeof(Material), false);
+				EditorGUILayout.ObjectField("Material", dc.dynamicMaterial, typeof(Material), false);
 
 				int count = 0;
 

@@ -285,30 +285,30 @@ public class UIDrawCall : MonoBehaviour
 		}
 		else // No clipping
 		{
-			shader = (mShader != null) ? mShader : Shader.Find(shaderName);
+			shader = Shader.Find(shaderName);
 		}
 
 		if (mMaterial != null)
 		{
 			mDynamicMat = new Material(mMaterial);
-			mDynamicMat.hideFlags = HideFlags.DontSave;
+			mDynamicMat.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
 			mDynamicMat.CopyPropertiesFromMaterial(mMaterial);
-
-			// If there is a valid shader, assign it to the custom material
-			if (shader != null)
-			{
-				mDynamicMat.shader = shader;
-			}
-			else if (mClipping != Clipping.None)
-			{
-				Debug.LogError(shaderName + " doesn't have a clipped shader version for " + mClipping);
-				mClipping = Clipping.None;
-			}
 		}
 		else
 		{
 			mDynamicMat = new Material(shader);
-			mDynamicMat.hideFlags = HideFlags.DontSave;
+			mDynamicMat.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
+		}
+
+		// If there is a valid shader, assign it to the custom material
+		if (shader != null)
+		{
+			mDynamicMat.shader = shader;
+		}
+		else if (mClipping != Clipping.None)
+		{
+			Debug.LogError(shaderName + " doesn't have a clipped shader version for " + mClipping);
+			mClipping = Clipping.None;
 		}
 	}
 
