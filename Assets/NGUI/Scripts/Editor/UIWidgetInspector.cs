@@ -462,10 +462,10 @@ public class UIWidgetInspector : UIRectEditor
 		bool canResize = (mWidget.GetComponent<UIStretch>() == null);
 		bool[] resizable = new bool[8];
 
-		resizable[4] = canResize && !mWidget.isAnchoredHorizontally;	// left
-		resizable[5] = canResize && !mWidget.isAnchoredVertically;		// top
-		resizable[6] = canResize && !mWidget.isAnchoredHorizontally;	// right
-		resizable[7] = canResize && !mWidget.isAnchoredVertically;		// bottom
+		resizable[4] = canResize;	// left
+		resizable[5] = canResize;	// top
+		resizable[6] = canResize;	// right
+		resizable[7] = canResize;	// bottom
 
 		if (mWidget.keepAspectRatio == UIWidget.AspectRatioSource.BasedOnHeight)
 		{
