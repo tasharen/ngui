@@ -186,6 +186,7 @@ public class UIPanel : UIRect
 
 			if (mAlpha != val)
 			{
+				mResized = true;
 				mAlpha = val;
 				SetDirty();
 			}
