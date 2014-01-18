@@ -279,7 +279,7 @@ static public class NGUIText
 	}
 
 	/// <summary>
-	/// Parse the symbol, if possible. Returns 'true' if the 'index' was adjusted. Advanced symbol support contributed by Contenga.
+	/// Parse the symbol, if possible. Returns 'true' if the 'index' was adjusted. Advanced symbol support contributed by Rudy Pangestu.
 	/// </summary>
 
 	static public bool ParseSymbol (string text, ref int index, BetterList<Color> colors, bool premultiply,
@@ -843,7 +843,7 @@ static public class NGUIText
 		Rect uvRect = new Rect();
 		float invX = 0f, invY = 0f;
 
-		// Advanced symbol support contributed by Contenga.
+		// Advanced symbol support contributed by Rudy Pangestu.
 		bool subscript = false;
 		int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
 		bool bold = false;
@@ -1104,7 +1104,7 @@ static public class NGUIText
 				v1x = glyph.v1.x;
 				v1y = glyph.v1.y;
 
-				// Bold and italic contributed by Contenga.
+				// Bold and italic contributed by Rudy Pangestu.
 				if (!bold)
 				{
 					if (!italic)
@@ -1136,7 +1136,7 @@ static public class NGUIText
 					}
 				}
 
-				// Underline and strike-through contributed by Contenga.
+				// Underline and strike-through contributed by Rudy Pangestu.
 				if (underline || strikethrough)
 				{
 					GlyphInfo dash = GetGlyph(strikethrough ? '-' : '_', prev);
