@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.0.8 f7
+            Version 3.0.9
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,27 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.9
+- NEW: Community contribution: bold, italic, underline, strike-through and subscript support for text (Rudy Pangestu).
+- NEW: You can now use TweenPosition on anchored widgets and panels.
+- NEW: You can now nudge anchored widgets, panels and containers (arrow keys).
+- NEW: It's now possible to resize and move anchored panels and widgets in the scene view.
+- FIX: You can now re-activate a tween in its OnFinished callback and set a new OnFinished callback without having it execute immediately.
+- FIX: Force-replace the GUI/Text shader with Unlit/Text inside UIDrawCall, seeing as GUI/Text was still used for dynamic text (ugh!)
+- FIX: Create Scroll view option from the NGUI menu should now correctly add the UIScrollView script.
+- FIX: Orange outline showing scroll view content should now update while dragging content around at edit time.
+- FIX: Widget and panel undo should now work properly even when it's anchored.
+- FIX: Fix for the issue with panels starting with alpha of 0.
+- FIX: Dragging using the slider's thumb should now reach 0 and 1 properly.
+- FIX: UIPlaySound set to trigger on hover will no longer play after the button was clicked.
+- FIX: Clicking a scroll view set to center on children should no longer conflict with Center On Child logic.
+- FIX: Widget aspect ratio will now automatically update when dragging the widget's dimensions even when it's not used.
+- FIX: Added a few extra null checks to avoid edge case issues such as destroying draw calls on quit.
+- FIX: Component selector (atlas / font selection) now has a scroll bar.
+- FIX: FindInParents should now work as expected in Unity 4.3 (Unity regression bug work-around).
+- FIX: 'Delete' key is now able to delete the last character correctly.
+- FIX: Some extra checks to eliminate possible NaN issues.
 
 3.0.8 f7
 - FIX: UIPanel's "explicit" render queue option should now work correctly.
