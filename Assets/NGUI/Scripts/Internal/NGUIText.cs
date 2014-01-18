@@ -842,6 +842,7 @@ static public class NGUIText
 
 		Rect uvRect = new Rect();
 		float invX = 0f, invY = 0f;
+		float sizePD = sizeF * pixelDensity;
 
 		// Advanced symbol support contributed by Rudy Pangestu.
 		bool subscript = false;
@@ -1016,11 +1017,11 @@ static public class NGUIText
 					{
 						if (gradient)
 						{
-							float min = sizeF + glyph.v0.y;
-							float max = sizeF + glyph.v1.y;
+							float min = sizePD + glyph.v0.y;
+							float max = sizePD + glyph.v1.y;
 
-							min /= sizeF;
-							max /= sizeF;
+							min /= sizePD;
+							max /= sizePD;
 
 							s_c0 = Color.Lerp(gb, gt, min);
 							s_c1 = Color.Lerp(gb, gt, max);
