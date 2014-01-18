@@ -143,6 +143,7 @@ public class UIRectEditor : Editor
 			NGUIEditorTools.BeginContents();
 			NGUIEditorTools.SetLabelWidth(62f);
 
+			EditorGUI.BeginDisabledGroup(!((target as UIRect).canBeAnchored));
 			GUILayout.BeginHorizontal();
 			AnchorType type = (AnchorType)EditorGUILayout.EnumPopup("Type", mAnchorType);
 			GUILayout.Space(18f);
@@ -171,8 +172,7 @@ public class UIRectEditor : Editor
 					tg[i].objectReferenceValue = mTarget[i];
 					mTarget[i] = null;
 				}
-
-				UpdateAnchors();
+				UpdateAnchors(true);
 			}
 
 			if (type == AnchorType.Advanced)
@@ -208,6 +208,7 @@ public class UIRectEditor : Editor
 
 			mAnchorType = type;
 			OnDrawFinalProperties();
+			EditorGUI.EndDisabledGroup();
 			NGUIEditorTools.EndContents();
 		}
 	}
@@ -218,7 +219,7 @@ public class UIRectEditor : Editor
 	/// Draw a selection for a single target (one target sets all 4 sides)
 	/// </summary>
 
-	SerializedProperty DrawSingleAnchorSelection ()
+	protected SerializedProperty DrawSingleAnchorSelection ()
 	{
 		SerializedProperty sp = serializedObject.FindProperty("leftAnchor.target");
 		Object before = sp.objectReferenceValue;
@@ -234,7 +235,7 @@ public class UIRectEditor : Editor
 		if (after != null || sp.hasMultipleDifferentValues)
 		{
 			if (before != after && after != null)
-				UpdateAnchors();
+				UpdateAnchors(true);
 		}
 		return sp;
 	}
@@ -243,7 +244,7 @@ public class UIRectEditor : Editor
 	/// Helper function that draws the suffix after the relative fields.
 	/// </summary>
 
-	void DrawAnchor (int index, bool targetSelection)
+	protected void DrawAnchor (int index, bool targetSelection)
 	{
 		if (targetSelection) GUILayout.Space(3f);
 
@@ -267,7 +268,7 @@ public class UIRectEditor : Editor
 			if (after != null || tar.hasMultipleDifferentValues)
 			{
 				if (before != after && after != null)
-					UpdateAnchor(index);
+					UpdateAnchor(index, true);
 			}
 
 			GUILayout.EndHorizontal();
@@ -426,10 +427,9 @@ public class UIRectEditor : Editor
 	/// Convenience function that switches the anchor mode and ensures that dimensions are kept intact.
 	/// </summary>
 
-	void UpdateAnchors ()
+	protected void UpdateAnchors (bool resetRelative)
 	{
 		serializedObject.ApplyModifiedProperties();
-		//serializedObject.Update();
 
 		Object[] objs = serializedObject.targetObjects;
 
@@ -439,16 +439,14 @@ public class UIRectEditor : Editor
 
 			if (rect)
 			{
-				UpdateHorizontalAnchor(rect, rect.leftAnchor);
-				UpdateHorizontalAnchor(rect, rect.rightAnchor);
-				UpdateVerticalAnchor(rect, rect.bottomAnchor);
-				UpdateVerticalAnchor(rect, rect.topAnchor);
+				UpdateHorizontalAnchor(rect, rect.leftAnchor, resetRelative);
+				UpdateHorizontalAnchor(rect, rect.rightAnchor, resetRelative);
+				UpdateVerticalAnchor(rect, rect.bottomAnchor, resetRelative);
+				UpdateVerticalAnchor(rect, rect.topAnchor, resetRelative);
 				
 				UnityEditor.EditorUtility.SetDirty(rect);
 			}
 		}
-		
-		//serializedObject.ApplyModifiedProperties();
 		serializedObject.Update();
 	}
 
@@ -456,10 +454,9 @@ public class UIRectEditor : Editor
 	/// Convenience function that switches the anchor mode and ensures that dimensions are kept intact.
 	/// </summary>
 
-	void UpdateAnchor (int index)
+	protected void UpdateAnchor (int index, bool resetRelative)
 	{
 		serializedObject.ApplyModifiedProperties();
-		//serializedObject.Update();
 
 		Object[] objs = serializedObject.targetObjects;
 
@@ -469,16 +466,14 @@ public class UIRectEditor : Editor
 
 			if (rect)
 			{
-				if (index == 0) UpdateHorizontalAnchor(rect, rect.leftAnchor);
-				if (index == 1) UpdateHorizontalAnchor(rect, rect.rightAnchor);
-				if (index == 2) UpdateVerticalAnchor(rect, rect.bottomAnchor);
-				if (index == 3) UpdateVerticalAnchor(rect, rect.topAnchor);
+				if (index == 0) UpdateHorizontalAnchor(rect, rect.leftAnchor, resetRelative);
+				if (index == 1) UpdateHorizontalAnchor(rect, rect.rightAnchor, resetRelative);
+				if (index == 2) UpdateVerticalAnchor(rect, rect.bottomAnchor, resetRelative);
+				if (index == 3) UpdateVerticalAnchor(rect, rect.topAnchor, resetRelative);
 
 				UnityEditor.EditorUtility.SetDirty(rect);
 			}
 		}
-		
-		//serializedObject.ApplyModifiedProperties();
 		serializedObject.Update();
 	}
 
@@ -486,7 +481,7 @@ public class UIRectEditor : Editor
 	/// Convenience function that switches the anchor mode and ensures that dimensions are kept intact.
 	/// </summary>
 
-	static void UpdateHorizontalAnchor (UIRect r, UIRect.AnchorPoint anchor)
+	static public void UpdateHorizontalAnchor (UIRect r, UIRect.AnchorPoint anchor, bool resetRelative)
 	{
 		// Update the target
 		if (anchor.target == null) return;
@@ -517,9 +512,17 @@ public class UIRectEditor : Editor
 
 			float val0 = localPos.x - side0.x;
 			float val2 = localPos.x - side1.x;
-			float val1 = localPos.x - Vector3.Lerp(side0, side1, 0.5f).x;
 
-			anchor.SetToNearest(val0, val1, val2);
+			if (resetRelative)
+			{
+				float val1 = localPos.x - Vector3.Lerp(side0, side1, 0.5f).x;
+				anchor.SetToNearest(val0, val1, val2);
+			}
+			else
+			{
+				float val = localPos.x - Vector3.Lerp(side0, side1, anchor.relative).x;
+				anchor.Set(anchor.relative, val);
+			}
 		}
 		else if (anchor.target.camera != null)
 		{
@@ -529,9 +532,17 @@ public class UIRectEditor : Editor
 
 			float val0 = localPos.x - side0.x;
 			float val2 = localPos.x - side1.x;
-			float val1 = localPos.x - Vector3.Lerp(side0, side1, 0.5f).x;
 
-			anchor.SetToNearest(val0, val1, val2);
+			if (resetRelative)
+			{
+				float val1 = localPos.x - Vector3.Lerp(side0, side1, 0.5f).x;
+				anchor.SetToNearest(val0, val1, val2);
+			}
+			else
+			{
+				float val = localPos.x - Vector3.Lerp(side0, side1, anchor.relative).x;
+				anchor.Set(anchor.relative, val);
+			}
 		}
 		else
 		{
@@ -549,7 +560,7 @@ public class UIRectEditor : Editor
 	/// Convenience function that switches the anchor mode and ensures that dimensions are kept intact.
 	/// </summary>
 
-	static void UpdateVerticalAnchor (UIRect r, UIRect.AnchorPoint anchor)
+	static public void UpdateVerticalAnchor (UIRect r, UIRect.AnchorPoint anchor, bool resetRelative)
 	{
 		// Update the target
 		if (anchor.target == null) return;
@@ -580,9 +591,17 @@ public class UIRectEditor : Editor
 
 			float val0 = localPos.y - side0.y;
 			float val2 = localPos.y - side1.y;
-			float val1 = localPos.y - Vector3.Lerp(side0, side1, 0.5f).y;
 
-			anchor.SetToNearest(val0, val1, val2);
+			if (resetRelative)
+			{
+				float val1 = localPos.y - Vector3.Lerp(side0, side1, 0.5f).y;
+				anchor.SetToNearest(val0, val1, val2);
+			}
+			else
+			{
+				float val = localPos.y - Vector3.Lerp(side0, side1, anchor.relative).y;
+				anchor.Set(anchor.relative, val);
+			}
 		}
 		else if (anchor.target.camera != null)
 		{
@@ -592,9 +611,17 @@ public class UIRectEditor : Editor
 
 			float val0 = localPos.y - side0.y;
 			float val2 = localPos.y - side1.y;
-			float val1 = localPos.y - Vector3.Lerp(side0, side1, 0.5f).y;
 
-			anchor.SetToNearest(val0, val1, val2);
+			if (resetRelative)
+			{
+				float val1 = localPos.y - Vector3.Lerp(side0, side1, 0.5f).y;
+				anchor.SetToNearest(val0, val1, val2);
+			}
+			else
+			{
+				float val = localPos.y - Vector3.Lerp(side0, side1, anchor.relative).y;
+				anchor.Set(anchor.relative, val);
+			}
 		}
 		else
 		{

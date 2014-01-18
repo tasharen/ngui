@@ -196,6 +196,12 @@ public abstract class UIRect : MonoBehaviour
 	public virtual bool isAnchoredVertically { get { return bottomAnchor.target || topAnchor.target; } }
 
 	/// <summary>
+	/// Whether the rectangle can be anchored.
+	/// </summary>
+
+	public virtual bool canBeAnchored { get { return true; } }
+
+	/// <summary>
 	/// Get the rectangle's parent, if any.
 	/// </summary>
 
@@ -239,7 +245,7 @@ public abstract class UIRect : MonoBehaviour
 	{
 		get
 		{
-			return leftAnchor.target || rightAnchor.target || topAnchor.target || bottomAnchor.target;
+			return (leftAnchor.target || rightAnchor.target || topAnchor.target || bottomAnchor.target) && canBeAnchored;
 		}
 	}
 

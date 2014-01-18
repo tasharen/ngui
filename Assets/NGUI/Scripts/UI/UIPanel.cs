@@ -171,6 +171,12 @@ public class UIPanel : UIRect
 	}
 
 	/// <summary>
+	/// Whether the rectangle can be anchored.
+	/// </summary>
+
+	public override bool canBeAnchored { get { return mClipping != UIDrawCall.Clipping.None; } }
+
+	/// <summary>
 	/// Panel's alpha affects everything drawn by the panel.
 	/// </summary>
 

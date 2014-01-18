@@ -295,7 +295,7 @@ public class UIWidgetInspector : UIRectEditor
 	/// Draw the specified anchor point.
 	/// </summary>
 
-	static public void DrawAnchor (UIRect.AnchorPoint anchor, Transform myTrans, Vector3[] myCorners, int side, int id)
+	static public void DrawAnchorHandle (UIRect.AnchorPoint anchor, Transform myTrans, Vector3[] myCorners, int side, int id)
 	{
 		if (!anchor.target) return;
 
@@ -444,10 +444,10 @@ public class UIWidgetInspector : UIRectEditor
 		// If the widget is anchored, draw the anchors
 		if (mWidget.isAnchored)
 		{
-			DrawAnchor(mWidget.leftAnchor, mWidget.cachedTransform, handles, 0, id);
-			DrawAnchor(mWidget.topAnchor, mWidget.cachedTransform, handles, 1, id);
-			DrawAnchor(mWidget.rightAnchor, mWidget.cachedTransform, handles, 2, id);
-			DrawAnchor(mWidget.bottomAnchor, mWidget.cachedTransform, handles, 3, id);
+			DrawAnchorHandle(mWidget.leftAnchor, mWidget.cachedTransform, handles, 0, id);
+			DrawAnchorHandle(mWidget.topAnchor, mWidget.cachedTransform, handles, 1, id);
+			DrawAnchorHandle(mWidget.rightAnchor, mWidget.cachedTransform, handles, 2, id);
+			DrawAnchorHandle(mWidget.bottomAnchor, mWidget.cachedTransform, handles, 3, id);
 		}
 
 		if (type == EventType.Repaint)
@@ -623,8 +623,8 @@ public class UIWidgetInspector : UIRectEditor
 
 							if (mAction != Action.None)
 							{
-								NGUIEditorTools.RegisterUndo("Change widget", t);
-								NGUIEditorTools.RegisterUndo("Change widget", mWidget);
+								NGUIEditorTools.RegisterUndo("Change Rect", t);
+								NGUIEditorTools.RegisterUndo("Change Rect", mWidget);
 
 								// Reset the widget before adjusting anything
 								t.position = mWorldPos;
@@ -746,29 +746,29 @@ public class UIWidgetInspector : UIRectEditor
 			{
 				if (e.keyCode == KeyCode.UpArrow)
 				{
-					NGUIEditorTools.RegisterUndo("Nudge widget", t);
-					NGUIEditorTools.RegisterUndo("Nudge widget", mWidget);
+					NGUIEditorTools.RegisterUndo("Nudge Rect", t);
+					NGUIEditorTools.RegisterUndo("Nudge Rect", mWidget);
 					NGUIMath.MoveRect(mWidget, 0f, 1f);
 					e.Use();
 				}
 				else if (e.keyCode == KeyCode.DownArrow)
 				{
-					NGUIEditorTools.RegisterUndo("Nudge widget", t);
-					NGUIEditorTools.RegisterUndo("Nudge widget", mWidget);
+					NGUIEditorTools.RegisterUndo("Nudge Rect", t);
+					NGUIEditorTools.RegisterUndo("Nudge Rect", mWidget);
 					NGUIMath.MoveRect(mWidget, 0f, -1f);
 					e.Use();
 				}
 				else if (e.keyCode == KeyCode.LeftArrow)
 				{
-					NGUIEditorTools.RegisterUndo("Nudge widget", t);
-					NGUIEditorTools.RegisterUndo("Nudge widget", mWidget);
+					NGUIEditorTools.RegisterUndo("Nudge Rect", t);
+					NGUIEditorTools.RegisterUndo("Nudge Rect", mWidget);
 					NGUIMath.MoveRect(mWidget, -1f, 0f);
 					e.Use();
 				}
 				else if (e.keyCode == KeyCode.RightArrow)
 				{
-					NGUIEditorTools.RegisterUndo("Nudge widget", t);
-					NGUIEditorTools.RegisterUndo("Nudge widget", mWidget);
+					NGUIEditorTools.RegisterUndo("Nudge Rect", t);
+					NGUIEditorTools.RegisterUndo("Nudge Rect", mWidget);
 					NGUIMath.MoveRect(mWidget, 1f, 0f);
 					e.Use();
 				}
