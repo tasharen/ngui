@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.0.9
+            Version 3.0.9 f1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -37,7 +37,7 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
  Version History
 -----------------
 
-3.0.9
+3.0.9 f1
 - NEW: Community contribution: bold, italic, underline, strike-through and subscript support for text (Rudy Pangestu).
 - NEW: You can now use TweenPosition on anchored widgets and panels.
 - NEW: You can now nudge anchored widgets, panels and containers (arrow keys).
@@ -57,6 +57,8 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - FIX: FindInParents should now work as expected in Unity 4.3 (Unity regression bug work-around).
 - FIX: 'Delete' key is now able to delete the last character correctly.
 - FIX: Some extra checks to eliminate possible NaN issues.
+- FIX: Gradient on labels should now look correct with fixed size UIRoot.
+- FIX: Draw calls from non-automatic Render Q panels will now be more careful with their Z position.
 
 3.0.8 f7
 - FIX: UIPanel's "explicit" render queue option should now work correctly.
