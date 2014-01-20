@@ -1256,7 +1256,8 @@ public class UIPanel : UIRect
 				if (w.UpdateTransform(frame) || mResized)
 				{
 					// Only proceed to checking the widget's visibility if it actually moved
-					bool vis = forceVisible || (w.CalculateCumulativeAlpha(frame) > 0.001f && IsVisible(w));
+					bool vis = forceVisible || (w.CalculateCumulativeAlpha(frame) > 0.001f &&
+						((mClipping == UIDrawCall.Clipping.None && !w.hideIfOffScreen) || IsVisible(w)));
 					w.UpdateVisibility(vis);
 				}
 				
