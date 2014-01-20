@@ -583,8 +583,11 @@ public abstract class UIRect : MonoBehaviour
 
 	protected virtual void OnValidate ()
 	{
-		ResetAnchors();
-		Invalidate(true);
+		if (NGUITools.GetActive(this))
+		{
+			ResetAnchors();
+			Invalidate(true);
+		}
 	}
 #endif
 }

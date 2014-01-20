@@ -543,7 +543,7 @@ public class UISprite : UIWidget
 			float x1 = x0 + mWidth;
 			float y1 = y0 + mHeight;
 
-			if (mSprite != null)
+			if (GetAtlasSprite() != null)
 			{
 				int padLeft = mSprite.paddingLeft;
 				int padBottom = mSprite.paddingBottom;

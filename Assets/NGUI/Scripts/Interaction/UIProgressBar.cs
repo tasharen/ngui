@@ -250,13 +250,25 @@ public class UIProgressBar : UIWidgetContainer
 
 	protected void OnValidate ()
 	{
-		Upgrade();
-		mIsDirty = true;
-		float val = Mathf.Clamp01(mValue);
-		if (mValue != val) mValue = val;
-		if (numberOfSteps < 0) numberOfSteps = 0;
-		else if (numberOfSteps > 20) numberOfSteps = 20;
-		ForceUpdate();
+		// For some bizzarre reason Unity calls this function on prefabs, even if prefabs
+		// are not actually USED in the scene. Dafuq?
+		if (NGUITools.GetActive(this))
+		{
+			Upgrade();
+			mIsDirty = true;
+			float val = Mathf.Clamp01(mValue);
+			if (mValue != val) mValue = val;
+			if (numberOfSteps < 0) numberOfSteps = 0;
+			else if (numberOfSteps > 20) numberOfSteps = 20;
+			ForceUpdate();
+		}
+		else
+		{
+			float val = Mathf.Clamp01(mValue);
+			if (mValue != val) mValue = val;
+			if (numberOfSteps < 0) numberOfSteps = 0;
+			else if (numberOfSteps > 20) numberOfSteps = 20;
+		}
 	}
 
 	/// <summary>

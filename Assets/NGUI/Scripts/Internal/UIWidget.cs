@@ -250,7 +250,7 @@ public class UIWidget : UIRect
 	/// Whether the widget is currently visible.
 	/// </summary>
 
-	public bool isVisible { get { return mIsVisible && mIsInFront; } }
+	public bool isVisible { get { return mIsVisible && mIsInFront && alpha > 0.001f; } }
 
 	/// <summary>
 	/// Whether the widget has vertices to draw.
@@ -757,35 +757,43 @@ public class UIWidget : UIRect
 	{
 		base.OnValidate();
 
-		// Prior to NGUI 2.7.0 width and height was specified as transform's local scale
-		if ((mWidth == 100 || mWidth == minWidth) &&
-			(mHeight == 100 || mHeight == minHeight) && cachedTransform.localScale.magnitude > 8f)
+		if (NGUITools.GetActive(this))
 		{
-			UpgradeFrom265();
-			cachedTransform.localScale = Vector3.one;
+			// Prior to NGUI 2.7.0 width and height was specified as transform's local scale
+			if ((mWidth == 100 || mWidth == minWidth) &&
+				(mHeight == 100 || mHeight == minHeight) && cachedTransform.localScale.magnitude > 8f)
+			{
+				UpgradeFrom265();
+				cachedTransform.localScale = Vector3.one;
+			}
+
+			if (mWidth < minWidth) mWidth = minWidth;
+			if (mHeight < minHeight) mHeight = minHeight;
+			if (autoResizeBoxCollider) ResizeCollider();
+
+			// If the texture is changing, we need to make sure to rebuild the draw calls
+			if (mOldTex != mainTexture || mOldShader != shader)
+			{
+				mOldTex = mainTexture;
+				mOldShader = shader;
+			}
+
+			if (panel != null)
+			{
+				panel.RemoveWidget(this);
+				panel = null;
+			}
+
+			aspectRatio = (keepAspectRatio == AspectRatioSource.Free) ?
+				(float)mWidth / mHeight : Mathf.Max(0.01f, aspectRatio);
+
+			CreatePanel();
 		}
-
-		if (mWidth < minWidth) mWidth = minWidth;
-		if (mHeight < minHeight) mHeight = minHeight;
-		if (autoResizeBoxCollider) ResizeCollider();
-
-		// If the texture is changing, we need to make sure to rebuild the draw calls
-		if (mOldTex != mainTexture || mOldShader != shader)
+		else
 		{
-			mOldTex = mainTexture;
-			mOldShader = shader;
+			if (mWidth < minWidth) mWidth = minWidth;
+			if (mHeight < minHeight) mHeight = minHeight;
 		}
-
-		if (panel != null)
-		{
-			panel.RemoveWidget(this);
-			panel = null;
-		}
-
-		aspectRatio = (keepAspectRatio == AspectRatioSource.Free) ?
-			(float)mWidth / mHeight : Mathf.Max(0.01f, aspectRatio);
-
-		CreatePanel();
 	}
 #endif
 
@@ -1179,8 +1187,6 @@ public class UIWidget : UIRect
 		{
 			mChanged = true;
 			mIsVisible = visible;
-			if (autoResizeBoxCollider && collider != null && GetComponent<UIButton>() == null)
-				collider.enabled = visible;
 			return true;
 		}
 		return false;
