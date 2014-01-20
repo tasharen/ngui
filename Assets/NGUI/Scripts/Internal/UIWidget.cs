@@ -1179,6 +1179,8 @@ public class UIWidget : UIRect
 		{
 			mChanged = true;
 			mIsVisible = visible;
+			if (autoResizeBoxCollider && collider != null)
+				collider.enabled = visible;
 			return true;
 		}
 		return false;
@@ -1238,7 +1240,7 @@ public class UIWidget : UIRect
 
 		// Notify the listeners
 		if (mMoved && onChange != null) onChange();
-		return mMoved;
+		return mMoved || mChanged;
 	}
 
 #if UNITY_3_5 || UNITY_4_0

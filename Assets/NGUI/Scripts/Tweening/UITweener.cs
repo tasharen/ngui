@@ -219,6 +219,10 @@ public abstract class UITweener : MonoBehaviour
 			// Notify the listener delegates
 			EventDelegate.Execute(mTemp);
 
+			// Re-add the previous persistent delegates
+			for (int i = 0; i < mTemp.Count; ++i)
+				EventDelegate.Add(onFinished, mTemp[i]);
+
 			// Deprecated legacy functionality support
 			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
 				eventReceiver.SendMessage(callWhenFinished, this, SendMessageOptions.DontRequireReceiver);
