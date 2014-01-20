@@ -1179,7 +1179,7 @@ public class UIWidget : UIRect
 		{
 			mChanged = true;
 			mIsVisible = visible;
-			if (autoResizeBoxCollider && collider != null)
+			if (autoResizeBoxCollider && collider != null && GetComponent<UIButton>() == null)
 				collider.enabled = visible;
 			return true;
 		}

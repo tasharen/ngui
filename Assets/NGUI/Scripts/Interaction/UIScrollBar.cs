@@ -120,19 +120,23 @@ public class UIScrollBar : UISlider
 			{
 				val0 = Mathf.Lerp(corners[0].x, corners[2].x, val0);
 				val1 = Mathf.Lerp(corners[0].x, corners[2].x, val1);
+				float diff = (val1 - val0);
+				if (diff == 0f) return value;
 
 				return isInverted ?
-					(val1 - localPos.x) / (val1 - val0) :
-					(localPos.x - val0) / (val1 - val0);
+					(val1 - localPos.x) / diff :
+					(localPos.x - val0) / diff;
 			}
 			else
 			{
 				val0 = Mathf.Lerp(corners[0].y, corners[1].y, val0);
 				val1 = Mathf.Lerp(corners[3].y, corners[2].y, val1);
+				float diff = (val1 - val0);
+				if (diff == 0f) return value;
 
 				return isInverted ?
-					(val1 - localPos.y) / (val1 - val0) :
-					(localPos.y - val0) / (val1 - val0);
+					(val1 - localPos.y) / diff :
+					(localPos.y - val0) / diff;
 			}
 		}
 		return base.LocalToValue(localPos);
