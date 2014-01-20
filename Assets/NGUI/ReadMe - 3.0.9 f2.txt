@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.0.9 f1
+            Version 3.0.9 f2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,11 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.9 f2
+- FIX: UITweener will again keep persistent OnFinished delegates.
+- FIX: Widgets that are invisible will disable their box collider as needed.
+- FIX: Minor tweak related to widget alpha checks.
 
 3.0.9 f1
 - NEW: Community contribution: bold, italic, underline, strike-through and subscript support for text (Rudy Pangestu).
