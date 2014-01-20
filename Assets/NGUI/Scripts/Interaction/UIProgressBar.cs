@@ -250,8 +250,8 @@ public class UIProgressBar : UIWidgetContainer
 
 	protected void OnValidate ()
 	{
-		// For some bizzarre reason Unity calls this function on prefabs, even if prefabs
-		// are not actually USED in the scene. Dafuq?
+		// For some bizarre reason Unity calls this function on prefabs, even if prefabs
+		// are not actually used in the scene, nor selected in inspector. Dafuq?
 		if (NGUITools.GetActive(this))
 		{
 			Upgrade();
