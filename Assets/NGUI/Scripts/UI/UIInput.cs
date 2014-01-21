@@ -170,7 +170,19 @@ public class UIInput : MonoBehaviour
 	/// Default text used by the input's label.
 	/// </summary>
 
-	public string defaultText { get { return mDefaultText; } set { mDefaultText = value; } }
+	public string defaultText
+	{
+		get
+		{
+			return mDefaultText;
+		}
+		set
+		{
+			if (mDoInit) Init();
+			mDefaultText = value;
+			UpdateLabel();
+		}
+	}
 
 	[System.Obsolete("Use UIInput.value instead")]
 	public string text { get { return this.value; } set { this.value = value; } }
