@@ -199,17 +199,6 @@ public class UIInput : MonoBehaviour
 			if (!Application.isPlaying) return "";
 #endif
 			if (mDoInit) Init();
-#if MOBILE
-			if (isSelected && mKeyboard != null && mKeyboard.active)
-			{
-				string val = mKeyboard.text;
-#if !UNITY_3_5
-				if (Application.platform == RuntimePlatform.BB10Player)
-					val = val.Replace("\\b", "\b");
-#endif
-				return val;
-			}
-#endif
 			return mValue;
 		}
 		set
@@ -219,37 +208,47 @@ public class UIInput : MonoBehaviour
 #endif
 			if (mDoInit) Init();
 			mDrawStart = 0;
-#if MOBILE
-			if (isSelected && mKeyboard != null)
-				mKeyboard.text = value;
 
-			if (this.value != value)
+#if MOBILE && !UNITY_3_5
+			// BB10's implementation has a bug in Unity
+			if (Application.platform == RuntimePlatform.BB10Player)
+				value = value.Replace("\\b", "\b");
+#endif
+			// Validate all input
+			value = Validate(value);
+#if MOBILE
+			if (isSelected && mKeyboard != null && mCached != value)
+			{
+				mKeyboard.text = value;
+				mCached = value;
+			}
+
+			if (mValue != value)
 			{
 				mValue = value;
-				if (isSelected && mKeyboard != null) mKeyboard.text = value;
-				SaveToPlayerPrefs(mValue);
+				if (!isSelected) SaveToPlayerPrefs(value);
 				UpdateLabel();
 				ExecuteOnChange();
 			}
 #else
-			if (this.value != value)
+			if (mValue != value)
 			{
 				mValue = value;
 
 				if (isSelected)
 				{
-					if (string.IsNullOrEmpty(mValue))
+					if (string.IsNullOrEmpty(value))
 					{
 						mSelectionStart = 0;
 						mSelectionEnd = 0;
 					}
 					else
 					{
-						mSelectionStart = mValue.Length;
+						mSelectionStart = value.Length;
 						mSelectionEnd = mSelectionStart;
 					}
 				}
-				else SaveToPlayerPrefs(mValue);
+				else SaveToPlayerPrefs(value);
 
 				UpdateLabel();
 				ExecuteOnChange();
@@ -287,6 +286,29 @@ public class UIInput : MonoBehaviour
 #else
 	protected int cursorPosition { get { return isSelected ? mSelectionEnd : value.Length; } }
 #endif
+
+	/// <summary>
+	/// Validate the specified text, returning the validated version.
+	/// </summary>
+
+	public string Validate (string val)
+	{
+		if (string.IsNullOrEmpty(val)) return "";
+
+		StringBuilder sb = new StringBuilder(val.Length);
+
+		for (int i = 0; i < val.Length; ++i)
+		{
+			char c = val[i];
+			if (onValidate != null) c = onValidate(sb.ToString(), sb.Length, c);
+			else if (validation != Validation.None) c = Validate(sb.ToString(), sb.Length, c);
+			if (c != 0) sb.Append(c);
+		}
+
+		if (characterLimit > 0 && sb.Length > characterLimit)
+			return sb.ToString(0, characterLimit);
+		return sb.ToString();
+	}
 
 	/// <summary>
 	/// Automatically set the value by loading it from player prefs if possible.
@@ -426,35 +448,18 @@ public class UIInput : MonoBehaviour
 	/// </summary>
 
 #if MOBILE
+	string mCached = "";
+
 	void Update()
 	{
 		if (mKeyboard != null && isSelected)
 		{
-			string val = mKeyboard.text;
-#if !UNITY_3_5
-			// BB10's implementation has a bug in Unity
-			if (Application.platform == RuntimePlatform.BB10Player)
-				val = val.Replace("\\b", "\b");
-#endif
-			if (mValue != val)
+			string text = mKeyboard.text;
+
+			if (mCached != text)
 			{
-				mValue = "";
-
-				for (int i = 0; i < val.Length; ++i)
-				{
-					char c = val[i];
-					if (onValidate != null) c = onValidate(mValue, mValue.Length, c);
-					else if (validation != Validation.None) c = Validate(mValue, mValue.Length, c);
-					if (c != 0) mValue += c;
-				}
-
-				if (characterLimit > 0 && mValue.Length > characterLimit)
-					mValue = mValue.Substring(0, characterLimit);
-				
-				UpdateLabel();
-				ExecuteOnChange();
-
-				if (mValue != val) mKeyboard.text = mValue;
+				mCached = text;
+				value = text;
 			}
 
 			if (mKeyboard.done)
@@ -465,6 +470,7 @@ public class UIInput : MonoBehaviour
 					Submit();
 				mKeyboard = null;
 				isSelected = false;
+				mCached = "";
 			}
 		}
 	}
@@ -761,6 +767,7 @@ public class UIInput : MonoBehaviour
 	{
 		string left = GetLeftText();
 		string right = GetRightText();
+		int rl = right.Length;
 
 		StringBuilder sb = new StringBuilder(left.Length + right.Length + text.Length);
 		sb.Append(left);
@@ -768,14 +775,13 @@ public class UIInput : MonoBehaviour
 		// Append the new text
 		for (int i = 0, imax = text.Length; i < imax; ++i)
 		{
-			char c = text[i];
-
 			// Can't go past the character limit
-			if (characterLimit > 0 && mValue.Length >= characterLimit) continue;
+			if (characterLimit > 0 && sb.Length + rl >= characterLimit) break;
 
 			// If we have an input validator, validate the input first
-			if (onValidate != null) c = onValidate(mValue, mValue.Length, c);
-			else if (validation != Validation.None) c = Validate(mValue, mValue.Length, c);
+			char c = text[i];
+			if (onValidate != null) c = onValidate(sb.ToString(), sb.Length, c);
+			else if (validation != Validation.None) c = Validate(sb.ToString(), sb.Length, c);
 
 			// Append the character if it hasn't been invalidated
 			if (c != 0) sb.Append(c);
@@ -789,9 +795,8 @@ public class UIInput : MonoBehaviour
 		for (int i = 0, imax = right.Length; i < imax; ++i)
 		{
 			char c = right[i];
-			if (characterLimit > 0 && mValue.Length >= characterLimit) continue;
-			if (onValidate != null) c = onValidate(mValue, mValue.Length, c);
-			else if (validation != Validation.None) c = Validate(mValue, mValue.Length, c);
+			if (onValidate != null) c = onValidate(sb.ToString(), sb.Length, c);
+			else if (validation != Validation.None) c = Validate(sb.ToString(), sb.Length, c);
 			if (c != 0) sb.Append(c);
 		}
 

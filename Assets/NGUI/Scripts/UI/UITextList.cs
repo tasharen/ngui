@@ -258,6 +258,7 @@ public class UITextList : MonoBehaviour
 			textLabel.UpdateNGUIText();
 			NGUIText.rectHeight = 1000000;
 			mTotalLines = 0;
+			bool success = true;
 
 			for (int i = 0; i < mParagraphs.size; ++i)
 			{
@@ -269,18 +270,27 @@ public class UITextList : MonoBehaviour
 					p.lines = final.Split('\n');
 					mTotalLines += p.lines.Length;
 				}
+				else
+				{
+					success = false;
+					break;
+				}
 			}
 
 			// Recalculate the total number of lines
 			mTotalLines = 0;
-			for (int i = 0, imax = mParagraphs.size; i < imax; ++i)
-				mTotalLines += mParagraphs.buffer[i].lines.Length;
+
+			if (success)
+			{
+				for (int i = 0, imax = mParagraphs.size; i < imax; ++i)
+					mTotalLines += mParagraphs.buffer[i].lines.Length;
+			}
 
 			// Update the bar's size
 			if (scrollBar != null)
 			{
 				UIScrollBar sb = scrollBar as UIScrollBar;
-				if (sb != null) sb.barSize = 1f - (float)scrollHeight / mTotalLines;
+				if (sb != null) sb.barSize = (mTotalLines == 0) ? 1f : 1f - (float)scrollHeight / mTotalLines;
 			}
 
 			// Update the visible text
@@ -296,6 +306,12 @@ public class UITextList : MonoBehaviour
 	{
 		if (isValid)
 		{
+			if (mTotalLines == 0)
+			{
+				textLabel.text = "";
+				return;
+			}
+
 			int maxLines = Mathf.FloorToInt((float)textLabel.height / lineHeight);
 			int sh = Mathf.Max(0, mTotalLines - maxLines);
 			int offset = Mathf.RoundToInt(mScroll * sh);
