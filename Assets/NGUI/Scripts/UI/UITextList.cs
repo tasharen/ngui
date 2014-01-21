@@ -117,8 +117,8 @@ public class UITextList : MonoBehaviour
 		get
 		{
 			if (!isValid) return 0;
-			int visibleLines = Mathf.FloorToInt((float)textLabel.height / textLabel.fontSize);
-			return Mathf.Max(0, mTotalLines - visibleLines);
+			int maxLines = Mathf.FloorToInt((float)textLabel.height / lineHeight);
+			return Mathf.Max(0, mTotalLines - maxLines);
 		}
 	}
 
@@ -296,7 +296,7 @@ public class UITextList : MonoBehaviour
 	{
 		if (isValid)
 		{
-			int maxLines = Mathf.FloorToInt((float)textLabel.height / textLabel.fontSize);
+			int maxLines = Mathf.FloorToInt((float)textLabel.height / lineHeight);
 			int sh = Mathf.Max(0, mTotalLines - maxLines);
 			int offset = Mathf.RoundToInt(mScroll * sh);
 			if (offset < 0) offset = 0;
