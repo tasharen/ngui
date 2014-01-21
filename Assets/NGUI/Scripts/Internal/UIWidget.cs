@@ -1160,8 +1160,9 @@ public class UIWidget : UIRect
 
 			Color outline = new Color(1f, 1f, 1f, 0.2f);
 
+			float adjustment = (root != null) ? 0.25f : 0.001f;
 			Vector2 offset = pivotOffset;
-			Vector3 center = new Vector3(mWidth * (0.5f - offset.x), mHeight * (0.5f - offset.y), -mDepth * 0.25f);
+			Vector3 center = new Vector3(mWidth * (0.5f - offset.x), mHeight * (0.5f - offset.y), -mDepth * adjustment);
 			Vector3 size = new Vector3(mWidth, mHeight, 1f);
 
 			// Draw the gizmo
