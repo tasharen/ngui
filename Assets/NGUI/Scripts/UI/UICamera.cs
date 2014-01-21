@@ -604,7 +604,16 @@ public class UICamera : MonoBehaviour
 					{
 						GameObject go = hits[b].collider.gameObject;
 						UIWidget w = go.GetComponent<UIWidget>();
-						if (w != null && !w.isVisible) continue;
+
+						if (w != null)
+						{
+							if (!w.isVisible) continue;
+						}
+						else
+						{
+							UIRect rect = NGUITools.FindInParents<UIRect>(go);
+							if (rect != null && rect.finalAlpha < 0.001f) continue;
+						}
 
 						mHit.depth = NGUITools.CalculateRaycastDepth(go);
 
@@ -635,8 +644,18 @@ public class UICamera : MonoBehaviour
 				}
 				else if (hits.Length == 1)
 				{
-					UIWidget w = hits[0].collider.GetComponent<UIWidget>();
-					if (w != null && !w.isVisible) continue;
+					Collider c = hits[0].collider;
+					UIWidget w = c.GetComponent<UIWidget>();
+
+					if (w != null)
+					{
+						if (!w.isVisible) continue;
+					}
+					else
+					{
+						UIRect rect = NGUITools.FindInParents<UIRect>(c.gameObject);
+						if (rect != null && rect.finalAlpha < 0.001f) continue;
+					}
 
 					if (IsVisible(ref hits[0]))
 					{

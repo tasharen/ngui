@@ -250,7 +250,7 @@ public class UIWidget : UIRect
 	/// Whether the widget is currently visible.
 	/// </summary>
 
-	public bool isVisible { get { return mIsVisible && mIsInFront && alpha > 0.001f; } }
+	public bool isVisible { get { return mIsVisible && mIsInFront && finalAlpha > 0.001f; } }
 
 	/// <summary>
 	/// Whether the widget has vertices to draw.

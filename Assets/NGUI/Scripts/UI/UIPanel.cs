@@ -1194,6 +1194,8 @@ public class UIPanel : UIRect
 		}
 	}
 
+	bool mForced = false;
+
 	/// <summary>
 	/// Update all of the widgets belonging to this panel.
 	/// </summary>
@@ -1206,6 +1208,12 @@ public class UIPanel : UIRect
 		bool forceVisible = cullWhileDragging ? false : (mCullTime > mUpdateTime);
 #endif
 		bool changed = false;
+
+		if (mForced != forceVisible)
+		{
+			mForced = forceVisible;
+			mResized = true;
+		}
 
 		// Update all widgets
 		for (int i = 0, imax = widgets.size; i < imax; ++i)
