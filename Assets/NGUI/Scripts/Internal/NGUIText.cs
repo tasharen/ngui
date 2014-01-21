@@ -1062,8 +1062,9 @@ static public class NGUIText
 							case 8: col.a += 0.51f; break;
 						}
 
+						Color32 c = col;
 						for (int j = 0, jmax = (bold ? 16 : 4); j < jmax; ++j)
-							cols.Add(uc);
+							cols.Add(c);
 					}
 				}
 
