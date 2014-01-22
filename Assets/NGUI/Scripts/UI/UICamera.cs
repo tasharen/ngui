@@ -608,6 +608,7 @@ public class UICamera : MonoBehaviour
 						if (w != null)
 						{
 							if (!w.isVisible) continue;
+							if (w.hitCheck != null && !w.hitCheck(hits[b].point)) continue;
 						}
 						else
 						{

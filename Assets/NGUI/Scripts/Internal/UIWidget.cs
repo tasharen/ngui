@@ -73,6 +73,15 @@ public class UIWidget : UIRect
 
 	public float aspectRatio = 1f;
 
+	public delegate bool HitCheck (Vector3 worldPos);
+
+	/// <summary>
+	/// Custom hit check function. If set, all hit checks (including events) will call this function,
+	/// passing the world position. Return 'true' if it's within the bounds of your choice, 'false' otherwise.
+	/// </summary>
+
+	public HitCheck hitCheck;
+
 	/// <summary>
 	/// Panel that's managing this widget.
 	/// </summary>

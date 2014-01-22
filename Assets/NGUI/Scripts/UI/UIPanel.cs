@@ -619,7 +619,9 @@ public class UIPanel : UIRect
 	public bool IsVisible (Vector3 worldPos)
 	{
 		if (mAlpha < 0.001f) return false;
-		if (mClipping == UIDrawCall.Clipping.None) return true;
+		if (mClipping == UIDrawCall.Clipping.None ||
+			mClipping == UIDrawCall.Clipping.ConstrainButDontClip) return true;
+
 		UpdateTransformMatrix();
 
 		Vector3 pos = worldToLocal.MultiplyPoint3x4(worldPos);
