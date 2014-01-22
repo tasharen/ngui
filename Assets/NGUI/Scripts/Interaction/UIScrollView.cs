@@ -511,7 +511,7 @@ public class UIScrollView : MonoBehaviour
 		mPanel.clipOffset = new Vector2(clip.x - cr.x, clip.y - cr.y);
 
 		// Update the scrollbars, reflecting this change
-		if (updateScrollbars) UpdateScrollbars(false);
+		if (updateScrollbars) UpdateScrollbars(mDragID == -10);
 	}
 
 	/// <summary>
