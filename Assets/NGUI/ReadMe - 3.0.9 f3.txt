@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.0.9 f2
+            Version 3.0.9 f3
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,17 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.9 f3
+- FIX: Work-around for a bug in Unity that was causing prefabs to be marked as edited (version control).
+- FIX: Optimized how UIInput works on mobiles, and setting UIInput.value will now force it through validation.
+- FIX: UICamera's raycast now always considers cumulative alpha and ignores invisible objects.
+- FIX: "Constrain but don't clip" option will no longer cause widgets to get culled.
+- FIX: UILocalize should now work properly when attached to UIInput's label.
+- FIX: UITextList will no longer die IRL if not even a single line can fit.
+- FIX: Text List should now use Y-padding properly for scrolling.
+- FIX: Scroll bar should no longer cause NaNs in some situations.
+- FIX: Packed fonts fix.
 
 3.0.9 f2
 - FIX: UITweener will again keep persistent OnFinished delegates.
