@@ -701,18 +701,21 @@ public class UIDrawCall : MonoBehaviour
 
 	static public void Destroy (UIDrawCall dc)
 	{
-		if (Application.isPlaying)
+		if (dc)
 		{
-			if (mActiveList.Remove(dc))
+			if (Application.isPlaying)
 			{
-				NGUITools.SetActive(dc.gameObject, false);
-				mInactiveList.Add(dc);
+				if (mActiveList.Remove(dc))
+				{
+					NGUITools.SetActive(dc.gameObject, false);
+					mInactiveList.Add(dc);
+				}
 			}
-		}
-		else
-		{
-			mActiveList.Remove(dc);
-			NGUITools.DestroyImmediate(dc.gameObject);
+			else
+			{
+				mActiveList.Remove(dc);
+				NGUITools.DestroyImmediate(dc.gameObject);
+			}
 		}
 	}
 }

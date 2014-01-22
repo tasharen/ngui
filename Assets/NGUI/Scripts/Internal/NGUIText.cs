@@ -589,14 +589,35 @@ static public class NGUIText
 
 				if (symbol == null)
 				{
-					ch = text[i];
 					float w = GetGlyphWidth(ch, prev);
-					if (w != 0f) x += finalSpacingX + w;
-					prev = ch;
+					
+					if (w != 0f)
+					{
+						w += finalSpacingX;
+
+						if (x + w > rectWidth)
+						{
+							if (x > maxX) maxX = x;
+							x = w;
+							y += finalLineHeight;
+						}
+						else x += w;
+
+						prev = ch;
+					}
 				}
 				else
 				{
-					x += finalSpacingX + symbol.advance * fontScale;
+					float w = finalSpacingX + symbol.advance * fontScale;
+
+					if (x + w > rectWidth)
+					{
+						if (x > maxX) maxX = x;
+						x = w;
+						y += finalLineHeight;
+					}
+					else x += w;
+
 					i += symbol.sequence.Length - 1;
 					prev = 0;
 				}
@@ -944,7 +965,7 @@ static public class NGUIText
 				v0y = v1y - symbol.height * fontScale;
 
 				// Doesn't fit? Move down to the next line
-				if (v1x > rectWidth)
+				if (x + symbol.advance * fontScale > rectWidth)
 				{
 					if (x == 0f) return;
 
@@ -1036,7 +1057,7 @@ static public class NGUIText
 				v1y = glyph.v1.y - y;
 
 				// Doesn't fit? Move down to the next line
-				if (v1x > rectWidth)
+				if (x + glyph.advance > rectWidth)
 				{
 					if (x == 0f) return;
 
