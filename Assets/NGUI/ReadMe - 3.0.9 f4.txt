@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.0.9 f3
+            Version 3.0.9 f4
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,11 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.9 f4
+- NEW: Added UIWidget.hitCheck delegate you can set for custom hit detection (circular sprites, alpha checks, etc).
+- FIX: Caret and selection will now work properly even with one long word that doesn't fit.
+- FIX: UITable will now always update the scroll view's scroll bars.
 
 3.0.9 f3
 - FIX: Work-around for a bug in Unity that was causing prefabs to be marked as edited (version control).
