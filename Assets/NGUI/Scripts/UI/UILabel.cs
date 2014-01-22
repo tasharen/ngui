@@ -1036,7 +1036,7 @@ public class UILabel : UIWidget
 				NGUIText.Update(false);
 
 				// Wrap the text
-				bool fits = NGUIText.WrapText(mText, out mProcessedText);
+				bool fits = NGUIText.WrapText(mText, out mProcessedText, true);
 
 				if (mOverflow == Overflow.ShrinkContent && !fits)
 				{
@@ -1175,7 +1175,7 @@ public class UILabel : UIWidget
 			UpdateNGUIText(fontSize, mWidth, mHeight);
 
 			NGUIText.PrintCharacterPositions(text, mTempVerts, mTempIndices);
-			
+
 			if (mTempVerts.size > 0)
 			{
 				ApplyOffset(mTempVerts, 0);
