@@ -59,7 +59,7 @@ public class RealTime : MonoBehaviour
 	void Update ()
 	{
 		float rt = Time.realtimeSinceStartup;
-		mRealDelta = rt - mRealTime;
+		mRealDelta = Mathf.Clamp01(rt - mRealTime);
 		mRealTime = rt;
 	}
 }
