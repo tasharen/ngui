@@ -765,7 +765,7 @@ public class UICreateWidgetWizard : EditorWindow
 				}
 				else
 				{
-					ComponentSelector.Show<Font>(OnFont);
+					ComponentSelector.Show<Font>(OnFont, new string[] { ".ttf", ".otf" });
 				}
 			}
 
