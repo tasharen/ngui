@@ -292,6 +292,9 @@ public class EventDelegate
 				{
 					del.Execute();
 
+					if (i < list.Count) break;
+					if (list[i] != del) continue;
+
 					if (del.oneShot)
 					{
 						list.RemoveAt(i);

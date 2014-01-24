@@ -152,7 +152,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CanEditMultipleObjects]
-[CustomEditor(typeof(Transform))]
+[CustomEditor(typeof(Transform), true)]
 public class NGUITransformInspector : Editor
 {
 	static public NGUITransformInspector instance;

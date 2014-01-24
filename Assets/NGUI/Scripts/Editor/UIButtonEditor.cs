@@ -7,7 +7,11 @@ using UnityEngine;
 using UnityEditor;
 
 [CanEditMultipleObjects]
+#if UNITY_3_5
 [CustomEditor(typeof(UIButton))]
+#else
+[CustomEditor(typeof(UIButton), true)]
+#endif
 public class UIButtonEditor : UIWidgetContainerEditor
 {
 	public override void OnInspectorGUI ()

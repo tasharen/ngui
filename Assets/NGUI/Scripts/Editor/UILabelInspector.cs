@@ -15,7 +15,11 @@ using UnityEditor;
 /// </summary>
 
 [CanEditMultipleObjects]
+#if UNITY_3_5
 [CustomEditor(typeof(UILabel))]
+#else
+[CustomEditor(typeof(UILabel), true)]
+#endif
 public class UILabelInspector : UIWidgetInspector
 {
 	public enum FontType

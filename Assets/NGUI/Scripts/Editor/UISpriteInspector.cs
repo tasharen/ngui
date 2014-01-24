@@ -12,7 +12,11 @@ using System.Collections.Generic;
 /// </summary>
 
 [CanEditMultipleObjects]
+#if UNITY_3_5
 [CustomEditor(typeof(UISprite))]
+#else
+[CustomEditor(typeof(UISprite), true)]
+#endif
 public class UISpriteInspector : UIWidgetInspector
 {
 	/// <summary>

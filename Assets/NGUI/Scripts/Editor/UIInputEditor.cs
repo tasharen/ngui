@@ -11,7 +11,11 @@ using UnityEngine;
 using UnityEditor;
 
 [CanEditMultipleObjects]
+#if UNITY_3_5
 [CustomEditor(typeof(UIInput))]
+#else
+[CustomEditor(typeof(UIInput), true)]
+#endif
 public class UIInputEditor : UIWidgetContainerEditor
 {
 	public override void OnInspectorGUI ()

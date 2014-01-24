@@ -213,7 +213,7 @@ public abstract class UITweener : MonoBehaviour
 
 			current = this;
 
-			List<EventDelegate> mTemp = onFinished;
+			mTemp = onFinished;
 			onFinished = new List<EventDelegate>();
 
 			// Notify the listener delegates
@@ -222,6 +222,7 @@ public abstract class UITweener : MonoBehaviour
 			// Re-add the previous persistent delegates
 			for (int i = 0; i < mTemp.Count; ++i)
 				EventDelegate.Add(onFinished, mTemp[i]);
+			mTemp = null;
 
 			// Deprecated legacy functionality support
 			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
@@ -230,6 +231,18 @@ public abstract class UITweener : MonoBehaviour
 			current = null;
 		}
 		else Sample(mFactor, false);
+	}
+
+	List<EventDelegate> mTemp = null;
+
+	/// <summary>
+	/// Remove an OnFinished delegate. Will work even while iterating through the list when the tweener has finished its operation.
+	/// </summary>
+
+	public void RemoveOnFinished (EventDelegate del)
+	{
+		if (onFinished != null) onFinished.Remove(del);
+		if (mTemp != null) mTemp.Remove(del);
 	}
 
 	/// <summary>

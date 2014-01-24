@@ -7,7 +7,11 @@ using UnityEngine;
 using UnityEditor;
 
 [CanEditMultipleObjects]
+#if UNITY_3_5
 [CustomEditor(typeof(UIProgressBar))]
+#else
+[CustomEditor(typeof(UIProgressBar), true)]
+#endif
 public class UIProgressBarEditor : UIWidgetContainerEditor
 {
 	public override void OnInspectorGUI ()
