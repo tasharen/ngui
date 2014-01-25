@@ -185,7 +185,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 					}
 					else
 					{
-						ComponentSelector.Show<Font>(OnDynamicFont);
+						ComponentSelector.Show<Font>(OnDynamicFont, new string[] { ".ttf", ".otf"});
 					}
 				}
 

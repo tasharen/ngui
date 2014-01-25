@@ -12,7 +12,11 @@ using System.Collections.Generic;
 /// </summary>
 
 [CanEditMultipleObjects]
+#if UNITY_3_5
 [CustomEditor(typeof(UIRect))]
+#else
+[CustomEditor(typeof(UIRect), true)]
+#endif
 public class UIRectEditor : Editor
 {
 	static protected string[] PrefixName = new string[] { "Left", "Right", "Bottom", "Top" };

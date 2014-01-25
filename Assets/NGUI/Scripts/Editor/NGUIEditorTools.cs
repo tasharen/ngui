@@ -846,6 +846,7 @@ public class NGUIEditorTools
 			// using BeginGroup/EndGroup, and there is no way to specify a UV rect... le'suq.
 			UnityEditor.EditorGUI.DrawPreviewTexture(outerRect, tex, mat);
 		}
+		GUI.color = Color.white;
 
 		// Draw the lines around the sprite
 		Handles.color = Color.black;

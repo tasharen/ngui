@@ -661,8 +661,12 @@ public class UIDrawCall : MonoBehaviour
 		for (int i = mActiveList.size; i > 0; )
 		{
 			UIDrawCall dc = mActiveList[--i];
-			if (playing) NGUITools.SetActive(dc.gameObject, false);
-			else NGUITools.DestroyImmediate(dc.gameObject);
+
+			if (dc)
+			{
+				if (playing) NGUITools.SetActive(dc.gameObject, false);
+				else NGUITools.DestroyImmediate(dc.gameObject);
+			}
 		}
 		mActiveList.Clear();
 	}
@@ -678,7 +682,7 @@ public class UIDrawCall : MonoBehaviour
 		for (int i = mInactiveList.size; i > 0; )
 		{
 			UIDrawCall dc = mInactiveList[--i];
-			NGUITools.DestroyImmediate(dc.gameObject);
+			if (dc) NGUITools.DestroyImmediate(dc.gameObject);
 		}
 		mInactiveList.Clear();
 	}

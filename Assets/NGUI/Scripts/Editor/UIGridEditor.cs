@@ -3,6 +3,7 @@
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
+#if UNITY_3_5
 using UnityEngine;
 using UnityEditor;
 
@@ -10,7 +11,5 @@ using UnityEditor;
 [CustomEditor(typeof(UIGrid))]
 public class UIGridEditor : UIWidgetContainerEditor
 {
-	//public override void OnInspectorGUI ()
-	//{
-	//}
 }
+#endif
