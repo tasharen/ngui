@@ -228,7 +228,6 @@ public class UIWidget : UIRect
 			{
 				bool alphaChange = (mColor.a != value.a);
 				mColor = value;
-				UpdateFinalAlpha(Time.frameCount);
 				Invalidate(alphaChange);
 			}
 		}
@@ -249,7 +248,6 @@ public class UIWidget : UIRect
 			if (mColor.a != value)
 			{
 				mColor.a = value;
-				UpdateFinalAlpha(Time.frameCount);
 				Invalidate(true);
 			}
 		}
@@ -590,6 +588,23 @@ public class UIWidget : UIRect
 		{
 			UIRect pt = parent;
 			finalAlpha = (parent != null) ? pt.CalculateFinalAlpha(frameID) * mColor.a : mColor.a;
+		}
+	}
+
+	/// <summary>
+	/// Update the widget's visibility and final alpha.
+	/// </summary>
+
+	public override void Invalidate (bool includeChildren)
+	{
+		mChanged = true;
+		mAlphaFrameID = -1;
+
+		if (panel != null)
+		{
+			UpdateVisibility(CalculateCumulativeAlpha(Time.frameCount) > 0.001f && panel.IsVisible(this));
+			UpdateFinalAlpha(Time.frameCount);
+			if (includeChildren) base.Invalidate(true);
 		}
 	}
 

@@ -636,8 +636,10 @@ public class UIPanel : UIRect
 	/// Returns whether the specified widget is visible by the panel.
 	/// </summary>
 
-	public bool IsVisible (UIRect w)
+	public bool IsVisible (UIWidget w)
 	{
+		if ((mClipping == UIDrawCall.Clipping.None || mClipping == UIDrawCall.Clipping.ConstrainButDontClip) && !w.hideIfOffScreen)
+			return true;
 		Vector3[] corners = w.worldCorners;
 		return IsVisible(corners[0], corners[1], corners[2], corners[3]);
 	}
@@ -1266,9 +1268,7 @@ public class UIPanel : UIRect
 				if (w.UpdateTransform(frame) || mResized)
 				{
 					// Only proceed to checking the widget's visibility if it actually moved
-					bool vis = forceVisible || (w.CalculateCumulativeAlpha(frame) > 0.001f &&
-						(((mClipping == UIDrawCall.Clipping.None || mClipping == UIDrawCall.Clipping.ConstrainButDontClip) &&
-						!w.hideIfOffScreen) || IsVisible(w)));
+					bool vis = forceVisible || (w.CalculateCumulativeAlpha(frame) > 0.001f && IsVisible(w));
 					w.UpdateVisibility(vis);
 				}
 				
