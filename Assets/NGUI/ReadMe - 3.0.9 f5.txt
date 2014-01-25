@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.0.9 f4
+            Version 3.0.9 f5
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,14 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.9 f5
+- NEW: UIGrid and UITable now have a virtual Sort function you can overwrite, and are now extensible.
+- NEW: You can now use the Component Selector to load more than just prefabs by specifying explicit extensions.
+- FIX: The Component Selector should now behave better with dynamic fonts and will hide Lucida Grande (internal Unity font).
+- FIX: UICamera's new hit check should now work even if only one widget was hit.
+- FIX: You can now remove delegates from the EventDelegate list even while executing its callbacks.
+- FIX: Work-around for potential crash on exit on mobiles due to an issue in Unity.
 
 3.0.9 f4
 - NEW: Added UIWidget.hitCheck delegate you can set for custom hit detection (circular sprites, alpha checks, etc).
