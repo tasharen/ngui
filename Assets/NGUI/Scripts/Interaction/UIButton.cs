@@ -41,7 +41,7 @@ public class UIButton : UIButtonColor
 	/// Whether the button should be enabled.
 	/// </summary>
 
-	public bool isEnabled
+	public virtual bool isEnabled
 	{
 		get
 		{
@@ -112,7 +112,7 @@ public class UIButton : UIButtonColor
 	/// Call the listener function.
 	/// </summary>
 
-	void OnClick ()
+	protected virtual void OnClick ()
 	{
 		if (isEnabled)
 		{
