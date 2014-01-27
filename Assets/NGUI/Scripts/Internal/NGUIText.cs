@@ -597,7 +597,7 @@ static public class NGUIText
 
 						if (x + w > rectWidth)
 						{
-							if (x > maxX) maxX = x;
+							if (x > maxX) maxX = x - finalSpacingX;
 							x = w;
 							y += finalLineHeight;
 						}
@@ -612,7 +612,7 @@ static public class NGUIText
 
 					if (x + w > rectWidth)
 					{
-						if (x > maxX) maxX = x;
+						if (x > maxX) maxX = x - finalSpacingX;
 						x = w;
 						y += finalLineHeight;
 					}
@@ -623,7 +623,7 @@ static public class NGUIText
 				}
 			}
 
-			v.x = ((x > maxX) ? x : maxX);
+			v.x = ((x > maxX) ? x - finalSpacingX : maxX);
 			v.y = (y + finalLineHeight);
 		}
 		return v;
@@ -1057,7 +1057,7 @@ static public class NGUIText
 				v1y = glyph.v1.y - y;
 
 				// Doesn't fit? Move down to the next line
-				if (x + glyph.advance > rectWidth)
+				if (x + glyph.advance + finalSpacingX > rectWidth)
 				{
 					if (x == 0f) return;
 
@@ -1506,7 +1506,7 @@ static public class NGUIText
 				float v0y = -y - fs;
 				float v1y = -y;
 
-				if (v1x > rectWidth)
+				if (v1x + finalSpacingX > rectWidth)
 				{
 					if (x == 0f) return;
 
