@@ -88,9 +88,6 @@ public class UIPlayAnimation : MonoBehaviour
 
 	void Awake ()
 	{
-#if !UNITY_3_5
-		if (animator != null) animator.enabled = false;
-#endif
 		UIButton btn = GetComponent<UIButton>();
 		if (btn != null) dragHighlight = btn.dragHighlight;
 
@@ -105,9 +102,33 @@ public class UIPlayAnimation : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Automatically find the necessary components.
+	/// </summary>
+
 	void Start ()
 	{
 		mStarted = true;
+
+#if !UNITY_3_5
+		// Automatically try to find the animator
+		if (target == null && animator == null)
+		{
+			animator = GetComponentInChildren<Animator>();
+#if UNITY_EDITOR
+			if (animator != null) UnityEditor.EditorUtility.SetDirty(this);
+#endif
+		}
+
+		if (animator != null)
+		{
+			// Ensure that the animator is disabled as we will be sampling it manually
+			if (animator.enabled) animator.enabled = false;
+
+			// Don't continue since we already have an animator to work with
+			return;
+		}
+#endif // !UNITY_3_5
 
 		if (target == null)
 		{
@@ -116,6 +137,9 @@ public class UIPlayAnimation : MonoBehaviour
 			if (target != null) UnityEditor.EditorUtility.SetDirty(this);
 #endif
 		}
+
+		if (target != null && target.enabled)
+			target.enabled = false;
 	}
 
 	void OnEnable ()

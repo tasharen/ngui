@@ -39,17 +39,18 @@ public class UIPlayAnimationEditor : Editor
 
 		GUI.changed = false;
 
+#if !UNITY_3_5
+		EditorGUI.BeginDisabledGroup(pa.target);
+		Animator animator = (Animator)EditorGUILayout.ObjectField("Animator", pa.animator, typeof(Animator), true);
+		EditorGUI.EndDisabledGroup();
+#endif
 		EditorGUI.BeginDisabledGroup(pa.animator);
 		Animation anim = (Animation)EditorGUILayout.ObjectField("Animation", pa.target, typeof(Animation), true);
 		EditorGUI.EndDisabledGroup();
 
 #if !UNITY_3_5
-		EditorGUI.BeginDisabledGroup(anim != null);
-		Animator animator = (Animator)EditorGUILayout.ObjectField("Animator", pa.animator, typeof(Animator), true);
-		EditorGUI.EndDisabledGroup();
-
 		EditorGUI.BeginDisabledGroup(anim == null && animator == null);
-		string clipName = EditorGUILayout.TextField("Starting State", pa.clipName);
+		string clipName = EditorGUILayout.TextField("State Name", pa.clipName);
 #else
 		EditorGUI.BeginDisabledGroup(anim == null);
 		string clipName = EditorGUILayout.TextField("Clip Name", pa.clipName);
