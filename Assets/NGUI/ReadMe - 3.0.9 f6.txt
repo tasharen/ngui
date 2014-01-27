@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.0.9 f5
+            Version 3.0.9 f6
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,9 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.9 f6
+- FIX: Typo fix in UIEventDelegate.
 
 3.0.9 f5
 - NEW: UIGrid and UITable now have a virtual Sort function you can overwrite, and are now extensible.
