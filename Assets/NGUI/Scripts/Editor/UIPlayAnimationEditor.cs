@@ -21,16 +21,6 @@ public class UIPlayAnimationEditor : Editor
 		SetToNothing,
 	}
 
-	void OnSelectAnimator (Object obj)
-	{
-		if (this != null)
-		{
-			UIPlayAnimation pa = target as UIPlayAnimation;
-			pa.animator = obj as Animator;
-			UnityEditor.EditorUtility.SetDirty(pa);
-		}
-	}
-
 	public override void OnInspectorGUI ()
 	{
 		NGUIEditorTools.SetLabelWidth(120f);
@@ -43,12 +33,12 @@ public class UIPlayAnimationEditor : Editor
 		EditorGUI.BeginDisabledGroup(pa.target);
 		Animator animator = (Animator)EditorGUILayout.ObjectField("Animator", pa.animator, typeof(Animator), true);
 		EditorGUI.EndDisabledGroup();
-#endif
 		EditorGUI.BeginDisabledGroup(pa.animator);
+#endif
 		Animation anim = (Animation)EditorGUILayout.ObjectField("Animation", pa.target, typeof(Animation), true);
-		EditorGUI.EndDisabledGroup();
 
 #if !UNITY_3_5
+		EditorGUI.EndDisabledGroup();
 		EditorGUI.BeginDisabledGroup(anim == null && animator == null);
 		string clipName = EditorGUILayout.TextField("State Name", pa.clipName);
 #else

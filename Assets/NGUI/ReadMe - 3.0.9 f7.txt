@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.0.9 f6
+            Version 3.0.9 f7
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,11 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.0.9 f7
+- NEW: UIPlayAnimation now supports Animator animations (mecanim).
+- NEW: Added UIEventTrigger that can be used to add event delegates via inspector for press, release, select, etc.
+- OLD: Deprecated UIButtonMessage and UIForwardEvents (upgrade to UIEventTrigger at your own pace).
 
 3.0.9 f6
 - FIX: Typo fix in UIEventDelegate.
