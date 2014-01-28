@@ -9,7 +9,7 @@ using UnityEngine;
 /// Sends a message to the remote object when something happens.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/Button Message")]
+[AddComponentMenu("NGUI/Interaction/Button Message (Legacy)")]
 public class UIButtonMessage : MonoBehaviour
 {
 	public enum Trigger

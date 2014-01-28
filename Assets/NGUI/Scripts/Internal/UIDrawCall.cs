@@ -678,7 +678,15 @@ public class UIDrawCall : MonoBehaviour
 	static public void ReleaseAll ()
 	{
 		ClearAll();
+		ReleaseInactive();
+	}
 
+	/// <summary>
+	/// Immediately destroy all inactive draw calls (draw calls that have been recycled and are waiting to be re-used).
+	/// </summary>
+
+	static public void ReleaseInactive()
+	{
 		for (int i = mInactiveList.size; i > 0; )
 		{
 			UIDrawCall dc = mInactiveList[--i];
