@@ -709,11 +709,22 @@ static public class NGUITools
 
 		if (trans != null)
 		{
+			// Find the root object
 			while (trans.parent != null) trans = trans.parent;
-			trans.parent = panel.transform;
-			trans.localScale = Vector3.one;
-			trans.localPosition = Vector3.zero;
-			SetChildLayer(panel.cachedTransform, panel.cachedGameObject.layer);
+
+			if (NGUITools.IsChild(trans, panel.transform))
+			{
+				// Odd hierarchy -- can't reparent
+				panel = trans.gameObject.AddComponent<UIPanel>();
+			}
+			else
+			{
+				// Reparent this root object to be a child of the panel
+				trans.parent = panel.transform;
+				trans.localScale = Vector3.one;
+				trans.localPosition = Vector3.zero;
+				SetChildLayer(panel.cachedTransform, panel.cachedGameObject.layer);
+			}
 		}
 		return panel;
 	}
