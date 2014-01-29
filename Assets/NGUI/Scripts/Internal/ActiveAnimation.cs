@@ -3,6 +3,10 @@
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+#define USE_MECANIM
+#endif
+
 using UnityEngine;
 using AnimationOrTween;
 using System.Collections.Generic;
@@ -36,7 +40,7 @@ public class ActiveAnimation : MonoBehaviour
 	Direction mDisableDirection = Direction.Toggle;
 	bool mNotify = false;
 
-#if !UNITY_3_5
+#if USE_MECANIM
 	Animator mAnimator;
 	string mClip = "";
 
@@ -60,7 +64,7 @@ public class ActiveAnimation : MonoBehaviour
 		{
 			if (mAnim == null)
 			{
-#if !UNITY_3_5
+#if USE_MECANIM
 				if (mAnimator != null)
 				{
 					if (mLastDirection == Direction.Reverse)
@@ -106,7 +110,7 @@ public class ActiveAnimation : MonoBehaviour
 				else if (mLastDirection == Direction.Forward) state.time = 0f;
 			}
 		}
-#if !UNITY_3_5
+#if USE_MECANIM
 		else if (mAnimator != null)
 		{
 			mAnimator.Play(mClip, 0, (mLastDirection == Direction.Reverse) ? 1f : 0f);
@@ -136,7 +140,7 @@ public class ActiveAnimation : MonoBehaviour
 		float delta = RealTime.deltaTime;
 		if (delta == 0f) return;
 
-#if !UNITY_3_5
+#if USE_MECANIM
 		if (mAnimator != null)
 		{
 			mAnimator.Update((mLastDirection == Direction.Reverse) ? -delta : delta);
@@ -244,7 +248,7 @@ public class ActiveAnimation : MonoBehaviour
 			mNotify = true;
 			mAnim.Sample();
 		}
-#if !UNITY_3_5
+#if USE_MECANIM
 		else if (mAnimator != null)
 		{
 			if (enabled && isPlaying)
@@ -315,7 +319,7 @@ public class ActiveAnimation : MonoBehaviour
 		return Play(anim, null, playDirection, EnableCondition.DoNothing, DisableCondition.DoNotDisable);
 	}
 
-#if !UNITY_3_5
+#if USE_MECANIM
 	/// <summary>
 	/// Play the specified animation on the specified object.
 	/// </summary>

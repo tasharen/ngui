@@ -3,6 +3,10 @@
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+#define USE_MECANIM
+#endif
+
 using UnityEngine;
 using AnimationOrTween;
 using System.Collections.Generic;
@@ -21,7 +25,7 @@ public class UIPlayAnimation : MonoBehaviour
 
 	public Animation target;
 
-#if !UNITY_3_5
+#if USE_MECANIM
 	/// <summary>
 	/// Target animator system.
 	/// </summary>
@@ -110,7 +114,7 @@ public class UIPlayAnimation : MonoBehaviour
 	{
 		mStarted = true;
 
-#if !UNITY_3_5
+#if USE_MECANIM
 		// Automatically try to find the animator
 		if (target == null && animator == null)
 		{
@@ -128,7 +132,7 @@ public class UIPlayAnimation : MonoBehaviour
 			// Don't continue since we already have an animator to work with
 			return;
 		}
-#endif // !UNITY_3_5
+#endif // USE_MECANIM
 
 		if (target == null)
 		{
@@ -232,10 +236,10 @@ public class UIPlayAnimation : MonoBehaviour
 
 	public void Play (bool forward, bool onlyIfDifferent)
 	{
-#if UNITY_3_5
-		if (target)
-#else
+#if USE_MECANIM
 		if (target || animator)
+#else
+		if (target)
 #endif
 		{
 			if (onlyIfDifferent)
@@ -249,12 +253,12 @@ public class UIPlayAnimation : MonoBehaviour
 
 			int pd = -(int)playDirection;
 			Direction dir = forward ? playDirection : ((Direction)pd);
-#if UNITY_3_5
-			ActiveAnimation anim = ActiveAnimation.Play(target, clipName, dir, ifDisabledOnPlay, disableWhenFinished);
-#else
+#if USE_MECANIM
 			ActiveAnimation anim = target ?
 				ActiveAnimation.Play(target, clipName, dir, ifDisabledOnPlay, disableWhenFinished) :
 				ActiveAnimation.Play(animator, clipName, dir, ifDisabledOnPlay, disableWhenFinished);
+#else
+			ActiveAnimation anim = ActiveAnimation.Play(target, clipName, dir, ifDisabledOnPlay, disableWhenFinished);
 #endif
 
 			if (anim != null)
