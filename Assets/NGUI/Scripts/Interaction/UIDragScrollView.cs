@@ -40,7 +40,8 @@ public class UIDragScrollView : MonoBehaviour
 			scrollView = draggablePanel;
 			draggablePanel = null;
 		}
-		FindScrollView();
+
+		if (mAutoFind || mScroll == null) FindScrollView();
 	}
 
 	/// <summary>

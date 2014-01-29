@@ -15,6 +15,9 @@ public class TweenPosition : UITweener
 	public Vector3 from;
 	public Vector3 to;
 
+	[HideInInspector]
+	public bool worldSpace = false;
+
 	Transform mTrans;
 	UIRect mRect;
 
@@ -31,13 +34,14 @@ public class TweenPosition : UITweener
 	{
 		get
 		{
-			return cachedTransform.localPosition;
+			return worldSpace ? cachedTransform.position : cachedTransform.localPosition;
 		}
 		set
 		{
-			if (mRect == null || !mRect.isAnchored)
+			if (mRect == null || !mRect.isAnchored || worldSpace)
 			{
-				cachedTransform.localPosition = value;
+				if (worldSpace) cachedTransform.position = value;
+				else cachedTransform.localPosition = value;
 			}
 			else
 			{

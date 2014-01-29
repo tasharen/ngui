@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
@@ -19,6 +19,7 @@ public class UIPlaySound : MonoBehaviour
 		OnMouseOut,
 		OnPress,
 		OnRelease,
+		Custom,
 	}
 
 	public AudioClip audioClip;
@@ -62,5 +63,16 @@ public class UIPlaySound : MonoBehaviour
 	{
 		if (enabled && trigger == Trigger.OnClick)
 			NGUITools.PlaySound(audioClip, volume, pitch);
+	}
+
+	void OnSelect (bool isSelected)
+	{
+		if (enabled && (!isSelected || UICamera.currentScheme == UICamera.ControlScheme.Controller))
+			OnHover(isSelected);
+	}
+
+	public void Play ()
+	{
+		NGUITools.PlaySound(audioClip, volume, pitch);
 	}
 }
