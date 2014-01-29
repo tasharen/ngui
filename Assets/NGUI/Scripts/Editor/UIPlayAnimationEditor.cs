@@ -3,6 +3,10 @@
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+#define USE_MECANIM
+#endif
+
 using UnityEngine;
 using UnityEditor;
 
@@ -29,7 +33,7 @@ public class UIPlayAnimationEditor : Editor
 
 		GUI.changed = false;
 
-#if !UNITY_3_5
+#if USE_MECANIM
 		EditorGUI.BeginDisabledGroup(pa.target);
 		Animator animator = (Animator)EditorGUILayout.ObjectField("Animator", pa.animator, typeof(Animator), true);
 		EditorGUI.EndDisabledGroup();
@@ -37,7 +41,7 @@ public class UIPlayAnimationEditor : Editor
 #endif
 		Animation anim = (Animation)EditorGUILayout.ObjectField("Animation", pa.target, typeof(Animation), true);
 
-#if !UNITY_3_5
+#if USE_MECANIM
 		EditorGUI.EndDisabledGroup();
 		EditorGUI.BeginDisabledGroup(anim == null && animator == null);
 		string clipName = EditorGUILayout.TextField("State Name", pa.clipName);
@@ -48,7 +52,7 @@ public class UIPlayAnimationEditor : Editor
 
 		AnimationOrTween.Trigger trigger = (AnimationOrTween.Trigger)EditorGUILayout.EnumPopup("Trigger condition", pa.trigger);
 
-#if !UNITY_3_5
+#if USE_MECANIM
 		EditorGUI.BeginDisabledGroup(animator != null && !string.IsNullOrEmpty(clipName));
 		AnimationOrTween.Direction dir = (AnimationOrTween.Direction)EditorGUILayout.EnumPopup("Play direction", pa.playDirection);
 		EditorGUI.EndDisabledGroup();
@@ -68,7 +72,7 @@ public class UIPlayAnimationEditor : Editor
 		{
 			NGUIEditorTools.RegisterUndo("PlayAnimation Change", pa);
 			pa.target = anim;
-#if !UNITY_3_5
+#if USE_MECANIM
 			pa.animator = animator;
 #endif
 			pa.clipName = clipName;
