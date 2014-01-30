@@ -91,13 +91,13 @@ public class UIScrollView : MonoBehaviour
 	/// Horizontal scrollbar used for visualization.
 	/// </summary>
 
-	public UIScrollBar horizontalScrollBar;
+	public UIProgressBar horizontalScrollBar;
 
 	/// <summary>
 	/// Vertical scrollbar used for visualization.
 	/// </summary>
 
-	public UIScrollBar verticalScrollBar;
+	public UIProgressBar verticalScrollBar;
 
 	/// <summary>
 	/// Condition that must be met for the scroll bars to become visible.
@@ -419,7 +419,9 @@ public class UIScrollView : MonoBehaviour
 
 				float sum = min + max;
 				mIgnoreCallbacks = true;
-				horizontalScrollBar.barSize = 1f - sum;
+
+				UIScrollBar sb = horizontalScrollBar as UIScrollBar;
+				if (sb != null) sb.barSize = 1f - sum;
 				horizontalScrollBar.value = (sum > 0.001f) ? min / sum : 0f;
 				mIgnoreCallbacks = false;
 			}
@@ -441,7 +443,8 @@ public class UIScrollView : MonoBehaviour
 				float sum = min + max;
 
 				mIgnoreCallbacks = true;
-				verticalScrollBar.barSize = 1f - sum;
+				UIScrollBar sb = verticalScrollBar as UIScrollBar;
+				if (sb != null) sb.barSize = 1f - sum;
 				verticalScrollBar.value = (sum > 0.001f) ? 1f - min / sum : 0f;
 				mIgnoreCallbacks = false;
 			}
