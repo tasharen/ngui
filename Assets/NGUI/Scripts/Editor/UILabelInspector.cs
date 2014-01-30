@@ -131,6 +131,19 @@ public class UILabelInspector : UIWidgetInspector
 
 				NGUIEditorTools.DrawProperty("Material", serializedObject, "mMaterial");
 			}
+			else if (fnt != null)
+			{
+				GUILayout.BeginHorizontal();
+				SerializedProperty prop = NGUIEditorTools.DrawProperty("Font Size", serializedObject, "mFontSize", GUILayout.Width(142f));
+
+				EditorGUI.BeginDisabledGroup(true);
+				if (!serializedObject.isEditingMultipleObjects)
+					GUILayout.Label(" Default: " + mLabel.defaultFontSize);
+				EditorGUI.EndDisabledGroup();
+
+				NGUISettings.fontSize = prop.intValue;
+				GUILayout.EndHorizontal();
+			}
 
 			bool ww = GUI.skin.textField.wordWrap;
 			GUI.skin.textField.wordWrap = true;

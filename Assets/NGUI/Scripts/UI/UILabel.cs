@@ -269,19 +269,31 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
-	/// Dynamic font size used by the label.
+	/// Default font size.
 	/// </summary>
 
-	public int fontSize
+	public int defaultFontSize
 	{
 		get
 		{
 			if (mFont != null) return mFont.defaultSize;
 			return mFontSize;
 		}
+	}
+
+	/// <summary>
+	/// Active font size used by the label.
+	/// </summary>
+
+	public int fontSize
+	{
+		get
+		{
+			return mFontSize;
+		}
 		set
 		{
-			value = Mathf.Clamp(value, 0, 144);
+			value = Mathf.Clamp(value, 0, 256);
 
 			if (mFontSize != value)
 			{
@@ -921,7 +933,6 @@ public class UILabel : UIWidget
 					bitmapFont = fnt;
 					mUseDynamicFont = false;
 				}
-				mFontSize = fnt.defaultSize;
 			}
 			else
 			{
@@ -997,7 +1008,7 @@ public class UILabel : UIWidget
 		NGUIText.rectWidth  = legacyMode ? (mMaxLineWidth  != 0 ? mMaxLineWidth  : 1000000) : width;
 		NGUIText.rectHeight = legacyMode ? (mMaxLineHeight != 0 ? mMaxLineHeight : 1000000) : height;
 
-		mPrintedSize = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : fontSize);
+		mPrintedSize = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : defaultFontSize);
 		mScale = 1f;
 
 		if (NGUIText.rectWidth < 1 || NGUIText.rectHeight < 0)
@@ -1030,7 +1041,7 @@ public class UILabel : UIWidget
 #endif
 				{
 					mScale = (float)ps / mPrintedSize;
-					NGUIText.fontScale = (bitmapFont != null) ? mScale * bitmapFont.pixelSize : mScale;
+					NGUIText.fontScale = (bitmapFont != null) ? ((float)mFontSize / mFont.defaultSize) * mScale * bitmapFont.pixelSize : mScale;
 				}
 
 				NGUIText.Update(false);
@@ -1107,27 +1118,26 @@ public class UILabel : UIWidget
 			}
 			else
 			{
+				int w = width;
+				int h = height;
+
 				Overflow over = mOverflow;
 				mOverflow = Overflow.ShrinkContent;
+				mWidth = 100000;
+				mHeight = 100000;
 				ProcessText(false);
 				mOverflow = over;
 
 				int minX = Mathf.RoundToInt(mCalculatedSize.x * pixelSize);
 				int minY = Mathf.RoundToInt(mCalculatedSize.y * pixelSize);
 
-				if (bitmapFont != null)
-				{
-					minX = Mathf.Max(bitmapFont.defaultSize);
-					minY = Mathf.Max(bitmapFont.defaultSize);
-				}
-				else
-				{
-					minX = Mathf.Max(base.minWidth);
-					minY = Mathf.Max(base.minHeight);
-				}
+				minX = Mathf.Max(minX, base.minWidth);
+				minY = Mathf.Max(minY, base.minHeight);
 
-				if (width < minX) width = minX;
-				if (height < minY) height = minY;
+				mWidth = Mathf.Max(w, minX);
+				mHeight = Mathf.Max(h, minY);
+
+				MarkAsChanged();
 			}
 		}
 		else base.MakePixelPerfect();
@@ -1141,12 +1151,14 @@ public class UILabel : UIWidget
 	{
 		if (ambigiousFont != null)
 		{
+			mWidth = 100000;
+			mHeight = 100000;
 			ProcessText(false);
-			float pixelSize = (bitmapFont != null) ? bitmapFont.pixelSize : 1f;
-			width = Mathf.RoundToInt(mCalculatedSize.x * pixelSize);
-			height = Mathf.RoundToInt(mCalculatedSize.y * pixelSize);
-			if ((width & 1) == 1) ++width;
-			if ((height & 1) == 1) ++height;
+			mWidth = Mathf.RoundToInt(mCalculatedSize.x * pixelSize);
+			mHeight = Mathf.RoundToInt(mCalculatedSize.y * pixelSize);
+			if ((mWidth & 1) == 1) ++mWidth;
+			if ((mHeight & 1) == 1) ++mHeight;
+			MarkAsChanged();
 		}
 	}
 
@@ -1174,7 +1186,7 @@ public class UILabel : UIWidget
 			string text = processedText;
 			if (string.IsNullOrEmpty(text)) return 0;
 
-			UpdateNGUIText(fontSize, mWidth, mHeight);
+			UpdateNGUIText(defaultFontSize, mWidth, mHeight);
 
 			NGUIText.PrintCharacterPositions(text, mTempVerts, mTempIndices);
 
@@ -1203,7 +1215,8 @@ public class UILabel : UIWidget
 			string text = processedText;
 			if (string.IsNullOrEmpty(text)) return 0;
 
-			UpdateNGUIText(fontSize, mWidth, mHeight);
+			int def = defaultFontSize;
+			UpdateNGUIText(def, mWidth, mHeight);
 
 			NGUIText.PrintCharacterPositions(text, mTempVerts, mTempIndices);
 
@@ -1218,8 +1231,8 @@ public class UILabel : UIWidget
 						// Determine position on the line above or below this character
 						Vector2 localPos = mTempVerts[i];
 
-						if (key == KeyCode.UpArrow) localPos.y += fontSize + spacingY;
-						else if (key == KeyCode.DownArrow) localPos.y -= fontSize + spacingY;
+						if (key == KeyCode.UpArrow) localPos.y += def + spacingY;
+						else if (key == KeyCode.DownArrow) localPos.y -= def + spacingY;
 						else if (key == KeyCode.Home) localPos.x -= 1000f;
 						else if (key == KeyCode.End) localPos.x += 1000f;
 
@@ -1255,7 +1268,7 @@ public class UILabel : UIWidget
 		if (!isValid) return;
 
 		string text = processedText;
-		UpdateNGUIText(fontSize, mWidth, mHeight);
+		UpdateNGUIText(defaultFontSize, mWidth, mHeight);
 
 		int startingCaretVerts = caret.verts.size;
 		Vector2 center = new Vector2(0.5f, 0.5f);
@@ -1310,7 +1323,7 @@ public class UILabel : UIWidget
 		float pixelSize = (mFont != null) ? mFont.pixelSize : 1f;
 		int start = verts.size;
 
-		UpdateNGUIText(fontSize, mWidth, mHeight);
+		UpdateNGUIText(defaultFontSize, mWidth, mHeight);
 
 		NGUIText.tint = col;
 		NGUIText.Print(text, verts, uvs, cols);
@@ -1470,7 +1483,7 @@ public class UILabel : UIWidget
 
 	public bool Wrap (string text, out string final, int height)
 	{
-		UpdateNGUIText(fontSize, mWidth, height);
+		UpdateNGUIText(defaultFontSize, mWidth, height);
 		return NGUIText.WrapText(text, out final);
 	}
 
@@ -1478,7 +1491,7 @@ public class UILabel : UIWidget
 	/// Update NGUIText.current with all the properties from this label.
 	/// </summary>
 
-	public void UpdateNGUIText () { UpdateNGUIText(fontSize, mWidth, mHeight); }
+	public void UpdateNGUIText () { UpdateNGUIText(defaultFontSize, mWidth, mHeight); }
 
 	/// <summary>
 	/// Update NGUIText.current with all the properties from this label.
@@ -1499,7 +1512,7 @@ public class UILabel : UIWidget
 		NGUIText.maxLines = mMaxLineCount;
 		NGUIText.spacingX = mSpacingX;
 		NGUIText.spacingY = mSpacingY;
-		NGUIText.fontScale = (bitmapFont != null) ? mScale * bitmapFont.pixelSize : mScale;
+		NGUIText.fontScale = (bitmapFont != null) ? ((float)mFontSize / mFont.defaultSize) * mScale * bitmapFont.pixelSize : mScale;
 
 		if (mFont != null)
 		{
