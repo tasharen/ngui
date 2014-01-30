@@ -1056,8 +1056,11 @@ static public class NGUIText
 				v1x = glyph.v1.x + x;
 				v1y = glyph.v1.y - y;
 
+				float w = glyph.advance;
+				if (finalSpacingX < 0f) w += finalSpacingX;
+
 				// Doesn't fit? Move down to the next line
-				if (x + glyph.advance + finalSpacingX > rectWidth)
+				if (x + w > rectWidth)
 				{
 					if (x == 0f) return;
 
