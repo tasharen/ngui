@@ -811,6 +811,14 @@ public class UIWidget : UIRect
 			aspectRatio = (keepAspectRatio == AspectRatioSource.Free) ?
 				(float)mWidth / mHeight : Mathf.Max(0.01f, aspectRatio);
 
+			if (keepAspectRatio == AspectRatioSource.BasedOnHeight)
+			{
+				mWidth = Mathf.RoundToInt(mHeight * aspectRatio);
+			}
+			else if (keepAspectRatio == AspectRatioSource.BasedOnWidth)
+			{
+				mHeight = Mathf.RoundToInt(mWidth / aspectRatio);
+			}
 			CreatePanel();
 		}
 		else
