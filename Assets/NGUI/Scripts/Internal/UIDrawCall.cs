@@ -566,6 +566,8 @@ public class UIDrawCall : MonoBehaviour
 		depthEnd = int.MinValue;
 		panel = null;
 		manager = null;
+		mMaterial = null;
+		mTexture = null;
 
 		NGUITools.DestroyImmediate(mDynamicMat);
 		mDynamicMat = null;
