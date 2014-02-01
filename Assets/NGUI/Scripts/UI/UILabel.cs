@@ -1049,7 +1049,6 @@ public class UILabel : UIWidget
 				// Wrap the text
 				bool fits = NGUIText.WrapText(mText, out mProcessedText, true);
 
-
 				if (mOverflow == Overflow.ShrinkContent && !fits)
 				{
 					if (--ps > 1) continue;
