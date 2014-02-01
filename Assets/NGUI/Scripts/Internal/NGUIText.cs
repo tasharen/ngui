@@ -595,7 +595,7 @@ static public class NGUIText
 					{
 						w += finalSpacingX;
 
-						if (x + w > rectWidth)
+						if (Mathf.RoundToInt(x + w) > rectWidth)
 						{
 							if (x > maxX) maxX = x - finalSpacingX;
 							x = w;
@@ -610,7 +610,7 @@ static public class NGUIText
 				{
 					float w = finalSpacingX + symbol.advance * fontScale;
 
-					if (x + w > rectWidth)
+					if (Mathf.RoundToInt(x + w) > rectWidth)
 					{
 						if (x > maxX) maxX = x - finalSpacingX;
 						x = w;
@@ -965,7 +965,7 @@ static public class NGUIText
 				v0y = v1y - symbol.height * fontScale;
 
 				// Doesn't fit? Move down to the next line
-				if (x + symbol.advance * fontScale > rectWidth)
+				if (Mathf.RoundToInt(x + symbol.advance * fontScale) > rectWidth)
 				{
 					if (x == 0f) return;
 
@@ -1060,7 +1060,7 @@ static public class NGUIText
 				if (finalSpacingX < 0f) w += finalSpacingX;
 
 				// Doesn't fit? Move down to the next line
-				if (x + w > rectWidth)
+				if (Mathf.RoundToInt(x + w) > rectWidth)
 				{
 					if (x == 0f) return;
 
@@ -1351,7 +1351,7 @@ static public class NGUIText
 				{
 					w += finalSpacingX;
 
-					if (x + w > rectWidth)
+					if (Mathf.RoundToInt(x + w) > rectWidth)
 					{
 						if (x == 0f) return;
 
@@ -1375,7 +1375,7 @@ static public class NGUIText
 			{
 				float w = symbol.advance * fontScale + finalSpacingX;
 
-				if (x + w > rectWidth)
+				if (Mathf.RoundToInt(x + w) > rectWidth)
 				{
 					if (x == 0f) return;
 
@@ -1509,7 +1509,7 @@ static public class NGUIText
 				float v0y = -y - fs;
 				float v1y = -y;
 
-				if (v1x + finalSpacingX > rectWidth)
+				if (Mathf.RoundToInt(v1x + finalSpacingX) > rectWidth)
 				{
 					if (x == 0f) return;
 
