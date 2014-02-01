@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.4.7
+            Version 3.4.8
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,12 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.4.8
+- NEW: Tweens will now display the curve in inspector as a square, making it easier to eyeball.
+- FIX: Fixed floating-point precision issues in NGUIText's print-wrapping logic.
+- FIX: UIDrawCall will remove all references to materials and textures when it's disabled.
+- FIX: Removed UIAnchor from the Drag & Drop scene.
 
 3.4.7
 - NEW: You can now set font size even on bitmap labels.
