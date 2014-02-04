@@ -1136,8 +1136,8 @@ static public class NGUIText
 					{
 						if (gradient)
 						{
-							float min = sizePD + y0;
-							float max = sizePD + y1;
+							float min = sizePD + y0 / fontScale;
+							float max = sizePD + y1 / fontScale;
 
 							min /= sizePD;
 							max /= sizePD;
