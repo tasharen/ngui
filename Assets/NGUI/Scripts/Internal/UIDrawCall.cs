@@ -458,7 +458,9 @@ public class UIDrawCall : MonoBehaviour
 					mMesh.triangles = mIndices;
 				}
 
+#if !UNITY_FLASH
 				if (trim || !alwaysOnScreen)
+#endif
 					mMesh.RecalculateBounds();
 
 				mFilter.mesh = mMesh;
