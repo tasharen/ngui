@@ -396,10 +396,12 @@ public class UIInput : MonoBehaviour
 			else
 #endif
 			{
-				Input.imeCompositionMode = IMECompositionMode.On;
-				Input.compositionCursorPos = (UICamera.current != null && UICamera.current.cachedCamera != null) ?
+				Vector2 pos = (UICamera.current != null && UICamera.current.cachedCamera != null) ?
 					UICamera.current.cachedCamera.WorldToScreenPoint(label.worldCorners[0]) :
 					label.worldCorners[0];
+				pos.y = Screen.height - pos.y;
+				Input.imeCompositionMode = IMECompositionMode.On;
+				Input.compositionCursorPos = pos;
 #if !MOBILE
 				mSelectionStart = 0;
 				mSelectionEnd = string.IsNullOrEmpty(mValue) ? 0 : mValue.Length;
@@ -435,7 +437,7 @@ public class UIInput : MonoBehaviour
 			}
 			else label.text = mValue;
 
-			Input.imeCompositionMode = IMECompositionMode.Off;
+			Input.imeCompositionMode = IMECompositionMode.Auto;
 			RestoreLabelPivot();
 		}
 		
@@ -490,12 +492,16 @@ public class UIInput : MonoBehaviour
 				return;
 			}
 
-			// Process input ignoring non-printable characters as they are not consistent.
-			// Windows has them, OSX may not. They get handled inside OnGUI() instead.
-			string s = Input.inputString;
-			
-			if (!string.IsNullOrEmpty(s))
+			string ime = Input.compositionString;
+
+			// There seems to be an inconsistency between IME on Windows, and IME on OSX.
+			// On Windows, Input.inputString is always empty while IME is active. On the OSX it is not.
+			if (string.IsNullOrEmpty(ime) && !string.IsNullOrEmpty(Input.inputString))
 			{
+				// Process input ignoring non-printable characters as they are not consistent.
+				// Windows has them, OSX may not. They get handled inside OnGUI() instead.
+				string s = Input.inputString;
+
 				for (int i = 0; i < s.Length; ++i)
 				{
 					char ch = s[i];
@@ -504,9 +510,10 @@ public class UIInput : MonoBehaviour
 			}
 
 			// Append IME composition
-			if (mLastIME != Input.compositionString)
+			if (mLastIME != ime)
 			{
-				mLastIME = Input.compositionString;
+				mSelectionEnd = string.IsNullOrEmpty(ime) ? mSelectionStart : mValue.Length + ime.Length;
+				mLastIME = ime;
 				UpdateLabel();
 				ExecuteOnChange();
 			}
@@ -943,7 +950,7 @@ public class UIInput : MonoBehaviour
 			if (mDoInit) Init();
 			bool selected = isSelected;
 			string fullText = value;
-			bool isEmpty = string.IsNullOrEmpty(fullText);
+			bool isEmpty = string.IsNullOrEmpty(fullText) && string.IsNullOrEmpty(Input.compositionString);
 			label.color = (isEmpty && !selected) ? mDefaultColor : activeTextColor;
 			string processed;
 
