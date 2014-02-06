@@ -84,9 +84,6 @@ public class UILabel : UIWidget
 	int mPrintedSize = 0;
 	int mLastWidth = 0;
 	int mLastHeight = 0;
-#if UNITY_EDITOR
-	bool mUseDynamicFont = false;
-#endif
 
 	/// <summary>
 	/// Function used to determine if something has changed (and thus the geometry must be rebuilt)
@@ -173,17 +170,9 @@ public class UILabel : UIWidget
 		{
 			if (mFont != value)
 			{
-#if DYNAMIC_FONT
-				if (value != null && value.dynamicFont != null)
-				{
-					trueTypeFont = value.dynamicFont;
-					return;
-				}
-#endif
-				if (trueTypeFont != null) trueTypeFont = null;
-				else RemoveFromPanel();
-
+				RemoveFromPanel();
 				mFont = value;
+				mTrueTypeFont = null;
 				MarkAsChanged();
 			}
 		}
@@ -197,7 +186,7 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			return mTrueTypeFont;
+			return mTrueTypeFont ?? (mFont != null ? mFont.dynamicFont : null);
 		}
 		set
 		{
@@ -215,6 +204,7 @@ public class UILabel : UIWidget
 					base.MarkAsChanged();
 #else
 				mTrueTypeFont = value;
+				mFont = null;
 #endif
 			}
 		}
@@ -272,14 +262,7 @@ public class UILabel : UIWidget
 	/// Default font size.
 	/// </summary>
 
-	public int defaultFontSize
-	{
-		get
-		{
-			if (mFont != null) return mFont.defaultSize;
-			return mFontSize;
-		}
-	}
+	public int defaultFontSize { get { return (trueTypeFont != null) ? mFontSize : mFont.defaultSize; } }
 
 	/// <summary>
 	/// Active font size used by the label.
@@ -761,16 +744,7 @@ public class UILabel : UIWidget
 	protected override void OnInit ()
 	{
 		base.OnInit();
-
-		// Auto-upgrade from 3.0.2 and earlier
-		if (mTrueTypeFont == null && mFont != null && mFont.isDynamic)
-		{
-			mTrueTypeFont = mFont.dynamicFont;
-			mFontSize = mFont.defaultSize;
-			mFontStyle = mFont.dynamicFontStyle;
-			mFont = null;
-		}
-		SetActiveFont(mTrueTypeFont);
+		SetActiveFont(trueTypeFont);
 	}
 
 	/// <summary>
@@ -892,6 +866,7 @@ public class UILabel : UIWidget
 #if UNITY_EDITOR
 	// Used to ensure that we don't process font more than once inside OnValidate function below
 	bool mAllowProcessing = true;
+	bool mUsingTTF = true;
 
 	/// <summary>
 	/// Validate the properties.
@@ -903,8 +878,11 @@ public class UILabel : UIWidget
 
 		if (NGUITools.GetActive(this))
 		{
-			UIFont fnt = mFont;
 			Font ttf = mTrueTypeFont;
+			UIFont fnt = mFont;
+
+			// If the true type font was not used before, but now it is, clear the font reference
+			if (!mUsingTTF && ttf != null) fnt = null;
 
 			mFont = null;
 			mTrueTypeFont = null;
@@ -913,31 +891,15 @@ public class UILabel : UIWidget
 #if DYNAMIC_FONT
 			SetActiveFont(null);
 #endif
-			if (ttf != null && (fnt == null || !mUseDynamicFont))
+			if (fnt != null)
 			{
-				bitmapFont = null;
-				trueTypeFont = ttf;
-				mUseDynamicFont = true;
+				bitmapFont = fnt;
+				mUsingTTF = false;
 			}
-			else if (fnt != null)
-			{
-				// Auto-upgrade from 3.0.2 and earlier
-				if (fnt.isDynamic)
-				{
-					trueTypeFont = fnt.dynamicFont;
-					mFontStyle = fnt.dynamicFontStyle;
-					mUseDynamicFont = true;
-				}
-				else
-				{
-					bitmapFont = fnt;
-					mUseDynamicFont = false;
-				}
-			}
-			else
+			else if (ttf != null)
 			{
 				trueTypeFont = ttf;
-				mUseDynamicFont = true;
+				mUsingTTF = true;
 			}
 
 			shouldBeProcessed = true;
@@ -1019,6 +981,7 @@ public class UILabel : UIWidget
 
 		UpdateNGUIText(mPrintedSize, mWidth, mHeight);
 
+		bool isDynamic = (trueTypeFont != null);
 		if (mOverflow == Overflow.ResizeFreely) NGUIText.rectWidth = 1000000;
 		if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
 			NGUIText.rectHeight = 1000000;
@@ -1041,7 +1004,7 @@ public class UILabel : UIWidget
 #endif
 				{
 					mScale = (float)ps / mPrintedSize;
-					NGUIText.fontScale = (bitmapFont != null) ? ((float)mFontSize / mFont.defaultSize) * mScale * bitmapFont.pixelSize : mScale;
+					NGUIText.fontScale = isDynamic ? mScale : ((float)mFontSize / mFont.defaultSize) * mScale * bitmapFont.pixelSize;
 				}
 
 				NGUIText.Update(false);
@@ -1101,7 +1064,7 @@ public class UILabel : UIWidget
 	{
 		if (ambigiousFont != null)
 		{
-			float pixelSize = (bitmapFont != null) ? bitmapFont.pixelSize : 1f;
+			float pixelSize = (trueTypeFont != null) ? 1f : bitmapFont.pixelSize;
 
 			Vector3 pos = cachedTransform.localPosition;
 			pos.x = Mathf.RoundToInt(pos.x);
@@ -1498,6 +1461,9 @@ public class UILabel : UIWidget
 
 	public void UpdateNGUIText (int size, int lineWidth, int lineHeight)
 	{
+		Font ttf = trueTypeFont;
+		bool isDynamic = (ttf != null);
+
 		NGUIText.fontSize = mPrintedSize;
 		NGUIText.fontStyle = mFontStyle;
 		NGUIText.rectWidth = lineWidth;
@@ -1511,7 +1477,7 @@ public class UILabel : UIWidget
 		NGUIText.maxLines = mMaxLineCount;
 		NGUIText.spacingX = mSpacingX;
 		NGUIText.spacingY = mSpacingY;
-		NGUIText.fontScale = (bitmapFont != null) ? ((float)mFontSize / mFont.defaultSize) * mScale * bitmapFont.pixelSize : mScale;
+		NGUIText.fontScale = isDynamic ? mScale : ((float)mFontSize / mFont.defaultSize) * mScale * bitmapFont.pixelSize;
 
 		if (mFont != null)
 		{
@@ -1536,16 +1502,16 @@ public class UILabel : UIWidget
 #if DYNAMIC_FONT
 		else
 		{
-			NGUIText.dynamicFont = mTrueTypeFont;
+			NGUIText.dynamicFont = ttf;
 			NGUIText.bitmapFont = null;
 		}
+#endif
 
-		if (keepCrisp)
+		if (isDynamic && keepCrisp)
 		{
 			UIRoot rt = root;
 			if (rt != null) NGUIText.pixelDensity = (rt != null) ? rt.pixelSizeAdjustment : 1f;
 		}
-#endif
 
 		Pivot p = pivot;
 

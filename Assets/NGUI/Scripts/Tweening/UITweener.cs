@@ -239,6 +239,12 @@ public abstract class UITweener : MonoBehaviour
 	List<EventDelegate> mTemp = null;
 
 	/// <summary>
+	/// Convenience function -- add a new OnFinished event delegate (here for to be consistent with RemoveOnFinished).
+	/// </summary>
+
+	public void AddOnFinished (EventDelegate del) { EventDelegate.Add(onFinished, del); }
+
+	/// <summary>
 	/// Remove an OnFinished delegate. Will work even while iterating through the list when the tweener has finished its operation.
 	/// </summary>
 
