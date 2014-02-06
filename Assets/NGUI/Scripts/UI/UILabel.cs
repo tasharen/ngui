@@ -766,12 +766,29 @@ public class UILabel : UIWidget
 		if (mActiveTTF != fnt)
 		{
 			if (mActiveTTF != null)
-				mActiveTTF.textureRebuildCallback -= MarkAsChanged;
+				mActiveTTF.textureRebuildCallback -= FontTextureChanged;
 
 			mActiveTTF = fnt;
 
 			if (mActiveTTF != null)
-				mActiveTTF.textureRebuildCallback += MarkAsChanged;
+				mActiveTTF.textureRebuildCallback += FontTextureChanged;
+		}
+	}
+
+	/// <summary>
+	/// Notification called when the Unity's font's texture gets rebuilt.
+	/// Unity's font has a nice tendency to simply discard other characters when the texture's dimensions change.
+	/// By requesting them inside the notification callback, we immediately force them back in.
+	/// </summary>
+
+	void FontTextureChanged ()
+	{
+		Font fnt = trueTypeFont;
+
+		if (fnt != null)
+		{
+			fnt.RequestCharactersInTexture(mText, mPrintedSize, mFontStyle);
+			MarkAsChanged();
 		}
 	}
 #endif
