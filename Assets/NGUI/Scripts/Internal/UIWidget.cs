@@ -107,7 +107,8 @@ public class UIWidget : UIRect
 	protected Vector4 mDrawRegion = new Vector4(0f, 0f, 1f, 1f);
 
 	Matrix4x4 mLocalToPanel;
-	bool mIsVisible = true;
+	bool mIsVisibleByAlpha = true;
+	bool mIsVisibleByPanel = true;
 	bool mIsInFront = true;
 	float mLastAlpha = 0f;
 	bool mMoved = false;
@@ -257,7 +258,7 @@ public class UIWidget : UIRect
 	/// Whether the widget is currently visible.
 	/// </summary>
 
-	public bool isVisible { get { return mIsVisible && mIsInFront && finalAlpha > 0.001f; } }
+	public bool isVisible { get { return mIsVisibleByPanel && mIsVisibleByAlpha && mIsInFront && finalAlpha > 0.001f; } }
 
 	/// <summary>
 	/// Whether the widget has vertices to draw.
@@ -580,7 +581,7 @@ public class UIWidget : UIRect
 
 	protected void UpdateFinalAlpha (int frameID)
 	{
-		if (!mIsVisible || !mIsInFront)
+		if (!mIsVisibleByAlpha || !mIsInFront)
 		{
 			finalAlpha = 0f;
 		}
@@ -602,7 +603,8 @@ public class UIWidget : UIRect
 
 		if (panel != null)
 		{
-			UpdateVisibility(CalculateCumulativeAlpha(Time.frameCount) > 0.001f && panel.IsVisible(this));
+			bool vis = (hideIfOffScreen || panel.clipsChildren) ? panel.IsVisible(this) : true;
+			UpdateVisibility(CalculateCumulativeAlpha(Time.frameCount) > 0.001f, vis);
 			UpdateFinalAlpha(Time.frameCount);
 			if (includeChildren) base.Invalidate(true);
 		}
@@ -1214,12 +1216,13 @@ public class UIWidget : UIRect
 	/// Update the widget's visibility state.
 	/// </summary>
 
-	public bool UpdateVisibility (bool visible)
+	public bool UpdateVisibility (bool visibleByAlpha, bool visibleByPanel)
 	{
-		if (mIsVisible != visible)
+		if (mIsVisibleByAlpha != visibleByAlpha || mIsVisibleByPanel != visibleByPanel)
 		{
 			mChanged = true;
-			mIsVisible = visible;
+			mIsVisibleByAlpha = visibleByAlpha;
+			mIsVisibleByPanel = visibleByPanel;
 			return true;
 		}
 		return false;
@@ -1314,14 +1317,14 @@ public class UIWidget : UIRect
 	{
 		// Has the alpha changed?
 		float finalAlpha = CalculateFinalAlpha(frame);
-		if (mIsVisible && mLastAlpha != finalAlpha) mChanged = true;
+		if (mIsVisibleByAlpha && mLastAlpha != finalAlpha) mChanged = true;
 		mLastAlpha = finalAlpha;
 
 		if (mChanged)
 		{
 			mChanged = false;
 
-			if (mIsVisible && finalAlpha > 0.001f && shader != null)
+			if (mIsVisibleByAlpha && finalAlpha > 0.001f && shader != null)
 			{
 				bool hadVertices = geometry.hasVertices;
 

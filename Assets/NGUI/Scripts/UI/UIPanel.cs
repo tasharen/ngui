@@ -304,6 +304,12 @@ public class UIPanel : UIRect
 	}
 
 	/// <summary>
+	/// Whether the panel will actually perform clipping of children.
+	/// </summary>
+
+	public bool clipsChildren { get { return mClipping == UIDrawCall.Clipping.AlphaClip || mClipping == UIDrawCall.Clipping.SoftClip; } }
+
+	/// <summary>
 	/// Clipping area offset used to make it possible to move clipped panels (scroll views) efficiently.
 	/// Scroll views move by adjusting the clip offset by one value, and the transform position by the inverse.
 	/// This makes it possible to not have to rebuild the geometry, greatly improving performance.
@@ -1219,6 +1225,8 @@ public class UIPanel : UIRect
 			mResized = true;
 		}
 
+		bool clipped = clipsChildren;
+
 		// Update all widgets
 		for (int i = 0, imax = widgets.size; i < imax; ++i)
 		{
@@ -1268,8 +1276,8 @@ public class UIPanel : UIRect
 				if (w.UpdateTransform(frame) || mResized)
 				{
 					// Only proceed to checking the widget's visibility if it actually moved
-					bool vis = forceVisible || (w.CalculateCumulativeAlpha(frame) > 0.001f && IsVisible(w));
-					w.UpdateVisibility(vis);
+					bool vis = forceVisible || (w.CalculateCumulativeAlpha(frame) > 0.001f);
+					w.UpdateVisibility(vis, forceVisible || ((clipped || w.hideIfOffScreen) ? IsVisible(w) : true));
 				}
 				
 				// Update the widget's geometry if necessary
