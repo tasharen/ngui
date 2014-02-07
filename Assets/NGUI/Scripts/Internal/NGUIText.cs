@@ -392,6 +392,21 @@ static public class NGUIText
 				sub = 0;
 				index += 6;
 				return true;
+
+				case "[/url]":
+				index += 6;
+				return true;
+			}
+		}
+
+		if (text[index + 1] == 'u' && text[index + 2] == 'r' && text[index + 3] == 'l' && text[index + 4] == '=')
+		{
+			int closingBracket = text.IndexOf(']');
+			
+			if (closingBracket != -1)
+			{
+				index = closingBracket + 1;
+				return true;
 			}
 		}
 

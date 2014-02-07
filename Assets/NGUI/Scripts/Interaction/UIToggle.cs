@@ -64,6 +64,12 @@ public class UIToggle : UIWidgetContainer
 	public bool optionCanBeNone = false;
 
 	/// <summary>
+	/// Whether the toggle starts active or not.
+	/// </summary>
+
+	public bool startsChecked = false;
+
+	/// <summary>
 	/// Callbacks triggered when the toggle's state changes.
 	/// </summary>
 
@@ -74,7 +80,6 @@ public class UIToggle : UIWidgetContainer
 	/// </summary>
 
 	[HideInInspector][SerializeField] Transform radioButtonRoot;
-	[HideInInspector][SerializeField] bool startsChecked;
 	[HideInInspector][SerializeField] UISprite checkSprite;
 	[HideInInspector][SerializeField] Animation checkAnimation;
 	[HideInInspector][SerializeField] GameObject eventReceiver;

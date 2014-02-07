@@ -1141,24 +1141,30 @@ public class UILabel : UIWidget
 		}
 	}
 
-	/// <summary>
-	/// Return the index of the character at the specified world position.
-	/// </summary>
+	[System.Obsolete("Use UILabel.GetCharacterAtPosition instead")]
+	public int GetCharacterIndex (Vector3 worldPos) { return GetCharacterIndexAtPosition(worldPos); }
 
-	public int GetCharacterIndex (Vector3 worldPos)
-	{
-		Vector2 localPos = cachedTransform.InverseTransformPoint(worldPos);
-		return GetCharacterIndex(localPos);
-	}
+	[System.Obsolete("Use UILabel.GetCharacterAtPosition instead")]
+	public int GetCharacterIndex (Vector2 localPos) { return GetCharacterIndexAtPosition(localPos); }
 
 	static BetterList<Vector3> mTempVerts = new BetterList<Vector3>();
 	static BetterList<int> mTempIndices = new BetterList<int>();
 
 	/// <summary>
+	/// Return the index of the character at the specified world position.
+	/// </summary>
+
+	public int GetCharacterIndexAtPosition (Vector3 worldPos)
+	{
+		Vector2 localPos = cachedTransform.InverseTransformPoint(worldPos);
+		return GetCharacterIndexAtPosition(localPos);
+	}
+
+	/// <summary>
 	/// Return the index of the character at the specified local position.
 	/// </summary>
 
-	public int GetCharacterIndex (Vector2 localPos)
+	public int GetCharacterIndexAtPosition (Vector2 localPos)
 	{
 		if (isValid)
 		{
@@ -1181,6 +1187,77 @@ public class UILabel : UIWidget
 			}
 		}
 		return 0;
+	}
+
+	/// <summary>
+	/// Retrieve the word directly below the specified world-space position.
+	/// </summary>
+
+	public string GetWordAtPosition (Vector3 worldPos) { return GetWordAtCharacterIndex(GetCharacterIndexAtPosition(worldPos)); }
+
+	/// <summary>
+	/// Retrieve the word directly below the specified relative-to-label position.
+	/// </summary>
+
+	public string GetWordAtPosition (Vector2 localPos) { return GetWordAtCharacterIndex(GetCharacterIndexAtPosition(localPos)); }
+
+	/// <summary>
+	/// Retrieve the word right under the specified character index.
+	/// </summary>
+
+	public string GetWordAtCharacterIndex (int characterIndex)
+	{
+		if (characterIndex != -1 && characterIndex < mText.Length)
+		{
+			int linkStart = mText.LastIndexOf(' ', characterIndex, characterIndex) + 1;
+			int linkEnd = mText.IndexOf(' ', characterIndex);
+			if (linkEnd == -1) linkEnd = mText.Length;
+
+			if (linkStart != linkEnd)
+			{
+				string word = mText.Substring(linkStart, linkEnd - linkStart);
+				return NGUIText.StripSymbols(word);
+			}
+		}
+		return null;
+	}
+
+	/// <summary>
+	/// Retrieve the URL directly below the specified world-space position.
+	/// </summary>
+
+	public string GetUrlAtPosition (Vector3 worldPos) { return GetUrlAtCharacterIndex(GetCharacterIndexAtPosition(worldPos)); }
+
+	/// <summary>
+	/// Retrieve the URL directly below the specified relative-to-label position.
+	/// </summary>
+
+	public string GetUrlAtPosition (Vector2 localPos) { return GetUrlAtCharacterIndex(GetCharacterIndexAtPosition(localPos)); }
+
+	/// <summary>
+	/// Retrieve the URL right under the specified character index.
+	/// </summary>
+
+	public string GetUrlAtCharacterIndex (int characterIndex)
+	{
+		if (characterIndex != -1 && characterIndex < mText.Length)
+		{
+			int linkStart = mText.LastIndexOf("[url=", characterIndex, characterIndex);
+
+			if (linkStart != -1)
+			{
+				linkStart += 5;
+				int linkEnd = mText.IndexOf("]", linkStart);
+
+				if (linkEnd != -1)
+				{
+					int closingStatement = mText.IndexOf("[/url]", linkEnd);
+					if (closingStatement == -1 || closingStatement >= characterIndex)
+						return mText.Substring(linkStart, linkEnd - linkStart);
+				}
+			}
+		}
+		return null;
 	}
 
 	/// <summary>
@@ -1228,7 +1305,7 @@ public class UILabel : UIWidget
 				mTempVerts.Clear();
 				mTempIndices.Clear();
 			}
-			
+
 			// If the selection doesn't move, then we're at the top or bottom-most line
 			if (key == KeyCode.UpArrow || key == KeyCode.Home) return 0;
 			if (key == KeyCode.DownArrow || key == KeyCode.End) return text.Length;

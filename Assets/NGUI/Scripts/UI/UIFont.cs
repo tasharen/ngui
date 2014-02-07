@@ -227,7 +227,7 @@ public class UIFont : MonoBehaviour
 		{
 			if (mReplacement != null) return mReplacement.uvRect;
 
-			if (mAtlas != null && (mSprite == null && sprite != null))
+			if (mAtlas != null && (!mSpriteSet && sprite != null))
 			{
 				Texture tex = mAtlas.texture;
 

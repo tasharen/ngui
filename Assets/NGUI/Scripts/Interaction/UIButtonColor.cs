@@ -52,7 +52,7 @@ public class UIButtonColor : UIWidgetContainer
 #if UNITY_EDITOR
 			if (!Application.isPlaying) return Color.white;
 #endif
-			Start();
+			Awake();
 			return mColor;
 		}
 		set
@@ -60,12 +60,12 @@ public class UIButtonColor : UIWidgetContainer
 #if UNITY_EDITOR
 			if (!Application.isPlaying) return;
 #endif
-			Start();
+			Awake();
 			mColor = value;
 		}
 	}
 
-	void Start ()
+	void Awake ()
 	{
 		if (!mStarted)
 		{
@@ -142,14 +142,13 @@ public class UIButtonColor : UIWidgetContainer
 				}
 			}
 		}
-		OnEnable();
 	}
 
 	protected virtual void OnPress (bool isPressed)
 	{
 		if (enabled && UICamera.currentTouch != null)
 		{
-			if (!mStarted) Start();
+			if (!mStarted) Awake();
 			
 			if (isPressed)
 			{
@@ -167,7 +166,7 @@ public class UIButtonColor : UIWidgetContainer
 	{
 		if (enabled)
 		{
-			if (!mStarted) Start();
+			if (!mStarted) Awake();
 			TweenColor.Begin(tweenTarget, duration, isOver ? hover : mColor);
 		}
 	}
@@ -176,7 +175,7 @@ public class UIButtonColor : UIWidgetContainer
 	{
 		if (enabled)
 		{
-			if (!mStarted) Start();
+			if (!mStarted) Awake();
 			TweenColor.Begin(tweenTarget, duration, pressed);
 		}
 	}
@@ -185,7 +184,7 @@ public class UIButtonColor : UIWidgetContainer
 	{
 		if (enabled)
 		{
-			if (!mStarted) Start();
+			if (!mStarted) Awake();
 			TweenColor.Begin(tweenTarget, duration, mColor);
 		}
 	}
