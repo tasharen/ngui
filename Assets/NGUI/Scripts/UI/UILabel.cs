@@ -1595,13 +1595,13 @@ public class UILabel : UIWidget
 			NGUIText.dynamicFont = ttf;
 			NGUIText.bitmapFont = null;
 		}
-#endif
 
 		if (isDynamic && keepCrisp)
 		{
 			UIRoot rt = root;
 			if (rt != null) NGUIText.pixelDensity = (rt != null) ? rt.pixelSizeAdjustment : 1f;
 		}
+#endif
 
 		Pivot p = pivot;
 

@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.4.8
+            Version 3.4.9
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,19 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.4.9
+- NEW: You can now embed hidden content in labels using bbcode: [url=link]Click Here[/url]. Retrieve this content via UILabel.GetUrlAtPosition(UICamera.lastHit.point), then do what you want.
+- NEW: Labels can now keep references to UIFonts that use dynamic fonts, for easy replacement/swapping.
+- FIX: Work-around for a bug in Unity related to dynamic fonts discarding previously requested characters.
+- FIX: UIButtonColor/UIButton will set the normal color in Awake instead of Start to avoid conflicts with tweens.
+- FIX: Create UI menu option will now let you create a 3D UI if you have a 2D UI present, and vice versa.
+- FIX: Input improvements: IME text selection while typing and proper dialog positioning.
+- FIX: Parent widget's visibility checks should no longer cause children to be culled.
+- FIX: Scaled bitmap fonts should now be correctly affected by the gradient setting.
+- FIX: Removed UIAnchor usage from the Scroll View example.
+- FIX: UIRoot should be executed before everything else.
+- FIX: UIToggle.startsChecked is now be public.
 
 3.4.8
 - NEW: Tweens will now display the curve in inspector as a square, making it easier to eyeball.
