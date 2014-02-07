@@ -186,7 +186,8 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			return mTrueTypeFont ?? (mFont != null ? mFont.dynamicFont : null);
+			if (mTrueTypeFont != null) return mTrueTypeFont;
+			return (mFont != null ? mFont.dynamicFont : null);
 		}
 		set
 		{
@@ -262,7 +263,7 @@ public class UILabel : UIWidget
 	/// Default font size.
 	/// </summary>
 
-	public int defaultFontSize { get { return (trueTypeFont != null) ? mFontSize : mFont.defaultSize; } }
+	public int defaultFontSize { get { return (trueTypeFont != null) ? mFontSize : (mFont != null ? mFont.defaultSize : 16); } }
 
 	/// <summary>
 	/// Active font size used by the label.
@@ -871,13 +872,7 @@ public class UILabel : UIWidget
 		if (!NGUITools.GetActive(this)) return;
 		if (!mAllowProcessing) return;
 #endif
-		if (ambigiousFont != null)
-		{
-			ProcessText();
-#if DYNAMIC_FONT
-			if (mActiveTTF != null) NGUIText.RequestCharactersInTexture(mActiveTTF, mText);
-#endif
-		}
+		if (ambigiousFont != null) ProcessText();
 	}
 
 #if UNITY_EDITOR
@@ -900,6 +895,7 @@ public class UILabel : UIWidget
 
 			// If the true type font was not used before, but now it is, clear the font reference
 			if (!mUsingTTF && ttf != null) fnt = null;
+			else if (mUsingTTF && fnt != null) ttf = null;
 
 			mFont = null;
 			mTrueTypeFont = null;

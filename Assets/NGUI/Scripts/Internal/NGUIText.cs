@@ -702,20 +702,6 @@ static public class NGUIText
 		return text.Substring(offset, textLength - offset);
 	}
 
-#if DYNAMIC_FONT
-	/// <summary>
-	/// Ensure that we have the requested characters present.
-	/// </summary>
-
-	static public void RequestCharactersInTexture (Font font, string text)
-	{
-		if (font != null)
-		{
-			font.RequestCharactersInTexture(text, finalSize, fontStyle);
-		}
-	}
-#endif
-
 	/// <summary>
 	/// Text wrapping functionality. The 'width' and 'height' should be in pixels.
 	/// </summary>
