@@ -26,7 +26,7 @@ public class UIFontInspector : Editor
 
 	enum FontType
 	{
-		Normal,
+		Bitmap,
 		Reference,
 		Dynamic,
 	}
@@ -35,7 +35,7 @@ public class UIFontInspector : Editor
 	static bool mUseShader = false;
 
 	UIFont mFont;
-	FontType mType = FontType.Normal;
+	FontType mType = FontType.Bitmap;
 	UIFont mReplacement = null;
 	string mSymbolSequence = "";
 	string mSymbolSprite = "";
@@ -52,7 +52,7 @@ public class UIFontInspector : Editor
 		mFont.replacement = obj as UIFont;
 		mReplacement = mFont.replacement;
 		UnityEditor.EditorUtility.SetDirty(mFont);
-		if (mReplacement == null) mType = FontType.Normal;
+		if (mReplacement == null) mType = FontType.Bitmap;
 	}
 
 	void OnSelectAtlas (Object obj)
@@ -103,7 +103,7 @@ public class UIFontInspector : Editor
 
 		if (mType != fontType)
 		{
-			if (fontType == FontType.Normal)
+			if (fontType == FontType.Bitmap)
 			{
 				OnSelectFont(null);
 			}
