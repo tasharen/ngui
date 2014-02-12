@@ -1200,10 +1200,11 @@ static public class NGUIText
 					}
 					else // Italic
 					{
-						verts.Add(new Vector3(v0x, v0y));
-						verts.Add(new Vector3(v0x + fontSize * 0.2f, v1y));
-						verts.Add(new Vector3(v1x + fontSize * 0.2f, v1y));
-						verts.Add(new Vector3(v1x, v0y));
+						float slant = fontSize * 0.1f * ((v1y - v0y) / fontSize);
+						verts.Add(new Vector3(v0x - slant, v0y));
+						verts.Add(new Vector3(v0x + slant, v1y));
+						verts.Add(new Vector3(v1x + slant, v1y));
+						verts.Add(new Vector3(v1x - slant, v0y));
 					}
 				}
 				else // Bold
@@ -1213,10 +1214,11 @@ static public class NGUIText
 						float a = mBoldOffset[j * 2];
 						float b = mBoldOffset[j * 2 + 1];
 
-						verts.Add(new Vector3(v0x + a, v0y + b));
-						verts.Add(new Vector3(v0x + (italic ? fontSize * 0.2f : 0) + a, v1y + b));
-						verts.Add(new Vector3(v1x + (italic ? fontSize * 0.2f : 0) + a, v1y + b));
-						verts.Add(new Vector3(v1x + a, v0y + b));
+						float slant = a + (italic ? fontSize * 0.1f * ((v1y - v0y) / fontSize) : 0f);
+						verts.Add(new Vector3(v0x - slant, v0y + b));
+						verts.Add(new Vector3(v0x + slant, v1y + b));
+						verts.Add(new Vector3(v1x + slant, v1y + b));
+						verts.Add(new Vector3(v1x - slant, v0y + b));
 					}
 				}
 
