@@ -146,6 +146,7 @@ public class UIPanel : UIRect
 	float mCullTime = 0f;
 	float mUpdateTime = 0f;
 	int mMatrixFrame = -1;
+	int mAlphaFrameID = 0;
 	int mLayer = -1;
 
 	// Values used for visibility checks
@@ -192,6 +193,7 @@ public class UIPanel : UIRect
 
 			if (mAlpha != val)
 			{
+				mAlphaFrameID = -1;
 				mResized = true;
 				mAlpha = val;
 				SetDirty();
@@ -563,8 +565,6 @@ public class UIPanel : UIRect
 		return base.GetSides(relativeTo);
 	}
 
-	int mAlphaFrameID = 0;
-
 	/// <summary>
 	/// Widget's final alpha, after taking the panel's alpha into account.
 	/// </summary>
@@ -715,6 +715,9 @@ public class UIPanel : UIRect
 		}
 
 		mRebuild = true;
+		mAlphaFrameID = -1;
+		mMatrixFrame = -1;
+
 		list.Add(this);
 		list.Sort(CompareFunc);
 	}
@@ -730,8 +733,12 @@ public class UIPanel : UIRect
 			UIDrawCall dc = drawCalls.buffer[i];
 			if (dc != null) UIDrawCall.Destroy(dc);
 		}
+		
 		drawCalls.Clear();
 		list.Remove(this);
+
+		mAlphaFrameID = -1;
+		mMatrixFrame = -1;
 		
 		if (list.size == 0)
 		{
