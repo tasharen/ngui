@@ -166,7 +166,7 @@ public class UIWidgetContainerEditor : Editor
 				mAllowSelection = true;
 				mStartMouse = e.mousePosition;
 
-				if (e.button == 1)
+				if (e.button == 1 && isWithinRect)
 				{
 					GUIUtility.hotControl = GUIUtility.keyboardControl = id;
 					e.Use();

@@ -549,38 +549,41 @@ public class UIWidgetInspector : UIRectEditor
 
 			case EventType.MouseDown:
 			{
-				mStartMouse = e.mousePosition;
-				mAllowSelection = true;
-
-				if (e.button == 1)
+				if (actionUnderMouse != Action.None)
 				{
-					if (e.modifiers == 0)
+					mStartMouse = e.mousePosition;
+					mAllowSelection = true;
+
+					if (e.button == 1)
 					{
+						if (e.modifiers == 0)
+						{
+							GUIUtility.hotControl = GUIUtility.keyboardControl = id;
+							e.Use();
+						}
+					}
+					else if (e.button == 0 && actionUnderMouse != Action.None && Raycast(handles, out mStartDrag))
+					{
+						mWorldPos = t.position;
+						mLocalPos = t.localPosition;
+						mStartRot = t.localRotation.eulerAngles;
+						mStartDir = mStartDrag - t.position;
+						mStartWidth = mWidget.width;
+						mStartHeight = mWidget.height;
+						mStartLeft.x = mWidget.leftAnchor.relative;
+						mStartLeft.y = mWidget.leftAnchor.absolute;
+						mStartRight.x = mWidget.rightAnchor.relative;
+						mStartRight.y = mWidget.rightAnchor.absolute;
+						mStartBottom.x = mWidget.bottomAnchor.relative;
+						mStartBottom.y = mWidget.bottomAnchor.absolute;
+						mStartTop.x = mWidget.topAnchor.relative;
+						mStartTop.y = mWidget.topAnchor.absolute;
+
+						mDragPivot = pivotUnderMouse;
+						mActionUnderMouse = actionUnderMouse;
 						GUIUtility.hotControl = GUIUtility.keyboardControl = id;
 						e.Use();
 					}
-				}
-				else if (e.button == 0 && actionUnderMouse != Action.None && Raycast(handles, out mStartDrag))
-				{
-					mWorldPos = t.position;
-					mLocalPos = t.localPosition;
-					mStartRot = t.localRotation.eulerAngles;
-					mStartDir = mStartDrag - t.position;
-					mStartWidth = mWidget.width;
-					mStartHeight = mWidget.height;
-					mStartLeft.x = mWidget.leftAnchor.relative;
-					mStartLeft.y = mWidget.leftAnchor.absolute;
-					mStartRight.x = mWidget.rightAnchor.relative;
-					mStartRight.y = mWidget.rightAnchor.absolute;
-					mStartBottom.x = mWidget.bottomAnchor.relative;
-					mStartBottom.y = mWidget.bottomAnchor.absolute;
-					mStartTop.x = mWidget.topAnchor.relative;
-					mStartTop.y = mWidget.topAnchor.absolute;
-
-					mDragPivot = pivotUnderMouse;
-					mActionUnderMouse = actionUnderMouse;
-					GUIUtility.hotControl = GUIUtility.keyboardControl = id;
-					e.Use();
 				}
 			}
 			break;

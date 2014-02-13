@@ -314,6 +314,9 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Attach/Play Animation Script", false, 7)]
 	static public void Add12 () { AddIfMissing<UIPlayAnimation>(); }
 
+	[MenuItem("NGUI/Attach/Play Sound Script", false, 7)]
+	static public void Add13 () { AddIfMissing<UIPlaySound>(); }
+
 #endregion
 #region Tweens
 

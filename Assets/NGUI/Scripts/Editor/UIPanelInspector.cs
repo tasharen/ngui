@@ -167,29 +167,32 @@ public class UIPanelInspector : UIRectEditor
 
 			case EventType.MouseDown:
 			{
-				mStartMouse = e.mousePosition;
-				mAllowSelection = true;
-
-				if (e.button == 1)
+				if (actionUnderMouse != UIWidgetInspector.Action.None)
 				{
-					if (e.modifiers == 0)
+					mStartMouse = e.mousePosition;
+					mAllowSelection = true;
+
+					if (e.button == 1)
 					{
+						if (e.modifiers == 0)
+						{
+							GUIUtility.hotControl = GUIUtility.keyboardControl = id;
+							e.Use();
+						}
+					}
+					else if (e.button == 0 && actionUnderMouse != UIWidgetInspector.Action.None &&
+						UIWidgetInspector.Raycast(handles, out mStartDrag))
+					{
+						mWorldPos = t.position;
+						mLocalPos = t.localPosition;
+						mStartRot = t.localRotation.eulerAngles;
+						mStartDir = mStartDrag - t.position;
+						mStartCR = mPanel.baseClipRegion;
+						mDragPivot = pivotUnderMouse;
+						mActionUnderMouse = actionUnderMouse;
 						GUIUtility.hotControl = GUIUtility.keyboardControl = id;
 						e.Use();
 					}
-				}
-				else if (e.button == 0 && actionUnderMouse != UIWidgetInspector.Action.None &&
-					UIWidgetInspector.Raycast(handles, out mStartDrag))
-				{
-					mWorldPos = t.position;
-					mLocalPos = t.localPosition;
-					mStartRot = t.localRotation.eulerAngles;
-					mStartDir = mStartDrag - t.position;
-					mStartCR = mPanel.baseClipRegion;
-					mDragPivot = pivotUnderMouse;
-					mActionUnderMouse = actionUnderMouse;
-					GUIUtility.hotControl = GUIUtility.keyboardControl = id;
-					e.Use();
 				}
 			}
 			break;
