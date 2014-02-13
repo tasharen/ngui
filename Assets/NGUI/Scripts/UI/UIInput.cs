@@ -943,7 +943,7 @@ public class UIInput : MonoBehaviour
 	/// Update the visual text label.
 	/// </summary>
 
-	protected void UpdateLabel ()
+	public void UpdateLabel ()
 	{
 		if (label != null)
 		{
