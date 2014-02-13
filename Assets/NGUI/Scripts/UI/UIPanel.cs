@@ -370,15 +370,18 @@ public class UIPanel : UIRect
 		}
 		set
 		{
-			if (Mathf.Abs(mClipRange.x - value.x) > 0.001f ||
-				Mathf.Abs(mClipRange.y - value.y) > 0.001f ||
-				Mathf.Abs(mClipRange.z - value.z) > 0.001f ||
-				Mathf.Abs(mClipRange.w - value.w) > 0.001f)
+			if (Mathf.Abs(mClipRange.x - value.x) > 0.49f ||
+				Mathf.Abs(mClipRange.y - value.y) > 0.49f ||
+				Mathf.Abs(mClipRange.z - value.z) > 0.49f ||
+				Mathf.Abs(mClipRange.w - value.w) > 0.49f)
 			{
 				mResized = true;
 				mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
 				mClipRange = value;
 				mMatrixFrame = -1;
+
+				UIScrollView sv = GetComponent<UIScrollView>();
+				if (sv != null) sv.UpdatePosition();
 #if UNITY_EDITOR
 				if (!Application.isPlaying) UpdateDrawCalls();
 #endif
@@ -387,7 +390,7 @@ public class UIPanel : UIRect
 	}
 
 	/// <summary>
-	/// Final clipping region after the offset has been taken into consideration.
+	/// Final clipping region after the offset has been taken into consideration. XY = center, ZW = size.
 	/// </summary>
 
 	public Vector4 finalClipRegion

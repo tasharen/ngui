@@ -163,7 +163,7 @@ public class UIGrid : UIWidgetContainer
 
 				if (animateSmoothly && Application.isPlaying)
 				{
-					SpringPosition.Begin(t.gameObject, pos, 15f);
+					SpringPosition.Begin(t.gameObject, pos, 15f).updateScrollView = true;
 				}
 				else t.localPosition = pos;
 
@@ -189,7 +189,7 @@ public class UIGrid : UIWidgetContainer
 
 				if (animateSmoothly && Application.isPlaying)
 				{
-					SpringPosition.Begin(t.gameObject, pos, 15f);
+					SpringPosition.Begin(t.gameObject, pos, 15f).updateScrollView = true;
 				}
 				else t.localPosition = pos;
 

@@ -13,10 +13,26 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Internal/Spring Panel")]
 public class SpringPanel : MonoBehaviour
 {
+	static public SpringPanel current;
+
+	/// <summary>
+	/// Target position to spring the panel to.
+	/// </summary>
+
 	public Vector3 target = Vector3.zero;
+
+	/// <summary>
+	/// Strength of the spring. The higher the value, the faster the movement.
+	/// </summary>
+
 	public float strength = 10f;
 
 	public delegate void OnFinished ();
+
+	/// <summary>
+	/// Delegate function to call when the operation finishes.
+	/// </summary>
+
 	public OnFinished onFinished;
 
 	UIPanel mPanel;
@@ -77,7 +93,13 @@ public class SpringPanel : MonoBehaviour
 		mPanel.clipOffset = cr;
 
         if (mDrag != null) mDrag.UpdateScrollbars(false);
-        if (trigger && onFinished != null) onFinished();
+
+		if (trigger && onFinished != null)
+		{
+			current = this;
+			onFinished();
+			current = null;
+		}
     }
 
 	/// <summary>

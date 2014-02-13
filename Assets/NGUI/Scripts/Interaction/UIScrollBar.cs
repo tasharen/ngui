@@ -50,13 +50,20 @@ public class UIScrollBar : UISlider
 				mSize = val;
 				mIsDirty = true;
 
-				if (onChange != null)
+				if (NGUITools.GetActive(this))
 				{
-					current = this;
-					EventDelegate.Execute(onChange);
-					current = null;
+					if (onChange != null)
+					{
+						current = this;
+						EventDelegate.Execute(onChange);
+						current = null;
+					}
+					ForceUpdate();
+#if UNITY_EDITOR
+					if (!Application.isPlaying)
+						UnityEditor.EditorUtility.SetDirty(this);
+#endif
 				}
-				if (!Application.isPlaying) ForceUpdate();
 			}
 		}
 	}

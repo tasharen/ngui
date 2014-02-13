@@ -127,13 +127,20 @@ public class UIProgressBar : UIWidgetContainer
 			{
 				mValue = val;
 
-				if (EventDelegate.IsValid(onChange))
+				if (NGUITools.GetActive(this))
 				{
-					current = this;
-					EventDelegate.Execute(onChange);
-					current = null;
+					if (EventDelegate.IsValid(onChange))
+					{
+						current = this;
+						EventDelegate.Execute(onChange);
+						current = null;
+					}
+					ForceUpdate();
+#if UNITY_EDITOR
+					if (!Application.isPlaying)
+						UnityEditor.EditorUtility.SetDirty(this);
+#endif
 				}
-				ForceUpdate();
 			}
 		}
 	}

@@ -61,10 +61,21 @@ public class UIProgressBarEditor : UIWidgetContainerEditor
 		if (sb.value != val ||
 			sb.alpha != alpha)
 		{
-			NGUIEditorTools.RegisterUndo("Scroll Bar Change", sb);
+			NGUIEditorTools.RegisterUndo("Progress Bar Change", sb);
 			sb.value = val;
 			sb.alpha = alpha;
 			UnityEditor.EditorUtility.SetDirty(sb);
+
+			for (int i = 0; i < UIScrollView.list.size; ++i)
+			{
+				UIScrollView sv = UIScrollView.list[i];
+
+				if (sv.horizontalScrollBar == sb || sv.verticalScrollBar == sb)
+				{
+					NGUIEditorTools.RegisterUndo("Progress Bar Change", sv);
+					sv.UpdatePosition();
+				}
+			}
 		}
 	}
 
