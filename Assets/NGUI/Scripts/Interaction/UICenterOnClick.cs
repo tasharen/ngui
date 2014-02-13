@@ -30,7 +30,7 @@ public class UICenterOnClick : MonoBehaviour
 		}
 		else if (mPanel != null && mPanel.clipping != UIDrawCall.Clipping.None)
 		{
-			SpringPanel.Begin(mPanel.cachedGameObject, mPanel.cachedTransform.InverseTransformPoint(transform.position), 6f);
+			SpringPanel.Begin(mPanel.cachedGameObject, -mPanel.cachedTransform.InverseTransformPoint(transform.position), 6f);
 		}
 	}
 }

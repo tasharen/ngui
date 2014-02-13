@@ -323,7 +323,7 @@ public class UIScrollView : MonoBehaviour
 
 	void Start ()
 	{
-		UpdatePosition();
+		//UpdatePosition();
 
 		if (Application.isPlaying)
 		{
@@ -567,7 +567,6 @@ public class UIScrollView : MonoBehaviour
 		{
 			// Invalidate the bounds
 			mCalculatedBounds = false;
-
 			Vector2 pv = NGUIMath.GetPivotOffset(contentPivot);
 
 			// First move the position back to where it would be if the scroll bars got reset to zero
@@ -588,8 +587,9 @@ public class UIScrollView : MonoBehaviour
 		{
 			mIgnoreCallbacks = true;
 			mCalculatedBounds = false;
-			float x = (horizontalScrollBar != null) ? horizontalScrollBar.value : 0f;
-			float y = (verticalScrollBar != null) ? verticalScrollBar.value : 0f;
+			Vector2 pv = NGUIMath.GetPivotOffset(contentPivot);
+			float x = (horizontalScrollBar != null) ? horizontalScrollBar.value : pv.x;
+			float y = (verticalScrollBar != null) ? verticalScrollBar.value : 1f - pv.y;
 			SetDragAmount(x, y, false);
 			UpdateScrollbars(true);
 			mIgnoreCallbacks = false;

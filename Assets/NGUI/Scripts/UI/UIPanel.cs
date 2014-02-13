@@ -141,7 +141,7 @@ public class UIPanel : UIRect
 	static BetterList<Color32> mCols = new BetterList<Color32>();
 
 	Camera mCam;
-	Vector2 mClipOffset = Vector2.zero;
+	[SerializeField] Vector2 mClipOffset = Vector2.zero;
 
 	float mCullTime = 0f;
 	float mUpdateTime = 0f;
