@@ -163,10 +163,15 @@ public class UIRoot : MonoBehaviour
 
 	static public void Broadcast (string funcName)
 	{
-		for (int i = 0, imax = list.Count; i < imax; ++i)
+#if UNITY_EDITOR
+		if (Application.isPlaying)
+#endif
 		{
-			UIRoot root = list[i];
-			if (root != null) root.BroadcastMessage(funcName, SendMessageOptions.DontRequireReceiver);
+			for (int i = 0, imax = list.Count; i < imax; ++i)
+			{
+				UIRoot root = list[i];
+				if (root != null) root.BroadcastMessage(funcName, SendMessageOptions.DontRequireReceiver);
+			}
 		}
 	}
 

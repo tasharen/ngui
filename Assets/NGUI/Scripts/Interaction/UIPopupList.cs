@@ -392,7 +392,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Localize the text label.
 	/// </summary>
 
-	void OnLocalize (Localization loc) { if (isLocalized) TriggerCallbacks(); }
+	void OnLocalize () { if (isLocalized) TriggerCallbacks(); }
 
 	/// <summary>
 	/// Visibly highlight the specified transform by moving the highlight sprite to be over it.
@@ -671,7 +671,7 @@ public class UIPopupList : UIWidgetContainer
 				lbl.trueTypeFont = trueTypeFont;
 				lbl.fontSize = labelFontSize;
 				lbl.fontStyle = fontStyle;
-				lbl.text = (isLocalized && Localization.instance != null) ? Localization.instance.Get(s) : s;
+				lbl.text = isLocalized ? Localization.Get(s) : s;
 				lbl.color = textColor;
 				lbl.cachedTransform.localPosition = new Vector3(bgPadding.x + padding.x, y, -1f);
 				lbl.overflowMethod = UILabel.Overflow.ResizeFreely;

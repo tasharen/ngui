@@ -1092,6 +1092,10 @@ public class NGUIEditorTools
 		GUILayout.EndHorizontal();
 	}
 
+	/// <summary>
+	/// Repaints all inspector windows related to sprite drawing.
+	/// </summary>
+
 	static public void RepaintSprites ()
 	{
 		if (UIAtlasInspector.instance != null)
