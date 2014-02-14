@@ -54,6 +54,9 @@ static public class NGUIHelp
 		if (type == typeof(UIPlayTween) || type.IsSubclassOf(typeof(UITweener)))
 			return "http://www.tasharen.com/forum/index.php?topic=6760";
 
+		if (type == typeof(UILocalize) || type == typeof(Localization))
+			return "http://www.tasharen.com/forum/index.php?topic=8092.0";
+
 		return null;
 	}
 

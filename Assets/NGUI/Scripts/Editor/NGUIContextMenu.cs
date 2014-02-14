@@ -106,6 +106,12 @@ public static class NGUIContextMenu
 	[MenuItem("CONTEXT/UIPanel/Help")]
 	static void ShowHelp27 (MenuCommand command) { NGUIHelp.Show(typeof(UIPanel)); }
 
+	[MenuItem("CONTEXT/UILocalize/Help")]
+	static void ShowHelp28 (MenuCommand command) { NGUIHelp.Show(typeof(UILocalize)); }
+
+	[MenuItem("CONTEXT/Localization/Help")]
+	static void ShowHelp29 (MenuCommand command) { NGUIHelp.Show(typeof(Localization)); }
+
 	public delegate UIWidget AddFunc (GameObject go);
 
 	static BetterList<string> mEntries = new BetterList<string>();
@@ -373,6 +379,9 @@ public static class NGUIContextMenu
 				AddItem("Attach/Play Animation Script", false, delegate(object obj) { target.AddComponent<UIPlayAnimation>(); }, null);
 				AddItem("Attach/Play Sound Script", false, delegate(object obj) { target.AddComponent<UIPlaySound>(); }, null);
 			}
+
+			if (target.GetComponent<UILocalize>() == null)
+				AddItem("Attach/Localization Script", false, delegate(object obj) { target.AddComponent<UILocalize>(); }, null);
 
 			if (widget != null)
 			{

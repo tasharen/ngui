@@ -317,6 +317,9 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Attach/Play Sound Script", false, 7)]
 	static public void Add13 () { AddIfMissing<UIPlaySound>(); }
 
+	[MenuItem("NGUI/Attach/Localization Script", false, 7)]
+	static public void Add14 () { AddIfMissing<UILocalize>(); }
+
 #endregion
 #region Tweens
 
