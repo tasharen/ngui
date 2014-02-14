@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.4.9
+            Version 3.5.0
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,17 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.5.0
+- NEW: Localization system now supports CSV type input.
+- NEW: UILocalize script now has key lookup and localized preview options.
+- NEW: Scroll views now have a Content Origin point.
+- FIX: Inlined italic text should now look better.
+- FIX: Improved scroll view resizing and logic regarding how it repositions the content.
+- FIX: Fixed an issue with how changing panel's alpha would not propagate to children in certain cases.
+- FIX: NGUI will no longer intercept RMB events that occur outside the selected widget's area.
+- FIX: UICenterOnClick should now work as expected when there is no UICenterOnChild present.
+- FIX: UICenterOnClick shouldn't cache the panel anymore, making it work properly with drag & drop.
 
 3.4.9
 - NEW: You can now embed hidden content in labels using bbcode: [url=link]Click Here[/url]. Retrieve this content via UILabel.GetUrlAtPosition(UICamera.lastHit.point), then do what you want.

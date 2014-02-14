@@ -50,7 +50,11 @@ public class UILocalizeEditor : Editor
 		GUI.color = isPresent ? Color.green : Color.red;
 		GUILayout.BeginVertical(GUILayout.Width(22f));
 		GUILayout.Space(2f);
+#if UNITY_3_5
+		GUILayout.Label(isPresent? "ok" : "!!", GUILayout.Height(20f));
+#else
 		GUILayout.Label(isPresent? "\u2714" : "\u2718", "TL SelectionButtonNew", GUILayout.Height(20f));
+#endif
 		GUILayout.EndVertical();
 		GUI.color = Color.white;
 		GUILayout.EndHorizontal();
@@ -101,7 +105,11 @@ public class UILocalizeEditor : Editor
 			{
 				if (mKeys[i].StartsWith(myKey, System.StringComparison.OrdinalIgnoreCase) || mKeys[i].Contains(myKey))
 				{
+#if UNITY_3_5
+					if (GUILayout.Button(mKeys[i] + " \u25B2"))
+#else
 					if (GUILayout.Button(mKeys[i] + " \u25B2", "CN CountBadge"))
+#endif
 					{
 						sp.stringValue = mKeys[i];
 						GUIUtility.hotControl = 0;

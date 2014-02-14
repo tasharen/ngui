@@ -284,15 +284,18 @@ public class Localization : MonoBehaviour
 		if (temp.size < 2) return false;
 
 		// The first entry must be 'KEY', capitalized
-		temp[0] = temp[0].ToUpper();
+		temp[0] = "KEY";
 
+#if !UNITY_3_5
 		// Ensure that the first value is what we expect
-		if (temp[0] != "KEY")
+		if (!string.Equals(temp[0], "KEY"))
 		{
-			Debug.LogError("Invalid localization CSV file. The first value is expected to be 'KEY', followed by language columns", asset);
+			Debug.LogError("Invalid localization CSV file. The first value is expected to be 'KEY', followed by language columns.\n" +
+				"Instead found '" + temp[0] + "'", asset);
 			return false;
 		}
 		else
+#endif
 		{
 			knownLanguages = new string[temp.size - 1];
 			for (int i = 0; i < knownLanguages.Length; ++i)

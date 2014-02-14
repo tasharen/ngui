@@ -1257,6 +1257,7 @@ public class NGUIEditorTools
 
 		GUILayout.Space(2f);
 		GUILayout.EndHorizontal();
+		Color c = GUI.backgroundColor;
 		GUI.backgroundColor = Color.white;
 		if (!forceOn && !state) GUILayout.Space(3f);
 		return state;
