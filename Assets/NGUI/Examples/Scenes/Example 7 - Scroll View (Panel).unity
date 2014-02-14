@@ -801,7 +801,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 103}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -117, z: 0}
+  m_LocalPosition: {x: 6, y: -117, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 209}
@@ -902,8 +902,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 178.610641, y: 14, z: 0}
-  m_Center: {x: 89.3053207, y: 0, z: 0}
+  m_Size: {x: 178.675323, y: 14, z: 0}
+  m_Center: {x: 89.3504028, y: 0, z: 0}
 --- !u!65 &222
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -982,8 +982,9 @@ MonoBehaviour:
   verticalScrollBar: {fileID: 0}
   showScrollBars: 1
   customMovement: {x: 1, y: 0}
-  relativePositionOnReset: {x: 0, y: 0}
+  contentPivot: 3
   scale: {x: 0, y: 0, z: 0}
+  relativePositionOnReset: {x: 0, y: 0}
 --- !u!114 &244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -997,7 +998,7 @@ MonoBehaviour:
   thumb: {fileID: 0}
   mBG: {fileID: 246}
   mFG: {fileID: 245}
-  mValue: 0
+  mValue: 2.39024976e-05
   mFill: 0
   numberOfSteps: 0
   onChange: []
@@ -1005,7 +1006,7 @@ MonoBehaviour:
   rawValue: 1
   direction: 2
   mInverted: 0
-  mSize: .240186095
+  mSize: .240278244
   mScroll: 0
   mDir: 2
 --- !u!114 &245
@@ -1998,6 +1999,7 @@ MonoBehaviour:
   mClipRange: {x: 0, y: 0, z: 0, w: 0}
   mClipSoftness: {x: 40, y: 40}
   mDepth: 3
+  mClipOffset: {x: 0, y: 0}
 --- !u!114 &351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2037,6 +2039,7 @@ MonoBehaviour:
   mClipRange: {x: 0, y: 0, z: 0, w: 0}
   mClipSoftness: {x: 40, y: 40}
   mDepth: 1
+  mClipOffset: {x: 0, y: 0}
 --- !u!114 &352
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2076,6 +2079,7 @@ MonoBehaviour:
   mClipRange: {x: 0, y: -4, z: 700, w: 240}
   mClipSoftness: {x: 10, y: 10}
   mDepth: 2
+  mClipOffset: {x: -6, y: 0}
 --- !u!196 &354
 NavMeshSettings:
   m_ObjectHideFlags: 0
@@ -2357,11 +2361,11 @@ MonoBehaviour:
   optionCanBeNone: 0
   onChange: []
   radioButtonRoot: {fileID: 0}
-  startsChecked: 0
   checkSprite: {fileID: 0}
   checkAnimation: {fileID: 0}
   eventReceiver: {fileID: 0}
   functionName: OnActivate
+  startsChecked: 0
 --- !u!114 &64656382
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10754,6 +10758,7 @@ MonoBehaviour:
   mClipRange: {x: 0, y: 0, z: 300, w: 200}
   mClipSoftness: {x: 4, y: 4}
   mDepth: 0
+  mClipOffset: {x: 0, y: 0}
 --- !u!1 &1917929775
 GameObject:
   m_ObjectHideFlags: 0
