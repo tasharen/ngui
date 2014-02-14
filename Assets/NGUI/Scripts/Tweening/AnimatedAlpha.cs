@@ -9,8 +9,12 @@ using UnityEngine;
 /// Makes it possible to animate alpha of the widget or a panel.
 /// </summary>
 
+[ExecuteInEditMode]
 public class AnimatedAlpha : MonoBehaviour
 {
+#if !UNITY_3_5
+	[Range(0f, 1f)]
+#endif
 	public float alpha = 1f;
 
 	UIWidget mWidget;
