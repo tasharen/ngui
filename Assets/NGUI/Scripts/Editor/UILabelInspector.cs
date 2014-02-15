@@ -172,6 +172,9 @@ public class UILabelInspector : UIWidgetInspector
 			GUILayout.EndHorizontal();
 #endif
 			GUI.skin.textField.wordWrap = ww;
+
+			NGUIEditorTools.DrawPaddedProperty("Alignment", serializedObject, "mAlignment");
+
 			SerializedProperty ov = NGUIEditorTools.DrawPaddedProperty("Overflow", serializedObject, "mOverflow");
 			NGUISettings.overflowStyle = (UILabel.Overflow)ov.intValue;
 

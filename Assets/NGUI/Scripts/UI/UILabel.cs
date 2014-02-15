@@ -10,6 +10,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using Alignment = NGUIText.Alignment;
 
 [ExecuteInEditMode]
 [AddComponentMenu("NGUI/UI/NGUI Label")]
@@ -52,6 +53,7 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] string mText = "";
 	[HideInInspector][SerializeField] int mFontSize = 16;
 	[HideInInspector][SerializeField] FontStyle mFontStyle = FontStyle.Normal;
+	[HideInInspector][SerializeField] Alignment mAlignment = Alignment.Automatic;
 	[HideInInspector][SerializeField] bool mEncoding = true;
 	[HideInInspector][SerializeField] int mMaxLineCount = 0; // 0 denotes unlimited
 	[HideInInspector][SerializeField] Effect mEffectStyle = Effect.None;
@@ -303,6 +305,27 @@ public class UILabel : UIWidget
 			if (mFontStyle != value)
 			{
 				mFontStyle = value;
+				shouldBeProcessed = true;
+				ProcessAndRequest();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Text alignment option.
+	/// </summary>
+
+	public Alignment alignment
+	{
+		get
+		{
+			return mAlignment;
+		}
+		set
+		{
+			if (mAlignment != value)
+			{
+				mAlignment = value;
 				shouldBeProcessed = true;
 				ProcessAndRequest();
 			}
@@ -1599,17 +1622,21 @@ public class UILabel : UIWidget
 		}
 #endif
 
-		Pivot p = pivot;
+		if (alignment == Alignment.Automatic)
+		{
+			Pivot p = pivot;
 
-		if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)
-		{
-			NGUIText.alignment = TextAlignment.Left;
+			if (p == Pivot.Left || p == Pivot.TopLeft || p == Pivot.BottomLeft)
+			{
+				NGUIText.alignment = Alignment.Left;
+			}
+			else if (p == Pivot.Right || p == Pivot.TopRight || p == Pivot.BottomRight)
+			{
+				NGUIText.alignment = Alignment.Right;
+			}
+			else NGUIText.alignment = Alignment.Center;
 		}
-		else if (p == Pivot.Right || p == Pivot.TopRight || p == Pivot.BottomRight)
-		{
-			NGUIText.alignment = TextAlignment.Right;
-		}
-		else NGUIText.alignment = TextAlignment.Center;
+		else NGUIText.alignment = alignment;
 
 		NGUIText.Update();
 	}

@@ -336,6 +336,13 @@ public class UIInput : MonoBehaviour
 			mDefaultText = label.text;
 			mDefaultColor = label.color;
 			label.supportEncoding = false;
+
+			if (label.alignment == NGUIText.Alignment.Justified)
+			{
+				label.alignment = NGUIText.Alignment.Left;
+				Debug.LogWarning("Input fields using labels with justified alignment are not supported at this time", this);
+			}
+
 			mPivot = label.pivot;
 			mPosition = label.cachedTransform.localPosition.x;
 			UpdateLabel();
