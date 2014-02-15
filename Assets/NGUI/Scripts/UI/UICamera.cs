@@ -87,8 +87,11 @@ public class UICamera : MonoBehaviour
 
 	public enum EventType
 	{
-		World,	// Perform a Physics.Raycast and sort by distance to the point that was hit.
-		UI,		// Perform a Physics.Raycast and sort by widget depth.
+		World,		// Perform a Physics.Raycast and sort by distance to the point that was hit.
+		UI,			// Perform a Physics.Raycast and sort by widget depth.
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+		Unity2D,	// Perform a Physics2D.OverlapPoint
+#endif
 	}
 
 	/// <summary>
@@ -668,6 +671,21 @@ public class UICamera : MonoBehaviour
 				}
 				continue;
 			}
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+			else if (cam.eventType == EventType.Unity2D)
+			{
+				Collider2D c2d = Physics2D.OverlapPoint(pos, mask);
+
+				if (c2d)
+				{
+					hit = lastHit;
+					hit.point = pos;
+					hoveredObject = c2d.gameObject;
+					return true;
+				}
+				continue;
+			}
+#endif
 		}
 		hit = mEmpty;
 		return false;

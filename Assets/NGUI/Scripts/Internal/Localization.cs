@@ -417,4 +417,14 @@ public class Localization : MonoBehaviour
 
 	[System.Obsolete("Use Localization.Get instead")]
 	static public string Localize (string key) { return Get(key); }
+
+	/// <summary>
+	/// Returns whether the specified key is present in the localization dictionary.
+	/// </summary>
+
+	static public bool Exists (string key)
+	{
+		if (mLanguageIndex != -1) return mDictionary.ContainsKey(key);
+		return mOldDictionary.ContainsKey(key);
+	}
 }
