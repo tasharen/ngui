@@ -40,6 +40,8 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 3.5.0
 - NEW: Localization system now supports CSV type input.
 - NEW: UILocalize script now has key lookup and localized preview options.
+- NEW: UICamera now has a new event type that supports 2D colliders.
+- NEW: Added justified alignment support for labels.
 - NEW: Scroll views now have a Content Origin point.
 - FIX: Inlined italic text should now look better.
 - FIX: Improved scroll view resizing and logic regarding how it repositions the content.
