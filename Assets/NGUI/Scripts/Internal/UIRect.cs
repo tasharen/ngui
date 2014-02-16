@@ -334,7 +334,7 @@ public abstract class UIRect : MonoBehaviour
 	/// Automatically find the parent rectangle.
 	/// </summary>
 
-	protected void OnEnable ()
+	protected virtual void OnEnable ()
 	{
 		mAnchorsCached = false;
 		if (mStarted) OnInit();

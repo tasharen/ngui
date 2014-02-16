@@ -913,13 +913,27 @@ public class UIWidgetInspector : UIRectEditor
 	{
 		GUILayout.BeginHorizontal();
 		{
-			EditorGUI.BeginDisabledGroup(!serializedObject.isEditingMultipleObjects && mWidget.isAnchoredHorizontally);
+			bool freezeSize = !serializedObject.isEditingMultipleObjects && mWidget.leftAnchor.target && mWidget.rightAnchor.target;
+
+			UILabel lbl = mWidget as UILabel;
+
+			if (!freezeSize && lbl) freezeSize = (lbl.overflowMethod == UILabel.Overflow.ResizeFreely);
+
+			EditorGUI.BeginDisabledGroup(freezeSize);
 			{
 				NGUIEditorTools.DrawProperty("Dimensions", serializedObject, "mWidth", GUILayout.MinWidth(100f));
 			}
 			EditorGUI.EndDisabledGroup();
 
-			EditorGUI.BeginDisabledGroup(!serializedObject.isEditingMultipleObjects && mWidget.isAnchoredVertically);
+			freezeSize = !serializedObject.isEditingMultipleObjects && mWidget.topAnchor.target && mWidget.bottomAnchor.target;
+
+			if (!freezeSize && lbl)
+			{
+				UILabel.Overflow ov = lbl.overflowMethod;
+				freezeSize = (ov == UILabel.Overflow.ResizeFreely || ov == UILabel.Overflow.ResizeHeight);
+			}
+
+			EditorGUI.BeginDisabledGroup(freezeSize);
 			{
 				NGUIEditorTools.SetLabelWidth(12f);
 				NGUIEditorTools.DrawProperty("x", serializedObject, "mHeight", GUILayout.MinWidth(30f));

@@ -65,7 +65,7 @@ public class UIRoot : MonoBehaviour
 			int height = Mathf.Max(2, Screen.height);
 			if (scalingStyle == Scaling.FixedSize) return manualHeight;
 
-#if UNITY_IPHONE || UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_BLACKBERRY
 			if (scalingStyle == Scaling.FixedSizeOnMobiles)
 				return manualHeight;
 #endif

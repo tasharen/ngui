@@ -761,6 +761,9 @@ public class UILabel : UIWidget
 	float pixelSize { get { return (mFont != null) ? mFont.pixelSize : 1f; } }
 
 #if DYNAMIC_FONT
+	static BetterList<UILabel> mList = new BetterList<UILabel>();
+	static Dictionary<Font, int> mFontUsage = new Dictionary<Font, int>();
+
 	/// <summary>
 	/// Register the font texture change listener.
 	/// </summary>
@@ -768,6 +771,7 @@ public class UILabel : UIWidget
 	protected override void OnInit ()
 	{
 		base.OnInit();
+		mList.Add(this);
 		SetActiveFont(trueTypeFont);
 	}
 
@@ -778,6 +782,7 @@ public class UILabel : UIWidget
 	protected override void OnDisable ()
 	{
 		SetActiveFont(null);
+		mList.Remove(this);
 		base.OnDisable();
 	}
 
@@ -790,12 +795,35 @@ public class UILabel : UIWidget
 		if (mActiveTTF != fnt)
 		{
 			if (mActiveTTF != null)
-				mActiveTTF.textureRebuildCallback -= FontTextureChanged;
+			{
+				int usage;
+
+				if (mFontUsage.TryGetValue(mActiveTTF, out usage))
+				{
+					usage = Mathf.Max(0, --usage);
+
+					if (usage == 0)
+					{
+						mActiveTTF.textureRebuildCallback = null;
+						mFontUsage.Remove(mActiveTTF);
+					}
+					else mFontUsage[mActiveTTF] = usage;
+				}
+				else mActiveTTF.textureRebuildCallback = null;
+			}
 
 			mActiveTTF = fnt;
 
 			if (mActiveTTF != null)
-				mActiveTTF.textureRebuildCallback += FontTextureChanged;
+			{
+				int usage = 0;
+
+				// Font hasn't been used yet? Register a change delegate callback
+				if (!mFontUsage.TryGetValue(mActiveTTF, out usage))
+					mActiveTTF.textureRebuildCallback = OnFontTextureChanged;
+
+				mFontUsage[mActiveTTF] = ++usage;
+			}
 		}
 	}
 
@@ -803,16 +831,27 @@ public class UILabel : UIWidget
 	/// Notification called when the Unity's font's texture gets rebuilt.
 	/// Unity's font has a nice tendency to simply discard other characters when the texture's dimensions change.
 	/// By requesting them inside the notification callback, we immediately force them back in.
+	/// Originally I was subscribing each label to the font individually, but as it turned out
+	/// mono's delegate system causes an insane amount of memory allocations when += or -= to a delegate.
+	/// So... queue yet another work-around.
 	/// </summary>
 
-	void FontTextureChanged ()
+	static void OnFontTextureChanged ()
 	{
-		Font fnt = trueTypeFont;
-
-		if (fnt != null)
+		for (int i = 0; i < mList.size; ++i)
 		{
-			fnt.RequestCharactersInTexture(mText, mPrintedSize, mFontStyle);
-			MarkAsChanged();
+			UILabel lbl = mList[i];
+
+			if (lbl != null)
+			{
+				Font fnt = lbl.trueTypeFont;
+
+				if (fnt != null)
+				{
+					fnt.RequestCharactersInTexture(lbl.mText, lbl.mPrintedSize, lbl.mFontStyle);
+					lbl.MarkAsChanged();
+				}
+			}
 		}
 	}
 #endif
