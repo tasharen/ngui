@@ -36,6 +36,18 @@ public class UIDragResize : MonoBehaviour
 
 	public int minHeight = 100;
 
+	/// <summary>
+	/// Maximum width the widget will be allowed to expand to when resizing.
+	/// </summary>
+
+	public int maxWidth = 100000;
+
+	/// <summary>
+	/// Maximum height the widget will be allowed to expand to when resizing.
+	/// </summary>
+
+	public int maxHeight = 100000;
+
 	Plane mPlane;
 	Vector3 mRayPos;
 	Vector3 mLocalPos;
@@ -96,7 +108,7 @@ public class UIDragResize : MonoBehaviour
 				t.localPosition = mLocalPos;
 
 				// Adjust the widget
-				NGUIMath.ResizeWidget(target, pivot, localDelta.x, localDelta.y, minWidth, minHeight);
+				NGUIMath.ResizeWidget(target, pivot, localDelta.x, localDelta.y, minWidth, minHeight, maxWidth, maxHeight);
 			}
 		}
 	}

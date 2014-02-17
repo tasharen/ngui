@@ -691,6 +691,15 @@ static public class NGUIMath
 
 	static public void ResizeWidget (UIWidget w, UIWidget.Pivot pivot, float x, float y, int minWidth, int minHeight)
 	{
+		ResizeWidget(w, pivot, x, y, 2, 2, 100000, 100000);
+	}
+
+	/// <summary>
+	/// Given the specified dragged pivot point, adjust the widget's dimensions.
+	/// </summary>
+
+	static public void ResizeWidget (UIWidget w, UIWidget.Pivot pivot, float x, float y, int minWidth, int minHeight, int maxWidth, int maxHeight)
+	{
 		if (pivot == UIWidget.Pivot.Center)
 		{
 			MoveRect(w, x, y);
@@ -703,35 +712,35 @@ static public class NGUIMath
 		switch (pivot)
 		{
 			case UIWidget.Pivot.BottomLeft:
-			AdjustWidget(w, v.x, v.y, 0, 0, minWidth, minHeight);
+			AdjustWidget(w, v.x, v.y, 0, 0, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 
 			case UIWidget.Pivot.Left:
-			AdjustWidget(w, v.x, 0, 0, 0, minWidth, minHeight);
+			AdjustWidget(w, v.x, 0, 0, 0, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 
 			case UIWidget.Pivot.TopLeft:
-			AdjustWidget(w, v.x, 0, 0, v.y, minWidth, minHeight);
+			AdjustWidget(w, v.x, 0, 0, v.y, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 
 			case UIWidget.Pivot.Top:
-			AdjustWidget(w, 0, 0, 0, v.y, minWidth, minHeight);
+			AdjustWidget(w, 0, 0, 0, v.y, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 
 			case UIWidget.Pivot.TopRight:
-			AdjustWidget(w, 0, 0, v.x, v.y, minWidth, minHeight);
+			AdjustWidget(w, 0, 0, v.x, v.y, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 
 			case UIWidget.Pivot.Right:
-			AdjustWidget(w, 0, 0, v.x, 0, minWidth, minHeight);
+			AdjustWidget(w, 0, 0, v.x, 0, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 
 			case UIWidget.Pivot.BottomRight:
-			AdjustWidget(w, 0, v.y, v.x, 0, minWidth, minHeight);
+			AdjustWidget(w, 0, v.y, v.x, 0, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 
 			case UIWidget.Pivot.Bottom:
-			AdjustWidget(w, 0, v.y, 0, 0, minWidth, minHeight);
+			AdjustWidget(w, 0, v.y, 0, 0, minWidth, minHeight, maxWidth, maxHeight);
 			break;
 		}
 	}
@@ -742,7 +751,7 @@ static public class NGUIMath
 
 	static public void AdjustWidget (UIWidget w, float left, float bottom, float right, float top)
 	{
-		AdjustWidget(w, left, bottom, right, top, 2, 2);
+		AdjustWidget(w, left, bottom, right, top, 2, 2, 100000, 100000);
 	}
 
 	/// <summary>
@@ -750,6 +759,16 @@ static public class NGUIMath
 	/// </summary>
 
 	static public void AdjustWidget (UIWidget w, float left, float bottom, float right, float top, int minWidth, int minHeight)
+	{
+		AdjustWidget(w, left, bottom, right, top, minWidth, minHeight, 100000, 100000);
+	}
+
+	/// <summary>
+	/// Adjust the widget's rectangle based on the specified modifier values.
+	/// </summary>
+
+	static public void AdjustWidget (UIWidget w, float left, float bottom, float right, float top,
+		int minWidth, int minHeight, int maxWidth, int maxHeight)
 	{
 		Vector2 piv = w.pivotOffset;
 		Transform t = w.cachedTransform;
@@ -833,8 +852,8 @@ static public class NGUIMath
 			offset.y = (rotatedT.y + rotatedB.y + rotatedL.y + rotatedR.y) * 0.5f;
 		}
 
-		int minx = Mathf.Max(minWidth, w.minWidth);
-		int miny = Mathf.Max(minHeight, w.minHeight);
+		minWidth = Mathf.Max(minWidth, w.minWidth);
+		minHeight = Mathf.Max(minHeight, w.minHeight);
 
 		// Calculate the widget's width and height after the requested adjustments
 		int finalWidth = w.width + iRight - iLeft;
@@ -843,38 +862,30 @@ static public class NGUIMath
 		// Now it's time to constrain the width and height so that they can't go below min values
 		Vector3 constraint = Vector3.zero;
 
-		if (finalWidth < minx)
+		int limitWidth = finalWidth;
+		if (finalWidth < minWidth) limitWidth = minWidth;
+		else if (finalWidth > maxWidth) limitWidth = maxWidth;
+
+		if (finalWidth != limitWidth)
 		{
-			if (iLeft != 0)
-			{
-				constraint.x -= Mathf.Lerp(minx - finalWidth, 0f, piv.x);
-			}
-			else
-			{
-				constraint.x += Mathf.Lerp(0f, minx - finalWidth, piv.x);
-			}
-			finalWidth = minx;
+			if (iLeft != 0) constraint.x -= Mathf.Lerp(limitWidth - finalWidth, 0f, piv.x);
+			else constraint.x += Mathf.Lerp(0f, limitWidth - finalWidth, piv.x);
+			finalWidth = limitWidth;
 		}
 
-		if (finalHeight < miny)
-		{
-			if (iBottom != 0)
-			{
-				constraint.y -= Mathf.Lerp(miny - finalHeight, 0f, piv.y);
-			}
-			else
-			{
-				constraint.y += Mathf.Lerp(0f, miny - finalHeight, piv.y);
-			}
-			finalHeight = miny;
-		}
+		int limitHeight = finalHeight;
+		if (finalHeight < minHeight) limitHeight = minHeight;
+		else if (finalHeight > maxHeight) limitHeight = maxHeight;
 
-		// Constrain the rect
-		if (finalWidth < minWidth) finalWidth = minWidth;
-		if (finalHeight < minHeight) finalHeight = minHeight;
+		if (finalHeight != limitHeight)
+		{
+			if (iBottom != 0) constraint.y -= Mathf.Lerp(limitHeight - finalHeight, 0f, piv.y);
+			else constraint.y += Mathf.Lerp(0f, limitHeight - finalHeight, piv.y);
+			finalHeight = limitHeight;
+		}
 
 		// Centered pivot requires power-of-two dimensions
-		if (piv.x == 0.5f) finalWidth = ((finalWidth >> 1) << 1);
+		if (piv.x == 0.5f) finalWidth  = ((finalWidth  >> 1) << 1);
 		if (piv.y == 0.5f) finalHeight = ((finalHeight >> 1) << 1);
 
 		// Update the position, width and height
