@@ -391,12 +391,12 @@ public class Localization : MonoBehaviour
 #if UNITY_IPHONE || UNITY_ANDROID
 		string mobKey = key + " Mobile";
 
-		if (mLanguageIndex != -1 && mLocalization.TryGetValue(mobKey, out vals))
+		if (mLanguageIndex != -1 && mDictionary.TryGetValue(mobKey, out vals))
 		{
 			if (mLanguageIndex < vals.Length)
 				return vals[mLanguageIndex];
 		}
-		else if (mDictionary.TryGetValue(mobKey, out val)) return val;
+		else if (mOldDictionary.TryGetValue(mobKey, out val)) return val;
 #endif
 		if (mLanguageIndex != -1 && mDictionary.TryGetValue(key, out vals))
 		{

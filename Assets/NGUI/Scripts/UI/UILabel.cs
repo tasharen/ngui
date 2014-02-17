@@ -243,6 +243,8 @@ public class UILabel : UIWidget
 		}
 		set
 		{
+			if (mText == value) return;
+
 			if (string.IsNullOrEmpty(value))
 			{
 				if (!string.IsNullOrEmpty(mText))
@@ -258,6 +260,8 @@ public class UILabel : UIWidget
 				shouldBeProcessed = true;
 				ProcessAndRequest();
 			}
+
+			if (autoResizeBoxCollider) ResizeCollider();
 		}
 	}
 
