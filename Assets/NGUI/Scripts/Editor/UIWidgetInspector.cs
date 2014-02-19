@@ -913,19 +913,24 @@ public class UIWidgetInspector : UIRectEditor
 	{
 		GUILayout.BeginHorizontal();
 		{
-			bool freezeSize = !serializedObject.isEditingMultipleObjects && mWidget.leftAnchor.target && mWidget.rightAnchor.target;
+			bool freezeSize = serializedObject.isEditingMultipleObjects;
 
 			UILabel lbl = mWidget as UILabel;
 
 			if (!freezeSize && lbl) freezeSize = (lbl.overflowMethod == UILabel.Overflow.ResizeFreely);
 
-			EditorGUI.BeginDisabledGroup(freezeSize);
+			if (freezeSize)
 			{
+				EditorGUI.BeginDisabledGroup(true);
 				NGUIEditorTools.DrawProperty("Dimensions", serializedObject, "mWidth", GUILayout.MinWidth(100f));
+				EditorGUI.EndDisabledGroup();
 			}
-			EditorGUI.EndDisabledGroup();
-
-			freezeSize = !serializedObject.isEditingMultipleObjects && mWidget.topAnchor.target && mWidget.bottomAnchor.target;
+			else
+			{
+				GUI.changed = false;
+				int val = EditorGUILayout.IntField("Dimensions", mWidget.width, GUILayout.MinWidth(100f));
+				if (GUI.changed) mWidget.width = val;
+			}
 
 			if (!freezeSize && lbl)
 			{
@@ -933,13 +938,22 @@ public class UIWidgetInspector : UIRectEditor
 				freezeSize = (ov == UILabel.Overflow.ResizeFreely || ov == UILabel.Overflow.ResizeHeight);
 			}
 
-			EditorGUI.BeginDisabledGroup(freezeSize);
+			NGUIEditorTools.SetLabelWidth(12f);
+
+			if (freezeSize)
 			{
-				NGUIEditorTools.SetLabelWidth(12f);
+				EditorGUI.BeginDisabledGroup(true);
 				NGUIEditorTools.DrawProperty("x", serializedObject, "mHeight", GUILayout.MinWidth(30f));
-				NGUIEditorTools.SetLabelWidth(80f);
+				EditorGUI.EndDisabledGroup();
 			}
-			EditorGUI.EndDisabledGroup();
+			else
+			{
+				GUI.changed = false;
+				int val = EditorGUILayout.IntField("x", mWidget.height, GUILayout.MinWidth(30f));
+				if (GUI.changed) mWidget.height = val;
+			}
+
+			NGUIEditorTools.SetLabelWidth(80f);
 
 			if (isPrefab)
 			{
@@ -947,7 +961,7 @@ public class UIWidgetInspector : UIRectEditor
 			}
 			else
 			{
-				EditorGUI.BeginDisabledGroup(!serializedObject.isEditingMultipleObjects && mWidget.isFullyAnchored);
+				EditorGUI.BeginDisabledGroup(serializedObject.isEditingMultipleObjects);
 
 				if (GUILayout.Button("Snap", GUILayout.Width(68f)))
 				{

@@ -168,16 +168,32 @@ public class UIWidget : UIRect
 
 			if (mWidth != value && keepAspectRatio != AspectRatioSource.BasedOnHeight)
 			{
-				mWidth = value;
-
-				if (keepAspectRatio == AspectRatioSource.BasedOnWidth)
-					mHeight = Mathf.RoundToInt(mWidth / aspectRatio);
-				else if (keepAspectRatio == AspectRatioSource.Free)
-					aspectRatio = mWidth / (float)mHeight;
-
-				mMoved = true;
-				if (autoResizeBoxCollider) ResizeCollider();
-				MarkAsChanged();
+				if (isAnchoredHorizontally)
+				{
+					if (leftAnchor.target != null && rightAnchor.target != null)
+					{
+						if (mPivot == Pivot.BottomLeft || mPivot == Pivot.Left || mPivot == Pivot.TopLeft)
+						{
+							NGUIMath.AdjustWidget(this, 0f, 0f, value - mWidth, 0f);
+						}
+						else if (mPivot == Pivot.BottomRight || mPivot == Pivot.Right || mPivot == Pivot.TopRight)
+						{
+							NGUIMath.AdjustWidget(this, mWidth - value, 0f, 0f, 0f);
+						}
+						else
+						{
+							int diff = value - mWidth;
+							diff = diff - (diff & 1);
+							if (diff != 0) NGUIMath.AdjustWidget(this, -diff * 0.5f, 0f, diff * 0.5f, 0f);
+						}
+					}
+					else if (leftAnchor.target != null)
+					{
+						NGUIMath.AdjustWidget(this, 0f, 0f, value - mWidth, 0f);
+					}
+					else NGUIMath.AdjustWidget(this, mWidth - value, 0f, 0f, 0f);
+				}
+				else SetDimensions(value, mHeight);
 			}
 		}
 	}
@@ -197,18 +213,34 @@ public class UIWidget : UIRect
 			int min = minHeight;
 			if (value < min) value = min;
 
-			if (mHeight != value && keepAspectRatio != AspectRatioSource.BasedOnWidth)
+			if (mHeight != value && keepAspectRatio != AspectRatioSource.BasedOnHeight)
 			{
-				mHeight = value;
-
-				if (keepAspectRatio == AspectRatioSource.BasedOnHeight)
-					mWidth = Mathf.RoundToInt(mHeight * aspectRatio);
-				else if (keepAspectRatio == AspectRatioSource.Free)
-					aspectRatio = mWidth / (float)mHeight;
-
-				mMoved = true;
-				if (autoResizeBoxCollider) ResizeCollider();
-				MarkAsChanged();
+				if (isAnchoredVertically)
+				{
+					if (bottomAnchor.target != null && topAnchor.target != null)
+					{
+						if (mPivot == Pivot.BottomLeft || mPivot == Pivot.Bottom || mPivot == Pivot.BottomRight)
+						{
+							NGUIMath.AdjustWidget(this, 0f, 0f, 0f, value - mHeight);
+						}
+						else if (mPivot == Pivot.TopLeft || mPivot == Pivot.Top || mPivot == Pivot.TopRight)
+						{
+							NGUIMath.AdjustWidget(this, 0f, mHeight - value, 0f, 0f);
+						}
+						else
+						{
+							int diff = value - mHeight;
+							diff = diff - (diff & 1);
+							if (diff != 0) NGUIMath.AdjustWidget(this, 0f, -diff * 0.5f, 0f, diff * 0.5f);
+						}
+					}
+					else if (bottomAnchor.target != null)
+					{
+						NGUIMath.AdjustWidget(this, 0f, 0f, 0f, value - mHeight);
+					}
+					else NGUIMath.AdjustWidget(this, 0f, mHeight - value, 0f, 0f);
+				}
+				else SetDimensions(mWidth, value);
 			}
 		}
 	}
@@ -526,6 +558,30 @@ public class UIWidget : UIRect
 		{
 			BoxCollider box = collider as BoxCollider;
 			return (box != null);
+		}
+	}
+
+	/// <summary>
+	/// Adjust the widget's dimensions without going through the anchor validation logic.
+	/// </summary>
+
+	public void SetDimensions (int w, int h)
+	{
+		if (mWidth != w || mHeight != h)
+		{
+			mWidth = w;
+			mHeight = h;
+
+			if (keepAspectRatio == AspectRatioSource.BasedOnWidth)
+				mHeight = Mathf.RoundToInt(mWidth / aspectRatio);
+			else if (keepAspectRatio == AspectRatioSource.BasedOnHeight)
+				mWidth = Mathf.RoundToInt(mHeight * aspectRatio);
+			else if (keepAspectRatio == AspectRatioSource.Free)
+				aspectRatio = mWidth / (float)mHeight;
+
+			mMoved = true;
+			if (autoResizeBoxCollider) ResizeCollider();
+			MarkAsChanged();
 		}
 	}
 

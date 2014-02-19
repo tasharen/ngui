@@ -1509,4 +1509,63 @@ public class UICamera : MonoBehaviour
 		Notify(mTooltip, "OnTooltip", val);
 		if (!val) mTooltip = null;
 	}
+
+	/// <summary>
+	/// Clear all active press states when the application gets paused.
+	/// </summary>
+
+	void OnApplicationPause ()
+	{
+		if (useTouch)
+		{
+			BetterList<int> ids = new BetterList<int>();
+
+			foreach (KeyValuePair<int, MouseOrTouch> pair in mTouches)
+			{
+				if (pair.Value != null && pair.Value.pressed)
+				{
+					currentTouch = pair.Value;
+					currentTouchID = pair.Key;
+					currentScheme = ControlScheme.Touch;
+					ProcessTouch(false, true);
+					ids.Add(currentTouchID);
+					currentTouch = null;
+				}
+			}
+
+			for (int i = 0; i < ids.size; ++i)
+				RemoveTouch(ids[i]);
+		}
+
+		if (useMouse)
+		{
+			for (int i = 0; i < 3; ++i)
+			{
+				if (mMouse[i].pressed)
+				{
+					currentTouch = mMouse[i];
+					currentTouchID = -1 - i;
+					currentKey = KeyCode.Mouse0 + i;
+					currentScheme = ControlScheme.Mouse;
+					ProcessTouch(false, true);
+					currentTouch = null;
+				}
+			}
+		}
+
+		if (useController)
+		{
+			if (controller.pressed)
+			{
+				currentTouch = controller;
+				currentTouchID = -100;
+				currentScheme = ControlScheme.Controller;
+				currentTouch.last = currentTouch.current;
+				currentTouch.current = mCurrentSelection;
+				ProcessTouch(false, true);
+				currentTouch.last = null;
+				currentTouch = null;
+			}
+		}
+	}
 }

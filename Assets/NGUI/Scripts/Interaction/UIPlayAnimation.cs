@@ -8,8 +8,8 @@
 #endif
 
 using UnityEngine;
-using AnimationOrTween;
 using System.Collections.Generic;
+using AnimationOrTween;
 
 /// <summary>
 /// Play the specified animation on click.

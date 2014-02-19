@@ -702,7 +702,18 @@ static public class NGUIMath
 	{
 		if (pivot == UIWidget.Pivot.Center)
 		{
-			MoveRect(w, x, y);
+			int diffX = Mathf.RoundToInt(x - w.width);
+			int diffY = Mathf.RoundToInt(y - w.height);
+
+			diffX = diffX - (diffX & 1);
+			diffY = diffY - (diffY & 1);
+
+			if ((diffX | diffY) != 0)
+			{
+				diffX >>= 1;
+				diffY >>= 1;
+				AdjustWidget(w, -diffX, -diffY, diffX, diffY, minWidth, minHeight);
+			}
 			return;
 		}
 
@@ -781,13 +792,13 @@ static public class NGUIMath
 		int iTop = Mathf.FloorToInt(top + 0.5f);
 
 		// Centered pivot should mean having to perform even number adjustments
-		if (piv.x == 0.5f)
+		if (piv.x == 0.5f && (iLeft == 0 || iRight == 0))
 		{
 			iLeft = ((iLeft >> 1) << 1);
 			iRight = ((iRight >> 1) << 1);
 		}
 
-		if (piv.y == 0.5f)
+		if (piv.y == 0.5f && (iBottom == 0 || iTop == 0))
 		{
 			iBottom = ((iBottom >> 1) << 1);
 			iTop = ((iTop >> 1) << 1);
@@ -891,8 +902,7 @@ static public class NGUIMath
 		// Update the position, width and height
 		Vector3 pos = t.localPosition + offset + rot * constraint;
 		t.localPosition = pos;
-		w.width = finalWidth;
-		w.height = finalHeight;
+		w.SetDimensions(finalWidth, finalHeight);
 
 		// If the widget is anchored, we should update the anchors as well
 		if (w.isAnchored)
