@@ -509,7 +509,7 @@ static public class NGUIText
 				bool oddDiff = (diff & 1) == 1;
 				bool oddWidth = (intWidth & 1) == 1;
 				if ((oddDiff && !oddWidth) || (!oddDiff && oddWidth))
-					padding += 0.5f / fontScale;
+					padding += 0.5f * fontScale;
 #if UNITY_FLASH
 				for (int i = indexOffset; i < verts.size; ++i)
 					verts.buffer[i] = verts.buffer[i] + new Vector3(padding, 0f);
