@@ -43,12 +43,19 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 - NEW: UICamera now has a new event type that supports 2D colliders.
 - NEW: Added justified alignment support for labels.
 - NEW: Scroll views now have a Content Origin point.
-- FIX: Inlined italic text should now look better.
+- NEW: You can now freely adjust width and height of anchored widgets.
+- NEW: UIDragResize script now has a maximum size limiting option as well.
 - FIX: Improved scroll view resizing and logic regarding how it repositions the content.
 - FIX: Fixed an issue with how changing panel's alpha would not propagate to children in certain cases.
 - FIX: NGUI will no longer intercept RMB events that occur outside the selected widget's area.
 - FIX: UICenterOnClick should now work as expected when there is no UICenterOnChild present.
 - FIX: UICenterOnClick shouldn't cache the panel anymore, making it work properly with drag & drop.
+- FIX: Widget inspector's Dimensions field should no longer be grayed out if the widget is partially anchored.
+- FIX: UIRoot's FixedSizeOnMobiles setting should now recognize BB and WP8 as mobile devices
+- FIX: UICamera will now clear all active touch events when the application is paused.
+- FIX: Work-around for dynamic font delegate subscriptions causing epic GC.
+- FIX: Setting label text will now auto-adjust the collider size.
+- FIX: Inlined italic text should now look better.
 
 3.4.9
 - NEW: You can now embed hidden content in labels using bbcode: [url=link]Click Here[/url]. Retrieve this content via UILabel.GetUrlAtPosition(UICamera.lastHit.point), then do what you want.
