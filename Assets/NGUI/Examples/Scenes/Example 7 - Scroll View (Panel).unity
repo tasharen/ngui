@@ -689,7 +689,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 94}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -360, y: 254, z: 0}
+  m_LocalPosition: {x: -360, y: 255, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 216}
@@ -1356,7 +1356,7 @@ MonoBehaviour:
     absolute: 10
   mColor: {r: .410447776, g: .410447776, b: .410447776, a: 1}
   mPivot: 4
-  mWidth: 1434
+  mWidth: 1320
   mHeight: 740
   mDepth: -2
   autoResizeBoxCollider: 0
@@ -1401,36 +1401,42 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
-  mColor: {r: 1, g: 1, b: 1, a: 1}
+  mColor: {r: .194029868, g: .127540812, b: .0637113079, a: 1}
   mPivot: 0
   mWidth: 720
-  mHeight: 229
+  mHeight: 220
   mDepth: 10
-  autoResizeBoxCollider: 0
+  autoResizeBoxCollider: 1
   hideIfOffScreen: 0
   keepAspectRatio: 0
-  aspectRatio: 3.14410472
+  aspectRatio: 3.27272725
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 29056518aafb01b49a5b08faf8e30cff, type: 2}
-  mText: "[554422]Dragging the panels around is the most efficient method of moving
-    something.\r\n\r\nThe best way to drag the contents of a panel around is by using
-    the [005099]UIDragPanelContents[-] script. It moves the panel's contents in a
-    way that doesn't cause the buffers to be rebuilt every frame, which gives a noticeable
-    performance boost, especially on mobile devices.\r\n\r\nYou will need to specify
-    a [005099]UIDraggablePanel[-] for that script to work with (attached to a [005099]UIPanel[-]).
-    The draggable panel script is also where you can adjust how it behaves -- iOS
-    style momentum, auto-fading scroll bar, the works! To limit dragging on a certain
-    axis, such as 'Y', set the [005099]scale[-] to (0, 1, 0). X? (1, 0, 0)."
+  mText: 'To create a Scroll View in NGUI: Right-click, Create, Scroll View.
+
+
+    To make it possible to navigate the scroll view, attach [i]UIDragScrollView[/i]
+    (right-click, attach, Drag Scroll View).
+
+
+    You should attach the Drag Scroll View script to all colliders within your scroll
+    view (and yes, this includes buttons!). If you don''t, then it won''t be possible
+    to drag the scroll view if the press event begins on a collider without it.
+
+
+    Note that the [i]Static[/i] flag on the panel improves performance, but should
+    [b]only[/b] be used if the scroll view''s contents will not move.'
   mFontSize: 20
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 1
   mEffectColor: {r: 1, g: .896530867, b: .798507452, a: .513725519}
   mSymbols: 1
   mEffectDistance: {x: 1, y: 1}
-  mOverflow: 1
+  mOverflow: 3
   mMaterial: {fileID: 0}
   mApplyGradient: 1
   mGradientTop: {r: .380596995, g: .280651063, b: .187458217, a: 1}
@@ -1483,6 +1489,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -1542,6 +1549,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -1601,6 +1609,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -1848,6 +1857,7 @@ MonoBehaviour:
   mText: Scroll View
   mFontSize: 20
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 1
@@ -2175,6 +2185,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -2628,6 +2639,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -2878,6 +2890,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -3038,6 +3051,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -3198,6 +3212,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -3352,6 +3367,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -3586,6 +3602,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -3672,6 +3689,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -3826,6 +3844,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -3986,6 +4005,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -4140,6 +4160,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -4294,6 +4315,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -4454,6 +4476,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -4540,6 +4563,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -4626,6 +4650,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -4786,6 +4811,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -4872,6 +4898,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -4958,6 +4985,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -5044,6 +5072,7 @@ MonoBehaviour:
   mText: Click Me
   mFontSize: 20
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 2
@@ -5130,6 +5159,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -5352,6 +5382,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -5513,6 +5544,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -5821,6 +5853,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -5981,6 +6014,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -6129,6 +6163,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -6289,6 +6324,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -6375,6 +6411,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -6461,6 +6498,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -6547,6 +6585,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -6633,6 +6672,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -6855,6 +6895,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -7015,6 +7056,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -7175,6 +7217,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -7261,6 +7304,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -7495,6 +7539,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -7581,6 +7626,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -7735,6 +7781,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -7776,7 +7823,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1368274916}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 707.003662, y: 360, z: 0}
+  m_LocalPosition: {x: 649.81958, y: 360, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 191}
@@ -8059,7 +8106,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1469404478}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 635.003662, y: -323, z: 0}
+  m_LocalPosition: {x: 577.81958, y: -323, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 749131100}
@@ -8487,6 +8534,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -8721,6 +8769,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -8955,6 +9004,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -9041,6 +9091,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -9559,6 +9610,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -9645,6 +9697,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -9805,6 +9858,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -9891,6 +9945,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -9991,6 +10046,7 @@ MonoBehaviour:
   mText: Center on Items
   mFontSize: 20
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 1
@@ -10151,6 +10207,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -10237,6 +10294,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -10391,6 +10449,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -10477,6 +10536,7 @@ MonoBehaviour:
   mText: 12,345 Gold
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -10637,6 +10697,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -10827,6 +10888,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -10974,7 +11036,7 @@ MonoBehaviour:
     absolute: 0
   mColor: {r: 0, g: 0, b: 0, a: .101960786}
   mPivot: 4
-  mWidth: 1434
+  mWidth: 1320
   mHeight: 740
   mDepth: -1
   autoResizeBoxCollider: 0
@@ -11165,6 +11227,7 @@ MonoBehaviour:
   mText: New!
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -11677,6 +11740,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -11763,6 +11827,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -11849,6 +11914,7 @@ MonoBehaviour:
   mText: Some Item
   mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0

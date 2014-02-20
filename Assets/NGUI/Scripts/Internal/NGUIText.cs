@@ -824,15 +824,6 @@ static public class NGUIText
 				continue;
 			}
 
-			// If this marks the end of a word, add it to the final string.
-			if (ch == ' ' && prev != ' ' && start < offset)
-			{
-				sb.Append(text.Substring(start, offset - start + 1));
-				lineIsEmpty = false;
-				start = offset + 1;
-				prev = ch;
-			}
-
 			// When encoded symbols such as [RrGgBb] or [-] are encountered, skip past them
 			if (encoding && ParseSymbol(text, ref offset)) { --offset; continue; }
 
@@ -853,6 +844,20 @@ static public class NGUIText
 
 			// Reduce the width
 			remainingWidth -= glyphWidth;
+
+			// If this marks the end of a word, add it to the final string.
+			if (ch == ' ' && prev != ' ' && start < offset)
+			{
+				int end = offset - start + 1;
+
+				// Last word on the last line should not include an invisible character
+				if (lineCount == maxLineCount && remainingWidth <= 0f && offset < textLength && text[offset] <= ' ') --end;
+
+				sb.Append(text.Substring(start, end));
+				lineIsEmpty = false;
+				start = offset + 1;
+				prev = ch;
+			}
 
 			// Doesn't fit?
 			if (remainingWidth < 0f)
