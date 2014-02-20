@@ -369,7 +369,6 @@ public class Localization : MonoBehaviour
 		mOldDictionary = dictionary;
 		localizationHasBeenSet = false;
 		mLanguageIndex = -1;
-		dictionary.Clear();
 		knownLanguages = new string[] { languageName };
 		UIRoot.Broadcast("OnLocalize");
 	}
