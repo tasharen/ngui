@@ -135,7 +135,7 @@ public class UITable : UIWidgetContainer
 		for (int i = 0, imax = children.Count; i < imax; ++i)
 		{
 			Transform t = children[i];
-			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(t);
+			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(t, !hideInactive);
 
 			Vector3 scale = t.localScale;
 			b.min = Vector3.Scale(b.min, scale);
