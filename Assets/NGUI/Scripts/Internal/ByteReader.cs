@@ -178,6 +178,7 @@ public class ByteReader
 		{
 			string line = ReadLine();
 			if (line == null) return null;
+			line = line.Replace("\\n", "\n");
 
 			int wordStart = 0;
 			bool insideQuotes = false;

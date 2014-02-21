@@ -404,6 +404,9 @@ public class UIDrawCall : MonoBehaviour
 				if (!trim && panel.renderQueue != UIPanel.RenderQueue.Automatic)
 					trim = (mMesh == null || mMesh.vertexCount != verts.buffer.Length);
 
+				// If the number of vertices in the buffer is less than half of the full buffer, trim it
+				if (!trim && (verts.size << 1) < verts.buffer.Length) trim = true;
+
 				mTriangles = (verts.size >> 1);
 
 				if (trim || verts.buffer.Length > 65000)

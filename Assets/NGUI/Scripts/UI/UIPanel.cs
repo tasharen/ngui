@@ -569,6 +569,16 @@ public class UIPanel : UIRect
 	}
 
 	/// <summary>
+	/// Invalidating the panel should reset its alpha.
+	/// </summary>
+
+	public override void Invalidate (bool includeChildren)
+	{
+		mAlphaFrameID = -1;
+		base.Invalidate(includeChildren);
+	}
+
+	/// <summary>
 	/// Widget's final alpha, after taking the panel's alpha into account.
 	/// </summary>
 
