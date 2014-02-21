@@ -452,7 +452,7 @@ public class UISprite : UIWidget
 			mFillCenter = true;
 			centerType = AdvancedType.Invisible;
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 		base.OnInit();

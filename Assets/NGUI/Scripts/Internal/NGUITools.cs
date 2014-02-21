@@ -303,7 +303,7 @@ static public class NGUITools
 				box.size = new Vector3(b.size.x, b.size.y, 0f);
 			}
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(box);
+			NGUITools.SetDirty(box);
 #endif
 		}
 	}
@@ -345,7 +345,24 @@ static public class NGUITools
  #else
 		UnityEditor.Undo.RecordObject(obj, name);
  #endif
-		UnityEditor.EditorUtility.SetDirty(obj);
+		NGUITools.SetDirty(obj);
+#endif
+	}
+
+	/// <summary>
+	/// Convenience function that marks the specified object as dirty in the Unity Editor.
+	/// </summary>
+
+	static public void SetDirty (UnityEngine.Object obj)
+	{
+#if UNITY_EDITOR
+		if (obj)
+		{
+			//if (obj is Component) Debug.Log(NGUITools.GetHierarchy((obj as Component).gameObject), obj);
+			//else if (obj is GameObject) Debug.Log(NGUITools.GetHierarchy(obj as GameObject), obj);
+			//else Debug.Log("Hmm... " + obj.GetType(), obj);
+			UnityEditor.EditorUtility.SetDirty(obj);
+		}
 #endif
 	}
 

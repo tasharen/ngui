@@ -368,7 +368,7 @@ public class UIPopupList : UIWidgetContainer
 			EventDelegate.Add(onChange, textLabel.SetCurrentSelection);
 			textLabel = null;
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 

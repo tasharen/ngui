@@ -26,7 +26,7 @@ public class UIScrollBarEditor : UIProgressBarEditor
 			sb.value = val;
 			sb.barSize = size;
 			sb.alpha = alpha;
-			UnityEditor.EditorUtility.SetDirty(sb);
+			NGUITools.SetDirty(sb);
 
 			for (int i = 0; i < UIScrollView.list.size; ++i)
 			{

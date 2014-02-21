@@ -448,7 +448,7 @@ public class UIRectEditor : Editor
 				UpdateVerticalAnchor(rect, rect.bottomAnchor, resetRelative);
 				UpdateVerticalAnchor(rect, rect.topAnchor, resetRelative);
 				
-				UnityEditor.EditorUtility.SetDirty(rect);
+				NGUITools.SetDirty(rect);
 			}
 		}
 		serializedObject.Update();
@@ -475,7 +475,7 @@ public class UIRectEditor : Editor
 				if (index == 2) UpdateVerticalAnchor(rect, rect.bottomAnchor, resetRelative);
 				if (index == 3) UpdateVerticalAnchor(rect, rect.topAnchor, resetRelative);
 
-				UnityEditor.EditorUtility.SetDirty(rect);
+				NGUITools.SetDirty(rect);
 			}
 		}
 		serializedObject.Update();

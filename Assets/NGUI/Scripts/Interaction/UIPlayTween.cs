@@ -92,7 +92,7 @@ public class UIPlayTween : MonoBehaviour
 			eventReceiver = null;
 			callWhenFinished = null;
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 	}
@@ -105,7 +105,7 @@ public class UIPlayTween : MonoBehaviour
 		{
 			tweenTarget = gameObject;
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 	}

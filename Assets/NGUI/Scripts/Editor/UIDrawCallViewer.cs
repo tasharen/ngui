@@ -178,7 +178,7 @@ public class UIDrawCallViewer : EditorWindow
 				if (dc.isActive != draw)
 				{
 					dc.isActive = draw;
-					UnityEditor.EditorUtility.SetDirty(dc.manager);
+					NGUITools.SetDirty(dc.manager);
 				}
 
 				GUILayout.BeginHorizontal();

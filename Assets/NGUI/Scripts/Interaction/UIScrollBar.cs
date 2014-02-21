@@ -61,7 +61,7 @@ public class UIScrollBar : UISlider
 					ForceUpdate();
 #if UNITY_EDITOR
 					if (!Application.isPlaying)
-						UnityEditor.EditorUtility.SetDirty(this);
+						NGUITools.SetDirty(this);
 #endif
 				}
 			}
@@ -88,7 +88,7 @@ public class UIScrollBar : UISlider
 			}
 			mDir = Direction.Upgraded;
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 	}

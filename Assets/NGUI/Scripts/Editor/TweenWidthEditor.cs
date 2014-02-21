@@ -30,7 +30,7 @@ public class TweenWidthEditor : UITweenerEditor
 			tw.from = from;
 			tw.to = to;
 			tw.updateTable = table;
-			UnityEditor.EditorUtility.SetDirty(tw);
+			NGUITools.SetDirty(tw);
 		}
 
 		DrawCommonProperties();

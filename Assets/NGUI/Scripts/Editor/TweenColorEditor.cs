@@ -25,7 +25,7 @@ public class TweenColorEditor : UITweenerEditor
 			NGUIEditorTools.RegisterUndo("Tween Change", tw);
 			tw.from = from;
 			tw.to = to;
-			UnityEditor.EditorUtility.SetDirty(tw);
+			NGUITools.SetDirty(tw);
 		}
 
 		DrawCommonProperties();

@@ -57,7 +57,7 @@ public class UIToggleInspector : UIWidgetContainerEditor
 				{
 					NGUIEditorTools.RegisterUndo("Toggle Change", toggle);
 					toggle.instantTween = (tr == Transition.Instant);
-					UnityEditor.EditorUtility.SetDirty(toggle);
+					NGUITools.SetDirty(toggle);
 				}
 			}
 			NGUIEditorTools.EndContents();

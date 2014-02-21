@@ -64,7 +64,7 @@ public class UIProgressBarEditor : UIWidgetContainerEditor
 			NGUIEditorTools.RegisterUndo("Progress Bar Change", sb);
 			sb.value = val;
 			sb.alpha = alpha;
-			UnityEditor.EditorUtility.SetDirty(sb);
+			NGUITools.SetDirty(sb);
 
 			for (int i = 0; i < UIScrollView.list.size; ++i)
 			{

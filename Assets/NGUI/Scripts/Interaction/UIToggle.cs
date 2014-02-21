@@ -125,7 +125,7 @@ public class UIToggle : UIWidgetContainer
 			startsChecked = false;
 			startsActive = true;
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 

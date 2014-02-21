@@ -27,7 +27,7 @@ public class UIButtonColorEditor : UIWidgetContainerEditor
 		{
 			NGUIEditorTools.RegisterUndo("Button Change", button);
 			button.tweenTarget = tt;
-			UnityEditor.EditorUtility.SetDirty(button);
+			NGUITools.SetDirty(button);
 		}
 
 		if (tt != null)
@@ -43,7 +43,7 @@ public class UIButtonColorEditor : UIWidgetContainerEditor
 				{
 					NGUIEditorTools.RegisterUndo("Button Change", w);
 					w.color = c;
-					UnityEditor.EditorUtility.SetDirty(w);
+					NGUITools.SetDirty(w);
 				}
 			}
 		}
@@ -65,7 +65,7 @@ public class UIButtonColorEditor : UIWidgetContainerEditor
 			button.hover = hover;
 			button.pressed = pressed;
 			button.duration = duration;
-			UnityEditor.EditorUtility.SetDirty(button);
+			NGUITools.SetDirty(button);
 		}
 
 		if (GUILayout.Button("Upgrade to a Button"))

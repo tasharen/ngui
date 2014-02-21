@@ -53,7 +53,7 @@ public class UIPlayTweenEditor : Editor
 			tw.resetOnPlay = (reset == ResetOnPlay.Restart);
 			tw.resetIfDisabled = (reset == ResetOnPlay.RestartIfNotPlaying);
 			tw.disableWhenFinished = dis;
-			UnityEditor.EditorUtility.SetDirty(tw);
+			NGUITools.SetDirty(tw);
 		}
 
 		NGUIEditorTools.SetLabelWidth(80f);

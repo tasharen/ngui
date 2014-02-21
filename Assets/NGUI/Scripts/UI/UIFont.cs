@@ -511,7 +511,7 @@ public class UIFont : MonoBehaviour
 	public void MarkAsChanged ()
 	{
 #if UNITY_EDITOR
-		UnityEditor.EditorUtility.SetDirty(gameObject);
+		NGUITools.SetDirty(gameObject);
 #endif
 		if (mReplacement != null) mReplacement.MarkAsChanged();
 

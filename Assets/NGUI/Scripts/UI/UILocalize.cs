@@ -41,7 +41,7 @@ public class UILocalize : MonoBehaviour
 					if (input != null && input.label == lbl) input.defaultText = value;
 					else lbl.text = value;
 #if UNITY_EDITOR
-					if (!Application.isPlaying) UnityEditor.EditorUtility.SetDirty(lbl);
+					if (!Application.isPlaying) NGUITools.SetDirty(lbl);
 #endif
 				}
 				else if (sp != null)
@@ -49,7 +49,7 @@ public class UILocalize : MonoBehaviour
 					sp.spriteName = value;
 					sp.MakePixelPerfect();
 #if UNITY_EDITOR
-					if (!Application.isPlaying) UnityEditor.EditorUtility.SetDirty(sp);
+					if (!Application.isPlaying) NGUITools.SetDirty(sp);
 #endif
 				}
 			}

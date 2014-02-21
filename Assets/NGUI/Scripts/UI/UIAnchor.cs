@@ -95,7 +95,7 @@ public class UIAnchor : MonoBehaviour
 			container = widgetContainer.gameObject;
 			widgetContainer = null;
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 

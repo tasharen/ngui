@@ -32,7 +32,7 @@ public class UIButtonEditor : UIWidgetContainerEditor
 			{
 				NGUIEditorTools.RegisterUndo("Button Change", button);
 				button.tweenTarget = tt;
-				UnityEditor.EditorUtility.SetDirty(button);
+				NGUITools.SetDirty(button);
 			}
 
 			if (tt != null)
@@ -48,7 +48,7 @@ public class UIButtonEditor : UIWidgetContainerEditor
 					{
 						NGUIEditorTools.RegisterUndo("Button Change", w);
 						w.color = c;
-						UnityEditor.EditorUtility.SetDirty(w);
+						NGUITools.SetDirty(w);
 					}
 				}
 			}

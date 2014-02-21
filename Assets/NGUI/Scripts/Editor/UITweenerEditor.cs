@@ -59,7 +59,7 @@ public class UITweenerEditor : Editor
 				tw.tweenGroup = tg;
 				tw.duration = dur;
 				tw.delay = del;
-				UnityEditor.EditorUtility.SetDirty(tw);
+				NGUITools.SetDirty(tw);
 			}
 			NGUIEditorTools.EndContents();
 		}

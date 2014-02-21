@@ -217,7 +217,7 @@ public class UIPanel : UIRect
 			{
 				mDepth = value;
 #if UNITY_EDITOR
-				UnityEditor.EditorUtility.SetDirty(this);
+				NGUITools.SetDirty(this);
 #endif
 				list.Sort(CompareFunc);
 			}

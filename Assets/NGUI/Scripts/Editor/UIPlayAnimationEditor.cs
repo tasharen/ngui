@@ -82,7 +82,7 @@ public class UIPlayAnimationEditor : Editor
 			pa.ifDisabledOnPlay = enab;
 			pa.resetOnPlay = reset;
 			pa.disableWhenFinished = dis;
-			UnityEditor.EditorUtility.SetDirty(pa);
+			NGUITools.SetDirty(pa);
 		}
 
 		NGUIEditorTools.SetLabelWidth(80f);

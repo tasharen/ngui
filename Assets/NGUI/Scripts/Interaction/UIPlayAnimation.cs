@@ -101,7 +101,7 @@ public class UIPlayAnimation : MonoBehaviour
 			eventReceiver = null;
 			callWhenFinished = null;
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 	}
@@ -120,7 +120,7 @@ public class UIPlayAnimation : MonoBehaviour
 		{
 			animator = GetComponentInChildren<Animator>();
 #if UNITY_EDITOR
-			if (animator != null) UnityEditor.EditorUtility.SetDirty(this);
+			if (animator != null) NGUITools.SetDirty(this);
 #endif
 		}
 
@@ -138,7 +138,7 @@ public class UIPlayAnimation : MonoBehaviour
 		{
 			target = GetComponentInChildren<Animation>();
 #if UNITY_EDITOR
-			if (target != null) UnityEditor.EditorUtility.SetDirty(this);
+			if (target != null) NGUITools.SetDirty(this);
 #endif
 		}
 

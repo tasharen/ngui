@@ -34,7 +34,7 @@ public class UIToggledObjects : MonoBehaviour
 			else target = null;
 
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 

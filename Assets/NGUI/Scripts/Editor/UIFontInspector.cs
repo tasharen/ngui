@@ -51,7 +51,7 @@ public class UIFontInspector : Editor
 
 		mFont.replacement = obj as UIFont;
 		mReplacement = mFont.replacement;
-		UnityEditor.EditorUtility.SetDirty(mFont);
+		NGUITools.SetDirty(mFont);
 		if (mReplacement == null) mType = FontType.Bitmap;
 	}
 
@@ -134,7 +134,7 @@ public class UIFontInspector : Editor
 			{
 				NGUIEditorTools.RegisterUndo("Font Change", mFont);
 				mFont.replacement = mReplacement;
-				UnityEditor.EditorUtility.SetDirty(mFont);
+				NGUITools.SetDirty(mFont);
 			}
 			return;
 		}

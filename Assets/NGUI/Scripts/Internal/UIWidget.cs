@@ -384,7 +384,7 @@ public class UIWidget : UIRect
 					}
 				}
 #if UNITY_EDITOR
-				UnityEditor.EditorUtility.SetDirty(this);
+				NGUITools.SetDirty(this);
 #endif
 			}
 		}
@@ -714,7 +714,7 @@ public class UIWidget : UIRect
 			if (bottomAnchor.target) bottomAnchor.SetVertical(t, y);
 			if (topAnchor.target) topAnchor.SetVertical(t, y + height);
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 	}
@@ -837,10 +837,10 @@ public class UIWidget : UIRect
 
 	protected override void OnValidate()
 	{
-		base.OnValidate();
-
 		if (NGUITools.GetActive(this))
 		{
+			base.OnValidate();
+
 			// Prior to NGUI 2.7.0 width and height was specified as transform's local scale
 			if ((mWidth == 100 || mWidth == minWidth) &&
 				(mHeight == 100 || mHeight == minHeight) && cachedTransform.localScale.magnitude > 8f)
@@ -893,20 +893,22 @@ public class UIWidget : UIRect
 
 	public virtual void MarkAsChanged ()
 	{
-		if (this == null) return;
-		mChanged = true;
-#if UNITY_EDITOR
-		UnityEditor.EditorUtility.SetDirty(this);
-#endif
-		// If we're in the editor, update the panel right away so its geometry gets updated.
-		if (panel != null && enabled && NGUITools.GetActive(gameObject) && !mPlayMode)
+		if (NGUITools.GetActive(this))
 		{
-			SetDirty();
-			CheckLayer();
+			mChanged = true;
 #if UNITY_EDITOR
-			// Mark the panel as dirty so it gets updated
-			if (material != null) UnityEditor.EditorUtility.SetDirty(panel.gameObject);
+			NGUITools.SetDirty(this);
 #endif
+			// If we're in the editor, update the panel right away so its geometry gets updated.
+			if (panel != null && enabled && NGUITools.GetActive(gameObject) && !mPlayMode)
+			{
+				SetDirty();
+				CheckLayer();
+#if UNITY_EDITOR
+				// Mark the panel as dirty so it gets updated
+				if (material != null) NGUITools.SetDirty(panel.gameObject);
+#endif
+			}
 		}
 	}
 
@@ -991,7 +993,7 @@ public class UIWidget : UIRect
 			UpgradeFrom265();
 			cachedTransform.localScale = Vector3.one;
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 		Update();
@@ -1171,11 +1173,13 @@ public class UIWidget : UIRect
 #endif
 	}
 
+#if !UNITY_EDITOR
 	/// <summary>
 	/// Mark the UI as changed when returning from paused state.
 	/// </summary>
 
 	void OnApplicationPause (bool paused) { if (!paused) MarkAsChanged(); }
+#endif
 
 	/// <summary>
 	/// Clear references.

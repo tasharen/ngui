@@ -678,7 +678,7 @@ static public class NGUIMath
 		}
 
 #if UNITY_EDITOR
-		UnityEditor.EditorUtility.SetDirty(rect);
+		NGUITools.SetDirty(rect);
 #endif
 
 		// If all sides were anchored, we're done
@@ -918,7 +918,7 @@ static public class NGUIMath
 		}
 
 #if UNITY_EDITOR
-		UnityEditor.EditorUtility.SetDirty(w);
+		NGUITools.SetDirty(w);
 #endif
 	}
 }

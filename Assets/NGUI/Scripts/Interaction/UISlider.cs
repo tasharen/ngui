@@ -58,7 +58,7 @@ public class UISlider : UIProgressBar
 			}
 			direction = Direction.Upgraded;
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 	}

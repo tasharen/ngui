@@ -138,7 +138,7 @@ public class UIProgressBar : UIWidgetContainer
 					ForceUpdate();
 #if UNITY_EDITOR
 					if (!Application.isPlaying)
-						UnityEditor.EditorUtility.SetDirty(this);
+						NGUITools.SetDirty(this);
 #endif
 				}
 			}

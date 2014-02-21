@@ -299,7 +299,7 @@ public class UIScrollView : MonoBehaviour
 			}
 			scale = Vector3.zero;
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 
@@ -309,7 +309,7 @@ public class UIScrollView : MonoBehaviour
 			contentPivot = NGUIMath.GetPivot(new Vector2(relativePositionOnReset.x, 1f - relativePositionOnReset.y));
 			relativePositionOnReset = Vector2.zero;
 #if UNITY_EDITOR
-			UnityEditor.EditorUtility.SetDirty(this);
+			NGUITools.SetDirty(this);
 #endif
 		}
 	}
