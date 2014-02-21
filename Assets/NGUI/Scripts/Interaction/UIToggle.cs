@@ -120,16 +120,19 @@ public class UIToggle : UIWidgetContainer
 
 	void Start ()
 	{
+		if (startsChecked)
+		{
+			startsChecked = false;
+			startsActive = true;
+#if UNITY_EDITOR
+			UnityEditor.EditorUtility.SetDirty(this);
+#endif
+		}
+
 #if UNITY_EDITOR
 		// Auto-upgrade
 		if (!Application.isPlaying)
 		{
-			if (startsChecked)
-			{
-				startsChecked = false;
-				startsActive = true;
-			}
-
 			if (checkSprite != null && activeSprite == null)
 			{
 				activeSprite = checkSprite;
