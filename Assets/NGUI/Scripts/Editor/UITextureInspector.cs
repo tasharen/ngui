@@ -51,7 +51,7 @@ public class UITextureInspector : UIWidgetInspector
 			}
 		}
 		EditorGUI.EndDisabledGroup();
-		return (sp.objectReferenceValue != null);
+		return true;
 	}
 
 	/// <summary>
