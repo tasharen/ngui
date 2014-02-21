@@ -410,7 +410,7 @@ static public class NGUIText
 
 		if (text[index + 1] == 'u' && text[index + 2] == 'r' && text[index + 3] == 'l' && text[index + 4] == '=')
 		{
-			int closingBracket = text.IndexOf(']');
+			int closingBracket = text.IndexOf(']', index + 4);
 			
 			if (closingBracket != -1)
 			{
