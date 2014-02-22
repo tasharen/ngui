@@ -15,63 +15,69 @@ public class UIButtonColorEditor : UIWidgetContainerEditor
 {
 	public override void OnInspectorGUI ()
 	{
-		NGUIEditorTools.SetLabelWidth(80f);
-		UIButtonColor button = target as UIButtonColor;
-
 		GUILayout.Space(6f);
+		NGUIEditorTools.SetLabelWidth(80f);
 
-		GUI.changed = false;
-		GameObject tt = (GameObject)EditorGUILayout.ObjectField("Target", button.tweenTarget, typeof(GameObject), true);
+		serializedObject.Update();
+		NGUIEditorTools.DrawProperty("Target", serializedObject, "tweenTarget");
+		DrawProperties();
+		serializedObject.ApplyModifiedProperties();
 
-		if (GUI.changed)
+		if (target.GetType() == typeof(UIButtonColor))
 		{
-			NGUIEditorTools.RegisterUndo("Button Change", button);
-			button.tweenTarget = tt;
-			NGUITools.SetDirty(button);
-		}
+			GUILayout.Space(3f);
 
-		if (tt != null)
-		{
-			UIWidget w = tt.GetComponent<UIWidget>();
-
-			if (w != null)
+			if (GUILayout.Button("Upgrade to a Button"))
 			{
-				GUI.changed = false;
-				Color c = EditorGUILayout.ColorField("Normal", w.color);
-
-				if (GUI.changed)
-				{
-					NGUIEditorTools.RegisterUndo("Button Change", w);
-					w.color = c;
-					NGUITools.SetDirty(w);
-				}
+				NGUIEditorTools.ReplaceClass(serializedObject, typeof(UIButton));
+				Selection.activeGameObject = null;
 			}
 		}
+	}
 
-		GUI.changed = false;
-		Color hover = EditorGUILayout.ColorField("Hover", button.hover);
-		Color pressed = EditorGUILayout.ColorField("Pressed", button.pressed);
+	protected virtual void DrawProperties ()
+	{
+		DrawTransition();
+		DrawColors();
+	}
 
+	protected void DrawColors ()
+	{
+		if (NGUIEditorTools.DrawHeader("Colors"))
+		{
+			NGUIEditorTools.BeginContents();
+			UIButtonColor btn = target as UIButtonColor;
+
+			if (btn.tweenTarget != null)
+			{
+				UIWidget widget = btn.tweenTarget.GetComponent<UIWidget>();
+
+				if (widget != null)
+				{
+					EditorGUI.BeginDisabledGroup(serializedObject.isEditingMultipleObjects);
+					{
+						SerializedObject obj = new SerializedObject(widget);
+						obj.Update();
+						NGUIEditorTools.DrawProperty("Normal", obj, "mColor");
+						obj.ApplyModifiedProperties();
+					}
+					EditorGUI.EndDisabledGroup();
+				}
+			}
+
+			NGUIEditorTools.DrawProperty("Hover", serializedObject, "hover");
+			NGUIEditorTools.DrawProperty("Pressed", serializedObject, "pressed");
+			NGUIEditorTools.DrawProperty("Disabled", serializedObject, "disabledColor");
+			NGUIEditorTools.EndContents();
+		}
+	}
+
+	protected void DrawTransition ()
+	{
 		GUILayout.BeginHorizontal();
-		float duration = EditorGUILayout.FloatField("Duration", button.duration, GUILayout.Width(120f));
+		NGUIEditorTools.DrawProperty("Transition", serializedObject, "duration", GUILayout.Width(120f));
 		GUILayout.Label("seconds");
 		GUILayout.EndHorizontal();
-
 		GUILayout.Space(3f);
-
-		if (GUI.changed)
-		{
-			NGUIEditorTools.RegisterUndo("Button Change", button);
-			button.hover = hover;
-			button.pressed = pressed;
-			button.duration = duration;
-			NGUITools.SetDirty(button);
-		}
-
-		if (GUILayout.Button("Upgrade to a Button"))
-		{
-			NGUIEditorTools.ReplaceClass(serializedObject, typeof(UIButton));
-			Selection.activeGameObject = null;
-		}
 	}
 }
