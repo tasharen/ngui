@@ -281,7 +281,7 @@ public class UIAtlasInspector : Editor
 
 					if (GUILayout.Button("Add a Transparent Border")) AddTransparentBorder(sprite);
 					if (GUILayout.Button("Add a Clamped Border")) AddClampedBorder(sprite);
-					if (GUILayout.Button("Add a Tiling Border")) AddTilingBorder(sprite);
+					if (GUILayout.Button("Add a Tiled Border")) AddTiledBorder(sprite);
 					if (GUILayout.Button("Add a Shadow")) AddShadow(sprite);
 					if (GUILayout.Button("Add Visual Depth")) AddDepth(sprite);
 
@@ -470,7 +470,7 @@ public class UIAtlasInspector : Editor
 	/// Add a border around the sprite that copies the pixels from the opposite side, making it possible for the sprite to tile without seams.
 	/// </summary>
 
-	void AddTilingBorder (UISpriteData sprite)
+	void AddTiledBorder (UISpriteData sprite)
 	{
 		List<UIAtlasMaker.SpriteEntry> sprites = new List<UIAtlasMaker.SpriteEntry>();
 		UIAtlasMaker.ExtractSprites(mAtlas, sprites);
@@ -690,13 +690,6 @@ public class UIAtlasInspector : Editor
 						count += 4;
 					}
 
-					// Bottom-right
-					//if (x2 + 1 != w2 && y2 != 0)
-					//{
-					//    val += c2[x2 + 1 + (y2 - 1) * w2].a * div1;
-					//    ++count;
-					//}
-
 					// Top-right
 					if (x2 + 1 != w2 && y2 + 1 != h2)
 					{
@@ -712,6 +705,11 @@ public class UIAtlasInspector : Editor
 			}
 
 			if (se.temporaryTexture) DestroyImmediate(se.tex);
+
+			++se.borderLeft;
+			++se.borderRight;
+			++se.borderTop;
+			++se.borderBottom;
 
 			se.tex = new Texture2D(w2, h2);
 			se.tex.name = sprite.name;
@@ -841,6 +839,11 @@ public class UIAtlasInspector : Editor
 			}
 
 			if (se.temporaryTexture) DestroyImmediate(se.tex);
+
+			++se.borderLeft;
+			++se.borderRight;
+			++se.borderTop;
+			++se.borderBottom;
 
 			se.tex = new Texture2D(w2, h2);
 			se.tex.name = sprite.name;
