@@ -919,8 +919,10 @@ public class UICamera : MonoBehaviour
 	
 	void Start ()
 	{
-		cachedCamera.eventMask = 0;
-		cachedCamera.transparencySortMode = TransparencySortMode.Orthographic;
+		if (eventType != EventType.World && cachedCamera.transparencySortMode != TransparencySortMode.Orthographic)
+			cachedCamera.transparencySortMode = TransparencySortMode.Orthographic;
+
+		if (Application.isPlaying) cachedCamera.eventMask = 0;
 		if (handlesEvents) NGUIDebug.debugRaycast = debug;
 	}
 #else
@@ -928,7 +930,7 @@ public class UICamera : MonoBehaviour
 #endif
 
 #if UNITY_EDITOR
-	void OnValidate () { if (handlesEvents) NGUIDebug.debugRaycast = debug; }
+	void OnValidate () { Start(); }
 #endif
 
 	/// <summary>
@@ -1510,6 +1512,7 @@ public class UICamera : MonoBehaviour
 		if (!val) mTooltip = null;
 	}
 
+#if !UNITY_EDITOR
 	/// <summary>
 	/// Clear all active press states when the application gets paused.
 	/// </summary>
@@ -1568,4 +1571,5 @@ public class UICamera : MonoBehaviour
 			}
 		}
 	}
+#endif
 }
