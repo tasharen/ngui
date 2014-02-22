@@ -251,6 +251,25 @@ public class UIAtlasInspector : Editor
 
 					GUILayout.Space(3f);
 
+					GUILayout.BeginHorizontal();
+
+					if (GUILayout.Button("Duplicate"))
+					{
+						UIAtlasMaker.SpriteEntry se = UIAtlasMaker.ExtractSprite(mAtlas, sprite.name);
+						
+						if (se != null)
+						{
+							se.name = se.name + " (Copy)";
+
+							List<UIAtlasMaker.SpriteEntry> sprites = new List<UIAtlasMaker.SpriteEntry>();
+							UIAtlasMaker.ExtractSprites(mAtlas, sprites);
+							sprites.Add(se);
+							UIAtlasMaker.UpdateAtlas(mAtlas, sprites);
+							if (se.temporaryTexture) DestroyImmediate(se.tex);
+							NGUISettings.selectedSprite = se.name;
+						}
+					}
+
 					if (GUILayout.Button("Save As..."))
 					{
 						string path = EditorUtility.SaveFilePanelInProject("Save As", sprite.name + ".png", "png", "Extract sprite into which file?");
@@ -268,6 +287,7 @@ public class UIAtlasInspector : Editor
 							}
 						}
 					}
+					GUILayout.EndHorizontal();
 					NGUIEditorTools.EndContents();
 				}
 
