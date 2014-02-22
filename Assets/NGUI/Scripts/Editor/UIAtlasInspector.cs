@@ -26,6 +26,7 @@ public class UIAtlasInspector : Editor
 	UIAtlas mAtlas;
 	AtlasType mType = AtlasType.Normal;
 	UIAtlas mReplacement = null;
+	float mAlpha = 1f;
 
 	void OnEnable () { instance = this; }
 	void OnDisable () { instance = null; }
@@ -302,12 +303,18 @@ public class UIAtlasInspector : Editor
 					if (GUILayout.Button("Add a Transparent Border")) AddTransparentBorder(sprite);
 					if (GUILayout.Button("Add a Clamped Border")) AddClampedBorder(sprite);
 					if (GUILayout.Button("Add a Tiled Border")) AddTiledBorder(sprite);
-					if (GUILayout.Button("Add a Shadow")) AddShadow(sprite);
-					if (GUILayout.Button("Add Visual Depth")) AddDepth(sprite);
-
 					EditorGUI.BeginDisabledGroup(!sprite.hasBorder);
 					if (GUILayout.Button("Crop Border")) CropBorder(sprite);
 					EditorGUI.EndDisabledGroup();
+
+					//GUILayout.BeginHorizontal();
+					mAlpha = GUILayout.HorizontalSlider(mAlpha, 0f, 1f);
+					string cap = Mathf.RoundToInt(mAlpha * 100f) + "%";
+					//GUILayout.Label(cap, GUILayout.Width(40f));
+					//GUILayout.EndHorizontal();
+
+					if (GUILayout.Button("Add a Shadow (" + cap + ")")) AddShadow(sprite);
+					if (GUILayout.Button("Add Visual Depth (" + cap + ")")) AddDepth(sprite);
 
 					EditorGUILayout.EndVertical();
 					GUILayout.Space(20f);
@@ -720,6 +727,7 @@ public class UIAtlasInspector : Editor
 					val /= count;
 
 					Color shadow = new Color(0f, 0f, 0f, val);
+					shadow = Color.Lerp(original, shadow, mAlpha);
 					c2[index] = Color.Lerp(shadow, original, original.a);
 				}
 			}
@@ -854,6 +862,7 @@ public class UIAtlasInspector : Editor
 					val /= count;
 
 					Color shadow = new Color(0f, 0f, 0f, val);
+					shadow = Color.Lerp(original, shadow, mAlpha);
 					c2[index] = Color.Lerp(shadow, original, original.a);
 				}
 			}
