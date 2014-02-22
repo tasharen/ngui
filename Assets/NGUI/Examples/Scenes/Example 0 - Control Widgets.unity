@@ -249,9 +249,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 33011791}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &33011795
 MonoBehaviour:
@@ -742,9 +746,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 200495921}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &200495926
 MonoBehaviour:
@@ -940,9 +948,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 224770902}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &224770906
 MonoBehaviour:
@@ -1442,9 +1454,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1732442511}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &467632727
 MonoBehaviour:
@@ -1733,9 +1749,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 545365667}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &545365671
 MonoBehaviour:
@@ -1861,9 +1881,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 479283370}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &546881212
 MonoBehaviour:
@@ -2001,9 +2025,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1959010897}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &559417568
 MonoBehaviour:
@@ -2679,9 +2707,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 708477826}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &708477830
 MonoBehaviour:
@@ -2897,9 +2929,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 734224203}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &734224208
 MonoBehaviour:
@@ -3575,9 +3611,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 953664392}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &953664397
 MonoBehaviour:
@@ -3981,9 +4021,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1064965833}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .5, g: .5, b: .5, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &1064965837
 MonoBehaviour:
@@ -4206,9 +4250,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 610990659}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &1105368452
 MonoBehaviour:
@@ -4522,9 +4570,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1230549333}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &1230549338
 MonoBehaviour:
@@ -5103,9 +5155,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1387244857}
   hover: {r: .522388101, g: .475607067, b: .382045031, a: 1}
   pressed: {r: .402985096, g: .371794552, b: .303742498, a: 1}
-  duration: .200000003
   disabledColor: {r: .179104507, g: .179104507, b: .179104507, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &1387244862
 MonoBehaviour:
@@ -5342,9 +5398,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1455752529}
   hover: {r: .940298498, g: .853753626, b: .680663824, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &1455752534
 MonoBehaviour:
@@ -5869,9 +5929,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1731476981}
   hover: {r: .522388101, g: .474307597, b: .378146619, a: 1}
   pressed: {r: .305970132, g: .275525331, b: .214635774, a: 1}
-  duration: .200000003
   disabledColor: {r: .268656731, g: .268656731, b: .268656731, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &1731476986
 MonoBehaviour:
@@ -7145,7 +7209,6 @@ GameObject:
   - 114: {fileID: 1989360001}
   - 114: {fileID: 1989360000}
   - 65: {fileID: 1989359997}
-  - 114: {fileID: 1989359999}
   - 114: {fileID: 1989359998}
   m_Layer: 8
   m_Name: Control - Colored Button
@@ -7195,21 +7258,6 @@ MonoBehaviour:
   trigger: 0
   volume: 1
   pitch: 1
---- !u!114 &1989359999
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 11400008, guid: fee46b827274e694aa251e2d36700135,
-    type: 2}
-  m_PrefabInternal: {fileID: 2093839116}
-  m_GameObject: {fileID: 1989359995}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c041f61e4a9fbf4e830210f5d933ece, type: 1}
-  m_Name: 
-  tweenTarget: {fileID: 0}
-  hover: {x: 1.03999996, y: 1.03999996, z: 1.03999996}
-  pressed: {x: 1, y: 1, z: 1}
-  duration: .200000003
 --- !u!114 &1989360000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7224,9 +7272,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1989359995}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: Flat
+  pressedSprite: Button
+  disabledSprite: Flat
+  pixelSnap: 1
   onClick: []
 --- !u!114 &1989360001
 MonoBehaviour:
@@ -7334,9 +7386,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 2026935858}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .5, g: .5, b: .5, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &2026935862
 MonoBehaviour:
@@ -7515,9 +7571,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 2027872938}
   hover: {r: .940298498, g: .853753626, b: .680663824, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!1 &2035772794
 GameObject:
@@ -7680,9 +7740,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 2075224090}
   hover: {r: .522388101, g: .475607067, b: .382045031, a: 1}
   pressed: {r: .402985096, g: .371794552, b: .303742498, a: 1}
-  duration: .200000003
   disabledColor: {r: .179104507, g: .179104507, b: .179104507, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &2075224094
 MonoBehaviour:
@@ -7961,9 +8025,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 2102120835}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 1
   onClick: []
 --- !u!114 &2102120839
 MonoBehaviour:

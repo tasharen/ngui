@@ -314,10 +314,10 @@ MonoBehaviour:
     borderRight: 5
     borderTop: 5
     borderBottom: 5
-    paddingLeft: 1
-    paddingRight: 1
-    paddingTop: 1
-    paddingBottom: 1
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
   - name: Glow - Inner
     x: 458
     y: 272

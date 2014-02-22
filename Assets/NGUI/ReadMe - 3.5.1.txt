@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.5.0b
+            Version 3.5.1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -36,6 +36,13 @@ Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.c
 -----------------
  Version History
 -----------------
+
+3.5.1
+- NEW: CSV reader will now convert the "\n" character sequence into a new line char.
+- FIX: Scenes using NGUI should no longer get marked edited so much.
+- FIX: Reduced the size of meshes used by NGUI draw calls.
+- FIX: Changing the panel's alpha will now properly inform child panels.
+- FIX: Fix for how URL tags get parsed in labels.
 
 3.5.0
 - NEW: Localization system now supports CSV type input.
