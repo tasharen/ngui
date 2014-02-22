@@ -599,6 +599,21 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
+	/// Add the specified texture to the atlas, or update an existing one.
+	/// </summary>
+
+	static public void AddOrUpdate (UIAtlas atlas, SpriteEntry se)
+	{
+		if (atlas != null && se != null)
+		{
+			List<SpriteEntry> sprites = new List<SpriteEntry>();
+			sprites.Add(se);
+			ExtractSprites(atlas, sprites);
+			UpdateAtlas(atlas, sprites);
+		}
+	}
+
+	/// <summary>
 	/// Update the sprites within the texture atlas, preserving the sprites that have not been selected.
 	/// </summary>
 
