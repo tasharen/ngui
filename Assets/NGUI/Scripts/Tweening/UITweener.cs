@@ -239,6 +239,24 @@ public abstract class UITweener : MonoBehaviour
 	List<EventDelegate> mTemp = null;
 
 	/// <summary>
+	/// Convenience function -- set a new OnFinished event delegate (here for to be consistent with RemoveOnFinished).
+	/// </summary>
+
+	public void SetOnFinished (EventDelegate.Callback del) { EventDelegate.Set(onFinished, del); }
+
+	/// <summary>
+	/// Convenience function -- set a new OnFinished event delegate (here for to be consistent with RemoveOnFinished).
+	/// </summary>
+
+	public void SetOnFinished (EventDelegate del) { EventDelegate.Set(onFinished, del); }
+
+	/// <summary>
+	/// Convenience function -- add a new OnFinished event delegate (here for to be consistent with RemoveOnFinished).
+	/// </summary>
+
+	public void AddOnFinished (EventDelegate.Callback del) { EventDelegate.Add(onFinished, del); }
+
+	/// <summary>
 	/// Convenience function -- add a new OnFinished event delegate (here for to be consistent with RemoveOnFinished).
 	/// </summary>
 

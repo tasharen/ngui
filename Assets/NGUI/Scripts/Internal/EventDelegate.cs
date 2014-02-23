@@ -338,6 +338,19 @@ public class EventDelegate
 	}
 
 	/// <summary>
+	/// Assign a new event delegate.
+	/// </summary>
+
+	static public void Set (List<EventDelegate> list, EventDelegate del)
+	{
+		if (list != null)
+		{
+			list.Clear();
+			list.Add(del);
+		}
+	}
+
+	/// <summary>
 	/// Append a new event delegate to the list.
 	/// </summary>
 
