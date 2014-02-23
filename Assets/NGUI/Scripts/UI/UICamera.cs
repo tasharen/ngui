@@ -26,7 +26,6 @@ using System.Collections.Generic;
 /// * OnDragOut (draggedObject) is sent to a game object when another object is dragged out of its area.
 /// * OnDragEnd () is sent to a dragged object when the drag event finishes.
 /// 
-/// * OnInput (text) is sent when typing (after selecting a collider by clicking on it).
 /// * OnTooltip (show) is sent when the mouse hovers over a collider for some time without moving.
 /// * OnScroll (float delta) is sent out when the mouse scroll wheel is moved.
 /// * OnKey (KeyCode key) is sent when keyboard or controller input is used.
@@ -979,21 +978,8 @@ public class UICamera : MonoBehaviour
 			}
 		}
 
-		// Forward the input to the selected object
-		if (mCurrentSelection != null)
-		{
-			string input = Input.inputString;
-
-			// Adding support for some macs only having the "Delete" key instead of "Backspace"
-			if (useKeyboard && Input.GetKeyDown(KeyCode.Delete)) input += "\b";
-
-			if (input.Length > 0)
-			{
-				if (!stickyTooltip && mTooltip != null) ShowTooltip(false);
-				Notify(mCurrentSelection, "OnInput", input);
-			}
-		}
-		else inputHasFocus = false;
+		// If nothing is selected, input focus is lost
+		if (mCurrentSelection == null) inputHasFocus = false;
 
 		// Update the keyboard and joystick events
 		if (mCurrentSelection != null) ProcessOthers();
