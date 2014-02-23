@@ -1271,7 +1271,7 @@ public class UILabel : UIWidget
 	{
 		if (characterIndex != -1 && characterIndex < mText.Length)
 		{
-			int linkStart = mText.LastIndexOf(' ', characterIndex, characterIndex) + 1;
+			int linkStart = mText.LastIndexOf(' ', characterIndex) + 1;
 			int linkEnd = mText.IndexOf(' ', characterIndex);
 			if (linkEnd == -1) linkEnd = mText.Length;
 
