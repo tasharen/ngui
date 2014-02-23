@@ -673,14 +673,17 @@ public class UICamera : MonoBehaviour
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 			else if (cam.eventType == EventType.Unity2D)
 			{
-				Collider2D c2d = Physics2D.OverlapPoint(pos, mask);
-
-				if (c2d)
+				if (m2DPlane.Raycast(ray, out dist))
 				{
-					hit = lastHit;
-					hit.point = pos;
-					hoveredObject = c2d.gameObject;
-					return true;
+					Collider2D c2d = Physics2D.OverlapPoint(ray.GetPoint(dist), mask);
+
+					if (c2d)
+					{
+						hit = lastHit;
+						hit.point = pos;
+						hoveredObject = c2d.gameObject;
+						return true;
+					}
 				}
 				continue;
 			}
@@ -689,6 +692,8 @@ public class UICamera : MonoBehaviour
 		hit = mEmpty;
 		return false;
 	}
+
+	static Plane m2DPlane = new Plane(Vector3.back, 0f);
 
 	/// <summary>
 	/// Helper function to check if the specified hit is visible by the panel.
