@@ -325,7 +325,9 @@ public class UIFont : MonoBehaviour
 	{
 		get
 		{
-			return (mReplacement != null) ? mReplacement.defaultSize : (isDynamic ? mDynamicFontSize : mFont.charSize);
+			if (mReplacement != null) return mReplacement.defaultSize;
+			if (isDynamic) return mDynamicFontSize;
+			return Mathf.RoundToInt(mFont.charSize * pixelSize);
 		}
 		set
 		{

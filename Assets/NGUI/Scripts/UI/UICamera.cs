@@ -1521,6 +1521,7 @@ public class UICamera : MonoBehaviour
 					currentTouch = pair.Value;
 					currentTouchID = pair.Key;
 					currentScheme = ControlScheme.Touch;
+					currentTouch.clickNotification = ClickNotification.None;
 					ProcessTouch(false, true);
 					ids.Add(currentTouchID);
 					currentTouch = null;
@@ -1541,6 +1542,7 @@ public class UICamera : MonoBehaviour
 					currentTouchID = -1 - i;
 					currentKey = KeyCode.Mouse0 + i;
 					currentScheme = ControlScheme.Mouse;
+					currentTouch.clickNotification = ClickNotification.None;
 					ProcessTouch(false, true);
 					currentTouch = null;
 				}
@@ -1556,6 +1558,7 @@ public class UICamera : MonoBehaviour
 				currentScheme = ControlScheme.Controller;
 				currentTouch.last = currentTouch.current;
 				currentTouch.current = mCurrentSelection;
+				currentTouch.clickNotification = ClickNotification.None;
 				ProcessTouch(false, true);
 				currentTouch.last = null;
 				currentTouch = null;

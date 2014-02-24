@@ -128,9 +128,11 @@ public class UIProgressBar : UIWidgetContainer
 				float before = this.value;
 				mValue = val;
 
-				if (NGUITools.GetActive(this))
+				if (Mathf.Abs(before - this.value) > 0.001f)
 				{
-					if (before != this.value)
+					ForceUpdate();
+
+					if (NGUITools.GetActive(this))
 					{
 						if (EventDelegate.IsValid(onChange))
 						{
@@ -138,13 +140,12 @@ public class UIProgressBar : UIWidgetContainer
 							EventDelegate.Execute(onChange);
 							current = null;
 						}
-						ForceUpdate();
 					}
-#if UNITY_EDITOR
-					if (!Application.isPlaying)
-						NGUITools.SetDirty(this);
-#endif
 				}
+#if UNITY_EDITOR
+				if (!Application.isPlaying)
+					NGUITools.SetDirty(this);
+#endif
 			}
 		}
 	}
