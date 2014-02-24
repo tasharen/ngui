@@ -282,6 +282,12 @@ public class NGUISettings
 		set { SetEnum("NGUI Font Style", value); }
 	}
 
+	static public Font dynamicFont
+	{
+		get { return Get<Font>("NGUI Dynamic Font", null); }
+		set { Set("NGUI Dynamic Font", value); }
+	}
+
 	static public UILabel.Overflow overflowStyle
 	{
 		get { return GetEnum("NGUI Overflow", UILabel.Overflow.ShrinkContent); }
