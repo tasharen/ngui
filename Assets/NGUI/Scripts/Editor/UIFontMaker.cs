@@ -70,6 +70,8 @@ public class UIFontMaker : EditorWindow
 		UIFont bf = (fnt as UIFont);
 
 		NGUIEditorTools.SetLabelWidth(80f);
+		GUILayout.Space(3f);
+
 		NGUIEditorTools.DrawHeader("Input", true);
 		NGUIEditorTools.BeginContents();
 
@@ -97,7 +99,13 @@ public class UIFontMaker : EditorWindow
 			NGUIEditorTools.EndContents();
 
 			EditorGUI.BeginDisabledGroup(ttf == null);
+
+			GUILayout.BeginHorizontal();
+			GUILayout.Space(20f);
 			if (GUILayout.Button("Create")) create = 1;
+			GUILayout.Space(20f);
+			GUILayout.EndHorizontal();
+
 			EditorGUI.EndDisabledGroup();
 
 #if UNITY_3_5
