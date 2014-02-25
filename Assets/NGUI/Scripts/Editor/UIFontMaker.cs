@@ -114,7 +114,7 @@ public class UIFontMaker : EditorWindow
 			// Helpful info
 			if (ttf == null)
 			{
-				EditorGUILayout.HelpBox("Dynamic font creation happens right in Unity. Simply specify the TrueType font to be used as source.", MessageType.Info);
+				EditorGUILayout.HelpBox("You don't have to create a UIFont to use dynamic fonts. You can just reference the Unity Font directly on the label.", MessageType.Info);
 			}
 			EditorGUILayout.HelpBox("Please note that dynamic fonts can't be made a part of an atlas, and using dynamic fonts will result in at least one extra draw call.", MessageType.Warning);
 #endif

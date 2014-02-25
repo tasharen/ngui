@@ -40,6 +40,7 @@ public class UIFont : MonoBehaviour
 	// Cached value
 	UISpriteData mSprite = null;
 	int mPMA = -1;
+	int mPacked = -1;
 	bool mSpriteSet = false;
 
 	/// <summary>
@@ -186,11 +187,11 @@ public class UIFont : MonoBehaviour
 	/// Whether the font is using a premultiplied alpha material.
 	/// </summary>
 
-	public bool premultipliedAlpha
+	public bool premultipliedAlphaShader
 	{
 		get
 		{
-			if (mReplacement != null) return mReplacement.premultipliedAlpha;
+			if (mReplacement != null) return mReplacement.premultipliedAlphaShader;
 
 			if (mAtlas != null) return mAtlas.premultipliedAlpha;
 
@@ -200,6 +201,26 @@ public class UIFont : MonoBehaviour
 				mPMA = (mat != null && mat.shader != null && mat.shader.name.Contains("Premultiplied")) ? 1 : 0;
 			}
 			return (mPMA == 1);
+		}
+	}
+
+	/// <summary>
+	/// Whether the font is a packed font.
+	/// </summary>
+
+	public bool packedFontShader
+	{
+		get
+		{
+			if (mReplacement != null) return mReplacement.packedFontShader;
+			if (mAtlas != null) return false;
+
+			if (mPacked == -1)
+			{
+				Material mat = material;
+				mPacked = (mat != null && mat.shader != null && mat.shader.name.Contains("Packed")) ? 1 : 0;
+			}
+			return (mPacked == 1);
 		}
 	}
 

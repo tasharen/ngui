@@ -897,7 +897,7 @@ public class UILabel : UIWidget
 
 		if (mFont != null)
 		{
-			int min = Mathf.RoundToInt(mFont.defaultSize * mFont.pixelSize);
+			int min = mFont.defaultSize;
 			if (height < min) height = min;
 		}
 
@@ -1083,7 +1083,7 @@ public class UILabel : UIWidget
 #endif
 				{
 					mScale = (float)ps / mPrintedSize;
-					NGUIText.fontScale = isDynamic ? mScale : ((float)mFontSize / mFont.defaultSize) * mScale * bitmapFont.pixelSize;
+					NGUIText.fontScale = isDynamic ? mScale : ((float)mFontSize / mFont.defaultSize) * mScale;
 				}
 
 				NGUIText.Update(false);
@@ -1435,7 +1435,8 @@ public class UILabel : UIWidget
 		int offset = verts.size;
 		Color col = color;
 		col.a = finalAlpha;
-		if (mFont != null && mFont.premultipliedAlpha) col = NGUITools.ApplyPMA(col);
+		
+		if (mFont != null && mFont.premultipliedAlphaShader) col = NGUITools.ApplyPMA(col);
 
 		string text = processedText;
 		float pixelSize = (mFont != null) ? mFont.pixelSize : 1f;
@@ -1448,6 +1449,9 @@ public class UILabel : UIWidget
 
 		// Center the content within the label vertically
 		Vector2 pos = ApplyOffset(verts, start);
+
+		// Effects don't work with packed fonts
+		if (mFont != null && mFont.packedFontShader) return;
 
 		// Apply an effect if one was requested
 		if (effectStyle != Effect.None)
@@ -1520,7 +1524,7 @@ public class UILabel : UIWidget
 	{
 		Color c = mEffectColor;
 		c.a *= finalAlpha;
-		Color32 col = (bitmapFont != null && bitmapFont.premultipliedAlpha) ? NGUITools.ApplyPMA(c) : c;
+		Color32 col = (bitmapFont != null && bitmapFont.premultipliedAlphaShader) ? NGUITools.ApplyPMA(c) : c;
 
 		for (int i = start; i < end; ++i)
 		{
@@ -1620,7 +1624,7 @@ public class UILabel : UIWidget
 		NGUIText.fontStyle = mFontStyle;
 		NGUIText.rectWidth = lineWidth;
 		NGUIText.rectHeight = lineHeight;
-		NGUIText.gradient = mApplyGradient;
+		NGUIText.gradient = mApplyGradient && (mFont == null || !mFont.packedFontShader);
 		NGUIText.gradientTop = mGradientTop;
 		NGUIText.gradientBottom = mGradientBottom;
 		NGUIText.encoding = mEncoding;
@@ -1629,7 +1633,7 @@ public class UILabel : UIWidget
 		NGUIText.maxLines = mMaxLineCount;
 		NGUIText.spacingX = mSpacingX;
 		NGUIText.spacingY = mSpacingY;
-		NGUIText.fontScale = isDynamic ? mScale : ((float)mFontSize / mFont.defaultSize) * mScale * bitmapFont.pixelSize;
+		NGUIText.fontScale = isDynamic ? mScale : ((float)mFontSize / mFont.defaultSize) * mScale;
 
 		if (mFont != null)
 		{
