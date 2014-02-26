@@ -211,10 +211,10 @@ public class UIFontMaker : EditorWindow
 		{
 			//if (create == Create.Bitmap)
 			//{
-			//    // Create the bitmap font
-			//    BMFont bmf = FreeType.CreateFont(NGUISettings.dynamicFont, NGUISettings.fontSize, NGUISettings.fontStyle);
-			//    Debug.Log(bmf != null);
-			//    return;
+			//	// Create the bitmap font
+			//	BMFont bmf = FreeType.CreateFont(NGUISettings.dynamicFont, NGUISettings.fontSize, NGUISettings.fontStyle);
+			//	Debug.Log(bmf != null);
+			//	return;
 			//}
 
 			if (NGUISettings.atlas != null)
@@ -309,6 +309,8 @@ public class UIFontMaker : EditorWindow
 				font.spriteName = NGUISettings.fontTexture.name;
 				font.atlas = NGUISettings.atlas;
 			}
+
+			NGUISettings.fontSize = font.defaultSize;
 		}
 	}
 }

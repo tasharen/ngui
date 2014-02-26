@@ -323,7 +323,7 @@ public class UIFontInspector : Editor
 
 						GUILayout.BeginHorizontal();
 						GUILayout.Label(sym.sequence, GUILayout.Width(40f));
-						if (NGUIEditorTools.DrawSpriteField(mFont.atlas, sym.spriteName, ChangeSymbolSprite))
+						if (NGUIEditorTools.DrawSpriteField(mFont.atlas, sym.spriteName, ChangeSymbolSprite, GUILayout.MinWidth(100f)))
 							mSelectedSymbol = sym;
 
 						if (GUILayout.Button("Edit", GUILayout.Width(40f)))

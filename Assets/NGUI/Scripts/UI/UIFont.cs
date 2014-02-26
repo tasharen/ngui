@@ -41,7 +41,6 @@ public class UIFont : MonoBehaviour
 	UISpriteData mSprite = null;
 	int mPMA = -1;
 	int mPacked = -1;
-	bool mSpriteSet = false;
 
 	/// <summary>
 	/// Access to the BMFont class directly.
@@ -247,41 +246,7 @@ public class UIFont : MonoBehaviour
 		get
 		{
 			if (mReplacement != null) return mReplacement.uvRect;
-
-			if (mAtlas != null && (!mSpriteSet && sprite != null))
-			{
-				Texture tex = mAtlas.texture;
-
-				if (tex != null)
-				{
-					mUVRect = new Rect(
-						mSprite.x - mSprite.paddingLeft,
-						mSprite.y - mSprite.paddingTop,
-						mSprite.width + mSprite.paddingLeft + mSprite.paddingRight,
-						mSprite.height + mSprite.paddingTop + mSprite.paddingBottom);
-
-					mUVRect = NGUIMath.ConvertToTexCoords(mUVRect, tex.width, tex.height);
-#if UNITY_EDITOR
-					// The font should always use the original texture size
-					if (mFont != null)
-					{
-						float tw = (float)mFont.texWidth / tex.width;
-						float th = (float)mFont.texHeight / tex.height;
-
-						if (tw != mUVRect.width || th != mUVRect.height)
-						{
-							//Debug.LogWarning("Font sprite size doesn't match the expected font texture size.\n" +
-							//	"Did you use the 'inner padding' setting on the Texture Packer? It must remain at '0'.", this);
-							mUVRect.width = tw;
-							mUVRect.height = th;
-						}
-					}
-#endif
-					// Trimmed sprite? Trim the glyphs
-					if (mSprite.hasPadding) Trim();
-				}
-			}
-			return mUVRect;
+			return (mAtlas != null && sprite != null) ? mUVRect : new Rect(0f, 0f, 1f, 1f);
 		}
 		set
 		{
@@ -367,8 +332,6 @@ public class UIFont : MonoBehaviour
 		{
 			if (mReplacement != null) return mReplacement.sprite;
 
-			if (!mSpriteSet) mSprite = null;
-
 			if (mSprite == null)
 			{
 				if (mAtlas != null && !string.IsNullOrEmpty(mFont.spriteName))
@@ -376,10 +339,8 @@ public class UIFont : MonoBehaviour
 					mSprite = mAtlas.GetSprite(mFont.spriteName);
 
 					if (mSprite == null) mSprite = mAtlas.GetSprite(name);
-
-					mSpriteSet = true;
-
 					if (mSprite == null) mFont.spriteName = null;
+					else UpdateUVRect();
 				}
 
 				for (int i = 0, imax = mSymbols.Count; i < imax; ++i)
@@ -556,6 +517,45 @@ public class UIFont : MonoBehaviour
 		// Clear all symbols
 		for (int i = 0, imax = mSymbols.Count; i < imax; ++i)
 			symbols[i].MarkAsChanged();
+	}
+
+	/// <summary>
+	/// Forcefully update the font's sprite reference.
+	/// </summary>
+
+	public void UpdateUVRect ()
+	{
+		if (mAtlas == null) return;
+		Texture tex = mAtlas.texture;
+
+		if (tex != null)
+		{
+			mUVRect = new Rect(
+				mSprite.x - mSprite.paddingLeft,
+				mSprite.y - mSprite.paddingTop,
+				mSprite.width + mSprite.paddingLeft + mSprite.paddingRight,
+				mSprite.height + mSprite.paddingTop + mSprite.paddingBottom);
+
+			mUVRect = NGUIMath.ConvertToTexCoords(mUVRect, tex.width, tex.height);
+#if UNITY_EDITOR
+			// The font should always use the original texture size
+			if (mFont != null)
+			{
+				float tw = (float)mFont.texWidth / tex.width;
+				float th = (float)mFont.texHeight / tex.height;
+
+				if (tw != mUVRect.width || th != mUVRect.height)
+				{
+					//Debug.LogWarning("Font sprite size doesn't match the expected font texture size.\n" +
+					//	"Did you use the 'inner padding' setting on the Texture Packer? It must remain at '0'.", this);
+					mUVRect.width = tw;
+					mUVRect.height = th;
+				}
+			}
+#endif
+			// Trimmed sprite? Trim the glyphs
+			if (mSprite.hasPadding) Trim();
+		}
 	}
 
 	/// <summary>

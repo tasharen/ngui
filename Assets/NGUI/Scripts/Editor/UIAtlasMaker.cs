@@ -683,7 +683,17 @@ public class UIAtlasMaker : EditorWindow
 
 		NGUIEditorTools.DrawHeader("Input");
 		NGUIEditorTools.BeginContents();
-		ComponentSelector.Draw<UIAtlas>("Atlas", NGUISettings.atlas, OnSelectAtlas, true);
+
+		GUILayout.BeginHorizontal();
+		{
+			ComponentSelector.Draw<UIAtlas>("Atlas", NGUISettings.atlas, OnSelectAtlas, true, GUILayout.MinWidth(80f));
+
+			EditorGUI.BeginDisabledGroup(NGUISettings.atlas == null);
+			if (GUILayout.Button("New", GUILayout.Width(40f)))
+				NGUISettings.atlas = null;
+			EditorGUI.EndDisabledGroup();
+		}
+		GUILayout.EndHorizontal();
 
 		List<Texture> textures = GetSelectedTextures();
 
@@ -769,20 +779,20 @@ public class UIAtlasMaker : EditorWindow
 		{
 			GUILayout.BeginHorizontal();
 			NGUISettings.atlasPMA = EditorGUILayout.Toggle("PMA Shader", NGUISettings.atlasPMA, GUILayout.Width(100f));
-			GUILayout.Label("Pre-multiply color by alpha");
+			GUILayout.Label("Pre-multiplied alpha", GUILayout.MinWidth(70f));
 			GUILayout.EndHorizontal();
 		}
 
 		GUILayout.BeginHorizontal();
 		NGUISettings.unityPacking = EditorGUILayout.Toggle("Unity Packer", NGUISettings.unityPacking, GUILayout.Width(100f));
-		GUILayout.Label("or custom packer");
+		GUILayout.Label("or custom packer", GUILayout.MinWidth(70f));
 		GUILayout.EndHorizontal();
 
 		if (!NGUISettings.unityPacking)
 		{
 			GUILayout.BeginHorizontal();
 			NGUISettings.forceSquareAtlas = EditorGUILayout.Toggle("Force Square", NGUISettings.forceSquareAtlas, GUILayout.Width(100f));
-			GUILayout.Label("if on, forces a square atlas texture");
+			GUILayout.Label("if on, forces a square atlas texture", GUILayout.MinWidth(70f));
 			GUILayout.EndHorizontal();
 		}
 
