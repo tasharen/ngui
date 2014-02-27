@@ -353,6 +353,12 @@ public class NGUISettings
 		get { return GetString("NGUI Chars", ""); }
 		set { SetString("NGUI Chars", value); }
 	}
+
+	static public string pathToFreeType
+	{
+		get { return GetString("NGUI FreeType", Application.dataPath + "/NGUI/Editor/FreeType.dll"); }
+		set { SetString("NGUI FreeType", value); }
+	}
 #endregion
 
 	/// <summary>
