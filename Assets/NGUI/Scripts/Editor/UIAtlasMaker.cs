@@ -219,6 +219,7 @@ public class UIAtlasMaker : EditorWindow
 		foreach (Texture tex in textures)
 		{
 			Texture2D oldTex = NGUIEditorTools.ImportTexture(tex, true, false, true);
+			if (oldTex == null) oldTex = tex as Texture2D;
 			if (oldTex == null) continue;
 
 			// If we aren't doing trimming, just use the texture as-is

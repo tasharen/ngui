@@ -46,7 +46,18 @@ public class UIFont : MonoBehaviour
 	/// Access to the BMFont class directly.
 	/// </summary>
 
-	public BMFont bmFont { get { return (mReplacement != null) ? mReplacement.bmFont : mFont; } }
+	public BMFont bmFont
+	{
+		get
+		{
+			return (mReplacement != null) ? mReplacement.bmFont : mFont;
+		}
+		set
+		{
+			if (mReplacement != null) mReplacement.bmFont = value;
+			else mFont = value;
+		}
+	}
 
 	/// <summary>
 	/// Original width of the font's texture in pixels.

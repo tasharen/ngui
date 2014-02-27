@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 /// <summary>
 /// Font maker lets you create font prefabs with a single click of a button.
@@ -95,7 +96,7 @@ public class UIFontMaker : EditorWindow
 	void OnGUI ()
 	{
 		Object fnt = NGUISettings.ambigiousFont;
-		UIFont bf = (fnt as UIFont);
+		UIFont uiFont = (fnt as UIFont);
 
 		NGUIEditorTools.SetLabelWidth(80f);
 		GUILayout.Space(3f);
@@ -337,18 +338,40 @@ public class UIFontMaker : EditorWindow
 		string prefabPath = EditorUtility.SaveFilePanelInProject("Save As", "New Font.prefab", "prefab", "Save font as...");
 		if (string.IsNullOrEmpty(prefabPath)) return;
 
-		// Try to load the material
-		Material mat = null;
-				
-		if (create != Create.Dynamic)
+		// Load the font's prefab
+		GameObject go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
+		Object prefab = null;
+		string fontName;
+
+		// Font doesn't exist yet
+		if (go == null || go.GetComponent<UIFont>() == null)
 		{
-			if (create == Create.Bitmap)
-			{
-				// Create the bitmap font
-				BMFont bmf = FreeType.CreateFont(NGUISettings.dynamicFont, NGUISettings.fontSize, mFaceIndex, NGUISettings.charsToInclude);
-				Debug.Log(bmf != null);
-				return;
-			}
+			// Create a new prefab for the atlas
+			prefab = PrefabUtility.CreateEmptyPrefab(prefabPath);
+
+			fontName = prefabPath.Replace(".prefab", "");
+			fontName = fontName.Substring(prefabPath.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
+
+			// Create a new game object for the font
+			go = new GameObject(fontName);
+			uiFont = go.AddComponent<UIFont>();
+		}
+		else
+		{
+			uiFont = go.GetComponent<UIFont>();
+			fontName = go.name;
+		}
+
+		if (create == Create.Dynamic)
+		{
+			uiFont.atlas = null;
+			uiFont.dynamicFont = NGUISettings.dynamicFont;
+			uiFont.dynamicFontStyle = NGUISettings.fontStyle;
+			uiFont.defaultSize = NGUISettings.fontSize;
+		}
+		else if (create == Create.Import)
+		{
+			Material mat = null;
 
 			if (NGUISettings.atlas != null)
 			{
@@ -374,27 +397,94 @@ public class UIFontMaker : EditorWindow
 					// Load the material so it's usable
 					mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
 				}
+
 				mat.mainTexture = NGUISettings.fontTexture;
 			}
+
+			uiFont.dynamicFont = null;
+			BMFontReader.Load(uiFont.bmFont, NGUITools.GetHierarchy(uiFont.gameObject), NGUISettings.fontData.bytes);
+
+			if (NGUISettings.atlas == null)
+			{
+				uiFont.atlas = null;
+				uiFont.material = mat;
+			}
+			else
+			{
+				uiFont.spriteName = NGUISettings.fontTexture.name;
+				uiFont.atlas = NGUISettings.atlas;
+			}
+			NGUISettings.fontSize = uiFont.defaultSize;
+		}
+		else if (create == Create.Bitmap)
+		{
+			// Create the bitmap font
+			BMFont bmFont;
+			Texture2D tex;
+
+			if (FreeType.CreateFont(
+				NGUISettings.dynamicFont,
+				NGUISettings.fontSize, mFaceIndex,
+				NGUISettings.charsToInclude, out bmFont, out tex))
+			{
+				uiFont.bmFont = bmFont;
+				tex.name = fontName;
+
+				if (NGUISettings.atlas != null)
+				{
+					// Add this texture to the atlas and destroy it
+					UIAtlasMaker.AddOrUpdate(NGUISettings.atlas, tex);
+					NGUITools.DestroyImmediate(tex);
+					NGUISettings.fontTexture = null;
+					tex = null;
+
+					uiFont.atlas = NGUISettings.atlas;
+					uiFont.spriteName = fontName;
+				}
+				else
+				{
+					string texPath = prefabPath.Replace(".prefab", ".png");
+					string matPath = prefabPath.Replace(".prefab", ".mat");
+
+					byte[] png = tex.EncodeToPNG();
+					FileStream fs = File.OpenWrite(texPath);
+					fs.Write(png, 0, png.Length);
+					fs.Close();
+
+					// See if the material already exists
+					Material mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
+
+					// If the material doesn't exist, create it
+					if (mat == null)
+					{
+						Shader shader = Shader.Find("Unlit/Transparent Colored");
+						mat = new Material(shader);
+
+						// Save the material
+						AssetDatabase.CreateAsset(mat, matPath);
+						AssetDatabase.Refresh();
+
+						// Load the material so it's usable
+						mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
+					}
+					else AssetDatabase.Refresh();
+
+					// Re-load the texture
+					tex = AssetDatabase.LoadAssetAtPath(texPath, typeof(Texture2D)) as Texture2D;
+
+					// Assign the texture
+					mat.mainTexture = tex;
+					NGUISettings.fontTexture = tex;
+
+					uiFont.atlas = null;
+					uiFont.material = mat;
+				}
+			}
+			else return;
 		}
 
-		// Load the font's prefab
-		GameObject go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
-
-		// Font doesn't exist yet
-		if (go == null || go.GetComponent<UIFont>() == null)
+		if (prefab != null)
 		{
-			// Create a new prefab for the atlas
-			Object prefab = PrefabUtility.CreateEmptyPrefab(prefabPath);
-
-			string fontName = prefabPath.Replace(".prefab", "");
-			fontName = fontName.Substring(prefabPath.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
-
-			// Create a new game object for the font
-			go = new GameObject(fontName);
-			bf = go.AddComponent<UIFont>();
-			CreateFont(bf, create, mat);
-
 			// Update the prefab
 			PrefabUtility.ReplacePrefab(go, prefab);
 			DestroyImmediate(go);
@@ -402,17 +492,11 @@ public class UIFontMaker : EditorWindow
 
 			// Select the atlas
 			go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
-			bf = go.GetComponent<UIFont>();
-			NGUISettings.ambigiousFont = bf;
+			uiFont = go.GetComponent<UIFont>();
 		}
-		else
-		{
-			bf = go.GetComponent<UIFont>();
-			CreateFont(bf, create, mat);
-			NGUISettings.ambigiousFont = bf;
-		}
-		MarkAsChanged();
 
+		NGUISettings.ambigiousFont = uiFont;
+		MarkAsChanged();
 		Selection.activeGameObject = go;
 	}
 
@@ -433,34 +517,22 @@ public class UIFontMaker : EditorWindow
 	/// Create the specified font.
 	/// </summary>
 
-	static void CreateFont (UIFont font, Create create, Material mat)
+	static void ImportFont (UIFont font, Create create, Material mat)
 	{
-		if (create == Create.Dynamic)
+		// New bitmap font
+		font.dynamicFont = null;
+		BMFontReader.Load(font.bmFont, NGUITools.GetHierarchy(font.gameObject), NGUISettings.fontData.bytes);
+
+		if (NGUISettings.atlas == null)
 		{
-			// New dynamic font
 			font.atlas = null;
-			font.dynamicFont = NGUISettings.dynamicFont;
-			font.dynamicFontStyle = NGUISettings.fontStyle;
-			font.defaultSize = NGUISettings.fontSize;
+			font.material = mat;
 		}
-		else if (create == Create.Import)
+		else
 		{
-			// New bitmap font
-			font.dynamicFont = null;
-			BMFontReader.Load(font.bmFont, NGUITools.GetHierarchy(font.gameObject), NGUISettings.fontData.bytes);
-
-			if (NGUISettings.atlas == null)
-			{
-				font.atlas = null;
-				font.material = mat;
-			}
-			else
-			{
-				font.spriteName = NGUISettings.fontTexture.name;
-				font.atlas = NGUISettings.atlas;
-			}
-
-			NGUISettings.fontSize = font.defaultSize;
+			font.spriteName = NGUISettings.fontTexture.name;
+			font.atlas = NGUISettings.atlas;
 		}
+		NGUISettings.fontSize = font.defaultSize;
 	}
 }

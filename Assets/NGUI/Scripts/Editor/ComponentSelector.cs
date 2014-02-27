@@ -48,9 +48,13 @@ public class ComponentSelector : ScriptableWizard
 			if (Selection.activeObject != mb.gameObject && GUILayout.Button("Edit", GUILayout.Width(40f)))
 				Selection.activeObject = mb.gameObject;
 		}
+		else if (o != null && GUILayout.Button("X", GUILayout.Width(20f)))
+		{
+			o = null;
+		}
 		GUILayout.EndHorizontal();
 		if (show) Show<T>(cb);
-		else if (o != obj) cb(o);
+		else cb(o);
 	}
 
 	/// <summary>
