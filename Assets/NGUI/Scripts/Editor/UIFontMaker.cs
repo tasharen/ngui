@@ -6,6 +6,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
+using System.Text;
 
 /// <summary>
 /// Font maker lets you create font prefabs with a single click of a button.
@@ -15,7 +16,7 @@ public class UIFontMaker : EditorWindow
 {
 	enum FontType
 	{
-		//GeneratedBitmap,	// Bitmap font, created from a dynamic font using FreeType
+		GeneratedBitmap,	// Bitmap font, created from a dynamic font using FreeType
 		ImportedBitmap,		// Imported bitmap font, created using BMFont or another external tool
 		Dynamic,			// Dynamic font, used as-is
 	}
@@ -28,7 +29,26 @@ public class UIFontMaker : EditorWindow
 		Dynamic,	// Dynamic font, used as-is
 	}
 
-	FontType mType = FontType.ImportedBitmap;
+	enum CharacterMap
+	{
+		Numeric,	// 0 through 9
+		Ascii,		// Character IDs 32 through 127
+		Latin,		// Ascii + various accented character such as "é"
+		Custom,		// Only explicitly specified characters will be included
+	}
+
+	FontType mType = FontType.GeneratedBitmap;
+	int mFaceIndex = 0;
+
+	/// <summary>
+	/// Type of character map chosen for export.
+	/// </summary>
+
+	static CharacterMap characterMap
+	{
+		get { return (CharacterMap)NGUISettings.GetInt("NGUI Character Map", (int)CharacterMap.Ascii); }
+		set { NGUISettings.SetInt("NGUI Character Map", (int)value); }
+	}
 
 	/// <summary>
 	/// Update all labels associated with this font.
@@ -142,10 +162,117 @@ public class UIFontMaker : EditorWindow
 			GUILayout.EndHorizontal();
 
 			GUILayout.BeginHorizontal();
-			NGUISettings.fontSize = EditorGUILayout.IntField("Size", NGUISettings.fontSize, GUILayout.Width(120f));
-			NGUISettings.fontStyle = (FontStyle)EditorGUILayout.EnumPopup(NGUISettings.fontStyle);
-			GUILayout.Space(18f);
+			{
+				NGUISettings.fontSize = EditorGUILayout.IntField("Size", NGUISettings.fontSize, GUILayout.Width(120f));
+
+				if (mType == FontType.Dynamic)
+				{
+					NGUISettings.fontStyle = (FontStyle)EditorGUILayout.EnumPopup(NGUISettings.fontStyle);
+					GUILayout.Space(18f);
+				}
+			}
 			GUILayout.EndHorizontal();
+
+			// Choose the font style if there are multiple faces present
+			if (mType == FontType.GeneratedBitmap)
+			{
+				if (!FreeType.isPresent)
+				{
+					EditorGUILayout.HelpBox("Assets/Plugins/FreeType.dll is missing", MessageType.Error);
+				}
+				else if (ttf != null)
+				{
+					string[] faces = FreeType.GetFaces(ttf);
+					if (mFaceIndex >= faces.Length) mFaceIndex = 0;
+
+					if (faces.Length > 1)
+					{
+						GUILayout.Label("Style", EditorStyles.boldLabel);
+						for (int i = 0; i < faces.Length; ++i)
+						{
+							GUILayout.BeginHorizontal();
+							GUILayout.Space(10f);
+							if (DrawOption(i == mFaceIndex, " " + faces[i]))
+								mFaceIndex = i;
+							GUILayout.EndHorizontal();
+						}
+					}
+
+					GUILayout.Label("Characters", EditorStyles.boldLabel);
+
+					CharacterMap cm = characterMap;
+
+					GUILayout.BeginHorizontal(GUILayout.Width(100f));
+					GUILayout.BeginVertical();
+					GUI.changed = false;
+					if (DrawOption(cm == CharacterMap.Numeric, " Numeric")) cm = CharacterMap.Numeric;
+					if (DrawOption(cm == CharacterMap.Ascii, " ASCII")) cm = CharacterMap.Ascii;
+					if (DrawOption(cm == CharacterMap.Latin, " Latin")) cm = CharacterMap.Latin;
+					if (DrawOption(cm == CharacterMap.Custom, " Custom")) cm = CharacterMap.Custom;
+					if (GUI.changed) characterMap = cm;
+					GUILayout.EndVertical();
+
+					EditorGUI.BeginDisabledGroup(cm != CharacterMap.Custom);
+					{
+						if (cm != CharacterMap.Custom)
+						{
+							EditorGUIUtility.keyboardControl = 0;
+
+							string chars = "";
+
+							if (cm == CharacterMap.Ascii)
+							{
+								for (int i = 33; i < 127; ++i)
+									chars += System.Convert.ToChar(i);
+							}
+							else if (cm == CharacterMap.Numeric)
+							{
+								chars = "01234567890";
+							}
+							else if (cm == CharacterMap.Latin)
+							{
+								for (int i = 33; i < 127; ++i)
+									chars += System.Convert.ToChar(i);
+
+								for (int i = 161; i < 256; ++i)
+									chars += System.Convert.ToChar(i);
+							}
+
+							NGUISettings.charsToInclude = chars;
+						}
+
+						GUI.changed = false;
+
+						string text = EditorGUILayout.TextArea(NGUISettings.charsToInclude, GUI.skin.textArea,
+							GUILayout.Height(80f), GUILayout.Width(Screen.width - 100f));
+
+						if (GUI.changed)
+						{
+							string final = "";
+
+							for (int i = 0; i < text.Length; ++i)
+							{
+								char c = text[i];
+								if (c < 33) continue;
+								string s = c.ToString();
+								if (!final.Contains(s)) final += s;
+							}
+
+							if (final.Length > 0)
+							{
+								char[] chars = final.ToCharArray();
+								System.Array.Sort(chars);
+								final = new string(chars);
+							}
+							else final = "";
+
+							NGUISettings.charsToInclude = final;
+						}
+					}
+					EditorGUI.EndDisabledGroup();
+					GUILayout.EndHorizontal();
+				}
+			}
 			NGUIEditorTools.EndContents();
 
 			if (mType == FontType.Dynamic)
@@ -170,8 +297,10 @@ public class UIFontMaker : EditorWindow
 			}
 			else
 			{
+				bool isBuiltIn = (ttf != null) && string.IsNullOrEmpty(UnityEditor.AssetDatabase.GetAssetPath(ttf));
+
 				// Draw the atlas selection only if we have the font data and texture specified, just to make it easier
-				EditorGUI.BeginDisabledGroup(ttf == null);
+				EditorGUI.BeginDisabledGroup(ttf == null || isBuiltIn || !FreeType.isPresent);
 				{
 					NGUIEditorTools.DrawHeader("Output", true);
 					NGUIEditorTools.BeginContents();
@@ -181,6 +310,10 @@ public class UIFontMaker : EditorWindow
 					if (ttf == null)
 					{
 						EditorGUILayout.HelpBox("You can create a bitmap font by specifying a dynamic font to use as the source.", MessageType.Info);
+					}
+					else if (isBuiltIn)
+					{
+						EditorGUILayout.HelpBox("You chose an embedded font. You can't create a bitmap font from an embedded resource.", MessageType.Warning);
 					}
 					else if (NGUISettings.atlas == null)
 					{
@@ -209,13 +342,13 @@ public class UIFontMaker : EditorWindow
 				
 		if (create != Create.Dynamic)
 		{
-			//if (create == Create.Bitmap)
-			//{
-			//	// Create the bitmap font
-			//	BMFont bmf = FreeType.CreateFont(NGUISettings.dynamicFont, NGUISettings.fontSize, NGUISettings.fontStyle);
-			//	Debug.Log(bmf != null);
-			//	return;
-			//}
+			if (create == Create.Bitmap)
+			{
+				// Create the bitmap font
+				BMFont bmf = FreeType.CreateFont(NGUISettings.dynamicFont, NGUISettings.fontSize, mFaceIndex, NGUISettings.charsToInclude);
+				Debug.Log(bmf != null);
+				return;
+			}
 
 			if (NGUISettings.atlas != null)
 			{
@@ -282,6 +415,23 @@ public class UIFontMaker : EditorWindow
 
 		Selection.activeGameObject = go;
 	}
+
+	/// <summary>
+	/// Helper function that draws a slightly padded toggle
+	/// </summary>
+
+	static bool DrawOption (bool state, string text, params GUILayoutOption[] options)
+	{
+		GUILayout.BeginHorizontal();
+		GUILayout.Space(10f);
+		bool val = GUILayout.Toggle(state, text, EditorStyles.radioButton, options);
+		GUILayout.EndHorizontal();
+		return val;
+	}
+
+	/// <summary>
+	/// Create the specified font.
+	/// </summary>
 
 	static void CreateFont (UIFont font, Create create, Material mat)
 	{

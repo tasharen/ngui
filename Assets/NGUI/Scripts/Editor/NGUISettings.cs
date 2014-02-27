@@ -347,6 +347,12 @@ public class NGUISettings
 		get { return GetBool("NGUI Guides", false); }
 		set { SetBool("NGUI Guides", value); }
 	}
+
+	static public string charsToInclude
+	{
+		get { return GetString("NGUI Chars", ""); }
+		set { SetString("NGUI Chars", value); }
+	}
 #endregion
 
 	/// <summary>
