@@ -59,6 +59,9 @@ public class UISprite : UIWidget
 	
 	bool mSpriteSet = false;
 
+	[HideInInspector] [SerializeField] private bool mFlipHorizontal = false;
+	[HideInInspector] [SerializeField] private bool mFlipVertical = false;
+
 	/// <summary>
 	/// When the sprite type is advanced, this determines whether the center is tiled or sliced.
 	/// </summary>
@@ -605,10 +608,35 @@ public class UISprite : UIWidget
 		verts.Add(new Vector3(v.z, v.w));
 		verts.Add(new Vector3(v.z, v.y));
 
-		uvs.Add(uv0);
-		uvs.Add(new Vector2(uv0.x, uv1.y));
-		uvs.Add(uv1);
-		uvs.Add(new Vector2(uv1.x, uv0.y));
+		if (mFlipHorizontal && mFlipVertical)
+		{
+			uvs.Add(uv1);
+			uvs.Add(new Vector2(uv1.x, uv0.y));	
+			uvs.Add(uv0);
+			uvs.Add(new Vector2(uv0.x, uv1.y));
+		}
+		else if (mFlipHorizontal)
+		{
+			uvs.Add(new Vector2(uv1.x, uv0.y));
+			uvs.Add(uv1);
+			uvs.Add(new Vector2(uv0.x, uv1.y));
+			uvs.Add(uv0);
+		}
+		else if (mFlipVertical)
+		{
+			uvs.Add(new Vector2(uv0.x, uv1.y));
+			uvs.Add(uv0);
+			uvs.Add(new Vector2(uv1.x, uv0.y));
+			uvs.Add(uv1);
+		}
+		else
+		{
+			uvs.Add(uv0);
+			uvs.Add(new Vector2(uv0.x, uv1.y));
+			uvs.Add(uv1);
+			uvs.Add(new Vector2(uv1.x, uv0.y));	
+		}
+		
 
 		Color colF = color;
 		colF.a = finalAlpha;
@@ -649,6 +677,40 @@ public class UISprite : UIWidget
 		mTempUVs[1] = new Vector2(mInnerUV.xMin, mInnerUV.yMin);
 		mTempUVs[2] = new Vector2(mInnerUV.xMax, mInnerUV.yMax);
 		mTempUVs[3] = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
+
+
+
+
+		if (mFlipHorizontal && mFlipVertical)
+		{
+			mTempUVs[0] = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
+			mTempUVs[1] = new Vector2(mInnerUV.xMax, mInnerUV.yMax);
+			mTempUVs[2] = new Vector2(mInnerUV.xMin, mInnerUV.yMin);
+			mTempUVs[3] = new Vector2(mOuterUV.xMin, mOuterUV.yMin);
+		}
+		else if (mFlipHorizontal)
+		{
+			mTempUVs[0] = new Vector2(mOuterUV.xMax, mOuterUV.yMin);
+			mTempUVs[1] = new Vector2(mInnerUV.xMax, mInnerUV.yMin);
+			mTempUVs[2] = new Vector2(mInnerUV.xMin, mInnerUV.yMax);
+			mTempUVs[3] = new Vector2(mOuterUV.xMin, mOuterUV.yMax);
+		}
+		else if (mFlipVertical)
+		{
+			mTempUVs[0] = new Vector2(mOuterUV.xMin, mOuterUV.yMax);
+			mTempUVs[1] = new Vector2(mInnerUV.xMin, mInnerUV.yMax);
+			mTempUVs[2] = new Vector2(mInnerUV.xMax, mInnerUV.yMin);
+			mTempUVs[3] = new Vector2(mOuterUV.xMax, mOuterUV.yMin);
+		}
+		else
+		{
+			mTempUVs[0] = new Vector2(mOuterUV.xMin, mOuterUV.yMin);
+			mTempUVs[1] = new Vector2(mInnerUV.xMin, mInnerUV.yMin);
+			mTempUVs[2] = new Vector2(mInnerUV.xMax, mInnerUV.yMax);
+			mTempUVs[3] = new Vector2(mOuterUV.xMax, mOuterUV.yMax);
+			
+		}
+
 
 		Color colF = color;
 		colF.a = finalAlpha;
