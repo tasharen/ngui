@@ -84,7 +84,14 @@ public class UISpriteInspector : UIWidgetInspector
 
 		EditorGUI.BeginDisabledGroup(sp.hasMultipleDifferentValues);
 		{
-			if ((UISprite.Type)sp.intValue == UISprite.Type.Sliced)
+			if ((UISprite.Type) sp.intValue == UISprite.Type.Simple)
+			{
+				sp = serializedObject.FindProperty("mFlipHorizontal");
+				sp.boolValue = EditorGUILayout.Toggle("Flip X", sp.boolValue);
+				sp = serializedObject.FindProperty("mFlipVertical");
+				sp.boolValue = EditorGUILayout.Toggle("Flip Y", sp.boolValue);
+			}
+			else if ((UISprite.Type)sp.intValue == UISprite.Type.Sliced)
 			{
 				sp = serializedObject.FindProperty("centerType");
 				bool val = (sp.intValue != (int)UISprite.AdvancedType.Invisible);
@@ -93,6 +100,11 @@ public class UISpriteInspector : UIWidgetInspector
 				{
 					sp.intValue = val ? (int)UISprite.AdvancedType.Invisible : (int)UISprite.AdvancedType.Sliced;
 				}
+
+				sp = serializedObject.FindProperty("mFlipHorizontal");
+				sp.boolValue = EditorGUILayout.Toggle("Flip X", sp.boolValue);
+				sp = serializedObject.FindProperty("mFlipVertical");
+				sp.boolValue = EditorGUILayout.Toggle("Flip Y", sp.boolValue);
 			}
 			else if ((UISprite.Type)sp.intValue == UISprite.Type.Filled)
 			{
