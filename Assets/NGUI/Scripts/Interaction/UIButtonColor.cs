@@ -191,9 +191,17 @@ public class UIButtonColor : UIWidgetContainer
 				{
 					SetState(State.Pressed, false);
 				}
-				else if (UICamera.currentTouch.current == gameObject && UICamera.currentScheme == UICamera.ControlScheme.Controller)
+				else if (UICamera.currentTouch.current == gameObject)
 				{
-					SetState(State.Hover, false);
+					if (UICamera.currentScheme == UICamera.ControlScheme.Controller)
+					{
+						SetState(State.Hover, false);
+					}
+					else if (UICamera.currentScheme == UICamera.ControlScheme.Mouse && UICamera.hoveredObject == gameObject)
+					{
+						SetState(State.Hover, false);
+					}
+					else SetState(State.Normal, false);
 				}
 				else SetState(State.Normal, false);
 			}

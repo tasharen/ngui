@@ -179,7 +179,7 @@ public class UITextList : MonoBehaviour
 	/// Allow scrolling of the text list.
 	/// </summary>
 
-	void OnScroll (float val)
+	public void OnScroll (float val)
 	{
 		int sh = scrollHeight;
 		
@@ -194,7 +194,7 @@ public class UITextList : MonoBehaviour
 	/// Allow dragging of the text list.
 	/// </summary>
 
-	void OnDrag (Vector2 delta)
+	public void OnDrag (Vector2 delta)
 	{
 		int sh = scrollHeight;
 

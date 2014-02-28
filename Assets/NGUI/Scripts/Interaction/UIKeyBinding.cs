@@ -103,7 +103,7 @@ public class UIKeyBinding : MonoBehaviour
 			if (UICamera.inputHasFocus) return;
 
 			UICamera.currentTouch = UICamera.controller;
-			UICamera.currentScheme = UICamera.ControlScheme.Controller;
+			UICamera.currentScheme = UICamera.ControlScheme.Mouse;
 			UICamera.currentTouch.current = gameObject;
 
 			if (Input.GetKeyDown(keyCode))
