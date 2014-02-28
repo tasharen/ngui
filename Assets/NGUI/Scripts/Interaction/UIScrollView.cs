@@ -153,6 +153,12 @@ public class UIScrollView : MonoBehaviour
 	public UIPanel panel { get { return mPanel; } }
 
 	/// <summary>
+	/// Whether the scroll view is being dragged.
+	/// </summary>
+
+	public bool isDragging { get { return mPressed && mDragStarted; } }
+
+	/// <summary>
 	/// Calculate the bounds used by the widgets.
 	/// </summary>
 

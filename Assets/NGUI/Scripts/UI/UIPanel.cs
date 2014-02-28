@@ -38,13 +38,13 @@ public class UIPanel : UIRect
 		Explicit,
 	}
 
-	public delegate void OnChangeDelegate ();
+	public delegate void OnGeometryUpdated ();
 
 	/// <summary>
-	/// Notification triggered when something changes within the panel.
+	/// Notification triggered when the panel's geometry get rebuilt. It's mainly here for debugging purposes.
 	/// </summary>
 
-	public OnChangeDelegate onChange;
+	public OnGeometryUpdated onGeometryUpdated;
 
 	/// <summary>
 	/// Whether this panel will show up in the panel tool (set this to 'false' for dynamically created temporary panels)
@@ -1322,7 +1322,7 @@ public class UIPanel : UIRect
 		}
 
 		// Inform the changed event listeners
-		if (changed && onChange != null) onChange();
+		if (changed && onGeometryUpdated != null) onGeometryUpdated();
 		mResized = false;
 	}
 

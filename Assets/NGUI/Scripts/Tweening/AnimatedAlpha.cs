@@ -24,10 +24,10 @@ public class AnimatedAlpha : MonoBehaviour
 	{
 		mWidget = GetComponent<UIWidget>();
 		mPanel = GetComponent<UIPanel>();
-		Update();
+		LateUpdate();
 	}
 
-	void Update ()
+	void LateUpdate ()
 	{
 		if (mWidget != null) mWidget.alpha = alpha;
 		if (mPanel != null) mPanel.alpha = alpha;

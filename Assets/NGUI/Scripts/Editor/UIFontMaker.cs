@@ -203,18 +203,22 @@ public class UIFontMaker : EditorWindow
 				else if (ttf != null)
 				{
 					string[] faces = FreeType.GetFaces(ttf);
-					if (mFaceIndex >= faces.Length) mFaceIndex = 0;
 
-					if (faces.Length > 1)
+					if (faces != null)
 					{
-						GUILayout.Label("Style", EditorStyles.boldLabel);
-						for (int i = 0; i < faces.Length; ++i)
+						if (mFaceIndex >= faces.Length) mFaceIndex = 0;
+
+						if (faces.Length > 1)
 						{
-							GUILayout.BeginHorizontal();
-							GUILayout.Space(10f);
-							if (DrawOption(i == mFaceIndex, " " + faces[i]))
-								mFaceIndex = i;
-							GUILayout.EndHorizontal();
+							GUILayout.Label("Style", EditorStyles.boldLabel);
+							for (int i = 0; i < faces.Length; ++i)
+							{
+								GUILayout.BeginHorizontal();
+								GUILayout.Space(10f);
+								if (DrawOption(i == mFaceIndex, " " + faces[i]))
+									mFaceIndex = i;
+								GUILayout.EndHorizontal();
+							}
 						}
 					}
 

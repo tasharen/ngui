@@ -56,7 +56,16 @@ public class EventDelegate
 	/// Whether the target script is actually enabled.
 	/// </summary>
 
-	public bool isEnabled { get { return (mRawDelegate && mCachedCallback != null) || (mTarget != null && mTarget.enabled); } }
+	public bool isEnabled
+	{
+		get
+		{
+			if (mRawDelegate && mCachedCallback != null) return true;
+			if (mTarget == null) return false;
+			MonoBehaviour mb = (mTarget as MonoBehaviour);
+			return (mb == null || mb.enabled);
+		}
+	}
 
 	public EventDelegate () { }
 	public EventDelegate (Callback call) { Set(call); }

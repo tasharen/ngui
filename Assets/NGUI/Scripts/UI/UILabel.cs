@@ -77,6 +77,7 @@ public class UILabel : UIWidget
 
 #if DYNAMIC_FONT
 	Font mActiveTTF = null;
+	float mDensity = 1f;
 #endif
 	bool mShouldBeProcessed = true;
 	string mProcessedText = null;
@@ -1034,7 +1035,7 @@ public class UILabel : UIWidget
 	/// </summary>
 
 	void ProcessText () { ProcessText(false); }
-	
+
 	/// <summary>
 	/// Process the raw text, called when something changes.
 	/// </summary>
@@ -1058,9 +1059,18 @@ public class UILabel : UIWidget
 			return;
 		}
 
+#if DYNAMIC_FONT
+		bool isDynamic = (trueTypeFont != null);
+
+		if (isDynamic && keepCrisp)
+		{
+			UIRoot rt = root;
+			if (rt != null) mDensity = (rt != null) ? rt.pixelSizeAdjustment : 1f;
+		}
+		else mDensity = 1f;
+#endif
 		UpdateNGUIText(mPrintedSize, mWidth, mHeight);
 
-		bool isDynamic = (trueTypeFont != null);
 		if (mOverflow == Overflow.ResizeFreely) NGUIText.rectWidth = 1000000;
 		if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
 			NGUIText.rectHeight = 1000000;
@@ -1083,7 +1093,11 @@ public class UILabel : UIWidget
 #endif
 				{
 					mScale = (float)ps / mPrintedSize;
+#if DYNAMIC_FONT
 					NGUIText.fontScale = isDynamic ? mScale : ((float)mFontSize / mFont.defaultSize) * mScale;
+#else
+					NGUIText.fontScale = ((float)mFontSize / mFont.defaultSize) * mScale;
+#endif
 				}
 
 				NGUIText.Update(false);
@@ -1667,6 +1681,9 @@ public class UILabel : UIWidget
 			UIRoot rt = root;
 			if (rt != null) NGUIText.pixelDensity = (rt != null) ? rt.pixelSizeAdjustment : 1f;
 		}
+		else NGUIText.pixelDensity = 1f;
+
+		if (mDensity != NGUIText.pixelDensity) ProcessText(false);
 #endif
 
 		if (alignment == Alignment.Automatic)

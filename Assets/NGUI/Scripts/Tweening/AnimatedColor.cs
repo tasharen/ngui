@@ -17,6 +17,6 @@ public class AnimatedColor : MonoBehaviour
 	
 	UIWidget mWidget;
 
-	void OnEnable () { mWidget = GetComponent<UIWidget>(); Update(); }
-	void Update () { mWidget.color = color; }
+	void OnEnable () { mWidget = GetComponent<UIWidget>(); LateUpdate(); }
+	void LateUpdate () { mWidget.color = color; }
 }

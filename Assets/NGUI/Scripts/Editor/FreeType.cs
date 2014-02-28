@@ -297,7 +297,7 @@ static public class FreeType
 			// The DLL has to be explicitly loaded first, or Unity doesn't seem to pick it up at all.
 			if (!mFound)
 			{
-				string path = Application.dataPath + "/NGUI/Editor/" + libName + ".dll";
+				string path = NGUISettings.pathToFreeType;
 				mFound = File.Exists(path);
 				if (mFound) LoadLibrary(path);
 			}
@@ -396,29 +396,28 @@ static public class FreeType
 		string fileName = Application.dataPath.Substring(0, Application.dataPath.Length - "Assets".Length) +
 			UnityEditor.AssetDatabase.GetAssetPath(font);
 
-		if (!File.Exists(fileName))
+		if (File.Exists(fileName))
 		{
-			Debug.LogError("Unable to use the chosen font.");
-		}
-		else if (FT_New_Face(lib, fileName, 0, out face) != 0)
-		{
-			Debug.LogError("Unable to use the chosen font (FT_New_Face).");
-		}
-		else
-		{
-			FT_FaceRec record = (FT_FaceRec)Marshal.PtrToStructure(face, typeof(FT_FaceRec));
-			names = new string[record.num_faces];
-
-			for (int i = 0; i < record.num_faces; i++)
+			if (FT_New_Face(lib, fileName, 0, out face) != 0)
 			{
-				IntPtr ptr = IntPtr.Zero;
+				Debug.LogError("Unable to use the chosen font (FT_New_Face).");
+			}
+			else
+			{
+				FT_FaceRec record = (FT_FaceRec)Marshal.PtrToStructure(face, typeof(FT_FaceRec));
+				names = new string[record.num_faces];
 
-				if (FT_New_Face(lib, fileName, i, out ptr) == 0)
+				for (int i = 0; i < record.num_faces; i++)
 				{
-					string family = Marshal.PtrToStringAnsi(record.family_name);
-					string style = Marshal.PtrToStringAnsi(record.style_name);
-					names[i] = family + " - " + style;
-					FT_Done_Face(ptr);
+					IntPtr ptr = IntPtr.Zero;
+
+					if (FT_New_Face(lib, fileName, i, out ptr) == 0)
+					{
+						string family = Marshal.PtrToStringAnsi(record.family_name);
+						string style = Marshal.PtrToStringAnsi(record.style_name);
+						names[i] = family + " - " + style;
+						FT_Done_Face(ptr);
+					}
 				}
 			}
 		}
