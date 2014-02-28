@@ -872,7 +872,7 @@ public class UILabel : UIWidget
 
 	protected override void UpgradeFrom265 ()
 	{
-		ProcessText(true);
+		ProcessText(true, true);
 
 		if (mShrinkToFit)
 		{
@@ -1028,13 +1028,13 @@ public class UILabel : UIWidget
 	/// Process the raw text, called when something changes.
 	/// </summary>
 
-	void ProcessText () { ProcessText(false); }
+	void ProcessText () { ProcessText(false, true); }
 
 	/// <summary>
 	/// Process the raw text, called when something changes.
 	/// </summary>
 
-	void ProcessText (bool legacyMode)
+	void ProcessText (bool legacyMode, bool full)
 	{
 		if (!isValid) return;
 
@@ -1063,7 +1063,7 @@ public class UILabel : UIWidget
 		}
 		else mDensity = 1f;
 #endif
-		UpdateNGUIText(mPrintedSize, mWidth, mHeight);
+		if (full) UpdateNGUIText();
 
 		if (mOverflow == Overflow.ResizeFreely) NGUIText.rectWidth = 1000000;
 		if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
@@ -1172,7 +1172,7 @@ public class UILabel : UIWidget
 				mOverflow = Overflow.ShrinkContent;
 				mWidth = 100000;
 				mHeight = 100000;
-				ProcessText(false);
+				ProcessText(false, true);
 				mOverflow = over;
 
 				int minX = Mathf.RoundToInt(mCalculatedSize.x);
@@ -1200,7 +1200,7 @@ public class UILabel : UIWidget
 		{
 			mWidth = 100000;
 			mHeight = 100000;
-			ProcessText(false);
+			ProcessText(false, true);
 			mWidth = Mathf.RoundToInt(mCalculatedSize.x);
 			mHeight = Mathf.RoundToInt(mCalculatedSize.y);
 			if ((mWidth & 1) == 1) ++mWidth;
@@ -1239,7 +1239,7 @@ public class UILabel : UIWidget
 			string text = processedText;
 			if (string.IsNullOrEmpty(text)) return 0;
 
-			UpdateNGUIText(defaultFontSize, mWidth, mHeight);
+			UpdateNGUIText();
 
 			NGUIText.PrintCharacterPositions(text, mTempVerts, mTempIndices);
 
@@ -1340,7 +1340,7 @@ public class UILabel : UIWidget
 			if (string.IsNullOrEmpty(text)) return 0;
 
 			int def = defaultFontSize;
-			UpdateNGUIText(def, mWidth, mHeight);
+			UpdateNGUIText();
 
 			NGUIText.PrintCharacterPositions(text, mTempVerts, mTempIndices);
 
@@ -1392,7 +1392,7 @@ public class UILabel : UIWidget
 		if (!isValid) return;
 
 		string text = processedText;
-		UpdateNGUIText(defaultFontSize, mWidth, mHeight);
+		UpdateNGUIText();
 
 		int startingCaretVerts = caret.verts.size;
 		Vector2 center = new Vector2(0.5f, 0.5f);
@@ -1447,7 +1447,7 @@ public class UILabel : UIWidget
 		string text = processedText;
 		int start = verts.size;
 
-		UpdateNGUIText(defaultFontSize, mWidth, mHeight);
+		UpdateNGUIText();
 
 		NGUIText.tint = col;
 		NGUIText.Print(text, verts, uvs, cols);
@@ -1605,7 +1605,7 @@ public class UILabel : UIWidget
 
 	public bool Wrap (string text, out string final, int height)
 	{
-		UpdateNGUIText(defaultFontSize, mWidth, height);
+		UpdateNGUIText();
 		return NGUIText.WrapText(text, out final);
 	}
 
@@ -1613,21 +1613,15 @@ public class UILabel : UIWidget
 	/// Update NGUIText.current with all the properties from this label.
 	/// </summary>
 
-	public void UpdateNGUIText () { UpdateNGUIText(defaultFontSize, mWidth, mHeight); }
-
-	/// <summary>
-	/// Update NGUIText.current with all the properties from this label.
-	/// </summary>
-
-	public void UpdateNGUIText (int size, int lineWidth, int lineHeight)
+	public void UpdateNGUIText ()
 	{
 		Font ttf = trueTypeFont;
 		bool isDynamic = (ttf != null);
 
 		NGUIText.fontSize = mPrintedSize;
 		NGUIText.fontStyle = mFontStyle;
-		NGUIText.rectWidth = lineWidth;
-		NGUIText.rectHeight = lineHeight;
+		NGUIText.rectWidth = mWidth;
+		NGUIText.rectHeight = mHeight;
 		NGUIText.gradient = mApplyGradient && (mFont == null || !mFont.packedFontShader);
 		NGUIText.gradientTop = mGradientTop;
 		NGUIText.gradientBottom = mGradientBottom;
@@ -1673,7 +1667,12 @@ public class UILabel : UIWidget
 		}
 		else NGUIText.pixelDensity = 1f;
 
-		if (mDensity != NGUIText.pixelDensity) ProcessText(false);
+		if (mDensity != NGUIText.pixelDensity)
+		{
+			ProcessText(false, false);
+			NGUIText.rectWidth = mWidth;
+			NGUIText.rectHeight = mHeight;
+		}
 #endif
 
 		if (alignment == Alignment.Automatic)
