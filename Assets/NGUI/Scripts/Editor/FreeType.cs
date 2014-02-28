@@ -562,6 +562,19 @@ static public class FreeType
 			tex = new Texture2D(32, 32, TextureFormat.ARGB32, false);
 			Rect[] rects = tex.PackTextures(textures.ToArray(), 1);
 
+			// Make the RGB channel pure white
+			Color32[] cols = tex.GetPixels32();
+			for (int i = 0, imax = cols.Length; i < imax; ++i)
+			{
+				Color32 c = cols[i];
+				c.r = 255;
+				c.g = 255;
+				c.b = 255;
+				cols[i] = c;
+			}
+			tex.SetPixels32(cols);
+			tex.Apply();
+
 			font.texWidth = tex.width;
 			font.texHeight = tex.height;
 
