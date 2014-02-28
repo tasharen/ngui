@@ -52,7 +52,6 @@ public class UIFontInspector : Editor
 		mFont.replacement = obj as UIFont;
 		mReplacement = mFont.replacement;
 		NGUITools.SetDirty(mFont);
-		if (mReplacement == null) mType = FontType.Bitmap;
 	}
 
 	void OnSelectAtlas (Object obj)
@@ -96,21 +95,16 @@ public class UIFontInspector : Editor
 			mType = FontType.Dynamic;
 		}
 
+		GUI.changed = false;
 		GUILayout.BeginHorizontal();
-		FontType fontType = (FontType)EditorGUILayout.EnumPopup("Font Type", mType);
+		mType = (FontType)EditorGUILayout.EnumPopup("Font Type", mType);
 		GUILayout.Space(18f);
 		GUILayout.EndHorizontal();
 
-		if (mType != fontType)
+		if (GUI.changed)
 		{
-			if (fontType == FontType.Bitmap)
-			{
+			if (mType == FontType.Bitmap)
 				OnSelectFont(null);
-			}
-			else
-			{
-				mType = fontType;
-			}
 
 			if (mType != FontType.Dynamic && mFont.dynamicFont != null)
 				mFont.dynamicFont = null;
@@ -180,8 +174,6 @@ public class UIFontInspector : Editor
 		}
 		else
 		{
-			NGUIEditorTools.DrawSeparator();
-
 			ComponentSelector.Draw<UIAtlas>(mFont.atlas, OnSelectAtlas, true);
 
 			if (mFont.atlas != null)

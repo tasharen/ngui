@@ -240,8 +240,6 @@ public class UIFontMaker : EditorWindow
 					{
 						if (cm != CharacterMap.Custom)
 						{
-							EditorGUIUtility.keyboardControl = 0;
-
 							string chars = "";
 
 							if (cm == CharacterMap.Ascii)
@@ -267,8 +265,18 @@ public class UIFontMaker : EditorWindow
 
 						GUI.changed = false;
 
-						string text = EditorGUILayout.TextArea(NGUISettings.charsToInclude, GUI.skin.textArea,
-							GUILayout.Height(80f), GUILayout.Width(Screen.width - 100f));
+						string text = NGUISettings.charsToInclude;
+
+						if (cm == CharacterMap.Custom)
+						{
+							text = EditorGUILayout.TextArea(text, GUI.skin.textArea,
+								GUILayout.Height(80f), GUILayout.Width(Screen.width - 100f));
+						}
+						else
+						{
+							GUILayout.Label(text, GUI.skin.textArea,
+								GUILayout.Height(80f), GUILayout.Width(Screen.width - 100f));
+						}
 
 						if (GUI.changed)
 						{
