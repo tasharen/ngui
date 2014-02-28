@@ -470,10 +470,12 @@ static public class FreeType
 			FT_Set_Pixel_Sizes(face, 0, (uint)size);
 
 			// Calculate the baseline value that would let the printed font be centered vertically
-			int ascender = (faceRec.ascender >> 6);
-			int descender = (faceRec.descender >> 6);
-			int baseline = ((ascender - descender) >> 1);
-			if ((baseline & 1) == 1) --baseline;
+			//int ascender = (faceRec.met.ascender >> 6);
+			//int descender = (faceRec.descender >> 6);
+			//int baseline = ((ascender - descender) >> 1);
+			//if ((baseline & 1) == 1) --baseline;
+
+			//Debug.Log(ascender + " " + descender + " " + baseline);
 
 			// Space character is not renderable
 			FT_Load_Glyph(face, FT_Get_Char_Index(face, 32), FT_LOAD_DEFAULT);
@@ -537,7 +539,7 @@ static public class FreeType
 					// Record the metrics
 					BMGlyph bmg = font.GetGlyph(ch, true);
 					bmg.offsetX = (glyph.metrics.horiBearingX >> 6);
-					bmg.offsetY = baseline - (glyph.metrics.horiBearingY >> 6);
+					bmg.offsetY = -(glyph.metrics.horiBearingY >> 6);
 					bmg.advance = (glyph.metrics.horiAdvance >> 6);
 					bmg.channel = 15;
 
@@ -563,6 +565,9 @@ static public class FreeType
 			font.texWidth = tex.width;
 			font.texHeight = tex.height;
 
+			int min = int.MaxValue;
+			int max = int.MinValue;
+
 			// Other glyphs are visible and need to be added
 			for (int i = 0; i < entries.size; ++i)
 			{
@@ -580,6 +585,16 @@ static public class FreeType
 
 				// Flip the Y since the UV coordinate system is different
 				glyph.y = font.texHeight - glyph.y - glyph.height;
+
+				max = Mathf.Max(max, -glyph.offsetY);
+				min = Mathf.Min(min, -glyph.offsetY - glyph.height);
+			}
+
+			// Offset all glyphs so that they are not using the baseline
+			for (int i = 0; i < entries.size; ++i)
+			{
+				BMGlyph glyph = font.GetGlyph(entries[i], true);
+				glyph.offsetY += size + min;
 			}
 		}
 		
