@@ -157,9 +157,8 @@ public class UIFontMaker : EditorWindow
 			GUILayout.BeginHorizontal();
 			if (NGUIEditorTools.DrawPrefixButton("Source"))
 				ComponentSelector.Show<Font>(OnUnityFont, new string[] { ".ttf", ".otf" });
-			Font ttf = NGUISettings.ambigiousFont as Font;
-			NGUISettings.ambigiousFont = EditorGUILayout.ObjectField(ttf, typeof(Font), false) as Font;
-			ttf = NGUISettings.ambigiousFont as Font;
+
+			Font ttf = EditorGUILayout.ObjectField(NGUISettings.ambigiousFont as Font, typeof(Font), false) as Font;
 			GUILayout.EndHorizontal();
 
 			GUILayout.BeginHorizontal();
@@ -526,7 +525,7 @@ public class UIFontMaker : EditorWindow
 			uiFont = go.GetComponent<UIFont>();
 		}
 
-		NGUISettings.ambigiousFont = uiFont;
+		if (uiFont != null) NGUISettings.ambigiousFont = uiFont;
 		MarkAsChanged();
 		Selection.activeGameObject = go;
 	}

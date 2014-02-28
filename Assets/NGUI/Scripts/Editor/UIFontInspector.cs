@@ -230,28 +230,7 @@ public class UIFontInspector : Editor
 					}
 
 					// Font sprite rectangle
-					GUI.backgroundColor = new Color(0.4f, 1f, 0f, 1f);
 					pixels = EditorGUILayout.RectField("Pixel Rect", pixels);
-					GUI.backgroundColor = Color.white;
-
-					// Create a button that can make the coordinates pixel-perfect on click
-					GUILayout.BeginHorizontal();
-					{
-						Rect corrected = NGUIMath.MakePixelPerfect(pixels);
-
-						if (corrected == pixels)
-						{
-							GUI.color = Color.grey;
-							GUILayout.Button("Make Pixel-Perfect");
-							GUI.color = Color.white;
-						}
-						else if (GUILayout.Button("Make Pixel-Perfect"))
-						{
-							pixels = corrected;
-							GUI.changed = true;
-						}
-					}
-					GUILayout.EndHorizontal();
 
 					// Convert the pixel coordinates back to UV coordinates
 					Rect uvRect = NGUIMath.ConvertToTexCoords(pixels, tex.width, tex.height);
@@ -274,14 +253,6 @@ public class UIFontInspector : Editor
 			{
 				mView = View.Font;
 				mUseShader = false;
-
-				float pixelSize = EditorGUILayout.FloatField("Pixel Size", mFont.pixelSize, GUILayout.Width(120f));
-
-				if (pixelSize != mFont.pixelSize)
-				{
-					NGUIEditorTools.RegisterUndo("Font Change", mFont);
-					mFont.pixelSize = pixelSize;
-				}
 			}
 			EditorGUILayout.Space();
 		}

@@ -173,10 +173,10 @@ public class UILabelInspector : UIWidgetInspector
 #endif
 			GUI.skin.textField.wordWrap = ww;
 
-			NGUIEditorTools.DrawPaddedProperty("Alignment", serializedObject, "mAlignment");
-
 			SerializedProperty ov = NGUIEditorTools.DrawPaddedProperty("Overflow", serializedObject, "mOverflow");
 			NGUISettings.overflowStyle = (UILabel.Overflow)ov.intValue;
+
+			NGUIEditorTools.DrawPaddedProperty("Alignment", serializedObject, "mAlignment");
 
 			if (dynFont != null)
 				NGUIEditorTools.DrawPaddedProperty("Keep crisp", serializedObject, "keepCrispWhenShrunk");

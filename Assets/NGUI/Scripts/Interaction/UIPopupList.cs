@@ -652,8 +652,7 @@ public class UIPopupList : UIWidgetContainer
 			if (hlsp == null) return;
 
 			float hlspHeight = hlsp.borderTop;
-			float pixelSize = (bitmapFont != null) ? bitmapFont.pixelSize : 1f;
-			float fontHeight = activeFontSize * pixelSize;
+			float fontHeight = activeFontSize;
 			float dynScale = activeFontScale;
 			float labelHeight = fontHeight * dynScale;
 			float x = 0f, y = -padding.y;
