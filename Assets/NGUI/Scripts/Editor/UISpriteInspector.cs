@@ -84,14 +84,13 @@ public class UISpriteInspector : UIWidgetInspector
 
 		EditorGUI.BeginDisabledGroup(sp.hasMultipleDifferentValues);
 		{
-			if ((UISprite.Type) sp.intValue == UISprite.Type.Simple)
+			UISprite.Type type = (UISprite.Type)sp.intValue;
+
+			if (type == UISprite.Type.Simple)
 			{
-				sp = serializedObject.FindProperty("mFlipHorizontal");
-				sp.boolValue = EditorGUILayout.Toggle("Flip X", sp.boolValue);
-				sp = serializedObject.FindProperty("mFlipVertical");
-				sp.boolValue = EditorGUILayout.Toggle("Flip Y", sp.boolValue);
+				NGUIEditorTools.DrawProperty("Flip", serializedObject, "mFlip");
 			}
-			else if ((UISprite.Type)sp.intValue == UISprite.Type.Sliced)
+			else if (type == UISprite.Type.Sliced)
 			{
 				sp = serializedObject.FindProperty("centerType");
 				bool val = (sp.intValue != (int)UISprite.AdvancedType.Invisible);
@@ -100,13 +99,8 @@ public class UISpriteInspector : UIWidgetInspector
 				{
 					sp.intValue = val ? (int)UISprite.AdvancedType.Invisible : (int)UISprite.AdvancedType.Sliced;
 				}
-
-				sp = serializedObject.FindProperty("mFlipHorizontal");
-				sp.boolValue = EditorGUILayout.Toggle("Flip X", sp.boolValue);
-				sp = serializedObject.FindProperty("mFlipVertical");
-				sp.boolValue = EditorGUILayout.Toggle("Flip Y", sp.boolValue);
 			}
-			else if ((UISprite.Type)sp.intValue == UISprite.Type.Filled)
+			else if (type == UISprite.Type.Filled)
 			{
 				NGUIEditorTools.DrawProperty("Fill Dir", serializedObject, "mFillDirection", GUILayout.MinWidth(20f));
 				GUILayout.BeginHorizontal();
@@ -116,7 +110,7 @@ public class UISpriteInspector : UIWidgetInspector
 				GUILayout.EndHorizontal();
 				NGUIEditorTools.DrawProperty("Invert Fill", serializedObject, "mInvert", GUILayout.MinWidth(20f));
 			}
-			else if ((UISprite.Type)sp.intValue == UISprite.Type.Advanced)
+			else if (type == UISprite.Type.Advanced)
 			{
 				NGUIEditorTools.DrawProperty("  - Left", serializedObject, "leftType");
 				NGUIEditorTools.DrawProperty("  - Right", serializedObject, "rightType");
