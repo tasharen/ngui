@@ -194,7 +194,7 @@ public class UIButton : UIButtonColor
 
 	protected void SetSprite (string sp)
 	{
-		if (mSprite != null && !string.IsNullOrEmpty(sp))
+		if (mSprite != null && !string.IsNullOrEmpty(sp) && mSprite.spriteName != sp)
 		{
 			mSprite.spriteName = sp;
 			if (pixelSnap) mSprite.MakePixelPerfect();
