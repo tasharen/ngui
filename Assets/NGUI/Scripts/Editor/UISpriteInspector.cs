@@ -99,6 +99,8 @@ public class UISpriteInspector : UIWidgetInspector
 				{
 					sp.intValue = val ? (int)UISprite.AdvancedType.Invisible : (int)UISprite.AdvancedType.Sliced;
 				}
+				
+				NGUIEditorTools.DrawProperty("Flip", serializedObject, "mFlip");
 			}
 			else if (type == UISprite.Type.Filled)
 			{

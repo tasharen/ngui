@@ -614,33 +614,32 @@ public class UISprite : UIWidget
 		verts.Add(new Vector3(v.z, v.w));
 		verts.Add(new Vector3(v.z, v.y));
 
-		if (mFlip == Flip.Both)
+		switch (mFlip)
 		{
-			uvs.Add(uv1);
-			uvs.Add(new Vector2(uv1.x, uv0.y));	
-			uvs.Add(uv0);
-			uvs.Add(new Vector2(uv0.x, uv1.y));
-		}
-		else if (mFlip == Flip.Horizontally)
-		{
-			uvs.Add(new Vector2(uv1.x, uv0.y));
-			uvs.Add(uv1);
-			uvs.Add(new Vector2(uv0.x, uv1.y));
-			uvs.Add(uv0);
-		}
-		else if (mFlip == Flip.Vertically)
-		{
-			uvs.Add(new Vector2(uv0.x, uv1.y));
-			uvs.Add(uv0);
-			uvs.Add(new Vector2(uv1.x, uv0.y));
-			uvs.Add(uv1);
-		}
-		else
-		{
-			uvs.Add(uv0);
-			uvs.Add(new Vector2(uv0.x, uv1.y));
-			uvs.Add(uv1);
-			uvs.Add(new Vector2(uv1.x, uv0.y));	
+			case Flip.Both:
+				uvs.Add(uv1);
+				uvs.Add(new Vector2(uv1.x, uv0.y));
+				uvs.Add(uv0);
+				uvs.Add(new Vector2(uv0.x, uv1.y));
+				break;
+			case Flip.Horizontally:
+				uvs.Add(new Vector2(uv1.x, uv0.y));
+				uvs.Add(uv1);
+				uvs.Add(new Vector2(uv0.x, uv1.y));
+				uvs.Add(uv0);
+				break;
+			case Flip.Vertically:
+				uvs.Add(new Vector2(uv0.x, uv1.y));
+				uvs.Add(uv0);
+				uvs.Add(new Vector2(uv1.x, uv0.y));
+				uvs.Add(uv1);
+				break;
+			default:
+				uvs.Add(uv0);
+				uvs.Add(new Vector2(uv0.x, uv1.y));
+				uvs.Add(uv1);
+				uvs.Add(new Vector2(uv1.x, uv0.y));
+				break;
 		}
 		
 
@@ -669,15 +668,65 @@ public class UISprite : UIWidget
 		Vector4 dr = drawingDimensions;
 		Vector4 br = border * atlas.pixelSize;
 
-		mTempPos[0].x = dr.x;
-		mTempPos[0].y = dr.y;
-		mTempPos[3].x = dr.z;
-		mTempPos[3].y = dr.w;
 
-		mTempPos[1].x = mTempPos[0].x + br.x;
-		mTempPos[1].y = mTempPos[0].y + br.y;
-		mTempPos[2].x = mTempPos[3].x - br.z;
-		mTempPos[2].y = mTempPos[3].y - br.w;
+
+		switch (mFlip)
+		{
+			case Flip.Both:
+				mTempPos[0].x = dr.z;
+				mTempPos[0].y = dr.w;
+				mTempPos[3].x = dr.x;
+				mTempPos[3].y = dr.y;
+
+				mTempPos[1].x = mTempPos[0].x - br.x;
+				mTempPos[1].y = mTempPos[0].y - br.y;
+				mTempPos[2].x = mTempPos[3].x + br.z;
+				mTempPos[2].y = mTempPos[3].y + br.w;
+				break;
+			case Flip.Horizontally:
+				mTempPos[0].x = dr.z;
+				mTempPos[0].y = dr.y;
+				mTempPos[3].x = dr.x;
+				mTempPos[3].y = dr.w;
+
+				mTempPos[1].x = mTempPos[0].x - br.z;
+				mTempPos[1].y = mTempPos[0].y + br.y;
+				mTempPos[2].x = mTempPos[3].x + br.x;
+				mTempPos[2].y = mTempPos[3].y - br.w;
+				break;
+			case Flip.Vertically:
+				mTempPos[0].x = dr.x;
+				mTempPos[0].y = dr.w;
+				mTempPos[3].x = dr.z;
+				mTempPos[3].y = dr.y;
+
+				mTempPos[1].x = mTempPos[0].x + br.x;
+				mTempPos[1].y = mTempPos[0].y - br.w;
+				mTempPos[2].x = mTempPos[3].x - br.z;
+				mTempPos[2].y = mTempPos[3].y + br.y;
+				break;
+			default:
+				mTempPos[0].x = dr.x;
+				mTempPos[0].y = dr.y;
+				mTempPos[3].x = dr.z;
+				mTempPos[3].y = dr.w;
+
+				mTempPos[1].x = mTempPos[0].x + br.x;
+				mTempPos[1].y = mTempPos[0].y + br.y;
+				mTempPos[2].x = mTempPos[3].x - br.z;
+				mTempPos[2].y = mTempPos[3].y - br.w;
+				break;
+		}
+
+//		mTempPos[0].x = dr.x;
+//		mTempPos[0].y = dr.y;
+//		mTempPos[3].x = dr.z;
+//		mTempPos[3].y = dr.w;
+//
+//		mTempPos[1].x = mTempPos[0].x + br.x;
+//		mTempPos[1].y = mTempPos[0].y + br.y;
+//		mTempPos[2].x = mTempPos[3].x - br.z;
+//		mTempPos[2].y = mTempPos[3].y - br.w;
 
 		mTempUVs[0] = new Vector2(mOuterUV.xMin, mOuterUV.yMin);
 		mTempUVs[1] = new Vector2(mInnerUV.xMin, mInnerUV.yMin);
