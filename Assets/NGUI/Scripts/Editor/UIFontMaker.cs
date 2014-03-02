@@ -51,6 +51,11 @@ public class UIFontMaker : EditorWindow
 		set { NGUISettings.SetInt("NGUI Character Map", (int)value); }
 	}
 
+	void Awake ()
+	{
+		mType = (Application.platform == RuntimePlatform.WindowsEditor) ? FontType.GeneratedBitmap : FontType.ImportedBitmap;
+	}
+
 	/// <summary>
 	/// Update all labels associated with this font.
 	/// </summary>
@@ -178,26 +183,33 @@ public class UIFontMaker : EditorWindow
 			{
 				if (!FreeType.isPresent)
 				{
-					EditorGUILayout.HelpBox("Assets/Editor/FreeType.dll is missing", MessageType.Error);
-
-					GUILayout.BeginHorizontal();
-					GUILayout.Space(20f);
-
-					if (GUILayout.Button("Find FreeType.dll"))
+					if (Application.platform != RuntimePlatform.WindowsEditor)
 					{
-						string path = EditorUtility.OpenFilePanel("Find FreeType.dll", "Assets", "dll");
-						
-						if (!string.IsNullOrEmpty(path))
-						{
-							if (Path.GetFileName(path) == "FreeType.dll")
-							{
-								NGUISettings.pathToFreeType = path;
-							}
-							else Debug.LogError("The library must be named 'FreeType'");
-						}
+						EditorGUILayout.HelpBox("Built-in bitmap font generation is only available on Windows platforms.", MessageType.Error);
 					}
-					GUILayout.Space(20f);
-					GUILayout.EndHorizontal();
+					else
+					{
+						EditorGUILayout.HelpBox("Assets/Editor/FreeType.dll is missing", MessageType.Error);
+
+						GUILayout.BeginHorizontal();
+						GUILayout.Space(20f);
+
+						if (GUILayout.Button("Find FreeType.dll"))
+						{
+							string path = EditorUtility.OpenFilePanel("Find FreeType.dll", "Assets", "dll");
+
+							if (!string.IsNullOrEmpty(path))
+							{
+								if (Path.GetFileName(path) == "FreeType.dll")
+								{
+									NGUISettings.pathToFreeType = path;
+								}
+								else Debug.LogError("The library must be named 'FreeType'");
+							}
+						}
+						GUILayout.Space(20f);
+						GUILayout.EndHorizontal();
+					}
 				}
 				else if (ttf != null)
 				{
