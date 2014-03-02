@@ -88,6 +88,8 @@ public class UIButtonColor : UIWidgetContainer
 
 	void Awake () { if (!mInitDone) OnInit(); }
 
+	void Start () { if (!isEnabled) SetState(State.Disabled, true); }
+
 	protected virtual void OnInit ()
 	{
 		mInitDone = true;
