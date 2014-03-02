@@ -422,7 +422,9 @@ static public class FreeType
 			}
 		}
 		if (face != IntPtr.Zero) FT_Done_Face(face);
+#if !UNITY_3_5
 		if (lib != IntPtr.Zero) FT_Done_FreeType(lib);
+#endif
 		return names;
 	}
 
@@ -612,7 +614,9 @@ static public class FreeType
 		}
 		
 		if (face != IntPtr.Zero) FT_Done_Face(face);
+#if !UNITY_3_5
 		if (lib != IntPtr.Zero) FT_Done_FreeType(lib);
+#endif
 		return (tex != null);
 	}
 }
