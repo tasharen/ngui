@@ -51,9 +51,12 @@ and it will not be included in the build of your game. It's only used in the edi
 - NEW: You can now add transparent, clamped and tiling border to sprites via the Atlas inspector.
 - NEW: You can now modify any sprite to bake a shadow or add some visual depth to it (want deeper shadow? add multiple!)
 - NEW: UIImageButton's functionality is now a part of UIButton.
+- NEW: You can now flip simple sprites horizontally and vertically (contributed by Nicki).
 - FIX: Labels using Packed Fonts no longer have the Gradient and Effect options, as they don't work with packed fonts.
-- FIX: It should be possible to set the font to be of Reference type again.
+- FIX: Moved the Localization file into Examples/Resources so that it doesn't break older localization projects.
+- FIX: Buttons that start with disabled colliders will now always assume their disabled state on start.
 - FIX: UIProgressBar will no longer send OnChange if the change was limited by the number of steps.
+- FIX: It should be possible to set the font to be of Reference type again.
 - FIX: UIKeyBinding will no longer leave the button in a highlighted state.
 - FIX: Another fix for scenes being marked as edited.
 - FIX: Fixed the 2D hit detection logic.
