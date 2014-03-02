@@ -292,6 +292,9 @@ static public class FreeType
 	{
 		get
 		{
+			// It's not possible to load C++ DLLs under anything other than Windows.
+			if (Application.platform != RuntimePlatform.WindowsEditor) return false;
+			
 			// According to Unity's documentation, placing the DLL into the Editor folder should make it possible
 			// to use it from within the editor. However from all my testing, that does not appear to be the case.
 			// The DLL has to be explicitly loaded first, or Unity doesn't seem to pick it up at all.
