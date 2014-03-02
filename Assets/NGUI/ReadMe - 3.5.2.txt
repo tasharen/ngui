@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.5.1
+            Version 3.5.2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -33,9 +33,33 @@ All can be found here: http://www.tasharen.com/forum/index.php?topic=6754.0
 
 Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.com/forum/index.php?topic=6
 
+-------------------
+  FreeType Library
+-------------------
+
+NGUI version 3.5.2 onwards includes the pre-compiled C++ FreeType library, which is an open source project (http://freetype.org/)
+FreeType license: http://git.savannah.gnu.org/cgit/freetype/freetype2.git/tree/docs/FTL.TXT
+This library is used only if you choose the "Generate Bitmap" font option in the Font Maker,
+and it will not be included in the build of your game. It's only used in the editor.
+
 -----------------
  Version History
 -----------------
+
+3.5.2
+- NEW: Added the ability to generate bitmap fonts from within Unity using FreeType directly.
+- NEW: You can now add transparent, clamped and tiling border to sprites via the Atlas inspector.
+- NEW: You can now modify any sprite to bake a shadow or add some visual depth to it (want deeper shadow? add multiple!)
+- NEW: UIImageButton's functionality is now a part of UIButton.
+- FIX: Labels using Packed Fonts no longer have the Gradient and Effect options, as they don't work with packed fonts.
+- FIX: It should be possible to set the font to be of Reference type again.
+- FIX: UIProgressBar will no longer send OnChange if the change was limited by the number of steps.
+- FIX: UIKeyBinding will no longer leave the button in a highlighted state.
+- FIX: Another fix for scenes being marked as edited.
+- FIX: Fixed the 2D hit detection logic.
+- FIX: Flash compile fix.
+- DEL: Removed Pixel Size property from UIFont. Set the label's target font size instead.
+- DEL: Removed UICamera's OnInput event as it wasn't being used (as it wasn't reliable).
 
 3.5.1
 - NEW: CSV reader will now convert the "\n" character sequence into a new line char.
