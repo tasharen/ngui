@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.5.2
+            Version 3.5.3
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -45,6 +45,11 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.5.3
+- NEW: All sprite types can now be flipped, not just simple sprites.
+- NEW: Exposed On Change event in UIInput's inspector.
+- FIX: UIButton will no longer pixel snap the normal sprite by default, and pixel snap is now off by default.
 
 3.5.2
 - NEW: Added the ability to generate bitmap fonts from within Unity using FreeType directly.
