@@ -47,7 +47,7 @@ public class UIButton : UIButtonColor
 	/// Whether the sprite changes will elicit a call to MakePixelPerfect() or not.
 	/// </summary>
 
-	public bool pixelSnap = true;
+	public bool pixelSnap = false;
 
 	/// <summary>
 	/// Click event listener.
