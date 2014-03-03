@@ -921,4 +921,27 @@ static public class NGUIMath
 		NGUITools.SetDirty(w);
 #endif
 	}
+
+	/// <summary>
+	/// Adjust the specified value by DPI: height * 96 / DPI.
+	/// This will result in in a smaller value returned for higher pixel density devices.
+	/// </summary>
+
+	static public int AdjustByDPI (float height)
+	{
+		float dpi = Screen.dpi;
+
+		RuntimePlatform platform = Application.platform;
+
+		if (dpi == 0f)
+		{
+			dpi = (platform == RuntimePlatform.Android || platform == RuntimePlatform.IPhonePlayer) ? 160f : 96f;
+#if UNITY_BLACKBERRY
+			if (platform == RuntimePlatform.BB10Player) dpi = 160f;
+#elif UNITY_WP8
+			if (platform == RuntimePlatform.WP8Player) dpi = 160f;
+#endif
+		}
+		return Mathf.RoundToInt(height * (96f / dpi));
+	}
 }

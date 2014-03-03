@@ -55,6 +55,12 @@ public class UIRoot : MonoBehaviour
 	public int maximumHeight = 1536;
 
 	/// <summary>
+	/// Whether the final value will be adjusted by the device's DPI setting.
+	/// </summary>
+
+	public bool adjustByDPI = false;
+
+	/// <summary>
 	/// UI Root's active height, based on the size of the screen.
 	/// </summary>
 
@@ -69,9 +75,9 @@ public class UIRoot : MonoBehaviour
 			if (scalingStyle == Scaling.FixedSizeOnMobiles)
 				return manualHeight;
 #endif
-			if (height < minimumHeight) return minimumHeight;
-			if (height > maximumHeight) return maximumHeight;
-			return height;
+			if (height < minimumHeight) height = minimumHeight;
+			if (height > maximumHeight) height = maximumHeight;
+			return adjustByDPI ? NGUIMath.AdjustByDPI(height) : height;
 		}
 	}
 
