@@ -846,17 +846,25 @@ static public class NGUIText
 			remainingWidth -= glyphWidth;
 
 			// If this marks the end of a word, add it to the final string.
-			if (ch == ' ' && prev != ' ' && start < offset)
+			if (ch == ' ')
 			{
-				int end = offset - start + 1;
+				if (prev == ' ')
+				{
+					sb.Append(' ');
+					start = offset + 1;
+				}
+				else if (prev != ' ' && start < offset)
+				{
+					int end = offset - start + 1;
 
-				// Last word on the last line should not include an invisible character
-				if (lineCount == maxLineCount && remainingWidth <= 0f && offset < textLength && text[offset] <= ' ') --end;
+					// Last word on the last line should not include an invisible character
+					if (lineCount == maxLineCount && remainingWidth <= 0f && offset < textLength && text[offset] <= ' ') --end;
 
-				sb.Append(text.Substring(start, end));
-				lineIsEmpty = false;
-				start = offset + 1;
-				prev = ch;
+					sb.Append(text.Substring(start, end));
+					lineIsEmpty = false;
+					start = offset + 1;
+					prev = ch;
+				}
 			}
 
 			// Doesn't fit?
@@ -894,9 +902,6 @@ static public class NGUIText
 				}
 				else
 				{
-					// Skip all spaces before the word
-					while (start < textLength && text[start] == ' ') ++start;
-
 					// Revert the position to the beginning of the word and reset the line
 					lineIsEmpty = true;
 					remainingWidth = rectWidth;
