@@ -42,25 +42,16 @@ public class UIDrawCall : MonoBehaviour
 		ConstrainButDontClip = 4,	// No actual clipping, but does have an area
 	}
 
-	[HideInInspector]
-	[System.NonSerialized]
-	public int depthStart = int.MaxValue;
-
-	[HideInInspector]
-	[System.NonSerialized]
-	public int depthEnd = int.MinValue;
-
-	[HideInInspector]
-	[System.NonSerialized]
-	public UIPanel manager;
-
-	[HideInInspector]
-	[System.NonSerialized]
-	public UIPanel panel;
-
-	[HideInInspector]
-	[System.NonSerialized]
-	public bool alwaysOnScreen = false;
+	[HideInInspector][System.NonSerialized] public int depthStart = int.MaxValue;
+	[HideInInspector][System.NonSerialized] public int depthEnd = int.MinValue;
+	[HideInInspector][System.NonSerialized] public UIPanel manager;
+	[HideInInspector][System.NonSerialized] public UIPanel panel;
+	[HideInInspector][System.NonSerialized] public bool alwaysOnScreen = false;
+	[HideInInspector][System.NonSerialized] public BetterList<Vector3> verts = new BetterList<Vector3>();
+	[HideInInspector][System.NonSerialized] public BetterList<Vector3> norms = new BetterList<Vector3>();
+	[HideInInspector][System.NonSerialized] public BetterList<Vector4> tans = new BetterList<Vector4>();
+	[HideInInspector][System.NonSerialized] public BetterList<Vector2> uvs = new BetterList<Vector2>();
+	[HideInInspector][System.NonSerialized] public BetterList<Color32> cols = new BetterList<Color32>();
 
 	Material		mMaterial;		// Material used by this screen
 	Texture			mTexture;		// Main texture used by the material
@@ -360,12 +351,7 @@ public class UIDrawCall : MonoBehaviour
 	/// Set the draw call's geometry.
 	/// </summary>
 
-	public void Set (
-		BetterList<Vector3> verts,
-		BetterList<Vector3> norms,
-		BetterList<Vector4> tans,
-		BetterList<Vector2> uvs,
-		BetterList<Color32> cols)
+	public void UpdateGeometry ()
 	{
 		int count = verts.size;
 
@@ -397,8 +383,8 @@ public class UIDrawCall : MonoBehaviour
 				// If the buffer length doesn't match, we need to trim all buffers
 				bool trim = (uvs.buffer.Length != verts.buffer.Length) ||
 					(cols.buffer.Length != verts.buffer.Length) ||
-					(norms != null && norms.buffer.Length != verts.buffer.Length) ||
-					(tans != null && tans.buffer.Length != verts.buffer.Length);
+					(norms.buffer != null && norms.buffer.Length != verts.buffer.Length) ||
+					(tans.buffer != null && tans.buffer.Length != verts.buffer.Length);
 
 				// Non-automatic render queues rely on Z position, so it's a good idea to trim everything
 				if (!trim && panel.renderQueue != UIPanel.RenderQueue.Automatic)
@@ -491,6 +477,12 @@ public class UIDrawCall : MonoBehaviour
 			if (mFilter.mesh != null) mFilter.mesh.Clear();
 			Debug.LogError("UIWidgets must fill the buffer with 4 vertices per quad. Found " + count);
 		}
+
+		verts.Clear();
+		uvs.Clear();
+		cols.Clear();
+		norms.Clear();
+		tans.Clear();
 	}
 
 	const int maxIndexBufferCache = 10;

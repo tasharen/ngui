@@ -133,13 +133,6 @@ public class UIPanel : UIRect
 	bool mRebuild = false;
 	bool mResized = false;
 
-	// Cached in order to reduce memory allocations
-	static BetterList<Vector3> mVerts = new BetterList<Vector3>();
-	static BetterList<Vector3> mNorms = new BetterList<Vector3>();
-	static BetterList<Vector4> mTans = new BetterList<Vector4>();
-	static BetterList<Vector2> mUvs = new BetterList<Vector2>();
-	static BetterList<Color32> mCols = new BetterList<Color32>();
-
 	Camera mCam;
 	[SerializeField] Vector2 mClipOffset = Vector2.zero;
 
@@ -1034,9 +1027,10 @@ public class UIPanel : UIRect
 
 				if (mat != mt || tex != tx || sdr != sd)
 				{
-					if (mVerts.size != 0)
+					if (dc != null && dc.verts.size != 0)
 					{
-						SubmitDrawCall(dc);
+						drawCalls.Add(dc);
+						dc.UpdateGeometry();
 						dc = null;
 					}
 
@@ -1063,28 +1057,18 @@ public class UIPanel : UIRect
 
 					w.drawCall = dc;
 
-					if (generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
-					else w.WriteToBuffers(mVerts, mUvs, mCols, null, null);
+					if (generateNormals) w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans);
+					else w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, null, null);
 				}
 			}
 			else w.drawCall = null;
 		}
-		if (mVerts.size != 0) SubmitDrawCall(dc);
-	}
 
-	/// <summary>
-	/// Submit the draw call using the current geometry.
-	/// </summary>
-
-	void SubmitDrawCall (UIDrawCall dc)
-	{
-		drawCalls.Add(dc);
-		dc.Set(mVerts, generateNormals ? mNorms : null, generateNormals ? mTans : null, mUvs, mCols);
-		mVerts.Clear();
-		mNorms.Clear();
-		mTans.Clear();
-		mUvs.Clear();
-		mCols.Clear();
+		if (dc != null && dc.verts.size != 0)
+		{
+			drawCalls.Add(dc);
+			dc.UpdateGeometry();
+		}
 	}
 
 	/// <summary>
@@ -1114,22 +1098,17 @@ public class UIPanel : UIRect
 				{
 					if (w.isVisible && w.hasVertices)
 					{
-						if (generateNormals) w.WriteToBuffers(mVerts, mUvs, mCols, mNorms, mTans);
-						else w.WriteToBuffers(mVerts, mUvs, mCols, null, null);
+						if (generateNormals) w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans);
+						else w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, null, null);
 					}
 					else w.drawCall = null;
 				}
 				++i;
 			}
 
-			if (mVerts.size != 0)
+			if (dc.verts.size != 0)
 			{
-				dc.Set(mVerts, generateNormals ? mNorms : null, generateNormals ? mTans : null, mUvs, mCols);
-				mVerts.Clear();
-				mNorms.Clear();
-				mTans.Clear();
-				mUvs.Clear();
-				mCols.Clear();
+				dc.UpdateGeometry();
 				return true;
 			}
 		}
