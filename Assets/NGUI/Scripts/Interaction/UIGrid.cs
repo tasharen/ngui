@@ -22,11 +22,26 @@ public class UIGrid : UIWidgetContainer
 		Vertical,
 	}
 
+	public enum Sorting
+	{
+		None,
+		Alphabetic,
+		Horizontal,
+		Vertical,
+		Custom,
+	}
+
 	/// <summary>
 	/// Type of arrangement -- vertical or horizontal.
 	/// </summary>
 
 	public Arrangement arrangement = Arrangement.Horizontal;
+
+	/// <summary>
+	/// How to sort the grid's elements.
+	/// </summary>
+
+	public Sorting sorting = Sorting.None;
 
 	/// <summary>
 	/// Maximum children per line.
@@ -55,12 +70,6 @@ public class UIGrid : UIWidgetContainer
 	public bool animateSmoothly = false;
 
 	/// <summary>
-	/// Whether the children will be sorted alphabetically prior to repositioning.
-	/// </summary>
-
-	public bool sorted = false;
-
-	/// <summary>
 	/// Whether to ignore the disabled children or to treat them as being present.
 	/// </summary>
 
@@ -78,15 +87,18 @@ public class UIGrid : UIWidgetContainer
 
 	public OnReposition onReposition;
 
+	// Use the 'sorting' property instead
+	[HideInInspector][SerializeField] bool sorted = false;
+
+	protected bool mReposition = false;
+	protected UIPanel mPanel;
+	protected bool mInitDone = false;
+
 	/// <summary>
 	/// Reposition the children on the next Update().
 	/// </summary>
 
 	public bool repositionNow { set { if (value) { mReposition = true; enabled = true; } } }
-
-	protected bool mReposition = false;
-	protected UIPanel mPanel;
-	protected bool mInitDone = false;
 
 	protected virtual void Init ()
 	{
@@ -110,7 +122,9 @@ public class UIGrid : UIWidgetContainer
 		enabled = false;
 	}
 
-	static protected int SortByName (Transform a, Transform b) { return string.Compare(a.name, b.name); }
+	static public int SortByName (Transform a, Transform b) { return string.Compare(a.name, b.name); }
+	static public int SortHorizontal (Transform a, Transform b) { return a.localPosition.x.CompareTo(b.localPosition.x); }
+	static public int SortVertical (Transform a, Transform b) { return b.localPosition.y.CompareTo(a.localPosition.y); }
 
 	/// <summary>
 	/// Want your own custom sorting logic? Override this function.
@@ -139,7 +153,7 @@ public class UIGrid : UIWidgetContainer
 		int x = 0;
 		int y = 0;
 
-		if (sorted)
+		if (sorting != Sorting.None || sorted)
 		{
 			List<Transform> list = new List<Transform>();
 
@@ -148,7 +162,11 @@ public class UIGrid : UIWidgetContainer
 				Transform t = myTrans.GetChild(i);
 				if (t && (!hideInactive || NGUITools.GetActive(t.gameObject))) list.Add(t);
 			}
-			Sort(list);
+
+			if (sorting == Sorting.Alphabetic) list.Sort(SortByName);
+			else if (sorting == Sorting.Horizontal) list.Sort(SortHorizontal);
+			else if (sorting == Sorting.Vertical) list.Sort(SortVertical);
+			else Sort(list);
 
 			for (int i = 0, imax = list.Count; i < imax; ++i)
 			{
