@@ -330,6 +330,11 @@ public class NGUITransformInspector : Editor
 			bool reset = GUILayout.Button("R", GUILayout.Width(20f));
 
 			Vector3 visible = (serializedObject.targetObject as Transform).localEulerAngles;
+
+			visible.x = NGUIMath.WrapAngle(visible.x);
+			visible.y = NGUIMath.WrapAngle(visible.y);
+			visible.z = NGUIMath.WrapAngle(visible.z);
+
 			Axes changed = CheckDifference(mRot);
 			Axes altered = Axes.None;
 
