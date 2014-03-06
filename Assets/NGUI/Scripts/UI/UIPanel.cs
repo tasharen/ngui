@@ -128,7 +128,9 @@ public class UIPanel : UIRect
 	[HideInInspector][SerializeField] Vector4 mClipRange = new Vector4(0f, 0f, 300f, 200f);
 	[HideInInspector][SerializeField] Vector2 mClipSoftness = new Vector2(4f, 4f);
 	[HideInInspector][SerializeField] int mDepth = 0;
-
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+	[HideInInspector][SerializeField] int mSortingOrder = 0;
+#endif
 	// Whether a full rebuild of geometry buffers is required
 	bool mRebuild = false;
 	bool mResized = false;
@@ -216,6 +218,31 @@ public class UIPanel : UIRect
 			}
 		}
 	}
+
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+	/// <summary>
+	/// Sorting order value for the panel's draw calls, to be used with Unity's 2D system.
+	/// </summary>
+
+	public int sortingOrder
+	{
+		get
+		{
+			return mSortingOrder;
+		}
+		set
+		{
+			if (mSortingOrder != value)
+			{
+				mSortingOrder = value;
+#if UNITY_EDITOR
+				NGUITools.SetDirty(this);
+#endif
+				UpdateDrawCalls();
+			}
+		}
+	}
+#endif
 
 	/// <summary>
 	/// Function that can be used to depth-sort panels.
@@ -1181,6 +1208,9 @@ public class UIPanel : UIRect
 			dc.clipSoftness = mClipSoftness;
 			dc.alwaysOnScreen = alwaysOnScreen &&
 				(mClipping == UIDrawCall.Clipping.None || mClipping == UIDrawCall.Clipping.ConstrainButDontClip);
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+			dc.sortingOrder = mSortingOrder;
+#endif
 		}
 	}
 

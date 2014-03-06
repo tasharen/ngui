@@ -107,6 +107,18 @@ public class UIDrawCall : MonoBehaviour
 		}
 	}
 
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+	/// <summary>
+	/// Renderer's sorting order, to be used with Unity's 2D system.
+	/// </summary>
+
+	public int sortingOrder
+	{
+		get { return (mRenderer != null) ? mRenderer.sortingOrder : 0; }
+		set { if (mRenderer != null && mRenderer.sortingOrder != value) mRenderer.sortingOrder = value; }
+	}
+#endif
+
 	/// <summary>
 	/// Final render queue used to draw the draw call's geometry.
 	/// </summary>
@@ -609,6 +621,9 @@ public class UIDrawCall : MonoBehaviour
 		dc.mainTexture = tex;
 		dc.shader = shader;
 		dc.renderQueue = pan.startingRenderQueue;
+#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+		dc.sortingOrder = pan.sortingOrder;
+#endif
 		dc.manager = pan;
 		return dc;
 	}
