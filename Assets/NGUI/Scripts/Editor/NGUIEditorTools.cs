@@ -952,7 +952,7 @@ public class NGUIEditorTools
 
 	static public void DrawSpriteField (string label, SerializedObject ob, string spriteField, params GUILayoutOption[] options)
 	{
-		DrawSpriteField(label, ob, ob.FindProperty("atlas"), ob.FindProperty(spriteField), 76f, false, options);
+		DrawSpriteField(label, ob, ob.FindProperty("atlas"), ob.FindProperty(spriteField), 76f, false, false, options);
 	}
 
 	/// <summary>
@@ -961,14 +961,23 @@ public class NGUIEditorTools
 
 	static public void DrawSpriteField (string label, SerializedObject ob, SerializedProperty atlas, SerializedProperty sprite, params GUILayoutOption[] options)
 	{
-		DrawSpriteField(label, ob, atlas, sprite, 76f, false, options);
+		DrawSpriteField(label, ob, atlas, sprite, 76f, false, false, options);
 	}
 
 	/// <summary>
 	/// Draw a sprite selection field.
 	/// </summary>
 
-	static public void DrawSpriteField (string label, SerializedObject ob, SerializedProperty atlas, SerializedProperty sprite, float width, bool padded, params GUILayoutOption[] options)
+	static public void DrawSpriteField (string label, SerializedObject ob, SerializedProperty atlas, SerializedProperty sprite, bool removable, params GUILayoutOption[] options)
+	{
+		DrawSpriteField(label, ob, atlas, sprite, 76f, false, removable, options);
+	}
+
+	/// <summary>
+	/// Draw a sprite selection field.
+	/// </summary>
+
+	static public void DrawSpriteField (string label, SerializedObject ob, SerializedProperty atlas, SerializedProperty sprite, float width, bool padded, bool removable, params GUILayoutOption[] options)
 	{
 		if (atlas != null && atlas.objectReferenceValue != null)
 		{
@@ -983,7 +992,7 @@ public class NGUIEditorTools
 			{
 				string spriteName = sprite.hasMultipleDifferentValues ? "-" : sprite.stringValue;
 
-				if (padded) GUILayout.BeginHorizontal();
+				GUILayout.BeginHorizontal();
 
 				EditorGUI.BeginDisabledGroup(atlas.hasMultipleDifferentValues);
 				{
@@ -992,11 +1001,15 @@ public class NGUIEditorTools
 				}
 				EditorGUI.EndDisabledGroup();
 
-				if (padded)
-				{
-					GUILayout.Space(18f);
-					GUILayout.EndHorizontal();
-				}
+				EditorGUI.BeginDisabledGroup(!removable);
+#if UNITY_3_5
+				if (GUILayout.Button("X", GUILayout.Width(20f))) sprite.stringValue = "";
+#else
+				if (GUILayout.Button("", "ToggleMixed", GUILayout.Width(20f))) sprite.stringValue = "";
+#endif
+				EditorGUI.EndDisabledGroup();
+				if (padded) GUILayout.Space(18f);
+				GUILayout.EndHorizontal();
 			}
 			GUILayout.EndHorizontal();
 		}

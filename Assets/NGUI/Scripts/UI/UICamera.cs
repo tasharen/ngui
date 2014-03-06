@@ -813,7 +813,7 @@ public class UICamera : MonoBehaviour
 
 	static public void Notify (GameObject go, string funcName, object obj)
 	{
-		if (go != null)
+		if (NGUITools.GetActive(go))
 		{
 			go.SendMessage(funcName, obj, SendMessageOptions.DontRequireReceiver);
 

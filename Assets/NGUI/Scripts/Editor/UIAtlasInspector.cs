@@ -307,11 +307,8 @@ public class UIAtlasInspector : Editor
 					if (GUILayout.Button("Crop Border")) CropBorder(sprite);
 					EditorGUI.EndDisabledGroup();
 
-					//GUILayout.BeginHorizontal();
 					mAlpha = GUILayout.HorizontalSlider(mAlpha, 0f, 1f);
 					string cap = Mathf.RoundToInt(mAlpha * 100f) + "%";
-					//GUILayout.Label(cap, GUILayout.Width(40f));
-					//GUILayout.EndHorizontal();
 
 					if (GUILayout.Button("Add a Shadow (" + cap + ")")) AddShadow(sprite);
 					if (GUILayout.Button("Add Visual Depth (" + cap + ")")) AddDepth(sprite);
