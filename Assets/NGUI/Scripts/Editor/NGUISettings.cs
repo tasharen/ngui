@@ -177,6 +177,18 @@ public class NGUISettings
 		set { SetColor("NGUI Color", value); }
 	}
 
+	static public Color foregroundColor
+	{
+		get { return GetColor("NGUI FG Color", Color.white); }
+		set { SetColor("NGUI FG Color", value); }
+	}
+
+	static public Color backgroundColor
+	{
+		get { return GetColor("NGUI BG Color", Color.black); }
+		set { SetColor("NGUI BG Color", value); }
+	}
+
 	static public ColorMode colorMode
 	{
 		get { return GetEnum("NGUI Color Mode", ColorMode.Blue); }

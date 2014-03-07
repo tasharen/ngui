@@ -40,7 +40,7 @@ public class UIFontInspector : Editor
 	string mSymbolSequence = "";
 	string mSymbolSprite = "";
 	BMSymbol mSelectedSymbol = null;
-	float mAlpha = 1f;
+	AnimationCurve mCurve = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f));
 
 	public override bool HasPreviewGUI () { return mView != View.Nothing; }
 
@@ -336,20 +336,30 @@ public class UIFontInspector : Editor
 				UISpriteData sd = mFont.sprite;
 
 				bool disable = (sd != null && (sd.paddingLeft != 0 || sd.paddingBottom != 0));
-				EditorGUI.BeginDisabledGroup(disable);
+				EditorGUI.BeginDisabledGroup(disable || mFont.packedFontShader);
 
 				EditorGUILayout.BeginHorizontal();
 				GUILayout.Space(20f);
 				EditorGUILayout.BeginVertical();
 
-				if (GUILayout.Button("Add Transparent Border (+1)")) AddBorder();
+				GUILayout.BeginHorizontal();
+				GUILayout.BeginVertical();
+				NGUISettings.foregroundColor = EditorGUILayout.ColorField("Foreground", NGUISettings.foregroundColor);
+				NGUISettings.backgroundColor = EditorGUILayout.ColorField("Background", NGUISettings.backgroundColor);
+				GUILayout.EndVertical();
+				mCurve = EditorGUILayout.CurveField("", mCurve, GUILayout.Width(40f), GUILayout.Height(40f));
+				GUILayout.EndHorizontal();
+
+				if (GUILayout.Button("Add a Shadow")) ApplyEffect(Effect.Shadow, NGUISettings.foregroundColor, NGUISettings.backgroundColor);
+				if (GUILayout.Button("Add a Soft Outline")) ApplyEffect(Effect.Outline, NGUISettings.foregroundColor, NGUISettings.backgroundColor);
+				if (GUILayout.Button("Rebalance Colors")) ApplyEffect(Effect.Rebalance, NGUISettings.foregroundColor, NGUISettings.backgroundColor);
+				if (GUILayout.Button("Apply Curve to Alpha")) ApplyEffect(Effect.AlphaCurve, NGUISettings.foregroundColor, NGUISettings.backgroundColor);
+				if (GUILayout.Button("Apply Curve to Foreground")) ApplyEffect(Effect.ForegroundCurve, NGUISettings.foregroundColor, NGUISettings.backgroundColor);
+				if (GUILayout.Button("Apply Curve to Background")) ApplyEffect(Effect.BackgroundCurve, NGUISettings.foregroundColor, NGUISettings.backgroundColor);
+
+				GUILayout.Space(10f);
+				if (GUILayout.Button("Add Transparent Border (+1)")) ApplyEffect(Effect.Border, NGUISettings.foregroundColor, NGUISettings.backgroundColor);
 				if (GUILayout.Button("Remove Border (-1)")) RemoveBorder();
-
-				mAlpha = GUILayout.HorizontalSlider(mAlpha, 0f, 1f);
-				string cap = Mathf.RoundToInt(mAlpha * 100f) + "%";
-
-				if (GUILayout.Button("Add a Shadow (" + cap + ")")) AddShadow();
-				if (GUILayout.Button("Add Visual Depth (" + cap + ")")) AddDepth();
 
 				EditorGUILayout.EndVertical();
 				GUILayout.Space(20f);
@@ -452,11 +462,22 @@ public class UIFontInspector : Editor
 		Repaint();
 	}
 
+	enum Effect
+	{
+		Rebalance,
+		ForegroundCurve,
+		BackgroundCurve,
+		AlphaCurve,
+		Border,
+		Shadow,
+		Outline,
+	}
+
 	/// <summary>
-	/// Add a single pixel transparent border around the font.
+	/// Apply an effect to the font.
 	/// </summary>
 
-	void AddBorder ()
+	void ApplyEffect (Effect effect, Color foreground, Color background)
 	{
 		BMFont bf = mFont.bmFont;
 		string path = AssetDatabase.GetAssetPath(mFont.texture);
@@ -472,12 +493,19 @@ public class UIFontInspector : Editor
 			BMGlyph glyph = glyphs[i];
 			if (glyph.width < 1 || glyph.height < 1) continue;
 
-			int newWidth = glyph.width + 2;
-			int newHeight = glyph.height + 2;
-			int size = newWidth * newHeight;
+			int width = glyph.width;
+			int height = glyph.height;
 
+			if (effect == Effect.Outline || effect == Effect.Shadow || effect == Effect.Border)
+			{
+				width += 2;
+				height += 2;
+			}
+
+			int size = width * height;
 			Color32[] colors = new Color32[size];
-			Color32 clear = new Color32(255, 255, 255, 0);
+			Color32 clear = background;
+			clear.a = 0;
 			for (int b = 0; b < size; ++b) colors[b] = clear;
 
 			for (int y = 0; y < glyph.height; ++y)
@@ -486,11 +514,32 @@ public class UIFontInspector : Editor
 				{
 					int fx = glyph.x + x;
 					int fy = mFont.texHeight - glyph.y - y - 1;
-					colors[x + 1 + (newHeight - y - 2) * newWidth] = atlas[fx + fy * bfTex.width];
+					Color c = atlas[fx + fy * bfTex.width];
+
+					if (effect == Effect.AlphaCurve) c.a = Mathf.Clamp01(mCurve.Evaluate(c.a));
+
+					Color bg = background;
+					bg.a = (effect == Effect.BackgroundCurve) ? Mathf.Clamp01(mCurve.Evaluate(c.a)) : c.a;
+
+					Color fg = foreground;
+					fg.a = (effect == Effect.ForegroundCurve) ? Mathf.Clamp01(mCurve.Evaluate(c.a)) : c.a;
+
+					if (effect == Effect.Outline || effect == Effect.Shadow || effect == Effect.Border)
+					{
+						colors[x + 1 + (glyph.height - y) * width] = Color.Lerp(bg, c, c.a);
+					}
+					else
+					{
+						colors[x + (glyph.height - y - 1) * width] = Color.Lerp(bg, fg, c.a);
+					}
 				}
 			}
 
-			Texture2D tex = new Texture2D(newWidth, newHeight, TextureFormat.ARGB32, false);
+			// Apply the appropriate affect
+			if (effect == Effect.Shadow) NGUIEditorTools.AddShadow(colors, width, height, NGUISettings.backgroundColor);
+			else if (effect == Effect.Outline) NGUIEditorTools.AddDepth(colors, width, height, NGUISettings.backgroundColor);
+
+			Texture2D tex = new Texture2D(width, height, TextureFormat.ARGB32, false);
 			tex.SetPixels32(colors);
 			tex.Apply();
 			glyphTextures.Add(tex);
@@ -501,16 +550,17 @@ public class UIFontInspector : Editor
 		Rect[] rects = final.PackTextures(glyphTextures.ToArray(), 1);
 		final.Apply();
 
-		// Make RGB channel pure white where there is transparency (Unity makes it black by default)
+		// Make RGB channel use the background color (Unity makes it black by default)
 		Color32[] fcs = final.GetPixels32();
+		Color32 bc = background;
 
 		for (int i = 0, imax = fcs.Length; i < imax; ++i)
 		{
 			if (fcs[i].a == 0)
 			{
-				fcs[i].r = 255;
-				fcs[i].g = 255;
-				fcs[i].b = 255;
+				fcs[i].r = bc.r;
+				fcs[i].g = bc.g;
+				fcs[i].b = bc.b;
 			}
 		}
 
@@ -534,8 +584,11 @@ public class UIFontInspector : Editor
 			glyph.height = Mathf.RoundToInt(rect.height * th);
 			glyph.y = th - glyph.y - glyph.height;
 
-			--glyph.offsetX;
-			--glyph.offsetY;
+			if (effect == Effect.Outline || effect == Effect.Shadow || effect == Effect.Border)
+			{
+				--glyph.offsetX;
+				--glyph.offsetY;
+			}
 		}
 
 		// Update the font's texture dimensions
@@ -568,6 +621,10 @@ public class UIFontInspector : Editor
 		// Refresh all labels
 		mFont.MarkAsChanged();
 	}
+
+	/// <summary>
+	/// Trim a single pixel around each letter.
+	/// </summary>
 
 	void RemoveBorder ()
 	{
@@ -685,15 +742,5 @@ public class UIFontInspector : Editor
 
 		// Refresh all labels
 		mFont.MarkAsChanged();
-	}
-
-	void AddDepth ()
-	{
-		throw new System.NotImplementedException();
-	}
-
-	void AddShadow ()
-	{
-		throw new System.NotImplementedException();
 	}
 }
