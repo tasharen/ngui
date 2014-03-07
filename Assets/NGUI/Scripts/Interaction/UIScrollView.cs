@@ -513,10 +513,6 @@ public class UIScrollView : MonoBehaviour
 		if (b.min.x == b.max.x || b.min.y == b.max.y) return;
 
 		Vector4 clip = mPanel.finalClipRegion;
-		clip.x = Mathf.Round(clip.x);
-		clip.y = Mathf.Round(clip.y);
-		clip.z = Mathf.Round(clip.z);
-		clip.w = Mathf.Round(clip.w);
 
 		float hx = clip.z * 0.5f;
 		float hy = clip.w * 0.5f;
@@ -536,9 +532,6 @@ public class UIScrollView : MonoBehaviour
 		// Calculate the offset based on the scroll value
 		float ox = Mathf.Lerp(left, right, x);
 		float oy = Mathf.Lerp(top, bottom, y);
-
-		ox = Mathf.Round(ox);
-		oy = Mathf.Round(oy);
 
 		// Update the position
 		if (!updateScrollbars)
