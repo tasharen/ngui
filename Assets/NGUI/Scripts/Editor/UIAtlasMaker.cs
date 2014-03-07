@@ -536,7 +536,7 @@ public class UIAtlasMaker : EditorWindow
 
 			// Load the texture we just saved as a Texture2D
 			AssetDatabase.SaveAssets();
-			AssetDatabase.Refresh();
+			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 			tex = NGUIEditorTools.ImportTexture(newPath, false, true, !atlas.premultipliedAlpha);
 
 			// Update the atlas texture
@@ -547,7 +547,7 @@ public class UIAtlasMaker : EditorWindow
 				ReleaseSprites(sprites);
 				
 				AssetDatabase.SaveAssets();
-				AssetDatabase.Refresh();
+				AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 			}
 			return true;
 		}
@@ -855,7 +855,7 @@ public class UIAtlasMaker : EditorWindow
 
 						// Save the material
 						AssetDatabase.CreateAsset(mat, matPath);
-						AssetDatabase.Refresh();
+						AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
 						// Load the material so it's usable
 						mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
@@ -874,7 +874,7 @@ public class UIAtlasMaker : EditorWindow
 					PrefabUtility.ReplacePrefab(go, prefab);
 					DestroyImmediate(go);
 					AssetDatabase.SaveAssets();
-					AssetDatabase.Refresh();
+					AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
 					// Select the atlas
 					go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;

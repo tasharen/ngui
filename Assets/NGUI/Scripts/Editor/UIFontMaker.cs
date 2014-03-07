@@ -200,7 +200,7 @@ public class UIFontMaker : EditorWindow
 
 							if (!string.IsNullOrEmpty(path))
 							{
-								if (Path.GetFileName(path) == "FreeType.dll")
+								if (System.IO.Path.GetFileName(path) == "FreeType.dll")
 								{
 									NGUISettings.pathToFreeType = path;
 								}
@@ -434,7 +434,7 @@ public class UIFontMaker : EditorWindow
 
 					// Save the material
 					AssetDatabase.CreateAsset(mat, matPath);
-					AssetDatabase.Refresh();
+					AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
 					// Load the material so it's usable
 					mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
@@ -504,12 +504,12 @@ public class UIFontMaker : EditorWindow
 
 						// Save the material
 						AssetDatabase.CreateAsset(mat, matPath);
-						AssetDatabase.Refresh();
+						AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
 						// Load the material so it's usable
 						mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
 					}
-					else AssetDatabase.Refresh();
+					else AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
 					// Re-load the texture
 					tex = AssetDatabase.LoadAssetAtPath(texPath, typeof(Texture2D)) as Texture2D;
@@ -530,7 +530,7 @@ public class UIFontMaker : EditorWindow
 			// Update the prefab
 			PrefabUtility.ReplacePrefab(go, prefab);
 			DestroyImmediate(go);
-			AssetDatabase.Refresh();
+			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
 			// Select the atlas
 			go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;

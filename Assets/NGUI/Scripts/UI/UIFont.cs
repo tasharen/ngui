@@ -62,13 +62,35 @@ public class UIFont : MonoBehaviour
 	/// Original width of the font's texture in pixels.
 	/// </summary>
 
-	public int texWidth { get { return (mReplacement != null) ? mReplacement.texWidth : ((mFont != null) ? mFont.texWidth : 1); } }
+	public int texWidth
+	{
+		get
+		{
+			return (mReplacement != null) ? mReplacement.texWidth : ((mFont != null) ? mFont.texWidth : 1);
+		}
+		set
+		{
+			if (mReplacement != null) mReplacement.texWidth = value;
+			else if (mFont != null) mFont.texWidth = value;
+		}
+	}
 
 	/// <summary>
 	/// Original height of the font's texture in pixels.
 	/// </summary>
 
-	public int texHeight { get { return (mReplacement != null) ? mReplacement.texHeight : ((mFont != null) ? mFont.texHeight : 1); } }
+	public int texHeight
+	{
+		get
+		{
+			return (mReplacement != null) ? mReplacement.texHeight : ((mFont != null) ? mFont.texHeight : 1);
+		}
+		set
+		{
+			if (mReplacement != null) mReplacement.texHeight = value;
+			else if (mFont != null) mFont.texHeight = value;
+		}
+	}
 
 	/// <summary>
 	/// Whether the font has any symbols defined.
@@ -305,16 +327,13 @@ public class UIFont : MonoBehaviour
 		{
 			if (mReplacement != null) return mReplacement.sprite;
 
-			if (mSprite == null)
+			if (mSprite == null && mAtlas != null && !string.IsNullOrEmpty(mFont.spriteName))
 			{
-				if (mAtlas != null && !string.IsNullOrEmpty(mFont.spriteName))
-				{
-					mSprite = mAtlas.GetSprite(mFont.spriteName);
+				mSprite = mAtlas.GetSprite(mFont.spriteName);
 
-					if (mSprite == null) mSprite = mAtlas.GetSprite(name);
-					if (mSprite == null) mFont.spriteName = null;
-					else UpdateUVRect();
-				}
+				if (mSprite == null) mSprite = mAtlas.GetSprite(name);
+				if (mSprite == null) mFont.spriteName = null;
+				else UpdateUVRect();
 
 				for (int i = 0, imax = mSymbols.Count; i < imax; ++i)
 					symbols[i].MarkAsChanged();

@@ -154,6 +154,8 @@ public class UIButtonColor : UIWidgetContainer
 #endif
 		if (mInitDone && tweenTarget != null)
 		{
+			SetState(State.Normal, true);
+
 			TweenColor tc = tweenTarget.GetComponent<TweenColor>();
 
 			if (tc != null)

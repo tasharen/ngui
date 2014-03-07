@@ -40,6 +40,7 @@ public class UIFontInspector : Editor
 	string mSymbolSequence = "";
 	string mSymbolSprite = "";
 	BMSymbol mSelectedSymbol = null;
+	float mAlpha = 1f;
 
 	public override bool HasPreviewGUI () { return mView != View.Nothing; }
 
@@ -246,29 +247,6 @@ public class UIFontInspector : Editor
 			}
 		}
 
-		// The font must be valid at this point for the rest of the options to show up
-		if (mFont.isDynamic || mFont.bmFont.isValid)
-		{
-			if (mFont.atlas == null)
-			{
-				mView = View.Font;
-				mUseShader = false;
-			}
-			EditorGUILayout.Space();
-		}
-
-		// Preview option
-		if (!mFont.isDynamic && mFont.atlas != null)
-		{
-			GUILayout.BeginHorizontal();
-			{
-				mView = (View)EditorGUILayout.EnumPopup("Preview", mView);
-				GUILayout.Label("Shader", GUILayout.Width(45f));
-				mUseShader = EditorGUILayout.Toggle(mUseShader, GUILayout.Width(20f));
-			}
-			GUILayout.EndHorizontal();
-		}
-
 		// Dynamic fonts don't support emoticons
 		if (!mFont.isDynamic && mFont.bmFont.isValid)
 		{
@@ -348,6 +326,69 @@ public class UIFontInspector : Editor
 				}
 			}
 		}
+
+		if (mFont.bmFont != null && mFont.bmFont.isValid)
+		{
+			if (NGUIEditorTools.DrawHeader("Modify"))
+			{
+				NGUIEditorTools.BeginContents();
+
+				UISpriteData sd = mFont.sprite;
+
+				bool disable = (sd != null && (sd.paddingLeft != 0 || sd.paddingBottom != 0));
+				EditorGUI.BeginDisabledGroup(disable);
+
+				EditorGUILayout.BeginHorizontal();
+				GUILayout.Space(20f);
+				EditorGUILayout.BeginVertical();
+
+				if (GUILayout.Button("Add Transparent Border (+1)")) AddBorder();
+				if (GUILayout.Button("Remove Border (-1)")) RemoveBorder();
+
+				mAlpha = GUILayout.HorizontalSlider(mAlpha, 0f, 1f);
+				string cap = Mathf.RoundToInt(mAlpha * 100f) + "%";
+
+				if (GUILayout.Button("Add a Shadow (" + cap + ")")) AddShadow();
+				if (GUILayout.Button("Add Visual Depth (" + cap + ")")) AddDepth();
+
+				EditorGUILayout.EndVertical();
+				GUILayout.Space(20f);
+				EditorGUILayout.EndHorizontal();
+
+				EditorGUI.EndDisabledGroup();
+
+				if (disable)
+				{
+					GUILayout.Space(3f);
+					EditorGUILayout.HelpBox("The sprite used by this font has been trimmed and is not suitable for modification. " +
+						"Try re-adding this sprite with 'Trim Alpha' disabled.", MessageType.Warning);
+				}
+
+				NGUIEditorTools.EndContents();
+			}
+		}
+
+		// The font must be valid at this point for the rest of the options to show up
+		if (mFont.isDynamic || mFont.bmFont.isValid)
+		{
+			if (mFont.atlas == null)
+			{
+				mView = View.Font;
+				mUseShader = false;
+			}
+		}
+
+		// Preview option
+		if (!mFont.isDynamic && mFont.atlas != null)
+		{
+			GUILayout.BeginHorizontal();
+			{
+				mView = (View)EditorGUILayout.EnumPopup("Preview", mView);
+				GUILayout.Label("Shader", GUILayout.Width(45f));
+				mUseShader = EditorGUILayout.Toggle(mUseShader, GUILayout.Width(20f));
+			}
+			GUILayout.EndHorizontal();
+		}
 	}
 
 	/// <summary>
@@ -389,7 +430,7 @@ public class UIFontInspector : Editor
 		{
 			Material m = (mUseShader ? mFont.material : null);
 
-			if (mView == View.Font && mFont.sprite != null)
+			if (mView == View.Font && mFont.atlas != null && mFont.sprite != null)
 			{
 				NGUIEditorTools.DrawSprite(tex, rect, mFont.sprite, Color.white, m);
 			}
@@ -409,5 +450,250 @@ public class UIFontInspector : Editor
 		NGUIEditorTools.RegisterUndo("Font Sprite", mFont);
 		mFont.spriteName = spriteName;
 		Repaint();
+	}
+
+	/// <summary>
+	/// Add a single pixel transparent border around the font.
+	/// </summary>
+
+	void AddBorder ()
+	{
+		BMFont bf = mFont.bmFont;
+		string path = AssetDatabase.GetAssetPath(mFont.texture);
+		Texture2D bfTex = NGUIEditorTools.ImportTexture(path, true, true, false);
+		Color32[] atlas = bfTex.GetPixels32();
+
+		// First we need to extract textures for all the glyphs, making them bigger in the process
+		List<BMGlyph> glyphs = bf.glyphs;
+		List<Texture2D> glyphTextures = new List<Texture2D>(glyphs.Count);
+
+		for (int i = 0, imax = glyphs.Count; i < imax; ++i)
+		{
+			BMGlyph glyph = glyphs[i];
+			if (glyph.width < 1 || glyph.height < 1) continue;
+
+			int newWidth = glyph.width + 2;
+			int newHeight = glyph.height + 2;
+			int size = newWidth * newHeight;
+
+			Color32[] colors = new Color32[size];
+			Color32 clear = new Color32(255, 255, 255, 0);
+			for (int b = 0; b < size; ++b) colors[b] = clear;
+
+			for (int y = 0; y < glyph.height; ++y)
+			{
+				for (int x = 0; x < glyph.width; ++x)
+				{
+					int fx = glyph.x + x;
+					int fy = mFont.texHeight - glyph.y - y - 1;
+					colors[x + 1 + (newHeight - y - 2) * newWidth] = atlas[fx + fy * bfTex.width];
+				}
+			}
+
+			Texture2D tex = new Texture2D(newWidth, newHeight, TextureFormat.ARGB32, false);
+			tex.SetPixels32(colors);
+			tex.Apply();
+			glyphTextures.Add(tex);
+		}
+
+		// Pack all glyphs into a new texture
+		Texture2D final = new Texture2D(bfTex.width, bfTex.height, TextureFormat.ARGB32, false);
+		Rect[] rects = final.PackTextures(glyphTextures.ToArray(), 1);
+		final.Apply();
+
+		// Make RGB channel pure white where there is transparency (Unity makes it black by default)
+		Color32[] fcs = final.GetPixels32();
+
+		for (int i = 0, imax = fcs.Length; i < imax; ++i)
+		{
+			if (fcs[i].a == 0)
+			{
+				fcs[i].r = 255;
+				fcs[i].g = 255;
+				fcs[i].b = 255;
+			}
+		}
+
+		final.SetPixels32(fcs);
+		final.Apply();
+
+		// Update the glyph rectangles
+		int index = 0;
+		int tw = final.width;
+		int th = final.height;
+
+		for (int i = 0, imax = glyphs.Count; i < imax; ++i)
+		{
+			BMGlyph glyph = glyphs[i];
+			if (glyph.width < 1 || glyph.height < 1) continue;
+
+			Rect rect = rects[index++];
+			glyph.x = Mathf.RoundToInt(rect.x * tw);
+			glyph.y = Mathf.RoundToInt(rect.y * th);
+			glyph.width = Mathf.RoundToInt(rect.width * tw);
+			glyph.height = Mathf.RoundToInt(rect.height * th);
+			glyph.y = th - glyph.y - glyph.height;
+
+			--glyph.offsetX;
+			--glyph.offsetY;
+		}
+
+		// Update the font's texture dimensions
+		mFont.texWidth = final.width;
+		mFont.texHeight = final.height;
+
+		if (mFont.atlas == null)
+		{
+			// Save the final texture
+			byte[] bytes = final.EncodeToPNG();
+			NGUITools.DestroyImmediate(final);
+			System.IO.File.WriteAllBytes(path, bytes);
+			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+		}
+		else
+		{
+			// Update the atlas
+			final.name = mFont.spriteName;
+			bool val = NGUISettings.atlasTrimming;
+			NGUISettings.atlasTrimming = false;
+			UIAtlasMaker.AddOrUpdate(mFont.atlas, final);
+			NGUISettings.atlasTrimming = val;
+			NGUITools.DestroyImmediate(final);
+		}
+
+		// Cleanup
+		for (int i = 0; i < glyphTextures.Count; ++i)
+			NGUITools.DestroyImmediate(glyphTextures[i]);
+
+		// Refresh all labels
+		mFont.MarkAsChanged();
+	}
+
+	void RemoveBorder ()
+	{
+		BMFont bf = mFont.bmFont;
+		string path = AssetDatabase.GetAssetPath(mFont.texture);
+		Texture2D bfTex = NGUIEditorTools.ImportTexture(path, true, true, false);
+		Color32[] atlas = bfTex.GetPixels32();
+
+		// First we need to extract textures for all the glyphs, making them bigger in the process
+		List<BMGlyph> glyphs = bf.glyphs;
+		List<Texture2D> glyphTextures = new List<Texture2D>(glyphs.Count);
+
+		for (int i = 0, imax = glyphs.Count; i < imax; ++i)
+		{
+			BMGlyph glyph = glyphs[i];
+			if (glyph.width < 1 || glyph.height < 1) continue;
+
+			int newWidth = glyph.width - 2;
+			int newHeight = glyph.height - 2;
+			if (newWidth < 1 || newHeight < 1) continue;
+			int size = newWidth * newHeight;
+
+			Color32[] colors = new Color32[size];
+			Color32 clear = new Color32(255, 255, 255, 0);
+			for (int b = 0; b < size; ++b) colors[b] = clear;
+
+			for (int y = 0; y < newHeight; ++y)
+			{
+				for (int x = 0; x < newWidth; ++x)
+				{
+					int fx = glyph.x + x + 1;
+					int fy = glyph.y + y + 1;
+
+					fy = mFont.texHeight - fy - 1;
+
+					Color32 c = atlas[fx + fy * bfTex.width];
+					colors[x + (newHeight - y - 1) * newWidth] = c;
+				}
+			}
+
+			Texture2D tex = new Texture2D(newWidth, newHeight, TextureFormat.ARGB32, false);
+			tex.SetPixels32(colors);
+			tex.Apply();
+			glyphTextures.Add(tex);
+		}
+
+		// Pack all glyphs into a new texture
+		Texture2D final = new Texture2D(bfTex.width, bfTex.height, TextureFormat.ARGB32, false);
+		Rect[] rects = final.PackTextures(glyphTextures.ToArray(), 1);
+		final.Apply();
+
+		// Make RGB channel pure white where there is transparency (Unity makes it black by default)
+		Color32[] fcs = final.GetPixels32();
+
+		for (int i = 0, imax = fcs.Length; i < imax; ++i)
+		{
+			if (fcs[i].a == 0)
+			{
+				fcs[i].r = 255;
+				fcs[i].g = 255;
+				fcs[i].b = 255;
+			}
+		}
+
+		final.SetPixels32(fcs);
+		final.Apply();
+
+		// Update the glyph rectangles
+		int index = 0;
+		int tw = final.width;
+		int th = final.height;
+
+		for (int i = 0, imax = glyphs.Count; i < imax; ++i)
+		{
+			BMGlyph glyph = glyphs[i];
+			if (glyph.width < 1 || glyph.height < 1) continue;
+
+			Rect rect = rects[index++];
+			glyph.x = Mathf.RoundToInt(rect.x * tw);
+			glyph.y = Mathf.RoundToInt(rect.y * th);
+			glyph.width = Mathf.RoundToInt(rect.width * tw);
+			glyph.height = Mathf.RoundToInt(rect.height * th);
+			glyph.y = th - glyph.y - glyph.height;
+
+			++glyph.offsetX;
+			++glyph.offsetY;
+		}
+
+		// Update the font's texture dimensions
+		mFont.texWidth = final.width;
+		mFont.texHeight = final.height;
+
+		if (mFont.atlas == null)
+		{
+			// Save the final texture
+			byte[] bytes = final.EncodeToPNG();
+			NGUITools.DestroyImmediate(final);
+			System.IO.File.WriteAllBytes(path, bytes);
+			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+		}
+		else
+		{
+			// Update the atlas
+			final.name = mFont.spriteName;
+			bool val = NGUISettings.atlasTrimming;
+			NGUISettings.atlasTrimming = false;
+			UIAtlasMaker.AddOrUpdate(mFont.atlas, final);
+			NGUISettings.atlasTrimming = val;
+			NGUITools.DestroyImmediate(final);
+		}
+
+		// Cleanup
+		for (int i = 0; i < glyphTextures.Count; ++i)
+			NGUITools.DestroyImmediate(glyphTextures[i]);
+
+		// Refresh all labels
+		mFont.MarkAsChanged();
+	}
+
+	void AddDepth ()
+	{
+		throw new System.NotImplementedException();
+	}
+
+	void AddShadow ()
+	{
+		throw new System.NotImplementedException();
 	}
 }
