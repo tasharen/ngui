@@ -1469,7 +1469,7 @@ public class UICamera : MonoBehaviour
 					}
 
 					// If the touch should consider clicks, send out an OnClick notification
-					if (currentTouch.clickNotification != ClickNotification.None)
+					if (currentTouch.clickNotification != ClickNotification.None && currentTouch.pressed == currentTouch.current)
 					{
 						float time = RealTime.time;
 

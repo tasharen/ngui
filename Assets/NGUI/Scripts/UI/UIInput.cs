@@ -513,7 +513,15 @@ public class UIInput : MonoBehaviour
 				for (int i = 0; i < s.Length; ++i)
 				{
 					char ch = s[i];
-					if (ch >= ' ') Insert(ch.ToString());
+					if (ch < ' ') continue;
+
+					// OSX inserts these characters for arrow keys
+					if (ch == '\u0700') continue;
+					if (ch == '\u0701') continue;
+					if (ch == '\u0702') continue;
+					if (ch == '\u0703') continue;
+
+					Insert(ch.ToString());
 				}
 			}
 
