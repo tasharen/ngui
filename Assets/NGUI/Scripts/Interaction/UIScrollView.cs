@@ -162,7 +162,7 @@ public class UIScrollView : MonoBehaviour
 	/// Calculate the bounds used by the widgets.
 	/// </summary>
 
-	public Bounds bounds
+	public virtual Bounds bounds
 	{
 		get
 		{

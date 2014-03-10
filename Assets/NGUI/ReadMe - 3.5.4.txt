@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.5.3
+            Version 3.5.4
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -45,6 +45,21 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.5.4
+- NEW: You can now bake basic effects into bitmap fonts via inspector: soft shadow, soft outline, bevel, etc.
+- NEW: Added a way to set the Sorting Order on panels using Explicit Render Queues (for Unity 2D).
+- NEW: Cached buffers are now per-draw call rather than global, reducing memory allocations.
+- NEW: Added a "tall portrait mode" setting to the UIRoot that will shrink the UI if it's in portrait mode.
+- NEW: Added a new experimental option to the UIRoot: "Adjust by DPI".
+- NEW: UIGrid and UITable now has the horizontal and vertical sorting options so drag & drop items can stay where you dropped them.
+- FIX: You can now clear sprite states under UIButton.
+- FIX: OSX character keys resulted from arrow key presses will now be ignored by UIInput.
+- FIX: Fixed an issue with scrollviews being anchored to non-centered widgets.
+- FIX: Input selection and caret should now be affected by parent alpha properly.
+- FIX: Transform inspector will now always display rotation in -180 to 180 range.
+- FIX: CSV parser now supports multi-line input without having to insert "\n".
+- FIX: A multi-line input field with a lot of spaces will now wrap correctly.
 
 3.5.3
 - NEW: All sprite types can now be flipped, not just simple sprites.
