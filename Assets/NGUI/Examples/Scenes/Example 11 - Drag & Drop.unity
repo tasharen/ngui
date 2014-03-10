@@ -136,9 +136,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 20}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!1 &24
 GameObject:
@@ -361,13 +365,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07c4de3b4b6fe9045b059ee627c100df, type: 1}
   m_Name: 
   arrangement: 1
+  sorting: 3
   maxPerLine: 0
   cellWidth: 100
   cellHeight: 100
   animateSmoothly: 1
-  sorted: 1
   hideInactive: 1
   keepWithinPanel: 0
+  sorted: 1
 --- !u!4 &42
 Transform:
   m_ObjectHideFlags: 0
@@ -686,6 +691,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf6484591c9cb0e409f5c53c6978a95d, type: 1}
   m_Name: 
   rotationsPerSecond: {x: 0, y: .00999999978, z: 0}
+  ignoreTimeScale: 0
 --- !u!114 &90
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -826,6 +832,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -873,6 +880,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -920,6 +928,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -1008,6 +1017,8 @@ MonoBehaviour:
   manualHeight: 720
   minimumHeight: 320
   maximumHeight: 1536
+  adjustByDPI: 0
+  shrinkPortraitUI: 0
 --- !u!114 &116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1281,6 +1292,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -1385,6 +1397,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -1416,9 +1429,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 227252772}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!1 &297538260
 GameObject:
@@ -1518,6 +1535,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -1549,9 +1567,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 297538260}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!1 &306477862
 GameObject:
@@ -1609,9 +1631,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 306477862}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!114 &306477867
 MonoBehaviour:
@@ -1655,6 +1681,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -1729,6 +1756,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -1803,6 +1831,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -1877,6 +1906,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -1951,6 +1981,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -2025,6 +2056,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -2128,6 +2160,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -2160,9 +2193,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 650606776}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!1 &710038377
 GameObject:
@@ -2364,6 +2401,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -2396,9 +2434,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 722266121}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!1 &760194420
 GameObject:
@@ -2497,6 +2539,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -2529,9 +2572,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 760194420}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!1 &818940270
 GameObject:
@@ -2631,6 +2678,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -2662,9 +2710,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 818940270}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!1 &830441777
 GameObject:
@@ -2710,13 +2762,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07c4de3b4b6fe9045b059ee627c100df, type: 1}
   m_Name: 
   arrangement: 1
+  sorting: 3
   maxPerLine: 0
   cellWidth: 100
   cellHeight: 100
   animateSmoothly: 1
-  sorted: 1
   hideInactive: 1
   keepWithinPanel: 0
+  sorted: 1
 --- !u!1 &848388262
 GameObject:
   m_ObjectHideFlags: 0
@@ -2917,6 +2970,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -2949,9 +3003,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 856643762}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!1 &927329124
 GameObject:
@@ -3021,6 +3079,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -3239,6 +3298,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -3313,6 +3373,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -3387,6 +3448,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -3491,6 +3553,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -3522,9 +3585,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1325024848}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!1 &1327411864
 GameObject:
@@ -3623,6 +3690,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -3655,9 +3723,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1327411864}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!1 &1376065658
 GameObject:
@@ -3727,6 +3799,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -3945,6 +4018,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -4147,6 +4221,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -4167,9 +4242,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1675588936}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .5, g: .5, b: .5, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!114 &1675588941
 MonoBehaviour:
@@ -4254,9 +4333,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1706457509}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .5, g: .5, b: .5, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!114 &1706457513
 MonoBehaviour:
@@ -4300,6 +4383,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -4400,6 +4484,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -4504,6 +4589,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -4535,9 +4621,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1771743970}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!1 &1958127439
 GameObject:
@@ -4637,6 +4727,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -4668,9 +4759,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 1958127439}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!1 &2069478556
 GameObject:
@@ -4756,6 +4851,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -4776,9 +4872,13 @@ MonoBehaviour:
   tweenTarget: {fileID: 2069478556}
   hover: {r: .882352948, g: .784313738, b: .588235319, a: 1}
   pressed: {r: .717647076, g: .639215708, b: .482352942, a: 1}
-  duration: .200000003
   disabledColor: {r: .5, g: .5, b: .5, a: 1}
+  duration: .200000003
   dragHighlight: 0
+  hoverSprite: 
+  pressedSprite: 
+  disabledSprite: 
+  pixelSnap: 0
   onClick: []
 --- !u!1 &2108089611
 GameObject:
@@ -4848,6 +4948,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
