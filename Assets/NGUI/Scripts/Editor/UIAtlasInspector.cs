@@ -621,7 +621,7 @@ public class UIAtlasInspector : Editor
 			int w2 = w1 + 2;
 			int h2 = h1 + 2;
 
-			Color32[] c2 = NGUIEditorTools.AddBorder(se.tex.GetPixels32(), w1, w2);
+			Color32[] c2 = NGUIEditorTools.AddBorder(se.tex.GetPixels32(), w1, h1);
 			NGUIEditorTools.AddShadow(c2, w2, h2, NGUISettings.backgroundColor);
 
 			if (se.temporaryTexture) DestroyImmediate(se.tex);

@@ -33,9 +33,9 @@ All can be found here: http://www.tasharen.com/forum/index.php?topic=6754.0
 
 Using NGUI with JavaScript (UnityScript)? Read this first: http://www.tasharen.com/forum/index.php?topic=6
 
--------------------
-  FreeType Library
--------------------
+------------------
+ FreeType Library
+------------------
 
 NGUI version 3.5.2 onwards includes the pre-compiled C++ FreeType library, which is an open source project (http://freetype.org/)
 FreeType license: http://git.savannah.gnu.org/cgit/freetype/freetype2.git/tree/docs/FTL.TXT
