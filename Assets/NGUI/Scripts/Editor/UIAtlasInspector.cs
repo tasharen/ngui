@@ -255,19 +255,8 @@ public class UIAtlasInspector : Editor
 
 					if (GUILayout.Button("Duplicate"))
 					{
-						UIAtlasMaker.SpriteEntry se = UIAtlasMaker.ExtractSprite(mAtlas, sprite.name);
-						
-						if (se != null)
-						{
-							se.name = se.name + " (Copy)";
-
-							List<UIAtlasMaker.SpriteEntry> sprites = new List<UIAtlasMaker.SpriteEntry>();
-							UIAtlasMaker.ExtractSprites(mAtlas, sprites);
-							sprites.Add(se);
-							UIAtlasMaker.UpdateAtlas(mAtlas, sprites);
-							if (se.temporaryTexture) DestroyImmediate(se.tex);
-							NGUISettings.selectedSprite = se.name;
-						}
+						UIAtlasMaker.SpriteEntry se = UIAtlasMaker.DuplicateSprite(mAtlas, sprite.name);
+						if (se != null) NGUISettings.selectedSprite = se.name;
 					}
 
 					if (GUILayout.Button("Save As..."))
@@ -389,7 +378,7 @@ public class UIAtlasInspector : Editor
 			int w2 = w1 + 2;
 			int h2 = h1 + 2;
 
-			Color32[] c2 = NGUIEditorTools.AddBorder(se.tex.GetPixels32(), w1, w2);
+			Color32[] c2 = NGUIEditorTools.AddBorder(se.tex.GetPixels32(), w1, h1);
 
 			if (se.temporaryTexture) DestroyImmediate(se.tex);
 
@@ -626,10 +615,13 @@ public class UIAtlasInspector : Editor
 
 			if (se.temporaryTexture) DestroyImmediate(se.tex);
 
-			++se.borderLeft;
-			++se.borderRight;
-			++se.borderTop;
-			++se.borderBottom;
+			if ((se.borderLeft | se.borderRight | se.borderBottom | se.borderTop) != 0)
+			{
+				++se.borderLeft;
+				++se.borderRight;
+				++se.borderTop;
+				++se.borderBottom;
+			}
 
 			se.tex = new Texture2D(w2, h2);
 			se.tex.name = sprite.name;
@@ -671,15 +663,18 @@ public class UIAtlasInspector : Editor
 			int w2 = w1 + 2;
 			int h2 = h1 + 2;
 
-			Color32[] c2 = NGUIEditorTools.AddBorder(se.tex.GetPixels32(), w1, w2);
+			Color32[] c2 = NGUIEditorTools.AddBorder(se.tex.GetPixels32(), w1, h1);
 			NGUIEditorTools.AddDepth(c2, w2, h2, NGUISettings.backgroundColor);
 
 			if (se.temporaryTexture) DestroyImmediate(se.tex);
 
-			++se.borderLeft;
-			++se.borderRight;
-			++se.borderTop;
-			++se.borderBottom;
+			if ((se.borderLeft | se.borderRight | se.borderBottom | se.borderTop) != 0)
+			{
+				++se.borderLeft;
+				++se.borderRight;
+				++se.borderTop;
+				++se.borderBottom;
+			}
 
 			se.tex = new Texture2D(w2, h2);
 			se.tex.name = sprite.name;

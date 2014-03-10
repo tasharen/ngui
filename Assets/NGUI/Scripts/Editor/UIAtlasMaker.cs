@@ -369,6 +369,33 @@ public class UIAtlasMaker : EditorWindow
 	}
 
 	/// <summary>
+	/// Duplicate the specified sprite.
+	/// </summary>
+
+	static public SpriteEntry DuplicateSprite (UIAtlas atlas, string spriteName)
+	{
+		if (atlas == null || atlas.texture == null) return null;
+		UISpriteData sd = atlas.GetSprite(spriteName);
+		if (sd == null) return null;
+
+		Texture2D tex = NGUIEditorTools.ImportTexture(atlas.texture, true, true, false);
+		SpriteEntry se = ExtractSprite(sd, tex);
+
+		if (se != null)
+		{
+			se.name = se.name + " (Copy)";
+
+			List<UIAtlasMaker.SpriteEntry> sprites = new List<UIAtlasMaker.SpriteEntry>();
+			UIAtlasMaker.ExtractSprites(atlas, sprites);
+			sprites.Add(se);
+			UIAtlasMaker.UpdateAtlas(atlas, sprites);
+			if (se.temporaryTexture) DestroyImmediate(se.tex);
+		}
+		else NGUIEditorTools.ImportTexture(atlas.texture, false, false, !atlas.premultipliedAlpha);
+		return se;
+	}
+
+	/// <summary>
 	/// Extract the specified sprite from the atlas.
 	/// </summary>
 
@@ -378,7 +405,7 @@ public class UIAtlasMaker : EditorWindow
 		UISpriteData sd = atlas.GetSprite(spriteName);
 		if (sd == null) return null;
 
-		Texture2D tex = NGUIEditorTools.ImportTexture(atlas.texture, true, false, !atlas.premultipliedAlpha);
+		Texture2D tex = NGUIEditorTools.ImportTexture(atlas.texture, true, true, false);
 		SpriteEntry se = ExtractSprite(sd, tex);
 		NGUIEditorTools.ImportTexture(atlas.texture, false, false, !atlas.premultipliedAlpha);
 		return se;
@@ -447,7 +474,7 @@ public class UIAtlasMaker : EditorWindow
 		ShowProgress(0f);
 
 		// Make the atlas texture readable
-		Texture2D tex = NGUIEditorTools.ImportTexture(atlas.texture, true, false, !atlas.premultipliedAlpha);
+		Texture2D tex = NGUIEditorTools.ImportTexture(atlas.texture, true, true, false);
 
 		if (tex != null)
 		{
@@ -524,7 +551,7 @@ public class UIAtlasMaker : EditorWindow
 		else
 		{
 			// Make the atlas readable so we can save it
-			tex = NGUIEditorTools.ImportTexture(oldPath, true, false, !atlas.premultipliedAlpha);
+			tex = NGUIEditorTools.ImportTexture(oldPath, true, false, false);
 		}
 
 		// Pack the sprites into this texture
