@@ -131,20 +131,20 @@ public class UIScrollView : MonoBehaviour
 	// Deprecated functionality. Use 'contentPivot' instead.
 	[SerializeField][HideInInspector] Vector2 relativePositionOnReset = Vector2.zero;
 
-	Transform mTrans;
-	UIPanel mPanel;
-	Plane mPlane;
-	Vector3 mLastPos;
-	bool mPressed = false;
-	Vector3 mMomentum = Vector3.zero;
-	float mScroll = 0f;
-	Bounds mBounds;
-	bool mCalculatedBounds = false;
-	bool mShouldMove = false;
-	bool mIgnoreCallbacks = false;
-	int mDragID = -10;
-	Vector2 mDragStartOffset = Vector2.zero;
-	bool mDragStarted = false;
+	protected Transform mTrans;
+	protected UIPanel mPanel;
+	protected Plane mPlane;
+	protected Vector3 mLastPos;
+	protected bool mPressed = false;
+	protected Vector3 mMomentum = Vector3.zero;
+	protected float mScroll = 0f;
+	protected Bounds mBounds;
+	protected bool mCalculatedBounds = false;
+	protected bool mShouldMove = false;
+	protected bool mIgnoreCallbacks = false;
+	protected int mDragID = -10;
+	protected Vector2 mDragStartOffset = Vector2.zero;
+	protected bool mDragStarted = false;
 
 	/// <summary>
 	/// Panel that's being dragged.
@@ -327,7 +327,7 @@ public class UIScrollView : MonoBehaviour
 	/// Set the initial drag value and register the listener delegates.
 	/// </summary>
 
-	void Start ()
+	protected virtual void Start ()
 	{
 		//UpdatePosition();
 
@@ -475,7 +475,7 @@ public class UIScrollView : MonoBehaviour
 	/// Helper function used in UpdateScrollbars(float) function above.
 	/// </summary>
 
-	void UpdateScrollbars (UIScrollBar sb, float contentMin, float contentMax, float contentSize, float viewSize, bool inverted)
+	protected void UpdateScrollbars (UIScrollBar sb, float contentMin, float contentMax, float contentSize, float viewSize, bool inverted)
 	{
 		if (viewSize < contentSize)
 		{
