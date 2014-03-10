@@ -1903,31 +1903,17 @@ public class NGUIEditorTools
 				if (uc.a == 255) continue;
 
 				Color original = uc;
-				float val = original.a * 2f;
-				int count = 2;
+				float val = original.a;
+				int count = 1;
 				float div1 = 1f / 255f;
 				float div2 = 2f / 255f;
-				float div4 = 4f / 255f;
+				float div3 = 3f / 255f;
 
 				// Left
 				if (x2 != 0)
 				{
-					val += colors[x2 - 1 + y2 * width].a * div2;
-					count += 2;
-				}
-
-				// Right
-				if (x2 + 1 != width)
-				{
-					val += colors[x2 + 1 + y2 * width].a * div1;
-					++count;
-				}
-
-				// Bottom
-				if (y2 != 0)
-				{
-					val += colors[x2 + (y2 - 1) * width].a * div1;
-					++count;
+					val += colors[x2 - 1 + y2 * width].a * div1;
+					count += 1;
 				}
 
 				// Top
@@ -1937,25 +1923,11 @@ public class NGUIEditorTools
 					count += 2;
 				}
 
-				// Bottom-left
-				if (x2 != 0 && y2 != 0)
-				{
-					val += colors[x2 - 1 + (y2 - 1) * width].a * div1;
-					++count;
-				}
-
 				// Top-left
 				if (x2 != 0 && y2 + 1 != height)
 				{
-					val += colors[x2 - 1 + (y2 + 1) * width].a * div4;
-					count += 4;
-				}
-
-				// Top-right
-				if (x2 + 1 != width && y2 + 1 != height)
-				{
-					val += colors[x2 + 1 + (y2 + 1) * width].a * div1;
-					++count;
+					val += colors[x2 - 1 + (y2 + 1) * width].a * div3;
+					count += 3;
 				}
 
 				val /= count;

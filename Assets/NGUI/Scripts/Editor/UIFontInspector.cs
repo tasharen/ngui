@@ -480,6 +480,17 @@ public class UIFontInspector : Editor
 	void ApplyEffect (Effect effect, Color foreground, Color background)
 	{
 		BMFont bf = mFont.bmFont;
+		int offsetX = 0;
+		int offsetY = 0;
+
+		if (mFont.atlas != null)
+		{
+			UISpriteData sd = mFont.atlas.GetSprite(bf.spriteName);
+			if (sd == null) return;
+			offsetX = sd.x;
+			offsetY = sd.y + mFont.texHeight - sd.paddingTop;
+		}
+
 		string path = AssetDatabase.GetAssetPath(mFont.texture);
 		Texture2D bfTex = NGUIEditorTools.ImportTexture(path, true, true, false);
 		Color32[] atlas = bfTex.GetPixels32();
@@ -512,8 +523,9 @@ public class UIFontInspector : Editor
 			{
 				for (int x = 0; x < glyph.width; ++x)
 				{
-					int fx = glyph.x + x;
-					int fy = mFont.texHeight - glyph.y - y - 1;
+					int fx = x + glyph.x + offsetX;
+					int fy = y + (mFont.texHeight - glyph.y - glyph.height) + (bfTex.height - offsetY - 1);
+
 					Color c = atlas[fx + fy * bfTex.width];
 
 					if (effect == Effect.AlphaCurve) c.a = Mathf.Clamp01(mCurve.Evaluate(c.a));
@@ -526,11 +538,11 @@ public class UIFontInspector : Editor
 
 					if (effect == Effect.Outline || effect == Effect.Shadow || effect == Effect.Border)
 					{
-						colors[x + 1 + (glyph.height - y) * width] = Color.Lerp(bg, c, c.a);
+						colors[x + 1 + (y + 1) * width] = Color.Lerp(bg, c, c.a);
 					}
 					else
 					{
-						colors[x + (glyph.height - y - 1) * width] = Color.Lerp(bg, fg, c.a);
+						colors[x + y * width] = Color.Lerp(bg, fg, c.a);
 					}
 				}
 			}
