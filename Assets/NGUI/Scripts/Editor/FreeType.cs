@@ -608,11 +608,14 @@ static public class FreeType
 				min = Mathf.Min(min, -glyph.offsetY - glyph.height);
 			}
 
+			int baseline = size + min;
+			baseline += ((max - min - size) >> 1);
+
 			// Offset all glyphs so that they are not using the baseline
 			for (int i = 0; i < entries.size; ++i)
 			{
 				BMGlyph glyph = font.GetGlyph(entries[i], true);
-				glyph.offsetY += size + min;
+				glyph.offsetY += baseline;
 			}
 		}
 		
