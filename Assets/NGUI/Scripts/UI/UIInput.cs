@@ -516,10 +516,10 @@ public class UIInput : MonoBehaviour
 					if (ch < ' ') continue;
 
 					// OSX inserts these characters for arrow keys
-					if (ch == '\u0700') continue;
-					if (ch == '\u0701') continue;
-					if (ch == '\u0702') continue;
-					if (ch == '\u0703') continue;
+					if (ch == '\uF700') continue;
+					if (ch == '\uF701') continue;
+					if (ch == '\uF702') continue;
+					if (ch == '\uF703') continue;
 
 					Insert(ch.ToString());
 				}
