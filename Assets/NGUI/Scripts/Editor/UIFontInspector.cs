@@ -540,14 +540,10 @@ public class UIFontInspector : Editor
 						if (mFont.atlas != null) fy += bfTex.height - offsetY;
 
 						Color c = atlas[fx + fy * bfTex.width];
-
 						Color bg = background;
 						bg.a = c.a;
 
-						Color fg = foreground;
-						fg.a = c.a;
-
-						colors[x + y * width] = Color.Lerp(bg, fg, c.a);
+						colors[x + y * width] = Color.Lerp(bg, c, c.a);
 					}
 				}
 			}
