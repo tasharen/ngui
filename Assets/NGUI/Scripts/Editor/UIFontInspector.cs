@@ -536,7 +536,8 @@ public class UIFontInspector : Editor
 					for (int x = 0; x < width; ++x)
 					{
 						int fx = x + glyph.x + offsetX + 1;
-						int fy = y + (mFont.texHeight - glyph.y - glyph.height) + (bfTex.height - offsetY) + 1;
+						int fy = y + (mFont.texHeight - glyph.y - glyph.height) + 1;
+						if (mFont.atlas != null) fy += bfTex.height - offsetY;
 
 						Color c = atlas[fx + fy * bfTex.width];
 
@@ -557,7 +558,8 @@ public class UIFontInspector : Editor
 					for (int x = 0; x < glyph.width; ++x)
 					{
 						int fx = x + glyph.x + offsetX;
-						int fy = y + (mFont.texHeight - glyph.y - glyph.height) + (bfTex.height - offsetY);
+						int fy = y + (mFont.texHeight - glyph.y - glyph.height);
+						if (mFont.atlas != null) fy += bfTex.height - offsetY;
 
 						Color c = atlas[fx + fy * bfTex.width];
 
