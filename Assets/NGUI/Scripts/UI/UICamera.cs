@@ -1348,6 +1348,10 @@ public class UICamera : MonoBehaviour
 		float drag   = isMouse ? mouseDragThreshold : touchDragThreshold;
 		float click  = isMouse ? mouseClickThreshold : touchClickThreshold;
 
+		// So we can use sqrMagnitude below
+		drag *= drag;
+		click *= click;
+
 		// Send out the press message
 		if (pressed)
 		{
@@ -1370,11 +1374,11 @@ public class UICamera : MonoBehaviour
 				selectedObject = null;
 			}
 		}
-		else if (currentTouch.pressed != null && (currentTouch.delta.magnitude != 0f || currentTouch.current != currentTouch.last))
+		else if (currentTouch.pressed != null && (currentTouch.delta.sqrMagnitude != 0f || currentTouch.current != currentTouch.last))
 		{
 			// Keep track of the total movement
 			currentTouch.totalDelta += currentTouch.delta;
-			float mag = currentTouch.totalDelta.magnitude;
+			float mag = currentTouch.totalDelta.sqrMagnitude;
 			bool justStarted = false;
 
 			// If the drag process hasn't started yet but we've already moved off the object, start it immediately
@@ -1460,7 +1464,7 @@ public class UICamera : MonoBehaviour
 				if (currentTouch.dragged == currentTouch.current ||
 					(currentScheme != ControlScheme.Controller &&
 					currentTouch.clickNotification != ClickNotification.None &&
-					currentTouch.totalDelta.sqrMagnitude < drag * drag))
+					currentTouch.totalDelta.sqrMagnitude < drag))
 				{
 					if (currentTouch.pressed != mCurrentSelection)
 					{
