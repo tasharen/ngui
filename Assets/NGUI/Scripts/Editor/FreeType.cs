@@ -280,7 +280,7 @@ static public class FreeType
 		public int x;
 		public int y;
 	}
-
+	
 	const string libName = "FreeType";
 	static bool mFound = false;
 
@@ -292,17 +292,34 @@ static public class FreeType
 	{
 		get
 		{
-			// It's not possible to load C++ DLLs under anything other than Windows.
-			if (Application.platform != RuntimePlatform.WindowsEditor) return false;
-			
 			// According to Unity's documentation, placing the DLL into the Editor folder should make it possible
 			// to use it from within the editor. However from all my testing, that does not appear to be the case.
 			// The DLL has to be explicitly loaded first, or Unity doesn't seem to pick it up at all.
+			// On Mac OS it doesn't seem to be possible to load it at all, unless it's located in /usr/local/lib.
 			if (!mFound)
 			{
-				string path = NGUISettings.pathToFreeType;
-				mFound = File.Exists(path);
-				if (mFound) LoadLibrary(path);
+				if (Application.platform == RuntimePlatform.WindowsEditor)
+				{
+					string path = NGUISettings.pathToFreeType;
+					mFound = File.Exists(path);
+					if (mFound) LoadLibrary(path);
+				}
+				else if (File.Exists("/usr/local/lib/FreeType.dylib"))
+				{
+					mFound = true;
+				}
+				else
+				{
+					string path = NGUISettings.pathToFreeType;
+					
+					if (File.Exists(path))
+					{
+						if (!System.IO.Directory.Exists("/usr/local/lib"))
+							System.IO.Directory.CreateDirectory("/usr/local/lib");
+						UnityEditor.FileUtil.CopyFileOrDirectory(path, "/usr/local/lib/FreeType.dylib");
+						mFound = true;
+					}
+				}
 			}
 			return mFound;
 		}

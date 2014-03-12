@@ -368,7 +368,13 @@ public class NGUISettings
 
 	static public string pathToFreeType
 	{
-		get { return GetString("NGUI FreeType", Application.dataPath + "/NGUI/Editor/FreeType.dll"); }
+		get
+		{
+			string path = Application.dataPath;
+			if (Application.platform == RuntimePlatform.WindowsEditor) path += "/NGUI/Editor/FreeType.dll";
+			else path += "/NGUI/Editor/FreeType.dylib";
+			return GetString("NGUI FreeType", path);
+		}
 		set { SetString("NGUI FreeType", value); }
 	}
 #endregion
