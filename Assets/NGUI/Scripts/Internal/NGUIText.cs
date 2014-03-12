@@ -801,6 +801,7 @@ static public class NGUIText
 		float remainingWidth = rectWidth;
 		int start = 0, offset = 0, lineCount = 1, prev = 0;
 		bool lineIsEmpty = true;
+		bool fits = true;
 
 		// Run through all characters
 		for (; offset < textLength; ++offset)
@@ -868,13 +869,19 @@ static public class NGUIText
 			}
 
 			// Doesn't fit?
-			if (remainingWidth < 0f)
+			if (Mathf.RoundToInt(remainingWidth) < 0)
 			{
 				// Can't start a new line
 				if (lineIsEmpty || lineCount == maxLineCount)
 				{
 					// This is the first word on the line -- add it up to the character that fits
 					sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
+					
+					if (ch != ' ')
+					{
+						fits = false;
+						break;
+					}
 
 					if (lineCount++ == maxLineCount)
 					{
@@ -926,7 +933,7 @@ static public class NGUIText
 
 		if (start < offset) sb.Append(text.Substring(start, offset - start));
 		finalText = sb.ToString();
-		return (offset == textLength) || (lineCount <= Mathf.Min(maxLines, maxLineCount));
+		return fits && ((offset == textLength) || (lineCount <= Mathf.Min(maxLines, maxLineCount)));
 	}
 
 	static Color32 s_c0, s_c1;

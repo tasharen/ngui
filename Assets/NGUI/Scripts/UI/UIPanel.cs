@@ -1464,7 +1464,7 @@ public class UIPanel : UIRect
 	{
 		Vector3 offset = CalculateConstrainOffset(targetBounds.min, targetBounds.max);
 
-		if (offset.magnitude > 0f)
+		if (offset.sqrMagnitude > 0f)
 		{
 			if (immediate)
 			{

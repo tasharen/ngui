@@ -807,12 +807,17 @@ public class UICamera : MonoBehaviour
 		return 0;
 	}
 
+	static bool mNotifying = false;
+
 	/// <summary>
 	/// Generic notification function. Used in place of SendMessage to shorten the code and allow for more than one receiver.
 	/// </summary>
 
 	static public void Notify (GameObject go, string funcName, object obj)
 	{
+		if (mNotifying) return;
+		mNotifying = true;
+
 		if (NGUITools.GetActive(go))
 		{
 			go.SendMessage(funcName, obj, SendMessageOptions.DontRequireReceiver);
@@ -822,6 +827,7 @@ public class UICamera : MonoBehaviour
 				genericEventHandler.SendMessage(funcName, obj, SendMessageOptions.DontRequireReceiver);
 			}
 		}
+		mNotifying = false;
 	}
 
 	/// <summary>
@@ -1454,7 +1460,7 @@ public class UICamera : MonoBehaviour
 				if (currentTouch.dragged == currentTouch.current ||
 					(currentScheme != ControlScheme.Controller &&
 					currentTouch.clickNotification != ClickNotification.None &&
-					currentTouch.totalDelta.magnitude < drag))
+					currentTouch.totalDelta.sqrMagnitude < drag * drag))
 				{
 					if (currentTouch.pressed != mCurrentSelection)
 					{
@@ -1512,6 +1518,8 @@ public class UICamera : MonoBehaviour
 
 	void OnApplicationPause ()
 	{
+		MouseOrTouch prev = currentTouch;
+
 		if (useTouch)
 		{
 			BetterList<int> ids = new BetterList<int>();
@@ -1526,7 +1534,6 @@ public class UICamera : MonoBehaviour
 					currentTouch.clickNotification = ClickNotification.None;
 					ProcessTouch(false, true);
 					ids.Add(currentTouchID);
-					currentTouch = null;
 				}
 			}
 
@@ -1546,7 +1553,6 @@ public class UICamera : MonoBehaviour
 					currentScheme = ControlScheme.Mouse;
 					currentTouch.clickNotification = ClickNotification.None;
 					ProcessTouch(false, true);
-					currentTouch = null;
 				}
 			}
 		}
@@ -1563,9 +1569,9 @@ public class UICamera : MonoBehaviour
 				currentTouch.clickNotification = ClickNotification.None;
 				ProcessTouch(false, true);
 				currentTouch.last = null;
-				currentTouch = null;
 			}
 		}
+		currentTouch = prev;
 	}
 #endif
 }
