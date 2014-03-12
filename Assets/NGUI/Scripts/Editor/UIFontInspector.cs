@@ -538,12 +538,7 @@ public class UIFontInspector : Editor
 						int fx = x + glyph.x + offsetX + 1;
 						int fy = y + (mFont.texHeight - glyph.y - glyph.height) + 1;
 						if (mFont.atlas != null) fy += bfTex.height - offsetY;
-
-						Color c = atlas[fx + fy * bfTex.width];
-						Color bg = background;
-						bg.a = c.a;
-
-						colors[x + y * width] = Color.Lerp(bg, c, c.a);
+						colors[x + y * width] = atlas[fx + fy * bfTex.width];
 					}
 				}
 			}
@@ -559,21 +554,28 @@ public class UIFontInspector : Editor
 
 						Color c = atlas[fx + fy * bfTex.width];
 
-						if (effect == Effect.AlphaCurve) c.a = Mathf.Clamp01(mCurve.Evaluate(c.a));
-
-						Color bg = background;
-						bg.a = (effect == Effect.BackgroundCurve) ? Mathf.Clamp01(mCurve.Evaluate(c.a)) : c.a;
-
-						Color fg = foreground;
-						fg.a = (effect == Effect.ForegroundCurve) ? Mathf.Clamp01(mCurve.Evaluate(c.a)) : c.a;
-
-						if (effect == Effect.Outline || effect == Effect.Shadow || effect == Effect.Border)
+						if (effect == Effect.Border)
 						{
-							colors[x + 1 + (y + 1) * width] = Color.Lerp(bg, c, c.a);
+							colors[x + 1 + (y + 1) * width] = c;
 						}
 						else
 						{
-							colors[x + y * width] = Color.Lerp(bg, fg, c.a);
+							if (effect == Effect.AlphaCurve) c.a = Mathf.Clamp01(mCurve.Evaluate(c.a));
+
+							Color bg = background;
+							bg.a = (effect == Effect.BackgroundCurve) ? Mathf.Clamp01(mCurve.Evaluate(c.a)) : c.a;
+
+							Color fg = foreground;
+							fg.a = (effect == Effect.ForegroundCurve) ? Mathf.Clamp01(mCurve.Evaluate(c.a)) : c.a;
+
+							if (effect == Effect.Outline || effect == Effect.Shadow)
+							{
+								colors[x + 1 + (y + 1) * width] = Color.Lerp(bg, c, c.a);
+							}
+							else
+							{
+								colors[x + y * width] = Color.Lerp(bg, fg, c.a);
+							}
 						}
 					}
 				}
