@@ -802,11 +802,13 @@ static public class NGUIText
 		int start = 0, offset = 0, lineCount = 1, prev = 0;
 		bool lineIsEmpty = true;
 		bool fits = true;
+		bool eastern = false;
 
 		// Run through all characters
 		for (; offset < textLength; ++offset)
 		{
 			char ch = text[offset];
+			if (ch > 12287) eastern = true;
 
 			// New line character -- start a new line
 			if (ch == '\n')
@@ -847,7 +849,7 @@ static public class NGUIText
 			remainingWidth -= glyphWidth;
 
 			// If this marks the end of a word, add it to the final string.
-			if (ch == ' ')
+			if (ch == ' ' && !eastern)
 			{
 				if (prev == ' ')
 				{
@@ -874,7 +876,7 @@ static public class NGUIText
 				// Can't start a new line
 				if (lineIsEmpty || lineCount == maxLineCount)
 				{
-					if (ch != ' ')
+					if (ch != ' ' && !eastern)
 					{
 						fits = false;
 						break;
