@@ -665,22 +665,22 @@ public class NGUIEditorTools
 
 	static public bool DrawPrefixButton (string text)
 	{
-		return GUILayout.Button(text, "DropDownButton", GUILayout.Width(76f));
+		return GUILayout.Button(text, "DropDown", GUILayout.Width(76f));
 	}
 
 	static public bool DrawPrefixButton (string text, params GUILayoutOption[] options)
 	{
-		return GUILayout.Button(text, "DropDownButton", options);
+		return GUILayout.Button(text, "DropDown", options);
 	}
 
 	static public int DrawPrefixList (int index, string[] list, params GUILayoutOption[] options)
 	{
-		return EditorGUILayout.Popup(index, list, "DropDownButton", options);
+		return EditorGUILayout.Popup(index, list, "DropDown", options);
 	}
 
 	static public int DrawPrefixList (string text, int index, string[] list, params GUILayoutOption[] options)
 	{
-		return EditorGUILayout.Popup(text, index, list, "DropDownButton", options);
+		return EditorGUILayout.Popup(text, index, list, "DropDown", options);
 	}
 
 	/// <summary>

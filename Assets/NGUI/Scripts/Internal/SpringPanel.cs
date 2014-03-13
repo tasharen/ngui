@@ -62,37 +62,38 @@ public class SpringPanel : MonoBehaviour
 
     /// <summary>
     /// Advance toward the target position.
-    /// </summary>
-    
-    protected virtual void AdvanceTowardsPosition()
-    {
-        float delta = RealTime.deltaTime;
+	/// </summary>
 
-        if (mThreshold == 0f)
-        {
-            mThreshold = (target - mTrans.localPosition).magnitude * 0.005f;
-            mThreshold = Mathf.Max(mThreshold, 0.00001f);
-        }
+	protected virtual void AdvanceTowardsPosition ()
+	{
+		float delta = RealTime.deltaTime;
 
-        bool trigger = false;
-        Vector3 before = mTrans.localPosition;
-        Vector3 after = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, delta);
+		if (mThreshold == 0f)
+		{
+			mThreshold = (target - mTrans.localPosition).magnitude * 0.005f;
+			mThreshold = Mathf.Max(mThreshold, 0.00001f);
+			mThreshold *= mThreshold;
+		}
 
-        if (mThreshold >= Vector3.Magnitude(after - target))
-        {
-            after = target;
-            enabled = false;
-            trigger = true;
-        }
-        mTrans.localPosition = after;
+		bool trigger = false;
+		Vector3 before = mTrans.localPosition;
+		Vector3 after = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, delta);
 
-        Vector3 offset = after - before;
-        Vector2 cr = mPanel.clipOffset;
-        cr.x -= offset.x;
-        cr.y -= offset.y;
+		if (mThreshold >= (after - target).sqrMagnitude)
+		{
+			after = target;
+			enabled = false;
+			trigger = true;
+		}
+		mTrans.localPosition = after;
+
+		Vector3 offset = after - before;
+		Vector2 cr = mPanel.clipOffset;
+		cr.x -= offset.x;
+		cr.y -= offset.y;
 		mPanel.clipOffset = cr;
 
-        if (mDrag != null) mDrag.UpdateScrollbars(false);
+		if (mDrag != null) mDrag.UpdateScrollbars(false);
 
 		if (trigger && onFinished != null)
 		{

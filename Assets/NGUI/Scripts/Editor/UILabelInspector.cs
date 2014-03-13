@@ -65,8 +65,14 @@ public class UILabelInspector : UIWidgetInspector
 		mLabel = mWidget as UILabel;
 
 		GUILayout.BeginHorizontal();
-		
-		if (NGUIEditorTools.DrawPrefixButton("Font"))
+
+#if DYNAMIC_FONT
+		mFontType = (FontType)EditorGUILayout.EnumPopup(mFontType, "DropDown", GUILayout.Width(74f));
+		if (NGUIEditorTools.DrawPrefixButton("Font", GUILayout.Width(64f)))
+#else
+		mFontType = FontType.NGUI;
+		if (NGUIEditorTools.DrawPrefixButton("Font", GUILayout.Width(74f)))
+#endif
 		{
 			if (mFontType == FontType.NGUI)
 			{
@@ -78,11 +84,6 @@ public class UILabelInspector : UIWidgetInspector
 			}
 		}
 
-#if DYNAMIC_FONT
-		mFontType = (FontType)EditorGUILayout.EnumPopup(mFontType, GUILayout.Width(62f));
-#else
-		mFontType = FontType.NGUI;
-#endif
 		bool isValid = false;
 		SerializedProperty fnt = null;
 		SerializedProperty ttf = null;

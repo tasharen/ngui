@@ -929,7 +929,12 @@ public class UIWidgetInspector : UIRectEditor
 			{
 				GUI.changed = false;
 				int val = EditorGUILayout.IntField("Dimensions", mWidget.width, GUILayout.MinWidth(100f));
-				if (GUI.changed) mWidget.width = val;
+
+				if (GUI.changed)
+				{
+					NGUIEditorTools.RegisterUndo("Dimensions Change", mWidget);
+					mWidget.width = val;
+				}
 			}
 
 			if (!freezeSize && lbl)
@@ -950,7 +955,12 @@ public class UIWidgetInspector : UIRectEditor
 			{
 				GUI.changed = false;
 				int val = EditorGUILayout.IntField("x", mWidget.height, GUILayout.MinWidth(30f));
-				if (GUI.changed) mWidget.height = val;
+
+				if (GUI.changed)
+				{
+					NGUIEditorTools.RegisterUndo("Dimensions Change", mWidget);
+					mWidget.height = val;
+				}
 			}
 
 			NGUIEditorTools.SetLabelWidth(80f);
