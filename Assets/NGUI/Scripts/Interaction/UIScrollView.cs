@@ -438,7 +438,7 @@ public class UIScrollView : MonoBehaviour
 				contentMin = viewMin - contentMin;
 				contentMax = contentMax - viewMax;
 
-				UpdateScrollbars(horizontalScrollBar as UIScrollBar, contentMin, contentMax, contentSize, viewSize, false);
+				UpdateScrollbars(horizontalScrollBar, contentMin, contentMax, contentSize, viewSize, false);
 			}
 
 			if (verticalScrollBar != null && bmax.y > bmin.y)
@@ -462,7 +462,7 @@ public class UIScrollView : MonoBehaviour
 				contentMin = viewMin - contentMin;
 				contentMax = contentMax - viewMax;
 
-				UpdateScrollbars(verticalScrollBar as UIScrollBar, contentMin, contentMax, contentSize, viewSize, true);
+				UpdateScrollbars(verticalScrollBar, contentMin, contentMax, contentSize, viewSize, true);
 			}
 		}
 		else if (recalculateBounds)
@@ -475,8 +475,10 @@ public class UIScrollView : MonoBehaviour
 	/// Helper function used in UpdateScrollbars(float) function above.
 	/// </summary>
 
-	protected void UpdateScrollbars (UIScrollBar sb, float contentMin, float contentMax, float contentSize, float viewSize, bool inverted)
+	protected void UpdateScrollbars (UIProgressBar slider, float contentMin, float contentMax, float contentSize, float viewSize, bool inverted)
 	{
+		if (slider == null) return;
+
 		if (viewSize < contentSize)
 		{
 			contentMin = Mathf.Clamp01(contentMin / contentSize);
@@ -491,8 +493,10 @@ public class UIScrollView : MonoBehaviour
 		mIgnoreCallbacks = true;
 		{
 			float contentPadding = contentMin + contentMax;
-			sb.value = inverted ? ((contentPadding > 0.001f) ? 1f - contentMin / contentPadding : 0f) :
+			slider.value = inverted ? ((contentPadding > 0.001f) ? 1f - contentMin / contentPadding : 0f) :
 				((contentPadding > 0.001f) ? contentMin / contentPadding : 1f);
+
+			UIScrollBar sb = slider as UIScrollBar;
 			if (sb != null) sb.barSize = 1f - contentPadding;
 		}
 		mIgnoreCallbacks = false;

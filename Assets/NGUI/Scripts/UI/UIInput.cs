@@ -278,14 +278,42 @@ public class UIInput : MonoBehaviour
 		}
 	}
 
+#if MOBILE
 	/// <summary>
 	/// Current position of the cursor.
 	/// </summary>
 
-#if MOBILE
 	protected int cursorPosition { get { return value.Length; } }
+
+	/// <summary>
+	/// Index of the character where selection begins.
+	/// </summary>
+
+	protected int selectionStart { get { return value.Length; } }
+
+	/// <summary>
+	/// Index of the character where selection ends.
+	/// </summary>
+
+	protected int selectionEnd { get { return value.Length; } }
 #else
+	/// <summary>
+	/// Current position of the cursor.
+	/// </summary>
+
 	protected int cursorPosition { get { return isSelected ? mSelectionEnd : value.Length; } }
+
+	/// <summary>
+	/// Index of the character where selection begins.
+	/// </summary>
+
+	protected int selectionStart { get { return isSelected ? mSelectionStart : value.Length; } set { mSelectionStart = value; UpdateLabel(); } }
+
+	/// <summary>
+	/// Index of the character where selection ends.
+	/// </summary>
+
+	protected int selectionEnd { get { return isSelected ? mSelectionEnd : value.Length; } set { mSelectionEnd = value; UpdateLabel(); } }
 #endif
 
 	/// <summary>
