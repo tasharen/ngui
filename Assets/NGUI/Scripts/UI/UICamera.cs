@@ -408,21 +408,6 @@ public class UICamera : MonoBehaviour
 		}
 		else if (mCurrentSelection != go)
 		{
-			if (mCurrentSelection != null)
-			{
-				UICamera uicam = FindCameraForLayer(mCurrentSelection.layer);
-
-				if (uicam != null)
-				{
-					current = uicam;
-					currentCamera = uicam.mCam;
-					UICamera.currentScheme = scheme;
-					Notify(mCurrentSelection, "OnSelect", false);
-					current = null;
-				}
-			}
-
-			mCurrentSelection = null;
 			mNextSelection = go;
 			mNextScheme = scheme;
 
@@ -443,6 +428,7 @@ public class UICamera : MonoBehaviour
 	System.Collections.IEnumerator ChangeSelection ()
 	{
 		yield return new WaitForEndOfFrame();
+		Notify(mCurrentSelection, "OnSelect", false);
 		mCurrentSelection = mNextSelection;
 		mNextSelection = null;
 
