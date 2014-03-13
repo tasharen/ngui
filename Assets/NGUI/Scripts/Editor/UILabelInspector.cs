@@ -157,17 +157,15 @@ public class UILabelInspector : UIWidgetInspector
 
 			bool ww = GUI.skin.textField.wordWrap;
 			GUI.skin.textField.wordWrap = true;
+			SerializedProperty sp = serializedObject.FindProperty("mText");
 #if UNITY_3_5
 			GUI.changed = false;
-			SerializedProperty textField = serializedObject.FindProperty("mText");
-			string text = EditorGUILayout.TextArea(textField.stringValue, GUI.skin.textArea, GUILayout.Height(100f));
-			if (GUI.changed) textField.stringValue = text;
+			string text = EditorGUILayout.TextArea(sp.stringValue, GUI.skin.textArea, GUILayout.Height(100f));
+			if (GUI.changed) sp.stringValue = text;
 #else
 #if UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 			GUILayout.Space(-16f);
 #endif
-			SerializedProperty sp = serializedObject.FindProperty("mText");
-
 			if (sp.hasMultipleDifferentValues)
 			{
 				NGUIEditorTools.DrawProperty("", sp, GUILayout.Height(128f));
@@ -227,7 +225,11 @@ public class UILabelInspector : UIWidgetInspector
 				GUILayout.EndHorizontal();
 				GUILayout.BeginHorizontal();
 				NGUIEditorTools.SetLabelWidth(50f);
+#if UNITY_3_5
+				GUILayout.Space(88f);
+#else
 				GUILayout.Space(84f);
+#endif
 				NGUIEditorTools.DrawProperty("Bottom", serializedObject, "mGradientBottom", GUILayout.MinWidth(40f));
 				NGUIEditorTools.SetLabelWidth(80f);
 			}

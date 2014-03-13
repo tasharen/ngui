@@ -58,7 +58,7 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] int mMaxLineCount = 0; // 0 denotes unlimited
 	[HideInInspector][SerializeField] Effect mEffectStyle = Effect.None;
 	[HideInInspector][SerializeField] Color mEffectColor = Color.black;
-	[HideInInspector][SerializeField] NGUIText.SymbolStyle mSymbols = NGUIText.SymbolStyle.Uncolored;
+	[HideInInspector][SerializeField] NGUIText.SymbolStyle mSymbols = NGUIText.SymbolStyle.Normal;
 	[HideInInspector][SerializeField] Vector2 mEffectDistance = Vector2.one;
 	[HideInInspector][SerializeField] Overflow mOverflow = Overflow.ShrinkContent;
 	[HideInInspector][SerializeField] Material mMaterial;

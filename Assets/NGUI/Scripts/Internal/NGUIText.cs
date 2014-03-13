@@ -28,7 +28,7 @@ static public class NGUIText
 	public enum SymbolStyle
 	{
 		None,
-		Uncolored,
+		Normal,
 		Colored,
 	}
 
