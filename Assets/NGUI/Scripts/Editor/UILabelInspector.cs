@@ -165,11 +165,46 @@ public class UILabelInspector : UIWidgetInspector
 #if UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 			GUILayout.Space(-16f);
 #endif
-			GUILayout.BeginHorizontal();
-			GUILayout.Space(4f);
-			NGUIEditorTools.DrawProperty("", serializedObject, "mText", GUILayout.Height(80f));
-			GUILayout.Space(4f);
-			GUILayout.EndHorizontal();
+			SerializedProperty sp = serializedObject.FindProperty("mText");
+
+			if (sp.hasMultipleDifferentValues)
+			{
+				NGUIEditorTools.DrawProperty("", sp, GUILayout.Height(128f));
+			}
+			else
+			{
+				GUIStyle style = new GUIStyle(EditorStyles.textField);
+				style.wordWrap = true;
+
+				float height = style.CalcHeight(new GUIContent(sp.stringValue), Screen.width - 100f);
+				bool offset = true;
+
+				if (height > 90f)
+				{
+				    offset = false;
+				    height = style.CalcHeight(new GUIContent(sp.stringValue), Screen.width - 20f);
+				}
+				else
+				{
+					GUILayout.BeginHorizontal();
+					GUILayout.BeginVertical(GUILayout.Width(76f));
+					GUILayout.Space(3f);
+					GUILayout.Label("Text");
+					GUILayout.EndVertical();
+					GUILayout.BeginVertical();
+				}
+				Rect rect = EditorGUILayout.GetControlRect(GUILayout.Height(height));
+
+				GUI.changed = false;
+				string text = EditorGUI.TextArea(rect, sp.stringValue, style);
+				if (GUI.changed) sp.stringValue = text;
+
+				if (offset)
+				{
+					GUILayout.EndVertical();
+					GUILayout.EndHorizontal();
+				}
+			}
 #endif
 			GUI.skin.textField.wordWrap = ww;
 
@@ -180,6 +215,46 @@ public class UILabelInspector : UIWidgetInspector
 
 			if (dynFont != null)
 				NGUIEditorTools.DrawPaddedProperty("Keep crisp", serializedObject, "keepCrispWhenShrunk");
+
+			EditorGUI.BeginDisabledGroup(mLabel.bitmapFont != null && mLabel.bitmapFont.packedFontShader);
+			GUILayout.BeginHorizontal();
+			SerializedProperty gr = NGUIEditorTools.DrawProperty("Gradient", serializedObject, "mApplyGradient", GUILayout.Width(100f));
+			EditorGUI.BeginDisabledGroup(!gr.hasMultipleDifferentValues && !gr.boolValue);
+			{
+				NGUIEditorTools.SetLabelWidth(30f);
+				NGUIEditorTools.DrawProperty("Top", serializedObject, "mGradientTop", GUILayout.MinWidth(40f));
+				GUILayout.EndHorizontal();
+				GUILayout.BeginHorizontal();
+				NGUIEditorTools.SetLabelWidth(50f);
+				GUILayout.Space(84f);
+				NGUIEditorTools.DrawProperty("Bottom", serializedObject, "mGradientBottom", GUILayout.MinWidth(40f));
+				NGUIEditorTools.SetLabelWidth(80f);
+			}
+			EditorGUI.EndDisabledGroup();
+			GUILayout.EndHorizontal();
+
+			GUILayout.BeginHorizontal();
+			GUILayout.Label("Effect", GUILayout.Width(76f));
+			sp = NGUIEditorTools.DrawProperty("", serializedObject, "mEffectStyle", GUILayout.MinWidth(16f));
+
+			EditorGUI.BeginDisabledGroup(!sp.hasMultipleDifferentValues && !sp.boolValue);
+			{
+				NGUIEditorTools.DrawProperty("", serializedObject, "mEffectColor", GUILayout.MinWidth(10f));
+				GUILayout.EndHorizontal();
+
+				GUILayout.BeginHorizontal();
+				{
+					GUILayout.Label(" ", GUILayout.Width(56f));
+					NGUIEditorTools.SetLabelWidth(20f);
+					NGUIEditorTools.DrawProperty("X", serializedObject, "mEffectDistance.x", GUILayout.MinWidth(40f));
+					NGUIEditorTools.DrawProperty("Y", serializedObject, "mEffectDistance.y", GUILayout.MinWidth(40f));
+					GUILayout.Space(18f);
+					NGUIEditorTools.SetLabelWidth(80f);
+				}
+			}
+			EditorGUI.EndDisabledGroup();
+			GUILayout.EndHorizontal();
+			EditorGUI.EndDisabledGroup();
 
 			GUILayout.BeginHorizontal();
 			GUILayout.Label("Spacing", GUILayout.Width(56f));
@@ -193,45 +268,13 @@ public class UILabelInspector : UIWidgetInspector
 			NGUIEditorTools.DrawProperty("Max Lines", serializedObject, "mMaxLineCount", GUILayout.Width(110f));
 
 			GUILayout.BeginHorizontal();
-			NGUIEditorTools.DrawProperty("Encoding", serializedObject, "mEncoding", GUILayout.Width(100f));
-			GUILayout.Label("use emoticons and colors");
-			GUILayout.EndHorizontal();
-
-			EditorGUI.BeginDisabledGroup(mLabel.bitmapFont != null && mLabel.bitmapFont.packedFontShader);
-			GUILayout.BeginHorizontal();
-			SerializedProperty gr = NGUIEditorTools.DrawProperty("Gradient", serializedObject, "mApplyGradient", GUILayout.Width(100f));
-			if (gr.hasMultipleDifferentValues || gr.boolValue)
-			{
-				NGUIEditorTools.DrawProperty("", serializedObject, "mGradientBottom", GUILayout.MinWidth(40f));
-				NGUIEditorTools.DrawProperty("", serializedObject, "mGradientTop", GUILayout.MinWidth(40f));
-			}
-			GUILayout.EndHorizontal();
-
-			GUILayout.Space(4f);
-
-			if (mLabel.supportEncoding && mLabel.bitmapFont != null && mLabel.bitmapFont.hasSymbols)
-				NGUIEditorTools.DrawPaddedProperty("Symbols", serializedObject, "mSymbols");
-
-			GUILayout.BeginHorizontal();
-			SerializedProperty sp = NGUIEditorTools.DrawProperty("Effect", serializedObject, "mEffectStyle", GUILayout.MinWidth(170f));
-			GUILayout.Space(18f);
-			GUILayout.EndHorizontal();
-
-			if (sp.hasMultipleDifferentValues || sp.boolValue)
-				NGUIEditorTools.DrawProperty("Effect Color", serializedObject, "mEffectColor", GUILayout.MinWidth(30f));
-
-			if (sp.hasMultipleDifferentValues || sp.boolValue)
-			{
-				GUILayout.BeginHorizontal();
-				GUILayout.Label("Distance", GUILayout.Width(56f));
-				NGUIEditorTools.SetLabelWidth(20f);
-				NGUIEditorTools.DrawProperty("X", serializedObject, "mEffectDistance.x", GUILayout.MinWidth(40f));
-				NGUIEditorTools.DrawProperty("Y", serializedObject, "mEffectDistance.y", GUILayout.MinWidth(40f));
-				GUILayout.Space(18f);
-				NGUIEditorTools.SetLabelWidth(80f);
-				GUILayout.EndHorizontal();
-			}
+			sp = NGUIEditorTools.DrawProperty("BBCode", serializedObject, "mEncoding", GUILayout.Width(100f));
+			EditorGUI.BeginDisabledGroup(!sp.boolValue || mLabel.bitmapFont == null || !mLabel.bitmapFont.hasSymbols);
+			NGUIEditorTools.SetLabelWidth(60f);
+			NGUIEditorTools.DrawPaddedProperty("Symbols", serializedObject, "mSymbols");
+			NGUIEditorTools.SetLabelWidth(80f);
 			EditorGUI.EndDisabledGroup();
+			GUILayout.EndHorizontal();
 		}
 		EditorGUI.EndDisabledGroup();
 		return isValid;

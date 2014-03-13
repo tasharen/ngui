@@ -365,7 +365,7 @@ public class UIScrollView : MonoBehaviour
 		if (!horizontal) constraint.x = 0f;
 		if (!vertical) constraint.y = 0f;
 
-		if (constraint.magnitude > 1f)
+		if (constraint.sqrMagnitude > 1f)
 		{
 			if (!instant && dragEffect == DragEffect.MomentumAndSpring)
 			{
