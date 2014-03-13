@@ -56,6 +56,7 @@ and it will not be included in the build of your game. It's only used in the edi
 - NEW: Added a new experimental option to the UIRoot: "Adjust by DPI".
 - NEW: Bitmap Font creation now works on OSX as well.
 - FIX: You can now clear sprite states under UIButton.
+- FIX: TweenRotation now tweens X, Y and Z values individually, so you can go from 0 to 360 now.
 - FIX: OSX character keys resulted from arrow key presses will now be ignored by UIInput.
 - FIX: Fixed an issue with scrollviews being anchored to non-centered widgets.
 - FIX: Input selection and caret should now be affected by parent alpha properly.
