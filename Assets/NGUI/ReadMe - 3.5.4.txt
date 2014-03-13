@@ -51,15 +51,23 @@ and it will not be included in the build of your game. It's only used in the edi
 - NEW: Added a way to set the Sorting Order on panels using Explicit Render Queues (for Unity 2D).
 - NEW: Cached buffers are now per-draw call rather than global, reducing memory allocations.
 - NEW: Added a "tall portrait mode" setting to the UIRoot that will shrink the UI if it's in portrait mode.
-- NEW: Added a new experimental option to the UIRoot: "Adjust by DPI".
 - NEW: UIGrid and UITable now has the horizontal and vertical sorting options so drag & drop items can stay where you dropped them.
+- NEW: Got rid of all the old tutorial scenes and replaced them with some new ones.
+- NEW: Added a new experimental option to the UIRoot: "Adjust by DPI".
+- NEW: Bitmap Font creation now works on OSX as well.
 - FIX: You can now clear sprite states under UIButton.
 - FIX: OSX character keys resulted from arrow key presses will now be ignored by UIInput.
 - FIX: Fixed an issue with scrollviews being anchored to non-centered widgets.
 - FIX: Input selection and caret should now be affected by parent alpha properly.
+- FIX: Changing the slider value via small increments should now work as expected.
 - FIX: Transform inspector will now always display rotation in -180 to 180 range.
 - FIX: CSV parser now supports multi-line input without having to insert "\n".
 - FIX: A multi-line input field with a lot of spaces will now wrap correctly.
+- FIX: Keyboard and controller navigation should again highlight things properly.
+- FIX: You can now assign sliders/progress bars for scroll view scroll bars.
+- FIX: Modifying widget dimensions in inspector is now properly undoable.
+- FIX: Typewriter effect example script now supports encoded tags.
+- FIX: Went through all examples and fixed a few that were wonky.
 
 3.5.3
 - NEW: All sprite types can now be flipped, not just simple sprites.
