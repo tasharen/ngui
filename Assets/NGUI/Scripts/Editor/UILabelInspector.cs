@@ -217,7 +217,7 @@ public class UILabelInspector : UIWidgetInspector
 
 			EditorGUI.BeginDisabledGroup(mLabel.bitmapFont != null && mLabel.bitmapFont.packedFontShader);
 			GUILayout.BeginHorizontal();
-			SerializedProperty gr = NGUIEditorTools.DrawProperty("Gradient", serializedObject, "mApplyGradient", GUILayout.Width(100f));
+			SerializedProperty gr = NGUIEditorTools.DrawProperty("Gradient", serializedObject, "mApplyGradient", GUILayout.Width(93f));
 			EditorGUI.BeginDisabledGroup(!gr.hasMultipleDifferentValues && !gr.boolValue);
 			{
 				NGUIEditorTools.SetLabelWidth(30f);
@@ -226,9 +226,9 @@ public class UILabelInspector : UIWidgetInspector
 				GUILayout.BeginHorizontal();
 				NGUIEditorTools.SetLabelWidth(50f);
 #if UNITY_3_5
-				GUILayout.Space(88f);
+				GUILayout.Space(81f);
 #else
-				GUILayout.Space(84f);
+				GUILayout.Space(77f);
 #endif
 				NGUIEditorTools.DrawProperty("Bottom", serializedObject, "mGradientBottom", GUILayout.MinWidth(40f));
 				NGUIEditorTools.SetLabelWidth(80f);
