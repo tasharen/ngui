@@ -223,7 +223,10 @@ public abstract class UITweener : MonoBehaviour
 
 				// Re-add the previous persistent delegates
 				for (int i = 0; i < mTemp.Count; ++i)
-					EventDelegate.Add(onFinished, mTemp[i]);
+				{
+					EventDelegate ed = mTemp[i];
+					if (ed != null) EventDelegate.Add(onFinished, ed, ed.oneShot);
+				}
 				mTemp = null;
 			}
 

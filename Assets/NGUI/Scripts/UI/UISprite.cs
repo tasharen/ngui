@@ -429,12 +429,14 @@ public class UISprite : UIWidget
 		if (!isValid) return;
 		base.MakePixelPerfect();
 
+		UISpriteData sp = GetAtlasSprite();
+		if (sp == null) return;
+
 		UISprite.Type t = type;
 
-		if (t == Type.Simple || t == Type.Filled)
+		if (t == Type.Simple || t == Type.Filled || !sp.hasBorder)
 		{
 			Texture tex = mainTexture;
-			UISpriteData sp = GetAtlasSprite();
 
 			if (tex != null && sp != null)
 			{

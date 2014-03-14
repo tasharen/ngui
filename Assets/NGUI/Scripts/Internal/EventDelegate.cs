@@ -394,7 +394,7 @@ public class EventDelegate
 	/// Append a new event delegate to the list.
 	/// </summary>
 
-	static public void Add (List<EventDelegate> list, EventDelegate ev) { Add(list, ev, false); }
+	static public void Add (List<EventDelegate> list, EventDelegate ev) { Add(list, ev, ev.oneShot); }
 
 	/// <summary>
 	/// Append a new event delegate to the list.

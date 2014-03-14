@@ -54,7 +54,7 @@ public class SpringPosition : MonoBehaviour
 	public OnFinished onFinished;
 
 	// Deprecated functionality
-	[SerializeField][HideInInspector] GameObject eventReceiver;
+	[SerializeField][HideInInspector] GameObject eventReceiver = null;
 	[SerializeField][HideInInspector] public string callWhenFinished;
 
 	Transform mTrans;

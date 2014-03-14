@@ -73,7 +73,7 @@ public class UIToggle : UIWidgetContainer
 	/// Deprecated functionality. Use the 'group' option instead.
 	/// </summary>
 
-	[HideInInspector][SerializeField] UISprite checkSprite;
+	[HideInInspector][SerializeField] UISprite checkSprite = null;
 	[HideInInspector][SerializeField] Animation checkAnimation;
 	[HideInInspector][SerializeField] GameObject eventReceiver;
 	[HideInInspector][SerializeField] string functionName = "OnActivate";

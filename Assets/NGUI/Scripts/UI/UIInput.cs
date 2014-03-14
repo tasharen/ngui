@@ -283,37 +283,79 @@ public class UIInput : MonoBehaviour
 	/// Current position of the cursor.
 	/// </summary>
 
-	protected int cursorPosition { get { return value.Length; } }
+	public int cursorPosition { get { return value.Length; } set {} }
 
 	/// <summary>
 	/// Index of the character where selection begins.
 	/// </summary>
 
-	protected int selectionStart { get { return value.Length; } }
+	public int selectionStart { get { return value.Length; } set {} }
 
 	/// <summary>
 	/// Index of the character where selection ends.
 	/// </summary>
 
-	protected int selectionEnd { get { return value.Length; } }
+	public int selectionEnd { get { return value.Length; } set {} }
 #else
 	/// <summary>
 	/// Current position of the cursor.
 	/// </summary>
 
-	protected int cursorPosition { get { return isSelected ? mSelectionEnd : value.Length; } }
+	public int cursorPosition
+	{
+		get
+		{
+			return isSelected ? mSelectionEnd : value.Length;
+		}
+		set
+		{
+			if (isSelected)
+			{
+				mSelectionEnd = value;
+				UpdateLabel();
+			}
+		}
+	}
 
 	/// <summary>
 	/// Index of the character where selection begins.
 	/// </summary>
 
-	protected int selectionStart { get { return isSelected ? mSelectionStart : value.Length; } set { mSelectionStart = value; UpdateLabel(); } }
+	public int selectionStart
+	{
+		get
+		{
+			return isSelected ? mSelectionStart : value.Length;
+		}
+		set
+		{
+			if (isSelected)
+			{
+				mSelectionStart = value;
+				UpdateLabel();
+			}
+		}
+	}
 
 	/// <summary>
 	/// Index of the character where selection ends.
 	/// </summary>
 
-	protected int selectionEnd { get { return isSelected ? mSelectionEnd : value.Length; } set { mSelectionEnd = value; UpdateLabel(); } }
+	public int selectionEnd
+	{
+		get
+		{
+			return isSelected ? mSelectionEnd : value.Length;
+		}
+		set
+		{
+			if (isSelected)
+			{
+				mSelectionEnd = value;
+				UpdateLabel();
+			}
+		}
+	}
 #endif
 
 	/// <summary>

@@ -390,10 +390,10 @@ public class UIPanel : UIRect
 		}
 		set
 		{
-			if (Mathf.Abs(mClipRange.x - value.x) > 0.49f ||
-				Mathf.Abs(mClipRange.y - value.y) > 0.49f ||
-				Mathf.Abs(mClipRange.z - value.z) > 0.49f ||
-				Mathf.Abs(mClipRange.w - value.w) > 0.49f)
+			if (Mathf.Abs(mClipRange.x - value.x) > 0.001f ||
+				Mathf.Abs(mClipRange.y - value.y) > 0.001f ||
+				Mathf.Abs(mClipRange.z - value.z) > 0.001f ||
+				Mathf.Abs(mClipRange.w - value.w) > 0.001f)
 			{
 				mResized = true;
 				mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
