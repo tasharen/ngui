@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.5.4
+            Version 3.5.4 r2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -65,7 +65,9 @@ and it will not be included in the build of your game. It's only used in the edi
 - FIX: CSV parser now supports multi-line input without having to insert "\n".
 - FIX: A multi-line input field with a lot of spaces will now wrap correctly.
 - FIX: Keyboard and controller navigation should again highlight things properly.
+- FIX: Disabling a game object with a widget that was just enabled should no longer cause it to remain visible on rare occasions.
 - FIX: You can now assign sliders/progress bars for scroll view scroll bars.
+- FIX: Event delegate copy will now work for raw (code) delegates as well.
 - FIX: Modifying widget dimensions in inspector is now properly undoable.
 - FIX: Typewriter effect example script now supports encoded tags.
 - FIX: Went through all examples and fixed a few that were wonky.
