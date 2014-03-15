@@ -431,7 +431,9 @@ public abstract class UITweener : MonoBehaviour
 	static public T Begin<T> (GameObject go, float duration) where T : UITweener
 	{
 		T comp = go.GetComponent<T>();
-		
+#if UNITY_FLASH
+		if ((object)comp == null) comp = (T)go.AddComponent<T>();
+#else
 		// Find the tween with an unset group ID (group ID of 0).
 		if (comp != null && comp.tweenGroup != 0)
 		{
@@ -444,9 +446,7 @@ public abstract class UITweener : MonoBehaviour
 				comp = null;
 			}
 		}
-#if UNITY_FLASH
-		if ((object)comp == null) comp = (T)go.AddComponent<T>();
-#else
+
 		if (comp == null) comp = go.AddComponent<T>();
 #endif
 		comp.mStarted = false;
