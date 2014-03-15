@@ -128,7 +128,6 @@ public class UIToggle : UIWidgetContainer
 #endif
 		}
 
-#if UNITY_EDITOR
 		// Auto-upgrade
 		if (!Application.isPlaying)
 		{
@@ -154,7 +153,6 @@ public class UIToggle : UIWidgetContainer
 			}
 		}
 		else
-#endif
 		{
 			mIsActive = !startsActive;
 			mStarted = true;
