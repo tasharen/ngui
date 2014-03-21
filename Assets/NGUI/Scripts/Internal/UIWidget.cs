@@ -213,7 +213,7 @@ public class UIWidget : UIRect
 			int min = minHeight;
 			if (value < min) value = min;
 
-			if (mHeight != value && keepAspectRatio != AspectRatioSource.BasedOnHeight)
+			if (mHeight != value && keepAspectRatio != AspectRatioSource.BasedOnWidth)
 			{
 				if (isAnchoredVertically)
 				{
