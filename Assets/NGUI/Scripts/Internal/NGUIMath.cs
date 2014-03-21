@@ -366,27 +366,27 @@ static public class NGUIMath
 	/// Calculate the combined bounds of all widgets attached to the specified game object or its children (in relative-to-object space).
 	/// </summary>
 
-	static public Bounds CalculateRelativeWidgetBounds (Transform root, Transform child)
+	static public Bounds CalculateRelativeWidgetBounds (Transform relativeTo, Transform content)
 	{
-		return CalculateRelativeWidgetBounds(root, child, false);
+		return CalculateRelativeWidgetBounds(relativeTo, content, false);
 	}
 
 	/// <summary>
 	/// Calculate the combined bounds of all widgets attached to the specified game object or its children (in relative-to-object space).
 	/// </summary>
 
-	static public Bounds CalculateRelativeWidgetBounds (Transform root, Transform child, bool considerInactive)
+	static public Bounds CalculateRelativeWidgetBounds (Transform relativeTo, Transform content, bool considerInactive)
 	{
-		if (child != null)
+		if (content != null)
 		{
-			UIWidget[] widgets = child.GetComponentsInChildren<UIWidget>(considerInactive);
+			UIWidget[] widgets = content.GetComponentsInChildren<UIWidget>(considerInactive);
 
 			if (widgets.Length > 0)
 			{
 				Vector3 vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
 				Vector3 vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
-				Matrix4x4 toLocal = root.worldToLocalMatrix;
+				Matrix4x4 toLocal = relativeTo.worldToLocalMatrix;
 				bool isSet = false;
 				Vector3 v;
 

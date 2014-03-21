@@ -702,8 +702,8 @@ public class UIWidget : UIRect
 		if (finalHeight < minHeight) finalHeight = minHeight;
 
 		t.localPosition = pos;
-		width = finalWidth;
-		height = finalHeight;
+		this.width = finalWidth;
+		this.height = finalHeight;
 
 		if (isAnchored)
 		{

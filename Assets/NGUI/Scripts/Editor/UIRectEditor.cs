@@ -211,6 +211,7 @@ public class UIRectEditor : Editor
 			}
 
 			mAnchorType = type;
+			NGUIEditorTools.DrawPaddedProperty("Execute", serializedObject, "updateAnchors");
 			OnDrawFinalProperties();
 			EditorGUI.EndDisabledGroup();
 			NGUIEditorTools.EndContents();
