@@ -16,10 +16,10 @@ public class UIButtonColorEditor : UIWidgetContainerEditor
 	public override void OnInspectorGUI ()
 	{
 		GUILayout.Space(6f);
-		NGUIEditorTools.SetLabelWidth(80f);
+		NGUIEditorTools.SetLabelWidth(86f);
 
 		serializedObject.Update();
-		NGUIEditorTools.DrawProperty("Target", serializedObject, "tweenTarget");
+		NGUIEditorTools.DrawProperty("Tween Target", serializedObject, "tweenTarget");
 		DrawProperties();
 		serializedObject.ApplyModifiedProperties();
 
@@ -43,6 +43,8 @@ public class UIButtonColorEditor : UIWidgetContainerEditor
 
 	protected void DrawColors ()
 	{
+		if (serializedObject.FindProperty("tweenTarget").objectReferenceValue == null) return;
+
 		if (NGUIEditorTools.DrawHeader("Colors"))
 		{
 			NGUIEditorTools.BeginContents();

@@ -179,6 +179,11 @@ public class UIRectEditor : Editor
 				UpdateAnchors(true);
 			}
 
+			if (type != AnchorType.None)
+			{
+				NGUIEditorTools.DrawPaddedProperty("Execute", serializedObject, "updateAnchors");
+			}
+
 			if (type == AnchorType.Advanced)
 			{
 				DrawAnchor(0, true);
@@ -211,7 +216,6 @@ public class UIRectEditor : Editor
 			}
 
 			mAnchorType = type;
-			NGUIEditorTools.DrawPaddedProperty("Execute", serializedObject, "updateAnchors");
 			OnDrawFinalProperties();
 			EditorGUI.EndDisabledGroup();
 			NGUIEditorTools.EndContents();
