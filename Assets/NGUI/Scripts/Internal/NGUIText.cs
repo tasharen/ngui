@@ -876,14 +876,14 @@ static public class NGUIText
 				// Can't start a new line
 				if (lineIsEmpty || lineCount == maxLineCount)
 				{
+					// This is the first word on the line -- add it up to the character that fits
+					sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
+
 					if (ch != ' ' && !eastern)
 					{
 						fits = false;
 						break;
 					}
-
-					// This is the first word on the line -- add it up to the character that fits
-					sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
 
 					if (lineCount++ == maxLineCount)
 					{

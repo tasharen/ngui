@@ -150,6 +150,7 @@ public class UIInput : MonoBehaviour
 	protected float mPosition = 0f;
 	protected bool mDoInit = true;
 	protected UIWidget.Pivot mPivot = UIWidget.Pivot.TopLeft;
+	protected bool mLoadSavedValue = true;
 
 	static protected int mDrawStart = 0;
 
@@ -227,6 +228,7 @@ public class UIInput : MonoBehaviour
 			if (mValue != value)
 			{
 				mValue = value;
+				mLoadSavedValue = false;
 				if (!isSelected) SaveToPlayerPrefs(value);
 				UpdateLabel();
 				ExecuteOnChange();
@@ -235,6 +237,7 @@ public class UIInput : MonoBehaviour
 			if (mValue != value)
 			{
 				mValue = value;
+				mLoadSavedValue = false;
 
 				if (isSelected)
 				{
@@ -387,7 +390,7 @@ public class UIInput : MonoBehaviour
 
 	void Start ()
 	{
-		if (string.IsNullOrEmpty(mValue))
+		if (mLoadSavedValue)
 		{
 			if (!string.IsNullOrEmpty(savedAs) && PlayerPrefs.HasKey(savedAs))
 				value = PlayerPrefs.GetString(savedAs);
@@ -840,7 +843,7 @@ public class UIInput : MonoBehaviour
 			{
 				ev.Use();
 				
-				if (label.multiLine && !ctrl && label.overflowMethod != UILabel.Overflow.ClampContent)
+				if (label.multiLine && !ctrl && label.overflowMethod != UILabel.Overflow.ClampContent && validation == Validation.None)
 				{
 					Insert("\n");
 				}
@@ -1291,4 +1294,10 @@ public class UIInput : MonoBehaviour
 			current = null;
 		}
 	}
+
+	/// <summary>
+	/// Convenience function to be used as a callback that will clear the input field's focus.
+	/// </summary>
+
+	public void RemoveFocus () { isSelected = false; }
 }

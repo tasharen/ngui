@@ -404,7 +404,9 @@ public abstract class UIRect : MonoBehaviour
 
 		if (mUpdateFrame != frame)
 		{
+#if !UNITY_EDITOR
 			if (updateAnchors == AnchorUpdate.OnUpdate || mUpdateAnchors)
+#endif
 			{
 				mUpdateFrame = frame;
 				mUpdateAnchors = false;
