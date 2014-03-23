@@ -44,6 +44,12 @@ public class UIGrid : UIWidgetContainer
 	public Sorting sorting = Sorting.None;
 
 	/// <summary>
+	/// Final pivot point for the grid's content.
+	/// </summary>
+
+	public UIWidget.Pivot pivot = UIWidget.Pivot.TopLeft;
+
+	/// <summary>
 	/// Maximum children per line.
 	/// If the arrangement is horizontal, this denotes the number of columns.
 	/// If the arrangement is vertical, this stands for the number of rows.
@@ -152,6 +158,8 @@ public class UIGrid : UIWidgetContainer
 
 		int x = 0;
 		int y = 0;
+		int maxX = 0;
+		int maxY = 0;
 
 		if (sorting != Sorting.None || sorted)
 		{
@@ -185,6 +193,9 @@ public class UIGrid : UIWidgetContainer
 				}
 				else t.localPosition = pos;
 
+				maxX = Mathf.Max(maxX, x);
+				maxY = Mathf.Max(maxY, y);
+
 				if (++x >= maxPerLine && maxPerLine > 0)
 				{
 					x = 0;
@@ -211,10 +222,54 @@ public class UIGrid : UIWidgetContainer
 				}
 				else t.localPosition = pos;
 
+				maxX = Mathf.Max(maxX, x);
+				maxY = Mathf.Max(maxY, y);
+
 				if (++x >= maxPerLine && maxPerLine > 0)
 				{
 					x = 0;
 					++y;
+				}
+			}
+		}
+
+		// Apply the origin offset
+		if (pivot != UIWidget.Pivot.TopLeft)
+		{
+			Vector2 po = NGUIMath.GetPivotOffset(pivot);
+
+			float fx, fy;
+
+			if (arrangement == Arrangement.Horizontal)
+			{
+				fx = Mathf.Lerp(0f, maxX * cellWidth, po.x);
+				fy = Mathf.Lerp(-maxY * cellHeight, 0f, po.y);
+			}
+			else
+			{
+				fx = Mathf.Lerp(0f, maxY * cellWidth, po.x);
+				fy = Mathf.Lerp(-maxX * cellHeight, 0f, po.y);
+			}
+
+			for (int i = 0; i < myTrans.childCount; ++i)
+			{
+				Transform t = myTrans.GetChild(i);
+
+				if (!NGUITools.GetActive(t.gameObject) && hideInactive) continue;
+
+				SpringPosition sp = t.GetComponent<SpringPosition>();
+
+				if (sp != null)
+				{
+					sp.target.x -= fx;
+					sp.target.y -= fy;
+				}
+				else
+				{
+					Vector3 pos = t.localPosition;
+					pos.x -= fx;
+					pos.y -= fy;
+					t.localPosition = pos;
 				}
 			}
 		}
