@@ -964,7 +964,13 @@ static public class NGUITools
 	/// Activate the specified object and all of its children.
 	/// </summary>
 
-	static void Activate (Transform t)
+	static void Activate (Transform t) { Activate(t, true); }
+
+	/// <summary>
+	/// Activate the specified object and all of its children.
+	/// </summary>
+
+	static void Activate (Transform t, bool compatibilityMode)
 	{
 		SetActiveSelf(t.gameObject, true);
 
@@ -977,18 +983,21 @@ static public class NGUITools
 			Activate(child);
 		}
 #else
-		// If there is even a single enabled child, then we're using a Unity 4.0-based nested active state scheme.
-		for (int i = 0, imax = t.childCount; i < imax; ++i)
+		if (compatibilityMode)
 		{
-			Transform child = t.GetChild(i);
-			if (child.gameObject.activeSelf) return;
-		}
+			// If there is even a single enabled child, then we're using a Unity 4.0-based nested active state scheme.
+			for (int i = 0, imax = t.childCount; i < imax; ++i)
+			{
+				Transform child = t.GetChild(i);
+				if (child.gameObject.activeSelf) return;
+			}
 
-		// If this point is reached, then all the children are disabled, so we must be using a Unity 3.5-based active state scheme.
-		for (int i = 0, imax = t.childCount; i < imax; ++i)
-		{
-			Transform child = t.GetChild(i);
-			Activate(child);
+			// If this point is reached, then all the children are disabled, so we must be using a Unity 3.5-based active state scheme.
+			for (int i = 0, imax = t.childCount; i < imax; ++i)
+			{
+				Transform child = t.GetChild(i);
+				Activate(child, true);
+			}
 		}
 #endif
 	}
@@ -1014,13 +1023,20 @@ static public class NGUITools
 	/// and it tries to find a panel on its parent.
 	/// </summary>
 
-	static public void SetActive (GameObject go, bool state)
+	static public void SetActive (GameObject go, bool state) { SetActive(go, state, true); }
+
+	/// <summary>
+	/// SetActiveRecursively enables children before parents. This is a problem when a widget gets re-enabled
+	/// and it tries to find a panel on its parent.
+	/// </summary>
+
+	static public void SetActive (GameObject go, bool state, bool compatibilityMode)
 	{
 		if (go)
 		{
 			if (state)
 			{
-				Activate(go.transform);
+				Activate(go.transform, compatibilityMode);
 #if UNITY_EDITOR
 				if (Application.isPlaying)
 #endif

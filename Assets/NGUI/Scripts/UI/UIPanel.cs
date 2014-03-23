@@ -120,6 +120,14 @@ public class UIPanel : UIRect
 	[System.NonSerialized]
 	public Matrix4x4 worldToLocal = Matrix4x4.identity;
 
+	public delegate void OnClippingMoved (UIPanel panel);
+
+	/// <summary>
+	/// Event callback that's triggered when the panel's clip region gets moved.
+	/// </summary>
+
+	public OnClippingMoved onClipMove;
+
 	// Panel's alpha (affects the alpha of all widgets)
 	[HideInInspector][SerializeField] float mAlpha = 1f;
 
@@ -352,6 +360,9 @@ public class UIPanel : UIRect
 				mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
 				mClipOffset = value;
 				mMatrixFrame = -1;
+
+				// Call the event delegate
+				if (onClipMove != null) onClipMove(this);
 #if UNITY_EDITOR
 				if (!Application.isPlaying) UpdateDrawCalls();
 #endif

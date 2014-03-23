@@ -136,7 +136,7 @@ public class UIGrid : UIWidgetContainer
 	/// Want your own custom sorting logic? Override this function.
 	/// </summary>
 
-	protected virtual void Sort (List<Transform> list) { list.Sort(SortByName); }
+	protected virtual void Sort (BetterList<Transform> list) { list.Sort(SortByName); }
 
 	/// <summary>
 	/// Recalculate the position of all elements within the grid, sorting them alphabetically if necessary.
@@ -163,7 +163,7 @@ public class UIGrid : UIWidgetContainer
 
 		if (sorting != Sorting.None || sorted)
 		{
-			List<Transform> list = new List<Transform>();
+			BetterList<Transform> list = new BetterList<Transform>();
 
 			for (int i = 0; i < myTrans.childCount; ++i)
 			{
@@ -176,7 +176,7 @@ public class UIGrid : UIWidgetContainer
 			else if (sorting == Sorting.Vertical) list.Sort(SortVertical);
 			else Sort(list);
 
-			for (int i = 0, imax = list.Count; i < imax; ++i)
+			for (int i = 0, imax = list.size; i < imax; ++i)
 			{
 				Transform t = list[i];
 

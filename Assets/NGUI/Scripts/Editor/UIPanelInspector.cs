@@ -450,7 +450,7 @@ public class UIPanelInspector : UIRectEditor
 			Vector4 range = mPanel.baseClipRegion;
 
 			// Scroll view is anchored, meaning it adjusts the offset itself, so we don't want it to be modifiable
-			EditorGUI.BeginDisabledGroup(mPanel.GetComponent<UIScrollView>() != null);
+			//EditorGUI.BeginDisabledGroup(mPanel.GetComponent<UIScrollView>() != null);
 			GUI.changed = false;
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(80f);
@@ -463,7 +463,7 @@ public class UIPanelInspector : UIRectEditor
 				mPanel.clipOffset = off;
 				EditorUtility.SetDirty(mPanel);
 			}
-			EditorGUI.EndDisabledGroup();
+			//EditorGUI.EndDisabledGroup();
 
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(80f);

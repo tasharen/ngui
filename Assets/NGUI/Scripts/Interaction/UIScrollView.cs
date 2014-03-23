@@ -626,6 +626,8 @@ public class UIScrollView : MonoBehaviour
 		co.x -= relative.x;
 		co.y -= relative.y;
 		mPanel.clipOffset = co;
+
+		// Update the scroll bars
 		UpdateScrollbars(false);
 	}
 
