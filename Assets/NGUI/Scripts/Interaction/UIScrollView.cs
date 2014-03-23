@@ -586,7 +586,7 @@ public class UIScrollView : MonoBehaviour
 
 	public void UpdatePosition ()
 	{
-		if (!mIgnoreCallbacks)
+		if (!mIgnoreCallbacks && (horizontalScrollBar != null || verticalScrollBar != null))
 		{
 			mIgnoreCallbacks = true;
 			mCalculatedBounds = false;
@@ -759,7 +759,7 @@ public class UIScrollView : MonoBehaviour
 				mMomentum = Vector3.Lerp(mMomentum, mMomentum + offset * (0.01f * momentumAmount), 0.67f);
 
 				// Move the scroll view
-				if (!iOSDragEmulation)
+				if (!iOSDragEmulation || dragEffect != DragEffect.MomentumAndSpring)
 				{
 					MoveAbsolute(offset);	
 				}

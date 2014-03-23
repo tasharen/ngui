@@ -93,7 +93,7 @@ public class SpringPosition : MonoBehaviour
 		}
 		else
 		{
-			if (mThreshold == 0f) mThreshold = (target - mTrans.localPosition).sqrMagnitude * 0.001f;
+			if (mThreshold == 0f) mThreshold = (target - mTrans.localPosition).sqrMagnitude * 0.00001f;
 			mTrans.localPosition = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, delta);
 
 			if (mThreshold >= (target - mTrans.localPosition).sqrMagnitude)

@@ -50,6 +50,8 @@ public class UIWrapContent : MonoBehaviour
 		{
 			mScroll.GetComponent<UIPanel>().onClipMove = OnMove;
 			mScroll.restrictWithinPanel = false;
+			if (mScroll.dragEffect == UIScrollView.DragEffect.MomentumAndSpring)
+				mScroll.dragEffect = UIScrollView.DragEffect.Momentum;
 		}
 	}
 
@@ -135,7 +137,13 @@ public class UIWrapContent : MonoBehaviour
 	{
 		float extents = itemSize * mChildren.size * 0.5f;
 		Vector3[] corners = mPanel.worldCorners;
-		for (int i = 0; i < 4; ++i) corners[i] = mTrans.InverseTransformPoint(corners[i]);
+		
+		for (int i = 0; i < 4; ++i)
+		{
+			Vector3 v = corners[i];
+			v = mTrans.InverseTransformPoint(v);
+			corners[i] = v;
+		}
 		Vector3 center = Vector3.Lerp(corners[0], corners[2], 0.5f);
 
 		if (mHorizontal)
@@ -163,7 +171,7 @@ public class UIWrapContent : MonoBehaviour
 
 				if (cullContent)
 				{
-					distance += mPanel.clipOffset.x;
+					distance += mPanel.clipOffset.x - mTrans.localPosition.x;
 					if (!UICamera.IsPressed(t.gameObject))
 						NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
 				}
@@ -194,7 +202,7 @@ public class UIWrapContent : MonoBehaviour
 
 				if (cullContent)
 				{
-					distance += mPanel.clipOffset.y;
+					distance += mPanel.clipOffset.y - mTrans.localPosition.y;
 					if (!UICamera.IsPressed(t.gameObject))
 						NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
 				}

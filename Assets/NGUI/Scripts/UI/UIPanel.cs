@@ -413,6 +413,7 @@ public class UIPanel : UIRect
 
 				UIScrollView sv = GetComponent<UIScrollView>();
 				if (sv != null) sv.UpdatePosition();
+				if (onClipMove != null) onClipMove(this);
 #if UNITY_EDITOR
 				if (!Application.isPlaying) UpdateDrawCalls();
 #endif
