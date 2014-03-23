@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.5.4 r2
+            Version 3.5.5
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -45,6 +45,16 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.5.5
+- NEW: Added built-in support for endless scroll view (UIWrapContent).
+- NEW: Added a new example showing how to make endless scroll views.
+- NEW: Added an "Pivot" setting to the UIGrid that controls how the content is positioned.
+- NEW: Keyboard and controller navigation has been simplified (UIKeyNavigation).
+- NEW: Added EnvelopContent example script that shows how to resize a sprite to envelop custom content.
+- NEW: Widget anchors now have an option to be executed only when enabled, rather than every update.
+- FIX: UIWidget.SetRect will now work properly again.
+- FIX: Unity 4.0, 4.1 and 4.2 compile fix.
 
 3.5.4
 - NEW: You can now bake basic effects into bitmap fonts via inspector: soft shadow, soft outline, bevel, etc.

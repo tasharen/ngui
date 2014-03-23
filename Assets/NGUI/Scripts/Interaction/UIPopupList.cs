@@ -222,12 +222,12 @@ public class UIPopupList : UIWidgetContainer
 	{
 		get
 		{
-			UIButtonKeys keys = GetComponent<UIButtonKeys>();
+			UIKeyNavigation keys = GetComponent<UIKeyNavigation>();
 			return (keys == null || !keys.enabled);
 		}
 		set
 		{
-			UIButtonKeys keys = GetComponent<UIButtonKeys>();
+			UIKeyNavigation keys = GetComponent<UIKeyNavigation>();
 			if (keys != null) keys.enabled = !value;
 		}
 	}
