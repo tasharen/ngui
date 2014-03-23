@@ -76,6 +76,9 @@ public class UIKeyNavigation : MonoBehaviour
 
 		if (startsSelected)
 		{
+#if UNITY_EDITOR
+			if (!Application.isPlaying) return;
+#endif
 			if (UICamera.selectedObject == null || !NGUITools.GetActive(UICamera.selectedObject))
 			{
 				UICamera.currentScheme = UICamera.ControlScheme.Controller;

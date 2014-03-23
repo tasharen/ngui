@@ -112,6 +112,9 @@ public static class NGUIContextMenu
 	[MenuItem("CONTEXT/Localization/Help")]
 	static void ShowHelp29 (MenuCommand command) { NGUIHelp.Show(typeof(Localization)); }
 
+	[MenuItem("CONTEXT/UIKeyNavigation/Help")]
+	static void ShowHelp30 (MenuCommand command) { NGUIHelp.Show(typeof(UIKeyNavigation)); }
+
 	public delegate UIWidget AddFunc (GameObject go);
 
 	static BetterList<string> mEntries = new BetterList<string>();
@@ -351,7 +354,8 @@ public static class NGUIContextMenu
 				AddItem("Attach/Input Field Script", false, delegate(object obj) { target.AddComponent<UIInput>(); }, null);
 				NGUIContextMenu.AddSeparator("Attach/");
 				
-				if (target.GetComponent<UIDragResize>() == null) AddItem("Attach/Drag Resize Script", false, delegate(object obj) { target.AddComponent<UIDragResize>(); }, null);
+				if (target.GetComponent<UIDragResize>() == null)
+					AddItem("Attach/Drag Resize Script", false, delegate(object obj) { target.AddComponent<UIDragResize>(); }, null);
 
 				if (target.GetComponent<UIDragScrollView>() == null)
 				{
@@ -372,6 +376,9 @@ public static class NGUIContextMenu
 				}
 
 				AddItem("Attach/Key Binding Script", false, delegate(object obj) { target.AddComponent<UIKeyBinding>(); }, null);
+
+				if (target.GetComponent<UIKeyNavigation>() == null)
+					AddItem("Attach/Key Navigation Script", false, delegate(object obj) { target.AddComponent<UIKeyNavigation>(); }, null);
 
 				NGUIContextMenu.AddSeparator("Attach/");
 

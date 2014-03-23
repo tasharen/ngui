@@ -308,6 +308,9 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Attach/Key Binding Script", false, 7)]
 	static public void Add10 () { AddIfMissing<UIKeyBinding>(); }
 
+	[MenuItem("NGUI/Attach/Key Navigation Script", false, 7)]
+	static public void Add10a () { AddIfMissing<UIKeyNavigation>(); }
+
 	[MenuItem("NGUI/Attach/Play Tween Script", false, 7)]
 	static public void Add11 () { AddIfMissing<UIPlayTween>(); }
 
