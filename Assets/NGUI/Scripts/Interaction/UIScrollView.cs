@@ -479,25 +479,39 @@ public class UIScrollView : MonoBehaviour
 	{
 		if (slider == null) return;
 
-		if (viewSize < contentSize)
-		{
-			contentMin = Mathf.Clamp01(contentMin / contentSize);
-			contentMax = Mathf.Clamp01(contentMax / contentSize);
-		}
-		else
-		{
-			contentMin = Mathf.Clamp01(-contentMin / contentSize);
-			contentMax = Mathf.Clamp01(-contentMax / contentSize);
-		}
-
 		mIgnoreCallbacks = true;
 		{
-			float contentPadding = contentMin + contentMax;
-			slider.value = inverted ? ((contentPadding > 0.001f) ? 1f - contentMin / contentPadding : 0f) :
-				((contentPadding > 0.001f) ? contentMin / contentPadding : 1f);
+			if (viewSize < contentSize)
+			{
+				contentMin = Mathf.Clamp01(contentMin / contentSize);
+				contentMax = Mathf.Clamp01(contentMax / contentSize);
 
-			UIScrollBar sb = slider as UIScrollBar;
-			if (sb != null) sb.barSize = 1f - contentPadding;
+				float contentPadding = contentMin + contentMax;
+				slider.value = inverted ? ((contentPadding > 0.001f) ? 1f - contentMin / contentPadding : 0f) :
+					((contentPadding > 0.001f) ? contentMin / contentPadding : 1f);
+
+				UIScrollBar sb = slider as UIScrollBar;
+				if (sb != null) sb.barSize = 1f - contentPadding;
+			}
+			else
+			{
+				contentMin = Mathf.Clamp01(-contentMin / contentSize);
+				contentMax = Mathf.Clamp01(-contentMax / contentSize);
+
+				float contentPadding = contentMin + contentMax;
+				slider.value = inverted ? ((contentPadding > 0.001f) ? 1f - contentMin / contentPadding : 0f) :
+					((contentPadding > 0.001f) ? contentMin / contentPadding : 1f);
+
+				if (contentSize > 0)
+				{
+					contentMin = Mathf.Clamp01(contentMin / contentSize);
+					contentMax = Mathf.Clamp01(contentMax / contentSize);
+					contentPadding = contentMin + contentMax;
+				}
+
+				UIScrollBar sb = slider as UIScrollBar;
+				if (sb != null) sb.barSize = 1f - contentPadding;
+			}
 		}
 		mIgnoreCallbacks = false;
 	}
