@@ -12,15 +12,22 @@ public class PropertyBindingEditor : Editor
 {
 	public override void OnInspectorGUI ()
 	{
+		NGUIEditorTools.SetLabelWidth(80f);
+
 		serializedObject.Update();
 
-		GUILayout.Space(3f);
-		NGUIEditorTools.SetLabelWidth(80f);
-		NGUIEditorTools.DrawPaddedProperty(serializedObject, "update");
 		GUILayout.Space(3f);
 		NGUIEditorTools.DrawProperty(serializedObject, "source");
 		GUILayout.Space(3f);
 		NGUIEditorTools.DrawProperty(serializedObject, "target");
+
+		GUILayout.Space(1f);
+		NGUIEditorTools.DrawPaddedProperty(serializedObject, "direction");
+		NGUIEditorTools.DrawPaddedProperty(serializedObject, "update");
+		GUILayout.BeginHorizontal();
+		NGUIEditorTools.DrawProperty(" ", serializedObject, "editMode", GUILayout.Width(100f));
+		GUILayout.Label("Update in Edit Mode");
+		GUILayout.EndHorizontal();
 
 		serializedObject.ApplyModifiedProperties();
 	}

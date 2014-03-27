@@ -20,26 +20,97 @@ public class PropertyBinding : MonoBehaviour
 		OnFixedUpdate,
 	}
 
+	public enum Direction
+	{
+		SourceUpdatesTarget,
+		TargetUpdatesSource,
+		BiDirectional,
+	}
+
+	/// <summary>
+	/// Direction of updates.
+	/// </summary>
+
+	public Direction direction = Direction.SourceUpdatesTarget;
+
+	/// <summary>
+	/// When the property update will occur.
+	/// </summary>
+
 	public UpdateCondition update = UpdateCondition.OnUpdate;
 	public PropertyReference source;
 	public PropertyReference target;
+	public bool editMode = true;
 
-	void Start () { UpdateTarget(); }
+	object mLastValue = null;
+
+	void Start ()
+	{
+		UpdateTarget();
+		if (update == UpdateCondition.OnStart) enabled = false;
+	}
 
 	void Update ()
 	{
 		if (update == UpdateCondition.OnUpdate) UpdateTarget();
 #if UNITY_EDITOR
-		else if (!Application.isPlaying) UpdateTarget();
+		else if (editMode && !Application.isPlaying) UpdateTarget();
 #endif
 	}
 
-	void LateUpdate () { if (update == UpdateCondition.OnLateUpdate) UpdateTarget(); }
-	void FixedUpdate () { if (update == UpdateCondition.OnFixedUpdate) UpdateTarget(); }
+	void LateUpdate ()
+	{
+#if UNITY_EDITOR
+		if (!Application.isPlaying) return;
+#endif
+		if (update == UpdateCondition.OnLateUpdate) UpdateTarget();
+	}
 
+	void FixedUpdate ()
+	{
+#if UNITY_EDITOR
+		if (!Application.isPlaying) return;
+#endif
+		if (update == UpdateCondition.OnFixedUpdate) UpdateTarget();
+	}
+
+	/// <summary>
+	/// Immediately update the bound data.
+	/// </summary>
+
+	[ContextMenu("Update Now")]
 	public void UpdateTarget ()
 	{
 		if (source != null && target != null && source.isValid && target.isValid)
-			target.Set(source.Get());
+		{
+			if (direction == Direction.SourceUpdatesTarget)
+			{
+				target.Set(source.Get());
+			}
+			else if (direction == Direction.TargetUpdatesSource)
+			{
+				source.Set(target.Get());
+			}
+			else
+			{
+				object current = source.Get();
+
+				if (mLastValue == null || !mLastValue.Equals(current))
+				{
+					mLastValue = current;
+					target.Set(current);
+				}
+				else
+				{
+					current = target.Get();
+
+					if (!mLastValue.Equals(current))
+					{
+						mLastValue = current;
+						source.Set(current);
+					}
+				}
+			}
+		}
 	}
 }
