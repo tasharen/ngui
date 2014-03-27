@@ -7,15 +7,10 @@ using UnityEngine;
 using UnityEditor;
 using System.Reflection;
 using System.Collections.Generic;
+using Entry = PropertyBindingDrawer.Entry;
 
 public static class EventDelegateEditor
 {
-	class Entry
-	{
-		public MonoBehaviour target;
-		public MethodInfo method;
-	}
-
 	/// <summary>
 	/// Collect a list of usable delegates from the specified target game object.
 	/// The delegates must be of type "void Delegate()".
@@ -44,39 +39,13 @@ public static class EventDelegateEditor
 					{
 						Entry ent = new Entry();
 						ent.target = mb;
-						ent.method = mi;
+						ent.name = mi.Name;
 						list.Add(ent);
 					}
 				}
 			}
 		}
 		return list;
-	}
-
-	/// <summary>
-	/// Convert the specified list of delegate entries into a string array.
-	/// </summary>
-
-	static string[] GetMethodNames (List<Entry> list, string choice, out int index)
-	{
-		index = 0;
-		string[] names = new string[list.Count + 1];
-		names[0] = string.IsNullOrEmpty(choice) ? "<Choose>" : choice;
-
-		for (int i = 0; i < list.Count; )
-		{
-			Entry ent = list[i];
-			string type = ent.target.GetType().ToString();
-			int period = type.LastIndexOf('.');
-			if (period > 0) type = type.Substring(period + 1);
-
-			string del = type + "." + ent.method.Name;
-			names[++i] = del;
-			
-			if (index == 0 && string.Equals(del, choice))
-				index = i;
-		}
-		return names;
 	}
 
 	/// <summary>
@@ -151,7 +120,7 @@ public static class EventDelegateEditor
 			List<Entry> list = GetMethods(go);
 
 			int index = 0;
-			string[] names = GetMethodNames(list, del.ToString(), out index);
+			string[] names = PropertyBindingDrawer.GetNames(list, del.ToString(), out index);
 			int choice = 0;
 
 			GUILayout.BeginHorizontal();
@@ -165,8 +134,8 @@ public static class EventDelegateEditor
 				{
 					Entry entry = list[choice - 1];
 					NGUIEditorTools.RegisterUndo("Delegate Selection", undoObject);
-					del.target = entry.target;
-					del.methodName = entry.method.Name;
+					del.target = entry.target as MonoBehaviour;
+					del.methodName = entry.name;
 					EditorUtility.SetDirty(undoObject);
 					GUI.changed = prev;
 					return true;
