@@ -27,17 +27,20 @@ public class PropertyBindingEditor : Editor
 		if (pb.direction == PropertyBinding.Direction.SourceUpdatesTarget && pb.source != null)
 			PropertyReferenceDrawer.filter = pb.source.GetPropertyType();
 
-		GUILayout.Space(-18f);
+		if (pb.source.target != null)
+		{
+			GUILayout.Space(-18f);
 
-		if (pb.direction == PropertyBinding.Direction.TargetUpdatesSource)
-		{
-			GUILayout.Label("   \u25B2"); // Up
+			if (pb.direction == PropertyBinding.Direction.TargetUpdatesSource)
+			{
+				GUILayout.Label("   \u25B2"); // Up
+			}
+			else if (pb.direction == PropertyBinding.Direction.SourceUpdatesTarget)
+			{
+				GUILayout.Label("   \u25BC"); // Down
+			}
+			else GUILayout.Label("  \u25B2\u25BC");
 		}
-		else if (pb.direction == PropertyBinding.Direction.SourceUpdatesTarget)
-		{
-			GUILayout.Label("   \u25BC"); // Down
-		}
-		else GUILayout.Label("  \u25B2\u25BC");
 
 		GUILayout.Space(1f);
 		NGUIEditorTools.DrawProperty(serializedObject, "target");
