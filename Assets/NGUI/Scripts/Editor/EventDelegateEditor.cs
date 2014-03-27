@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Reflection;
 using System.Collections.Generic;
-using Entry = PropertyBindingDrawer.Entry;
+using Entry = PropertyReferenceDrawer.Entry;
 
 public static class EventDelegateEditor
 {
@@ -120,7 +120,7 @@ public static class EventDelegateEditor
 			List<Entry> list = GetMethods(go);
 
 			int index = 0;
-			string[] names = PropertyBindingDrawer.GetNames(list, del.ToString(), out index);
+			string[] names = PropertyReferenceDrawer.GetNames(list, del.ToString(), out index);
 			int choice = 0;
 
 			GUILayout.BeginHorizontal();

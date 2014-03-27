@@ -13,8 +13,8 @@ using System.Reflection;
 /// Generic property binding drawer.
 /// </summary>
 
-[CustomPropertyDrawer(typeof(PropertyBinding))]
-public class PropertyBindingDrawer : PropertyDrawer
+[CustomPropertyDrawer(typeof(PropertyReference))]
+public class PropertyReferenceDrawer : PropertyDrawer
 {
 	public class Entry
 	{
@@ -99,7 +99,7 @@ public class PropertyBindingDrawer : PropertyDrawer
 	{
 		SerializedProperty target = prop.FindPropertyRelative("mTarget");
 		Component comp = target.objectReferenceValue as Component;
-		return (comp != null) ? 34f : 16f;
+		return (comp != null) ? 36f : 16f;
 	}
 
 	/// <summary>
@@ -112,30 +112,31 @@ public class PropertyBindingDrawer : PropertyDrawer
 		SerializedProperty field = prop.FindPropertyRelative("mName");
 
 		rect.height = 16f;
-		GUI.changed = false;
 		EditorGUI.PropertyField(rect, target, label);
-		if (GUI.changed) field.stringValue = "";
 
 		Component comp = target.objectReferenceValue as Component;
 
 		if (comp != null)
 		{
-			EditorGUI.BeginDisabledGroup(target.hasMultipleDifferentValues);
 			rect.y += 18f;
+			GUI.changed = false;
+			EditorGUI.BeginDisabledGroup(target.hasMultipleDifferentValues);
 			int index = 0;
 
 			// Get all the properties on the target game object
 			List<Entry> list = GetProperties(comp.gameObject, true, true);
 
 			// We want the field to look like "Component.property" rather than just "property"
-			string current = PropertyBinding.ToString(target.objectReferenceValue as Component, field.stringValue);
+			string current = PropertyReference.ToString(target.objectReferenceValue as Component, field.stringValue);
 
 			// Convert all the properties to names
-			string[] names = PropertyBindingDrawer.GetNames(list, current, out index);
+			string[] names = PropertyReferenceDrawer.GetNames(list, current, out index);
 
 			// Draw a selection list
 			GUI.changed = false;
-			int choice = EditorGUI.Popup(rect, " ", index, names);
+			rect.xMin += EditorGUIUtility.labelWidth;
+			rect.width -= 18f;
+			int choice = EditorGUI.Popup(rect, "", index, names);
 
 			// Update the target object and property name
 			if (GUI.changed && choice > 0)
