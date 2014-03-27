@@ -91,6 +91,12 @@ public class PropertyBinding : MonoBehaviour
 		if (update == UpdateCondition.OnFixedUpdate) UpdateTarget();
 	}
 
+	void OnValidate ()
+	{
+		if (source != null) source.Reset();
+		if (target != null) target.Reset();
+	}
+
 	/// <summary>
 	/// Immediately update the bound data.
 	/// </summary>
@@ -108,7 +114,7 @@ public class PropertyBinding : MonoBehaviour
 			{
 				source.Set(target.Get());
 			}
-			else
+			else if (source.GetPropertyType() == target.GetPropertyType())
 			{
 				object current = source.Get();
 

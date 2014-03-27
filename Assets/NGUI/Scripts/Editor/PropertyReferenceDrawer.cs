@@ -23,6 +23,12 @@ public class PropertyReferenceDrawer : PropertyDrawer
 	}
 
 	/// <summary>
+	/// If you want the property drawer to limit its selection list to values of specified type, set this to something other than 'void'.
+	/// </summary>
+
+	static public Type filter = typeof(void);
+
+	/// <summary>
 	/// Collect a list of usable properties and fields.
 	/// </summary>
 
@@ -45,6 +51,7 @@ public class PropertyReferenceDrawer : PropertyDrawer
 			for (int b = 0; b < fields.Length; ++b)
 			{
 				FieldInfo field = fields[b];
+				if (filter != typeof(void) && !PropertyReference.Convert(filter, field.FieldType)) continue;
 				Entry ent = new Entry();
 				ent.target = comp;
 				ent.name = field.Name;
@@ -56,6 +63,7 @@ public class PropertyReferenceDrawer : PropertyDrawer
 				PropertyInfo prop = props[b];
 				if (read && !prop.CanRead) continue;
 				if (write && !prop.CanWrite) continue;
+				if (filter != typeof(void) && !PropertyReference.Convert(filter, prop.PropertyType)) continue;
 				Entry ent = new Entry();
 				ent.target = comp;
 				ent.name = prop.Name;

@@ -98,6 +98,20 @@ public class PropertyReference
 	}
 
 	/// <summary>
+	/// Helper function that returns the property type.
+	/// </summary>
+
+	public Type GetPropertyType ()
+	{
+#if REFLECTION_SUPPORT
+		if (mProperty == null && mField == null && isValid) Cache();
+		if (mProperty != null) return mProperty.PropertyType;
+		if (mField != null) return mField.FieldType;
+#endif
+		return typeof(void);
+	}
+
+	/// <summary>
 	/// Equality operator.
 	/// </summary>
 
@@ -142,6 +156,16 @@ public class PropertyReference
 	{
 		mTarget = null;
 		mName = null;
+	}
+
+	/// <summary>
+	/// Reset the cached references.
+	/// </summary>
+
+	public void Reset ()
+	{
+		mField = null;
+		mProperty = null;
 	}
 
 	/// <summary>
@@ -202,21 +226,135 @@ public class PropertyReference
 	{
 #if REFLECTION_SUPPORT
 		if (mProperty == null && mField == null && isValid) Cache();
+		if (mProperty == null && mField == null) return false;
 
-		if (mProperty != null)
+		if (value == null)
 		{
-			if (mProperty.CanWrite && mProperty.PropertyType.IsAssignableFrom(value.GetType()))
+			try
 			{
-				mProperty.SetValue(mTarget, value, null);
-				return true;
+				if (mProperty != null) mProperty.SetValue(mTarget, null, null);
+				else mField.SetValue(mTarget, null);
 			}
+			catch (Exception) { return false; }
+		}
+
+		// Can we set the value?
+		if (!Convert(ref value))
+		{
+			if (Application.isPlaying)
+				UnityEngine.Debug.LogError("Unable to convert " + value.GetType() + " to " + GetPropertyType());
 		}
 		else if (mField != null)
 		{
-			if (mField.FieldType.IsAssignableFrom(value.GetType()))
+			mField.SetValue(mTarget, value);
+			return true;
+		}
+		else if (mProperty.CanWrite)
+		{
+			mProperty.SetValue(mTarget, value, null);
+			return true;
+		}
+#endif
+		return false;
+	}
+
+	/// <summary>
+	/// Whether we can assign the property using the specified value.
+	/// </summary>
+
+	bool Convert (ref object value)
+	{
+#if REFLECTION_SUPPORT
+		if (mTarget == null) return false;
+
+		Type to = GetPropertyType();
+		Type from;
+
+		if (value == null)
+		{
+			if (!to.IsClass) return false;
+			from = to;
+		}
+		else from = value.GetType();
+		return Convert(ref value, from, to);
+#else
+		return false;
+#endif
+	}
+
+	/// <summary>
+	/// Whether we can convert one type to another for assignment purposes.
+	/// </summary>
+
+	static public bool Convert (Type from, Type to)
+	{
+		object temp = null;
+		return Convert(ref temp, from, to);
+	}
+
+	/// <summary>
+	/// Whether we can convert one type to another for assignment purposes.
+	/// </summary>
+
+	static public bool Convert (object value, Type to)
+	{
+		if (value == null)
+		{
+			value = null;
+			return Convert(ref value, to, to);
+		}
+		return Convert(ref value, value.GetType(), to);
+	}
+
+	/// <summary>
+	/// Whether we can convert one type to another for assignment purposes.
+	/// </summary>
+
+	static public bool Convert (ref object value, Type from, Type to)
+	{
+#if REFLECTION_SUPPORT
+		// If the value can be assigned as-is, we're done
+		if (to.IsAssignableFrom(from)) return true;
+
+		// If the target type is a string, just convert the value
+		if (to == typeof(string))
+		{
+			value = (value != null) ? value.ToString() : "null";
+			return true;
+		}
+
+		// If the value is null we should not proceed further
+		if (value == null) return false;
+
+		if (to == typeof(int))
+		{
+			if (from == typeof(string))
 			{
-				mField.SetValue(mTarget, value);
+				int val;
+
+				if (int.TryParse((string)value, out val))
+				{
+					value = val;
+					return true;
+				}
+			}
+			else if (from == typeof(float))
+			{
+				value = Mathf.RoundToInt((float)value);
 				return true;
+			}
+		}
+		else if (to == typeof(float))
+		{
+			if (from == typeof(string))
+			{
+				float val;
+
+				if (float.TryParse((string)value, out val))
+				{
+					value = val;
+					return true;
+				}
 			}
 		}
 #endif
