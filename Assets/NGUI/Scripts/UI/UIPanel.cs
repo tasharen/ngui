@@ -24,13 +24,6 @@ public class UIPanel : UIRect
 
 	static public BetterList<UIPanel> list = new BetterList<UIPanel>();
 
-	public enum DebugInfo
-	{
-		None,
-		Gizmos,
-		Geometry,
-	}
-
 	public enum RenderQueue
 	{
 		Automatic,
