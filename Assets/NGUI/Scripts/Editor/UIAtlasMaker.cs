@@ -37,8 +37,11 @@ public class UIAtlasMaker : EditorWindow
 
 	void OnSelectAtlas (Object obj)
 	{
-		NGUISettings.atlas = obj as UIAtlas;
-		Repaint();
+		if (NGUISettings.atlas != obj)
+		{
+			NGUISettings.atlas = obj as UIAtlas;
+			Repaint();
+		}
 	}
 
 	/// <summary>
@@ -716,10 +719,10 @@ public class UIAtlasMaker : EditorWindow
 		{
 			ComponentSelector.Draw<UIAtlas>("Atlas", NGUISettings.atlas, OnSelectAtlas, true, GUILayout.MinWidth(80f));
 
-			EditorGUI.BeginDisabledGroup(NGUISettings.atlas == null);
-			if (GUILayout.Button("New", GUILayout.Width(40f)))
-				NGUISettings.atlas = null;
-			EditorGUI.EndDisabledGroup();
+			//EditorGUI.BeginDisabledGroup(NGUISettings.atlas == null);
+			//if (GUILayout.Button("New", GUILayout.Width(40f)))
+			//    NGUISettings.atlas = null;
+			//EditorGUI.EndDisabledGroup();
 		}
 		GUILayout.EndHorizontal();
 
