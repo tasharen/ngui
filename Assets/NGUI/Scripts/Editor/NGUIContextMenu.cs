@@ -114,6 +114,9 @@ public static class NGUIContextMenu
 
 	[MenuItem("CONTEXT/UIKeyNavigation/Help")]
 	static void ShowHelp30 (MenuCommand command) { NGUIHelp.Show(typeof(UIKeyNavigation)); }
+	
+	[MenuItem("CONTEXT/PropertyBinding/Help")]
+	static void ShowHelp31 (MenuCommand command) { NGUIHelp.Show(typeof(PropertyBinding)); }
 
 	public delegate UIWidget AddFunc (GameObject go);
 
@@ -386,6 +389,8 @@ public static class NGUIContextMenu
 				AddItem("Attach/Play Animation Script", false, delegate(object obj) { target.AddComponent<UIPlayAnimation>(); }, null);
 				AddItem("Attach/Play Sound Script", false, delegate(object obj) { target.AddComponent<UIPlaySound>(); }, null);
 			}
+
+			AddItem("Attach/Property Binding", false, delegate(object obj) { target.AddComponent<PropertyBinding>(); }, null);
 
 			if (target.GetComponent<UILocalize>() == null)
 				AddItem("Attach/Localization Script", false, delegate(object obj) { target.AddComponent<UILocalize>(); }, null);
