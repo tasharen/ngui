@@ -10,6 +10,7 @@ using UnityEngine;
 /// </summary>
 
 [ExecuteInEditMode]
+[AddComponentMenu("NGUI/Internal/Property Binding")]
 public class PropertyBinding : MonoBehaviour
 {
 	public enum UpdateCondition
@@ -28,6 +29,18 @@ public class PropertyBinding : MonoBehaviour
 	}
 
 	/// <summary>
+	/// First property reference.
+	/// </summary>
+
+	public PropertyReference source;
+
+	/// <summary>
+	/// Second property reference.
+	/// </summary>
+
+	public PropertyReference target;
+
+	/// <summary>
 	/// Direction of updates.
 	/// </summary>
 
@@ -38,10 +51,14 @@ public class PropertyBinding : MonoBehaviour
 	/// </summary>
 
 	public UpdateCondition update = UpdateCondition.OnUpdate;
-	public PropertyReference source;
-	public PropertyReference target;
+
+	/// <summary>
+	/// Whether the values will update while in edit mode.
+	/// </summary>
+
 	public bool editMode = true;
 
+	// Cached value from the last update, used to see which property changes for bi-directional updates.
 	object mLastValue = null;
 
 	void Start ()
