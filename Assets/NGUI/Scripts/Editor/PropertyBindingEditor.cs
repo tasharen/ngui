@@ -12,6 +12,8 @@ public class PropertyBindingEditor : Editor
 {
 	public override void OnInspectorGUI ()
 	{
+		serializedObject.Update();
+
 		GUILayout.Space(3f);
 		NGUIEditorTools.SetLabelWidth(80f);
 		NGUIEditorTools.DrawPaddedProperty(serializedObject, "update");
@@ -19,5 +21,7 @@ public class PropertyBindingEditor : Editor
 		NGUIEditorTools.DrawProperty(serializedObject, "source");
 		GUILayout.Space(3f);
 		NGUIEditorTools.DrawProperty(serializedObject, "target");
+
+		serializedObject.ApplyModifiedProperties();
 	}
 }

@@ -14,13 +14,13 @@ public class PropertyBinding : MonoBehaviour
 {
 	public enum UpdateCondition
 	{
-		Start,
-		Update,
-		LateUpdate,
-		FixedUpdate,
+		OnStart,
+		OnUpdate,
+		OnLateUpdate,
+		OnFixedUpdate,
 	}
 
-	public UpdateCondition update = UpdateCondition.Update;
+	public UpdateCondition update = UpdateCondition.OnUpdate;
 	public PropertyReference source;
 	public PropertyReference target;
 
@@ -28,14 +28,14 @@ public class PropertyBinding : MonoBehaviour
 
 	void Update ()
 	{
-		if (update == UpdateCondition.Update) UpdateTarget();
+		if (update == UpdateCondition.OnUpdate) UpdateTarget();
 #if UNITY_EDITOR
 		else if (!Application.isPlaying) UpdateTarget();
 #endif
 	}
 
-	void LateUpdate () { if (update == UpdateCondition.LateUpdate) UpdateTarget(); }
-	void FixedUpdate () { if (update == UpdateCondition.FixedUpdate) UpdateTarget(); }
+	void LateUpdate () { if (update == UpdateCondition.OnLateUpdate) UpdateTarget(); }
+	void FixedUpdate () { if (update == UpdateCondition.OnFixedUpdate) UpdateTarget(); }
 
 	public void UpdateTarget ()
 	{
