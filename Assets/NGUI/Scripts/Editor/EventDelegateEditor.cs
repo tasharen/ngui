@@ -13,7 +13,6 @@ public static class EventDelegateEditor
 {
 	/// <summary>
 	/// Collect a list of usable delegates from the specified target game object.
-	/// The delegates must be of type "void Delegate()".
 	/// </summary>
 
 	static List<Entry> GetMethods (GameObject target)
@@ -33,15 +32,22 @@ public static class EventDelegateEditor
 			{
 				MethodInfo mi = methods[b];
 
-				if (mi.GetParameters().Length == 0 && mi.ReturnType == typeof(void))
+				if (mi.ReturnType == typeof(void))
 				{
-					if (mi.Name != "StopAllCoroutines" && mi.Name != "CancelInvoke")
-					{
-						Entry ent = new Entry();
-						ent.target = mb;
-						ent.name = mi.Name;
-						list.Add(ent);
-					}
+					string name = mi.Name;
+					if (name == "Invoke") continue;
+					if (name == "InvokeRepeating") continue;
+					if (name == "CancelInvoke") continue;
+					if (name == "StopCoroutine") continue;
+					if (name == "StopAllCoroutines") continue;
+					if (name == "BroadcastMessage") continue;
+					if (name.StartsWith("SendMessage")) continue;
+					if (name.StartsWith("set_")) continue;
+
+					Entry ent = new Entry();
+					ent.target = mb;
+					ent.name = mi.Name;
+					list.Add(ent);
 				}
 			}
 		}
@@ -128,24 +134,109 @@ public static class EventDelegateEditor
 			GUILayout.Space(18f);
 			GUILayout.EndHorizontal();
 
-			if (choice > 0)
+			if (choice > 0 && choice != index)
 			{
-				if (choice != index)
+				Entry entry = list[choice - 1];
+				NGUIEditorTools.RegisterUndo("Delegate Selection", undoObject);
+				del.target = entry.target as MonoBehaviour;
+				del.methodName = entry.name;
+				EditorUtility.SetDirty(undoObject);
+				retVal = true;
+			}
+
+			GUI.changed = false;
+			EventDelegate.Parameter[] ps = del.parameters;
+
+			if (ps != null)
+			{
+				for (int i = 0; i < ps.Length; ++i)
 				{
-					Entry entry = list[choice - 1];
-					NGUIEditorTools.RegisterUndo("Delegate Selection", undoObject);
-					del.target = entry.target as MonoBehaviour;
-					del.methodName = entry.name;
-					EditorUtility.SetDirty(undoObject);
-					GUI.changed = prev;
-					return true;
+					EventDelegate.Parameter param = ps[i];
+
+					Object obj = EditorGUILayout.ObjectField("   Arg " + i, param.obj, typeof(Object), true);
+
+					if (GUI.changed)
+					{
+						GUI.changed = false;
+						param.obj = obj;
+						EditorUtility.SetDirty(undoObject);
+					}
+
+					if (obj == null) continue;
+
+					System.Type type = obj.GetType();
+
+					GameObject selGO = null;
+					if (type == typeof(GameObject)) selGO = obj as GameObject;
+					else if (type.IsSubclassOf(typeof(Component))) selGO = (obj as Component).gameObject;
+
+					if (selGO != null)
+					{
+						// Parameters must be exact -- they can't be converted like property bindings
+						PropertyReferenceDrawer.filter = param.expectedType;
+						PropertyReferenceDrawer.canConvert = false;
+						List<PropertyReferenceDrawer.Entry> ents = PropertyReferenceDrawer.GetProperties(selGO, true, false);
+
+						int selection;
+						string[] props = GetNames(ents, NGUITools.GetFuncName(param.obj, param.field), out selection);
+
+						GUILayout.BeginHorizontal();
+						int newSel = EditorGUILayout.Popup(" ", selection, props);
+						GUILayout.Space(18f);
+						GUILayout.EndHorizontal();
+
+						if (GUI.changed)
+						{
+							GUI.changed = false;
+
+							if (newSel == 0)
+							{
+								param.obj = selGO;
+								param.field = null;
+							}
+							else
+							{
+								param.obj = ents[newSel - 1].target;
+								param.field = ents[newSel - 1].name;
+							}
+							EditorUtility.SetDirty(undoObject);
+						}
+					}
+					else if (!string.IsNullOrEmpty(param.field))
+					{
+						param.field = null;
+						EditorUtility.SetDirty(undoObject);
+					}
+
+					PropertyReferenceDrawer.filter = typeof(void);
+					PropertyReferenceDrawer.canConvert = true;
 				}
 			}
 		}
-
-		retVal = GUI.changed;
+		else retVal = GUI.changed;
 		GUI.changed = prev;
 		return retVal;
+	}
+
+	/// <summary>
+	/// Convert the specified list of delegate entries into a string array.
+	/// </summary>
+
+	static string[] GetNames (List<Entry> list, string choice, out int index)
+	{
+		index = 0;
+		string[] names = new string[list.Count + 1];
+		names[0] = "<GameObject>";
+
+		for (int i = 0; i < list.Count; )
+		{
+			Entry ent = list[i];
+			string del = NGUITools.GetFuncName(ent.target, ent.name);
+			names[++i] = del;
+			if (index == 0 && string.Equals(del, choice))
+				index = i;
+		}
+		return names;
 	}
 
 	/// <summary>

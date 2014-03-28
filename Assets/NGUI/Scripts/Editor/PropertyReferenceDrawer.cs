@@ -29,10 +29,16 @@ public class PropertyReferenceDrawer : PropertyDrawer
 	static public Type filter = typeof(void);
 
 	/// <summary>
+	/// Whether it's possible to convert between basic types, such as int to string.
+	/// </summary>
+
+	static public bool canConvert = true;
+
+	/// <summary>
 	/// Collect a list of usable properties and fields.
 	/// </summary>
 
-	static List<Entry> GetProperties (GameObject target, bool read, bool write)
+	static public List<Entry> GetProperties (GameObject target, bool read, bool write)
 	{
 		Component[] comps = target.GetComponents<Component>();
 
@@ -51,7 +57,16 @@ public class PropertyReferenceDrawer : PropertyDrawer
 			for (int b = 0; b < fields.Length; ++b)
 			{
 				FieldInfo field = fields[b];
-				if (filter != typeof(void) && !PropertyReference.Convert(filter, field.FieldType)) continue;
+
+				if (filter != typeof(void))
+				{
+					if (canConvert)
+					{
+						if (!PropertyReference.Convert(field.FieldType, filter)) continue;
+					}
+					else if (!filter.IsAssignableFrom(field.FieldType)) continue;
+				}
+
 				Entry ent = new Entry();
 				ent.target = comp;
 				ent.name = field.Name;
@@ -63,7 +78,16 @@ public class PropertyReferenceDrawer : PropertyDrawer
 				PropertyInfo prop = props[b];
 				if (read && !prop.CanRead) continue;
 				if (write && !prop.CanWrite) continue;
-				if (filter != typeof(void) && !PropertyReference.Convert(filter, prop.PropertyType)) continue;
+
+				if (filter != typeof(void))
+				{
+					if (canConvert)
+					{
+						if (!PropertyReference.Convert(prop.PropertyType, filter)) continue;
+					}
+					else if (!filter.IsAssignableFrom(prop.PropertyType)) continue;
+				}
+
 				Entry ent = new Entry();
 				ent.target = comp;
 				ent.name = prop.Name;
@@ -86,13 +110,8 @@ public class PropertyReferenceDrawer : PropertyDrawer
 		for (int i = 0; i < list.Count; )
 		{
 			Entry ent = list[i];
-			string type = ent.target.GetType().ToString();
-			int period = type.LastIndexOf('.');
-			if (period > 0) type = type.Substring(period + 1);
-
-			string del = type + "." + ent.name;
+			string del = NGUITools.GetFuncName(ent.target, ent.name);
 			names[++i] = del;
-
 			if (index == 0 && string.Equals(del, choice))
 				index = i;
 		}

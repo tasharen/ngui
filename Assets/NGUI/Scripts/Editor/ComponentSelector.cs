@@ -196,7 +196,7 @@ public class ComponentSelector : ScriptableWizard
 			{
 				if (GUILayout.Button("Open the Font Maker", GUILayout.Width(150f)))
 				{
-					EditorWindow.GetWindow<UIFontMaker>(false, "Font Maker", true);
+					EditorWindow.GetWindow<UIFontMaker>(false, "Font Maker", true).Show();
 					isDone = true;
 				}
 			}
@@ -204,7 +204,7 @@ public class ComponentSelector : ScriptableWizard
 			{
 				if (GUILayout.Button("Open the Atlas Maker", GUILayout.Width(150f)))
 				{
-					EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true);
+					EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true).Show();
 					isDone = true;
 				}
 			}

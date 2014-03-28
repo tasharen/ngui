@@ -193,6 +193,33 @@ public class PropertyReference
 	}
 
 	/// <summary>
+	/// Helper function that returns the value of the specified property.
+	/// </summary>
+
+//    static public object GetValue (object obj, string property)
+//    {
+//#if REFLECTION_SUPPORT
+//        if (obj == null) return null;
+
+//        // No property specified? Return the object itself.
+//        if (string.IsNullOrEmpty(property)) return obj;
+
+//        // If it's a game object, always return it as-is
+//        System.Type type = obj.GetType();
+//        if (type == typeof(GameObject)) return obj;
+
+//        // Try to get the property with that name, and if found -- execute it
+//        PropertyInfo pi = type.GetProperty(property);
+//        if (pi != null) return pi.GetValue(obj, null);
+
+//        // Try to get a field with that name, and if found -- execute it
+//        FieldInfo field = type.GetField(property);
+//        if (field != null) return field.GetValue(obj);
+//#endif
+//        return null;
+//    }
+
+	/// <summary>
 	/// Retrieve the property's value.
 	/// </summary>
 

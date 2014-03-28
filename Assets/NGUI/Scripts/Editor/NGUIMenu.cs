@@ -399,14 +399,14 @@ static public class NGUIMenu
 	[MenuItem("Assets/NGUI/Open Atlas Maker", false, 0)]
 	static public void OpenAtlasMaker ()
 	{
-		EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true);
+		EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true).Show();
 	}
 
 	[MenuItem("NGUI/Open/Font Maker", false, 9)]
 	[MenuItem("Assets/NGUI/Open Bitmap Font Maker", false, 0)]
 	static public void OpenFontMaker ()
 	{
-		EditorWindow.GetWindow<UIFontMaker>(false, "Font Maker", true);
+		EditorWindow.GetWindow<UIFontMaker>(false, "Font Maker", true).Show();
 	}
 
 	[MenuItem("NGUI/Open/", false, 9)]
@@ -416,31 +416,31 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Open/Panel Tool", false, 9)]
 	static public void OpenPanelWizard ()
 	{
-		EditorWindow.GetWindow<UIPanelTool>(false, "Panel Tool", true);
+		EditorWindow.GetWindow<UIPanelTool>(false, "Panel Tool", true).Show();
 	}
 
 	[MenuItem("NGUI/Open/Draw Call Tool", false, 9)]
 	static public void OpenDCTool ()
 	{
-		EditorWindow.GetWindow<UIDrawCallViewer>(false, "Draw Call Tool", true);
+		EditorWindow.GetWindow<UIDrawCallViewer>(false, "Draw Call Tool", true).Show();
 	}
 
 	[MenuItem("NGUI/Open/Camera Tool", false, 9)]
 	static public void OpenCameraWizard ()
 	{
-		EditorWindow.GetWindow<UICameraTool>(false, "Camera Tool", true);
+		EditorWindow.GetWindow<UICameraTool>(false, "Camera Tool", true).Show();
 	}
 
 	[MenuItem("NGUI/Open/Widget Wizard (Legacy)", false, 9)]
 	static public void CreateWidgetWizard ()
 	{
-		EditorWindow.GetWindow<UICreateWidgetWizard>(false, "Widget Tool", true);
+		EditorWindow.GetWindow<UICreateWidgetWizard>(false, "Widget Tool", true).Show();
 	}
 
 	//[MenuItem("NGUI/Open/UI Wizard (Legacy)", false, 9)]
 	//static public void CreateUIWizard ()
 	//{
-	//    EditorWindow.GetWindow<UICreateNewUIWizard>(false, "UI Tool", true);
+	//    EditorWindow.GetWindow<UICreateNewUIWizard>(false, "UI Tool", true).Show();
 	//}
 
 #endregion
