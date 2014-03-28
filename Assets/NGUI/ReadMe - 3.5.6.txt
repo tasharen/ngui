@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.5.5
+            Version 3.5.6
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -45,6 +45,14 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.5.6
+- NEW: Added basic built-in data binding support (PropertyBinding script).
+- NEW: All delegates now support any number of parameters that you can set in inspector.
+- FIX: Fix for scroll bar size being wrong if the content was smaller than the scroll view.
+- FIX: UIInput will now load the saved value properly even if the "starting value" is not empty.
+- FIX: Anchors set to update only in OnEnable will now still update while in edit mode.
+- FIX: Fixed the bug that was causing the atlas maker to eat up CPU.
 
 3.5.5
 - NEW: Added built-in support for endless scroll view (UIWrapContent).
