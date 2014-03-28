@@ -328,8 +328,11 @@ public class UIAtlasInspector : Editor
 
 	void SelectSprite (string spriteName)
 	{
-		NGUISettings.selectedSprite = spriteName;
-		Repaint();
+		if (NGUISettings.selectedSprite != spriteName)
+		{
+			NGUISettings.selectedSprite = spriteName;
+			Repaint();
+		}
 	}
 
 	/// <summary>
