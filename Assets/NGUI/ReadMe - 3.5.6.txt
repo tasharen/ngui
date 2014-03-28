@@ -8,6 +8,15 @@
 
 Thank you for buying NGUI!
 
+PLEASE NOTE that NGUI can only be legally downloaded from the following 3 sources:
+
+  1. Unity Asset Store (Standard License)
+  2. www.tasharen.com (Standard License)
+  3. github.com/tasharen/ngui (Professional License)
+
+If you've obtained NGUI via some other means then note that your license is effectively invalid,
+as Tasharen cannot provide support for pirated and/or potentially modified software.
+
 Documentation can be found here: http://www.tasharen.com/forum/index.php?topic=6754.0
 
 If you have any questions, suggestions, comments or feature requests, please
