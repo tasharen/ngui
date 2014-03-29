@@ -791,6 +791,9 @@ public class UISprite : UIWidget
 		Vector2 size = new Vector2(mInnerUV.width * tex.width, mInnerUV.height * tex.height);
 		size *= atlas.pixelSize;
 
+		// Don't tile really small sprites
+		if (size.x < 2f || size.y < 2f) return;
+
 		Color colF = color;
 		colF.a = finalAlpha;
 		Color32 col = atlas.premultipliedAlpha ? NGUITools.ApplyPMA(colF) : colF;

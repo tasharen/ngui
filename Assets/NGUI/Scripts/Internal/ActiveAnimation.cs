@@ -97,6 +97,28 @@ public class ActiveAnimation : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Immediately finish playing the animation.
+	/// </summary>
+
+	public void Finish ()
+	{
+		if (mAnim != null)
+		{
+			foreach (AnimationState state in mAnim)
+			{
+				if (mLastDirection == Direction.Forward) state.time = state.length;
+				else if (mLastDirection == Direction.Reverse) state.time = 0f;
+			}
+		}
+#if USE_MECANIM
+		else if (mAnimator != null)
+		{
+			mAnimator.Play(mClip, 0, (mLastDirection == Direction.Forward) ? 1f : 0f);
+		}
+#endif
+	}
+
+	/// <summary>
 	/// Manually reset the active animation to the beginning.
 	/// </summary>
 

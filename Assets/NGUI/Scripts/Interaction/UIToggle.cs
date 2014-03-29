@@ -156,7 +156,10 @@ public class UIToggle : UIWidgetContainer
 		{
 			mIsActive = !startsActive;
 			mStarted = true;
+			bool instant = instantTween;
+			instantTween = true;
 			Set(startsActive);
+			instantTween = instant;
 		}
 	}
 
@@ -229,7 +232,8 @@ public class UIToggle : UIWidgetContainer
 			// Play the checkmark animation
 			if (activeAnimation != null)
 			{
-				ActiveAnimation.Play(activeAnimation, state ? Direction.Forward : Direction.Reverse);
+				ActiveAnimation aa = ActiveAnimation.Play(activeAnimation, state ? Direction.Forward : Direction.Reverse);
+				if (instantTween) aa.Finish();
 			}
 		}
 	}
