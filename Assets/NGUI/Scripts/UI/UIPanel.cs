@@ -113,6 +113,13 @@ public class UIPanel : UIRect
 	[System.NonSerialized]
 	public Matrix4x4 worldToLocal = Matrix4x4.identity;
 
+	/// <summary>
+	/// Cached clip range passed to the draw call's shader.
+	/// </summary>
+
+	[System.NonSerialized]
+	public Vector4 drawCallClipRange = new Vector4(0f, 0f, 1f, 1f);
+
 	public delegate void OnClippingMoved (UIPanel panel);
 
 	/// <summary>
@@ -326,11 +333,32 @@ public class UIPanel : UIRect
 		}
 	}
 
+	UIPanel mParentPanel = null;
+
+	/// <summary>
+	/// Reference to the parent panel, if any.
+	/// </summary>
+
+	public UIPanel parentPanel { get { return mParentPanel; } }
+
+	/// <summary>
+	/// Number of times the panel's contents get clipped.
+	/// </summary>
+
+	public int clipCount
+	{
+		get
+		{
+			int count = (mClipping == UIDrawCall.Clipping.SoftClip) ? 1 : 0;
+			return (mParentPanel != null) ? count + mParentPanel.clipCount : count;
+		}
+	}
+
 	/// <summary>
 	/// Whether the panel will actually perform clipping of children.
 	/// </summary>
 
-	public bool clipsChildren { get { return mClipping == UIDrawCall.Clipping.AlphaClip || mClipping == UIDrawCall.Clipping.SoftClip; } }
+	public bool clipsChildren { get { return mClipping == UIDrawCall.Clipping.SoftClip; } }
 
 	/// <summary>
 	/// Clipping area offset used to make it possible to move clipped panels (scroll views) efficiently.
@@ -723,6 +751,28 @@ public class UIPanel : UIRect
 
 		// Only DirectX 9 needs the half-pixel offset
 		if (mHalfPixelOffset) mHalfPixelOffset = (SystemInfo.graphicsShaderLevel < 40);
+	}
+
+	/// <summary>
+	/// Remember the parent panel, if any.
+	/// </summary>
+
+	protected override void OnEnable ()
+	{
+		base.OnEnable();
+		Transform parent = cachedTransform.parent;
+		mParentPanel = (parent != null) ? NGUITools.FindInParents<UIPanel>(parent.gameObject) : null;
+	}
+
+	/// <summary>
+	/// Find the parent panel, if we have one.
+	/// </summary>
+
+	public override void ParentHasChanged ()
+	{
+		base.ParentHasChanged();
+		Transform parent = cachedTransform.parent;
+		mParentPanel = (parent != null) ? NGUITools.FindInParents<UIPanel>(parent.gameObject) : null;
 	}
 
 	/// <summary>
@@ -1154,22 +1204,25 @@ public class UIPanel : UIRect
 	void UpdateDrawCalls ()
 	{
 		Transform trans = cachedTransform;
-		Vector4 range = Vector4.zero;
 		bool isUI = usedForUI;
 
 		if (clipping != UIDrawCall.Clipping.None)
 		{
-			Vector4 cr = finalClipRegion;
-			range = new Vector4(cr.x, cr.y, cr.z * 0.5f, cr.w * 0.5f);
+			drawCallClipRange = finalClipRegion;
+			drawCallClipRange.z *= 0.5f;
+			drawCallClipRange.w *= 0.5f;
 		}
+		else drawCallClipRange = Vector4.zero;
 
-		if (range.z == 0f) range.z = Screen.width * 0.5f;
-		if (range.w == 0f) range.w = Screen.height * 0.5f;
+		// Legacy functionality
+		if (drawCallClipRange.z == 0f) drawCallClipRange.z = Screen.width * 0.5f;
+		if (drawCallClipRange.w == 0f) drawCallClipRange.w = Screen.height * 0.5f;
 
+		// DirectX 9 half-pixel offset
 		if (halfPixelOffset)
 		{
-			range.x -= 0.5f;
-			range.y += 0.5f;
+			drawCallClipRange.x -= 0.5f;
+			drawCallClipRange.y += 0.5f;
 		}
 
 		Vector3 pos;
@@ -1185,8 +1238,10 @@ public class UIPanel : UIRect
 			{
 				float x = Mathf.Round(pos.x);
 				float y = Mathf.Round(pos.y);
-				range.x += pos.x - x;
-				range.y += pos.y - y;
+
+				drawCallClipRange.x += pos.x - x;
+				drawCallClipRange.y += pos.y - y;
+
 				pos.x = x;
 				pos.y = y;
 				pos = parent.TransformPoint(pos);
@@ -1208,9 +1263,6 @@ public class UIPanel : UIRect
 			t.localScale = scale;
 
 			dc.renderQueue = (renderQueue == RenderQueue.Explicit) ? startingRenderQueue : startingRenderQueue + i;
-			dc.clipping = clipping;
-			dc.clipRange = range;
-			dc.clipSoftness = mClipSoftness;
 			dc.alwaysOnScreen = alwaysOnScreen &&
 				(mClipping == UIDrawCall.Clipping.None || mClipping == UIDrawCall.Clipping.ConstrainButDontClip);
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
