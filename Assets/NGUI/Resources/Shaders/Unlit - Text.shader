@@ -51,7 +51,7 @@ Shader "Unlit/Text"
 				{
 					v2f o;
 					o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
-					o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
+					o.texcoord = v.texcoord;
 					o.color = v.color;
 					return o;
 				}

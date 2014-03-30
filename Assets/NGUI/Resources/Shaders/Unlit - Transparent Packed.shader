@@ -1,4 +1,4 @@
-Shader "Unlit/Transparent Colored (Packed)"
+Shader "Unlit/Transparent Packed"
 {
 	Properties
 	{

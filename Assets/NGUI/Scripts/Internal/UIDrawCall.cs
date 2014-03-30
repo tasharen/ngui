@@ -257,6 +257,9 @@ public class UIDrawCall : MonoBehaviour
 			}
 		}
 
+		if (shaderName.StartsWith("HIDDEN/"))
+			shaderName = shaderName.Substring(7);
+
 		// Legacy functionality
 		const string soft = " (SoftClip)";
 		shaderName = shaderName.Replace(soft, "");
@@ -268,8 +271,9 @@ public class UIDrawCall : MonoBehaviour
 
 		if (mClipCount != 0)
 		{
-			shader = Shader.Find(shaderName + " " + mClipCount);
-		
+			shader = Shader.Find("HIDDEN/" + shaderName + " " + mClipCount);
+			if (shader == null) Shader.Find(shaderName + " " + mClipCount);
+
 			// Legacy functionality
 			if (shader == null && mClipCount == 1)
 			{

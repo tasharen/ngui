@@ -1,4 +1,4 @@
-Shader "Unlit/Transparent Colored 1"
+Shader "HIDDEN/Unlit/Transparent Colored 1"
 {
 	Properties
 	{
@@ -34,9 +34,8 @@ Shader "Unlit/Transparent Colored 1"
 			#include "UnityCG.cginc"
 
 			sampler2D _MainTex;
-			float4 _MainTex_ST;
 			float4 _ClipRange0 = float4(0.0, 0.0, 1.0, 1.0);
-			float2 _ClipSharpness0 = float2(1000.0, 1000.0);
+			float2 _ClipArgs0 = float2(1000.0, 1000.0);
 
 			struct appdata_t
 			{
@@ -66,7 +65,7 @@ Shader "Unlit/Transparent Colored 1"
 			half4 frag (v2f IN) : COLOR
 			{
 				// Softness factor
-				float2 factor = (float2(1.0, 1.0) - abs(IN.worldPos)) * _ClipSharpness0;
+				float2 factor = (float2(1.0, 1.0) - abs(IN.worldPos)) * _ClipArgs0;
 			
 				// Sample the texture
 				half4 col = tex2D(_MainTex, IN.texcoord) * IN.color;

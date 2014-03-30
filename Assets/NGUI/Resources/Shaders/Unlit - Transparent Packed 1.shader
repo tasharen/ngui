@@ -1,4 +1,4 @@
-Shader "Unlit/Transparent Colored (Packed) (SoftClip)"
+Shader "HIDDEN/Unlit/Transparent Packed 1"
 {
 	Properties
 	{
@@ -33,8 +33,8 @@ Shader "Unlit/Transparent Colored (Packed) (SoftClip)"
 			#include "UnityCG.cginc"
 
 			sampler2D _MainTex;
-			half4 _MainTex_ST;
-			float2 _ClipSharpness = float2(20.0, 20.0);
+			float4 _ClipRange0 = float4(0.0, 0.0, 1.0, 1.0);
+			float2 _ClipArgs0 = float2(1000.0, 1000.0);
 
 			struct appdata_t
 			{
@@ -57,7 +57,7 @@ Shader "Unlit/Transparent Colored (Packed) (SoftClip)"
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.color = v.color;
 				o.texcoord = v.texcoord;
-				o.worldPos = TRANSFORM_TEX(v.vertex.xy, _MainTex);
+				o.worldPos = v.vertex.xy * _ClipRange0.zw + _ClipRange0.xy;
 				return o;
 			}
 
@@ -66,7 +66,9 @@ Shader "Unlit/Transparent Colored (Packed) (SoftClip)"
 				half4 mask = tex2D(_MainTex, IN.texcoord);
 				half4 mixed = saturate(ceil(IN.color - 0.5));
 				half4 col = saturate((mixed * 0.51 - IN.color) / -0.49);
-				float2 factor = (float2(1.0, 1.0) - abs(IN.worldPos)) * _ClipSharpness;
+
+				// Softness factor
+				float2 factor = (float2(1.0, 1.0) - abs(IN.worldPos)) * _ClipArgs0;
 				
 				mask *= mixed;
 				col.a *= clamp( min(factor.x, factor.y), 0.0, 1.0);

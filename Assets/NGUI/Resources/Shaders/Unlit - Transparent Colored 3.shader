@@ -1,4 +1,4 @@
-Shader "Unlit/Transparent Colored 3"
+Shader "HIDDEN/Unlit/Transparent Colored 3"
 {
 	Properties
 	{
@@ -34,7 +34,6 @@ Shader "Unlit/Transparent Colored 3"
 			#include "UnityCG.cginc"
 
 			sampler2D _MainTex;
-			float4 _MainTex_ST;
 			float4 _ClipRange0 = float4(0.0, 0.0, 1.0, 1.0);
 			float4 _ClipArgs0 = float4(1000.0, 1000.0, 0.0, 1.0);
 			float4 _ClipRange1 = float4(0.0, 0.0, 1.0, 1.0);
