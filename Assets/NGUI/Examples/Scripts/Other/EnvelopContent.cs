@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
@@ -10,6 +10,7 @@ using UnityEngine;
 /// </summary>
 
 [RequireComponent(typeof(UIWidget))]
+[AddComponentMenu("NGUI/Examples/Envelop Content")]
 public class EnvelopContent : MonoBehaviour
 {
 	public Transform targetRoot;
