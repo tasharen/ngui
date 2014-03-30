@@ -58,6 +58,7 @@ and it will not be included in the build of your game. It's only used in the edi
 3.5.6
 - NEW: Added basic built-in data binding support (PropertyBinding script).
 - NEW: All delegates now support any number of parameters that you can set in inspector.
+- NEW: You can now nest scroll views (scroll views within scroll views). The built-in shaders support up to 3 scroll views, but you can add more.
 - FIX: Fix for scroll bar size being wrong if the content was smaller than the scroll view.
 - FIX: UIInput will now load the saved value properly even if the "starting value" is not empty.
 - FIX: Anchors set to update only in OnEnable will now still update while in edit mode.
