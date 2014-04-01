@@ -942,6 +942,9 @@ static public class NGUIMath
 			if (platform == RuntimePlatform.WP8Player) dpi = 160f;
 #endif
 		}
-		return Mathf.RoundToInt(height * (96f / dpi));
+
+		int h = Mathf.RoundToInt(height * (96f / dpi));
+		if ((h & 1) == 1) ++h;
+		return h;
 	}
 }

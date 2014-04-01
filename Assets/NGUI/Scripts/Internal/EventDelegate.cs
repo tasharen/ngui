@@ -333,8 +333,8 @@ public class EventDelegate
 		{
 			if (mTarget != null && !string.IsNullOrEmpty(mMethodName))
 			{
-				mMethod = mTarget.GetType().GetMethod(mMethodName);
-				
+				mMethod = mTarget.GetType().GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
 				if (mMethod == null)
 				{
 					Debug.LogError("Could not find method '" + mMethodName + "' on " + mTarget.GetType(), mTarget);
