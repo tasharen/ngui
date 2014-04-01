@@ -335,6 +335,11 @@ public class EventDelegate
 			{
 				mMethod = mTarget.GetType().GetMethod(mMethodName);
 				
+				if (mMethod == null){
+					Debug.LogError("Could not find " + mMethodName + " on target.");
+					return;
+				}
+				
 				if (mMethod.ReturnType != typeof(void))
 				{
 					Debug.LogError(mTarget.GetType() + "." + mMethodName + " must have a 'void' return type.");
