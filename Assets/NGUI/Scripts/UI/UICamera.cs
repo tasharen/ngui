@@ -449,9 +449,11 @@ public class UICamera : MonoBehaviour
 			current = this;
 			currentCamera = mCam;
 			UICamera.currentScheme = mNextScheme;
+			inputHasFocus = (mCurrentSelection.GetComponent<UIInput>() != null);
 			Notify(mCurrentSelection, "OnSelect", true);
 			current = null;
 		}
+		else inputHasFocus = false;
 	}
 
 	/// <summary>
@@ -1233,9 +1235,6 @@ public class UICamera : MonoBehaviour
 	{
 		currentTouchID = -100;
 		currentTouch = controller;
-
-		// If this is an input field, ignore WASD and Space key presses
-		inputHasFocus = (mCurrentSelection != null && mCurrentSelection.GetComponent<UIInput>() != null);
 
 		bool submitKeyDown = false;
 		bool submitKeyUp = false;
