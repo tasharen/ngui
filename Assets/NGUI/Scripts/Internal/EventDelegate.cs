@@ -653,14 +653,19 @@ public class EventDelegate
 					return;
 			}
 			
-			EventDelegate ed = new EventDelegate(ev.target, ev.methodName);
-			ed.oneShot = oneShot;
-			list.Add(ed);
+			EventDelegate copy = new EventDelegate(ev.target, ev.methodName);
+			copy.oneShot = oneShot;
+
+			if (ev.mParameters != null && ev.mParameters.Length > 0)
+			{
+				copy.mParameters = new Parameter[ev.mParameters.Length];
+				for (int i = 0; i < ev.mParameters.Length; ++i)
+					copy.mParameters[i] = ev.mParameters[i];
+			}
+
+			list.Add(copy);
 		}
-		else
-		{
-			Debug.LogWarning("Attempting to add a callback to a list that's null");
-		}
+		else Debug.LogWarning("Attempting to add a callback to a list that's null");
 	}
 
 	/// <summary>
@@ -676,6 +681,28 @@ public class EventDelegate
 				EventDelegate del = list[i];
 				
 				if (del != null && del.Equals(callback))
+				{
+					list.RemoveAt(i);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Remove an existing event delegate from the list.
+	/// </summary>
+
+	static public bool Remove (List<EventDelegate> list, EventDelegate ev)
+	{
+		if (list != null)
+		{
+			for (int i = 0, imax = list.Count; i < imax; ++i)
+			{
+				EventDelegate del = list[i];
+
+				if (del != null && del.Equals(ev))
 				{
 					list.RemoveAt(i);
 					return true;

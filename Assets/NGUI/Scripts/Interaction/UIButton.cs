@@ -97,8 +97,16 @@ public class UIButton : UIButtonColor
 		}
 		set
 		{
-			mNormalSprite = value;
-			if (mState == State.Normal) SetSprite(value);
+			if (mSprite != null && !string.IsNullOrEmpty(mNormalSprite) && mNormalSprite == mSprite.spriteName)
+			{
+				mNormalSprite = value;
+				SetSprite(value);
+			}
+			else
+			{
+				mNormalSprite = value;
+				if (mState == State.Normal) SetSprite(value);
+			}
 		}
 	}
 
