@@ -89,7 +89,7 @@ public class UIToggle : UIWidgetContainer
 	public bool value
 	{
 		get { return mIsActive; }
-		set { if (group == 0 || value || optionCanBeNone || !mStarted) Set(value); }
+		set { if (group == 0 || value || optionCanBeNone || !mStarted) Set(value, true); }
 	}
 
 	[System.Obsolete("Use 'value' instead")]
@@ -158,7 +158,7 @@ public class UIToggle : UIWidgetContainer
 			mStarted = true;
 			bool instant = instantTween;
 			instantTween = true;
-			Set(startsActive);
+			Set(startsActive, false);
 			instantTween = instant;
 		}
 	}
@@ -173,7 +173,7 @@ public class UIToggle : UIWidgetContainer
 	/// Fade out or fade in the active sprite and notify the OnChange event listener.
 	/// </summary>
 
-	void Set (bool state)
+	void Set (bool state, bool callCallbacks)
 	{
 		if (!mStarted)
 		{
@@ -189,7 +189,7 @@ public class UIToggle : UIWidgetContainer
 				for (int i = 0, imax = list.size; i < imax; )
 				{
 					UIToggle cb = list[i];
-					if (cb != this && cb.group == group) cb.Set(false);
+					if (cb != this && cb.group == group) cb.Set(false, true);
 					
 					if (list.size != imax)
 					{
@@ -216,8 +216,10 @@ public class UIToggle : UIWidgetContainer
 				}
 			}
 
-			current = this;
 
+			if (callCallbacks) 
+			{
+				current = this;
 			if (EventDelegate.IsValid(onChange))
 			{
 				EventDelegate.Execute(onChange);
@@ -228,6 +230,7 @@ public class UIToggle : UIWidgetContainer
 				eventReceiver.SendMessage(functionName, mIsActive, SendMessageOptions.DontRequireReceiver);
 			}
 			current = null;
+			}
 
 			// Play the checkmark animation
 			if (activeAnimation != null)
