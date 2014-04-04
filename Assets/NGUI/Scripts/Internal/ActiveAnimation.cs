@@ -320,6 +320,11 @@ public class ActiveAnimation : MonoBehaviour
 		aa.mDisableDirection = (Direction)(int)disableCondition;
 		aa.onFinished.Clear();
 		aa.Play(clipName, playDirection);
+
+		if (aa.mAnim != null) aa.mAnim.Sample();
+#if USE_MECANIM
+		else if (aa.mAnimator != null) aa.mAnimator.Update(0f);
+#endif
 		return aa;
 	}
 
@@ -368,6 +373,11 @@ public class ActiveAnimation : MonoBehaviour
 		aa.mDisableDirection = (Direction)(int)disableCondition;
 		aa.onFinished.Clear();
 		aa.Play(clipName, playDirection);
+
+		if (aa.mAnim != null) aa.mAnim.Sample();
+#if USE_MECANIM
+		else if (aa.mAnimator != null) aa.mAnimator.Update(0f);
+#endif
 		return aa;
 	}
 #endif
