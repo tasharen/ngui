@@ -1283,8 +1283,13 @@ public class UILabel : UIWidget
 
 			if (linkStart != linkEnd)
 			{
-				string word = mText.Substring(linkStart, linkEnd - linkStart);
-				return NGUIText.StripSymbols(word);
+				int len = linkEnd - linkStart;
+
+				if (len > 0)
+				{
+					string word = mText.Substring(linkStart, len);
+					return NGUIText.StripSymbols(word);
+				}
 			}
 		}
 		return null;
