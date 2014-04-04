@@ -158,6 +158,12 @@ public class UIDragDropItem : MonoBehaviour
 		pos.z = 0f;
 		mTrans.localPosition = pos;
 
+		TweenPosition tp = GetComponent<TweenPosition>();
+		if (tp != null) tp.enabled = false;
+
+		SpringPosition sp = GetComponent<SpringPosition>();
+		if (sp != null) sp.enabled = false;
+
 		// Notify the widgets that the parent has changed
 		NGUITools.MarkParentAsChanged(gameObject);
 
