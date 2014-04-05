@@ -96,7 +96,7 @@ public class UIFont : MonoBehaviour
 	/// Whether the font has any symbols defined.
 	/// </summary>
 
-	public bool hasSymbols { get { return (mReplacement != null) ? mReplacement.hasSymbols : mSymbols.Count != 0; } }
+	public bool hasSymbols { get { return (mReplacement != null) ? mReplacement.hasSymbols : (mSymbols != null && mSymbols.Count != 0); } }
 
 	/// <summary>
 	/// List of symbols within the font.
@@ -307,7 +307,7 @@ public class UIFont : MonoBehaviour
 		get
 		{
 			if (mReplacement != null) return mReplacement.defaultSize;
-			if (isDynamic) return mDynamicFontSize;
+			if (isDynamic || mFont == null) return mDynamicFontSize;
 			return mFont.charSize;
 		}
 		set

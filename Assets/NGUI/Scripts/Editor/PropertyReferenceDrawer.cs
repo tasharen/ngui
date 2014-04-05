@@ -13,8 +13,12 @@ using System.Reflection;
 /// Generic property binding drawer.
 /// </summary>
 
+#if !UNITY_3_5
 [CustomPropertyDrawer(typeof(PropertyReference))]
 public class PropertyReferenceDrawer : PropertyDrawer
+#else
+public class PropertyReferenceDrawer
+#endif
 {
 	public class Entry
 	{
@@ -118,6 +122,7 @@ public class PropertyReferenceDrawer : PropertyDrawer
 		return names;
 	}
 
+#if !UNITY_3_5
 	/// <summary>
 	/// The property is either going to be 16 or 34 pixels tall, depending on whether the target has been set or not.
 	/// </summary>
@@ -175,4 +180,5 @@ public class PropertyReferenceDrawer : PropertyDrawer
 			EditorGUI.EndDisabledGroup();
 		}
 	}
+#endif
 }
