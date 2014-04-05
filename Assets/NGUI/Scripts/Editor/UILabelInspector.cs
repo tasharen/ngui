@@ -91,7 +91,7 @@ public class UILabelInspector : UIWidgetInspector
 		if (mFontType == FontType.NGUI)
 		{
 			fnt = NGUIEditorTools.DrawProperty("", serializedObject, "mFont", GUILayout.MinWidth(40f));
-			
+
 			if (fnt.objectReferenceValue != null)
 			{
 				NGUISettings.ambigiousFont = fnt.objectReferenceValue;
