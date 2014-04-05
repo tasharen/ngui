@@ -533,64 +533,60 @@ public class UIDrawCall : MonoBehaviour
 	{
 		UpdateMaterials();
 
-		if (mClipCount != 0)
+		if (mDynamicMat == null || mClipCount == 0) return;
+
+		if (!mLegacyShader)
 		{
-			if (mDynamicMat != null && isClipped && mClipCount > 0)
+			UIPanel currentPanel = panel;
+
+			for (int i = 0; currentPanel != null; )
 			{
-				if (!mLegacyShader)
+				if (currentPanel.hasClipping)
 				{
-					UIPanel p = panel;
+					float angle = 0f;
+					Vector4 cr = currentPanel.drawCallClipRange;
 
-					for (int i = 0; p != null; )
+					// Clipping regions past the first one need additional math
+					if (currentPanel != panel)
 					{
-						if (p.clipsChildren)
-						{
-							float angle = 0f;
-							Vector4 cr = p.drawCallClipRange;
+						Vector3 pos = currentPanel.cachedTransform.InverseTransformPoint(panel.cachedTransform.position);
+						cr.x -= pos.x;
+						cr.y -= pos.y;
 
-							// Clipping regions past the first one need additional math
-							if (i != 0)
-							{
-								Vector3 pos = p.cachedTransform.InverseTransformPoint(panel.cachedTransform.position);
-								cr.x -= pos.x;
-								cr.y -= pos.y;
+						Vector3 v0 = panel.cachedTransform.rotation.eulerAngles;
+						Vector3 v1 = currentPanel.cachedTransform.rotation.eulerAngles;
+						Vector3 diff = v1 - v0;
 
-								Vector3 v0 = panel.cachedTransform.rotation.eulerAngles;
-								Vector3 v1 = p.cachedTransform.rotation.eulerAngles;
-								Vector3 diff = v1 - v0;
+						diff.x = NGUIMath.WrapAngle(diff.x);
+						diff.y = NGUIMath.WrapAngle(diff.y);
+						diff.z = NGUIMath.WrapAngle(diff.z);
 
-								diff.x = NGUIMath.WrapAngle(diff.x);
-								diff.y = NGUIMath.WrapAngle(diff.y);
-								diff.z = NGUIMath.WrapAngle(diff.z);
+						if (Mathf.Abs(diff.x) > 0.001f || Mathf.Abs(diff.y) > 0.001f)
+							Debug.LogWarning("Panel can only be clipped properly if X and Y rotation is left at 0", panel);
 
-								if (Mathf.Abs(diff.x) > 0.001f || Mathf.Abs(diff.y) > 0.001f)
-									Debug.LogWarning("Panel can only be clipped properly if X and Y rotation is left at 0", panel);
-
-								angle = diff.z;
-							}
-
-							// Pass the clipping parameters to the shader
-							SetClipping(i++, cr, p.clipSoftness, angle);
-						}
-						p = p.parentPanel;
+						angle = diff.z;
 					}
-				}
-				else // Legacy functionality
-				{
-					Vector2 soft = panel.clipSoftness;
-					Vector4 cr = panel.drawCallClipRange;
-					Vector2 v0 = new Vector2(-cr.x / cr.z, -cr.y / cr.w);
-					Vector2 v1 = new Vector2(1f / cr.z, 1f / cr.w);
 
-					Vector2 sharpness = new Vector2(1000.0f, 1000.0f);
-					if (soft.x > 0f) sharpness.x = cr.z / soft.x;
-					if (soft.y > 0f) sharpness.y = cr.w / soft.y;
-
-					mDynamicMat.mainTextureOffset = v0;
-					mDynamicMat.mainTextureScale = v1;
-					mDynamicMat.SetVector("_ClipSharpness", sharpness);
+					// Pass the clipping parameters to the shader
+					SetClipping(i++, cr, currentPanel.clipSoftness, angle);
 				}
+				currentPanel = currentPanel.parentPanel;
 			}
+		}
+		else // Legacy functionality
+		{
+			Vector2 soft = panel.clipSoftness;
+			Vector4 cr = panel.drawCallClipRange;
+			Vector2 v0 = new Vector2(-cr.x / cr.z, -cr.y / cr.w);
+			Vector2 v1 = new Vector2(1f / cr.z, 1f / cr.w);
+
+			Vector2 sharpness = new Vector2(1000.0f, 1000.0f);
+			if (soft.x > 0f) sharpness.x = cr.z / soft.x;
+			if (soft.y > 0f) sharpness.y = cr.w / soft.y;
+
+			mDynamicMat.mainTextureOffset = v0;
+			mDynamicMat.mainTextureScale = v1;
+			mDynamicMat.SetVector("_ClipSharpness", sharpness);
 		}
 	}
 

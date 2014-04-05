@@ -349,8 +349,15 @@ public class UIPanel : UIRect
 	{
 		get
 		{
-			int count = (mClipping == UIDrawCall.Clipping.SoftClip) ? 1 : 0;
-			return (mParentPanel != null) ? count + mParentPanel.clipCount : count;
+			int count = 0;
+			UIPanel p = this;
+
+			while (p != null)
+			{
+				if (p.mClipping == UIDrawCall.Clipping.SoftClip) ++count;
+				p = p.mParentPanel;
+			}
+			return count;
 		}
 	}
 
@@ -358,7 +365,16 @@ public class UIPanel : UIRect
 	/// Whether the panel will actually perform clipping of children.
 	/// </summary>
 
-	public bool clipsChildren { get { return mClipping == UIDrawCall.Clipping.SoftClip; } }
+	public bool hasClipping { get { return mClipping == UIDrawCall.Clipping.SoftClip; } }
+
+	/// <summary>
+	/// Whether the panel will actually perform clipping of children.
+	/// </summary>
+
+	public bool hasCumulativeClipping { get { return clipCount != 0; } }
+
+	[System.Obsolete("Use 'hasClipping' or 'hasCumulativeClipping' instead")]
+	public bool clipsChildren { get { return hasCumulativeClipping; } }
 
 	/// <summary>
 	/// Clipping area offset used to make it possible to move clipped panels (scroll views) efficiently.
@@ -711,9 +727,41 @@ public class UIPanel : UIRect
 	public bool IsVisible (UIWidget w)
 	{
 		if ((mClipping == UIDrawCall.Clipping.None || mClipping == UIDrawCall.Clipping.ConstrainButDontClip) && !w.hideIfOffScreen)
-			return true;
+		{
+			if (mParentPanel == null || clipCount == 0) return true;
+		}
+
+		UIPanel p = this;
 		Vector3[] corners = w.worldCorners;
-		return IsVisible(corners[0], corners[1], corners[2], corners[3]);
+
+		while (p != null)
+		{
+			if (!IsVisible(corners[0], corners[1], corners[2], corners[3])) return false;
+			p = p.mParentPanel;
+		}
+		return true;
+	}
+
+	/// <summary>
+	/// Whether the specified widget is going to be affected by this panel in any way.
+	/// </summary>
+
+	public bool Affects (UIWidget w)
+	{
+		if (w == null) return false;
+
+		UIPanel expected = w.panel;
+		if (expected == null) return false;
+
+		UIPanel p = this;
+
+		while (p != null)
+		{
+			if (p == expected) return true;
+			if (!p.hasCumulativeClipping) return false;
+			p = p.mParentPanel;
+		}
+		return false;
 	}
 
 	/// <summary>
@@ -1311,7 +1359,7 @@ public class UIPanel : UIRect
 			mResized = true;
 		}
 
-		bool clipped = clipsChildren;
+		bool clipped = hasCumulativeClipping;
 
 		// Update all widgets
 		for (int i = 0, imax = widgets.size; i < imax; ++i)
