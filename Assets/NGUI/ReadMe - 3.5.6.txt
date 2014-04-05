@@ -12,7 +12,7 @@ PLEASE NOTE that NGUI can only be legally downloaded from the following 3 source
 
   1. Unity Asset Store (Standard License)
   2. www.tasharen.com (Standard License)
-  3. github.com/tasharen/ngui (Professional License)
+  3. github.com/tasharen/ngui (Professional and Site Licenses)
 
 If you've obtained NGUI via some other means then note that your license is effectively invalid,
 as Tasharen cannot provide support for pirated and/or potentially modified software.
@@ -26,9 +26,9 @@ drop by the NGUI forum, found here: http://www.tasharen.com/forum/index.php?boar
  How To Update NGUI
 --------------------
 
-If you have the Professional Edition of NGUI that comes with Git access, just pull the latest changes.
+If you have the Professional or Site License of NGUI that comes with Git access, just pull the latest changes.
 
-If you have a Standard Edition:
+If you have a Standard License:
 
 1. In Unity, File -> New Scene
 2. Delete the NGUI folder from the Project View.
@@ -59,9 +59,13 @@ and it will not be included in the build of your game. It's only used in the edi
 - NEW: Added basic built-in data binding support (PropertyBinding script).
 - NEW: All delegates now support any number of parameters that you can set in inspector.
 - NEW: You can now nest scroll views (scroll views within scroll views). The built-in shaders support up to 3 scroll views, but you can add more.
+- NEW: You can now nest non-clipped panels within clipped panels and clipping will still work.
 - FIX: Fix for scroll bar size being wrong if the content was smaller than the scroll view.
 - FIX: UIInput will now load the saved value properly even if the "starting value" is not empty.
+- FIX: Drag & drop item will now always disable the tween or spring effect when it begins dragging.
+- FIX: UICamera's 'inputHasFocus' flag is now set when selection changes rather than every frame.
 - FIX: Anchors set to update only in OnEnable will now still update while in edit mode.
+- FIX: Triggering ActiveAnimation.Play will now immediately sample the animation.
 - FIX: Fixed the bug that was causing the atlas maker to eat up CPU.
 
 3.5.5

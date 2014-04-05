@@ -1339,6 +1339,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
   mWidth: 255
@@ -1801,6 +1802,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
   mWidth: 12
@@ -1855,6 +1857,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: .184313729, g: .258823544, b: .494117647, a: .925490201}
   mPivot: 4
   mWidth: 200
@@ -1903,6 +1906,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
   mWidth: 70
@@ -2003,6 +2007,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
   mWidth: 82
@@ -2063,6 +2068,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: .183782578, g: .25935185, b: .49253732, a: .925490201}
   mPivot: 4
   mWidth: 200
@@ -2111,6 +2117,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: .111940324, g: .111940324, b: .111940324, a: 1}
   mPivot: 4
   mWidth: 494
@@ -2159,6 +2166,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 0
   mWidth: 470
@@ -2224,6 +2232,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
   mWidth: 380
@@ -2284,6 +2293,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: .694029808, g: .60159874, b: .393628836, a: 1}
   mPivot: 4
   mWidth: 500
@@ -2332,6 +2342,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: .141791046, g: .141791046, b: .141791046, a: 1}
   mPivot: 4
   mWidth: 500
@@ -2414,6 +2425,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   showInPanelTool: 1
   generateNormals: 0
   widgetsAreStatic: 0
@@ -2454,6 +2466,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   showInPanelTool: 1
   generateNormals: 1
   widgetsAreStatic: 0
