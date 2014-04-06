@@ -32,10 +32,12 @@ public class EventDelegate
 		public Object obj;
 		public string field;
 
+		[System.NonSerialized]
+		public System.Type expectedType = typeof(void);
+
 #if REFLECTION_SUPPORT
 		// Cached values
 		[System.NonSerialized] public bool cached = false;
-		[System.NonSerialized] public System.Type expectedType = typeof(void);
 		[System.NonSerialized] public PropertyInfo propInfo;
 		[System.NonSerialized] public FieldInfo fieldInfo;
 
@@ -99,8 +101,10 @@ public class EventDelegate
 	Callback mCachedCallback;
 	bool mRawDelegate = false;
 	bool mCached = false;
+#if REFLECTION_SUPPORT
 	MethodInfo mMethod;
 	object[] mArgs;
+#endif
 
 	/// <summary>
 	/// Event delegate's target object.
@@ -118,7 +122,9 @@ public class EventDelegate
 			mCachedCallback = null;
 			mRawDelegate = false;
 			mCached = false;
+#if REFLECTION_SUPPORT
 			mMethod = null;
+#endif
 			mParameters = null;
 		}
 	}
@@ -139,7 +145,9 @@ public class EventDelegate
 			mCachedCallback = null;
 			mRawDelegate = false;
 			mCached = false;
+#if REFLECTION_SUPPORT
 			mMethod = null;
+#endif
 			mParameters = null;
 		}
 	}
@@ -385,7 +393,8 @@ public class EventDelegate
 #if !REFLECTION_SUPPORT
 		if (isValid)
 		{
-			mTarget.SendMessage(mMethodName, SendMessageOptions.DontRequireReceiver);
+			if (mRawDelegate) mCachedCallback();
+			else mTarget.SendMessage(mMethodName, SendMessageOptions.DontRequireReceiver);
 			return true;
 		}
 #else
@@ -501,8 +510,10 @@ public class EventDelegate
 		mCachedCallback = null;
 		mParameters = null;
 		mCached = false;
+#if REFLECTION_SUPPORT
 		mMethod = null;
 		mArgs = null;
+#endif
 	}
 
 	/// <summary>
