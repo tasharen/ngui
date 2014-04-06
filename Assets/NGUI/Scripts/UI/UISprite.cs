@@ -598,7 +598,7 @@ public class UISprite : UIWidget
 				}
 			}
 
-			Vector4 br = border * atlas.pixelSize;
+			Vector4 br = (mAtlas != null) ? border * mAtlas.pixelSize : Vector4.zero;
 
 			float fw = br.x + br.z;
 			float fh = br.y + br.w;
