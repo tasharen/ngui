@@ -401,6 +401,12 @@ public class UIScrollView : MonoBehaviour
 	/// Update the values of the associated scroll bars.
 	/// </summary>
 
+	public void UpdateScrollbars () { UpdateScrollbars(true); }
+
+	/// <summary>
+	/// Update the values of the associated scroll bars.
+	/// </summary>
+
 	public virtual void UpdateScrollbars (bool recalculateBounds)
 	{
 		if (mPanel == null) return;

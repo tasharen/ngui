@@ -13,7 +13,7 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Button Color")]
 public class UIButtonColor : UIWidgetContainer
 {
-	protected enum State
+	public enum State
 	{
 		Normal,
 		Hover,
@@ -55,6 +55,12 @@ public class UIButtonColor : UIWidgetContainer
 	protected bool mInitDone = false;
 	protected UIWidget mWidget;
 	protected State mState = State.Normal;
+
+	/// <summary>
+	/// Button's current state.
+	/// </summary>
+
+	public State state { get { return mState; } set { SetState(value, false); } }
 
 	/// <summary>
 	/// UIButtonColor's default (starting) color. It's useful to be able to change it, just in case.
