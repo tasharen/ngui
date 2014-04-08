@@ -238,8 +238,11 @@ static public class NGUIMenu
 
 	static void AddIfMissing<T> () where T : Component
 	{
-		GameObject go = Selection.activeGameObject;
-		if (go != null) go.AddMissingComponent<T>();
+		if (Selection.activeGameObject != null)
+		{
+			for (int i = 0; i < Selection.gameObjects.Length; ++i)
+				Selection.gameObjects[i].AddMissingComponent<T>();
+		}
 		else Debug.Log("You must select a game object first.");
 	}
 
@@ -253,20 +256,12 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Attach/Collider &#c", false, 7)]
 	static public void AddCollider ()
 	{
-		GameObject go = Selection.activeGameObject;
-
-		if (NGUIEditorTools.WillLosePrefab(go))
+		if (Selection.activeGameObject != null)
 		{
-			if (go != null)
-			{
-				NGUIEditorTools.RegisterUndo("Add Widget Collider", go);
-				NGUITools.AddWidgetCollider(go);
-			}
-			else
-			{
-				Debug.Log("You must select a game object first, such as your button.");
-			}
+			for (int i = 0; i < Selection.gameObjects.Length; ++i)
+				NGUITools.AddWidgetCollider(Selection.gameObjects[i]);
 		}
+		else Debug.Log("You must select a game object first, such as your button.");
 	}
 
 	//[MenuItem("NGUI/Attach/Anchor", false, 7)]

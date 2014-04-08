@@ -119,6 +119,26 @@ public class UISprite : UIWidget
 	}
 
 	/// <summary>
+	/// Sprite flip setting.
+	/// </summary>
+
+	public Flip flip
+	{
+		get
+		{
+			return mFlip;
+		}
+		set
+		{
+			if (mFlip != value)
+			{
+				mFlip = value;
+				MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
 	/// Retrieve the material used by the font.
 	/// </summary>
 
@@ -492,20 +512,18 @@ public class UISprite : UIWidget
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
 		Texture tex = mainTexture;
+		if (tex == null) return;
 
-		if (tex != null)
-		{
-			if (mSprite == null) mSprite = atlas.GetSprite(spriteName);
-			if (mSprite == null) return;
+		if (mSprite == null) mSprite = atlas.GetSprite(spriteName);
+		if (mSprite == null) return;
 
-			mOuterUV.Set(mSprite.x, mSprite.y, mSprite.width, mSprite.height);
-			mInnerUV.Set(mSprite.x + mSprite.borderLeft, mSprite.y + mSprite.borderTop,
-				mSprite.width - mSprite.borderLeft - mSprite.borderRight,
-				mSprite.height - mSprite.borderBottom - mSprite.borderTop);
+		mOuterUV.Set(mSprite.x, mSprite.y, mSprite.width, mSprite.height);
+		mInnerUV.Set(mSprite.x + mSprite.borderLeft, mSprite.y + mSprite.borderTop,
+			mSprite.width - mSprite.borderLeft - mSprite.borderRight,
+			mSprite.height - mSprite.borderBottom - mSprite.borderTop);
 
-			mOuterUV = NGUIMath.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
-			mInnerUV = NGUIMath.ConvertToTexCoords(mInnerUV, tex.width, tex.height);
-		}
+		mOuterUV = NGUIMath.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
+		mInnerUV = NGUIMath.ConvertToTexCoords(mInnerUV, tex.width, tex.height);
 
 		switch (type)
 		{

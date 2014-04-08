@@ -236,7 +236,11 @@ static public class NGUITools
 					if (Application.isPlaying) GameObject.Destroy(col);
 					else GameObject.DestroyImmediate(col);
 				}
+
 				box = go.AddComponent<BoxCollider>();
+#if !UNITY_3_5 && UNITY_EDITOR
+				UnityEditor.Undo.RegisterCreatedObjectUndo(box, "Add Collider");
+#endif
 				box.isTrigger = true;
 
 				UIWidget widget = go.GetComponent<UIWidget>();
