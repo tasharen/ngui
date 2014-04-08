@@ -52,7 +52,7 @@ public class UIScrollBar : UISlider
 
 				if (NGUITools.GetActive(this))
 				{
-					if (onChange != null)
+					if (current == null && onChange != null)
 					{
 						current = this;
 						EventDelegate.Execute(onChange);

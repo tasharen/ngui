@@ -209,15 +209,17 @@ public class ActiveAnimation : MonoBehaviour
 		{
 			mNotify = false;
 
-			current = this;
-			EventDelegate.Execute(onFinished);
+			if (current == null)
+			{
+				current = this;
+				EventDelegate.Execute(onFinished);
 
-			// Deprecated functionality, kept for backwards compatibility
-			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
-				eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
+				// Deprecated functionality, kept for backwards compatibility
+				if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
+					eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
 
-			current = null;
-
+				current = null;
+			}
 			if (mDisableDirection != Direction.Toggle && mLastDirection == mDisableDirection)
 				NGUITools.SetActive(gameObject, false);
 		}

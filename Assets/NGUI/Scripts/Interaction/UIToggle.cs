@@ -216,18 +216,21 @@ public class UIToggle : UIWidgetContainer
 				}
 			}
 
-			current = this;
+			if (current == null)
+			{
+				current = this;
 
-			if (EventDelegate.IsValid(onChange))
-			{
-				EventDelegate.Execute(onChange);
+				if (EventDelegate.IsValid(onChange))
+				{
+					EventDelegate.Execute(onChange);
+				}
+				else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
+				{
+					// Legacy functionality support (for backwards compatibility)
+					eventReceiver.SendMessage(functionName, mIsActive, SendMessageOptions.DontRequireReceiver);
+				}
+				current = null;
 			}
-			else if (eventReceiver != null && !string.IsNullOrEmpty(functionName))
-			{
-				// Legacy functionality support (for backwards compatibility)
-				eventReceiver.SendMessage(functionName, mIsActive, SendMessageOptions.DontRequireReceiver);
-			}
-			current = null;
 
 			// Play the checkmark animation
 			if (activeAnimation != null)

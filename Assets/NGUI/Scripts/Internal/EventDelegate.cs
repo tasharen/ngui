@@ -341,8 +341,11 @@ public class EventDelegate
 		{
 			if (mTarget != null && !string.IsNullOrEmpty(mMethodName))
 			{
+#if NETFX_CORE
+				mMethod = mTarget.GetTypeInfo().GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+#else
 				mMethod = mTarget.GetType().GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-
+#endif
 				if (mMethod == null)
 				{
 					Debug.LogError("Could not find method '" + mMethodName + "' on " + mTarget.GetType(), mTarget);
@@ -366,6 +369,7 @@ public class EventDelegate
 					mParameters = null;
 					return;
 				}
+				else mCachedCallback = null;
 
 				// Allocate the initial list of parameters
 				if (mParameters == null || mParameters.Length != info.Length)

@@ -1016,11 +1016,15 @@ public class UIInput : MonoBehaviour
 	{
 		if (NGUITools.GetActive(this))
 		{
-			current = this;
 			mValue = value;
-			EventDelegate.Execute(onSubmit);
+
+			if (current == null)
+			{
+				current = this;
+				EventDelegate.Execute(onSubmit);
+				current = null;
+			}
 			SaveToPlayerPrefs(mValue);
-			current = null;
 		}
 	}
 
@@ -1287,7 +1291,7 @@ public class UIInput : MonoBehaviour
 
 	protected void ExecuteOnChange ()
 	{
-		if (EventDelegate.IsValid(onChange))
+		if (current == null && EventDelegate.IsValid(onChange))
 		{
 			current = this;
 			EventDelegate.Execute(onChange);

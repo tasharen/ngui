@@ -15,6 +15,8 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/Interaction/Play Tween")]
 public class UIPlayTween : MonoBehaviour
 {
+	static public UIPlayTween current;
+
 	/// <summary>
 	/// Target on which there is one or more tween.
 	/// </summary>
@@ -323,15 +325,17 @@ public class UIPlayTween : MonoBehaviour
 
 	void OnFinished ()
 	{
-		if (--mActive == 0)
+		if (--mActive == 0 && current == null)
 		{
+			current = this;
 			EventDelegate.Execute(onFinished);
-			
+
 			// Legacy functionality
 			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
 				eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
 
 			eventReceiver = null;
+			current = null;
 		}
 	}
 }

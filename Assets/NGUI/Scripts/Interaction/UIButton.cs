@@ -171,7 +171,7 @@ public class UIButton : UIButtonColor
 
 	protected virtual void OnClick ()
 	{
-		if (isEnabled)
+		if (current == null && isEnabled)
 		{
 			current = this;
 			EventDelegate.Execute(onClick);

@@ -19,6 +19,8 @@ using AnimationOrTween;
 [AddComponentMenu("NGUI/Interaction/Play Animation")]
 public class UIPlayAnimation : MonoBehaviour
 {
+	static public UIPlayAnimation current = null;
+
 	/// <summary>
 	/// Target animation to activate.
 	/// </summary>
@@ -288,12 +290,17 @@ public class UIPlayAnimation : MonoBehaviour
 
 	void OnFinished ()
 	{
-		EventDelegate.Execute(onFinished);
+		if (current == null)
+		{
+			current = this;
+			EventDelegate.Execute(onFinished);
 
-		// Legacy functionality
-		if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
-			eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
+			// Legacy functionality
+			if (eventReceiver != null && !string.IsNullOrEmpty(callWhenFinished))
+				eventReceiver.SendMessage(callWhenFinished, SendMessageOptions.DontRequireReceiver);
 
-		eventReceiver = null;
+			eventReceiver = null;
+			current = null;
+		}
 	}
 }

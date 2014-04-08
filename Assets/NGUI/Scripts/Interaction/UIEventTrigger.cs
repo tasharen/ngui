@@ -26,6 +26,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	void OnHover (bool isOver)
 	{
+		if (current != null) return;
 		current = this;
 		if (isOver) EventDelegate.Execute(onHoverOver);
 		else EventDelegate.Execute(onHoverOut);
@@ -34,6 +35,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	void OnPress (bool pressed)
 	{
+		if (current != null) return;
 		current = this;
 		if (pressed) EventDelegate.Execute(onPress);
 		else EventDelegate.Execute(onRelease);
@@ -42,6 +44,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	void OnSelect (bool selected)
 	{
+		if (current != null) return;
 		current = this;
 		if (selected) EventDelegate.Execute(onSelect);
 		else EventDelegate.Execute(onDeselect);
@@ -50,6 +53,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	void OnClick ()
 	{
+		if (current != null) return;
 		current = this;
 		EventDelegate.Execute(onClick);
 		current = null;
@@ -57,6 +61,7 @@ public class UIEventTrigger : MonoBehaviour
 
 	void OnDoubleClick ()
 	{
+		if (current != null) return;
 		current = this;
 		EventDelegate.Execute(onDoubleClick);
 		current = null;
