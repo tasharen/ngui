@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
@@ -23,6 +23,8 @@ public class UIEventTriggerEditor : Editor
 		EditorPrefs.SetBool("ET5", EventDelegate.IsValid(mTrigger.onDeselect));
 		EditorPrefs.SetBool("ET6", EventDelegate.IsValid(mTrigger.onClick));
 		EditorPrefs.SetBool("ET7", EventDelegate.IsValid(mTrigger.onDoubleClick));
+		EditorPrefs.SetBool("ET8", EventDelegate.IsValid(mTrigger.onDragOver));
+		EditorPrefs.SetBool("ET9", EventDelegate.IsValid(mTrigger.onDragOut));
 	}
 
 	public override void OnInspectorGUI ()
@@ -37,6 +39,8 @@ public class UIEventTriggerEditor : Editor
 		DrawEvents("ET5", "On Deselect", mTrigger.onDeselect);
 		DrawEvents("ET6", "On Click/Tap", mTrigger.onClick);
 		DrawEvents("ET7", "On Double-Click/Tap", mTrigger.onDoubleClick);
+		DrawEvents("ET8", "On Drag Over", mTrigger.onDragOver);
+		DrawEvents("ET9", "On Drag Out", mTrigger.onDragOut);
 	}
 
 	void DrawEvents (string key, string text, List<EventDelegate> list)

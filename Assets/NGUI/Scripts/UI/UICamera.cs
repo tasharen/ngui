@@ -953,20 +953,12 @@ public class UICamera : MonoBehaviour
 	void Update ()
 	{
 		// Only the first UI layer should be processing events
+#if UNITY_EDITOR
 		if (!Application.isPlaying || !handlesEvents) return;
-
+#else
+		if (!handlesEvents) return;
+#endif
 		current = this;
-
-		int w = Screen.width;
-		int h = Screen.height;
-
-		if (w != mWidth || h != mHeight)
-		{
-			mWidth = w;
-			mHeight = h;
-			if (onScreenResize != null)
-				onScreenResize();
-		}
 
 		// Process touch events first
 		if (useTouch) ProcessTouches ();
@@ -1012,6 +1004,29 @@ public class UICamera : MonoBehaviour
 			}
 		}
 		current = null;
+	}
+
+	/// <summary>
+	/// Keep an eye on screen size changes.
+	/// </summary>
+
+	void LateUpdate ()
+	{
+#if UNITY_EDITOR
+		if (!Application.isPlaying || !handlesEvents) return;
+#else
+		if (!handlesEvents) return;
+#endif
+		int w = Screen.width;
+		int h = Screen.height;
+
+		if (w != mWidth || h != mHeight)
+		{
+			mWidth = w;
+			mHeight = h;
+			if (onScreenResize != null)
+				onScreenResize();
+		}
 	}
 
 	/// <summary>

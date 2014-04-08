@@ -23,6 +23,8 @@ public class UIEventTrigger : MonoBehaviour
 	public List<EventDelegate> onDeselect = new List<EventDelegate>();
 	public List<EventDelegate> onClick = new List<EventDelegate>();
 	public List<EventDelegate> onDoubleClick = new List<EventDelegate>();
+	public List<EventDelegate> onDragOver = new List<EventDelegate>();
+	public List<EventDelegate> onDragOut = new List<EventDelegate>();
 
 	void OnHover (bool isOver)
 	{
@@ -64,6 +66,22 @@ public class UIEventTrigger : MonoBehaviour
 		if (current != null) return;
 		current = this;
 		EventDelegate.Execute(onDoubleClick);
+		current = null;
+	}
+
+	void OnDragOver (GameObject go)
+	{
+		if (current != null) return;
+		current = this;
+		EventDelegate.Execute(onDragOver);
+		current = null;
+	}
+
+	void OnDragOut (GameObject go)
+	{
+		if (current != null) return;
+		current = this;
+		EventDelegate.Execute(onDragOut);
 		current = null;
 	}
 }
