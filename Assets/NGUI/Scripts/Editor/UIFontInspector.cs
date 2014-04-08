@@ -57,7 +57,7 @@ public class UIFontInspector : Editor
 
 	void OnSelectAtlas (Object obj)
 	{
-		if (mFont != null)
+		if (mFont != null && mFont.atlas != obj)
 		{
 			NGUIEditorTools.RegisterUndo("Font Atlas", mFont);
 			mFont.atlas = obj as UIAtlas;
