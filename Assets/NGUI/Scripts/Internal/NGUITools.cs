@@ -83,7 +83,7 @@ static public class NGUITools
 		{
 			if (mListener == null || !NGUITools.GetActive(mListener))
 			{
-				AudioListener[] listeners = GameObject.FindObjectsOfType<AudioListener>();
+				AudioListener[] listeners = GameObject.FindObjectsOfType(typeof(AudioListener)) as AudioListener[];
 
 				if (listeners != null)
 				{

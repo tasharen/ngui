@@ -73,14 +73,17 @@ public class UIButton : UIButtonColor
 		}
 		set
 		{
-			Collider col = collider;
-
-			if (col != null)
+			if (isEnabled != value)
 			{
-				col.enabled = value;
-				SetState(value ? State.Normal : State.Disabled, false);
+				Collider col = collider;
+
+				if (col != null)
+				{
+					col.enabled = value;
+					SetState(value ? State.Normal : State.Disabled, false);
+				}
+				else enabled = value;
 			}
-			else enabled = value;
 		}
 	}
 
