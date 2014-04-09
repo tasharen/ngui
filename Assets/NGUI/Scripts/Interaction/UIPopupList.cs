@@ -256,8 +256,9 @@ public class UIPopupList : UIWidgetContainer
 
 	protected void TriggerCallbacks ()
 	{
-		if (current == null)
+		if (current != this)
 		{
+			UIPopupList old = current;
 			current = this;
 
 			// Legacy functionality
@@ -272,7 +273,7 @@ public class UIPopupList : UIWidgetContainer
 				// Legacy functionality support (for backwards compatibility)
 				eventReceiver.SendMessage(functionName, mSelectedItem, SendMessageOptions.DontRequireReceiver);
 			}
-			current = null;
+			current = old;
 		}
 	}
 
