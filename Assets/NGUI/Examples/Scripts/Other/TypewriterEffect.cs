@@ -20,6 +20,8 @@ public class TypewriterEffect : MonoBehaviour
 	int mOffset = 0;
 	float mNextChar = 0f;
 
+	void OnEnable () { mOffset = 0; }
+
 	void Update ()
 	{
 		if (mLabel == null)
@@ -46,6 +48,5 @@ public class TypewriterEffect : MonoBehaviour
 				mLabel.text = mText.Substring(0, ++mOffset);
 			}
 		}
-		else Destroy(this);
 	}
 }
