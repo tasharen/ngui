@@ -724,7 +724,13 @@ public class UICamera : MonoBehaviour
 #endif
 	{
 		UIPanel panel = NGUITools.FindInParents<UIPanel>(de.hit.collider.gameObject);
-		return (panel == null || panel.IsVisible(de.hit.point));
+
+		while (panel != null)
+		{
+			if (!panel.IsVisible(de.hit.point)) return false;
+			panel = panel.parentPanel;
+		}
+		return true;
 	}
 
 	/// <summary>
