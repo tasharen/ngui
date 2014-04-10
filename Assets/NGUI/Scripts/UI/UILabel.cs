@@ -1169,9 +1169,10 @@ public class UILabel : UIWidget
 				int h = height;
 
 				Overflow over = mOverflow;
-				mOverflow = Overflow.ShrinkContent;
-				mWidth = 100000;
+				if (over != Overflow.ResizeHeight) mWidth = 100000;
 				mHeight = 100000;
+
+				mOverflow = Overflow.ShrinkContent;
 				ProcessText(false, true);
 				mOverflow = over;
 
