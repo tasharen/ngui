@@ -342,10 +342,21 @@ public class EventDelegate
 			if (mTarget != null && !string.IsNullOrEmpty(mMethodName))
 			{
 #if NETFX_CORE
-				mMethod = mTarget.GetTypeInfo().GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+				System.Type type = mTarget.GetTypeInfo();
 #else
-				mMethod = mTarget.GetType().GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+				System.Type type = mTarget.GetType();
 #endif
+
+				try
+				{
+					mMethod = type.GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+				}
+				catch (System.Exception ex)
+				{
+					Debug.LogError("Failed to bind " + type + "." + mMethodName + "\n" +  ex.Message);
+					return;
+				}
+
 				if (mMethod == null)
 				{
 					Debug.LogError("Could not find method '" + mMethodName + "' on " + mTarget.GetType(), mTarget);
