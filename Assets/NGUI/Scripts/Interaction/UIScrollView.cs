@@ -749,7 +749,7 @@ public class UIScrollView : MonoBehaviour
 				Vector3 offset = currentPos - mLastPos;
 				mLastPos = currentPos;
 
-				if (offset.x != 0f || offset.y != 0f)
+				if (offset.x != 0f || offset.y != 0f || offset.z != 0f)
 				{
 					offset = mTrans.InverseTransformDirection(offset);
 
