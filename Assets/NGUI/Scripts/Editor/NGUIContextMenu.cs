@@ -469,8 +469,8 @@ public static class NGUIContextMenu
 		{
 			GameObject go = Selection.gameObjects[i];
 			if (go.GetComponent(type) != null) continue;
-			Component cmp = go.AddComponent(type);
 #if !UNITY_3_5
+			Component cmp = go.AddComponent(type);
 			Undo.RegisterCreatedObjectUndo(cmp, "Attach " + type);
 #endif
 		}
