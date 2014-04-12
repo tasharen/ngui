@@ -497,8 +497,8 @@ public class UIPanelInspector : UIRectEditor
 				Vector2 soft = EditorGUILayout.Vector2Field("Softness", mPanel.clipSoftness);
 				GUILayout.EndHorizontal();
 
-				if (soft.x < 1f) soft.x = 1f;
-				if (soft.y < 1f) soft.y = 1f;
+				if (soft.x < 0f) soft.x = 0f;
+				if (soft.y < 0f) soft.y = 0f;
 
 				if (mPanel.clipSoftness != soft)
 				{

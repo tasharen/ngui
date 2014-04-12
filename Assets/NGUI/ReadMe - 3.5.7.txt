@@ -67,6 +67,7 @@ and it will not be included in the build of your game. It's only used in the edi
 - FIX: MakePixelPerfect should not change the width if the label is set to "resize height".
 - FIX: Made UIButton.isEnabled work with a 2D collider.
 - FIX: Unity 4.2 compatibility tweaks.
+- FIX: Clip softness can now be 0.
 
 3.5.6
 - NEW: Added basic built-in data binding support (PropertyBinding script).
