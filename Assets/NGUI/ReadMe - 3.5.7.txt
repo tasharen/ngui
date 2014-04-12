@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.5.6
+            Version 3.5.7
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,19 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.5.7
+- NEW: Added OnDragOver/OnDragOut to the Event Trigger.
+- FIX: Event delegate compilation on platforms that don't support reflection.
+- FIX: The example tooltip should no longer go off-screen.
+- FIX: Exposed UISprite's 'flip' option to scripting.
+- FIX: Context menu 'Attach' options should now work with multiple objects selected.
+- FIX: 'Attach' menu options should now all be undo-able via CTRL+Z.
+- FIX: Exposed UIButton.state for those that may need it for any reason.
+- FIX: UICamera's raycasts can now be clipped by nested panels.
+- FIX: MakePixelPerfect should not change the width if the label is set to "resize height".
+- FIX: Made UIButton.isEnabled work with a 2D collider.
+- FIX: Unity 4.2 compatibility tweaks.
 
 3.5.6
 - NEW: Added basic built-in data binding support (PropertyBinding script).
