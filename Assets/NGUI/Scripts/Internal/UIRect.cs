@@ -550,6 +550,12 @@ public abstract class UIRect : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Set the rectangle manually.
+	/// </summary>
+
+	public abstract void SetRect (float x, float y, float width, float height);
+
+	/// <summary>
 	/// Helper function -- attempt to find the camera responsible for the specified anchor.
 	/// </summary>
 

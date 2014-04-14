@@ -680,7 +680,7 @@ public class UIWidget : UIRect
 	/// Set the widget's rectangle.
 	/// </summary>
 
-	public void SetRect (float x, float y, float width, float height)
+	public override void SetRect (float x, float y, float width, float height)
 	{
 		Vector2 po = pivotOffset;
 
