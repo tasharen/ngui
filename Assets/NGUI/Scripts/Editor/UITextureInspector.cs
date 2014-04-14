@@ -39,7 +39,9 @@ public class UITextureInspector : UIWidgetInspector
 			NGUIEditorTools.DrawProperty("Shader", serializedObject, "mShader");
 		}
 
+		NGUIEditorTools.DrawPaddedProperty("Flip", serializedObject, "mFlip");
 		EditorGUI.BeginDisabledGroup(serializedObject.isEditingMultipleObjects);
+
 		if (mTex.mainTexture != null)
 		{
 			Rect rect = EditorGUILayout.RectField("UV Rectangle", mTex.uvRect);
@@ -50,6 +52,7 @@ public class UITextureInspector : UIWidgetInspector
 				mTex.uvRect = rect;
 			}
 		}
+
 		EditorGUI.EndDisabledGroup();
 		return true;
 	}

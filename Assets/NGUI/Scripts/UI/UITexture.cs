@@ -16,10 +16,19 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/UI/NGUI Texture")]
 public class UITexture : UIWidget
 {
+	public enum Flip
+	{
+		Nothing,
+		Horizontally,
+		Vertically,
+		Both,
+	}
+
 	[HideInInspector][SerializeField] Rect mRect = new Rect(0f, 0f, 1f, 1f);
 	[HideInInspector][SerializeField] Texture mTexture;
 	[HideInInspector][SerializeField] Material mMat;
 	[HideInInspector][SerializeField] Shader mShader;
+	[HideInInspector][SerializeField] Flip mFlip = Flip.Nothing;
 
 	int mPMA = -1;
 
@@ -89,6 +98,26 @@ public class UITexture : UIWidget
 					mPMA = -1;
 					MarkAsChanged();
 				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Sprite texture setting.
+	/// </summary>
+
+	public Flip flip
+	{
+		get
+		{
+			return mFlip;
+		}
+		set
+		{
+			if (mFlip != value)
+			{
+				mFlip = value;
+				MarkAsChanged();
 			}
 		}
 	}
@@ -201,10 +230,34 @@ public class UITexture : UIWidget
 		verts.Add(new Vector3(v.z, v.w));
 		verts.Add(new Vector3(v.z, v.y));
 
-		uvs.Add(new Vector2(mRect.xMin, mRect.yMin));
-		uvs.Add(new Vector2(mRect.xMin, mRect.yMax));
-		uvs.Add(new Vector2(mRect.xMax, mRect.yMax));
-		uvs.Add(new Vector2(mRect.xMax, mRect.yMin));
+		if (mFlip == Flip.Horizontally)
+		{
+			uvs.Add(new Vector2(mRect.xMax, mRect.yMin));
+			uvs.Add(new Vector2(mRect.xMax, mRect.yMax));
+			uvs.Add(new Vector2(mRect.xMin, mRect.yMax));
+			uvs.Add(new Vector2(mRect.xMin, mRect.yMin));
+		}
+		else if (mFlip == Flip.Vertically)
+		{
+			uvs.Add(new Vector2(mRect.xMin, mRect.yMax));
+			uvs.Add(new Vector2(mRect.xMin, mRect.yMin));
+			uvs.Add(new Vector2(mRect.xMax, mRect.yMin));
+			uvs.Add(new Vector2(mRect.xMax, mRect.yMax));
+		}
+		else if (mFlip == Flip.Both)
+		{
+			uvs.Add(new Vector2(mRect.xMax, mRect.yMin));
+			uvs.Add(new Vector2(mRect.xMax, mRect.yMax));
+			uvs.Add(new Vector2(mRect.xMin, mRect.yMax));
+			uvs.Add(new Vector2(mRect.xMin, mRect.yMin));
+		}
+		else
+		{
+			uvs.Add(new Vector2(mRect.xMin, mRect.yMin));
+			uvs.Add(new Vector2(mRect.xMin, mRect.yMax));
+			uvs.Add(new Vector2(mRect.xMax, mRect.yMax));
+			uvs.Add(new Vector2(mRect.xMax, mRect.yMin));
+		}
 
 		cols.Add(col);
 		cols.Add(col);
