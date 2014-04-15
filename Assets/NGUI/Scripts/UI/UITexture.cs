@@ -68,6 +68,7 @@ public class UITexture : UIWidget
 			if (mMat != value)
 			{
 				RemoveFromPanel();
+				mShader = null;
 				mMat = value;
 				mPMA = -1;
 				MarkAsChanged();
@@ -91,13 +92,11 @@ public class UITexture : UIWidget
 		{
 			if (mShader != value)
 			{
+				RemoveFromPanel();
 				mShader = value;
-
-				if (mMat == null)
-				{
-					mPMA = -1;
-					MarkAsChanged();
-				}
+				mPMA = -1;
+				mMat = null;
+				MarkAsChanged();
 			}
 		}
 	}

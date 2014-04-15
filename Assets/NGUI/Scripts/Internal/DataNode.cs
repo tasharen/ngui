@@ -255,17 +255,27 @@ public class DataNode
 	/// Convert the node's value to a human-readable string.
 	/// </summary>
 
-	string GetValueString () { return string.Format("{0}({1})", TypeToName(type), GetValueDataString()); }
+	string GetValueString ()
+	{
+		if (type == typeof(string)) return "\"" + value + "\"";
+		if (type == typeof(Vector2) || type == typeof(Vector3) || type == typeof(Color))
+			return "(" + GetValueDataString() + ")";
+		return string.Format("{0}({1})", TypeToName(type), GetValueDataString());
+	}
 
 	/// <summary>
 	/// Set the node's value using its text representation.
 	/// </summary>
 
-	bool SetValue (string text, Type type)
+	bool SetValue (string text, Type type, string[] parts)
 	{
 		if (type == null || type == typeof(void))
 		{
 			value = null;
+		}
+		else if (type == typeof(string))
+		{
+			value = text;
 		}
 		else if (type == typeof(bool))
 		{
@@ -307,13 +317,9 @@ public class DataNode
 			double b;
 			if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out b)) value = b;
 		}
-		else if (type == typeof(string))
-		{
-			value = text;
-		}
 		else if (type == typeof(Vector2))
 		{
-			string[] parts = text.Split(',');
+			if (parts == null) parts = text.Split(',');
 
 			if (parts.Length == 2)
 			{
@@ -325,7 +331,7 @@ public class DataNode
 		}
 		else if (type == typeof(Vector3))
 		{
-			string[] parts = text.Split(',');
+			if (parts == null) parts = text.Split(',');
 
 			if (parts.Length == 3)
 			{
@@ -338,7 +344,7 @@ public class DataNode
 		}
 		else if (type == typeof(Vector4))
 		{
-			string[] parts = text.Split(',');
+			if (parts == null) parts = text.Split(',');
 
 			if (parts.Length == 4)
 			{
@@ -352,7 +358,7 @@ public class DataNode
 		}
 		else if (type == typeof(Quaternion))
 		{
-			string[] parts = text.Split(',');
+			if (parts == null) parts = text.Split(',');
 
 			if (parts.Length == 4)
 			{
@@ -366,7 +372,7 @@ public class DataNode
 		}
 		else if (type == typeof(Color32))
 		{
-			string[] parts = text.Split(',');
+			if (parts == null) parts = text.Split(',');
 
 			if (parts.Length == 4)
 			{
@@ -380,7 +386,7 @@ public class DataNode
 		}
 		else if (type == typeof(Color))
 		{
-			string[] parts = text.Split(',');
+			if (parts == null) parts = text.Split(',');
 
 			if (parts.Length == 4)
 			{
@@ -394,7 +400,7 @@ public class DataNode
 		}
 		else if (type == typeof(Rect))
 		{
-			string[] parts = text.Split(',');
+			if (parts == null) parts = text.Split(',');
 
 			if (parts.Length == 4)
 			{
@@ -439,6 +445,34 @@ public class DataNode
 #endif
 
 	/// <summary>
+	/// Convenience function for easy debugging -- convert the entire data into the string representation form.
+	/// </summary>
+
+	public override string ToString ()
+	{
+		string data = "";
+		Write(ref data, 0);
+		return data;
+	}
+
+	/// <summary>
+	/// Write the node into the string.
+	/// </summary>
+
+	void Write (ref string data, int tab)
+	{
+		if (!string.IsNullOrEmpty(name))
+		{
+			for (int i = 0; i < tab; ++i) data += "\t";
+			data += Escape(name);
+			if (value != null) data += " = " + GetValueString();
+			data += "\n";
+			for (int i = 0; i < children.Count; ++i)
+				children[i].Write(ref data, tab + 1);
+		}
+	}
+
+	/// <summary>
 	/// Write the node into the stream writer.
 	/// </summary>
 
@@ -446,7 +480,8 @@ public class DataNode
 	{
 		if (!string.IsNullOrEmpty(name))
 		{
-			WriteTabs(writer, tab);
+			for (int i = 0; i < tab; ++i)
+				writer.Write("\t");
 
 			writer.Write(Escape(name));
 
@@ -494,30 +529,60 @@ public class DataNode
 
 	bool Set (string line, int offset)
 	{
-		int divider = line.IndexOf(" = ", offset);
+		int divider = line.IndexOf("=", offset);
 
 		if (divider == -1)
 		{
-			name = Unescape(line.Substring(offset));
+			name = Unescape(line.Substring(offset)).Trim();
 			return true;
 		}
 
-		name = Unescape(line.Substring(offset, divider - offset));
+		name = Unescape(line.Substring(offset, divider - offset)).Trim();
 
-		int dataStart = line.IndexOf('(', divider);
-		if (dataStart == -1) return false;
+		// Skip past the divider
+		line = line.Substring(divider + 1).Trim();
 
-		// For some odd reason LastIndexOf() fails to find the last character of the string
-		int dataEnd = line.EndsWith(")") ? line.Length - 1 : line.LastIndexOf(')', dataStart);
-		if (dataEnd == -1) return false;
+		// There must be at least 3 characters present at this point
+		if (line.Length < 3) return false;
 
-		int typeStart = divider + 3;
-		string strType = line.Substring(typeStart, dataStart - typeStart);
+		// If the line starts with a quote, it must also end with a quote
+		if (line[0] == '"' && line[line.Length - 1] == '"')
+		{
+			value = line.Substring(1, line.Length - 2);
+			return true;
+		}
 
-		Type type = NameToType(strType);
-		if (type == typeof(void)) return false;
+		// If the line starts with an opening bracket, it must always end with a closing bracket
+		if (line[0] == '(' && line[line.Length - 1] == ')')
+		{
+			line = line.Substring(1, line.Length - 2);
+			string[] parts = line.Split(',');
 
-		return SetValue(line.Substring(dataStart + 1, dataEnd - dataStart - 1), type);
+			if (parts.Length == 1) return SetValue(line, typeof(float), null);
+			if (parts.Length == 2) return SetValue(line, typeof(Vector2), parts);
+			if (parts.Length == 3) return SetValue(line, typeof(Vector3), parts);
+			if (parts.Length == 4) return SetValue(line, typeof(Color), parts);
+
+			value = line;
+			return true;
+		}
+
+		Type type = typeof(string);
+		int dataStart = line.IndexOf('(');
+
+		if (dataStart != -1)
+		{
+			// For some odd reason LastIndexOf() fails to find the last character of the string
+			int dataEnd = (line[line.Length - 1] == ')') ? line.Length - 1 : line.LastIndexOf(')', dataStart);
+			
+			if (dataEnd != -1 && line.Length > 2)
+			{
+				string strType = line.Substring(0, dataStart);
+				type = NameToType(strType);
+				line = line.Substring(dataStart + 1, dataEnd - dataStart - 1);
+			}
+		}
+		return SetValue(line, type, null);
 	}
 #endregion
 #region Static Helper Functions
@@ -583,16 +648,6 @@ public class DataNode
 		return val;
 	}
 
-	/// <summary>
-	/// Helper function to write a sequence of tabs.
-	/// </summary>
-
-	static void WriteTabs (StreamWriter writer, int tab)
-	{
-		for (int i = 0; i < tab; ++i)
-			writer.Write("\t");
-	}
-
 	static Dictionary<string, Type> mNameToType = new Dictionary<string, Type>();
 	static Dictionary<Type, string> mTypeToName = new Dictionary<Type, string>();
 
@@ -607,6 +662,18 @@ public class DataNode
 		if (!mNameToType.TryGetValue(name, out type))
 		{
 			type = Type.GetType(name);
+			
+			if (type == null)
+			{
+				if (name == "String") type = typeof(string);
+				else if (name == "Vector2") type = typeof(Vector2);
+				else if (name == "Vector3") type = typeof(Vector3);
+				else if (name == "Vector4") type = typeof(Vector4);
+				else if (name == "Quaternion") type = typeof(Quaternion);
+				else if (name == "Color") type = typeof(Color);
+				else if (name == "Rect") type = typeof(Rect);
+				else if (name == "Color32") type = typeof(Color32);
+			}
 			mNameToType[name] = type;
 		}
 		return type;

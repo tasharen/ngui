@@ -182,7 +182,7 @@ public class UITextList : MonoBehaviour
 	public void OnScroll (float val)
 	{
 		int sh = scrollHeight;
-		
+
 		if (sh != 0)
 		{
 			val *= lineHeight;
