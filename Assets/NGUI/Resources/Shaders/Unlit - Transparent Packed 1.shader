@@ -1,4 +1,4 @@
-Shader "HIDDEN/Unlit/Transparent Packed 1"
+Shader "Hidden/Unlit/Transparent Packed 1"
 {
 	Properties
 	{

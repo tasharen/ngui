@@ -257,7 +257,7 @@ public class UIDrawCall : MonoBehaviour
 			}
 		}
 
-		if (shaderName.StartsWith("HIDDEN/"))
+		if (shaderName.StartsWith("Hidden/"))
 			shaderName = shaderName.Substring(7);
 
 		// Legacy functionality
@@ -271,7 +271,7 @@ public class UIDrawCall : MonoBehaviour
 
 		if (mClipCount != 0)
 		{
-			shader = Shader.Find("HIDDEN/" + shaderName + " " + mClipCount);
+			shader = Shader.Find("Hidden/" + shaderName + " " + mClipCount);
 			if (shader == null) Shader.Find(shaderName + " " + mClipCount);
 
 			// Legacy functionality
@@ -388,9 +388,12 @@ public class UIDrawCall : MonoBehaviour
 				if (!trim && panel.renderQueue != UIPanel.RenderQueue.Automatic)
 					trim = (mMesh == null || mMesh.vertexCount != verts.buffer.Length);
 
+				// NOTE: Apparently there is a bug with Adreno devices:
+				// http://www.tasharen.com/forum/index.php?topic=8415.0
+#if !UNITY_4_3 || !UNITY_ANDROID
 				// If the number of vertices in the buffer is less than half of the full buffer, trim it
 				if (!trim && (verts.size << 1) < verts.buffer.Length) trim = true;
-
+#endif
 				mTriangles = (verts.size >> 1);
 
 				if (trim || verts.buffer.Length > 65000)

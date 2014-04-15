@@ -1,4 +1,4 @@
-Shader "HIDDEN/Unlit/Text 3" 
+Shader "Hidden/Unlit/Text 3" 
 {
 	Properties
 	{
