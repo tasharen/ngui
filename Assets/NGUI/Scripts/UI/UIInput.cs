@@ -299,6 +299,12 @@ public class UIInput : MonoBehaviour
 	/// </summary>
 
 	public int selectionEnd { get { return value.Length; } set {} }
+
+	/// <summary>
+	/// Caret, in case it's needed.
+	/// </summary>
+
+	public UITexture caret { get { return null; } }
 #else
 	/// <summary>
 	/// Current position of the cursor.
@@ -359,6 +365,12 @@ public class UIInput : MonoBehaviour
 			}
 		}
 	}
+
+	/// <summary>
+	/// Caret, in case it's needed.
+	/// </summary>
+
+	public UITexture caret { get { return mCaret; } }
 #endif
 
 	/// <summary>

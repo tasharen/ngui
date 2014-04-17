@@ -62,6 +62,7 @@ public class UISprite : UIWidget
 	// Deprecated, no longer used
 	[HideInInspector][SerializeField] bool mFillCenter = true;
 
+	[System.NonSerialized]
 	protected UISpriteData mSprite;
 	protected Rect mInnerUV = new Rect();
 	protected Rect mOuterUV = new Rect();

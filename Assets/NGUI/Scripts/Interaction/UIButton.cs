@@ -206,7 +206,7 @@ public class UIButton : UIButtonColor
 	/// Change the visual state.
 	/// </summary>
 
-	protected override void SetState (State state, bool immediate)
+	public override void SetState (State state, bool immediate)
 	{
 		base.SetState(state, immediate);
 

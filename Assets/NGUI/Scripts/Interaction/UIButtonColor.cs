@@ -258,7 +258,7 @@ public class UIButtonColor : UIWidgetContainer
 	/// Change the visual state.
 	/// </summary>
 
-	protected virtual void SetState (State state, bool instant)
+	public virtual void SetState (State state, bool instant)
 	{
 		if (!mInitDone)
 		{
