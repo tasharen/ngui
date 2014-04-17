@@ -56,8 +56,8 @@ public class UIButton : UIButtonColor
 	public List<EventDelegate> onClick = new List<EventDelegate>();
 
 	// Cached value
-	string mNormalSprite;
-	UISprite mSprite;
+	[System.NonSerialized] string mNormalSprite;
+	[System.NonSerialized] UISprite mSprite;
 
 	/// <summary>
 	/// Whether the button should be enabled.
