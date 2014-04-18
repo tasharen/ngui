@@ -99,6 +99,9 @@ public class UIGrid : UIWidgetContainer
 
 	public BetterList<Transform>.CompareFunc onCustomSort;
 
+	// Use the 'sorting' property instead
+	[HideInInspector][SerializeField] bool sorted = false;
+
 	protected bool mReposition = false;
 	protected UIPanel mPanel;
 	protected bool mInitDone = false;
@@ -269,6 +272,14 @@ public class UIGrid : UIWidgetContainer
 		{
 			mReposition = true;
 			return;
+		}
+
+		// Legacy functionality
+		if (sorted)
+		{
+			sorted = false;
+			sorting = Sorting.Alphabetic;
+			NGUITools.SetDirty(this);
 		}
 
 		if (!mInitDone) Init();
