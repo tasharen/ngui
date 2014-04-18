@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.5.7
+            Version 3.5.8
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,22 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.5.8
+- NEW: Added a generic node-based class for simple text-based serialization (DataNode).
+- NEW: UITexture now has flip options just like UISprite.
+- NEW: Moved the SetRect function from UIWidget to UIRect, making it usable by panels as well.
+- NEW: Added convenience add and remove functions to the UIGrid.
+- NEW: Added NGUIMath.ScreenToPixels for when you need to convert from screen to virtual pixels.
+- NEW: UIButton's SetState is now public, in case you need it.
+- NEW: UIInput.caret is now exposed in case you need it.
+- FIX: Re-added the "New" button to the atlas maker that was removed for no reason.
+- FIX: Added [NonSerialized] next to private variables. Unity apparently serialized private variables in prefabs (sigh).
+- FIX: "Flip" option is now exposed in inspector with tiled sprites.
+- FIX: Changed all "HIDDEN" shaders to be "Hidden" instead, effectively hiding them.
+- FIX: Text list should no longer break when a very long line of text is added.
+- FIX: Clip softness can now be 0.
+- DEL: Localization is now a static class, and can no longer be included in the scene.
 
 3.5.7
 - NEW: Added OnDragOver/OnDragOut to the Event Trigger.

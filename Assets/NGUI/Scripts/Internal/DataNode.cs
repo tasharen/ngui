@@ -3,7 +3,7 @@
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
-#if UNITY_EDITOR || !UNITY_FLASH
+#if UNITY_EDITOR || (!UNITY_FLASH && !NETFX_CORE && !UNITY_WP8)
 #define REFLECTION_SUPPORT
 #endif
 
@@ -28,6 +28,24 @@ namespace Tasharen
 /// To create a new node: new DataNode (name, value).
 /// To add a new child node: dataNode.AddChild("Scale", Vector3.one).
 /// To retrieve a Vector3 value: dataNode.GetChild<Vector3>("Scale").
+/// 
+/// To make it possible to serialize custom classes, make sure to override your class's ToString() function,
+/// and add a "static object FromString (string data);" function to actually perform parsing of the same string,
+/// returning an instance of your class created from the text data. For example:
+/// 
+/// public class MyClass
+/// {
+///     public int someID = 0;
+///     
+///     public override string ToString () { return someID.ToString(); }
+///     
+///     static object FromString (string data)
+///     {
+///         MyClass inst = new MyClass();
+///         int.TryParse(data, out inst.someID);
+///         return inst;
+///     }
+/// }
 /// </summary>
 
 public class DataNode
