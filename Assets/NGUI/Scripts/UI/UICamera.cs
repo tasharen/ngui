@@ -1030,6 +1030,9 @@ public class UICamera : MonoBehaviour
 		{
 			mWidth = w;
 			mHeight = h;
+
+			UIRoot.Broadcast("UpdateAnchors");
+
 			if (onScreenResize != null)
 				onScreenResize();
 		}

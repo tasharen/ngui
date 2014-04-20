@@ -278,7 +278,8 @@ public class UIGrid : UIWidgetContainer
 		if (sorted)
 		{
 			sorted = false;
-			sorting = Sorting.Alphabetic;
+			if (sorting == Sorting.None)
+				sorting = Sorting.Alphabetic;
 			NGUITools.SetDirty(this);
 		}
 
