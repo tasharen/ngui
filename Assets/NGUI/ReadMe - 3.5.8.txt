@@ -68,6 +68,7 @@ and it will not be included in the build of your game. It's only used in the edi
 - FIX: "Flip" option is now exposed in inspector with tiled sprites.
 - FIX: Changed all "HIDDEN" shaders to be "Hidden" instead, effectively hiding them.
 - FIX: Text list should no longer break when a very long line of text is added.
+- FIX: DragDropItem script wasn't un-highlighting things quite right.
 - FIX: Clip softness can now be 0.
 - DEL: Localization is now a static class, and can no longer be included in the scene.
 
