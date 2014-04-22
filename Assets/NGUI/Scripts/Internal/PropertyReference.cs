@@ -164,8 +164,10 @@ public class PropertyReference
 
 	public void Reset ()
 	{
+#if REFLECTION_SUPPORT
 		mField = null;
 		mProperty = null;
+#endif
 	}
 
 	/// <summary>

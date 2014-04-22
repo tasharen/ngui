@@ -35,6 +35,9 @@ public class EventDelegate
 		[System.NonSerialized]
 		public System.Type expectedType = typeof(void);
 
+		public Parameter () { }
+		public Parameter (Object obj, string field) { this.obj = obj; this.field = field; }
+
 #if REFLECTION_SUPPORT
 		// Cached values
 		[System.NonSerialized] public bool cached = false;

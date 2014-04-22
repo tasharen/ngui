@@ -147,8 +147,12 @@ public static class Localization
 			if (SelectLanguage(value)) return true;
 		}
 
+		// Old style dictionary
+		if (mOldDictionary.Count > 0) return true;
+
 		// Either the language is null, or it wasn't found
 		mOldDictionary.Clear();
+		mDictionary.Clear();
 		if (string.IsNullOrEmpty(value)) PlayerPrefs.DeleteKey("Language");
 		return false;
 	}
