@@ -1388,12 +1388,12 @@ public class UICamera : MonoBehaviour
 			currentTouch.dragStarted = false;
 			Notify(currentTouch.pressed, "OnPress", true);
 
-			// Clear the selection
+			// Update the selection
 			if (currentTouch.pressed != mCurrentSelection)
 			{
 				if (mTooltip != null) ShowTooltip(false);
 				currentScheme = ControlScheme.Touch;
-				selectedObject = null;
+				selectedObject = currentTouch.pressed;
 			}
 		}
 		else if (currentTouch.pressed != null && (currentTouch.delta.sqrMagnitude != 0f || currentTouch.current != currentTouch.last))
