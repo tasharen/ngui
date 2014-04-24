@@ -723,7 +723,7 @@ public class DataNode
 	{
 		if (type.IsAssignableFrom(value.GetType()))
 			return value;
-
+#if REFLECTION_SUPPORT
 		if (type.IsEnum)
 		{
 			if (value.GetType() == typeof(Int32))
@@ -742,6 +742,7 @@ public class DataNode
 				}
 			}
 		}
+#endif
 		return null;
 	}
 #endregion

@@ -58,6 +58,9 @@ public class UICenterOnChild : MonoBehaviour
 
 	public void Recenter ()
 	{
+		Transform trans = transform;
+		if (trans.childCount == 0) return;
+
 		if (mScrollView == null)
 		{
 			mScrollView = NGUITools.FindInParents<UIScrollView>(gameObject);
@@ -91,7 +94,6 @@ public class UICenterOnChild : MonoBehaviour
 
 		float min = float.MaxValue;
 		Transform closest = null;
-		Transform trans = transform;
 		int index = 0;
 
 		// Determine the closest child
