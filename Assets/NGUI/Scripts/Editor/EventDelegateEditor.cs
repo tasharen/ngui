@@ -15,7 +15,7 @@ public static class EventDelegateEditor
 	/// Collect a list of usable delegates from the specified target game object.
 	/// </summary>
 
-	static List<Entry> GetMethods (GameObject target)
+	static public List<Entry> GetMethods (GameObject target)
 	{
 		MonoBehaviour[] comps = target.GetComponents<MonoBehaviour>();
 
