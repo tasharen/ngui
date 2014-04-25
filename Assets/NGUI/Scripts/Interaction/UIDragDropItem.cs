@@ -32,6 +32,13 @@ public class UIDragDropItem : MonoBehaviour
 
 	public bool cloneOnDrag = false;
 
+	/// <summary>
+	/// How long the user has to press on an item before the drag action activates.
+	/// </summary>
+
+	[HideInInspector]
+	public float pressAndHoldDelay = 1f;
+
 #region Common functionality
 
 	protected Transform mTrans;
@@ -86,7 +93,7 @@ public class UIDragDropItem : MonoBehaviour
 			}
 			else if (restriction == Restriction.PressAndHold)
 			{
-				if (mPressTime + 1f > RealTime.time) return;
+				if (mPressTime + pressAndHoldDelay > RealTime.time) return;
 			}
 		}
 
