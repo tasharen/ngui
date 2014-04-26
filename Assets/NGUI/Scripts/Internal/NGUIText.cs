@@ -854,18 +854,18 @@ static public class NGUIText
 				if (prev == ' ')
 				{
 					sb.Append(' ');
-					start = offset + 1;
+					start = offset;
 				}
 				else if (prev != ' ' && start < offset)
 				{
-					int end = offset - start + 1;
+					int end = offset - start;
 
 					// Last word on the last line should not include an invisible character
 					if (lineCount == maxLineCount && remainingWidth <= 0f && offset < textLength && text[offset] <= ' ') --end;
 
 					sb.Append(text.Substring(start, end));
 					lineIsEmpty = false;
-					start = offset + 1;
+					start = offset;
 					prev = ch;
 				}
 			}

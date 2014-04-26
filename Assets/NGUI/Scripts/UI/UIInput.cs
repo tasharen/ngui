@@ -402,7 +402,7 @@ public class UIInput : MonoBehaviour
 
 	void Start ()
 	{
-		if (mLoadSavedValue) LoadValue();
+		if (mLoadSavedValue && !string.IsNullOrEmpty(savedAs)) LoadValue();
 		else value = mValue.Replace("\\n", "\n");
 	}
 
