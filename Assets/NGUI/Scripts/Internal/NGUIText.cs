@@ -858,14 +858,14 @@ static public class NGUIText
 				}
 				else if (prev != ' ' && start < offset)
 				{
-					int end = offset - start;
+					int end = offset - start + 1;
 
 					// Last word on the last line should not include an invisible character
 					if (lineCount == maxLineCount && remainingWidth <= 0f && offset < textLength && text[offset] <= ' ') --end;
 
 					sb.Append(text.Substring(start, end));
 					lineIsEmpty = false;
-					start = offset;
+					start = offset + 1;
 					prev = ch;
 				}
 			}
