@@ -365,7 +365,7 @@ public class UIScrollView : MonoBehaviour
 		if (!horizontal) constraint.x = 0f;
 		if (!vertical) constraint.y = 0f;
 
-		if (constraint.sqrMagnitude > 1f)
+		if (constraint.sqrMagnitude > 0.1f)
 		{
 			if (!instant && dragEffect == DragEffect.MomentumAndSpring)
 			{
@@ -780,7 +780,7 @@ public class UIScrollView : MonoBehaviour
 				// Move the scroll view
 				if (!iOSDragEmulation || dragEffect != DragEffect.MomentumAndSpring)
 				{
-					MoveAbsolute(offset);	
+					MoveAbsolute(offset);
 				}
 				else
 				{

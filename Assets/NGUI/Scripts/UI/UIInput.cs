@@ -89,7 +89,7 @@ public class UIInput : MonoBehaviour
 	/// Maximum number of characters allowed before input no longer works.
 	/// </summary>
 
-	public int characterLimit = 0; 
+	public int characterLimit = 0;
 
 	/// <summary>
 	/// Field in player prefs used to automatically save the value.
@@ -529,7 +529,7 @@ public class UIInput : MonoBehaviour
 			Input.imeCompositionMode = IMECompositionMode.Auto;
 			RestoreLabelPivot();
 		}
-		
+
 		selection = null;
 		UpdateLabel();
 	}
@@ -553,7 +553,7 @@ public class UIInput : MonoBehaviour
 				value = text;
 			}
 
-			if (mKeyboard.done)
+			if (mKeyboard.done || !mKeyboard.active)
 			{
 #if !UNITY_3_5
 				if (!mKeyboard.wasCanceled)
@@ -850,7 +850,7 @@ public class UIInput : MonoBehaviour
 			case KeyCode.KeypadEnter:
 			{
 				ev.Use();
-				
+
 				if (label.multiLine && !ctrl && label.overflowMethod != UILabel.Overflow.ClampContent && validation == Validation.None)
 				{
 					Insert("\n");

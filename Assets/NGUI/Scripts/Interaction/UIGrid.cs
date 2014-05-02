@@ -142,6 +142,12 @@ public class UIGrid : UIWidgetContainer
 	}
 
 	/// <summary>
+	/// Get the index of the specified item.
+	/// </summary>
+
+	public int GetIndex (Transform trans) { return GetChildList().IndexOf(trans); }
+
+	/// <summary>
 	/// Convenience method -- add a new child.
 	/// </summary>
 
