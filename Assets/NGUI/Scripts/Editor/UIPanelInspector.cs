@@ -551,12 +551,9 @@ public class UIPanelInspector : UIRectEditor
 			GUILayout.EndHorizontal();
 
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
-			if (rq == UIPanel.RenderQueue.Explicit)
-			{
-				GUI.changed = false;
-				int so = EditorGUILayout.IntField("Sort Order", mPanel.sortingOrder, GUILayout.Width(120f));
-				if (GUI.changed) mPanel.sortingOrder = so;
-			}
+			GUI.changed = false;
+			int so = EditorGUILayout.IntField("Sort Order", mPanel.sortingOrder, GUILayout.Width(120f));
+			if (GUI.changed) mPanel.sortingOrder = so;
 #endif
 			GUILayout.BeginHorizontal();
 			bool norms = EditorGUILayout.Toggle("Normals", mPanel.generateNormals, GUILayout.Width(100f));
