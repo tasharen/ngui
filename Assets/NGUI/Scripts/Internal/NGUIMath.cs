@@ -366,27 +366,27 @@ static public class NGUIMath
 	/// Calculate the combined bounds of all widgets attached to the specified game object or its children (in relative-to-object space).
 	/// </summary>
 
-	static public Bounds CalculateRelativeWidgetBounds (Transform root, Transform child)
+	static public Bounds CalculateRelativeWidgetBounds (Transform relativeTo, Transform content)
 	{
-		return CalculateRelativeWidgetBounds(root, child, false);
+		return CalculateRelativeWidgetBounds(relativeTo, content, false);
 	}
 
 	/// <summary>
 	/// Calculate the combined bounds of all widgets attached to the specified game object or its children (in relative-to-object space).
 	/// </summary>
 
-	static public Bounds CalculateRelativeWidgetBounds (Transform root, Transform child, bool considerInactive)
+	static public Bounds CalculateRelativeWidgetBounds (Transform relativeTo, Transform content, bool considerInactive)
 	{
-		if (child != null)
+		if (content != null)
 		{
-			UIWidget[] widgets = child.GetComponentsInChildren<UIWidget>(considerInactive);
+			UIWidget[] widgets = content.GetComponentsInChildren<UIWidget>(considerInactive);
 
 			if (widgets.Length > 0)
 			{
 				Vector3 vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
 				Vector3 vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
-				Matrix4x4 toLocal = root.worldToLocalMatrix;
+				Matrix4x4 toLocal = relativeTo.worldToLocalMatrix;
 				bool isSet = false;
 				Vector3 v;
 
@@ -942,6 +942,51 @@ static public class NGUIMath
 			if (platform == RuntimePlatform.WP8Player) dpi = 160f;
 #endif
 		}
-		return Mathf.RoundToInt(height * (96f / dpi));
+
+		int h = Mathf.RoundToInt(height * (96f / dpi));
+		if ((h & 1) == 1) ++h;
+		return h;
+	}
+
+	/// <summary>
+	/// Convert the specified position, making it relative to the specified object.
+	/// </summary>
+
+	static public Vector2 ScreenToPixels (Vector2 pos, Transform relativeTo)
+	{
+		int layer = relativeTo.gameObject.layer;
+		Camera cam = NGUITools.FindCameraForLayer(layer);
+
+		if (cam == null)
+		{
+			Debug.LogWarning("No camera found for layer " + layer);
+			return pos;
+		}
+
+		Vector3 wp = cam.ScreenToWorldPoint(pos);
+		return relativeTo.InverseTransformPoint(wp);
+	}
+
+	/// <summary>
+	/// Convert the specified position, making it relative to the specified object's parent.
+	/// Useful if you plan on positioning the widget using the specified value (think mouse cursor).
+	/// </summary>
+
+	static public Vector2 ScreenToParentPixels (Vector2 pos, Transform relativeTo)
+	{
+		int layer = relativeTo.gameObject.layer;
+		if (relativeTo.parent != null)
+			relativeTo = relativeTo.parent;
+
+		Camera cam = NGUITools.FindCameraForLayer(layer);
+
+		if (cam == null)
+		{
+			Debug.LogWarning("No camera found for layer " + layer);
+			return pos;
+		}
+
+		Vector3 wp = cam.ScreenToWorldPoint(pos);
+		return (relativeTo != null) ? relativeTo.InverseTransformPoint(wp) : wp;
 	}
 }

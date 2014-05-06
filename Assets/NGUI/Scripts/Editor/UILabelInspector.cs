@@ -91,7 +91,7 @@ public class UILabelInspector : UIWidgetInspector
 		if (mFontType == FontType.NGUI)
 		{
 			fnt = NGUIEditorTools.DrawProperty("", serializedObject, "mFont", GUILayout.MinWidth(40f));
-			
+
 			if (fnt.objectReferenceValue != null)
 			{
 				NGUISettings.ambigiousFont = fnt.objectReferenceValue;
@@ -158,7 +158,7 @@ public class UILabelInspector : UIWidgetInspector
 			bool ww = GUI.skin.textField.wordWrap;
 			GUI.skin.textField.wordWrap = true;
 			SerializedProperty sp = serializedObject.FindProperty("mText");
-#if UNITY_3_5
+#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
 			GUI.changed = false;
 			string text = EditorGUILayout.TextArea(sp.stringValue, GUI.skin.textArea, GUILayout.Height(100f));
 			if (GUI.changed) sp.stringValue = text;
@@ -217,7 +217,12 @@ public class UILabelInspector : UIWidgetInspector
 
 			EditorGUI.BeginDisabledGroup(mLabel.bitmapFont != null && mLabel.bitmapFont.packedFontShader);
 			GUILayout.BeginHorizontal();
-			SerializedProperty gr = NGUIEditorTools.DrawProperty("Gradient", serializedObject, "mApplyGradient", GUILayout.Width(93f));
+			SerializedProperty gr = NGUIEditorTools.DrawProperty("Gradient", serializedObject, "mApplyGradient",
+#if UNITY_3_5
+				GUILayout.Width(93f));
+#else
+				GUILayout.Width(95f));
+#endif
 			EditorGUI.BeginDisabledGroup(!gr.hasMultipleDifferentValues && !gr.boolValue);
 			{
 				NGUIEditorTools.SetLabelWidth(30f);
@@ -228,7 +233,7 @@ public class UILabelInspector : UIWidgetInspector
 #if UNITY_3_5
 				GUILayout.Space(81f);
 #else
-				GUILayout.Space(77f);
+				GUILayout.Space(79f);
 #endif
 				NGUIEditorTools.DrawProperty("Bottom", serializedObject, "mGradientBottom", GUILayout.MinWidth(40f));
 				NGUIEditorTools.SetLabelWidth(80f);

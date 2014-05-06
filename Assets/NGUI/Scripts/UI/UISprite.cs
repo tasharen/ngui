@@ -62,6 +62,7 @@ public class UISprite : UIWidget
 	// Deprecated, no longer used
 	[HideInInspector][SerializeField] bool mFillCenter = true;
 
+	[System.NonSerialized]
 	protected UISpriteData mSprite;
 	protected Rect mInnerUV = new Rect();
 	protected Rect mOuterUV = new Rect();
@@ -113,6 +114,26 @@ public class UISprite : UIWidget
 			if (mType != value)
 			{
 				mType = value;
+				MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Sprite flip setting.
+	/// </summary>
+
+	public Flip flip
+	{
+		get
+		{
+			return mFlip;
+		}
+		set
+		{
+			if (mFlip != value)
+			{
+				mFlip = value;
 				MarkAsChanged();
 			}
 		}
@@ -429,12 +450,14 @@ public class UISprite : UIWidget
 		if (!isValid) return;
 		base.MakePixelPerfect();
 
+		UISpriteData sp = GetAtlasSprite();
+		if (sp == null) return;
+
 		UISprite.Type t = type;
 
-		if (t == Type.Simple || t == Type.Filled)
+		if (t == Type.Simple || t == Type.Filled || !sp.hasBorder)
 		{
 			Texture tex = mainTexture;
-			UISpriteData sp = GetAtlasSprite();
 
 			if (tex != null && sp != null)
 			{
@@ -490,20 +513,18 @@ public class UISprite : UIWidget
 	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
 	{
 		Texture tex = mainTexture;
+		if (tex == null) return;
 
-		if (tex != null)
-		{
-			if (mSprite == null) mSprite = atlas.GetSprite(spriteName);
-			if (mSprite == null) return;
+		if (mSprite == null) mSprite = atlas.GetSprite(spriteName);
+		if (mSprite == null) return;
 
-			mOuterUV.Set(mSprite.x, mSprite.y, mSprite.width, mSprite.height);
-			mInnerUV.Set(mSprite.x + mSprite.borderLeft, mSprite.y + mSprite.borderTop,
-				mSprite.width - mSprite.borderLeft - mSprite.borderRight,
-				mSprite.height - mSprite.borderBottom - mSprite.borderTop);
+		mOuterUV.Set(mSprite.x, mSprite.y, mSprite.width, mSprite.height);
+		mInnerUV.Set(mSprite.x + mSprite.borderLeft, mSprite.y + mSprite.borderTop,
+			mSprite.width - mSprite.borderLeft - mSprite.borderRight,
+			mSprite.height - mSprite.borderBottom - mSprite.borderTop);
 
-			mOuterUV = NGUIMath.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
-			mInnerUV = NGUIMath.ConvertToTexCoords(mInnerUV, tex.width, tex.height);
-		}
+		mOuterUV = NGUIMath.ConvertToTexCoords(mOuterUV, tex.width, tex.height);
+		mInnerUV = NGUIMath.ConvertToTexCoords(mInnerUV, tex.width, tex.height);
 
 		switch (type)
 		{
@@ -596,7 +617,7 @@ public class UISprite : UIWidget
 				}
 			}
 
-			Vector4 br = border * atlas.pixelSize;
+			Vector4 br = (mAtlas != null) ? border * mAtlas.pixelSize : Vector4.zero;
 
 			float fw = br.x + br.z;
 			float fh = br.y + br.w;
@@ -788,6 +809,9 @@ public class UISprite : UIWidget
 
 		Vector2 size = new Vector2(mInnerUV.width * tex.width, mInnerUV.height * tex.height);
 		size *= atlas.pixelSize;
+
+		// Don't tile really small sprites
+		if (size.x < 2f || size.y < 2f) return;
 
 		Color colF = color;
 		colF.a = finalAlpha;

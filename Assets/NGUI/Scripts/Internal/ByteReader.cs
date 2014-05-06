@@ -191,16 +191,16 @@ public class ByteReader
 			if (insideQuotes)
 			{
 				string s = ReadLine(false);
-				s = s.Replace("\\n", "\n");
 				if (s == null) return null;
+				s = s.Replace("\\n", "\n");
 				line += "\n" + s;
 				++wordStart;
 			}
 			else
 			{
 				line = ReadLine(true);
-				line = line.Replace("\\n", "\n");
 				if (line == null) return null;
+				line = line.Replace("\\n", "\n");
 				wordStart = 0;
 			}
 

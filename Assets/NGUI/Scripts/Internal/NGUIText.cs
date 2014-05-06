@@ -411,7 +411,7 @@ static public class NGUIText
 		if (text[index + 1] == 'u' && text[index + 2] == 'r' && text[index + 3] == 'l' && text[index + 4] == '=')
 		{
 			int closingBracket = text.IndexOf(']', index + 4);
-			
+
 			if (closingBracket != -1)
 			{
 				index = closingBracket + 1;
@@ -539,7 +539,7 @@ static public class NGUIText
 				for (int i = indexOffset + 4, charIndex = 1; i < verts.size; ++charIndex)
 				{
 					float x0 = verts.buffer[i].x;
-					float x1 = verts.buffer[i+2].x;
+					float x1 = verts.buffer[i + 2].x;
 					float w = x1 - x0;
 					float x0a = x0 * scale;
 					float x1a = x0a + w;
@@ -665,7 +665,7 @@ static public class NGUIText
 				if (symbol == null)
 				{
 					float w = GetGlyphWidth(ch, prev);
-					
+
 					if (w != 0f)
 					{
 						w += finalSpacingX;
@@ -854,7 +854,7 @@ static public class NGUIText
 				if (prev == ' ')
 				{
 					sb.Append(' ');
-					start = offset + 1;
+					start = offset;
 				}
 				else if (prev != ' ' && start < offset)
 				{
@@ -876,14 +876,9 @@ static public class NGUIText
 				// Can't start a new line
 				if (lineIsEmpty || lineCount == maxLineCount)
 				{
-					if (ch != ' ' && !eastern)
-					{
-						fits = false;
-						break;
-					}
-
 					// This is the first word on the line -- add it up to the character that fits
 					sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
+					if (ch != ' ' && !eastern) fits = false;
 
 					if (lineCount++ == maxLineCount)
 					{

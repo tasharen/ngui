@@ -76,6 +76,12 @@ public class BetterList<T>
 	public bool Contains (T item) { return mList.Contains(item); }
 
 	/// <summary>
+	/// Return the index of the specified item.
+	/// </summary>
+
+	public int IndexOf (T item) { return mList.IndexOf(item); }
+
+	/// <summary>
 	/// Remove the specified item from the list. Note that RemoveAt() is faster and is advisable if you already know the index.
 	/// </summary>
 
@@ -234,6 +240,17 @@ public class BetterList<T>
 		if (buffer == null) return false;
 		for (int i = 0; i < size; ++i) if (buffer[i].Equals(item)) return true;
 		return false;
+	}
+
+	/// <summary>
+	/// Return the index of the specified item.
+	/// </summary>
+
+	public int IndexOf (T item)
+	{
+		if (buffer == null) return -1;
+		for (int i = 0; i < size; ++i) if (buffer[i].Equals(item)) return i;
+		return -1;
 	}
 
 	/// <summary>

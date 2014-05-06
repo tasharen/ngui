@@ -214,7 +214,7 @@ public class UIScrollView : MonoBehaviour
 		{
 			float size = bounds.size.x;
 			if (mPanel.clipping == UIDrawCall.Clipping.SoftClip) size += mPanel.clipSoftness.x * 2f;
-			return size > mPanel.width;
+			return Mathf.RoundToInt(size - mPanel.width) > 0;
 		}
 	}
 
@@ -228,7 +228,7 @@ public class UIScrollView : MonoBehaviour
 		{
 			float size = bounds.size.y;
 			if (mPanel.clipping == UIDrawCall.Clipping.SoftClip) size += mPanel.clipSoftness.y * 2f;
-			return size > mPanel.height;
+			return Mathf.RoundToInt(size - mPanel.height) > 0;
 		}
 	}
 
@@ -365,7 +365,7 @@ public class UIScrollView : MonoBehaviour
 		if (!horizontal) constraint.x = 0f;
 		if (!vertical) constraint.y = 0f;
 
-		if (constraint.sqrMagnitude > 1f)
+		if (constraint.sqrMagnitude > 0.1f)
 		{
 			if (!instant && dragEffect == DragEffect.MomentumAndSpring)
 			{
@@ -396,6 +396,12 @@ public class UIScrollView : MonoBehaviour
 		SpringPanel sp = GetComponent<SpringPanel>();
 		if (sp != null) sp.enabled = false;
 	}
+
+	/// <summary>
+	/// Update the values of the associated scroll bars.
+	/// </summary>
+
+	public void UpdateScrollbars () { UpdateScrollbars(true); }
 
 	/// <summary>
 	/// Update the values of the associated scroll bars.
@@ -479,22 +485,35 @@ public class UIScrollView : MonoBehaviour
 	{
 		if (slider == null) return;
 
-		if (viewSize < contentSize)
-		{
-			contentMin = Mathf.Clamp01(contentMin / contentSize);
-			contentMax = Mathf.Clamp01(contentMax / contentSize);
-		}
-		else
-		{
-			contentMin = Mathf.Clamp01(-contentMin / contentSize);
-			contentMax = Mathf.Clamp01(-contentMax / contentSize);
-		}
-
 		mIgnoreCallbacks = true;
 		{
-			float contentPadding = contentMin + contentMax;
-			slider.value = inverted ? ((contentPadding > 0.001f) ? 1f - contentMin / contentPadding : 0f) :
-				((contentPadding > 0.001f) ? contentMin / contentPadding : 1f);
+			float contentPadding;
+
+			if (viewSize < contentSize)
+			{
+				contentMin = Mathf.Clamp01(contentMin / contentSize);
+				contentMax = Mathf.Clamp01(contentMax / contentSize);
+
+				contentPadding = contentMin + contentMax;
+				slider.value = inverted ? ((contentPadding > 0.001f) ? 1f - contentMin / contentPadding : 0f) :
+					((contentPadding > 0.001f) ? contentMin / contentPadding : 1f);
+			}
+			else
+			{
+				contentMin = Mathf.Clamp01(-contentMin / contentSize);
+				contentMax = Mathf.Clamp01(-contentMax / contentSize);
+
+				contentPadding = contentMin + contentMax;
+				slider.value = inverted ? ((contentPadding > 0.001f) ? 1f - contentMin / contentPadding : 0f) :
+					((contentPadding > 0.001f) ? contentMin / contentPadding : 1f);
+
+				if (contentSize > 0)
+				{
+					contentMin = Mathf.Clamp01(contentMin / contentSize);
+					contentMax = Mathf.Clamp01(contentMax / contentSize);
+					contentPadding = contentMin + contentMax;
+				}
+			}
 
 			UIScrollBar sb = slider as UIScrollBar;
 			if (sb != null) sb.barSize = 1f - contentPadding;
@@ -586,7 +605,7 @@ public class UIScrollView : MonoBehaviour
 
 	public void UpdatePosition ()
 	{
-		if (!mIgnoreCallbacks)
+		if (!mIgnoreCallbacks && (horizontalScrollBar != null || verticalScrollBar != null))
 		{
 			mIgnoreCallbacks = true;
 			mCalculatedBounds = false;
@@ -626,6 +645,8 @@ public class UIScrollView : MonoBehaviour
 		co.x -= relative.x;
 		co.y -= relative.y;
 		mPanel.clipOffset = co;
+
+		// Update the scroll bars
 		UpdateScrollbars(false);
 	}
 
@@ -728,7 +749,7 @@ public class UIScrollView : MonoBehaviour
 				Vector3 offset = currentPos - mLastPos;
 				mLastPos = currentPos;
 
-				if (offset.x != 0f || offset.y != 0f)
+				if (offset.x != 0f || offset.y != 0f || offset.z != 0f)
 				{
 					offset = mTrans.InverseTransformDirection(offset);
 
@@ -757,9 +778,9 @@ public class UIScrollView : MonoBehaviour
 				mMomentum = Vector3.Lerp(mMomentum, mMomentum + offset * (0.01f * momentumAmount), 0.67f);
 
 				// Move the scroll view
-				if (!iOSDragEmulation)
+				if (!iOSDragEmulation || dragEffect != DragEffect.MomentumAndSpring)
 				{
-					MoveAbsolute(offset);	
+					MoveAbsolute(offset);
 				}
 				else
 				{

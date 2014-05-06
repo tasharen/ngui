@@ -46,9 +46,9 @@ MonoBehaviour:
   mMat: {fileID: 2100000, guid: ec268c3ea1baceb4abb2168daed86f68, type: 2}
   mUVRect:
     serializedVersion: 2
-    x: .5
-    y: .162109375
-    width: .498046875
+    x: 0
+    y: .6640625
+    width: .249023438
     height: .248046875
   mFont:
     mSize: 18
@@ -2619,7 +2619,6 @@ MonoBehaviour:
       kerning: 
   mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
   mReplacement: {fileID: 0}
-  mPixelSize: 1
   mSymbols: []
   mDynamicFont: {fileID: 0}
   mDynamicFontSize: 16

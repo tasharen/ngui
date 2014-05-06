@@ -1276,7 +1276,7 @@ Animation:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 8}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Animation: {fileID: 7400000, guid: e8c465e83c3e18040884ef096f01647b, type: 2}
   m_Animations:
@@ -1294,7 +1294,7 @@ Animation:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 9}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Animation: {fileID: 7400000, guid: e8c465e83c3e18040884ef096f01647b, type: 2}
   m_Animations:
@@ -1339,6 +1339,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
   mWidth: 255
@@ -1354,6 +1355,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -1515,6 +1517,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf6484591c9cb0e409f5c53c6978a95d, type: 1}
   m_Name: 
   rotationsPerSecond: {x: 0, y: .100000001, z: 0}
+  ignoreTimeScale: 0
 --- !u!114 &95
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1526,6 +1529,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf6484591c9cb0e409f5c53c6978a95d, type: 1}
   m_Name: 
   rotationsPerSecond: {x: 0, y: -.100000001, z: -.25}
+  ignoreTimeScale: 0
 --- !u!114 &96
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1591,6 +1595,7 @@ MonoBehaviour:
   callWhenFinished: 
   from: {x: -2.78728104, y: 3.93878102, z: 2.82702398}
   to: {x: -.803140104, y: -.1548305, z: .200000003}
+  worldSpace: 0
 --- !u!114 &99
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1628,6 +1633,7 @@ MonoBehaviour:
   callWhenFinished: 
   from: {x: -1.27418804, y: -.315431505, z: -1.16163599}
   to: {x: .5, y: .239999995, z: -.209999993}
+  worldSpace: 0
 --- !u!114 &100
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1641,6 +1647,7 @@ MonoBehaviour:
   tweenTarget: {fileID: 17}
   hover: {r: .600000024, g: 1, b: .200000003, a: 1}
   pressed: {r: 0, g: 0, b: 0, a: 1}
+  disabledColor: {r: .5, g: .5, b: .5, a: 1}
   duration: .200000003
 --- !u!114 &101
 MonoBehaviour:
@@ -1655,6 +1662,7 @@ MonoBehaviour:
   tweenTarget: {fileID: 20}
   hover: {r: .600000024, g: 1, b: .200000003, a: .882352948}
   pressed: {r: .283582091, g: .283582091, b: .283582091, a: .890196085}
+  disabledColor: {r: .5, g: .5, b: .5, a: 1}
   duration: .200000003
 --- !u!114 &102
 MonoBehaviour:
@@ -1669,6 +1677,7 @@ MonoBehaviour:
   tweenTarget: {fileID: 18}
   hover: {r: .600000024, g: 1, b: .200000003, a: 1}
   pressed: {r: 0, g: 0, b: 0, a: 1}
+  disabledColor: {r: .5, g: .5, b: .5, a: 1}
   duration: .200000003
 --- !u!114 &103
 MonoBehaviour:
@@ -1683,6 +1692,7 @@ MonoBehaviour:
   tweenTarget: {fileID: 27}
   hover: {r: .600000024, g: 1, b: .200000003, a: .847058833}
   pressed: {r: .276119411, g: .276119411, b: .276119411, a: .847058833}
+  disabledColor: {r: .5, g: .5, b: .5, a: 1}
   duration: .200000003
 --- !u!114 &104
 MonoBehaviour:
@@ -1792,6 +1802,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
   mWidth: 12
@@ -1846,6 +1857,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: .184313729, g: .258823544, b: .494117647, a: .925490201}
   mPivot: 4
   mWidth: 200
@@ -1861,6 +1873,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -1893,6 +1906,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
   mWidth: 70
@@ -1901,13 +1915,14 @@ MonoBehaviour:
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
   keepAspectRatio: 0
-  aspectRatio: 1
+  aspectRatio: 3
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: fc7978f4e2005ea418e07fdd0465efe5, type: 2}
   mText: Hide
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -1992,6 +2007,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
   mWidth: 82
@@ -2000,13 +2016,14 @@ MonoBehaviour:
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
   keepAspectRatio: 0
-  aspectRatio: 1
+  aspectRatio: 3
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: fc7978f4e2005ea418e07fdd0465efe5, type: 2}
   mText: Show
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -2051,6 +2068,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: .183782578, g: .25935185, b: .49253732, a: .925490201}
   mPivot: 4
   mWidth: 200
@@ -2066,6 +2084,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -2098,6 +2117,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: .111940324, g: .111940324, b: .111940324, a: 1}
   mPivot: 4
   mWidth: 494
@@ -2113,6 +2133,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -2145,6 +2166,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 0
   mWidth: 470
@@ -2153,7 +2175,7 @@ MonoBehaviour:
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
   keepAspectRatio: 0
-  aspectRatio: 1
+  aspectRatio: 1.80769229
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: 9dfefea9e318d8c439ce15f9525c0853, type: 2}
@@ -2163,8 +2185,9 @@ MonoBehaviour:
     attached to them that light up when the mouse hovers over them.\n \nPlease note
     that refraction will only show up on non-mobile platforms using Unity Pro at \"Good\"
     or higher quality settings."
-  mFontSize: 16
+  mFontSize: 20
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -2209,6 +2232,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: 1}
   mPivot: 4
   mWidth: 380
@@ -2217,13 +2241,14 @@ MonoBehaviour:
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
   keepAspectRatio: 0
-  aspectRatio: 1
+  aspectRatio: 14
   keepCrispWhenShrunk: 1
   mTrueTypeFont: {fileID: 0}
   mFont: {fileID: 11400000, guid: fc7978f4e2005ea418e07fdd0465efe5, type: 2}
   mText: Lights and Refraction
-  mFontSize: 16
+  mFontSize: 28
   mFontStyle: 0
+  mAlignment: 0
   mEncoding: 1
   mMaxLineCount: 0
   mEffectStyle: 0
@@ -2268,6 +2293,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: .694029808, g: .60159874, b: .393628836, a: 1}
   mPivot: 4
   mWidth: 500
@@ -2283,6 +2309,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 1
   leftType: 1
@@ -2315,6 +2342,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   mColor: {r: .141791046, g: .141791046, b: .141791046, a: 1}
   mPivot: 4
   mWidth: 500
@@ -2330,6 +2358,7 @@ MonoBehaviour:
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
+  mFlip: 0
   mFillCenter: 1
   centerType: 0
   leftType: 1
@@ -2396,6 +2425,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   showInPanelTool: 1
   generateNormals: 0
   widgetsAreStatic: 0
@@ -2409,6 +2439,7 @@ MonoBehaviour:
   mClipRange: {x: 0, y: 0, z: 0, w: 0}
   mClipSoftness: {x: 40, y: 40}
   mDepth: 0
+  mClipOffset: {x: 0, y: 0}
 --- !u!114 &123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2435,6 +2466,7 @@ MonoBehaviour:
     target: {fileID: 0}
     relative: 1
     absolute: 0
+  updateAnchors: 1
   showInPanelTool: 1
   generateNormals: 1
   widgetsAreStatic: 0
@@ -2448,6 +2480,7 @@ MonoBehaviour:
   mClipRange: {x: 0, y: 0, z: 0, w: 0}
   mClipSoftness: {x: 40, y: 40}
   mDepth: 1
+  mClipOffset: {x: 0, y: 0}
 --- !u!196 &124
 NavMeshSettings:
   m_ObjectHideFlags: 0
@@ -2477,6 +2510,8 @@ MonoBehaviour:
   manualHeight: 800
   minimumHeight: 320
   maximumHeight: 1536
+  adjustByDPI: 0
+  shrinkPortraitUI: 0
 --- !u!54 &126
 Rigidbody:
   m_ObjectHideFlags: 0

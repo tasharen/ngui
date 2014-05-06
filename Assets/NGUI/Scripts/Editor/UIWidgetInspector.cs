@@ -698,6 +698,7 @@ public class UIWidgetInspector : UIRectEditor
 
 			case EventType.MouseUp:
 			{
+				if (e.button == 2) break;
 				if (GUIUtility.hotControl == id)
 				{
 					GUIUtility.hotControl = 0;
@@ -1072,7 +1073,7 @@ public class UIWidgetInspector : UIRectEditor
 			Toggle("\u25BA", "ButtonRight", UIWidget.Pivot.Right, true);
 #else
 			Toggle("<", "ButtonLeft", UIWidget.Pivot.Left, true);
-			Toggle("|", "ButtonMid", UIWidget.Pivot.Center, true);
+			Toggle("--", "ButtonMid", UIWidget.Pivot.Center, true);
 			Toggle(">", "ButtonRight", UIWidget.Pivot.Right, true);
 #endif
 			Toggle("\u25B2", "ButtonLeft", UIWidget.Pivot.Top, false);

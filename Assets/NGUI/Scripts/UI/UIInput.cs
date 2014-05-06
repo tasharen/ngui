@@ -89,7 +89,7 @@ public class UIInput : MonoBehaviour
 	/// Maximum number of characters allowed before input no longer works.
 	/// </summary>
 
-	public int characterLimit = 0; 
+	public int characterLimit = 0;
 
 	/// <summary>
 	/// Field in player prefs used to automatically save the value.
@@ -150,6 +150,7 @@ public class UIInput : MonoBehaviour
 	protected float mPosition = 0f;
 	protected bool mDoInit = true;
 	protected UIWidget.Pivot mPivot = UIWidget.Pivot.TopLeft;
+	protected bool mLoadSavedValue = true;
 
 	static protected int mDrawStart = 0;
 
@@ -227,6 +228,7 @@ public class UIInput : MonoBehaviour
 			if (mValue != value)
 			{
 				mValue = value;
+				mLoadSavedValue = false;
 				if (!isSelected) SaveToPlayerPrefs(value);
 				UpdateLabel();
 				ExecuteOnChange();
@@ -235,6 +237,7 @@ public class UIInput : MonoBehaviour
 			if (mValue != value)
 			{
 				mValue = value;
+				mLoadSavedValue = false;
 
 				if (isSelected)
 				{
@@ -283,37 +286,91 @@ public class UIInput : MonoBehaviour
 	/// Current position of the cursor.
 	/// </summary>
 
-	protected int cursorPosition { get { return value.Length; } }
+	public int cursorPosition { get { return value.Length; } set {} }
 
 	/// <summary>
 	/// Index of the character where selection begins.
 	/// </summary>
 
-	protected int selectionStart { get { return value.Length; } }
+	public int selectionStart { get { return value.Length; } set {} }
 
 	/// <summary>
 	/// Index of the character where selection ends.
 	/// </summary>
 
-	protected int selectionEnd { get { return value.Length; } }
+	public int selectionEnd { get { return value.Length; } set {} }
+
+	/// <summary>
+	/// Caret, in case it's needed.
+	/// </summary>
+
+	public UITexture caret { get { return null; } }
 #else
 	/// <summary>
 	/// Current position of the cursor.
 	/// </summary>
 
-	protected int cursorPosition { get { return isSelected ? mSelectionEnd : value.Length; } }
+	public int cursorPosition
+	{
+		get
+		{
+			return isSelected ? mSelectionEnd : value.Length;
+		}
+		set
+		{
+			if (isSelected)
+			{
+				mSelectionEnd = value;
+				UpdateLabel();
+			}
+		}
+	}
 
 	/// <summary>
 	/// Index of the character where selection begins.
 	/// </summary>
 
-	protected int selectionStart { get { return isSelected ? mSelectionStart : value.Length; } set { mSelectionStart = value; UpdateLabel(); } }
+	public int selectionStart
+	{
+		get
+		{
+			return isSelected ? mSelectionStart : value.Length;
+		}
+		set
+		{
+			if (isSelected)
+			{
+				mSelectionStart = value;
+				UpdateLabel();
+			}
+		}
+	}
 
 	/// <summary>
 	/// Index of the character where selection ends.
 	/// </summary>
 
-	protected int selectionEnd { get { return isSelected ? mSelectionEnd : value.Length; } set { mSelectionEnd = value; UpdateLabel(); } }
+	public int selectionEnd
+	{
+		get
+		{
+			return isSelected ? mSelectionEnd : value.Length;
+		}
+		set
+		{
+			if (isSelected)
+			{
+				mSelectionEnd = value;
+				UpdateLabel();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Caret, in case it's needed.
+	/// </summary>
+
+	public UITexture caret { get { return mCaret; } }
 #endif
 
 	/// <summary>
@@ -345,11 +402,7 @@ public class UIInput : MonoBehaviour
 
 	void Start ()
 	{
-		if (string.IsNullOrEmpty(mValue))
-		{
-			if (!string.IsNullOrEmpty(savedAs) && PlayerPrefs.HasKey(savedAs))
-				value = PlayerPrefs.GetString(savedAs);
-		}
+		if (mLoadSavedValue && !string.IsNullOrEmpty(savedAs)) LoadValue();
 		else value = mValue.Replace("\\n", "\n");
 	}
 
@@ -476,7 +529,7 @@ public class UIInput : MonoBehaviour
 			Input.imeCompositionMode = IMECompositionMode.Auto;
 			RestoreLabelPivot();
 		}
-		
+
 		selection = null;
 		UpdateLabel();
 	}
@@ -500,7 +553,7 @@ public class UIInput : MonoBehaviour
 				value = text;
 			}
 
-			if (mKeyboard.done)
+			if (mKeyboard.done || !mKeyboard.active)
 			{
 #if !UNITY_3_5
 				if (!mKeyboard.wasCanceled)
@@ -797,8 +850,8 @@ public class UIInput : MonoBehaviour
 			case KeyCode.KeypadEnter:
 			{
 				ev.Use();
-				
-				if (label.multiLine && !ctrl && label.overflowMethod != UILabel.Overflow.ClampContent)
+
+				if (label.multiLine && !ctrl && label.overflowMethod != UILabel.Overflow.ClampContent && validation == Validation.None)
 				{
 					Insert("\n");
 				}
@@ -971,11 +1024,15 @@ public class UIInput : MonoBehaviour
 	{
 		if (NGUITools.GetActive(this))
 		{
-			current = this;
 			mValue = value;
-			EventDelegate.Execute(onSubmit);
+
+			if (current == null)
+			{
+				current = this;
+				EventDelegate.Execute(onSubmit);
+				current = null;
+			}
 			SaveToPlayerPrefs(mValue);
-			current = null;
 		}
 	}
 
@@ -1004,7 +1061,13 @@ public class UIInput : MonoBehaviour
 				if (inputType == InputType.Password)
 				{
 					processed = "";
-					for (int i = 0, imax = fullText.Length; i < imax; ++i) processed += "*";
+
+					string asterisk = "*";
+
+					if (label.bitmapFont != null && label.bitmapFont.bmFont != null &&
+						label.bitmapFont.bmFont.GetGlyph('*') == null) asterisk = "x";
+
+					for (int i = 0, imax = fullText.Length; i < imax; ++i) processed += asterisk;
 				}
 				else processed = fullText;
 
@@ -1242,11 +1305,33 @@ public class UIInput : MonoBehaviour
 
 	protected void ExecuteOnChange ()
 	{
-		if (EventDelegate.IsValid(onChange))
+		if (current == null && EventDelegate.IsValid(onChange))
 		{
 			current = this;
 			EventDelegate.Execute(onChange);
 			current = null;
 		}
+	}
+
+	/// <summary>
+	/// Convenience function to be used as a callback that will clear the input field's focus.
+	/// </summary>
+
+	public void RemoveFocus () { isSelected = false; }
+
+	/// <summary>
+	/// Convenience function that can be used as a callback for On Change notification.
+	/// </summary>
+
+	public void SaveValue () { SaveToPlayerPrefs(mValue); }
+
+	/// <summary>
+	/// Convenience function that can forcefully reset the input field's value to what was saved earlier.
+	/// </summary>
+
+	public void LoadValue ()
+	{
+		if (!string.IsNullOrEmpty(savedAs) && PlayerPrefs.HasKey(savedAs))
+			value = PlayerPrefs.GetString(savedAs);
 	}
 }

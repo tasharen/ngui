@@ -86,7 +86,7 @@ public class UISpriteInspector : UIWidgetInspector
 		{
 			UISprite.Type type = (UISprite.Type)sp.intValue;
 
-			if (type == UISprite.Type.Simple)
+			if (type == UISprite.Type.Simple || type == UISprite.Type.Tiled)
 			{
 				NGUIEditorTools.DrawProperty("Flip", serializedObject, "mFlip");
 			}
