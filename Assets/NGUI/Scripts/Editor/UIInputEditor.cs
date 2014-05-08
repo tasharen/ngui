@@ -58,6 +58,8 @@ public class UIInputEditor : UIWidgetContainerEditor
 			NGUIEditorTools.DrawPaddedProperty(serializedObject, "inputType");
 #if MOBILE
 			NGUIEditorTools.DrawPaddedProperty(serializedObject, "keyboardType");
+#else
+			NGUIEditorTools.DrawPaddedProperty(serializedObject, "onReturnKey");
 #endif
 			NGUIEditorTools.DrawPaddedProperty(serializedObject, "validation");
 

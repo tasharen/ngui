@@ -47,6 +47,13 @@ public class UIInput : MonoBehaviour
 		EmailAddress = 7,
 	}
 
+	public enum OnReturnKey
+	{
+		Default,
+		Submit,
+		NewLine,
+	}
+
 	public delegate char OnValidate (string text, int charIndex, char addedChar);
 
 	/// <summary>
@@ -72,6 +79,12 @@ public class UIInput : MonoBehaviour
 	/// </summary>
 
 	public InputType inputType = InputType.Standard;
+
+	/// <summary>
+	/// What to do when the Return key is pressed on the keyboard.
+	/// </summary>
+
+	public OnReturnKey onReturnKey = OnReturnKey.Default;
 
 	/// <summary>
 	/// Keyboard type applies to mobile keyboards that get shown.
@@ -851,7 +864,13 @@ public class UIInput : MonoBehaviour
 			{
 				ev.Use();
 
-				if (label.multiLine && !ctrl && label.overflowMethod != UILabel.Overflow.ClampContent && validation == Validation.None)
+				bool newLine = (onReturnKey == OnReturnKey.NewLine) ||
+					(onReturnKey == OnReturnKey.Default &&
+					label.multiLine && !ctrl &&
+					label.overflowMethod != UILabel.Overflow.ClampContent &&
+					validation == Validation.None);
+
+				if (newLine)
 				{
 					Insert("\n");
 				}
