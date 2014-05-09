@@ -162,7 +162,7 @@ static public class NGUIText
 		else if (dynamicFont != null)
 		{
 			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fontStyle))
-				return Mathf.Round(mTempChar.width * fontScale * pixelDensity);
+				return mTempChar.width * fontScale * pixelDensity;
 		}
 #endif
 		return 0f;
@@ -235,8 +235,6 @@ static public class NGUIText
 					glyph.v1 *= pd;
 					glyph.advance *= pd;
 				}
-
-				glyph.advance = Mathf.Round(glyph.advance);
 				return glyph;
 			}
 		}

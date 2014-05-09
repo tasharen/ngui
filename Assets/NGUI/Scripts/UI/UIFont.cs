@@ -365,6 +365,14 @@ public class UIFont : MonoBehaviour
 				if (rep != null && rep.replacement == this) rep.replacement = null;
 				if (mReplacement != null) MarkAsChanged();
 				mReplacement = rep;
+
+				if (rep != null)
+				{
+					mPMA = -1;
+					mMat = null;
+					mFont = null;
+					mDynamicFont = null;
+				}
 				MarkAsChanged();
 			}
 		}
