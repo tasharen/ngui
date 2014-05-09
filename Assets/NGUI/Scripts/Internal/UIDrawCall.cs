@@ -289,9 +289,11 @@ public class UIDrawCall : MonoBehaviour
 			mDynamicMat.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
 			mDynamicMat.CopyPropertiesFromMaterial(mMaterial);
 
+#if !UNITY_3_5
 			string[] keywords = mMaterial.shaderKeywords;
 			for (int i = 0; i < keywords.Length; ++i)
 				mDynamicMat.EnableKeyword(keywords[i]);
+#endif
 		}
 		else
 		{
