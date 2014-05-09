@@ -6,6 +6,7 @@
 using UnityEngine;
 using System.Text;
 using System.Collections.Generic;
+using System.IO;
 
 /// <summary>
 /// MemoryStream.ReadLine has an interesting oddity: it doesn't always advance the stream's position by the correct amount:
@@ -20,6 +21,26 @@ public class ByteReader
 
 	public ByteReader (byte[] bytes) { mBuffer = bytes; }
 	public ByteReader (TextAsset asset) { mBuffer = asset.bytes; }
+
+	/// <summary>
+	/// Read the contents of the specified file and return a Byte Reader to work with.
+	/// </summary>
+
+	static public ByteReader Open (string path)
+	{
+		FileStream fs = File.OpenRead(path);
+
+		if (fs != null)
+		{
+			fs.Seek(0, SeekOrigin.End);
+			byte[] buffer = new byte[fs.Position];
+			fs.Seek(0, SeekOrigin.Begin);
+			fs.Read(buffer, 0, buffer.Length);
+			fs.Close();
+			return new ByteReader(buffer);
+		}
+		return null;
+	}
 
 	/// <summary>
 	/// Whether the buffer is readable.
