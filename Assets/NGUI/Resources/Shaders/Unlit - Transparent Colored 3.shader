@@ -24,7 +24,6 @@ Shader "Hidden/Unlit/Transparent Colored 3"
 			Offset -1, -1
 			Fog { Mode Off }
 			ColorMask RGB
-			AlphaTest Greater .01
 			Blend SrcAlpha OneMinusSrcAlpha
 
 			CGPROGRAM
@@ -118,7 +117,6 @@ Shader "Hidden/Unlit/Transparent Colored 3"
 			ZWrite Off
 			Fog { Mode Off }
 			ColorMask RGB
-			AlphaTest Greater .01
 			Blend SrcAlpha OneMinusSrcAlpha
 			ColorMaterial AmbientAndDiffuse
 			
