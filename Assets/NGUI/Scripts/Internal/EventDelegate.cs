@@ -101,12 +101,12 @@ public class EventDelegate
 
 	// Private variables
 	public delegate void Callback();
-	Callback mCachedCallback;
-	bool mRawDelegate = false;
-	bool mCached = false;
+	[System.NonSerialized] Callback mCachedCallback;
+	[System.NonSerialized] bool mRawDelegate = false;
+	[System.NonSerialized] bool mCached = false;
 #if REFLECTION_SUPPORT
-	MethodInfo mMethod;
-	object[] mArgs;
+	[System.NonSerialized] MethodInfo mMethod;
+	[System.NonSerialized] object[] mArgs;
 #endif
 
 	/// <summary>

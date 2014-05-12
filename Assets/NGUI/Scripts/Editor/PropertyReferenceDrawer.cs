@@ -58,6 +58,14 @@ public class PropertyReferenceDrawer
 			FieldInfo[] fields = type.GetFields(flags);
 			PropertyInfo[] props = type.GetProperties(flags);
 
+			// The component itself without any method
+			if (PropertyReference.Convert(comp, filter))
+			{
+				Entry ent = new Entry();
+				ent.target = comp;
+				list.Add(ent);
+			}
+
 			for (int b = 0; b < fields.Length; ++b)
 			{
 				FieldInfo field = fields[b];

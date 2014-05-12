@@ -1442,10 +1442,9 @@ static public class NGUITools
 	static public string GetFuncName (object obj, string method)
 	{
 		if (obj == null) return "<null>";
-		if (string.IsNullOrEmpty(method)) return "<Choose>";
 		string type = obj.GetType().ToString();
 		int period = type.LastIndexOf('.');
 		if (period > 0) type = type.Substring(period + 1);
-		return type + "." + method;
+		return string.IsNullOrEmpty(method) ? type : type + "." + method;
 	}
 }
