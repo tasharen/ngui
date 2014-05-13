@@ -380,6 +380,7 @@ public class UIPrefabTool : EditorWindow
 			Execute<UIPanel>("LateUpdate", root);
 
 			RenderTexture rt = new RenderTexture(cellSize - 4, cellSize - 4, 1);
+			rt.hideFlags = HideFlags.HideAndDontSave;
 			cam.targetTexture = rt;
 			cam.Render();
 
