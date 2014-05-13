@@ -1313,10 +1313,10 @@ static public class NGUITools
 	}
 
 	[System.Obsolete("Use NGUIText.EncodeColor instead")]
-	static public string EncodeColor (Color c) { return NGUIText.EncodeColor(c); }
+	static public string EncodeColor (Color c) { return NGUIText.EncodeColor24(c); }
 
 	[System.Obsolete("Use NGUIText.ParseColor instead")]
-	static public Color ParseColor (string text, int offset) { return NGUIText.ParseColor(text, offset); }
+	static public Color ParseColor (string text, int offset) { return NGUIText.ParseColor24(text, offset); }
 
 	[System.Obsolete("Use NGUIText.StripSymbols instead")]
 	static public string StripSymbols (string text) { return NGUIText.StripSymbols(text); }
