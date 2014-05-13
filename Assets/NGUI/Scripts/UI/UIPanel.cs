@@ -653,7 +653,11 @@ public class UIPanel : UIRect
 
 	public override float CalculateFinalAlpha (int frameID)
 	{
+#if UNITY_EDITOR
+		if (mAlphaFrameID != frameID || !Application.isPlaying)
+#else
 		if (mAlphaFrameID != frameID)
+#endif
 		{
 			mAlphaFrameID = frameID;
 			UIRect pt = parent;
@@ -1083,7 +1087,11 @@ public class UIPanel : UIRect
 
 	void LateUpdate ()
 	{
+#if UNITY_EDITOR
+		if (mUpdateFrame != Time.frameCount || !Application.isPlaying)
+#else
 		if (mUpdateFrame != Time.frameCount)
+#endif
 		{
 			mUpdateFrame = Time.frameCount;
 
@@ -1720,7 +1728,11 @@ public class UIPanel : UIRect
 	{
 		int frame = Time.frameCount;
 
+#if UNITY_EDITOR
+		if (mSizeFrame != frame || !Application.isPlaying)
+#else
 		if (mSizeFrame != frame)
+#endif
 		{
 			mSizeFrame = frame;
 

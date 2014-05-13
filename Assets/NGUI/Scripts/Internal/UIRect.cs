@@ -405,7 +405,11 @@ public abstract class UIRect : MonoBehaviour
 
 		int frame = Time.frameCount;
 
+#if UNITY_EDITOR
+		if (mUpdateFrame != frame || !Application.isPlaying)
+#else
 		if (mUpdateFrame != frame)
+#endif
 		{
 #if UNITY_EDITOR
 			if (updateAnchors == AnchorUpdate.OnUpdate || mUpdateAnchors || !Application.isPlaying)

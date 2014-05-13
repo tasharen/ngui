@@ -377,6 +377,18 @@ public class NGUISettings
 		}
 		set { SetString("NGUI FreeType", value); }
 	}
+
+	static public string searchField
+	{
+		get { return GetString("NGUI Search", null); }
+		set { SetString("NGUI Search", value); }
+	}
+
+	static public string currentPath
+	{
+		get { return GetString("NGUI Path", "Assets/"); }
+		set { SetString("NGUI Path", value); }
+	}
 #endregion
 
 	/// <summary>

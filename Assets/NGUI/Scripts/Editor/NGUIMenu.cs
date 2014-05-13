@@ -408,6 +408,12 @@ static public class NGUIMenu
 	[MenuItem("Assets/NGUI/", false, 0)]
 	static public void OpenSeparator2 () { }
 
+	[MenuItem("NGUI/Open/Prefab Toolbar", false, 9)]
+	static public void OpenPrefabTool ()
+	{
+		EditorWindow.GetWindow<UIPrefabTool>(false, "Prefab Toolbar", true).Show();
+	}
+
 	[MenuItem("NGUI/Open/Panel Tool", false, 9)]
 	static public void OpenPanelWizard ()
 	{
@@ -494,6 +500,14 @@ static public class NGUIMenu
 
 	[MenuItem("NGUI/Options/Guides/Only When Needed", true, 10)]
 	static public bool TurnGuidesOffCheck () { return NGUISettings.drawGuides; }
+
+	[MenuItem("NGUI/Options/Reset Prefab Toolbar", false, 10)]
+	static public void ResetPrefabTool ()
+	{
+		if (UIPrefabTool.instance == null) OpenPrefabTool();
+		UIPrefabTool.instance.Reset();
+		UIPrefabTool.instance.Repaint();
+	}
 
 #endregion
 

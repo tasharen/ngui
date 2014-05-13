@@ -222,7 +222,7 @@ public class BetterList<T>
 	{
 		if (buffer == null || size == buffer.Length) AllocateMore();
 
-		if (index < size)
+		if (index > -1 && index < size)
 		{
 			for (int i = size; i > index; --i) buffer[i] = buffer[i - 1];
 			buffer[index] = item;
@@ -284,7 +284,7 @@ public class BetterList<T>
 
 	public void RemoveAt (int index)
 	{
-		if (buffer != null && index < size)
+		if (buffer != null && index > -1 && index < size)
 		{
 			--size;
 			buffer[index] = default(T);

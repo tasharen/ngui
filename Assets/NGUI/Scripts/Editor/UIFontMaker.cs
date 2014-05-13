@@ -190,13 +190,14 @@ public class UIFontMaker : EditorWindow
 
 					if (GUILayout.Button("Find " + filename))
 					{
-						string path = EditorUtility.OpenFilePanel("Find " + filename, "Assets",
+						string path = EditorUtility.OpenFilePanel("Find " + filename, NGUISettings.currentPath,
 							(Application.platform == RuntimePlatform.WindowsEditor) ? "dll" : "dylib");
 
 						if (!string.IsNullOrEmpty(path))
 						{
 							if (System.IO.Path.GetFileName(path) == filename)
 							{
+								NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
 								NGUISettings.pathToFreeType = path;
 							}
 							else Debug.LogError("The library must be named '" + filename + "'");
@@ -371,8 +372,11 @@ public class UIFontMaker : EditorWindow
 		if (create == Create.None) return;
 
 		// Open the "Save As" file dialog
-		string prefabPath = EditorUtility.SaveFilePanelInProject("Save As", "New Font.prefab", "prefab", "Save font as...");
+		string prefabPath = EditorUtility.SaveFilePanelInProject("Save As",
+			"New Font.prefab", "prefab", "Save font as...", NGUISettings.currentPath);
+
 		if (string.IsNullOrEmpty(prefabPath)) return;
+		NGUISettings.currentPath = System.IO.Path.GetDirectoryName(prefabPath);
 
 		// Load the font's prefab
 		GameObject go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
