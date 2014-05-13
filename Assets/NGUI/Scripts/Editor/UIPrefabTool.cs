@@ -379,8 +379,13 @@ public class UIPrefabTool : EditorWindow
 			Execute<UIPanel>("Update", root);
 			Execute<UIPanel>("LateUpdate", root);
 
-			RenderTexture rt = new RenderTexture(cellSize - 4, cellSize - 4, 1);
+			int dim = (cellSize - 4) * 2;
+			RenderTexture rt = new RenderTexture(dim, dim, 1);
 			rt.hideFlags = HideFlags.HideAndDontSave;
+			rt.generateMips = false;
+			rt.format = RenderTextureFormat.ARGB32;
+			rt.filterMode = FilterMode.Trilinear;
+			rt.anisoLevel = 4;
 			cam.targetTexture = rt;
 			cam.Render();
 
