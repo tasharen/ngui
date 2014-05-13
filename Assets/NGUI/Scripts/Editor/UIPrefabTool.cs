@@ -619,7 +619,7 @@ public class UIPrefabTool : EditorWindow
 				int index = indices[i];
 				Item ent = (index != -1) ? mItems[index] : selection;
 
-				if (ent == null || ent.prefab == null)
+				if (ent != null && ent.prefab == null)
 				{
 					mItems.RemoveAt(index);
 					continue;
