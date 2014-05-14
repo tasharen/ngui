@@ -866,9 +866,13 @@ public class UIAtlasMaker : EditorWindow
 
 			if (create)
 			{
+#if UNITY_3_5
+				string path = EditorUtility.SaveFilePanel("Save As",
+					NGUISettings.currentPath, "New Atlas.prefab", "prefab");
+#else
 				string path = EditorUtility.SaveFilePanelInProject("Save As",
 					"New Atlas.prefab", "prefab", "Save atlas as...", NGUISettings.currentPath);
-
+#endif
 				if (!string.IsNullOrEmpty(path))
 				{
 					NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);

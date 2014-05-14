@@ -372,9 +372,13 @@ public class UIFontMaker : EditorWindow
 		if (create == Create.None) return;
 
 		// Open the "Save As" file dialog
+#if UNITY_3_5
+		string prefabPath = EditorUtility.SaveFilePanel("Save As",
+			NGUISettings.currentPath, "New Font.prefab", "prefab");
+#else
 		string prefabPath = EditorUtility.SaveFilePanelInProject("Save As",
 			"New Font.prefab", "prefab", "Save font as...", NGUISettings.currentPath);
-
+#endif
 		if (string.IsNullOrEmpty(prefabPath)) return;
 		NGUISettings.currentPath = System.IO.Path.GetDirectoryName(prefabPath);
 

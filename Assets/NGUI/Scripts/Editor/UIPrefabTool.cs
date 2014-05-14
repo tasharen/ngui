@@ -152,9 +152,13 @@ public class UIPrefabTool : EditorWindow
 
 		if (string.IsNullOrEmpty(guid))
 		{
+#if UNITY_3_5
+			string path = EditorUtility.SaveFilePanel("Save a prefab",
+				NGUISettings.currentPath, "New Prefab.prefab", "prefab");
+#else
 			string path = EditorUtility.SaveFilePanelInProject("Save a prefab",
 				"New Prefab.prefab", "prefab", "Save prefab as...", NGUISettings.currentPath);
-			
+#endif	
 			if (string.IsNullOrEmpty(path)) return;
 			NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
 
@@ -373,7 +377,9 @@ public class UIPrefabTool : EditorWindow
 		int dim = (cellSize - 4) * 2;
 		RenderTexture rt = new RenderTexture(dim, dim, 1);
 		rt.hideFlags = HideFlags.HideAndDontSave;
+#if !UNITY_3_5
 		rt.generateMips = false;
+#endif
 		rt.format = RenderTextureFormat.ARGB32;
 		rt.filterMode = FilterMode.Trilinear;
 		rt.anisoLevel = 4;
