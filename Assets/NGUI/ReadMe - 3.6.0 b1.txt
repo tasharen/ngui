@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.5.9
+            Version 3.6.1 b1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,13 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.6.0 b1
+- NEW: Added a new tool -- Prefab Toolbar. It lets you drop prefabs onto it for easy preview.
+- NEW: You can now choose components as parameters for functions via inspector.
+- NEW: Added support for full RGBA32 color encoding in text (RrGgBbAa).
+- NEW: UISpriteAnimation example script now has pixel snap setting as optional.
+- FIX: WP8/WSA compile fixes.
 
 3.5.9
 - NEW: Added an event delegate drawer in case you want to use the Event Delegate in your own scripts.
