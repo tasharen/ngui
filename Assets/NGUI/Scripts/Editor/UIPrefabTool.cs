@@ -176,7 +176,7 @@ public class UIPrefabTool : EditorWindow
 		Item ent = new Item();
 		ent.prefab = go;
 		ent.guid = guid;
-		GeneratePreview(ent);
+		GeneratePreview(ent, null);
 		RectivateLights();
 
 		if (index < mItems.size) mItems.Insert(index, ent);
@@ -197,7 +197,7 @@ public class UIPrefabTool : EditorWindow
 			Item ent = new Item();
 			ent.prefab = go;
 			ent.guid = guid;
-			GeneratePreview(ent);
+			GeneratePreview(ent, null);
 			if (index < mItems.size) mItems.Insert(index, ent);
 			else mItems.Add(ent);
 			return ent;
@@ -308,6 +308,25 @@ public class UIPrefabTool : EditorWindow
 	}
 
 	/// <summary>
+	/// Re-generate the specified prefab's snapshot texture using the provided snapshot point's values.
+	/// </summary>
+
+	public void RegenerateTexture (GameObject prefab, UISnapshotPoint point)
+	{
+		for (int i = 0; i < mItems.size; ++i)
+		{
+			Item item = mItems[i];
+
+			if (item.prefab == prefab)
+			{
+				GeneratePreview(item, point);
+				RectivateLights();
+				break;
+			}
+		}
+	}
+
+	/// <summary>
 	/// Update the visual mode based on the dragged object.
 	/// </summary>
 
@@ -335,7 +354,7 @@ public class UIPrefabTool : EditorWindow
 				Item ent = new Item();
 				ent.prefab = go;
 				ent.guid = guid;
-				GeneratePreview(ent);
+				GeneratePreview(ent, null);
 				return ent;
 			}
 			else Debug.Log("No GUID");
@@ -347,11 +366,17 @@ public class UIPrefabTool : EditorWindow
 	/// Generate an item preview for the specified item.
 	/// </summary>
 
-	void GeneratePreview (Item item)
+	void GeneratePreview (Item item, UISnapshotPoint point)
 	{
 		if (item == null || item.prefab == null) return;
-		if (item.tex != null && item.dynamicTex)
+
+		int dim = (cellSize - 4) * 2;
+		RenderTexture rt = (item.tex as RenderTexture);
+
+		// If the dimensions have changed, we will need to create a new render texture
+		if (rt != null && item.dynamicTex && (item.tex.width != dim || item.tex.height != dim))
 			DestroyImmediate(item.tex);
+
 #if UNITY_3_5
 		// Unfortunately Unity 3.5 doesn't seem to support a proper way of doing any of this
 		item.tex = null;
@@ -382,27 +407,30 @@ public class UIPrefabTool : EditorWindow
 		cam.backgroundColor = new Color(0f, 0f, 0f, 0f);
 
 		// Set up the render texture for the camera
-		int dim = (cellSize - 4) * 2;
-		RenderTexture rt = new RenderTexture(dim, dim, 1);
-		rt.hideFlags = HideFlags.HideAndDontSave;
-		rt.generateMips = false;
-		rt.format = RenderTextureFormat.ARGB32;
-		rt.filterMode = FilterMode.Trilinear;
-		rt.anisoLevel = 4;
+		if (rt == null)
+		{
+			rt = new RenderTexture(dim, dim, 1);
+			rt.hideFlags = HideFlags.HideAndDontSave;
+			rt.generateMips = false;
+			rt.format = RenderTextureFormat.ARGB32;
+			rt.filterMode = FilterMode.Trilinear;
+			rt.anisoLevel = 4;
+
+			item.tex = rt;
+			item.dynamicTex = true;
+		}
 		cam.targetTexture = rt;
 
 		// Finally instantiate the prefab as a child of the root
 		GameObject child = NGUITools.AddChild(root, item.prefab);
 
+		// Try to find the snapshot point script
+		if (point == null) point = child.GetComponentInChildren<UISnapshotPoint>();
+
 		// If there is a UIRect present (widgets or panels) then it's an NGUI object
-		if (SetupPreviewForUI(cam, root, child) || SetupPreviewFor3D(cam, root, child))
-		{
-			// Render the scene and set the item's texture
+		if (SetupPreviewForUI(cam, root, child, point) ||
+			SetupPreviewFor3D(cam, root, child, point))
 			cam.Render();
-			item.tex = rt;
-			item.dynamicTex = true;
-		}
-		//else item.tex = (Texture2D)AssetDatabase.GetCachedIcon(AssetDatabase.GetAssetPath(item.prefab));
 
 		// Clean up everything
 		DestroyImmediate(camGO);
@@ -414,7 +442,7 @@ public class UIPrefabTool : EditorWindow
 	/// Set up everything necessary to preview a UI object.
 	/// </summary>
 
-	static bool SetupPreviewForUI (Camera cam, GameObject root, GameObject child)
+	static bool SetupPreviewForUI (Camera cam, GameObject root, GameObject child, UISnapshotPoint point)
 	{
 		if (child.GetComponentInChildren<UIRect>() == null) return false;
 
@@ -428,7 +456,8 @@ public class UIPrefabTool : EditorWindow
 		cam.transform.position = bounds.center;
 		cam.cullingMask = (1 << root.layer);
 
-		SetupSnapshotCamera(child, cam, objSize, Mathf.RoundToInt(Mathf.Max(size.x, size.y)), -100f, 100f);
+		if (point != null) SetupSnapshotCamera(child, cam, point);
+		else SetupSnapshotCamera(child, cam, objSize, Mathf.RoundToInt(Mathf.Max(size.x, size.y)), -100f, 100f);
 
 		Execute<UIWidget>("Start", root);
 		Execute<UIPanel>("Start", root);
@@ -442,7 +471,7 @@ public class UIPrefabTool : EditorWindow
 	/// Set up everything necessary to preview a UI object.
 	/// </summary>
 
-	static bool SetupPreviewFor3D (Camera cam, GameObject root, GameObject child)
+	static bool SetupPreviewFor3D (Camera cam, GameObject root, GameObject child, UISnapshotPoint point)
 	{
 		Renderer[] rens = child.GetComponentsInChildren<Renderer>();
 		if (rens.Length == 0) return false;
@@ -472,7 +501,8 @@ public class UIPrefabTool : EditorWindow
 		cam.transform.rotation = Quaternion.LookRotation(camDir);
 
 		float objSize = bounds.size.magnitude;
-		SetupSnapshotCamera(child, cam, objSize, objSize * 0.4f, -objSize, objSize);
+		if (point != null) SetupSnapshotCamera(child, cam, point);
+		else SetupSnapshotCamera(child, cam, objSize, objSize * 0.4f, -objSize, objSize);
 
 		// Deactivate all scene lights
 		DeactivateLights();
@@ -487,6 +517,31 @@ public class UIPrefabTool : EditorWindow
 		light.transform.rotation = Quaternion.LookRotation(lightDir);
 		light.cullingMask = mask;
 		return true;
+	}
+
+	/// <summary>
+	/// Set up the camera using the provided snapshot point's values.
+	/// </summary>
+
+	static void SetupSnapshotCamera (GameObject go, Camera cam, UISnapshotPoint point)
+	{
+		Vector3 pos = point.transform.localPosition;
+		Quaternion rot = point.transform.localRotation;
+		Transform t = go.transform;
+
+		if (t.parent != null)
+		{
+			pos = t.parent.TransformPoint(pos);
+			rot = t.parent.rotation * rot;
+		}
+
+		cam.transform.position = pos;
+		cam.transform.rotation = rot;
+		cam.isOrthoGraphic = point.isOrthographic;
+		cam.nearClipPlane = point.nearClip;
+		cam.farClipPlane = point.farClip;
+		cam.orthographicSize = point.orthoSize;
+		cam.fieldOfView = point.fieldOfView;
 	}
 
 	/// <summary>
@@ -689,7 +744,7 @@ public class UIPrefabTool : EditorWindow
 		if (mReset && type == EventType.Repaint)
 		{
 			mReset = false;
-			foreach (Item item in mItems) GeneratePreview(item);
+			foreach (Item item in mItems) GeneratePreview(item, null);
 			RectivateLights();
 		}
 

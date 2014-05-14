@@ -170,6 +170,7 @@ static public class NGUITools
 
 	static public string GetHierarchy (GameObject obj)
 	{
+		if (obj == null) return "";
 		string path = obj.name;
 
 		while (obj.transform.parent != null)
