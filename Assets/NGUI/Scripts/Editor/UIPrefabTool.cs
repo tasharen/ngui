@@ -374,7 +374,7 @@ public class UIPrefabTool : EditorWindow
 		cam.renderingPath = RenderingPath.Forward;
 		cam.clearFlags = CameraClearFlags.Skybox;
 		cam.isOrthoGraphic = true;
-		cam.backgroundColor = new Color(0.5f, 0.5f, 0.5f, 0f);
+		cam.backgroundColor = new Color(0f, 0f, 0f, 0f);
 
 		// Set up the render texture for the camera
 		int dim = (cellSize - 4) * 2;
