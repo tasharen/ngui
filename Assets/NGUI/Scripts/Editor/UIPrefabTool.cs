@@ -131,13 +131,18 @@ public class UIPrefabTool : EditorWindow
 	{
 		foreach (Item item in mItems) DestroyTexture(item);
 		mItems.Clear();
+
+		BetterList<string> filtered = new BetterList<string>();
 		string[] allAssets = AssetDatabase.GetAllAssetPaths();
 
 		foreach (string s in allAssets)
 		{
 			if (s.EndsWith(".prefab") && s.Contains("Control -"))
-				AddGUID(AssetDatabase.AssetPathToGUID(s), -1);
+				filtered.Add(s);
 		}
+
+		filtered.Sort(string.Compare);
+		foreach (string s in filtered) AddGUID(AssetDatabase.AssetPathToGUID(s), -1);
 		RectivateLights();
 	}
 
