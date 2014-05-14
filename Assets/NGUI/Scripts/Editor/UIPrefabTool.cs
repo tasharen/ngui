@@ -107,7 +107,7 @@ public class UIPrefabTool : EditorWindow
 		mStyle.wordWrap = true;
 		mStyle.stretchWidth = false;
 		mStyle.stretchHeight = false;
-		mStyle.normal.textColor = new Color(1f, 1f, 1f, 0.5f);
+		mStyle.normal.textColor = UnityEditor.EditorGUIUtility.isProSkin ? new Color(1f, 1f, 1f, 0.5f) : new Color(0f, 0f, 0f, 0.5f);
 		mStyle.normal.background = null;
 	}
 
@@ -348,7 +348,11 @@ public class UIPrefabTool : EditorWindow
 		if (item == null || item.prefab == null) return;
 		if (item.tex != null && item.dynamicTex)
 			DestroyImmediate(item.tex);
-
+#if UNITY_3_5
+		// Unfortunately Unity 3.5 doesn't seem to support a proper way of doing any of this
+		item.tex = null;
+		item.dynamicTex = false;
+#else
 		// Asset Preview-based approach is unreliable, and most of the time fails to provide a texture.
 		// Sometimes it even throws null exceptions.
 		//item.tex = AssetPreview.GetAssetPreview(item.prefab);
@@ -377,9 +381,7 @@ public class UIPrefabTool : EditorWindow
 		int dim = (cellSize - 4) * 2;
 		RenderTexture rt = new RenderTexture(dim, dim, 1);
 		rt.hideFlags = HideFlags.HideAndDontSave;
-#if !UNITY_3_5
 		rt.generateMips = false;
-#endif
 		rt.format = RenderTextureFormat.ARGB32;
 		rt.filterMode = FilterMode.Trilinear;
 		rt.anisoLevel = 4;
@@ -401,6 +403,7 @@ public class UIPrefabTool : EditorWindow
 		// Clean up everything
 		DestroyImmediate(camGO);
 		DestroyImmediate(root);
+#endif
 	}
 
 	/// <summary>
