@@ -139,6 +139,7 @@ public class UIPrefabTool : EditorWindow
 			if (s.EndsWith(".prefab") && s.Contains("Control -"))
 				AddGUID(AssetDatabase.AssetPathToGUID(s), -1);
 		}
+		RectivateLights();
 	}
 
 	/// <summary>
@@ -168,6 +169,8 @@ public class UIPrefabTool : EditorWindow
 		ent.prefab = go;
 		ent.guid = guid;
 		GeneratePreview(ent);
+		RectivateLights();
+
 		if (index < mItems.size) mItems.Insert(index, ent);
 		else mItems.Add(ent);
 		Save();
@@ -278,6 +281,7 @@ public class UIPrefabTool : EditorWindow
 			if (string.IsNullOrEmpty(data)) return;
 			string[] guids = data.Split('|');
 			foreach (string s in guids) AddGUID(s, -1);
+			RectivateLights();
 		}
 	}
 
@@ -338,64 +342,248 @@ public class UIPrefabTool : EditorWindow
 	void GeneratePreview (Item item)
 	{
 		if (item == null || item.prefab == null) return;
-
 		if (item.tex != null && item.dynamicTex)
 			DestroyImmediate(item.tex);
 
-		item.tex = AssetPreview.GetAssetPreview(item.prefab);
-		item.dynamicTex = false;
-		if (item.tex != null) return;
+		// Asset Preview-based approach is unreliable, and most of the time fails to provide a texture.
+		// Sometimes it even throws null exceptions.
+		//item.tex = AssetPreview.GetAssetPreview(item.prefab);
+		//item.dynamicTex = false;
+		//if (item.tex != null) return;
 
-		if (item.prefab.GetComponent<UIRect>() != null)
+		// Let's create a basic scene
+		GameObject root = EditorUtility.CreateGameObjectWithHideFlags(
+				"Preview Root", HideFlags.HideAndDontSave);
+
+		GameObject camGO = EditorUtility.CreateGameObjectWithHideFlags(
+			"Preview Camera", HideFlags.HideAndDontSave, typeof(Camera));
+
+		// Position it far away so that it doesn't interfere with existing objects
+		root.transform.position = new Vector3(0f, 0f, 10000f);
+		root.layer = item.prefab.layer;
+
+		// Set up the camera
+		Camera cam = camGO.camera;
+		cam.renderingPath = RenderingPath.Forward;
+		cam.clearFlags = CameraClearFlags.Skybox;
+		cam.isOrthoGraphic = true;
+		cam.backgroundColor = new Color(0.5f, 0.5f, 0.5f, 0f);
+
+		// Set up the render texture for the camera
+		int dim = (cellSize - 4) * 2;
+		RenderTexture rt = new RenderTexture(dim, dim, 1);
+		rt.hideFlags = HideFlags.HideAndDontSave;
+		rt.generateMips = false;
+		rt.format = RenderTextureFormat.ARGB32;
+		rt.filterMode = FilterMode.Trilinear;
+		rt.anisoLevel = 4;
+		cam.targetTexture = rt;
+
+		// Finally instantiate the prefab as a child of the root
+		GameObject child = NGUITools.AddChild(root, item.prefab);
+
+		// If there is a UIRect present (widgets or panels) then it's an NGUI object
+		if (SetupPreviewForUI(cam, root, child) || SetupPreviewFor3D(cam, root, child))
 		{
-			GameObject root = EditorUtility.CreateGameObjectWithHideFlags(
-				"Preview Root", HideFlags.HideAndDontSave, typeof(UIPanel));
-
-			GameObject camGO = EditorUtility.CreateGameObjectWithHideFlags(
-				"Preview Camera", HideFlags.HideAndDontSave, typeof(Camera));
-
-			root.transform.position = new Vector3(0f, 0f, 10000f);
-			root.layer = item.prefab.layer;
-
-			GameObject child = NGUITools.AddChild(root, item.prefab);
-
-			Bounds b = NGUIMath.CalculateAbsoluteWidgetBounds(child.transform);
-			Vector3 size = b.extents;
-			camGO.transform.position = b.center;
-
-			Camera cam = camGO.camera;
-			cam.isOrthoGraphic = true;
-			cam.cullingMask = (1 << root.layer);
-			cam.nearClipPlane = -100f;
-			cam.farClipPlane = 100f;
-			cam.orthographicSize = Mathf.RoundToInt(Mathf.Max(size.x, size.y));
-			cam.renderingPath = RenderingPath.Forward;
-			cam.clearFlags = CameraClearFlags.Skybox;
-			cam.backgroundColor = new Color(0.5f, 0.5f, 0.5f, 0f);
-
-			Execute<UIWidget>("Start", root);
-			Execute<UIPanel>("Start", root);
-			Execute<UIWidget>("Update", root);
-			Execute<UIPanel>("Update", root);
-			Execute<UIPanel>("LateUpdate", root);
-
-			int dim = (cellSize - 4) * 2;
-			RenderTexture rt = new RenderTexture(dim, dim, 1);
-			rt.hideFlags = HideFlags.HideAndDontSave;
-			rt.generateMips = false;
-			rt.format = RenderTextureFormat.ARGB32;
-			rt.filterMode = FilterMode.Trilinear;
-			rt.anisoLevel = 4;
-			cam.targetTexture = rt;
+			// Render the scene and set the item's texture
 			cam.Render();
-
-			DestroyImmediate(camGO);
-			DestroyImmediate(root);
-
 			item.tex = rt;
 			item.dynamicTex = true;
 		}
 		//else item.tex = (Texture2D)AssetDatabase.GetCachedIcon(AssetDatabase.GetAssetPath(item.prefab));
+
+		// Clean up everything
+		DestroyImmediate(camGO);
+		DestroyImmediate(root);
+	}
+
+	/// <summary>
+	/// Set up everything necessary to preview a UI object.
+	/// </summary>
+
+	static bool SetupPreviewForUI (Camera cam, GameObject root, GameObject child)
+	{
+		if (child.GetComponentInChildren<UIRect>() == null) return false;
+
+		if (child.GetComponent<UIPanel>() == null)
+			root.AddComponent<UIPanel>();
+
+		Bounds bounds = NGUIMath.CalculateAbsoluteWidgetBounds(child.transform);
+		Vector3 size = bounds.extents;
+		float objSize = size.magnitude;
+
+		cam.transform.position = bounds.center;
+		cam.cullingMask = (1 << root.layer);
+
+		SetupSnapshotCamera(child, cam, objSize, Mathf.RoundToInt(Mathf.Max(size.x, size.y)), -100f, 100f);
+
+		Execute<UIWidget>("Start", root);
+		Execute<UIPanel>("Start", root);
+		Execute<UIWidget>("Update", root);
+		Execute<UIPanel>("Update", root);
+		Execute<UIPanel>("LateUpdate", root);
+		return true;
+	}
+
+	/// <summary>
+	/// Set up everything necessary to preview a UI object.
+	/// </summary>
+
+	static bool SetupPreviewFor3D (Camera cam, GameObject root, GameObject child)
+	{
+		Renderer[] rens = child.GetComponentsInChildren<Renderer>();
+		if (rens.Length == 0) return false;
+
+		Vector3 camDir = new Vector3(-0.25f, -0.35f, -0.5f);
+		Vector3 lightDir = new Vector3(-0.25f, -0.5f, -0.25f);
+
+		camDir.Normalize();
+		lightDir.Normalize();
+
+		// Determine the bounds of the model
+		Renderer ren = rens[0];
+		Bounds bounds = ren.bounds;
+		int mask = (1 << ren.gameObject.layer);
+
+		for (int i = 1; i < rens.Length; ++i)
+		{
+			ren = rens[i];
+			mask |= (1 << ren.gameObject.layer);
+			bounds.Encapsulate(ren.bounds);
+		}
+
+		// Set the camera's properties
+		cam.cullingMask = mask;
+		cam.isOrthoGraphic = true;
+		cam.transform.position = bounds.center;
+		cam.transform.rotation = Quaternion.LookRotation(camDir);
+
+		float objSize = bounds.size.magnitude;
+		SetupSnapshotCamera(child, cam, objSize, objSize * 0.4f, -objSize, objSize);
+
+		// Deactivate all scene lights
+		DeactivateLights();
+
+		// Create our own light
+		GameObject lightGO = NGUITools.AddChild(root);
+		Light light = lightGO.AddComponent<Light>();
+		light.type = LightType.Directional;
+		light.shadows = LightShadows.None;
+		light.color = Color.white;
+		light.intensity = 0.65f;
+		light.transform.rotation = Quaternion.LookRotation(lightDir);
+		light.cullingMask = mask;
+		return true;
+	}
+
+	/// <summary>
+	/// Set up the snapshot camera using an explicit game object, if there is one available.
+	/// </summary>
+
+	static void SetupSnapshotCamera (GameObject go, Camera cam, float objectSize, float orthoSize, float near, float far)
+	{
+		// If you place a game object called "NGUI Snapshot Point" on your object,
+		// NGUI will use it as the camera's snapshot point, taking its position, rotation,
+		// and any optional parameters you deem to specify. For an orthographic snapshot,
+		// specify only one parameter -- the orthographic camera's size.
+		// For a 3D snapshot, specify 3 parameters: near, far, and field of view.
+		// Parameters must be separated by a space. For example:
+		//   NGUI Snapshot Point 0.3
+		//   NGUI Snapshot Point 0.1 10 45
+
+		Transform snapshot = FindChild(go.transform, "NGUI Snapshot Point");
+		
+		if (snapshot == null)
+		{
+			cam.nearClipPlane = near;
+			cam.farClipPlane = far;
+			cam.orthographicSize = orthoSize;
+			return;
+		}
+
+		string str = snapshot.name.Replace("NGUI Snapshot Point", "");
+		string[] parts = str.Split(new char[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
+
+		if (parts.Length == 3)
+		{
+			near = 0.1f;
+			far = objectSize * 3f;
+			float fov = 30f;
+
+			float.TryParse(parts[0], out near);
+			float.TryParse(parts[1], out far);
+			float.TryParse(parts[2], out fov);
+
+			cam.isOrthoGraphic = false;
+			cam.nearClipPlane = near;
+			cam.farClipPlane = far;
+			cam.fieldOfView = fov;
+		}
+		else
+		{
+			float.TryParse(parts[0], out orthoSize);
+			cam.nearClipPlane = near;
+			cam.farClipPlane = far;
+			cam.orthographicSize = orthoSize;
+		}
+
+		cam.transform.position = snapshot.position;
+		cam.transform.rotation = snapshot.rotation;
+	}
+
+	/// <summary>
+	/// Find a child with a name that begins with the specified string.
+	/// </summary>
+
+	static Transform FindChild (Transform t, string startsWith)
+	{
+		if (t.name.StartsWith(startsWith)) return t;
+
+		for (int i = 0, imax = t.childCount; i < imax; ++i)
+		{
+			Transform ch = FindChild(t.GetChild(i), startsWith);
+			if (ch != null) return ch;
+		}
+		return null;
+	}
+
+	// List of lights that have been deactivated
+	static BetterList<Light> mLights;
+
+	/// <summary>
+	/// Deactivate all scene lights.
+	/// </summary>
+
+	static void DeactivateLights ()
+	{
+		if (mLights == null)
+		{
+			mLights = new BetterList<Light>();
+			Light[] lights = FindObjectsOfType(typeof(Light)) as Light[];
+
+			foreach (Light l in lights)
+			{
+				if (NGUITools.GetActive(l))
+				{
+					l.enabled = false;
+					mLights.Add(l);
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Reactivate all scene lights.
+	/// </summary>
+
+	static void RectivateLights ()
+	{
+		if (mLights != null)
+		{
+			for (int i = 0; i < mLights.size; ++i)
+				mLights[i].enabled = true;
+			mLights = null;
+		}
 	}
 
 	/// <summary>
@@ -489,6 +677,7 @@ public class UIPrefabTool : EditorWindow
 		{
 			mReset = false;
 			foreach (Item item in mItems) GeneratePreview(item);
+			RectivateLights();
 		}
 
 		// Search field
@@ -638,19 +827,18 @@ public class UIPrefabTool : EditorWindow
 				inner.yMax -= 2f;
 				rect.yMax -= 1f; // Button seems to be mis-shaped. It's height is larger than its width by a single pixel.
 
-				GUI.backgroundColor = normal;
-
 				if (!isDragging && (mMode == Mode.CompactMode || (ent == null || ent.tex != null)))
 					mContent.tooltip = (ent != null) ? ent.prefab.name : "Click to add";
 				else mContent.tooltip = "";
 
-				if (ent == selection)
+				//if (ent == selection)
 				{
-					GUI.contentColor = normal;
+					GUI.color = normal;
 					NGUIEditorTools.DrawTiledTexture(inner, NGUIEditorTools.backdropTexture);
 				}
 
-				GUI.contentColor = Color.white;
+				GUI.color = Color.white;
+				GUI.backgroundColor = normal;
 
 				if (GUI.Button(rect, mContent, "Button"))
 				{

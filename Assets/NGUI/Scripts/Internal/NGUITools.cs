@@ -1123,9 +1123,9 @@ static public class NGUITools
 	static public bool GetActive (Behaviour mb)
 	{
 #if UNITY_3_5
-		return mb != null && mb.enabled && mb.gameObject.active;
+		return mb && mb.enabled && mb.gameObject.active;
 #else
-		return mb != null && mb.enabled && mb.gameObject.activeInHierarchy;
+		return mb && mb.enabled && mb.gameObject.activeInHierarchy;
 #endif
 	}
 
