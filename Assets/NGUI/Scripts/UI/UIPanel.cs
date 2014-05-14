@@ -393,10 +393,8 @@ public class UIPanel : UIRect
 			if (Mathf.Abs(mClipOffset.x - value.x) > 0.001f ||
 				Mathf.Abs(mClipOffset.y - value.y) > 0.001f)
 			{
-				mResized = true;
-				mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
 				mClipOffset = value;
-				mMatrixFrame = -1;
+				InvalidateClipping();
 
 				// Call the event delegate
 				if (onClipMove != null) onClipMove(this);
@@ -404,6 +402,24 @@ public class UIPanel : UIRect
 				if (!Application.isPlaying) UpdateDrawCalls();
 #endif
 			}
+		}
+	}
+
+	/// <summary>
+	/// Invalidate the panel's clipping, calling child panels in turn.
+	/// </summary>
+
+	void InvalidateClipping ()
+	{
+		mResized = true;
+		mMatrixFrame = -1;
+		mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
+
+		for (int i = 0; i < list.size; ++i)
+		{
+			UIPanel p = list[i];
+			if (p != this && p.parentPanel == this)
+				p.InvalidateClipping();
 		}
 	}
 
@@ -768,7 +784,8 @@ public class UIPanel : UIRect
 	{
 		if ((mClipping == UIDrawCall.Clipping.None || mClipping == UIDrawCall.Clipping.ConstrainButDontClip) && !w.hideIfOffScreen)
 		{
-			if (mParentPanel == null || clipCount == 0) return true;
+			if (clipCount == 0) return true;
+			if (mParentPanel != null) return mParentPanel.IsVisible(w);
 		}
 
 		UIPanel p = this;
