@@ -37,6 +37,7 @@ public class UIPrefabTool : EditorWindow
 
 	int cellSize { get { return (mMode == Mode.CompactMode) ? 50 : 80; } }
 
+	int mTab = 0;
 	Mode mMode = Mode.IconMode;
 	Vector2 mPos = Vector2.zero;
 	bool mMouseIsInside = false;
@@ -132,18 +133,21 @@ public class UIPrefabTool : EditorWindow
 		foreach (Item item in mItems) DestroyTexture(item);
 		mItems.Clear();
 
-		BetterList<string> filtered = new BetterList<string>();
-		string[] allAssets = AssetDatabase.GetAllAssetPaths();
-
-		foreach (string s in allAssets)
+		if (mTab == 0)
 		{
-			if (s.EndsWith(".prefab") && s.Contains("Control -"))
-				filtered.Add(s);
-		}
+			BetterList<string> filtered = new BetterList<string>();
+			string[] allAssets = AssetDatabase.GetAllAssetPaths();
 
-		filtered.Sort(string.Compare);
-		foreach (string s in filtered) AddGUID(AssetDatabase.AssetPathToGUID(s), -1);
-		RectivateLights();
+			foreach (string s in allAssets)
+			{
+				if (s.EndsWith(".prefab") && s.Contains("Control -"))
+					filtered.Add(s);
+			}
+
+			filtered.Sort(string.Compare);
+			foreach (string s in filtered) AddGUID(AssetDatabase.AssetPathToGUID(s), -1);
+			RectivateLights();
+		}
 	}
 
 	/// <summary>
@@ -235,6 +239,12 @@ public class UIPrefabTool : EditorWindow
 	}
 
 	/// <summary>
+	/// Key used to save and load the data.
+	/// </summary>
+
+	string saveKey { get { return "NGUI " + Application.dataPath + " " + mTab; } }
+
+	/// <summary>
 	/// Save all the items to Editor Prefs.
 	/// </summary>
 
@@ -242,7 +252,7 @@ public class UIPrefabTool : EditorWindow
 	{
 		string data = "";
 
-		if (mItems.size > 1)
+		if (mItems.size > 0)
 		{
 			string guid = mItems[0].guid;
 			StringBuilder sb = new StringBuilder();
@@ -264,7 +274,7 @@ public class UIPrefabTool : EditorWindow
 			}
 			data = sb.ToString();
 		}
-		NGUISettings.SetString("NGUI " + Application.dataPath, data);
+		NGUISettings.SetString(saveKey, data);
 	}
 
 	/// <summary>
@@ -273,12 +283,13 @@ public class UIPrefabTool : EditorWindow
 
 	void Load ()
 	{
+		mTab = NGUISettings.GetInt("NGUI Prefab Tab", 0);
 		mMode = NGUISettings.GetEnum<Mode>("NGUI Prefab Mode", mMode);
 
 		foreach (Item item in mItems) DestroyTexture(item);
 		mItems.Clear();
 
-		string data = NGUISettings.GetString("NGUI " + Application.dataPath, "");
+		string data = NGUISettings.GetString(saveKey, "");
 
 		if (string.IsNullOrEmpty(data))
 		{
@@ -701,7 +712,7 @@ public class UIPrefabTool : EditorWindow
 				if (pos.x > x) return -1;
 				y += spacingY;
 				x = cellPadding;
-				if (y + spacingY > height) break;
+				if (y + spacingY > height) return -1;
 			}
 		}
 		return index;
@@ -730,15 +741,23 @@ public class UIPrefabTool : EditorWindow
 		Item selection = isDragging ? FindItem(dragged) : null;
 		string searchFilter = NGUISettings.searchField;
 
-		// Mode
-		GUILayout.Space(4f);
-		Mode modeAfter = (Mode)EditorGUILayout.EnumPopup(mMode);
+		int newTab = mTab;
 
-		if (modeAfter != mMode)
+		GUILayout.BeginHorizontal();
+		if (GUILayout.Toggle(newTab == 0, "1", "ButtonLeft")) newTab = 0;
+		if (GUILayout.Toggle(newTab == 1, "2", "ButtonMid")) newTab = 1;
+		if (GUILayout.Toggle(newTab == 2, "3", "ButtonMid")) newTab = 2;
+		if (GUILayout.Toggle(newTab == 3, "4", "ButtonMid")) newTab = 3;
+		if (GUILayout.Toggle(newTab == 4, "5", "ButtonRight")) newTab = 4;
+		GUILayout.EndHorizontal();
+
+		if (mTab != newTab)
 		{
-			mMode = modeAfter;
+			Save();
+			mTab = newTab;
 			mReset = true;
-			NGUISettings.SetEnum("NGUI Prefab Mode", mMode);
+			NGUISettings.SetInt("NGUI Prefab Tab", mTab);
+			Load();
 		}
 
 		if (mReset && type == EventType.Repaint)
@@ -767,6 +786,8 @@ public class UIPrefabTool : EditorWindow
 		}
 		GUILayout.EndHorizontal();
 
+		bool eligibleToDrag = (currentEvent.mousePosition.y < Screen.height - 40);
+
 		if (type == EventType.MouseDown)
 		{
 			mMouseIsInside = true;
@@ -775,13 +796,10 @@ public class UIPrefabTool : EditorWindow
 		{
 			mMouseIsInside = true;
 
-			if (indexUnderMouse != -1)
+			if (indexUnderMouse != -1 && eligibleToDrag)
 			{
 				// Drag operation begins
-				if (draggedObjectIsOurs)
-				{
-					DragAndDrop.StartDrag("Prefab Tool");
-				}
+				if (draggedObjectIsOurs) DragAndDrop.StartDrag("Prefab Tool");
 				currentEvent.Use();
 			}
 		}
@@ -848,7 +866,7 @@ public class UIPrefabTool : EditorWindow
 		if (!indices.Contains(-1)) indices.Add(-1);
 
 		// We want to start dragging something from within the window
-		if (type == EventType.MouseDown && indexUnderMouse > -1)
+		if (eligibleToDrag && type == EventType.MouseDown && indexUnderMouse > -1)
 		{
 			GUIUtility.keyboardControl = 0;
 
@@ -969,5 +987,15 @@ public class UIPrefabTool : EditorWindow
 			GUILayout.Space(y);
 		}
 		GUILayout.EndScrollView();
+
+		// Mode
+		Mode modeAfter = (Mode)EditorGUILayout.EnumPopup(mMode);
+
+		if (modeAfter != mMode)
+		{
+			mMode = modeAfter;
+			mReset = true;
+			NGUISettings.SetEnum("NGUI Prefab Mode", mMode);
+		}
 	}
 }
