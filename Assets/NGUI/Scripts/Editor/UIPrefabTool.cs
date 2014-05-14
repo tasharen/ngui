@@ -64,7 +64,6 @@ public class UIPrefabTool : EditorWindow
 			{
 				DragAndDrop.PrepareStartDrag();
 				DragAndDrop.objectReferences = new Object[1] { value };
-				DragAndDrop.paths = new string[1] { "" };
 				draggedObjectIsOurs = true;
 			}
 			else DragAndDrop.AcceptDrag();
