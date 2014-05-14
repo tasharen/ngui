@@ -527,7 +527,7 @@ public class UIPrefabTool : EditorWindow
 			cam.farClipPlane = far;
 			cam.fieldOfView = fov;
 		}
-		else
+		else if (parts.Length > 0)
 		{
 			float.TryParse(parts[0], out orthoSize);
 			cam.nearClipPlane = near;
