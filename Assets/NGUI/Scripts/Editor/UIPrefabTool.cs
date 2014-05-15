@@ -162,10 +162,10 @@ public class UIPrefabTool : EditorWindow
 		{
 #if UNITY_3_5
 			string path = EditorUtility.SaveFilePanel("Save a prefab",
-				NGUISettings.currentPath, "New Prefab.prefab", "prefab");
+				NGUISettings.currentPath, go.name + ".prefab", "prefab");
 #else
 			string path = EditorUtility.SaveFilePanelInProject("Save a prefab",
-				"New Prefab.prefab", "prefab", "Save prefab as...", NGUISettings.currentPath);
+				go.name + ".prefab", "prefab", "Save prefab as...", NGUISettings.currentPath);
 #endif	
 			if (string.IsNullOrEmpty(path)) return;
 			NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);

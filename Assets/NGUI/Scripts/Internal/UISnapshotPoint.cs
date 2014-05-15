@@ -17,5 +17,5 @@ public class UISnapshotPoint : MonoBehaviour
 	public int fieldOfView = 35;
 	public float orthoSize = 30f;
 
-	void Start () { tag = "EditorOnly"; }
+	void Start () { if (tag != "EditorOnly") tag = "EditorOnly"; }
 }

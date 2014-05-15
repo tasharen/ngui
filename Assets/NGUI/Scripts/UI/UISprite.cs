@@ -454,6 +454,7 @@ public class UISprite : UIWidget
 		if (sp == null) return;
 
 		UISprite.Type t = type;
+		if (t == Type.Tiled) return;
 
 		if (t == Type.Simple || t == Type.Filled || !sp.hasBorder)
 		{
