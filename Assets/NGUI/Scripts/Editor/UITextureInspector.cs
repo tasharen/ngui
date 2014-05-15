@@ -29,12 +29,13 @@ public class UITextureInspector : UIWidgetInspector
 
 	protected override bool ShouldDrawProperties ()
 	{
+		if (target == null) return false;
 		SerializedProperty sp = NGUIEditorTools.DrawProperty("Texture", serializedObject, "mTexture");
 		NGUIEditorTools.DrawProperty("Material", serializedObject, "mMat");
 
-		NGUISettings.texture = sp.objectReferenceValue as Texture;
+		if (sp != null) NGUISettings.texture = sp.objectReferenceValue as Texture;
 
-		if (mTex.material == null || serializedObject.isEditingMultipleObjects)
+		if (mTex != null && (mTex.material == null || serializedObject.isEditingMultipleObjects))
 		{
 			NGUIEditorTools.DrawProperty("Shader", serializedObject, "mShader");
 		}
@@ -42,7 +43,7 @@ public class UITextureInspector : UIWidgetInspector
 		NGUIEditorTools.DrawPaddedProperty("Flip", serializedObject, "mFlip");
 		EditorGUI.BeginDisabledGroup(serializedObject.isEditingMultipleObjects);
 
-		if (mTex.mainTexture != null)
+		if (mTex != null && mTex.mainTexture != null)
 		{
 			Rect rect = EditorGUILayout.RectField("UV Rectangle", mTex.uvRect);
 
