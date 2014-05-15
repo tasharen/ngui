@@ -124,6 +124,7 @@ public class UIButton : UIButtonColor
 			{
 				mNormalSprite = value;
 				SetSprite(value);
+				NGUITools.SetDirty(mSprite);
 			}
 			else
 			{
