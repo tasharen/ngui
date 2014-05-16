@@ -442,6 +442,19 @@ public class UIWidget : UIRect
 	}
 
 	/// <summary>
+	/// Widget's center in local coordinates. Don't forget to transform by the widget's transform.
+	/// </summary>
+
+	public Vector3 localCenter
+	{
+		get
+		{
+			Vector3[] cr = localCorners;
+			return Vector3.Lerp(cr[0], cr[2], 0.5f);
+		}
+	}
+
+	/// <summary>
 	/// World-space corners of the widget. The order is bottom-left, top-left, top-right, bottom-right.
 	/// </summary>
 
@@ -466,6 +479,12 @@ public class UIWidget : UIRect
 			return mCorners;
 		}
 	}
+
+	/// <summary>
+	/// World-space center of the widget.
+	/// </summary>
+
+	public Vector3 worldCenter { get { return cachedTransform.TransformPoint(localCenter); } }
 
 	/// <summary>
 	/// Local space region where the actual drawing will take place.
