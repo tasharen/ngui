@@ -409,7 +409,7 @@ static public class NGUIMath
 		{
 			bool isSet = false;
 			Matrix4x4 toLocal = relativeTo.worldToLocalMatrix;
-			CalculateRelativeWidgetBounds(content, considerInactive, ref toLocal, ref b, ref isSet);
+			CalculateRelativeWidgetBounds(content, considerInactive, true, ref toLocal, ref b, ref isSet);
 			if (isSet) return b;
 		}
 		return b;
@@ -421,21 +421,26 @@ static public class NGUIMath
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static void CalculateRelativeWidgetBounds (Transform content, bool considerInactive, ref Matrix4x4 toLocal, ref Bounds b, ref bool isSet)
+	static void CalculateRelativeWidgetBounds (Transform content, bool considerInactive, bool isRoot, ref Matrix4x4 toLocal, ref Bounds b, ref bool isSet)
 	{
 		if (content == null) return;
 		if (!considerInactive && !NGUITools.GetActive(content.gameObject)) return;
 
-		UIWidget w = content.GetComponent<UIWidget>();
-		
-		if (w != null && w.enabled)
+		// If this isn't a root node, check to see if there is a panel present
+		UIPanel p = isRoot ? null : content.GetComponent<UIPanel>();
+
+		// Ignore disabled panels as a disabled panel means invisible children
+		if (p != null && !p.enabled) return;
+
+		// If there is a clipped panel present simply include its dimensions
+		if (p != null && p.clipping != UIDrawCall.Clipping.None)
 		{
-			Vector3[] corners = w.worldCorners;
+			Vector3[] corners = p.worldCorners;
 
 			for (int j = 0; j < 4; ++j)
 			{
 				Vector3 v = toLocal.MultiplyPoint3x4(corners[j]);
-				
+
 				if (isSet)
 				{
 					b.Encapsulate(v);
@@ -447,15 +452,14 @@ static public class NGUIMath
 				}
 			}
 		}
-
-		for (int i = 0, imax = content.childCount; i < imax; ++i)
+		else // No panel present
 		{
-			Transform child = content.GetChild(i);
-			UIPanel p = child.GetComponent<UIPanel>();
-			
-			if (p != null && p.clipping != UIDrawCall.Clipping.None)
+			// If there is a widget present, include its bounds
+			UIWidget w = content.GetComponent<UIWidget>();
+
+			if (w != null && w.enabled)
 			{
-				Vector3[] corners = p.worldCorners;
+				Vector3[] corners = w.worldCorners;
 
 				for (int j = 0; j < 4; ++j)
 				{
@@ -472,7 +476,10 @@ static public class NGUIMath
 					}
 				}
 			}
-			else CalculateRelativeWidgetBounds(child, considerInactive, ref toLocal, ref b, ref isSet);
+
+			// Iterate through children including their bounds in turn
+			for (int i = 0, imax = content.childCount; i < imax; ++i)
+				CalculateRelativeWidgetBounds(content.GetChild(i), considerInactive, false, ref toLocal, ref b, ref isSet);
 		}
 	}
 

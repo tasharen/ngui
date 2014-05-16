@@ -1121,6 +1121,8 @@ static public class NGUITools
 	/// Helper function that returns whether the specified MonoBehaviour is active.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public bool GetActive (Behaviour mb)
 	{
 #if UNITY_3_5
@@ -1134,6 +1136,8 @@ static public class NGUITools
 	/// Unity4 has changed GameObject.active to GameObject.activeself.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public bool GetActive (GameObject go)
 	{
 #if UNITY_3_5
@@ -1147,6 +1151,8 @@ static public class NGUITools
 	/// Unity4 has changed GameObject.active to GameObject.SetActive.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public void SetActiveSelf (GameObject go, bool state)
 	{
 #if UNITY_3_5
