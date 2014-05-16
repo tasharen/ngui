@@ -403,45 +403,77 @@ static public class NGUIMath
 
 	static public Bounds CalculateRelativeWidgetBounds (Transform relativeTo, Transform content, bool considerInactive)
 	{
+		Bounds b = new Bounds(Vector3.zero, Vector3.zero);
+
 		if (content != null)
 		{
-			UIWidget[] widgets = content.GetComponentsInChildren<UIWidget>(considerInactive);
+			bool isSet = false;
+			Matrix4x4 toLocal = relativeTo.worldToLocalMatrix;
+			CalculateRelativeWidgetBounds(content, considerInactive, ref toLocal, ref b, ref isSet);
+			if (isSet) return b;
+		}
+		return b;
+	}
 
-			if (widgets.Length > 0)
+	/// <summary>
+	/// Recursive function used to calculate the widget bounds.
+	/// </summary>
+
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
+	static void CalculateRelativeWidgetBounds (Transform content, bool considerInactive, ref Matrix4x4 toLocal, ref Bounds b, ref bool isSet)
+	{
+		if (content == null) return;
+		if (!considerInactive && !NGUITools.GetActive(content.gameObject)) return;
+
+		UIWidget w = content.GetComponent<UIWidget>();
+		
+		if (w != null && w.enabled)
+		{
+			Vector3[] corners = w.worldCorners;
+
+			for (int j = 0; j < 4; ++j)
 			{
-				Vector3 vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-				Vector3 vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-
-				Matrix4x4 toLocal = relativeTo.worldToLocalMatrix;
-				bool isSet = false;
-				Vector3 v;
-
-				for (int i = 0, imax = widgets.Length; i < imax; ++i)
-				{
-					UIWidget w = widgets[i];
-					if (!considerInactive && !w.enabled) continue;
-
-					Vector3[] corners = w.worldCorners;
-
-					for (int j = 0; j < 4; ++j)
-					{
-						//v = root.InverseTransformPoint(corners[j]);
-						v = toLocal.MultiplyPoint3x4(corners[j]);
-						vMax = Vector3.Max(v, vMax);
-						vMin = Vector3.Min(v, vMin);
-					}
-					isSet = true;
-				}
-
+				Vector3 v = toLocal.MultiplyPoint3x4(corners[j]);
+				
 				if (isSet)
 				{
-					Bounds b = new Bounds(vMin, Vector3.zero);
-					b.Encapsulate(vMax);
-					return b;
+					b.Encapsulate(v);
+				}
+				else
+				{
+					b = new Bounds(v, Vector3.zero);
+					isSet = true;
 				}
 			}
 		}
-		return new Bounds(Vector3.zero, Vector3.zero);
+
+		for (int i = 0, imax = content.childCount; i < imax; ++i)
+		{
+			Transform child = content.GetChild(i);
+			UIPanel p = child.GetComponent<UIPanel>();
+			
+			if (p != null && p.clipping != UIDrawCall.Clipping.None)
+			{
+				Vector3[] corners = p.worldCorners;
+
+				for (int j = 0; j < 4; ++j)
+				{
+					Vector3 v = toLocal.MultiplyPoint3x4(corners[j]);
+
+					if (isSet)
+					{
+						b.Encapsulate(v);
+					}
+					else
+					{
+						b = new Bounds(v, Vector3.zero);
+						isSet = true;
+					}
+				}
+			}
+			else CalculateRelativeWidgetBounds(child, considerInactive, ref toLocal, ref b, ref isSet);
+		}
 	}
 
 	/// <summary>
