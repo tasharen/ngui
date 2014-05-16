@@ -12,12 +12,8 @@ using System.Collections.Generic;
 /// </summary>
 
 [CanEditMultipleObjects]
-#if UNITY_3_5
-[CustomEditor(typeof(UITexture))]
-#else
 [CustomEditor(typeof(UITexture), true)]
-#endif
-public class UITextureInspector : UIWidgetInspector
+public class UITextureInspector : UIBasicSpriteEditor
 {
 	UITexture mTex;
 
@@ -40,19 +36,9 @@ public class UITextureInspector : UIWidgetInspector
 			NGUIEditorTools.DrawProperty("Shader", serializedObject, "mShader");
 		}
 
-		NGUIEditorTools.DrawPaddedProperty("Flip", serializedObject, "mFlip");
-		EditorGUI.BeginDisabledGroup(serializedObject.isEditingMultipleObjects);
+		EditorGUI.BeginDisabledGroup(mTex == null || mTex.mainTexture == null || serializedObject.isEditingMultipleObjects);
 
-		if (mTex != null && mTex.mainTexture != null)
-		{
-			Rect rect = EditorGUILayout.RectField("UV Rectangle", mTex.uvRect);
-
-			if (rect != mTex.uvRect)
-			{
-				NGUIEditorTools.RegisterUndo("UV Rectangle Change", mTex);
-				mTex.uvRect = rect;
-			}
-		}
+		NGUIEditorTools.DrawRectProperty("UV Rect", serializedObject, "mRect");
 
 		EditorGUI.EndDisabledGroup();
 		return true;
@@ -64,7 +50,8 @@ public class UITextureInspector : UIWidgetInspector
 
 	public override bool HasPreviewGUI ()
 	{
-		return (mTex != null) && (mTex.mainTexture as Texture2D != null);
+		return (Selection.activeGameObject == null || Selection.gameObjects.Length == 1) &&
+			(mTex != null) && (mTex.mainTexture as Texture2D != null);
 	}
 
 	/// <summary>
@@ -74,6 +61,15 @@ public class UITextureInspector : UIWidgetInspector
 	public override void OnPreviewGUI (Rect rect, GUIStyle background)
 	{
 		Texture2D tex = mTex.mainTexture as Texture2D;
-		if (tex != null) NGUIEditorTools.DrawTexture(tex, rect, mTex.uvRect, mTex.color);
+
+		if (tex != null)
+		{
+			Rect tc = mTex.uvRect;
+			tc.xMin *= tex.width;
+			tc.xMax *= tex.width;
+			tc.yMin *= tex.height;
+			tc.yMax *= tex.height;
+			NGUIEditorTools.DrawSprite(tex, rect, mTex.color, tc, mTex.border);
+		}
 	}
 }

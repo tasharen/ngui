@@ -1490,7 +1490,7 @@ public class UIWidget : UIRect
 	/// Dimensions of the sprite's border, if any.
 	/// </summary>
 
-	virtual public Vector4 border { get { return Vector4.zero; } }
+	virtual public Vector4 border { get { return Vector4.zero; } set { } }
 
 	/// <summary>
 	/// Virtual function called by the UIPanel that fills the buffers.

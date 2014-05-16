@@ -704,13 +704,42 @@ public class NGUIEditorTools
 	static public void DrawSprite (Texture2D tex, Rect drawRect, UISpriteData sprite, Color color, Material mat)
 	{
 		if (!tex || sprite == null) return;
+		DrawSprite(tex, drawRect, color, mat, sprite.x, sprite.y, sprite.width, sprite.height,
+			sprite.borderLeft, sprite.borderBottom, sprite.borderRight, sprite.borderTop);
+	}
+
+	/// <summary>
+	/// Draw a sprite preview.
+	/// </summary>
+
+	static public void DrawSprite (Texture2D tex, Rect drawRect, Color color, Rect textureRect, Vector4 border)
+	{
+		NGUIEditorTools.DrawSprite(tex, drawRect, color, null,
+			Mathf.RoundToInt(textureRect.x),
+			Mathf.RoundToInt(tex.height - textureRect.y - textureRect.height),
+			Mathf.RoundToInt(textureRect.width),
+			Mathf.RoundToInt(textureRect.height),
+			Mathf.RoundToInt(border.x),
+			Mathf.RoundToInt(border.y),
+			Mathf.RoundToInt(border.z),
+			Mathf.RoundToInt(border.w));
+	}
+
+	/// <summary>
+	/// Draw a sprite preview.
+	/// </summary>
+
+	static public void DrawSprite (Texture2D tex, Rect drawRect, Color color, Material mat,
+		int x, int y, int width, int height, int borderLeft, int borderBottom, int borderRight, int borderTop)
+	{
+		if (!tex) return;
 
 		// Create the texture rectangle that is centered inside rect.
 		Rect outerRect = drawRect;
-		outerRect.width = sprite.width;
-		outerRect.height = sprite.height;
+		outerRect.width = width;
+		outerRect.height = height;
 
-		if (sprite.width > 0)
+		if (width > 0)
 		{
 			float f = drawRect.width / outerRect.width;
 			outerRect.width *= f;
@@ -738,7 +767,7 @@ public class NGUIEditorTools
 
 		if (mat == null)
 		{
-			Rect uv = new Rect(sprite.x, sprite.y, sprite.width, sprite.height);
+			Rect uv = new Rect(x, y, width, height);
 			uv = NGUIMath.ConvertToTexCoords(uv, tex.width, tex.height);
 			GUI.DrawTextureWithTexCoords(outerRect, tex, uv, true);
 		}
@@ -749,48 +778,51 @@ public class NGUIEditorTools
 			UnityEditor.EditorGUI.DrawPreviewTexture(outerRect, tex, mat);
 		}
 
-		// Draw the border indicator lines
-		GUI.BeginGroup(outerRect);
+		if (Selection.activeGameObject == null || Selection.gameObjects.Length == 1)
 		{
-			tex = NGUIEditorTools.contrastTexture;
-			GUI.color = Color.white;
-
-			if (sprite.borderLeft > 0)
+			// Draw the border indicator lines
+			GUI.BeginGroup(outerRect);
 			{
-				float x0 = (float)sprite.borderLeft / sprite.width * outerRect.width - 1;
-				NGUIEditorTools.DrawTiledTexture(new Rect(x0, 0f, 1f, outerRect.height), tex);
-			}
+				tex = NGUIEditorTools.contrastTexture;
+				GUI.color = Color.white;
 
-			if (sprite.borderRight > 0)
-			{
-				float x1 = (float)(sprite.width - sprite.borderRight) / sprite.width * outerRect.width - 1;
-				NGUIEditorTools.DrawTiledTexture(new Rect(x1, 0f, 1f, outerRect.height), tex);
-			}
+				if (borderLeft > 0)
+				{
+					float x0 = (float)borderLeft / width * outerRect.width - 1;
+					NGUIEditorTools.DrawTiledTexture(new Rect(x0, 0f, 1f, outerRect.height), tex);
+				}
 
-			if (sprite.borderBottom > 0)
-			{
-				float y0 = (float)(sprite.height - sprite.borderBottom) / sprite.height * outerRect.height - 1;
-				NGUIEditorTools.DrawTiledTexture(new Rect(0f, y0, outerRect.width, 1f), tex);
-			}
+				if (borderRight > 0)
+				{
+					float x1 = (float)(width - borderRight) / width * outerRect.width - 1;
+					NGUIEditorTools.DrawTiledTexture(new Rect(x1, 0f, 1f, outerRect.height), tex);
+				}
 
-			if (sprite.borderTop > 0)
-			{
-				float y1 = (float)sprite.borderTop / sprite.height * outerRect.height - 1;
-				NGUIEditorTools.DrawTiledTexture(new Rect(0f, y1, outerRect.width, 1f), tex);
+				if (borderBottom > 0)
+				{
+					float y0 = (float)(height - borderBottom) / height * outerRect.height - 1;
+					NGUIEditorTools.DrawTiledTexture(new Rect(0f, y0, outerRect.width, 1f), tex);
+				}
+
+				if (borderTop > 0)
+				{
+					float y1 = (float)borderTop / height * outerRect.height - 1;
+					NGUIEditorTools.DrawTiledTexture(new Rect(0f, y1, outerRect.width, 1f), tex);
+				}
 			}
+			GUI.EndGroup();
+
+			// Draw the lines around the sprite
+			Handles.color = Color.black;
+			Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMin), new Vector3(outerRect.xMin, outerRect.yMax));
+			Handles.DrawLine(new Vector3(outerRect.xMax, outerRect.yMin), new Vector3(outerRect.xMax, outerRect.yMax));
+			Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMin), new Vector3(outerRect.xMax, outerRect.yMin));
+			Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMax), new Vector3(outerRect.xMax, outerRect.yMax));
+
+			// Sprite size label
+			string text = string.Format("Sprite Size: {0}x{1}", Mathf.RoundToInt(width), Mathf.RoundToInt(height));
+			EditorGUI.DropShadowLabel(GUILayoutUtility.GetRect(Screen.width, 18f), text);
 		}
-		GUI.EndGroup();
-
-		// Draw the lines around the sprite
-		Handles.color = Color.black;
-		Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMin), new Vector3(outerRect.xMin, outerRect.yMax));
-		Handles.DrawLine(new Vector3(outerRect.xMax, outerRect.yMin), new Vector3(outerRect.xMax, outerRect.yMax));
-		Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMin), new Vector3(outerRect.xMax, outerRect.yMin));
-		Handles.DrawLine(new Vector3(outerRect.xMin, outerRect.yMax), new Vector3(outerRect.xMax, outerRect.yMax));
-
-		// Sprite size label
-		string text = string.Format("Sprite Size: {0}x{1}", Mathf.RoundToInt(sprite.width), Mathf.RoundToInt(sprite.height));
-		EditorGUI.DropShadowLabel(GUILayoutUtility.GetRect(Screen.width, 18f), text);
 	}
 
 	/// <summary>
@@ -1416,6 +1448,75 @@ public class NGUIEditorTools
 				GUILayout.Space(18f);
 				EditorGUILayout.EndHorizontal();
 			}
+		}
+	}
+
+	/// <summary>
+	/// Helper function that draws a compact Vector4.
+	/// </summary>
+
+	static public void DrawBorderProperty (string name, SerializedObject serializedObject, string field)
+	{
+		if (serializedObject.FindProperty(field) != null)
+		{
+			GUILayout.BeginHorizontal();
+			{
+				GUILayout.Label(name, GUILayout.Width(75f));
+
+				NGUIEditorTools.SetLabelWidth(50f);
+				GUILayout.BeginVertical();
+				NGUIEditorTools.DrawProperty("Left", serializedObject, field + ".x", GUILayout.MinWidth(80f));
+				NGUIEditorTools.DrawProperty("Bottom", serializedObject, field + ".y", GUILayout.MinWidth(80f));
+				GUILayout.EndVertical();
+
+				GUILayout.BeginVertical();
+				NGUIEditorTools.DrawProperty("Right", serializedObject, field + ".z", GUILayout.MinWidth(80f));
+				NGUIEditorTools.DrawProperty("Top", serializedObject, field + ".w", GUILayout.MinWidth(80f));
+				GUILayout.EndVertical();
+
+				NGUIEditorTools.SetLabelWidth(80f);
+			}
+			GUILayout.EndHorizontal();
+		}
+	}
+
+	/// <summary>
+	/// Helper function that draws a compact Rect.
+	/// </summary>
+
+	static public void DrawRectProperty (string name, SerializedObject serializedObject, string field)
+	{
+		DrawRectProperty(name, serializedObject, field, 56f, 18f);
+	}
+
+	/// <summary>
+	/// Helper function that draws a compact Rect.
+	/// </summary>
+
+	static public void DrawRectProperty (string name, SerializedObject serializedObject, string field, float labelWidth, float spacing)
+	{
+		if (serializedObject.FindProperty(field) != null)
+		{
+			GUILayout.BeginHorizontal();
+			{
+				GUILayout.Label(name, GUILayout.Width(labelWidth));
+
+				NGUIEditorTools.SetLabelWidth(20f);
+				GUILayout.BeginVertical();
+				NGUIEditorTools.DrawProperty("X", serializedObject, field + ".x", GUILayout.MinWidth(50f));
+				NGUIEditorTools.DrawProperty("Y", serializedObject, field + ".y", GUILayout.MinWidth(50f));
+				GUILayout.EndVertical();
+
+				NGUIEditorTools.SetLabelWidth(50f);
+				GUILayout.BeginVertical();
+				NGUIEditorTools.DrawProperty("Width", serializedObject, field + ".width", GUILayout.MinWidth(80f));
+				NGUIEditorTools.DrawProperty("Height", serializedObject, field + ".height", GUILayout.MinWidth(80f));
+				GUILayout.EndVertical();
+
+				NGUIEditorTools.SetLabelWidth(80f);
+				if (spacing != 0f) GUILayout.Space(spacing);
+			}
+			GUILayout.EndHorizontal();
 		}
 	}
 
