@@ -577,6 +577,12 @@ public class UIScrollView : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Manually invalidate the scroll view's bounds so that they update next time.
+	/// </summary>
+
+	public void InvalidateBounds () { mCalculatedBounds = true; }
+
+	/// <summary>
 	/// Reset the scroll view's position to the top-left corner.
 	/// It's recommended to call this function before AND after you re-populate the scroll view's contents (ex: switching window tabs).
 	/// Another option is to populate the scroll view's contents, reset its position, then call this function to reposition the clipping.

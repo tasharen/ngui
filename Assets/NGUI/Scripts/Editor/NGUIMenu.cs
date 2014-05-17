@@ -153,7 +153,7 @@ static public class NGUIMenu
 	}
 
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
-	[MenuItem("NGUI/Create/Unity 2D Sprite &#r", false, 6)]
+	[MenuItem("NGUI/Create/Unity 2D Sprite &#d", false, 6)]
 	static public void AddSprite2D ()
 	{
 		GameObject go = NGUIEditorTools.SelectedRoot(true);

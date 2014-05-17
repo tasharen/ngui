@@ -208,13 +208,6 @@ public class UIProgressBar : UIWidgetContainer
 
 		if (Application.isPlaying)
 		{
-			if (mFG == null)
-			{
-				Debug.LogWarning("Progress bar needs a foreground widget to work with", this);
-				enabled = false;
-				return;
-			}
-
 			if (mBG != null) mBG.autoResizeBoxCollider = true;
 
 			OnStart();

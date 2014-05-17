@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 /// <summary>
 /// Functionality common to both NGUI and 2D sprites brought out into a single common parent.
@@ -160,6 +160,42 @@ public abstract class UIBasicSprite : UIWidget
 				mFillAmount = val;
 				mChanged = true;
 			}
+		}
+	}
+
+	/// <summary>
+	/// Minimum allowed width for this widget.
+	/// </summary>
+
+	override public int minWidth
+	{
+		get
+		{
+			if (type == Type.Sliced || type == Type.Advanced)
+			{
+				Vector4 b = border * pixelSize;
+				int min = Mathf.RoundToInt(b.x + b.z);
+				return Mathf.Max(base.minWidth, ((min & 1) == 1) ? min + 1 : min);
+			}
+			return base.minWidth;
+		}
+	}
+
+	/// <summary>
+	/// Minimum allowed height for this widget.
+	/// </summary>
+
+	override public int minHeight
+	{
+		get
+		{
+			if (type == Type.Sliced || type == Type.Advanced)
+			{
+				Vector4 b = border * pixelSize;
+				int min = Mathf.RoundToInt(b.y + b.w);
+				return Mathf.Max(base.minHeight, ((min & 1) == 1) ? min + 1 : min);
+			}
+			return base.minHeight;
 		}
 	}
 

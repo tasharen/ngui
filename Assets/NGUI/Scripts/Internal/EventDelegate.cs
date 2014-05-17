@@ -363,7 +363,13 @@ public class EventDelegate
 
 					mMethod = (from m in type.GetRuntimeMethods() where m.Name == mMethodName && !m.IsStatic select m).FirstOrDefault();
 #else
-					mMethod = type.GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+					for (mMethod = null; ; )
+					{
+						mMethod = type.GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+						if (mMethod != null) break;
+						type = type.BaseType;
+						if (type == null) break;
+					}
 #endif
 				}
 				catch (System.Exception ex)
