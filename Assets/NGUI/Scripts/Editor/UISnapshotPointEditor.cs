@@ -60,7 +60,8 @@ public class UISnapshotPointEditor : Editor
 		UISnapshotPoint point = target as UISnapshotPoint;
 
 		// Root object of this prefab instance
-		GameObject go = PrefabUtility.FindPrefabRoot(point.gameObject);
+		Transform t = point.transform.parent;
+		GameObject go = PrefabUtility.FindPrefabRoot(t == null ? point.gameObject : t.gameObject);
 		if (go == null) return null;
 
 		// Actual prefab
