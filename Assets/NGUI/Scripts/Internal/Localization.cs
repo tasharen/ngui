@@ -323,7 +323,14 @@ public static class Localization
 
 	static public bool Exists (string key)
 	{
-		if (mLanguageIndex != -1) return mDictionary.ContainsKey(key);
-		return mOldDictionary.ContainsKey(key);
+		// Ensure we have a language to work with
+		if (!localizationHasBeenSet) language = PlayerPrefs.GetString("Language", "English");
+
+#if UNITY_IPHONE || UNITY_ANDROID
+		string mobKey = key + " Mobile";
+		if (mDictionary.ContainsKey(mobKey)) return true;
+		else if (mOldDictionary.ContainsKey(mobKey)) return true;
+#endif
+		return mDictionary.ContainsKey(key) || mOldDictionary.ContainsKey(key);
 	}
 }

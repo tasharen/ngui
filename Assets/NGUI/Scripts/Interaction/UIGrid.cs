@@ -127,6 +127,16 @@ public class UIGrid : UIWidgetContainer
 			if (!hideInactive || (t && NGUITools.GetActive(t.gameObject)))
 				list.Add(t);
 		}
+
+		// Sort the list using the desired sorting logic
+		if (sorting != Sorting.None)
+		{
+			if (sorting == Sorting.Alphabetic) list.Sort(SortByName);
+			else if (sorting == Sorting.Horizontal) list.Sort(SortHorizontal);
+			else if (sorting == Sorting.Vertical) list.Sort(SortVertical);
+			else if (onCustomSort != null) list.Sort(onCustomSort);
+			else Sort(list);
+		}
 		return list;
 	}
 
@@ -294,16 +304,6 @@ public class UIGrid : UIWidgetContainer
 		// Get the list of children in their current order
 		BetterList<Transform> list = GetChildList();
 
-		// Sort the list using the desired sorting logic
-		if (sorting != Sorting.None)
-		{
-			if (sorting == Sorting.Alphabetic) list.Sort(SortByName);
-			else if (sorting == Sorting.Horizontal) list.Sort(SortHorizontal);
-			else if (sorting == Sorting.Vertical) list.Sort(SortVertical);
-			else if (onCustomSort != null) list.Sort(onCustomSort);
-			else Sort(list);
-		}
-
 		// Reset the position and order of all objects in the list
 		ResetPosition(list);
 
@@ -334,8 +334,9 @@ public class UIGrid : UIWidgetContainer
 		mReposition = false;
 
 		// Epic hack: Unparent all children so that we get to control the order in which they are re-added back in
-		for (int i = 0, imax = list.size; i < imax; ++i)
-			list[i].parent = null;
+		// EDIT: Turns out this does nothing.
+		//for (int i = 0, imax = list.size; i < imax; ++i)
+		//	list[i].parent = null;
 
 		int x = 0;
 		int y = 0;
@@ -347,7 +348,8 @@ public class UIGrid : UIWidgetContainer
 		for (int i = 0, imax = list.size; i < imax; ++i)
 		{
 			Transform t = list[i];
-			t.parent = myTrans;
+			// See above
+			//t.parent = myTrans;
 
 			float depth = t.localPosition.z;
 			Vector3 pos = (arrangement == Arrangement.Horizontal) ?
