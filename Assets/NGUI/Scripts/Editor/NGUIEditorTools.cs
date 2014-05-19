@@ -12,7 +12,7 @@ using System.Reflection;
 /// Tools for the editor
 /// </summary>
 
-public class NGUIEditorTools
+public static class NGUIEditorTools
 {
 	static Texture2D mBackdropTex;
 	static Texture2D mContrastTex;

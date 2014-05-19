@@ -374,6 +374,30 @@ public class UIPrefabTool : EditorWindow
 	}
 
 	/// <summary>
+	/// Helper function that loads a preview texture. Previews are used for the Free version of Unity that can't use render textures.
+	/// </summary>
+
+	static Texture2D LoadPreview (Item item)
+	{
+		string path = "Assets/NGUI/Editor/Preview/" + item.prefab.name + ".png";
+		if (!File.Exists(path)) return null;
+
+		FileStream fs = File.OpenRead(path);
+		fs.Seek(0, SeekOrigin.End);
+		int size = (int)fs.Position;
+		fs.Seek(0, SeekOrigin.Begin);
+		BinaryReader reader = new BinaryReader(fs);
+		byte[] bytes = new byte[size];
+		reader.Read(bytes, 0, size);
+		reader.Close();
+
+		Texture2D tex = new Texture2D(1, 1);
+		tex.LoadImage(bytes);
+		tex.Apply();
+		return tex;
+	}
+
+	/// <summary>
 	/// Generate an item preview for the specified item.
 	/// </summary>
 
@@ -381,18 +405,16 @@ public class UIPrefabTool : EditorWindow
 	{
 		if (item == null || item.prefab == null) return;
 
+		// Render textures only work in Unity Pro
+		if (!UnityEditorInternal.InternalEditorUtility.HasPro())
+		{
+			item.tex = LoadPreview(item);
+			item.dynamicTex = true;
+			return;
+		}
+
 		int dim = (cellSize - 4) * 2;
-		RenderTexture rt = (item.tex as RenderTexture);
 
-		// If the dimensions have changed, we will need to create a new render texture
-		if (rt != null && item.dynamicTex && (item.tex.width != dim || item.tex.height != dim))
-			DestroyImmediate(item.tex);
-
-#if UNITY_3_5
-		// Unfortunately Unity 3.5 doesn't seem to support a proper way of doing any of this
-		item.tex = null;
-		item.dynamicTex = false;
-#else
 		// Asset Preview-based approach is unreliable, and most of the time fails to provide a texture.
 		// Sometimes it even throws null exceptions.
 		//item.tex = AssetPreview.GetAssetPreview(item.prefab);
@@ -416,21 +438,8 @@ public class UIPrefabTool : EditorWindow
 		cam.clearFlags = CameraClearFlags.Skybox;
 		cam.isOrthoGraphic = true;
 		cam.backgroundColor = new Color(0f, 0f, 0f, 0f);
-
-		// Set up the render texture for the camera
-		if (rt == null)
-		{
-			rt = new RenderTexture(dim, dim, 1);
-			rt.hideFlags = HideFlags.HideAndDontSave;
-			rt.generateMips = false;
-			rt.format = RenderTextureFormat.ARGB32;
-			rt.filterMode = FilterMode.Trilinear;
-			rt.anisoLevel = 4;
-
-			item.tex = rt;
-			item.dynamicTex = true;
-		}
-		cam.targetTexture = rt;
+		cam.targetTexture = (item.tex as RenderTexture);
+		cam.enabled = false;
 
 		// Finally instantiate the prefab as a child of the root
 		GameObject child = NGUITools.AddChild(root, item.prefab);
@@ -439,14 +448,27 @@ public class UIPrefabTool : EditorWindow
 		if (point == null) point = child.GetComponentInChildren<UISnapshotPoint>();
 
 		// If there is a UIRect present (widgets or panels) then it's an NGUI object
-		if (SetupPreviewForUI(cam, root, child, point) ||
-			SetupPreviewFor3D(cam, root, child, point))
-			cam.Render();
+		RenderTexture rt = (SetupPreviewForUI(cam, root, child, point) || SetupPreviewFor3D(cam, root, child, point)) ?
+			cam.RenderToTexture(dim, dim) : null;
+
+		// Did we have a different render texture? Get rid of it.
+		if (item.tex != rt && item.tex != null && item.dynamicTex)
+		{
+			NGUITools.DestroyImmediate(item.tex);
+			item.tex = null;
+			item.dynamicTex = false;
+		}
+
+		// Do we have a new render texture? Assign it.
+		if (rt != null)
+		{
+			item.tex = rt;
+			item.dynamicTex = true;
+		}
 
 		// Clean up everything
 		DestroyImmediate(camGO);
 		DestroyImmediate(root);
-#endif
 	}
 
 	/// <summary>
