@@ -327,7 +327,7 @@ public class UIProgressBar : UIWidgetContainer
 
 		if (mFG != null)
 		{
-			var sprite = mFG as UIBasicSprite;
+			UIBasicSprite sprite = mFG as UIBasicSprite;
 
 			if (isHorizontal)
 			{

@@ -32,7 +32,9 @@ public class UITexture : UIBasicSprite
 	{
 		get
 		{
-			return mTexture;
+			if (mTexture != null) return mTexture;
+			if (mMat != null) return mMat.mainTexture;
+			return null;
 		}
 		set
 		{
@@ -40,6 +42,8 @@ public class UITexture : UIBasicSprite
 			{
 				RemoveFromPanel();
 				mTexture = value;
+				if (value != null) mMat = null;
+				mPMA = -1;
 				MarkAsChanged();
 			}
 		}
