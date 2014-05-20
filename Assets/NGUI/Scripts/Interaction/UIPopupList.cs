@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 /// <summary>
 /// Popup list can be used to display pop-up menus and drop-down lists.
@@ -406,20 +407,12 @@ public class UIPopupList : UIWidgetContainer
 	{
 		if (mHighlight != null)
 		{
-			// Don't allow highlighting while the label is animating to its intended position
-			TweenPosition tp = lbl.GetComponent<TweenPosition>();
-			if (tp != null && tp.enabled) return;
-
 			mHighlightedLabel = lbl;
 
 			UISpriteData sp = mHighlight.GetAtlasSprite();
 			if (sp == null) return;
 
-			float scaleFactor = atlas.pixelSize;
-			float offsetX = sp.borderLeft * scaleFactor;
-			float offsetY = sp.borderTop * scaleFactor;
-
-			Vector3 pos = lbl.cachedTransform.localPosition + new Vector3(-offsetX, offsetY, 1f);
+			Vector3 pos = GetHighlightPosition();
 
 			if (instant || !isAnimated)
 			{
@@ -428,8 +421,53 @@ public class UIPopupList : UIWidgetContainer
 			else
 			{
 				TweenPosition.Begin(mHighlight.gameObject, 0.1f, pos).method = UITweener.Method.EaseOut;
+
+				if (!mTweening)
+				{
+					mTweening = true;
+					StartCoroutine(UpdateTweenPosition());
+				}
 			}
 		}
+	}
+
+	/// <summary>
+	/// Helper function that calculates where the tweened position should be.
+	/// </summary>
+
+	Vector3 GetHighlightPosition ()
+	{
+		if (mHighlightedLabel == null) return Vector3.zero;
+		UISpriteData sp = mHighlight.GetAtlasSprite();
+		if (sp == null) return Vector3.zero;
+
+		float scaleFactor = atlas.pixelSize;
+		float offsetX = sp.borderLeft * scaleFactor;
+		float offsetY = sp.borderTop * scaleFactor;
+
+		return mHighlightedLabel.cachedTransform.localPosition + new Vector3(-offsetX, offsetY, 1f);
+	}
+
+	bool mTweening = false;
+
+	/// <summary>
+	/// Periodically update the tweened target position.
+	/// It's needed because the popup list animates into view, and the target position changes.
+	/// </summary>
+
+	IEnumerator UpdateTweenPosition ()
+	{
+		if (mHighlight != null && mHighlightedLabel != null)
+		{
+			TweenPosition tp = mHighlight.GetComponent<TweenPosition>();
+			
+			while (tp != null && tp.enabled)
+			{
+				tp.to = GetHighlightPosition();
+				yield return null;
+			}
+		}
+		mTweening = false;
 	}
 
 	/// <summary>
@@ -678,6 +716,7 @@ public class UIPopupList : UIWidgetContainer
 				string s = items[i];
 
 				UILabel lbl = NGUITools.AddWidget<UILabel>(mChild);
+				lbl.name = i.ToString();
 				lbl.pivot = UIWidget.Pivot.TopLeft;
 				lbl.bitmapFont = bitmapFont;
 				lbl.trueTypeFont = trueTypeFont;
