@@ -476,6 +476,12 @@ public class UIPopupList : UIWidgetContainer
 	void OnItemPress (GameObject go, bool isPressed) { if (isPressed) Select(go.GetComponent<UILabel>(), true); }
 
 	/// <summary>
+	/// Close the popup list on click.
+	/// </summary>
+
+	void OnItemClick (GameObject go) { Close(); }
+
+	/// <summary>
 	/// React to key-based input.
 	/// </summary>
 
@@ -693,6 +699,7 @@ public class UIPopupList : UIWidgetContainer
 				UIEventListener listener = UIEventListener.Get(lbl.gameObject);
 				listener.onHover = OnItemHover;
 				listener.onPress = OnItemPress;
+				listener.onClick = OnItemClick;
 				listener.parameter = s;
 
 				// Move the selection here if this is the right label
