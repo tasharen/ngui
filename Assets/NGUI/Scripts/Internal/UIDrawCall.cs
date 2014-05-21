@@ -396,7 +396,7 @@ public class UIDrawCall : MonoBehaviour
 
 				// NOTE: Apparently there is a bug with Adreno devices:
 				// http://www.tasharen.com/forum/index.php?topic=8415.0
-#if !UNITY_4_3 || !UNITY_ANDROID
+#if (!UNITY_4_3 && !UNITY_4_5) || !UNITY_ANDROID
 				// If the number of vertices in the buffer is less than half of the full buffer, trim it
 				if (!trim && (verts.size << 1) < verts.buffer.Length) trim = true;
 #endif
