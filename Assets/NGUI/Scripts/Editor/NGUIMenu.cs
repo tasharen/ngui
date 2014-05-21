@@ -509,6 +509,54 @@ static public class NGUIMenu
 		UIPrefabTool.instance.Repaint();
 	}
 
+#if !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+	[MenuItem("NGUI/Extras/Switch to 2D Colliders", false, 10)]
+	static public void SwitchTo2D ()
+	{
+		BoxCollider[] colliders = NGUITools.FindActive<BoxCollider>();
+		
+		for (int i = 0; i < colliders.Length; ++i)
+		{
+			BoxCollider c = colliders[i];
+			GameObject go = c.gameObject;
+			Vector3 center = c.center;
+			Vector3 size = c.size;
+			NGUITools.DestroyImmediate(c);
+
+			BoxCollider2D bc = go.AddComponent<BoxCollider2D>();
+			bc.size = size;
+			bc.center = center;
+			NGUITools.SetDirty(go);
+
+			UICamera cam = UICamera.FindCameraForLayer(go.layer);
+			if (cam != null) cam.eventType = UICamera.EventType.UI_2D;
+		}
+	}
+
+	[MenuItem("NGUI/Extras/Switch to 3D Colliders", false, 10)]
+	static public void SwitchTo3D ()
+	{
+		BoxCollider2D[] colliders = NGUITools.FindActive<BoxCollider2D>();
+
+		for (int i = 0; i < colliders.Length; ++i)
+		{
+			BoxCollider2D c = colliders[i];
+			GameObject go = c.gameObject;
+			Vector3 center = c.center;
+			Vector3 size = c.size;
+			NGUITools.DestroyImmediate(c);
+
+			BoxCollider bc = go.AddComponent<BoxCollider>();
+			bc.size = size;
+			bc.center = center;
+			NGUITools.SetDirty(go);
+
+			UICamera cam = UICamera.FindCameraForLayer(go.layer);
+			if (cam != null) cam.eventType = UICamera.EventType.UI_3D;
+		}
+	}
+#endif
+
 #endregion
 
 	[MenuItem("NGUI/Normalize Depth Hierarchy &#0", false, 11)]
