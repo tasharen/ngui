@@ -264,7 +264,7 @@ static public class NGUITools
 
 			UICamera ui = UICamera.FindCameraForLayer(go.layer);
 
-			if (ui != null && ui.eventType == UICamera.EventType.Unity2D)
+			if (ui != null && (ui.eventType == UICamera.EventType.World_2D || ui.eventType == UICamera.EventType.UI_2D))
 			{
 				box2 = go.AddComponent<BoxCollider2D>();
 				box2.isTrigger = true;

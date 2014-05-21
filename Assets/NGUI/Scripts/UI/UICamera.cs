@@ -84,12 +84,13 @@ public class UICamera : MonoBehaviour
 	/// Camera type controls how raycasts are handled by the UICamera.
 	/// </summary>
 
-	public enum EventType
+	public enum EventType : int
 	{
-		World,		// Perform a Physics.Raycast and sort by distance to the point that was hit.
-		UI,			// Perform a Physics.Raycast and sort by widget depth.
+		World_3D,	// Perform a Physics.Raycast and sort by distance to the point that was hit.
+		UI_3D,		// Perform a Physics.Raycast and sort by widget depth.
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
-		Unity2D,	// Perform a Physics2D.OverlapPoint
+		World_2D,	// Perform a Physics2D.OverlapPoint
+		UI_2D,		// Physics2D.OverlapPoint then sort by widget depth
 #endif
 	}
 
@@ -113,7 +114,7 @@ public class UICamera : MonoBehaviour
 	/// This setting changes how raycasts are handled. Raycasts have to be more complicated for UI cameras.
 	/// </summary>
 
-	public EventType eventType = EventType.UI;
+	public EventType eventType = EventType.UI_3D;
 
 	/// <summary>
 	/// Which layers will receive events.
@@ -251,8 +252,15 @@ public class UICamera : MonoBehaviour
 	static public Vector2 lastTouchPosition = Vector2.zero;
 
 	/// <summary>
+	/// Position of the last touch (or mouse) event in the world.
+	/// </summary>
+
+	static public Vector3 lastWorldPosition = Vector3.zero;
+
+	/// <summary>
 	/// Last raycast hit prior to sending out the event. This is useful if you want detailed information
 	/// about what was actually hit in your OnClick, OnHover, and other event functions.
+	/// Note that this is not going to be valid if you're using 2D colliders.
 	/// </summary>
 
 	static public RaycastHit lastHit;
@@ -553,17 +561,17 @@ public class UICamera : MonoBehaviour
 	{
 		public int depth;
 		public RaycastHit hit;
+		public GameObject go;
 	}
 
 	static DepthEntry mHit = new DepthEntry();
 	static BetterList<DepthEntry> mHits = new BetterList<DepthEntry>();
-	static RaycastHit mEmpty = new RaycastHit();
 
 	/// <summary>
 	/// Returns the object under the specified position.
 	/// </summary>
 
-	static public bool Raycast (Vector3 inPos, out RaycastHit hit)
+	static public bool Raycast (Vector3 inPos)
 	{
 		for (int i = 0; i < list.size; ++i)
 		{
@@ -587,16 +595,16 @@ public class UICamera : MonoBehaviour
 			int mask = currentCamera.cullingMask & (int)cam.eventReceiverMask;
 			float dist = (cam.rangeDistance > 0f) ? cam.rangeDistance : currentCamera.farClipPlane - currentCamera.nearClipPlane;
 
-			if (cam.eventType == EventType.World)
+			if (cam.eventType == EventType.World_3D)
 			{
-				if (Physics.Raycast(ray, out hit, dist, mask))
+				if (Physics.Raycast(ray, out lastHit, dist, mask))
 				{
-					hoveredObject = hit.collider.gameObject;
+					hoveredObject = lastHit.collider.gameObject;
 					return true;
 				}
 				continue;
 			}
-			else if (cam.eventType == EventType.UI)
+			else if (cam.eventType == EventType.UI_3D)
 			{
 				RaycastHit[] hits = Physics.RaycastAll(ray, dist, mask);
 
@@ -622,7 +630,8 @@ public class UICamera : MonoBehaviour
 
 						if (mHit.depth != int.MaxValue)
 						{
-							mHit.hit = hits[b];
+							mHit.hit = lastHit;
+							mHit.go = lastHit.collider.gameObject;
 							mHits.Add(mHit);
 						}
 					}
@@ -637,8 +646,9 @@ public class UICamera : MonoBehaviour
 						if (IsVisible(ref mHits.buffer[b]))
 #endif
 						{
-							hit = mHits[b].hit;
-							hoveredObject = hit.collider.gameObject;
+							lastHit = mHits[b].hit;
+							hoveredObject = mHits[b].go;
+							lastWorldPosition = hits[b].point;
 							mHits.Clear();
 							return true;
 						}
@@ -647,8 +657,8 @@ public class UICamera : MonoBehaviour
 				}
 				else if (hits.Length == 1)
 				{
-					Collider c = hits[0].collider;
-					UIWidget w = c.GetComponent<UIWidget>();
+					GameObject go = hits[0].collider.gameObject;
+					UIWidget w = go.GetComponent<UIWidget>();
 
 					if (w != null)
 					{
@@ -657,39 +667,115 @@ public class UICamera : MonoBehaviour
 					}
 					else
 					{
-						UIRect rect = NGUITools.FindInParents<UIRect>(c.gameObject);
+						UIRect rect = NGUITools.FindInParents<UIRect>(go);
 						if (rect != null && rect.finalAlpha < 0.001f) continue;
 					}
 
-					if (IsVisible(ref hits[0]))
+					if (IsVisible(hits[0].point, hits[0].collider.gameObject))
 					{
-						hit = hits[0];
-						hoveredObject = hit.collider.gameObject;
+						lastHit = hits[0];
+						lastWorldPosition = hits[0].point;
+						hoveredObject = lastHit.collider.gameObject;
 						return true;
 					}
 				}
 				continue;
 			}
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
-			else if (cam.eventType == EventType.Unity2D)
+			else if (cam.eventType == EventType.World_2D)
 			{
 				if (m2DPlane.Raycast(ray, out dist))
 				{
-					Collider2D c2d = Physics2D.OverlapPoint(ray.GetPoint(dist), mask);
+					Vector3 point = ray.GetPoint(dist);
+					Collider2D c2d = Physics2D.OverlapPoint(point, mask);
 
 					if (c2d)
 					{
-						hit = lastHit;
-						hit.point = pos;
+						lastWorldPosition = point;
 						hoveredObject = c2d.gameObject;
 						return true;
 					}
 				}
 				continue;
 			}
+			else if (cam.eventType == EventType.UI_2D)
+			{
+				if (m2DPlane.Raycast(ray, out dist))
+				{
+					lastWorldPosition = ray.GetPoint(dist);
+					Collider2D[] hits = Physics2D.OverlapPointAll(lastWorldPosition, mask);
+
+					if (hits.Length > 1)
+					{
+						for (int b = 0; b < hits.Length; ++b)
+						{
+							GameObject go = hits[b].collider.gameObject;
+							UIWidget w = go.GetComponent<UIWidget>();
+
+							if (w != null)
+							{
+								if (!w.isVisible) continue;
+								if (w.hitCheck != null && !w.hitCheck(lastWorldPosition)) continue;
+							}
+							else
+							{
+								UIRect rect = NGUITools.FindInParents<UIRect>(go);
+								if (rect != null && rect.finalAlpha < 0.001f) continue;
+							}
+
+							mHit.depth = NGUITools.CalculateRaycastDepth(go);
+
+							if (mHit.depth != int.MaxValue)
+							{
+								mHit.go = hits[b].gameObject;
+								mHits.Add(mHit);
+							}
+						}
+
+						mHits.Sort(delegate(DepthEntry r1, DepthEntry r2) { return r2.depth.CompareTo(r1.depth); });
+
+						for (int b = 0; b < mHits.size; ++b)
+						{
+#if UNITY_FLASH
+							if (IsVisible(mHits.buffer[b]))
+#else
+							if (IsVisible(ref mHits.buffer[b]))
+#endif
+							{
+								hoveredObject = mHits[b].go;
+								mHits.Clear();
+								return true;
+							}
+						}
+						mHits.Clear();
+					}
+					else if (hits.Length == 1)
+					{
+						GameObject go = hits[0].gameObject;
+						UIWidget w = go.GetComponent<UIWidget>();
+
+						if (w != null)
+						{
+							if (!w.isVisible) continue;
+							if (w.hitCheck != null && !w.hitCheck(lastWorldPosition)) continue;
+						}
+						else
+						{
+							UIRect rect = NGUITools.FindInParents<UIRect>(go);
+							if (rect != null && rect.finalAlpha < 0.001f) continue;
+						}
+
+						if (IsVisible(lastWorldPosition, go))
+						{
+							hoveredObject = go;
+							return true;
+						}
+					}
+				}
+				continue;
+			}
 #endif
 		}
-		hit = mEmpty;
 		return false;
 	}
 
@@ -701,13 +787,13 @@ public class UICamera : MonoBehaviour
 	/// Helper function to check if the specified hit is visible by the panel.
 	/// </summary>
 
-	static bool IsVisible (ref RaycastHit hit)
+	static bool IsVisible (Vector3 worldPoint, GameObject go)
 	{
-		UIPanel panel = NGUITools.FindInParents<UIPanel>(hit.collider.gameObject);
+		UIPanel panel = NGUITools.FindInParents<UIPanel>(go);
 
 		while (panel != null)
 		{
-			if (!panel.IsVisible(hit.point)) return false;
+			if (!panel.IsVisible(worldPoint)) return false;
 			panel = panel.parentPanel;
 		}
 		return true;
@@ -938,7 +1024,7 @@ public class UICamera : MonoBehaviour
 	
 	void Start ()
 	{
-		if (eventType != EventType.World && cachedCamera.transparencySortMode != TransparencySortMode.Orthographic)
+		if (eventType != EventType.World_3D && cachedCamera.transparencySortMode != TransparencySortMode.Orthographic)
 			cachedCamera.transparencySortMode = TransparencySortMode.Orthographic;
 
 		if (Application.isPlaying) cachedCamera.eventMask = 0;
@@ -1080,7 +1166,7 @@ public class UICamera : MonoBehaviour
 		if (isPressed || posChanged || mNextRaycast < RealTime.time)
 		{
 			mNextRaycast = RealTime.time + 0.02f;
-			if (!Raycast(Input.mousePosition, out lastHit)) hoveredObject = fallThrough;
+			if (!Raycast(Input.mousePosition)) hoveredObject = fallThrough;
 			if (hoveredObject == null) hoveredObject = genericEventHandler;
 			for (int i = 0; i < 3; ++i) mMouse[i].current = hoveredObject;
 		}
@@ -1176,7 +1262,7 @@ public class UICamera : MonoBehaviour
 			currentTouch.pos = touch.position;
 
 			// Raycast into the screen
-			if (!Raycast(currentTouch.pos, out lastHit)) hoveredObject = fallThrough;
+			if (!Raycast(currentTouch.pos)) hoveredObject = fallThrough;
 			if (hoveredObject == null) hoveredObject = genericEventHandler;
 			currentTouch.last = currentTouch.current;
 			currentTouch.current = hoveredObject;
@@ -1232,7 +1318,7 @@ public class UICamera : MonoBehaviour
 			currentTouch.pos = pos;
 
 			// Raycast into the screen
-			if (!Raycast(currentTouch.pos, out lastHit)) hoveredObject = fallThrough;
+			if (!Raycast(currentTouch.pos)) hoveredObject = fallThrough;
 			if (hoveredObject == null) hoveredObject = genericEventHandler;
 			currentTouch.last = currentTouch.current;
 			currentTouch.current = hoveredObject;
