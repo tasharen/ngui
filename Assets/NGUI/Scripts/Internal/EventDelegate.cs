@@ -227,34 +227,22 @@ public class EventDelegate
 	/// </summary>
 
 #if REFLECTION_SUPPORT
-	#if !UNITY_EDITOR && UNITY_WP8
-		static string GetMethodName (Callback callback)
-		{
-			System.Delegate d = callback as System.Delegate;
-			return d.Method.Name;
-		}
+ #if !UNITY_EDITOR && NETFX_CORE
+	static string GetMethodName (Callback callback)
+	{
+		System.Delegate d = callback as System.Delegate;
+		return d.GetMethodInfo().Name;
+	}
 
-		static bool IsValid (Callback callback)
-		{
-			System.Delegate d = callback as System.Delegate;
-			return d != null && d.Method != null;
-		}
-	#elif !UNITY_EDITOR && UNITY_METRO
-		static string GetMethodName (Callback callback)
-		{
-			System.Delegate d = callback as System.Delegate;
-			return d.GetMethodInfo().Name;
-		}
-
-		static bool IsValid (Callback callback)
-		{
-			System.Delegate d = callback as System.Delegate;
-			return d != null && d.GetMethodInfo() != null;
-		}
-	#else
-		static string GetMethodName (Callback callback) { return callback.Method.Name; }
-		static bool IsValid (Callback callback) { return callback != null && callback.Method != null; }
-	#endif
+	static bool IsValid (Callback callback)
+	{
+		System.Delegate d = callback as System.Delegate;
+		return d != null && d.GetMethodInfo() != null;
+	}
+ #else
+	static string GetMethodName (Callback callback) { return callback.Method.Name; }
+	static bool IsValid (Callback callback) { return callback != null && callback.Method != null; }
+ #endif
 #else
 	static bool IsValid (Callback callback) { return callback != null; }
 #endif
@@ -498,8 +486,13 @@ public class EventDelegate
 				}
 				catch (System.ArgumentException ex)
 				{
-					string msg = ex.Message;
-					msg += "\nExpected: ";
+					string msg = "Error calling ";
+
+					if (mTarget == null) msg += mMethod.Name;
+					else msg += mTarget.GetType() + "." + mMethod.Name;
+					
+					msg += ": " + ex.Message;
+					msg += "\n  Expected: ";
 
 					ParameterInfo[] pis = mMethod.GetParameters();
 
@@ -514,7 +507,7 @@ public class EventDelegate
 							msg += ", " + pis[i].ParameterType;
 					}
 
-					msg += "\nGot: ";
+					msg += "\n  Received: ";
 
 					if (mParameters.Length == 0)
 					{

@@ -187,11 +187,11 @@ static public class NGUITools
 
 	static public T[] FindActive<T> () where T : Component
 	{
-#if UNITY_3_5 || UNITY_4_0
-		return GameObject.FindSceneObjectsOfType(typeof(T)) as T[];
-#else
+//#if UNITY_3_5 || UNITY_4_0
+//        return GameObject.FindSceneObjectsOfType(typeof(T)) as T[];
+//#else
 		return GameObject.FindObjectsOfType(typeof(T)) as T[];
-#endif
+//#endif
 	}
 
 	/// <summary>

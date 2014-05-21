@@ -226,7 +226,11 @@ public class UIInput : MonoBehaviour
 
 #if MOBILE && !UNITY_3_5
 			// BB10's implementation has a bug in Unity
+ #if UNITY_4_0 || UNITY_4_2 || UNITY_4_3
 			if (Application.platform == RuntimePlatform.BB10Player)
+ #else
+			if (Application.platform == RuntimePlatform.BlackBerryPlayer)
+ #endif
 				value = value.Replace("\\b", "\b");
 #endif
 			// Validate all input

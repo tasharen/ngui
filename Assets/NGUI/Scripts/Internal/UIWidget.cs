@@ -575,6 +575,8 @@ public class UIWidget : UIRect
 			if (box != null) return true;
 #if !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 			return GetComponent<BoxCollider2D>() != null;
+#else
+            return false;
 #endif
 		}
 	}
