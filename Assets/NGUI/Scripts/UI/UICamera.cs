@@ -630,8 +630,8 @@ public class UICamera : MonoBehaviour
 
 						if (mHit.depth != int.MaxValue)
 						{
-							mHit.hit = lastHit;
-							mHit.go = lastHit.collider.gameObject;
+							mHit.hit = hits[b];
+							mHit.go = hits[b].collider.gameObject;
 							mHits.Add(mHit);
 						}
 					}
@@ -709,7 +709,7 @@ public class UICamera : MonoBehaviour
 					{
 						for (int b = 0; b < hits.Length; ++b)
 						{
-							GameObject go = hits[b].collider.gameObject;
+							GameObject go = hits[b].gameObject;
 							UIWidget w = go.GetComponent<UIWidget>();
 
 							if (w != null)
@@ -727,7 +727,7 @@ public class UICamera : MonoBehaviour
 
 							if (mHit.depth != int.MaxValue)
 							{
-								mHit.go = hits[b].gameObject;
+								mHit.go = go;
 								mHits.Add(mHit);
 							}
 						}
@@ -809,7 +809,7 @@ public class UICamera : MonoBehaviour
 	static bool IsVisible (ref DepthEntry de)
 #endif
 	{
-		UIPanel panel = NGUITools.FindInParents<UIPanel>(de.hit.collider.gameObject);
+		UIPanel panel = NGUITools.FindInParents<UIPanel>(de.go);
 
 		while (panel != null)
 		{

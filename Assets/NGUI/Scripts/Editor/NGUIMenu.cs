@@ -519,6 +519,14 @@ static public class NGUIMenu
 		{
 			BoxCollider c = colliders[i];
 			GameObject go = c.gameObject;
+
+			UICamera cam = UICamera.FindCameraForLayer(go.layer);
+			if (cam == null) continue;
+			if (cam.eventType == UICamera.EventType.World_3D) continue;
+			if (cam.eventType == UICamera.EventType.World_2D) continue;
+
+			cam.eventType = UICamera.EventType.UI_2D;
+
 			Vector3 center = c.center;
 			Vector3 size = c.size;
 			NGUITools.DestroyImmediate(c);
@@ -526,10 +534,8 @@ static public class NGUIMenu
 			BoxCollider2D bc = go.AddComponent<BoxCollider2D>();
 			bc.size = size;
 			bc.center = center;
+			bc.isTrigger = true;
 			NGUITools.SetDirty(go);
-
-			UICamera cam = UICamera.FindCameraForLayer(go.layer);
-			if (cam != null) cam.eventType = UICamera.EventType.UI_2D;
 		}
 	}
 
@@ -542,6 +548,14 @@ static public class NGUIMenu
 		{
 			BoxCollider2D c = colliders[i];
 			GameObject go = c.gameObject;
+
+			UICamera cam = UICamera.FindCameraForLayer(go.layer);
+			if (cam == null) continue;
+			if (cam.eventType == UICamera.EventType.World_3D) continue;
+			if (cam.eventType == UICamera.EventType.World_2D) continue;
+
+			cam.eventType = UICamera.EventType.UI_3D;
+
 			Vector3 center = c.center;
 			Vector3 size = c.size;
 			NGUITools.DestroyImmediate(c);
@@ -549,10 +563,8 @@ static public class NGUIMenu
 			BoxCollider bc = go.AddComponent<BoxCollider>();
 			bc.size = size;
 			bc.center = center;
+			bc.isTrigger = true;
 			NGUITools.SetDirty(go);
-
-			UICamera cam = UICamera.FindCameraForLayer(go.layer);
-			if (cam != null) cam.eventType = UICamera.EventType.UI_3D;
 		}
 	}
 #endif
