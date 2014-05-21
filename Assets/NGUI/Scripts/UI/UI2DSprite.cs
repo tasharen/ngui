@@ -30,7 +30,7 @@ public class UI2DSprite : UIBasicSprite
 
 	public UnityEngine.Sprite nextSprite;
 
-	int mPMA = -1;
+	[System.NonSerialized] int mPMA = -1;
 
 	/// <summary>
 	/// UnityEngine.Sprite drawn by this widget.

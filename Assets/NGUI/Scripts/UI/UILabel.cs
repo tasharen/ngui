@@ -901,8 +901,7 @@ public class UILabel : UIWidget
 		mMaxLineHeight = 0;
 		mShrinkToFit = false;
 
-		if (GetComponent<BoxCollider>() != null)
-			NGUITools.AddWidgetCollider(gameObject, true);
+		NGUITools.UpdateWidgetCollider(gameObject, true);
 	}
 
 	/// <summary>

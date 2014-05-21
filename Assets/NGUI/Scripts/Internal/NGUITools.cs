@@ -229,27 +229,56 @@ static public class NGUITools
 	/// Add a collider to the game object containing one or more widgets.
 	/// </summary>
 
-	static public BoxCollider AddWidgetCollider (GameObject go) { return AddWidgetCollider(go, false); }
+	static public void AddWidgetCollider (GameObject go) { AddWidgetCollider(go, false); }
 
 	/// <summary>
 	/// Add a collider to the game object containing one or more widgets.
 	/// </summary>
 
-	static public BoxCollider AddWidgetCollider (GameObject go, bool considerInactive)
+	static public void AddWidgetCollider (GameObject go, bool considerInactive)
 	{
 		if (go != null)
 		{
+			// 3D collider
 			Collider col = go.GetComponent<Collider>();
 			BoxCollider box = col as BoxCollider;
 
-			if (box == null)
+			if (box != null)
 			{
-				if (col != null)
-				{
-					if (Application.isPlaying) GameObject.Destroy(col);
-					else GameObject.DestroyImmediate(col);
-				}
+				UpdateWidgetCollider(box, considerInactive);
+				return;
+			}
 
+			// Is there already another collider present? If so, do nothing.
+			if (col != null) return;
+
+#if !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+			// 2D collider
+			BoxCollider2D box2 = go.GetComponent<BoxCollider2D>();
+
+			if (box2 != null)
+			{
+				UpdateWidgetCollider(box2, considerInactive);
+				return;
+			}
+
+			UICamera ui = UICamera.FindCameraForLayer(go.layer);
+
+			if (ui != null && ui.eventType == UICamera.EventType.Unity2D)
+			{
+				box2 = go.AddComponent<BoxCollider2D>();
+				box2.isTrigger = true;
+#if UNITY_EDITOR
+				UnityEditor.Undo.RegisterCreatedObjectUndo(box2, "Add Collider");
+#endif
+				UIWidget widget = go.GetComponent<UIWidget>();
+				if (widget != null) widget.autoResizeBoxCollider = true;
+				UpdateWidgetCollider(box2, considerInactive);
+				return;
+			}
+			else
+#endif
+			{
 				box = go.AddComponent<BoxCollider>();
 #if !UNITY_3_5 && UNITY_EDITOR
 				UnityEditor.Undo.RegisterCreatedObjectUndo(box, "Add Collider");
@@ -258,12 +287,10 @@ static public class NGUITools
 
 				UIWidget widget = go.GetComponent<UIWidget>();
 				if (widget != null) widget.autoResizeBoxCollider = true;
+				UpdateWidgetCollider(box, considerInactive);
 			}
-
-			UpdateWidgetCollider(box, considerInactive);
-			return box;
 		}
-		return null;
+		return;
 	}
 
 	/// <summary>
@@ -283,17 +310,18 @@ static public class NGUITools
 	{
 		if (go != null)
 		{
-			UpdateWidgetCollider(go.GetComponent<BoxCollider>(), considerInactive);
+			BoxCollider bc = go.GetComponent<BoxCollider>();
+
+			if (bc != null)
+			{
+				UpdateWidgetCollider(bc, considerInactive);
+				return;
+			}
+#if !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+			BoxCollider2D box2 = go.GetComponent<BoxCollider2D>();
+			if (box2 != null) UpdateWidgetCollider(box2, considerInactive);
+#endif
 		}
-	}
-
-	/// <summary>
-	/// Adjust the widget's collider based on the depth of the widgets, as well as the widget's dimensions.
-	/// </summary>
-
-	static public void UpdateWidgetCollider (BoxCollider bc)
-	{
-		UpdateWidgetCollider(bc, false);
 	}
 
 	/// <summary>
@@ -324,6 +352,37 @@ static public class NGUITools
 #endif
 		}
 	}
+
+#if !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+	/// <summary>
+	/// Adjust the widget's collider based on the depth of the widgets, as well as the widget's dimensions.
+	/// </summary>
+
+	static public void UpdateWidgetCollider (BoxCollider2D box, bool considerInactive)
+	{
+		if (box != null)
+		{
+			GameObject go = box.gameObject;
+			UIWidget w = go.GetComponent<UIWidget>();
+
+			if (w != null)
+			{
+				Vector3[] corners = w.localCorners;
+				box.center = Vector3.Lerp(corners[0], corners[2], 0.5f);
+				box.size = corners[2] - corners[0];
+			}
+			else
+			{
+				Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
+				box.center = b.center;
+				box.size = new Vector2(b.size.x, b.size.y);
+			}
+#if UNITY_EDITOR
+			NGUITools.SetDirty(box);
+#endif
+		}
+	}
+#endif
 
 	/// <summary>
 	/// Helper function that returns the string name of the type.

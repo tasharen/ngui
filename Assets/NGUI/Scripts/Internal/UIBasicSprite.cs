@@ -48,8 +48,8 @@ public abstract class UIBasicSprite : UIWidget
 	[HideInInspector][SerializeField] protected Flip mFlip = Flip.Nothing;
 
 	// Cached to avoid allocations
-	Rect mInnerUV = new Rect();
-	Rect mOuterUV = new Rect();
+	[System.NonSerialized] Rect mInnerUV = new Rect();
+	[System.NonSerialized] Rect mOuterUV = new Rect();
 
 	/// <summary>
 	/// When the sprite type is advanced, this determines whether the center is tiled or sliced.

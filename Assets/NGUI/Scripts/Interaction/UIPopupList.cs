@@ -760,10 +760,23 @@ public class UIPopupList : UIWidgetContainer
 			for (int i = 0, imax = labels.Count; i < imax; ++i)
 			{
 				UILabel lbl = labels[i];
-				BoxCollider bc = NGUITools.AddWidgetCollider(lbl.gameObject);
-				bcCenter.z = bc.center.z;
-				bc.center = bcCenter;
-				bc.size = bcSize;
+				NGUITools.AddWidgetCollider(lbl.gameObject);
+				BoxCollider bc = lbl.GetComponent<BoxCollider>();
+
+				if (bc != null)
+				{
+					bcCenter.z = bc.center.z;
+					bc.center = bcCenter;
+					bc.size = bcSize;
+				}
+#if !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
+				else
+				{
+					BoxCollider2D b2d = lbl.GetComponent<BoxCollider2D>();
+					b2d.center = bcCenter;
+					b2d.size = bcSize;
+				}
+#endif
 			}
 
 			x += (bgPadding.x + padding.x) * 2f;

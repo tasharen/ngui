@@ -21,10 +21,8 @@ public class UISprite : UIBasicSprite
 	// Deprecated, no longer used
 	[HideInInspector][SerializeField] bool mFillCenter = true;
 
-	[System.NonSerialized]
-	protected UISpriteData mSprite;
-	
-	bool mSpriteSet = false;
+	[System.NonSerialized] protected UISpriteData mSprite;
+	[System.NonSerialized] bool mSpriteSet = false;
 
 	/// <summary>
 	/// Retrieve the material used by the font.
