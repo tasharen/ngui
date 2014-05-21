@@ -51,11 +51,11 @@ public class UIButtonColor : UIWidgetContainer
 
 	public float duration = 0.2f;
 
-	protected Color mStartingColor;
-	protected Color mDefaultColor;
-	protected bool mInitDone = false;
-	protected UIWidget mWidget;
-	protected State mState = State.Normal;
+	[System.NonSerialized] protected Color mStartingColor;
+	[System.NonSerialized] protected Color mDefaultColor;
+	[System.NonSerialized] protected bool mInitDone = false;
+	[System.NonSerialized] protected UIWidget mWidget;
+	[System.NonSerialized] protected State mState = State.Normal;
 
 	/// <summary>
 	/// Button's current state.
