@@ -86,15 +86,13 @@ public class UIWidget : UIRect
 	/// Panel that's managing this widget.
 	/// </summary>
 
-	[System.NonSerialized]
-	public UIPanel panel;
+	[System.NonSerialized] public UIPanel panel;
 
 	/// <summary>
 	/// Widget's generated geometry.
 	/// </summary>
 
-	[System.NonSerialized]
-	public UIGeometry geometry = new UIGeometry();
+	[System.NonSerialized] public UIGeometry geometry = new UIGeometry();
 
 	/// <summary>
 	/// If set to 'false', the widget's OnFill function will not be called, letting you define custom geometry at will.

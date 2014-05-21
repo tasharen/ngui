@@ -11,10 +11,6 @@
 using System.Reflection;
 #endif
 
-#if NETFX_CORE
-using System.Linq;
-#endif
-
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -346,14 +342,20 @@ public class EventDelegate
 				try
 				{
 #if NETFX_CORE
-					// we can't use this since we don't seem to have the correct parameter type list yet
-					// mMethod = type.GetRuntimeMethod(mMethodName, (from p in mParameters select p.type).ToArray());
+					IEnumerable<MethodInfo> methods = type.GetRuntimeMethods();
 
-					mMethod = (from m in type.GetRuntimeMethods() where m.Name == mMethodName && !m.IsStatic select m).FirstOrDefault();
+					foreach (MethodInfo mi in methods)
+					{
+						if (mi.Name == mMethodName)
+						{
+							mMethod = mi;
+							break;
+						}
+					}
 #else
 					for (mMethod = null; ; )
 					{
-						mMethod = type.GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+						mMethod = type.GetMethod(mMethodName);
 						if (mMethod != null) break;
 						type = type.BaseType;
 						if (type == null) break;
