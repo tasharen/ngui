@@ -9,6 +9,7 @@
 
 using UnityEngine;
 using System.Text;
+using System.Diagnostics;
 
 /// <summary>
 /// Helper class containing functionality related to using dynamic fonts.
@@ -661,13 +662,23 @@ static public class NGUIText
 	}
 
 	/// <summary>
+	/// Whether the specified character is a space.
+	/// </summary>
+
+	[DebuggerHidden]
+	[DebuggerStepThrough]
+	static bool IsSpace (int ch) { return (ch == ' ' || ch == 0x200a || ch == 0x200b); }
+
+	/// <summary>
 	/// Convenience function that ends the line by either appending a new line character or replacing a space with one.
 	/// </summary>
 
+	[DebuggerHidden]
+	[DebuggerStepThrough]
 	static public void EndLine (ref StringBuilder s)
 	{
 		int i = s.Length - 1;
-		if (i > 0 && s[i] == ' ') s[i] = '\n';
+		if (i > 0 && IsSpace(s[i])) s[i] = '\n';
 		else s.Append('\n');
 	}
 
@@ -675,10 +686,12 @@ static public class NGUIText
 	/// Convenience function that ends the line by replacing a space with a newline character.
 	/// </summary>
 
+	[DebuggerHidden]
+	[DebuggerStepThrough]
 	static void ReplaceSpaceWithNewline (ref StringBuilder s)
 	{
 		int i = s.Length - 1;
-		if (i > 0 && s[i] == ' ') s[i] = '\n';
+		if (i > 0 && IsSpace(s[i])) s[i] = '\n';
 	}
 
 	/// <summary>
@@ -906,19 +919,25 @@ static public class NGUIText
 			remainingWidth -= glyphWidth;
 
 			// If this marks the end of a word, add it to the final string.
-			if (ch == ' ' && !eastern)
+			if (IsSpace(ch) && !eastern)
 			{
-				if (prev == ' ')
+				bool sp = IsSpace(prev);
+
+				if (sp)
 				{
 					sb.Append(' ');
 					start = offset;
 				}
-				else if (prev != ' ' && start < offset)
+				else if (!sp && start < offset)
 				{
 					int end = offset - start + 1;
 
 					// Last word on the last line should not include an invisible character
-					if (lineCount == maxLineCount && remainingWidth <= 0f && offset < textLength && text[offset] <= ' ') --end;
+					if (lineCount == maxLineCount && remainingWidth <= 0f && offset < textLength)
+					{
+						char cho = text[offset];
+						if (cho < ' ' || IsSpace(cho)) --end;
+					}
 
 					sb.Append(text.Substring(start, end));
 					lineIsEmpty = false;
@@ -935,7 +954,8 @@ static public class NGUIText
 				{
 					// This is the first word on the line -- add it up to the character that fits
 					sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
-					if (ch != ' ' && !eastern) fits = false;
+					bool space = IsSpace(ch);
+					if (!space && !eastern) fits = false;
 
 					if (lineCount++ == maxLineCount)
 					{
@@ -949,7 +969,7 @@ static public class NGUIText
 					// Start a brand-new line
 					lineIsEmpty = true;
 
-					if (ch == ' ')
+					if (space)
 					{
 						start = offset + 1;
 						remainingWidth = rectWidth;
@@ -1212,7 +1232,7 @@ static public class NGUIText
 					prevX = 0;
 				}
 
-				if (ch == ' ')
+				if (IsSpace(ch))
 				{
 					if (underline)
 					{
@@ -1229,7 +1249,7 @@ static public class NGUIText
 					(finalSpacingX + glyph.advance) * sizeShrinkage;
 
 				// No need to continue if this is a space character
-				if (ch == ' ') continue;
+				if (IsSpace(ch)) continue;
 
 				// Texture coordinates
 				if (uvs != null)
@@ -1677,7 +1697,6 @@ static public class NGUIText
 						// Align the highlight
 						if (alignment != Alignment.Left && highlightOffset < highlight.size)
 						{
-							Debug.Log("Aligning");
 							Align(highlight, highlightOffset, x - finalSpacingX);
 							highlightOffset = highlight.size;
 						}
