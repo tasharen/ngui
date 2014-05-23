@@ -151,6 +151,13 @@ public class UIButton : UIButtonColor
 
 	protected override void OnEnable ()
 	{
+#if UNITY_EDITOR
+		if (!Application.isPlaying)
+		{
+			mInitDone = false;
+			return;
+		}
+#endif
 		if (isEnabled)
 		{
 			if (mInitDone)

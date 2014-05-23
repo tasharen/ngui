@@ -152,7 +152,11 @@ public class UIButtonColor : UIWidgetContainer
 	protected virtual void OnEnable ()
 	{
 #if UNITY_EDITOR
-		if (!Application.isPlaying) return;
+		if (!Application.isPlaying)
+		{
+			mInitDone = false;
+			return;
+		}
 #endif
 		if (mInitDone) OnHover(UICamera.IsHighlighted(gameObject));
 

@@ -828,6 +828,19 @@ public class UIInput : MonoBehaviour
 				return true;
 			}
 
+			// Select all
+			case KeyCode.A:
+			{
+				if (ctrl)
+				{
+					ev.Use();
+					mSelectionStart = 0;
+					mSelectionEnd = mValue.Length;
+					UpdateLabel();
+				}
+				return true;
+			}
+
 			// Copy
 			case KeyCode.C:
 			{
@@ -1105,7 +1118,7 @@ public class UIInput : MonoBehaviour
 				processed = left + processed.Substring(selPos, processed.Length - selPos);
 
 				// Clamped content needs to be adjusted further
-				if (selected && label.overflowMethod == UILabel.Overflow.ClampContent)
+				if (selected && label.overflowMethod == UILabel.Overflow.ClampContent && label.maxLineCount == 1)
 				{
 					// Determine what will actually fit into the given line
 					int offset = label.CalculateOffsetToFit(processed);
