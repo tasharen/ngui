@@ -516,7 +516,7 @@ public class UIFont : MonoBehaviour
 		}
 
 		// Clear all symbols
-		for (int i = 0, imax = mSymbols.Count; i < imax; ++i)
+		for (int i = 0, imax = symbols.Count; i < imax; ++i)
 			symbols[i].MarkAsChanged();
 	}
 

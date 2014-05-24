@@ -355,7 +355,7 @@ public class EventDelegate
 #else
 					for (mMethod = null; ; )
 					{
-						mMethod = type.GetMethod(mMethodName);
+						mMethod = type.GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 						if (mMethod != null) break;
 						type = type.BaseType;
 						if (type == null) break;
