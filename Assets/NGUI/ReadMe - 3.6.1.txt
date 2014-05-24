@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.6.0
+            Version 3.6.1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,23 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.6.1
+- NEW: NGUI now fully supports 2D colliders, and will create them by default if UICamera is in 2D UI mode.
+- NEW: Added a way to automatically switch the entire UI to use 2D or 3D colliders via the NGUI->Extras.
+- NEW: Added support for TouchScreenKeyboard.hideInput (input caret, selection, etc on mobiles)
+- NEW: Added pre-generated Prefab Toolbar preview icons for Unity Free.
+- NEW: EnvelopContent script will now execute itself every time it's enabled, and will update anchors.
+- NEW: You can now see your NGUI's version via the Help menu.
+- FIX: NGUIText now supports unicode spaces (contributed by Graham Reeves).
+- FIX: Popup list was not highlighting the selection properly in some cases.
+- FIX: Popup list will now always be closed when any item gets chosen.
+- FIX: UIProgressBar will now work properly with 2D sprites and UITextures.
+- FIX: Nested scroll views instantiated at run-time should now be clipped properly.
+- FIX: Grid will now sort the list of children in GetChildList() since the hack-around didn't work.
+- FIX: Localization will load the data in the Exists() function as well.
+- FIX: Still more WP8 fixes.
+- DEL: Upgrade tools are no longer a part of the package. Grab them from the website instead.
 
 3.6.0
 - NOTE: NGUI now requires Unity 4.3.4 or higher!

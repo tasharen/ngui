@@ -1300,7 +1300,7 @@ static public class NGUITools
 		}
 		catch (System.Exception ex)
 		{
-			NGUIDebug.Log(ex.Message);
+			Debug.LogError(ex.Message);
 			return false;
 		}
 

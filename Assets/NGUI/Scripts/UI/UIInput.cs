@@ -45,7 +45,7 @@ public class UIInput : MonoBehaviour
 		PhonePad = 5,
 		NamePhonePad = 6,
 		EmailAddress = 7,
-		Hidden = 8,
+		HiddenInput = 8,
 	}
 
 	public enum OnReturnKey
@@ -536,7 +536,7 @@ public class UIInput : MonoBehaviour
 					string val;
 					TouchScreenKeyboardType kt;
 
-					if (keyboardType == KeyboardType.Hidden)
+					if (keyboardType == KeyboardType.HiddenInput)
 					{
 						TouchScreenKeyboard.hideInput = true;
 						kt = TouchScreenKeyboardType.Default;
