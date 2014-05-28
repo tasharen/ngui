@@ -38,6 +38,7 @@ public class UIButtonEditor : UIButtonColorEditor
 		if (btn.tweenTarget != null)
 		{
 			UISprite sprite = btn.tweenTarget.GetComponent<UISprite>();
+			UI2DSprite s2d = btn.tweenTarget.GetComponent<UI2DSprite>();
 
 			if (sprite != null)
 			{
@@ -55,6 +56,29 @@ public class UIButtonEditor : UIButtonColorEditor
 						NGUIEditorTools.DrawSpriteField("Hover", serializedObject, atlas, serializedObject.FindProperty("hoverSprite"), true);
 						NGUIEditorTools.DrawSpriteField("Pressed", serializedObject, atlas, serializedObject.FindProperty("pressedSprite"), true);
 						NGUIEditorTools.DrawSpriteField("Disabled", serializedObject, atlas, serializedObject.FindProperty("disabledSprite"), true);
+					}
+					EditorGUI.EndDisabledGroup();
+
+					NGUIEditorTools.DrawProperty("Pixel Snap", serializedObject, "pixelSnap");
+					NGUIEditorTools.EndContents();
+				}
+			}
+			else if (s2d != null)
+			{
+				if (NGUIEditorTools.DrawHeader("Sprites"))
+				{
+					NGUIEditorTools.BeginContents();
+					EditorGUI.BeginDisabledGroup(serializedObject.isEditingMultipleObjects);
+					{
+						SerializedObject obj = new SerializedObject(s2d);
+						obj.Update();
+						SerializedProperty atlas = obj.FindProperty("mSprite");
+						NGUIEditorTools.DrawProperty("Normal", obj, "mSprite");
+						obj.ApplyModifiedProperties();
+
+						NGUIEditorTools.DrawProperty("Hover", serializedObject, "hoverSprite2D");
+						NGUIEditorTools.DrawProperty("Pressed", serializedObject, "pressedSprite2D");
+						NGUIEditorTools.DrawProperty("Disabled", serializedObject, "disabledSprite2D");
 					}
 					EditorGUI.EndDisabledGroup();
 
