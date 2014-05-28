@@ -42,7 +42,6 @@ public class UITexture : UIBasicSprite
 			{
 				RemoveFromPanel();
 				mTexture = value;
-				if (value != null) mMat = null;
 				mPMA = -1;
 				MarkAsChanged();
 			}

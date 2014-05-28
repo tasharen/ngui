@@ -919,31 +919,21 @@ static public class NGUIText
 			remainingWidth -= glyphWidth;
 
 			// If this marks the end of a word, add it to the final string.
-			if (IsSpace(ch) && !eastern)
+			if (IsSpace(ch) && !eastern && start < offset)
 			{
-				bool sp = IsSpace(prev);
+				int end = offset - start + 1;
 
-				if (sp)
+				// Last word on the last line should not include an invisible character
+				if (lineCount == maxLineCount && remainingWidth <= 0f && offset < textLength)
 				{
-					sb.Append(' ');
-					start = offset;
+					char cho = text[offset];
+					if (cho < ' ' || IsSpace(cho)) --end;
 				}
-				else if (!sp && start < offset)
-				{
-					int end = offset - start + 1;
 
-					// Last word on the last line should not include an invisible character
-					if (lineCount == maxLineCount && remainingWidth <= 0f && offset < textLength)
-					{
-						char cho = text[offset];
-						if (cho < ' ' || IsSpace(cho)) --end;
-					}
-
-					sb.Append(text.Substring(start, end));
-					lineIsEmpty = false;
-					start = offset + 1;
-					prev = ch;
-				}
+				sb.Append(text.Substring(start, end));
+				lineIsEmpty = false;
+				start = offset + 1;
+				prev = ch;
 			}
 
 			// Doesn't fit?

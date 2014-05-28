@@ -930,7 +930,7 @@ public class UILabel : UIWidget
 	void ProcessAndRequest ()
 	{
 #if UNITY_EDITOR
-		if (!NGUITools.GetActive(this)) return;
+		if (!Application.isPlaying && !NGUITools.GetActive(this)) return;
 		if (!mAllowProcessing) return;
 #endif
 		if (ambigiousFont != null) ProcessText();

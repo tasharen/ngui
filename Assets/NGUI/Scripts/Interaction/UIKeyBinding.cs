@@ -46,6 +46,7 @@ public class UIKeyBinding : MonoBehaviour
 
 	bool mIgnoreUp = false;
 	bool mIsInput = false;
+	bool mPress = false;
 
 	/// <summary>
 	/// If we're bound to an input field, subscribe to its Submit notification.
@@ -108,13 +109,19 @@ public class UIKeyBinding : MonoBehaviour
 
 			if (Input.GetKeyDown(keyCode))
 			{
+				mPress = true;
 				UICamera.Notify(gameObject, "OnPress", true);
 			}
 
 			if (Input.GetKeyUp(keyCode))
 			{
 				UICamera.Notify(gameObject, "OnPress", false);
-				UICamera.Notify(gameObject, "OnClick", null);
+
+				if (mPress)
+				{
+					UICamera.Notify(gameObject, "OnClick", null);
+					mPress = false;
+				}
 			}
 			UICamera.currentTouch.current = null;
 		}
