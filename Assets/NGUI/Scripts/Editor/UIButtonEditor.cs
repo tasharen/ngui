@@ -72,7 +72,6 @@ public class UIButtonEditor : UIButtonColorEditor
 					{
 						SerializedObject obj = new SerializedObject(s2d);
 						obj.Update();
-						SerializedProperty atlas = obj.FindProperty("mSprite");
 						NGUIEditorTools.DrawProperty("Normal", obj, "mSprite");
 						obj.ApplyModifiedProperties();
 
