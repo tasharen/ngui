@@ -568,8 +568,8 @@ public class EventDelegate
 			int period = typeName.LastIndexOf('.');
 			if (period > 0) typeName = typeName.Substring(period + 1);
 
-			if (!string.IsNullOrEmpty(methodName)) return typeName + "." + methodName;
-			else return typeName + ".[delegate]";
+			if (!string.IsNullOrEmpty(methodName)) return typeName + "/" + methodName;
+			else return typeName + "/[delegate]";
 		}
 		return mRawDelegate ? "[delegate]" : null;
 	}

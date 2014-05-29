@@ -1509,8 +1509,8 @@ static public class NGUITools
 	{
 		if (obj == null) return "<null>";
 		string type = obj.GetType().ToString();
-		int period = type.LastIndexOf('.');
+		int period = type.LastIndexOf('/');
 		if (period > 0) type = type.Substring(period + 1);
-		return string.IsNullOrEmpty(method) ? type : type + "." + method;
+		return string.IsNullOrEmpty(method) ? type : type + "/" + method;
 	}
 }
