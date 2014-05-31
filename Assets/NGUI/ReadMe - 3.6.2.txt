@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.6.1
+            Version 3.6.2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,18 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.6.2
+- NEW: Added an optional different (minimalistic) look for NGUI's components (change via Options -> Inspector Look).
+- NEW: Typewriter script can now fade in letters gradually using alpha (have a look at Tutorial 5).
+- NEW: You can now embed overriding alpha in text using [Aa] format.
+- NEW: UIButton can now swap 2D sprites as well.
+- FIX: Embedded color's alpha now also affects the shadow and outline effects.
+- FIX: Typewriter effect should now be able to fade in multiple tags properly.
+- FIX: Replaced all usage of UICamera.lastHit.point with UICamera.lastWorldPosition (for 2D events).
+- FIX: Certain widget elements should now support 2D colliders properly (sliders and such)
+- FIX: Fixed an issue with double space in an input field causing issues.
+- FIX: Yet more WP8 stuff.
 
 3.6.1
 - NEW: NGUI now fully supports 2D colliders, and will create them by default if UICamera is in 2D UI mode.
