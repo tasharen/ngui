@@ -134,7 +134,7 @@ public class UILabelInspector : UIWidgetInspector
 					prop = NGUIEditorTools.DrawProperty("", serializedObject, "mFontStyle", GUILayout.MinWidth(40f));
 					NGUISettings.fontStyle = (FontStyle)prop.intValue;
 					
-					GUILayout.Space(18f);
+					NGUIEditorTools.DrawPadding();
 					EditorGUI.EndDisabledGroup();
 				}
 				GUILayout.EndHorizontal();
@@ -256,7 +256,7 @@ public class UILabelInspector : UIWidgetInspector
 					NGUIEditorTools.SetLabelWidth(20f);
 					NGUIEditorTools.DrawProperty("X", serializedObject, "mEffectDistance.x", GUILayout.MinWidth(40f));
 					NGUIEditorTools.DrawProperty("Y", serializedObject, "mEffectDistance.y", GUILayout.MinWidth(40f));
-					GUILayout.Space(18f);
+					NGUIEditorTools.DrawPadding();
 					NGUIEditorTools.SetLabelWidth(80f);
 				}
 			}
@@ -269,7 +269,7 @@ public class UILabelInspector : UIWidgetInspector
 			NGUIEditorTools.SetLabelWidth(20f);
 			NGUIEditorTools.DrawProperty("X", serializedObject, "mSpacingX", GUILayout.MinWidth(40f));
 			NGUIEditorTools.DrawProperty("Y", serializedObject, "mSpacingY", GUILayout.MinWidth(40f));
-			GUILayout.Space(18f);
+			NGUIEditorTools.DrawPadding();
 			NGUIEditorTools.SetLabelWidth(80f);
 			GUILayout.EndHorizontal();
 

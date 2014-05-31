@@ -931,7 +931,7 @@ public static class NGUIEditorTools
 			NGUISettings.selectedSprite = spriteName;
 			SpriteSelector.Show(callback);
 		}
-		GUILayout.Space(18f);
+		NGUIEditorTools.DrawPadding();
 		GUILayout.EndHorizontal();
 	}
 
@@ -1126,7 +1126,7 @@ public static class NGUIEditorTools
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Label(spriteName, "HelpBox", GUILayout.Height(18f));
-				GUILayout.Space(18f);
+				NGUIEditorTools.DrawPadding();
 				GUILayout.EndHorizontal();
 
 				if (GUILayout.Button("Edit", GUILayout.Width(40f)))
@@ -1263,6 +1263,12 @@ public static class NGUIEditorTools
 	/// Draw a distinctly different looking header label
 	/// </summary>
 
+	static public bool DrawMinimalisticHeader (string text) { return DrawHeader(text, text, false, true); }
+
+	/// <summary>
+	/// Draw a distinctly different looking header label
+	/// </summary>
+
 	static public bool DrawHeader (string text) { return DrawHeader(text, text, false, NGUISettings.minimalisticLook); }
 
 	/// <summary>
@@ -1288,16 +1294,15 @@ public static class NGUIEditorTools
 		if (!minimalistic) GUILayout.Space(3f);
 		if (!forceOn && !state) GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f);
 		GUILayout.BeginHorizontal();
-		if (minimalistic) GUILayout.Space(-10f);
 		GUI.changed = false;
 
 		if (minimalistic)
 		{
-			if (state) text = "\u25B2" + (char)0x200a + text;
-			else text = "\u25BC" + (char)0x200a + text;
+			if (state) text = "\u25BC" + (char)0x200a + text;
+			else text = "\u25BA" + (char)0x200a + text;
 
 			GUILayout.BeginHorizontal();
-			GUI.contentColor = new Color(1f, 1f, 1f, 0.7f);
+			GUI.contentColor = EditorGUIUtility.isProSkin ? new Color(1f, 1f, 1f, 0.7f) : new Color(0f, 0f, 0f, 0.7f);
 			if (!GUILayout.Toggle(true, text, "PreToolbar2", GUILayout.MinWidth(20f))) state = !state;
 			GUI.contentColor = Color.white;
 			GUILayout.EndHorizontal();
@@ -1305,8 +1310,8 @@ public static class NGUIEditorTools
 		else
 		{
 			text = "<b><size=11>" + text + "</size></b>";
-			if (state) text = "\u25B2 " + text;
-			else text = "\u25BC " + text;
+			if (state) text = "\u25BC " + text;
+			else text = "\u25BA " + text;
 			if (!GUILayout.Toggle(true, text, "dragtab", GUILayout.MinWidth(20f))) state = !state;
 		}
 
@@ -1337,11 +1342,14 @@ public static class NGUIEditorTools
 		{
 			mEndHorizontal = true;
 			GUILayout.BeginHorizontal();
+			EditorGUILayout.BeginHorizontal("AS TextArea", GUILayout.MinHeight(10f));
 		}
-		else mEndHorizontal = false;
-
-		if (minimalistic) EditorGUILayout.BeginHorizontal(GUILayout.MinHeight(10f));
-		else EditorGUILayout.BeginHorizontal("AS TextArea", GUILayout.MinHeight(10f));
+		else
+		{
+			mEndHorizontal = false;
+			EditorGUILayout.BeginHorizontal(GUILayout.MinHeight(10f));
+			GUILayout.Space(10f);
+		}
 		GUILayout.BeginVertical();
 		GUILayout.Space(2f);
 	}
@@ -1395,7 +1403,6 @@ public static class NGUIEditorTools
 		{
 			NGUIEditorTools.BeginContents(minimalistic);
 			GUILayout.BeginHorizontal();
-			GUILayout.Space(-2f);
 			GUILayout.BeginVertical();
 
 			EventDelegateEditor.Field(undoObject, list, notValid, notValid, minimalistic);
@@ -1453,6 +1460,8 @@ public static class NGUIEditorTools
 
 		if (sp != null)
 		{
+			if (NGUISettings.minimalisticLook) padding = false;
+
 			if (padding) EditorGUILayout.BeginHorizontal();
 			
 			if (label != null) EditorGUILayout.PropertyField(sp, new GUIContent(label), options);
@@ -1460,7 +1469,7 @@ public static class NGUIEditorTools
 
 			if (padding) 
 			{
-				GUILayout.Space(18f);
+				NGUIEditorTools.DrawPadding();
 				EditorGUILayout.EndHorizontal();
 			}
 		}
@@ -1491,7 +1500,7 @@ public static class NGUIEditorTools
 
 			if (padding)
 			{
-				GUILayout.Space(18f);
+				NGUIEditorTools.DrawPadding();
 				EditorGUILayout.EndHorizontal();
 			}
 		}
@@ -2168,5 +2177,15 @@ public static class NGUIEditorTools
 				colors[index] = Color.Lerp(c, original, original.a);
 			}
 		}
+	}
+
+	/// <summary>
+	/// Draw 18 pixel padding on the right-hand side. Used to align fields.
+	/// </summary>
+
+	static public void DrawPadding ()
+	{
+		if (!NGUISettings.minimalisticLook)
+			GUILayout.Space(18f);
 	}
 }

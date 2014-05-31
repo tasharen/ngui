@@ -70,7 +70,7 @@ public class UIInputEditor : UIWidgetContainerEditor
 			if (sp.hasMultipleDifferentValues || input.characterLimit > 0)
 			{
 				EditorGUILayout.PropertyField(sp);
-				GUILayout.Space(18f);
+				NGUIEditorTools.DrawPadding();
 			}
 			else
 			{

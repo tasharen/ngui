@@ -85,9 +85,6 @@ public class UIBasicSpriteEditor : UIWidgetInspector
 		//    NGUIEditorTools.RegisterUndo("Draw Region", mWidget);
 		//    mWidget.drawRegion = draw;
 		//}
-
-
-		GUILayout.Space(4f);
 		base.DrawCustomProperties();
 	}
 }

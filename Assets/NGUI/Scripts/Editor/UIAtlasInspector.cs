@@ -106,7 +106,7 @@ public class UIAtlasInspector : Editor
 
 		GUILayout.BeginHorizontal();
 		AtlasType after = (AtlasType)EditorGUILayout.EnumPopup("Atlas Type", mType);
-		GUILayout.Space(18f);
+		NGUIEditorTools.DrawPadding();
 		GUILayout.EndHorizontal();
 
 		if (mType != after)

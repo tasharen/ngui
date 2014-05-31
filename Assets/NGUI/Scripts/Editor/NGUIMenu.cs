@@ -478,16 +478,44 @@ static public class NGUIMenu
 	static public bool SetToGreenCheck () { return UIWidget.showHandlesWithMoveTool && NGUISettings.colorMode != NGUISettings.ColorMode.Green; }
 
 	[MenuItem("NGUI/Options/Inspector Look/Set to Minimalistic", false, 10)]
-	static public void SetToMin () { NGUISettings.minimalisticLook = true; }
+	static public void SetToMin ()
+	{
+		NGUISettings.minimalisticLook = true;
+		if (NGUITransformInspector.instance != null) NGUITransformInspector.instance.Repaint();
+	}
 
 	[MenuItem("NGUI/Options/Inspector Look/Set to Minimalistic", true, 10)]
 	static public bool SetToMinCheck () { return !NGUISettings.minimalisticLook; }
 
 	[MenuItem("NGUI/Options/Inspector Look/Set to Distinct", false, 10)]
-	static public void SetToDistinct () { NGUISettings.minimalisticLook = false; }
+	static public void SetToDistinct ()
+	{
+		NGUISettings.minimalisticLook = false;
+		if (NGUITransformInspector.instance != null) NGUITransformInspector.instance.Repaint();
+	}
 
 	[MenuItem("NGUI/Options/Inspector Look/Set to Distinct", true, 10)]
 	static public bool SetToDistinctCheck () { return NGUISettings.minimalisticLook; }
+
+	[MenuItem("NGUI/Options/Inspector Look/Set to Unified", false, 10)]
+	static public void SetToUnified ()
+	{
+		NGUISettings.unifiedTransform = true;
+		if (NGUITransformInspector.instance != null) NGUITransformInspector.instance.Repaint();
+	}
+
+	[MenuItem("NGUI/Options/Inspector Look/Set to Unified", true, 10)]
+	static public bool SetToUnifiedCheck () { return !NGUISettings.unifiedTransform; }
+
+	[MenuItem("NGUI/Options/Inspector Look/Set to Traditional", false, 10)]
+	static public void SetToTraditional ()
+	{
+		NGUISettings.unifiedTransform = false;
+		if (NGUITransformInspector.instance != null) NGUITransformInspector.instance.Repaint();
+	}
+
+	[MenuItem("NGUI/Options/Inspector Look/Set to Traditional", true, 10)]
+	static public bool SetToTraditionalCheck () { return NGUISettings.unifiedTransform; }
 
 	[MenuItem("NGUI/Options/Snapping/Turn On", false, 10)]
 	static public void TurnSnapOn () { NGUISnap.allow = true; }
@@ -501,16 +529,16 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Options/Snapping/Turn Off", true, 10)]
 	static public bool TurnSnapOffCheck () { return NGUISnap.allow; }
 
-	[MenuItem("NGUI/Options/Guides/Always On", false, 10)]
+	[MenuItem("NGUI/Options/Guides/Set to Always On", false, 10)]
 	static public void TurnGuidesOn () { NGUISettings.drawGuides = true; }
 
-	[MenuItem("NGUI/Options/Guides/Always On", true, 10)]
+	[MenuItem("NGUI/Options/Guides/Set to Always On", true, 10)]
 	static public bool TurnGuidesOnCheck () { return !NGUISettings.drawGuides; }
 
-	[MenuItem("NGUI/Options/Guides/Only When Needed", false, 10)]
+	[MenuItem("NGUI/Options/Guides/Set to Only When Needed", false, 10)]
 	static public void TurnGuidesOff () { NGUISettings.drawGuides = false; }
 
-	[MenuItem("NGUI/Options/Guides/Only When Needed", true, 10)]
+	[MenuItem("NGUI/Options/Guides/Set to Only When Needed", true, 10)]
 	static public bool TurnGuidesOffCheck () { return NGUISettings.drawGuides; }
 
 	[MenuItem("NGUI/Options/Reset Prefab Toolbar", false, 10)]

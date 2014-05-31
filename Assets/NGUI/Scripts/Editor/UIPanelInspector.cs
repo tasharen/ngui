@@ -38,6 +38,12 @@ public class UIPanelInspector : UIRectEditor
 		mPanel = target as UIPanel;
 	}
 
+	protected override void OnDisable ()
+	{
+		base.OnDisable();
+		NGUIEditorTools.HideMoveTool(false);
+	}
+
 	/// <summary>
 	/// Helper function that draws draggable knobs.
 	/// </summary>
@@ -58,8 +64,6 @@ public class UIPanelInspector : UIRectEditor
 			mStyle0.Draw(rect, GUIContent.none, id);
 		}
 	}
-
-	void OnDisable () { NGUIEditorTools.HideMoveTool(false); }
 
 	/// <summary>
 	/// Handles & interaction.
@@ -454,7 +458,7 @@ public class UIPanelInspector : UIRectEditor
 			GUI.changed = false;
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(80f);
-			Vector3 off = EditorGUILayout.Vector2Field("Offset", mPanel.clipOffset);
+			Vector3 off = EditorGUILayout.Vector2Field("Offset", mPanel.clipOffset, GUILayout.MinWidth(20f));
 			GUILayout.EndHorizontal();
 
 			if (GUI.changed)
@@ -467,12 +471,12 @@ public class UIPanelInspector : UIRectEditor
 
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(80f);
-			Vector2 pos = EditorGUILayout.Vector2Field("Center", new Vector2(range.x, range.y));
+			Vector2 pos = EditorGUILayout.Vector2Field("Center", new Vector2(range.x, range.y), GUILayout.MinWidth(20f));
 			GUILayout.EndHorizontal();
 
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(80f);
-			Vector2 size = EditorGUILayout.Vector2Field("Size", new Vector2(range.z, range.w));
+			Vector2 size = EditorGUILayout.Vector2Field("Size", new Vector2(range.z, range.w), GUILayout.MinWidth(20f));
 			GUILayout.EndHorizontal();
 
 			if (size.x < 0f) size.x = 0f;
@@ -494,7 +498,7 @@ public class UIPanelInspector : UIRectEditor
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Space(80f);
-				Vector2 soft = EditorGUILayout.Vector2Field("Softness", mPanel.clipSoftness);
+				Vector2 soft = EditorGUILayout.Vector2Field("Softness", mPanel.clipSoftness, GUILayout.MinWidth(20f));
 				GUILayout.EndHorizontal();
 
 				if (soft.x < 0f) soft.x = 0f;

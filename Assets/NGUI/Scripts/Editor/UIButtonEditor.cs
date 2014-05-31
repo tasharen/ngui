@@ -26,7 +26,7 @@ public class UIButtonEditor : UIButtonColorEditor
 		Highlight ht = sp.boolValue ? Highlight.Press : Highlight.DoNothing;
 		GUILayout.BeginHorizontal();
 		bool highlight = (Highlight)EditorGUILayout.EnumPopup("Drag Over", ht) == Highlight.Press;
-		GUILayout.Space(18f);
+		NGUIEditorTools.DrawPadding();
 		GUILayout.EndHorizontal();
 		if (sp.boolValue != highlight) sp.boolValue = highlight;
 
@@ -42,9 +42,9 @@ public class UIButtonEditor : UIButtonColorEditor
 
 			if (sprite != null)
 			{
-				if (NGUIEditorTools.DrawHeader("Sprites"))
+				if (NGUIEditorTools.DrawHeader("Sprites", "Sprites", false, true))
 				{
-					NGUIEditorTools.BeginContents();
+					NGUIEditorTools.BeginContents(true);
 					EditorGUI.BeginDisabledGroup(serializedObject.isEditingMultipleObjects);
 					{
 						SerializedObject obj = new SerializedObject(sprite);
@@ -65,9 +65,9 @@ public class UIButtonEditor : UIButtonColorEditor
 			}
 			else if (s2d != null)
 			{
-				if (NGUIEditorTools.DrawHeader("Sprites"))
+				if (NGUIEditorTools.DrawHeader("Sprites", "Sprites", false, true))
 				{
-					NGUIEditorTools.BeginContents();
+					NGUIEditorTools.BeginContents(true);
 					EditorGUI.BeginDisabledGroup(serializedObject.isEditingMultipleObjects);
 					{
 						SerializedObject obj = new SerializedObject(s2d);

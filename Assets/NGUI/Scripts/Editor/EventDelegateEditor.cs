@@ -126,7 +126,7 @@ public static class EventDelegateEditor
 
 			GUILayout.BeginHorizontal();
 			choice = EditorGUILayout.Popup("Method", index, names);
-			GUILayout.Space(18f);
+			NGUIEditorTools.DrawPadding();
 			GUILayout.EndHorizontal();
 
 			if (choice > 0 && choice != index)
@@ -175,7 +175,7 @@ public static class EventDelegateEditor
 
 						GUILayout.BeginHorizontal();
 						int newSel = EditorGUILayout.Popup(" ", selection, props);
-						GUILayout.Space(18f);
+						NGUIEditorTools.DrawPadding();
 						GUILayout.EndHorizontal();
 
 						if (GUI.changed)

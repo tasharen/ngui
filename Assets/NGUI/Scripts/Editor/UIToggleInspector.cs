@@ -34,9 +34,9 @@ public class UIToggleInspector : UIWidgetContainerEditor
 		NGUIEditorTools.DrawProperty("Starting State", serializedObject, "startsActive");
 		NGUIEditorTools.SetLabelWidth(80f);
 
-		if (NGUIEditorTools.DrawHeader("State Transition"))
+		if (NGUIEditorTools.DrawMinimalisticHeader("State Transition"))
 		{
-			NGUIEditorTools.BeginContents();
+			NGUIEditorTools.BeginContents(true);
 			NGUIEditorTools.DrawProperty("Sprite", serializedObject, "activeSprite");
 			NGUIEditorTools.DrawProperty("Animation", serializedObject, "activeAnimation");
 
@@ -50,7 +50,7 @@ public class UIToggleInspector : UIWidgetContainerEditor
 				Transition tr = toggle.instantTween ? Transition.Instant : Transition.Smooth;
 				GUILayout.BeginHorizontal();
 				tr = (Transition)EditorGUILayout.EnumPopup("Transition", tr);
-				GUILayout.Space(18f);
+				NGUIEditorTools.DrawPadding();
 				GUILayout.EndHorizontal();
 
 				if (GUI.changed)
