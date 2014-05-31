@@ -60,14 +60,14 @@ public static class EventDelegateEditor
 
 	static public bool Field (Object undoObject, EventDelegate del)
 	{
-		return Field(undoObject, del, true);
+		return Field(undoObject, del, true, NGUISettings.minimalisticLook);
 	}
 
 	/// <summary>
 	/// Draw an editor field for the Unity Delegate.
 	/// </summary>
 
-	static public bool Field (Object undoObject, EventDelegate del, bool removeButton)
+	static public bool Field (Object undoObject, EventDelegate del, bool removeButton, bool minimalistic)
 	{
 		if (del == null) return false;
 		bool prev = GUI.changed;
@@ -78,6 +78,8 @@ public static class EventDelegateEditor
 
 		if (removeButton && (del.target != null || del.isValid))
 		{
+			if (!minimalistic) NGUIEditorTools.SetLabelWidth(82f);
+
 			if (del.target == null && del.isValid)
 			{
 				EditorGUILayout.LabelField("Notify", del.ToString());
@@ -87,25 +89,18 @@ public static class EventDelegateEditor
 				target = EditorGUILayout.ObjectField("Notify", del.target, typeof(MonoBehaviour), true) as MonoBehaviour;
 			}
 
-			GUILayout.Space(-20f);
+			GUILayout.Space(-18f);
 			GUILayout.BeginHorizontal();
-			GUILayout.Space(64f);
+			GUILayout.Space(70f);
 
-#if UNITY_3_5
-			if (GUILayout.Button("X", GUILayout.Width(20f)))
-#else
-			if (GUILayout.Button("", "ToggleMixed", GUILayout.Width(20f)))
-#endif
+			if (GUILayout.Button("", "ToggleMixed", GUILayout.Width(20f), GUILayout.Height(16f)))
 			{
 				target = null;
 				remove = true;
 			}
 			GUILayout.EndHorizontal();
 		}
-		else
-		{
-			target = EditorGUILayout.ObjectField("Notify", del.target, typeof(MonoBehaviour), true) as MonoBehaviour;
-		}
+		else target = EditorGUILayout.ObjectField("Notify", del.target, typeof(MonoBehaviour), true) as MonoBehaviour;
 
 		if (remove)
 		{
@@ -243,14 +238,23 @@ public static class EventDelegateEditor
 
 	static public void Field (Object undoObject, List<EventDelegate> list)
 	{
-		Field(undoObject, list, null, null);
+		Field(undoObject, list, null, null, NGUISettings.minimalisticLook);
 	}
 
 	/// <summary>
 	/// Draw a list of fields for the specified list of delegates.
 	/// </summary>
 
-	static public void Field (Object undoObject, List<EventDelegate> list, string noTarget, string notValid)
+	static public void Field (Object undoObject, List<EventDelegate> list, bool minimalistic)
+	{
+		Field(undoObject, list, null, null, minimalistic);
+	}
+
+	/// <summary>
+	/// Draw a list of fields for the specified list of delegates.
+	/// </summary>
+
+	static public void Field (Object undoObject, List<EventDelegate> list, string noTarget, string notValid, bool minimalistic)
 	{
 		bool targetPresent = false;
 		bool isValid = false;
@@ -266,7 +270,7 @@ public static class EventDelegateEditor
 				continue;
 			}
 
-			Field(undoObject, del);
+			Field(undoObject, del, true, minimalistic);
 			EditorGUILayout.Space();
 
 			if (del.target == null && !del.isValid)
@@ -284,7 +288,7 @@ public static class EventDelegateEditor
 
 		// Draw a new delegate
 		EventDelegate newDel = new EventDelegate();
-		Field(undoObject, newDel);
+		Field(undoObject, newDel, true, minimalistic);
 
 		if (newDel.target != null)
 		{

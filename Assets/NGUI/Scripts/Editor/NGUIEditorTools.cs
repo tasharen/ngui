@@ -990,7 +990,7 @@ public static class NGUIEditorTools
 
 	static public void DrawSpriteField (string label, SerializedObject ob, string spriteField, params GUILayoutOption[] options)
 	{
-		DrawSpriteField(label, ob, ob.FindProperty("atlas"), ob.FindProperty(spriteField), 76f, false, false, options);
+		DrawSpriteField(label, ob, ob.FindProperty("atlas"), ob.FindProperty(spriteField), 82f, false, false, options);
 	}
 
 	/// <summary>
@@ -999,7 +999,7 @@ public static class NGUIEditorTools
 
 	static public void DrawSpriteField (string label, SerializedObject ob, SerializedProperty atlas, SerializedProperty sprite, params GUILayoutOption[] options)
 	{
-		DrawSpriteField(label, ob, atlas, sprite, 76f, false, false, options);
+		DrawSpriteField(label, ob, atlas, sprite, 82f, false, false, options);
 	}
 
 	/// <summary>
@@ -1008,7 +1008,7 @@ public static class NGUIEditorTools
 
 	static public void DrawSpriteField (string label, SerializedObject ob, SerializedProperty atlas, SerializedProperty sprite, bool removable, params GUILayoutOption[] options)
 	{
-		DrawSpriteField(label, ob, atlas, sprite, 76f, false, removable, options);
+		DrawSpriteField(label, ob, atlas, sprite, 82f, false, removable, options);
 	}
 
 	/// <summary>
@@ -1040,13 +1040,10 @@ public static class NGUIEditorTools
 				EditorGUI.EndDisabledGroup();
 
 				EditorGUI.BeginDisabledGroup(!removable);
-#if UNITY_3_5
-				if (GUILayout.Button("X", GUILayout.Width(20f))) sprite.stringValue = "";
-#else
 				if (GUILayout.Button("", "ToggleMixed", GUILayout.Width(20f))) sprite.stringValue = "";
-#endif
 				EditorGUI.EndDisabledGroup();
-				if (padded) GUILayout.Space(18f);
+				if (padded) GUILayout.Space(12f);
+				else GUILayout.Space(-6f);
 				GUILayout.EndHorizontal();
 			}
 			GUILayout.EndHorizontal();
@@ -1266,47 +1263,56 @@ public static class NGUIEditorTools
 	/// Draw a distinctly different looking header label
 	/// </summary>
 
-	static public bool DrawHeader (string text) { return DrawHeader(text, text, false); }
+	static public bool DrawHeader (string text) { return DrawHeader(text, text, false, NGUISettings.minimalisticLook); }
 
 	/// <summary>
 	/// Draw a distinctly different looking header label
 	/// </summary>
 
-	static public bool DrawHeader (string text, string key) { return DrawHeader(text, key, false); }
+	static public bool DrawHeader (string text, string key) { return DrawHeader(text, key, false, NGUISettings.minimalisticLook); }
 
 	/// <summary>
 	/// Draw a distinctly different looking header label
 	/// </summary>
 
-	static public bool DrawHeader (string text, bool forceOn) { return DrawHeader(text, text, forceOn); }
+	static public bool DrawHeader (string text, bool detailed) { return DrawHeader(text, text, detailed, !detailed); }
 
 	/// <summary>
 	/// Draw a distinctly different looking header label
 	/// </summary>
 
-	static public bool DrawHeader (string text, string key, bool forceOn)
+	static public bool DrawHeader (string text, string key, bool forceOn, bool minimalistic)
 	{
 		bool state = EditorPrefs.GetBool(key, true);
 
-		GUILayout.Space(3f);
+		if (!minimalistic) GUILayout.Space(3f);
 		if (!forceOn && !state) GUI.backgroundColor = new Color(0.8f, 0.8f, 0.8f);
 		GUILayout.BeginHorizontal();
-		GUILayout.Space(3f);
-
+		if (minimalistic) GUILayout.Space(-10f);
 		GUI.changed = false;
-#if UNITY_3_5
-		if (state) text = "\u25B2 " + text;
-		else text = "\u25BC " + text;
-		if (!GUILayout.Toggle(true, text, "dragtab", GUILayout.MinWidth(20f))) state = !state;
-#else
-		text = "<b><size=11>" + text + "</size></b>";
-		if (state) text = "\u25B2 " + text;
-		else text = "\u25BC " + text;
-		if (!GUILayout.Toggle(true, text, "dragtab", GUILayout.MinWidth(20f))) state = !state;
-#endif
+
+		if (minimalistic)
+		{
+			if (state) text = "\u25B2" + (char)0x200a + text;
+			else text = "\u25BC" + (char)0x200a + text;
+
+			GUILayout.BeginHorizontal();
+			GUI.contentColor = new Color(1f, 1f, 1f, 0.7f);
+			if (!GUILayout.Toggle(true, text, "PreToolbar2", GUILayout.MinWidth(20f))) state = !state;
+			GUI.contentColor = Color.white;
+			GUILayout.EndHorizontal();
+		}
+		else
+		{
+			text = "<b><size=11>" + text + "</size></b>";
+			if (state) text = "\u25B2 " + text;
+			else text = "\u25BC " + text;
+			if (!GUILayout.Toggle(true, text, "dragtab", GUILayout.MinWidth(20f))) state = !state;
+		}
+
 		if (GUI.changed) EditorPrefs.SetBool(key, state);
 
-		GUILayout.Space(2f);
+		if (!minimalistic) GUILayout.Space(2f);
 		GUILayout.EndHorizontal();
 		GUI.backgroundColor = Color.white;
 		if (!forceOn && !state) GUILayout.Space(3f);
@@ -1317,11 +1323,25 @@ public static class NGUIEditorTools
 	/// Begin drawing the content area.
 	/// </summary>
 
-	static public void BeginContents ()
+	static public void BeginContents () { BeginContents(NGUISettings.minimalisticLook); }
+
+	static bool mEndHorizontal = false;
+
+	/// <summary>
+	/// Begin drawing the content area.
+	/// </summary>
+
+	static public void BeginContents (bool minimalistic)
 	{
-		GUILayout.BeginHorizontal();
-		GUILayout.Space(4f);
-		EditorGUILayout.BeginHorizontal("AS TextArea", GUILayout.MinHeight(10f));
+		if (!minimalistic)
+		{
+			mEndHorizontal = true;
+			GUILayout.BeginHorizontal();
+		}
+		else mEndHorizontal = false;
+
+		if (minimalistic) EditorGUILayout.BeginHorizontal(GUILayout.MinHeight(10f));
+		else EditorGUILayout.BeginHorizontal("AS TextArea", GUILayout.MinHeight(10f));
 		GUILayout.BeginVertical();
 		GUILayout.Space(2f);
 	}
@@ -1335,8 +1355,13 @@ public static class NGUIEditorTools
 		GUILayout.Space(3f);
 		GUILayout.EndVertical();
 		EditorGUILayout.EndHorizontal();
-		GUILayout.Space(3f);
-		GUILayout.EndHorizontal();
+
+		if (mEndHorizontal)
+		{
+			GUILayout.Space(3f);
+			GUILayout.EndHorizontal();
+		}
+
 		GUILayout.Space(3f);
 	}
 
@@ -1346,19 +1371,40 @@ public static class NGUIEditorTools
 
 	static public void DrawEvents (string text, Object undoObject, List<EventDelegate> list)
 	{
-		DrawEvents(text, undoObject, list, null, null);
+		DrawEvents(text, undoObject, list, null, null, NGUISettings.minimalisticLook);
 	}
 
 	/// <summary>
 	/// Draw a list of fields for the specified list of delegates.
 	/// </summary>
 
-	static public void DrawEvents (string text, Object undoObject, List<EventDelegate> list, string noTarget, string notValid)
+	static public void DrawEvents (string text, Object undoObject, List<EventDelegate> list, bool minimalistic)
 	{
-		if (!NGUIEditorTools.DrawHeader(text)) return;
-		NGUIEditorTools.BeginContents();
-		EventDelegateEditor.Field(undoObject, list, notValid, notValid);
-		NGUIEditorTools.EndContents();
+		DrawEvents(text, undoObject, list, null, null, minimalistic);
+	}
+
+	/// <summary>
+	/// Draw a list of fields for the specified list of delegates.
+	/// </summary>
+
+	static public void DrawEvents (string text, Object undoObject, List<EventDelegate> list, string noTarget, string notValid, bool minimalistic)
+	{
+		if (!NGUIEditorTools.DrawHeader(text, text, false, minimalistic)) return;
+
+		if (!minimalistic)
+		{
+			NGUIEditorTools.BeginContents(minimalistic);
+			GUILayout.BeginHorizontal();
+			GUILayout.Space(-2f);
+			GUILayout.BeginVertical();
+
+			EventDelegateEditor.Field(undoObject, list, notValid, notValid, minimalistic);
+
+			GUILayout.EndVertical();
+			GUILayout.EndHorizontal();
+			NGUIEditorTools.EndContents();
+		}
+		else EventDelegateEditor.Field(undoObject, list, notValid, notValid, minimalistic);
 	}
 
 	/// <summary>

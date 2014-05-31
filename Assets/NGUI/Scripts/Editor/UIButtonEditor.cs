@@ -88,6 +88,6 @@ public class UIButtonEditor : UIButtonColorEditor
 		}
 
 		UIButton button = target as UIButton;
-		NGUIEditorTools.DrawEvents("On Click", button, button.onClick);
+		NGUIEditorTools.DrawEvents("On Click", button, button.onClick, false);
 	}
 }

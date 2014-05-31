@@ -171,6 +171,12 @@ public class NGUISettings
 
 #region Convenience accessor properties
 
+	static public bool minimalisticLook
+	{
+		get { return GetBool("NGUI Minimalistic", true); }
+		set { SetBool("NGUI Minimalistic", value); }
+	}
+
 	static public Color color
 	{
 		get { return GetColor("NGUI Color", Color.white); }

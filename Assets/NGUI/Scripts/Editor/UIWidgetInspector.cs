@@ -974,7 +974,7 @@ public class UIWidgetInspector : UIRectEditor
 			{
 				EditorGUI.BeginDisabledGroup(serializedObject.isEditingMultipleObjects);
 
-				if (GUILayout.Button("Snap", GUILayout.Width(68f)))
+				if (GUILayout.Button("Snap", GUILayout.Width(60f)))
 				{
 					foreach (GameObject go in Selection.gameObjects)
 					{

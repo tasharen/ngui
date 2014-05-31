@@ -7,11 +7,11 @@ using UnityEngine;
 using System.Text;
 
 /// <summary>
-/// Trivial script that fills the label's contents gradually, as if someone was typing.
+/// This script is able to fill in the label's text gradually, giving the effect of someone typing or fading in the content over time.
 /// </summary>
 
 [RequireComponent(typeof(UILabel))]
-[AddComponentMenu("NGUI/Examples/Typewriter Effect")]
+[AddComponentMenu("NGUI/Interaction/Typewriter Effect")]
 public class TypewriterEffect : MonoBehaviour
 {
 	struct FadeEntry

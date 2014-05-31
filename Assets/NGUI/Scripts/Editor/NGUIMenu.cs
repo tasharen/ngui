@@ -477,6 +477,18 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Options/Handles/Set to Green", true, 10)]
 	static public bool SetToGreenCheck () { return UIWidget.showHandlesWithMoveTool && NGUISettings.colorMode != NGUISettings.ColorMode.Green; }
 
+	[MenuItem("NGUI/Options/Inspector Look/Set to Minimalistic", false, 10)]
+	static public void SetToMin () { NGUISettings.minimalisticLook = true; }
+
+	[MenuItem("NGUI/Options/Inspector Look/Set to Minimalistic", true, 10)]
+	static public bool SetToMinCheck () { return !NGUISettings.minimalisticLook; }
+
+	[MenuItem("NGUI/Options/Inspector Look/Set to Distinct", false, 10)]
+	static public void SetToDistinct () { NGUISettings.minimalisticLook = false; }
+
+	[MenuItem("NGUI/Options/Inspector Look/Set to Distinct", true, 10)]
+	static public bool SetToDistinctCheck () { return NGUISettings.minimalisticLook; }
+
 	[MenuItem("NGUI/Options/Snapping/Turn On", false, 10)]
 	static public void TurnSnapOn () { NGUISnap.allow = true; }
 

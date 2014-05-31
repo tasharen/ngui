@@ -712,8 +712,8 @@ public class UIAtlasMaker : EditorWindow
 		NGUIEditorTools.SetLabelWidth(80f);
 		GUILayout.Space(3f);
 
-		NGUIEditorTools.DrawHeader("Input");
-		NGUIEditorTools.BeginContents();
+		NGUIEditorTools.DrawHeader("Input", true);
+		NGUIEditorTools.BeginContents(false);
 
 		GUILayout.BeginHorizontal();
 		{
