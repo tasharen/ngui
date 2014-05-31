@@ -117,6 +117,25 @@ static public class NGUIMath
 
 	/// <summary>
 	/// Convert a decimal value to its hex representation.
+	/// </summary>
+
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
+	static public string DecimalToHex8 (int num)
+	{
+		num &= 0xFF;
+#if UNITY_FLASH
+		StringBuilder sb = new StringBuilder();
+		sb.Append(DecimalToHexChar((num >> 4) & 0xF));
+		sb.Append(DecimalToHexChar(num & 0xF));
+		return sb.ToString();
+#else
+		return num.ToString("X2");
+#endif
+	}
+
+	/// <summary>
+	/// Convert a decimal value to its hex representation.
 	/// It's coded because num.ToString("X6") syntax doesn't seem to be supported by Unity's Flash. It just silently crashes.
 	/// string.Format("{0,6:X}", num).Replace(' ', '0') doesn't work either. It returns the format string, not the formatted value.
 	/// </summary>

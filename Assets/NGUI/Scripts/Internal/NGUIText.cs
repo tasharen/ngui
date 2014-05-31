@@ -250,20 +250,37 @@ static public class NGUIText
 
 	static Color mInvisible = new Color(0f, 0f, 0f, 0f);
 	static BetterList<Color> mColors = new BetterList<Color>();
+	static float mAlpha = 1f;
 #if DYNAMIC_FONT
 	static CharacterInfo mTempChar;
 #endif
 
 	/// <summary>
+	/// Parse Aa syntax alpha encoded in the string.
+	/// </summary>
+
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
+	static public float ParseAlpha (string text, int index)
+	{
+		int a = (NGUIMath.HexToDecimal(text[index + 1]) << 4) | NGUIMath.HexToDecimal(text[index + 2]);
+		return Mathf.Clamp01(a / 255f);
+	}
+
+	/// <summary>
 	/// Parse a RrGgBb color encoded in the string.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public Color ParseColor (string text, int offset) { return ParseColor24(text, offset); }
 
 	/// <summary>
 	/// Parse a RrGgBb color encoded in the string.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public Color ParseColor24 (string text, int offset)
 	{
 		int r = (NGUIMath.HexToDecimal(text[offset])     << 4) | NGUIMath.HexToDecimal(text[offset + 1]);
@@ -277,6 +294,8 @@ static public class NGUIText
 	/// Parse a RrGgBbAa color encoded in the string.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public Color ParseColor32 (string text, int offset)
 	{
 		int r = (NGUIMath.HexToDecimal(text[offset]) << 4) | NGUIMath.HexToDecimal(text[offset + 1]);
@@ -291,12 +310,28 @@ static public class NGUIText
 	/// The reverse of ParseColor -- encodes a color in RrGgBb format.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public string EncodeColor (Color c) { return EncodeColor24(c); }
+
+	/// <summary>
+	/// The reverse of ParseAlpha -- encodes a color in Aa format.
+	/// </summary>
+
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
+	static public string EncodeAlpha (float a)
+	{
+		int i = Mathf.Clamp(Mathf.RoundToInt(a * 255f), 0, 255);
+		return NGUIMath.DecimalToHex8(i);
+	}
 
 	/// <summary>
 	/// The reverse of ParseColor24 -- encodes a color in RrGgBb format.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public string EncodeColor24 (Color c)
 	{
 		int i = 0xFFFFFF & (NGUIMath.ColorToInt(c) >> 8);
@@ -307,6 +342,8 @@ static public class NGUIText
 	/// The reverse of ParseColor32 -- encodes a color in RrGgBb format.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public string EncodeColor32 (Color c)
 	{
 		int i = NGUIMath.ColorToInt(c);
@@ -401,6 +438,12 @@ static public class NGUIText
 				strike = false;
 				index += 4;
 				return true;
+
+				default:
+				int a = (NGUIMath.HexToDecimal(text[index + 1]) << 4) | NGUIMath.HexToDecimal(text[index + 2]);
+				mAlpha = a / 255f;
+				index += 4;
+				return true;
 			}
 		}
 
@@ -455,6 +498,11 @@ static public class NGUIText
 			if (closingBracket != -1)
 			{
 				index = closingBracket + 1;
+				return true;
+			}
+			else
+			{
+				index = text.Length;
 				return true;
 			}
 		}
@@ -1015,6 +1063,7 @@ static public class NGUIText
 
 		// Start with the white tint
 		mColors.Add(Color.white);
+		mAlpha = 1f;
 
 		int ch = 0, prev = 0;
 		float x = 0f, y = 0f, maxX = 0f;
@@ -1085,7 +1134,11 @@ static public class NGUIText
 			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold, ref italic, ref underline, ref strikethrough))
 			{
 				Color fc = tint * mColors[mColors.size - 1];
+				fc.a *= mAlpha;
 				uc = fc;
+
+				for (int b = 0, bmax = mColors.size - 2; b < bmax; ++b)
+					fc.a *= mColors[b].a;
 
 				if (gradient)
 				{

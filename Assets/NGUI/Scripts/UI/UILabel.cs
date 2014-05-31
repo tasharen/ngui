@@ -1322,13 +1322,7 @@ public class UILabel : UIWidget
 			{
 				linkStart += 5;
 				int linkEnd = mText.IndexOf("]", linkStart);
-
-				if (linkEnd != -1)
-				{
-					int closingStatement = mText.IndexOf("[/url]", linkEnd);
-					if (closingStatement == -1 || closingStatement >= characterIndex)
-						return mText.Substring(linkStart, linkEnd - linkStart);
-				}
+				if (linkEnd != -1) return mText.Substring(linkStart, linkEnd - linkStart);
 			}
 		}
 		return null;
@@ -1546,7 +1540,19 @@ public class UILabel : UIWidget
 			v.x += x;
 			v.y += y;
 			verts.buffer[i] = v;
-			cols.buffer[i] = col;
+
+			Color32 uc = cols.buffer[i];
+
+			if (uc.a == 255)
+			{
+				cols.buffer[i] = col;
+			}
+			else
+			{
+				Color fc = c;
+				fc.a = (uc.a / 255f * c.a);
+				cols.buffer[i] = (bitmapFont != null && bitmapFont.premultipliedAlphaShader) ? NGUITools.ApplyPMA(fc) : fc;
+			}
 		}
 	}
 
