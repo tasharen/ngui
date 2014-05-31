@@ -1371,7 +1371,7 @@ public static class NGUIEditorTools
 
 	static public void DrawEvents (string text, Object undoObject, List<EventDelegate> list)
 	{
-		DrawEvents(text, undoObject, list, null, null, NGUISettings.minimalisticLook);
+		DrawEvents(text, undoObject, list, null, null, false);
 	}
 
 	/// <summary>
