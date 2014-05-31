@@ -48,6 +48,7 @@ public class UIButtonColorEditor : UIWidgetContainerEditor
 		if (NGUIEditorTools.DrawHeader("Colors", "Colors", false, true))
 		{
 			NGUIEditorTools.BeginContents(true);
+			NGUIEditorTools.SetLabelWidth(76f);
 			UIButtonColor btn = target as UIButtonColor;
 
 			if (btn.tweenTarget != null)

@@ -999,7 +999,7 @@ public static class NGUIEditorTools
 
 	static public void DrawSpriteField (string label, SerializedObject ob, SerializedProperty atlas, SerializedProperty sprite, params GUILayoutOption[] options)
 	{
-		DrawSpriteField(label, ob, atlas, sprite, 82f, false, false, options);
+		DrawSpriteField(label, ob, atlas, sprite, 72f, false, false, options);
 	}
 
 	/// <summary>
@@ -1008,7 +1008,7 @@ public static class NGUIEditorTools
 
 	static public void DrawSpriteField (string label, SerializedObject ob, SerializedProperty atlas, SerializedProperty sprite, bool removable, params GUILayoutOption[] options)
 	{
-		DrawSpriteField(label, ob, atlas, sprite, 82f, false, removable, options);
+		DrawSpriteField(label, ob, atlas, sprite, 72f, false, removable, options);
 	}
 
 	/// <summary>
