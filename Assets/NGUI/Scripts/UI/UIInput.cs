@@ -541,7 +541,7 @@ public class UIInput : MonoBehaviour
 					string val;
 					TouchScreenKeyboardType kt;
 
-					if (hideInput && !label.multiLine)
+					if (hideInput)
 					{
 						TouchScreenKeyboard.hideInput = true;
 						kt = (TouchScreenKeyboardType)((int)keyboardType);
@@ -562,7 +562,7 @@ public class UIInput : MonoBehaviour
 
 					mKeyboard = (inputType == InputType.Password) ?
 						TouchScreenKeyboard.Open(val, kt, false, false, true) :
-						TouchScreenKeyboard.Open(val, kt, inputType == InputType.AutoCorrect, label.multiLine, false, false, defaultText);
+						TouchScreenKeyboard.Open(val, kt, inputType == InputType.AutoCorrect, label.multiLine && !hideInput, false, false, defaultText);
 				}
 				else
 #endif
