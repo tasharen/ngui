@@ -45,7 +45,6 @@ public class UIInput : MonoBehaviour
 		PhonePad = 5,
 		NamePhonePad = 6,
 		EmailAddress = 7,
-		HiddenInput = 8,
 	}
 
 	public enum OnReturnKey
@@ -92,6 +91,12 @@ public class UIInput : MonoBehaviour
 	/// </summary>
 
 	public KeyboardType keyboardType = KeyboardType.Default;
+
+	/// <summary>
+	/// Whether the input will be hidden on mobile platforms.
+	/// </summary>
+
+	public bool hideInput = false;
 
 	/// <summary>
 	/// What kind of validation to use with the input field's data.
@@ -536,10 +541,10 @@ public class UIInput : MonoBehaviour
 					string val;
 					TouchScreenKeyboardType kt;
 
-					if (keyboardType == KeyboardType.HiddenInput)
+					if (hideInput && !label.multiLine)
 					{
 						TouchScreenKeyboard.hideInput = true;
-						kt = TouchScreenKeyboardType.Default;
+						kt = (TouchScreenKeyboardType)((int)keyboardType);
 						val = "|";
 					}
 					else if (inputType == InputType.Password)

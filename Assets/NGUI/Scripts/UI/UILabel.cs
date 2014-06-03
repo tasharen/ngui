@@ -1618,6 +1618,7 @@ public class UILabel : UIWidget
 	public bool Wrap (string text, out string final, int height)
 	{
 		UpdateNGUIText();
+		NGUIText.rectHeight = height;
 		return NGUIText.WrapText(text, out final);
 	}
 

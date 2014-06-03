@@ -1973,9 +1973,7 @@ public static class NGUIEditorTools
 		return (!string.IsNullOrEmpty(path)) ? AssetDatabase.AssetPathToGUID(path) : null;
 	}
 
-#if !UNITY_3_5
 	static MethodInfo s_GetInstanceIDFromGUID;
-#endif
 
 	/// <summary>
 	/// Convert the specified GUID to an object reference.
@@ -1984,13 +1982,12 @@ public static class NGUIEditorTools
 	static public Object GUIDToObject (string guid)
 	{
 		if (string.IsNullOrEmpty(guid)) return null;
-#if !UNITY_3_5
-		// This method is not going to be available in Unity 3.5
+		
 		if (s_GetInstanceIDFromGUID == null)
 			s_GetInstanceIDFromGUID = typeof(AssetDatabase).GetMethod("GetInstanceIDFromGUID", BindingFlags.Static | BindingFlags.NonPublic);
+
 		int id = (int)s_GetInstanceIDFromGUID.Invoke(null, new object[] { guid });
 		if (id != 0) return EditorUtility.InstanceIDToObject(id);
-#endif
 		string path = AssetDatabase.GUIDToAssetPath(guid);
 		if (string.IsNullOrEmpty(path)) return null;
 		return AssetDatabase.LoadAssetAtPath(path, typeof(Object));
