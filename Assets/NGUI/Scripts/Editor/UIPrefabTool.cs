@@ -491,12 +491,7 @@ public class UIPrefabTool : EditorWindow
 
 		if (point != null) SetupSnapshotCamera(child, cam, point);
 		else SetupSnapshotCamera(child, cam, objSize, Mathf.RoundToInt(Mathf.Max(size.x, size.y)), -100f, 100f);
-
-		Execute<UIWidget>("Start", root);
-		Execute<UIPanel>("Start", root);
-		Execute<UIWidget>("Update", root);
-		Execute<UIPanel>("Update", root);
-		Execute<UIPanel>("LateUpdate", root);
+		NGUITools.ImmediatelyCreateDrawCalls(root);
 		return true;
 	}
 
@@ -685,25 +680,6 @@ public class UIPrefabTool : EditorWindow
 				mLights[i].enabled = true;
 			mLights = null;
 		}
-	}
-
-	/// <summary>
-	/// Helper function that executes the functions in a proper order.
-	/// </summary>
-
-	static void Execute<T> (string funcName, GameObject root) where T : Component
-	{
-		T[] comps = root.GetComponents<T>();
-
-		foreach (T comp in comps)
-		{
-			MethodInfo method = comp.GetType().GetMethod(funcName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-			if (method != null) method.Invoke(comp, null);
-		}
-
-		Transform t = root.transform;
-		for (int i = 0, imax = t.childCount; i < imax; ++i)
-			Execute<T>(funcName, t.GetChild(i).gameObject);
 	}
 
 	/// <summary>

@@ -601,9 +601,13 @@ static public class NGUIMenu
 			NGUITools.DestroyImmediate(c);
 
 			BoxCollider bc = go.AddComponent<BoxCollider>();
-			bc.size = size;
-			bc.center = center;
-			bc.isTrigger = true;
+
+			if (bc != null)
+			{
+				bc.size = size;
+				bc.center = center;
+				bc.isTrigger = true;
+			}
 			NGUITools.SetDirty(go);
 		}
 	}

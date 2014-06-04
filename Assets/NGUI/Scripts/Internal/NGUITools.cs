@@ -187,11 +187,7 @@ static public class NGUITools
 
 	static public T[] FindActive<T> () where T : Component
 	{
-//#if UNITY_3_5 || UNITY_4_0
-//        return GameObject.FindSceneObjectsOfType(typeof(T)) as T[];
-//#else
 		return GameObject.FindObjectsOfType(typeof(T)) as T[];
-//#endif
 	}
 
 	/// <summary>
@@ -353,7 +349,6 @@ static public class NGUITools
 		}
 	}
 
-#if !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 	/// <summary>
 	/// Adjust the widget's collider based on the depth of the widgets, as well as the widget's dimensions.
 	/// </summary>
@@ -382,7 +377,6 @@ static public class NGUITools
 #endif
 		}
 	}
-#endif
 
 	/// <summary>
 	/// Helper function that returns the string name of the type.
@@ -416,11 +410,7 @@ static public class NGUITools
 	static public void RegisterUndo (UnityEngine.Object obj, string name)
 	{
 #if UNITY_EDITOR
- #if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
-		UnityEditor.Undo.RegisterUndo(obj, name);
- #else
 		UnityEditor.Undo.RecordObject(obj, name);
- #endif
 		NGUITools.SetDirty(obj);
 #endif
 	}
@@ -477,10 +467,7 @@ static public class NGUITools
 	static public GameObject AddChild (GameObject parent, GameObject prefab)
 	{
 		GameObject go = GameObject.Instantiate(prefab) as GameObject;
-
-#if UNITY_EDITOR && !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 		UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
-#endif
 
 		if (go != null && parent != null)
 		{
@@ -1040,7 +1027,7 @@ static public class NGUITools
 	/// Activate the specified object and all of its children.
 	/// </summary>
 
-	static void Activate (Transform t) { Activate(t, true); }
+	static void Activate (Transform t) { Activate(t, false); }
 
 	/// <summary>
 	/// Activate the specified object and all of its children.
@@ -1050,15 +1037,6 @@ static public class NGUITools
 	{
 		SetActiveSelf(t.gameObject, true);
 
-		// Prior to Unity 4, active state was not nested. It was possible to have an enabled child of a disabled object.
-		// Unity 4 onwards made it so that the state is nested, and a disabled parent results in a disabled child.
-#if UNITY_3_5
-		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
-		{
-			Transform child = t.GetChild(i);
-			Activate(child);
-		}
-#else
 		if (compatibilityMode)
 		{
 			// If there is even a single enabled child, then we're using a Unity 4.0-based nested active state scheme.
@@ -1075,24 +1053,13 @@ static public class NGUITools
 				Activate(child, true);
 			}
 		}
-#endif
 	}
 
 	/// <summary>
 	/// Deactivate the specified object and all of its children.
 	/// </summary>
 
-	static void Deactivate (Transform t)
-	{
-#if UNITY_3_5
-		for (int i = 0, imax = t.GetChildCount(); i < imax; ++i)
-		{
-			Transform child = t.GetChild(i);
-			Deactivate(child);
-		}
-#endif
-		SetActiveSelf(t.gameObject, false);
-	}
+	static void Deactivate (Transform t) { SetActiveSelf(t.gameObject, false); }
 
 	/// <summary>
 	/// SetActiveRecursively enables children before parents. This is a problem when a widget gets re-enabled
@@ -1169,11 +1136,7 @@ static public class NGUITools
 	[System.Obsolete("Use NGUITools.GetActive instead")]
 	static public bool IsActive (Behaviour mb)
 	{
-#if UNITY_3_5
-		return mb != null && mb.enabled && mb.gameObject.active;
-#else
 		return mb != null && mb.enabled && mb.gameObject.activeInHierarchy;
-#endif
 	}
 
 	/// <summary>
@@ -1184,11 +1147,7 @@ static public class NGUITools
 	[System.Diagnostics.DebuggerStepThrough]
 	static public bool GetActive (Behaviour mb)
 	{
-#if UNITY_3_5
-		return mb && mb.enabled && mb.gameObject.active;
-#else
 		return mb && mb.enabled && mb.gameObject.activeInHierarchy;
-#endif
 	}
 
 	/// <summary>
@@ -1199,11 +1158,7 @@ static public class NGUITools
 	[System.Diagnostics.DebuggerStepThrough]
 	static public bool GetActive (GameObject go)
 	{
-#if UNITY_3_5
-		return go && go.active;
-#else
 		return go && go.activeInHierarchy;
-#endif
 	}
 
 	/// <summary>
@@ -1214,11 +1169,7 @@ static public class NGUITools
 	[System.Diagnostics.DebuggerStepThrough]
 	static public void SetActiveSelf (GameObject go, bool state)
 	{
-#if UNITY_3_5
-		go.active = state;
-#else
 		go.SetActive(state);
-#endif
 	}
 
 	/// <summary>
@@ -1512,5 +1463,50 @@ static public class NGUITools
 		int period = type.LastIndexOf('/');
 		if (period > 0) type = type.Substring(period + 1);
 		return string.IsNullOrEmpty(method) ? type : type + "/" + method;
+	}
+
+	/// <summary>
+	/// Execute the specified function on the target game object.
+	/// </summary>
+
+	static public void Execute<T> (GameObject go, string funcName) where T : Component
+	{
+		T[] comps = go.GetComponents<T>();
+
+		foreach (T comp in comps)
+		{
+#if UNITY_WEBPLAYER || UNITY_FLASH || UNITY_METRO || UNITY_WP8
+			comp.SendMessage(funcName, SendMessageOptions.DontRequireReceiver);
+#else
+			MethodInfo method = comp.GetType().GetMethod(funcName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			if (method != null) method.Invoke(comp, null);
+#endif
+		}
+	}
+
+	/// <summary>
+	/// Execute the specified function on the target game object and all of its children.
+	/// </summary>
+
+	static public void ExecuteAll<T> (GameObject root, string funcName) where T : Component
+	{
+		Execute<T>(root, funcName);
+		Transform t = root.transform;
+		for (int i = 0, imax = t.childCount; i < imax; ++i)
+			ExecuteAll<T>(t.GetChild(i).gameObject, funcName);
+	}
+
+	/// <summary>
+	/// Immediately start, update, and create all the draw calls from newly instantiated UI.
+	/// This is useful if you plan on doing something like immediately taking a screenshot then destroying the UI.
+	/// </summary>
+
+	static public void ImmediatelyCreateDrawCalls (GameObject root)
+	{
+		ExecuteAll<UIWidget>(root, "Start");
+		ExecuteAll<UIPanel>(root, "Start");
+		ExecuteAll<UIWidget>(root, "Update");
+		ExecuteAll<UIPanel>(root, "Update");
+		ExecuteAll<UIPanel>(root, "LateUpdate");
 	}
 }

@@ -97,8 +97,11 @@ public class UIGrid : UIWidgetContainer
 	/// Custom sort delegate, used when the sorting method is set to 'custom'.
 	/// </summary>
 
+#if UNITY_FLASH
+	public System.Comparison<Transform> onCustomSort;
+#else
 	public BetterList<Transform>.CompareFunc onCustomSort;
-
+#endif
 	// Use the 'sorting' property instead
 	[HideInInspector][SerializeField] bool sorted = false;
 

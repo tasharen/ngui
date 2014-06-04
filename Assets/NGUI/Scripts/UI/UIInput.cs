@@ -1402,7 +1402,11 @@ public class UIInput : MonoBehaviour
 
 	public void LoadValue ()
 	{
-		if (!string.IsNullOrEmpty(savedAs) && PlayerPrefs.HasKey(savedAs))
-			value = PlayerPrefs.GetString(savedAs);
+		if (!string.IsNullOrEmpty(savedAs))
+		{
+			string val = mValue.Replace("\\n", "\n");
+			mValue = "";
+			value = PlayerPrefs.HasKey(savedAs) ? PlayerPrefs.GetString(savedAs) : val;
+		}
 	}
 }
