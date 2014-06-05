@@ -242,6 +242,9 @@ public class UIDrawCall : MonoBehaviour
 
 	void CreateMaterial ()
 	{
+		mLegacyShader = false;
+		mClipCount = panel.clipCount;
+
 		string shaderName = (mShader != null) ? mShader.name :
 			((mMaterial != null) ? mMaterial.shader.name : "Unlit/Transparent Colored");
 
@@ -264,11 +267,6 @@ public class UIDrawCall : MonoBehaviour
 		const string soft = " (SoftClip)";
 		shaderName = shaderName.Replace(soft, "");
 
-		// Try to find the new shader
-		Shader shader;
-		mLegacyShader = false;
-		mClipCount = panel.clipCount;
-
 		if (mClipCount != 0)
 		{
 			shader = Shader.Find("Hidden/" + shaderName + " " + mClipCount);
@@ -289,24 +287,25 @@ public class UIDrawCall : MonoBehaviour
 			mDynamicMat.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
 			mDynamicMat.CopyPropertiesFromMaterial(mMaterial);
 
-#if !UNITY_3_5 && !UNITY_4_1 && !UNITY_4_2
 			string[] keywords = mMaterial.shaderKeywords;
 			for (int i = 0; i < keywords.Length; ++i)
 				mDynamicMat.EnableKeyword(keywords[i]);
-#endif
+
+			// If there is a valid shader, assign it to the custom material
+			if (shader != null)
+			{
+				mDynamicMat.shader = shader;
+			}
+			else if (mClipCount != 0)
+			{
+				Debug.LogError(shaderName + " shader doesn't have a clipped shader version for " + mClipCount + " clip regions");
+			}
 		}
 		else
 		{
 			mDynamicMat = new Material(shader);
 			mDynamicMat.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
 		}
-
-		// If there is a valid shader, assign it to the custom material
-		if (shader != null)
-		{
-			mDynamicMat.shader = shader;
-		}
-		else Debug.LogError(shaderName + " shader doesn't have a clipped shader version for " + mClipCount + " clip regions");
 	}
 
 	/// <summary>
