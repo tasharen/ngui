@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.6.2
+            Version 3.6.3
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,14 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.6.3
+- NEW: Added onFinished and Finish() to the Typewriter script.
+- FIX: Changed the way "hide input" logic works in UIInput.
+- FIX: UIInput was not setting its starting value correctly in some cases.
+- FIX: Hide Input setting on the input field is now a separate field.
+- FIX: UIlabel.Wrap was not using the provided height.
+- FIX: Flash compile fixes.
 
 3.6.2
 - NEW: Added an optional different (minimalistic) look for NGUI's components (change via Options -> Inspector Look).
