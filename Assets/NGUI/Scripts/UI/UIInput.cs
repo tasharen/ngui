@@ -206,6 +206,18 @@ public class UIInput : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Should the input be hidden?
+	/// </summary>
+
+	public bool inputShouldBeHidden
+	{
+		get
+		{
+			return hideInput && label != null && !label.multiLine;
+		}
+	}
+
 	[System.Obsolete("Use UIInput.value instead")]
 	public string text { get { return this.value; } set { this.value = value; } }
 
@@ -304,7 +316,7 @@ public class UIInput : MonoBehaviour
 		get
 		{
 #if MOBILE
-			if (mKeyboard != null && !TouchScreenKeyboard.hideInput) return value.Length;
+			if (mKeyboard != null && !inputShouldBeHidden) return value.Length;
 #endif
 			return isSelected ? mSelectionEnd : value.Length;
 		}
@@ -313,7 +325,7 @@ public class UIInput : MonoBehaviour
 			if (isSelected)
 			{
 #if MOBILE
-				if (mKeyboard != null && !TouchScreenKeyboard.hideInput) return;
+				if (mKeyboard != null && !inputShouldBeHidden) return;
 #endif
 				mSelectionEnd = value;
 				UpdateLabel();
@@ -330,7 +342,7 @@ public class UIInput : MonoBehaviour
 		get
 		{
 #if MOBILE
-			if (mKeyboard != null && !TouchScreenKeyboard.hideInput) return 0;
+			if (mKeyboard != null && !inputShouldBeHidden) return 0;
 #endif
 			return isSelected ? mSelectionStart : value.Length;
 		}
@@ -339,7 +351,7 @@ public class UIInput : MonoBehaviour
 			if (isSelected)
 			{
 #if MOBILE
-				if (mKeyboard != null && !TouchScreenKeyboard.hideInput) return;
+				if (mKeyboard != null && !inputShouldBeHidden) return;
 #endif
 				mSelectionStart = value;
 				UpdateLabel();
@@ -356,7 +368,7 @@ public class UIInput : MonoBehaviour
 		get
 		{
 #if MOBILE
-			if (mKeyboard != null && !TouchScreenKeyboard.hideInput) return value.Length;
+			if (mKeyboard != null && !inputShouldBeHidden) return value.Length;
 #endif
 			return isSelected ? mSelectionEnd : value.Length;
 		}
@@ -365,7 +377,7 @@ public class UIInput : MonoBehaviour
 			if (isSelected)
 			{
 #if MOBILE
-				if (mKeyboard != null && !TouchScreenKeyboard.hideInput) return;
+				if (mKeyboard != null && !inputShouldBeHidden) return;
 #endif
 				mSelectionEnd = value;
 				UpdateLabel();
@@ -541,7 +553,7 @@ public class UIInput : MonoBehaviour
 					string val;
 					TouchScreenKeyboardType kt;
 
-					if (hideInput)
+					if (inputShouldBeHidden)
 					{
 						TouchScreenKeyboard.hideInput = true;
 						kt = (TouchScreenKeyboardType)((int)keyboardType);
@@ -585,7 +597,7 @@ public class UIInput : MonoBehaviour
 			{
 				string text = mKeyboard.text;
 
-				if (TouchScreenKeyboard.hideInput)
+				if (inputShouldBeHidden)
 				{
 					if (text != "|")
 					{
@@ -1195,7 +1207,7 @@ public class UIInput : MonoBehaviour
 
 			label.text = processed;
 #if MOBILE
-			if (selected && (mKeyboard == null || TouchScreenKeyboard.hideInput))
+			if (selected && (mKeyboard == null || inputShouldBeHidden))
 #else
 			if (selected)
 #endif

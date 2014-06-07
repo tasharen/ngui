@@ -357,9 +357,9 @@ public class EventDelegate
 					{
 #if UNITY_WP8
 						mMethod = type.GetMethod(mMethodName);
-#else
-						mMethod = type.GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+						if (mMethod == null)
 #endif
+						mMethod = type.GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 						if (mMethod != null) break;
 						type = type.BaseType;
 						if (type == null) break;

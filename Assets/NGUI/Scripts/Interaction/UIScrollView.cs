@@ -379,7 +379,11 @@ public class UIScrollView : MonoBehaviour
 			{
 				// Jump back into place
 				MoveRelative(constraint);
-				mMomentum = Vector3.zero;
+
+				// Clear the momentum in the constrained direction
+				if (Mathf.Abs(constraint.x) > 0.01f) mMomentum.x = 0;
+				if (Mathf.Abs(constraint.y) > 0.01f) mMomentum.y = 0;
+				if (Mathf.Abs(constraint.z) > 0.01f) mMomentum.z = 0;
 				mScroll = 0f;
 			}
 			return true;
@@ -580,7 +584,7 @@ public class UIScrollView : MonoBehaviour
 	/// Manually invalidate the scroll view's bounds so that they update next time.
 	/// </summary>
 
-	public void InvalidateBounds () { mCalculatedBounds = true; }
+	public void InvalidateBounds () { mCalculatedBounds = false; }
 
 	/// <summary>
 	/// Reset the scroll view's position to the top-left corner.

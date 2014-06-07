@@ -5,6 +5,7 @@
 
 using UnityEngine;
 using System.Text;
+using System.Collections.Generic;
 
 /// <summary>
 /// This script is able to fill in the label's text gradually, giving the effect of someone typing or fading in the content over time.
@@ -14,6 +15,8 @@ using System.Text;
 [AddComponentMenu("NGUI/Interaction/Typewriter Effect")]
 public class TypewriterEffect : MonoBehaviour
 {
+	static public TypewriterEffect current;
+
 	struct FadeEntry
 	{
 		public int index;
@@ -57,13 +60,26 @@ public class TypewriterEffect : MonoBehaviour
 
 	public bool keepFullDimensions = false;
 
+	/// <summary>
+	/// Event delegate triggered when the typewriter effect finishes.
+	/// </summary>
+
+	public List<EventDelegate> onFinished = new List<EventDelegate>();
+
 	UILabel mLabel;
 	string mFullText = "";
 	int mCurrentOffset = 0;
 	float mNextChar = 0f;
 	bool mReset = true;
+	bool mActive = false;
 
 	BetterList<FadeEntry> mFade = new BetterList<FadeEntry>();
+
+	/// <summary>
+	/// Whether the typewriter effect is currently active or not.
+	/// </summary>
+
+	public bool isActive { get { return mActive; } }
 
 	/// <summary>
 	/// Reset the typewriter effect to the beginning of the label.
@@ -71,10 +87,38 @@ public class TypewriterEffect : MonoBehaviour
 
 	public void ResetToBeginning () { mReset = true; }
 
-	void OnEnable () { mReset = true; }
+	/// <summary>
+	/// Finish the typewriter operation and show all the text right away.
+	/// </summary>
+
+	public void Finish ()
+	{
+		if (mActive)
+		{
+			mActive = false;
+
+			if (!mReset)
+			{
+				mCurrentOffset = mFullText.Length;
+				mFade.Clear();
+				mLabel.text = mFullText;
+			}
+
+			if (keepFullDimensions && scrollView != null)
+				scrollView.UpdatePosition();
+
+			current = this;
+			EventDelegate.Execute(onFinished);
+			current = null;
+		}
+	}
+
+	void OnEnable () { mReset = true; mActive = true; }
 
 	void Update ()
 	{
+		if (!mActive) return;
+
 		if (mReset)
 		{
 			mCurrentOffset = 0;
@@ -190,6 +234,13 @@ public class TypewriterEffect : MonoBehaviour
 
 				mLabel.text = sb.ToString();
 			}
+		}
+		else if (mCurrentOffset == mFullText.Length)
+		{
+			current = this;
+			EventDelegate.Execute(onFinished);
+			current = null;
+			mActive = false;
 		}
 	}
 }
