@@ -100,6 +100,7 @@ public class UICenterOnChild : MonoBehaviour
 		for (int i = 0, imax = trans.childCount; i < imax; ++i)
 		{
 			Transform t = trans.GetChild(i);
+			if (!t.gameObject.activeInHierarchy) continue;
 			float sqrDist = Vector3.SqrMagnitude(t.position - pickingPoint);
 
 			if (sqrDist < min)
