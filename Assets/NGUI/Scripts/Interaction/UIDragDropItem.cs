@@ -120,11 +120,28 @@ public class UIDragDropItem : MonoBehaviour
 	/// Perform the dragging.
 	/// </summary>
 
+
+	SetCameraSize _cachedCameraSize = null;
 	void OnDrag (Vector2 delta)
 	{
 		if (!enabled || mTouchID != UICamera.currentTouchID) return;
-		OnDragDropMove((Vector3)delta * mRoot.pixelSizeAdjustment);
+		
+		if(_cachedCameraSize == null) {
+			_cachedCameraSize = UICamera.mainCamera.GetComponent<SetCameraSize>();
+		}
+		float	pixelSizeAdjust = 1.0f;
+		if(_cachedCameraSize != null && _cachedCameraSize.Retina) {
+			// retina drags "slower". this is klang hack from oddur. 
+			pixelSizeAdjust = 0.5f;
+		}
+		
+		if (mRoot != null) {
+			pixelSizeAdjust = mRoot.pixelSizeAdjustment;
+		}
+		
+		OnDragDropMove((Vector3)delta * pixelSizeAdjust);
 	}
+
 
 	/// <summary>
 	/// Notification sent when the drag event has ended.
