@@ -576,6 +576,20 @@ static public class NGUIMenu
 			bc.center = center;
 			bc.isTrigger = true;
 			NGUITools.SetDirty(go);
+
+			UIPanel p = NGUITools.FindInParents<UIPanel>(go);
+			
+			if (p != null)
+			{
+				if (p.rigidbody != null) NGUITools.Destroy(p.rigidbody);
+
+				// It's unclear if having a 2D rigidbody actually helps or not
+				//if (p.GetComponent<Rigidbody2D>() == null)
+				//{
+				//    Rigidbody2D rb = p.gameObject.AddComponent<Rigidbody2D>();
+				//    rb.isKinematic = true;
+				//}
+			}
 		}
 	}
 
@@ -609,6 +623,21 @@ static public class NGUIMenu
 				bc.isTrigger = true;
 			}
 			NGUITools.SetDirty(go);
+
+			UIPanel p = NGUITools.FindInParents<UIPanel>(go);
+			
+			if (p != null)
+			{
+				if (p.GetComponent<Rigidbody2D>() != null)
+					NGUITools.Destroy(p.GetComponent<Rigidbody2D>());
+
+				if (p.rigidbody == null)
+				{
+					Rigidbody rb = p.gameObject.AddComponent<Rigidbody>();
+					rb.isKinematic = true;
+					rb.useGravity = false;
+				}
+			}
 		}
 	}
 #endif

@@ -900,9 +900,24 @@ public class UIPanel : UIRect
 		// Apparently having a rigidbody helps
 		if (rigidbody == null)
 		{
-			Rigidbody rb = gameObject.AddComponent<Rigidbody>();
-			rb.isKinematic = true;
-			rb.useGravity = false;
+			UICamera uic = (mCam != null) ? mCam.GetComponent<UICamera>() : null;
+
+			if (uic != null)
+			{
+				if (uic.eventType == UICamera.EventType.UI_3D || uic.eventType == UICamera.EventType.World_3D)
+				{
+					Rigidbody rb = gameObject.AddComponent<Rigidbody>();
+					rb.isKinematic = true;
+					rb.useGravity = false;
+				}
+				// It's unclear if this helps 2D physics or not, so leaving it disabled for now.
+				// Note that when enabling this, the 'if (rigidbody == null)' statement above should be adjusted as well.
+				//else
+				//{
+				//    Rigidbody2D rb = gameObject.AddComponent<Rigidbody2D>();
+				//    rb.isKinematic = true;
+				//}
+			}
 		}
 
 		FindParent();
