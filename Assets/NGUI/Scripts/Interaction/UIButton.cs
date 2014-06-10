@@ -90,12 +90,8 @@ public class UIButton : UIButtonColor
 			if (!enabled) return false;
 			Collider col = collider;
 			if (col && col.enabled) return true;
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 			Collider2D c2d = GetComponent<Collider2D>();
 			return (c2d && c2d.enabled);
-#else
-			return false;
-#endif
 		}
 		set
 		{
@@ -108,7 +104,6 @@ public class UIButton : UIButtonColor
 					col.enabled = value;
 					SetState(value ? State.Normal : State.Disabled, false);
 				}
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 				else
 				{
 					Collider2D c2d = GetComponent<Collider2D>();
@@ -120,9 +115,6 @@ public class UIButton : UIButtonColor
 					}
 					else enabled = value;
 				}
-#else
-				else enabled = value;
-#endif
 			}
 		}
 	}

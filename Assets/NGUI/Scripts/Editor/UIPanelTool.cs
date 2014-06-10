@@ -191,10 +191,11 @@ public class UIPanelTool : EditorWindow
 			widgetCount = ent.widgets.Count.ToString();
 			drawCalls = ent.panel.drawCalls.size.ToString();
 			clipping = (ent.panel.clipping != UIDrawCall.Clipping.None) ? "Yes" : "";
+
 			int triangeCount = 0;
-			foreach (var dc in ent.panel.drawCalls) {
+			foreach (var dc in ent.panel.drawCalls)
 				triangeCount += dc.triangles;
-			}
+
 			triangles = triangeCount.ToString();
 		}
 		else
