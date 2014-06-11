@@ -62,11 +62,18 @@ public class NGUITransformInspector : Editor
 			
 			if (UIWidgetInspector.instance != null)
 			{
+				UIWidgetInspector.instance.serializedObject.Update();
 				UIWidgetInspector.instance.DrawWidgetTransform();
 				if (NGUISettings.minimalisticLook) GUILayout.Space(-4f);
+				UIWidgetInspector.instance.serializedObject.ApplyModifiedProperties();
 			}
+
 			if (UIRectEditor.instance != null)
+			{
+				UIRectEditor.instance.serializedObject.Update();
 				UIRectEditor.instance.DrawAnchorTransform();
+				UIRectEditor.instance.serializedObject.ApplyModifiedProperties();
+			}
 		}
 	}
 
