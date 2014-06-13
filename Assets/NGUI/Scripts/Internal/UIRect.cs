@@ -350,6 +350,7 @@ public abstract class UIRect : MonoBehaviour
 	protected virtual void OnEnable ()
 	{
 		mAnchorsCached = false;
+		mUpdateFrame = -1;
 		if (updateAnchors == AnchorUpdate.OnEnable)
 			mUpdateAnchors = true;
 		if (mStarted) OnInit();
