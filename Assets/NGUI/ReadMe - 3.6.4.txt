@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.6.3
+            Version 3.6.4
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,16 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.6.4:
+- NEW: Added the way to set the label alignment for popup lists.
+- NEW: EventDelegate.Add(list, callback) now returns an EventDelegate to work with.
+- NEW: Added an option to execute the UICenterOnChild in the editor via right-click.
+- FIX: Fix for a regression bug causing bar view foreground's collider was never adjusted properly.
+- FIX: UILabel now automatically clears NGUIText font references after using them.
+- FIX: Nested anchors set to update in OnEnable will now work as expected when the hierarchy gets re-enabled.
+- FIX: Unified inspector look can now be modified properly.
+- FIX: Switching from 3D to 2D UI will now remove the 3D rigidbody.
 
 3.6.3
 - NEW: Added onFinished and Finish() to the Typewriter script.
