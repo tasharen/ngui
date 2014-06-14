@@ -1141,6 +1141,12 @@ public class UILabel : UIWidget
 			mProcessedText = "";
 			mScale = 1f;
 		}
+		
+		if (full)
+		{
+			NGUIText.bitmapFont = null;
+			NGUIText.dynamicFont = null;
+		}
 	}
 
 	/// <summary>
@@ -1252,8 +1258,14 @@ public class UILabel : UIWidget
 
 				mTempVerts.Clear();
 				mTempIndices.Clear();
+
+				NGUIText.bitmapFont = null;
+				NGUIText.dynamicFont = null;
 				return retVal;
 			}
+
+			NGUIText.bitmapFont = null;
+			NGUIText.dynamicFont = null;
 		}
 		return 0;
 	}
@@ -1374,6 +1386,9 @@ public class UILabel : UIWidget
 				mTempIndices.Clear();
 			}
 
+			NGUIText.bitmapFont = null;
+			NGUIText.dynamicFont = null;
+
 			// If the selection doesn't move, then we're at the top or bottom-most line
 			if (key == KeyCode.UpArrow || key == KeyCode.Home) return 0;
 			if (key == KeyCode.DownArrow || key == KeyCode.End) return text.Length;
@@ -1428,6 +1443,9 @@ public class UILabel : UIWidget
 			caret.uvs.Add(center);
 			caret.cols.Add(cc);
 		}
+
+		NGUIText.bitmapFont = null;
+		NGUIText.dynamicFont = null;
 	}
 
 	/// <summary>
@@ -1451,6 +1469,8 @@ public class UILabel : UIWidget
 
 		NGUIText.tint = col;
 		NGUIText.Print(text, verts, uvs, cols);
+		NGUIText.bitmapFont = null;
+		NGUIText.dynamicFont = null;
 
 		// Center the content within the label vertically
 		Vector2 pos = ApplyOffset(verts, start);
@@ -1565,7 +1585,10 @@ public class UILabel : UIWidget
 		UpdateNGUIText();
 		NGUIText.encoding = false;
 		NGUIText.symbolStyle = NGUIText.SymbolStyle.None;
-		return NGUIText.CalculateOffsetToFit(text);
+		int offset = NGUIText.CalculateOffsetToFit(text);
+		NGUIText.bitmapFont = null;
+		NGUIText.dynamicFont = null;
+		return offset;
 	}
 
 	/// <summary>
@@ -1619,7 +1642,10 @@ public class UILabel : UIWidget
 	{
 		UpdateNGUIText();
 		NGUIText.rectHeight = height;
-		return NGUIText.WrapText(text, out final);
+		bool retVal = NGUIText.WrapText(text, out final);
+		NGUIText.bitmapFont = null;
+		NGUIText.dynamicFont = null;
+		return retVal;
 	}
 
 	/// <summary>

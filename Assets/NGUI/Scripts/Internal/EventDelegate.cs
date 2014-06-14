@@ -626,13 +626,16 @@ public class EventDelegate
 	/// Assign a new event delegate.
 	/// </summary>
 
-	static public void Set (List<EventDelegate> list, Callback callback)
+	static public EventDelegate Set (List<EventDelegate> list, Callback callback)
 	{
 		if (list != null)
 		{
+			EventDelegate del = new EventDelegate(callback);
 			list.Clear();
-			list.Add(new EventDelegate(callback));
+			list.Add(del);
+			return del;
 		}
+		return null;
 	}
 
 	/// <summary>
@@ -652,13 +655,13 @@ public class EventDelegate
 	/// Append a new event delegate to the list.
 	/// </summary>
 
-	static public void Add (List<EventDelegate> list, Callback callback) { Add(list, callback, false); }
+	static public EventDelegate Add (List<EventDelegate> list, Callback callback) { return Add(list, callback, false); }
 
 	/// <summary>
 	/// Append a new event delegate to the list.
 	/// </summary>
 
-	static public void Add (List<EventDelegate> list, Callback callback, bool oneShot)
+	static public EventDelegate Add (List<EventDelegate> list, Callback callback, bool oneShot)
 	{
 		if (list != null)
 		{
@@ -666,17 +669,16 @@ public class EventDelegate
 			{
 				EventDelegate del = list[i];
 				if (del != null && del.Equals(callback))
-					return;
+					return del;
 			}
 
 			EventDelegate ed = new EventDelegate(callback);
 			ed.oneShot = oneShot;
 			list.Add(ed);
+			return ed;
 		}
-		else
-		{
-			Debug.LogWarning("Attempting to add a callback to a list that's null");
-		}
+		Debug.LogWarning("Attempting to add a callback to a list that's null");
+		return null;
 	}
 
 	/// <summary>
