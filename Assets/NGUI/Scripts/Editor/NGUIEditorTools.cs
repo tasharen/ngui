@@ -448,7 +448,7 @@ public static class NGUIEditorTools
 			)
 		{
 			settings.readable = true;
-			settings.textureFormat = TextureImporterFormat.ARGB32;
+			if (NGUISettings.trueColorAtlas) settings.textureFormat = TextureImporterFormat.ARGB32;
 			settings.npotScale = TextureImporterNPOTScale.None;
 #if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1
 			settings.alphaIsTransparency = false;
@@ -482,12 +482,10 @@ public static class NGUIEditorTools
 			settings.maxTextureSize = 4096;
 			settings.wrapMode = TextureWrapMode.Clamp;
 			settings.npotScale = TextureImporterNPOTScale.ToNearest;
-			settings.textureFormat = TextureImporterFormat.ARGB32;
+			if (NGUISettings.trueColorAtlas) settings.textureFormat = TextureImporterFormat.ARGB32;
 			settings.filterMode = FilterMode.Trilinear;
 			settings.aniso = 4;
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1
 			settings.alphaIsTransparency = alphaTransparency;
-#endif
 			ti.SetTextureSettings(settings);
 			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
 		}

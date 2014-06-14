@@ -338,10 +338,9 @@ public class EventDelegate
 			if (mTarget != null && !string.IsNullOrEmpty(mMethodName))
 			{
 				System.Type type = mTarget.GetType();
-
+ #if NETFX_CORE
 				try
 				{
-#if NETFX_CORE
 					IEnumerable<MethodInfo> methods = type.GetRuntimeMethods();
 
 					foreach (MethodInfo mi in methods)
@@ -352,25 +351,33 @@ public class EventDelegate
 							break;
 						}
 					}
-#else
-					for (mMethod = null; ; )
-					{
-#if UNITY_WP8
-						mMethod = type.GetMethod(mMethodName);
-						if (mMethod == null)
-#endif
-						mMethod = type.GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-						if (mMethod != null) break;
-						type = type.BaseType;
-						if (type == null) break;
-					}
-#endif
 				}
 				catch (System.Exception ex)
 				{
 					Debug.LogError("Failed to bind " + type + "." + mMethodName + "\n" +  ex.Message);
 					return;
 				}
+ #else // NETFX_CORE
+				for (mMethod = null; type != null; )
+				{
+					try
+					{
+						mMethod = type.GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+						if (mMethod != null) break;
+					}
+					catch (System.Exception) { }
+  #if UNITY_WP8
+					// For some odd reason Type.GetMethod(name, bindingFlags) doesn't seem to work on WP8...
+					try
+					{
+						mMethod = type.GetMethod(mMethodName);
+						if (mMethod == null) break;
+					}
+					catch (System.Exception) { }
+  #endif
+					type = type.BaseType;
+				}
+ #endif // NETFX_CORE
 
 				if (mMethod == null)
 				{
@@ -390,11 +397,11 @@ public class EventDelegate
 				if (info.Length == 0)
 				{
 					// No parameters means we can create a simple delegate for it, optimizing the call
-#if NETFX_CORE
+ #if NETFX_CORE
 					mCachedCallback = (Callback)mMethod.CreateDelegate(typeof(Callback), mTarget);
-#else
+ #else
 					mCachedCallback = (Callback)System.Delegate.CreateDelegate(typeof(Callback), mTarget, mMethodName);
-#endif
+ #endif
 
 					mArgs = null;
 					mParameters = null;
@@ -415,7 +422,7 @@ public class EventDelegate
 					mParameters[i].expectedType = info[i].ParameterType;
 			}
 		}
-#endif
+#endif // REFLECTION_SUPPORT
 	}
 
 	/// <summary>

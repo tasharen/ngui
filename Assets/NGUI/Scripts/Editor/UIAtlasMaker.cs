@@ -818,6 +818,11 @@ public class UIAtlasMaker : EditorWindow
 		GUILayout.Label("or custom packer", GUILayout.MinWidth(70f));
 		GUILayout.EndHorizontal();
 
+		GUILayout.BeginHorizontal();
+		NGUISettings.trueColorAtlas = EditorGUILayout.Toggle("Truecolor", NGUISettings.trueColorAtlas, GUILayout.Width(100f));
+		GUILayout.Label("force ARGB32 textures", GUILayout.MinWidth(70f));
+		GUILayout.EndHorizontal();
+
 		if (!NGUISettings.unityPacking)
 		{
 			GUILayout.BeginHorizontal();

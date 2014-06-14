@@ -346,6 +346,12 @@ public class NGUISettings
 		set { SetBool("NGUI Packing", value); }
 	}
 
+	static public bool trueColorAtlas
+	{
+		get { return GetBool("NGUI Truecolor", true); }
+		set { SetBool("NGUI Truecolor", value); }
+	}
+
 	static public bool forceSquareAtlas
 	{
 		get { return GetBool("NGUI Square", false); }
