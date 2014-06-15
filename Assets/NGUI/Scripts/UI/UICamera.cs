@@ -599,6 +599,7 @@ public class UICamera : MonoBehaviour
 			{
 				if (Physics.Raycast(ray, out lastHit, dist, mask))
 				{
+					lastWorldPosition = lastHit.point;
 					hoveredObject = lastHit.collider.gameObject;
 					return true;
 				}

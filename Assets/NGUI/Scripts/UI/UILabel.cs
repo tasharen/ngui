@@ -1028,7 +1028,7 @@ public class UILabel : UIWidget
 	/// Process the raw text, called when something changes.
 	/// </summary>
 
-	void ProcessText () { ProcessText(false, true); }
+	public void ProcessText () { ProcessText(false, true); }
 
 	/// <summary>
 	/// Process the raw text, called when something changes.
