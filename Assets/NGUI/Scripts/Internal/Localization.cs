@@ -310,9 +310,8 @@ public static class Localization
 		return key;
 	}
 
-	/// <summary>
-	/// Localize the specified value.
-	/// </summary>
+	[System.Obsolete("Localization is now always active. You no longer need to check this property.")]
+	static public bool isActive { get { return true; } }
 
 	[System.Obsolete("Use Localization.Get instead")]
 	static public string Localize (string key) { return Get(key); }
