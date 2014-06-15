@@ -711,8 +711,19 @@ static public class NGUITools
 	{
 		// Find the existing UI Root
 		UIRoot root = (trans != null) ? NGUITools.FindInParents<UIRoot>(trans.gameObject) : null;
-		if (root == null && UIRoot.list.Count > 0)
-			root = UIRoot.list[0];
+		if (root == null && UIRoot.list.Count > 0) root = UIRoot.list[0];
+
+		// If we are working with a different UI type, we need to treat it as a brand-new one instead
+		if (root != null)
+		{
+			UICamera cam = root.GetComponentInChildren<UICamera>();
+
+			if (cam != null && cam.camera.isOrthoGraphic == advanced3D)
+			{
+				trans = null;
+				root = null;
+			}
+		}
 
 		// If no root found, create one
 		if (root == null)
