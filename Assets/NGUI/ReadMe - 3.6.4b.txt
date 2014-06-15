@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.6.4
+            Version 3.6.4b
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -64,6 +64,8 @@ and it will not be included in the build of your game. It's only used in the edi
 - FIX: Nested anchors set to update in OnEnable will now work as expected when the hierarchy gets re-enabled.
 - FIX: Unified inspector look can now be modified properly.
 - FIX: Switching from 3D to 2D UI will now remove the 3D rigidbody.
+- FIX: Drag & drop example wasn't working properly due to a missed line in UICamera. (3.6.4b)
+- FIX: UIToggle.value will now return the starting state if the toggle has not yet been activated (3.6.4b)
 
 3.6.3
 - NEW: Added onFinished and Finish() to the Typewriter script.
