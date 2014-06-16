@@ -653,6 +653,8 @@ public class UIDrawCall : MonoBehaviour
 
 		NGUITools.DestroyImmediate(mDynamicMat);
 		mDynamicMat = null;
+		if (mRenderer != null)
+			mRenderer.sharedMaterials = new Material[] {};
 	}
 
 	/// <summary>
