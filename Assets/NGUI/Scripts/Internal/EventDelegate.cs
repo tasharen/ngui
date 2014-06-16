@@ -371,7 +371,7 @@ public class EventDelegate
 					try
 					{
 						mMethod = type.GetMethod(mMethodName);
-						if (mMethod == null) break;
+						if (mMethod != null) break;
 					}
 					catch (System.Exception) { }
   #endif
