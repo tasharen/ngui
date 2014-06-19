@@ -461,6 +461,22 @@ static public class NGUIMenu
 #endregion
 #region Options
 
+	[MenuItem("NGUI/Options/Transform Move Gizmo/Turn On", false, 10)]
+	static public void TurnGizmosOn ()
+	{
+		NGUISettings.showTransformHandles = true;
+		NGUIEditorTools.HideMoveTool(false);
+	}
+
+	[MenuItem("NGUI/Options/Transform Move Gizmo/Turn On", true, 10)]
+	static public bool TurnGizmosOnCheck () { return !NGUISettings.showTransformHandles; }
+
+	[MenuItem("NGUI/Options/Transform Move Gizmo/Turn Off", false, 10)]
+	static public void TurnGizmosOff () { NGUISettings.showTransformHandles = false; }
+
+	[MenuItem("NGUI/Options/Transform Move Gizmo/Turn Off", true, 10)]
+	static public bool TurnGizmosOffCheck () { return NGUISettings.showTransformHandles; }
+
 	[MenuItem("NGUI/Options/Handles/Turn On", false, 10)]
 	static public void TurnHandlesOn () { UIWidget.showHandlesWithMoveTool = true; }
 

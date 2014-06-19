@@ -158,6 +158,7 @@ public class UIPanel : UIRect
 	Vector2 mMax = Vector2.zero;
 	bool mHalfPixelOffset = false;
 	bool mSortWidgets = false;
+	bool mUpdateScroll = false;
 
 	/// <summary>
 	/// Helper property that returns the first unused depth value.
@@ -1191,6 +1192,13 @@ public class UIPanel : UIRect
 				++i;
 			}
 		}
+
+		if (mUpdateScroll)
+		{
+			mUpdateScroll = false;
+			UIScrollView sv = GetComponent<UIScrollView>();
+			if (sv != null) sv.UpdateScrollbars();
+		}
 	}
 
 	/// <summary>
@@ -1558,6 +1566,8 @@ public class UIPanel : UIRect
 
 	public void AddWidget (UIWidget w)
 	{
+		mUpdateScroll = true;
+
 		if (widgets.size == 0)
 		{
 			widgets.Add(w);

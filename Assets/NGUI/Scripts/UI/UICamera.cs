@@ -14,8 +14,8 @@ using System.Collections.Generic;
 /// 
 /// * OnHover (isOver) is sent when the mouse hovers over a collider or moves away.
 /// * OnPress (isDown) is sent when a mouse button gets pressed on the collider.
-/// * OnSelect (selected) is sent when a mouse button is released on the same object as it was pressed on.
-/// * OnClick () is sent with the same conditions as OnSelect, with the added check to see if the mouse has not moved much.
+/// * OnSelect (selected) is sent when a mouse button is first pressed on an object. Repeated presses won't result in an OnSelect(true).
+/// * OnClick () is sent when a mouse is pressed and released on the same object.
 ///   UICamera.currentTouchID tells you which button was clicked.
 /// * OnDoubleClick () is sent when the click happens twice within a fourth of a second.
 ///   UICamera.currentTouchID tells you which button was clicked.
