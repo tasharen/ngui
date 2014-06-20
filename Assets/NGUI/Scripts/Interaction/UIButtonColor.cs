@@ -287,22 +287,30 @@ public class UIButtonColor : UIWidgetContainer
 		if (mState != state)
 		{
 			mState = state;
+			UpdateColor(instant);
+		}
+	}
 
-			TweenColor tc;
+	/// <summary>
+	/// Update the button's color. Call this method after changing the colors of the button at run-time.
+	/// </summary>
 
-			switch (mState)
-			{
-				case State.Hover: tc = TweenColor.Begin(tweenTarget, duration, hover); break;
-				case State.Pressed: tc = TweenColor.Begin(tweenTarget, duration, pressed); break;
-				case State.Disabled: tc = TweenColor.Begin(tweenTarget, duration, disabledColor); break;
-				default: tc = TweenColor.Begin(tweenTarget, duration, mDefaultColor); break;
-			}
+	public void UpdateColor (bool instant)
+	{
+		TweenColor tc;
 
-			if (instant && tc != null)
-			{
-				tc.value = tc.to;
-				tc.enabled = false;
-			}
+		switch (mState)
+		{
+			case State.Hover: tc = TweenColor.Begin(tweenTarget, duration, hover); break;
+			case State.Pressed: tc = TweenColor.Begin(tweenTarget, duration, pressed); break;
+			case State.Disabled: tc = TweenColor.Begin(tweenTarget, duration, disabledColor); break;
+			default: tc = TweenColor.Begin(tweenTarget, duration, mDefaultColor); break;
+		}
+
+		if (instant && tc != null)
+		{
+			tc.value = tc.to;
+			tc.enabled = false;
 		}
 	}
 }

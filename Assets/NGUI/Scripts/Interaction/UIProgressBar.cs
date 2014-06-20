@@ -336,8 +336,12 @@ public class UIProgressBar : UIWidgetContainer
 			{
 				if (sprite != null && sprite.type == UIBasicSprite.Type.Filled)
 				{
-					sprite.fillDirection = UIBasicSprite.FillDirection.Horizontal;
-					sprite.invert = isInverted;
+					if (sprite.fillDirection == UIBasicSprite.FillDirection.Horizontal ||
+						sprite.fillDirection == UIBasicSprite.FillDirection.Vertical)
+					{
+						sprite.fillDirection = UIBasicSprite.FillDirection.Horizontal;
+						sprite.invert = isInverted;
+					}
 					sprite.fillAmount = value;
 				}
 				else
@@ -349,8 +353,12 @@ public class UIProgressBar : UIWidgetContainer
 			}
 			else if (sprite != null && sprite.type == UIBasicSprite.Type.Filled)
 			{
-				sprite.fillDirection = UIBasicSprite.FillDirection.Vertical;
-				sprite.invert = isInverted;
+				if (sprite.fillDirection == UIBasicSprite.FillDirection.Horizontal ||
+					sprite.fillDirection == UIBasicSprite.FillDirection.Vertical)
+				{
+					sprite.fillDirection = UIBasicSprite.FillDirection.Vertical;
+					sprite.invert = isInverted;
+				}
 				sprite.fillAmount = value;
 			}
 			else
