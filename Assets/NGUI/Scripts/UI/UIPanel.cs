@@ -3,10 +3,6 @@
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
-#if UNITY_FLASH || UNITY_WP8 || UNITY_METRO
-#define USE_SIMPLE_DICTIONARY
-#endif
-
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -136,9 +132,8 @@ public class UIPanel : UIRect
 	[HideInInspector][SerializeField] Vector4 mClipRange = new Vector4(0f, 0f, 300f, 200f);
 	[HideInInspector][SerializeField] Vector2 mClipSoftness = new Vector2(4f, 4f);
 	[HideInInspector][SerializeField] int mDepth = 0;
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 	[HideInInspector][SerializeField] int mSortingOrder = 0;
-#endif
+
 	// Whether a full rebuild of geometry buffers is required
 	bool mRebuild = false;
 	bool mResized = false;
@@ -228,7 +223,6 @@ public class UIPanel : UIRect
 		}
 	}
 
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 	/// <summary>
 	/// Sorting order value for the panel's draw calls, to be used with Unity's 2D system.
 	/// </summary>
@@ -251,7 +245,6 @@ public class UIPanel : UIRect
 			}
 		}
 	}
-#endif
 
 	/// <summary>
 	/// Function that can be used to depth-sort panels.
@@ -783,18 +776,19 @@ public class UIPanel : UIRect
 
 	public bool IsVisible (UIWidget w)
 	{
-		if ((mClipping == UIDrawCall.Clipping.None || mClipping == UIDrawCall.Clipping.ConstrainButDontClip) && !w.hideIfOffScreen)
-		{
-			if (clipCount == 0) return true;
-			if (mParentPanel != null) return mParentPanel.IsVisible(w);
-		}
-
 		UIPanel p = this;
-		Vector3[] corners = w.worldCorners;
+		Vector3[] corners = null;
 
 		while (p != null)
 		{
-			if (!IsVisible(corners[0], corners[1], corners[2], corners[3])) return false;
+			if ((p.mClipping == UIDrawCall.Clipping.None || p.mClipping == UIDrawCall.Clipping.ConstrainButDontClip) && !w.hideIfOffScreen)
+			{
+				p = p.mParentPanel;
+				continue;
+			}
+
+			if (corners == null) corners = w.worldCorners;
+			if (!p.IsVisible(corners[0], corners[1], corners[2], corners[3])) return false;
 			p = p.mParentPanel;
 		}
 		return true;
@@ -1408,9 +1402,7 @@ public class UIPanel : UIRect
 			dc.renderQueue = (renderQueue == RenderQueue.Explicit) ? startingRenderQueue : startingRenderQueue + i;
 			dc.alwaysOnScreen = alwaysOnScreen &&
 				(mClipping == UIDrawCall.Clipping.None || mClipping == UIDrawCall.Clipping.ConstrainButDontClip);
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 			dc.sortingOrder = mSortingOrder;
-#endif
 		}
 	}
 
@@ -1768,7 +1760,6 @@ public class UIPanel : UIRect
 	}
 
 #if UNITY_EDITOR
-
 	static int mSizeFrame = -1;
 	static System.Reflection.MethodInfo s_GetSizeOfMainGameView;
 	static Vector2 mGameSize = Vector2.one;
@@ -1781,11 +1772,7 @@ public class UIPanel : UIRect
 	{
 		int frame = Time.frameCount;
 
-#if UNITY_EDITOR
 		if (mSizeFrame != frame || !Application.isPlaying)
-#else
-		if (mSizeFrame != frame)
-#endif
 		{
 			mSizeFrame = frame;
 
@@ -1855,5 +1842,5 @@ public class UIPanel : UIRect
 			}
 		}
 	}
-#endif
+#endif // UNITY_EDITOR
 }
