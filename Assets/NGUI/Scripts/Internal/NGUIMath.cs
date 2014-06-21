@@ -4,9 +4,8 @@
 //----------------------------------------------
 
 using UnityEngine;
-using System;
-using System.Collections.Generic;
 using System.Text;
+using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// Helper class containing generic functions used throughout the UI library.
@@ -377,8 +376,13 @@ static public class NGUIMath
 
 				for (int j = 0; j < 4; ++j)
 				{
-					vMax = Vector3.Max(corners[j], vMax);
-					vMin = Vector3.Min(corners[j], vMin);
+					if (corners[j].x > vMax.x) vMax.x = corners[j].x;
+					if (corners[j].y > vMax.y) vMax.y = corners[j].y;
+					if (corners[j].z > vMax.z) vMax.z = corners[j].z;
+
+					if (corners[j].x < vMin.x) vMin.x = corners[j].x;
+					if (corners[j].y < vMin.y) vMin.y = corners[j].y;
+					if (corners[j].z < vMin.z) vMin.z = corners[j].z;
 				}
 			}
 
@@ -422,25 +426,26 @@ static public class NGUIMath
 
 	static public Bounds CalculateRelativeWidgetBounds (Transform relativeTo, Transform content, bool considerInactive)
 	{
-		Bounds b = new Bounds(Vector3.zero, Vector3.zero);
+		if (content == null || relativeTo == null) return new Bounds(Vector3.zero, Vector3.zero);
+		
+		Matrix4x4 toLocal = relativeTo.worldToLocalMatrix;
+		Vector3 minBounds = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+		Vector3 maxBounds = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+		CalculateRelativeWidgetBounds(content, considerInactive, true, ref toLocal, ref minBounds, ref maxBounds);
 
-		if (content != null)
-		{
-			bool isSet = false;
-			Matrix4x4 toLocal = relativeTo.worldToLocalMatrix;
-			CalculateRelativeWidgetBounds(content, considerInactive, true, ref toLocal, ref b, ref isSet);
-			if (isSet) return b;
-		}
-		return b;
+		Bounds b = new Bounds(minBounds, Vector3.zero);
+		b.Encapsulate(maxBounds);
+		return b; 
 	}
+
 
 	/// <summary>
 	/// Recursive function used to calculate the widget bounds.
 	/// </summary>
-
+	
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static void CalculateRelativeWidgetBounds (Transform content, bool considerInactive, bool isRoot, ref Matrix4x4 toLocal, ref Bounds b, ref bool isSet)
+	static void CalculateRelativeWidgetBounds(Transform content, bool considerInactive, bool isRoot, ref Matrix4x4 toLocal, ref Vector3 vMin, ref Vector3 vMax)
 	{
 		if (content == null) return;
 		if (!considerInactive && !NGUITools.GetActive(content.gameObject)) return;
@@ -460,15 +465,13 @@ static public class NGUIMath
 			{
 				Vector3 v = toLocal.MultiplyPoint3x4(corners[j]);
 
-				if (isSet)
-				{
-					b.Encapsulate(v);
-				}
-				else
-				{
-					b = new Bounds(v, Vector3.zero);
-					isSet = true;
-				}
+				if (v.x > vMax.x) vMax.x = v.x;
+				if (v.y > vMax.y) vMax.y = v.y;
+				if (v.z > vMax.z) vMax.z = v.z;
+
+				if (v.x < vMin.x) vMin.x = v.x;
+				if (v.y < vMin.y) vMin.y = v.y;
+				if (v.z < vMin.z) vMin.z = v.z;
 			}
 		}
 		else // No panel present
@@ -484,23 +487,23 @@ static public class NGUIMath
 				{
 					Vector3 v = toLocal.MultiplyPoint3x4(corners[j]);
 
-					if (isSet)
-					{
-						b.Encapsulate(v);
-					}
-					else
-					{
-						b = new Bounds(v, Vector3.zero);
-						isSet = true;
-					}
+					if (v.x > vMax.x) vMax.x = v.x;
+					if (v.y > vMax.y) vMax.y = v.y;
+					if (v.z > vMax.z) vMax.z = v.z;
+
+					if (v.x < vMin.x) vMin.x = v.x;
+					if (v.y < vMin.y) vMin.y = v.y;
+					if (v.z < vMin.z) vMin.z = v.z;
 				}
 			}
 
 			// Iterate through children including their bounds in turn
 			for (int i = 0, imax = content.childCount; i < imax; ++i)
-				CalculateRelativeWidgetBounds(content.GetChild(i), considerInactive, false, ref toLocal, ref b, ref isSet);
+				CalculateRelativeWidgetBounds(content.GetChild(i), considerInactive, false, ref toLocal, ref vMin, ref vMax);
 		}
 	}
+
+
 
 	/// <summary>
 	/// This code is not framerate-independent:
