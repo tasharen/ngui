@@ -891,6 +891,18 @@ public class UIPanel : UIRect
 	}
 
 	/// <summary>
+	/// Reset the frame IDs.
+	/// </summary>
+
+	protected override void OnEnable ()
+	{
+		mRebuild = true;
+		mAlphaFrameID = -1;
+		mMatrixFrame = -1;
+		base.OnEnable();
+	}
+
+	/// <summary>
 	/// Mark all widgets as having been changed so the draw calls get re-created.
 	/// </summary>
 

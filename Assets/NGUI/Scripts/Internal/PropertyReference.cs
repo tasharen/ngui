@@ -108,7 +108,11 @@ public class PropertyReference
 		if (mProperty != null) return mProperty.PropertyType;
 		if (mField != null) return mField.FieldType;
 #endif
+#if UNITY_EDITOR || !UNITY_FLASH
 		return typeof(void);
+#else
+		return null;
+#endif
 	}
 
 	/// <summary>

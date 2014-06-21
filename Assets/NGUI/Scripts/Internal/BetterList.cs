@@ -67,7 +67,11 @@ public class BetterList<T>
 	/// Insert an item at the specified index, pushing the entries back.
 	/// </summary>
 
-	public void Insert (int index, T item) { mList.Insert(index, item); }
+	public void Insert (int index, T item)
+	{
+		if (index > -1 && index < mList.Count) mList.Insert(index, item);
+		else mList.Add(item);
+	}
 
 	/// <summary>
 	/// Returns 'true' if the specified item is within the list.

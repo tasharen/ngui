@@ -32,13 +32,13 @@ public class EventDelegate
 		public Object obj;
 		public string field;
 
-		[System.NonSerialized]
-		public System.Type expectedType = typeof(void);
-
 		public Parameter () { }
 		public Parameter (Object obj, string field) { this.obj = obj; this.field = field; }
 
 #if REFLECTION_SUPPORT
+		[System.NonSerialized]
+		public System.Type expectedType = typeof(void);
+
 		// Cached values
 		[System.NonSerialized] public bool cached = false;
 		[System.NonSerialized] public PropertyInfo propInfo;
@@ -88,9 +88,13 @@ public class EventDelegate
 				return obj.GetType();
 			}
 		}
-#else
+#else // REFLECTION_SUPPORT
 		public object value { get { return obj; } }
+ #if UNITY_EDITOR || !UNITY_FLASH
 		public System.Type type { get { return typeof(void); } }
+ #else
+		public System.Type type { get { return null; } }
+ #endif
 #endif
 	}
 

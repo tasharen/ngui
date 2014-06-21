@@ -286,11 +286,11 @@ public class UIDrawCall : MonoBehaviour
 			mDynamicMat = new Material(mMaterial);
 			mDynamicMat.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
 			mDynamicMat.CopyPropertiesFromMaterial(mMaterial);
-
+#if !UNITY_FLASH
 			string[] keywords = mMaterial.shaderKeywords;
 			for (int i = 0; i < keywords.Length; ++i)
 				mDynamicMat.EnableKeyword(keywords[i]);
-
+#endif
 			// If there is a valid shader, assign it to the custom material
 			if (shader != null)
 			{
