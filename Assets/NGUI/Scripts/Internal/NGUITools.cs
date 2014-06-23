@@ -210,12 +210,14 @@ static public class NGUITools
 		cam = Camera.main;
 		if (cam && (cam.cullingMask & layerMask) != 0) return cam;
 
+
 		Camera[] cameras = new Camera[Camera.allCamerasCount];
 		int camerasFound = Camera.GetAllCameras(cameras);
+
 		for (int i = 0; i < camerasFound; ++i)
 		{
 			cam = cameras[i];
-			if (cam && (cam.cullingMask & layerMask) != 0)
+			if (cam && cam.enabled && (cam.cullingMask & layerMask) != 0)
 				return cam;
 		}
 		return null;
