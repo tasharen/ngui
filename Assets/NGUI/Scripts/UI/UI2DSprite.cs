@@ -3,8 +3,6 @@
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
-
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -323,4 +321,3 @@ public class UI2DSprite : UIBasicSprite
 		Fill(verts, uvs, cols, outer, inner);
 	}
 }
-#endif

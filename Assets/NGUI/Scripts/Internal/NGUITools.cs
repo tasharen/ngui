@@ -248,7 +248,6 @@ static public class NGUITools
 			// Is there already another collider present? If so, do nothing.
 			if (col != null) return;
 
-#if !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 			// 2D collider
 			BoxCollider2D box2 = go.GetComponent<BoxCollider2D>();
 
@@ -273,10 +272,9 @@ static public class NGUITools
 				return;
 			}
 			else
-#endif
 			{
 				box = go.AddComponent<BoxCollider>();
-#if !UNITY_3_5 && UNITY_EDITOR
+#if UNITY_EDITOR
 				UnityEditor.Undo.RegisterCreatedObjectUndo(box, "Add Collider");
 #endif
 				box.isTrigger = true;
@@ -313,10 +311,8 @@ static public class NGUITools
 				UpdateWidgetCollider(bc, considerInactive);
 				return;
 			}
-#if !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 			BoxCollider2D box2 = go.GetComponent<BoxCollider2D>();
 			if (box2 != null) UpdateWidgetCollider(box2, considerInactive);
-#endif
 		}
 	}
 

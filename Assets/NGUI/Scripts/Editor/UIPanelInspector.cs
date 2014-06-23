@@ -554,11 +554,10 @@ public class UIPanelInspector : UIRectEditor
 			}
 			GUILayout.EndHorizontal();
 
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 			GUI.changed = false;
 			int so = EditorGUILayout.IntField("Sort Order", mPanel.sortingOrder, GUILayout.Width(120f));
 			if (GUI.changed) mPanel.sortingOrder = so;
-#endif
+
 			GUILayout.BeginHorizontal();
 			bool norms = EditorGUILayout.Toggle("Normals", mPanel.generateNormals, GUILayout.Width(100f));
 			GUILayout.Label("Needed for lit shaders", GUILayout.MinWidth(20f));

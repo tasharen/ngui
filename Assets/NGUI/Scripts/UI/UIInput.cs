@@ -244,7 +244,7 @@ public class UIInput : MonoBehaviour
 			mDrawStart = 0;
 
 			// BB10's implementation has a bug in Unity
- #if UNITY_4_0 || UNITY_4_2 || UNITY_4_3
+ #if UNITY_4_3
 			if (Application.platform == RuntimePlatform.BB10Player)
  #else
 			if (Application.platform == RuntimePlatform.BlackBerryPlayer)
@@ -544,11 +544,11 @@ public class UIInput : MonoBehaviour
 				if (Application.platform == RuntimePlatform.IPhonePlayer
 					|| Application.platform == RuntimePlatform.Android
 					|| Application.platform == RuntimePlatform.WP8Player
-#if UNITY_4_0 || UNITY_4_2 || UNITY_4_3
+ #if UNITY_4_3
 					|| Application.platform == RuntimePlatform.BB10Player
-#else
+ #else
 					|| Application.platform == RuntimePlatform.BlackBerryPlayer
-#endif
+ #endif
 				)
 				{
 					string val;
@@ -581,7 +581,7 @@ public class UIInput : MonoBehaviour
 							label.multiLine && !hideInput, false, false, defaultText);
 				}
 				else
-#endif
+#endif // MOBILE
 				{
 					Vector2 pos = (UICamera.current != null && UICamera.current.cachedCamera != null) ?
 						UICamera.current.cachedCamera.WorldToScreenPoint(label.worldCorners[0]) :

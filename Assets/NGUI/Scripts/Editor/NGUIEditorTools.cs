@@ -1678,11 +1678,7 @@ public static class NGUIEditorTools
 
 	static public void SetLabelWidth (float width)
 	{
-#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
-		EditorGUIUtility.LookLikeControls(width);
-#else
 		EditorGUIUtility.labelWidth = width;
-#endif
 	}
 
 	/// <summary>
@@ -1693,11 +1689,8 @@ public static class NGUIEditorTools
 	{
 		if (objects != null && objects.Length > 0)
 		{
-#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
-			UnityEditor.Undo.RegisterUndo(objects, name);
-#else
 			UnityEditor.Undo.RecordObjects(objects, name);
-#endif
+
 			foreach (Object obj in objects)
 			{
 				if (obj == null) continue;
@@ -1712,7 +1705,7 @@ public static class NGUIEditorTools
 
 	static public void HideMoveTool (bool hide)
 	{
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2 && !UNITY_4_3
+#if !UNITY_4_3
 		UnityEditor.Tools.hidden = hide && (UnityEditor.Tools.current == UnityEditor.Tool.Move) &&
 			UIWidget.showHandlesWithMoveTool && !NGUISettings.showTransformHandles;
 #endif

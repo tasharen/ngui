@@ -442,7 +442,6 @@ public class NGUISettings
 		return w;
 	}
 
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 	/// <summary>
 	/// Convenience method -- add a UnityEngine.Sprite.
 	/// </summary>
@@ -457,7 +456,7 @@ public class NGUISettings
 		w.height = 100;
 		return w;
 	}
-#endif
+
 	/// <summary>
 	/// Convenience method -- add a sprite.
 	/// </summary>

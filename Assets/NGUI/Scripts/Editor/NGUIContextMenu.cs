@@ -47,10 +47,8 @@ public static class NGUIContextMenu
 	[MenuItem("CONTEXT/UISlider/Help")]
 	static void ShowHelp8 (MenuCommand command) { NGUIHelp.Show(typeof(UISlider)); }
 
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 	[MenuItem("CONTEXT/UI2DSprite/Help")]
 	static void ShowHelp9 (MenuCommand command) { NGUIHelp.Show(typeof(UI2DSprite)); }
-#endif
 
 	[MenuItem("CONTEXT/UIScrollBar/Help")]
 	static void ShowHelp10 (MenuCommand command) { NGUIHelp.Show(typeof(UIScrollBar)); }
@@ -296,16 +294,12 @@ public static class NGUIContextMenu
 				AddChildWidget("Create/Label/Child", false, NGUISettings.AddLabel);
 				AddChildWidget("Create/Invisible Widget/Child", false, NGUISettings.AddWidget);
 				AddChildWidget("Create/Simple Texture/Child", false, NGUISettings.AddTexture);
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 				AddChildWidget("Create/Unity 2D Sprite/Child", false, NGUISettings.Add2DSprite);
-#endif
 				AddSiblingWidget("Create/Sprite/Sibling", false, NGUISettings.AddSprite);
 				AddSiblingWidget("Create/Label/Sibling", false, NGUISettings.AddLabel);
 				AddSiblingWidget("Create/Invisible Widget/Sibling", false, NGUISettings.AddWidget);
 				AddSiblingWidget("Create/Simple Texture/Sibling", false, NGUISettings.AddTexture);
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 				AddSiblingWidget("Create/Unity 2D Sprite/Sibling", false, NGUISettings.Add2DSprite);
-#endif
 			}
 			else
 			{
@@ -313,9 +307,7 @@ public static class NGUIContextMenu
 				AddChildWidget("Create/Label", false, NGUISettings.AddLabel);
 				AddChildWidget("Create/Invisible Widget", false, NGUISettings.AddWidget);
 				AddChildWidget("Create/Simple Texture", false, NGUISettings.AddTexture);
-#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_1 && !UNITY_4_2
 				AddChildWidget("Create/Unity 2D Sprite", false, NGUISettings.Add2DSprite);
-#endif
 			}
 
 			NGUIContextMenu.AddSeparator("Create/");
@@ -566,11 +558,7 @@ public static class NGUIContextMenu
 	{
 		GameObject go = obj as GameObject;
 		Selection.activeGameObject = go.transform.parent.gameObject;
-#if UNITY_3_5 || UNITY_4_0 || UNITY_4_1 || UNITY_4_2
-		NGUITools.Destroy(go);
-#else
 		Undo.DestroyObjectImmediate(go);
-#endif
 	}
 
 	/// <summary>
