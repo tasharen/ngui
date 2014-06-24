@@ -365,6 +365,7 @@ public abstract class UIRect : MonoBehaviour
 		if (updateAnchors == AnchorUpdate.OnEnable)
 			mUpdateAnchors = true;
 		if (mStarted) OnInit();
+		mUpdateFrame = -1;
 #if UNITY_EDITOR
 		OnValidate();
 #endif
