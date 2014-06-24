@@ -99,7 +99,6 @@ public class UITable : UIWidgetContainer
 			if (mChildren.Count == 0)
 			{
 				Transform myTrans = transform;
-				mChildren.Clear();
 
 				for (int i = 0; i < myTrans.childCount; ++i)
 				{
