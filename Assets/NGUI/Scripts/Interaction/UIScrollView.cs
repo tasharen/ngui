@@ -830,6 +830,8 @@ public class UIScrollView : MonoBehaviour
 			mShouldMove = shouldMove;
 			if (Mathf.Sign(mScroll) != Mathf.Sign(delta)) mScroll = 0f;
 			mScroll += delta * scrollWheelFactor;
+			
+			mCalculatedBounds = false;
 		}
 	}
 
