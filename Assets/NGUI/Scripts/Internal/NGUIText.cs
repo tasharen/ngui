@@ -1243,9 +1243,6 @@ static public class NGUIText
 					}
 				}
 
-				float y0 = glyph.v0.y;
-				float y1 = glyph.v1.y;
-
 				v0x = glyph.v0.x + x;
 				v0y = glyph.v0.y - y;
 				v1x = glyph.v1.x + x;
@@ -1331,8 +1328,8 @@ static public class NGUIText
 					{
 						if (gradient)
 						{
-							float min = sizePD + y0 / fontScale;
-							float max = sizePD + y1 / fontScale;
+							float min = sizePD + glyph.v0.y / fontScale;
+							float max = sizePD + glyph.v1.y / fontScale;
 
 							min /= sizePD;
 							max /= sizePD;
@@ -1433,12 +1430,11 @@ static public class NGUIText
 						}
 
 						float cx = (dash.u0.x + dash.u1.x) * 0.5f;
-						float cy = (dash.u0.y + dash.u1.y) * 0.5f;
 
-						uvs.Add(new Vector2(cx, cy));
-						uvs.Add(new Vector2(cx, cy));
-						uvs.Add(new Vector2(cx, cy));
-						uvs.Add(new Vector2(cx, cy));
+						uvs.Add(new Vector2(cx, dash.u0.y));
+						uvs.Add(new Vector2(cx, dash.u1.y));
+						uvs.Add(new Vector2(cx, dash.u1.y));
+						uvs.Add(new Vector2(cx, dash.u0.y));
 					}
 
 					if (subscript && strikethrough)
@@ -1457,21 +1453,30 @@ static public class NGUIText
 					verts.Add(new Vector3(x, v1y));
 					verts.Add(new Vector3(x, v0y));
 
-					Color tint2 = uc;
-
-					if (strikethrough)
+					if (gradient)
 					{
-						tint2.r *= 0.5f;
-						tint2.g *= 0.5f;
-						tint2.b *= 0.5f;
-					}
-					tint2.a *= 0.75f;
-					Color32 uc2 = tint2;
+						float min = sizePD + dash.v0.y / fontScale;
+						float max = sizePD + dash.v1.y / fontScale;
 
-					cols.Add(uc2);
-					cols.Add(uc);
-					cols.Add(uc);
-					cols.Add(uc2);
+						min /= sizePD;
+						max /= sizePD;
+
+						s_c0 = Color.Lerp(gb, gt, min);
+						s_c1 = Color.Lerp(gb, gt, max);
+
+						for (int j = 0, jmax = (bold ? 4 : 1); j < jmax; ++j)
+						{
+							cols.Add(s_c0);
+							cols.Add(s_c1);
+							cols.Add(s_c1);
+							cols.Add(s_c0);
+						}
+					}
+					else
+					{
+						for (int j = 0, jmax = (bold ? 16 : 4); j < jmax; ++j)
+							cols.Add(uc);
+					}
 				}
 			}
 		}

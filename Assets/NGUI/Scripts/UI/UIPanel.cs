@@ -894,6 +894,7 @@ public class UIPanel : UIRect
 		mAlphaFrameID = -1;
 		mMatrixFrame = -1;
 		base.OnEnable();
+		mMatrixFrame = -1;
 	}
 
 	/// <summary>
