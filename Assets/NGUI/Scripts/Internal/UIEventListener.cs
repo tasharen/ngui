@@ -1,4 +1,4 @@
-﻿//----------------------------------------------
+//----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
@@ -30,6 +30,8 @@ public class UIEventListener : MonoBehaviour
 	public BoolDelegate onSelect;
 	public FloatDelegate onScroll;
 	public VectorDelegate onDrag;
+	public VoidDelegate onDragOver;
+	public VoidDelegate onDragOut;
 	public ObjectDelegate onDrop;
 	public KeyCodeDelegate onKey;
 
@@ -41,6 +43,8 @@ public class UIEventListener : MonoBehaviour
 	void OnSelect (bool selected)	{ if (onSelect != null) onSelect(gameObject, selected); }
 	void OnScroll (float delta)		{ if (onScroll != null) onScroll(gameObject, delta); }
 	void OnDrag (Vector2 delta)		{ if (onDrag != null) onDrag(gameObject, delta); }
+	void OnDragOver ()				{ if (onDragOver != null) onDragOver(gameObject); }
+	void OnDragOut ()				{ if (onDragOut != null) onDragOut(gameObject); }
 	void OnDrop (GameObject go)		{ if (onDrop != null) onDrop(gameObject, go); }
 	void OnKey (KeyCode key)		{ if (onKey != null) onKey(gameObject, key); }
 

@@ -1007,9 +1007,7 @@ public class UIWidget : UIRect
 			NGUITools.SetDirty(this);
 #endif
 		}
-#if UNITY_EDITOR
-		if (!Application.isPlaying) Update();
-#endif
+		Update();
 	}
 
 	/// <summary>

@@ -39,7 +39,7 @@ public class UIScrollView : MonoBehaviour
 		WhenDragging,
 	}
 
-	public delegate void OnDragFinished ();
+	public delegate void OnDragNotification ();
 
 	/// <summary>
 	/// Type of movement allowed by the scroll view.
@@ -120,10 +120,16 @@ public class UIScrollView : MonoBehaviour
 	public UIWidget.Pivot contentPivot = UIWidget.Pivot.TopLeft;
 
 	/// <summary>
+	/// Event callback to trigger when the drag process begins.
+	/// </summary>
+
+	public OnDragNotification onDragStarted;
+
+	/// <summary>
 	/// Event callback to trigger when the drag process finished. Can be used for additional effects, such as centering on some object.
 	/// </summary>
 
-	public OnDragFinished onDragFinished;
+	public OnDragNotification onDragFinished;
 
 	// Deprecated functionality. Use 'movement' instead.
 	[HideInInspector][SerializeField] Vector3 scale = new Vector3(1f, 0f, 0f);
@@ -745,6 +751,7 @@ public class UIScrollView : MonoBehaviour
 			{
 				mDragStarted = true;
 				mDragStartOffset = UICamera.currentTouch.totalDelta;
+				if (onDragStarted != null) onDragStarted();
 			}
 
 			Ray ray = smoothDragStart ?

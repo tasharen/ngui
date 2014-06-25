@@ -3,7 +3,7 @@
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
-#if !UNITY_EDITOR && (UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_BLACKBERRY)
+#if !UNITY_EDITOR && (UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_BLACKBERRY || UNITY_WINRT)
 #define MOBILE
 #endif
 
@@ -214,7 +214,11 @@ public class UIInput : MonoBehaviour
 	{
 		get
 		{
+#if UNITY_METRO
+			return true;
+#else
 			return hideInput && label != null && !label.multiLine && inputType != InputType.Password;
+#endif
 		}
 	}
 
@@ -543,11 +547,14 @@ public class UIInput : MonoBehaviour
 #if MOBILE
 				if (Application.platform == RuntimePlatform.IPhonePlayer
 					|| Application.platform == RuntimePlatform.Android
-					|| Application.platform == RuntimePlatform.WP8Player
+				    || Application.platform == RuntimePlatform.WP8Player
  #if UNITY_4_3
 					|| Application.platform == RuntimePlatform.BB10Player
  #else
 					|| Application.platform == RuntimePlatform.BlackBerryPlayer
+					|| Application.platform == RuntimePlatform.MetroPlayerARM
+					|| Application.platform == RuntimePlatform.MetroPlayerX64
+					|| Application.platform == RuntimePlatform.MetroPlayerX86
  #endif
 				)
 				{
@@ -558,7 +565,11 @@ public class UIInput : MonoBehaviour
 					{
 						TouchScreenKeyboard.hideInput = true;
 						kt = (TouchScreenKeyboardType)((int)keyboardType);
+ #if UNITY_METRO
+						val = "";
+ #else
 						val = "|";
+ #endif
 					}
 					else if (inputType == InputType.Password)
 					{
@@ -579,6 +590,9 @@ public class UIInput : MonoBehaviour
 						TouchScreenKeyboard.Open(val, kt, false, false, true) :
 						TouchScreenKeyboard.Open(val, kt, !inputShouldBeHidden && inputType == InputType.AutoCorrect,
 							label.multiLine && !hideInput, false, false, defaultText);
+ #if UNITY_METRO
+					mKeyboard.active = true;
+ #endif
 				}
 				else
 #endif // MOBILE
@@ -597,8 +611,12 @@ public class UIInput : MonoBehaviour
 #if MOBILE
 			if (mKeyboard != null)
 			{
+ #if UNITY_METRO
+				string text = Input.inputString;
+				if (!string.IsNullOrEmpty(text)) Insert(text);
+ #else
 				string text = mKeyboard.text;
-
+ 
 				if (inputShouldBeHidden)
 				{
 					if (text != "|")
@@ -617,7 +635,7 @@ public class UIInput : MonoBehaviour
 					mCached = text;
 					value = text;
 				}
-
+ #endif // UNITY_METRO
 				if (mKeyboard.done || !mKeyboard.active)
 				{
 					if (!mKeyboard.wasCanceled) Submit();
@@ -627,7 +645,7 @@ public class UIInput : MonoBehaviour
 				}
 			}
 			else
-#endif
+#endif // MOBILE
 			{
 				if (selectOnTab != null && Input.GetKeyDown(KeyCode.Tab))
 				{
@@ -966,11 +984,18 @@ public class UIInput : MonoBehaviour
 		// Append the new text
 		for (int i = 0, imax = text.Length; i < imax; ++i)
 		{
+			// If we have an input validator, validate the input first
+			char c = text[i];
+
+			if (c == '\b')
+			{
+				DoBackspace();
+				continue;
+			}
+
 			// Can't go past the character limit
 			if (characterLimit > 0 && sb.Length + rl >= characterLimit) break;
 
-			// If we have an input validator, validate the input first
-			char c = text[i];
 			if (onValidate != null) c = onValidate(sb.ToString(), sb.Length, c);
 			else if (validation != Validation.None) c = Validate(sb.ToString(), sb.Length, c);
 
