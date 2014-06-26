@@ -559,6 +559,7 @@ public class UICamera : MonoBehaviour
 	{
 		public int depth;
 		public RaycastHit hit;
+		public Vector3 point;
 		public GameObject go;
 	}
 
@@ -630,6 +631,7 @@ public class UICamera : MonoBehaviour
 						if (mHit.depth != int.MaxValue)
 						{
 							mHit.hit = hits[b];
+							mHit.point = hits[b].point;
 							mHit.go = hits[b].collider.gameObject;
 							mHits.Add(mHit);
 						}
@@ -647,7 +649,7 @@ public class UICamera : MonoBehaviour
 						{
 							lastHit = mHits[b].hit;
 							hoveredObject = mHits[b].go;
-							lastWorldPosition = hits[b].point;
+							lastWorldPosition = mHits[b].point;
 							mHits.Clear();
 							return true;
 						}
@@ -726,6 +728,7 @@ public class UICamera : MonoBehaviour
 							if (mHit.depth != int.MaxValue)
 							{
 								mHit.go = go;
+								mHit.point = lastWorldPosition;
 								mHits.Add(mHit);
 							}
 						}
@@ -808,7 +811,7 @@ public class UICamera : MonoBehaviour
 
 		while (panel != null)
 		{
-			if (!panel.IsVisible(de.hit.point)) return false;
+			if (!panel.IsVisible(de.point)) return false;
 			panel = panel.parentPanel;
 		}
 		return true;
