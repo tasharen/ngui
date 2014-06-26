@@ -768,6 +768,7 @@ public class UIPopupList : UIWidgetContainer
 			{
 				UILabel lbl = labels[i];
 				NGUITools.AddWidgetCollider(lbl.gameObject);
+				lbl.autoResizeBoxCollider = false;
 				BoxCollider bc = lbl.GetComponent<BoxCollider>();
 
 				if (bc != null)

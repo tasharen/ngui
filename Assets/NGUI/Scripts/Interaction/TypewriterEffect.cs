@@ -130,7 +130,7 @@ public class TypewriterEffect : MonoBehaviour
 			if (keepFullDimensions && scrollView != null) scrollView.UpdatePosition();
 		}
 
-		if (mCurrentOffset < mFullText.Length && mNextChar <= RealTime.time)
+		while (mCurrentOffset < mFullText.Length && mNextChar <= RealTime.time)
 		{
 			int lastOffset = mCurrentOffset;
 			charsPerSecond = Mathf.Max(1, charsPerSecond);
@@ -163,7 +163,12 @@ public class TypewriterEffect : MonoBehaviour
 					delay += delayOnPeriod;
 				}
 			}
-			mNextChar = RealTime.time + delay;
+
+			if (mNextChar == 0f)
+			{
+				mNextChar = RealTime.time + delay;
+			}
+			else mNextChar += delay;
 
 			if (fadeInTime != 0f)
 			{
