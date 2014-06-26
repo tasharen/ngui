@@ -177,6 +177,7 @@ public class UIInput : MonoBehaviour
 #if MOBILE
 	// Unity fails to compile if the touch screen keyboard is used on a non-mobile device
 	static protected TouchScreenKeyboard mKeyboard;
+	static bool mWaitForKeyboard = false;
 #endif
 	[System.NonSerialized] protected int mSelectionStart = 0;
 	[System.NonSerialized] protected int mSelectionEnd = 0;
@@ -534,7 +535,14 @@ public class UIInput : MonoBehaviour
 		if (isSelected)
 		{
 			if (mDoInit) Init();
-
+#if MOBILE
+			// Wait for the keyboard to open. Apparently mKeyboard.active will return 'false' for a while in some cases.
+			if (mWaitForKeyboard)
+			{
+				if (!mKeyboard.active) return;
+				mWaitForKeyboard = false;
+			}
+#endif
 			// Unity has issues bringing up the keyboard properly if it's in "hideInput" mode and you happen
 			// to select one input in the same Update as de-selecting another.
 			if (mSelectMe != -1 && mSelectMe != Time.frameCount)
@@ -586,6 +594,7 @@ public class UIInput : MonoBehaviour
 						mSelectionStart = mSelectionEnd;
 					}
 
+					mWaitForKeyboard = true;
 					mKeyboard = (inputType == InputType.Password) ?
 						TouchScreenKeyboard.Open(val, kt, false, false, true) :
 						TouchScreenKeyboard.Open(val, kt, !inputShouldBeHidden && inputType == InputType.AutoCorrect,

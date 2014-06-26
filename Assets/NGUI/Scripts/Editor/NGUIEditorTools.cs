@@ -482,8 +482,13 @@ public static class NGUIEditorTools
 			settings.maxTextureSize = 4096;
 			settings.wrapMode = TextureWrapMode.Clamp;
 			settings.npotScale = TextureImporterNPOTScale.ToNearest;
-			if (NGUISettings.trueColorAtlas) settings.textureFormat = TextureImporterFormat.ARGB32;
-			settings.filterMode = FilterMode.Trilinear;
+
+			if (NGUISettings.trueColorAtlas)
+			{
+				settings.textureFormat = TextureImporterFormat.ARGB32;
+				settings.filterMode = FilterMode.Trilinear;
+			}
+
 			settings.aniso = 4;
 			settings.alphaIsTransparency = alphaTransparency;
 			ti.SetTextureSettings(settings);
