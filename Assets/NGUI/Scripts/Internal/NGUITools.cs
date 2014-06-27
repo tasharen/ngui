@@ -121,36 +121,36 @@ static public class NGUITools
 	/// New WWW call can fail if the crossdomain policy doesn't check out. Exceptions suck. It's much more elegant to check for null instead.
 	/// </summary>
 
-	static public WWW OpenURL (string url)
-	{
-#if UNITY_FLASH
-		Debug.LogError("WWW is not yet implemented in Flash");
-		return null;
-#else
-		WWW www = null;
-		try { www = new WWW(url); }
-		catch (System.Exception ex) { Debug.LogError(ex.Message); }
-		return www;
-#endif
-	}
+//    static public WWW OpenURL (string url)
+//    {
+//#if UNITY_FLASH
+//        Debug.LogError("WWW is not yet implemented in Flash");
+//        return null;
+//#else
+//        WWW www = null;
+//        try { www = new WWW(url); }
+//        catch (System.Exception ex) { Debug.LogError(ex.Message); }
+//        return www;
+//#endif
+//    }
 
-	/// <summary>
-	/// New WWW call can fail if the crossdomain policy doesn't check out. Exceptions suck. It's much more elegant to check for null instead.
-	/// </summary>
+//    /// <summary>
+//    /// New WWW call can fail if the crossdomain policy doesn't check out. Exceptions suck. It's much more elegant to check for null instead.
+//    /// </summary>
 
-	static public WWW OpenURL (string url, WWWForm form)
-	{
-		if (form == null) return OpenURL(url);
-#if UNITY_FLASH
-		Debug.LogError("WWW is not yet implemented in Flash");
-		return null;
-#else
-		WWW www = null;
-		try { www = new WWW(url, form); }
-		catch (System.Exception ex) { Debug.LogError(ex != null ? ex.Message : "<null>"); }
-		return www;
-#endif
-	}
+//    static public WWW OpenURL (string url, WWWForm form)
+//    {
+//        if (form == null) return OpenURL(url);
+//#if UNITY_FLASH
+//        Debug.LogError("WWW is not yet implemented in Flash");
+//        return null;
+//#else
+//        WWW www = null;
+//        try { www = new WWW(url, form); }
+//        catch (System.Exception ex) { Debug.LogError(ex != null ? ex.Message : "<null>"); }
+//        return www;
+//#endif
+//    }
 
 	/// <summary>
 	/// Same as Random.Range, but the returned value is between min and max, inclusive.
