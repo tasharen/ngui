@@ -74,20 +74,28 @@ public class UIRoot : MonoBehaviour
 	{
 		get
 		{
-			int h = Screen.height;
-			int height = Mathf.Max(2, h);
 			if (scalingStyle == Scaling.FixedSize) return manualHeight;
-			int w = Screen.width;
 
 #if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_BLACKBERRY
 			if (scalingStyle == Scaling.FixedSizeOnMobiles)
 				return manualHeight;
 #endif
-			if (height < minimumHeight) height = minimumHeight;
-			if (height > maximumHeight) height = maximumHeight;
+			Vector2 screen = NGUITools.screenSize;
+			float aspect = screen.x / screen.y;
+			
+			if (screen.y < minimumHeight)
+			{
+				screen.y = minimumHeight;
+				screen.x = screen.y * aspect;
+			}
+			else if (screen.y > maximumHeight)
+			{
+				screen.y = maximumHeight;
+				screen.x = screen.y * aspect;
+			}
 
 			// Portrait mode uses the maximum of width or height to shrink the UI
-			if (shrinkPortraitUI && h > w) height = Mathf.RoundToInt(height * ((float)h / w));
+			int height = Mathf.RoundToInt((shrinkPortraitUI && screen.y > screen.x) ? screen.y / aspect : screen.y);
 
 			// Adjust the final value by the DPI setting
 			return adjustByDPI ? NGUIMath.AdjustByDPI(height) : height;
@@ -98,7 +106,7 @@ public class UIRoot : MonoBehaviour
 	/// Pixel size adjustment. Most of the time it's at 1, unless the scaling style is set to FixedSize.
 	/// </summary>
 
-	public float pixelSizeAdjustment { get { return GetPixelSizeAdjustment(Screen.height); } }
+	public float pixelSizeAdjustment { get { return GetPixelSizeAdjustment(Mathf.RoundToInt(NGUITools.screenSize.y)); } }
 
 	/// <summary>
 	/// Helper function that figures out the pixel size adjustment for the specified game object.

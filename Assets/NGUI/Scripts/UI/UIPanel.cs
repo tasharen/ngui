@@ -576,6 +576,19 @@ public class UIPanel : UIRect
 		{
 			if (mClipping == UIDrawCall.Clipping.None)
 			{
+				if (mCam != null)
+				{
+					Vector3[] corners = NGUITools.GetWorldCorners(mCam);
+					UIRoot rt = root;
+
+					if (rt != null)
+					{
+						float adjustment = rt.pixelSizeAdjustment;
+						for (int i = 0; i < 4; ++i) corners[i] *= adjustment;
+					}
+					return corners;
+				}
+
 				Vector2 size = GetViewSize();
 
 				float x0 = -0.5f * size.x;
@@ -583,15 +596,10 @@ public class UIPanel : UIRect
 				float x1 = x0 + size.x;
 				float y1 = y0 + size.y;
 
-				Transform wt = (mCam != null) ? mCam.transform : null;
-
-				if (wt != null)
-				{
-					mCorners[0] = wt.TransformPoint(x0, y0, 0f);
-					mCorners[1] = wt.TransformPoint(x0, y1, 0f);
-					mCorners[2] = wt.TransformPoint(x1, y1, 0f);
-					mCorners[3] = wt.TransformPoint(x1, y0, 0f);
-				}
+				mCorners[0] = new Vector3(x0, y0, 0f);
+				mCorners[1] = new Vector3(x0, y1, 0f);
+				mCorners[2] = new Vector3(x1, y1, 0f);
+				mCorners[3] = new Vector3(x1, y0, 0f);
 			}
 			else
 			{
@@ -1726,13 +1734,8 @@ public class UIPanel : UIRect
 	Vector2 GetWindowSize ()
 	{
 		UIRoot rt = root;
-#if UNITY_EDITOR
-		Vector2 size = GetMainGameViewSize();
+		Vector2 size = NGUITools.screenSize;
 		if (rt != null) size *= rt.GetPixelSizeAdjustment(Mathf.RoundToInt(size.y));
-#else
-		Vector2 size = new Vector2(Screen.width, Screen.height);
-		if (rt != null) size *= rt.GetPixelSizeAdjustment(Screen.height);
-#endif
 		return size;
 	}
 
@@ -1742,52 +1745,16 @@ public class UIPanel : UIRect
 
 	public Vector2 GetViewSize ()
 	{
-		bool clip = (mClipping != UIDrawCall.Clipping.None);
-#if UNITY_EDITOR
-		Vector2 size = clip ? new Vector2(mClipRange.z, mClipRange.w) : GetMainGameViewSize();
-#else
-		Vector2 size = clip ? new Vector2(mClipRange.z, mClipRange.w) : new Vector2(Screen.width, Screen.height);
-#endif
-		if (!clip)
-		{
-			UIRoot rt = root;
-#if UNITY_EDITOR
-			if (rt != null) size *= rt.GetPixelSizeAdjustment(Mathf.RoundToInt(size.y));
-#else
-			if (rt != null) size *= rt.GetPixelSizeAdjustment(Screen.height);
-#endif
-		}
+		if (mClipping != UIDrawCall.Clipping.None)
+			return new Vector2(mClipRange.z, mClipRange.w);
+		
+		Vector2 size = NGUITools.screenSize;
+		UIRoot rt = root;
+		if (rt != null) size *= rt.pixelSizeAdjustment;
 		return size;
 	}
 
 #if UNITY_EDITOR
-	static int mSizeFrame = -1;
-	static System.Reflection.MethodInfo s_GetSizeOfMainGameView;
-	static Vector2 mGameSize = Vector2.one;
-
-	/// <summary>
-	/// Major hax to get the size of the game view window.
-	/// </summary>
-
-	static public Vector2 GetMainGameViewSize ()
-	{
-		int frame = Time.frameCount;
-
-		if (mSizeFrame != frame || !Application.isPlaying)
-		{
-			mSizeFrame = frame;
-
-			if (s_GetSizeOfMainGameView == null)
-			{
-				System.Type type = System.Type.GetType("UnityEditor.GameView,UnityEditor");
-				s_GetSizeOfMainGameView = type.GetMethod("GetSizeOfMainGameView",
-					System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-			}
-			mGameSize = (Vector2)s_GetSizeOfMainGameView.Invoke(null, null);
-		}
-		return mGameSize;
-	}
-
 	/// <summary>
 	/// Draw a visible pink outline for the clipped area.
 	/// </summary>
@@ -1796,51 +1763,32 @@ public class UIPanel : UIRect
 	{
 		if (mCam == null) return;
 
-		Vector2 size = GetViewSize();
-		GameObject go = UnityEditor.Selection.activeGameObject;
-		bool selected = (go != null) && (NGUITools.FindInParents<UIPanel>(go) == this);
 		bool clip = (mClipping != UIDrawCall.Clipping.None);
+		Transform t = clip ? transform : mCam.transform;
 
-		Transform t = clip ? transform : (mCam != null ? mCam.transform : null);
+		Vector3[] corners = worldCorners;
+		for (int i = 0; i < 4; ++i) corners[i] = t.InverseTransformPoint(corners[i]);
+		Vector3 pos = Vector3.Lerp(corners[0], corners[2], 0.5f);
+		Vector3 size = corners[2] - corners[0];
 
-		if (t != null)
+		GameObject go = UnityEditor.Selection.activeGameObject;
+		bool isUsingThisPanel = (go != null) && (NGUITools.FindInParents<UIPanel>(go) == this);
+		bool isSelected = (UnityEditor.Selection.activeGameObject == gameObject);
+		bool detailedView = (isSelected && isUsingThisPanel && mClipping == UIDrawCall.Clipping.SoftClip);
+
+		Gizmos.color = (isUsingThisPanel && !detailedView) ? new Color(1f, 0f, 0.5f) : new Color(0.5f, 0f, 0.5f);
+		Gizmos.matrix = t.localToWorldMatrix;
+		Gizmos.DrawWireCube(pos, size);
+
+		if (detailedView)
 		{
-			Vector3 pos = clip ? new Vector3(mClipOffset.x + mClipRange.x, mClipOffset.y + mClipRange.y) : Vector3.zero;
-			Gizmos.matrix = t.localToWorldMatrix;
+			//UIRoot rt = root;
+			//float scale = (rt != null) ? rt.pixelSizeAdjustment : 1f;
 
-			if (selected)
-			{
-				if (mClipping == UIDrawCall.Clipping.SoftClip)
-				{
-					if (UnityEditor.Selection.activeGameObject == gameObject)
-					{
-						Gizmos.color = new Color(1f, 0f, 0.5f);
-						size.x -= mClipSoftness.x * 2f;
-						size.y -= mClipSoftness.y * 2f;
-						Gizmos.DrawWireCube(pos, size);
-					}
-					else
-					{
-						Gizmos.color = new Color(0.5f, 0f, 0.5f);
-						Gizmos.DrawWireCube(pos, size);
-
-						Gizmos.color = new Color(1f, 0f, 0.5f);
-						size.x -= mClipSoftness.x * 2f;
-						size.y -= mClipSoftness.y * 2f;
-						Gizmos.DrawWireCube(pos, size);
-					}
-				}
-				else
-				{
-					Gizmos.color = new Color(1f, 0f, 0.5f);
-					Gizmos.DrawWireCube(pos, size);
-				}
-			}
-			else
-			{
-				Gizmos.color = new Color(0.5f, 0f, 0.5f);
-				Gizmos.DrawWireCube(pos, size);
-			}
+			Gizmos.color = new Color(1f, 0f, 0.5f);
+			size.x -= mClipSoftness.x * 2f;// *scale;
+			size.y -= mClipSoftness.y * 2f;// *scale;
+			Gizmos.DrawWireCube(pos, size);
 		}
 	}
 #endif // UNITY_EDITOR

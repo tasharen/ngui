@@ -321,7 +321,15 @@ public abstract class UIRect : MonoBehaviour
 	{
 		if (anchorCamera != null)
 		{
-			return anchorCamera.GetSides(relativeTo);
+			Vector3[] sides = anchorCamera.GetSides(relativeTo);
+			UIRoot rt = root;
+
+			if (rt != null)
+			{
+				float adjustment = rt.pixelSizeAdjustment;
+				for (int i = 0; i < 4; ++i) sides[i] *= adjustment;
+			}
+			return sides;
 		}
 		else
 		{

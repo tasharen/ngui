@@ -1425,10 +1425,28 @@ static public class NGUITools
 
 	static public Vector3[] GetSides (this Camera cam, float depth, Transform relativeTo)
 	{
-		mSides[0] = cam.ViewportToWorldPoint(new Vector3(0f, 0.5f, depth));
-		mSides[1] = cam.ViewportToWorldPoint(new Vector3(0.5f, 1f, depth));
-		mSides[2] = cam.ViewportToWorldPoint(new Vector3(1f, 0.5f, depth));
-		mSides[3] = cam.ViewportToWorldPoint(new Vector3(0.5f, 0f, depth));
+		Rect rect = cam.rect;
+		Vector2 size = screenSize;
+
+		float x0 = -0.5f;
+		float x1 = 0.5f;
+		float y0 = -0.5f;
+		float y1 = 0.5f;
+
+		float aspect = rect.width / rect.height;
+		x0 *= aspect;
+		x1 *= aspect;
+
+		x0 *= size.x;
+		x1 *= size.x;
+		y0 *= size.y;
+		y1 *= size.y;
+
+		Transform t = cam.transform;
+		mSides[0] = t.TransformPoint(new Vector3(x0, 0f, depth));
+		mSides[1] = t.TransformPoint(new Vector3(0f, y1, depth));
+		mSides[2] = t.TransformPoint(new Vector3(x1, 0f, depth));
+		mSides[3] = t.TransformPoint(new Vector3(0f, y0, depth));
 
 		if (relativeTo != null)
 		{
@@ -1471,10 +1489,28 @@ static public class NGUITools
 
 	static public Vector3[] GetWorldCorners (this Camera cam, float depth, Transform relativeTo)
 	{
-		mSides[0] = cam.ViewportToWorldPoint(new Vector3(0f, 0f, depth));
-		mSides[1] = cam.ViewportToWorldPoint(new Vector3(0f, 1f, depth));
-		mSides[2] = cam.ViewportToWorldPoint(new Vector3(1f, 1f, depth));
-		mSides[3] = cam.ViewportToWorldPoint(new Vector3(1f, 0f, depth));
+		Rect rect = cam.rect;
+		Vector2 size = screenSize;
+
+		float x0 = -0.5f;
+		float x1 = 0.5f;
+		float y0 = -0.5f;
+		float y1 = 0.5f;
+
+		float aspect = rect.width / rect.height;
+		x0 *= aspect;
+		x1 *= aspect;
+
+		x0 *= size.x;
+		x1 *= size.x;
+		y0 *= size.y;
+		y1 *= size.y;
+
+		Transform t = cam.transform;
+		mSides[0] = t.TransformPoint(new Vector3(x0, y0, depth));
+		mSides[1] = t.TransformPoint(new Vector3(x0, y1, depth));
+		mSides[2] = t.TransformPoint(new Vector3(x1, y1, depth));
+		mSides[3] = t.TransformPoint(new Vector3(x1, y0, depth));
 
 		if (relativeTo != null)
 		{
@@ -1542,5 +1578,43 @@ static public class NGUITools
 		ExecuteAll<UIPanel>(root, "Update");
 		ExecuteAll<UIPanel>(root, "LateUpdate");
 	}
+#endif
+
+#if UNITY_EDITOR
+	static int mSizeFrame = -1;
+	static System.Reflection.MethodInfo s_GetSizeOfMainGameView;
+	static Vector2 mGameSize = Vector2.one;
+
+	/// <summary>
+	/// Size of the game view cannot be retrieved from Screen.width and Screen.height when the game view is hidden.
+	/// </summary>
+
+	static public Vector2 screenSize
+	{
+		get
+		{
+			int frame = Time.frameCount;
+
+			if (mSizeFrame != frame || !Application.isPlaying)
+			{
+				mSizeFrame = frame;
+
+				if (s_GetSizeOfMainGameView == null)
+				{
+					System.Type type = System.Type.GetType("UnityEditor.GameView,UnityEditor");
+					s_GetSizeOfMainGameView = type.GetMethod("GetSizeOfMainGameView",
+						System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+				}
+				mGameSize = (Vector2)s_GetSizeOfMainGameView.Invoke(null, null);
+			}
+			return mGameSize;
+		}
+	}
+#else
+	/// <summary>
+	/// Size of the game view cannot be retrieved from Screen.width and Screen.height when the game view is hidden.
+	/// </summary>
+
+	static public Vector2 screenSize { get { return new Vector2(Screen.width, Screen.height); } }
 #endif
 }
