@@ -19,6 +19,8 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Wrap Content")]
 public class UIWrapContent : MonoBehaviour
 {
+	public delegate void OnInitializeItem (GameObject go, int wrapIndex, int realIndex);
+
 	/// <summary>
 	/// Width or height of the child items for positioning purposes.
 	/// </summary>
@@ -31,10 +33,18 @@ public class UIWrapContent : MonoBehaviour
 
 	public bool cullContent = true;
 
+	/// <summary>
+	/// Callback that will be called every time an item needs to have its content updated.
+	/// The 'wrapIndex' is the index within the child list, and 'realIndex' is the index using position logic.
+	/// </summary>
+
+	public OnInitializeItem onInitializeItem;
+
 	Transform mTrans;
 	UIPanel mPanel;
 	UIScrollView mScroll;
 	bool mHorizontal = false;
+	bool mFirstTime = true;
 	BetterList<Transform> mChildren = new BetterList<Transform>();
 
 	/// <summary>
@@ -53,6 +63,7 @@ public class UIWrapContent : MonoBehaviour
 			if (mScroll.dragEffect == UIScrollView.DragEffect.MomentumAndSpring)
 				mScroll.dragEffect = UIScrollView.DragEffect.Momentum;
 		}
+		mFirstTime = false;
 	}
 
 	/// <summary>
@@ -168,6 +179,7 @@ public class UIWrapContent : MonoBehaviour
 					distance = t.localPosition.x - center.x;
 					UpdateItem(t, i);
 				}
+				else if (mFirstTime) UpdateItem(t, i);
 
 				if (cullContent)
 				{
@@ -199,6 +211,7 @@ public class UIWrapContent : MonoBehaviour
 					distance = t.localPosition.y - center.y;
 					UpdateItem(t, i);
 				}
+				else if (mFirstTime) UpdateItem(t, i);
 
 				if (cullContent)
 				{
@@ -214,5 +227,14 @@ public class UIWrapContent : MonoBehaviour
 	/// Want to update the content of items as they are scrolled? Override this function.
 	/// </summary>
 
-	protected virtual void UpdateItem (Transform item, int index) {}
+	protected virtual void UpdateItem (Transform item, int index)
+	{
+		if (onInitializeItem != null)
+		{
+			int realIndex = (mScroll.movement == UIScrollView.Movement.Vertical) ?
+				Mathf.RoundToInt(item.localPosition.y / itemSize) :
+				Mathf.RoundToInt(item.localPosition.x / itemSize);
+			onInitializeItem(item.gameObject, index, realIndex);
+		}
+	}
 }
