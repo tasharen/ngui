@@ -8,7 +8,7 @@ using UnityEditor;
 
 public static class NGUIContextMenu
 {
-	[MenuItem("Help/NGUI Documentation (v.3.6.5)")]
+	[MenuItem("Help/NGUI Documentation (v.3.6.6)")]
 	static void ShowHelp0 (MenuCommand command) { NGUIHelp.Show(); }
 
 	[MenuItem("Help/NGUI Support Forum")]

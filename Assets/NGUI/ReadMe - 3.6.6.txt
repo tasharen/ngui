@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.6.5
+            Version 3.6.6
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -55,7 +55,19 @@ and it will not be included in the build of your game. It's only used in the edi
  Version History
 -----------------
 
-3.6.5:
+3.6.6
+- NEW: UIWrapContent now has a settable delegate to initialize items, and will call it on Start().
+- NEW: Added OnDragStarted to the scroll view for those that needed it.
+- NEW: Added the missing OnDragOver/OnDragOut to the UIEventListener.
+- FIX: Hiding game view behind the scene view should now work as expected (thanks NikolayLezhnev).
+- FIX: Localization was not always handling double quotes properly.
+- FIX: Mobile keyboard-related fix (thanks niniane).
+- FIX: 2D raycasts were not working quite right...
+- FIX: Underline and strike-out should now look better and will be affected by the gradient.
+- DEL: Commented out NGUITools.OpenURL since it causes network permissions to be used on mobile. Uncomment them if you need them.
+- DEL: Cleaned up pre-Unity 4.3 code.
+
+3.6.5
 - NEW: Added a way to show the transform gizmo without disabling the drag handles (NGUI->Options).
 - NEW: Added an "onCenter" notification to UICenterOnChild.
 - FIX: Drag & drop example wasn't working properly due to a missed line in UICamera.
@@ -64,7 +76,7 @@ and it will not be included in the build of your game. It's only used in the edi
 - FIX: Flash compilation fixes.
 - FIX: Nicki's optimizations.
 
-3.6.4:
+3.6.4
 - NEW: Added the way to set the label alignment for popup lists.
 - NEW: EventDelegate.Add(list, callback) now returns an EventDelegate to work with.
 - NEW: Added an option to execute the UICenterOnChild in the editor via right-click.
