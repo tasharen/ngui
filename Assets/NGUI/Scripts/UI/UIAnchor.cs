@@ -135,10 +135,9 @@ public class UIAnchor : MonoBehaviour
 			if (pc.clipping == UIDrawCall.Clipping.None)
 			{
 				// Panel has no clipping -- just use the screen's dimensions
-				Vector2 size = NGUITools.screenSize;
-				float ratio = (mRoot != null) ? (float)mRoot.activeHeight / size.y * 0.5f : 0.5f;
-				mRect.xMin = -size.x * ratio;
-				mRect.yMin = -size.y * ratio;
+				float ratio = (mRoot != null) ? (float)mRoot.activeHeight / Screen.height * 0.5f : 0.5f;
+				mRect.xMin = -Screen.width * ratio;
+				mRect.yMin = -Screen.height * ratio;
 				mRect.xMax = -mRect.xMin;
 				mRect.yMax = -mRect.yMin;
 			}
@@ -167,12 +166,7 @@ public class UIAnchor : MonoBehaviour
 		else if (uiCamera != null)
 		{
 			useCamera = true;
-			Vector2 size = NGUITools.screenSize;
-			mRect = uiCamera.rect;
-			mRect.xMin *= size.x;
-			mRect.yMin *= size.y;
-			mRect.xMax *= size.x;
-			mRect.yMax *= size.y;
+			mRect = uiCamera.pixelRect;
 		}
 		else return;
 
