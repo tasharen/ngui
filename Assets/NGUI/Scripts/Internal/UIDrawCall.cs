@@ -595,22 +595,21 @@ public class UIDrawCall : MonoBehaviour
 		}
 	}
 
-	static string[] ClipRange =
+	static int[] ClipRange =
 	{
-		"_ClipRange0",
-		"_ClipRange1",
-		"_ClipRange2",
-		"_ClipRange4",
+		Shader.PropertyToID("_ClipRange0"),
+		Shader.PropertyToID("_ClipRange1"),
+		Shader.PropertyToID("_ClipRange2"),
+		Shader.PropertyToID("_ClipRange4"),
 	};
 
-	static string[] ClipArgs =
+	static int[] ClipArgs =
 	{
-		"_ClipArgs0",
-		"_ClipArgs1",
-		"_ClipArgs2",
-		"_ClipArgs3",
+		Shader.PropertyToID("_ClipArgs0"),
+		Shader.PropertyToID("_ClipArgs1"),
+		Shader.PropertyToID("_ClipArgs2"),
+		Shader.PropertyToID("_ClipArgs3"),
 	};
-
 	/// <summary>
 	/// Set the shader clipping parameters.
 	/// </summary>
