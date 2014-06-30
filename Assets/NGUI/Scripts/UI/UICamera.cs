@@ -6,6 +6,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 /// <summary>
 /// This script should be attached to each camera that's used to draw the objects with
 /// UI components on them. This may mean only one camera (main camera or your UI camera),
@@ -1005,7 +1009,10 @@ public class UICamera : MonoBehaviour
 	/// Sort the list when enabled.
 	/// </summary>
 
-	void OnEnable () { list.Add(this); list.Sort(CompareFunc); }
+	void OnEnable ()
+	{ list.Add(this);
+		list.Sort(CompareFunc);
+	}
 
 	/// <summary>
 	/// Remove this camera from the list.

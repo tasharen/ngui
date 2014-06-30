@@ -643,6 +643,47 @@ static public class NGUIMenu
 			}
 		}
 	}
+
+	[MenuItem("NGUI/Extras/Align Scene View to UI", false, 10)]
+	static public void AlignSVToUI ()
+	{
+		GameObject go = Selection.activeGameObject ?? UICamera.list[0].gameObject;
+		Camera cam = NGUITools.FindCameraForLayer(go.layer);
+		SceneView sv = SceneView.lastActiveSceneView;
+		Camera svc = sv.camera;
+		svc.nearClipPlane = cam.nearClipPlane;
+		svc.farClipPlane = cam.farClipPlane;
+		sv.size = Mathf.Sqrt(svc.aspect) / 0.7071068f;
+		sv.pivot = cam.transform.position;
+		sv.rotation = cam.transform.rotation;
+		sv.orthographic = true;
+		sv.Repaint();
+	}
+
+	[MenuItem("NGUI/Extras/Align Scene View to UI", true, 10)]
+	static public bool AlignSVToUICheck ()
+	{
+		if (SceneView.lastActiveSceneView == null) return false;
+		if (UICamera.list.size == 0) return false;
+		
+		GameObject go = Selection.activeGameObject ?? UICamera.list[0].gameObject;
+		if (go == null) return false;
+		
+		Camera cam = NGUITools.FindCameraForLayer(go.layer);
+		if (cam == null || !cam.orthographic) return false;
+		return true;
+	}
+
+	[MenuItem("GameObject/Align View To Selected UI", false, 999)]
+	static public void AlignSVWithSelectedUI () { AlignSVToUI(); }
+
+	[MenuItem("GameObject/Align View To Selected UI", true, 999)]
+	static public bool AlignSVWithSelectedUICheck ()
+	{
+		GameObject go = Selection.activeGameObject;
+		if (go == null) return false;
+		return AlignSVToUICheck();
+	}
 #endregion
 
 	[MenuItem("NGUI/Normalize Depth Hierarchy &#0", false, 11)]
