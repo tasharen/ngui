@@ -131,6 +131,18 @@ public class UIScrollView : MonoBehaviour
 
 	public OnDragNotification onDragFinished;
 
+	/// <summary>
+	/// Event callback triggered when the scroll view is moving as a result of momentum in between of OnDragFinished and OnStoppedMoving.
+	/// </summary>
+
+	public OnDragNotification onMomentumMove;
+
+	/// <summary>
+	/// Event callback to trigger when the scroll view's movement ends.
+	/// </summary>
+
+	public OnDragNotification onStoppedMoving;
+
 	// Deprecated functionality. Use 'movement' instead.
 	[HideInInspector][SerializeField] Vector3 scale = new Vector3(1f, 0f, 0f);
 
@@ -274,7 +286,18 @@ public class UIScrollView : MonoBehaviour
 	/// Current momentum, exposed just in case it's needed.
 	/// </summary>
 
-	public Vector3 currentMomentum { get { return mMomentum; } set { mMomentum = value; mShouldMove = true; } }
+	public Vector3 currentMomentum
+	{
+		get
+		{
+			return mMomentum;
+		}
+		set
+		{
+			mMomentum = value;
+			mShouldMove = true;
+		}
+	}
 
 	/// <summary>
 	/// Cache the transform and the panel.
@@ -379,7 +402,7 @@ public class UIScrollView : MonoBehaviour
 				Vector3 pos = mTrans.localPosition + constraint;
 				pos.x = Mathf.Round(pos.x);
 				pos.y = Mathf.Round(pos.y);
-				SpringPanel.Begin(mPanel.gameObject, pos, 13f);
+				SpringPanel.Begin(mPanel.gameObject, pos, 13f).strength = 8f;
 			}
 			else
 			{
@@ -726,11 +749,12 @@ public class UIScrollView : MonoBehaviour
 			}
 			else
 			{
-				if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None && dragEffect == DragEffect.MomentumAndSpring)
-					RestrictWithinBounds(false, canMoveHorizontally, canMoveVertically);
+				if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None)
+					RestrictWithinBounds(dragEffect == DragEffect.None, canMoveHorizontally, canMoveVertically);
 
-				if (onDragFinished != null)
-					onDragFinished();
+				if (onDragFinished != null) onDragFinished();
+				if (!mShouldMove && onStoppedMoving != null)
+					onStoppedMoving();
 			}
 		}
 	}
@@ -792,7 +816,8 @@ public class UIScrollView : MonoBehaviour
 				}
 
 				// Adjust the momentum
-				mMomentum = Vector3.Lerp(mMomentum, mMomentum + offset * (0.01f * momentumAmount), 0.67f);
+				if (dragEffect == DragEffect.None) mMomentum = Vector3.zero;
+				else mMomentum = Vector3.Lerp(mMomentum, mMomentum + offset * (0.01f * momentumAmount), 0.67f);
 
 				// Move the scroll view
 				if (!iOSDragEmulation || dragEffect != DragEffect.MomentumAndSpring)
@@ -878,30 +903,32 @@ public class UIScrollView : MonoBehaviour
 			}
 		}
 
-		// Apply momentum
-		if (mShouldMove && !mPressed)
-		{
-			if (movement == Movement.Horizontal)
-			{
-				mMomentum -= mTrans.TransformDirection(new Vector3(mScroll * 0.05f, 0f, 0f));
-			}
-			else if (movement == Movement.Vertical)
-			{
-				mMomentum -= mTrans.TransformDirection(new Vector3(0f, mScroll * 0.05f, 0f));
-			}
-			else if (movement == Movement.Unrestricted)
-			{
-				mMomentum -= mTrans.TransformDirection(new Vector3(mScroll * 0.05f, mScroll * 0.05f, 0f));
-			}
-			else
-			{
-				mMomentum -= mTrans.TransformDirection(new Vector3(
-					mScroll * customMovement.x * 0.05f,
-					mScroll * customMovement.y * 0.05f, 0f));
-			}
+		if (!mShouldMove) return;
 
-			if (mMomentum.magnitude > 0.0001f)
+		// Apply momentum
+		if (!mPressed)
+		{
+			if (mMomentum.magnitude > 0.0001f || mScroll != 0f)
 			{
+				if (movement == Movement.Horizontal)
+				{
+					mMomentum -= mTrans.TransformDirection(new Vector3(mScroll * 0.05f, 0f, 0f));
+				}
+				else if (movement == Movement.Vertical)
+				{
+					mMomentum -= mTrans.TransformDirection(new Vector3(0f, mScroll * 0.05f, 0f));
+				}
+				else if (movement == Movement.Unrestricted)
+				{
+					mMomentum -= mTrans.TransformDirection(new Vector3(mScroll * 0.05f, mScroll * 0.05f, 0f));
+				}
+				else
+				{
+					mMomentum -= mTrans.TransformDirection(new Vector3(
+						mScroll * customMovement.x * 0.05f,
+						mScroll * customMovement.y * 0.05f, 0f));
+				}
+
 				mScroll = NGUIMath.SpringLerp(mScroll, 0f, 20f, delta);
 
 				// Move the scroll view
@@ -911,22 +938,29 @@ public class UIScrollView : MonoBehaviour
 				// Restrict the contents to be within the scroll view's bounds
 				if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None)
 					RestrictWithinBounds(false, canMoveHorizontally, canMoveVertically);
-				
-				if (mMomentum.magnitude < 0.0001f && onDragFinished != null) 
-					onDragFinished();
-				
-				return;
+
+				if (onMomentumMove != null)
+					onMomentumMove();
 			}
 			else
 			{
 				mScroll = 0f;
 				mMomentum = Vector3.zero;
+
+				SpringPanel sp = GetComponent<SpringPanel>();
+				if (sp != null && sp.enabled) return;
+
+				mShouldMove = false;
+				if (onStoppedMoving != null)
+					onStoppedMoving();
 			}
 		}
-		else mScroll = 0f;
-
-		// Dampen the momentum
-		NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
+		else
+		{
+			// Dampen the momentum
+			mScroll = 0f;
+			NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
+		}
 	}
 
 #if UNITY_EDITOR

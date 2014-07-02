@@ -48,17 +48,20 @@ public class UICenterOnChild : MonoBehaviour
 
 	public GameObject centeredObject { get { return mCenteredObject; } }
 
-	void OnEnable () { Recenter(); }
+	void OnEnable ()
+	{
+		Recenter();
+		if (mScrollView) mScrollView.onDragFinished = OnDragFinished;
+	}
+	
+	void OnDisable () { if (mScrollView) mScrollView.onDragFinished -= OnDragFinished; }
 	void OnDragFinished () { if (enabled) Recenter(); }
 
 	/// <summary>
 	/// Ensure that the threshold is always positive.
 	/// </summary>
 
-	void OnValidate ()
-	{
-		nextPageThreshold = Mathf.Abs(nextPageThreshold);
-	}
+	void OnValidate () { nextPageThreshold = Mathf.Abs(nextPageThreshold); }
 
 	/// <summary>
 	/// Recenter the draggable list on the center-most child.
@@ -67,9 +70,6 @@ public class UICenterOnChild : MonoBehaviour
 	[ContextMenu("Execute")]
 	public void Recenter ()
 	{
-		Transform trans = transform;
-		if (trans.childCount == 0) return;
-
 		if (mScrollView == null)
 		{
 			mScrollView = NGUITools.FindInParents<UIScrollView>(gameObject);
@@ -93,12 +93,17 @@ public class UICenterOnChild : MonoBehaviour
 		}
 		if (mScrollView.panel == null) return;
 
+		Transform trans = transform;
+		if (trans.childCount == 0) return;
+
 		// Calculate the panel's center in world coordinates
 		Vector3[] corners = mScrollView.panel.worldCorners;
 		Vector3 panelCenter = (corners[2] + corners[0]) * 0.5f;
 
 		// Offset this value by the momentum
-		Vector3 pickingPoint = panelCenter - mScrollView.currentMomentum * (mScrollView.momentumAmount * 0.1f);
+		Vector3 momentum = mScrollView.currentMomentum * mScrollView.momentumAmount;
+		Vector3 moveDelta = NGUIMath.SpringDampen(ref momentum, 9f, 2f);
+		Vector3 pickingPoint = panelCenter - moveDelta * 0.05f; // Magic number based on what "feels right"
 		mScrollView.currentMomentum = Vector3.zero;
 
 		float min = float.MaxValue;
@@ -201,8 +206,10 @@ public class UICenterOnChild : MonoBehaviour
 			}
 			else
 #endif
-			SpringPanel.Begin(mScrollView.panel.cachedGameObject,
-				panelTrans.localPosition - localOffset, springStrength).onFinished = onFinished;
+			{
+				SpringPanel.Begin(mScrollView.panel.cachedGameObject,
+					panelTrans.localPosition - localOffset, springStrength).onFinished = onFinished;
+			}
 		}
 		else mCenteredObject = null;
 

@@ -577,6 +577,12 @@ public abstract class UIRect : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Convenience method that resets and updates the anchors, all at once.
+	/// </summary>
+
+	public void ResetAndUpdateAnchors () { ResetAnchors(); UpdateAnchors(); }
+
+	/// <summary>
 	/// Set the rectangle manually.
 	/// </summary>
 
