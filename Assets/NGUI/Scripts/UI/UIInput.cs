@@ -504,6 +504,7 @@ public class UIInput : MonoBehaviour
 #if MOBILE
 			if (mKeyboard != null)
 			{
+				mWaitForKeyboard = false;
 				mKeyboard.active = false;
 				mKeyboard = null;
 			}
@@ -539,7 +540,7 @@ public class UIInput : MonoBehaviour
 			// Wait for the keyboard to open. Apparently mKeyboard.active will return 'false' for a while in some cases.
 			if (mWaitForKeyboard)
 			{
-				if (!mKeyboard.active) return;
+				if (mKeyboard != null && !mKeyboard.active) return;
 				mWaitForKeyboard = false;
 			}
 #endif
