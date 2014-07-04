@@ -1522,7 +1522,7 @@ public class UILabel : UIWidget
 	/// Returns the offset that was applied.
 	/// </summary>
 
-	protected Vector2 ApplyOffset (BetterList<Vector3> verts, int start)
+	public Vector2 ApplyOffset (BetterList<Vector3> verts, int start)
 	{
 		Vector2 po = pivotOffset;
 
@@ -1554,7 +1554,7 @@ public class UILabel : UIWidget
 	/// Apply a shadow effect to the buffer.
 	/// </summary>
 
-	void ApplyShadow (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols, int start, int end, float x, float y)
+	public void ApplyShadow (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols, int start, int end, float x, float y)
 	{
 		Color c = mEffectColor;
 		c.a *= finalAlpha;
