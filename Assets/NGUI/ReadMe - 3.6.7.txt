@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.6.6
+            Version 3.6.7
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,15 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.6.7
+- NEW: Added a lookup table to the atlas in order to make GetSprite() faster.
+- NEW: Added OnPostFill functionality to widgets, in case you want to further modify the geometry.
+- NEW: Added OnMomentumMove and OnStoppedMoving notifications to UIScrollView in addition to OnDragFinished.
+- NEW: Added NGUI -> Extras -> Align Scene View to UI (thanks NikolayLezhnev)
+- FIX: UIGrid's smooth snapping will now ignore time scale.
+- FIX: Nicki's optimizations (Shader.PropertyToID instead of by name).
+- FIX: Null check for 'mKeyboard' being null in UIInput (rare case).
 
 3.6.6
 - NEW: UIWrapContent now has a settable delegate to initialize items, and will call it on Start().
