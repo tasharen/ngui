@@ -1515,6 +1515,9 @@ public class UILabel : UIWidget
 				ApplyShadow(verts, uvs, cols, offset, end, -pos.x, -pos.y);
 			}
 		}
+
+		if (onPostFill != null)
+			onPostFill(this, offset, verts, uvs, cols);
 	}
 
 	/// <summary>

@@ -361,7 +361,9 @@ public class UIGrid : UIWidgetContainer
 
 			if (animateSmoothly && Application.isPlaying)
 			{
-				SpringPosition.Begin(t.gameObject, pos, 15f).updateScrollView = true;
+				SpringPosition sp = SpringPosition.Begin(t.gameObject, pos, 15f);
+				sp.updateScrollView = true;
+				sp.ignoreTimeScale = true;
 			}
 			else t.localPosition = pos;
 
