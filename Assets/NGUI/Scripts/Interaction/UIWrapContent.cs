@@ -34,6 +34,20 @@ public class UIWrapContent : MonoBehaviour
 	public bool cullContent = true;
 
 	/// <summary>
+	/// Minimum allowed index for items. If "min" is equal to "max" then there is no limit.
+	/// For vertical scroll views indices increment with the Y position (towards top of the screen).
+	/// </summary>
+
+	public int minIndex = 0;
+
+	/// <summary>
+	/// Maximum allowed index for items. If "min" is equal to "max" then there is no limit.
+	/// For vertical scroll views indices increment with the Y position (towards top of the screen).
+	/// </summary>
+
+	public int maxIndex = 0;
+
+	/// <summary>
 	/// Callback that will be called every time an item needs to have its content updated.
 	/// The 'wrapIndex' is the index within the child list, and 'realIndex' is the index using position logic.
 	/// </summary>
@@ -55,14 +69,7 @@ public class UIWrapContent : MonoBehaviour
 	{
 		SortBasedOnScrollMovement();
 		WrapContent();
-
-		if (mScroll != null)
-		{
-			mScroll.GetComponent<UIPanel>().onClipMove = OnMove;
-			mScroll.restrictWithinPanel = false;
-			if (mScroll.dragEffect == UIScrollView.DragEffect.MomentumAndSpring)
-				mScroll.dragEffect = UIScrollView.DragEffect.Momentum;
-		}
+		if (mScroll != null) mScroll.GetComponent<UIPanel>().onClipMove = OnMove;
 		mFirstTime = false;
 	}
 
@@ -155,7 +162,10 @@ public class UIWrapContent : MonoBehaviour
 			v = mTrans.InverseTransformPoint(v);
 			corners[i] = v;
 		}
+		
 		Vector3 center = Vector3.Lerp(corners[0], corners[2], 0.5f);
+		bool allWithinRange = true;
+		float ext2 = extents * 2f;
 
 		if (mHorizontal)
 		{
@@ -169,15 +179,33 @@ public class UIWrapContent : MonoBehaviour
 
 				if (distance < -extents)
 				{
-					t.localPosition += new Vector3(extents * 2f, 0f, 0f);
-					distance = t.localPosition.x - center.x;
-					UpdateItem(t, i);
+					Vector3 pos = t.localPosition;
+					pos.x += ext2;
+					distance = pos.x - center.x;
+					int realIndex = Mathf.RoundToInt(pos.x / itemSize);
+
+					if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
+					{
+						t.localPosition = pos;
+						UpdateItem(t, i);
+						t.name = realIndex.ToString();
+					}
+					else allWithinRange = false;
 				}
 				else if (distance > extents)
 				{
-					t.localPosition -= new Vector3(extents * 2f, 0f, 0f);
-					distance = t.localPosition.x - center.x;
-					UpdateItem(t, i);
+					Vector3 pos = t.localPosition;
+					pos.x -= ext2;
+					distance = pos.x - center.x;
+					int realIndex = Mathf.RoundToInt(pos.x / itemSize);
+
+					if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
+					{
+						t.localPosition = pos;
+						UpdateItem(t, i);
+						t.name = realIndex.ToString();
+					}
+					else allWithinRange = false;
 				}
 				else if (mFirstTime) UpdateItem(t, i);
 
@@ -201,15 +229,33 @@ public class UIWrapContent : MonoBehaviour
 
 				if (distance < -extents)
 				{
-					t.localPosition += new Vector3(0f, extents * 2f, 0f);
-					distance = t.localPosition.y - center.y;
-					UpdateItem(t, i);
+					Vector3 pos = t.localPosition;
+					pos.y += ext2;
+					distance = pos.y - center.y;
+					int realIndex = Mathf.RoundToInt(pos.y / itemSize);
+
+					if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
+					{
+						t.localPosition = pos;
+						UpdateItem(t, i);
+						t.name = realIndex.ToString();
+					}
+					else allWithinRange = false;
 				}
 				else if (distance > extents)
 				{
-					t.localPosition -= new Vector3(0f, extents * 2f, 0f);
-					distance = t.localPosition.y - center.y;
-					UpdateItem(t, i);
+					Vector3 pos = t.localPosition;
+					pos.y -= ext2;
+					distance = pos.y - center.y;
+					int realIndex = Mathf.RoundToInt(pos.y / itemSize);
+
+					if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
+					{
+						t.localPosition = pos;
+						UpdateItem(t, i);
+						t.name = realIndex.ToString();
+					}
+					else allWithinRange = false;
 				}
 				else if (mFirstTime) UpdateItem(t, i);
 
@@ -220,7 +266,20 @@ public class UIWrapContent : MonoBehaviour
 						NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
 				}
 			}
+			mScroll.restrictWithinPanel = !allWithinRange;
 		}
+	}
+
+	/// <summary>
+	/// Sanity checks.
+	/// </summary>
+
+	void OnValidate ()
+	{
+		if (maxIndex < minIndex)
+			maxIndex = minIndex;
+		if (minIndex > maxIndex)
+			maxIndex = minIndex;
 	}
 
 	/// <summary>
