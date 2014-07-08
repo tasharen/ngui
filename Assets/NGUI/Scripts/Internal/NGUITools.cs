@@ -1425,14 +1425,15 @@ static public class NGUITools
 
 	static public Vector3[] GetSides (this Camera cam, float depth, Transform relativeTo)
 	{
+		float os = cam.orthographicSize;
+		float x0 = -os;
+		float x1 = os;
+		float y0 = -os;
+		float y1 = os;
+
 		Rect rect = cam.rect;
 		Vector2 size = screenSize;
 		float aspect = size.x / size.y;
-		float x0 = -1f;
-		float x1 = 1f;
-		float y0 = -1f;
-		float y1 = 1f;
-
 		aspect *= rect.width / rect.height;
 		x0 *= aspect;
 		x1 *= aspect;
@@ -1488,14 +1489,15 @@ static public class NGUITools
 
 	static public Vector3[] GetWorldCorners (this Camera cam, float depth, Transform relativeTo)
 	{
+		float os = cam.orthographicSize;
+		float x0 = -os;
+		float x1 = os;
+		float y0 = -os;
+		float y1 = os;
+
 		Rect rect = cam.rect;
 		Vector2 size = screenSize;
 		float aspect = size.x / size.y;
-		float x0 = -1f;
-		float x1 = 1f;
-		float y0 = -1f;
-		float y1 = 1f;
-
 		aspect *= rect.width / rect.height;
 		x0 *= aspect;
 		x1 *= aspect;
