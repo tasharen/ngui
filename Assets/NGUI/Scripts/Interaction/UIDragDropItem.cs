@@ -4,6 +4,7 @@
 //----------------------------------------------
 
 using UnityEngine;
+using System.Collections;
 
 /// <summary>
 /// UIDragDropItem is a base script for your own Drag & Drop operations.
@@ -226,7 +227,7 @@ public class UIDragDropItem : MonoBehaviour
 
 			// Re-enable the drag scroll view script
 			if (mDragScrollView != null)
-				mDragScrollView.enabled = true;
+				StartCoroutine(EnableDragScrollView());
 
 			// Notify the widgets that the parent has changed
 			NGUITools.MarkParentAsChanged(gameObject);
@@ -235,5 +236,16 @@ public class UIDragDropItem : MonoBehaviour
 			if (mGrid != null) mGrid.repositionNow = true;
 		}
 		else NGUITools.Destroy(gameObject);
+	}
+
+	/// <summary>
+	/// Re-enable the drag scroll view script at the end of the frame.
+	/// Reason: http://www.tasharen.com/forum/index.php?topic=10203.0
+	/// </summary>
+
+	protected IEnumerator EnableDragScrollView ()
+	{
+		yield return new WaitForEndOfFrame();
+		if (mDragScrollView != null) mDragScrollView.enabled = true;
 	}
 }

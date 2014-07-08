@@ -85,7 +85,12 @@ public class TypewriterEffect : MonoBehaviour
 	/// Reset the typewriter effect to the beginning of the label.
 	/// </summary>
 
-	public void ResetToBeginning () { mReset = true; }
+	public void ResetToBeginning ()
+	{
+		Finish();
+		mReset = true;
+		mActive = true;
+	}
 
 	/// <summary>
 	/// Finish the typewriter operation and show all the text right away.

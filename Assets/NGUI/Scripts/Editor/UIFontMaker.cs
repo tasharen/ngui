@@ -255,7 +255,7 @@ public class UIFontMaker : EditorWindow
 							}
 							else if (cm == CharacterMap.Numeric)
 							{
-								chars = "01234567890";
+								chars = "0123456789";
 							}
 							else if (cm == CharacterMap.Latin)
 							{
