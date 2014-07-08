@@ -521,34 +521,10 @@ public class UIPanel : UIRect
 		{
 			if (mClipping == UIDrawCall.Clipping.None)
 			{
-				Vector2 size = GetViewSize();
-
-				float x0 = -0.5f * size.x;
-				float y0 = -0.5f * size.y;
-				float x1 = x0 + size.x;
-				float y1 = y0 + size.y;
-
-				Transform wt = (mCam != null) ? mCam.transform : null;
-
-				if (wt != null)
-				{
-					mCorners[0] = wt.TransformPoint(x0, y0, 0f);
-					mCorners[1] = wt.TransformPoint(x0, y1, 0f);
-					mCorners[2] = wt.TransformPoint(x1, y1, 0f);
-					mCorners[3] = wt.TransformPoint(x1, y0, 0f);
-
-					wt = cachedTransform;
-
-					for (int i = 0; i < 4; ++i)
-						mCorners[i] = wt.InverseTransformPoint(mCorners[i]);
-				}
-				else
-				{
-					mCorners[0] = new Vector3(x0, y0);
-					mCorners[1] = new Vector3(x0, y1);
-					mCorners[2] = new Vector3(x1, y1);
-					mCorners[3] = new Vector3(x1, y0);
-				}
+				Vector3[] corners = worldCorners;
+				Transform wt = cachedTransform;
+				for (int i = 0; i < 4; ++i) corners[i] = wt.InverseTransformPoint(corners[i]);
+				return corners;
 			}
 			else
 			{
@@ -574,34 +550,7 @@ public class UIPanel : UIRect
 	{
 		get
 		{
-			if (mClipping == UIDrawCall.Clipping.None)
-			{
-				if (mCam != null)
-				{
-					Vector3[] corners = NGUITools.GetWorldCorners(mCam);
-					UIRoot rt = root;
-
-					if (rt != null)
-					{
-						float adjustment = rt.pixelSizeAdjustment;
-						for (int i = 0; i < 4; ++i) corners[i] *= adjustment;
-					}
-					return corners;
-				}
-
-				Vector2 size = GetViewSize();
-
-				float x0 = -0.5f * size.x;
-				float y0 = -0.5f * size.y;
-				float x1 = x0 + size.x;
-				float y1 = y0 + size.y;
-
-				mCorners[0] = new Vector3(x0, y0, 0f);
-				mCorners[1] = new Vector3(x0, y1, 0f);
-				mCorners[2] = new Vector3(x1, y1, 0f);
-				mCorners[3] = new Vector3(x1, y0, 0f);
-			}
-			else
+			if (mClipping != UIDrawCall.Clipping.None)
 			{
 				float x0 = mClipOffset.x + mClipRange.x - 0.5f * mClipRange.z;
 				float y0 = mClipOffset.y + mClipRange.y - 0.5f * mClipRange.w;
@@ -615,6 +564,40 @@ public class UIPanel : UIRect
 				mCorners[2] = wt.TransformPoint(x1, y1, 0f);
 				mCorners[3] = wt.TransformPoint(x1, y0, 0f);
 			}
+			else
+			{
+				if (mCam != null)
+				{
+					Vector3[] corners = mCam.GetWorldCorners();
+
+					if (anchorOffset)
+					{
+						Vector3 off = cachedTransform.position;
+						for (int i = 0; i < 4; ++i)
+							corners[i] += off;
+					}
+					return corners;
+				}
+
+				Vector2 size = GetViewSize();
+
+				float x0 = -0.5f * size.x;
+				float y0 = -0.5f * size.y;
+				float x1 = x0 + size.x;
+				float y1 = y0 + size.y;
+
+				mCorners[0] = new Vector3(x0, y0);
+				mCorners[1] = new Vector3(x0, y1);
+				mCorners[2] = new Vector3(x1, y1);
+				mCorners[3] = new Vector3(x1, y0);
+
+				if (anchorOffset)
+				{
+					Vector3 off = cachedTransform.position;
+					for (int i = 0; i < 4; ++i)
+						mCorners[i] += off;
+				}
+			}
 			return mCorners;
 		}
 	}
@@ -626,31 +609,42 @@ public class UIPanel : UIRect
 
 	public override Vector3[] GetSides (Transform relativeTo)
 	{
-		if (mClipping != UIDrawCall.Clipping.None || anchorOffset)
+		if (mClipping != UIDrawCall.Clipping.None)
 		{
-			Vector2 size = GetViewSize();
-			Vector2 cr = (mClipping != UIDrawCall.Clipping.None) ? (Vector2)mClipRange + mClipOffset : Vector2.zero;
+			float x0 = mClipOffset.x + mClipRange.x - 0.5f * mClipRange.z;
+			float y0 = mClipOffset.y + mClipRange.y - 0.5f * mClipRange.w;
+			float x1 = x0 + mClipRange.z;
+			float y1 = y0 + mClipRange.w;
+			float hx = (x0 + x1) * 0.5f;
+			float hy = (y0 + y1) * 0.5f;
 
-			float x0 = cr.x - 0.5f * size.x;
-			float y0 = cr.y - 0.5f * size.y;
-			float x1 = x0 + size.x;
-			float y1 = y0 + size.y;
-			float cx = (x0 + x1) * 0.5f;
-			float cy = (y0 + y1) * 0.5f;
+			Transform wt = cachedTransform;
 
-			Matrix4x4 mat = cachedTransform.localToWorldMatrix;
-
-			mCorners[0] = mat.MultiplyPoint3x4(new Vector3(x0, cy));
-			mCorners[1] = mat.MultiplyPoint3x4(new Vector3(cx, y1));
-			mCorners[2] = mat.MultiplyPoint3x4(new Vector3(x1, cy));
-			mCorners[3] = mat.MultiplyPoint3x4(new Vector3(cx, y0));
+			mSides[0] = wt.TransformPoint(x0, hy, 0f);
+			mSides[1] = wt.TransformPoint(hx, y1, 0f);
+			mSides[2] = wt.TransformPoint(x1, hy, 0f);
+			mSides[3] = wt.TransformPoint(hx, y0, 0f);
 
 			if (relativeTo != null)
 			{
 				for (int i = 0; i < 4; ++i)
-					mCorners[i] = relativeTo.InverseTransformPoint(mCorners[i]);
+					mSides[i] = relativeTo.InverseTransformPoint(mSides[i]);
 			}
-			return mCorners;
+			return mSides;
+		}
+		else if (anchorOffset)
+		{
+			Vector3[] sides = mCam.GetSides();
+			Vector3 off = cachedTransform.position;
+			for (int i = 0; i < 4; ++i)
+				sides[i] += off;
+
+			if (relativeTo != null)
+			{
+				for (int i = 0; i < 4; ++i)
+					sides[i] = relativeTo.InverseTransformPoint(sides[i]);
+			}
+			return sides;
 		}
 		return base.GetSides(relativeTo);
 	}
@@ -901,6 +895,7 @@ public class UIPanel : UIRect
 		mRebuild = true;
 		mAlphaFrameID = -1;
 		mMatrixFrame = -1;
+		OnStart();
 		base.OnEnable();
 		mMatrixFrame = -1;
 	}
@@ -1749,8 +1744,8 @@ public class UIPanel : UIRect
 			return new Vector2(mClipRange.z, mClipRange.w);
 		
 		Vector2 size = NGUITools.screenSize;
-		UIRoot rt = root;
-		if (rt != null) size *= rt.pixelSizeAdjustment;
+		//UIRoot rt = root;
+		//if (rt != null) size *= rt.pixelSizeAdjustment;
 		return size;
 	}
 

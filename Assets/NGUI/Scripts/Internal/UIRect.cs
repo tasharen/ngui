@@ -310,7 +310,7 @@ public abstract class UIRect : MonoBehaviour
 	}
 
 	// Temporary variable to avoid GC allocation
-	static Vector3[] mSides = new Vector3[4];
+	static protected Vector3[] mSides = new Vector3[4];
 
 	/// <summary>
 	/// Get the sides of the rectangle relative to the specified transform.
@@ -319,31 +319,18 @@ public abstract class UIRect : MonoBehaviour
 
 	public virtual Vector3[] GetSides (Transform relativeTo)
 	{
-		if (anchorCamera != null)
-		{
-			Vector3[] sides = anchorCamera.GetSides(relativeTo);
-			UIRoot rt = root;
+		if (anchorCamera != null) return mMyCam.GetSides(relativeTo);
+		
+		Vector3 pos = cachedTransform.position;
+		for (int i = 0; i < 4; ++i)
+			mSides[i] = pos;
 
-			if (rt != null)
-			{
-				float adjustment = rt.pixelSizeAdjustment;
-				for (int i = 0; i < 4; ++i) sides[i] *= adjustment;
-			}
-			return sides;
-		}
-		else
+		if (relativeTo != null)
 		{
-			Vector3 pos = cachedTransform.position;
 			for (int i = 0; i < 4; ++i)
-				mSides[i] = pos;
-
-			if (relativeTo != null)
-			{
-				for (int i = 0; i < 4; ++i)
-					mSides[i] = relativeTo.InverseTransformPoint(mSides[i]);
-			}
-			return mSides;
+				mSides[i] = relativeTo.InverseTransformPoint(mSides[i]);
 		}
+		return mSides;
 	}
 
 	/// <summary>
