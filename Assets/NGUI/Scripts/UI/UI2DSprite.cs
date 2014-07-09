@@ -47,7 +47,7 @@ public class UI2DSprite : UIBasicSprite
 				RemoveFromPanel();
 				mSprite = value;
 				nextSprite = null;
-				MarkAsChanged();
+				CreatePanel();
 			}
 		}
 	}

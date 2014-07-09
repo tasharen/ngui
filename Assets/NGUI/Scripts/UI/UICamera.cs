@@ -1010,7 +1010,8 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	void OnEnable ()
-	{ list.Add(this);
+	{
+		list.Add(this);
 		list.Sort(CompareFunc);
 	}
 

@@ -129,7 +129,7 @@ public class UIRoot : MonoBehaviour
 		if (scalingStyle == Scaling.FixedSize)
 			return (float)manualHeight / height;
 
-#if UNITY_IPHONE || UNITY_ANDROID
+#if UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_BLACKBERRY
 		if (scalingStyle == Scaling.FixedSizeOnMobiles)
 			return (float)manualHeight / height;
 #endif
