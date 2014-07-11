@@ -443,7 +443,7 @@ public class UIPopupList : UIWidgetContainer
 
 	Vector3 GetHighlightPosition ()
 	{
-		if (mHighlightedLabel == null) return Vector3.zero;
+		if (mHighlightedLabel == null || mHighlight == null) return Vector3.zero;
 		UISpriteData sp = mHighlight.GetAtlasSprite();
 		if (sp == null) return Vector3.zero;
 
