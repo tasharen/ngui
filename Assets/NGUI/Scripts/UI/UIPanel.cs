@@ -58,7 +58,7 @@ public class UIPanel : UIRect
 	/// Having this on improves performance, but turning it off will reduce garbage collection.
 	/// </summary>
 
-	public bool cullWhileDragging = false;
+	public bool cullWhileDragging = true;
 
 	/// <summary>
 	/// Optimization flag. Makes the assumption that the panel's geometry
