@@ -97,11 +97,8 @@ public class UIGrid : UIWidgetContainer
 	/// Custom sort delegate, used when the sorting method is set to 'custom'.
 	/// </summary>
 
-#if UNITY_FLASH
 	public System.Comparison<Transform> onCustomSort;
-#else
-	public BetterList<Transform>.CompareFunc onCustomSort;
-#endif
+
 	// Use the 'sorting' property instead
 	[HideInInspector][SerializeField] bool sorted = false;
 
@@ -119,10 +116,10 @@ public class UIGrid : UIWidgetContainer
 	/// Get the current list of the grid's children.
 	/// </summary>
 
-	public BetterList<Transform> GetChildList()
+	public List<Transform> GetChildList ()
 	{
 		Transform myTrans = transform;
-		BetterList<Transform> list = new BetterList<Transform>();
+		List<Transform> list = new List<Transform>();
 
 		for (int i = 0; i < myTrans.childCount; ++i)
 		{
@@ -150,8 +147,8 @@ public class UIGrid : UIWidgetContainer
 
 	public Transform GetChild (int index)
 	{
-		BetterList<Transform> list = GetChildList();
-		return (index < list.size) ? list[index] : null;
+		List<Transform> list = GetChildList();
+		return (index < list.Count) ? list[index] : null;
 	}
 
 	/// <summary>
@@ -208,7 +205,7 @@ public class UIGrid : UIWidgetContainer
 	{
 		BetterList<Transform> list = GetChildList();
 
-		if (index < list.size)
+		if (index < list.Count)
 		{
 			Transform t = list[index];
 			list.RemoveAt(index);
@@ -225,7 +222,7 @@ public class UIGrid : UIWidgetContainer
 
 	public bool RemoveChild (Transform t)
 	{
-		BetterList<Transform> list = GetChildList();
+		List<Transform> list = GetChildList();
 
 		if (list.Remove(t))
 		{
@@ -278,7 +275,7 @@ public class UIGrid : UIWidgetContainer
 	/// You can override this function, but in most cases it's easier to just set the onCustomSort delegate instead.
 	/// </summary>
 
-	protected virtual void Sort (BetterList<Transform> list) { }
+	protected virtual void Sort (List<Transform> list) { }
 
 	/// <summary>
 	/// Recalculate the position of all elements within the grid, sorting them alphabetically if necessary.
@@ -305,7 +302,7 @@ public class UIGrid : UIWidgetContainer
 		if (!mInitDone) Init();
 
 		// Get the list of children in their current order
-		BetterList<Transform> list = GetChildList();
+		List<Transform> list = GetChildList();
 
 		// Reset the position and order of all objects in the list
 		ResetPosition(list);
@@ -332,13 +329,13 @@ public class UIGrid : UIWidgetContainer
 	/// Reset the position of all child objects based on the order of items in the list.
 	/// </summary>
 
-	protected void ResetPosition (BetterList<Transform> list)
+	protected void ResetPosition (List<Transform> list)
 	{
 		mReposition = false;
 
 		// Epic hack: Unparent all children so that we get to control the order in which they are re-added back in
 		// EDIT: Turns out this does nothing.
-		//for (int i = 0, imax = list.size; i < imax; ++i)
+		//for (int i = 0, imax = list.Count; i < imax; ++i)
 		//	list[i].parent = null;
 
 		int x = 0;
@@ -348,7 +345,7 @@ public class UIGrid : UIWidgetContainer
 		Transform myTrans = transform;
 
 		// Re-add the children in the same order we have them in and position them accordingly
-		for (int i = 0, imax = list.size; i < imax; ++i)
+		for (int i = 0, imax = list.Count; i < imax; ++i)
 		{
 			Transform t = list[i];
 			// See above

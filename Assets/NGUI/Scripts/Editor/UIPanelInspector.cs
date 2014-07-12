@@ -247,8 +247,8 @@ public class UIPanelInspector : UIRectEditor
 				}
 				else if (mAllowSelection)
 				{
-					BetterList<UIWidget> widgets = NGUIEditorTools.SceneViewRaycast(e.mousePosition);
-					if (widgets.size > 0) Selection.activeGameObject = widgets[0].gameObject;
+					List<UIWidget> widgets = NGUIEditorTools.SceneViewRaycast(e.mousePosition);
+					if (widgets.Count > 0) Selection.activeGameObject = widgets[0].gameObject;
 				}
 				mAllowSelection = true;
 			}
@@ -429,7 +429,7 @@ public class UIPanelInspector : UIRectEditor
 
 		int matchingDepths = 0;
 
-		for (int i = 0; i < UIPanel.list.size; ++i)
+		for (int i = 0, imax = UIPanel.list.Count; i < imax; ++i)
 		{
 			UIPanel p = UIPanel.list[i];
 			if (p != null && mPanel.depth == p.depth)

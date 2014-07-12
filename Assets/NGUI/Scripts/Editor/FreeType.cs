@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// FreeType library is a C++ library used to print text from TrueType fonts.
@@ -492,8 +493,8 @@ static public class FreeType
 			font.charSize = size;
 
 			Color32 white = Color.white;
-			BetterList<int> entries = new BetterList<int>();
-			BetterList<Texture2D> textures = new BetterList<Texture2D>();
+			List<int> entries = new List<int>();
+			List<Texture2D> textures = new List<Texture2D>();
 
 			FT_FaceRec faceRec = (FT_FaceRec)Marshal.PtrToStructure(face, typeof(FT_FaceRec));
 			FT_Set_Pixel_Sizes(face, 0, (uint)size);
@@ -611,7 +612,7 @@ static public class FreeType
 			int max = int.MinValue;
 
 			// Other glyphs are visible and need to be added
-			for (int i = 0; i < entries.size; ++i)
+			for (int i = 0, imax = entries.Count; i < imax; ++i)
 			{
 				// Destroy the texture now that it's a part of an atlas
 				UnityEngine.Object.DestroyImmediate(textures[i]);
@@ -636,7 +637,7 @@ static public class FreeType
 			baseline += ((max - min - size) >> 1);
 
 			// Offset all glyphs so that they are not using the baseline
-			for (int i = 0; i < entries.size; ++i)
+			for (int i = 0, imax = entries.Count; i < imax; ++i)
 			{
 				BMGlyph glyph = font.GetGlyph(entries[i], true);
 				glyph.offsetY += baseline;

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 /// <summary>
 /// This editor helper class makes it easy to create and show a context menu.
@@ -121,7 +122,7 @@ public static class NGUIContextMenu
 
 	public delegate UIWidget AddFunc (GameObject go);
 
-	static BetterList<string> mEntries = new BetterList<string>();
+	static List<string> mEntries = new List<string>();
 	static GenericMenu mMenu;
 
 	/// <summary>
@@ -145,7 +146,7 @@ public static class NGUIContextMenu
 			if (mMenu == null) mMenu = new GenericMenu();
 			int count = 0;
 
-			for (int i = 0; i < mEntries.size; ++i)
+			for (int i = 0; i < mEntries.Count; ++i)
 			{
 				string str = mEntries[i];
 				if (str == item) ++count;
@@ -180,7 +181,7 @@ public static class NGUIContextMenu
 			if (mMenu == null) mMenu = new GenericMenu();
 			int count = 0;
 
-			for (int i = 0; i < mEntries.size; ++i)
+			for (int i = 0; i < mEntries.Count; ++i)
 			{
 				string str = mEntries[i];
 				if (str == item) ++count;
@@ -215,7 +216,7 @@ public static class NGUIContextMenu
 			if (mMenu == null) mMenu = new GenericMenu();
 			int count = 0;
 
-			for (int i = 0; i < mEntries.size; ++i)
+			for (int i = 0; i < mEntries.Count; ++i)
 			{
 				string str = mEntries[i];
 				if (str == item) ++count;
@@ -377,7 +378,7 @@ public static class NGUIContextMenu
 
 				if (target.GetComponent<UIDragScrollView>() == null)
 				{
-					for (int i = 0; i < UIPanel.list.size; ++i)
+					for (int i = 0; i < UIPanel.list.Count; ++i)
 					{
 						UIPanel pan = UIPanel.list[i];
 						if (pan.clipping == UIDrawCall.Clipping.None) continue;

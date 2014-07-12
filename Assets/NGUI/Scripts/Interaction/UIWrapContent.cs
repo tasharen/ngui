@@ -4,6 +4,7 @@
 //----------------------------------------------
 
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// This script makes it possible for a scroll view to wrap its content, creating endless scroll views.
@@ -59,7 +60,7 @@ public class UIWrapContent : MonoBehaviour
 	UIScrollView mScroll;
 	bool mHorizontal = false;
 	bool mFirstTime = true;
-	BetterList<Transform> mChildren = new BetterList<Transform>();
+	List<Transform> mChildren = new List<Transform>();
 
 	/// <summary>
 	/// Initialize everything and register a callback with the UIPanel to be notified when the clipping region moves.
@@ -140,7 +141,7 @@ public class UIWrapContent : MonoBehaviour
 
 	void ResetChildPositions ()
 	{
-		for (int i = 0; i < mChildren.size; ++i)
+		for (int i = 0, imax = mChildren.Count; i < imax; ++i)
 		{
 			Transform t = mChildren[i];
 			t.localPosition = mHorizontal ? new Vector3(i * itemSize, 0f, 0f) : new Vector3(0f, -i * itemSize, 0f);
@@ -153,7 +154,7 @@ public class UIWrapContent : MonoBehaviour
 
 	public void WrapContent ()
 	{
-		float extents = itemSize * mChildren.size * 0.5f;
+		float extents = itemSize * mChildren.Count * 0.5f;
 		Vector3[] corners = mPanel.worldCorners;
 		
 		for (int i = 0; i < 4; ++i)
@@ -172,7 +173,7 @@ public class UIWrapContent : MonoBehaviour
 			float min = corners[0].x - itemSize;
 			float max = corners[2].x + itemSize;
 
-			for (int i = 0; i < mChildren.size; ++i)
+			for (int i = 0, imax = mChildren.Count; i < imax; ++i)
 			{
 				Transform t = mChildren[i];
 				float distance = t.localPosition.x - center.x;
@@ -222,7 +223,7 @@ public class UIWrapContent : MonoBehaviour
 			float min = corners[0].y - itemSize;
 			float max = corners[2].y + itemSize;
 
-			for (int i = 0; i < mChildren.size; ++i)
+			for (int i = 0, imax = mChildren.Count; i < imax; ++i)
 			{
 				Transform t = mChildren[i];
 				float distance = t.localPosition.y - center.y;

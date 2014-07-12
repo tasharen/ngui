@@ -15,7 +15,7 @@ using System.Collections.Generic;
 #endif
 public class UILocalizeEditor : Editor
 {
-	BetterList<string> mKeys;
+	List<string> mKeys;
 
 	void OnEnable ()
 	{
@@ -23,7 +23,7 @@ public class UILocalizeEditor : Editor
 
 		if (dict.Count > 0)
 		{
-			mKeys = new BetterList<string>();
+			mKeys = new List<string>();
 
 			foreach (KeyValuePair<string, string[]> pair in dict)
 			{
@@ -101,7 +101,7 @@ public class UILocalizeEditor : Editor
 
 			int matches = 0;
 
-			for (int i = 0; i < mKeys.size; ++i)
+			for (int i = 0, imax = mKeys.Count; i < imax; ++i)
 			{
 				if (mKeys[i].StartsWith(myKey, System.StringComparison.OrdinalIgnoreCase) || mKeys[i].Contains(myKey))
 				{

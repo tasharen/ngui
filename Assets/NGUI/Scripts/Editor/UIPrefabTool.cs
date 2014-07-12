@@ -135,7 +135,7 @@ public class UIPrefabTool : EditorWindow
 
 		if (mTab == 0)
 		{
-			BetterList<string> filtered = new BetterList<string>();
+			List<string> filtered = new List<string>();
 			string[] allAssets = AssetDatabase.GetAllAssetPaths();
 
 			foreach (string s in allAssets)
