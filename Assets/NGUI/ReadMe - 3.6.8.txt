@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.6.7
+            Version 3.6.8
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,18 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.6.8
+- NEW: UIWrapContent now has a range limit you can set for indices (such as -10 to 10).
+- NEW: Added Transform.OverlayPosition to make it easy to position widgets using 3D object positions.
+- FIX: Progress bars / sliders will no longer show the foreground if the value is 0.
+- FIX: Changing UI2DSprite.sprite2D will now immediately re-add the widget to the panel.
+- FIX: UIDragDropItem will now delay enabling the drag scroll view script (thanks, slumtrimpet!)
+- FIX: Re-added a hack-around for Adreno GPU crashes. Looks like Unity 4.5 did not fix the problem, despite the patch notes.
+- FIX: Seeing as BetterList is slower at sorting than List, some instances of BetterList were replaced with List.
+- FIX: UIPanel's option to cull widgets while the scroll view is being dragged is now on by default.
+- FIX: UIRoot now considers WP8 and BlackBerry to be mobile devices.
+- FIX: More tweaks for how camera's region gets calculated.
 
 3.6.7
 - NEW: Added a lookup table to the atlas in order to make GetSprite() faster.
