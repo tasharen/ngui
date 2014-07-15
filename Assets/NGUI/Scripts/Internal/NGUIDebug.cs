@@ -63,10 +63,7 @@ public class NGUIDebug : MonoBehaviour
 			mLines.Add(text);
 			CreateInstance();
 		}
-		else
-		{
-			Debug.Log(text);
-		}
+		else Debug.Log(text);
 	}
 
 	/// <summary>
