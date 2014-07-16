@@ -73,7 +73,7 @@ public class UILocalizeEditor : Editor
 					for (int i = 0; i < keys.Length; ++i)
 					{
 						GUILayout.BeginHorizontal();
-						GUILayout.Label(keys[i], GUILayout.Width(70f));
+						GUILayout.Label(keys[i], GUILayout.Width(66f));
 
 						if (GUILayout.Button(values[i], "AS TextArea", GUILayout.MinWidth(80f), GUILayout.MaxWidth(Screen.width - 110f)))
 						{

@@ -217,7 +217,6 @@ public class ByteReader
 				if (s == null) return null;
 				s = s.Replace("\\n", "\n");
 				line += "\n" + s;
-				++wordStart;
 			}
 			else
 			{
