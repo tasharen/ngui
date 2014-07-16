@@ -138,7 +138,6 @@ public class UIPanel : UIRect
 	bool mRebuild = false;
 	bool mResized = false;
 
-	Camera mCam;
 	[SerializeField] Vector2 mClipOffset = Vector2.zero;
 
 	float mCullTime = 0f;
@@ -283,7 +282,7 @@ public class UIPanel : UIRect
 	/// Whether the camera is used to draw UI geometry.
 	/// </summary>
 
-	public bool usedForUI { get { return (mCam != null && mCam.isOrthoGraphic); } }
+	public bool usedForUI { get { return (anchorCamera != null && mCam.isOrthoGraphic); } }
 
 	/// <summary>
 	/// Directx9 pixel offset, used for drawing.
@@ -293,7 +292,7 @@ public class UIPanel : UIRect
 	{
 		get
 		{
-			if (mHalfPixelOffset && mCam != null && mCam.isOrthoGraphic)
+			if (mHalfPixelOffset && anchorCamera != null && mCam.isOrthoGraphic)
 			{
 				Vector2 size = GetWindowSize();
 				float mod = (1f / size.y) / mCam.orthographicSize;
@@ -564,21 +563,20 @@ public class UIPanel : UIRect
 				mCorners[2] = wt.TransformPoint(x1, y1, 0f);
 				mCorners[3] = wt.TransformPoint(x1, y0, 0f);
 			}
+			else if (anchorCamera != null)
+			{
+				Vector3[] corners = mCam.GetWorldCorners(cameraRayDistance);
+
+				if (anchorOffset)
+				{
+					Vector3 off = cachedTransform.position;
+					for (int i = 0; i < 4; ++i)
+						corners[i] += off;
+				}
+				return corners;
+			}
 			else
 			{
-				if (mCam != null)
-				{
-					Vector3[] corners = mCam.GetWorldCorners();
-
-					if (anchorOffset)
-					{
-						Vector3 off = cachedTransform.position;
-						for (int i = 0; i < 4; ++i)
-							corners[i] += off;
-					}
-					return corners;
-				}
-
 				Vector2 size = GetViewSize();
 
 				float x0 = -0.5f * size.x;
@@ -632,9 +630,9 @@ public class UIPanel : UIRect
 			}
 			return mSides;
 		}
-		else if (anchorOffset)
+		else if (anchorCamera != null && anchorOffset)
 		{
-			Vector3[] sides = mCam.GetSides();
+			Vector3[] sides = mCam.GetSides(cameraRayDistance);
 			Vector3 off = cachedTransform.position;
 			for (int i = 0; i < 4; ++i)
 				sides[i] += off;
@@ -882,8 +880,6 @@ public class UIPanel : UIRect
 	protected override void OnStart ()
 	{
 		mLayer = mGo.layer;
-		UICamera uic = UICamera.FindCameraForLayer(mLayer);
-		mCam = (uic != null) ? uic.cachedCamera : NGUITools.FindCameraForLayer(mLayer);
 	}
 
 	/// <summary>
@@ -911,7 +907,7 @@ public class UIPanel : UIRect
 		// Apparently having a rigidbody helps
 		if (rigidbody == null)
 		{
-			UICamera uic = (mCam != null) ? mCam.GetComponent<UICamera>() : null;
+			UICamera uic = (anchorCamera != null) ? mCam.GetComponent<UICamera>() : null;
 
 			if (uic != null)
 			{
@@ -1420,9 +1416,8 @@ public class UIPanel : UIRect
 		if (mLayer != cachedGameObject.layer)
 		{
 			mLayer = mGo.layer;
-			UICamera uic = UICamera.FindCameraForLayer(mLayer);
-			mCam = (uic != null) ? uic.cachedCamera : NGUITools.FindCameraForLayer(mLayer);
 			NGUITools.SetChildLayer(cachedTransform, mLayer);
+			ResetAnchors();
 
 			for (int i = 0; i < drawCalls.Count; ++i)
 				drawCalls[i].gameObject.layer = mLayer;
@@ -1756,7 +1751,7 @@ public class UIPanel : UIRect
 
 	void OnDrawGizmos ()
 	{
-		if (mCam == null) return;
+		if (anchorCamera == null) return;
 
 		bool clip = (mClipping != UIDrawCall.Clipping.None);
 		Transform t = clip ? transform : mCam.transform;

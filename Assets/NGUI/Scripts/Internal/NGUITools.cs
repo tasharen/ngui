@@ -1425,29 +1425,39 @@ static public class NGUITools
 
 	static public Vector3[] GetSides (this Camera cam, float depth, Transform relativeTo)
 	{
-		float os = cam.orthographicSize;
-		float x0 = -os;
-		float x1 = os;
-		float y0 = -os;
-		float y1 = os;
+		if (cam.isOrthoGraphic)
+		{
+			float os = cam.orthographicSize;
+			float x0 = -os;
+			float x1 = os;
+			float y0 = -os;
+			float y1 = os;
 
-		Rect rect = cam.rect;
-		Vector2 size = screenSize;
-		float aspect = size.x / size.y;
-		aspect *= rect.width / rect.height;
-		x0 *= aspect;
-		x1 *= aspect;
+			Rect rect = cam.rect;
+			Vector2 size = screenSize;
+			float aspect = size.x / size.y;
+			aspect *= rect.width / rect.height;
+			x0 *= aspect;
+			x1 *= aspect;
 
-		// We want to ignore the scale, as scale doesn't affect the camera's view region in Unity
-		Transform t = cam.transform;
-		Quaternion rot = t.rotation;
-		Vector3 pos = t.position;
+			// We want to ignore the scale, as scale doesn't affect the camera's view region in Unity
+			Transform t = cam.transform;
+			Quaternion rot = t.rotation;
+			Vector3 pos = t.position;
 
-		mSides[0] = rot * (new Vector3(x0, 0f, depth)) + pos;
-		mSides[1] = rot * (new Vector3(0f, y1, depth)) + pos;
-		mSides[2] = rot * (new Vector3(x1, 0f, depth)) + pos;
-		mSides[3] = rot * (new Vector3(0f, y0, depth)) + pos;
-
+			mSides[0] = rot * (new Vector3(x0, 0f, depth)) + pos;
+			mSides[1] = rot * (new Vector3(0f, y1, depth)) + pos;
+			mSides[2] = rot * (new Vector3(x1, 0f, depth)) + pos;
+			mSides[3] = rot * (new Vector3(0f, y0, depth)) + pos;
+		}
+		else
+		{
+			mSides[0] = cam.ViewportToWorldPoint(new Vector3(0f, 0.5f, depth));
+			mSides[1] = cam.ViewportToWorldPoint(new Vector3(0.5f, 1f, depth));
+			mSides[2] = cam.ViewportToWorldPoint(new Vector3(1f, 0.5f, depth));
+			mSides[3] = cam.ViewportToWorldPoint(new Vector3(0.5f, 0f, depth));
+		}
+		
 		if (relativeTo != null)
 		{
 			for (int i = 0; i < 4; ++i)
@@ -1462,7 +1472,8 @@ static public class NGUITools
 
 	static public Vector3[] GetWorldCorners (this Camera cam)
 	{
-		return cam.GetWorldCorners(Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f), null);
+		float depth = Mathf.Lerp(cam.nearClipPlane, cam.farClipPlane, 0.5f);
+		return cam.GetWorldCorners(depth, null);
 	}
 
 	/// <summary>
@@ -1489,28 +1500,38 @@ static public class NGUITools
 
 	static public Vector3[] GetWorldCorners (this Camera cam, float depth, Transform relativeTo)
 	{
-		float os = cam.orthographicSize;
-		float x0 = -os;
-		float x1 = os;
-		float y0 = -os;
-		float y1 = os;
+		if (cam.isOrthoGraphic)
+		{
+			float os = cam.orthographicSize;
+			float x0 = -os;
+			float x1 = os;
+			float y0 = -os;
+			float y1 = os;
 
-		Rect rect = cam.rect;
-		Vector2 size = screenSize;
-		float aspect = size.x / size.y;
-		aspect *= rect.width / rect.height;
-		x0 *= aspect;
-		x1 *= aspect;
+			Rect rect = cam.rect;
+			Vector2 size = screenSize;
+			float aspect = size.x / size.y;
+			aspect *= rect.width / rect.height;
+			x0 *= aspect;
+			x1 *= aspect;
 
-		// We want to ignore the scale, as scale doesn't affect the camera's view region in Unity
-		Transform t = cam.transform;
-		Quaternion rot = t.rotation;
-		Vector3 pos = t.position;
+			// We want to ignore the scale, as scale doesn't affect the camera's view region in Unity
+			Transform t = cam.transform;
+			Quaternion rot = t.rotation;
+			Vector3 pos = t.position;
 
-		mSides[0] = rot * (new Vector3(x0, y0, depth)) + pos;
-		mSides[1] = rot * (new Vector3(x0, y1, depth)) + pos;
-		mSides[2] = rot * (new Vector3(x1, y1, depth)) + pos;
-		mSides[3] = rot * (new Vector3(x1, y0, depth)) + pos;
+			mSides[0] = rot * (new Vector3(x0, y0, depth)) + pos;
+			mSides[1] = rot * (new Vector3(x0, y1, depth)) + pos;
+			mSides[2] = rot * (new Vector3(x1, y1, depth)) + pos;
+			mSides[3] = rot * (new Vector3(x1, y0, depth)) + pos;
+		}
+		else
+		{
+			mSides[0] = cam.ViewportToWorldPoint(new Vector3(0f, 0f, depth));
+			mSides[1] = cam.ViewportToWorldPoint(new Vector3(0f, 1f, depth));
+			mSides[2] = cam.ViewportToWorldPoint(new Vector3(1f, 1f, depth));
+			mSides[3] = cam.ViewportToWorldPoint(new Vector3(1f, 0f, depth));
+		}
 
 		if (relativeTo != null)
 		{

@@ -178,7 +178,7 @@ public abstract class UIRect : MonoBehaviour
 
 	UIRoot mRoot;
 	UIRect mParent;
-	Camera mMyCam;
+	protected Camera mCam;
 	int mUpdateFrame = -1;
 	bool mAnchorsCached = false;
 	bool mRootSet = false;
@@ -199,7 +199,7 @@ public abstract class UIRect : MonoBehaviour
 	/// Camera used by anchors.
 	/// </summary>
 
-	public Camera anchorCamera { get { if (!mAnchorsCached) ResetAnchors(); return mMyCam; } }
+	public Camera anchorCamera { get { if (!mAnchorsCached) ResetAnchors(); return mCam; } }
 
 	/// <summary>
 	/// Whether the rectangle is currently anchored fully on all sides.
@@ -298,6 +298,29 @@ public abstract class UIRect : MonoBehaviour
 	public abstract Vector3[] worldCorners { get; }
 
 	/// <summary>
+	/// Helper function that returns the distance to the camera's directional vector hitting the panel's plane.
+	/// </summary>
+
+	protected float cameraRayDistance
+	{
+		get
+		{
+			if (anchorCamera == null) return 0f;
+
+			if (!mCam.isOrthoGraphic)
+			{
+				Transform t = cachedTransform;
+				Transform ct = mCam.transform;
+				Plane p = new Plane(t.rotation * Vector3.back, t.position);
+				Ray ray = new Ray(ct.position, ct.rotation * Vector3.forward);
+				float dist;
+				if (p.Raycast(ray, out dist)) return dist;
+			}
+			return Mathf.Lerp(mCam.nearClipPlane, mCam.farClipPlane, 0.5f);
+		}
+	}
+
+	/// <summary>
 	/// Sets the local 'changed' flag, indicating that some parent value(s) are now be different, such as alpha for example.
 	/// </summary>
 
@@ -319,7 +342,7 @@ public abstract class UIRect : MonoBehaviour
 
 	public virtual Vector3[] GetSides (Transform relativeTo)
 	{
-		if (anchorCamera != null) return mMyCam.GetSides(relativeTo);
+		if (anchorCamera != null) return mCam.GetSides(cameraRayDistance, relativeTo);
 		
 		Vector3 pos = cachedTransform.position;
 		for (int i = 0; i < 4; ++i)
@@ -342,7 +365,7 @@ public abstract class UIRect : MonoBehaviour
 		if (anchorCamera == null || ac.targetCam == null)
 			return cachedTransform.localPosition;
 
-		Vector3 pos = mMyCam.ViewportToWorldPoint(ac.targetCam.WorldToViewportPoint(ac.target.position));
+		Vector3 pos = mCam.ViewportToWorldPoint(ac.targetCam.WorldToViewportPoint(ac.target.position));
 		if (trans != null) pos = trans.InverseTransformPoint(pos);
 		pos.x = Mathf.Floor(pos.x + 0.5f);
 		pos.y = Mathf.Floor(pos.y + 0.5f);
@@ -553,7 +576,7 @@ public abstract class UIRect : MonoBehaviour
 		rightAnchor.rect	= (rightAnchor.target)	? rightAnchor.target.GetComponent<UIRect>()	 : null;
 		topAnchor.rect		= (topAnchor.target)	? topAnchor.target.GetComponent<UIRect>()	 : null;
 
-		mMyCam = NGUITools.FindCameraForLayer(cachedGameObject.layer);
+		mCam = NGUITools.FindCameraForLayer(cachedGameObject.layer);
 
 		FindCameraFor(leftAnchor);
 		FindCameraFor(bottomAnchor);
