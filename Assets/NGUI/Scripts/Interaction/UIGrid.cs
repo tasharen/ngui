@@ -322,7 +322,11 @@ public class UIGrid : UIWidgetContainer
 	public void ConstrainWithinPanel ()
 	{
 		if (mPanel != null)
+		{
 			mPanel.ConstrainTargetToBounds(transform, true);
+			UIScrollView sv = mPanel.GetComponent<UIScrollView>();
+			if (sv != null) sv.UpdateScrollbars(true);
+		}
 	}
 
 	/// <summary>
