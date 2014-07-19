@@ -64,6 +64,8 @@ static public class NGUIText
 
 	static public int rectWidth = 1000000;
 	static public int rectHeight = 1000000;
+	static public int regionWidth = 1000000;
+	static public int regionHeight = 1000000;
 	static public int maxLines = 0;
 
 	static public bool gradient = false;
@@ -788,7 +790,7 @@ static public class NGUIText
 					{
 						w += finalSpacingX;
 
-						if (Mathf.RoundToInt(x + w) > rectWidth)
+						if (Mathf.RoundToInt(x + w) > regionWidth)
 						{
 							if (x > maxX) maxX = x - finalSpacingX;
 							x = w;
@@ -803,7 +805,7 @@ static public class NGUIText
 				{
 					float w = finalSpacingX + symbol.advance * fontScale;
 
-					if (Mathf.RoundToInt(x + w) > rectWidth)
+					if (Mathf.RoundToInt(x + w) > regionWidth)
 					{
 						if (x > maxX) maxX = x - finalSpacingX;
 						x = w;
@@ -830,7 +832,7 @@ static public class NGUIText
 
 	static public int CalculateOffsetToFit (string text)
 	{
-		if (string.IsNullOrEmpty(text) || rectWidth < 1) return 0;
+		if (string.IsNullOrEmpty(text) || regionWidth < 1) return 0;
 
 		Prepare(text);
 
@@ -857,7 +859,7 @@ static public class NGUIText
 			}
 		}
 
-		float remainingWidth = rectWidth;
+		float remainingWidth = regionWidth;
 		int currentCharacterIndex = mSizes.size;
 
 		while (currentCharacterIndex > 0 && remainingWidth > 0)
@@ -895,13 +897,13 @@ static public class NGUIText
 
 	static public bool WrapText (string text, out string finalText, bool keepCharCount)
 	{
-		if (rectWidth < 1 || rectHeight < 1 || finalLineHeight < 1f)
+		if (regionWidth < 1 || regionHeight < 1 || finalLineHeight < 1f)
 		{
 			finalText = "";
 			return false;
 		}
 
-		float height = (maxLines > 0) ? Mathf.Min(rectHeight, finalLineHeight * maxLines) : rectHeight;
+		float height = (maxLines > 0) ? Mathf.Min(regionHeight, finalLineHeight * maxLines) : regionHeight;
 		int maxLineCount = (maxLines > 0) ? maxLines : 1000000;
 		maxLineCount = Mathf.FloorToInt(Mathf.Min(maxLineCount, height / finalLineHeight) + 0.01f);
 
@@ -916,7 +918,7 @@ static public class NGUIText
 
 		StringBuilder sb = new StringBuilder();
 		int textLength = text.Length;
-		float remainingWidth = rectWidth;
+		float remainingWidth = regionWidth;
 		int start = 0, offset = 0, lineCount = 1, prev = 0;
 		bool lineIsEmpty = true;
 		bool fits = true;
@@ -932,7 +934,7 @@ static public class NGUIText
 			if (ch == '\n')
 			{
 				if (lineCount == maxLineCount) break;
-				remainingWidth = rectWidth;
+				remainingWidth = regionWidth;
 
 				// Add the previous word to the final string
 				if (start < offset) sb.Append(text.Substring(start, offset - start + 1));
@@ -1010,12 +1012,12 @@ static public class NGUIText
 					if (space)
 					{
 						start = offset + 1;
-						remainingWidth = rectWidth;
+						remainingWidth = regionWidth;
 					}
 					else
 					{
 						start = offset;
-						remainingWidth = rectWidth - glyphWidth;
+						remainingWidth = regionWidth - glyphWidth;
 					}
 					prev = 0;
 				}
@@ -1023,7 +1025,7 @@ static public class NGUIText
 				{
 					// Revert the position to the beginning of the word and reset the line
 					lineIsEmpty = true;
-					remainingWidth = rectWidth;
+					remainingWidth = regionWidth;
 					offset = start - 1;
 					prev = 0;
 
@@ -1160,7 +1162,7 @@ static public class NGUIText
 				v0y = v1y - symbol.height * fontScale;
 
 				// Doesn't fit? Move down to the next line
-				if (Mathf.RoundToInt(x + symbol.advance * fontScale) > rectWidth)
+				if (Mathf.RoundToInt(x + symbol.advance * fontScale) > regionWidth)
 				{
 					if (x == 0f) return;
 
@@ -1252,7 +1254,7 @@ static public class NGUIText
 				if (finalSpacingX < 0f) w += finalSpacingX;
 
 				// Doesn't fit? Move down to the next line
-				if (Mathf.RoundToInt(x + w) > rectWidth)
+				if (Mathf.RoundToInt(x + w) > regionWidth)
 				{
 					if (x == 0f) return;
 
@@ -1553,7 +1555,7 @@ static public class NGUIText
 				{
 					w += finalSpacingX;
 
-					if (Mathf.RoundToInt(x + w) > rectWidth)
+					if (Mathf.RoundToInt(x + w) > regionWidth)
 					{
 						if (x == 0f) return;
 
@@ -1577,7 +1579,7 @@ static public class NGUIText
 			{
 				float w = symbol.advance * fontScale + finalSpacingX;
 
-				if (Mathf.RoundToInt(x + w) > rectWidth)
+				if (Mathf.RoundToInt(x + w) > regionWidth)
 				{
 					if (x == 0f) return;
 
@@ -1710,7 +1712,7 @@ static public class NGUIText
 				float v0y = -y - fs;
 				float v1y = -y;
 
-				if (Mathf.RoundToInt(v1x + finalSpacingX) > rectWidth)
+				if (Mathf.RoundToInt(v1x + finalSpacingX) > regionWidth)
 				{
 					if (x == 0f) return;
 

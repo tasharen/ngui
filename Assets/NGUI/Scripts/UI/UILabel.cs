@@ -1041,13 +1041,18 @@ public class UILabel : UIWidget
 		mChanged = true;
 		shouldBeProcessed = false;
 
-		NGUIText.rectWidth  = legacyMode ? (mMaxLineWidth  != 0 ? mMaxLineWidth  : 1000000) : width;
-		NGUIText.rectHeight = legacyMode ? (mMaxLineHeight != 0 ? mMaxLineHeight : 1000000) : height;
+		float regionX = mDrawRegion.z - mDrawRegion.x;
+		float regionY = mDrawRegion.w - mDrawRegion.y;
+
+		NGUIText.rectWidth    = legacyMode ? (mMaxLineWidth  != 0 ? mMaxLineWidth  : 1000000) : width;
+		NGUIText.rectHeight   = legacyMode ? (mMaxLineHeight != 0 ? mMaxLineHeight : 1000000) : height;
+		NGUIText.regionWidth  = (regionX != 1f) ? Mathf.RoundToInt(NGUIText.rectWidth  * regionX) : NGUIText.rectWidth;
+		NGUIText.regionHeight = (regionY != 1f) ? Mathf.RoundToInt(NGUIText.rectHeight * regionY) : NGUIText.rectHeight;
 
 		mPrintedSize = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : defaultFontSize);
 		mScale = 1f;
 
-		if (NGUIText.rectWidth < 1 || NGUIText.rectHeight < 0)
+		if (NGUIText.regionWidth < 1 || NGUIText.regionHeight < 0)
 		{
 			mProcessedText = "";
 			return;
@@ -1065,9 +1070,17 @@ public class UILabel : UIWidget
 #endif
 		if (full) UpdateNGUIText();
 
-		if (mOverflow == Overflow.ResizeFreely) NGUIText.rectWidth = 1000000;
+		if (mOverflow == Overflow.ResizeFreely)
+		{
+			NGUIText.rectWidth = 1000000;
+			NGUIText.regionWidth = 1000000;
+		}
+
 		if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
+		{
 			NGUIText.rectHeight = 1000000;
+			NGUIText.regionHeight = 1000000;
+		}
 
 		if (mPrintedSize > 0)
 		{
@@ -1109,7 +1122,9 @@ public class UILabel : UIWidget
 					mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText);
 
 					mWidth = Mathf.Max(minWidth, Mathf.RoundToInt(mCalculatedSize.x));
+					if (regionX != 1f) mWidth = Mathf.RoundToInt(mWidth / regionX);
 					mHeight = Mathf.Max(minHeight, Mathf.RoundToInt(mCalculatedSize.y));
+					if (regionY != 1f) mHeight = Mathf.RoundToInt(mHeight / regionY);
 
 					if ((mWidth & 1) == 1) ++mWidth;
 					if ((mHeight & 1) == 1) ++mHeight;
@@ -1118,6 +1133,7 @@ public class UILabel : UIWidget
 				{
 					mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText);
 					mHeight = Mathf.Max(minHeight, Mathf.RoundToInt(mCalculatedSize.y));
+					if (regionY != 1f) mHeight = Mathf.RoundToInt(mHeight / regionY);
 					if ((mHeight & 1) == 1) ++mHeight;
 				}
 				else
@@ -1657,6 +1673,7 @@ public class UILabel : UIWidget
 	{
 		UpdateNGUIText();
 		NGUIText.rectHeight = height;
+		NGUIText.regionHeight = height;
 		bool retVal = NGUIText.WrapText(text, out final);
 		NGUIText.bitmapFont = null;
 #if DYNAMIC_FONT
@@ -1678,6 +1695,8 @@ public class UILabel : UIWidget
 		NGUIText.fontStyle = mFontStyle;
 		NGUIText.rectWidth = mWidth;
 		NGUIText.rectHeight = mHeight;
+		NGUIText.regionWidth = Mathf.RoundToInt(mWidth * (mDrawRegion.z - mDrawRegion.x));
+		NGUIText.regionHeight = Mathf.RoundToInt(mHeight * (mDrawRegion.w - mDrawRegion.y));
 		NGUIText.gradient = mApplyGradient && (mFont == null || !mFont.packedFontShader);
 		NGUIText.gradientTop = mGradientTop;
 		NGUIText.gradientBottom = mGradientBottom;
@@ -1728,6 +1747,8 @@ public class UILabel : UIWidget
 			ProcessText(false, false);
 			NGUIText.rectWidth = mWidth;
 			NGUIText.rectHeight = mHeight;
+			NGUIText.regionWidth = Mathf.RoundToInt(mWidth * (mDrawRegion.z - mDrawRegion.x));
+			NGUIText.regionHeight = Mathf.RoundToInt(mHeight * (mDrawRegion.w - mDrawRegion.y));
 		}
 #endif
 
