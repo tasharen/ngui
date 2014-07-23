@@ -578,11 +578,15 @@ static public class NGUITools
 			}
 			else
 			{
+				panel = FindInParents<UIPanel>(go);
+				if (panel == null) return 0;
+
 				UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>(true);
 
 				for (int i = 0, imax = widgets.Length; i < imax; ++i)
 				{
 					UIWidget w = widgets[i];
+					if (w.panel != panel) continue;
 #if UNITY_EDITOR
 					RegisterUndo(w, "Depth Change");
 #endif

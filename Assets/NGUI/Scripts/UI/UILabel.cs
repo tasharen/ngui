@@ -849,7 +849,22 @@ public class UILabel : UIWidget
 				if (fnt != null)
 				{
 					fnt.RequestCharactersInTexture(lbl.mText, lbl.mPrintedSize, lbl.mFontStyle);
-					lbl.MarkAsChanged();
+				}
+			}
+		}
+
+		for (int i = 0; i < mList.size; ++i)
+		{
+			UILabel lbl = mList[i];
+
+			if (lbl != null)
+			{
+				Font fnt = lbl.trueTypeFont;
+
+				if (fnt != null)
+				{
+					lbl.RemoveFromPanel();
+					lbl.CreatePanel();
 				}
 			}
 		}
