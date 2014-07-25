@@ -1620,6 +1620,7 @@ public class UIPanel : UIRect
 	public void Refresh ()
 	{
 		mRebuild = true;
+		mUpdateFrame = -1;
 		if (list.Count > 0) list[0].LateUpdate();
 	}
 
