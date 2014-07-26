@@ -1250,10 +1250,10 @@ public class UILabel : UIWidget
 	}
 
 	[System.Obsolete("Use UILabel.GetCharacterAtPosition instead")]
-	public int GetCharacterIndex (Vector3 worldPos) { return GetCharacterIndexAtPosition(worldPos); }
+	public int GetCharacterIndex (Vector3 worldPos) { return GetCharacterIndexAtPosition(worldPos, false); }
 
 	[System.Obsolete("Use UILabel.GetCharacterAtPosition instead")]
-	public int GetCharacterIndex (Vector2 localPos) { return GetCharacterIndexAtPosition(localPos); }
+	public int GetCharacterIndex (Vector2 localPos) { return GetCharacterIndexAtPosition(localPos, false); }
 
 	static BetterList<Vector3> mTempVerts = new BetterList<Vector3>();
 	static BetterList<int> mTempIndices = new BetterList<int>();
@@ -1262,17 +1262,17 @@ public class UILabel : UIWidget
 	/// Return the index of the character at the specified world position.
 	/// </summary>
 
-	public int GetCharacterIndexAtPosition (Vector3 worldPos)
+	public int GetCharacterIndexAtPosition (Vector3 worldPos, bool precise)
 	{
 		Vector2 localPos = cachedTransform.InverseTransformPoint(worldPos);
-		return GetCharacterIndexAtPosition(localPos);
+		return GetCharacterIndexAtPosition(localPos, precise);
 	}
 
 	/// <summary>
 	/// Return the index of the character at the specified local position.
 	/// </summary>
 
-	public int GetCharacterIndexAtPosition (Vector2 localPos)
+	public int GetCharacterIndexAtPosition (Vector2 localPos, bool precise)
 	{
 		if (isValid)
 		{
@@ -1281,13 +1281,15 @@ public class UILabel : UIWidget
 
 			UpdateNGUIText();
 
-			NGUIText.PrintCharacterPositions(text, mTempVerts, mTempIndices);
+			if (precise) NGUIText.PrintExactCharacterPositions(text, mTempVerts, mTempIndices);
+			else NGUIText.PrintApproximateCharacterPositions(text, mTempVerts, mTempIndices);
 
 			if (mTempVerts.size > 0)
 			{
 				ApplyOffset(mTempVerts, 0);
-				int retVal = NGUIText.GetClosestCharacter(mTempVerts, localPos);
-				retVal = mTempIndices[retVal];
+				int retVal = precise ?
+					NGUIText.GetExactCharacterIndex(mTempVerts, mTempIndices, localPos) :
+					NGUIText.GetApproximateCharacterIndex(mTempVerts, mTempIndices, localPos);
 
 				mTempVerts.Clear();
 				mTempIndices.Clear();
@@ -1311,13 +1313,21 @@ public class UILabel : UIWidget
 	/// Retrieve the word directly below the specified world-space position.
 	/// </summary>
 
-	public string GetWordAtPosition (Vector3 worldPos) { return GetWordAtCharacterIndex(GetCharacterIndexAtPosition(worldPos)); }
+	public string GetWordAtPosition (Vector3 worldPos)
+	{
+		int index = GetCharacterIndexAtPosition(worldPos, false);
+		return GetWordAtCharacterIndex(index);
+	}
 
 	/// <summary>
 	/// Retrieve the word directly below the specified relative-to-label position.
 	/// </summary>
 
-	public string GetWordAtPosition (Vector2 localPos) { return GetWordAtCharacterIndex(GetCharacterIndexAtPosition(localPos)); }
+	public string GetWordAtPosition (Vector2 localPos)
+	{
+		int index = GetCharacterIndexAtPosition(localPos, false);
+		return GetWordAtCharacterIndex(index);
+	}
 
 	/// <summary>
 	/// Retrieve the word right under the specified character index.
@@ -1349,13 +1359,13 @@ public class UILabel : UIWidget
 	/// Retrieve the URL directly below the specified world-space position.
 	/// </summary>
 
-	public string GetUrlAtPosition (Vector3 worldPos) { return GetUrlAtCharacterIndex(GetCharacterIndexAtPosition(worldPos)); }
+	public string GetUrlAtPosition (Vector3 worldPos) { return GetUrlAtCharacterIndex(GetCharacterIndexAtPosition(worldPos, true)); }
 
 	/// <summary>
 	/// Retrieve the URL directly below the specified relative-to-label position.
 	/// </summary>
 
-	public string GetUrlAtPosition (Vector2 localPos) { return GetUrlAtCharacterIndex(GetCharacterIndexAtPosition(localPos)); }
+	public string GetUrlAtPosition (Vector2 localPos) { return GetUrlAtCharacterIndex(GetCharacterIndexAtPosition(localPos, true)); }
 
 	/// <summary>
 	/// Retrieve the URL right under the specified character index.
@@ -1363,16 +1373,30 @@ public class UILabel : UIWidget
 
 	public string GetUrlAtCharacterIndex (int characterIndex)
 	{
-		if (characterIndex != -1 && characterIndex < mText.Length)
+		if (characterIndex != -1 && characterIndex < mText.Length - 6)
 		{
-			int linkStart = mText.LastIndexOf("[url=", characterIndex);
+			int linkStart;
 
-			if (linkStart != -1)
+			// LastIndexOf() fails if the string happens to begin with the expected text
+			if (mText[characterIndex] == '[' &&
+				mText[characterIndex + 1] == 'u' &&
+				mText[characterIndex + 2] == 'r' &&
+				mText[characterIndex + 3] == 'l' &&
+				mText[characterIndex + 4] == '=')
 			{
-				linkStart += 5;
-				int linkEnd = mText.IndexOf("]", linkStart);
-				if (linkEnd != -1) return mText.Substring(linkStart, linkEnd - linkStart);
+				linkStart = characterIndex;
 			}
+			else linkStart = mText.LastIndexOf("[url=", characterIndex);
+			
+			if (linkStart == -1) return null;
+
+			linkStart += 5;
+			int linkEnd = mText.IndexOf("]", linkStart);
+			if (linkEnd == -1) return null;
+
+			int urlEnd = mText.IndexOf("[/url]", linkEnd);
+			if (urlEnd == -1 || characterIndex <= urlEnd)
+				return mText.Substring(linkStart, linkEnd - linkStart);
 		}
 		return null;
 	}
@@ -1391,7 +1415,7 @@ public class UILabel : UIWidget
 			int def = defaultFontSize;
 			UpdateNGUIText();
 
-			NGUIText.PrintCharacterPositions(text, mTempVerts, mTempIndices);
+			NGUIText.PrintApproximateCharacterPositions(text, mTempVerts, mTempIndices);
 
 			if (mTempVerts.size > 0)
 			{
@@ -1410,8 +1434,7 @@ public class UILabel : UIWidget
 						else if (key == KeyCode.End) localPos.x += 1000f;
 
 						// Find the closest character to this position
-						int retVal = NGUIText.GetClosestCharacter(mTempVerts, localPos);
-						retVal = mTempIndices[retVal];
+						int retVal = NGUIText.GetApproximateCharacterIndex(mTempVerts, mTempIndices, localPos);
 						if (retVal == currentIndex) break;
 
 						mTempVerts.Clear();
@@ -1501,6 +1524,13 @@ public class UILabel : UIWidget
 		col.a = finalAlpha;
 		
 		if (mFont != null && mFont.premultipliedAlphaShader) col = NGUITools.ApplyPMA(col);
+
+		if (QualitySettings.activeColorSpace == ColorSpace.Linear)
+		{
+			col.r = Mathf.Pow(col.r, 2.2f);
+			col.g = Mathf.Pow(col.g, 2.2f);
+			col.b = Mathf.Pow(col.b, 2.2f);
+		}
 
 		string text = processedText;
 		int start = verts.size;

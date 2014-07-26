@@ -1079,7 +1079,7 @@ public class UIInput : MonoBehaviour
 		Ray ray = UICamera.currentRay;
 		Plane p = new Plane(corners[0], corners[1], corners[2]);
 		float dist;
-		return p.Raycast(ray, out dist) ? mDrawStart + label.GetCharacterIndexAtPosition(ray.GetPoint(dist)) : 0;
+		return p.Raycast(ray, out dist) ? mDrawStart + label.GetCharacterIndexAtPosition(ray.GetPoint(dist), false) : 0;
 	}
 
 	/// <summary>

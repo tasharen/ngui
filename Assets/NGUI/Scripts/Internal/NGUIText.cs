@@ -679,10 +679,40 @@ static public class NGUIText
 
 	/// <summary>
 	/// Get the index of the closest character within the provided list of values.
-	/// This function first sorts by Y, and only then by X.
+	/// Meant to be used with the arrays created by PrintExactCharacterPositions().
 	/// </summary>
 
-	static public int GetClosestCharacter (BetterList<Vector3> verts, Vector2 pos)
+	static public int GetExactCharacterIndex (BetterList<Vector3> verts, BetterList<int> indices, Vector2 pos)
+	{
+		for (int i = 0; i < indices.size; ++i)
+		{
+			int i0 = (i << 1);
+			int i1 = i0 + 1;
+
+			float x0 = verts[i0].x;
+			if (pos.x < x0) continue;
+
+			float x1 = verts[i1].x;
+			if (pos.x > x1) continue;
+
+			float y0 = verts[i0].y;
+			if (pos.y < y0) continue;
+
+			float y1 = verts[i1].y;
+			if (pos.y > y1) continue;
+
+			return indices[i];
+		}
+		return 0;
+	}
+
+	/// <summary>
+	/// Get the index of the closest vertex within the provided list of values.
+	/// This function first sorts by Y, and only then by X.
+	/// Meant to be used with the arrays created by PrintApproximateCharacterPositions().
+	/// </summary>
+
+	static public int GetApproximateCharacterIndex (BetterList<Vector3> verts, BetterList<int> indices, Vector2 pos)
 	{
 		// First sort by Y, and only then by X
 		float bestX = float.MaxValue;
@@ -708,7 +738,7 @@ static public class NGUIText
 				bestIndex = i;
 			}
 		}
-		return bestIndex;
+		return indices[bestIndex];
 	}
 
 	/// <summary>
@@ -1501,7 +1531,7 @@ static public class NGUIText
 	/// Print character positions and indices into the specified buffer. Meant to be used with the "find closest vertex" calculations.
 	/// </summary>
 
-	static public void PrintCharacterPositions (string text, BetterList<Vector3> verts, BetterList<int> indices)
+	static public void PrintApproximateCharacterPositions (string text, BetterList<Vector3> verts, BetterList<int> indices)
 	{
 		if (string.IsNullOrEmpty(text)) text = " ";
 
@@ -1597,6 +1627,122 @@ static public class NGUIText
 				verts.Add(new Vector3(x, -y - halfSize));
 				indices.Add(i + 1);
 				i += symbol.sequence.Length - 1;
+				prev = 0;
+			}
+		}
+
+		if (alignment != Alignment.Left && indexOffset < verts.size)
+			Align(verts, indexOffset, x - finalSpacingX);
+	}
+
+	/// <summary>
+	/// Print character positions and indices into the specified buffer.
+	/// This function's data is meant to be used for precise character selection, such as clicking on a link.
+	/// There are 2 vertices for every index: Bottom Left + Top Right.
+	/// </summary>
+
+	static public void PrintExactCharacterPositions (string text, BetterList<Vector3> verts, BetterList<int> indices)
+	{
+		if (string.IsNullOrEmpty(text)) text = " ";
+
+		Prepare(text);
+
+		float fullSize = fontSize * fontScale;
+		float x = 0f, y = 0f, maxX = 0f;
+		int textLength = text.Length, indexOffset = verts.size, ch = 0, prev = 0;
+
+		for (int i = 0; i < textLength; ++i)
+		{
+			ch = text[i];
+
+			if (ch == '\n')
+			{
+				if (x > maxX) maxX = x;
+
+				if (alignment != Alignment.Left)
+				{
+					Align(verts, indexOffset, x - finalSpacingX);
+					indexOffset = verts.size;
+				}
+
+				x = 0;
+				y += finalLineHeight;
+				prev = 0;
+				continue;
+			}
+			else if (ch < ' ')
+			{
+				prev = 0;
+				continue;
+			}
+
+			if (encoding && ParseSymbol(text, ref i))
+			{
+				--i;
+				continue;
+			}
+
+			// See if there is a symbol matching this text
+			BMSymbol symbol = useSymbols ? GetSymbol(text, i, textLength) : null;
+
+			if (symbol == null)
+			{
+				float gw = GetGlyphWidth(ch, prev);
+
+				if (gw != 0f)
+				{
+					float w = gw + finalSpacingX;
+
+					if (Mathf.RoundToInt(x + w) > regionWidth)
+					{
+						if (x == 0f) return;
+
+						if (alignment != Alignment.Left && indexOffset < verts.size)
+						{
+							Align(verts, indexOffset, x - finalSpacingX);
+							indexOffset = verts.size;
+						}
+
+						x = 0f;
+						y += finalLineHeight;
+						prev = 0;
+						--i;
+						continue;
+					}
+
+					indices.Add(i);
+					verts.Add(new Vector3(x, -y - fullSize));
+					verts.Add(new Vector3(x + w, -y));
+					prev = ch;
+					x += w;
+				}
+			}
+			else
+			{
+				float w = symbol.advance * fontScale + finalSpacingX;
+
+				if (Mathf.RoundToInt(x + w) > regionWidth)
+				{
+					if (x == 0f) return;
+
+					if (alignment != Alignment.Left && indexOffset < verts.size)
+					{
+						Align(verts, indexOffset, x - finalSpacingX);
+						indexOffset = verts.size;
+					}
+
+					x = 0f;
+					y += finalLineHeight;
+					prev = 0;
+					--i;
+					continue;
+				}
+
+				indices.Add(i);
+				verts.Add(new Vector3(x, -y - fullSize));
+				verts.Add(new Vector3(x + w, -y));
+				i += symbol.sequence.Length - 1;
+				x += w;
 				prev = 0;
 			}
 		}
