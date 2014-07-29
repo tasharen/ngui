@@ -910,6 +910,7 @@ public class UILabel : UIWidget
 		{
 			int min = mFont.defaultSize;
 			if (height < min) height = min;
+			fontSize = min;
 		}
 
 		mMaxLineWidth = 0;
