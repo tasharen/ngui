@@ -89,6 +89,12 @@ public class NGUIDebug : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Clear the logged text.
+	/// </summary>
+
+	static public void Clear () { mLines.Clear(); }
+
+	/// <summary>
 	/// Draw bounds immediately. Won't be remembered for the next frame.
 	/// </summary>
 

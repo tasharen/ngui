@@ -268,7 +268,7 @@ public class UIDrawCall : MonoBehaviour
 		if (mClipCount != 0)
 		{
 			shader = Shader.Find("Hidden/" + shaderName + " " + mClipCount);
-			if (shader == null) Shader.Find(shaderName + " " + mClipCount);
+			if (shader == null) shader = Shader.Find(shaderName + " " + mClipCount);
 
 			// Legacy functionality
 			if (shader == null && mClipCount == 1)
