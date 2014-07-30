@@ -609,6 +609,7 @@ public class NGUISettings
 		sp.centerType = GetEnum<UISprite.AdvancedType>("Center Type", UISprite.AdvancedType.Sliced);
 		sp.fillAmount = GetFloat("Fill", sp.fillAmount);
 		sp.fillDirection = GetEnum<UISprite.FillDirection>("FDir", sp.fillDirection);
+		NGUITools.SetDirty(sp);
 	}
 
 	/// <summary>
@@ -650,5 +651,6 @@ public class NGUISettings
 		float x = GetFloat("Effect X", lbl.effectDistance.x);
 		float y = GetFloat("Effect Y", lbl.effectDistance.y);
 		lbl.effectDistance = new Vector2(x, y);
+		NGUITools.SetDirty(lbl);
 	}
 }

@@ -227,7 +227,7 @@ public abstract class UITweener : MonoBehaviour
 					for (int i = 0; i < mTemp.Count; ++i)
 					{
 						EventDelegate ed = mTemp[i];
-						if (ed != null) EventDelegate.Add(onFinished, ed, ed.oneShot);
+						if (ed != null && !ed.oneShot) EventDelegate.Add(onFinished, ed, ed.oneShot);
 					}
 					mTemp = null;
 				}
