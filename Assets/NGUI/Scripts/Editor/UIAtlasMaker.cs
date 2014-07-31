@@ -143,6 +143,9 @@ public class UIAtlasMaker : EditorWindow
 		{
 			Rect rect = NGUIMath.ConvertToPixels(rects[i], tex.width, tex.height, true);
 
+			// Apparently Unity can take the liberty of destroying temporary textures without any warning
+			if (textures[i] == null) return false;
+
 			// Make sure that we don't shrink the textures
 			if (Mathf.RoundToInt(rect.width) != textures[i].width) return false;
 

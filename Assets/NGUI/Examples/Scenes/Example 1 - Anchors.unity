@@ -230,10 +230,11 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 5}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -474.999969, y: 286.5, z: 0}
+  m_LocalPosition: {x: -499, y: 290, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 78}
+  m_RootOrder: 6
 --- !u!4 &70
 Transform:
   m_ObjectHideFlags: 0
@@ -245,6 +246,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 72}
+  m_RootOrder: 0
 --- !u!4 &72
 Transform:
   m_ObjectHideFlags: 0
@@ -252,11 +254,12 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 29}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -384.999969, y: 251.5, z: 0}
+  m_LocalPosition: {x: -409, y: 255, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 70}
   m_Father: {fileID: 78}
+  m_RootOrder: 7
 --- !u!4 &78
 Transform:
   m_ObjectHideFlags: 0
@@ -265,7 +268,7 @@ Transform:
   m_GameObject: {fileID: 35}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: .00349040143, y: .00349040143, z: .00349040143}
+  m_LocalScale: {x: .00344827585, y: .00344827585, z: .00344827585}
   m_Children:
   - {fileID: 79}
   - {fileID: 805691306}
@@ -279,6 +282,7 @@ Transform:
   - {fileID: 42646019}
   - {fileID: 80}
   m_Father: {fileID: 0}
+  m_RootOrder: 0
 --- !u!4 &79
 Transform:
   m_ObjectHideFlags: 0
@@ -290,6 +294,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 78}
+  m_RootOrder: 0
 --- !u!4 &80
 Transform:
   m_ObjectHideFlags: 0
@@ -302,6 +307,7 @@ Transform:
   m_Children:
   - {fileID: 81}
   m_Father: {fileID: 78}
+  m_RootOrder: 10
 --- !u!4 &81
 Transform:
   m_ObjectHideFlags: 0
@@ -315,6 +321,7 @@ Transform:
   - {fileID: 86}
   - {fileID: 84}
   m_Father: {fileID: 80}
+  m_RootOrder: 0
 --- !u!4 &84
 Transform:
   m_ObjectHideFlags: 0
@@ -326,6 +333,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 81}
+  m_RootOrder: 1
 --- !u!4 &86
 Transform:
   m_ObjectHideFlags: 0
@@ -337,6 +345,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 81}
+  m_RootOrder: 0
 --- !u!20 &91
 Camera:
   m_ObjectHideFlags: 0
@@ -346,7 +355,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: .5, g: .5, b: .5, a: .0196078438}
+  m_BackGroundColor: {r: .5, g: .5, b: .5, a: 1}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -364,8 +373,11 @@ Camera:
     m_Bits: 256
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
   m_HDR: 0
   m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: .0219999999
 --- !u!81 &92
 AudioListener:
   m_ObjectHideFlags: 0
@@ -403,26 +415,26 @@ MonoBehaviour:
   updateAnchors: 1
   mColor: {r: 1, g: 1, b: 1, a: .172549024}
   mPivot: 0
-  mWidth: 950
-  mHeight: 573
+  mWidth: 998
+  mHeight: 580
   mDepth: -10
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
   keepAspectRatio: 0
-  aspectRatio: 1.77777779
-  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
-  mSpriteName: Stripes 2
+  aspectRatio: 1.65794063
   mType: 2
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
   mFlip: 0
-  mFillCenter: 1
   centerType: 1
   leftType: 1
   rightType: 1
   bottomType: 1
   topType: 1
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Stripes 2
+  mFillCenter: 1
 --- !u!114 &113
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -522,19 +534,19 @@ MonoBehaviour:
   hideIfOffScreen: 0
   keepAspectRatio: 0
   aspectRatio: 2.57142854
-  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
-  mSpriteName: Window
   mType: 1
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
   mFlip: 0
-  mFillCenter: 1
   centerType: 1
   leftType: 1
   rightType: 1
   bottomType: 1
   topType: 1
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Window
+  mFillCenter: 1
 --- !u!114 &120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -607,19 +619,19 @@ MonoBehaviour:
   hideIfOffScreen: 0
   keepAspectRatio: 0
   aspectRatio: 1.33333337
-  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
-  mSpriteName: Window
   mType: 1
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
   mFlip: 0
-  mFillCenter: 1
   centerType: 1
   leftType: 1
   rightType: 1
   bottomType: 1
   topType: 1
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Window
+  mFillCenter: 1
 --- !u!114 &124
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -657,19 +669,19 @@ MonoBehaviour:
   hideIfOffScreen: 0
   keepAspectRatio: 0
   aspectRatio: 1.34722221
-  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
-  mSpriteName: Stripes 3
   mType: 2
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
   mFlip: 0
-  mFillCenter: 1
   centerType: 1
   leftType: 1
   rightType: 1
   bottomType: 1
   topType: 1
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Stripes 3
+  mFillCenter: 1
 --- !u!114 &125
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -860,11 +872,12 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 42646018}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 384.999969, y: -251.5, z: 0}
+  m_LocalPosition: {x: 409, y: -255, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1561260348}
   m_Father: {fileID: 78}
+  m_RootOrder: 9
 --- !u!114 &42646020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -902,19 +915,19 @@ MonoBehaviour:
   hideIfOffScreen: 0
   keepAspectRatio: 0
   aspectRatio: 2.57142854
-  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
-  mSpriteName: Window
   mType: 1
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
   mFlip: 0
-  mFillCenter: 1
   centerType: 1
   leftType: 1
   rightType: 1
   bottomType: 1
   topType: 1
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Window
+  mFillCenter: 1
 --- !u!1 &427803582
 GameObject:
   m_ObjectHideFlags: 0
@@ -938,11 +951,12 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 427803582}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -384.999969, y: -251.5, z: 0}
+  m_LocalPosition: {x: -409, y: -255, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1245101533}
   m_Father: {fileID: 78}
+  m_RootOrder: 2
 --- !u!114 &427803584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -980,19 +994,19 @@ MonoBehaviour:
   hideIfOffScreen: 0
   keepAspectRatio: 0
   aspectRatio: 2.57142854
-  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
-  mSpriteName: Window
   mType: 1
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
   mFlip: 0
-  mFillCenter: 1
   centerType: 1
   leftType: 1
   rightType: 1
   bottomType: 1
   topType: 1
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Window
+  mFillCenter: 1
 --- !u!1 &447242990
 GameObject:
   m_ObjectHideFlags: 0
@@ -1016,11 +1030,12 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 447242990}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -384.999969, y: 0, z: 0}
+  m_LocalPosition: {x: -409, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1703930847}
   m_Father: {fileID: 78}
+  m_RootOrder: 3
 --- !u!114 &447242992
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1058,19 +1073,19 @@ MonoBehaviour:
   hideIfOffScreen: 0
   keepAspectRatio: 0
   aspectRatio: 2.57142854
-  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
-  mSpriteName: Window
   mType: 1
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
   mFlip: 0
-  mFillCenter: 1
   centerType: 1
   leftType: 1
   rightType: 1
   bottomType: 1
   topType: 1
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Window
+  mFillCenter: 1
 --- !u!1 &480628899
 GameObject:
   m_ObjectHideFlags: 0
@@ -1098,6 +1113,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 985872076}
+  m_RootOrder: 0
 --- !u!114 &480628901
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1183,11 +1199,12 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 614817121}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -251.5, z: 0}
+  m_LocalPosition: {x: 0, y: -255, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2109992742}
   m_Father: {fileID: 78}
+  m_RootOrder: 5
 --- !u!114 &614817123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1225,19 +1242,19 @@ MonoBehaviour:
   hideIfOffScreen: 0
   keepAspectRatio: 0
   aspectRatio: 2.57142854
-  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
-  mSpriteName: Window
   mType: 1
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
   mFlip: 0
-  mFillCenter: 1
   centerType: 1
   leftType: 1
   rightType: 1
   bottomType: 1
   topType: 1
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Window
+  mFillCenter: 1
 --- !u!1 &805691305
 GameObject:
   m_ObjectHideFlags: 0
@@ -1261,11 +1278,12 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 805691305}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 251.5, z: 0}
+  m_LocalPosition: {x: 0, y: 255, z: 0}
   m_LocalScale: {x: 1.00007999, y: 1.00007999, z: 1.00007999}
   m_Children:
   - {fileID: 1728592130}
   m_Father: {fileID: 78}
+  m_RootOrder: 1
 --- !u!114 &805691307
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1303,19 +1321,19 @@ MonoBehaviour:
   hideIfOffScreen: 0
   keepAspectRatio: 0
   aspectRatio: 2.57142854
-  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
-  mSpriteName: Window
   mType: 1
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
   mFlip: 0
-  mFillCenter: 1
   centerType: 1
   leftType: 1
   rightType: 1
   bottomType: 1
   topType: 1
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Window
+  mFillCenter: 1
 --- !u!1 &985872075
 GameObject:
   m_ObjectHideFlags: 0
@@ -1339,11 +1357,12 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 985872075}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 384.999969, y: 0, z: 0}
+  m_LocalPosition: {x: 409, y: 0, z: 0}
   m_LocalScale: {x: 1.00007999, y: 1.00007999, z: 1.00007999}
   m_Children:
   - {fileID: 480628900}
   m_Father: {fileID: 78}
+  m_RootOrder: 4
 --- !u!114 &985872077
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1381,19 +1400,19 @@ MonoBehaviour:
   hideIfOffScreen: 0
   keepAspectRatio: 0
   aspectRatio: 2.57142854
-  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
-  mSpriteName: Window
   mType: 1
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
   mFlip: 0
-  mFillCenter: 1
   centerType: 1
   leftType: 1
   rightType: 1
   bottomType: 1
   topType: 1
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Window
+  mFillCenter: 1
 --- !u!1 &1136886531
 GameObject:
   m_ObjectHideFlags: 0
@@ -1421,6 +1440,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1589195468}
+  m_RootOrder: 0
 --- !u!114 &1136886533
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1510,6 +1530,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 427803583}
+  m_RootOrder: 0
 --- !u!114 &1245101534
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1599,6 +1620,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 42646019}
+  m_RootOrder: 0
 --- !u!114 &1561260349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1684,11 +1706,12 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1589195467}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 384.999969, y: 251.5, z: 0}
+  m_LocalPosition: {x: 409, y: 255, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1136886532}
   m_Father: {fileID: 78}
+  m_RootOrder: 8
 --- !u!114 &1589195469
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1726,19 +1749,19 @@ MonoBehaviour:
   hideIfOffScreen: 0
   keepAspectRatio: 0
   aspectRatio: 2.57142854
-  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
-  mSpriteName: Window
   mType: 1
   mFillDirection: 4
   mFillAmount: 1
   mInvert: 0
   mFlip: 0
-  mFillCenter: 1
   centerType: 1
   leftType: 1
   rightType: 1
   bottomType: 1
   topType: 1
+  mAtlas: {fileID: 11400000, guid: 62adb30369acbf943a67cee0f69267a3, type: 2}
+  mSpriteName: Window
+  mFillCenter: 1
 --- !u!1 &1703930846
 GameObject:
   m_ObjectHideFlags: 0
@@ -1766,6 +1789,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 447242991}
+  m_RootOrder: 0
 --- !u!114 &1703930848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1855,6 +1879,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 805691306}
+  m_RootOrder: 0
 --- !u!114 &1728592131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1944,6 +1969,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 614817122}
+  m_RootOrder: 0
 --- !u!114 &2109992743
 MonoBehaviour:
   m_ObjectHideFlags: 0
