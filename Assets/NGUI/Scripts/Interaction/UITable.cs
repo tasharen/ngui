@@ -51,6 +51,12 @@ public class UITable : UIWidgetContainer
 	public Sorting sorting = Sorting.None;
 
 	/// <summary>
+	/// Final pivot point for the grid's content.
+	/// </summary>
+
+	public UIWidget.Pivot pivot = UIWidget.Pivot.TopLeft;
+
+	/// <summary>
 	/// Whether inactive children will be discarded from the table's calculations.
 	/// </summary>
 
@@ -124,6 +130,43 @@ public class UITable : UIWidgetContainer
 	/// </summary>
 
 	protected virtual void Sort (List<Transform> list) { list.Sort(UIGrid.SortByName); }
+
+	/// <summary>
+	/// Position the grid's contents when the script starts.
+	/// </summary>
+
+	protected virtual void Start ()
+	{
+		Init();
+		Reposition();
+		enabled = false;
+	}
+
+	/// <summary>
+	/// Find the necessary components.
+	/// </summary>
+
+	protected virtual void Init ()
+	{
+		mInitDone = true;
+		mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
+	}
+
+	/// <summary>
+	/// Is it time to reposition? Do so now.
+	/// </summary>
+
+	protected virtual void LateUpdate ()
+	{
+		if (mReposition) Reposition();
+		enabled = false;
+	}
+
+	/// <summary>
+	/// Reposition the content on inspector validation.
+	/// </summary>
+
+	void OnValidate () { if (!Application.isPlaying && NGUITools.GetActive(this)) Reposition(); }
 
 	/// <summary>
 	/// Positions the grid items, taking their own size into consideration.
@@ -202,6 +245,40 @@ public class UITable : UIWidgetContainer
 				yOffset += bc.size.y + padding.y * 2f;
 			}
 		}
+
+		// Apply the origin offset
+		if (pivot != UIWidget.Pivot.TopLeft)
+		{
+			Vector2 po = NGUIMath.GetPivotOffset(pivot);
+
+			float fx, fy;
+
+			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(transform);
+
+			fx = Mathf.Lerp(0f, b.size.x, po.x);
+			fy = Mathf.Lerp(-b.size.y, 0f, po.y);
+
+			Transform myTrans = transform;
+
+			for (int i = 0; i < myTrans.childCount; ++i)
+			{
+				Transform t = myTrans.GetChild(i);
+				SpringPosition sp = t.GetComponent<SpringPosition>();
+
+				if (sp != null)
+				{
+					sp.target.x -= fx;
+					sp.target.y -= fy;
+				}
+				else
+				{
+					Vector3 pos = t.localPosition;
+					pos.x -= fx;
+					pos.y -= fy;
+					t.localPosition = pos;
+				}
+			}
+		}
 	}
 
 	/// <summary>
@@ -234,36 +311,5 @@ public class UITable : UIWidgetContainer
 
 		if (onReposition != null)
 			onReposition();
-	}
-
-	/// <summary>
-	/// Position the grid's contents when the script starts.
-	/// </summary>
-
-	protected virtual void Start ()
-	{
-		Init();
-		Reposition();
-		enabled = false;
-	}
-
-	/// <summary>
-	/// Find the necessary components.
-	/// </summary>
-
-	protected virtual void Init ()
-	{
-		mInitDone = true;
-		mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
-	}
-
-	/// <summary>
-	/// Is it time to reposition? Do so now.
-	/// </summary>
-
-	protected virtual void LateUpdate ()
-	{
-		if (mReposition) Reposition();
-		enabled = false;
 	}
 }
