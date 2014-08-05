@@ -267,8 +267,8 @@ public class UIWrapContent : MonoBehaviour
 						NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
 				}
 			}
-			mScroll.restrictWithinPanel = !allWithinRange;
 		}
+		mScroll.restrictWithinPanel = !allWithinRange;
 	}
 
 	/// <summary>
