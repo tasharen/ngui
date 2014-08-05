@@ -716,7 +716,18 @@ static public class NGUITools
 	{
 		// Find the existing UI Root
 		UIRoot root = (trans != null) ? NGUITools.FindInParents<UIRoot>(trans.gameObject) : null;
-		if (root == null && UIRoot.list.Count > 0) root = UIRoot.list[0];
+
+		if (root == null && UIRoot.list.Count > 0)
+		{
+			foreach (UIRoot r in UIRoot.list)
+			{
+				if (r.gameObject.layer == layer)
+				{
+					root = r;
+					break;
+				}
+			}
+		}
 
 		// If we are working with a different UI type, we need to treat it as a brand-new one instead
 		if (root != null)
