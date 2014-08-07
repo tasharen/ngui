@@ -153,6 +153,7 @@ public abstract class UIRect : MonoBehaviour
 	{
 		OnEnable,
 		OnUpdate,
+		OnStart,
 	}
 
 	/// <summary>
@@ -167,7 +168,10 @@ public abstract class UIRect : MonoBehaviour
 	protected bool mChanged = true;
 	protected bool mStarted = false;
 	protected bool mParentFound = false;
-	protected bool mUpdateAnchors = false;
+
+	[System.NonSerialized] bool mUpdateAnchors = true;
+	[System.NonSerialized] int mUpdateFrame = -1;
+	[System.NonSerialized] bool mAnchorsCached = false;
 
 	/// <summary>
 	/// Final calculated alpha.
@@ -178,10 +182,8 @@ public abstract class UIRect : MonoBehaviour
 
 	UIRoot mRoot;
 	UIRect mParent;
-	protected Camera mCam;
-	int mUpdateFrame = -1;
-	bool mAnchorsCached = false;
 	bool mRootSet = false;
+	protected Camera mCam;
 
 	/// <summary>
 	/// Game object gets cached for speed. Can't simply return 'mGo' set in Awake because this function may be called on a prefab.
@@ -378,10 +380,13 @@ public abstract class UIRect : MonoBehaviour
 
 	protected virtual void OnEnable ()
 	{
-		mAnchorsCached = false;
 		mUpdateFrame = -1;
+		
 		if (updateAnchors == AnchorUpdate.OnEnable)
+		{
+			mAnchorsCached = false;
 			mUpdateAnchors = true;
+		}
 		if (mStarted) OnInit();
 		mUpdateFrame = -1;
 #if UNITY_EDITOR
@@ -494,7 +499,7 @@ public abstract class UIRect : MonoBehaviour
 	/// Manually update anchored sides.
 	/// </summary>
 
-	public void UpdateAnchors () { if (isAnchored) OnAnchor(); }
+	public void UpdateAnchors () { if (isAnchored && updateAnchors != AnchorUpdate.OnStart) OnAnchor(); }
 
 	/// <summary>
 	/// Update the dimensions of the rectangle using anchor points.
@@ -655,7 +660,7 @@ public abstract class UIRect : MonoBehaviour
 	{
 		if (NGUITools.GetActive(this))
 		{
-			ResetAnchors();
+			if (!Application.isPlaying) ResetAnchors();
 			Invalidate(true);
 		}
 	}
