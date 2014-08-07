@@ -1437,11 +1437,11 @@ static public class NGUIText
 						float a = mBoldOffset[j * 2];
 						float b = mBoldOffset[j * 2 + 1];
 
-						float slant = a + (italic ? fontSize * 0.1f * ((v1y - v0y) / fontSize) : 0f);
-						verts.Add(new Vector3(v0x - slant, v0y + b));
-						verts.Add(new Vector3(v0x + slant, v1y + b));
-						verts.Add(new Vector3(v1x + slant, v1y + b));
-						verts.Add(new Vector3(v1x - slant, v0y + b));
+						float slant = (italic ? fontSize * 0.1f * ((v1y - v0y) / fontSize) : 0f);
+						verts.Add(new Vector3(v0x + a - slant, v0y + b));
+						verts.Add(new Vector3(v0x + a + slant, v1y + b));
+						verts.Add(new Vector3(v1x + a + slant, v1y + b));
+						verts.Add(new Vector3(v1x + a - slant, v0y + b));
 					}
 				}
 
@@ -1463,10 +1463,13 @@ static public class NGUIText
 
 						float cx = (dash.u0.x + dash.u1.x) * 0.5f;
 
-						uvs.Add(new Vector2(cx, dash.u0.y));
-						uvs.Add(new Vector2(cx, dash.u1.y));
-						uvs.Add(new Vector2(cx, dash.u1.y));
-						uvs.Add(new Vector2(cx, dash.u0.y));
+						for (int j = 0, jmax = (bold ? 4 : 1); j < jmax; ++j)
+						{
+							uvs.Add(new Vector2(cx, dash.u0.y));
+							uvs.Add(new Vector2(cx, dash.u1.y));
+							uvs.Add(new Vector2(cx, dash.u1.y));
+							uvs.Add(new Vector2(cx, dash.u0.y));
+						}
 					}
 
 					if (subscript && strikethrough)
@@ -1480,10 +1483,26 @@ static public class NGUIText
 						v1y = (-y + dash.v1.y);
 					}
 
-					verts.Add(new Vector3(prevX, v0y));
-					verts.Add(new Vector3(prevX, v1y));
-					verts.Add(new Vector3(x, v1y));
-					verts.Add(new Vector3(x, v0y));
+					if (bold)
+					{
+						for (int j = 0; j < 4; ++j)
+						{
+							float a = mBoldOffset[j * 2];
+							float b = mBoldOffset[j * 2 + 1];
+
+							verts.Add(new Vector3(prevX + a, v0y + b));
+							verts.Add(new Vector3(prevX + a, v1y + b));
+							verts.Add(new Vector3(x + a, v1y + b));
+							verts.Add(new Vector3(x + a, v0y + b));
+						}
+					}
+					else
+					{
+						verts.Add(new Vector3(prevX, v0y));
+						verts.Add(new Vector3(prevX, v1y));
+						verts.Add(new Vector3(x, v1y));
+						verts.Add(new Vector3(x, v0y));
+					}
 
 					if (gradient)
 					{
