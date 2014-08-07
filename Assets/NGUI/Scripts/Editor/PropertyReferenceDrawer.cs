@@ -39,6 +39,18 @@ public class PropertyReferenceDrawer
 	static public bool canConvert = true;
 
 	/// <summary>
+	/// Whether the property should be readable.
+	/// </summary>
+
+	static public bool mustRead = true;
+
+	/// <summary>
+	/// Whether the property should be writeable.
+	/// </summary>
+
+	static public bool mustWrite = false;
+
+	/// <summary>
 	/// Collect a list of usable properties and fields.
 	/// </summary>
 
@@ -163,7 +175,7 @@ public class PropertyReferenceDrawer
 			int index = 0;
 
 			// Get all the properties on the target game object
-			List<Entry> list = GetProperties(comp.gameObject, true, true);
+			List<Entry> list = GetProperties(comp.gameObject, mustRead, mustWrite);
 
 			// We want the field to look like "Component.property" rather than just "property"
 			string current = PropertyReference.ToString(target.objectReferenceValue as Component, field.stringValue);
