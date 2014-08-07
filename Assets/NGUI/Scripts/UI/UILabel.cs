@@ -1316,7 +1316,7 @@ public class UILabel : UIWidget
 
 	public string GetWordAtPosition (Vector3 worldPos)
 	{
-		int index = GetCharacterIndexAtPosition(worldPos, false);
+		int index = GetCharacterIndexAtPosition(worldPos, true);
 		return GetWordAtCharacterIndex(index);
 	}
 
@@ -1326,7 +1326,7 @@ public class UILabel : UIWidget
 
 	public string GetWordAtPosition (Vector2 localPos)
 	{
-		int index = GetCharacterIndexAtPosition(localPos, false);
+		int index = GetCharacterIndexAtPosition(localPos, true);
 		return GetWordAtCharacterIndex(index);
 	}
 
@@ -1338,17 +1338,18 @@ public class UILabel : UIWidget
 	{
 		if (characterIndex != -1 && characterIndex < mText.Length)
 		{
-			int linkStart = mText.LastIndexOf(' ', characterIndex) + 1;
-			int linkEnd = mText.IndexOf(' ', characterIndex);
-			if (linkEnd == -1) linkEnd = mText.Length;
+			int wordStart = mText.LastIndexOfAny(new char[] {' ', '\n'}, characterIndex) + 1;
+			int wordEnd = mText.IndexOfAny(new char[] { ' ', '\n', ',', '.' }, characterIndex);
 
-			if (linkStart != linkEnd)
+			if (wordEnd == -1) wordEnd = mText.Length;
+
+			if (wordStart != wordEnd)
 			{
-				int len = linkEnd - linkStart;
+				int len = wordEnd - wordStart;
 
 				if (len > 0)
 				{
-					string word = mText.Substring(linkStart, len);
+					string word = mText.Substring(wordStart, len);
 					return NGUIText.StripSymbols(word);
 				}
 			}
