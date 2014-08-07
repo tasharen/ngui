@@ -58,6 +58,8 @@ public class PropertyBindingEditor : Editor
 
 		NGUIEditorTools.DrawProperty(serializedObject, "target");
 
+		PropertyReferenceDrawer.mustRead = false;
+		PropertyReferenceDrawer.mustWrite = false;
 		PropertyReferenceDrawer.filter = typeof(void);
 
 		GUILayout.Space(1f);

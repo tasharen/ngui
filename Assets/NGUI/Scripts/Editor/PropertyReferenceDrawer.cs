@@ -39,13 +39,13 @@ public class PropertyReferenceDrawer
 	static public bool canConvert = true;
 
 	/// <summary>
-	/// Whether the property should be readable.
+	/// Whether the property should be readable. Used to filter the property selection list.
 	/// </summary>
 
-	static public bool mustRead = true;
+	static public bool mustRead = false;
 
 	/// <summary>
-	/// Whether the property should be writeable.
+	/// Whether the property should be writable. Used to filter the property selection list.
 	/// </summary>
 
 	static public bool mustWrite = false;
