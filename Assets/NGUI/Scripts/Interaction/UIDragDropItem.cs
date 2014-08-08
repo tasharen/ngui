@@ -45,6 +45,7 @@ public class UIDragDropItem : MonoBehaviour
 	protected Transform mTrans;
 	protected Transform mParent;
 	protected Collider mCollider;
+	protected Collider2D mCollider2D;
 	protected UIButton mButton;
 	protected UIRoot mRoot;
 	protected UIGrid mGrid;
@@ -61,6 +62,7 @@ public class UIDragDropItem : MonoBehaviour
 	{
 		mTrans = transform;
 		mCollider = collider;
+		mCollider2D = collider2D;
 		mButton = GetComponent<UIButton>();
 		mDragScrollView = GetComponent<UIDragScrollView>();
 	}
@@ -151,6 +153,7 @@ public class UIDragDropItem : MonoBehaviour
 		// Disable the collider so that it doesn't intercept events
 		if (mButton != null) mButton.isEnabled = false;
 		else if (mCollider != null) mCollider.enabled = false;
+		else if (mCollider2D != null) mCollider2D.enabled = false;
 
 		mTouchID = UICamera.currentTouchID;
 		mParent = mTrans.parent;
@@ -201,6 +204,7 @@ public class UIDragDropItem : MonoBehaviour
 			// Re-enable the collider
 			if (mButton != null) mButton.isEnabled = true;
 			else if (mCollider != null) mCollider.enabled = true;
+			else if (mCollider2D != null) mCollider2D.enabled = true;
 
 			// Is there a droppable container?
 			UIDragDropContainer container = surface ? NGUITools.FindInParents<UIDragDropContainer>(surface) : null;
