@@ -75,6 +75,12 @@ public class UIPanel : UIRect
 	public bool anchorOffset = false;
 
 	/// <summary>
+	/// Whether the soft border will be used as padding.
+	/// </summary>
+
+	public bool softBorderPadding = true;
+
+	/// <summary>
 	/// By default all panels manage render queues of their draw calls themselves by incrementing them
 	/// so that the geometry is drawn in the proper order. You can alter this behaviour.
 	/// </summary>
@@ -1640,12 +1646,12 @@ public class UIPanel : UIRect
 		Vector2 minArea = new Vector2(cr.x - offsetX, cr.y - offsetY);
 		Vector2 maxArea = new Vector2(cr.x + offsetX, cr.y + offsetY);
 
-		if (clipping == UIDrawCall.Clipping.SoftClip)
+		if (softBorderPadding && clipping == UIDrawCall.Clipping.SoftClip)
 		{
-			minArea.x += clipSoftness.x;
-			minArea.y += clipSoftness.y;
-			maxArea.x -= clipSoftness.x;
-			maxArea.y -= clipSoftness.y;
+			minArea.x += mClipSoftness.x;
+			minArea.y += mClipSoftness.y;
+			maxArea.x -= mClipSoftness.x;
+			maxArea.y -= mClipSoftness.y;
 		}
 		return NGUIMath.ConstrainRect(minRect, maxRect, minArea, maxArea);
 	}
