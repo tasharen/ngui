@@ -61,7 +61,6 @@ public class UIAtlasMaker : EditorWindow
 		{
 			if (temporaryTexture)
 			{
-				Debug.Log(name);
 				Object.DestroyImmediate(tempGO);
 				Object.DestroyImmediate(tempMat);
 				Object.DestroyImmediate(tex);
