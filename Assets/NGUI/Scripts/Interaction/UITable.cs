@@ -80,13 +80,15 @@ public class UITable : UIWidgetContainer
 
 	public OnReposition onReposition;
 
+	/// <summary>
+	/// Custom sort delegate, used when the sorting method is set to 'custom'.
+	/// </summary>
+
+	public System.Comparison<Transform> onCustomSort;
+
 	protected UIPanel mPanel;
 	protected bool mInitDone = false;
 	protected bool mReposition = false;
-	protected List<Transform> mChildren = new List<Transform>();
-
-	// Use the 'sorting' property instead
-	[HideInInspector][SerializeField] bool sorted = false;
 
 	/// <summary>
 	/// Reposition the children on the next Update().
@@ -95,34 +97,31 @@ public class UITable : UIWidgetContainer
 	public bool repositionNow { set { if (value) { mReposition = true; enabled = true; } } }
 
 	/// <summary>
-	/// Returns the list of table's children, sorted alphabetically if necessary.
+	/// Get the current list of the grid's children.
 	/// </summary>
 
-	public List<Transform> children
+	public List<Transform> GetChildList ()
 	{
-		get
-		{
-			if (mChildren.Count == 0)
-			{
-				Transform myTrans = transform;
+		Transform myTrans = transform;
+		List<Transform> list = new List<Transform>();
 
-				for (int i = 0; i < myTrans.childCount; ++i)
-				{
-					Transform child = myTrans.GetChild(i);
-					if (child && child.gameObject && (!hideInactive || NGUITools.GetActive(child.gameObject)))
-						mChildren.Add(child);
-				}
-				
-				if (sorting != Sorting.None || sorted)
-				{
-					if (sorting == Sorting.Alphabetic) mChildren.Sort(UIGrid.SortByName);
-					else if (sorting == Sorting.Horizontal) mChildren.Sort(UIGrid.SortHorizontal);
-					else if (sorting == Sorting.Vertical) mChildren.Sort(UIGrid.SortVertical);
-					else Sort(mChildren);
-				}
-			}
-			return mChildren;
+		for (int i = 0; i < myTrans.childCount; ++i)
+		{
+			Transform t = myTrans.GetChild(i);
+			if (!hideInactive || (t && NGUITools.GetActive(t.gameObject)))
+				list.Add(t);
 		}
+
+		// Sort the list using the desired sorting logic
+		if (sorting != Sorting.None)
+		{
+			if (sorting == Sorting.Alphabetic) list.Sort(UIGrid.SortByName);
+			else if (sorting == Sorting.Horizontal) list.Sort(UIGrid.SortHorizontal);
+			else if (sorting == Sorting.Vertical) list.Sort(UIGrid.SortVertical);
+			else if (onCustomSort != null) list.Sort(onCustomSort);
+			else Sort(list);
+		}
+		return list;
 	}
 
 	/// <summary>
@@ -298,8 +297,7 @@ public class UITable : UIWidgetContainer
 
 		mReposition = false;
 		Transform myTrans = transform;
-		mChildren.Clear();
-		List<Transform> ch = children;
+		List<Transform> ch = GetChildList();
 		if (ch.Count > 0) RepositionVariableSize(ch);
 
 		if (keepWithinPanel && mPanel != null)
