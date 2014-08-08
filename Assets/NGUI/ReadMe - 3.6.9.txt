@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.6.8
+            Version 3.6.9
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,31 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.6.9
+- NEW: Added loop, play, pause and reset functionality to UI2DSpriteAnimation.
+- NEW: Added new automatic support for linear lighting.
+- NEW: Added a pivot point setting to UITable to match UIGrid.
+- NEW: Added warnings to UIAnchor and UIStretch components that inform the user about them being deprecated.
+- NEW: Property binding can now let you select properties that only have either get or set, depending on what's needed.
+- NEW: Added settable delegates to UICamera: GetKey, GetKeyDown, GetKeyUp, GetAxis.
+- NEW: UIRect has a new anchor update setting: OnStart. It will only update anchors once.
+- NEW: Panels have a new option to ignore soft border when constraining scroll view content.
+- FIX: Added alexkring's work-around for the rare "texture destroyed" issue in the Atlas Maker.
+- FIX: Dragging 2D UI elements into a scene with a 3D UI should no longer create many UI Roots.
+- FIX: Labels will now use the draw region, making them usable as the slider's foreground.
+- FIX: Localization with multi-line entries would skip the first word.
+- FIX: The layout system's anchors should now work even for 3D UIs.
+- FIX: UIWrapContent was not setting the restrict within panel flag correctly.
+- FIX: UILabel.GetWordAtPosition now works with line breaks properly.
+- FIX: Embedded URL retrieval code wasn't capping when it encountered a /url tag.
+- FIX: Embedded URL retrieval is now much more precise.
+- FIX: Mouse scroll wheel should again work with UICenterOnChild.
+- FIX: UILocalize will now change UIButton's normal sprite.
+- FIX: UIToggle transitions will now be instant if the value was changed while the toggle is disabled.
+- FIX: UIDragDropitem will now work with 2D colliders (thanks HanzaRu).
+- FIX: Bold can now be mixed with underline properly.
+- DEL: Removed the old "Shader Quality" script that was messing up the refractive atlas.
 
 3.6.8
 - NEW: UIWrapContent now has a range limit you can set for indices (such as -10 to 10).
