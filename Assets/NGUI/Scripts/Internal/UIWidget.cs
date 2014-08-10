@@ -832,13 +832,14 @@ public class UIWidget : UIRect
 	/// Remove this widget from the panel.
 	/// </summary>
 
-	protected void RemoveFromPanel ()
+	public void RemoveFromPanel ()
 	{
 		if (panel != null)
 		{
 			panel.RemoveWidget(this);
 			panel = null;
 		}
+		drawCall = null;
 #if UNITY_EDITOR
 		mOldTex = null;
 		mOldShader = null;
@@ -855,6 +856,8 @@ public class UIWidget : UIRect
 
 	protected override void OnValidate()
 	{
+		if (!Application.isPlaying) return;
+
 		if (NGUITools.GetActive(this))
 		{
 			base.OnValidate();
@@ -878,12 +881,6 @@ public class UIWidget : UIRect
 				mOldShader = shader;
 			}
 
-			if (panel != null)
-			{
-				panel.RemoveWidget(this);
-				panel = null;
-			}
-
 			aspectRatio = (keepAspectRatio == AspectRatioSource.Free) ?
 				(float)mWidth / mHeight : Mathf.Max(0.01f, aspectRatio);
 
@@ -895,7 +892,16 @@ public class UIWidget : UIRect
 			{
 				mHeight = Mathf.RoundToInt(mWidth / aspectRatio);
 			}
-			CreatePanel();
+
+			//if (!Application.isPlaying)
+			{
+				if (panel != null)
+				{
+					panel.RemoveWidget(this);
+					panel = null;
+				}
+				CreatePanel();
+			}
 		}
 		else
 		{
