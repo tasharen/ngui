@@ -40,10 +40,18 @@ public class UITexture : UIBasicSprite
 		{
 			if (mTexture != value)
 			{
-				RemoveFromPanel();
-				mTexture = value;
-				mPMA = -1;
-				MarkAsChanged();
+				if (drawCall != null && drawCall.widgetCount == 1 && mMat == null)
+				{
+					mTexture = value;
+					drawCall.mainTexture = value;
+				}
+				else
+				{
+					RemoveFromPanel();
+					mTexture = value;
+					mPMA = -1;
+					MarkAsChanged();
+				}
 			}
 		}
 	}
@@ -87,11 +95,19 @@ public class UITexture : UIBasicSprite
 		{
 			if (mShader != value)
 			{
-				RemoveFromPanel();
-				mShader = value;
-				mPMA = -1;
-				mMat = null;
-				MarkAsChanged();
+				if (drawCall != null && drawCall.widgetCount == 1 && mMat == null)
+				{
+					mShader = value;
+					drawCall.shader = value;
+				}
+				else
+				{
+					RemoveFromPanel();
+					mShader = value;
+					mPMA = -1;
+					mMat = null;
+					MarkAsChanged();
+				}
 			}
 		}
 	}

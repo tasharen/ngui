@@ -290,11 +290,7 @@ public class UIGrid : UIWidgetContainer
 	[ContextMenu("Execute")]
 	public virtual void Reposition ()
 	{
-		if (Application.isPlaying && !mInitDone && NGUITools.GetActive(this))
-		{
-			mReposition = true;
-			return;
-		}
+		if (Application.isPlaying && !mInitDone && NGUITools.GetActive(this)) Init();
 
 		// Legacy functionality
 		if (sorted)

@@ -41,6 +41,7 @@ public class UIDrawCall : MonoBehaviour
 		ConstrainButDontClip = 4,	// No actual clipping, but does have an area
 	}
 
+	[HideInInspector][System.NonSerialized] public int widgetCount = 0;
 	[HideInInspector][System.NonSerialized] public int depthStart = int.MaxValue;
 	[HideInInspector][System.NonSerialized] public int depthEnd = int.MinValue;
 	[HideInInspector][System.NonSerialized] public UIPanel manager;
@@ -74,6 +75,14 @@ public class UIDrawCall : MonoBehaviour
 
 	[System.NonSerialized]
 	public bool isDirty = false;
+
+	public delegate void OnRenderCallback (Material mat);
+
+	/// <summary>
+	/// Callback that will be triggered at OnWillRenderObject() time.
+	/// </summary>
+
+	public OnRenderCallback onRender;
 
 	/// <summary>
 	/// Render queue used by the draw call.
@@ -352,8 +361,9 @@ public class UIDrawCall : MonoBehaviour
 	/// Set the draw call's geometry.
 	/// </summary>
 
-	public void UpdateGeometry ()
+	public void UpdateGeometry (int widgetCount)
 	{
+		this.widgetCount = widgetCount;
 		int count = verts.size;
 
 		// Safety check to ensure we get valid values
@@ -537,6 +547,7 @@ public class UIDrawCall : MonoBehaviour
 	{
 		UpdateMaterials();
 
+		if (onRender != null) onRender(mDynamicMat ?? mMaterial);
 		if (mDynamicMat == null || mClipCount == 0) return;
 
 		if (!mLegacyShader)
@@ -798,6 +809,8 @@ public class UIDrawCall : MonoBehaviour
 	{
 		if (dc)
 		{
+			dc.onRender = null;
+
 			if (Application.isPlaying)
 			{
 				if (mActiveList.Remove(dc))

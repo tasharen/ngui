@@ -287,13 +287,7 @@ public class UITable : UIWidgetContainer
 	[ContextMenu("Execute")]
 	public virtual void Reposition ()
 	{
-		if (Application.isPlaying && !mInitDone && NGUITools.GetActive(this))
-		{
-			mReposition = true;
-			return;
-		}
-
-		if (!mInitDone) Init();
+		if (Application.isPlaying && !mInitDone && NGUITools.GetActive(this)) Init();
 
 		mReposition = false;
 		Transform myTrans = transform;
