@@ -856,7 +856,7 @@ public class UIWidget : UIRect
 
 	protected override void OnValidate()
 	{
-		if (!Application.isPlaying) return;
+		if (Application.isPlaying) return;
 
 		if (NGUITools.GetActive(this))
 		{
