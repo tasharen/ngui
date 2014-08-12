@@ -304,6 +304,12 @@ public class NGUISettings
 		set { SetInt("NGUI Font Size", value); }
 	}
 
+	static public bool fontKerning
+	{
+		get { return GetBool("NGUI Font Kerning", true); }
+		set { SetBool("NGUI Font Kerning", value); }
+	}
+
 	static public FontStyle fontStyle
 	{
 		get { return GetEnum("NGUI Font Style", FontStyle.Normal); }
