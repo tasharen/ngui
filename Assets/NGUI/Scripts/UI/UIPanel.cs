@@ -573,7 +573,7 @@ public class UIPanel : UIRect
 			{
 				Vector3[] corners = mCam.GetWorldCorners(cameraRayDistance);
 
-				if (anchorOffset)
+				if (anchorOffset && mCam == null || mCam.transform.parent != cachedTransform)
 				{
 					Vector3 off = cachedTransform.position;
 					for (int i = 0; i < 4; ++i)
@@ -595,7 +595,7 @@ public class UIPanel : UIRect
 				mCorners[2] = new Vector3(x1, y1);
 				mCorners[3] = new Vector3(x1, y0);
 
-				if (anchorOffset)
+				if (anchorOffset && mCam == null || mCam.transform.parent != cachedTransform)
 				{
 					Vector3 off = cachedTransform.position;
 					for (int i = 0; i < 4; ++i)
@@ -1802,18 +1802,32 @@ public class UIPanel : UIRect
 
 		Gizmos.matrix = t.localToWorldMatrix;
 
-		if (isUsingThisPanel)
+		if (isUsingThisPanel && !clip && mCam.isOrthoGraphic)
 		{
 			UIRoot rt = root;
 
 			if (rt != null && rt.scalingStyle != UIRoot.Scaling.Flexible)
 			{
-				Vector3 sz = new Vector3(rt.manualWidth, rt.manualHeight, 0f);
+				float width = rt.manualWidth;
+				float height = rt.manualHeight;
+
+				float x0 = -0.5f * width;
+				float y0 = -0.5f * height;
+				float x1 = x0 + width;
+				float y1 = y0 + height;
+
+				corners[0] = new Vector3(x0, y0);
+				corners[1] = new Vector3(x0, y1);
+				corners[2] = new Vector3(x1, y1);
+				corners[3] = new Vector3(x1, y0);
+
+				Vector3 szPos = Vector3.Lerp(corners[0], corners[2], 0.5f);
+				Vector3 szSize = corners[2] - corners[0];
+
 				Gizmos.color = new Color(0f, 0.75f, 1f);
-				Gizmos.DrawWireCube(pos, sz);
+				Gizmos.DrawWireCube(szPos, szSize);
 			}
 		}
-
 		Gizmos.color = (isUsingThisPanel && !detailedClipped) ? new Color(1f, 0f, 0.5f) : new Color(0.5f, 0f, 0.5f);
 		Gizmos.DrawWireCube(pos, size);
 
