@@ -772,12 +772,12 @@ static public class NGUITools
 			if (advanced3D)
 			{
 				go.name = "UI Root (3D)";
-				root.scalingStyle = UIRoot.Scaling.FixedSize;
+				root.scalingStyle = UIRoot.Scaling.Constrained;
 			}
 			else
 			{
 				go.name = "UI Root";
-				root.scalingStyle = UIRoot.Scaling.PixelPerfect;
+				root.scalingStyle = UIRoot.Scaling.Flexible;
 			}
 		}
 

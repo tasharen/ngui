@@ -1797,21 +1797,35 @@ public class UIPanel : UIRect
 		GameObject go = UnityEditor.Selection.activeGameObject;
 		bool isUsingThisPanel = (go != null) && (NGUITools.FindInParents<UIPanel>(go) == this);
 		bool isSelected = (UnityEditor.Selection.activeGameObject == gameObject);
-		bool detailedView = (isSelected && isUsingThisPanel && mClipping == UIDrawCall.Clipping.SoftClip);
+		bool detailedView = (isSelected && isUsingThisPanel);
+		bool detailedClipped = detailedView && mClipping == UIDrawCall.Clipping.SoftClip;
 
-		Gizmos.color = (isUsingThisPanel && !detailedView) ? new Color(1f, 0f, 0.5f) : new Color(0.5f, 0f, 0.5f);
 		Gizmos.matrix = t.localToWorldMatrix;
+
+		if (isUsingThisPanel)
+		{
+			UIRoot rt = root;
+
+			if (rt != null && rt.scalingStyle != UIRoot.Scaling.Flexible)
+			{
+				Vector3 sz = new Vector3(rt.manualWidth, rt.manualHeight, 0f);
+				Gizmos.color = new Color(0f, 0.75f, 1f);
+				Gizmos.DrawWireCube(pos, sz);
+			}
+		}
+
+		Gizmos.color = (isUsingThisPanel && !detailedClipped) ? new Color(1f, 0f, 0.5f) : new Color(0.5f, 0f, 0.5f);
 		Gizmos.DrawWireCube(pos, size);
 
 		if (detailedView)
 		{
-			//UIRoot rt = root;
-			//float scale = (rt != null) ? rt.pixelSizeAdjustment : 1f;
-
-			Gizmos.color = new Color(1f, 0f, 0.5f);
-			size.x -= mClipSoftness.x * 2f;// *scale;
-			size.y -= mClipSoftness.y * 2f;// *scale;
-			Gizmos.DrawWireCube(pos, size);
+			if (detailedClipped)
+			{
+				Gizmos.color = new Color(1f, 0f, 0.5f);
+				size.x -= mClipSoftness.x * 2f;
+				size.y -= mClipSoftness.y * 2f;
+				Gizmos.DrawWireCube(pos, size);
+			}
 		}
 	}
 #endif // UNITY_EDITOR
