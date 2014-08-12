@@ -887,8 +887,6 @@ public class UIWidget : UIRect
 
 	protected override void OnValidate()
 	{
-		if (Application.isPlaying) return;
-
 		if (NGUITools.GetActive(this))
 		{
 			base.OnValidate();
@@ -924,7 +922,7 @@ public class UIWidget : UIRect
 				mHeight = Mathf.RoundToInt(mWidth / aspectRatio);
 			}
 
-			//if (!Application.isPlaying)
+			if (!Application.isPlaying)
 			{
 				if (panel != null)
 				{
