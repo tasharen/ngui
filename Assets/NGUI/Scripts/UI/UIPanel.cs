@@ -1405,14 +1405,14 @@ public class UIPanel : UIRect
 
 			if (parent != null)
 			{
-				float x = Mathf.Round(pos.x);
-				float y = Mathf.Round(pos.y);
+				//float x = Mathf.Round(pos.x);
+				//float y = Mathf.Round(pos.y);
 
-				drawCallClipRange.x += pos.x - x;
-				drawCallClipRange.y += pos.y - y;
+				//drawCallClipRange.x += pos.x - x;
+				//drawCallClipRange.y += pos.y - y;
 
-				pos.x = x;
-				pos.y = y;
+				//pos.x = x;
+				//pos.y = y;
 				pos = parent.TransformPoint(pos);
 			}
 			pos += drawCallOffset;

@@ -631,6 +631,9 @@ public class UICamera : MonoBehaviour
 				{
 					lastWorldPosition = lastHit.point;
 					hoveredObject = lastHit.collider.gameObject;
+
+					Rigidbody rb = hoveredObject.GetComponentInParent<Rigidbody>();
+					if (rb != null) hoveredObject = rb.gameObject;
 					return true;
 				}
 				continue;
@@ -724,6 +727,9 @@ public class UICamera : MonoBehaviour
 					{
 						lastWorldPosition = point;
 						hoveredObject = c2d.gameObject;
+
+						Rigidbody2D rb = hoveredObject.GetComponentInParent<Rigidbody2D>();
+						if (rb != null) hoveredObject = rb.gameObject;
 						return true;
 					}
 				}
