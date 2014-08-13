@@ -246,7 +246,7 @@ public class UIToggle : UIWidgetContainer
 					state ? Direction.Forward : Direction.Reverse,
 					EnableCondition.IgnoreDisabledState,
 					DisableCondition.DoNotDisable);
-				if (instantTween || !NGUITools.GetActive(this)) aa.Finish();
+				if (aa != null && (instantTween || !NGUITools.GetActive(this))) aa.Finish();
 			}
 		}
 	}
