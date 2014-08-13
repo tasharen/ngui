@@ -73,7 +73,9 @@ public class EventDelegate
 				if (propInfo != null) return propInfo.GetValue(obj, null);
 				if (fieldInfo != null) return fieldInfo.GetValue(obj);
 				if (obj != null) return obj;
+#if !NETFX_CORE
 				if (expectedType != null && expectedType.IsValueType) return null;
+#endif
 				return System.Convert.ChangeType(null, expectedType);
 			}
 		}
