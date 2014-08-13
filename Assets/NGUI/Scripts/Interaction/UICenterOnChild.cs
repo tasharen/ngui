@@ -78,7 +78,11 @@ public class UICenterOnChild : MonoBehaviour
 			}
 			else
 			{
-				if (mScrollView) mScrollView.centerOnChild = this;
+				if (mScrollView)
+				{
+					mScrollView.centerOnChild = this;
+					mScrollView.onDragFinished = OnDragFinished;
+				}
 
 				if (mScrollView.horizontalScrollBar != null)
 					mScrollView.horizontalScrollBar.onDragFinished = OnDragFinished;
