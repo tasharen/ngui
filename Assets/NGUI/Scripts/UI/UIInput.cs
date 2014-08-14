@@ -758,6 +758,9 @@ public class UIInput : MonoBehaviour
 			((ev.modifiers & EventModifiers.Command) != 0) :
 			((ev.modifiers & EventModifiers.Control) != 0);
 
+		// http://www.tasharen.com/forum/index.php?topic=10780.0
+		if ((ev.modifiers & EventModifiers.Alt) != 0) ctrl = false;
+
 		bool shift = ((ev.modifiers & EventModifiers.Shift) != 0);
 
 		switch (ev.keyCode)
