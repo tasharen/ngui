@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.6.9
+            Version 3.7.0
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,19 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.7.0
+- NEW: You can now set UIWidget.onRender to change material properties like in OnWillRenderObject.
+- NEW: Changing UITexture.mainTexture and shader is now super-quick if it's not batched.
+- NEW: UIRoot now has additional scaling constraints enabling new fill and fit modes.
+- NEW: Added the ability to ignore kerning information when making bitmap fonts.
+- NEW: NGUI's events sent via "3D" and "2D" event type UICameras will now go to the rigidbody instead of colliders.
+- NEW: UIKeyBinding now has a new setting "All" that will trigger both select and press/click logic.
+- NEW: UICamera.currentTouch.isOverUI.
+- FIX: Removed code that was snapping draw call positions to pixels, allowing you animate panels smoothly.
+- FIX: Calling Reposition() on the grid and table now works even if its Start() hasn't executed.
+- FIX: Dynamic font baseline calculation work-around for some partial fonts.
+- FIX: Center On Child script got semi-broken in the last version.
 
 3.6.9
 - NEW: Added loop, play, pause and reset functionality to UI2DSpriteAnimation.
