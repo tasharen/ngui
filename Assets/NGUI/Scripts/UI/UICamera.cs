@@ -82,6 +82,18 @@ public class UICamera : MonoBehaviour
 		public bool touchBegan = true;
 		public bool pressStarted = false;
 		public bool dragStarted = false;
+
+		/// <summary>
+		/// Returns whether this touch is currently over a UI element.
+		/// </summary>
+
+		public bool isOverUI
+		{
+			get
+			{
+				return current != null && current.GetComponentInParent<UIRoot>() != null;
+			}
+		}
 	}
 
 	/// <summary>
@@ -1233,6 +1245,7 @@ public class UICamera : MonoBehaviour
 		if ((justPressed || !isPressed) && mHover != null && highlightChanged)
 		{
 			currentScheme = ControlScheme.Mouse;
+			currentTouch = mMouse[0];
 			if (mTooltip != null) ShowTooltip(false);
 			Notify(mHover, "OnHover", false);
 			mHover = null;
@@ -1258,7 +1271,6 @@ public class UICamera : MonoBehaviour
 			ProcessTouch(pressed, unpressed);
 			currentKey = KeyCode.None;
 		}
-		currentTouch = null;
 
 		// If nothing is pressed and there is an object under the touch, highlight it
 		if (!isPressed && highlightChanged)
@@ -1266,8 +1278,10 @@ public class UICamera : MonoBehaviour
 			currentScheme = ControlScheme.Mouse;
 			mTooltipTime = RealTime.time + tooltipDelay;
 			mHover = mMouse[0].current;
+			currentTouch = mMouse[0];
 			Notify(mHover, "OnHover", true);
 		}
+		currentTouch = null;
 
 		// Update the last value
 		mMouse[0].last = mMouse[0].current;
