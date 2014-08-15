@@ -1705,7 +1705,12 @@ public static class NGUIEditorTools
 	static public void HideMoveTool (bool hide)
 	{
 #if !UNITY_4_3
-		UnityEditor.Tools.hidden = hide && (UnityEditor.Tools.current == UnityEditor.Tool.Move) &&
+		UnityEditor.Tools.hidden = hide &&
+ #if !UNITY_4_5
+			(UnityEditor.Tools.current == UnityEditor.Tool.Rect) &&
+ #else
+			(UnityEditor.Tools.current == UnityEditor.Tool.Move) &&
+ #endif
 			UIWidget.showHandlesWithMoveTool && !NGUISettings.showTransformHandles;
 #endif
 	}
