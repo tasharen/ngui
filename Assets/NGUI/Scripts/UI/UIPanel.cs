@@ -573,12 +573,12 @@ public class UIPanel : UIRect
 			{
 				Vector3[] corners = mCam.GetWorldCorners(cameraRayDistance);
 
-				if (anchorOffset && mCam == null || mCam.transform.parent != cachedTransform)
-				{
-					Vector3 off = cachedTransform.position;
-					for (int i = 0; i < 4; ++i)
-						corners[i] += off;
-				}
+				//if (anchorOffset && mCam == null || mCam.transform.parent != cachedTransform)
+				//{
+				//    Vector3 off = cachedTransform.position;
+				//    for (int i = 0; i < 4; ++i)
+				//        corners[i] += off;
+				//}
 				return corners;
 			}
 			else
@@ -1396,25 +1396,11 @@ public class UIPanel : UIRect
 
 		Vector3 pos;
 
-		// We want the position to always be on even pixels so that the
-		// panel's contents always appear pixel-perfect.
 		if (isUI)
 		{
 			Transform parent = cachedTransform.parent;
 			pos = cachedTransform.localPosition;
-
-			if (parent != null)
-			{
-				//float x = Mathf.Round(pos.x);
-				//float y = Mathf.Round(pos.y);
-
-				//drawCallClipRange.x += pos.x - x;
-				//drawCallClipRange.y += pos.y - y;
-
-				//pos.x = x;
-				//pos.y = y;
-				pos = parent.TransformPoint(pos);
-			}
+			if (parent != null) pos = parent.TransformPoint(pos);
 			pos += drawCallOffset;
 		}
 		else pos = trans.position;
@@ -1738,15 +1724,8 @@ public class UIPanel : UIRect
 
 	static public UIPanel Find (Transform trans, bool createIfMissing, int layer)
 	{
-		UIPanel panel = null;
-
-		while (panel == null && trans != null)
-		{
-			panel = trans.GetComponent<UIPanel>();
-			if (panel != null) return panel;
-			if (trans.parent == null) break;
-			trans = trans.parent;
-		}
+		UIPanel panel = trans.GetComponentInParent<UIPanel>();
+		if (panel != null) return panel;
 		return createIfMissing ? NGUITools.CreateUI(trans, false, layer) : null;
 	}
 

@@ -430,6 +430,20 @@ public class UICamera : MonoBehaviour
 	static public GameObject hoveredObject;
 
 	/// <summary>
+	/// Whether the last raycast was over the UI.
+	/// </summary>
+
+	static public bool isOverUI
+	{
+		get
+		{
+			if (currentTouch != null) return currentTouch.isOverUI;
+			if (hoveredObject == null) return false;
+			return hoveredObject.GetComponentInParent<UIRoot>() != null;
+		}
+	}
+
+	/// <summary>
 	/// Option to manually set the selected game object.
 	/// </summary>
 

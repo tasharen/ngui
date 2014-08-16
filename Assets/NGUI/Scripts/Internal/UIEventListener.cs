@@ -34,6 +34,7 @@ public class UIEventListener : MonoBehaviour
 	public VoidDelegate onDragOut;
 	public ObjectDelegate onDrop;
 	public KeyCodeDelegate onKey;
+	public BoolDelegate onTooltip;
 
 	void OnSubmit ()				{ if (onSubmit != null) onSubmit(gameObject); }
 	void OnClick ()					{ if (onClick != null) onClick(gameObject); }
@@ -47,6 +48,7 @@ public class UIEventListener : MonoBehaviour
 	void OnDragOut ()				{ if (onDragOut != null) onDragOut(gameObject); }
 	void OnDrop (GameObject go)		{ if (onDrop != null) onDrop(gameObject, go); }
 	void OnKey (KeyCode key)		{ if (onKey != null) onKey(gameObject, key); }
+	void OnTooltip (bool show)		{ if (onTooltip != null) onTooltip(gameObject, show); }
 
 	/// <summary>
 	/// Get or add an event listener to the specified game object.

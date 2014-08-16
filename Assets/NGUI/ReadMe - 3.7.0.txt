@@ -62,8 +62,11 @@ and it will not be included in the build of your game. It's only used in the edi
 - NEW: Added the ability to ignore kerning information when making bitmap fonts.
 - NEW: NGUI's events sent via "3D" and "2D" event type UICameras will now go to the rigidbody instead of colliders.
 - NEW: UIKeyBinding now has a new setting "All" that will trigger both select and press/click logic.
-- NEW: UICamera.currentTouch.isOverUI.
+- NEW: UICamera.isOverUI, UICamera.currentTouch.isOverUI.
 - NEW: NGUI now uses the new rect transform tool instead of the move transform in Unity 4.6+.
+- NEW: UIPlaySound now has an OnEnable play option. For convenience.
+- NEW: UIEventListener now has OnTooltip.
+- NEW: TweenAlpha now works with renderers as well.
 - FIX: Removed code that was snapping draw call positions to pixels, allowing you animate panels smoothly.
 - FIX: Calling Reposition() on the grid and table now works even if its Start() hasn't executed.
 - FIX: Dynamic font baseline calculation work-around for some partial fonts.
