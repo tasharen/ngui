@@ -373,6 +373,32 @@ public class UICamera : MonoBehaviour
 
 	static public GameObject fallThrough;
 
+	public delegate void VoidDelegate (GameObject go);
+	public delegate void BoolDelegate (GameObject go, bool state);
+	public delegate void FloatDelegate (GameObject go, float delta);
+	public delegate void VectorDelegate (GameObject go, Vector2 delta);
+	public delegate void ObjectDelegate (GameObject go, GameObject obj);
+	public delegate void KeyCodeDelegate (GameObject go, KeyCode key);
+
+	/// <summary>
+	/// These notifications are sent out prior to the actual event going out.
+	/// </summary>
+
+	static public VoidDelegate onClick;
+	static public VoidDelegate onDoubleClick;
+	static public BoolDelegate onHover;
+	static public BoolDelegate onPress;
+	static public BoolDelegate onSelect;
+	static public FloatDelegate onScroll;
+	static public VectorDelegate onDrag;
+	static public VoidDelegate onDragStart;
+	static public ObjectDelegate onDragOver;
+	static public ObjectDelegate onDragOut;
+	static public VoidDelegate onDragEnd;
+	static public ObjectDelegate onDrop;
+	static public KeyCodeDelegate onKey;
+	static public BoolDelegate onTooltip;
+
 	// Selected widget (for input)
 	static GameObject mCurrentSelection = null;
 	static GameObject mNextSelection = null;
@@ -503,6 +529,7 @@ public class UICamera : MonoBehaviour
 	System.Collections.IEnumerator ChangeSelection ()
 	{
 		yield return new WaitForEndOfFrame();
+		if (onSelect != null) onSelect(mCurrentSelection, false);
 		Notify(mCurrentSelection, "OnSelect", false);
 		mCurrentSelection = mNextSelection;
 		mNextSelection = null;
@@ -513,6 +540,7 @@ public class UICamera : MonoBehaviour
 			currentCamera = mCam;
 			UICamera.currentScheme = mNextScheme;
 			inputHasFocus = (mCurrentSelection.GetComponent<UIInput>() != null);
+			if (onSelect != null) onSelect(mCurrentSelection, true);
 			Notify(mCurrentSelection, "OnSelect", true);
 			current = null;
 		}
@@ -1148,7 +1176,12 @@ public class UICamera : MonoBehaviour
 		if (useMouse && mHover != null)
 		{
 			float scroll = !string.IsNullOrEmpty(scrollAxisName) ? GetAxis(scrollAxisName) : 0f;
-			if (scroll != 0f) Notify(mHover, "OnScroll", scroll);
+
+			if (scroll != 0f)
+			{
+				if (onScroll != null) onScroll(mHover, scroll);
+				Notify(mHover, "OnScroll", scroll);
+			}
 
 			if (showTooltips && mTooltipTime != 0f && (mTooltipTime < RealTime.time ||
 				GetKey(KeyCode.LeftShift) || GetKey(KeyCode.RightShift)))
@@ -1261,6 +1294,7 @@ public class UICamera : MonoBehaviour
 			currentScheme = ControlScheme.Mouse;
 			currentTouch = mMouse[0];
 			if (mTooltip != null) ShowTooltip(false);
+			if (onHover != null) onHover(mHover, false);
 			Notify(mHover, "OnHover", false);
 			mHover = null;
 		}
@@ -1293,6 +1327,7 @@ public class UICamera : MonoBehaviour
 			mTooltipTime = RealTime.time + tooltipDelay;
 			mHover = mMouse[0].current;
 			currentTouch = mMouse[0];
+			if (onHover != null) onHover(mHover, true);
 			Notify(mHover, "OnHover", true);
 		}
 		currentTouch = null;
@@ -1474,19 +1509,24 @@ public class UICamera : MonoBehaviour
 		if (vertical != 0)
 		{
 			currentScheme = ControlScheme.Controller;
-			Notify(mCurrentSelection, "OnKey", vertical > 0 ? KeyCode.UpArrow : KeyCode.DownArrow);
+			KeyCode key = vertical > 0 ? KeyCode.UpArrow : KeyCode.DownArrow;
+			if (onKey != null) onKey(mCurrentSelection, key);
+			Notify(mCurrentSelection, "OnKey", key);
 		}
 		
 		if (horizontal != 0)
 		{
 			currentScheme = ControlScheme.Controller;
-			Notify(mCurrentSelection, "OnKey", horizontal > 0 ? KeyCode.RightArrow : KeyCode.LeftArrow);
+			KeyCode key = horizontal > 0 ? KeyCode.RightArrow : KeyCode.LeftArrow;
+			if (onKey != null) onKey(mCurrentSelection, key);
+			Notify(mCurrentSelection, "OnKey", key);
 		}
 		
 		if (useKeyboard && GetKeyDown(KeyCode.Tab))
 		{
 			currentKey = KeyCode.Tab;
 			currentScheme = ControlScheme.Controller;
+			if (onKey != null) onKey(mCurrentSelection, KeyCode.Tab);
 			Notify(mCurrentSelection, "OnKey", KeyCode.Tab);
 		}
 
@@ -1495,6 +1535,7 @@ public class UICamera : MonoBehaviour
 		{
 			currentKey = cancelKey0;
 			currentScheme = ControlScheme.Controller;
+			if (onKey != null) onKey(mCurrentSelection, KeyCode.Escape);
 			Notify(mCurrentSelection, "OnKey", KeyCode.Escape);
 		}
 
@@ -1502,6 +1543,7 @@ public class UICamera : MonoBehaviour
 		{
 			currentKey = cancelKey1;
 			currentScheme = ControlScheme.Controller;
+			if (onKey != null) onKey(mCurrentSelection, KeyCode.Escape);
 			Notify(mCurrentSelection, "OnKey", KeyCode.Escape);
 		}
 
@@ -1530,12 +1572,14 @@ public class UICamera : MonoBehaviour
 			if (mTooltip != null) ShowTooltip(false);
 
 			currentTouch.pressStarted = true;
+			if (onPress != null) onPress(currentTouch.pressed, false);
 			Notify(currentTouch.pressed, "OnPress", false);
 			currentTouch.pressed = currentTouch.current;
 			currentTouch.dragged = currentTouch.current;
 			currentTouch.clickNotification = ClickNotification.BasedOnDelta;
 			currentTouch.totalDelta = Vector2.zero;
 			currentTouch.dragStarted = false;
+			if (onPress != null) onPress(currentTouch.pressed, true);
 			Notify(currentTouch.pressed, "OnPress", true);
 
 			// Update the selection
@@ -1561,8 +1605,13 @@ public class UICamera : MonoBehaviour
 
 				// OnDragOver is sent for consistency, so that OnDragOut is always preceded by OnDragOver
 				isDragging = true;
+				
+				if (onDragStart != null) onDragStart(currentTouch.dragged);
 				Notify(currentTouch.dragged, "OnDragStart", null);
+
+				if (onDragOver != null) onDragOver(currentTouch.last, currentTouch.dragged);
 				Notify(currentTouch.last, "OnDragOver", currentTouch.dragged);
+
 				isDragging = false;
 			}
 			else if (!currentTouch.dragStarted && drag < mag)
@@ -1583,15 +1632,22 @@ public class UICamera : MonoBehaviour
 
 				if (justStarted)
 				{
+					if (onDragStart != null) onDragStart(currentTouch.dragged);
 					Notify(currentTouch.dragged, "OnDragStart", null);
+
+					if (onDragOver != null) onDragOver(currentTouch.last, currentTouch.dragged);
 					Notify(currentTouch.current, "OnDragOver", currentTouch.dragged);
 				}
 				else if (currentTouch.last != currentTouch.current)
 				{
+					if (onDragStart != null) onDragStart(currentTouch.dragged);
 					Notify(currentTouch.last, "OnDragOut", currentTouch.dragged);
+
+					if (onDragOver != null) onDragOver(currentTouch.last, currentTouch.dragged);
 					Notify(currentTouch.current, "OnDragOver", currentTouch.dragged);
 				}
 
+				if (onDrag != null) onDrag(currentTouch.dragged, currentTouch.delta);
 				Notify(currentTouch.dragged, "OnDrag", currentTouch.delta);
 
 				currentTouch.last = currentTouch.current;
@@ -1621,15 +1677,23 @@ public class UICamera : MonoBehaviour
 				// If there was a drag event in progress, make sure OnDragOut gets sent
 				if (currentTouch.dragStarted)
 				{
+					if (onDragOut != null) onDragOut(currentTouch.last, currentTouch.dragged);
 					Notify(currentTouch.last, "OnDragOut", currentTouch.dragged);
+
+					if (onDragEnd != null) onDragEnd(currentTouch.dragged);
 					Notify(currentTouch.dragged, "OnDragEnd", null);
 				}
 
 				// Send the notification of a touch ending
+				if (onPress != null) onPress(currentTouch.pressed, false);
 				Notify(currentTouch.pressed, "OnPress", false);
 
 				// Send a hover message to the object
-				if (isMouse) Notify(currentTouch.current, "OnHover", true);
+				if (isMouse)
+				{
+					if (onHover != null) onHover(currentTouch.current, true);
+					Notify(currentTouch.current, "OnHover", true);
+				}
 				mHover = currentTouch.current;
 
 				// If the button/touch was released on the same object, consider it a click and select it
@@ -1642,6 +1706,7 @@ public class UICamera : MonoBehaviour
 					{
 						mNextSelection = null;
 						mCurrentSelection = currentTouch.pressed;
+						if (onSelect != null) onSelect(currentTouch.pressed, true);
 						Notify(currentTouch.pressed, "OnSelect", true);
 					}
 					else
@@ -1655,10 +1720,12 @@ public class UICamera : MonoBehaviour
 					{
 						float time = RealTime.time;
 
+						if (onClick != null) onClick(currentTouch.pressed);
 						Notify(currentTouch.pressed, "OnClick", null);
 
 						if (currentTouch.clickTime + 0.35f > time)
 						{
+							if (onDoubleClick != null) onDoubleClick(currentTouch.pressed);
 							Notify(currentTouch.pressed, "OnDoubleClick", null);
 						}
 						currentTouch.clickTime = time;
@@ -1667,6 +1734,7 @@ public class UICamera : MonoBehaviour
 				else if (currentTouch.dragStarted) // The button/touch was released on a different object
 				{
 					// Send a drop notification (for drag & drop)
+					if (onDrop != null) onDrop(currentTouch.current, currentTouch.dragged);
 					Notify(currentTouch.current, "OnDrop", currentTouch.dragged);
 				}
 			}
@@ -1683,6 +1751,7 @@ public class UICamera : MonoBehaviour
 	public void ShowTooltip (bool val)
 	{
 		mTooltipTime = 0f;
+		if (onTooltip != null) onTooltip(mTooltip, val);
 		Notify(mTooltip, "OnTooltip", val);
 		if (!val) mTooltip = null;
 	}

@@ -39,6 +39,16 @@ public class UI2DSpriteEditor : UIBasicSpriteEditor
 		{
 			NGUIEditorTools.DrawProperty("Shader", serializedObject, "mShader");
 		}
+
+		SerializedProperty fa = serializedObject.FindProperty("mFixedAspect");
+		bool before = fa.boolValue;
+		NGUIEditorTools.DrawProperty("Fixed Aspect", fa);
+		if (fa.boolValue != before) (target as UIWidget).drawRegion = new Vector4(0f, 0f, 1f, 1f);
+
+		if (fa.boolValue)
+		{
+			EditorGUILayout.HelpBox("Note that Fixed Aspect mode is not compatible with Draw Region modifications done by sliders and progress bars.", MessageType.Info);
+		}
 		return (sp.objectReferenceValue != null);
 	}
 

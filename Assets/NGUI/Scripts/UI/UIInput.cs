@@ -616,7 +616,7 @@ public class UIInput : MonoBehaviour
 				}
 
 				UpdateLabel();
-				return;
+				if (string.IsNullOrEmpty(Input.inputString)) return;
 			}
 #if MOBILE
 			if (mKeyboard != null)

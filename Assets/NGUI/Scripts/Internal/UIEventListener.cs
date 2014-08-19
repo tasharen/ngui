@@ -17,7 +17,7 @@ public class UIEventListener : MonoBehaviour
 	public delegate void BoolDelegate (GameObject go, bool state);
 	public delegate void FloatDelegate (GameObject go, float delta);
 	public delegate void VectorDelegate (GameObject go, Vector2 delta);
-	public delegate void ObjectDelegate (GameObject go, GameObject draggedObject);
+	public delegate void ObjectDelegate (GameObject go, GameObject obj);
 	public delegate void KeyCodeDelegate (GameObject go, KeyCode key);
 
 	public object parameter;
