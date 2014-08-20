@@ -29,9 +29,11 @@ public class UIEventListener : MonoBehaviour
 	public BoolDelegate onPress;
 	public BoolDelegate onSelect;
 	public FloatDelegate onScroll;
+	public VoidDelegate onDragStart;
 	public VectorDelegate onDrag;
 	public VoidDelegate onDragOver;
 	public VoidDelegate onDragOut;
+	public VoidDelegate onDragEnd;
 	public ObjectDelegate onDrop;
 	public KeyCodeDelegate onKey;
 	public BoolDelegate onTooltip;
@@ -43,9 +45,11 @@ public class UIEventListener : MonoBehaviour
 	void OnPress (bool isPressed)	{ if (onPress != null) onPress(gameObject, isPressed); }
 	void OnSelect (bool selected)	{ if (onSelect != null) onSelect(gameObject, selected); }
 	void OnScroll (float delta)		{ if (onScroll != null) onScroll(gameObject, delta); }
+	void OnDragStart ()				{ if (onDragStart != null) onDragStart(gameObject); }
 	void OnDrag (Vector2 delta)		{ if (onDrag != null) onDrag(gameObject, delta); }
 	void OnDragOver ()				{ if (onDragOver != null) onDragOver(gameObject); }
 	void OnDragOut ()				{ if (onDragOut != null) onDragOut(gameObject); }
+	void OnDragEnd ()				{ if (onDragEnd != null) onDragEnd(gameObject); }
 	void OnDrop (GameObject go)		{ if (onDrop != null) onDrop(gameObject, go); }
 	void OnKey (KeyCode key)		{ if (onKey != null) onKey(gameObject, key); }
 	void OnTooltip (bool show)		{ if (onTooltip != null) onTooltip(gameObject, show); }

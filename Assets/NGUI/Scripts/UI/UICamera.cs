@@ -361,11 +361,15 @@ public class UICamera : MonoBehaviour
 
 	static public bool inputHasFocus = false;
 
+	// Obsolete, kept for backwards compatibility.
+	static GameObject mGenericHandler;
+
 	/// <summary>
 	/// If set, this game object will receive all events regardless of whether they were handled or not.
 	/// </summary>
 
-	static public GameObject genericEventHandler;
+	[System.Obsolete("Use delegates instead such as UICamera.onClick, UICamera.onHover, etc.")]
+	static public GameObject genericEventHandler { get { return mGenericHandler; } set { mGenericHandler = value; } }
 
 	/// <summary>
 	/// If events don't get handled, they will be forwarded to this game object.
@@ -373,6 +377,7 @@ public class UICamera : MonoBehaviour
 
 	static public GameObject fallThrough;
 
+	public delegate void MoveDelegate (Vector2 delta);
 	public delegate void VoidDelegate (GameObject go);
 	public delegate void BoolDelegate (GameObject go, bool state);
 	public delegate void FloatDelegate (GameObject go, float delta);
@@ -398,6 +403,7 @@ public class UICamera : MonoBehaviour
 	static public ObjectDelegate onDrop;
 	static public KeyCodeDelegate onKey;
 	static public BoolDelegate onTooltip;
+	static public MoveDelegate onMouseMove;
 
 	// Selected widget (for input)
 	static GameObject mCurrentSelection = null;
@@ -1004,9 +1010,9 @@ public class UICamera : MonoBehaviour
 		{
 			go.SendMessage(funcName, obj, SendMessageOptions.DontRequireReceiver);
 
-			if (genericEventHandler != null && genericEventHandler != go)
+			if (mGenericHandler != null && mGenericHandler != go)
 			{
-				genericEventHandler.SendMessage(funcName, obj, SendMessageOptions.DontRequireReceiver);
+				mGenericHandler.SendMessage(funcName, obj, SendMessageOptions.DontRequireReceiver);
 			}
 		}
 		mNotifying = false;
@@ -1262,7 +1268,7 @@ public class UICamera : MonoBehaviour
 		{
 			mNextRaycast = RealTime.time + 0.02f;
 			if (!Raycast(Input.mousePosition)) hoveredObject = fallThrough;
-			if (hoveredObject == null) hoveredObject = genericEventHandler;
+			if (hoveredObject == null) hoveredObject = mGenericHandler;
 			for (int i = 0; i < 3; ++i) mMouse[i].current = hoveredObject;
 		}
 
@@ -1286,6 +1292,14 @@ public class UICamera : MonoBehaviour
 				// Hide the tooltip
 				ShowTooltip(false);
 			}
+		}
+
+		// Generic mouse move notifications
+		if (onMouseMove != null)
+		{
+			currentTouch = mMouse[0];
+			onMouseMove(currentTouch.delta);
+			currentTouch = null;
 		}
 
 		// The button was released over a different object -- remove the highlight from the previous
@@ -1362,7 +1376,7 @@ public class UICamera : MonoBehaviour
 
 			// Raycast into the screen
 			if (!Raycast(currentTouch.pos)) hoveredObject = fallThrough;
-			if (hoveredObject == null) hoveredObject = genericEventHandler;
+			if (hoveredObject == null) hoveredObject = mGenericHandler;
 			currentTouch.last = currentTouch.current;
 			currentTouch.current = hoveredObject;
 			lastTouchPosition = currentTouch.pos;
@@ -1418,7 +1432,7 @@ public class UICamera : MonoBehaviour
 
 			// Raycast into the screen
 			if (!Raycast(currentTouch.pos)) hoveredObject = fallThrough;
-			if (hoveredObject == null) hoveredObject = genericEventHandler;
+			if (hoveredObject == null) hoveredObject = mGenericHandler;
 			currentTouch.last = currentTouch.current;
 			currentTouch.current = hoveredObject;
 			lastTouchPosition = currentTouch.pos;
