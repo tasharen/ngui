@@ -49,9 +49,10 @@ Shader "Unlit/Transparent Packed"
 				float2 texcoord : TEXCOORD0;
 			};
 
+			v2f o;
+
 			v2f vert (appdata_t v)
 			{
-				v2f o;
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.color = v.color;
 				o.texcoord = v.texcoord;

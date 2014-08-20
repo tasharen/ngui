@@ -64,9 +64,10 @@ Shader "Hidden/Unlit/Transparent Colored 3"
 				return ret;
 			}
 
+			v2f o;
+
 			v2f vert (appdata_t v)
 			{
-				v2f o;
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.color = v.color;
 				o.texcoord = v.texcoord;

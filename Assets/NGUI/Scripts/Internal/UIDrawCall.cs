@@ -53,7 +53,7 @@ public class UIDrawCall : MonoBehaviour
 	[HideInInspector][System.NonSerialized] public BetterList<Vector2> uvs = new BetterList<Vector2>();
 	[HideInInspector][System.NonSerialized] public BetterList<Color32> cols = new BetterList<Color32>();
 
-	Material		mMaterial;		// Material used by this screen
+	Material		mMaterial;		// Material used by this draw call
 	Texture			mTexture;		// Main texture used by the material
 	Shader			mShader;		// Shader used by the dynamically created material
 	int				mClipCount = 0;	// Number of times the draw call's content is getting clipped
@@ -291,6 +291,7 @@ public class UIDrawCall : MonoBehaviour
 		if (mMaterial != null)
 		{
 			mDynamicMat = new Material(mMaterial);
+			mDynamicMat.name = "[NGUI] " + mMaterial.name;
 			mDynamicMat.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
 			mDynamicMat.CopyPropertiesFromMaterial(mMaterial);
 #if !UNITY_FLASH
@@ -311,6 +312,7 @@ public class UIDrawCall : MonoBehaviour
 		else
 		{
 			mDynamicMat = new Material(shader);
+			mDynamicMat.name = "[NGUI] " + shader.name;
 			mDynamicMat.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
 		}
 	}
@@ -384,7 +386,7 @@ public class UIDrawCall : MonoBehaviour
 				{
 					mMesh = new Mesh();
 					mMesh.hideFlags = HideFlags.DontSave;
-					mMesh.name = (mMaterial != null) ? mMaterial.name : "Mesh";
+					mMesh.name = (mMaterial != null) ? "[NGUI] " + mMaterial.name : "[NGUI] Mesh";
 					mMesh.MarkDynamic();
 					setIndices = true;
 				}
@@ -658,10 +660,11 @@ public class UIDrawCall : MonoBehaviour
 		mMaterial = null;
 		mTexture = null;
 
-		NGUITools.DestroyImmediate(mDynamicMat);
-		mDynamicMat = null;
 		if (mRenderer != null)
 			mRenderer.sharedMaterials = new Material[] {};
+
+		NGUITools.DestroyImmediate(mDynamicMat);
+		mDynamicMat = null;
 	}
 
 	/// <summary>
@@ -671,6 +674,7 @@ public class UIDrawCall : MonoBehaviour
 	void OnDestroy ()
 	{
 		NGUITools.DestroyImmediate(mMesh);
+		mMesh = null;
 	}
 
 	/// <summary>

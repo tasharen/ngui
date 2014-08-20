@@ -71,6 +71,9 @@ public class UIPanelInspector : UIRectEditor
 
 	public void OnSceneGUI ()
 	{
+		UICamera cam = UICamera.FindCameraForLayer(mPanel.gameObject.layer);
+		if (cam == null || !cam.cachedCamera.isOrthoGraphic) return;
+
 		NGUIEditorTools.HideMoveTool(true);
 		if (!UIWidget.showHandles) return;
 
