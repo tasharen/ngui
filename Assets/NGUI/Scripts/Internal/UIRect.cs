@@ -389,9 +389,6 @@ public abstract class UIRect : MonoBehaviour
 		}
 		if (mStarted) OnInit();
 		mUpdateFrame = -1;
-#if UNITY_EDITOR
-		OnValidate();
-#endif
 	}
 
 	/// <summary>
