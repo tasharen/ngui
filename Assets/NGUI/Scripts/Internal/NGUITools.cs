@@ -957,7 +957,9 @@ static public class NGUITools
 	static public T FindInParents<T> (GameObject go) where T : Component
 	{
 		if (go == null) return null;
-#if UNITY_4_3
+		// Commented out because apparently it causes Unity 4.5.3 to lag horribly:
+		// http://www.tasharen.com/forum/index.php?topic=10882.0
+//#if UNITY_4_3
  #if UNITY_FLASH
 		object comp = go.GetComponent<T>();
  #else
@@ -978,9 +980,9 @@ static public class NGUITools
  #else
 		return comp;
  #endif
-#else
-		return go.GetComponentInParent<T>();
-#endif
+//#else
+//		return go.GetComponentInParent<T>();
+//#endif
 	}
 
 	/// <summary>
