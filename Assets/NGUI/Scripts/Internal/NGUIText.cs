@@ -363,15 +363,17 @@ static public class NGUIText
 		bool italic = false;
 		bool underline = false;
 		bool strikethrough = false;
-		return ParseSymbol(text, ref index, null, false, ref n, ref bold, ref italic, ref underline, ref strikethrough);
+		bool ignoreColor = false;
+		return ParseSymbol(text, ref index, null, false, ref n, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor);
 	}
 
 	/// <summary>
-	/// Parse the symbol, if possible. Returns 'true' if the 'index' was adjusted. Advanced symbol support contributed by Rudy Pangestu.
+	/// Parse the symbol, if possible. Returns 'true' if the 'index' was adjusted.
+	/// Advanced symbol support originally contributed by Rudy Pangestu.
 	/// </summary>
 
 	static public bool ParseSymbol (string text, ref int index, BetterList<Color> colors, bool premultiply,
-		ref int sub, ref bool bold, ref bool italic, ref bool underline, ref bool strike)
+		ref int sub, ref bool bold, ref bool italic, ref bool underline, ref bool strike, ref bool ignoreColor)
 	{
 		int length = text.Length;
 
@@ -410,6 +412,11 @@ static public class NGUIText
 				strike = true;
 				index += 3;
 				return true;
+
+				case "[c]":
+				ignoreColor = true;
+				index += 3;
+				return true;
 			}
 		}
 
@@ -438,6 +445,11 @@ static public class NGUIText
 
 				case "[/s]":
 				strike = false;
+				index += 4;
+				return true;
+
+				case "[/c]":
+				ignoreColor = false;
 				index += 4;
 				return true;
 
@@ -568,9 +580,10 @@ static public class NGUIText
 					bool italic = false;
 					bool underline = false;
 					bool strikethrough = false;
+					bool ignoreColor = false;
 					int retVal = i;
 
-					if (ParseSymbol(text, ref retVal, null, false, ref sub, ref bold, ref italic, ref underline, ref strikethrough))
+					if (ParseSymbol(text, ref retVal, null, false, ref sub, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor))
 					{
 						text = text.Remove(i, retVal - i);
 						imax = text.Length;
@@ -1117,6 +1130,7 @@ static public class NGUIText
 		bool italic = false;
 		bool underline = false;
 		bool strikethrough = false;
+		bool ignoreColor = false;
 		const float sizeShrinkage = 0.75f;
 
 		float v0x;
@@ -1163,10 +1177,21 @@ static public class NGUIText
 			}
 
 			// Color changing symbol
-			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold, ref italic, ref underline, ref strikethrough))
+			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
+				ref italic, ref underline, ref strikethrough, ref ignoreColor))
 			{
-				Color fc = tint * mColors[mColors.size - 1];
-				fc.a *= mAlpha;
+				Color fc;
+
+				if (ignoreColor)
+				{
+					fc = mColors[mColors.size - 1];
+					fc.a *= mAlpha * tint.a;
+				}
+				else
+				{
+					fc = tint * mColors[mColors.size - 1];
+					fc.a *= mAlpha;
+				}
 				uc = fc;
 
 				for (int b = 0, bmax = mColors.size - 2; b < bmax; ++b)

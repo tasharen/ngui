@@ -1724,7 +1724,7 @@ public class UIPanel : UIRect
 
 	static public UIPanel Find (Transform trans, bool createIfMissing, int layer)
 	{
-		UIPanel panel = trans.GetComponentInParent<UIPanel>();
+		UIPanel panel = NGUITools.FindInParents<UIPanel>(trans);
 		if (panel != null) return panel;
 		return createIfMissing ? NGUITools.CreateUI(trans, false, layer) : null;
 	}
