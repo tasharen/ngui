@@ -658,6 +658,39 @@ public class UICamera : MonoBehaviour
 	static BetterList<DepthEntry> mHits = new BetterList<DepthEntry>();
 
 	/// <summary>
+	/// Find the rigidbody on the parent, but return 'null' if a UIPanel is found instead.
+	/// The idea is: send events to the rigidbody in the world, but to colliders in the UI.
+	/// </summary>
+
+	static Rigidbody FindRootRigidbody (Transform trans)
+	{
+		while (trans != null)
+		{
+			if (trans.GetComponent<UIPanel>() != null) return null;
+			Rigidbody rb = trans.rigidbody;
+			if (rb != null) return rb;
+			trans = trans.parent;
+		}
+		return null;
+	}
+
+	/// <summary>
+	/// Find the 2D rigidbody on the parent, but return 'null' if a UIPanel is found instead.
+	/// </summary>
+
+	static Rigidbody2D FindRootRigidbody2D (Transform trans)
+	{
+		while (trans != null)
+		{
+			if (trans.GetComponent<UIPanel>() != null) return null;
+			Rigidbody2D rb = trans.rigidbody2D;
+			if (rb != null) return rb;
+			trans = trans.parent;
+		}
+		return null;
+	}
+
+	/// <summary>
 	/// Returns the object under the specified position.
 	/// </summary>
 
@@ -692,7 +725,7 @@ public class UICamera : MonoBehaviour
 					lastWorldPosition = lastHit.point;
 					hoveredObject = lastHit.collider.gameObject;
 
-					Rigidbody rb = NGUITools.FindInParents<Rigidbody>(hoveredObject);
+					Rigidbody rb = FindRootRigidbody(hoveredObject.transform);
 					if (rb != null) hoveredObject = rb.gameObject;
 					return true;
 				}
@@ -788,7 +821,7 @@ public class UICamera : MonoBehaviour
 						lastWorldPosition = point;
 						hoveredObject = c2d.gameObject;
 
-						Rigidbody2D rb = NGUITools.FindInParents<Rigidbody2D>(hoveredObject);
+						Rigidbody2D rb = FindRootRigidbody2D(hoveredObject.transform);
 						if (rb != null) hoveredObject = rb.gameObject;
 						return true;
 					}
