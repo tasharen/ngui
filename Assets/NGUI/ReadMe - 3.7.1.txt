@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.7.0
+            Version 3.7.1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,18 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.7.1
+- NEW: Added generic delegates to UICamera you can subscribe to (onClick, onHover, etc) to replace the genericEventHandler.
+- NEW: Added a new option to UITexture and UI2DSprite to keep the original texture's aspect ratio.
+- NEW: Popup list items can now have arbitrary data associated with each entry.
+- NEW: You can now choose what kind of click will open the popup list.
+- NEW: New text symbol [c] will cause the text that follows it to ignore the label's color tint.
+- NEW: Added the missing OnDragStart and OnDragEnd to UIEventListener.
+- NEW: UICamera.onMouseMove notification.
+- FIX: UICamera will only send events to rigidbodies if there was no UIPanel present.
+- FIX: UIPanel will no longer use handles if the camera drawing it is not 2D.
+- FIX: Unity 4.3 compatibility.
 
 3.7.0
 - NEW: You can now set UIWidget.onRender to change material properties like in OnWillRenderObject.
