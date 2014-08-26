@@ -117,10 +117,10 @@ public class UIInput : MonoBehaviour
 	public string savedAs;
 
 	/// <summary>
-	/// Object to select when Tab key gets pressed.
+	/// Don't use this anymore. Attach UIKeyNavigation instead.
 	/// </summary>
 
-	public GameObject selectOnTab;
+	[HideInInspector][SerializeField] GameObject selectOnTab;
 
 	/// <summary>
 	/// Color of the label when the input field has focus.
@@ -424,6 +424,19 @@ public class UIInput : MonoBehaviour
 
 	void Start ()
 	{
+		if (selectOnTab != null)
+		{
+			UIKeyNavigation nav = GetComponent<UIKeyNavigation>();
+
+			if (nav == null)
+			{
+				nav = gameObject.AddComponent<UIKeyNavigation>();
+				nav.onDown = selectOnTab;
+			}
+			selectOnTab = null;
+			NGUITools.SetDirty(this);
+		}
+
 		if (mLoadSavedValue && !string.IsNullOrEmpty(savedAs)) LoadValue();
 		else value = mValue.Replace("\\n", "\n");
 	}
@@ -657,12 +670,6 @@ public class UIInput : MonoBehaviour
 			else
 #endif // MOBILE
 			{
-				if (selectOnTab != null && Input.GetKeyDown(KeyCode.Tab))
-				{
-					UICamera.selectedObject = selectOnTab;
-					return;
-				}
-
 				string ime = Input.compositionString;
 
 				// There seems to be an inconsistency between IME on Windows, and IME on OSX.

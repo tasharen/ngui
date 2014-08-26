@@ -381,9 +381,18 @@ public class UIPrefabTool : EditorWindow
 	{
 		if (item == null || item.prefab == null) return;
 
-		// Render textures only work in Unity Pro
-		if (!UnityEditorInternal.InternalEditorUtility.HasPro())
+		if (point == null) point = item.prefab.GetComponentInChildren<UISnapshotPoint>();
+
+		if (point != null && point.thumbnail != null)
 		{
+			// Explicitly chosen thumbnail
+			item.tex = point.thumbnail;
+			item.dynamicTex = false;
+			return;
+		}
+		else if (!UnityEditorInternal.InternalEditorUtility.HasPro())
+		{
+			// Render textures only work in Unity Pro
 			string path = "Assets/NGUI/Editor/Preview/" + item.prefab.name + ".png";
 			item.tex = File.Exists(path) ? (Texture2D)Resources.LoadAssetAtPath(path, typeof(Texture2D)) : null;
 			item.dynamicTex = false;

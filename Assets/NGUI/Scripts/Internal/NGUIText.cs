@@ -368,6 +368,17 @@ static public class NGUIText
 	}
 
 	/// <summary>
+	/// Whether the specified character falls under the 'hex' character category (0-9, A-F).
+	/// </summary>
+
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
+	static public bool IsHex (char ch)
+	{
+		return (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F');
+	}
+
+	/// <summary>
 	/// Parse the symbol, if possible. Returns 'true' if the 'index' was adjusted.
 	/// Advanced symbol support originally contributed by Rudy Pangestu.
 	/// </summary>
@@ -454,10 +465,19 @@ static public class NGUIText
 				return true;
 
 				default:
-				int a = (NGUIMath.HexToDecimal(text[index + 1]) << 4) | NGUIMath.HexToDecimal(text[index + 2]);
-				mAlpha = a / 255f;
-				index += 4;
-				return true;
+				{
+					char ch0 = text[index + 1];
+					char ch1 = text[index + 2];
+
+					if (IsHex(ch0) && IsHex(ch1))
+					{
+						int a = (NGUIMath.HexToDecimal(ch0) << 4) | NGUIMath.HexToDecimal(text[ch1]);
+						mAlpha = a / 255f;
+						index += 4;
+						return true;
+					}
+				}
+				break;
 			}
 		}
 
@@ -1567,8 +1587,8 @@ static public class NGUIText
 
 	static float[] mBoldOffset = new float[]
 	{
-		-0.5f, 0f, 0.5f, 0f,
-		0f, -0.5f, 0f, 0.5f
+		-0.25f, 0f, 0.25f, 0f,
+		0f, -0.25f, 0f, 0.25f
 	};
 
 	/// <summary>

@@ -573,7 +573,7 @@ public class UIPanel : UIRect
 			{
 				Vector3[] corners = mCam.GetWorldCorners(cameraRayDistance);
 
-				//if (anchorOffset && mCam == null || mCam.transform.parent != cachedTransform)
+				//if (anchorOffset && (mCam == null || mCam.transform.parent != cachedTransform))
 				//{
 				//    Vector3 off = cachedTransform.position;
 				//    for (int i = 0; i < 4; ++i)
@@ -595,7 +595,7 @@ public class UIPanel : UIRect
 				mCorners[2] = new Vector3(x1, y1);
 				mCorners[3] = new Vector3(x1, y0);
 
-				if (anchorOffset && mCam == null || mCam.transform.parent != cachedTransform)
+				if (anchorOffset && (mCam == null || mCam.transform.parent != cachedTransform))
 				{
 					Vector3 off = cachedTransform.position;
 					for (int i = 0; i < 4; ++i)

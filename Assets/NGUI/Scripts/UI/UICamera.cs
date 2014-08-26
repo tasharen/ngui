@@ -1146,7 +1146,6 @@ public class UICamera : MonoBehaviour
 
 	void OnDisable () { list.Remove(this); }
 
-#if !UNITY_3_5 && !UNITY_4_0
 	/// <summary>
 	/// We don't want the camera to send out any kind of mouse events.
 	/// </summary>
@@ -1156,12 +1155,13 @@ public class UICamera : MonoBehaviour
 		if (eventType != EventType.World_3D && cachedCamera.transparencySortMode != TransparencySortMode.Orthographic)
 			cachedCamera.transparencySortMode = TransparencySortMode.Orthographic;
 
-		if (Application.isPlaying) cachedCamera.eventMask = 0;
+		if (Application.isPlaying)
+		{
+			if (fallThrough == null) fallThrough = gameObject;
+			cachedCamera.eventMask = 0;
+		}
 		if (handlesEvents) NGUIDebug.debugRaycast = debug;
 	}
-#else
-	void Start () { if (handlesEvents) NGUIDebug.debugRaycast = debug; }
-#endif
 
 #if UNITY_EDITOR
 	void OnValidate () { Start(); }
