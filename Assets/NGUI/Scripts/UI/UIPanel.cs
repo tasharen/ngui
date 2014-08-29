@@ -909,9 +909,10 @@ public class UIPanel : UIRect
 	protected override void OnInit ()
 	{
 		base.OnInit();
+		FindParent();
 
 		// Apparently having a rigidbody helps
-		if (rigidbody == null)
+		if (rigidbody == null && mParentPanel == null)
 		{
 			UICamera uic = (anchorCamera != null) ? mCam.GetComponent<UICamera>() : null;
 
@@ -933,7 +934,6 @@ public class UIPanel : UIRect
 			}
 		}
 
-		FindParent();
 		mRebuild = true;
 		mAlphaFrameID = -1;
 		mMatrixFrame = -1;

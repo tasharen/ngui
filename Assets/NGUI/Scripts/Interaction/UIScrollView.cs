@@ -349,16 +349,9 @@ public class UIScrollView : MonoBehaviour
 		}
 	}
 
-	void OnEnable () { list.Add(this); }
-	void OnDisable () { list.Remove(this); }
-
-	/// <summary>
-	/// Set the initial drag value and register the listener delegates.
-	/// </summary>
-
-	protected virtual void Start ()
+	void OnEnable ()
 	{
-		//UpdatePosition();
+		list.Add(this);
 
 		if (Application.isPlaying)
 		{
@@ -375,6 +368,8 @@ public class UIScrollView : MonoBehaviour
 			}
 		}
 	}
+
+	void OnDisable () { list.Remove(this); }
 
 	/// <summary>
 	/// Restrict the scroll view's contents to be within the scroll view's bounds.

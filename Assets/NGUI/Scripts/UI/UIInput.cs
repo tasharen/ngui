@@ -541,7 +541,7 @@ public class UIInput : MonoBehaviour
 	/// Update the text based on input.
 	/// </summary>
 	
-	void Update ()
+	protected virtual void Update ()
 	{
 #if UNITY_EDITOR
 		if (!Application.isPlaying) return;

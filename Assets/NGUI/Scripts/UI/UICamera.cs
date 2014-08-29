@@ -91,7 +91,7 @@ public class UICamera : MonoBehaviour
 		{
 			get
 			{
-				return current != null && NGUITools.FindInParents<UIRoot>(current) != null;
+				return current != null && current != fallThrough && NGUITools.FindInParents<UIRoot>(current) != null;
 			}
 		}
 	}
@@ -471,6 +471,7 @@ public class UICamera : MonoBehaviour
 		{
 			if (currentTouch != null) return currentTouch.isOverUI;
 			if (hoveredObject == null) return false;
+			if (hoveredObject == fallThrough) return false;
 			return NGUITools.FindInParents<UIRoot>(hoveredObject) != null;
 		}
 	}
@@ -1157,7 +1158,21 @@ public class UICamera : MonoBehaviour
 
 		if (Application.isPlaying)
 		{
-			if (fallThrough == null) fallThrough = gameObject;
+			// Always set a fallthrough object
+			if (fallThrough == null)
+			{
+				UIRoot root = NGUITools.FindInParents<UIRoot>(gameObject);
+
+				if (root != null)
+				{
+					fallThrough = root.gameObject;
+				}
+				else
+				{
+					Transform t = transform;
+					fallThrough = (t.parent != null) ? t.parent.gameObject : gameObject;
+				}
+			}
 			cachedCamera.eventMask = 0;
 		}
 		if (handlesEvents) NGUIDebug.debugRaycast = debug;

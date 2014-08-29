@@ -79,7 +79,7 @@ public class UIGrid : UIWidgetContainer
 	/// Whether to ignore the disabled children or to treat them as being present.
 	/// </summary>
 
-	public bool hideInactive = true;
+	public bool hideInactive = false;
 
 	/// <summary>
 	/// Whether the parent container will be notified of the grid's changes.
@@ -262,7 +262,7 @@ public class UIGrid : UIWidgetContainer
 
 	protected virtual void Update ()
 	{
-		if (mReposition) Reposition();
+		Reposition();
 		enabled = false;
 	}
 
@@ -290,7 +290,7 @@ public class UIGrid : UIWidgetContainer
 	[ContextMenu("Execute")]
 	public virtual void Reposition ()
 	{
-		if (Application.isPlaying && !mInitDone && NGUITools.GetActive(this)) Init();
+		if (Application.isPlaying && !mInitDone && NGUITools.GetActive(gameObject)) Init();
 
 		// Legacy functionality
 		if (sorted)
@@ -300,8 +300,6 @@ public class UIGrid : UIWidgetContainer
 				sorting = Sorting.Alphabetic;
 			NGUITools.SetDirty(this);
 		}
-
-		if (!mInitDone) Init();
 
 		// Get the list of children in their current order
 		List<Transform> list = GetChildList();

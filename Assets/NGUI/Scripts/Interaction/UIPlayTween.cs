@@ -141,6 +141,8 @@ public class UIPlayTween : MonoBehaviour
 		if (toggle != null) EventDelegate.Remove(toggle.onChange, OnToggle);
 	}
 
+	void OnDragOver () { if (trigger == Trigger.OnHover) OnHover(true); }
+
 	void OnHover (bool isOver)
 	{
 		if (enabled)

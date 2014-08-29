@@ -613,6 +613,7 @@ public class EventDelegate
 
 				if (del != null)
 				{
+#if !UNITY_EDITOR
 					try
 					{
 						del.Execute();
@@ -622,6 +623,9 @@ public class EventDelegate
 						if (ex.InnerException != null) Debug.LogError(ex.InnerException.Message);
 						else Debug.LogError(ex.Message);
 					}
+#else
+					del.Execute();
+#endif
 
 					if (i >= list.Count) break;
 					if (list[i] != del) continue;
