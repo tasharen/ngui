@@ -63,9 +63,7 @@ Shader "Transparent/Refractive"
 
 			void vert (inout appdata_full v, out Input o)
 			{
-#if SHADER_API_D3D11
 				UNITY_INITIALIZE_OUTPUT(Input, o);
-#endif
 				o.position = mul(UNITY_MATRIX_MVP, v.vertex);
 				
 				#if UNITY_UV_STARTS_AT_TOP
