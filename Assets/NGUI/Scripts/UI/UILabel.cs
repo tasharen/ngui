@@ -150,7 +150,7 @@ public class UILabel : UIWidget
 		{
 			if (mMaterial != value)
 			{
-				MarkAsChanged();
+				RemoveFromPanel();
 				mMaterial = value;
 				MarkAsChanged();
 			}

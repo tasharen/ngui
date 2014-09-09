@@ -948,7 +948,12 @@ public class UIScrollView : MonoBehaviour
 				{
 					if (NGUITools.GetActive(centerOnChild))
 					{
-						centerOnChild.Recenter();
+						if (centerOnChild.nextPageThreshold != 0f)
+						{
+							mMomentum = Vector3.zero;
+							mScroll = 0f;
+						}
+						else centerOnChild.Recenter();
 					}
 					else
 					{

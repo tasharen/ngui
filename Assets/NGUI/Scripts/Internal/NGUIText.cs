@@ -179,6 +179,14 @@ static public class NGUIText
 	{
 		if (bitmapFont != null)
 		{
+			bool thinSpace = false;
+
+			if (ch == '\u2009')
+			{
+				thinSpace = true;
+				ch = ' ';
+			}
+
 			BMGlyph bmg = bitmapFont.bmFont.GetGlyph(ch);
 
 			if (bmg != null)
@@ -196,7 +204,9 @@ static public class NGUIText
 				glyph.u1.x = bmg.x + bmg.width;
 				glyph.u1.y = bmg.y;
 
-				glyph.advance = bmg.advance + kern;
+				int adv = bmg.advance;
+				if (thinSpace) adv >>= 1;
+				glyph.advance = adv + kern;
 				glyph.channel = bmg.channel;
 				glyph.rotatedUVs = false;
 
