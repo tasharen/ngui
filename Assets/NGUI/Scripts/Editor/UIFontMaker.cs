@@ -30,7 +30,7 @@ public class UIFontMaker : EditorWindow
 		Dynamic,	// Dynamic font, used as-is
 	}
 
-	enum CharacterMap
+	public enum CharacterMap
 	{
 		Numeric,	// 0 through 9
 		Ascii,		// Character IDs 32 through 127
@@ -115,7 +115,7 @@ public class UIFontMaker : EditorWindow
 
 		if (mType == FontType.ImportedBitmap)
 		{
-			NGUISettings.fontData = EditorGUILayout.ObjectField("Font Data", NGUISettings.fontData, typeof(TextAsset), false) as TextAsset;
+            NGUISettings.fontData = EditorGUILayout.ObjectField("Font Data", NGUISettings.fontData, typeof(TextAsset), false) as TextAsset;
 			NGUISettings.fontTexture = EditorGUILayout.ObjectField("Texture", NGUISettings.fontTexture, typeof(Texture2D), false, GUILayout.Width(140f)) as Texture2D;
 			NGUIEditorTools.EndContents();
 
@@ -551,7 +551,7 @@ public class UIFontMaker : EditorWindow
 	/// Helper function that draws a slightly padded toggle
 	/// </summary>
 
-	static bool DrawOption (bool state, string text, params GUILayoutOption[] options)
+	public static bool DrawOption (bool state, string text, params GUILayoutOption[] options)
 	{
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(10f);
