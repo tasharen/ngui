@@ -1102,7 +1102,6 @@ public class UICamera : MonoBehaviour
 #endif
 			)
 		{
-			useMouse = false;
 			useTouch = true;
 
 			if (Application.platform == RuntimePlatform.IPhonePlayer)
