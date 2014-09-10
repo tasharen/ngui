@@ -481,7 +481,7 @@ static public class NGUIText
 
 					if (IsHex(ch0) && IsHex(ch1))
 					{
-						int a = (NGUIMath.HexToDecimal(ch0) << 4) | NGUIMath.HexToDecimal(text[ch1]);
+						int a = (NGUIMath.HexToDecimal(ch0) << 4) | NGUIMath.HexToDecimal(ch1);
 						mAlpha = a / 255f;
 						index += 4;
 						return true;
