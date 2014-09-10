@@ -154,11 +154,21 @@ static public class NGUIText
 	{
 		if (bitmapFont != null)
 		{
+			bool thinSpace = false;
+
+			if (ch == '\u2009')
+			{
+				thinSpace = true;
+				ch = ' ';
+			}
+
 			BMGlyph bmg = bitmapFont.bmFont.GetGlyph(ch);
 
 			if (bmg != null)
 			{
-				return fontScale * ((prev != 0) ? bmg.advance + bmg.GetKerning(prev) : bmg.advance);
+				int adv = bmg.advance;
+				if (thinSpace) adv >>= 1;
+				return fontScale * ((prev != 0) ? adv + bmg.GetKerning(prev) : bmg.advance);
 			}
 		}
 #if DYNAMIC_FONT
@@ -790,7 +800,7 @@ static public class NGUIText
 
 	[DebuggerHidden]
 	[DebuggerStepThrough]
-	static bool IsSpace (int ch) { return (ch == ' ' || ch == 0x200a || ch == 0x200b); }
+	static bool IsSpace (int ch) { return (ch == ' ' || ch == 0x200a || ch == 0x200b || ch == '\u2009'); }
 
 	/// <summary>
 	/// Convenience function that ends the line by either appending a new line character or replacing a space with one.
