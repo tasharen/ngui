@@ -105,9 +105,9 @@ public class EventDelegate
 #else // REFLECTION_SUPPORT
 		public object value { get { if (mValue != null) return mValue; return obj; } }
  #if UNITY_EDITOR || !UNITY_FLASH
-		public System.Type type { get { if (mValue != null) return mValue.GeType(); return typeof(void); } }
+		public System.Type type { get { if (mValue != null) return mValue.GetType(); return typeof(void); } }
  #else
-		public System.Type type { get { if (mValue != null) return mValue.GeType(); return null; } }
+		public System.Type type { get { if (mValue != null) return mValue.GetType(); return null; } }
  #endif
 #endif
 	}
