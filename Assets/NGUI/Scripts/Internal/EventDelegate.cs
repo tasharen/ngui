@@ -613,7 +613,7 @@ public class EventDelegate
 
 				if (del != null)
 				{
-#if !UNITY_EDITOR
+#if !UNITY_EDITOR && !UNITY_FLASH
 					try
 					{
 						del.Execute();

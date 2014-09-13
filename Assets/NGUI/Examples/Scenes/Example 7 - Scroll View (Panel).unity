@@ -201,6 +201,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 216}
+  panelRegion: {fileID: 0}
   scrollMomentum: {x: 0, y: 0, z: 0}
   restrictWithinPanel: 1
   contentRect: {fileID: 1002127741}
@@ -1411,13 +1412,13 @@ MonoBehaviour:
   updateAnchors: 1
   mColor: {r: .410447776, g: .410447776, b: .410447776, a: 1}
   mPivot: 4
-  mWidth: 1305
+  mWidth: 1589
   mHeight: 740
   mDepth: -2
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
   keepAspectRatio: 0
-  aspectRatio: 1.76351357
+  aspectRatio: 2.14729738
   mType: 1
   mFillDirection: 4
   mFillAmount: 1
@@ -8163,7 +8164,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1368274916}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 642.44165, y: 360, z: 0}
+  m_LocalPosition: {x: 784.736877, y: 360, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 191}
@@ -8460,7 +8461,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1469404478}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 570.44165, y: -323, z: 0}
+  m_LocalPosition: {x: 712.736877, y: -323, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 749131100}
@@ -11563,13 +11564,13 @@ MonoBehaviour:
   updateAnchors: 1
   mColor: {r: 0, g: 0, b: 0, a: .101960786}
   mPivot: 4
-  mWidth: 1305
+  mWidth: 1589
   mHeight: 740
   mDepth: -1
   autoResizeBoxCollider: 0
   hideIfOffScreen: 0
   keepAspectRatio: 0
-  aspectRatio: 1.76351357
+  aspectRatio: 2.14729738
   mType: 2
   mFillDirection: 4
   mFillAmount: 1
