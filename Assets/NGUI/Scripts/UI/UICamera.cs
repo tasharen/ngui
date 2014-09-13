@@ -76,12 +76,19 @@ public class UICamera : MonoBehaviour
 		public GameObject pressed;		// Last game object to receive OnPress
 		public GameObject dragged;		// Game object that's being dragged
 
+		public float pressTime = 0f;	// When the touch event started
 		public float clickTime = 0f;	// The last time a click event was sent out
 
 		public ClickNotification clickNotification = ClickNotification.Always;
 		public bool touchBegan = true;
 		public bool pressStarted = false;
 		public bool dragStarted = false;
+
+		/// <summary>
+		/// Delta time since the touch operation started.
+		/// </summary>
+
+		public float deltaTime { get { return touchBegan ? RealTime.time - pressTime : 0f; } }
 
 		/// <summary>
 		/// Returns whether this touch is currently over a UI element.
@@ -1071,6 +1078,7 @@ public class UICamera : MonoBehaviour
 		if (!mTouches.TryGetValue(id, out touch))
 		{
 			touch = new MouseOrTouch();
+			touch.pressTime = RealTime.time;
 			touch.touchBegan = true;
 			mTouches.Add(id, touch);
 		}
@@ -1472,6 +1480,7 @@ public class UICamera : MonoBehaviour
 			currentTouchID = 1;
 			currentTouch = mMouse[0];
 			currentTouch.touchBegan = pressed;
+			if (pressed) currentTouch.pressTime = RealTime.time;
 
 			Vector2 pos = Input.mousePosition;
 			currentTouch.delta = pressed ? Vector2.zero : pos - currentTouch.pos;
