@@ -374,6 +374,24 @@ public class UIPrefabTool : EditorWindow
 	}
 
 	/// <summary>
+	/// GetComponentInChildren doesn't work on prefabs.
+	/// </summary>
+
+	static UISnapshotPoint GetSnapshotPoint (Transform t)
+	{
+		UISnapshotPoint point = t.GetComponent<UISnapshotPoint>();
+		if (point != null) return point;
+		
+		for (int i = 0, imax = t.childCount; i < imax; ++i)
+		{
+			Transform c = t.GetChild(i);
+			point = GetSnapshotPoint(c);
+			if (point != null) return point;
+		}
+		return null;
+	}
+
+	/// <summary>
 	/// Generate an item preview for the specified item.
 	/// </summary>
 
@@ -381,10 +399,11 @@ public class UIPrefabTool : EditorWindow
 	{
 		if (item == null || item.prefab == null) return;
 
-		if (point == null) point = item.prefab.GetComponentInChildren<UISnapshotPoint>();
+		if (point == null) point = GetSnapshotPoint(item.prefab.transform);
 
 		if (point != null && point.thumbnail != null)
 		{
+			Debug.Log(2);
 			// Explicitly chosen thumbnail
 			item.tex = point.thumbnail;
 			item.dynamicTex = false;

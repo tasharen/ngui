@@ -165,6 +165,13 @@ public class UICamera : MonoBehaviour
 	public EventType eventType = EventType.UI_3D;
 
 	/// <summary>
+	/// By default, events will go to rigidbodies when the Event Type is not UI.
+	/// You can change this behaviour back to how it was pre-3.7.0 using this flag.
+	/// </summary>
+
+	public bool eventsGoToColliders = false;
+
+	/// <summary>
 	/// Which layers will receive events.
 	/// </summary>
 
@@ -733,8 +740,11 @@ public class UICamera : MonoBehaviour
 					lastWorldPosition = lastHit.point;
 					hoveredObject = lastHit.collider.gameObject;
 
-					Rigidbody rb = FindRootRigidbody(hoveredObject.transform);
-					if (rb != null) hoveredObject = rb.gameObject;
+					if (!cam.eventsGoToColliders)
+					{
+						Rigidbody rb = FindRootRigidbody(hoveredObject.transform);
+						if (rb != null) hoveredObject = rb.gameObject;
+					}
 					return true;
 				}
 				continue;
@@ -829,8 +839,11 @@ public class UICamera : MonoBehaviour
 						lastWorldPosition = point;
 						hoveredObject = c2d.gameObject;
 
-						Rigidbody2D rb = FindRootRigidbody2D(hoveredObject.transform);
-						if (rb != null) hoveredObject = rb.gameObject;
+						if (!cam.eventsGoToColliders)
+						{
+							Rigidbody2D rb = FindRootRigidbody2D(hoveredObject.transform);
+							if (rb != null) hoveredObject = rb.gameObject;
+						}
 						return true;
 					}
 				}
@@ -1114,6 +1127,7 @@ public class UICamera : MonoBehaviour
 
 			if (Application.platform == RuntimePlatform.IPhonePlayer)
 			{
+				useMouse = false;
 				useKeyboard = false;
 				useController = false;
 			}
