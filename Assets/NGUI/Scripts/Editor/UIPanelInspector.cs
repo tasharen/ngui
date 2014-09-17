@@ -603,8 +603,10 @@ public class UIPanelInspector : UIRectEditor
 			GUILayout.EndHorizontal();
 
 			GUILayout.BeginHorizontal();
-			bool off = EditorGUILayout.Toggle("Offset", mPanel.anchorOffset, GUILayout.Width(100f));
+			EditorGUI.BeginDisabledGroup(mPanel.GetComponent<UIRoot>() != null);
+			bool off = EditorGUILayout.Toggle("Offset", mPanel.anchorOffset && mPanel.GetComponent<UIRoot>() == null, GUILayout.Width(100f));
 			GUILayout.Label("Offset anchors by position", GUILayout.MinWidth(20f));
+			EditorGUI.EndDisabledGroup();
 			GUILayout.EndHorizontal();
 
 			if (mPanel.anchorOffset != off)

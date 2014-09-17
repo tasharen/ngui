@@ -197,6 +197,7 @@ public class UIInput : MonoBehaviour
 	{
 		get
 		{
+			if (mDoInit) Init();
 			return mDefaultText;
 		}
 		set
