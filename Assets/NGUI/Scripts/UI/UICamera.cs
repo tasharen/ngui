@@ -1364,7 +1364,7 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Generic mouse move notifications
-		if (onMouseMove != null)
+		if (posChanged && onMouseMove != null)
 		{
 			currentTouch = mMouse[0];
 			onMouseMove(currentTouch.delta);
