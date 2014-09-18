@@ -59,8 +59,7 @@ Shader "Unlit/Transparent Colored"
 				
 			fixed4 frag (v2f IN) : COLOR
 			{
-				fixed4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
-				return col;
+				return tex2D(_MainTex, IN.texcoord) * IN.color;
 			}
 			ENDCG
 		}

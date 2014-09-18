@@ -1,8 +1,8 @@
-Shader "Hidden/Unlit/Premultiplied Colored 1"
+Shader "Hidden/Unlit/Text (TextureClip)" 
 {
 	Properties
 	{
-		_MainTex ("Base (RGB), Alpha (A)", 2D) = "black" {}
+		_MainTex ("Alpha (A)", 2D) = "white" {}
 	}
 
 	SubShader
@@ -21,11 +21,10 @@ Shader "Hidden/Unlit/Premultiplied Colored 1"
 			Cull Off
 			Lighting Off
 			ZWrite Off
-			AlphaTest Off
-			Fog { Mode Off }
 			Offset -1, -1
-			ColorMask RGB
-			Blend One OneMinusSrcAlpha
+			Fog { Mode Off }
+			//ColorMask RGB
+			Blend SrcAlpha OneMinusSrcAlpha
 
 			CGPROGRAM
 			#pragma vertex vert
@@ -33,22 +32,22 @@ Shader "Hidden/Unlit/Premultiplied Colored 1"
 			#include "UnityCG.cginc"
 
 			sampler2D _MainTex;
+			sampler2D _ClipTex;
 			float4 _ClipRange0 = float4(0.0, 0.0, 1.0, 1.0);
-			float4 _ClipArgs0 = float4(1000.0, 1000.0, 0.0, 1.0);
 
 			struct appdata_t
 			{
 				float4 vertex : POSITION;
-				half4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
+				half4 color : COLOR;
 			};
 
 			struct v2f
 			{
 				float4 vertex : POSITION;
-				half4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
-				float2 worldPos : TEXCOORD1;
+				float2 clipUV : TEXCOORD1;
+				half4 color : COLOR;
 			};
 
 			v2f vert (appdata_t v)
@@ -57,24 +56,18 @@ Shader "Hidden/Unlit/Premultiplied Colored 1"
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.color = v.color;
 				o.texcoord = v.texcoord;
-				o.worldPos = v.vertex.xy * _ClipRange0.zw + _ClipRange0.xy;
+				o.clipUV = (v.vertex.xy * _ClipRange0.zw + _ClipRange0.xy) * 0.5 + float2(0.5, 0.5);
 				return o;
 			}
 
 			half4 frag (v2f IN) : COLOR
 			{
-				// Softness factor
-				float2 factor = (float2(1.0, 1.0) - abs(IN.worldPos)) * _ClipArgs0.xy;
-			
-				// Sample the texture
-				half4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
-				float fade = clamp( min(factor.x, factor.y), 0.0, 1.0);
-				col.a *= fade;
-				col.rgb = lerp(half3(0.0, 0.0, 0.0), col.rgb, fade);
+				half4 col = IN.color;
+				col.a *= tex2D(_MainTex, IN.texcoord).a * tex2D(_ClipTex, IN.clipUV).a;
 				return col;
 			}
 			ENDCG
 		}
 	}
-	Fallback "Unlit/Premultiplied Colored"
+	Fallback "Unlit/Text"
 }

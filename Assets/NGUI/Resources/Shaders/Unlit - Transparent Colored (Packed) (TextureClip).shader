@@ -1,4 +1,4 @@
-Shader "Hidden/Unlit/Premultiplied Colored 1"
+Shader "Unlit/Transparent Colored (Packed) (TextureClip)"
 {
 	Properties
 	{
@@ -21,20 +21,20 @@ Shader "Hidden/Unlit/Premultiplied Colored 1"
 			Cull Off
 			Lighting Off
 			ZWrite Off
-			AlphaTest Off
-			Fog { Mode Off }
 			Offset -1, -1
+			Fog { Mode Off }
 			ColorMask RGB
-			Blend One OneMinusSrcAlpha
+			Blend SrcAlpha OneMinusSrcAlpha
 
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
+
 			#include "UnityCG.cginc"
 
 			sampler2D _MainTex;
-			float4 _ClipRange0 = float4(0.0, 0.0, 1.0, 1.0);
-			float4 _ClipArgs0 = float4(1000.0, 1000.0, 0.0, 1.0);
+			half4 _MainTex_ST;
+			sampler2D _ClipTex;
 
 			struct appdata_t
 			{
@@ -57,24 +57,24 @@ Shader "Hidden/Unlit/Premultiplied Colored 1"
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.color = v.color;
 				o.texcoord = v.texcoord;
-				o.worldPos = v.vertex.xy * _ClipRange0.zw + _ClipRange0.xy;
+				o.worldPos = TRANSFORM_TEX(v.vertex.xy, _MainTex);
 				return o;
 			}
 
 			half4 frag (v2f IN) : COLOR
 			{
-				// Softness factor
-				float2 factor = (float2(1.0, 1.0) - abs(IN.worldPos)) * _ClipArgs0.xy;
-			
-				// Sample the texture
-				half4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
-				float fade = clamp( min(factor.x, factor.y), 0.0, 1.0);
-				col.a *= fade;
-				col.rgb = lerp(half3(0.0, 0.0, 0.0), col.rgb, fade);
+				half alpha = tex2D(_ClipTex, IN.worldPos * 0.5 + float2(0.5, 0.5)).a;
+				half4 mask = tex2D(_MainTex, IN.texcoord);
+				half4 mixed = saturate(ceil(IN.color - 0.5));
+				half4 col = saturate((mixed * 0.51 - IN.color) / -0.49);
+				
+				col.a *= alpha;
+				mask *= mixed;
+				col.a *= mask.r + mask.g + mask.b + mask.a;
 				return col;
 			}
 			ENDCG
 		}
 	}
-	Fallback "Unlit/Premultiplied Colored"
+	Fallback Off
 }
