@@ -71,6 +71,8 @@ public class UIPanelInspector : UIRectEditor
 
 	public void OnSceneGUI ()
 	{
+		if (Selection.objects.Length > 1) return;
+
 		UICamera cam = UICamera.FindCameraForLayer(mPanel.gameObject.layer);
 		if (cam == null || !cam.cachedCamera.isOrthoGraphic) return;
 

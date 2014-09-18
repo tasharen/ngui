@@ -20,6 +20,7 @@ public class UIGrid : UIWidgetContainer
 	{
 		Horizontal,
 		Vertical,
+		CellSnap,
 	}
 
 	public enum Sorting
@@ -32,7 +33,7 @@ public class UIGrid : UIWidgetContainer
 	}
 
 	/// <summary>
-	/// Type of arrangement -- vertical or horizontal.
+	/// Type of arrangement -- vertical, horizontal or cell snap.
 	/// </summary>
 
 	public Arrangement arrangement = Arrangement.Horizontal;
@@ -129,7 +130,7 @@ public class UIGrid : UIWidgetContainer
 		}
 
 		// Sort the list using the desired sorting logic
-		if (sorting != Sorting.None)
+		if (sorting != Sorting.None && arrangement != Arrangement.CellSnap)
 		{
 			if (sorting == Sorting.Alphabetic) list.Sort(SortByName);
 			else if (sorting == Sorting.Horizontal) list.Sort(SortHorizontal);
@@ -355,8 +356,15 @@ public class UIGrid : UIWidgetContainer
 			// See above
 			//t.parent = myTrans;
 
-			float depth = t.localPosition.z;
-			Vector3 pos = (arrangement == Arrangement.Horizontal) ?
+			Vector3 pos = t.localPosition;
+			float depth = pos.z;
+
+			if (arrangement == Arrangement.CellSnap)
+			{
+				if (cellWidth > 0) pos.x = Mathf.Round(pos.x / cellWidth) * cellWidth;
+				if (cellHeight > 0) pos.y = Mathf.Round(pos.y / cellHeight) * cellHeight;
+			}
+			else pos = (arrangement == Arrangement.Horizontal) ?
 				new Vector3(cellWidth * x, -cellHeight * y, depth) :
 				new Vector3(cellWidth * y, -cellHeight * x, depth);
 
