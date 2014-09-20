@@ -356,7 +356,7 @@ public class UIPanel : UIRect
 
 			while (p != null)
 			{
-				if (p.mClipping == UIDrawCall.Clipping.SoftClip || p.mClipping == UIDrawCall.Clipping.TextureClip) ++count;
+				if (p.mClipping == UIDrawCall.Clipping.SoftClip || p.mClipping == UIDrawCall.Clipping.TextureMask) ++count;
 				p = p.mParentPanel;
 			}
 			return count;
@@ -367,7 +367,7 @@ public class UIPanel : UIRect
 	/// Whether the panel will actually perform clipping of children.
 	/// </summary>
 
-	public bool hasClipping { get { return mClipping == UIDrawCall.Clipping.SoftClip || mClipping == UIDrawCall.Clipping.TextureClip; } }
+	public bool hasClipping { get { return mClipping == UIDrawCall.Clipping.SoftClip || mClipping == UIDrawCall.Clipping.TextureMask; } }
 
 	/// <summary>
 	/// Whether the panel will actually perform clipping of children.

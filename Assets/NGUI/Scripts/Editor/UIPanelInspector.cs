@@ -516,7 +516,7 @@ public class UIPanelInspector : UIRectEditor
 					EditorUtility.SetDirty(mPanel);
 				}
 			}
-			else if (mPanel.clipping == UIDrawCall.Clipping.TextureClip)
+			else if (mPanel.clipping == UIDrawCall.Clipping.TextureMask)
 			{
 				NGUIEditorTools.SetLabelWidth(0f);
 				GUILayout.Space(-90f);

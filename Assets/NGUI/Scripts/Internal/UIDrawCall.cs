@@ -37,7 +37,7 @@ public class UIDrawCall : MonoBehaviour
 	public enum Clipping : int
 	{
 		None = 0,
-		TextureClip = 1,			// Clipped using a texture rather than math
+		TextureMask = 1,			// Clipped using a texture rather than math
 		SoftClip = 3,				// Alpha-based clipping with a softened edge
 		ConstrainButDontClip = 4,	// No actual clipping, but does have an area
 	}
@@ -283,7 +283,7 @@ public class UIDrawCall : MonoBehaviour
 		const string textureClip = " (TextureClip)";
 		shaderName = shaderName.Replace(textureClip, "");
 
-		if (panel.clipping == Clipping.TextureClip)
+		if (panel.clipping == Clipping.TextureMask)
 		{
 			mTextureClip = true;
 			shader = Shader.Find("Hidden/" + shaderName + textureClip);
@@ -359,7 +359,7 @@ public class UIDrawCall : MonoBehaviour
 	void UpdateMaterials ()
 	{
 		// If clipping should be used, we need to find a replacement shader
-		if (mRebuildMat || mDynamicMat == null || mClipCount != panel.clipCount || mTextureClip != (panel.clipping == Clipping.TextureClip))
+		if (mRebuildMat || mDynamicMat == null || mClipCount != panel.clipCount || mTextureClip != (panel.clipping == Clipping.TextureMask))
 		{
 			RebuildMaterial();
 			mRebuildMat = false;

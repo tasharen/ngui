@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.7.2
+            Version 3.7.3
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,16 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.7.3
+- NEW: New clipping option on panels: Texture Mask. Any texture with alpha will work (think round minimap etc).
+- NEW: UICamera now has an option for whether events go to colliders or rigidbodies.
+- NEW: Added Cell Alignment field to the UITable letting you change the content's alignment.
+- NEW: UIGrid now has a "cell snap" arrangement type for when you simply want to have widgets snap as you drag them.
+- NEW: 2D Sprites now have a "pixel size" property.
+- FIX: Pre-defined texture preview for the Prefab Tool wasn't quite working right.
+- FIX: UIPanel now always force-disables the "offset" option if it's on the UIRoot.
+- FIX: Handles will now automatically hide when multi-editing widgets, allowing you to use the transform move.
 
 3.7.2
 - NEW: You can now explicitly choose the panel used as a drag region for UIDragObject.
