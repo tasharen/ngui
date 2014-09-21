@@ -143,15 +143,35 @@ public class UISlider : UIProgressBar
 		{
 			float step = (numberOfSteps > 1f) ? 1f / (numberOfSteps - 1) : 0.125f;
 
-			if (fillDirection == FillDirection.LeftToRight || fillDirection == FillDirection.RightToLeft)
+			switch (mFill)
 			{
-				if (key == KeyCode.LeftArrow) value = mValue - step;
-				else if (key == KeyCode.RightArrow) value = mValue + step;
-			}
-			else
-			{
-				if (key == KeyCode.DownArrow) value = mValue - step;
-				else if (key == KeyCode.UpArrow) value = mValue + step;
+				case FillDirection.LeftToRight:
+				{
+					if (key == KeyCode.LeftArrow) value = mValue - step;
+					else if (key == KeyCode.RightArrow) value = mValue + step;
+				}
+				break;
+
+				case FillDirection.RightToLeft:
+				{
+					if (key == KeyCode.LeftArrow) value = mValue + step;
+					else if (key == KeyCode.RightArrow) value = mValue - step;
+				}
+				break;
+
+				case FillDirection.BottomToTop:
+				{
+					if (key == KeyCode.DownArrow) value = mValue - step;
+					else if (key == KeyCode.UpArrow) value = mValue + step;
+				}
+				break;
+
+				case FillDirection.TopToBottom:
+				{
+					if (key == KeyCode.DownArrow) value = mValue + step;
+					else if (key == KeyCode.UpArrow) value = mValue - step;
+				}
+				break;
 			}
 		}
 	}
