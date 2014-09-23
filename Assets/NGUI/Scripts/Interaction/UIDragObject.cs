@@ -169,7 +169,7 @@ public class UIDragObject : MonoBehaviour
 			else if (mPressed && mTouchID == UICamera.currentTouchID)
 			{
 				mPressed = false;
-				
+
 				if (restrictWithinPanel && dragEffect == DragEffect.MomentumAndSpring)
 				{
 					if (panelRegion.ConstrainTargetToBounds(target, ref mBounds, false))
@@ -290,7 +290,6 @@ public class UIDragObject : MonoBehaviour
 				else CancelSpring();
 			}
 		}
-		else mTargetPos = (target != null) ? target.position : Vector3.zero;
 
 		// Dampen the momentum
 		NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
