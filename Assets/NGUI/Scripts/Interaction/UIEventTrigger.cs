@@ -72,7 +72,7 @@ public class UIEventTrigger : MonoBehaviour
 		current = null;
 	}
 
-	void OnDragStart (GameObject go)
+	void OnDragStart ()
 	{
 		if (current != null) return;
 		current = this;
@@ -80,7 +80,7 @@ public class UIEventTrigger : MonoBehaviour
 		current = null;
 	}
 
-	void OnDragEnd (GameObject go)
+	void OnDragEnd ()
 	{
 		if (current != null) return;
 		current = this;
