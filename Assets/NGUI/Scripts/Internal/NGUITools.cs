@@ -914,7 +914,6 @@ static public class NGUITools
 		widget.width = 100;
 		widget.height = 100;
 		widget.depth = depth;
-		widget.gameObject.layer = go.layer;
 		return widget;
 	}
 
