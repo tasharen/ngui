@@ -109,7 +109,8 @@ public class UILabelInspector : UIWidgetInspector
 
 		if (mFontType == FontType.Unity)
 		{
-			EditorGUILayout.HelpBox("Dynamic fonts suffer from a bunch of issues caused by its poorly designed system within Unity itself. Your characters may disappear, get garbled, or just not show at times. Use this bugged Unity feature at your own risk.", MessageType.Warning);
+			EditorGUILayout.HelpBox("Dynamic fonts suffer from issues in Unity itself where your characters may disappear, get garbled, or just not show at times. Use this feature at your own risk.\n\n" +
+				"When you do run into such issues, please submit a Bug Report to Unity via Help -> Report a Bug (as this is will be a Unity bug, not an NGUI one).", MessageType.Warning);
 		}
 
 		EditorGUI.BeginDisabledGroup(!isValid);
