@@ -146,6 +146,9 @@ public class TypewriterEffect : MonoBehaviour
 			while (NGUIText.ParseSymbol(mFullText, ref mCurrentOffset)) { }
 			++mCurrentOffset;
 
+			// Reached the end? We're done.
+			if (mCurrentOffset >= mFullText.Length) break;
+
 			// Periods and end-of-line characters should pause for a longer time.
 			float delay = 1f / charsPerSecond;
 			char c = (lastOffset < mFullText.Length) ? mFullText[lastOffset] : '\n';
