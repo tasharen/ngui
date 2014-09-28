@@ -51,7 +51,7 @@ public class UISavedOption : MonoBehaviour
 
 		if (mCheck != null)
 		{
-			mCheck.value = (PlayerPrefs.GetInt(key, 1) != 0);
+			mCheck.value = (PlayerPrefs.GetInt(key, mCheck.startsActive ? 1 : 0) != 0);
 		}
 		else
 		{
