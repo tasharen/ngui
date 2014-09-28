@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.7.3
+            Version 3.7.4
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,13 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.7.4
+- FIX: UIInput no longer uses OnGUI unless you actually select the input field first (eliminates GC alloc).
+- FIX: UIEventTrigger's OnDragStart/OnDragEnd shouldn't have had parameters.
+- FIX: UIDragObject should now work properly with a constrained type UIRoot.
+- FIX: Key/controller interaction wasn't quite correct with sliders/scroll bars.
+- FIX: UIDragObject will now snap to pixels after the movement completes.
 
 3.7.3
 - NEW: New clipping option on panels: Texture Mask. Any texture with alpha will work (think round minimap etc).
