@@ -68,7 +68,7 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] int mSpacingX = 0;
 	[HideInInspector][SerializeField] int mSpacingY = 0;
 	[HideInInspector][SerializeField] bool mUseFloatSpacing = false;
-    [HideInInspector][SerializeField] float mFloatSpacingX = 0;
+	[HideInInspector][SerializeField] float mFloatSpacingX = 0;
 	[HideInInspector][SerializeField] float mFloatSpacingY = 0;
 
 	// Obsolete values
@@ -441,91 +441,91 @@ public class UILabel : UIWidget
 		}
 	}
 
-    /// <summary>
-    /// Whether this label will support color encoding in the format of [RRGGBB] and new line in the form of a "\\n" string.
-    /// </summary>
+	/// <summary>
+	/// Whether this label will support color encoding in the format of [RRGGBB] and new line in the form of a "\\n" string.
+	/// </summary>
 
-    public bool useFloatSpacing
-    {
-        get
-        {
-            return mUseFloatSpacing;
-        }
-        set
-        {
-            if (mUseFloatSpacing != value)
-            {
-                mUseFloatSpacing = value;
-                shouldBeProcessed = true;
-            }
-        }
-    }
+	public bool useFloatSpacing
+	{
+		get
+		{
+			return mUseFloatSpacing;
+		}
+		set
+		{
+			if (mUseFloatSpacing != value)
+			{
+				mUseFloatSpacing = value;
+				shouldBeProcessed = true;
+			}
+		}
+	}
 
-    /// <summary>
-    /// Additional horizontal spacing between characters when printing text.
-    /// For this to have any effect useFloatSpacing must be true.
-    /// </summary>
+	/// <summary>
+	/// Additional horizontal spacing between characters when printing text.
+	/// For this to have any effect useFloatSpacing must be true.
+	/// </summary>
 
-    public float floatSpacingX
-    {
-        get
-        {
-            return mFloatSpacingX;
-        }
-        set
-        {
-            if (!Mathf.Approximately(mFloatSpacingX, value))
-            {
-                mFloatSpacingX = value;
-                MarkAsChanged();
-            }
-        }
-    }
+	public float floatSpacingX
+	{
+		get
+		{
+			return mFloatSpacingX;
+		}
+		set
+		{
+			if (!Mathf.Approximately(mFloatSpacingX, value))
+			{
+				mFloatSpacingX = value;
+				MarkAsChanged();
+			}
+		}
+	}
 
-    /// <summary>
-    /// Additional vertical spacing between lines when printing text.
-    /// For this to have any effect useFloatSpacing must be true.
-    /// </summary>
+	/// <summary>
+	/// Additional vertical spacing between lines when printing text.
+	/// For this to have any effect useFloatSpacing must be true.
+	/// </summary>
 
-    public float floatSpacingY
-    {
-        get
-        {
-            return mFloatSpacingY;
-        }
-        set
-        {
-            if (!Mathf.Approximately(mFloatSpacingY, value))
-            {
-                mFloatSpacingY = value;
-                MarkAsChanged();
-            }
-        }
-    }
+	public float floatSpacingY
+	{
+		get
+		{
+			return mFloatSpacingY;
+		}
+		set
+		{
+			if (!Mathf.Approximately(mFloatSpacingY, value))
+			{
+				mFloatSpacingY = value;
+				MarkAsChanged();
+			}
+		}
+	}
 
-    /// <summary>
-    /// Convenience property to get the used y spacing.
-    /// </summary>
+	/// <summary>
+	/// Convenience property to get the used y spacing.
+	/// </summary>
 
-    public float effectiveSpacingY
-    {
-        get
-        {
-            return mUseFloatSpacing ? mFloatSpacingY : mSpacingY;
-        }
-    }
+	public float effectiveSpacingY
+	{
+		get
+		{
+			return mUseFloatSpacing ? mFloatSpacingY : mSpacingY;
+		}
+	}
 
-    /// <summary>
-    /// Convenience property to get the used x spacing.
-    /// </summary>
+	/// <summary>
+	/// Convenience property to get the used x spacing.
+	/// </summary>
 
-    public float effectiveSpacingX
-    {
-        get
-        {
-            return mUseFloatSpacing ? mFloatSpacingX : mSpacingX;
-        }
-    }
+	public float effectiveSpacingX
+	{
+		get
+		{
+			return mUseFloatSpacing ? mFloatSpacingX : mSpacingX;
+		}
+	}
 
 #if DYNAMIC_FONT
 	/// <summary>
@@ -1523,7 +1523,7 @@ public class UILabel : UIWidget
 						Vector2 localPos = mTempVerts[i];
 
 						if (key == KeyCode.UpArrow) localPos.y += def + effectiveSpacingY;
-                        else if (key == KeyCode.DownArrow) localPos.y -= def + effectiveSpacingY;
+						else if (key == KeyCode.DownArrow) localPos.y -= def + effectiveSpacingY;
 						else if (key == KeyCode.Home) localPos.x -= 1000f;
 						else if (key == KeyCode.End) localPos.x += 1000f;
 
@@ -1844,7 +1844,7 @@ public class UILabel : UIWidget
 		NGUIText.symbolStyle = mSymbols;
 		NGUIText.maxLines = mMaxLineCount;
 		NGUIText.spacingX = effectiveSpacingX;
-        NGUIText.spacingY = effectiveSpacingY;
+		NGUIText.spacingY = effectiveSpacingY;
 		NGUIText.fontScale = isDynamic ? mScale : ((float)mFontSize / mFont.defaultSize) * mScale;
 
 		if (mFont != null)
