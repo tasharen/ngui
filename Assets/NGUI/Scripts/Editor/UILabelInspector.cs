@@ -253,15 +253,31 @@ public class UILabelInspector : UIWidgetInspector
 			GUILayout.EndHorizontal();
 			EditorGUI.EndDisabledGroup();
 
-			GUILayout.BeginHorizontal();
-			GUILayout.Label("Spacing", GUILayout.Width(56f));
-			NGUIEditorTools.SetLabelWidth(20f);
-			NGUIEditorTools.DrawProperty("X", serializedObject, "mSpacingX", GUILayout.MinWidth(40f));
-			NGUIEditorTools.DrawProperty("Y", serializedObject, "mSpacingY", GUILayout.MinWidth(40f));
-			NGUIEditorTools.DrawPadding();
-			NGUIEditorTools.SetLabelWidth(80f);
-			GUILayout.EndHorizontal();
+            sp = NGUIEditorTools.DrawProperty("Float spacing", serializedObject, "mUseFloatSpacing", GUILayout.Width(100f));
 
+		    if (!sp.boolValue)
+		    {
+		        GUILayout.BeginHorizontal();
+			    GUILayout.Label("Spacing", GUILayout.Width(56f));
+			    NGUIEditorTools.SetLabelWidth(20f);
+			    NGUIEditorTools.DrawProperty("X", serializedObject, "mSpacingX", GUILayout.MinWidth(40f));
+			    NGUIEditorTools.DrawProperty("Y", serializedObject, "mSpacingY", GUILayout.MinWidth(40f));
+			    NGUIEditorTools.DrawPadding();
+			    NGUIEditorTools.SetLabelWidth(80f);
+			    GUILayout.EndHorizontal();
+		    }
+		    else
+		    {
+		        GUILayout.BeginHorizontal();
+                GUILayout.Label("Spacing", GUILayout.Width(56f));
+                NGUIEditorTools.SetLabelWidth(20f);
+                NGUIEditorTools.DrawProperty("X", serializedObject, "mFloatSpacingX", GUILayout.MinWidth(40f));
+                NGUIEditorTools.DrawProperty("Y", serializedObject, "mFloatSpacingY", GUILayout.MinWidth(40f));
+                NGUIEditorTools.DrawPadding();
+                NGUIEditorTools.SetLabelWidth(80f);
+                GUILayout.EndHorizontal();
+		    }
+			
 			NGUIEditorTools.DrawProperty("Max Lines", serializedObject, "mMaxLineCount", GUILayout.Width(110f));
 
 			GUILayout.BeginHorizontal();
