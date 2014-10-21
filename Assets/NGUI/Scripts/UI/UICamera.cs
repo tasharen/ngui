@@ -740,7 +740,7 @@ public class UICamera : MonoBehaviour
 					lastWorldPosition = lastHit.point;
 					hoveredObject = lastHit.collider.gameObject;
 
-					if (!cam.eventsGoToColliders)
+					if (!list[0].eventsGoToColliders)
 					{
 						Rigidbody rb = FindRootRigidbody(hoveredObject.transform);
 						if (rb != null) hoveredObject = rb.gameObject;

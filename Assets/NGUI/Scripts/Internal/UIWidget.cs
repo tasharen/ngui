@@ -70,7 +70,11 @@ public class UIWidget : UIRect
 		}
 		set
 		{
+#if UNITY_FLASH
+			if (!(mOnRender == value))
+#else
 			if (mOnRender != value)
+#endif
 			{
 #if !UNITY_FLASH
 				if (drawCall != null && drawCall.onRender != null && mOnRender != null)

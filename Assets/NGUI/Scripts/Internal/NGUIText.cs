@@ -106,6 +106,7 @@ static public class NGUIText
 		{
 			dynamicFont.RequestCharactersInTexture(")_-", finalSize, fontStyle);
 
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 			if (!dynamicFont.GetCharacterInfo(')', out mTempChar, finalSize, fontStyle) || mTempChar.vert.height == 0f)
 			{
 				dynamicFont.RequestCharactersInTexture("A", finalSize, fontStyle);
@@ -120,6 +121,22 @@ static public class NGUIText
 
 			float y0 = mTempChar.vert.yMax;
 			float y1 = mTempChar.vert.yMin;
+#else
+			if (!dynamicFont.GetCharacterInfo(')', out mTempChar, finalSize, fontStyle) || mTempChar.maxY == 0f)
+			{
+				dynamicFont.RequestCharactersInTexture("A", finalSize, fontStyle);
+				{
+					if (!dynamicFont.GetCharacterInfo('A', out mTempChar, finalSize, fontStyle))
+					{
+						baseline = 0f;
+						return;
+					}
+				}
+			}
+
+			float y0 = mTempChar.maxY;
+			float y1 = mTempChar.minY;
+#endif
 			baseline = Mathf.Round(y0 + (finalSize - y0 + y1) * 0.5f);
 		}
 #endif
@@ -175,7 +192,11 @@ static public class NGUIText
 		else if (dynamicFont != null)
 		{
 			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fontStyle))
+ #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 				return mTempChar.width * fontScale * pixelDensity;
+ #else
+				return mTempChar.advance * fontScale * pixelDensity;
+ #endif
 		}
 #endif
 		return 0f;
@@ -234,6 +255,7 @@ static public class NGUIText
 		{
 			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fontStyle))
 			{
+ #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 				glyph.v0.x = mTempChar.vert.xMin;
 				glyph.v1.x = glyph.v0.x + mTempChar.vert.width;
 
@@ -249,7 +271,20 @@ static public class NGUIText
 				glyph.advance = mTempChar.width;
 				glyph.channel = 0;
 				glyph.rotatedUVs = mTempChar.flipped;
+ #else
+				glyph.v0.x = mTempChar.minX;
+				glyph.v1.x = mTempChar.maxX;
 
+				glyph.v0.y = mTempChar.maxY - baseline;
+				glyph.v1.y = mTempChar.minY - baseline;
+
+				glyph.u0 = mTempChar.uvBottomLeft;
+				glyph.u1 = mTempChar.uvTopRight;
+
+				glyph.advance = mTempChar.advance;
+				glyph.channel = 0;
+				glyph.rotatedUVs = false;
+ #endif
 				glyph.v0.x = Mathf.Round(glyph.v0.x);
 				glyph.v0.y = Mathf.Round(glyph.v0.y);
 				glyph.v1.x = Mathf.Round(glyph.v1.x);

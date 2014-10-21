@@ -747,16 +747,27 @@ public class UIPanel : UIRect
 	/// Returns whether the specified rectangle is visible by the panel. The coordinates must be in world space.
 	/// </summary>
 
+#if UNITY_FLASH
+	public bool IsVisible (Vector3 aa, Vector3 bb, Vector3 cc, Vector3 dd)
+#else
 	public bool IsVisible (Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+#endif
 	{
 		UpdateTransformMatrix();
 
 		// Transform the specified points from world space to local space
+#if UNITY_FLASH
+		// http://www.tasharen.com/forum/index.php?topic=11390.0
+		Vector3 a = worldToLocal.MultiplyPoint3x4(aa);
+		Vector3 b = worldToLocal.MultiplyPoint3x4(bb);
+		Vector3 c = worldToLocal.MultiplyPoint3x4(cc);
+		Vector3 d = worldToLocal.MultiplyPoint3x4(dd);
+#else
 		a = worldToLocal.MultiplyPoint3x4(a);
 		b = worldToLocal.MultiplyPoint3x4(b);
 		c = worldToLocal.MultiplyPoint3x4(c);
 		d = worldToLocal.MultiplyPoint3x4(d);
-
+#endif
 		mTemp[0] = a.x;
 		mTemp[1] = b.x;
 		mTemp[2] = c.x;
@@ -1426,6 +1437,13 @@ public class UIPanel : UIRect
 		{
 			Transform parent = cachedTransform.parent;
 			pos = cachedTransform.localPosition;
+
+			if (clipping != UIDrawCall.Clipping.None)
+			{
+				pos.x = Mathf.RoundToInt(pos.x);
+				pos.y = Mathf.RoundToInt(pos.y);
+			}
+
 			if (parent != null) pos = parent.TransformPoint(pos);
 			pos += drawCallOffset;
 		}

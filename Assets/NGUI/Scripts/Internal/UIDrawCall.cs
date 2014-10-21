@@ -1,3 +1,4 @@
+
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
 // Copyright © 2011-2014 Tasharen Entertainment
@@ -633,21 +634,8 @@ public class UIDrawCall : MonoBehaviour
 		}
 	}
 
-	static int[] ClipRange =
-	{
-		Shader.PropertyToID("_ClipRange0"),
-		Shader.PropertyToID("_ClipRange1"),
-		Shader.PropertyToID("_ClipRange2"),
-		Shader.PropertyToID("_ClipRange4"),
-	};
-
-	static int[] ClipArgs =
-	{
-		Shader.PropertyToID("_ClipArgs0"),
-		Shader.PropertyToID("_ClipArgs1"),
-		Shader.PropertyToID("_ClipArgs2"),
-		Shader.PropertyToID("_ClipArgs3"),
-	};
+	static int[] ClipRange = null;
+	static int[] ClipArgs = null;
 
 	/// <summary>
 	/// Set the shader clipping parameters.
@@ -665,6 +653,35 @@ public class UIDrawCall : MonoBehaviour
 		{
 			mDynamicMat.SetVector(ClipRange[index], new Vector4(-cr.x / cr.z, -cr.y / cr.w, 1f / cr.z, 1f / cr.w));
 			mDynamicMat.SetVector(ClipArgs[index], new Vector4(sharpness.x, sharpness.y, Mathf.Sin(angle), Mathf.Cos(angle)));
+		}
+	}
+
+	/// <summary>
+	/// Cache the property IDs.
+	/// </summary>
+
+	void Awake ()
+	{
+		if (ClipRange == null)
+		{
+			ClipRange = new int[]
+			{
+				Shader.PropertyToID("_ClipRange0"),
+				Shader.PropertyToID("_ClipRange1"),
+				Shader.PropertyToID("_ClipRange2"),
+				Shader.PropertyToID("_ClipRange4"),
+			};
+		}
+
+		if (ClipArgs == null)
+		{
+			ClipArgs = new int[]
+			{
+				Shader.PropertyToID("_ClipArgs0"),
+				Shader.PropertyToID("_ClipArgs1"),
+				Shader.PropertyToID("_ClipArgs2"),
+				Shader.PropertyToID("_ClipArgs3"),
+			};
 		}
 	}
 
