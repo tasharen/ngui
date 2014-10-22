@@ -442,7 +442,7 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
-	/// Whether this label will support color encoding in the format of [RRGGBB] and new line in the form of a "\\n" string.
+	/// Whether this label will use float text spacing values, instead of integers.
 	/// </summary>
 
 	public bool useFloatSpacing
