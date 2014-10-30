@@ -111,14 +111,14 @@ public class UIButtonColor : UIWidgetContainer
 	{
 		mInitDone = true;
 		if (tweenTarget == null) tweenTarget = gameObject;
-		mWidget = tweenTarget.GetComponent<UIWidget>();
+		if (tweenTarget != null) mWidget = tweenTarget.GetComponent<UIWidget>();
 
 		if (mWidget != null)
 		{
 			mDefaultColor = mWidget.color;
 			mStartingColor = mDefaultColor;
 		}
-		else
+		else if (tweenTarget != null)
 		{
 			Renderer ren = tweenTarget.renderer;
 
@@ -302,18 +302,21 @@ public class UIButtonColor : UIWidgetContainer
 	{
 		TweenColor tc;
 
-		switch (mState)
+		if (tweenTarget != null)
 		{
-			case State.Hover: tc = TweenColor.Begin(tweenTarget, duration, hover); break;
-			case State.Pressed: tc = TweenColor.Begin(tweenTarget, duration, pressed); break;
-			case State.Disabled: tc = TweenColor.Begin(tweenTarget, duration, disabledColor); break;
-			default: tc = TweenColor.Begin(tweenTarget, duration, mDefaultColor); break;
-		}
+			switch (mState)
+			{
+				case State.Hover: tc = TweenColor.Begin(tweenTarget, duration, hover); break;
+				case State.Pressed: tc = TweenColor.Begin(tweenTarget, duration, pressed); break;
+				case State.Disabled: tc = TweenColor.Begin(tweenTarget, duration, disabledColor); break;
+				default: tc = TweenColor.Begin(tweenTarget, duration, mDefaultColor); break;
+			}
 
-		if (instant && tc != null)
-		{
-			tc.value = tc.to;
-			tc.enabled = false;
+			if (instant && tc != null)
+			{
+				tc.value = tc.to;
+				tc.enabled = false;
+			}
 		}
 	}
 }

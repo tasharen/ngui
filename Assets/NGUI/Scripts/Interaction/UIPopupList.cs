@@ -247,7 +247,7 @@ public class UIPopupList : UIWidgetContainer
 		get
 		{
 			int index = items.IndexOf(mSelectedItem);
-			return index < itemData.Count ? itemData[index] : null;
+			return index > -1 && index < itemData.Count ? itemData[index] : null;
 		}
 	}
 

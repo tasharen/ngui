@@ -108,7 +108,7 @@ public class UIEventTrigger : MonoBehaviour
 	{
 		if (current != null) return;
 		current = this;
-		EventDelegate.Execute(onDragOut);
+		EventDelegate.Execute(onDrag);
 		current = null;
 	}
 }

@@ -367,7 +367,10 @@ public abstract class UIRect : MonoBehaviour
 		if (anchorCamera == null || ac.targetCam == null)
 			return cachedTransform.localPosition;
 
-		Vector3 pos = mCam.ViewportToWorldPoint(ac.targetCam.WorldToViewportPoint(ac.target.position));
+		Rect rect = ac.targetCam.rect;
+		Vector3 viewPos = ac.targetCam.WorldToViewportPoint(ac.target.position);
+		Vector3 pos = new Vector3((viewPos.x * rect.width) + rect.x, (viewPos.y * rect.height) + rect.y, viewPos.z);
+		pos = mCam.ViewportToWorldPoint(pos);
 		if (trans != null) pos = trans.InverseTransformPoint(pos);
 		pos.x = Mathf.Floor(pos.x + 0.5f);
 		pos.y = Mathf.Floor(pos.y + 0.5f);
