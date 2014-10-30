@@ -189,7 +189,6 @@ public class UIWrapContent : MonoBehaviour
 					{
 						t.localPosition = pos;
 						UpdateItem(t, i);
-						t.name = realIndex.ToString();
 					}
 					else allWithinRange = false;
 				}
@@ -204,7 +203,6 @@ public class UIWrapContent : MonoBehaviour
 					{
 						t.localPosition = pos;
 						UpdateItem(t, i);
-						t.name = realIndex.ToString();
 					}
 					else allWithinRange = false;
 				}
@@ -239,7 +237,6 @@ public class UIWrapContent : MonoBehaviour
 					{
 						t.localPosition = pos;
 						UpdateItem(t, i);
-						t.name = realIndex.ToString();
 					}
 					else allWithinRange = false;
 				}
@@ -254,7 +251,6 @@ public class UIWrapContent : MonoBehaviour
 					{
 						t.localPosition = pos;
 						UpdateItem(t, i);
-						t.name = realIndex.ToString();
 					}
 					else allWithinRange = false;
 				}

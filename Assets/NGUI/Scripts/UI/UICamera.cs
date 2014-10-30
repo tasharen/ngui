@@ -1420,6 +1420,8 @@ public class UICamera : MonoBehaviour
 		for (int i = 1; i < 3; ++i) mMouse[i].last = mMouse[0].last;
 	}
 
+	static bool mUsingTouchEvents = true;
+
 	/// <summary>
 	/// Update touch-based events.
 	/// </summary>
@@ -1471,11 +1473,19 @@ public class UICamera : MonoBehaviour
 
 		if (Input.touchCount == 0)
 		{
+			// Skip the first frame after using touch events
+			if (mUsingTouchEvents)
+			{
+				mUsingTouchEvents = false;
+				return;
+			}
+
 			if (useMouse) ProcessMouse();
 #if UNITY_EDITOR
 			else ProcessFakeTouches();
 #endif
 		}
+		else mUsingTouchEvents = true;
 	}
 
 	/// <summary>
