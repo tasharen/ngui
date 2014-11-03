@@ -1391,8 +1391,19 @@ public class UICamera : MonoBehaviour
 			if (pressed || unpressed) currentScheme = ControlScheme.Mouse;
 
 			currentTouch = mMouse[i];
-			currentTouchID = -1 - i;
-			currentKey = KeyCode.Mouse0 + i;
+
+#if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+			if (i == 0 && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+			{
+				currentTouchID = -2;
+				currentKey = KeyCode.Mouse1;
+			}
+			else
+#endif
+			{
+				currentTouchID = -1 - i;
+				currentKey = KeyCode.Mouse0 + i;
+			}
 	
 			// We don't want to update the last camera while there is a touch happening
 			if (pressed) currentTouch.pressedCam = currentCamera;
