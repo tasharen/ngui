@@ -145,6 +145,7 @@ public class UIWrapContent : MonoBehaviour
 		{
 			Transform t = mChildren[i];
 			t.localPosition = mHorizontal ? new Vector3(i * itemSize, 0f, 0f) : new Vector3(0f, -i * itemSize, 0f);
+			UpdateItem(t, i);
 		}
 	}
 
