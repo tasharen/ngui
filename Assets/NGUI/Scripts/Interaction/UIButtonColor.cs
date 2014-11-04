@@ -103,9 +103,7 @@ public class UIButtonColor : UIWidgetContainer
 
 	public void ResetDefaultColor () { defaultColor = mStartingColor; }
 
-	void Awake () { if (!mInitDone) OnInit(); }
-
-	void Start () { if (!isEnabled) SetState(State.Disabled, true); }
+	void Start () { if (!mInitDone) OnInit(); if (!isEnabled) SetState(State.Disabled, true); }
 
 	protected virtual void OnInit ()
 	{
