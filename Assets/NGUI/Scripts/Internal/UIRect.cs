@@ -172,18 +172,16 @@ public abstract class UIRect : MonoBehaviour
 	[System.NonSerialized] bool mUpdateAnchors = true;
 	[System.NonSerialized] int mUpdateFrame = -1;
 	[System.NonSerialized] bool mAnchorsCached = false;
+	[System.NonSerialized] UIRoot mRoot;
+	[System.NonSerialized] UIRect mParent;
+	[System.NonSerialized] bool mRootSet = false;
+	[System.NonSerialized] protected Camera mCam;
 
 	/// <summary>
 	/// Final calculated alpha.
 	/// </summary>
 
-	[System.NonSerialized]
-	public float finalAlpha = 1f;
-
-	UIRoot mRoot;
-	UIRect mParent;
-	bool mRootSet = false;
-	protected Camera mCam;
+	[System.NonSerialized] public float finalAlpha = 1f;
 
 	/// <summary>
 	/// Game object gets cached for speed. Can't simply return 'mGo' set in Awake because this function may be called on a prefab.
