@@ -907,7 +907,11 @@ public class UIPopupList : UIWidgetContainer
 				else
 				{
 					BoxCollider2D b2d = lbl.GetComponent<BoxCollider2D>();
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 					b2d.center = bcCenter;
+#else
+					b2d.offset = bcCenter;
+#endif
 					b2d.size = bcSize;
 				}
 			}

@@ -479,7 +479,7 @@ public static class NGUIEditorTools
 
 			if (NGUISettings.trueColorAtlas)
 			{
-				settings.textureFormat = TextureImporterFormat.AutomaticTruecolor;
+				settings.textureFormat = TextureImporterFormat.ARGB32;
 				settings.filterMode = FilterMode.Trilinear;
 			}
 

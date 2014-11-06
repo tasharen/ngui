@@ -303,6 +303,9 @@ public class UIDrawCall : MonoBehaviour
 		}
 		else shader = Shader.Find(shaderName);
 
+		// Always fallback to the default shader
+		if (shader == null) shader = Shader.Find("Unlit/Transparent Colored");
+
 		if (mMaterial != null)
 		{
 			mDynamicMat = new Material(mMaterial);

@@ -461,7 +461,11 @@ public class UICamera : MonoBehaviour
 	/// Caching is always preferable for performance.
 	/// </summary>
 
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 	public Camera cachedCamera { get { if (mCam == null) mCam = camera; return mCam; } }
+#else
+	public Camera cachedCamera { get { if (mCam == null) mCam = GetComponent<Camera>(); return mCam; } }
+#endif
 
 	/// <summary>
 	/// Set to 'true' just before OnDrag-related events are sent. No longer needed, but kept for backwards compatibility.
@@ -682,7 +686,11 @@ public class UICamera : MonoBehaviour
 		while (trans != null)
 		{
 			if (trans.GetComponent<UIPanel>() != null) return null;
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 			Rigidbody rb = trans.rigidbody;
+#else
+			Rigidbody rb = trans.GetComponent<Rigidbody>();
+#endif
 			if (rb != null) return rb;
 			trans = trans.parent;
 		}
@@ -698,7 +706,11 @@ public class UICamera : MonoBehaviour
 		while (trans != null)
 		{
 			if (trans.GetComponent<UIPanel>() != null) return null;
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 			Rigidbody2D rb = trans.rigidbody2D;
+#else
+			Rigidbody2D rb = trans.GetComponent<Rigidbody2D>();
+#endif
 			if (rb != null) return rb;
 			trans = trans.parent;
 		}
@@ -1391,8 +1403,19 @@ public class UICamera : MonoBehaviour
 			if (pressed || unpressed) currentScheme = ControlScheme.Mouse;
 
 			currentTouch = mMouse[i];
-			currentTouchID = -1 - i;
-			currentKey = KeyCode.Mouse0 + i;
+
+#if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
+			if (i == 0 && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+			{
+				currentTouchID = -2;
+				currentKey = KeyCode.Mouse1;
+			}
+			else
+#endif
+			{
+				currentTouchID = -1 - i;
+				currentKey = KeyCode.Mouse0 + i;
+			}
 	
 			// We don't want to update the last camera while there is a touch happening
 			if (pressed) currentTouch.pressedCam = currentCamera;

@@ -103,9 +103,7 @@ public class UIButtonColor : UIWidgetContainer
 
 	public void ResetDefaultColor () { defaultColor = mStartingColor; }
 
-	void Awake () { if (!mInitDone) OnInit(); }
-
-	void Start () { if (!isEnabled) SetState(State.Disabled, true); }
+	void Start () { if (!mInitDone) OnInit(); if (!isEnabled) SetState(State.Disabled, true); }
 
 	protected virtual void OnInit ()
 	{
@@ -120,8 +118,11 @@ public class UIButtonColor : UIWidgetContainer
 		}
 		else if (tweenTarget != null)
 		{
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 			Renderer ren = tweenTarget.renderer;
-
+#else
+			Renderer ren = tweenTarget.GetComponent<Renderer>();
+#endif
 			if (ren != null)
 			{
 				mDefaultColor = Application.isPlaying ? ren.material.color : ren.sharedMaterial.color;
@@ -129,8 +130,11 @@ public class UIButtonColor : UIWidgetContainer
 			}
 			else
 			{
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 				Light lt = tweenTarget.light;
-
+#else
+				Light lt = tweenTarget.GetComponent<Light>();
+#endif
 				if (lt != null)
 				{
 					mDefaultColor = lt.color;
