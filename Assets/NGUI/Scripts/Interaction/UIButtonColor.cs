@@ -118,8 +118,11 @@ public class UIButtonColor : UIWidgetContainer
 		}
 		else if (tweenTarget != null)
 		{
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 			Renderer ren = tweenTarget.renderer;
-
+#else
+			Renderer ren = tweenTarget.GetComponent<Renderer>();
+#endif
 			if (ren != null)
 			{
 				mDefaultColor = Application.isPlaying ? ren.material.color : ren.sharedMaterial.color;
@@ -127,8 +130,11 @@ public class UIButtonColor : UIWidgetContainer
 			}
 			else
 			{
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 				Light lt = tweenTarget.light;
-
+#else
+				Light lt = tweenTarget.GetComponent<Light>();
+#endif
 				if (lt != null)
 				{
 					mDefaultColor = lt.color;

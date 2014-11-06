@@ -291,7 +291,11 @@ public class UIPanel : UIRect
 	/// Whether the camera is used to draw UI geometry.
 	/// </summary>
 
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 	public bool usedForUI { get { return (anchorCamera != null && mCam.isOrthoGraphic); } }
+#else
+	public bool usedForUI { get { return (anchorCamera != null && mCam.orthographic); } }
+#endif
 
 	/// <summary>
 	/// Directx9 pixel offset, used for drawing.
@@ -301,7 +305,11 @@ public class UIPanel : UIRect
 	{
 		get
 		{
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 			if (mHalfPixelOffset && anchorCamera != null && mCam.isOrthoGraphic)
+#else
+			if (mHalfPixelOffset && anchorCamera != null && mCam.orthographic)
+#endif
 			{
 				Vector2 size = GetWindowSize();
 				float mod = (1f / size.y) / mCam.orthographicSize;
@@ -949,7 +957,11 @@ public class UIPanel : UIRect
 		FindParent();
 
 		// Apparently having a rigidbody helps
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 		if (rigidbody == null && mParentPanel == null)
+#else
+		if (GetComponent<Rigidbody>() == null && mParentPanel == null)
+#endif
 		{
 			UICamera uic = (anchorCamera != null) ? mCam.GetComponent<UICamera>() : null;
 
@@ -1845,7 +1857,11 @@ public class UIPanel : UIRect
 
 		Gizmos.matrix = t.localToWorldMatrix;
 
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 		if (isUsingThisPanel && !clip && mCam.isOrthoGraphic)
+#else
+		if (isUsingThisPanel && !clip && mCam.orthographic)
+#endif
 		{
 			UIRoot rt = root;
 
