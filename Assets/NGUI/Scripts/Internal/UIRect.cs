@@ -383,12 +383,19 @@ public abstract class UIRect : MonoBehaviour
 		return pos;
 	}
 
+#if UNITY_EDITOR
+	[System.NonSerialized] bool mEnabled = false;
+#endif
+
 	/// <summary>
 	/// Automatically find the parent rectangle.
 	/// </summary>
 
 	protected virtual void OnEnable ()
 	{
+#if UNITY_EDITOR
+		mEnabled = true;
+#endif
 		mUpdateFrame = -1;
 		
 		if (updateAnchors == AnchorUpdate.OnEnable)
@@ -418,6 +425,9 @@ public abstract class UIRect : MonoBehaviour
 
 	protected virtual void OnDisable ()
 	{
+#if UNITY_EDITOR
+		mEnabled = false;
+#endif
 		if (mParent) mParent.mChildren.Remove(this);
 		mParent = null;
 		mRoot = null;
@@ -664,7 +674,7 @@ public abstract class UIRect : MonoBehaviour
 
 	protected virtual void OnValidate ()
 	{
-		if (NGUITools.GetActive(this))
+		if (mEnabled && NGUITools.GetActive(this))
 		{
 			if (!Application.isPlaying) ResetAnchors();
 			Invalidate(true);

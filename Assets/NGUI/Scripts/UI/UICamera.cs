@@ -1116,12 +1116,18 @@ public class UICamera : MonoBehaviour
 
 	static public void RemoveTouch (int id) { mTouches.Remove(id); }
 
+	[System.NonSerialized] bool mAwakened = false;
+	[System.NonSerialized] bool mEnabled = false;
+
 	/// <summary>
 	/// Add this camera to the list.
 	/// </summary>
 
 	void Awake ()
 	{
+		if (mAwakened) return;
+		mAwakened = true;
+
 		mWidth = Screen.width;
 		mHeight = Screen.height;
 
@@ -1170,15 +1176,19 @@ public class UICamera : MonoBehaviour
 
 	void OnEnable ()
 	{
-		list.Add(this);
-		list.Sort(CompareFunc);
+		if (!mEnabled)
+		{
+			mEnabled = true;
+			list.Add(this);
+			list.Sort(CompareFunc);
+		}
 	}
 
 	/// <summary>
 	/// Remove this camera from the list.
 	/// </summary>
 
-	void OnDisable () { list.Remove(this); }
+	void OnDisable () { list.Remove(this); mEnabled = false; }
 
 	/// <summary>
 	/// We don't want the camera to send out any kind of mouse events.
@@ -1212,7 +1222,12 @@ public class UICamera : MonoBehaviour
 	}
 
 #if UNITY_EDITOR
-	void OnValidate () { Start(); }
+	void OnValidate ()
+	{
+		if (!mAwakened) Awake();
+		if (!mEnabled) OnEnable();
+		Start();
+	}
 #endif
 
 	/// <summary>
