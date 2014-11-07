@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.7.5
+            Version 3.7.6
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,13 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.7.6
+- FIX: Unity 5.0 compilation and functionality compatibility fixes.
+- FIX: Work-around for a Unity bug in 4.5.5p3 and p4 (OnValidate not affected by script execution order).
+- FIX: Potential work-around for touch events sending mouse events.
+- FIX: NGUI texture import will now use automatic true color instead of ARGB32.
+- FIX: UIEventTrigger's OnDrag was mistakenly calling the onDragOut callback.
 
 3.7.5
 - NEW: UISavedOption now works with progress bars as well.
