@@ -1574,7 +1574,7 @@ static public class NGUIText
 							dash.u2.y = uvRect.yMax - invY * dash.u2.y;
 						}
 
-						float cx = (dash.u0.x + dash.u1.x) * 0.5f;
+						float cx = (dash.u0.x + dash.u2.x) * 0.5f;
 
 						for (int j = 0, jmax = (bold ? 4 : 1); j < jmax; ++j)
 						{

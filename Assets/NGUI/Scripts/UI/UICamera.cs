@@ -342,7 +342,7 @@ public class UICamera : MonoBehaviour
 	/// ID of the touch or mouse operation prior to sending out the event. Mouse ID is '-1' for left, '-2' for right mouse button, '-3' for middle.
 	/// </summary>
 
-	static public int currentTouchID = -1;
+	static public int currentTouchID = -100;
 
 	/// <summary>
 	/// Key that triggered the event, if any.
@@ -1277,7 +1277,9 @@ public class UICamera : MonoBehaviour
 				ShowTooltip(true);
 			}
 		}
+
 		current = null;
+		currentTouchID = -100;
 	}
 
 	/// <summary>
@@ -1689,14 +1691,20 @@ public class UICamera : MonoBehaviour
 			if (mTooltip != null) ShowTooltip(false);
 
 			currentTouch.pressStarted = true;
-			if (onPress != null) onPress(currentTouch.pressed, false);
+			if (onPress != null && currentTouch.pressed)
+				onPress(currentTouch.pressed, false);
+
 			Notify(currentTouch.pressed, "OnPress", false);
+
 			currentTouch.pressed = currentTouch.current;
 			currentTouch.dragged = currentTouch.current;
 			currentTouch.clickNotification = ClickNotification.BasedOnDelta;
 			currentTouch.totalDelta = Vector2.zero;
 			currentTouch.dragStarted = false;
-			if (onPress != null) onPress(currentTouch.pressed, true);
+
+			if (onPress != null && currentTouch.pressed)
+				onPress(currentTouch.pressed, true);
+
 			Notify(currentTouch.pressed, "OnPress", true);
 
 			// Update the selection
