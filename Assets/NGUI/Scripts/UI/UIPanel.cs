@@ -953,6 +953,7 @@ public class UIPanel : UIRect
 
 	protected override void OnInit ()
 	{
+		if (list.Contains(this)) return;
 		base.OnInit();
 		FindParent();
 
