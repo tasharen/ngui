@@ -893,12 +893,16 @@ public class UILabel : UIWidget
 
 					if (usage == 0)
 					{
+#if UNTIY_4_3 || UNITY_4_5 || UNITY_4_6
 						mActiveTTF.textureRebuildCallback = null;
+#endif
 						mFontUsage.Remove(mActiveTTF);
 					}
 					else mFontUsage[mActiveTTF] = usage;
 				}
+#if UNTIY_4_3 || UNITY_4_5 || UNITY_4_6
 				else mActiveTTF.textureRebuildCallback = null;
+#endif
 			}
 
 			mActiveTTF = fnt;
@@ -908,8 +912,10 @@ public class UILabel : UIWidget
 				int usage = 0;
 
 				// Font hasn't been used yet? Register a change delegate callback
+#if UNTIY_4_3 || UNITY_4_5 || UNITY_4_6
 				if (!mFontUsage.TryGetValue(mActiveTTF, out usage))
 					mActiveTTF.textureRebuildCallback = OnFontTextureChanged;
+#endif
 #if UNITY_FLASH
 				mFontUsage[mActiveTTF] = usage + 1;
 #else
@@ -928,6 +934,7 @@ public class UILabel : UIWidget
 	/// So... queue yet another work-around.
 	/// </summary>
 
+#if UNTIY_4_3 || UNITY_4_5 || UNITY_4_6
 	static void OnFontTextureChanged ()
 	{
 		for (int i = 0; i < mList.size; ++i)
@@ -961,6 +968,41 @@ public class UILabel : UIWidget
 			}
 		}
 	}
+#else
+	static void OnFontChanged (Font font)
+	{
+		for (int i = 0; i < mList.size; ++i)
+		{
+			UILabel lbl = mList[i];
+
+			if (lbl != null)
+			{
+				Font fnt = lbl.trueTypeFont;
+
+				if (fnt == font)
+				{
+					fnt.RequestCharactersInTexture(lbl.mText, lbl.mPrintedSize, lbl.mFontStyle);
+				}
+			}
+		}
+
+		for (int i = 0; i < mList.size; ++i)
+		{
+			UILabel lbl = mList[i];
+
+			if (lbl != null)
+			{
+				Font fnt = lbl.trueTypeFont;
+
+				if (fnt == font)
+				{
+					lbl.RemoveFromPanel();
+					lbl.CreatePanel();
+				}
+			}
+		}
+	}
+#endif
 #endif
 
 	/// <summary>
@@ -1088,6 +1130,20 @@ public class UILabel : UIWidget
 			mAllowProcessing = true;
 			ProcessAndRequest();
 			if (autoResizeBoxCollider) ResizeCollider();
+		}
+	}
+#endif
+
+#if !UNTIY_4_3 && !UNITY_4_5 && !UNITY_4_6
+	static bool mTexRebuildAdded = false;
+
+	protected override void OnEnable ()
+	{
+		base.OnEnable();
+		if (!mTexRebuildAdded)
+		{
+			mTexRebuildAdded = true;
+			Font.textureRebuilt += OnFontChanged;
 		}
 	}
 #endif
