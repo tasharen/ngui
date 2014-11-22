@@ -970,7 +970,7 @@ public class UIPopupList : UIWidgetContainer
 
 			min = t.localPosition;
 			max.x = min.x + mBackground.width;
-			max.y = min.y + mBackground.height;
+			max.y = min.y - mBackground.height;
 			max.z = min.z;
 			Vector3 offset = mPanel.CalculateConstrainOffset(min, max);
 			t.localPosition += offset;
