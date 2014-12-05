@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.7.6
+            Version 3.7.7
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,13 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.7.7
+- Fix for the drop-down list appearing in the wrong place in some situations.
+- You can now choose to merge loaded localization data with existing one. Useful for patching games.
+- Added a user-contributed outline8 type label effect.
+- Cleaned up new warnings shown in Unity 5.
+- Fixes for dynamic font rendering in Unity 5 (underline/strikethrough).
 
 3.7.6
 - FIX: Unity 5.0 compilation and functionality compatibility fixes.
