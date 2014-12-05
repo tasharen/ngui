@@ -282,7 +282,11 @@ static public class FreeType
 		public int y;
 	}
 	
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 	const string libName = "FreeType";
+#else
+	const string libName = "FreeType64";
+#endif
 	static bool mFound = false;
 
 	/// <summary>
