@@ -123,7 +123,7 @@ public class UIRoot : MonoBehaviour
 			Scaling scaling = scalingStyle;
 
 			if (scaling == Scaling.ConstrainedOnMobiles)
-#if UNITY_EDITOR || UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_BLACKBERRY
+#if UNITY_EDITOR || UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_WP_8_1 || UNITY_BLACKBERRY
 				return Scaling.Constrained;
 #else
 				return Scaling.Flexible;

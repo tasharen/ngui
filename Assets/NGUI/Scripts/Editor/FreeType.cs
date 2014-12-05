@@ -305,26 +305,34 @@ static public class FreeType
 					mFound = File.Exists(path);
 					if (mFound) LoadLibrary(path);
 				}
-				else if (File.Exists("/usr/local/lib/FreeType.dylib"))
-				{
-					mFound = true;
-				}
 				else
 				{
-					string path = NGUISettings.pathToFreeType;
-					
-					if (File.Exists(path))
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+					string filename = "FreeType.dylib";
+#else
+					string filename = "FreeType64.dylib";
+#endif
+					if (File.Exists("/usr/local/lib/" + filename))
 					{
-						try
+						mFound = true;
+					}
+					else
+					{
+						string path = NGUISettings.pathToFreeType;
+
+						if (File.Exists(path))
 						{
-							if (!System.IO.Directory.Exists("/usr/local/lib"))
-								System.IO.Directory.CreateDirectory("/usr/local/lib");
-							UnityEditor.FileUtil.CopyFileOrDirectory(path, "/usr/local/lib/FreeType.dylib");
-							mFound = true;
-						}
-						catch (Exception ex)
-						{
-							Debug.LogWarning("Unable to copy FreeType.dylib to /usr/local/lib:\n" + ex.Message);
+							try
+							{
+								if (!System.IO.Directory.Exists("/usr/local/lib"))
+									System.IO.Directory.CreateDirectory("/usr/local/lib");
+								UnityEditor.FileUtil.CopyFileOrDirectory(path, "/usr/local/lib/" + filename);
+								mFound = true;
+							}
+							catch (Exception ex)
+							{
+								Debug.LogWarning("Unable to copy " + filename + " to /usr/local/lib:\n" + ex.Message);
+							}
 						}
 					}
 				}

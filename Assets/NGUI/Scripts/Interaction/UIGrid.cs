@@ -334,7 +334,7 @@ public class UIGrid : UIWidgetContainer
 	/// Reset the position of all child objects based on the order of items in the list.
 	/// </summary>
 
-	protected void ResetPosition (List<Transform> list)
+	protected virtual void ResetPosition (List<Transform> list)
 	{
 		mReposition = false;
 

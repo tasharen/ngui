@@ -387,7 +387,7 @@ public class EventDelegate
 						if (mMethod != null) break;
 					}
 					catch (System.Exception) { }
-  #if UNITY_WP8
+  #if UNITY_WP8 || UNITY_WP_8_1
 					// For some odd reason Type.GetMethod(name, bindingFlags) doesn't seem to work on WP8...
 					try
 					{

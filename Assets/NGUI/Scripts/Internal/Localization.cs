@@ -204,19 +204,19 @@ public static class Localization
 	/// Load the specified CSV file.
 	/// </summary>
 
-	static public bool LoadCSV (TextAsset asset) { return LoadCSV(asset.bytes, asset); }
+	static public bool LoadCSV (TextAsset asset, bool merge = false) { return LoadCSV(asset.bytes, asset, merge); }
 
 	/// <summary>
 	/// Load the specified CSV file.
 	/// </summary>
 
-	static public bool LoadCSV (byte[] bytes) { return LoadCSV(bytes, null); }
+	static public bool LoadCSV (byte[] bytes, bool merge = false) { return LoadCSV(bytes, null, merge); }
 
 	/// <summary>
 	/// Load the specified CSV file.
 	/// </summary>
 
-	static bool LoadCSV (byte[] bytes, TextAsset asset)
+	static bool LoadCSV (byte[] bytes, TextAsset asset, bool merge = false)
 	{
 		if (bytes == null) return false;
 		ByteReader reader = new ByteReader(bytes);
@@ -227,31 +227,22 @@ public static class Localization
 		// There must be at least two columns in a valid CSV file
 		if (temp.size < 2) return false;
 
-		// The first entry must be 'KEY', capitalized
+		// Clear the dictionary
+		if (!merge || temp.size - 1 != mLanguage.Length)
+		{
+			merge = false;
+			mDictionary.Clear();
+		}
+
 		temp[0] = "KEY";
-
-#if !UNITY_3_5
-		// Ensure that the first value is what we expect
-		if (!string.Equals(temp[0], "KEY"))
-		{
-			Debug.LogError("Invalid localization CSV file. The first value is expected to be 'KEY', followed by language columns.\n" +
-				"Instead found '" + temp[0] + "'", asset);
-			return false;
-		}
-		else
-#endif
-		{
-			mLanguages = new string[temp.size - 1];
-			for (int i = 0; i < mLanguages.Length; ++i)
-				mLanguages[i] = temp[i + 1];
-		}
-
-		mDictionary.Clear();
+		mLanguages = new string[temp.size - 1];
+		for (int i = 0; i < mLanguages.Length; ++i)
+			mLanguages[i] = temp[i + 1];
 
 		// Read the entire CSV file into memory
 		while (temp != null)
 		{
-			AddCSV(temp);
+			AddCSV(temp, !merge);
 			temp = reader.ReadCSV();
 		}
 		return true;
@@ -291,19 +282,30 @@ public static class Localization
 	/// Helper function that adds a single line from a CSV file to the localization list.
 	/// </summary>
 
-	static void AddCSV (BetterList<string> values)
+	static void AddCSV (BetterList<string> values, bool warnOnDuplicate = true)
 	{
-		if (values.size < 2 || string.IsNullOrEmpty(values[0])) return;
+		if (values.size < 2) return;
+		string key = values[0];
+		if (string.IsNullOrEmpty(key)) return;
+
 		string[] temp = new string[values.size - 1];
 		for (int i = 1; i < values.size; ++i) temp[i - 1] = values[i];
-		
-		try
+
+		if (mDictionary.ContainsKey(key))
 		{
-			mDictionary.Add(values[0], temp);
+			mDictionary[key] = temp;
+			if (warnOnDuplicate) Debug.LogWarning("Localization key '" + key + "' is already present");
 		}
-		catch (System.Exception ex)
+		else
 		{
-			Debug.LogError("Unable to add '" + values[0] + "' to the Localization dictionary.\n" + ex.Message);
+			try
+			{
+				mDictionary.Add(key, temp);
+			}
+			catch (System.Exception ex)
+			{
+				Debug.LogError("Unable to add '" + key + "' to the Localization dictionary.\n" + ex.Message);
+			}
 		}
 	}
 

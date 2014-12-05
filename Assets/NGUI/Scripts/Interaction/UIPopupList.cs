@@ -782,7 +782,9 @@ public class UIPopupList : UIWidgetContainer
 
 			// Calculate the dimensions of the object triggering the popup list so we can position it below it
 			Transform myTrans = transform;
-			Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(myTrans.parent, myTrans);
+
+			Vector3 min;
+			Vector3 max;
 
 			// Create the root object for the list
 			mChild = new GameObject("Drop-down List");
@@ -790,12 +792,10 @@ public class UIPopupList : UIWidgetContainer
 
 			Transform t = mChild.transform;
 			t.parent = myTrans.parent;
-			Vector3 min;
-			Vector3 max;
 			Vector3 pos;
 
 			// Manually triggered popup list on some other game object
-			if (openOn == OpenOn.Manual && UICamera.selectedObject != gameObject && bounds.size == Vector3.zero)
+			if (openOn == OpenOn.Manual && UICamera.selectedObject != gameObject)
 			{
 				StopCoroutine("CloseIfUnselected");
 				min = t.parent.InverseTransformPoint(mPanel.anchorCamera.ScreenToWorldPoint(UICamera.lastTouchPosition));
@@ -806,6 +806,7 @@ public class UIPopupList : UIWidgetContainer
 			}
 			else
 			{
+				Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(myTrans.parent, myTrans, false, false);
 				min = bounds.min;
 				max = bounds.max;
 				t.localPosition = min;
@@ -884,7 +885,7 @@ public class UIPopupList : UIWidgetContainer
 			}
 
 			// The triggering widget's width should be the minimum allowed width
-			x = Mathf.Max(x, bounds.size.x * dynScale - (bgPadding.x + padding.x) * 2f);
+			x = Mathf.Max(x, (max.x - min.x) * dynScale - (bgPadding.x + padding.x) * 2f);
 
 			float cx = x;
 			Vector3 bcCenter = new Vector3(cx * 0.5f, -labelHeight * 0.5f, 0f);

@@ -256,6 +256,8 @@ public static class EventDelegateEditor
 
 	static public void Field (Object undoObject, List<EventDelegate> list, string noTarget, string notValid, bool minimalistic)
 	{
+		if (list == null) return;
+
 		bool targetPresent = false;
 		bool isValid = false;
 
