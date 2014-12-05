@@ -311,11 +311,8 @@ static public class FreeType
 				}
 				else
 				{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
-					string filename = "FreeType.dylib";
-#else
-					string filename = "FreeType64.dylib";
-#endif
+					string filename = libName + ".dylib";
+
 					if (File.Exists("/usr/local/lib/" + filename))
 					{
 						mFound = true;
