@@ -747,7 +747,7 @@ public class UIAtlasMaker : EditorWindow
 		bool update = false;
 		bool replace = false;
 
-		NGUIEditorTools.SetLabelWidth(80f);
+		NGUIEditorTools.SetLabelWidth(84f);
 		GUILayout.Space(3f);
 
 		NGUIEditorTools.DrawHeader("Input", true);
@@ -851,6 +851,11 @@ public class UIAtlasMaker : EditorWindow
 			GUILayout.Label("Pre-multiplied alpha", GUILayout.MinWidth(70f));
 			GUILayout.EndHorizontal();
 		}
+
+		//GUILayout.BeginHorizontal();
+		//NGUISettings.keepPadding = EditorGUILayout.Toggle("Keep Padding", NGUISettings.keepPadding, GUILayout.Width(100f));
+		//GUILayout.Label("or replace with trimmed pixels", GUILayout.MinWidth(70f));
+		//GUILayout.EndHorizontal();
 
 		GUILayout.BeginHorizontal();
 		NGUISettings.unityPacking = EditorGUILayout.Toggle("Unity Packer", NGUISettings.unityPacking, GUILayout.Width(100f));

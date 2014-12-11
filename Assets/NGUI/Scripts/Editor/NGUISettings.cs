@@ -364,6 +364,12 @@ public class NGUISettings
 		set { SetBool("NGUI Truecolor", value); }
 	}
 
+	static public bool keepPadding
+	{
+		get { return GetBool("NGUI KeepPadding", false); }
+		set { SetBool("NGUI KeepPadding", value); }
+	}
+
 	static public bool forceSquareAtlas
 	{
 		get { return GetBool("NGUI Square", false); }
