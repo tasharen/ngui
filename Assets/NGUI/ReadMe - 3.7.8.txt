@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
- Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.7.7
+ Copyright © 2011-2015 Tasharen Entertainment
+            Version 3.7.8
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,15 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.7.8
+- NEW: Added a validator delegate to the toggle class for when you want to add custom code to prevent state changes before they happen.
+- FIX: Some more compile fixes for newer Unity 5 versions.
+- FIX: Sliced sprite corners will no longer be drawn if sides were chosen to be hidden.
+- FIX: UIPanel no longer makes all of the game objects underneath it be on the same layer. Just widgets.
+- FIX: Minor fix for the scroll view recentering.
+- FIX: Flash compilation #ifdef.
+- FIX: FreeType fix for Unity 5 (64 bit).
 
 3.7.7
 - Fix for the drop-down list appearing in the wrong place in some situations.
