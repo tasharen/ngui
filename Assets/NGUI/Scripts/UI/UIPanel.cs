@@ -1810,7 +1810,7 @@ public class UIPanel : UIRect
 	/// Get the size of the game window in pixels.
 	/// </summary>
 
-	Vector2 GetWindowSize ()
+	public Vector2 GetWindowSize ()
 	{
 		UIRoot rt = root;
 		Vector2 size = NGUITools.screenSize;
