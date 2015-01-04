@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2014 Tasharen Entertainment
+// Copyright © 2011-2015 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -553,7 +553,9 @@ public class UICamera : MonoBehaviour
 
 	System.Collections.IEnumerator ChangeSelection ()
 	{
+#if !UNITY_WINRT && !UNITY_WP8 && !UNITY_WP_8_1
 		yield return new WaitForEndOfFrame();
+#endif
 		if (onSelect != null) onSelect(mCurrentSelection, false);
 		Notify(mCurrentSelection, "OnSelect", false);
 		mCurrentSelection = mNextSelection;

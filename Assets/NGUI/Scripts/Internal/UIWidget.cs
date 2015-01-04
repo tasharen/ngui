@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2014 Tasharen Entertainment
+// Copyright © 2011-2015 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -402,6 +402,14 @@ public class UIWidget : UIRect
 	{
 		get
 		{
+			// Experiment with a transform-based depth, uGUI style
+			//if (mDepth == int.MinValue)
+			//{
+			//    int val = cachedTransform.GetSiblingIndex();
+			//    UIWidget pt = parent as UIWidget;
+			//    if (pt != null) val += pt.depth;
+			//    return val;
+			//}
 			return mDepth;
 		}
 		set

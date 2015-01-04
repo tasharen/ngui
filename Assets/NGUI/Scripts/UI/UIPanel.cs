@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2014 Tasharen Entertainment
+// Copyright © 2011-2015 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -312,7 +312,8 @@ public class UIPanel : UIRect
 #endif
 			{
 				Vector2 size = GetWindowSize();
-				float mod = (1f / size.y) / mCam.orthographicSize;
+				float pixelSize = (root != null) ? root.pixelSizeAdjustment : 1f;
+				float mod = (pixelSize / size.y) / mCam.orthographicSize;
 				return new Vector3(-mod, mod);
 			}
 			return Vector3.zero;
@@ -1492,7 +1493,13 @@ public class UIPanel : UIRect
 		if (mLayer != cachedGameObject.layer)
 		{
 			mLayer = mGo.layer;
-			NGUITools.SetChildLayer(cachedTransform, mLayer);
+
+			for (int i = 0, imax = widgets.Count; i < imax; ++i)
+			{
+				UIWidget w = widgets[i];
+				if (w && w.parent == this) w.gameObject.layer = mLayer;
+			}
+
 			ResetAnchors();
 
 			for (int i = 0; i < drawCalls.Count; ++i)

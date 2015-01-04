@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2014 Tasharen Entertainment
+// Copyright © 2011-2015 Tasharen Entertainment
 //----------------------------------------------
 
 #if !UNITY_EDITOR && (UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_WP_8_1 || UNITY_BLACKBERRY)
@@ -1122,9 +1122,9 @@ public class UIInput : MonoBehaviour
 			(UICamera.currentScheme == UICamera.ControlScheme.Mouse ||
 			 UICamera.currentScheme == UICamera.ControlScheme.Touch))
 		{
- #if UNITY_METRO
+#if UNITY_WP8 || UNITY_WP_8_1
 			if (mKeyboard != null) mKeyboard.active = true;
- #endif
+#endif
 			selectionEnd = GetCharUnderMouse();
 			if (!Input.GetKey(KeyCode.LeftShift) &&
 				!Input.GetKey(KeyCode.RightShift)) selectionStart = mSelectionEnd;
