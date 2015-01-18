@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2015 Tasharen Entertainment
-            Version 3.7.8
+            Version 3.7.9
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,15 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.7.9
+- NEW: Localization system can now automatically merge localization data coming from multiple sources as well as partial localizations.
+- NEW: Command-click = right click is now an option on the UICamera instead of always being on.
+- FIX: UIInput's Return key handling was moved to the Update() function to fix an issue with typing quickly and pressing Return causing the last character to be cut off.
+- FIX: Forced keyboard and mouse to be turned off for Android devices in UICamera's Awake() function.
+- FIX: UICamera will no longer process keyboard events if both keyboard and controller input is turned off.
+- FIX: UICamera should now properly handle release and press events being sent in the same frame.
+- FIX: Relative anchor slider will no longer get disabled if the user types values outside 0 to 1.
 
 3.7.8
 - NEW: Added a validator delegate to the toggle class for when you want to add custom code to prevent state changes before they happen.
