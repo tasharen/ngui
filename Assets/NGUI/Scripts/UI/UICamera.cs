@@ -277,6 +277,12 @@ public class UICamera : MonoBehaviour
 	public string horizontalAxisName = "Horizontal";
 
 	/// <summary>
+	/// Simulate a right-click on OSX when the Command key is held and a left-click is used (for trackpad).
+	/// </summary>
+
+	public bool commandClick = true;
+
+	/// <summary>
 	/// Various keys used by the camera.
 	/// </summary>
 
@@ -502,7 +508,9 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			return mCurrentSelection;
+			if (mCurrentSelection) return mCurrentSelection;
+			mCurrentSelection = null;
+			return null;
 		}
 		set
 		{
@@ -553,9 +561,7 @@ public class UICamera : MonoBehaviour
 
 	System.Collections.IEnumerator ChangeSelection ()
 	{
-#if !UNITY_WINRT && !UNITY_WP8 && !UNITY_WP_8_1
-		yield return new WaitForEndOfFrame();
-#endif
+        yield return new WaitForEndOfFrame();
 		if (onSelect != null) onSelect(mCurrentSelection, false);
 		Notify(mCurrentSelection, "OnSelect", false);
 		mCurrentSelection = mNextSelection;
@@ -1138,13 +1144,9 @@ public class UICamera : MonoBehaviour
 			)
 		{
 			useTouch = true;
-
-			if (Application.platform == RuntimePlatform.IPhonePlayer)
-			{
-				useMouse = false;
-				useKeyboard = false;
-				useController = false;
-			}
+			useMouse = false;
+			useKeyboard = false;
+			useController = false;
 		}
 		else if (Application.platform == RuntimePlatform.PS3 ||
 				 Application.platform == RuntimePlatform.XBOX360)
@@ -1259,7 +1261,7 @@ public class UICamera : MonoBehaviour
 		if (mCurrentSelection == null) inputHasFocus = false;
 
 		// Update the keyboard and joystick events
-		if (mCurrentSelection != null) ProcessOthers();
+		if ((useKeyboard || useController) && mCurrentSelection != null) ProcessOthers();
 
 		// If it's time to show a tooltip, inform the object we're hovering over
 		if (useMouse && mHover != null)
@@ -1409,7 +1411,7 @@ public class UICamera : MonoBehaviour
 			currentTouch = mMouse[i];
 
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
-			if (i == 0 && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+			if (commandClick && i == 0 && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
 			{
 				currentTouchID = -2;
 				currentKey = KeyCode.Mouse1;
@@ -1673,20 +1675,11 @@ public class UICamera : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Process the events of the specified touch.
+	/// Process the press part of a touch.
 	/// </summary>
 
-	public void ProcessTouch (bool pressed, bool unpressed)
+	void ProcessPress (bool pressed, float click, float drag)
 	{
-		// Whether we're using the mouse
-		bool isMouse = (currentScheme == ControlScheme.Mouse);
-		float drag   = isMouse ? mouseDragThreshold : touchDragThreshold;
-		float click  = isMouse ? mouseClickThreshold : touchClickThreshold;
-
-		// So we can use sqrMagnitude below
-		drag *= drag;
-		click *= click;
-
 		// Send out the press message
 		if (pressed)
 		{
@@ -1732,7 +1725,7 @@ public class UICamera : MonoBehaviour
 
 				// OnDragOver is sent for consistency, so that OnDragOut is always preceded by OnDragOver
 				isDragging = true;
-				
+
 				if (onDragStart != null) onDragStart(currentTouch.dragged);
 				Notify(currentTouch.dragged, "OnDragStart", null);
 
@@ -1792,82 +1785,113 @@ public class UICamera : MonoBehaviour
 				}
 			}
 		}
+	}
 
+	/// <summary>
+	/// Process the release part of a touch.
+	/// </summary>
+
+	void ProcessRelease (bool isMouse, float drag)
+	{
 		// Send out the unpress message
-		if (unpressed)
+		currentTouch.pressStarted = false;
+		if (mTooltip != null) ShowTooltip(false);
+
+		if (currentTouch.pressed != null)
 		{
-			currentTouch.pressStarted = false;
-			if (mTooltip != null) ShowTooltip(false);
-
-			if (currentTouch.pressed != null)
+			// If there was a drag event in progress, make sure OnDragOut gets sent
+			if (currentTouch.dragStarted)
 			{
-				// If there was a drag event in progress, make sure OnDragOut gets sent
-				if (currentTouch.dragStarted)
-				{
-					if (onDragOut != null) onDragOut(currentTouch.last, currentTouch.dragged);
-					Notify(currentTouch.last, "OnDragOut", currentTouch.dragged);
+				if (onDragOut != null) onDragOut(currentTouch.last, currentTouch.dragged);
+				Notify(currentTouch.last, "OnDragOut", currentTouch.dragged);
 
-					if (onDragEnd != null) onDragEnd(currentTouch.dragged);
-					Notify(currentTouch.dragged, "OnDragEnd", null);
+				if (onDragEnd != null) onDragEnd(currentTouch.dragged);
+				Notify(currentTouch.dragged, "OnDragEnd", null);
+			}
+
+			// Send the notification of a touch ending
+			if (onPress != null) onPress(currentTouch.pressed, false);
+			Notify(currentTouch.pressed, "OnPress", false);
+
+			// Send a hover message to the object
+			if (isMouse)
+			{
+				if (onHover != null) onHover(currentTouch.current, true);
+				Notify(currentTouch.current, "OnHover", true);
+			}
+			mHover = currentTouch.current;
+
+			// If the button/touch was released on the same object, consider it a click and select it
+			if (currentTouch.dragged == currentTouch.current ||
+				(currentScheme != ControlScheme.Controller &&
+				currentTouch.clickNotification != ClickNotification.None &&
+				currentTouch.totalDelta.sqrMagnitude < drag))
+			{
+				if (currentTouch.pressed != mCurrentSelection)
+				{
+					mNextSelection = null;
+					mCurrentSelection = currentTouch.pressed;
+					if (onSelect != null) onSelect(currentTouch.pressed, true);
+					Notify(currentTouch.pressed, "OnSelect", true);
+				}
+				else
+				{
+					mNextSelection = null;
+					mCurrentSelection = currentTouch.pressed;
 				}
 
-				// Send the notification of a touch ending
-				if (onPress != null) onPress(currentTouch.pressed, false);
-				Notify(currentTouch.pressed, "OnPress", false);
-
-				// Send a hover message to the object
-				if (isMouse)
+				// If the touch should consider clicks, send out an OnClick notification
+				if (currentTouch.clickNotification != ClickNotification.None && currentTouch.pressed == currentTouch.current)
 				{
-					if (onHover != null) onHover(currentTouch.current, true);
-					Notify(currentTouch.current, "OnHover", true);
-				}
-				mHover = currentTouch.current;
+					float time = RealTime.time;
 
-				// If the button/touch was released on the same object, consider it a click and select it
-				if (currentTouch.dragged == currentTouch.current ||
-					(currentScheme != ControlScheme.Controller &&
-					currentTouch.clickNotification != ClickNotification.None &&
-					currentTouch.totalDelta.sqrMagnitude < drag))
-				{
-					if (currentTouch.pressed != mCurrentSelection)
+					if (onClick != null) onClick(currentTouch.pressed);
+					Notify(currentTouch.pressed, "OnClick", null);
+
+					if (currentTouch.clickTime + 0.35f > time)
 					{
-						mNextSelection = null;
-						mCurrentSelection = currentTouch.pressed;
-						if (onSelect != null) onSelect(currentTouch.pressed, true);
-						Notify(currentTouch.pressed, "OnSelect", true);
+						if (onDoubleClick != null) onDoubleClick(currentTouch.pressed);
+						Notify(currentTouch.pressed, "OnDoubleClick", null);
 					}
-					else
-					{
-						mNextSelection = null;
-						mCurrentSelection = currentTouch.pressed;
-					}
-
-					// If the touch should consider clicks, send out an OnClick notification
-					if (currentTouch.clickNotification != ClickNotification.None && currentTouch.pressed == currentTouch.current)
-					{
-						float time = RealTime.time;
-
-						if (onClick != null) onClick(currentTouch.pressed);
-						Notify(currentTouch.pressed, "OnClick", null);
-
-						if (currentTouch.clickTime + 0.35f > time)
-						{
-							if (onDoubleClick != null) onDoubleClick(currentTouch.pressed);
-							Notify(currentTouch.pressed, "OnDoubleClick", null);
-						}
-						currentTouch.clickTime = time;
-					}
-				}
-				else if (currentTouch.dragStarted) // The button/touch was released on a different object
-				{
-					// Send a drop notification (for drag & drop)
-					if (onDrop != null) onDrop(currentTouch.current, currentTouch.dragged);
-					Notify(currentTouch.current, "OnDrop", currentTouch.dragged);
+					currentTouch.clickTime = time;
 				}
 			}
-			currentTouch.dragStarted = false;
-			currentTouch.pressed = null;
-			currentTouch.dragged = null;
+			else if (currentTouch.dragStarted) // The button/touch was released on a different object
+			{
+				// Send a drop notification (for drag & drop)
+				if (onDrop != null) onDrop(currentTouch.current, currentTouch.dragged);
+				Notify(currentTouch.current, "OnDrop", currentTouch.dragged);
+			}
+		}
+		currentTouch.dragStarted = false;
+		currentTouch.pressed = null;
+		currentTouch.dragged = null;
+	}
+
+	/// <summary>
+	/// Process the events of the specified touch.
+	/// </summary>
+
+	public void ProcessTouch (bool pressed, bool released)
+	{
+		// Whether we're using the mouse
+		bool isMouse = (currentScheme == ControlScheme.Mouse);
+		float drag   = isMouse ? mouseDragThreshold : touchDragThreshold;
+		float click  = isMouse ? mouseClickThreshold : touchClickThreshold;
+
+		// So we can use sqrMagnitude below
+		drag *= drag;
+		click *= click;
+
+		if (currentTouch.pressed != null)
+		{
+			if (released) ProcessRelease(isMouse, drag);
+			ProcessPress(pressed, click, drag);
+		}
+		else
+		{
+			ProcessPress(pressed, click, drag);
+			if (released) ProcessRelease(isMouse, drag);
 		}
 	}
 

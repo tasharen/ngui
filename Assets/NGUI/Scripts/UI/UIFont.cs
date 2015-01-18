@@ -123,14 +123,14 @@ public class UIFont : MonoBehaviour
 			}
 			else if (mAtlas != value)
 			{
-				if (value == null)
-				{
-					if (mAtlas != null) mMat = mAtlas.spriteMaterial;
-					if (sprite != null) mUVRect = uvRect;
-				}
-
 				mPMA = -1;
 				mAtlas = value;
+
+				if (mAtlas != null)
+				{
+					mMat = mAtlas.spriteMaterial;
+					if (sprite != null) mUVRect = uvRect;
+				}
 				MarkAsChanged();
 			}
 		}
