@@ -42,19 +42,19 @@ public class UIDragDropItem : MonoBehaviour
 
 #region Common functionality
 
-	protected Transform mTrans;
-	protected Transform mParent;
-	protected Collider mCollider;
-	protected Collider2D mCollider2D;
-	protected UIButton mButton;
-	protected UIRoot mRoot;
-	protected UIGrid mGrid;
-	protected UITable mTable;
-	protected int mTouchID = int.MinValue;
-	protected float mDragStartTime = 0f;
-	protected UIDragScrollView mDragScrollView = null;
-	protected bool mPressed = false;
-	protected bool mDragging = false;
+	[System.NonSerialized] protected Transform mTrans;
+	[System.NonSerialized] protected Transform mParent;
+	[System.NonSerialized] protected Collider mCollider;
+	[System.NonSerialized] protected Collider2D mCollider2D;
+	[System.NonSerialized] protected UIButton mButton;
+	[System.NonSerialized] protected UIRoot mRoot;
+	[System.NonSerialized] protected UIGrid mGrid;
+	[System.NonSerialized] protected UITable mTable;
+	[System.NonSerialized] protected float mDragStartTime = 0f;
+	[System.NonSerialized] protected UIDragScrollView mDragScrollView = null;
+	[System.NonSerialized] protected bool mPressed = false;
+	[System.NonSerialized] protected bool mDragging = false;
+	[System.NonSerialized] protected UICamera.MouseOrTouch mTouch;
 
 	/// <summary>
 	/// Cache the transform.
@@ -82,10 +82,15 @@ public class UIDragDropItem : MonoBehaviour
 	{
 		if (isPressed)
 		{
+			mTouch = UICamera.currentTouch;
 			mDragStartTime = RealTime.time + pressAndHoldDelay;
 			mPressed = true;
 		}
-		else mPressed = false;
+		else
+		{
+			mPressed = false;
+			mTouch = null;
+		}
 	}
 
 	/// <summary>
@@ -107,19 +112,19 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected void OnDragStart ()
 	{
-		if (!enabled || mTouchID != int.MinValue) return;
+		if (!enabled || mTouch != UICamera.currentTouch) return;
 
 		// If we have a restriction, check to see if its condition has been met first
 		if (restriction != Restriction.None)
 		{
 			if (restriction == Restriction.Horizontal)
 			{
-				Vector2 delta = UICamera.currentTouch.totalDelta;
+				Vector2 delta = mTouch.totalDelta;
 				if (Mathf.Abs(delta.x) < Mathf.Abs(delta.y)) return;
 			}
 			else if (restriction == Restriction.Vertical)
 			{
-				Vector2 delta = UICamera.currentTouch.totalDelta;
+				Vector2 delta = mTouch.totalDelta;
 				if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y)) return;
 			}
 			else if (restriction == Restriction.PressAndHold)
@@ -141,6 +146,7 @@ public class UIDragDropItem : MonoBehaviour
 		{
 			if (cloneOnDrag)
 			{
+				mPressed = false;
 				GameObject clone = NGUITools.AddChild(transform.parent.gameObject, gameObject);
 				clone.transform.localPosition = transform.localPosition;
 				clone.transform.localRotation = transform.localRotation;
@@ -149,12 +155,28 @@ public class UIDragDropItem : MonoBehaviour
 				UIButtonColor bc = clone.GetComponent<UIButtonColor>();
 				if (bc != null) bc.defaultColor = GetComponent<UIButtonColor>().defaultColor;
 
-				UICamera.currentTouch.dragged = clone;
+				if (mTouch != null && mTouch.pressed == gameObject)
+				{
+					mTouch.current = clone;
+					mTouch.pressed = clone;
+					mTouch.dragged = clone;
+					mTouch.last = clone;
+				}
 
 				UIDragDropItem item = clone.GetComponent<UIDragDropItem>();
+				item.mTouch = mTouch;
+				item.mPressed = true;
 				item.mDragging = true;
 				item.Start();
 				item.OnDragDropStart();
+
+				if (UICamera.currentTouch == null)
+					UICamera.currentTouch = mTouch;
+
+				mTouch = null;
+
+				UICamera.Notify(gameObject, "OnPress", false);
+				UICamera.Notify(gameObject, "OnHover", false);
 			}
 			else
 			{
@@ -170,7 +192,7 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected void OnDrag (Vector2 delta)
 	{
-		if (!mDragging || !enabled || mTouchID != UICamera.currentTouchID) return;
+		if (!mDragging || !enabled || mTouch != UICamera.currentTouch) return;
 		OnDragDropMove(delta * mRoot.pixelSizeAdjustment);
 	}
 
@@ -180,7 +202,7 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected void OnDragEnd ()
 	{
-		if (!enabled || mTouchID != UICamera.currentTouchID) return;
+		if (!enabled || mTouch != UICamera.currentTouch) return;
 		StopDragging(UICamera.hoveredObject);
 	}
 
@@ -213,7 +235,6 @@ public class UIDragDropItem : MonoBehaviour
 		else if (mCollider != null) mCollider.enabled = false;
 		else if (mCollider2D != null) mCollider2D.enabled = false;
 
-		mTouchID = UICamera.currentTouchID;
 		mParent = mTrans.parent;
 		mRoot = NGUITools.FindInParents<UIRoot>(mParent);
 		mGrid = NGUITools.FindInParents<UIGrid>(mParent);
@@ -257,8 +278,6 @@ public class UIDragDropItem : MonoBehaviour
 	{
 		if (!cloneOnDrag)
 		{
-			mTouchID = int.MinValue;
-
 			// Re-enable the collider
 			if (mButton != null) mButton.isEnabled = true;
 			else if (mCollider != null) mCollider.enabled = true;
