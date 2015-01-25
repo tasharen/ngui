@@ -595,16 +595,17 @@ public class UIInput : MonoBehaviour
 				mSelectionStart = selectAllTextOnFocus ? 0 : mSelectionEnd;
 				label.color = activeTextColor;
 #if MOBILE
-				if (Application.platform == RuntimePlatform.IPhonePlayer
-					|| Application.platform == RuntimePlatform.Android
-				    || Application.platform == RuntimePlatform.WP8Player
+				RuntimePlatform pf = Application.platform;
+				if (pf == RuntimePlatform.IPhonePlayer
+					|| pf == RuntimePlatform.Android
+				    || pf == RuntimePlatform.WP8Player
  #if UNITY_4_3
-					|| Application.platform == RuntimePlatform.BB10Player
+					|| pf == RuntimePlatform.BB10Player
  #else
-					|| Application.platform == RuntimePlatform.BlackBerryPlayer
-					|| Application.platform == RuntimePlatform.MetroPlayerARM
-					|| Application.platform == RuntimePlatform.MetroPlayerX64
-					|| Application.platform == RuntimePlatform.MetroPlayerX86
+					|| pf == RuntimePlatform.BlackBerryPlayer
+					|| pf == RuntimePlatform.MetroPlayerARM
+					|| pf == RuntimePlatform.MetroPlayerX64
+					|| pf == RuntimePlatform.MetroPlayerX86
  #endif
 				)
 				{
