@@ -512,6 +512,7 @@ public class UICamera : MonoBehaviour
 		}
 		set
 		{
+			if (mCurrentSelection == value) return;
 			if (onSelect != null) onSelect(selectedObject, false);
 
 			bool shouldRestore = false;
