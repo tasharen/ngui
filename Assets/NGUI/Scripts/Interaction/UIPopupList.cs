@@ -637,6 +637,8 @@ public class UIPopupList : UIWidgetContainer
 
 	public void Close ()
 	{
+		StopCoroutine("CloseIfUnselected");
+
 		if (mChild != null)
 		{
 			mLabelList.Clear();
@@ -746,13 +748,11 @@ public class UIPopupList : UIWidgetContainer
 
 	IEnumerator CloseIfUnselected ()
 	{
-		GameObject go = UICamera.selectedObject;
-
 		for (; ; )
 		{
 			yield return null;
 
-			if (UICamera.selectedObject != go)
+			if (UICamera.selectedObject != gameObject)
 			{
 				Close();
 				break;
@@ -794,15 +794,15 @@ public class UIPopupList : UIWidgetContainer
 			t.parent = myTrans.parent;
 			Vector3 pos;
 
+			StopCoroutine("CloseIfUnselected");
+
 			// Manually triggered popup list on some other game object
 			if (openOn == OpenOn.Manual && UICamera.selectedObject != gameObject)
 			{
-				StopCoroutine("CloseIfUnselected");
 				min = t.parent.InverseTransformPoint(mPanel.anchorCamera.ScreenToWorldPoint(UICamera.lastTouchPosition));
 				max = min;
 				t.localPosition = min;
 				pos = t.position;
-				StartCoroutine("CloseIfUnselected");
 			}
 			else
 			{
@@ -812,6 +812,8 @@ public class UIPopupList : UIWidgetContainer
 				t.localPosition = min;
 				pos = myTrans.position;
 			}
+
+			StartCoroutine("CloseIfUnselected");
 
 			t.localRotation = Quaternion.identity;
 			t.localScale = Vector3.one;
