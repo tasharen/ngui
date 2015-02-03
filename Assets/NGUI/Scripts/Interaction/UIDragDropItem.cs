@@ -40,6 +40,12 @@ public class UIDragDropItem : MonoBehaviour
 	[HideInInspector]
 	public float pressAndHoldDelay = 1f;
 
+	/// <summary>
+	/// Whether this drag & drop item can be interacted with. If not, only tooltips will work.
+	/// </summary>
+
+	public bool interactable = true;
+
 #region Common functionality
 
 	[System.NonSerialized] protected Transform mTrans;
@@ -78,8 +84,10 @@ public class UIDragDropItem : MonoBehaviour
 	/// Record the time the item was pressed on.
 	/// </summary>
 
-	protected void OnPress (bool isPressed)
+	protected virtual void OnPress (bool isPressed)
 	{
+		if (!interactable) return;
+
 		if (isPressed)
 		{
 			mTouch = UICamera.currentTouch;
@@ -110,8 +118,9 @@ public class UIDragDropItem : MonoBehaviour
 	/// Start the dragging operation.
 	/// </summary>
 
-	protected void OnDragStart ()
+	protected virtual void OnDragStart ()
 	{
+		if (!interactable) return;
 		if (!enabled || mTouch != UICamera.currentTouch) return;
 
 		// If we have a restriction, check to see if its condition has been met first
@@ -142,6 +151,8 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void StartDragging ()
 	{
+		if (!interactable) return;
+
 		if (!mDragging)
 		{
 			if (cloneOnDrag)
@@ -190,8 +201,9 @@ public class UIDragDropItem : MonoBehaviour
 	/// Perform the dragging.
 	/// </summary>
 
-	protected void OnDrag (Vector2 delta)
+	protected virtual void OnDrag (Vector2 delta)
 	{
+		if (!interactable) return;
 		if (!mDragging || !enabled || mTouch != UICamera.currentTouch) return;
 		OnDragDropMove(delta * mRoot.pixelSizeAdjustment);
 	}
@@ -200,8 +212,9 @@ public class UIDragDropItem : MonoBehaviour
 	/// Notification sent when the drag event has ended.
 	/// </summary>
 
-	protected void OnDragEnd ()
+	protected virtual void OnDragEnd ()
 	{
+		if (!interactable) return;
 		if (!enabled || mTouch != UICamera.currentTouch) return;
 		StopDragging(UICamera.hoveredObject);
 	}

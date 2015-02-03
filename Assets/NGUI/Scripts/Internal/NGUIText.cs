@@ -389,6 +389,14 @@ static public class NGUIText
 	static public string EncodeColor (Color c) { return EncodeColor24(c); }
 
 	/// <summary>
+	/// Convenience function that wraps the specified text block in a color tag.
+	/// </summary>
+
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
+	static public string EncodeColor (string text, Color c) { return "[c][" + EncodeColor24(c) + "]" + text + "[-][/c]"; }
+
+	/// <summary>
 	/// The reverse of ParseAlpha -- encodes a color in Aa format.
 	/// </summary>
 

@@ -75,7 +75,6 @@ public class UISpriteAnimation : MonoBehaviour
 
 			if (rate < mDelta)
 			{
-				
 				mDelta = (rate > 0f) ? mDelta - rate : 0f;
 
 				if (++mIndex >= mSpriteNames.Count)

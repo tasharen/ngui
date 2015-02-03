@@ -420,7 +420,7 @@ public static class Localization
 		mLanguage = languageName;
 		PlayerPrefs.SetString("Language", mLanguage);
 		mOldDictionary = dictionary;
-		localizationHasBeenSet = false;
+		localizationHasBeenSet = true;
 		mLanguageIndex = -1;
 		mLanguages = new string[] { languageName };
 		if (onLocalize != null) onLocalize();

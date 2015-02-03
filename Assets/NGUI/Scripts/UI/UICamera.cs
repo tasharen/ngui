@@ -513,7 +513,6 @@ public class UICamera : MonoBehaviour
 		set
 		{
 			if (mCurrentSelection == value) return;
-			if (onSelect != null) onSelect(selectedObject, false);
 
 			bool shouldRestore = false;
 
@@ -525,6 +524,8 @@ public class UICamera : MonoBehaviour
 				UICamera.currentScheme = ControlScheme.Mouse;
 			}
 
+			inputHasFocus = false;
+			if (onSelect != null) onSelect(selectedObject, false);
 			Notify(mCurrentSelection, "OnSelect", false);
 			mCurrentSelection = value;
 
@@ -545,7 +546,6 @@ public class UICamera : MonoBehaviour
 				if (onSelect != null) onSelect(mCurrentSelection, true);
 				Notify(mCurrentSelection, "OnSelect", true);
 			}
-			else inputHasFocus = false;
 
 			if (shouldRestore)
 			{
@@ -1058,7 +1058,7 @@ public class UICamera : MonoBehaviour
 		return 0;
 	}
 
-	static bool mNotifying = false;
+	static int mNotifying = 0;
 
 	/// <summary>
 	/// Generic notification function. Used in place of SendMessage to shorten the code and allow for more than one receiver.
@@ -1066,16 +1066,16 @@ public class UICamera : MonoBehaviour
 
 	static public void Notify (GameObject go, string funcName, object obj)
 	{
-		if (mNotifying) return;
+		if (mNotifying > 10) return;
 
 		if (NGUITools.GetActive(go))
 		{
-			mNotifying = true;
+			++mNotifying;
 			//NGUIDebug.Log(funcName + "(" + obj + ") on " + (go != null ? go.name : "<null>") + "; " + currentTouchID + ", " + Input.touchCount);
 			go.SendMessage(funcName, obj, SendMessageOptions.DontRequireReceiver);
 			if (mGenericHandler != null && mGenericHandler != go)
 				mGenericHandler.SendMessage(funcName, obj, SendMessageOptions.DontRequireReceiver);
-			mNotifying = false;
+			--mNotifying;
 		}
 	}
 

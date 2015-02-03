@@ -170,13 +170,13 @@ public class UICenterOnChild : MonoBehaviour
 						{
 							// Next page
 							if (ignoredIndex > 0) closest = list[ignoredIndex - 1];
-							else closest = list[0];
+							else closest = (GetComponent<UIWrapContent>() == null) ? list[0] : list[list.Count - 1];
 						}
 						else if (delta < -nextPageThreshold)
 						{
 							// Previous page
 							if (ignoredIndex < list.Count - 1) closest = list[ignoredIndex + 1];
-							else closest = list[list.Count - 1];
+							else closest = (GetComponent<UIWrapContent>() == null) ? list[list.Count - 1] : list[0];
 						}
 					}
 					else Debug.LogWarning("Next Page Threshold requires a sorted UIGrid in order to work properly", this);
