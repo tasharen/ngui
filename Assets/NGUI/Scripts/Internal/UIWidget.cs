@@ -718,7 +718,7 @@ public class UIWidget : UIRect
 		else
 		{
 			UIRect pt = parent;
-			finalAlpha = (parent != null) ? pt.CalculateFinalAlpha(frameID) * mColor.a : mColor.a;
+			finalAlpha = (pt != null) ? pt.CalculateFinalAlpha(frameID) * mColor.a : mColor.a;
 		}
 	}
 
@@ -1317,7 +1317,7 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5
 			if (showHandlesWithMoveTool)
 			{
 				return UnityEditor.Tools.current == UnityEditor.Tool.Move;

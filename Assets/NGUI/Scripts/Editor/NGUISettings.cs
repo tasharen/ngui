@@ -304,6 +304,12 @@ public class NGUISettings
 		set { SetInt("NGUI Font Size", value); }
 	}
 
+	static public int FMSize
+	{
+		get { return GetInt("NGUI FM Size", 16); }
+		set { SetInt("NGUI FM Size", value); }
+	}
+
 	static public bool fontKerning
 	{
 		get { return GetBool("NGUI Font Kerning", true); }
@@ -320,6 +326,18 @@ public class NGUISettings
 	{
 		get { return Get<Font>("NGUI Dynamic Font", null); }
 		set { Set("NGUI Dynamic Font", value); }
+	}
+
+	static public Font FMFont
+	{
+		get { return Get<Font>("NGUI FM Font", null); }
+		set { Set("NGUI FM Font", value); }
+	}
+
+	static public UIFont BMFont
+	{
+		get { return Get<UIFont>("NGUI BM Font", null); }
+		set { Set("NGUI BM Font", value); }
 	}
 
 	static public UILabel.Overflow overflowStyle

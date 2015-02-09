@@ -507,7 +507,6 @@ public class UICamera : MonoBehaviour
 		get
 		{
 			if (mCurrentSelection) return mCurrentSelection;
-			mCurrentSelection = null;
 			return null;
 		}
 		set
@@ -542,7 +541,7 @@ public class UICamera : MonoBehaviour
 					}
 				}
 
-				inputHasFocus = (mCurrentSelection.GetComponent<UIInput>() != null);
+				inputHasFocus = (mCurrentSelection.activeInHierarchy && mCurrentSelection.GetComponent<UIInput>() != null);
 				if (onSelect != null) onSelect(mCurrentSelection, true);
 				Notify(mCurrentSelection, "OnSelect", true);
 			}
@@ -1245,7 +1244,15 @@ public class UICamera : MonoBehaviour
 		}
 
 		// If nothing is selected, input focus is lost
-		if (mCurrentSelection == null) inputHasFocus = false;
+		if (mCurrentSelection == null)
+		{
+			inputHasFocus = false;
+		}
+		else if (!mCurrentSelection || !mCurrentSelection.activeInHierarchy)
+		{
+			inputHasFocus = false;
+			mCurrentSelection = null;
+		}
 
 		// Update the keyboard and joystick events
 		if ((useKeyboard || useController) && mCurrentSelection != null) ProcessOthers();
