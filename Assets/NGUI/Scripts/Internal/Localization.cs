@@ -108,7 +108,6 @@ public static class Localization
 		{
 			if (string.IsNullOrEmpty(mLanguage))
 			{
-				localizationHasBeenSet = true;
 				mLanguage = PlayerPrefs.GetString("Language", "English");
 				LoadAndSelect(mLanguage);
 			}
@@ -491,7 +490,12 @@ public static class Localization
 		if (mLanguageIndex != -1 && mDictionary.TryGetValue(key, out vals))
 		{
 			if (mLanguageIndex < vals.Length)
-				return vals[mLanguageIndex];
+			{
+				string s = vals[mLanguageIndex];
+				if (string.IsNullOrEmpty(s)) s = vals[0];
+				return s;
+			}
+			return vals[0];
 		}
 		if (mOldDictionary.TryGetValue(key, out val)) return val;
 

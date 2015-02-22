@@ -102,6 +102,8 @@ public class UIDragObject : MonoBehaviour
 			UIWidget w = target.GetComponent<UIWidget>();
 			if (w != null) contentRect = w;
 		}
+
+		mTargetPos = (target != null) ? target.position : Vector3.zero;
 	}
 
 	void OnDisable () { mStarted = false; }

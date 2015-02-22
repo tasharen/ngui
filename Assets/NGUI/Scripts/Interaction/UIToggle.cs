@@ -46,6 +46,12 @@ public class UIToggle : UIWidgetContainer
 	public Animation activeAnimation;
 
 	/// <summary>
+	/// Animation to play on the active sprite, if any.
+	/// </summary>
+
+	public Animator animator;
+
+	/// <summary>
 	/// Whether the toggle starts checked.
 	/// </summary>
 
@@ -251,7 +257,15 @@ public class UIToggle : UIWidgetContainer
 			}
 
 			// Play the checkmark animation
-			if (activeAnimation != null)
+			if (animator != null)
+			{
+				ActiveAnimation aa = ActiveAnimation.Play(animator, null,
+					state ? Direction.Forward : Direction.Reverse,
+					EnableCondition.IgnoreDisabledState,
+					DisableCondition.DoNotDisable);
+				if (aa != null && (instantTween || !NGUITools.GetActive(this))) aa.Finish();
+			}
+			else if (activeAnimation != null)
 			{
 				ActiveAnimation aa = ActiveAnimation.Play(activeAnimation, null,
 					state ? Direction.Forward : Direction.Reverse,
