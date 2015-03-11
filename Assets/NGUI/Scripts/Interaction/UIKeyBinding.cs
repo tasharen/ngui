@@ -21,10 +21,11 @@ public class UIKeyBinding : MonoBehaviour
 
 	public enum Modifier
 	{
-		None,
+		Any,
 		Shift,
 		Control,
 		Alt,
+		None,
 	}
 
 	/// <summary>
@@ -37,7 +38,7 @@ public class UIKeyBinding : MonoBehaviour
 	/// Modifier key that must be active in order for the binding to trigger.
 	/// </summary>
 
-	public Modifier modifier = Modifier.None;
+	public Modifier modifier = Modifier.Any;
 
 	/// <summary>
 	/// Action to take with the specified key.
@@ -72,7 +73,7 @@ public class UIKeyBinding : MonoBehaviour
 
 	protected virtual bool IsModifierActive ()
 	{
-		if (modifier == Modifier.None) return true;
+		if (modifier == Modifier.Any) return true;
 
 		if (modifier == Modifier.Alt)
 		{
@@ -89,6 +90,14 @@ public class UIKeyBinding : MonoBehaviour
 			if (Input.GetKey(KeyCode.LeftShift) ||
 				Input.GetKey(KeyCode.RightShift)) return true;
 		}
+		else if (modifier == Modifier.None)
+			return
+				!Input.GetKey(KeyCode.LeftAlt) &&
+				!Input.GetKey(KeyCode.RightAlt) &&
+				!Input.GetKey(KeyCode.LeftControl) &&
+				!Input.GetKey(KeyCode.RightControl) &&
+				!Input.GetKey(KeyCode.LeftShift) &&
+				!Input.GetKey(KeyCode.RightShift);
 		return false;
 	}
 
@@ -108,18 +117,24 @@ public class UIKeyBinding : MonoBehaviour
 
 		if (action == Action.PressAndClick || action == Action.All)
 		{
-			UICamera.currentTouch = UICamera.controller;
-			UICamera.currentScheme = UICamera.ControlScheme.Mouse;
-			UICamera.currentTouch.current = gameObject;
-
-			if (keyDown) OnBindingPress(true);
+			if (keyDown)
+			{
+				UICamera.currentTouch = UICamera.controller;
+				UICamera.currentScheme = UICamera.ControlScheme.Controller;
+				UICamera.currentTouch.current = gameObject;
+				OnBindingPress(true);
+				UICamera.currentTouch.current = null;
+			}
 
 			if (mPress && keyUp)
 			{
+				UICamera.currentTouch = UICamera.controller;
+				UICamera.currentScheme = UICamera.ControlScheme.Controller;
+				UICamera.currentTouch.current = gameObject;
 				OnBindingPress(false);
 				OnBindingClick();
+				UICamera.currentTouch.current = null;
 			}
-			UICamera.currentTouch.current = null;
 		}
 
 		if (action == Action.Select || action == Action.All)

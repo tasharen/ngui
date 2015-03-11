@@ -229,6 +229,12 @@ public class UICamera : MonoBehaviour
 	public float tooltipDelay = 1f;
 
 	/// <summary>
+	/// If enabled, a tooltip will be shown after touch gets pressed on something and held for more than "tooltipDelay" seconds.
+	/// </summary>
+
+	public bool longPressTooltip = false;
+
+	/// <summary>
 	/// How much the mouse has to be moved after pressing a button before it starts to send out drag events.
 	/// </summary>
 
@@ -342,7 +348,7 @@ public class UICamera : MonoBehaviour
 	/// Current control scheme. Set automatically when events arrive.
 	/// </summary>
 
-	static public ControlScheme currentScheme = ControlScheme.Mouse;
+	static public ControlScheme currentScheme = ControlScheme.Controller;
 
 	/// <summary>
 	/// ID of the touch or mouse operation prior to sending out the event. Mouse ID is '-1' for left, '-2' for right mouse button, '-3' for middle.
@@ -518,9 +524,9 @@ public class UICamera : MonoBehaviour
 			if (currentTouch == null)
 			{
 				shouldRestore = true;
-				currentTouchID = -1;
-				currentTouch = mMouse[0];
-				UICamera.currentScheme = ControlScheme.Mouse;
+				currentTouchID = -100;
+				currentTouch = controller;
+				currentScheme = ControlScheme.Controller;
 			}
 
 			inputHasFocus = false;
@@ -1314,19 +1320,6 @@ public class UICamera : MonoBehaviour
 
 	public void ProcessMouse ()
 	{
-		// Update the position and delta
-		lastTouchPosition = Input.mousePosition;
-		mMouse[0].delta = lastTouchPosition - mMouse[0].pos;
-		mMouse[0].pos = lastTouchPosition;
-		bool posChanged = mMouse[0].delta.sqrMagnitude > 0.001f;
-
-		// Propagate the updates to the other mouse buttons
-		for (int i = 1; i < 3; ++i)
-		{
-			mMouse[i].pos = mMouse[0].pos;
-			mMouse[i].delta = mMouse[0].delta;
-		}
-
 		// Is any button currently pressed?
 		bool isPressed = false;
 		bool justPressed = false;
@@ -1344,6 +1337,32 @@ public class UICamera : MonoBehaviour
 				currentScheme = ControlScheme.Mouse;
 				isPressed = true;
 			}
+		}
+
+		// We're currently using touches -- do nothing
+		if (currentScheme == ControlScheme.Touch) return;
+
+		// Update the position and delta
+		Vector2 pos = Input.mousePosition;
+		Vector2 delta = pos - mMouse[0].pos;
+		float sqrMag = delta.sqrMagnitude;
+		bool posChanged = false;
+
+		if (currentScheme != ControlScheme.Mouse)
+		{
+			if (sqrMag < 0.001f) return; // Nothing changed and we are not using the mouse -- exit
+			currentScheme = ControlScheme.Mouse;
+			posChanged = true;
+		}
+		else if (sqrMag > 0.001f) posChanged = true;
+
+		lastTouchPosition = pos;
+
+		// Propagate the updates to the other mouse buttons
+		for (int i = 0; i < 3; ++i)
+		{
+			mMouse[i].pos = pos;
+			mMouse[i].delta = delta;
 		}
 
 		// No need to perform raycasts every frame
@@ -1389,7 +1408,6 @@ public class UICamera : MonoBehaviour
 		// The button was released over a different object -- remove the highlight from the previous
 		if ((justPressed || !isPressed) && mHover != null && highlightChanged)
 		{
-			currentScheme = ControlScheme.Mouse;
 			if (mTooltip != null) ShowTooltip(false);
 			if (onHover != null) onHover(mHover, false);
 			Notify(mHover, "OnHover", false);
@@ -1401,9 +1419,7 @@ public class UICamera : MonoBehaviour
 		{
 			bool pressed = Input.GetMouseButtonDown(i);
 			bool unpressed = Input.GetMouseButtonUp(i);
-
 			if (pressed || unpressed) currentScheme = ControlScheme.Mouse;
-
 			currentTouch = mMouse[i];
 
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
@@ -1420,7 +1436,11 @@ public class UICamera : MonoBehaviour
 			}
 	
 			// We don't want to update the last camera while there is a touch happening
-			if (pressed) currentTouch.pressedCam = currentCamera;
+			if (pressed)
+			{
+				currentTouch.pressedCam = currentCamera;
+				currentTouch.pressTime = RealTime.time;
+			}
 			else if (currentTouch.pressed != null) currentCamera = currentTouch.pressedCam;
 	
 			// Process the mouse events
@@ -1468,7 +1488,6 @@ public class UICamera : MonoBehaviour
 
 	public void ProcessTouches ()
 	{
-		currentScheme = ControlScheme.Touch;
 		int count = (GetInputTouchCount == null) ? Input.touchCount : GetInputTouchCount();
 
 		for (int i = 0; i < count; ++i)
@@ -1502,6 +1521,9 @@ public class UICamera : MonoBehaviour
 			bool unpressed = (phase == TouchPhase.Canceled) || (phase == TouchPhase.Ended);
 			currentTouch.touchBegan = false;
 
+			// Assume touch-based control
+			currentScheme = ControlScheme.Touch;
+
 			// Although input.deltaPosition can be used, calculating it manually is safer (just in case)
 			currentTouch.delta = pressed ? Vector2.zero : position - currentTouch.pos;
 			currentTouch.pos = position;
@@ -1525,6 +1547,7 @@ public class UICamera : MonoBehaviour
 
 			// If the touch has ended, remove it from the list
 			if (unpressed) RemoveTouch(currentTouchID);
+
 			currentTouch.last = null;
 			currentTouch = null;
 
@@ -1543,7 +1566,7 @@ public class UICamera : MonoBehaviour
 
 			if (useMouse) ProcessMouse();
 #if UNITY_EDITOR
-			else ProcessFakeTouches();
+			else if (GetInputTouch == null) ProcessFakeTouches();
 #endif
 		}
 		else mUsingTouchEvents = true;
@@ -1627,6 +1650,8 @@ public class UICamera : MonoBehaviour
 			currentKey = submitKey1;
 			submitKeyUp = true;
 		}
+
+		if (submitKeyDown) currentTouch.pressTime = RealTime.time;
 
 		if (submitKeyDown || submitKeyUp)
 		{
@@ -1716,7 +1741,6 @@ public class UICamera : MonoBehaviour
 		if (pressed)
 		{
 			if (mTooltip != null) ShowTooltip(false);
-
 			currentTouch.pressStarted = true;
 			if (onPress != null && currentTouch.pressed)
 				onPress(currentTouch.pressed, false);
@@ -1823,7 +1847,7 @@ public class UICamera : MonoBehaviour
 		// Send out the unpress message
 		if (currentTouch == null) return;
 		currentTouch.pressStarted = false;
-		if (mTooltip != null) ShowTooltip(false);
+		//if (mTooltip != null) ShowTooltip(false);
 
 		if (currentTouch.pressed != null)
 		{
@@ -1902,6 +1926,16 @@ public class UICamera : MonoBehaviour
 		{
 			if (released) ProcessRelease(isMouse, drag);
 			ProcessPress(pressed, click, drag);
+
+			// Hold event = show tooltip
+			if (longPressTooltip && currentTouch.pressed == currentTouch.current &&
+				currentTouch.clickNotification != ClickNotification.None &&
+				!currentTouch.dragStarted && currentTouch.deltaTime > tooltipDelay)
+			{
+				currentTouch.clickNotification = ClickNotification.None;
+				mTooltip = currentTouch.pressed;
+				ShowTooltip(true);
+			}
 		}
 		else if (isMouse || pressed || released)
 		{
@@ -1922,7 +1956,7 @@ public class UICamera : MonoBehaviour
 		if (!val) mTooltip = null;
 	}
 
-#if !UNITY_EDITOR
+/*#if !UNITY_EDITOR
 	/// <summary>
 	/// Clear all active press states when the application gets paused.
 	/// </summary>
@@ -1984,5 +2018,5 @@ public class UICamera : MonoBehaviour
 		}
 		currentTouch = prev;
 	}
-#endif
+#endif*/
 }

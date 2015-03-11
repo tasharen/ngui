@@ -81,14 +81,18 @@ public class UICameraEditor : Editor
 			EditorGUI.EndDisabledGroup();
 
 			EditorGUI.BeginDisabledGroup(!mouse.boolValue);
-			{
-				EditorGUILayout.PropertyField(serializedObject.FindProperty("stickyTooltip"));
+			EditorGUILayout.PropertyField(serializedObject.FindProperty("stickyTooltip"));
+			EditorGUI.EndDisabledGroup();
 
-				GUILayout.BeginHorizontal();
-				EditorGUILayout.PropertyField(serializedObject.FindProperty("tooltipDelay"));
-				GUILayout.Label("seconds", GUILayout.MinWidth(60f));
-				GUILayout.EndHorizontal();
-			}
+			GUILayout.BeginHorizontal();
+			EditorGUILayout.PropertyField(serializedObject.FindProperty("longPressTooltip"));
+			GUILayout.EndHorizontal();
+
+			EditorGUI.BeginDisabledGroup(!mouse.boolValue);
+			GUILayout.BeginHorizontal();
+			EditorGUILayout.PropertyField(serializedObject.FindProperty("tooltipDelay"));
+			GUILayout.Label("seconds", GUILayout.MinWidth(60f));
+			GUILayout.EndHorizontal();
 			EditorGUI.EndDisabledGroup();
 
 			GUILayout.BeginHorizontal();

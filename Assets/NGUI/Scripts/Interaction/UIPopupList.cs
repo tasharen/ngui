@@ -323,6 +323,36 @@ public class UIPopupList : UIWidgetContainer
 	}
 
 	/// <summary>
+	/// Remove the specified item.
+	/// </summary>
+
+	public void RemoveItem (string text)
+	{
+		int index = items.IndexOf(text);
+
+		if (index != -1)
+		{
+			items.RemoveAt(index);
+			itemData.RemoveAt(index);
+		}
+	}
+
+	/// <summary>
+	/// Remove the specified item.
+	/// </summary>
+
+	public void RemoveItemByData (object data)
+	{
+		int index = itemData.IndexOf(data);
+
+		if (index != -1)
+		{
+			items.RemoveAt(index);
+			itemData.RemoveAt(index);
+		}
+	}
+
+	/// <summary>
 	/// Trigger all event notification callbacks.
 	/// </summary>
 
