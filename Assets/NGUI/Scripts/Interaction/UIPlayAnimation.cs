@@ -279,6 +279,18 @@ public class UIPlayAnimation : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Play the tween forward.
+	/// </summary>
+
+	public void PlayForward () { Play(true); }
+
+	/// <summary>
+	/// Play the tween in reverse.
+	/// </summary>
+
+	public void PlayReverse () { Play(false); }
+
+	/// <summary>
 	/// Callback triggered when each tween executed by this script finishes.
 	/// </summary>
 

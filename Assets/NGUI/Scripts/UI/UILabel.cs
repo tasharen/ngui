@@ -1371,6 +1371,9 @@ public class UILabel : UIWidget
 				minX = Mathf.Max(minX, base.minWidth);
 				minY = Mathf.Max(minY, base.minHeight);
 
+				if ((minX & 1) == 1) ++minX;
+				if ((minY & 1) == 1) ++minY;
+
 				mWidth = Mathf.Max(w, minX);
 				mHeight = Mathf.Max(h, minY);
 
