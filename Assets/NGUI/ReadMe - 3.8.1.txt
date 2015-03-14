@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2015 Tasharen Entertainment
-            Version 3.8.0
+            Version 3.8.1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,18 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.8.1
+- NEW: Added Animator to UIToggle in addition to Animation.
+- NEW: Added a "long press" tooltip option to UICamera (to show tooltips on touch-based devices).
+- NEW: UIKeyBinding now has explicit "none" and "any" modifier key options.
+- NEW: UIScrollView's movement dampening strength is now exposed as a property for scripting.
+- NEW: Added Transparent Masked shaders for when you want to have clipped masked textures.
+- FIX: Label's MakePixelPerfect will no longer snap to dimensions that don't divide by two.
+- FIX: UIButton's isEnabled property will now affect all button scripts on the object, not just the first one.
+- FIX: Sprite's padding should now be affected by pixel size adjustments.
+- FIX: UIPlayAnimation should now work properly with the controller input again.
+- FIX: Unity 4.3 compilation fix.
 
 3.8.0
 - NEW: Added a way to add TouchScript support to NGUI: http://www.tasharen.com/forum/index.php?topic=12411.0
