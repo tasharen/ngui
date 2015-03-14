@@ -399,17 +399,19 @@ public class UIPrefabTool : EditorWindow
 	{
 		if (item == null || item.prefab == null) return;
 
+		// For some reason Unity 5 doesn't seem to support render textures at edit time while Unity 4 does...
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 		if (point == null) point = GetSnapshotPoint(item.prefab.transform);
 
 		if (point != null && point.thumbnail != null)
 		{
-			Debug.Log(2);
 			// Explicitly chosen thumbnail
 			item.tex = point.thumbnail;
 			item.dynamicTex = false;
 			return;
 		}
 		else if (!UnityEditorInternal.InternalEditorUtility.HasPro())
+#endif
 		{
 			// Render textures only work in Unity Pro
 			string path = "Assets/NGUI/Editor/Preview/" + item.prefab.name + ".png";
@@ -417,7 +419,7 @@ public class UIPrefabTool : EditorWindow
 			item.dynamicTex = false;
 			return;
 		}
-
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 		int dim = (cellSize - 4) * 2;
 
 		// Asset Preview-based approach is unreliable, and most of the time fails to provide a texture.
@@ -427,24 +429,21 @@ public class UIPrefabTool : EditorWindow
 		//if (item.tex != null) return;
 
 		// Let's create a basic scene
-		GameObject root = EditorUtility.CreateGameObjectWithHideFlags(
-				"Preview Root", HideFlags.HideAndDontSave);
-
-		GameObject camGO = EditorUtility.CreateGameObjectWithHideFlags(
-			"Preview Camera", HideFlags.HideAndDontSave, typeof(Camera));
+		GameObject root = EditorUtility.CreateGameObjectWithHideFlags("Preview Root", HideFlags.HideAndDontSave);
+		GameObject camGO = EditorUtility.CreateGameObjectWithHideFlags("Preview Camera", HideFlags.HideAndDontSave, typeof(Camera));
 
 		// Position it far away so that it doesn't interfere with existing objects
 		root.transform.position = new Vector3(0f, 0f, 10000f);
 		root.layer = item.prefab.layer;
 
 		// Set up the camera
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+//#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 		Camera cam = camGO.camera;
 		cam.isOrthoGraphic = true;
-#else
-		Camera cam = camGO.GetComponent<Camera>();
-		cam.orthographic = true;
-#endif
+//#else
+//		Camera cam = camGO.GetComponent<Camera>();
+//		cam.orthographic = true;
+//#endif
 		cam.renderingPath = RenderingPath.Forward;
 		cam.clearFlags = CameraClearFlags.Skybox;
 		cam.backgroundColor = new Color(0f, 0f, 0f, 0f);
@@ -479,6 +478,7 @@ public class UIPrefabTool : EditorWindow
 		// Clean up everything
 		DestroyImmediate(camGO);
 		DestroyImmediate(root);
+#endif
 	}
 
 	/// <summary>
