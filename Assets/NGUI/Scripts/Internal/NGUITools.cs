@@ -1554,6 +1554,12 @@ static public class NGUITools
 			Quaternion rot = t.rotation;
 			Vector3 pos = t.position;
 
+			int w = Mathf.RoundToInt(size.x);
+			int h = Mathf.RoundToInt(size.y);
+
+			if ((w & 1) == 1) pos.x -= 1f / size.x;
+			if ((h & 1) == 1) pos.y += 1f / size.y;
+
 			mSides[0] = rot * (new Vector3(x0, 0f, depth)) + pos;
 			mSides[1] = rot * (new Vector3(0f, y1, depth)) + pos;
 			mSides[2] = rot * (new Vector3(x1, 0f, depth)) + pos;

@@ -306,15 +306,22 @@ public class UIPanel : UIRect
 		get
 		{
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
-			if (mHalfPixelOffset && anchorCamera != null && mCam.isOrthoGraphic)
+			if (anchorCamera != null && mCam.isOrthoGraphic)
 #else
-			if (mHalfPixelOffset && anchorCamera != null && mCam.orthographic)
+			if (anchorCamera != null && mCam.orthographic)
 #endif
 			{
 				Vector2 size = GetWindowSize();
 				float pixelSize = (root != null) ? root.pixelSizeAdjustment : 1f;
 				float mod = (pixelSize / size.y) / mCam.orthographicSize;
-				return new Vector3(-mod, mod);
+
+				bool x = mHalfPixelOffset;
+				bool y = mHalfPixelOffset;
+
+				if ((Mathf.RoundToInt(size.x) & 1) == 1) x = !x;
+				if ((Mathf.RoundToInt(size.y) & 1) == 1) y = !y;
+
+				return new Vector3(x ? -mod : 0f, y ? mod : 0f);
 			}
 			return Vector3.zero;
 		}
@@ -901,8 +908,8 @@ public class UIPanel : UIRect
 			Application.platform == RuntimePlatform.WindowsEditor);
 
 		// Only DirectX 9 needs the half-pixel offset
-		if (mHalfPixelOffset) mHalfPixelOffset = (SystemInfo.graphicsShaderLevel < 40 &&
-		                                          SystemInfo.graphicsDeviceVersion.Contains("Direct3D"));
+		if (mHalfPixelOffset && SystemInfo.graphicsDeviceVersion.Contains("Direct3D"))
+			mHalfPixelOffset = (SystemInfo.graphicsShaderLevel < 40);
 	}
 
 	/// <summary>
@@ -1434,9 +1441,12 @@ public class UIPanel : UIRect
 		}
 		else drawCallClipRange = Vector4.zero;
 
+		int w = Screen.width;
+		int h = Screen.height;
+
 		// Legacy functionality
-		if (drawCallClipRange.z == 0f) drawCallClipRange.z = Screen.width * 0.5f;
-		if (drawCallClipRange.w == 0f) drawCallClipRange.w = Screen.height * 0.5f;
+		if (drawCallClipRange.z == 0f) drawCallClipRange.z = w * 0.5f;
+		if (drawCallClipRange.w == 0f) drawCallClipRange.w = h * 0.5f;
 
 		// DirectX 9 half-pixel offset
 		if (halfPixelOffset)
