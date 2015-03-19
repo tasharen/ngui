@@ -773,6 +773,23 @@ static public class NGUITools
 			}
 		}
 
+		// Try to find an existing panel
+		if (root == null)
+		{
+			for (int i = 0, imax = UIPanel.list.Count; i < imax; ++i)
+			{
+				UIPanel p = UIPanel.list[i];
+				GameObject go = p.gameObject;
+
+				if (go.hideFlags == HideFlags.None && go.layer == layer)
+				{
+					trans.parent = p.transform;
+					trans.localScale = Vector3.one;
+					return p;
+				}
+			}
+		}
+
 		// If we are working with a different UI type, we need to treat it as a brand-new one instead
 		if (root != null)
 		{
