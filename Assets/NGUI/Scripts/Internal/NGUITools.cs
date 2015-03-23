@@ -1544,6 +1544,7 @@ static public class NGUITools
 
 			Rect rect = cam.rect;
 			Vector2 size = screenSize;
+
 			float aspect = size.x / size.y;
 			aspect *= rect.width / rect.height;
 			x0 *= aspect;

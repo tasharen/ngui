@@ -1210,6 +1210,9 @@ public class UIWidget : UIRect
 
 		// Calculate the new position, width and height
 		Vector3 newPos = new Vector3(Mathf.Lerp(lt, rt, pvt.x), Mathf.Lerp(bt, tt, pvt.y), pos.z);
+		newPos.x = Mathf.Round(newPos.x);
+		newPos.y = Mathf.Round(newPos.y);
+
 		int w = Mathf.FloorToInt(rt - lt + 0.5f);
 		int h = Mathf.FloorToInt(tt - bt + 0.5f);
 

@@ -1820,6 +1820,7 @@ public class UIPanel : UIRect
 	{
 		UIPanel panel = NGUITools.FindInParents<UIPanel>(trans);
 		if (panel != null) return panel;
+		while (trans.parent != null) trans = trans.parent;
 		return createIfMissing ? NGUITools.CreateUI(trans, false, layer) : null;
 	}
 
