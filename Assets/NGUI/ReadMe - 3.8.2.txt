@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2015 Tasharen Entertainment
-            Version 3.8.1
+            Version 3.8.2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,15 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.8.2
+- NEW: Localization will now automatically pull mobile version of keys if the current control scheme is touch.
+- NEW: UICamera.touchCount was split into GetInputSources() and UICamera.activeTouches.Count.
+- FIX: Better handling of touches in UICamera.
+- FIX: Tooltip will now show at the last mouse/touch position rather than last mouse position.
+- FIX: Fixed UI colors with linear-space lighting.
+- FIX: Fixed UI blurriness in the editor when targeting Android on Windows.
+- FIX: Fixed UI blurriness when the window's dimensions are not dividable by two.
 
 3.8.1
 - NEW: Added Animator to UIToggle in addition to Animation.
