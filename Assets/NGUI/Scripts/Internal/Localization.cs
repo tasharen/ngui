@@ -477,16 +477,21 @@ public static class Localization
 
 		string val;
 		string[] vals;
-#if UNITY_IPHONE || UNITY_ANDROID
-		string mobKey = key + " Mobile";
 
-		if (mLanguageIndex != -1 && mDictionary.TryGetValue(mobKey, out vals))
-		{
-			if (mLanguageIndex < vals.Length)
-				return vals[mLanguageIndex];
-		}
-		if (mOldDictionary.TryGetValue(mobKey, out val)) return val;
+#if !UNITY_IPHONE && !UNITY_ANDROID && !UNITY_WP8 && !UNITY_BLACKBERRY
+		if (UICamera.currentScheme == UICamera.ControlScheme.Touch)
 #endif
+		{
+			string mobKey = key + " Mobile";
+
+			if (mLanguageIndex != -1 && mDictionary.TryGetValue(mobKey, out vals))
+			{
+				if (mLanguageIndex < vals.Length)
+					return vals[mLanguageIndex];
+			}
+			if (mOldDictionary.TryGetValue(mobKey, out val)) return val;
+		}
+
 		if (mLanguageIndex != -1 && mDictionary.TryGetValue(key, out vals))
 		{
 			if (mLanguageIndex < vals.Length)

@@ -88,7 +88,7 @@ public class UICamera : MonoBehaviour
 		/// Delta time since the touch operation started.
 		/// </summary>
 
-		public float deltaTime { get { return touchBegan ? RealTime.time - pressTime : 0f; } }
+		public float deltaTime { get { return RealTime.time - pressTime; } }
 
 		/// <summary>
 		/// Returns whether this touch is currently over a UI element.
@@ -446,8 +446,14 @@ public class UICamera : MonoBehaviour
 	// Used to ensure that joystick-based controls don't trigger that often
 	static float mNextEvent = 0f;
 
-	// List of currently active touches
-	static Dictionary<int, MouseOrTouch> mTouches = new Dictionary<int, MouseOrTouch>();
+	/// <summary>
+	/// List of all the active touches.
+	/// </summary>
+	
+	static public List<MouseOrTouch> activeTouches = new List<MouseOrTouch>();
+
+	// Used internally to store IDs of active touches
+	static List<int> mTouchIDs = new List<int>();
 
 	// Used to detect screen dimension changes
 	static int mWidth = 0;
@@ -569,34 +575,43 @@ public class UICamera : MonoBehaviour
 	static public bool IsPressed (GameObject go)
 	{
 		for (int i = 0; i < 3; ++i) if (mMouse[i].pressed == go) return true;
-		foreach (KeyValuePair<int, MouseOrTouch> touch in mTouches) if (touch.Value.pressed == go) return true;
+		for (int i = 0, imax = activeTouches.Count; i < imax; ++i)
+		{
+			MouseOrTouch touch = activeTouches[i];
+			if (touch.pressed == go) return true;
+		}
 		if (controller.pressed == go) return true;
 		return false;
 	}
 
+	[System.Obsolete("Use either 'CountInputSources()' or 'activeTouches.Count'")]
+	static public int touchCount { get { return CountInputSources(); } }
+
 	/// <summary>
 	/// Number of active touches from all sources.
+	/// Note that this will include the sum of touch, mouse and controller events.
+	/// If you want only touch events, use activeTouches.Count.
 	/// </summary>
 
-	static public int touchCount
+	static public int CountInputSources ()
 	{
-		get
+		int count = 0;
+
+		for (int i = 0, imax = activeTouches.Count; i < imax; ++i)
 		{
-			int count = 0;
+			MouseOrTouch touch = activeTouches[i];
+			if (touch.pressed != null)
+				++count;
+		}
 
-			foreach (KeyValuePair<int, MouseOrTouch> touch in mTouches)
-				if (touch.Value.pressed != null)
-					++count;
-
-			for (int i = 0; i < mMouse.Length; ++i)
-				if (mMouse[i].pressed != null)
-					++count;
-
-			if (controller.pressed != null)
+		for (int i = 0; i < mMouse.Length; ++i)
+			if (mMouse[i].pressed != null)
 				++count;
 
-			return count;
-		}
+		if (controller.pressed != null)
+			++count;
+
+		return count;
 	}
 
 	/// <summary>
@@ -609,9 +624,12 @@ public class UICamera : MonoBehaviour
 		{
 			int count = 0;
 
-			foreach (KeyValuePair<int, MouseOrTouch> touch in mTouches)
-				if (touch.Value.dragged != null)
+			for (int i = 0, imax = activeTouches.Count; i < imax; ++i)
+			{
+				MouseOrTouch touch = activeTouches[i];
+				if (touch.dragged != null)
 					++count;
+			}
 
 			for (int i = 0; i < mMouse.Length; ++i)
 				if (mMouse[i].dragged != null)
@@ -1091,22 +1109,21 @@ public class UICamera : MonoBehaviour
 	static public MouseOrTouch GetMouse (int button) { return mMouse[button]; }
 
 	/// <summary>
-	/// Get or create a touch event.
+	/// Get or create a touch event. If you are trying to iterate through a list of active touches, use activeTouches instead.
 	/// </summary>
 
 	static public MouseOrTouch GetTouch (int id)
 	{
-		MouseOrTouch touch = null;
-
 		if (id < 0) return GetMouse(-id - 1);
 
-		if (!mTouches.TryGetValue(id, out touch))
-		{
-			touch = new MouseOrTouch();
-			touch.pressTime = RealTime.time;
-			touch.touchBegan = true;
-			mTouches.Add(id, touch);
-		}
+		for (int i = 0, imax = mTouchIDs.Count; i < imax; ++i)
+			if (mTouchIDs[i] == id) return activeTouches[i];
+
+		MouseOrTouch touch = new MouseOrTouch();
+		touch.pressTime = RealTime.time;
+		touch.touchBegan = true;
+		activeTouches.Add(touch);
+		mTouchIDs.Add(id);
 		return touch;
 	}
 
@@ -1114,7 +1131,18 @@ public class UICamera : MonoBehaviour
 	/// Remove a touch event from the list.
 	/// </summary>
 
-	static public void RemoveTouch (int id) { mTouches.Remove(id); }
+	static public void RemoveTouch (int id)
+	{
+		for (int i = 0, imax = mTouchIDs.Count; i < imax; ++i)
+		{
+			if (mTouchIDs[i] == id)
+			{
+				mTouchIDs.RemoveAt(i);
+				activeTouches.RemoveAt(i);
+				return;
+			}
+		}
+	}
 
 	/// <summary>
 	/// Add this camera to the list.
@@ -1928,13 +1956,18 @@ public class UICamera : MonoBehaviour
 			ProcessPress(pressed, click, drag);
 
 			// Hold event = show tooltip
-			if (longPressTooltip && currentTouch.pressed == currentTouch.current &&
+			if (currentTouch.pressed == currentTouch.current &&
 				currentTouch.clickNotification != ClickNotification.None &&
 				!currentTouch.dragStarted && currentTouch.deltaTime > tooltipDelay)
 			{
 				currentTouch.clickNotification = ClickNotification.None;
-				mTooltip = currentTouch.pressed;
-				ShowTooltip(true);
+
+				if (longPressTooltip)
+				{
+					mTooltip = currentTouch.pressed;
+					ShowTooltip(true);
+				}
+				Notify(currentTouch.current, "OnLongPress", null);
 			}
 		}
 		else if (isMouse || pressed || released)
@@ -1955,68 +1988,4 @@ public class UICamera : MonoBehaviour
 		Notify(mTooltip, "OnTooltip", val);
 		if (!val) mTooltip = null;
 	}
-
-/*#if !UNITY_EDITOR
-	/// <summary>
-	/// Clear all active press states when the application gets paused.
-	/// </summary>
-
-	void OnApplicationPause ()
-	{
-		MouseOrTouch prev = currentTouch;
-
-		if (useTouch)
-		{
-			BetterList<int> ids = new BetterList<int>();
-
-			foreach (KeyValuePair<int, MouseOrTouch> pair in mTouches)
-			{
-				if (pair.Value != null && pair.Value.pressed)
-				{
-					currentTouch = pair.Value;
-					currentTouchID = pair.Key;
-					currentScheme = ControlScheme.Touch;
-					currentTouch.clickNotification = ClickNotification.None;
-					ProcessTouch(false, true);
-					ids.Add(currentTouchID);
-				}
-			}
-
-			for (int i = 0; i < ids.size; ++i)
-				RemoveTouch(ids[i]);
-		}
-
-		if (useMouse)
-		{
-			for (int i = 0; i < 3; ++i)
-			{
-				if (mMouse[i].pressed)
-				{
-					currentTouch = mMouse[i];
-					currentTouchID = -1 - i;
-					currentKey = KeyCode.Mouse0 + i;
-					currentScheme = ControlScheme.Mouse;
-					currentTouch.clickNotification = ClickNotification.None;
-					ProcessTouch(false, true);
-				}
-			}
-		}
-
-		if (useController)
-		{
-			if (controller.pressed)
-			{
-				currentTouch = controller;
-				currentTouchID = -100;
-				currentScheme = ControlScheme.Controller;
-				currentTouch.last = currentTouch.current;
-				currentTouch.current = mCurrentSelection;
-				currentTouch.clickNotification = ClickNotification.None;
-				ProcessTouch(false, true);
-				currentTouch.last = null;
-			}
-		}
-		currentTouch = prev;
-	}
-#endif*/
 }

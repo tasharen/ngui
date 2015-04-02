@@ -145,6 +145,10 @@ public class UIDragObject : MonoBehaviour
 
 	void OnPress (bool pressed)
 	{
+		// Unity's physics seems to break when timescale is not quite zero. Raycasts start to fail completely.
+		float ts = Time.timeScale;
+		if (ts < 0.01f && ts != 0f) return;
+
 		if (enabled && NGUITools.GetActive(gameObject) && target != null)
 		{
 			if (pressed)

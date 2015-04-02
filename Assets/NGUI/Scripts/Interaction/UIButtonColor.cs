@@ -275,7 +275,7 @@ public class UIButtonColor : UIWidgetContainer
 		if (isEnabled && tweenTarget != null)
 		{
 			if (UICamera.currentScheme == UICamera.ControlScheme.Controller) OnHover(isSelected);
-			else if (!isSelected && UICamera.touchCount < 2) OnHover(isSelected);
+			else if (!isSelected && UICamera.CountInputSources() < 2) OnHover(isSelected);
 		}
 	}
 

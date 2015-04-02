@@ -107,7 +107,7 @@ public class UITooltip : MonoBehaviour
 			text.text = tooltipText;
 
 			// Orthographic camera positioning is trivial
-			mPos = Input.mousePosition;
+			mPos = UICamera.lastTouchPosition;
 
 			Transform textTrans = text.transform;
 			Vector3 offset = textTrans.localPosition;
