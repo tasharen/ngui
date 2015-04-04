@@ -257,6 +257,7 @@ public class UITextList : MonoBehaviour
 			// and then do wrapping ourselves in the 'for' loop below.
 			textLabel.UpdateNGUIText();
 			NGUIText.rectHeight = 1000000;
+			NGUIText.regionHeight = 1000000;
 			mTotalLines = 0;
 
 			for (int i = 0; i < mParagraphs.size; ++i)
