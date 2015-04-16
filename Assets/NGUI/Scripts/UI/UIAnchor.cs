@@ -224,7 +224,11 @@ public class UIAnchor : MonoBehaviour
 		}
 
 		// Wrapped in an 'if' so the scene doesn't get marked as 'edited' every frame
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 		if (useCamera && uiCamera.isOrthoGraphic && mTrans.parent != null)
+#else
+		if (useCamera && uiCamera.orthographic && mTrans.parent != null)
+#endif
 		{
 			v = mTrans.parent.InverseTransformPoint(v);
 			v.x = Mathf.RoundToInt(v.x);

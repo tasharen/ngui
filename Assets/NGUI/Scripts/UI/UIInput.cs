@@ -667,7 +667,7 @@ public class UIInput : MonoBehaviour
 				string text = Input.inputString;
 				if (!string.IsNullOrEmpty(text)) Insert(text);
  #else
-				string text = mKeyboard.text;
+				string text = (mKeyboard.done || !mKeyboard.active) ? mCached : mKeyboard.text;
  
 				if (inputShouldBeHidden)
 				{
@@ -685,7 +685,7 @@ public class UIInput : MonoBehaviour
 				else if (mCached != text)
 				{
 					mCached = text;
-					value = text;
+					if (!mKeyboard.done && mKeyboard.active) value = text;
 				}
  #endif // UNITY_METRO
 				if (mKeyboard.done || !mKeyboard.active)

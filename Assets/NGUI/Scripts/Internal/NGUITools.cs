@@ -80,7 +80,7 @@ static public class NGUITools
 
 	static public AudioSource PlaySound (AudioClip clip, float volume, float pitch)
 	{
-		float time = Time.time;
+		float time = RealTime.time;
 		if (mLastClip == clip && mLastTimestamp + 0.1f > time) return null;
 
 		mLastClip = clip;

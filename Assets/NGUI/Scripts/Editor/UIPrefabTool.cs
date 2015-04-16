@@ -437,13 +437,13 @@ public class UIPrefabTool : EditorWindow
 		root.layer = item.prefab.layer;
 
 		// Set up the camera
-//#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 		Camera cam = camGO.camera;
 		cam.isOrthoGraphic = true;
-//#else
-//		Camera cam = camGO.GetComponent<Camera>();
-//		cam.orthographic = true;
-//#endif
+#else
+		Camera cam = camGO.GetComponent<Camera>();
+		cam.orthographic = true;
+#endif
 		cam.renderingPath = RenderingPath.Forward;
 		cam.clearFlags = CameraClearFlags.Skybox;
 		cam.backgroundColor = new Color(0f, 0f, 0f, 0f);

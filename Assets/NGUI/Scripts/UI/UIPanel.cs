@@ -1597,6 +1597,7 @@ public class UIPanel : UIRect
 				if (w.UpdateGeometry(frame))
 				{
 					changed = true;
+					//Debug.Log("Geometry changed: " + w.name, w);
 
 					if (!mRebuild)
 					{
@@ -1719,7 +1720,7 @@ public class UIPanel : UIRect
 
 	
 
-	// <summary>
+	/// <summary>
 	/// Calculate the offset needed to be constrained within the panel's bounds.
 	/// </summary>
 

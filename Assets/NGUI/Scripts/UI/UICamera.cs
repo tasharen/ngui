@@ -1616,7 +1616,12 @@ public class UICamera : MonoBehaviour
 			currentTouchID = 1;
 			currentTouch = mMouse[0];
 			currentTouch.touchBegan = pressed;
-			if (pressed) currentTouch.pressTime = RealTime.time;
+
+			if (pressed)
+			{
+				currentTouch.pressTime = RealTime.time;
+				activeTouches.Add(mMouse[0]);
+			}
 
 			Vector2 pos = Input.mousePosition;
 			currentTouch.delta = pressed ? Vector2.zero : pos - currentTouch.pos;
@@ -1637,7 +1642,7 @@ public class UICamera : MonoBehaviour
 			ProcessTouch(pressed, unpressed);
 
 			// If the touch has ended, remove it from the list
-			if (unpressed) RemoveTouch(currentTouchID);
+			if (unpressed) activeTouches.Remove(mMouse[0]);
 			currentTouch.last = null;
 			currentTouch = null;
 		}

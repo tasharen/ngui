@@ -249,7 +249,7 @@ public class UIPopupList : UIWidgetContainer
 		get
 		{
 			int index = items.IndexOf(mSelectedItem);
-			return index > -1 && index < itemData.Count ? itemData[index] : null;
+			return (index > -1) && index < itemData.Count ? itemData[index] : null;
 		}
 	}
 
@@ -478,20 +478,9 @@ public class UIPopupList : UIWidgetContainer
 #endif
 		}
 
-		if (Application.isPlaying)
-		{
-			// Automatically choose the first item
-			if (string.IsNullOrEmpty(mSelectedItem))
-			{
-				if (items.Count > 0) value = items[0];
-			}
-			else
-			{
-				string s = mSelectedItem;
-				mSelectedItem = null;
-				value = s;
-			}
-		}
+		// Automatically choose the first item
+		if (Application.isPlaying && string.IsNullOrEmpty(mSelectedItem) && items.Count > 0)
+			value = items[0];
 	}
 
 	/// <summary>
@@ -515,11 +504,7 @@ public class UIPopupList : UIWidgetContainer
 
 			Vector3 pos = GetHighlightPosition();
 
-			if (instant || !isAnimated)
-			{
-				mHighlight.cachedTransform.localPosition = pos;
-			}
-			else
+			if (!instant && isAnimated)
 			{
 				TweenPosition.Begin(mHighlight.gameObject, 0.1f, pos).method = UITweener.Method.EaseOut;
 
@@ -529,6 +514,7 @@ public class UIPopupList : UIWidgetContainer
 					StartCoroutine("UpdateTweenPosition");
 				}
 			}
+			else mHighlight.cachedTransform.localPosition = pos;
 		}
 	}
 
@@ -998,11 +984,16 @@ public class UIPopupList : UIWidgetContainer
 			// If the list should be animated, let's animate it by expanding it
 			if (isAnimated)
 			{
-				float bottom = y + labelHeight;
-				Animate(mHighlight, placeAbove, bottom);
-				for (int i = 0, imax = labels.Count; i < imax; ++i) Animate(labels[i], placeAbove, bottom);
 				AnimateColor(mBackground);
-				AnimateScale(mBackground, placeAbove, bottom);
+
+				if (Time.timeScale == 0f || Time.timeScale >= 0.1f)
+				{
+					float bottom = y + labelHeight;
+					Animate(mHighlight, placeAbove, bottom);
+					for (int i = 0, imax = labels.Count; i < imax; ++i)
+						Animate(labels[i], placeAbove, bottom);
+					AnimateScale(mBackground, placeAbove, bottom);
+				}
 			}
 
 			// If we need to place the popup list above the item, we need to reposition everything by the size of the list
@@ -1012,8 +1003,9 @@ public class UIPopupList : UIWidgetContainer
 			}
 
 			min = t.localPosition;
+			max.y = min.y;
 			max.x = min.x + mBackground.width;
-			max.y = min.y - mBackground.height;
+			min.y = max.y - mBackground.height;
 			max.z = min.z;
 			Vector3 offset = mPanel.CalculateConstrainOffset(min, max);
 
