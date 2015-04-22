@@ -490,6 +490,7 @@ public class UIInput : MonoBehaviour
 #if !MOBILE
 	[System.NonSerialized] UIInputOnGUI mOnGUI;
 #endif
+	[System.NonSerialized] UICamera mCam;
 	/// <summary>
 	/// Selection event, sent by the EventSystem.
 	/// </summary>
@@ -746,8 +747,11 @@ public class UIInput : MonoBehaviour
 			if (isSelected && mLastAlpha != label.finalAlpha)
 				UpdateLabel();
 
+			// Cache the camera
+			if (mCam == null) mCam = UICamera.FindCameraForLayer(gameObject.layer);
+
 			// Having this in OnGUI causes issues because Input.inputString gets updated *after* OnGUI, apparently...
-			if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+			if (mCam != null && (Input.GetKeyDown(mCam.submitKey0) || Input.GetKeyDown(mCam.submitKey1)))
 			{
 				bool newLine = (onReturnKey == OnReturnKey.NewLine) ||
 					(onReturnKey == OnReturnKey.Default &&
@@ -762,7 +766,7 @@ public class UIInput : MonoBehaviour
 				else
 				{
 					UICamera.currentScheme = UICamera.ControlScheme.Controller;
-					UICamera.currentKey = KeyCode.Return;
+					UICamera.currentKey = mCam.submitKey0;
 					Submit();
 					UICamera.currentKey = KeyCode.None;
 				}

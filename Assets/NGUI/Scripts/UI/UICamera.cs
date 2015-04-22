@@ -1532,6 +1532,10 @@ public class UICamera : MonoBehaviour
 				fingerId = touch.fingerId;
 				position = touch.position;
 				tapCount = touch.tapCount;
+#if UNITY_WIIU && !UNITY_EDITOR
+				// Unity bug: http://www.tasharen.com/forum/index.php?topic=5821.0
+				position.y = Screen.height - position.y;
+#endif
 			}
 			else
 			{
@@ -1613,6 +1617,7 @@ public class UICamera : MonoBehaviour
 
 		if (pressed || unpressed || held)
 		{
+			currentScheme = ControlScheme.Touch;
 			currentTouchID = 1;
 			currentTouch = mMouse[0];
 			currentTouch.touchBegan = pressed;
@@ -1961,7 +1966,7 @@ public class UICamera : MonoBehaviour
 			ProcessPress(pressed, click, drag);
 
 			// Hold event = show tooltip
-			if (currentTouch.pressed == currentTouch.current &&
+			if (currentTouch.pressed == currentTouch.current && mTooltipTime != 0f &&
 				currentTouch.clickNotification != ClickNotification.None &&
 				!currentTouch.dragStarted && currentTouch.deltaTime > tooltipDelay)
 			{

@@ -149,8 +149,6 @@ public class UIPanel : UIRect
 
 	[SerializeField] Vector2 mClipOffset = Vector2.zero;
 
-	float mCullTime = 0f;
-	float mUpdateTime = 0f;
 	int mMatrixFrame = -1;
 	int mAlphaFrameID = 0;
 	int mLayer = -1;
@@ -431,7 +429,6 @@ public class UIPanel : UIRect
 	{
 		mResized = true;
 		mMatrixFrame = -1;
-		mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
 
 		for (int i = 0, imax = list.Count; i < imax; ++i)
 		{
@@ -500,7 +497,6 @@ public class UIPanel : UIRect
 				Mathf.Abs(mClipRange.w - value.w) > 0.001f)
 			{
 				mResized = true;
-				mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
 				mClipRange = value;
 				mMatrixFrame = -1;
 
@@ -1236,8 +1232,6 @@ public class UIPanel : UIRect
 
 	void UpdateSelf ()
 	{
-		mUpdateTime = RealTime.time;
-
 		UpdateTransformMatrix();
 		UpdateLayers();
 		UpdateWidgets();
@@ -1525,20 +1519,24 @@ public class UIPanel : UIRect
 
 	void UpdateWidgets()
 	{
-#if UNITY_EDITOR
-		bool forceVisible = cullWhileDragging ? false : (Application.isPlaying && mCullTime > mUpdateTime);
-#else
-		bool forceVisible = cullWhileDragging ? false : (mCullTime > mUpdateTime);
-#endif
 		bool changed = false;
+		bool forceVisible = false;
+		bool clipped = hasCumulativeClipping;
+
+		if (!cullWhileDragging)
+		{
+			for (int i = 0; i < UIScrollView.list.size; ++i)
+			{
+				UIScrollView sv = UIScrollView.list[i];
+				if (sv.panel == this && sv.isDragging) forceVisible = true;
+			}
+		}
 
 		if (mForced != forceVisible)
 		{
 			mForced = forceVisible;
 			mResized = true;
 		}
-
-		bool clipped = hasCumulativeClipping;
 
 		// Update all widgets
 		for (int i = 0, imax = widgets.Count; i < imax; ++i)
@@ -1597,19 +1595,13 @@ public class UIPanel : UIRect
 				if (w.UpdateGeometry(frame))
 				{
 					changed = true;
-					//Debug.Log("Geometry changed: " + w.name, w);
+					//Debug.Log("Geometry changed: " + w.name + " " + frame, w);
 
 					if (!mRebuild)
 					{
-						if (w.drawCall != null)
-						{
-							w.drawCall.isDirty = true;
-						}
-						else
-						{
-							// Find an existing draw call, if possible
-							FindDrawCall(w);
-						}
+						// Find an existing draw call, if possible
+						if (w.drawCall != null) w.drawCall.isDirty = true;
+						else FindDrawCall(w);
 					}
 				}
 			}

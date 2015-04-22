@@ -800,8 +800,6 @@ public class UIPopupList : UIWidgetContainer
 			handleEvents = true;
 
 			// Calculate the dimensions of the object triggering the popup list so we can position it below it
-			Transform myTrans = transform;
-
 			Vector3 min;
 			Vector3 max;
 
@@ -810,7 +808,7 @@ public class UIPopupList : UIWidgetContainer
 			mChild.layer = gameObject.layer;
 
 			Transform t = mChild.transform;
-			t.parent = myTrans.parent;
+			t.parent = mPanel.cachedTransform;
 			Vector3 pos;
 
 			StopCoroutine("CloseIfUnselected");
@@ -825,18 +823,18 @@ public class UIPopupList : UIWidgetContainer
 			// Manually triggered popup list on some other game object
 			if (openOn == OpenOn.Manual && mSelection != gameObject)
 			{
-				min = t.parent.InverseTransformPoint(mPanel.anchorCamera.ScreenToWorldPoint(UICamera.lastTouchPosition));
+				min = mPanel.cachedTransform.InverseTransformPoint(mPanel.anchorCamera.ScreenToWorldPoint(UICamera.lastTouchPosition));
 				max = min;
 				t.localPosition = min;
 				pos = t.position;
 			}
 			else
 			{
-				Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(myTrans.parent, myTrans, false, false);
+				Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.cachedTransform, transform, false, false);
 				min = bounds.min;
 				max = bounds.max;
 				t.localPosition = min;
-				pos = myTrans.position;
+				pos = t.position;
 			}
 
 			StartCoroutine("CloseIfUnselected");
@@ -999,16 +997,30 @@ public class UIPopupList : UIWidgetContainer
 			// If we need to place the popup list above the item, we need to reposition everything by the size of the list
 			if (placeAbove)
 			{
-				t.localPosition = new Vector3(min.x, max.y - y - bgPadding.y, min.z);
+				min.y = max.y - bgPadding.y;
+				max.y = min.y + mBackground.height;
+				max.x = min.x + mBackground.width;
+				t.localPosition = new Vector3(min.x, max.y - bgPadding.y, min.z);
+			}
+			else
+			{
+				max.y = min.y + bgPadding.y;
+				min.y = max.y - mBackground.height;
+				max.x = min.x + mBackground.width;
 			}
 
-			min = t.localPosition;
-			max.y = min.y;
-			max.x = min.x + mBackground.width;
-			min.y = max.y - mBackground.height;
-			max.z = min.z;
-			Vector3 offset = mPanel.CalculateConstrainOffset(min, max);
+			Transform pt = mPanel.cachedTransform.parent;
 
+			if (pt != null)
+			{
+				min = mPanel.cachedTransform.TransformPoint(min);
+				max = mPanel.cachedTransform.TransformPoint(max);
+				min = pt.InverseTransformPoint(min);
+				max = pt.InverseTransformPoint(max);
+			}
+
+			// Ensure that everything fits into the panel's visible range
+			Vector3 offset = mPanel.CalculateConstrainOffset(min, max);
 			pos = t.localPosition + offset;
 			pos.x = Mathf.Round(pos.x);
 			pos.y = Mathf.Round(pos.y);
