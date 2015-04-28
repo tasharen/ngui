@@ -441,12 +441,6 @@ public abstract class UIRect : MonoBehaviour
 
 	protected void Start ()
 	{
-		if (updateAnchors == AnchorUpdate.OnStart)
-		{
-			mAnchorsCached = false;
-			mUpdateAnchors = true;
-		}
-
 		mStarted = true;
 		OnInit();
 		OnStart();
@@ -469,64 +463,72 @@ public abstract class UIRect : MonoBehaviour
 		if (mUpdateFrame != frame)
 #endif
 		{
-			UpdateAnchorsInternal();
+#if UNITY_EDITOR
+			if (updateAnchors == AnchorUpdate.OnUpdate || mUpdateAnchors || !Application.isPlaying)
+#else
+			if (updateAnchors == AnchorUpdate.OnUpdate || mUpdateAnchors)
+#endif
+				UpdateAnchorsInternal(frame);
+
 			// Continue with the update
 			OnUpdate();
 		}
 	}
+
+	/// <summary>
+	/// Update anchors.
+	/// </summary>
+
+	protected void UpdateAnchorsInternal (int frame)
+	{
+		mUpdateFrame = frame;
+		mUpdateAnchors = false;
+
+		bool anchored = false;
+
+		if (leftAnchor.target)
+		{
+			anchored = true;
+			if (leftAnchor.rect != null && leftAnchor.rect.mUpdateFrame != frame)
+				leftAnchor.rect.Update();
+		}
+
+		if (bottomAnchor.target)
+		{
+			anchored = true;
+			if (bottomAnchor.rect != null && bottomAnchor.rect.mUpdateFrame != frame)
+				bottomAnchor.rect.Update();
+		}
+
+		if (rightAnchor.target)
+		{
+			anchored = true;
+			if (rightAnchor.rect != null && rightAnchor.rect.mUpdateFrame != frame)
+				rightAnchor.rect.Update();
+		}
+
+		if (topAnchor.target)
+		{
+			anchored = true;
+			if (topAnchor.rect != null && topAnchor.rect.mUpdateFrame != frame)
+				topAnchor.rect.Update();
+		}
+
+		// Update the dimensions using anchors
+		if (anchored) OnAnchor();
+	}
+
 	/// <summary>
 	/// Manually update anchored sides.
 	/// </summary>
 
-	public void UpdateAnchors () { if (isAnchored) UpdateAnchorsInternal(); }
-
-	private void UpdateAnchorsInternal()
+	public void UpdateAnchors ()
 	{
-		if (!mAnchorsCached) ResetAnchors();
-
-		int frame = Time.frameCount;
-		if (mUpdateFrame == frame && Application.isPlaying) return;
-#if UNITY_EDITOR
-		if (updateAnchors == AnchorUpdate.OnUpdate || mUpdateAnchors || !Application.isPlaying)
-#else
-		if (updateAnchors == AnchorUpdate.OnUpdate || mUpdateAnchors)
-#endif
+		if (isAnchored)
 		{
-			mUpdateAnchors = false;
-			bool anchored = false;
-
-			if (leftAnchor.target)
-			{
-				anchored = true;
-				if (leftAnchor.rect != null && leftAnchor.rect.mUpdateFrame != frame)
-					leftAnchor.rect.Update();
-			}
-
-			if (bottomAnchor.target)
-			{
-				anchored = true;
-				if (bottomAnchor.rect != null && bottomAnchor.rect.mUpdateFrame != frame)
-					bottomAnchor.rect.Update();
-			}
-
-			if (rightAnchor.target)
-			{
-				anchored = true;
-				if (rightAnchor.rect != null && rightAnchor.rect.mUpdateFrame != frame)
-					rightAnchor.rect.Update();
-			}
-
-			if (topAnchor.target)
-			{
-				anchored = true;
-				if (topAnchor.rect != null && topAnchor.rect.mUpdateFrame != frame)
-					topAnchor.rect.Update();
-			}
-
-			// Update the dimensions using anchors
-			if (anchored) OnAnchor();
-
-			mUpdateFrame = frame;
+			mUpdateFrame = -1;
+			mUpdateAnchors = true;
+			UpdateAnchorsInternal(Time.frameCount);
 		}
 	}
 
