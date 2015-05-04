@@ -1006,6 +1006,22 @@ public class UIScrollView : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Pan the scroll view.
+	/// </summary>
+
+	public void OnPan (Vector2 delta)
+	{
+		if (horizontalScrollBar != null) horizontalScrollBar.OnPan(delta);
+		if (verticalScrollBar != null) verticalScrollBar.OnPan(delta);
+
+		if (horizontalScrollBar == null && verticalScrollBar == null)
+		{
+			if (scale.x != 0f) Scroll(delta.x);
+			else if (scale.y != 0f) Scroll(delta.y);
+		}
+	}
+
 #if UNITY_EDITOR
 
 	/// <summary>

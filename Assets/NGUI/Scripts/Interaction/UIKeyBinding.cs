@@ -4,6 +4,7 @@
 //----------------------------------------------
 
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// This class makes it possible to activate or select something by pressing a key (such as space bar for example).
@@ -12,6 +13,8 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Key Binding")]
 public class UIKeyBinding : MonoBehaviour
 {
+	static List<UIKeyBinding> mList = new List<UIKeyBinding>();
+
 	public enum Action
 	{
 		PressAndClick,
@@ -46,9 +49,26 @@ public class UIKeyBinding : MonoBehaviour
 
 	public Action action = Action.PressAndClick;
 
-	bool mIgnoreUp = false;
-	bool mIsInput = false;
-	bool mPress = false;
+	[System.NonSerialized] bool mIgnoreUp = false;
+	[System.NonSerialized] bool mIsInput = false;
+	[System.NonSerialized] bool mPress = false;
+
+	/// <summary>
+	/// Check to see if the specified key happens to be bound to some element.
+	/// </summary>
+
+	static public bool IsBound (KeyCode key)
+	{
+		for (int i = 0, imax = mList.Count; i < imax; ++i)
+		{
+			UIKeyBinding kb = mList[i];
+			if (kb != null && kb.keyCode == key) return true;
+		}
+		return false;
+	}
+
+	protected virtual void OnEnable () { mList.Add(this); }
+	protected virtual void OnDisable () { mList.Remove(this); }
 
 	/// <summary>
 	/// If we're bound to an input field, subscribe to its Submit notification.
@@ -119,21 +139,15 @@ public class UIKeyBinding : MonoBehaviour
 		{
 			if (keyDown)
 			{
-				UICamera.currentTouch = UICamera.controller;
-				UICamera.currentScheme = UICamera.ControlScheme.Controller;
-				UICamera.currentTouch.current = gameObject;
+				UICamera.currentKey = keyCode;
 				OnBindingPress(true);
-				UICamera.currentTouch.current = null;
 			}
 
 			if (mPress && keyUp)
 			{
-				UICamera.currentTouch = UICamera.controller;
-				UICamera.currentScheme = UICamera.ControlScheme.Controller;
-				UICamera.currentTouch.current = gameObject;
+				UICamera.currentKey = keyCode;
 				OnBindingPress(false);
 				OnBindingClick();
-				UICamera.currentTouch.current = null;
 			}
 		}
 
@@ -149,7 +163,10 @@ public class UIKeyBinding : MonoBehaviour
 					}
 					mIgnoreUp = false;
 				}
-				else if (mPress) UICamera.selectedObject = gameObject;
+				else if (mPress)
+				{
+					UICamera.hoveredObject = gameObject;
+				}
 			}
 		}
 

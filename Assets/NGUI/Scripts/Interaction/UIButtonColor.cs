@@ -267,19 +267,6 @@ public class UIButtonColor : UIWidgetContainer
 	}
 
 	/// <summary>
-	/// Set the selected state.
-	/// </summary>
-
-	protected virtual void OnSelect (bool isSelected)
-	{
-		if (isEnabled && tweenTarget != null)
-		{
-			if (UICamera.currentScheme == UICamera.ControlScheme.Controller) OnHover(isSelected);
-			else if (!isSelected && UICamera.CountInputSources() < 2) OnHover(isSelected);
-		}
-	}
-
-	/// <summary>
 	/// Change the visual state.
 	/// </summary>
 

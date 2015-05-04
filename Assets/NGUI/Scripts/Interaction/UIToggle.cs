@@ -113,6 +113,21 @@ public class UIToggle : UIWidgetContainer
 		}
 	}
 
+	/// <summary>
+	/// Whether the collider is enabled and the widget can be interacted with.
+	/// </summary>
+
+	public bool isColliderEnabled
+	{
+		get
+		{
+			Collider c = GetComponent<Collider>();
+			if (c != null) return c.enabled;
+			Collider2D b = GetComponent<Collider2D>();
+			return (b != null && b.enabled);
+		}
+	}
+
 	[System.Obsolete("Use 'value' instead")]
 	public bool isChecked { get { return value; } set { this.value = value; } }
 
@@ -188,7 +203,7 @@ public class UIToggle : UIWidgetContainer
 	/// Check or uncheck on click.
 	/// </summary>
 
-	void OnClick () { if (enabled) value = !value; }
+	void OnClick () { if (enabled && isColliderEnabled) value = !value; }
 
 	/// <summary>
 	/// Fade out or fade in the active sprite and notify the OnChange event listener.

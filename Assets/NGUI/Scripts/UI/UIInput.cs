@@ -195,6 +195,7 @@ public class UIInput : MonoBehaviour
 	[System.NonSerialized] protected float mLastAlpha = 0f;
 	[System.NonSerialized] protected string mCached = "";
 	[System.NonSerialized] protected int mSelectMe = -1;
+	[System.NonSerialized] protected int mSelectTime = -1;
 
 	/// <summary>
 	/// Default text used by the input's label.
@@ -524,6 +525,7 @@ public class UIInput : MonoBehaviour
 
 	protected void OnSelectEvent ()
 	{
+		mSelectTime = Time.frameCount;
 		selection = this;
 		if (mDoInit) Init();
 
@@ -575,6 +577,8 @@ public class UIInput : MonoBehaviour
 #if UNITY_EDITOR
 		if (!Application.isPlaying) return;
 #endif
+		if (mSelectTime == Time.frameCount) return;
+
 		if (isSelected)
 		{
 			if (mDoInit) Init();
@@ -765,10 +769,8 @@ public class UIInput : MonoBehaviour
 				}
 				else
 				{
-					UICamera.currentScheme = UICamera.ControlScheme.Controller;
 					UICamera.currentKey = mCam.submitKey0;
 					Submit();
-					UICamera.currentKey = KeyCode.None;
 				}
 			}
 		}
@@ -1491,5 +1493,12 @@ public class UIInput : MonoBehaviour
 			mValue = "";
 			value = PlayerPrefs.HasKey(savedAs) ? PlayerPrefs.GetString(savedAs) : val;
 		}
+	}
+
+	void OnKey (KeyCode key)
+	{
+		if (key == UICamera.current.cancelKey0 ||
+			key == UICamera.current.cancelKey1)
+			isSelected = false;
 	}
 }
