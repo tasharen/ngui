@@ -1443,7 +1443,7 @@ public class UICamera : MonoBehaviour
 		if (mNotifying > 10) return;
 
 		// Automatically forward events to the currently open popup list
-		if (UIPopupList.current != null && UIPopupList.current.source == go)
+		if (currentScheme == ControlScheme.Controller && UIPopupList.current != null && UIPopupList.current.source == go)
 			go = UIPopupList.current.gameObject;
 
 		if (go && go.activeInHierarchy)
