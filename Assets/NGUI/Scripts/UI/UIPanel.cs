@@ -1539,6 +1539,7 @@ public class UIPanel : UIRect
 		}
 
 		// Update all widgets
+		int frame = Time.frameCount;
 		for (int i = 0, imax = widgets.Count; i < imax; ++i)
 		{
 			UIWidget w = widgets[i];
@@ -1581,7 +1582,7 @@ public class UIPanel : UIRect
 					}
 				}
 #endif
-				int frame = Time.frameCount;
+				
 
 				// First update the widget's transform
 				if (w.UpdateTransform(frame) || mResized)
