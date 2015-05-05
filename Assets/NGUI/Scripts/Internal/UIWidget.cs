@@ -1382,6 +1382,9 @@ public class UIWidget : UIRect
 	Vector3 mOldV0;
 	Vector3 mOldV1;
 
+	Vector3 mOldScale;
+	Quaternion mOldQuat;
+
 	/// <summary>
 	/// Check to see if the widget has moved relative to the panel that manages it
 	/// </summary>
@@ -1412,25 +1415,43 @@ public class UIWidget : UIRect
 		}
 		else if (!panel.widgetsAreStatic && trans.hasChanged)
 		{
-			mMoved = true;
 			mMatrixFrame = -1;
 			trans.hasChanged = false;
-			Vector2 offset = pivotOffset;
 
-			float x0 = -offset.x * mWidth;
-			float y0 = -offset.y * mHeight;
-			float x1 = x0 + mWidth;
-			float y1 = y0 + mHeight;
-
-			Vector3 v0 = panel.worldToLocal.MultiplyPoint3x4(trans.TransformPoint(x0, y0, 0f));
-			Vector3 v1 = panel.worldToLocal.MultiplyPoint3x4(trans.TransformPoint(x1, y1, 0f));
-
-			if (Vector3.SqrMagnitude(mOldV0 - v0) > 0.000001f ||
-				Vector3.SqrMagnitude(mOldV1 - v1) > 0.000001f)
+			var quat = trans.rotation;
+			if (Quaternion.Dot(quat, mOldQuat) > 0.001f) //significantly faster than converting to euler angles.
 			{
 				mMoved = true;
-				mOldV0 = v0;
-				mOldV1 = v1;
+				mOldQuat = quat;
+			}
+			else
+			{
+				Vector3 scale = trans.lossyScale;
+
+				if (Vector3.SqrMagnitude(scale - mOldScale) > 0.000001f)
+				{
+					mMoved = true;
+					mOldScale = scale;
+				}
+				else
+				{
+					Vector2 offset = pivotOffset;
+
+					float x0 = -offset.x * mWidth;
+					float y0 = -offset.y * mHeight;
+					float x1 = x0 + mWidth;
+					float y1 = y0 + mHeight;
+
+					Vector3 v0 = panel.worldToLocal.MultiplyPoint3x4(trans.TransformPoint(x0, y0, 0f));
+					Vector3 v1 = panel.worldToLocal.MultiplyPoint3x4(trans.TransformPoint(x1, y1, 0f));
+					if (Vector3.SqrMagnitude(mOldV0 - v0) > 0.000001f ||
+						Vector3.SqrMagnitude(mOldV1 - v1) > 0.000001f)
+					{
+						mMoved = true;
+						mOldV0 = v0;
+						mOldV1 = v1;
+					}
+				}
 			}
 		}
 
@@ -1474,7 +1495,7 @@ public class UIWidget : UIRect
 						mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix;
 						mMatrixFrame = frame;
 					}
-					geometry.ApplyTransform(mLocalToPanel);
+					geometry.ApplyTransform(mLocalToPanel, panel.generateNormals);
 					mMoved = false;
 					return true;
 				}
@@ -1494,7 +1515,7 @@ public class UIWidget : UIRect
 				mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix;
 				mMatrixFrame = frame;
 			}
-			geometry.ApplyTransform(mLocalToPanel);
+			geometry.ApplyTransform(mLocalToPanel, panel.generateNormals);
 			mMoved = false;
 			return true;
 		}
