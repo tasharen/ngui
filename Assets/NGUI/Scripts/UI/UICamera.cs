@@ -711,6 +711,7 @@ public class UICamera : MonoBehaviour
 			}
 
 			mHover = value;
+			currentTouch.clickNotification = ClickNotification.None;
 
 			if (mHover)
 			{
@@ -861,6 +862,7 @@ public class UICamera : MonoBehaviour
 			// Change the selection and hover
 			mSelected = value;
 			if (scheme >= ControlScheme.Controller) mHover = value;
+			currentTouch.clickNotification = ClickNotification.None;
 
 			if (value != null)
 			{
@@ -2122,31 +2124,56 @@ public class UICamera : MonoBehaviour
 		// Send out the press message
 		if (pressed)
 		{
-			if (HasCollider(currentTouch.current))
-			{
-				if (mTooltip != null) ShowTooltip(null);
-				currentTouch.pressStarted = true;
-				if (onPress != null && currentTouch.pressed)
-					onPress(currentTouch.pressed, false);
+			if (mTooltip != null) ShowTooltip(null);
+			currentTouch.pressStarted = true;
+			if (onPress != null && currentTouch.pressed)
+				onPress(currentTouch.pressed, false);
 
-				Notify(currentTouch.pressed, "OnPress", false);
+			Notify(currentTouch.pressed, "OnPress", false);
 
-				currentTouch.pressed = currentTouch.current;
-				currentTouch.dragged = currentTouch.current;
-				currentTouch.clickNotification = ClickNotification.BasedOnDelta;
-				currentTouch.totalDelta = Vector2.zero;
-				currentTouch.dragStarted = false;
+			currentTouch.pressed = currentTouch.current;
+			currentTouch.dragged = currentTouch.current;
+			currentTouch.clickNotification = ClickNotification.BasedOnDelta;
+			currentTouch.totalDelta = Vector2.zero;
+			currentTouch.dragStarted = false;
 
-				if (onPress != null && currentTouch.pressed)
-					onPress(currentTouch.pressed, true);
+			if (onPress != null && currentTouch.pressed)
+				onPress(currentTouch.pressed, true);
 
-				Notify(currentTouch.pressed, "OnPress", true);
-
-				selectedObject = currentTouch.pressed;
-			}
-			else selectedObject = currentTouch.pressed;
+			Notify(currentTouch.pressed, "OnPress", true);
 
 			if (mTooltip != null) ShowTooltip(null);
+
+			// Change the selection
+			if (mSelected != currentTouch.pressed)
+			{
+				// Input no longer has selection, even if it did
+				mInputFocus = false;
+
+				// Remove the selection
+				if (mSelected)
+				{
+					Notify(mSelected, "OnSelect", false);
+					if (onSelect != null) onSelect(mSelected, false);
+				}
+
+				// Change the selection
+				mSelected = currentTouch.pressed;
+
+				if (currentTouch.pressed != null)
+				{
+					UIKeyNavigation nav = currentTouch.pressed.GetComponent<UIKeyNavigation>();
+					if (nav != null) controller.current = currentTouch.pressed;
+				}
+
+				// Set the selection
+				if (mSelected)
+				{
+					mInputFocus = (mSelected.activeInHierarchy && mSelected.GetComponent<UIInput>() != null);
+					if (onSelect != null) onSelect(mSelected, true);
+					Notify(mSelected, "OnSelect", true);
+				}
+			}
 		}
 		else if (currentTouch.pressed != null && (currentTouch.delta.sqrMagnitude != 0f || currentTouch.current != currentTouch.last))
 		{
@@ -2248,23 +2275,20 @@ public class UICamera : MonoBehaviour
 				Notify(currentTouch.dragged, "OnDragEnd", null);
 			}
 
-			if (HasCollider(currentTouch.pressed))
-			{
-				// Send the notification of a touch ending
-				if (onPress != null) onPress(currentTouch.pressed, false);
-				Notify(currentTouch.pressed, "OnPress", false);
+			// Send the notification of a touch ending
+			if (onPress != null) onPress(currentTouch.pressed, false);
+			Notify(currentTouch.pressed, "OnPress", false);
 
-				// Send a hover message to the object
-				if (isMouse)
+			// Send a hover message to the object
+			if (isMouse && HasCollider(currentTouch.pressed))
+			{
+				// OnHover is sent to restore the visual state
+				if (mHover == currentTouch.current)
 				{
-					// OnHover is sent to restore the visual state
-					if (mHover == currentTouch.current)
-					{
-						if (onHover != null) onHover(currentTouch.current, true);
-						Notify(currentTouch.current, "OnHover", true);
-					}
-					else hoveredObject = currentTouch.current;
+					if (onHover != null) onHover(currentTouch.current, true);
+					Notify(currentTouch.current, "OnHover", true);
 				}
+				else hoveredObject = currentTouch.current;
 			}
 
 			// If the button/touch was released on the same object, consider it a click and select it
@@ -2279,16 +2303,13 @@ public class UICamera : MonoBehaviour
 					ShowTooltip(null);
 					float time = RealTime.time;
 
-					if (HasCollider(currentTouch.pressed))
-					{
-						if (onClick != null) onClick(currentTouch.pressed);
-						Notify(currentTouch.pressed, "OnClick", null);
+					if (onClick != null) onClick(currentTouch.pressed);
+					Notify(currentTouch.pressed, "OnClick", null);
 
-						if (currentTouch.clickTime + 0.35f > time)
-						{
-							if (onDoubleClick != null) onDoubleClick(currentTouch.pressed);
-							Notify(currentTouch.pressed, "OnDoubleClick", null);
-						}
+					if (currentTouch.clickTime + 0.35f > time)
+					{
+						if (onDoubleClick != null) onDoubleClick(currentTouch.pressed);
+						Notify(currentTouch.pressed, "OnDoubleClick", null);
 					}
 					currentTouch.clickTime = time;
 				}
