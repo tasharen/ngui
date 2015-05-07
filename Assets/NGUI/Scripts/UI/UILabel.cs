@@ -227,7 +227,7 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			return (mFont != null) ? (UnityEngine.Object)mFont : (UnityEngine.Object)mTrueTypeFont;
+			return (UnityEngine.Object)mFont ?? (UnityEngine.Object)mTrueTypeFont;
 		}
 		set
 		{
@@ -1089,8 +1089,8 @@ public class UILabel : UIWidget
 
 #if UNITY_EDITOR
 	// Used to ensure that we don't process font more than once inside OnValidate function below
-	bool mAllowProcessing = true;
-	bool mUsingTTF = true;
+	[System.NonSerialized] bool mAllowProcessing = true;
+	[System.NonSerialized] bool mUsingTTF = true;
 
 	/// <summary>
 	/// Validate the properties.

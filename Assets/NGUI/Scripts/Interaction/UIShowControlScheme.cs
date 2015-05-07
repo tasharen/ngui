@@ -14,7 +14,6 @@ public class UIShowControlScheme : MonoBehaviour
 	public GameObject target;
 	public bool mouse = false;
 	public bool touch = false;
-	public bool keyboard = false;
 	public bool controller = true;
 
 	void OnEnable () { UICamera.onSchemeChange += OnScheme; OnScheme(); }
@@ -27,7 +26,6 @@ public class UIShowControlScheme : MonoBehaviour
 			UICamera.ControlScheme scheme = UICamera.currentScheme;
 			if (scheme == UICamera.ControlScheme.Mouse) target.SetActive(mouse);
 			else if (scheme == UICamera.ControlScheme.Touch) target.SetActive(touch);
-			else if (scheme == UICamera.ControlScheme.Keyboard) target.SetActive(keyboard);
 			else if (scheme == UICamera.ControlScheme.Controller) target.SetActive(controller);
 		}
 	}

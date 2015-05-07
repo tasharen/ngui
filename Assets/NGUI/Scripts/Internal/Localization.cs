@@ -290,7 +290,13 @@ public static class Localization
 					foreach (KeyValuePair<string, string[]> pair in mDictionary)
 					{
 						string[] arr = pair.Value;
+#if UNITY_FLASH
+						string[] temp = new string[newSize];
+						for (int b = 0, bmax = arr.Length; b < bmax; ++b) temp[b] = arr[b];
+						arr = temp;
+#else
 						System.Array.Resize(ref arr, newSize);
+#endif
 						arr[newSize - 1] = arr[0];
 						newDict.Add(pair.Key, arr);
 					}

@@ -47,7 +47,6 @@ public class UICamera : MonoBehaviour
 		Mouse,
 		Touch,
 		Controller,
-		Keyboard,
 	}
 
 	/// <summary>
@@ -373,7 +372,7 @@ public class UICamera : MonoBehaviour
 		{
 			UICamera.ControlScheme scheme = UICamera.currentScheme;
 
-			if (scheme == UICamera.ControlScheme.Controller || scheme == UICamera.ControlScheme.Keyboard)
+			if (scheme == UICamera.ControlScheme.Controller)
 			{
 				GameObject go = hoveredObject;
 
@@ -433,8 +432,7 @@ public class UICamera : MonoBehaviour
 		{
 			if (mCurrentKey == KeyCode.None) return ControlScheme.Touch;
 			if (mCurrentKey >= KeyCode.JoystickButton0) return ControlScheme.Controller;
-			if (mCurrentKey >= KeyCode.Mouse0 && mCurrentKey <= KeyCode.Mouse6) return ControlScheme.Mouse;
-			return ControlScheme.Keyboard;
+			return ControlScheme.Mouse;
 		}
 		set
 		{
@@ -485,7 +483,7 @@ public class UICamera : MonoBehaviour
 				{
 					HideTooltip();
 
-					if (after == ControlScheme.Mouse || after == ControlScheme.Keyboard)
+					if (after == ControlScheme.Mouse)
 					{
 						Screen.lockCursor = false;
 						Screen.showCursor = true;
@@ -1633,7 +1631,7 @@ public class UICamera : MonoBehaviour
 				Notify(mHover, "OnScroll", scroll);
 			}
 
-			if (showTooltips && mTooltipTime != 0f && (mTooltipTime < RealTime.time ||
+			if (showTooltips && mTooltipTime != 0f && !UIPopupList.isOpen && (mTooltipTime < RealTime.time ||
 				GetKey(KeyCode.LeftShift) || GetKey(KeyCode.RightShift)))
 			{
 				currentTouch = mMouse[0];
@@ -2020,7 +2018,7 @@ public class UICamera : MonoBehaviour
 
 		if (submitKeyDown) currentTouch.pressTime = RealTime.time;
 
-		if (submitKeyDown || submitKeyUp)
+		if ((submitKeyDown || submitKeyUp) && currentScheme == ControlScheme.Controller)
 		{
 			currentTouch.current = controllerNavigationObject;
 			ProcessTouch(submitKeyDown, submitKeyUp);
@@ -2261,7 +2259,6 @@ public class UICamera : MonoBehaviour
 		// Send out the unpress message
 		if (currentTouch == null) return;
 		currentTouch.pressStarted = false;
-		//if (mTooltip != null) ShowTooltip(null);
 
 		if (currentTouch.pressed != null)
 		{
