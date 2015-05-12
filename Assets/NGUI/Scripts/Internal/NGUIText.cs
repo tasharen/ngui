@@ -700,7 +700,7 @@ static public class NGUIText
 	/// Align the vertices to be right or center-aligned given the line width specified by NGUIText.lineWidth.
 	/// </summary>
 
-	static public void Align (BetterList<Vector3> verts, int indexOffset, float printedWidth)
+	static public void Align (BetterList<Vector3> verts, int indexOffset, float printedWidth, int elements = 4)
 	{
 		switch (alignment)
 		{
@@ -751,16 +751,16 @@ static public class NGUIText
 				if (padding < 1f) return;
 
 				// There must be at least two characters
-				int chars = (verts.size - indexOffset) / 4;
+				int chars = (verts.size - indexOffset) / elements;
 				if (chars < 1) return;
 
 				float progressPerChar = 1f / (chars - 1);
 				float scale = rectWidth / printedWidth;
 
-				for (int i = indexOffset + 4, charIndex = 1; i < verts.size; ++charIndex)
+				for (int i = indexOffset + elements, charIndex = 1; i < verts.size; ++charIndex)
 				{
 					float x0 = verts.buffer[i].x;
-					float x1 = verts.buffer[i + 2].x;
+					float x1 = verts.buffer[i + elements / 2].x;
 					float w = x1 - x0;
 					float x0a = x0 * scale;
 					float x1a = x0a + w;
@@ -768,22 +768,44 @@ static public class NGUIText
 					float x0b = x1b - w;
 					float progress = charIndex * progressPerChar;
 
-					x0 = Mathf.Lerp(x0a, x0b, progress);
 					x1 = Mathf.Lerp(x1a, x1b, progress);
+					x0 = Mathf.Lerp(x0a, x0b, progress);
 					x0 = Mathf.Round(x0);
 					x1 = Mathf.Round(x1);
+
+					if (elements == 4)
+					{
 #if UNITY_FLASH
-					verts.buffer[i] = verts.buffer[i] + new Vector3(x0, 0f);
-					verts.buffer[i+1] = verts.buffer[i+1] + new Vector3(x0, 0f);
-					verts.buffer[i+2] = verts.buffer[i+2] + new Vector3(x1, 0f);
-					verts.buffer[i+3] = verts.buffer[i+3] + new Vector3(x1, 0f);
-					i += 4;
+						verts.buffer[i] = verts.buffer[i] + new Vector3(x0, 0f);
+						verts.buffer[i+1] = verts.buffer[i+1] + new Vector3(x0, 0f);
+						verts.buffer[i+2] = verts.buffer[i+2] + new Vector3(x1, 0f);
+						verts.buffer[i+3] = verts.buffer[i+3] + new Vector3(x1, 0f);
+						i += elements;
 #else
-					verts.buffer[i++].x = x0;
-					verts.buffer[i++].x = x0;
-					verts.buffer[i++].x = x1;
-					verts.buffer[i++].x = x1;
+						verts.buffer[i++].x = x0;
+						verts.buffer[i++].x = x0;
+						verts.buffer[i++].x = x1;
+						verts.buffer[i++].x = x1;
 #endif
+					}
+					else if (elements == 2)
+					{
+#if UNITY_FLASH
+						verts.buffer[i] = verts.buffer[i] + new Vector3(x0, 0f);
+						verts.buffer[i + 1] = verts.buffer[i + 1] + new Vector3(x1, 0f);
+#else
+						verts.buffer[i++].x = x0;
+						verts.buffer[i++].x = x1;
+#endif
+					}
+					else if (elements == 1)
+					{
+#if UNITY_FLASH
+						verts.buffer[i] = verts.buffer[i] + new Vector3(x0, 0f);
+#else
+						verts.buffer[i++].x = x0;
+#endif
+					}
 				}
 				break;
 			}
@@ -1693,7 +1715,7 @@ static public class NGUIText
 
 				if (alignment != Alignment.Left)
 				{
-					Align(verts, indexOffset, x - finalSpacingX);
+					Align(verts, indexOffset, x - finalSpacingX, 1);
 					indexOffset = verts.size;
 				}
 
@@ -1731,7 +1753,7 @@ static public class NGUIText
 
 						if (alignment != Alignment.Left && indexOffset < verts.size)
 						{
-							Align(verts, indexOffset, x - finalSpacingX);
+							Align(verts, indexOffset, x - finalSpacingX, 1);
 							indexOffset = verts.size;
 						}
 
@@ -1755,7 +1777,7 @@ static public class NGUIText
 
 					if (alignment != Alignment.Left && indexOffset < verts.size)
 					{
-						Align(verts, indexOffset, x - finalSpacingX);
+						Align(verts, indexOffset, x - finalSpacingX, 1);
 						indexOffset = verts.size;
 					}
 
@@ -1772,7 +1794,7 @@ static public class NGUIText
 		}
 
 		if (alignment != Alignment.Left && indexOffset < verts.size)
-			Align(verts, indexOffset, x - finalSpacingX);
+			Align(verts, indexOffset, x - finalSpacingX, 1);
 	}
 
 	/// <summary>
@@ -1801,7 +1823,7 @@ static public class NGUIText
 
 				if (alignment != Alignment.Left)
 				{
-					Align(verts, indexOffset, x - finalSpacingX);
+					Align(verts, indexOffset, x - finalSpacingX, 2);
 					indexOffset = verts.size;
 				}
 
@@ -1839,7 +1861,7 @@ static public class NGUIText
 
 						if (alignment != Alignment.Left && indexOffset < verts.size)
 						{
-							Align(verts, indexOffset, x - finalSpacingX);
+							Align(verts, indexOffset, x - finalSpacingX, 2);
 							indexOffset = verts.size;
 						}
 
@@ -1867,7 +1889,7 @@ static public class NGUIText
 
 					if (alignment != Alignment.Left && indexOffset < verts.size)
 					{
-						Align(verts, indexOffset, x - finalSpacingX);
+						Align(verts, indexOffset, x - finalSpacingX, 2);
 						indexOffset = verts.size;
 					}
 
@@ -1888,7 +1910,7 @@ static public class NGUIText
 		}
 
 		if (alignment != Alignment.Left && indexOffset < verts.size)
-			Align(verts, indexOffset, x - finalSpacingX);
+			Align(verts, indexOffset, x - finalSpacingX, 2);
 	}
 
 	/// <summary>

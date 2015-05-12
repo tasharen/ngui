@@ -126,6 +126,7 @@ public class NGUIDebug : MonoBehaviour
 			GUI.color = Color.white;
 			GUI.Label(rect, text);
 			rect.y += 18f;
+			rect.x += 1f;
 
 			text = "Hover: " + NGUITools.GetHierarchy(UICamera.hoveredObject).Replace("\"", "");
 			GUI.color = Color.black;
@@ -135,6 +136,7 @@ public class NGUIDebug : MonoBehaviour
 			GUI.color = Color.white;
 			GUI.Label(rect, text);
 			rect.y += 18f;
+			rect.x += 1f;
 
 			text = "Selection: " + NGUITools.GetHierarchy(UICamera.selectedObject).Replace("\"", "");
 			GUI.color = Color.black;
@@ -144,6 +146,7 @@ public class NGUIDebug : MonoBehaviour
 			GUI.color = Color.white;
 			GUI.Label(rect, text);
 			rect.y += 18f;
+			rect.x += 1f;
 
 			text = "Controller: " + NGUITools.GetHierarchy(UICamera.controllerNavigationObject).Replace("\"", "");
 			GUI.color = Color.black;
@@ -153,6 +156,7 @@ public class NGUIDebug : MonoBehaviour
 			GUI.color = Color.white;
 			GUI.Label(rect, text);
 			rect.y += 18f;
+			rect.x += 1f;
 
 			text = "Active events: " + UICamera.CountInputSources();
 			if (UICamera.disableController) text += ", disabled controller";
@@ -164,6 +168,7 @@ public class NGUIDebug : MonoBehaviour
 			GUI.color = Color.white;
 			GUI.Label(rect, text);
 			rect.y += 18f;
+			rect.x += 1f;
 		}
 
 		for (int i = 0, imax = mLines.Count; i < imax; ++i)
@@ -175,6 +180,7 @@ public class NGUIDebug : MonoBehaviour
 			GUI.color = Color.white;
 			GUI.Label(rect, mLines[i]);
 			rect.y += 18f;
+			rect.x += 1f;
 		}
 	}
 }

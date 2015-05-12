@@ -291,13 +291,13 @@ public class UICamera : MonoBehaviour
 	/// Name of the horizontal axis used to move scroll views and sliders around.
 	/// </summary>
 
-	public string horizontalPanAxisName = "Horizontal";
+	public string horizontalPanAxisName = null;
 
 	/// <summary>
 	/// Name of the vertical axis used to move scroll views and sliders around.
 	/// </summary>
 
-	public string verticalPanAxisName = "Vertical";
+	public string verticalPanAxisName = null;
 
 	/// <summary>
 	/// Name of the axis used for scrolling.
@@ -488,7 +488,11 @@ public class UICamera : MonoBehaviour
 						Screen.lockCursor = false;
 						Screen.showCursor = true;
 					}
+#if UNITY_EDITOR
+					else if (after == ControlScheme.Controller)
+#else
 					else
+#endif
 					{
 						Screen.showCursor = false;
 						Screen.lockCursor = true;
