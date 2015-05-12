@@ -1890,7 +1890,7 @@ public class UICamera : MonoBehaviour
 			}
 
 			currentTouchID = allowMultiTouch ? fingerId : 1;
-			currentTouch = GetTouch(currentTouchID);
+			currentTouch = GetTouch(currentTouchID, true);
 
 			bool pressed = (phase == TouchPhase.Began) || currentTouch.touchBegan;
 			bool unpressed = (phase == TouchPhase.Canceled) || (phase == TouchPhase.Ended);
