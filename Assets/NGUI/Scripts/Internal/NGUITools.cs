@@ -545,11 +545,15 @@ static public class NGUITools
 
 	static public int CalculateNextDepth (GameObject go)
 	{
-		int depth = -1;
-		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
-		for (int i = 0, imax = widgets.Length; i < imax; ++i)
-			depth = Mathf.Max(depth, widgets[i].depth);
-		return depth + 1;
+		if (go)
+		{
+			int depth = -1;
+			UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
+			for (int i = 0, imax = widgets.Length; i < imax; ++i)
+				depth = Mathf.Max(depth, widgets[i].depth);
+			return depth + 1;
+		}
+		return 0;
 	}
 
 	/// <summary>
@@ -558,7 +562,7 @@ static public class NGUITools
 
 	static public int CalculateNextDepth (GameObject go, bool ignoreChildrenWithColliders)
 	{
-		if (ignoreChildrenWithColliders)
+		if (go && ignoreChildrenWithColliders)
 		{
 			int depth = -1;
 			UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();

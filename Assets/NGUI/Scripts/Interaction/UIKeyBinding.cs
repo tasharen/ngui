@@ -97,27 +97,27 @@ public class UIKeyBinding : MonoBehaviour
 
 		if (modifier == Modifier.Alt)
 		{
-			if (Input.GetKey(KeyCode.LeftAlt) ||
-				Input.GetKey(KeyCode.RightAlt)) return true;
+			if (UICamera.GetKey(KeyCode.LeftAlt) ||
+				UICamera.GetKey(KeyCode.RightAlt)) return true;
 		}
 		else if (modifier == Modifier.Control)
 		{
-			if (Input.GetKey(KeyCode.LeftControl) ||
-				Input.GetKey(KeyCode.RightControl)) return true;
+			if (UICamera.GetKey(KeyCode.LeftControl) ||
+				UICamera.GetKey(KeyCode.RightControl)) return true;
 		}
 		else if (modifier == Modifier.Shift)
 		{
-			if (Input.GetKey(KeyCode.LeftShift) ||
-				Input.GetKey(KeyCode.RightShift)) return true;
+			if (UICamera.GetKey(KeyCode.LeftShift) ||
+				UICamera.GetKey(KeyCode.RightShift)) return true;
 		}
 		else if (modifier == Modifier.None)
 			return
-				!Input.GetKey(KeyCode.LeftAlt) &&
-				!Input.GetKey(KeyCode.RightAlt) &&
-				!Input.GetKey(KeyCode.LeftControl) &&
-				!Input.GetKey(KeyCode.RightControl) &&
-				!Input.GetKey(KeyCode.LeftShift) &&
-				!Input.GetKey(KeyCode.RightShift);
+				!UICamera.GetKey(KeyCode.LeftAlt) &&
+				!UICamera.GetKey(KeyCode.RightAlt) &&
+				!UICamera.GetKey(KeyCode.LeftControl) &&
+				!UICamera.GetKey(KeyCode.RightControl) &&
+				!UICamera.GetKey(KeyCode.LeftShift) &&
+				!UICamera.GetKey(KeyCode.RightShift);
 		return false;
 	}
 
@@ -130,8 +130,8 @@ public class UIKeyBinding : MonoBehaviour
 		if (UICamera.inputHasFocus) return;
 		if (keyCode == KeyCode.None || !IsModifierActive()) return;
 
-		bool keyDown = Input.GetKeyDown(keyCode);
-		bool keyUp = Input.GetKeyUp(keyCode);
+		bool keyDown = UICamera.GetKeyDown(keyCode);
+		bool keyUp = UICamera.GetKeyUp(keyCode);
 
 		if (keyDown) mPress = true;
 

@@ -1514,7 +1514,7 @@ public class UICamera : MonoBehaviour
 		mWidth = Screen.width;
 		mHeight = Screen.height;
 
-		if (Application.platform == RuntimePlatform.Android ||
+		/*if (Application.platform == RuntimePlatform.Android ||
 			Application.platform == RuntimePlatform.IPhonePlayer
 			|| Application.platform == RuntimePlatform.WP8Player
 #if UNITY_4_3
@@ -1527,7 +1527,6 @@ public class UICamera : MonoBehaviour
 			useTouch = true;
 			useMouse = false;
 			useKeyboard = false;
-			useController = false;
 		}
 		else if (Application.platform == RuntimePlatform.PS3 ||
 				 Application.platform == RuntimePlatform.XBOX360)
@@ -1536,7 +1535,7 @@ public class UICamera : MonoBehaviour
 			useTouch = false;
 			useKeyboard = false;
 			useController = true;
-		}
+		}*/
 
 		// Save the starting mouse position
 		mMouse[0].pos = Input.mousePosition;

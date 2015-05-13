@@ -667,11 +667,11 @@ public class UIPopupList : UIWidgetContainer
 
 	public void CloseSelf ()
 	{
-		StopCoroutine("CloseIfUnselected");
-		mSelection = null;
-
-		if (mChild != null)
+		if (mChild != null && current == this)
 		{
+			StopCoroutine("CloseIfUnselected");
+			mSelection = null;
+
 			mLabelList.Clear();
 
 			if (isAnimated)
@@ -701,9 +701,8 @@ public class UIPopupList : UIWidgetContainer
 			mBackground = null;
 			mHighlight = null;
 			mChild = null;
+			current = null;
 		}
-
-		if (current == this) current = null;
 	}
 
 	/// <summary>
@@ -818,6 +817,21 @@ public class UIPopupList : UIWidgetContainer
 		if (enabled && NGUITools.GetActive(gameObject) && mChild == null && atlas != null && isValid && items.Count > 0)
 		{
 			mLabelList.Clear();
+			StopCoroutine("CloseIfUnselected");
+
+			// Ensure the popup's source has the selection
+			UICamera.selectedObject = (UICamera.hoveredObject ?? gameObject);
+			mSelection = UICamera.selectedObject;
+			source = UICamera.selectedObject;
+
+			if (source == null)
+			{
+				Debug.LogError("Popup list needs a source object...");
+				return;
+			}
+
+			current = this;
+			mOpenFrame = Time.frameCount;
 
 			// Automatically locate the panel responsible for this object
 			if (mPanel == null)
@@ -825,10 +839,6 @@ public class UIPopupList : UIWidgetContainer
 				mPanel = UIPanel.Find(transform);
 				if (mPanel == null) return;
 			}
-
-			current = this;
-			source = UICamera.hoveredObject;
-			mOpenFrame = Time.frameCount;
 
 			// Calculate the dimensions of the object triggering the popup list so we can position it below it
 			Vector3 min;
@@ -841,13 +851,6 @@ public class UIPopupList : UIWidgetContainer
 			Transform t = mChild.transform;
 			t.parent = mPanel.cachedTransform;
 			Vector3 pos;
-
-			StopCoroutine("CloseIfUnselected");
-
-			if (source == null) mSelection = gameObject;
-			else mSelection = source;
-
-			UICamera.selectedObject = mSelection;
 
 			// Manually triggered popup list on some other game object
 			if (openOn == OpenOn.Manual && mSelection != gameObject)
