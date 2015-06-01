@@ -1051,16 +1051,16 @@ static public class NGUIText
 	/// Text wrapping functionality. The 'width' and 'height' should be in pixels.
 	/// </summary>
 
-	static public bool WrapText (string text, out string finalText)
+	static public bool WrapText (string text, out string finalText, bool wrapLineColors = false)
 	{
-		return WrapText(text, out finalText, false);
+		return WrapText(text, out finalText, false, wrapLineColors);
 	}
 
 	/// <summary>
 	/// Text wrapping functionality. The 'width' and 'height' should be in pixels.
 	/// </summary>
 
-	static public bool WrapText (string text, out string finalText, bool keepCharCount)
+	static public bool WrapText (string text, out string finalText, bool keepCharCount, bool wrapLineColors)
 	{
 		if (regionWidth < 1 || regionHeight < 1 || finalLineHeight < 1f)
 		{
@@ -1089,6 +1089,17 @@ static public class NGUIText
 		bool fits = true;
 		bool eastern = false;
 
+		Color c = tint;
+		int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
+		bool bold = false;
+		bool italic = false;
+		bool underline = false;
+		bool strikethrough = false;
+		bool ignoreColor = false;
+
+		if (!useSymbols) wrapLineColors = false;
+		if (wrapLineColors) mColors.Add(c);
+
 		// Run through all characters
 		for (; offset < textLength; ++offset)
 		{
@@ -1105,6 +1116,19 @@ static public class NGUIText
 				if (start < offset) sb.Append(text.Substring(start, offset - start + 1));
 				else sb.Append(ch);
 
+				if (wrapLineColors)
+				{
+					for (int i = 0; i < mColors.size; ++i)
+						sb.Insert(sb.Length - 1, "[-]");
+
+					for (int i = 0; i < mColors.size; ++i)
+					{
+						sb.Append("[");
+						sb.Append(NGUIText.EncodeColor(mColors[i]));
+						sb.Append("]");
+					}
+				}
+
 				lineIsEmpty = true;
 				++lineCount;
 				start = offset + 1;
@@ -1113,7 +1137,37 @@ static public class NGUIText
 			}
 
 			// When encoded symbols such as [RrGgBb] or [-] are encountered, skip past them
-			if (encoding && ParseSymbol(text, ref offset)) { --offset; continue; }
+			if (encoding)
+			{
+				if (!wrapLineColors)
+				{
+					if (ParseSymbol(text, ref offset))
+					{
+						--offset;
+						continue;
+					}
+				}
+				else if (ParseSymbol(text, ref offset, mColors, premultiply, ref subscriptMode, ref bold,
+					ref italic, ref underline, ref strikethrough, ref ignoreColor))
+				{
+					if (ignoreColor)
+					{
+						c = mColors[mColors.size - 1];
+						c.a *= mAlpha * tint.a;
+					}
+					else
+					{
+						c = tint * mColors[mColors.size - 1];
+						c.a *= mAlpha;
+					}
+
+					for (int b = 0, bmax = mColors.size - 2; b < bmax; ++b)
+						c.a *= mColors[b].a;
+
+					--offset;
+					continue;
+				}
+			}
 
 			// See if there is a symbol matching this text
 			BMSymbol symbol = useSymbols ? GetSymbol(text, offset, textLength) : null;
@@ -1162,6 +1216,8 @@ static public class NGUIText
 					bool space = IsSpace(ch);
 					if (!space && !eastern) fits = false;
 
+					if (wrapLineColors && mColors.size > 0) sb.Append("[-]");
+
 					if (lineCount++ == maxLineCount)
 					{
 						start = offset;
@@ -1170,6 +1226,19 @@ static public class NGUIText
 
 					if (keepCharCount) ReplaceSpaceWithNewline(ref sb);
 					else EndLine(ref sb);
+
+					if (wrapLineColors)
+					{
+						for (int i = 0; i < mColors.size; ++i)
+							sb.Insert(sb.Length - 1, "[-]");
+
+						for (int i = 0; i < mColors.size; ++i)
+						{
+							sb.Append("[");
+							sb.Append(NGUIText.EncodeColor(mColors[i]));
+							sb.Append("]");
+						}
+					}
 
 					// Start a brand-new line
 					lineIsEmpty = true;
@@ -1197,6 +1266,19 @@ static public class NGUIText
 					if (lineCount++ == maxLineCount) break;
 					if (keepCharCount) ReplaceSpaceWithNewline(ref sb);
 					else EndLine(ref sb);
+
+					if (wrapLineColors)
+					{
+						for (int i = 0; i < mColors.size; ++i)
+							sb.Insert(sb.Length - 1, "[-]");
+
+						for (int i = 0; i < mColors.size; ++i)
+						{
+							sb.Append("[");
+							sb.Append(NGUIText.EncodeColor(mColors[i]));
+							sb.Append("]");
+						}
+					}
 					continue;
 				}
 			}
@@ -1211,7 +1293,9 @@ static public class NGUIText
 		}
 
 		if (start < offset) sb.Append(text.Substring(start, offset - start));
+		if (wrapLineColors && mColors.size > 0) sb.Append("[-]");
 		finalText = sb.ToString();
+		mColors.Clear();
 		return fits && ((offset == textLength) || (lineCount <= Mathf.Min(maxLines, maxLineCount)));
 	}
 

@@ -65,6 +65,12 @@ public class UIKeyNavigation : MonoBehaviour
 	public GameObject onClick;
 
 	/// <summary>
+	/// Which object will get selected on tab.
+	/// </summary>
+
+	public GameObject onTab;
+
+	/// <summary>
 	/// Whether the object this script is attached to will get selected as soon as this script is enabled.
 	/// </summary>
 
@@ -253,29 +259,30 @@ public class UIKeyNavigation : MonoBehaviour
 
 	public virtual void OnKey (KeyCode key)
 	{
-		GameObject go = null;
-
-		switch (key)
+		if (key == KeyCode.Tab)
 		{
-		case KeyCode.Tab:
-			if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-			{
-				go = GetLeft();
-				if (go == null) go = GetUp();
-				if (go == null) go = GetDown();
-				if (go == null) go = GetRight();
-			}
-			else
-			{
-				go = GetRight();
-				if (go == null) go = GetDown();
-				if (go == null) go = GetUp();
-				if (go == null) go = GetLeft();
-			}
-			break;
-		}
+			GameObject go = onTab;
 
-		if (go != null) UICamera.hoveredObject = go;
+			if (go == null)
+			{
+				if (UICamera.GetKey(KeyCode.LeftShift) || UICamera.GetKey(KeyCode.RightShift))
+				{
+					go = GetLeft();
+					if (go == null) go = GetUp();
+					if (go == null) go = GetDown();
+					if (go == null) go = GetRight();
+				}
+				else
+				{
+					go = GetRight();
+					if (go == null) go = GetDown();
+					if (go == null) go = GetUp();
+					if (go == null) go = GetLeft();
+				}
+			}
+
+			if (go != null) UICamera.selectedObject = go;
+		}
 	}
 
 	protected virtual void OnClick ()

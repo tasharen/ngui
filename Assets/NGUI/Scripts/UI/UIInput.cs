@@ -33,6 +33,7 @@ public class UIInput : MonoBehaviour
 		Alphanumeric,
 		Username,
 		Name,
+		Filename,
 	}
 
 	public enum KeyboardType
@@ -753,23 +754,74 @@ public class UIInput : MonoBehaviour
 		if (mCam == null) mCam = UICamera.FindCameraForLayer(gameObject.layer);
 
 		// Having this in OnGUI causes issues because Input.inputString gets updated *after* OnGUI, apparently...
-		if (mCam != null && (Input.GetKeyDown(mCam.submitKey0) || Input.GetKeyDown(mCam.submitKey1)))
+		if (mCam != null)
 		{
-			bool newLine = (onReturnKey == OnReturnKey.NewLine) ||
-				(onReturnKey == OnReturnKey.Default &&
-				label.multiLine && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl) &&
-				label.overflowMethod != UILabel.Overflow.ClampContent &&
-				validation == Validation.None);
+			if (UICamera.GetKeyDown(mCam.submitKey0))
+			{
+				bool newLine = (onReturnKey == OnReturnKey.NewLine) ||
+					(onReturnKey == OnReturnKey.Default &&
+					label.multiLine && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl) &&
+					label.overflowMethod != UILabel.Overflow.ClampContent &&
+					validation == Validation.None);
 
-			if (newLine)
-			{
-				Insert("\n");
+				if (newLine)
+				{
+					Insert("\n");
+				}
+				else
+				{
+					if (UICamera.controller.current != null)
+						UICamera.controller.clickNotification = UICamera.ClickNotification.None;
+					UICamera.currentKey = mCam.submitKey0;
+					Submit();
+				}
 			}
-			else
+
+			if (UICamera.GetKeyDown(mCam.submitKey1))
 			{
-				UICamera.currentKey = mCam.submitKey0;
-				Submit();
+				bool newLine = (onReturnKey == OnReturnKey.NewLine) ||
+					(onReturnKey == OnReturnKey.Default &&
+					label.multiLine && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl) &&
+					label.overflowMethod != UILabel.Overflow.ClampContent &&
+					validation == Validation.None);
+
+				if (newLine)
+				{
+					Insert("\n");
+				}
+				else
+				{
+					if (UICamera.controller.current != null)
+						UICamera.controller.clickNotification = UICamera.ClickNotification.None;
+					UICamera.currentKey = mCam.submitKey1;
+					Submit();
+				}
 			}
+
+			if (!mCam.useKeyboard && UICamera.GetKeyUp(KeyCode.Tab))
+				OnKey(KeyCode.Tab);
+		}
+	}
+
+	static int mIgnoreKey = Time.frameCount;
+
+	void OnKey (KeyCode key)
+	{
+		int frame = Time.frameCount;
+
+		if (mIgnoreKey == frame) return;
+		
+		if (key == mCam.cancelKey0 || key == mCam.cancelKey1)
+		{
+			mIgnoreKey = frame;
+			isSelected = false;
+		}
+		else if (key == KeyCode.Tab)
+		{
+			mIgnoreKey = frame;
+			isSelected = false;
+			UIKeyNavigation nav = GetComponent<UIKeyNavigation>();
+			if (nav != null) nav.OnKey(KeyCode.Tab);
 		}
 	}
 
@@ -1421,6 +1473,23 @@ public class UIInput : MonoBehaviour
 			if (ch >= 'a' && ch <= 'z') return ch;
 			if (ch >= '0' && ch <= '9') return ch;
 		}
+		else if (validation == Validation.Filename)
+		{
+			if (ch == ':') return (char)0;
+			if (ch == '/') return (char)0;
+			if (ch == '\\') return (char)0;
+			if (ch == '<') return (char)0;
+			if (ch == '>') return (char)0;
+			if (ch == '|') return (char)0;
+			if (ch == '^') return (char)0;
+			if (ch == '*') return (char)0;
+			if (ch == ';') return (char)0;
+			if (ch == '"') return (char)0;
+			if (ch == '`') return (char)0;
+			if (ch == '\t') return (char)0;
+			if (ch == '\n') return (char)0;
+			return ch;
+		}
 		else if (validation == Validation.Name)
 		{
 			char lastChar = (text.Length > 0) ? text[Mathf.Clamp(pos, 0, text.Length - 1)] : ' ';
@@ -1490,12 +1559,5 @@ public class UIInput : MonoBehaviour
 			mValue = "";
 			value = PlayerPrefs.HasKey(savedAs) ? PlayerPrefs.GetString(savedAs) : val;
 		}
-	}
-
-	void OnKey (KeyCode key)
-	{
-		if (key == UICamera.current.cancelKey0 ||
-			key == UICamera.current.cancelKey1)
-			isSelected = false;
 	}
 }

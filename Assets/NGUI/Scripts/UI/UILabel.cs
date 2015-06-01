@@ -1275,7 +1275,7 @@ public class UILabel : UIWidget
 				NGUIText.Update(false);
 
 				// Wrap the text
-				bool fits = NGUIText.WrapText(mText, out mProcessedText, true);
+				bool fits = NGUIText.WrapText(mText, out mProcessedText, true, false);
 
 				if (mOverflow == Overflow.ShrinkContent && !fits)
 				{
@@ -1923,7 +1923,7 @@ public class UILabel : UIWidget
 
 	public void SetCurrentSelection ()
 	{
-		if (UIPopupList.current != null)
+		if (UIPopupList.isOpen)
 		{
 			text = UIPopupList.current.isLocalized ?
 				Localization.Get(UIPopupList.current.value) :

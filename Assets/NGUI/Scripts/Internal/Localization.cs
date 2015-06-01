@@ -60,6 +60,9 @@ public static class Localization
 	// Key = Values dictionary (multiple languages)
 	static Dictionary<string, string[]> mDictionary = new Dictionary<string, string[]>();
 
+	// Replacement dictionary forces a specific value instead of the existing entry
+	static Dictionary<string, string> mReplacement = new Dictionary<string, string>();
+
 	// Index of the selected language within the multi-language dictionary
 	static int mLanguageIndex = -1;
 
@@ -207,6 +210,22 @@ public static class Localization
 		ByteReader reader = new ByteReader(bytes);
 		Set(languageName, reader.ReadDictionary());
 	}
+
+	/// <summary>
+	/// Forcefully replace the specified key with another value.
+	/// </summary>
+
+	static public void ReplaceKey (string key, string val)
+	{
+		if (!string.IsNullOrEmpty(val)) mReplacement[key] = val;
+		else mReplacement.Remove(key);
+	}
+
+	/// <summary>
+	/// Clear the replacement values.
+	/// </summary>
+
+	static public void ClearReplacements () { mReplacement.Clear(); }
 
 	/// <summary>
 	/// Load the specified CSV file.
@@ -486,28 +505,33 @@ public static class Localization
 
 		UICamera.ControlScheme scheme = UICamera.currentScheme;
 
+
 		if (scheme == UICamera.ControlScheme.Touch)
 		{
-			string mobKey = key + " Mobile";
+			string altKey = key + " Mobile";
+			if (mReplacement.TryGetValue(altKey, out val)) return val;
 
-			if (mLanguageIndex != -1 && mDictionary.TryGetValue(mobKey, out vals))
+			if (mLanguageIndex != -1 && mDictionary.TryGetValue(altKey, out vals))
 			{
 				if (mLanguageIndex < vals.Length)
 					return vals[mLanguageIndex];
 			}
-			if (mOldDictionary.TryGetValue(mobKey, out val)) return val;
+			if (mOldDictionary.TryGetValue(altKey, out val)) return val;
 		}
 		else if (scheme == UICamera.ControlScheme.Controller)
 		{
-			string mobKey = key + " Controller";
+			string altKey = key + " Controller";
+			if (mReplacement.TryGetValue(altKey, out val)) return val;
 
-			if (mLanguageIndex != -1 && mDictionary.TryGetValue(mobKey, out vals))
+			if (mLanguageIndex != -1 && mDictionary.TryGetValue(altKey, out vals))
 			{
 				if (mLanguageIndex < vals.Length)
 					return vals[mLanguageIndex];
 			}
-			if (mOldDictionary.TryGetValue(mobKey, out val)) return val;
+			if (mOldDictionary.TryGetValue(altKey, out val)) return val;
 		}
+
+		if (mReplacement.TryGetValue(key, out val)) return val;
 
 		if (mLanguageIndex != -1 && mDictionary.TryGetValue(key, out vals))
 		{

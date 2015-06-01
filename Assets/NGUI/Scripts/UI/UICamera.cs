@@ -699,10 +699,11 @@ public class UICamera : MonoBehaviour
 			ShowTooltip(null);
 
 			// Remove the selection
-			if (mSelected && currentScheme != ControlScheme.Mouse)
+			if (mSelected && currentScheme == ControlScheme.Controller)
 			{
 				Notify(mSelected, "OnSelect", false);
 				if (onSelect != null) onSelect(mSelected, false);
+				mSelected = null;
 			}
 
 			// Remove the previous hover state
@@ -835,7 +836,7 @@ public class UICamera : MonoBehaviour
 
 			bool statesDiffer = false;
 			UICamera prevCamera = current;
-			ControlScheme scheme = currentScheme;
+			//ControlScheme scheme = currentScheme;
 
 			if (currentTouch == null)
 			{
@@ -855,15 +856,16 @@ public class UICamera : MonoBehaviour
 			}
 
 			// Remove the hovered state
-			if (mHover)
-			{
-				Notify(mHover, "OnHover", false);
-				if (onHover != null) onHover(mHover, false);
-			}
+			//if (mHover && scheme < ControlScheme.Controller)
+			//{
+			//    Notify(mHover, "OnHover", false);
+			//    if (onHover != null) onHover(mHover, false);
+			//    mHover = null;
+			//}
 
 			// Change the selection and hover
 			mSelected = value;
-			if (scheme >= ControlScheme.Controller) mHover = value;
+			//if (scheme >= ControlScheme.Controller) mHover = value;
 			currentTouch.clickNotification = ClickNotification.None;
 
 			if (value != null)
@@ -885,11 +887,11 @@ public class UICamera : MonoBehaviour
 			}
 
 			// Set the hovered state first
-			if (mHover && currentScheme >= ControlScheme.Controller)
-			{
-				if (onHover != null) onHover(mHover, false);
-				Notify(mHover, "OnHover", true);
-			}
+			//if (mHover && currentScheme >= ControlScheme.Controller)
+			//{
+			//    if (onHover != null) onHover(mHover, true);
+			//    Notify(mHover, "OnHover", true);
+			//}
 
 			// Set the selection
 			if (mSelected)
@@ -1445,13 +1447,15 @@ public class UICamera : MonoBehaviour
 		if (mNotifying > 10) return;
 
 		// Automatically forward events to the currently open popup list
-		if (currentScheme == ControlScheme.Controller && UIPopupList.current != null && UIPopupList.current.source == go)
-			go = UIPopupList.current.gameObject;
+		if (currentScheme == ControlScheme.Controller && UIPopupList.isOpen &&
+			UIPopupList.current.source == go && UIPopupList.isOpen)
+				go = UIPopupList.current.gameObject;
 
 		if (go && go.activeInHierarchy)
 		{
 			++mNotifying;
-			//Debug.Log((go != null ? go.name : "global") + "." + funcName + "(" + obj + ");", go);
+			//if (currentScheme == ControlScheme.Controller)
+			//	Debug.Log((go != null ? "[" + go.name + "]." : "[global].") + funcName + "(" + obj + ");", go);
 			go.SendMessage(funcName, obj, SendMessageOptions.DontRequireReceiver);
 			if (mGenericHandler != null && mGenericHandler != go)
 				mGenericHandler.SendMessage(funcName, obj, SendMessageOptions.DontRequireReceiver);
@@ -2000,10 +2004,14 @@ public class UICamera : MonoBehaviour
 			currentKey = submitKey0;
 			submitKeyDown = true;
 		}
-
-		if (submitKey1 != KeyCode.None && GetKeyDown(submitKey1))
+		else if (submitKey1 != KeyCode.None && GetKeyDown(submitKey1))
 		{
 			currentKey = submitKey1;
+			submitKeyDown = true;
+		}
+		else if ((submitKey0 == KeyCode.Return || submitKey1 == KeyCode.Return) && GetKeyDown(KeyCode.KeypadEnter))
+		{
+			currentKey = submitKey0;
 			submitKeyDown = true;
 		}
 
@@ -2012,10 +2020,14 @@ public class UICamera : MonoBehaviour
 			currentKey = submitKey0;
 			submitKeyUp = true;
 		}
-
-		if (submitKey1 != KeyCode.None && GetKeyUp(submitKey1))
+		else if (submitKey1 != KeyCode.None && GetKeyUp(submitKey1))
 		{
 			currentKey = submitKey1;
+			submitKeyUp = true;
+		}
+		else if ((submitKey0 == KeyCode.Return || submitKey1 == KeyCode.Return) && GetKeyUp(KeyCode.KeypadEnter))
+		{
+			currentKey = submitKey0;
 			submitKeyUp = true;
 		}
 
@@ -2095,7 +2107,7 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Send out all key events
-		if (GetKey != Input.GetKey || Input.anyKeyDown)
+		if (Input.anyKeyDown)
 		{
 			for (int i = 0, imax = NGUITools.keys.Length; i < imax; ++i)
 			{

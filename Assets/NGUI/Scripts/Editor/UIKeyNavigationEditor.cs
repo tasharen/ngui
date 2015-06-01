@@ -32,6 +32,7 @@ public class UIKeyNavigationEditor : Editor
 			NGUIEditorTools.DrawProperty("Right", serializedObject, "onRight");
 			NGUIEditorTools.DrawProperty("Up", serializedObject, "onUp");
 			NGUIEditorTools.DrawProperty("Down", serializedObject, "onDown");
+			NGUIEditorTools.DrawProperty("Tab", serializedObject, "onTab");
 			NGUIEditorTools.EndContents();
 		}
 

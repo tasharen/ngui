@@ -218,7 +218,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Whether the popup list is currently open.
 	/// </summary>
 
-	static public bool isOpen { get { return mChild != null || mFadeOutComplete > Time.unscaledTime; } }
+	static public bool isOpen { get { return current != null && (mChild != null || mFadeOutComplete > Time.unscaledTime); } }
 
 	/// <summary>
 	/// Current selection.
@@ -659,7 +659,14 @@ public class UIPopupList : UIWidgetContainer
 	/// Manually close the popup list.
 	/// </summary>
 
-	static public void Close () { if (current != null) current.CloseSelf(); }
+	static public void Close ()
+	{
+		if (current != null)
+		{
+			current.CloseSelf();
+			current = null;
+		}
+	}
 
 	/// <summary>
 	/// Manually close the popup list.
@@ -830,7 +837,6 @@ public class UIPopupList : UIWidgetContainer
 				return;
 			}
 
-			current = this;
 			mOpenFrame = Time.frameCount;
 
 			// Automatically locate the panel responsible for this object
@@ -847,6 +853,7 @@ public class UIPopupList : UIWidgetContainer
 			// Create the root object for the list
 			mChild = new GameObject("Drop-down List");
 			mChild.layer = gameObject.layer;
+			current = this;
 
 			Transform t = mChild.transform;
 			t.parent = mPanel.cachedTransform;
@@ -943,7 +950,7 @@ public class UIPopupList : UIWidgetContainer
 			}
 
 			// The triggering widget's width should be the minimum allowed width
-			x = Mathf.Max(x, (max.x - min.x) * dynScale - (bgPadding.x + padding.x) * 2f);
+			x = Mathf.Max(x, (max.x - min.x) - (bgPadding.x + padding.x) * 2f);
 
 			float cx = x;
 			Vector3 bcCenter = new Vector3(cx * 0.5f, -labelHeight * 0.5f, 0f);
