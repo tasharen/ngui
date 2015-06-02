@@ -144,7 +144,9 @@ public class TypewriterEffect : MonoBehaviour
 			charsPerSecond = Mathf.Max(1, charsPerSecond);
 
 			// Automatically skip all symbols
-			while (NGUIText.ParseSymbol(mFullText, ref mCurrentOffset)) { }
+			if (mLabel.supportEncoding)
+				while (NGUIText.ParseSymbol(mFullText, ref mCurrentOffset)) { }
+
 			++mCurrentOffset;
 
 			// Reached the end? We're done.
@@ -251,7 +253,7 @@ public class TypewriterEffect : MonoBehaviour
 				mLabel.text = sb.ToString();
 			}
 		}
-		else if (mCurrentOffset == mFullText.Length)
+		else if (mCurrentOffset >= mFullText.Length)
 		{
 			current = this;
 			EventDelegate.Execute(onFinished);

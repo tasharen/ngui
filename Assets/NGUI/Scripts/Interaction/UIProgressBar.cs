@@ -132,7 +132,7 @@ public class UIProgressBar : UIWidgetContainer
 				{
 					ForceUpdate();
 
-					if (current == null && NGUITools.GetActive(this) && EventDelegate.IsValid(onChange))
+					if (NGUITools.GetActive(this) && EventDelegate.IsValid(onChange))
 					{
 						current = this;
 						EventDelegate.Execute(onChange);

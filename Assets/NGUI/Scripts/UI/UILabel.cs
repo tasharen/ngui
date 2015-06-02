@@ -1923,7 +1923,7 @@ public class UILabel : UIWidget
 
 	public void SetCurrentSelection ()
 	{
-		if (UIPopupList.isOpen)
+		if (UIPopupList.current != null)
 		{
 			text = UIPopupList.current.isLocalized ?
 				Localization.Get(UIPopupList.current.value) :
