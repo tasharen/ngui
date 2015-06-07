@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2015 Tasharen Entertainment
-            Version 3.8.2
+            Version 3.9.0
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,28 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.9.0
+- NEW: Completely redesigned how controller-based input was handled. It's now much more robust and handless seamless transitions from one method of input to another.
+- NEW: New OnNavigate and OnPan events. OnPan events require Pan axes to be set on the UICamera.
+- NEW: Scroll views are now scrollable via controller if Pan axes are set.
+- NEW: Sliders can now be adjusted via controller by using Pan axes.
+- NEW: OnKey event will now send all key press events to the targeted object.
+- NEW: Added UICamera.controllerNavigationObject that explicitly tracks controller-based selection.
+- NEW: NGUI now automatically finds and focuses on an appropriate UIKeyNavigation object if none has focus while receiving controller-based input.
+- NEW: Added a Color Picker.
+- NEW: Added a Tab option to the Key Navigation script (visible when it's attached to a UIInput).
+- NEW: Added a new "replacement key" feature to localization that lets you replace localization values without changing the localization itself. Useful for user-defined "overrides".
+- NEW: Added a proper editor class for the TypewriterEffect.
+- NEW: UIViewport will now automatically disable itself if the corner object has been disabled.
+- FIX: Various fixes and improvements for controller-based input support.
+- FIX: UITextList now properly line-wraps embedded colors.
+- FIX: UICenterOnChild should now respect paging through sorted lists.
+- FIX: Popup list's "ensure it's visible" code has been redesigned.
+- FIX: Optimized code related to widget change detection / buffer rebuilding.
+- FIX: Dynamic font labels will now automatically invalidate themselves when the application regains focus.
+- FIX: Unity 5 compatibility tweaks.
+- DEL: Removed the Keyboard scheme, since it's always Keyboard+Mouse.
 
 3.8.2
 - NEW: Localization will now automatically pull mobile version of keys if the current control scheme is touch.

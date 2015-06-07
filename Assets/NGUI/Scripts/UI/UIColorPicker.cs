@@ -80,8 +80,8 @@ public class UIColorPicker : MonoBehaviour
 		mTex = null;
 	}
 
-	void OnPress (bool pressed) { if (pressed && UICamera.currentScheme != UICamera.ControlScheme.Controller) Sample(); }
-	void OnDrag (Vector2 delta) { Sample(); }
+	void OnPress (bool pressed) { if (enabled && pressed && UICamera.currentScheme != UICamera.ControlScheme.Controller) Sample(); }
+	void OnDrag (Vector2 delta) { if (enabled) Sample(); }
 	void OnPan (Vector2 delta)
 	{
 		if (enabled)

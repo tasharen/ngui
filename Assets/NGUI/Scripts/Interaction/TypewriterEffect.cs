@@ -122,6 +122,7 @@ public class TypewriterEffect : MonoBehaviour
 	}
 
 	void OnEnable () { mReset = true; mActive = true; }
+	void OnDisable () { Finish(); }
 
 	void Update ()
 	{
