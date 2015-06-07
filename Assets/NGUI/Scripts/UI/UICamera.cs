@@ -1761,17 +1761,12 @@ public class UICamera : MonoBehaviour
 		currentTouchID = -1;
 		if (highlightChanged) currentKey = KeyCode.Mouse0;
 
-		if (isPressed)
-		{
-			// A button was pressed -- cancel the tooltip
-			mTooltipTime = 0f;
-		}
-		else if (posChanged && (!stickyTooltip || highlightChanged))
+		if (!isPressed && posChanged && (!stickyTooltip || highlightChanged))
 		{
 			if (mTooltipTime != 0f)
 			{
 				// Delay the tooltip
-				mTooltipTime = RealTime.time + tooltipDelay;
+				mTooltipTime = Time.unscaledTime + tooltipDelay;
 			}
 			else if (mTooltip != null)
 			{
@@ -2238,7 +2233,7 @@ public class UICamera : MonoBehaviour
 				}
 				else if (currentTouch.last != currentTouch.current)
 				{
-					if (onDragStart != null) onDragStart(currentTouch.dragged);
+					if (onDragOut != null) onDragOut(currentTouch.last, currentTouch.dragged);
 					Notify(currentTouch.last, "OnDragOut", currentTouch.dragged);
 
 					if (onDragOver != null) onDragOver(currentTouch.last, currentTouch.dragged);
@@ -2353,6 +2348,8 @@ public class UICamera : MonoBehaviour
 
 	public void ProcessTouch (bool pressed, bool released)
 	{
+		if (pressed) mTooltipTime = Time.unscaledTime + tooltipDelay;
+
 		// Whether we're using the mouse
 		bool isMouse = (currentScheme == ControlScheme.Mouse);
 		float drag   = isMouse ? mouseDragThreshold : touchDragThreshold;
@@ -2372,8 +2369,8 @@ public class UICamera : MonoBehaviour
 				currentTouch.clickNotification != ClickNotification.None &&
 				!currentTouch.dragStarted && currentTouch.deltaTime > tooltipDelay)
 			{
+				mTooltipTime = 0f;
 				currentTouch.clickNotification = ClickNotification.None;
-
 				if (longPressTooltip) ShowTooltip(currentTouch.pressed);
 				Notify(currentTouch.current, "OnLongPress", null);
 			}
