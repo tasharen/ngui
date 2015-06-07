@@ -803,7 +803,7 @@ public class UIInput : MonoBehaviour
 		}
 	}
 
-	static int mIgnoreKey = Time.frameCount;
+	static int mIgnoreKey = 0;
 
 	void OnKey (KeyCode key)
 	{

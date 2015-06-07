@@ -485,8 +485,13 @@ public class UICamera : MonoBehaviour
 
 					if (after == ControlScheme.Mouse)
 					{
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 						Screen.lockCursor = false;
 						Screen.showCursor = true;
+#else
+						Cursor.lockState = CursorLockMode.Locked;
+						Cursor.visible = true;
+#endif
 					}
 #if UNITY_EDITOR
 					else if (after == ControlScheme.Controller)
@@ -494,8 +499,13 @@ public class UICamera : MonoBehaviour
 					else
 #endif
 					{
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 						Screen.showCursor = false;
 						Screen.lockCursor = true;
+#else
+						Cursor.visible = false;
+						Cursor.lockState = CursorLockMode.None;
+#endif
 
 						// Skip the next 2 frames worth of mouse movement
 						mMouse[0].ignoreDelta = 2;
@@ -1754,8 +1764,9 @@ public class UICamera : MonoBehaviour
 		}
 
 		bool highlightChanged = (currentTouch.last != currentTouch.current);
+		bool wasPressed = (currentTouch.pressed != null);
 
-		if (currentTouch.pressed == null)
+		if (!wasPressed)
 			hoveredObject = currentTouch.current;
 
 		currentTouchID = -1;
@@ -1783,7 +1794,7 @@ public class UICamera : MonoBehaviour
 		}
 
 		// The button was released over a different object -- remove the highlight from the previous
-		if ((justPressed || !isPressed) && highlightChanged)
+		if (highlightChanged && (justPressed || (wasPressed && !isPressed)))
 			hoveredObject = null;
 
 		// Process all 3 mouse buttons as individual touches

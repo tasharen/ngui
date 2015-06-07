@@ -374,12 +374,14 @@ public class UIScrollView : MonoBehaviour
 		if (horizontalScrollBar != null)
 		{
 			EventDelegate.Add(horizontalScrollBar.onChange, OnScrollBar);
+			horizontalScrollBar.BroadcastMessage("CacheDefaultColor", SendMessageOptions.DontRequireReceiver);
 			horizontalScrollBar.alpha = ((showScrollBars == ShowCondition.Always) || shouldMoveHorizontally) ? 1f : 0f;
 		}
 
 		if (verticalScrollBar != null)
 		{
 			EventDelegate.Add(verticalScrollBar.onChange, OnScrollBar);
+			verticalScrollBar.BroadcastMessage("CacheDefaultColor", SendMessageOptions.DontRequireReceiver);
 			verticalScrollBar.alpha = ((showScrollBars == ShowCondition.Always) || shouldMoveVertically) ? 1f : 0f;
 		}
 	}
