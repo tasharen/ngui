@@ -80,18 +80,30 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] bool mMultiline = true;
 
 #if DYNAMIC_FONT
-	[System.NonSerialized]
-	Font mActiveTTF = null;
-	float mDensity = 1f;
+	[System.NonSerialized] Font mActiveTTF = null;
+	[System.NonSerialized] float mDensity = 1f;
 #endif
-	bool mShouldBeProcessed = true;
-	string mProcessedText = null;
-	bool mPremultiply = false;
-	Vector2 mCalculatedSize = Vector2.zero;
-	float mScale = 1f;
-	int mPrintedSize = 0;
-	int mLastWidth = 0;
-	int mLastHeight = 0;
+	[System.NonSerialized] bool mShouldBeProcessed = true;
+	[System.NonSerialized] string mProcessedText = null;
+	[System.NonSerialized] bool mPremultiply = false;
+	[System.NonSerialized] Vector2 mCalculatedSize = Vector2.zero;
+	[System.NonSerialized] float mScale = 1f;
+	[System.NonSerialized] int mFinalFontSize = 0;
+	[System.NonSerialized] int mLastWidth = 0;
+	[System.NonSerialized] int mLastHeight = 0;
+
+	/// <summary>
+	/// Font size after modifications got taken into consideration such as shrinking content.
+	/// </summary>
+
+	public int finalFontSize
+	{
+		get
+		{
+			if (trueTypeFont) return Mathf.RoundToInt(mScale * mFinalFontSize);
+			return Mathf.RoundToInt(mFinalFontSize * mScale);
+		}
+	}
 
 	/// <summary>
 	/// Function used to determine if something has changed (and thus the geometry must be rebuilt)
@@ -982,7 +994,7 @@ public class UILabel : UIWidget
 
 				if (fnt == font)
 				{
-					fnt.RequestCharactersInTexture(lbl.mText, lbl.mPrintedSize, lbl.mFontStyle);
+					fnt.RequestCharactersInTexture(lbl.mText, lbl.mFinalFontSize, lbl.mFontStyle);
 				}
 			}
 		}
@@ -1214,7 +1226,7 @@ public class UILabel : UIWidget
 		NGUIText.regionWidth  = (regionX != 1f) ? Mathf.RoundToInt(NGUIText.rectWidth  * regionX) : NGUIText.rectWidth;
 		NGUIText.regionHeight = (regionY != 1f) ? Mathf.RoundToInt(NGUIText.rectHeight * regionY) : NGUIText.rectHeight;
 
-		mPrintedSize = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : defaultFontSize);
+		mFinalFontSize = Mathf.Abs(legacyMode ? Mathf.RoundToInt(cachedTransform.localScale.x) : defaultFontSize);
 		mScale = 1f;
 
 		if (NGUIText.regionWidth < 1 || NGUIText.regionHeight < 0)
@@ -1247,24 +1259,24 @@ public class UILabel : UIWidget
 			NGUIText.regionHeight = 1000000;
 		}
 
-		if (mPrintedSize > 0)
+		if (mFinalFontSize > 0)
 		{
 #if DYNAMIC_FONT
 			bool adjustSize = keepCrisp;
 #endif
-			for (int ps = mPrintedSize; ps > 0; --ps)
+			for (int ps = mFinalFontSize; ps > 0; --ps)
 			{
 #if DYNAMIC_FONT
 				// Adjust either the size, or the scale
 				if (adjustSize)
 				{
-					mPrintedSize = ps;
-					NGUIText.fontSize = mPrintedSize;
+					mFinalFontSize = ps;
+					NGUIText.fontSize = mFinalFontSize;
 				}
 				else
 #endif
 				{
-					mScale = (float)ps / mPrintedSize;
+					mScale = (float)ps / mFinalFontSize;
 #if DYNAMIC_FONT
 					NGUIText.fontScale = isDynamic ? mScale : ((float)mFontSize / mFont.defaultSize) * mScale;
 #else
@@ -1963,7 +1975,7 @@ public class UILabel : UIWidget
 		Font ttf = trueTypeFont;
 		bool isDynamic = (ttf != null);
 
-		NGUIText.fontSize = mPrintedSize;
+		NGUIText.fontSize = mFinalFontSize;
 		NGUIText.fontStyle = mFontStyle;
 		NGUIText.rectWidth = mWidth;
 		NGUIText.rectHeight = mHeight;
