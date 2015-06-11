@@ -489,7 +489,7 @@ public class UICamera : MonoBehaviour
 						Screen.lockCursor = false;
 						Screen.showCursor = true;
 #else
-						Cursor.lockState = CursorLockMode.Locked;
+						Cursor.lockState = CursorLockMode.None;
 						Cursor.visible = true;
 #endif
 					}
@@ -504,7 +504,7 @@ public class UICamera : MonoBehaviour
 						Screen.lockCursor = true;
 #else
 						Cursor.visible = false;
-						Cursor.lockState = CursorLockMode.None;
+						Cursor.lockState = CursorLockMode.Locked;
 #endif
 
 						// Skip the next 2 frames worth of mouse movement
