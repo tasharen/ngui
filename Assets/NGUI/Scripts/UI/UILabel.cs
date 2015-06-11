@@ -960,7 +960,7 @@ public class UILabel : UIWidget
 
 				if (fnt != null)
 				{
-					fnt.RequestCharactersInTexture(lbl.mText, lbl.mPrintedSize, lbl.mFontStyle);
+					fnt.RequestCharactersInTexture(lbl.mText, lbl.mFinalFontSize, lbl.mFontStyle);
 				}
 			}
 		}
