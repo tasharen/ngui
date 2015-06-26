@@ -2113,7 +2113,7 @@ public class UICamera : MonoBehaviour
 		}
 
 		// Send out all key events
-		if (Input.anyKeyDown)
+		if (GetAnyKeyDown != null ? GetAnyKeyDown() : Input.anyKeyDown)
 		{
 			for (int i = 0, imax = NGUITools.keys.Length; i < imax; ++i)
 			{
