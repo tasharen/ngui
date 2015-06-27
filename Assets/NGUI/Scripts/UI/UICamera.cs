@@ -344,7 +344,7 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			return mDisableController && UIPopupList.current == null;
+			return mDisableController && !UIPopupList.isOpen;
 		}
 		set
 		{
