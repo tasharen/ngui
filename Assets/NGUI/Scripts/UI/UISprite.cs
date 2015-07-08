@@ -223,15 +223,18 @@ public class UISprite : UIBasicSprite
 				int padRight = mSprite.paddingRight;
 				int padTop = mSprite.paddingTop;
 
-				//float ps = pixelSize;
+				if (mType != Type.Simple)
+				{
+					float ps = pixelSize;
 
-				//if (ps != 1f)
-				//{
-				//    padLeft = Mathf.RoundToInt(ps * padLeft);
-				//    padBottom = Mathf.RoundToInt(ps * padBottom);
-				//    padRight = Mathf.RoundToInt(ps * padRight);
-				//    padTop = Mathf.RoundToInt(ps * padTop);
-				//}
+					if (ps != 1f)
+					{
+						padLeft = Mathf.RoundToInt(ps * padLeft);
+						padBottom = Mathf.RoundToInt(ps * padBottom);
+						padRight = Mathf.RoundToInt(ps * padRight);
+						padTop = Mathf.RoundToInt(ps * padTop);
+					}
+				}
 
 				int w = mSprite.width + padLeft + padRight;
 				int h = mSprite.height + padBottom + padTop;

@@ -1560,6 +1560,26 @@ public class UICamera : MonoBehaviour
 			mMouse[i].lastPos = mMouse[0].pos;
 		}
 		mLastPos = mMouse[0].pos;
+
+#if !UNITY_EDITOR && (UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX)
+		string[] args = System.Environment.GetCommandLineArgs();
+
+		if (args != null)
+		{
+			for (int i = 0; i < args.Length; ++i)
+			{
+				string s = args[i];
+				if (s == "-noMouse") useMouse = false;
+				else if (s == "-noTouch") useTouch = false;
+				else if (s == "-noController") useController = false;
+				else if (s == "-noJoystick") useController = false;
+				else if (s == "-useMouse") useMouse = true;
+				else if (s == "-useTouch") useTouch = true;
+				else if (s == "-useController") useController = true;
+				else if (s == "-useJoystick") useController = true;
+			}
+		}
+#endif
 	}
 
 	/// <summary>
