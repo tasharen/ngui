@@ -1598,6 +1598,10 @@ public class UICamera : MonoBehaviour
 
 	void OnDisable () { list.Remove(this); }
 
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
+	static bool disableControllerCheck = true;
+#endif
+
 	/// <summary>
 	/// We don't want the camera to send out any kind of mouse events.
 	/// </summary>
@@ -1609,7 +1613,7 @@ public class UICamera : MonoBehaviour
 
 		if (Application.isPlaying)
 		{
-			// Always set a fallthrough object
+			// Always set a fall-through object
 			if (fallThrough == null)
 			{
 				UIRoot root = NGUITools.FindInParents<UIRoot>(gameObject);
@@ -1625,6 +1629,19 @@ public class UICamera : MonoBehaviour
 				}
 			}
 			cachedCamera.eventMask = 0;
+
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
+			// Automatically disable controller-based input if the game starts with a non-zero controller input.
+			// This most commonly happens with Thrustmaster and other similar joystick types.
+			if (disableControllerCheck && useController && handlesEvents)
+			{
+				disableControllerCheck = false;
+				if (!string.IsNullOrEmpty(horizontalAxisName) && Mathf.Abs(GetAxis(horizontalAxisName)) > 0.1f) useController = false;
+				else if (!string.IsNullOrEmpty(verticalAxisName) && Mathf.Abs(GetAxis(verticalAxisName)) > 0.1f) useController = false;
+				else if (!string.IsNullOrEmpty(horizontalPanAxisName) && Mathf.Abs(GetAxis(horizontalPanAxisName)) > 0.1f) useController = false;
+				else if (!string.IsNullOrEmpty(verticalPanAxisName) && Mathf.Abs(GetAxis(verticalPanAxisName)) > 0.1f) useController = false;
+			}
+#endif
 		}
 	}
 

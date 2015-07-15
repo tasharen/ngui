@@ -416,7 +416,7 @@ public class UIDrawCall : MonoBehaviour
 					(tans.buffer != null && tans.buffer.Length != verts.buffer.Length);
 
 				// Non-automatic render queues rely on Z position, so it's a good idea to trim everything
-				if (!trim && panel.renderQueue != UIPanel.RenderQueue.Automatic)
+				if (!trim && panel != null && panel.renderQueue != UIPanel.RenderQueue.Automatic)
 					trim = (mMesh == null || mMesh.vertexCount != verts.buffer.Length);
 
 				// NOTE: Apparently there is a bug with Adreno devices:

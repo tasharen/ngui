@@ -3,7 +3,7 @@
 // Copyright © 2011-2015 Tasharen Entertainment
 //----------------------------------------------
 
-#if !UNITY_EDITOR && (UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_WP_8_1 || UNITY_BLACKBERRY)
+#if !UNITY_EDITOR && (UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_WP_8_1 || UNITY_BLACKBERRY || UNITY_WINRT || UNITY_METRO)
 #define MOBILE
 #endif
 
@@ -225,11 +225,7 @@ public class UIInput : MonoBehaviour
 	{
 		get
 		{
-#if UNITY_METRO
-			return true;
-#else
 			return hideInput && label != null && !label.multiLine && inputType != InputType.Password;
-#endif
 		}
 	}
 
@@ -620,11 +616,7 @@ public class UIInput : MonoBehaviour
 				{
 					TouchScreenKeyboard.hideInput = true;
 					kt = (TouchScreenKeyboardType)((int)keyboardType);
- #if UNITY_METRO
-					val = "";
- #else
 					val = "|";
- #endif
 				}
 				else if (inputType == InputType.Password)
 				{
@@ -667,10 +659,6 @@ public class UIInput : MonoBehaviour
 #if MOBILE
 		if (mKeyboard != null)
 		{
- #if UNITY_METRO
-			string text = Input.inputString;
-			if (!string.IsNullOrEmpty(text)) Insert(text);
- #else
 			string text = (mKeyboard.done || !mKeyboard.active) ? mCached : mKeyboard.text;
  
 			if (inputShouldBeHidden)
@@ -691,7 +679,7 @@ public class UIInput : MonoBehaviour
 				mCached = text;
 				if (!mKeyboard.done && mKeyboard.active) value = text;
 			}
- #endif // UNITY_METRO
+
 			if (mKeyboard.done || !mKeyboard.active)
 			{
 				if (!mKeyboard.wasCanceled) Submit();

@@ -1059,7 +1059,7 @@ public class UIPopupList : UIWidgetContainer
 			}
 
 			// Ensure that everything fits into the panel's visible range
-			Vector3 offset = mPanel.CalculateConstrainOffset(min, max);
+			Vector3 offset = mPanel.hasClipping ? Vector3.zero : mPanel.CalculateConstrainOffset(min, max);
 			pos = t.localPosition + offset;
 			pos.x = Mathf.Round(pos.x);
 			pos.y = Mathf.Round(pos.y);
