@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2015 Tasharen Entertainment
-            Version 3.9.0
+            Version 3.9.1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,17 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.9.1
+- NEW: NGUI will now automatically disable controller input on stand-alone builds if the game starts up with some joystick axis reporting non-zero.
+- NEW: Added command-line arguments that can enable/disable control types, such as -noJoystick.
+- NEW: Scene view UI focus is now bound to ALT+F.
+- FIX: Unity 5 dynamic font work-around.
+- FIX: Panels moving should no longer cause widgets to get marked as moving.
+- FIX: UICamera now uses the GetAnyKeyDown delegate.
+- FIX: Dragging a window should now be much faster.
+- FIX: UICamera.disableController should now report the correct value after a popup list has been closed.
+- FIX: UIPopupList will now again trigger callbacks on start when setting the default value.
 
 3.9.0
 - NEW: Completely redesigned how controller-based input was handled. It's now much more robust and handless seamless transitions from one method of input to another.
