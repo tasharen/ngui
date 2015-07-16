@@ -482,8 +482,13 @@ public class UIPopupList : UIWidgetContainer
 		}
 
 		// Automatically choose the first item
-		if (Application.isPlaying && string.IsNullOrEmpty(mSelectedItem) && items.Count > 0)
-			value = items[0];
+		if (Application.isPlaying)
+		{
+			if (string.IsNullOrEmpty(mSelectedItem) && items.Count > 0)
+				mSelectedItem = items[0];
+			if (!string.IsNullOrEmpty(mSelectedItem))
+				TriggerCallbacks();
+		}
 	}
 
 	/// <summary>
