@@ -675,21 +675,17 @@ public class UICamera : MonoBehaviour
 		{
 			if (currentTouch != null) return currentTouch.isOverUI;
 
-			if (mHover != null && mHover == fallThrough && NGUITools.FindInParents<UIRoot>(mHover) != null)
-				return true;
-
 			for (int i = 0, imax = activeTouches.Count; i < imax; ++i)
 			{
 				MouseOrTouch touch = activeTouches[i];
-				if (touch.pressed != null && NGUITools.FindInParents<UIRoot>(touch.pressed) != null)
+				if (touch.pressed != null && touch.pressed != fallThrough && NGUITools.FindInParents<UIRoot>(touch.pressed) != null)
 					return true;
 			}
 
-			for (int i = 0; i < mMouse.Length; ++i)
-				if (mMouse[i].pressed != null && NGUITools.FindInParents<UIRoot>(mMouse[i].pressed) != null)
-					return true;
+			if (mMouse[0].current != null && mMouse[0].current != fallThrough && NGUITools.FindInParents<UIRoot>(mMouse[0].current) != null)
+				return true;
 
-			if (controller.pressed != null && NGUITools.FindInParents<UIRoot>(controller.pressed) != null)
+			if (controller.pressed != null && controller.pressed != fallThrough && NGUITools.FindInParents<UIRoot>(controller.pressed) != null)
 				return true;
 
 			return false;
@@ -1901,6 +1897,7 @@ public class UICamera : MonoBehaviour
 			currentKey = KeyCode.Mouse0;
 			hoveredObject = currentTouch.current;
 		}
+
 		currentTouch = null;
 
 		// Update the last value
