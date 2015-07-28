@@ -320,6 +320,12 @@ public class UICamera : MonoBehaviour
 	public KeyCode cancelKey0 = KeyCode.Escape;
 	public KeyCode cancelKey1 = KeyCode.JoystickButton1;
 
+	/// <summary>
+	/// Whether NGUI will automatically hide the mouse cursor when controller or touch input is detected.
+	/// </summary>
+
+	public bool autoHideCursor = true;
+
 	public delegate void OnCustomInput ();
 
 	/// <summary>
@@ -499,16 +505,19 @@ public class UICamera : MonoBehaviour
 					else
 #endif
 					{
+						if (current != null && current.autoHideCursor)
+						{
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
-						Screen.showCursor = false;
-						Screen.lockCursor = true;
+							Screen.showCursor = false;
+							Screen.lockCursor = true;
 #else
-						Cursor.visible = false;
-						Cursor.lockState = CursorLockMode.Locked;
+							Cursor.visible = false;
+							Cursor.lockState = CursorLockMode.Locked;
 #endif
 
-						// Skip the next 2 frames worth of mouse movement
-						mMouse[0].ignoreDelta = 2;
+							// Skip the next 2 frames worth of mouse movement
+							mMouse[0].ignoreDelta = 2;
+						}
 					}
 
 					if (onSchemeChange != null) onSchemeChange();
@@ -665,9 +674,25 @@ public class UICamera : MonoBehaviour
 		get
 		{
 			if (currentTouch != null) return currentTouch.isOverUI;
-			if (mHover == null) return false;
-			if (mHover == fallThrough) return false;
-			return NGUITools.FindInParents<UIRoot>(mHover) != null;
+
+			if (mHover != null && mHover == fallThrough && NGUITools.FindInParents<UIRoot>(mHover) != null)
+				return true;
+
+			for (int i = 0, imax = activeTouches.Count; i < imax; ++i)
+			{
+				MouseOrTouch touch = activeTouches[i];
+				if (touch.pressed != null && NGUITools.FindInParents<UIRoot>(touch.pressed) != null)
+					return true;
+			}
+
+			for (int i = 0; i < mMouse.Length; ++i)
+				if (mMouse[i].pressed != null && NGUITools.FindInParents<UIRoot>(mMouse[i].pressed) != null)
+					return true;
+
+			if (controller.pressed != null && NGUITools.FindInParents<UIRoot>(controller.pressed) != null)
+				return true;
+
+			return false;
 		}
 	}
 

@@ -164,6 +164,12 @@ public class UIPopupList : UIWidgetContainer
 
 	public bool isLocalized = false;
 
+	/// <summary>
+	/// Whether a separate panel will be used to ensure that the popup will appear on top of everything else.
+	/// </summary>
+
+	public bool separatePanel = true;
+
 	public enum OpenOn
 	{
 		ClickOrTap,
@@ -858,6 +864,21 @@ public class UIPopupList : UIWidgetContainer
 			// Create the root object for the list
 			mChild = new GameObject("Drop-down List");
 			mChild.layer = gameObject.layer;
+
+			if (separatePanel)
+			{
+				if (GetComponent<Collider>() != null)
+				{
+					Rigidbody rb = mChild.AddComponent<Rigidbody>();
+					rb.isKinematic = true;
+				}
+				else if (GetComponent<Collider2D>() != null)
+				{
+					Rigidbody2D rb = mChild.AddComponent<Rigidbody2D>();
+					rb.isKinematic = true;
+				}
+				mChild.AddComponent<UIPanel>().depth = 1000000;
+			}
 			current = this;
 
 			Transform t = mChild.transform;
@@ -888,9 +909,8 @@ public class UIPopupList : UIWidgetContainer
 			t.localScale = Vector3.one;
 
 			// Add a sprite for the background
-			mBackground = NGUITools.AddSprite(mChild, atlas, backgroundSprite);
+			mBackground = NGUITools.AddSprite(mChild, atlas, backgroundSprite, separatePanel ? 0 : NGUITools.CalculateNextDepth(mPanel.gameObject));
 			mBackground.pivot = UIWidget.Pivot.TopLeft;
-			mBackground.depth = NGUITools.CalculateNextDepth(mPanel.gameObject);
 			mBackground.color = backgroundColor;
 
 			// We need to know the size of the background sprite for padding purposes
@@ -899,7 +919,7 @@ public class UIPopupList : UIWidgetContainer
 			mBackground.cachedTransform.localPosition = new Vector3(0f, bgPadding.y, 0f);
 
 			// Add a sprite used for the selection
-			mHighlight = NGUITools.AddSprite(mChild, atlas, highlightSprite);
+			mHighlight = NGUITools.AddSprite(mChild, atlas, highlightSprite, mBackground.depth + 1);
 			mHighlight.pivot = UIWidget.Pivot.TopLeft;
 			mHighlight.color = highlightColor;
 
@@ -922,7 +942,7 @@ public class UIPopupList : UIWidgetContainer
 			{
 				string s = items[i];
 
-				UILabel lbl = NGUITools.AddWidget<UILabel>(mChild);
+				UILabel lbl = NGUITools.AddWidget<UILabel>(mChild, mBackground.depth + 2);
 				lbl.name = i.ToString();
 				lbl.pivot = UIWidget.Pivot.TopLeft;
 				lbl.bitmapFont = bitmapFont;

@@ -1060,7 +1060,7 @@ static public class NGUIText
 	/// Text wrapping functionality. The 'width' and 'height' should be in pixels.
 	/// </summary>
 
-	static public bool WrapText (string text, out string finalText, bool keepCharCount, bool wrapLineColors)
+	static public bool WrapText (string text, out string finalText, bool keepCharCount, bool wrapLineColors, bool useEllipsis = false)
 	{
 		if (regionWidth < 1 || regionHeight < 1 || finalLineHeight < 1f)
 		{
@@ -1211,6 +1211,44 @@ static public class NGUIText
 				// Can't start a new line
 				if (lineIsEmpty || lineCount == maxLineCount)
 				{
+					// Adds "..." at the end of text that doesn't fit. Contributed by Jason Nollan.
+					if (useEllipsis && lineCount == maxLineCount && offset > 1)
+					{
+						float ellipsisWidth = GetGlyphWidth('.', '.') * 3f;
+
+						if (ellipsisWidth < regionWidth)
+						{
+							remainingWidth += glyphWidth;
+							int tempOffset = offset;
+							int removeCount = 0;
+
+							while (tempOffset > 1 && remainingWidth < ellipsisWidth)
+							{
+								--tempOffset;
+								char prevCh = text[tempOffset - 1];
+								char characterToRemove = text[tempOffset];
+								bool isCaseWhereSpaceShouldBeInStringBuilderButIsnt = (remainingWidth == 0 && IsSpace(characterToRemove));
+								remainingWidth += GetGlyphWidth(characterToRemove, prevCh);
+								if (tempOffset < start && !isCaseWhereSpaceShouldBeInStringBuilderButIsnt)
+									++removeCount;
+							}
+
+							if (remainingWidth >= ellipsisWidth)
+							{
+								if (removeCount > 0)
+									sb.Length = Mathf.Max(0, sb.Length - removeCount);
+
+								sb.Append(text.Substring(start, Mathf.Max(0, tempOffset - start)));
+								while (sb.Length > 0 && IsSpace(sb[sb.Length - 1])) --sb.Length;
+								sb.Append("...");
+
+								++lineCount;
+								start = offset = tempOffset;
+								break;
+							}
+						}
+					}
+
 					// This is the first word on the line -- add it up to the character that fits
 					sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
 					bool space = IsSpace(ch);

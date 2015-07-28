@@ -71,6 +71,7 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] bool mUseFloatSpacing = false;
 	[HideInInspector][SerializeField] float mFloatSpacingX = 0;
 	[HideInInspector][SerializeField] float mFloatSpacingY = 0;
+	[HideInInspector][SerializeField] bool mOverflowEllipsis = false;
 
 	// Obsolete values
 	[HideInInspector][SerializeField] bool mShrinkToFit = false;
@@ -537,6 +538,26 @@ public class UILabel : UIWidget
 		get
 		{
 			return mUseFloatSpacing ? mFloatSpacingX : mSpacingX;
+		}
+	}
+
+	/// <summary>
+	/// Whether to append "..." at the end of clamped text that didn't fit.
+	/// </summary>
+
+	public bool overflowEllipsis
+	{
+		get
+		{
+			return mOverflowEllipsis;
+		}
+		set
+		{
+			if (mOverflowEllipsis != value)
+			{
+				mOverflowEllipsis = value;
+				MarkAsChanged();
+			}
 		}
 	}
 
@@ -1287,7 +1308,8 @@ public class UILabel : UIWidget
 				NGUIText.Update(false);
 
 				// Wrap the text
-				bool fits = NGUIText.WrapText(mText, out mProcessedText, true, false);
+				bool fits = NGUIText.WrapText(mText, out mProcessedText, true, false,
+					mOverflowEllipsis && mOverflow == Overflow.ClampContent);
 
 				if (mOverflow == Overflow.ShrinkContent && !fits)
 				{
@@ -1746,6 +1768,7 @@ public class UILabel : UIWidget
 			col.r = Mathf.GammaToLinearSpace(col.r);
 			col.g = Mathf.GammaToLinearSpace(col.g);
 			col.b = Mathf.GammaToLinearSpace(col.b);
+			col.a = Mathf.GammaToLinearSpace(col.a);
 		}
 
 		string text = processedText;
