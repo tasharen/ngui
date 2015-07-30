@@ -1549,28 +1549,15 @@ public class UICamera : MonoBehaviour
 		mWidth = Screen.width;
 		mHeight = Screen.height;
 
-		/*if (Application.platform == RuntimePlatform.Android ||
-			Application.platform == RuntimePlatform.IPhonePlayer
-			|| Application.platform == RuntimePlatform.WP8Player
-#if UNITY_4_3
-			|| Application.platform == RuntimePlatform.BB10Player
+#if (UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_WP_8_1 || UNITY_BLACKBERRY || UNITY_WINRT || UNITY_METRO)
+		currentScheme = ControlScheme.Touch;
 #else
-			|| Application.platform == RuntimePlatform.BlackBerryPlayer
-#endif
-			)
+		if (Application.platform == RuntimePlatform.PS3 ||
+			Application.platform == RuntimePlatform.XBOX360)
 		{
-			useTouch = true;
-			useMouse = false;
-			useKeyboard = false;
+			currentScheme = ControlScheme.Controller;
 		}
-		else if (Application.platform == RuntimePlatform.PS3 ||
-				 Application.platform == RuntimePlatform.XBOX360)
-		{
-			useMouse = false;
-			useTouch = false;
-			useKeyboard = false;
-			useController = true;
-		}*/
+#endif
 
 		// Save the starting mouse position
 		mMouse[0].pos = Input.mousePosition;
@@ -2208,6 +2195,9 @@ public class UICamera : MonoBehaviour
 				onPress(currentTouch.pressed, false);
 
 			Notify(currentTouch.pressed, "OnPress", false);
+
+			if (currentScheme == ControlScheme.Mouse && hoveredObject == null && currentTouch.current != null)
+				hoveredObject = currentTouch.current;
 
 			currentTouch.pressed = currentTouch.current;
 			currentTouch.dragged = currentTouch.current;
