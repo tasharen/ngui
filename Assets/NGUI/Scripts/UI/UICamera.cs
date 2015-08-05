@@ -1693,8 +1693,8 @@ public class UICamera : MonoBehaviour
 				Notify(mHover, "OnScroll", scroll);
 			}
 
-			if (showTooltips && mTooltipTime != 0f && !UIPopupList.isOpen && (mTooltipTime < RealTime.time ||
-				GetKey(KeyCode.LeftShift) || GetKey(KeyCode.RightShift)))
+			if (showTooltips && mTooltipTime != 0f && !UIPopupList.isOpen && mMouse[0].dragged == null &&
+				(mTooltipTime < RealTime.time || GetKey(KeyCode.LeftShift) || GetKey(KeyCode.RightShift)))
 			{
 				currentTouch = mMouse[0];
 				currentTouchID = -1;

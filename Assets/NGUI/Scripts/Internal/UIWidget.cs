@@ -826,8 +826,8 @@ public class UIWidget : UIRect
 		Material rightMat = right.material;
 
 		if (leftMat == rightMat) return 0;
-		if (leftMat != null) return -1;
-		if (rightMat != null) return 1;
+		if (leftMat == null) return 1;
+		if (rightMat == null) return -1;
 
 		return (leftMat.GetInstanceID() < rightMat.GetInstanceID()) ? -1 : 1;
 	}

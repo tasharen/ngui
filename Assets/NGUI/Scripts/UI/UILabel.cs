@@ -948,7 +948,7 @@ public class UILabel : UIWidget
 				// Font hasn't been used yet? Register a change delegate callback
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 				if (!mFontUsage.TryGetValue(mActiveTTF, out usage))
-					mActiveTTF.textureRebuildCallback = OnFontTextureChanged;
+					mActiveTTF.textureRebuildCallback = delegate() { OnFontChanged(mActiveTTF); };
 #endif
 #if UNITY_FLASH
 				mFontUsage[mActiveTTF] = usage + 1;
@@ -968,41 +968,6 @@ public class UILabel : UIWidget
 	/// So... queue yet another work-around.
 	/// </summary>
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
-	static void OnFontTextureChanged ()
-	{
-		for (int i = 0; i < mList.size; ++i)
-		{
-			UILabel lbl = mList[i];
-
-			if (lbl != null)
-			{
-				Font fnt = lbl.trueTypeFont;
-
-				if (fnt != null)
-				{
-					fnt.RequestCharactersInTexture(lbl.mText, lbl.mFinalFontSize, lbl.mFontStyle);
-				}
-			}
-		}
-
-		for (int i = 0; i < mList.size; ++i)
-		{
-			UILabel lbl = mList[i];
-
-			if (lbl != null)
-			{
-				Font fnt = lbl.trueTypeFont;
-
-				if (fnt != null)
-				{
-					lbl.RemoveFromPanel();
-					lbl.CreatePanel();
-				}
-			}
-		}
-	}
-#else
 	static void OnFontChanged (Font font)
 	{
 		for (int i = 0; i < mList.size; ++i)
@@ -1016,27 +981,30 @@ public class UILabel : UIWidget
 				if (fnt == font)
 				{
 					fnt.RequestCharactersInTexture(lbl.mText, lbl.mFinalFontSize, lbl.mFontStyle);
-				}
-			}
-		}
-
-		for (int i = 0; i < mList.size; ++i)
-		{
-			UILabel lbl = mList[i];
-
-			if (lbl != null)
-			{
-				Font fnt = lbl.trueTypeFont;
-
-				if (fnt == font)
-				{
 					lbl.RemoveFromPanel();
 					lbl.CreatePanel();
+
+					if (mTempPanelList == null)
+						mTempPanelList = new List<UIPanel>();
+
+					if (!mTempPanelList.Contains(lbl.panel))
+						mTempPanelList.Add(lbl.panel);
 				}
 			}
 		}
+
+		if (mTempPanelList != null)
+		{
+			for (int i = 0, imax = mTempPanelList.Count; i < imax; ++i)
+			{
+				UIPanel p = mTempPanelList[i];
+				p.Refresh();
+			}
+			mTempPanelList.Clear();
+		}
 	}
-#endif
+
+	static List<UIPanel> mTempPanelList;
 #endif
 
 	/// <summary>
