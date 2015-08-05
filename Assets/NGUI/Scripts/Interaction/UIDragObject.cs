@@ -250,7 +250,7 @@ public class UIDragObject : MonoBehaviour
 		{
 			mTargetPos += worldDelta;
 			Transform parent = target.parent;
-			Rigidbody rb = target.rigidbody;
+			Rigidbody rb = target.GetComponent<Rigidbody>();
 
 			if (parent != null)
 			{
