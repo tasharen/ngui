@@ -130,8 +130,13 @@ public class UIKeyBinding : MonoBehaviour
 		if (UICamera.inputHasFocus) return;
 		if (keyCode == KeyCode.None || !IsModifierActive()) return;
 
+#if UNITY_FLASH
+		bool keyDown = Input.GetKeyDown(keyCode);
+		bool keyUp = Input.GetKeyUp(keyCode);
+#else
 		bool keyDown = UICamera.GetKeyDown(keyCode);
 		bool keyUp = UICamera.GetKeyUp(keyCode);
+#endif
 
 		if (keyDown) mPress = true;
 
