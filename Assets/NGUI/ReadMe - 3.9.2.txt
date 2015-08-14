@@ -65,6 +65,7 @@ and it will not be included in the build of your game. It's only used in the edi
 - FIX: NGUIEditorTools.DrawProperty can now draw arrays.
 - FIX: Added mdeletrain's broken dynamic font fix.
 - FIX: Drag operation now cancels tooltips properly.
+- FIX: UITextList should now wrap colors properly.
 - FIX: Flash compilation fixes.
 
 3.9.1

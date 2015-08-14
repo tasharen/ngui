@@ -1098,7 +1098,13 @@ static public class NGUIText
 		bool ignoreColor = false;
 
 		if (!useSymbols) wrapLineColors = false;
-		if (wrapLineColors) mColors.Add(c);
+		if (wrapLineColors)
+		{
+			mColors.Add(c);
+			sb.Append("[");
+			sb.Append(NGUIText.EncodeColor(c));
+			sb.Append("]");
+		}
 
 		// Run through all characters
 		for (; offset < textLength; ++offset)
