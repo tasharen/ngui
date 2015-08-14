@@ -1461,7 +1461,7 @@ public static class NGUIEditorTools
 
 			if (padding) EditorGUILayout.BeginHorizontal();
 
-			if (sp.isArray) DrawArray(serializedObject, property, label ?? property);
+			if (sp.isArray && sp.type != "string") DrawArray(serializedObject, property, label ?? property);
 			else if (label != null) EditorGUILayout.PropertyField(sp, new GUIContent(label), options);
 			else EditorGUILayout.PropertyField(sp, options);
 

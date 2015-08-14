@@ -415,6 +415,19 @@ public class UICamera : MonoBehaviour
 	static public UICamera current = null;
 
 	/// <summary>
+	/// NGUI event system that will be handling all events.
+	/// </summary>
+
+	static public UICamera first
+	{
+		get
+		{
+			if (list == null || list.size == 0) return null;
+			return list[0];
+		}
+	}
+
+	/// <summary>
 	/// Last camera active prior to sending out the event. This will always be the camera that actually sent out the event.
 	/// </summary>
 

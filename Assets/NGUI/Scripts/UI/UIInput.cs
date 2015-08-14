@@ -694,9 +694,11 @@ public class UIInput : MonoBehaviour
 					{
 						Insert(text.Substring(1));
 					}
-					else if (!mKeyboard.done && mKeyboard.active) DoBackspace();
-
-					mKeyboard.text = "|";
+					else if (!mKeyboard.done && mKeyboard.active)
+					{
+						DoBackspace();
+						mKeyboard.text = "|";
+					}
 				}
 			}
 			else if (mCached != text)
