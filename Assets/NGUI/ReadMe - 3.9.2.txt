@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2015 Tasharen Entertainment
-            Version 3.9.1
+            Version 3.9.2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,18 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.9.2
+- NEW: Added an option to UICamera to automatically hide the cursor when controller or touch input is used.
+- NEW: Added ellipsis overflow support by Jason Nollan.
+- NEW: Added an option to the Popup List to automatically create its popup on a separate panel, ensuring that it's always on top.
+- NEW: Added UICamera.first referencing the active NGUI event system.
+- FIX: Alpha should now work as expected with Linear lighting.
+- FIX: UICamera.isOverUI should now work properly for all types of input.
+- FIX: NGUIEditorTools.DrawProperty can now draw arrays.
+- FIX: Added mdeletrain's broken dynamic font fix.
+- FIX: Drag operation now cancels tooltips properly.
+- FIX: Flash compilation fixes.
 
 3.9.1
 - NEW: NGUI will now automatically disable controller input on stand-alone builds if the game starts up with some joystick axis reporting non-zero.
