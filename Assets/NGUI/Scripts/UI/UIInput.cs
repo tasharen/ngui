@@ -697,8 +697,8 @@ public class UIInput : MonoBehaviour
 					else if (!mKeyboard.done && mKeyboard.active)
 					{
 						DoBackspace();
-						mKeyboard.text = "|";
 					}
+					mKeyboard.text = "|";
 				}
 			}
 			else if (mCached != text)
@@ -826,7 +826,7 @@ public class UIInput : MonoBehaviour
 
 		if (mIgnoreKey == frame) return;
 		
-		if (key == mCam.cancelKey0 || key == mCam.cancelKey1)
+		if (mCam != null && (key == mCam.cancelKey0 || key == mCam.cancelKey1))
 		{
 			mIgnoreKey = frame;
 			isSelected = false;
