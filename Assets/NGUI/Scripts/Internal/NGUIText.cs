@@ -1185,7 +1185,7 @@ static public class NGUIText
 			{
 				// Find the glyph for this character
 				float w = GetGlyphWidth(ch, prev);
-				if (w == 0f) continue;
+				if (w == 0f && !IsSpace(ch)) continue;
 				glyphWidth = finalSpacingX + w;
 			}
 			else glyphWidth = finalSpacingX + symbol.advance * fontScale;
