@@ -257,7 +257,7 @@ public class UIDrawCall : MonoBehaviour
 	{
 		mTextureClip = false;
 		mLegacyShader = false;
-		mClipCount = panel.clipCount;
+		mClipCount = (panel != null) ? panel.clipCount : 0;
 
 		string shaderName = (mShader != null) ? mShader.name :
 			((mMaterial != null) ? mMaterial.shader.name : "Unlit/Transparent Colored");
@@ -284,7 +284,7 @@ public class UIDrawCall : MonoBehaviour
 		const string textureClip = " (TextureClip)";
 		shaderName = shaderName.Replace(textureClip, "");
 
-		if (panel.clipping == Clipping.TextureMask)
+		if (panel != null && panel.clipping == Clipping.TextureMask)
 		{
 			mTextureClip = true;
 			shader = Shader.Find("Hidden/" + shaderName + textureClip);
