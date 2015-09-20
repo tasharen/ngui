@@ -362,6 +362,8 @@ public class UIDrawCall : MonoBehaviour
 
 	void UpdateMaterials ()
 	{
+		if (panel == null) return;
+
 		// If clipping should be used, we need to find a replacement shader
 		if (mRebuildMat || mDynamicMat == null || mClipCount != panel.clipCount || mTextureClip != (panel.clipping == Clipping.TextureMask))
 		{
