@@ -440,6 +440,7 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	static public OnSchemeChange onSchemeChange;
+	static ControlScheme mLastScheme = ControlScheme.Mouse;
 
 	/// <summary>
 	/// Current control scheme. Derived from the last event to arrive.
@@ -451,6 +452,9 @@ public class UICamera : MonoBehaviour
 		{
 			if (mCurrentKey == KeyCode.None) return ControlScheme.Touch;
 			if (mCurrentKey >= KeyCode.JoystickButton0) return ControlScheme.Controller;
+			if (current != null && mLastScheme == ControlScheme.Controller &&
+				(mCurrentKey == current.submitKey0 || mCurrentKey == current.submitKey1))
+				return ControlScheme.Controller;
 			return ControlScheme.Mouse;
 		}
 		set
@@ -468,6 +472,8 @@ public class UICamera : MonoBehaviour
 				currentKey = KeyCode.None;
 			}
 			else currentKey = KeyCode.Alpha0;
+
+			mLastScheme = value;
 		}
 	}
 
@@ -494,15 +500,15 @@ public class UICamera : MonoBehaviour
 		{
 			if (mCurrentKey != value)
 			{
-				ControlScheme before = currentScheme;
+				ControlScheme before = mLastScheme;
 				mCurrentKey = value;
-				ControlScheme after = currentScheme;
+				mLastScheme = currentScheme;
 
-				if (before != after)
+				if (before != mLastScheme)
 				{
 					HideTooltip();
 
-					if (after == ControlScheme.Mouse)
+					if (mLastScheme == ControlScheme.Mouse)
 					{
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
 						Screen.lockCursor = false;
@@ -513,7 +519,7 @@ public class UICamera : MonoBehaviour
 #endif
 					}
 #if UNITY_EDITOR
-					else if (after == ControlScheme.Controller)
+					else if (mLastScheme == ControlScheme.Controller)
 #else
 					else
 #endif
