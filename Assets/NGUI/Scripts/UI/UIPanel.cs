@@ -1030,6 +1030,12 @@ public class UIPanel : UIRect
 	{
 		int fc = Time.frameCount;
 
+		if (mTrans.hasChanged)
+		{
+			mTrans.hasChanged = false;
+			mMatrixFrame = -1;
+		}
+
 		if (mMatrixFrame != fc)
 		{
 			mMatrixFrame = fc;
