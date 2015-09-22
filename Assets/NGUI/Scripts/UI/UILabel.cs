@@ -899,43 +899,46 @@ public class UILabel : UIWidget
 	{
 		if (mActiveTTF != fnt)
 		{
-			if (mActiveTTF != null)
+			Font font = mActiveTTF;
+
+			if (font != null)
 			{
 				int usage;
 
-				if (mFontUsage.TryGetValue(mActiveTTF, out usage))
+				if (mFontUsage.TryGetValue(font, out usage))
 				{
 					usage = Mathf.Max(0, --usage);
 
 					if (usage == 0)
 					{
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
-						mActiveTTF.textureRebuildCallback = null;
+						font.textureRebuildCallback = null;
 #endif
-						mFontUsage.Remove(mActiveTTF);
+						mFontUsage.Remove(font);
 					}
-					else mFontUsage[mActiveTTF] = usage;
+					else mFontUsage[font] = usage;
 				}
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
-				else mActiveTTF.textureRebuildCallback = null;
+				else font.textureRebuildCallback = null;
 #endif
 			}
 
 			mActiveTTF = fnt;
+			font = fnt;
 
-			if (mActiveTTF != null)
+			if (font != null)
 			{
 				int usage = 0;
 
 				// Font hasn't been used yet? Register a change delegate callback
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
-				if (!mFontUsage.TryGetValue(mActiveTTF, out usage))
-					mActiveTTF.textureRebuildCallback = delegate() { OnFontChanged(mActiveTTF); };
+				if (!mFontUsage.TryGetValue(font, out usage))
+					font.textureRebuildCallback = delegate() { OnFontChanged(font); };
 #endif
 #if UNITY_FLASH
-				mFontUsage[mActiveTTF] = usage + 1;
+				mFontUsage[font] = usage + 1;
 #else
-				mFontUsage[mActiveTTF] = ++usage;
+				mFontUsage[font] = ++usage;
 #endif
 			}
 		}
