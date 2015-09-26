@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2015 Tasharen Entertainment
-            Version 3.9.2
+            Version 3.9.3
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,16 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.9.3
+- NEW: Toggle is now capable of triggering tweens in addition to animations.
+- FIX: UITextList should now wrap colors properly.
+- FIX: UIKeyNavigation will now highlight elements properly with Tab.
+- FIX: Keyboard input can now be used in Example 4.
+- FIX: More tweaks to dynamic fonts. Oh how I hate that particular "feature"...
+- FIX: Work-arounds for some new oddities in Unity 5.2.
+- FIX: Fix for an old bug that would sometimes cause items inside a tweened scroll view to be offset visually.
+- FIX: Minor tweaks related to ensuring that anchors get called properly on start only once.
 
 3.9.2
 - NEW: Added an option to UICamera to automatically hide the cursor when controller or touch input is used.
