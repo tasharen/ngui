@@ -893,10 +893,9 @@ public class UIPanel : UIRect
 	/// Cache components.
 	/// </summary>
 
-	void Awake ()
+	protected override void Awake ()
 	{
-		mGo = gameObject;
-		mTrans = transform;
+		base.Awake();
 
 		mHalfPixelOffset = (Application.platform == RuntimePlatform.WindowsPlayer ||
 			Application.platform == RuntimePlatform.XBOX360 ||
@@ -934,7 +933,7 @@ public class UIPanel : UIRect
 
 	protected override void OnStart ()
 	{
-		mLayer = mGo.layer;
+		mLayer = cachedGameObject.layer;
 	}
 
 	/// <summary>

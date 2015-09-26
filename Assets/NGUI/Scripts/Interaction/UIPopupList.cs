@@ -191,16 +191,16 @@ public class UIPopupList : UIWidgetContainer
 	public List<EventDelegate> onChange = new List<EventDelegate>();
 
 	// Currently selected item
-	[HideInInspector][SerializeField] string mSelectedItem;
-	[HideInInspector][SerializeField] UIPanel mPanel;
-	[HideInInspector][SerializeField] UISprite mBackground;
-	[HideInInspector][SerializeField] UISprite mHighlight;
-	[HideInInspector][SerializeField] UILabel mHighlightedLabel = null;
-	[HideInInspector][SerializeField] List<UILabel> mLabelList = new List<UILabel>();
-	[HideInInspector][SerializeField] float mBgBorder = 0f;
+	[HideInInspector][SerializeField] protected string mSelectedItem;
+	[HideInInspector][SerializeField] protected UIPanel mPanel;
+	[HideInInspector][SerializeField] protected UISprite mBackground;
+	[HideInInspector][SerializeField] protected UISprite mHighlight;
+	[HideInInspector][SerializeField] protected UILabel mHighlightedLabel = null;
+	[HideInInspector][SerializeField] protected List<UILabel> mLabelList = new List<UILabel>();
+	[HideInInspector][SerializeField] protected float mBgBorder = 0f;
 
-	[System.NonSerialized] GameObject mSelection;
-	[System.NonSerialized] int mOpenFrame = 0;
+	[System.NonSerialized] protected GameObject mSelection;
+	[System.NonSerialized] protected int mOpenFrame = 0;
 
 	// Deprecated functionality
 	[HideInInspector][SerializeField] GameObject eventReceiver;
@@ -230,7 +230,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Current selection.
 	/// </summary>
 
-	public string value
+	public virtual string value
 	{
 		get
 		{
@@ -252,7 +252,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Item data associated with the current selection.
 	/// </summary>
 
-	public object data
+	public virtual object data
 	{
 		get
 		{
@@ -301,7 +301,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Clear the popup list's contents.
 	/// </summary>
 
-	public void Clear ()
+	public virtual void Clear ()
 	{
 		items.Clear();
 		itemData.Clear();
@@ -311,7 +311,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Add a new item to the popup list.
 	/// </summary>
 
-	public void AddItem (string text)
+	public virtual void AddItem (string text)
 	{
 		items.Add(text);
 		itemData.Add(null);
@@ -321,7 +321,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Add a new item to the popup list.
 	/// </summary>
 
-	public void AddItem (string text, object data)
+	public virtual void AddItem (string text, object data)
 	{
 		items.Add(text);
 		itemData.Add(data);
@@ -331,7 +331,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Remove the specified item.
 	/// </summary>
 
-	public void RemoveItem (string text)
+	public virtual void RemoveItem (string text)
 	{
 		int index = items.IndexOf(text);
 
@@ -346,7 +346,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Remove the specified item.
 	/// </summary>
 
-	public void RemoveItemByData (object data)
+	public virtual void RemoveItemByData (object data)
 	{
 		int index = itemData.IndexOf(data);
 
@@ -357,7 +357,7 @@ public class UIPopupList : UIWidgetContainer
 		}
 	}
 
-	[System.NonSerialized] bool mExecuting = false;
+	[System.NonSerialized] protected bool mExecuting = false;
 
 	/// <summary>
 	/// Trigger all event notification callbacks.
@@ -392,7 +392,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Remove legacy functionality.
 	/// </summary>
 
-	void OnEnable ()
+	protected virtual void OnEnable ()
 	{
 		if (EventDelegate.IsValid(onChange))
 		{
@@ -432,9 +432,9 @@ public class UIPopupList : UIWidgetContainer
 		}
 	}
 
-	bool mUseDynamicFont = false;
+	protected bool mUseDynamicFont = false;
 
-	void OnValidate ()
+	protected virtual void OnValidate ()
 	{
 		Font ttf = trueTypeFont;
 		UIFont fnt = bitmapFont;
@@ -475,7 +475,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Send out the selection message on start.
 	/// </summary>
 
-	void Start ()
+	protected virtual void Start ()
 	{
 		// Auto-upgrade legacy functionality
 		if (textLabel != null)
@@ -501,13 +501,13 @@ public class UIPopupList : UIWidgetContainer
 	/// Localize the text label.
 	/// </summary>
 
-	void OnLocalize () { if (isLocalized) TriggerCallbacks(); }
+	protected virtual void OnLocalize () { if (isLocalized) TriggerCallbacks(); }
 
 	/// <summary>
 	/// Visibly highlight the specified transform by moving the highlight sprite to be over it.
 	/// </summary>
 
-	void Highlight (UILabel lbl, bool instant)
+	protected virtual void Highlight (UILabel lbl, bool instant)
 	{
 		if (mHighlight != null)
 		{
@@ -536,7 +536,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Helper function that calculates where the tweened position should be.
 	/// </summary>
 
-	Vector3 GetHighlightPosition ()
+	protected virtual Vector3 GetHighlightPosition ()
 	{
 		if (mHighlightedLabel == null || mHighlight == null) return Vector3.zero;
 		UISpriteData sp = mHighlight.GetAtlasSprite();
@@ -548,14 +548,14 @@ public class UIPopupList : UIWidgetContainer
 		return mHighlightedLabel.cachedTransform.localPosition + new Vector3(-offsetX, offsetY, 1f);
 	}
 
-	bool mTweening = false;
+	protected bool mTweening = false;
 
 	/// <summary>
 	/// Periodically update the tweened target position.
 	/// It's needed because the popup list animates into view, and the target position changes.
 	/// </summary>
 
-	IEnumerator UpdateTweenPosition ()
+	protected virtual IEnumerator UpdateTweenPosition ()
 	{
 		if (mHighlight != null && mHighlightedLabel != null)
 		{
@@ -574,7 +574,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Event function triggered when the mouse hovers over an item.
 	/// </summary>
 
-	void OnItemHover (GameObject go, bool isOver)
+	protected virtual void OnItemHover (GameObject go, bool isOver)
 	{
 		if (isOver)
 		{
@@ -587,7 +587,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Event function triggered when the drop-down list item gets clicked on.
 	/// </summary>
 
-	void OnItemPress (GameObject go, bool isPressed)
+	protected virtual void OnItemPress (GameObject go, bool isPressed)
 	{
 		if (isPressed)
 		{
@@ -617,7 +617,7 @@ public class UIPopupList : UIWidgetContainer
 	/// React to key-based input.
 	/// </summary>
 
-	void OnNavigate (KeyCode key)
+	protected virtual void OnNavigate (KeyCode key)
 	{
 		if (enabled && current == this)
 		{
@@ -645,7 +645,7 @@ public class UIPopupList : UIWidgetContainer
 	/// React to key-based input.
 	/// </summary>
 
-	void OnKey (KeyCode key)
+	protected virtual void OnKey (KeyCode key)
 	{
 		if (enabled && current == this)
 		{
@@ -658,13 +658,13 @@ public class UIPopupList : UIWidgetContainer
 	/// Close the popup list when disabled.
 	/// </summary>
 
-	void OnDisable () { CloseSelf(); }
+	protected virtual void OnDisable () { CloseSelf(); }
 
 	/// <summary>
 	/// Get rid of the popup dialog when the selection gets lost.
 	/// </summary>
 
-	void OnSelect (bool isSelected) { if (!isSelected) CloseSelf(); }
+	protected virtual void OnSelect (bool isSelected) { if (!isSelected) CloseSelf(); }
 
 	/// <summary>
 	/// Manually close the popup list.
@@ -683,7 +683,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Manually close the popup list.
 	/// </summary>
 
-	public void CloseSelf ()
+	public virtual void CloseSelf ()
 	{
 		if (mChild != null && current == this)
 		{
@@ -727,7 +727,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Helper function that causes the widget to smoothly fade in.
 	/// </summary>
 
-	void AnimateColor (UIWidget widget)
+	protected virtual void AnimateColor (UIWidget widget)
 	{
 		Color c = widget.color;
 		widget.color = new Color(c.r, c.g, c.b, 0f);
@@ -738,7 +738,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Helper function that causes the widget to smoothly move into position.
 	/// </summary>
 
-	void AnimatePosition (UIWidget widget, bool placeAbove, float bottom)
+	protected virtual void AnimatePosition (UIWidget widget, bool placeAbove, float bottom)
 	{
 		Vector3 target = widget.cachedTransform.localPosition;
 		Vector3 start = placeAbove ? new Vector3(target.x, bottom, target.z) : new Vector3(target.x, 0f, target.z);
@@ -753,7 +753,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Helper function that causes the widget to smoothly grow until it reaches its original size.
 	/// </summary>
 
-	void AnimateScale (UIWidget widget, bool placeAbove, float bottom)
+	protected virtual void AnimateScale (UIWidget widget, bool placeAbove, float bottom)
 	{
 		GameObject go = widget.gameObject;
 		Transform t = widget.cachedTransform;
@@ -784,7 +784,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Display the drop-down list when the game object gets clicked on.
 	/// </summary>
 
-	void OnClick()
+	protected virtual void OnClick ()
 	{
 		if (mOpenFrame == Time.frameCount) return;
 
@@ -804,7 +804,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Show the popup list on double-click.
 	/// </summary>
 
-	void OnDoubleClick () { if (openOn == OpenOn.DoubleClick) Show(); }
+	protected virtual void OnDoubleClick () { if (openOn == OpenOn.DoubleClick) Show(); }
 
 	/// <summary>
 	/// Used to keep an eye on the selected object, closing the popup if it changes.
@@ -830,7 +830,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Show the popup list dialog.
 	/// </summary>
 
-	public void Show ()
+	public virtual void Show ()
 	{
 		if (enabled && NGUITools.GetActive(gameObject) && mChild == null && atlas != null && isValid && items.Count > 0)
 		{

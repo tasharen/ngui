@@ -1042,9 +1042,9 @@ public class UIWidget : UIRect
 	/// Remember whether we're in play mode.
 	/// </summary>
 
-	protected virtual void Awake ()
+	protected override void Awake ()
 	{
-		mGo = gameObject;
+		base.Awake();
 		mPlayMode = Application.isPlaying;
 	}
 
