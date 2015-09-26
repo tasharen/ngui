@@ -1029,7 +1029,7 @@ public class UIPanel : UIRect
 	{
 		int fc = Time.frameCount;
 
-		if (mTrans.hasChanged)
+		if (cachedTransform.hasChanged)
 		{
 			mTrans.hasChanged = false;
 			mMatrixFrame = -1;
@@ -1038,7 +1038,7 @@ public class UIPanel : UIRect
 		if (mMatrixFrame != fc)
 		{
 			mMatrixFrame = fc;
-			worldToLocal = cachedTransform.worldToLocalMatrix;
+			worldToLocal = mTrans.worldToLocalMatrix;
 
 			Vector2 size = GetViewSize() * 0.5f;
 
