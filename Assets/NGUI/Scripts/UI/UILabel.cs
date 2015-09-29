@@ -969,15 +969,18 @@ public class UILabel : UIWidget
 					lbl.RemoveFromPanel();
 					lbl.CreatePanel();
 
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_5_0 || UNITY_5_1
 					if (mTempPanelList == null)
 						mTempPanelList = new List<UIPanel>();
 
 					if (!mTempPanelList.Contains(lbl.panel))
 						mTempPanelList.Add(lbl.panel);
+#endif
 				}
 			}
 		}
 
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_5_0 || UNITY_5_1
 		if (mTempPanelList != null)
 		{
 			for (int i = 0, imax = mTempPanelList.Count; i < imax; ++i)
@@ -987,9 +990,12 @@ public class UILabel : UIWidget
 			}
 			mTempPanelList.Clear();
 		}
+#endif
 	}
 
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_5_0 || UNITY_5_1
 	static List<UIPanel> mTempPanelList;
+#endif
 
 	/// <summary>
 	/// Get the sides of the rectangle relative to the specified transform.
