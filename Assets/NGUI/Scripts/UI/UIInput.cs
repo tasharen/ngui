@@ -232,6 +232,24 @@ public class UIInput : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Text's default color when not selected.
+	/// </summary>
+
+	public Color defaultColor
+	{
+		get
+		{
+			if (mDoInit) Init();
+			return mDefaultColor;
+		}
+		set
+		{
+			mDefaultColor = value;
+			if (!isSelected) label.color = value;
+		}
+	}
+
+	/// <summary>
 	/// Should the input be hidden?
 	/// </summary>
 
@@ -771,14 +789,17 @@ public class UIInput : MonoBehaviour
 		// Having this in OnGUI causes issues because Input.inputString gets updated *after* OnGUI, apparently...
 		if (mCam != null)
 		{
+			bool newLine = false;
+
+			if (label.multiLine)
+			{
+				bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+				if (onReturnKey == OnReturnKey.Submit) newLine = ctrl;
+				else newLine = !ctrl;
+			}
+
 			if (UICamera.GetKeyDown(mCam.submitKey0))
 			{
-				bool newLine = (onReturnKey == OnReturnKey.NewLine) ||
-					(onReturnKey == OnReturnKey.Default &&
-					label.multiLine && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl) &&
-					label.overflowMethod != UILabel.Overflow.ClampContent &&
-					validation == Validation.None);
-
 				if (newLine)
 				{
 					Insert("\n");
@@ -794,12 +815,6 @@ public class UIInput : MonoBehaviour
 
 			if (UICamera.GetKeyDown(mCam.submitKey1))
 			{
-				bool newLine = (onReturnKey == OnReturnKey.NewLine) ||
-					(onReturnKey == OnReturnKey.Default &&
-					label.multiLine && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.RightControl) &&
-					label.overflowMethod != UILabel.Overflow.ClampContent &&
-					validation == Validation.None);
-
 				if (newLine)
 				{
 					Insert("\n");

@@ -1372,7 +1372,7 @@ public class UIPanel : UIRect
 	/// Fill the geometry for the specified draw call.
 	/// </summary>
 
-	bool FillDrawCall (UIDrawCall dc)
+	public bool FillDrawCall (UIDrawCall dc)
 	{
 		if (dc != null)
 		{
@@ -1715,8 +1715,6 @@ public class UIPanel : UIRect
 		mUpdateFrame = -1;
 		if (list.Count > 0) list[0].LateUpdate();
 	}
-
-	
 
 	/// <summary>
 	/// Calculate the offset needed to be constrained within the panel's bounds.

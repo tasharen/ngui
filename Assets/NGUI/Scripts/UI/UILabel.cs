@@ -966,36 +966,32 @@ public class UILabel : UIWidget
 				if (fnt == font)
 				{
 					fnt.RequestCharactersInTexture(lbl.mText, lbl.mFinalFontSize, lbl.mFontStyle);
-					lbl.RemoveFromPanel();
-					lbl.CreatePanel();
+					lbl.MarkAsChanged();
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_5_0 || UNITY_5_1
-					if (mTempPanelList == null)
-						mTempPanelList = new List<UIPanel>();
+					if (lbl.panel == null)
+						lbl.CreatePanel();
 
-					if (!mTempPanelList.Contains(lbl.panel))
-						mTempPanelList.Add(lbl.panel);
-#endif
+					if (mTempDrawcalls == null)
+						mTempDrawcalls = new List<UIDrawCall>();
+
+					if (lbl.drawCall != null && !mTempDrawcalls.Contains(lbl.drawCall))
+						mTempDrawcalls.Add(lbl.drawCall);
 				}
 			}
 		}
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_5_0 || UNITY_5_1
-		if (mTempPanelList != null)
+		if (mTempDrawcalls != null)
 		{
-			for (int i = 0, imax = mTempPanelList.Count; i < imax; ++i)
+			for (int i = 0, imax = mTempDrawcalls.Count; i < imax; ++i)
 			{
-				UIPanel p = mTempPanelList[i];
-				p.Refresh();
+				UIDrawCall dc = mTempDrawcalls[i];
+				if (dc.panel != null) dc.panel.FillDrawCall(dc);
 			}
-			mTempPanelList.Clear();
+			mTempDrawcalls.Clear();
 		}
-#endif
 	}
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_5_0 || UNITY_5_1
-	static List<UIPanel> mTempPanelList;
-#endif
+	static List<UIDrawCall> mTempDrawcalls;
 
 	/// <summary>
 	/// Get the sides of the rectangle relative to the specified transform.
