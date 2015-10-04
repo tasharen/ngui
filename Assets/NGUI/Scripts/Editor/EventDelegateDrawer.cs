@@ -83,7 +83,6 @@ public class EventDelegateDrawer : PropertyDrawer
 		{
 			GameObject go = target.gameObject;
 			List<Entry> list = EventDelegateEditor.GetMethods(go);
-			list.Sort(delegate(Entry a, Entry b) { return a.name.CompareTo(b.name); });
 
 			int index = 0;
 			int choice = 0;

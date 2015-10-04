@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2015 Tasharen Entertainment
-            Version 3.9.3
+            Version 3.9.4
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,11 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.9.4
+- FIX: Work-around for a bug in Unity crashing when dynamic fonts are used (Unity also fixed it in 5.2.1p2).
+- FIX: Fix for caret appearing in the wrong place for a split second when typing past the end of the label.
+- FIX: Multi-line UIInput will now do a submit via Ctrl+Return by default.
 
 3.9.3
 - NEW: Toggle is now capable of triggering tweens in addition to animations.
