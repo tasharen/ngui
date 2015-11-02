@@ -283,8 +283,7 @@ public abstract class UIBasicSprite : UIWidget
 	/// <summary>
 	/// Final widget's color passed to the draw buffer.
 	/// </summary>
-
-	Color32 drawingColor
+	protected Color32 drawingColor
 	{
 		get
 		{
@@ -297,7 +296,6 @@ public abstract class UIBasicSprite : UIWidget
 				colF.r = Mathf.GammaToLinearSpace(colF.r);
 				colF.g = Mathf.GammaToLinearSpace(colF.g);
 				colF.b = Mathf.GammaToLinearSpace(colF.b);
-				colF.a = Mathf.GammaToLinearSpace(colF.a);
 			}
 			return colF;
 		}
@@ -344,7 +342,6 @@ public abstract class UIBasicSprite : UIWidget
 	{
 		Vector4 v = drawingDimensions;
 		Vector4 u = drawingUVs;
-		Color32 c = drawingColor;
 
 		verts.Add(new Vector3(v.x, v.y));
 		verts.Add(new Vector3(v.x, v.w));
@@ -356,10 +353,10 @@ public abstract class UIBasicSprite : UIWidget
 		uvs.Add(new Vector2(u.z, u.w));
 		uvs.Add(new Vector2(u.z, u.y));
 
-		cols.Add(c);
-		cols.Add(c);
-		cols.Add(c);
-		cols.Add(c);
+		AddVertexColours(cols, 1, 1);
+		AddVertexColours(cols, 1, 2);
+		AddVertexColours(cols, 2, 2);
+		AddVertexColours(cols, 2, 1);
 	}
 
 	/// <summary>
@@ -376,7 +373,6 @@ public abstract class UIBasicSprite : UIWidget
 			return;
 		}
 
-		Color32 c = drawingColor;
 		Vector4 v = drawingDimensions;
 
 		mTempPos[0].x = v.x;
@@ -446,12 +442,21 @@ public abstract class UIBasicSprite : UIWidget
 				uvs.Add(new Vector2(mTempUVs[x2].x, mTempUVs[y2].y));
 				uvs.Add(new Vector2(mTempUVs[x2].x, mTempUVs[y].y));
 
-				cols.Add(c);
-				cols.Add(c);
-				cols.Add(c);
-				cols.Add(c);
+				AddVertexColours(cols, x, y);
+				AddVertexColours(cols, x, y2);
+				AddVertexColours(cols, x2, y2);
+				AddVertexColours(cols, x2, y);
 			}
 		}
+	}
+	
+	/// <summary>
+	/// Adds vertex color to the sprite.
+	/// </summary>
+	
+	protected virtual void AddVertexColours(BetterList<Color32> cols, int x, int y)
+	{
+		cols.Add(drawingColor);
 	}
 
 	/// <summary>
