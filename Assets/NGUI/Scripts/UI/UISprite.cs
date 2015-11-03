@@ -4,7 +4,6 @@
 //----------------------------------------------
 
 using UnityEngine;
-using System.Collections.Generic;
 
 /// <summary>
 /// Sprite is a textured element in the UI hierarchy.
@@ -17,6 +16,11 @@ public class UISprite : UIBasicSprite
 	// Cached and saved values
 	[HideInInspector][SerializeField] UIAtlas mAtlas;
 	[HideInInspector][SerializeField] string mSpriteName;
+
+	[HideInInspector][SerializeField] bool mApplyGradient = false;
+	[HideInInspector][SerializeField] Color mGradientTop = Color.white;
+	[HideInInspector][SerializeField] Color mGradientBottom = new Color(0.7f, 0.7f, 0.7f);
+
 
 	// Deprecated, no longer used
 	[HideInInspector][SerializeField] bool mFillCenter = true;
@@ -129,6 +133,66 @@ public class UISprite : UIBasicSprite
 			{
 				centerType = value ? AdvancedType.Sliced : AdvancedType.Invisible;
 				MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Whether a gradient will be applied.
+	/// </summary>
+
+	public bool applyGradient
+	{
+		get
+		{
+			return mApplyGradient;
+		}
+		set
+		{
+			if (mApplyGradient != value)
+			{
+				mApplyGradient = value;
+				MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Top gradient color.
+	/// </summary>
+
+	public Color gradientTop
+	{
+		get
+		{
+			return mGradientTop;
+		}
+		set
+		{
+			if (mGradientTop != value)
+			{
+				mGradientTop = value;
+				if (mApplyGradient) MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Bottom gradient color.
+	/// </summary>
+
+	public Color gradientBottom
+	{
+		get
+		{
+			return mGradientBottom;
+		}
+		set
+		{
+			if (mGradientBottom != value)
+			{
+				mGradientBottom = value;
+				if (mApplyGradient) MarkAsChanged();
 			}
 		}
 	}
@@ -438,5 +502,24 @@ public class UISprite : UIBasicSprite
 
 		if (onPostFill != null)
 			onPostFill(this, offset, verts, uvs, cols);
+	}
+
+	protected override void AddVertexColours(BetterList<Color32> cols, int x, int y)
+	{
+		if (mApplyGradient)
+		{
+			if (y == 0 || y == 1)
+			{
+				cols.Add(drawingColor * mGradientBottom);
+			}
+			else if (y == 2 || y == 3)
+			{
+				cols.Add(drawingColor * mGradientTop);
+			}
+		}
+		else
+		{
+			base.AddVertexColours(cols, x, y);
+		}
 	}
 }

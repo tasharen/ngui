@@ -3,9 +3,8 @@
 // Copyright © 2011-2015 Tasharen Entertainment
 //----------------------------------------------
 
-using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// Inspector class used to edit UISprites.
