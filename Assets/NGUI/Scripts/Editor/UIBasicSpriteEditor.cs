@@ -74,33 +74,26 @@ public class UIBasicSpriteEditor : UIWidgetInspector
 			NGUIEditorTools.DrawProperty("Flip", serializedObject, "mFlip");
 		}
 		
-		if (type == UIBasicSprite.Type.Simple || type == UIBasicSprite.Type.Sliced) //gradients get too complicated for tiled and filled.
+		if (type == UIBasicSprite.Type.Simple || type == UIBasicSprite.Type.Sliced) // Gradients get too complicated for tiled and filled.
 		{
 			GUILayout.BeginHorizontal();
 			SerializedProperty gr = NGUIEditorTools.DrawProperty("Gradient", serializedObject, "mApplyGradient", GUILayout.Width(95f));
+
 			EditorGUI.BeginDisabledGroup(!gr.hasMultipleDifferentValues && !gr.boolValue);
 			{
 				NGUIEditorTools.SetLabelWidth(30f);
-				NGUIEditorTools.DrawProperty("Top", serializedObject, "mGradientTop", GUILayout.MinWidth(40f));
+				serializedObject.DrawProperty("mGradientTop", "Top", GUILayout.MinWidth(40f));
 				GUILayout.EndHorizontal();
 				GUILayout.BeginHorizontal();
 				NGUIEditorTools.SetLabelWidth(50f);
 				GUILayout.Space(79f);
 
-				NGUIEditorTools.DrawProperty("Bottom", serializedObject, "mGradientBottom", GUILayout.MinWidth(40f));
+				serializedObject.DrawProperty("mGradientBottom", "Bottom", GUILayout.MinWidth(40f));
 				NGUIEditorTools.SetLabelWidth(80f);
 			}
 			EditorGUI.EndDisabledGroup();
 			GUILayout.EndHorizontal();
 		}
-		//GUI.changed = false;
-		//Vector4 draw = EditorGUILayout.Vector4Field("Draw Region", mWidget.drawRegion);
-
-		//if (GUI.changed)
-		//{
-		//    NGUIEditorTools.RegisterUndo("Draw Region", mWidget);
-		//    mWidget.drawRegion = draw;
-		//}
 		base.DrawCustomProperties();
 	}
 }

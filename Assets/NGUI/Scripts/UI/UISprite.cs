@@ -17,11 +17,6 @@ public class UISprite : UIBasicSprite
 	[HideInInspector][SerializeField] UIAtlas mAtlas;
 	[HideInInspector][SerializeField] string mSpriteName;
 
-	[HideInInspector][SerializeField] bool mApplyGradient = false;
-	[HideInInspector][SerializeField] Color mGradientTop = Color.white;
-	[HideInInspector][SerializeField] Color mGradientBottom = new Color(0.7f, 0.7f, 0.7f);
-
-
 	// Deprecated, no longer used
 	[HideInInspector][SerializeField] bool mFillCenter = true;
 
@@ -502,24 +497,5 @@ public class UISprite : UIBasicSprite
 
 		if (onPostFill != null)
 			onPostFill(this, offset, verts, uvs, cols);
-	}
-
-	protected override void AddVertexColours(BetterList<Color32> cols, int x, int y)
-	{
-		if (mApplyGradient)
-		{
-			if (y == 0 || y == 1)
-			{
-				cols.Add(drawingColor * mGradientBottom);
-			}
-			else if (y == 2 || y == 3)
-			{
-				cols.Add(drawingColor * mGradientTop);
-			}
-		}
-		else
-		{
-			base.AddVertexColours(cols, x, y);
-		}
 	}
 }
