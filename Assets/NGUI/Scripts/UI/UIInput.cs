@@ -798,7 +798,7 @@ public class UIInput : MonoBehaviour
 				else newLine = !ctrl;
 			}
 
-			if (UICamera.GetKeyDown(mCam.submitKey0))
+			if (UICamera.GetKeyDown(mCam.submitKey0) || (mCam.submitKey0 == KeyCode.Return && UICamera.GetKeyDown(KeyCode.KeypadEnter)))
 			{
 				if (newLine)
 				{
@@ -813,7 +813,7 @@ public class UIInput : MonoBehaviour
 				}
 			}
 
-			if (UICamera.GetKeyDown(mCam.submitKey1))
+			if (UICamera.GetKeyDown(mCam.submitKey1) || (mCam.submitKey1 == KeyCode.Return && UICamera.GetKeyDown(KeyCode.KeypadEnter)))
 			{
 				if (newLine)
 				{

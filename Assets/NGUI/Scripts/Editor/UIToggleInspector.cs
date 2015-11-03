@@ -50,6 +50,7 @@ public class UIToggleInspector : UIWidgetContainerEditor
 			if (sprite.objectReferenceValue != null)
 			{
 				NGUIEditorTools.DrawProperty("Sprite", sprite, false);
+				serializedObject.DrawProperty("invertSpriteState");
 			}
 			else if (animator.objectReferenceValue != null)
 			{

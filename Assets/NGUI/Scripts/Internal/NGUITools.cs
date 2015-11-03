@@ -931,6 +931,8 @@ static public class NGUITools
 		}
 	}
 
+	static Dictionary<System.Type, string> mTypeNames = new Dictionary<Type, string>();
+
 	/// <summary>
 	/// Add a child object to the specified parent and attaches the specified script to it.
 	/// </summary>
@@ -938,7 +940,14 @@ static public class NGUITools
 	static public T AddChild<T> (GameObject parent) where T : Component
 	{
 		GameObject go = AddChild(parent);
-		go.name = GetTypeName<T>();
+		string name;
+
+		if (!mTypeNames.TryGetValue(typeof(T), out name) || name == null)
+		{
+			name = GetTypeName<T>();
+			mTypeNames[typeof(T)] = name;
+		}
+		go.name = name;
 		return go.AddComponent<T>();
 	}
 
@@ -949,7 +958,14 @@ static public class NGUITools
 	static public T AddChild<T> (GameObject parent, bool undo) where T : Component
 	{
 		GameObject go = AddChild(parent, undo);
-		go.name = GetTypeName<T>();
+		string name;
+
+		if (!mTypeNames.TryGetValue(typeof(T), out name) || name == null)
+		{
+			name = GetTypeName<T>();
+			mTypeNames[typeof(T)] = name;
+		}
+		go.name = name;
 		return go.AddComponent<T>();
 	}
 
