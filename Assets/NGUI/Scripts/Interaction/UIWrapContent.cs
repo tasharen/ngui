@@ -49,6 +49,12 @@ public class UIWrapContent : MonoBehaviour
 	public int maxIndex = 0;
 
 	/// <summary>
+	/// Whether hidden game objects will be ignored for the purpose of calculating bounds.
+	/// </summary>
+
+	public bool hideInactive = false;
+
+	/// <summary>
 	/// Callback that will be called every time an item needs to have its content updated.
 	/// The 'wrapIndex' is the index within the child list, and 'realIndex' is the index using position logic.
 	/// </summary>
@@ -92,7 +98,11 @@ public class UIWrapContent : MonoBehaviour
 		// Cache all children and place them in order
 		mChildren.Clear();
 		for (int i = 0; i < mTrans.childCount; ++i)
-			mChildren.Add(mTrans.GetChild(i));
+		{
+			Transform t = mTrans.GetChild(i);
+			if (hideInactive && !t.gameObject.activeInHierarchy) continue;
+			mChildren.Add(t);
+		}
 
 		// Sort the list of children so that they are in order
 		if (mHorizontal) mChildren.Sort(UIGrid.SortHorizontal);
@@ -112,7 +122,11 @@ public class UIWrapContent : MonoBehaviour
 		// Cache all children and place them in order
 		mChildren.Clear();
 		for (int i = 0; i < mTrans.childCount; ++i)
-			mChildren.Add(mTrans.GetChild(i));
+		{
+			Transform t = mTrans.GetChild(i);
+			if (hideInactive && !t.gameObject.activeInHierarchy) continue;
+			mChildren.Add(t);
+		}
 
 		// Sort the list of children so that they are in order
 		mChildren.Sort(UIGrid.SortByName);

@@ -6,6 +6,8 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
+using UnityEditorInternal;
+using System.Reflection;
 
 /// <summary>
 /// Editor class used to view panels.
@@ -457,6 +459,40 @@ public class UIPanelInspector : UIRectEditor
 			mPanel.clipping = clipping;
 			EditorUtility.SetDirty(mPanel);
 		}
+
+		// Contributed by Benzino07: http://www.tasharen.com/forum/index.php?topic=6956.15
+		GUILayout.BeginHorizontal();
+		{
+			EditorGUILayout.PrefixLabel("Sorting Layer");
+
+			// Get the names of the Sorting layers
+			System.Type internalEditorUtilityType = typeof(InternalEditorUtility);
+			PropertyInfo sortingLayersProperty = internalEditorUtilityType.GetProperty("sortingLayerNames", BindingFlags.Static | BindingFlags.NonPublic);
+			string[] names = (string[])sortingLayersProperty.GetValue(null, new object[0]);
+
+			int index = 0;
+			if (!string.IsNullOrEmpty(mPanel.sortingLayerName))
+			{
+				for (int i = 0; i < names.Length; i++)
+				{
+					if (mPanel.sortingLayerName == names[i])
+					{
+						index = i;
+						break;
+					}
+				}
+			}
+
+			// Get the selected index and update the panel sorting layer if it has changed
+			int selectedIndex = EditorGUILayout.Popup(index, names);
+
+			if (index != selectedIndex)
+			{
+				mPanel.sortingLayerName = names[selectedIndex];
+				EditorUtility.SetDirty(mPanel);
+			}
+		}
+		GUILayout.EndHorizontal();
 
 		if (mPanel.clipping != UIDrawCall.Clipping.None)
 		{

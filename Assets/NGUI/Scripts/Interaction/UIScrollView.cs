@@ -386,7 +386,7 @@ public class UIScrollView : MonoBehaviour
 		}
 	}
 
-	void OnDisable () { list.Remove(this); }
+	void OnDisable () { list.Remove(this); mPressed = false; }
 
 	/// <summary>
 	/// Restrict the scroll view's contents to be within the scroll view's bounds.

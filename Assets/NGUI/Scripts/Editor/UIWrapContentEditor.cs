@@ -49,6 +49,8 @@ public class UIWrapContentEditor : Editor
 		if (sp1.intValue == sp2.intValue) GUILayout.Label("unlimited");
 		GUILayout.EndHorizontal();
 
+		serializedObject.DrawProperty("hideInactive");
+
 		NGUIEditorTools.DrawProperty("Cull Content", serializedObject, "cullContent");
 
 		if (!string.IsNullOrEmpty(error))

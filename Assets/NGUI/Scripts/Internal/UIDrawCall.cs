@@ -128,6 +128,16 @@ public class UIDrawCall : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Renderer's sorting layer name, used with the Unity's 2D system.
+	/// </summary>
+
+	public string sortingLayerName
+	{
+		get { return (mRenderer != null) ? mRenderer.sortingLayerName : null; }
+		set { if (mRenderer != null && mRenderer.sortingLayerName != value) mRenderer.sortingLayerName = value; }
+	}
+
+	/// <summary>
 	/// Final render queue used to draw the draw call's geometry.
 	/// </summary>
 
