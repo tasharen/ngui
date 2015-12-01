@@ -348,7 +348,7 @@ public class UIDragDropItem : MonoBehaviour
 
 			// Re-enable the drag scroll view script
 			if (mDragScrollView != null)
-				StartCoroutine(EnableDragScrollView());
+				Invoke("EnableDragScrollView", 0.001f);
 
 			// Notify the widgets that the parent has changed
 			NGUITools.MarkParentAsChanged(gameObject);
@@ -373,9 +373,9 @@ public class UIDragDropItem : MonoBehaviour
 	/// Reason: http://www.tasharen.com/forum/index.php?topic=10203.0
 	/// </summary>
 
-	protected IEnumerator EnableDragScrollView ()
+	protected void EnableDragScrollView ()
 	{
-		yield return new WaitForEndOfFrame();
-		if (mDragScrollView != null) mDragScrollView.enabled = true;
+		if (mDragScrollView != null)
+			mDragScrollView.enabled = true;
 	}
 }

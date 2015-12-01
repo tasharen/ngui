@@ -78,6 +78,19 @@ public class UIDragScrollView : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Stop the active dragging operation.
+	/// </summary>
+
+	void OnDisable ()
+	{
+		if (mScroll != null)
+		{
+			mScroll.Press(false);
+			mScroll = null;
+		}
+	}
+
+	/// <summary>
 	/// Create a plane on which we will be performing the dragging.
 	/// </summary>
 
