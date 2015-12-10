@@ -471,13 +471,13 @@ static public class NGUITools
 	/// Add a new child game object.
 	/// </summary>
 
-	static public GameObject AddChild (GameObject parent) { return AddChild(parent, true); }
+	static public GameObject AddChild (this GameObject parent) { return AddChild(parent, true); }
 
 	/// <summary>
 	/// Add a new child game object.
 	/// </summary>
 
-	static public GameObject AddChild (GameObject parent, bool undo)
+	static public GameObject AddChild (this GameObject parent, bool undo)
 	{
 		GameObject go = new GameObject();
 #if UNITY_EDITOR
@@ -499,7 +499,7 @@ static public class NGUITools
 	/// Instantiate an object and add it to the specified parent.
 	/// </summary>
 
-	static public GameObject AddChild (GameObject parent, GameObject prefab)
+	static public GameObject AddChild (this GameObject parent, GameObject prefab)
 	{
 		GameObject go = GameObject.Instantiate(prefab) as GameObject;
 #if UNITY_EDITOR
@@ -921,7 +921,7 @@ static public class NGUITools
 	/// Helper function that recursively sets all children with widgets' game objects layers to the specified value.
 	/// </summary>
 
-	static public void SetChildLayer (Transform t, int layer)
+	static public void SetChildLayer (this Transform t, int layer)
 	{
 		for (int i = 0; i < t.childCount; ++i)
 		{
@@ -937,7 +937,7 @@ static public class NGUITools
 	/// Add a child object to the specified parent and attaches the specified script to it.
 	/// </summary>
 
-	static public T AddChild<T> (GameObject parent) where T : Component
+	static public T AddChild<T> (this GameObject parent) where T : Component
 	{
 		GameObject go = AddChild(parent);
 		string name;
@@ -955,7 +955,7 @@ static public class NGUITools
 	/// Add a child object to the specified parent and attaches the specified script to it.
 	/// </summary>
 
-	static public T AddChild<T> (GameObject parent, bool undo) where T : Component
+	static public T AddChild<T> (this GameObject parent, bool undo) where T : Component
 	{
 		GameObject go = AddChild(parent, undo);
 		string name;
@@ -973,7 +973,7 @@ static public class NGUITools
 	/// Add a new widget of specified type.
 	/// </summary>
 
-	static public T AddWidget<T> (GameObject go, int depth = int.MaxValue) where T : UIWidget
+	static public T AddWidget<T> (this GameObject go, int depth = int.MaxValue) where T : UIWidget
 	{
 		if (depth == int.MaxValue) depth = CalculateNextDepth(go);
 
@@ -990,7 +990,7 @@ static public class NGUITools
 	/// It will be sliced if the sprite has an inner rect, and a regular sprite otherwise.
 	/// </summary>
 
-	static public UISprite AddSprite (GameObject go, UIAtlas atlas, string spriteName, int depth = int.MaxValue)
+	static public UISprite AddSprite (this GameObject go, UIAtlas atlas, string spriteName, int depth = int.MaxValue)
 	{
 		UISpriteData sp = (atlas != null) ? atlas.GetSprite(spriteName) : null;
 		UISprite sprite = AddWidget<UISprite>(go, depth);
@@ -2114,5 +2114,65 @@ static public class NGUITools
 			case KeyCode.JoystickButton19: return "J19";
 		}
 		return null;
+	}
+
+	static Dictionary<string, UIWidget> mWidgets = new Dictionary<string, UIWidget>();
+	static UIPanel mRoot;
+	static GameObject mGo;
+
+	public delegate void OnInitFunc<T> (T w) where T : UIWidget;
+
+	/// <summary>
+	/// Immediately add a new widget to the screen or return an existing one that matches the specified ID.
+	/// The usage of this function is very similar to GUI.Draw in a sense that it can be used to quickly
+	/// show persistent widgets via code.
+	/// </summary>
+
+	static public T Draw<T> (string id, OnInitFunc<T> onInit = null) where T : UIWidget
+	{
+		UIWidget w;
+		if (mWidgets.TryGetValue(id, out w) && w) return (T)w;
+
+		if (mRoot == null)
+		{
+			UICamera baseCam = null;
+			UIRoot baseRoot = null;
+
+			for (int i = 0; i < UIRoot.list.Count; ++i)
+			{
+				UIRoot root = UIRoot.list[i];
+
+				if (root)
+				{
+					UICamera cam = UICamera.FindCameraForLayer(root.gameObject.layer);
+
+					if (cam && cam.cachedCamera.isOrthoGraphic)
+					{
+						baseCam = cam;
+						baseRoot = root;
+						break;
+					}
+				}
+			}
+
+			if (baseCam == null)
+			{
+				mRoot = NGUITools.CreateUI(false, LayerMask.NameToLayer("UI"));
+			}
+			else
+			{
+				mRoot = baseRoot.gameObject.AddChild<UIPanel>();
+			}
+
+			mRoot.depth = 100000;
+			mGo = mRoot.gameObject;
+			mGo.name = "Immediate Mode GUI";
+		}
+
+		w = mGo.AddWidget<T>();
+		w.name = id;
+		mWidgets[id] = w;
+		if (onInit != null) onInit((T)w);
+		return (T)w;
 	}
 }

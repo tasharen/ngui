@@ -211,6 +211,7 @@ public class UIInput : MonoBehaviour
 	[System.NonSerialized] protected string mCached = "";
 	[System.NonSerialized] protected int mSelectMe = -1;
 	[System.NonSerialized] protected int mSelectTime = -1;
+	[System.NonSerialized] protected bool mStarted = false;
 
 	/// <summary>
 	/// Default text used by the input's label.
@@ -321,7 +322,7 @@ public class UIInput : MonoBehaviour
 						mSelectionEnd = mSelectionStart;
 					}
 				}
-				else SaveToPlayerPrefs(value);
+				else if (mStarted) SaveToPlayerPrefs(value);
 
 				UpdateLabel();
 				ExecuteOnChange();
@@ -477,6 +478,7 @@ public class UIInput : MonoBehaviour
 
 		if (mLoadSavedValue && !string.IsNullOrEmpty(savedAs)) LoadValue();
 		else value = mValue.Replace("\\n", "\n");
+		mStarted = true;
 	}
 
 	/// <summary>

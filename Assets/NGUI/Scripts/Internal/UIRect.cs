@@ -613,6 +613,105 @@ public abstract class UIRect : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Anchor this rectangle to the specified transform.
+	/// </summary>
+
+	public void SetAnchor (GameObject go, float left, float bottom, float right, float top)
+	{
+		Transform t = (go != null) ? go.transform : null;
+
+		leftAnchor.target = t;
+		rightAnchor.target = t;
+		topAnchor.target = t;
+		bottomAnchor.target = t;
+
+		leftAnchor.relative = left;
+		rightAnchor.relative = right;
+		bottomAnchor.relative = bottom;
+		topAnchor.relative = top;
+
+		leftAnchor.absolute = 0;
+		rightAnchor.absolute = 0;
+		bottomAnchor.absolute = 0;
+		topAnchor.absolute = 0;
+
+		ResetAnchors();
+		UpdateAnchors();
+	}
+
+	/// <summary>
+	/// Anchor this rectangle to the specified transform.
+	/// </summary>
+
+	public void SetAnchor (GameObject go,
+		float left, int leftOffset,
+		float bottom, int bottomOffset,
+		float right, int rightOffset,
+		float top, int topOffset)
+	{
+		Transform t = (go != null) ? go.transform : null;
+
+		leftAnchor.target = t;
+		rightAnchor.target = t;
+		topAnchor.target = t;
+		bottomAnchor.target = t;
+
+		leftAnchor.relative = left;
+		rightAnchor.relative = right;
+		bottomAnchor.relative = bottom;
+		topAnchor.relative = top;
+
+		leftAnchor.absolute = leftOffset;
+		rightAnchor.absolute = rightOffset;
+		bottomAnchor.absolute = bottomOffset;
+		topAnchor.absolute = topOffset;
+
+		ResetAnchors();
+		UpdateAnchors();
+	}
+
+	/// <summary>
+	/// Anchor this rectangle to the specified transform.
+	/// </summary>
+
+	public void SetAnchor (
+		float left, int leftOffset,
+		float bottom, int bottomOffset,
+		float right, int rightOffset,
+		float top, int topOffset)
+	{
+		Transform t = cachedTransform.parent;
+
+		leftAnchor.target = t;
+		rightAnchor.target = t;
+		topAnchor.target = t;
+		bottomAnchor.target = t;
+
+		leftAnchor.relative = left;
+		rightAnchor.relative = right;
+		bottomAnchor.relative = bottom;
+		topAnchor.relative = top;
+
+		leftAnchor.absolute = leftOffset;
+		rightAnchor.absolute = rightOffset;
+		bottomAnchor.absolute = bottomOffset;
+		topAnchor.absolute = topOffset;
+
+		ResetAnchors();
+		UpdateAnchors();
+	}
+
+	/// <summary>
+	/// Set the rect of the widget to the specified X, Y, width and height, anchored to the top-left corner of the screen.
+	/// Convenience function for those familiar with GUI.Draw.
+	/// </summary>
+
+	public void SetScreenRect (int left, int top, int width, int height)
+	{
+		SetAnchor(0f, left, 1f, -top - height, 0f, left + width, 1f, -top);
+	}
+
+	/// <summary>
 	/// Ensure that all rect references are set correctly on the anchors.
 	/// </summary>
 
@@ -642,7 +741,7 @@ public abstract class UIRect : MonoBehaviour
 	public void ResetAndUpdateAnchors () { ResetAnchors(); UpdateAnchors(); }
 
 	/// <summary>
-	/// Set the rectangle manually.
+	/// Set the rectangle manually. XY is the bottom-left corner.
 	/// </summary>
 
 	public abstract void SetRect (float x, float y, float width, float height);

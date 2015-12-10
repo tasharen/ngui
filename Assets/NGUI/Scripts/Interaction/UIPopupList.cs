@@ -488,13 +488,15 @@ public class UIPopupList : UIWidgetContainer
 		}
 
 		// Automatically choose the first item
-		if (Application.isPlaying)
-		{
-			if (string.IsNullOrEmpty(mSelectedItem) && items.Count > 0)
-				mSelectedItem = items[0];
-			if (!string.IsNullOrEmpty(mSelectedItem))
-				TriggerCallbacks();
-		}
+		// Removed: This triggers callbacks, which messes with popup setting the input field's value,
+		// with input field set to auto-save its value.
+		//if (Application.isPlaying)
+		//{
+		//    if (string.IsNullOrEmpty(mSelectedItem) && items.Count > 0)
+		//        mSelectedItem = items[0];
+		//    if (!string.IsNullOrEmpty(mSelectedItem))
+		//        TriggerCallbacks();
+		//}
 	}
 
 	/// <summary>
