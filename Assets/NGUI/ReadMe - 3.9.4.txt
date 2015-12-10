@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2015 Tasharen Entertainment
-            Version 3.9.4
+            Version 3.9.5
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,23 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.9.6
+- NEW: Added NGUITools.Draw<T> function that can be used like GUI.Draw (just much more efficient).
+- NEW: NGUITools.AddChild is now an extension method (ie: gameObject.AddChild).
+- NEW: Added several new versions of UIRect.SetAnchor.
+- NEW: UIRect.SetScreenRect can be used to set the widget's screen rect to be anchored to top-left, identical to how GUI.Draw(rect) would work.
+- NEW: Added "hide inactive" option to UIWrapContent.
+- NEW: Added the sorting layer name option to UIPanel (contributed by Benzino07).
+- NEW: serializedObject.DrawProperty() convenience function(editor)
+- NEW: Localization.Set(language, key, text) to add individual localization entries.
+- NEW: Added sprite gradient support (contributed by Nicki).
+- FIX: NGUITools.AddChild<T>() now caches types, making it faster.
+- FIX: Num pad's Enter is now treated just like Return by UIInput.
+- FIX: Fixed a deprecation warning on Unity 4.6.8 and 4.6.9.
+- FIX: Tweener will no longer use delta time for the first frame of the animation.
+- FIX: Drag & drop should no longer prevent mouse wheel from scrolling the scroll view until the next click.
+- FIX: Fix for UISpriteAnimation freezing the game after extended time being minimized.
 
 3.9.4
 - FIX: Work-around for a bug in Unity crashing when dynamic fonts are used (Unity also fixed it in 5.2.1p2).
