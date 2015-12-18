@@ -90,8 +90,11 @@ internal class Unity5DynamicLabelWorkAround : UnityEditor.AssetModificationProce
 	static string[] OnWillSaveAssets (string[] paths)
 	{
 		// Older versions: UnityEditor.EditorApplication.currentScene
+#if UNITY_5_0 || UNITY_5_1 || UNITY_5_2
+		string current = UnityEditor.EditorApplication.currentScene;
+#else
 		string current = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().path;
-
+#endif
 		foreach (var path in paths)
 		{
 			if (path == current)
