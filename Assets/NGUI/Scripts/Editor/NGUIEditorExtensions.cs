@@ -83,15 +83,18 @@ public static class NGUIEditorExtensions
 	}
 }
 
-#if !UNITY_4_3 && !UNITY_4_5 && !UNITY_4_6
+#if !UNITY_4_3 && !UNITY_4_5 && !UNITY_4_6 && !UNITY_4_7
 // Unity 5 bug fix. Source: http://www.tasharen.com/forum/index.php?topic=13231.0
 internal class Unity5DynamicLabelWorkAround : UnityEditor.AssetModificationProcessor
 {
 	static string[] OnWillSaveAssets (string[] paths)
 	{
+		// Older versions: UnityEditor.EditorApplication.currentScene
+		string current = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().path;
+
 		foreach (var path in paths)
 		{
-			if (path == UnityEditor.EditorApplication.currentScene)
+			if (path == current)
 			{
 				UILabel[] labels = Object.FindObjectsOfType<UILabel>();
 				for (int i = 0, imax = labels.Length; i < imax; ++i) labels[i].MarkAsChanged();

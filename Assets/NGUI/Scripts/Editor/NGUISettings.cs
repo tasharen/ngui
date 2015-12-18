@@ -418,7 +418,7 @@ public class NGUISettings
 		set { SetString("NGUI Chars", value); }
 	}
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 	static public string pathToFreeType
 	{
 		get

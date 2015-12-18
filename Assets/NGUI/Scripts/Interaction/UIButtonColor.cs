@@ -124,7 +124,7 @@ public class UIButtonColor : UIWidgetContainer
 		}
 		else if (tweenTarget != null)
 		{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			Renderer ren = tweenTarget.renderer;
 #else
 			Renderer ren = tweenTarget.GetComponent<Renderer>();
@@ -136,7 +136,7 @@ public class UIButtonColor : UIWidgetContainer
 			}
 			else
 			{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 				Light lt = tweenTarget.light;
 #else
 				Light lt = tweenTarget.GetComponent<Light>();

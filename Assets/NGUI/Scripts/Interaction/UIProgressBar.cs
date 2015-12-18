@@ -161,7 +161,7 @@ public class UIProgressBar : UIWidgetContainer
 		}
 		set
 		{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			if (mFG != null)
 			{
 				mFG.alpha = value;

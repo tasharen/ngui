@@ -84,7 +84,7 @@ public class UIStretch : MonoBehaviour
 
 	void Awake ()
 	{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 		mAnim = animation;
 #else
 		mAnim = GetComponent<Animation>();

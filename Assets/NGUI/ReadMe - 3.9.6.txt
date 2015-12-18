@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2015 Tasharen Entertainment
-            Version 3.9.5
+            Version 3.9.6
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -71,6 +71,7 @@ and it will not be included in the build of your game. It's only used in the edi
 - FIX: Tweener will no longer use delta time for the first frame of the animation.
 - FIX: Drag & drop should no longer prevent mouse wheel from scrolling the scroll view until the next click.
 - FIX: Fix for UISpriteAnimation freezing the game after extended time being minimized.
+- FIX: Fixed compilation warnings in Unity 5.3.
 
 3.9.4
 - FIX: Work-around for a bug in Unity crashing when dynamic fonts are used (Unity also fixed it in 5.2.1p2).

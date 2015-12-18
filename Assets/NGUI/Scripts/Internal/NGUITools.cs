@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2015 Tasharen Entertainment
+// Copyright Â© 2011-2015 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -115,7 +115,7 @@ static public class NGUITools
 
 			if (mListener != null && mListener.enabled && NGUITools.GetActive(mListener.gameObject))
 			{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 				AudioSource source = mListener.audio;
 #else
 				AudioSource source = mListener.GetComponent<AudioSource>();
@@ -390,7 +390,7 @@ static public class NGUITools
 			if (w != null)
 			{
 				Vector3[] corners = w.localCorners;
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 				box.center = Vector3.Lerp(corners[0], corners[2], 0.5f);
 #else
 				box.offset = Vector3.Lerp(corners[0], corners[2], 0.5f);
@@ -400,7 +400,7 @@ static public class NGUITools
 			else
 			{
 				Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 				box.center = b.center;
 #else
 				box.offset = b.center;
@@ -570,7 +570,7 @@ static public class NGUITools
 			for (int i = 0, imax = widgets.Length; i < imax; ++i)
 			{
 				UIWidget w = widgets[i];
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 				if (w.cachedGameObject != go && (w.collider != null || w.GetComponent<Collider2D>() != null)) continue;
 #else
 				if (w.cachedGameObject != go && (w.GetComponent<Collider>() != null || w.GetComponent<Collider2D>() != null)) continue;
@@ -799,7 +799,7 @@ static public class NGUITools
 		{
 			UICamera cam = root.GetComponentInChildren<UICamera>();
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			if (cam != null && cam.camera.isOrthoGraphic == advanced3D)
 #else
 			if (cam != null && cam.GetComponent<Camera>().orthographic == advanced3D)
@@ -1487,12 +1487,20 @@ static public class NGUITools
 		{
 			TextEditor te = new TextEditor();
 			te.Paste();
+#if UNITY_4_6 || UNITY_4_7
 			return te.content.text;
+#else
+			return te.text;
+#endif
 		}
 		set
 		{
 			TextEditor te = new TextEditor();
+#if UNITY_4_6 || UNITY_4_7
 			te.content = new GUIContent(value);
+#else
+			te.text = value;
+#endif
 			te.OnFocus();
 			te.Copy();
 		}
@@ -1570,7 +1578,7 @@ static public class NGUITools
 
 	static public Vector3[] GetSides (this Camera cam, float depth, Transform relativeTo)
 	{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 		if (cam.isOrthoGraphic)
 #else
 		if (cam.orthographic)
@@ -1656,7 +1664,7 @@ static public class NGUITools
 
 	static public Vector3[] GetWorldCorners (this Camera cam, float depth, Transform relativeTo)
 	{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 		if (cam.isOrthoGraphic)
 #else
 		if (cam.orthographic)
@@ -2146,7 +2154,7 @@ static public class NGUITools
 				{
 					UICamera cam = UICamera.FindCameraForLayer(root.gameObject.layer);
 
-					if (cam && cam.cachedCamera.isOrthoGraphic)
+					if (cam && cam.cachedCamera.orthographic)
 					{
 						baseCam = cam;
 						baseRoot = root;

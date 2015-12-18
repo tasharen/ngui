@@ -119,7 +119,7 @@ public abstract class UIRect : MonoBehaviour
 			if (target != null)
 			{
 				if (rect != null) return rect.GetSides(relativeTo);
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 				if (target.camera != null) return target.camera.GetSides(relativeTo);
 #else
 				if (target.GetComponent<Camera>() != null) return target.GetComponent<Camera>().GetSides(relativeTo);
@@ -312,7 +312,7 @@ public abstract class UIRect : MonoBehaviour
 		{
 			if (anchorCamera == null) return 0f;
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			if (!mCam.isOrthoGraphic)
 #else
 			if (!mCam.orthographic)

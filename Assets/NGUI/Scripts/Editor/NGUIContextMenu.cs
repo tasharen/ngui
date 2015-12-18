@@ -327,7 +327,7 @@ public static class NGUIContextMenu
 					NGUIContextMenu.AddSeparator("Attach/");
 				}
 			}
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			else if (target.collider == null && target.GetComponent<Collider2D>() == null)
 #else
 			else if (target.GetComponent<Collider>() == null && target.GetComponent<Collider2D>() == null)
@@ -349,7 +349,7 @@ public static class NGUIContextMenu
 				}
 			}
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			if (target.collider != null || target.GetComponent<Collider2D>() != null)
 #else
 			if (target.GetComponent<Collider>() != null || target.GetComponent<Collider2D>() != null)
