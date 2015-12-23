@@ -1968,7 +1968,6 @@ public class UICamera : MonoBehaviour
 
 			bool pressed = (phase == TouchPhase.Began) || currentTouch.touchBegan;
 			bool unpressed = (phase == TouchPhase.Canceled) || (phase == TouchPhase.Ended);
-			currentTouch.touchBegan = false;
 			currentTouch.delta = position - currentTouch.pos;
 			currentTouch.pos = position;
 			currentKey = KeyCode.None;
@@ -1989,6 +1988,7 @@ public class UICamera : MonoBehaviour
 			// If the touch has ended, remove it from the list
 			if (unpressed) RemoveTouch(currentTouchID);
 
+			currentTouch.touchBegan = false;
 			currentTouch.last = null;
 			currentTouch = null;
 

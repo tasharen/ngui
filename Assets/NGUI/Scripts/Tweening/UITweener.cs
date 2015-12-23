@@ -168,9 +168,9 @@ public abstract class UITweener : MonoBehaviour
 
 		if (!mStarted)
 		{
-			delay = 0;
+			delta = 0;
 			mStarted = true;
-			mStartTime = time;
+			mStartTime = time + delay;
 		}
 
 		if (time < mStartTime) return;

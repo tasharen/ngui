@@ -186,16 +186,19 @@ public class UIButtonColor : UIWidgetContainer
 #if UNITY_EDITOR
 		if (!Application.isPlaying) return;
 #endif
-		if (mInitDone && tweenTarget != null)
+		if (mInitDone && mState != State.Normal)
 		{
 			SetState(State.Normal, true);
 
-			TweenColor tc = tweenTarget.GetComponent<TweenColor>();
-
-			if (tc != null)
+			if (tweenTarget != null)
 			{
-				tc.value = mDefaultColor;
-				tc.enabled = false;
+				TweenColor tc = tweenTarget.GetComponent<TweenColor>();
+
+				if (tc != null)
+				{
+					tc.value = mDefaultColor;
+					tc.enabled = false;
+				}
 			}
 		}
 	}

@@ -1487,7 +1487,7 @@ static public class NGUITools
 		{
 			TextEditor te = new TextEditor();
 			te.Paste();
-#if UNITY_4_6 || UNITY_4_7
+#if UNITY_4_6 || UNITY_4_7 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
 			return te.content.text;
 #else
 			return te.text;
@@ -1496,7 +1496,7 @@ static public class NGUITools
 		set
 		{
 			TextEditor te = new TextEditor();
-#if UNITY_4_6 || UNITY_4_7
+#if UNITY_4_6 || UNITY_4_7 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
 			te.content = new GUIContent(value);
 #else
 			te.text = value;
