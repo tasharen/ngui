@@ -1,6 +1,6 @@
 //----------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2015 Tasharen Entertainment
+// Copyright © 2011-2016 Tasharen Entertainment
 //----------------------------------------------
 
 using UnityEngine;
@@ -792,7 +792,7 @@ public class UIScrollView : MonoBehaviour
 
 	public void Drag ()
 	{
-		if (UICamera.currentScheme == UICamera.ControlScheme.Controller) return;
+		if (!mPressed || UICamera.currentScheme == UICamera.ControlScheme.Controller) return;
 
 		if (enabled && NGUITools.GetActive(gameObject) && mShouldMove)
 		{
@@ -869,12 +869,12 @@ public class UIScrollView : MonoBehaviour
 				}
 
 				// We want to constrain the UI to be within bounds
-				if (restrictWithinPanel &&
-					mPanel.clipping != UIDrawCall.Clipping.None &&
-					dragEffect != DragEffect.MomentumAndSpring)
-				{
-					RestrictWithinBounds(true, canMoveHorizontally, canMoveVertically);
-				}
+				//if (restrictWithinPanel &&
+				//    mPanel.clipping != UIDrawCall.Clipping.None &&
+				//    dragEffect != DragEffect.MomentumAndSpring)
+				//{
+				//    RestrictWithinBounds(true, canMoveHorizontally, canMoveVertically);
+				//}
 			}
 		}
 	}
