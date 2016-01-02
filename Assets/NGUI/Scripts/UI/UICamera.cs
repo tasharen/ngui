@@ -133,25 +133,41 @@ public class UICamera : MonoBehaviour
 	/// GetKeyDown function -- return whether the specified key was pressed this Update().
 	/// </summary>
 
-	static public GetKeyStateFunc GetKeyDown = Input.GetKeyDown;
+	static public GetKeyStateFunc GetKeyDown = delegate(KeyCode key)
+	{
+		if (key >= KeyCode.JoystickButton0 && ignoreControllerInput) return false;
+		return Input.GetKeyDown(key);
+	};
 
 	/// <summary>
 	/// GetKeyDown function -- return whether the specified key was released this Update().
 	/// </summary>
 
-	static public GetKeyStateFunc GetKeyUp = Input.GetKeyUp;
+	static public GetKeyStateFunc GetKeyUp = delegate(KeyCode key)
+	{
+		if (key >= KeyCode.JoystickButton0 && ignoreControllerInput) return false;
+		return Input.GetKeyUp(key);
+	};
 
 	/// <summary>
 	/// GetKey function -- return whether the specified key is currently held.
 	/// </summary>
 
-	static public GetKeyStateFunc GetKey = Input.GetKey;
+	static public GetKeyStateFunc GetKey = delegate(KeyCode key)
+	{
+		if (key >= KeyCode.JoystickButton0 && ignoreControllerInput) return false;
+		return Input.GetKey(key);
+	};
 
 	/// <summary>
 	/// GetAxis function -- return the state of the specified axis.
 	/// </summary>
 
-	static public GetAxisFunc GetAxis = Input.GetAxis;
+	static public GetAxisFunc GetAxis = delegate(string axis)
+	{
+		if (ignoreControllerInput) return 0f;
+		return Input.GetAxis(axis);
+	};
 
 	/// <summary>
 	/// User-settable Input.anyKeyDown
@@ -357,6 +373,12 @@ public class UICamera : MonoBehaviour
 			mDisableController = value;
 		}
 	}
+
+	/// <summary>
+	/// If set to 'true', controller input will be flat-out ignored. Permanently, for all cameras.
+	/// </summary>
+
+	static public bool ignoreControllerInput = false;
 
 	static bool mDisableController = false;
 	static Vector2 mLastPos = Vector2.zero;
@@ -811,7 +833,7 @@ public class UICamera : MonoBehaviour
 
 			// Automatically update the object chosen by the controller
 			if (currentScheme == ControlScheme.Controller &&
-				UICamera.current != null && UICamera.current.useController &&
+				UICamera.current != null && (UICamera.current.useController && !ignoreControllerInput) &&
 				UIKeyNavigation.list.size > 0)
 			{
 				for (int i = 0; i < UIKeyNavigation.list.size; ++i)
@@ -1598,8 +1620,8 @@ public class UICamera : MonoBehaviour
 				string s = args[i];
 				if (s == "-noMouse") useMouse = false;
 				else if (s == "-noTouch") useTouch = false;
-				else if (s == "-noController") useController = false;
-				else if (s == "-noJoystick") useController = false;
+				else if (s == "-noController") { useController = false; ignoreControllerInput = true; }
+				else if (s == "-noJoystick") { useController = false; ignoreControllerInput = true; }
 				else if (s == "-useMouse") useMouse = true;
 				else if (s == "-useTouch") useTouch = true;
 				else if (s == "-useController") useController = true;
@@ -1660,13 +1682,13 @@ public class UICamera : MonoBehaviour
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
 			// Automatically disable controller-based input if the game starts with a non-zero controller input.
 			// This most commonly happens with Thrustmaster and other similar joystick types.
-			if (disableControllerCheck && useController && handlesEvents)
+			if (!ignoreControllerInput && disableControllerCheck && useController && handlesEvents)
 			{
 				disableControllerCheck = false;
-				if (!string.IsNullOrEmpty(horizontalAxisName) && Mathf.Abs(GetAxis(horizontalAxisName)) > 0.1f) useController = false;
-				else if (!string.IsNullOrEmpty(verticalAxisName) && Mathf.Abs(GetAxis(verticalAxisName)) > 0.1f) useController = false;
-				else if (!string.IsNullOrEmpty(horizontalPanAxisName) && Mathf.Abs(GetAxis(horizontalPanAxisName)) > 0.1f) useController = false;
-				else if (!string.IsNullOrEmpty(verticalPanAxisName) && Mathf.Abs(GetAxis(verticalPanAxisName)) > 0.1f) useController = false;
+				if (!string.IsNullOrEmpty(horizontalAxisName) && Mathf.Abs(GetAxis(horizontalAxisName)) > 0.1f) ignoreControllerInput = true;
+				else if (!string.IsNullOrEmpty(verticalAxisName) && Mathf.Abs(GetAxis(verticalAxisName)) > 0.1f) ignoreControllerInput = true;
+				else if (!string.IsNullOrEmpty(horizontalPanAxisName) && Mathf.Abs(GetAxis(horizontalPanAxisName)) > 0.1f) ignoreControllerInput = true;
+				else if (!string.IsNullOrEmpty(verticalPanAxisName) && Mathf.Abs(GetAxis(verticalPanAxisName)) > 0.1f) ignoreControllerInput = true;
 			}
 #endif
 		}
@@ -1699,7 +1721,7 @@ public class UICamera : MonoBehaviour
 		if (onCustomInput != null) onCustomInput();
 
 		// Update the keyboard and joystick events
-		if ((useKeyboard || useController) && !disableController) ProcessOthers();
+		if ((useKeyboard || useController) && !disableController && !ignoreControllerInput) ProcessOthers();
 
 		// If it's time to show a tooltip, inform the object we're hovering over
 		if (useMouse && mHover != null)
@@ -2114,7 +2136,7 @@ public class UICamera : MonoBehaviour
 		KeyCode lastKey = KeyCode.None;
 
 		// Handle controller events
-		if (useController)
+		if (useController && !ignoreControllerInput)
 		{
 			// Automatically choose the first available selection object
 			if (!disableController && currentScheme == ControlScheme.Controller && (currentTouch.current == null || !currentTouch.current.activeInHierarchy))
@@ -2187,7 +2209,7 @@ public class UICamera : MonoBehaviour
 				if (!GetKeyDown(key)) continue;
 
 				if (!useKeyboard && key < KeyCode.Mouse0) continue;
-				if (!useController && key >= KeyCode.JoystickButton0) continue;
+				if ((!useController || ignoreControllerInput) && key >= KeyCode.JoystickButton0) continue;
 				if (!useMouse && (key >= KeyCode.Mouse0 || key <= KeyCode.Mouse6)) continue;
 
 				currentKey = key;
