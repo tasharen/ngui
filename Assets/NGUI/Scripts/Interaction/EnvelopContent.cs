@@ -6,11 +6,12 @@
 using UnityEngine;
 
 /// <summary>
-/// Example script that resizes the widget it's attached to in order to envelop the target content.
+/// This script is capable of resizing the widget it's attached to in order to
+/// completely envelop targeted UI content.
 /// </summary>
 
 [RequireComponent(typeof(UIWidget))]
-[AddComponentMenu("NGUI/Examples/Envelop Content")]
+[AddComponentMenu("NGUI/Interaction/Envelop Content")]
 public class EnvelopContent : MonoBehaviour
 {
 	public Transform targetRoot;
