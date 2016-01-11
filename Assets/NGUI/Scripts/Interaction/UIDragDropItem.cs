@@ -229,7 +229,8 @@ public class UIDragDropItem : MonoBehaviour
 	{
 		if (!interactable) return;
 		if (!mDragging || !enabled || mTouch != UICamera.currentTouch) return;
-		OnDragDropMove(delta * mRoot.pixelSizeAdjustment);
+		if (mRoot != null) OnDragDropMove(delta * mRoot.pixelSizeAdjustment);
+		else OnDragDropMove(delta);
 	}
 
 	/// <summary>

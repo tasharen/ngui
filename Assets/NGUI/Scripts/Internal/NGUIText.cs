@@ -349,7 +349,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public Color ParseColor (string text, int offset) { return ParseColor24(text, offset); }
+	static public Color ParseColor (string text, int offset = 0) { return ParseColor24(text, offset); }
 
 	/// <summary>
 	/// Parse a RrGgBb color encoded in the string.
@@ -357,7 +357,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public Color ParseColor24 (string text, int offset)
+	static public Color ParseColor24 (string text, int offset = 0)
 	{
 		int r = (NGUIMath.HexToDecimal(text[offset])     << 4) | NGUIMath.HexToDecimal(text[offset + 1]);
 		int g = (NGUIMath.HexToDecimal(text[offset + 2]) << 4) | NGUIMath.HexToDecimal(text[offset + 3]);
@@ -1597,6 +1597,9 @@ static public class NGUIText
 				x += (subscriptMode == 0) ? finalSpacingX + glyph.advance :
 					(finalSpacingX + glyph.advance) * sizeShrinkage;
 
+				// Subscript may cause pixels to no longer be aligned
+				if (subscriptMode != 0) x = Mathf.Round(x);
+
 				// No need to continue if this is a space character
 				if (IsSpace(ch)) continue;
 
@@ -2266,6 +2269,76 @@ static public class NGUIText
 			// Align the highlight
 			if (alignment != Alignment.Left && highlightOffset < highlight.size)
 				Align(highlight, highlightOffset, x - finalSpacingX);
+		}
+	}
+
+	/// <summary>
+	/// Replace the specified link.
+	/// </summary>
+
+	static public bool ReplaceLink (ref string text, ref int index, string prefix)
+	{
+		if (index == -1) return false;
+		index = text.IndexOf(prefix, index);
+		if (index == -1) return false;
+
+		int domainStart = index + prefix.Length;
+		int end = text.IndexOf(' ', domainStart);
+		if (end == -1) end = text.Length;
+
+		int domainEnd = text.IndexOfAny(new char[] { '/', ' ' }, domainStart);
+
+		if (domainEnd == -1 || domainEnd == domainStart)
+		{
+			index += 7;
+			return true;
+		}
+
+		string left = text.Substring(0, index);
+		string link = text.Substring(index, end - index);
+		string right = text.Substring(end);
+		string urlName = text.Substring(domainStart, domainEnd - domainStart);
+
+		text = left + "[url=" + link + "][u]" + urlName + "[/u][/url]";
+		index = text.Length;
+		text += right;
+		return true;
+	}
+
+	/// <summary>
+	/// Insert a hyperlink around the specified keyword.
+	/// </summary>
+
+	static public bool InsertHyperlink (ref string text, ref int index, string keyword, string link)
+	{
+		int patchStart = text.IndexOf(keyword, index, System.StringComparison.CurrentCultureIgnoreCase);
+		if (patchStart == -1) return false;
+
+		string left = text.Substring(0, patchStart);
+		string url = "[url=" + link + "][u]";
+		string middle = text.Substring(patchStart, keyword.Length) + "[/u][/url]";
+		string right = text.Substring(patchStart + keyword.Length);
+
+		text = left + url + middle;
+		index = text.Length;
+		text += right;
+		return true;
+	}
+
+	/// <summary>
+	/// Helper function that replaces links within text with clickable ones.
+	/// </summary>
+
+	static public void ReplaceLinks (ref string text)
+	{
+		for (int index = 0; index < text.Length; )
+		{
+			if (!ReplaceLink(ref text, ref index, "http://")) break;
+		}
+
+		for (int index = 0; index < text.Length; )
+		{
+			if (!ReplaceLink(ref text, ref index, "https://")) break;
 		}
 	}
 }

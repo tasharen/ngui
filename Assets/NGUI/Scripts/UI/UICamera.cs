@@ -596,11 +596,7 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			if (mInputFocus)
-			{
-				if (mSelected && mSelected.activeInHierarchy) return true;
-				mInputFocus = false;
-			}
+			if (mInputFocus && mSelected && mSelected.activeInHierarchy) return true;
 			return false;
 		}
 	}
