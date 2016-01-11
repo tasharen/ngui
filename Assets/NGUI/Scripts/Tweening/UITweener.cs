@@ -117,10 +117,12 @@ public abstract class UITweener : MonoBehaviour
 	{
 		get
 		{
+			if (duration == 0f) return 1000f;
+
 			if (mDuration != duration)
 			{
 				mDuration = duration;
-				mAmountPerDelta = Mathf.Abs((duration > 0f) ? 1f / duration : 1000f) * Mathf.Sign(mAmountPerDelta);
+				mAmountPerDelta = Mathf.Abs(1f / duration) * Mathf.Sign(mAmountPerDelta);
 			}
 			return mAmountPerDelta;
 		}
