@@ -178,7 +178,7 @@ public abstract class UITweener : MonoBehaviour
 		if (time < mStartTime) return;
 
 		// Advance the sampling factor
-		mFactor += amountPerDelta * delta;
+		mFactor += (duration == 0f) ? 1f : amountPerDelta * delta;
 
 		// Loop style simply resets the play factor after it exceeds 1.
 		if (style == Style.Loop)

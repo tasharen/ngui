@@ -68,6 +68,7 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] float mFloatSpacingX = 0;
 	[HideInInspector][SerializeField] float mFloatSpacingY = 0;
 	[HideInInspector][SerializeField] bool mOverflowEllipsis = false;
+	[HideInInspector][SerializeField] int mOverflowWidth = 0;
 
 	// Obsolete values
 	[HideInInspector][SerializeField] bool mShrinkToFit = false;
@@ -545,6 +546,27 @@ public class UILabel : UIWidget
 			if (mOverflowEllipsis != value)
 			{
 				mOverflowEllipsis = value;
+				MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Maximum width used when Resize Freely overflow type is enabled.
+	/// If the printed text exceeds this width, it will wrap onto the following line.
+	/// </summary>
+
+	public int overflowWidth
+	{
+		get
+		{
+			return mOverflowWidth;
+		}
+		set
+		{
+			if (mOverflowWidth != value)
+			{
+				mOverflowWidth = value;
 				MarkAsChanged();
 			}
 		}
@@ -1221,6 +1243,12 @@ public class UILabel : UIWidget
 		{
 			NGUIText.rectWidth = 1000000;
 			NGUIText.regionWidth = 1000000;
+
+			if (mOverflowWidth > 0)
+			{
+				NGUIText.rectWidth = Mathf.Min(NGUIText.rectWidth, mOverflowWidth);
+				NGUIText.regionWidth = Mathf.Min(NGUIText.regionWidth, mOverflowWidth);
+			}
 		}
 
 		if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)

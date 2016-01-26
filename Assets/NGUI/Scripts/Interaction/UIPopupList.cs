@@ -104,6 +104,18 @@ public class UIPopupList : UIWidgetContainer
 	public string highlightSprite;
 
 	/// <summary>
+	/// Name of the sprite used to create the popup's background.
+	/// </summary>
+
+	public Sprite background2DSprite;
+
+	/// <summary>
+	/// Name of the sprite used to highlight items.
+	/// </summary>
+
+	public Sprite highlight2DSprite;
+
+	/// <summary>
 	/// Popup list's display style.
 	/// </summary>
 
@@ -193,8 +205,8 @@ public class UIPopupList : UIWidgetContainer
 	// Currently selected item
 	[HideInInspector][SerializeField] protected string mSelectedItem;
 	[HideInInspector][SerializeField] protected UIPanel mPanel;
-	[HideInInspector][SerializeField] protected UISprite mBackground;
-	[HideInInspector][SerializeField] protected UISprite mHighlight;
+	[HideInInspector][SerializeField] protected UIBasicSprite mBackground;
+	[HideInInspector][SerializeField] protected UIBasicSprite mHighlight;
 	[HideInInspector][SerializeField] protected UILabel mHighlightedLabel = null;
 	[HideInInspector][SerializeField] protected List<UILabel> mLabelList = new List<UILabel>();
 	[HideInInspector][SerializeField] protected float mBgBorder = 0f;
@@ -230,23 +242,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Current selection.
 	/// </summary>
 
-	public virtual string value
-	{
-		get
-		{
-			return mSelectedItem;
-		}
-		set
-		{
-			mSelectedItem = value;
-			if (mSelectedItem == null) return;
-#if UNITY_EDITOR
-			if (!Application.isPlaying) return;
-#endif
-			if (mSelectedItem != null)
-				TriggerCallbacks();
-		}
-	}
+	public virtual string value { get { return mSelectedItem; } set { Set(value); } }
 
 	/// <summary>
 	/// Item data associated with the current selection.
@@ -296,6 +292,21 @@ public class UIPopupList : UIWidgetContainer
 	/// </summary>
 
 	float activeFontScale { get { return (trueTypeFont != null || bitmapFont == null) ? 1f : (float)fontSize / bitmapFont.defaultSize; } }
+
+	/// <summary>
+	/// Set the current selection.
+	/// </summary>
+
+	public void Set (string value, bool notify = true)
+	{
+		mSelectedItem = value;
+		if (mSelectedItem == null) return;
+#if UNITY_EDITOR
+		if (!Application.isPlaying) return;
+#endif
+		if (notify && mSelectedItem != null)
+			TriggerCallbacks();
+	}
 
 	/// <summary>
 	/// Clear the popup list's contents.
@@ -471,12 +482,17 @@ public class UIPopupList : UIWidgetContainer
 		}
 	}
 
+	[System.NonSerialized] protected bool mStarted = false;
+
 	/// <summary>
 	/// Send out the selection message on start.
 	/// </summary>
 
-	protected virtual void Start ()
+	public virtual void Start ()
 	{
+		if (mStarted) return;
+		mStarted = true;
+
 		// Auto-upgrade legacy functionality
 		if (textLabel != null)
 		{
@@ -515,9 +531,6 @@ public class UIPopupList : UIWidgetContainer
 		{
 			mHighlightedLabel = lbl;
 
-			UISpriteData sp = mHighlight.GetAtlasSprite();
-			if (sp == null) return;
-
 			Vector3 pos = GetHighlightPosition();
 
 			if (!instant && isAnimated)
@@ -541,12 +554,11 @@ public class UIPopupList : UIWidgetContainer
 	protected virtual Vector3 GetHighlightPosition ()
 	{
 		if (mHighlightedLabel == null || mHighlight == null) return Vector3.zero;
-		UISpriteData sp = mHighlight.GetAtlasSprite();
-		if (sp == null) return Vector3.zero;
-
-		float scaleFactor = atlas.pixelSize;
-		float offsetX = sp.borderLeft * scaleFactor;
-		float offsetY = sp.borderTop * scaleFactor;
+		
+		Vector4 border = mHighlight.border;
+		float scaleFactor = (atlas != null) ? atlas.pixelSize : 1f;
+		float offsetX = border.x * scaleFactor;
+		float offsetY = border.w * scaleFactor;
 		return mHighlightedLabel.cachedTransform.localPosition + new Vector3(-offsetX, offsetY, 1f);
 	}
 
@@ -834,7 +846,7 @@ public class UIPopupList : UIWidgetContainer
 
 	public virtual void Show ()
 	{
-		if (enabled && NGUITools.GetActive(gameObject) && mChild == null && atlas != null && isValid && items.Count > 0)
+		if (enabled && NGUITools.GetActive(gameObject) && mChild == null && isValid && items.Count > 0)
 		{
 			mLabelList.Clear();
 			StopCoroutine("CloseIfUnselected");
@@ -910,8 +922,18 @@ public class UIPopupList : UIWidgetContainer
 			t.localRotation = Quaternion.identity;
 			t.localScale = Vector3.one;
 
+			int depth = separatePanel ? 0 : NGUITools.CalculateNextDepth(mPanel.gameObject);
+
 			// Add a sprite for the background
-			mBackground = NGUITools.AddSprite(mChild, atlas, backgroundSprite, separatePanel ? 0 : NGUITools.CalculateNextDepth(mPanel.gameObject));
+			if (background2DSprite != null)
+			{
+				UI2DSprite sp2 = mChild.AddWidget<UI2DSprite>(depth);
+				sp2.sprite2D = background2DSprite;
+				mBackground = sp2;
+			}
+			else if (atlas != null) mBackground = NGUITools.AddSprite(mChild, atlas, backgroundSprite, depth);
+			else return;
+
 			mBackground.pivot = UIWidget.Pivot.TopLeft;
 			mBackground.color = backgroundColor;
 
@@ -921,14 +943,26 @@ public class UIPopupList : UIWidgetContainer
 			mBackground.cachedTransform.localPosition = new Vector3(0f, bgPadding.y, 0f);
 
 			// Add a sprite used for the selection
-			mHighlight = NGUITools.AddSprite(mChild, atlas, highlightSprite, mBackground.depth + 1);
+			if (highlight2DSprite != null)
+			{
+				UI2DSprite sp2 = mChild.AddWidget<UI2DSprite>(++depth);
+				sp2.sprite2D = highlight2DSprite;
+				mHighlight = sp2;
+			}
+			else if (atlas != null) mHighlight = NGUITools.AddSprite(mChild, atlas, highlightSprite, ++depth);
+			else return;
+
+			float hlspHeight = 0f, hlspLeft = 0f;
+
+			if (mHighlight.hasBorder)
+			{
+				hlspHeight = mHighlight.border.w;
+				hlspLeft = mHighlight.border.x;
+			}
+
 			mHighlight.pivot = UIWidget.Pivot.TopLeft;
 			mHighlight.color = highlightColor;
 
-			UISpriteData hlsp = mHighlight.GetAtlasSprite();
-			if (hlsp == null) return;
-
-			float hlspHeight = hlsp.borderTop;
 			float fontHeight = activeFontSize;
 			float dynScale = activeFontScale;
 			float labelHeight = fontHeight * dynScale;
@@ -1026,8 +1060,8 @@ public class UIPopupList : UIWidgetContainer
 			}
 
 			// Scale the highlight sprite to envelop a single item
-			float scaleFactor = 2f * atlas.pixelSize;
-			float w = x - (bgPadding.x + padding.x) * 2f + hlsp.borderLeft * scaleFactor;
+			float scaleFactor = (atlas != null) ? 2f * atlas.pixelSize : 2f;
+			float w = x - (bgPadding.x + padding.x) * 2f + hlspLeft * scaleFactor;
 			float h = labelHeight + hlspHeight * scaleFactor;
 			mHighlight.width = Mathf.RoundToInt(w);
 			mHighlight.height = Mathf.RoundToInt(h);

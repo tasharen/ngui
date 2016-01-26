@@ -150,16 +150,26 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 		{
 			NGUIEditorTools.BeginContents();
 
+			SerializedProperty atlasSp = null;
+
 			GUILayout.BeginHorizontal();
 			{
 				if (NGUIEditorTools.DrawPrefixButton("Atlas"))
 					ComponentSelector.Show<UIAtlas>(OnSelectAtlas);
-				NGUIEditorTools.DrawProperty("", serializedObject, "atlas");
+				atlasSp = NGUIEditorTools.DrawProperty("", serializedObject, "atlas");
 			}
 			GUILayout.EndHorizontal();
 
-			NGUIEditorTools.DrawPaddedSpriteField("Background", mList.atlas, mList.backgroundSprite, OnBackground);
-			NGUIEditorTools.DrawPaddedSpriteField("Highlight", mList.atlas, mList.highlightSprite, OnHighlight);
+			if (atlasSp != null && atlasSp.objectReferenceValue != null)
+			{
+				NGUIEditorTools.DrawPaddedSpriteField("Background", mList.atlas, mList.backgroundSprite, OnBackground);
+				NGUIEditorTools.DrawPaddedSpriteField("Highlight", mList.atlas, mList.highlightSprite, OnHighlight);
+			}
+			else
+			{
+				serializedObject.DrawProperty("background2DSprite", "Background");
+				serializedObject.DrawProperty("highlight2DSprite", "Highlight");
+			}
 
 			EditorGUILayout.Space();
 

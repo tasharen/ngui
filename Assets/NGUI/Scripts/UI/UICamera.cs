@@ -204,6 +204,18 @@ public class UICamera : MonoBehaviour
 
 	public LayerMask eventReceiverMask = -1;
 
+	public enum ProcessEventsIn
+	{
+		Update,
+		LateUpdate,
+	}
+
+	/// <summary>
+	/// When events will be processed.
+	/// </summary>
+
+	public ProcessEventsIn processEventsIn = ProcessEventsIn.Update;
+
 	/// <summary>
 	/// If 'true', currently hovered object will be shown in the top left corner.
 	/// </summary>
@@ -1197,7 +1209,7 @@ public class UICamera : MonoBehaviour
 					lastWorldPosition = lastHit.point;
 					mRayHitObject = lastHit.collider.gameObject;
 
-					if (!list[0].eventsGoToColliders)
+					if (!cam.eventsGoToColliders)
 					{
 						Rigidbody rb = FindRootRigidbody(mRayHitObject.transform);
 						if (rb != null) mRayHitObject = rb.gameObject;
@@ -1662,16 +1674,7 @@ public class UICamera : MonoBehaviour
 			if (fallThrough == null)
 			{
 				UIRoot root = NGUITools.FindInParents<UIRoot>(gameObject);
-
-				if (root != null)
-				{
-					fallThrough = root.gameObject;
-				}
-				else
-				{
-					Transform t = transform;
-					fallThrough = (t.parent != null) ? t.parent.gameObject : gameObject;
-				}
+				fallThrough = (root != null) ? root.gameObject : gameObject;
 			}
 			cachedCamera.eventMask = 0;
 
@@ -1704,13 +1707,50 @@ public class UICamera : MonoBehaviour
 #if UNITY_EDITOR
 		if (!Application.isPlaying || !handlesEvents) return;
 #else
+        if (!handlesEvents) return;
+#endif
+		if (processEventsIn == ProcessEventsIn.Update) ProcessEvents();
+	}
+
+	/// <summary>
+	/// Keep an eye on screen size changes.
+	/// </summary>
+
+	void LateUpdate ()
+	{
+#if UNITY_EDITOR
+		if (!Application.isPlaying || !handlesEvents) return;
+#else
 		if (!handlesEvents) return;
 #endif
+		if (processEventsIn == ProcessEventsIn.LateUpdate) ProcessEvents();
+
+		int w = Screen.width;
+		int h = Screen.height;
+
+		if (w != mWidth || h != mHeight)
+		{
+			mWidth = w;
+			mHeight = h;
+
+			UIRoot.Broadcast("UpdateAnchors");
+
+			if (onScreenResize != null)
+				onScreenResize();
+		}
+	}
+
+	/// <summary>
+	/// Process all events.
+	/// </summary>
+
+	void ProcessEvents ()
+	{
 		current = this;
 		NGUIDebug.debugRaycast = debug;
 
 		// Process touch events first
-		if (useTouch) ProcessTouches ();
+		if (useTouch) ProcessTouches();
 		else if (useMouse) ProcessMouse();
 
 		// Custom input processing
@@ -1744,32 +1784,6 @@ public class UICamera : MonoBehaviour
 
 		current = null;
 		currentTouchID = -100;
-	}
-
-	/// <summary>
-	/// Keep an eye on screen size changes.
-	/// </summary>
-
-	void LateUpdate ()
-	{
-#if UNITY_EDITOR
-		if (!Application.isPlaying || !handlesEvents) return;
-#else
-		if (!handlesEvents) return;
-#endif
-		int w = Screen.width;
-		int h = Screen.height;
-
-		if (w != mWidth || h != mHeight)
-		{
-			mWidth = w;
-			mHeight = h;
-
-			UIRoot.Broadcast("UpdateAnchors");
-
-			if (onScreenResize != null)
-				onScreenResize();
-		}
 	}
 
 	/// <summary>
@@ -2478,6 +2492,13 @@ public class UICamera : MonoBehaviour
 			if (released) ProcessRelease(isMouse, drag);
 		}
 	}
+
+	/// <summary>
+	/// Cancel the next tooltip, preventing it from being shown.
+	/// Moving the mouse again will reset this counter.
+	/// </summary>
+
+	static public void CancelNextTooltip () { mTooltipTime = 0f; }
 
 	/// <summary>
 	/// Show or hide the tooltip.

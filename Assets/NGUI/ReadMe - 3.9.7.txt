@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2016 Tasharen Entertainment
-            Version 3.9.6d
+            Version 3.9.7
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,18 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.9.7
+- NEW: Added "events go to colliders" option to all UICameras, not just the first one.
+- NEW: UICamera now has an option to process events in either Update or LateUpdate.
+- NEW: Added a "max width" property to labels set to overflow using Resize Freely.
+- NEW: UIPopupList now supports 2D sprites.
+- NEW: Added code to UIKeyBinding to convert its key+modifier to text format and back (good for saving a list of key bindings in files).
+- NEW: Added Set() functions to UIProgressBar, UIToggle, UIInput that can set a value without triggering the event callbacks.
+- NEW: Added Camera.FitOnScreen() extension that can be used to ensure that any UI does not go past the screen's dimensions (ex: tooltip).
+- NEW: Added TweenFill that can be used to tween filled sprites' fill value.
+- FIX: UIButton no longer fires its OnClick notification from right and middle mouse button clicks.
+- FIX: Fix for duration 0 tweens not advancing their time properly.
 
 3.9.6
 - NEW: Added NGUITools.Draw<T> function that can be used like GUI.Draw (just much more efficient).

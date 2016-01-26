@@ -54,6 +54,22 @@ public class UIKeyBinding : MonoBehaviour
 	[System.NonSerialized] bool mPress = false;
 
 	/// <summary>
+	/// Key binding's descriptive caption.
+	/// </summary>
+
+	public string captionText
+	{
+		get
+		{
+			string s = NGUITools.KeyToCaption(keyCode);
+			if (modifier == Modifier.Alt) return "Alt+" + s;
+			if (modifier == Modifier.Control) return "Control+" + s;
+			if (modifier == Modifier.Shift) return "Shift+" + s;
+			return s;
+		}
+	}
+
+	/// <summary>
 	/// Check to see if the specified key happens to be bound to some element.
 	/// </summary>
 
@@ -185,4 +201,40 @@ public class UIKeyBinding : MonoBehaviour
 
 	protected virtual void OnBindingPress (bool pressed) { UICamera.Notify(gameObject, "OnPress", pressed); }
 	protected virtual void OnBindingClick () { UICamera.Notify(gameObject, "OnClick", null); }
+
+	/// <summary>
+	/// Convert the key binding to its text format.
+	/// </summary>
+
+	public override string ToString () { return (modifier != Modifier.None) ? modifier + "+" + keyCode : keyCode.ToString(); }
+
+	/// <summary>
+	/// Given the ToString() text, parse it for key and modifier information.
+	/// </summary>
+
+	static public bool GetKeyCode (string text, out KeyCode key, out Modifier modifier)
+	{
+		key = KeyCode.None;
+		modifier = Modifier.None;
+		if (string.IsNullOrEmpty(text)) return false;
+
+		if (text.Contains("+"))
+		{
+			string[] parts = text.Split('+');
+
+			try
+			{
+				modifier = (Modifier)System.Enum.Parse(typeof(Modifier), parts[0]);
+				key = (KeyCode)System.Enum.Parse(typeof(KeyCode), parts[1]);
+			}
+			catch (System.Exception) { return false; }
+		}
+		else
+		{
+			modifier = Modifier.None;
+			try { key = (KeyCode)System.Enum.Parse(typeof(KeyCode), text); }
+			catch (System.Exception) { return false; }
+		}
+		return true;
+	}
 }

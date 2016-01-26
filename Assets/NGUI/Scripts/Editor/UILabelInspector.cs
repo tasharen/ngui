@@ -225,6 +225,14 @@ public class UILabelInspector : UIWidgetInspector
 			if (NGUISettings.overflowStyle == UILabel.Overflow.ClampContent)
 				NGUIEditorTools.DrawProperty("Use Ellipsis", serializedObject, "mOverflowEllipsis", GUILayout.Width(110f));
 
+			if (NGUISettings.overflowStyle == UILabel.Overflow.ResizeFreely)
+			{
+				GUILayout.BeginHorizontal();
+				SerializedProperty s = NGUIEditorTools.DrawPaddedProperty("Max Width", serializedObject, "mOverflowWidth");
+				if (s != null && s.intValue < 1) GUILayout.Label("unlimited");
+				GUILayout.EndHorizontal();
+			}
+
 			NGUIEditorTools.DrawPaddedProperty("Alignment", serializedObject, "mAlignment");
 
 			if (dynFont != null)
