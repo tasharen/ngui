@@ -1410,7 +1410,18 @@ static public class NGUITools
 
 	static public void FitOnScreen (this Camera cam, Transform transform, Transform content, Vector3 pos)
 	{
-		Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(transform, content);
+		Bounds b;
+		cam.FitOnScreen(transform, content, pos, out b);
+	}
+
+	/// <summary>
+	/// Fit the specified NGUI hierarchy on the screen.
+	/// Example: uiCamera.FitOnScreen(rootObjectTransform, contentObjectTransform, UICamera.lastEventPosition);
+	/// </summary>
+
+	static public void FitOnScreen (this Camera cam, Transform transform, Transform content, Vector3 pos, out Bounds bounds)
+	{
+		bounds = NGUIMath.CalculateRelativeWidgetBounds(transform, content);
 
 		Vector3 min = bounds.min;
 		Vector3 max = bounds.max;

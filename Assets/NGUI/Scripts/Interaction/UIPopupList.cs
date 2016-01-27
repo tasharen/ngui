@@ -226,6 +226,9 @@ public class UIPopupList : UIWidgetContainer
 	// EventDelegate.Add(list.onChange, lbl.SetCurrentSelection);
 	[HideInInspector][SerializeField] UILabel textLabel;
 
+	// Popup list's starting position
+	[System.NonSerialized] public Vector3 startingPosition;
+
 	public delegate void LegacyEvent (string val);
 	LegacyEvent mLegacyEvent;
 
@@ -897,16 +900,15 @@ public class UIPopupList : UIWidgetContainer
 
 			Transform t = mChild.transform;
 			t.parent = mPanel.cachedTransform;
-			Vector3 pos;
 
 			// Manually triggered popup list on some other game object
 			if (openOn == OpenOn.Manual && mSelection != gameObject)
 			{
-				pos = UICamera.lastEventPosition;
-				min = mPanel.cachedTransform.InverseTransformPoint(mPanel.anchorCamera.ScreenToWorldPoint(pos));
+				startingPosition = UICamera.lastEventPosition;
+				min = mPanel.cachedTransform.InverseTransformPoint(mPanel.anchorCamera.ScreenToWorldPoint(startingPosition));
 				max = min;
 				t.localPosition = min;
-				pos = t.position;
+				startingPosition = t.position;
 			}
 			else
 			{
@@ -914,7 +916,7 @@ public class UIPopupList : UIWidgetContainer
 				min = bounds.min;
 				max = bounds.max;
 				t.localPosition = min;
-				pos = t.position;
+				startingPosition = t.position;
 			}
 
 			StartCoroutine("CloseIfUnselected");
@@ -1074,7 +1076,7 @@ public class UIPopupList : UIWidgetContainer
 
 				if (cam != null)
 				{
-					Vector3 viewPos = cam.cachedCamera.WorldToViewportPoint(pos);
+					Vector3 viewPos = cam.cachedCamera.WorldToViewportPoint(startingPosition);
 					placeAbove = (viewPos.y < 0.5f);
 				}
 			}
@@ -1121,7 +1123,7 @@ public class UIPopupList : UIWidgetContainer
 
 			// Ensure that everything fits into the panel's visible range
 			Vector3 offset = mPanel.hasClipping ? Vector3.zero : mPanel.CalculateConstrainOffset(min, max);
-			pos = t.localPosition + offset;
+			Vector3 pos = t.localPosition + offset;
 			pos.x = Mathf.Round(pos.x);
 			pos.y = Mathf.Round(pos.y);
 			t.localPosition = pos;

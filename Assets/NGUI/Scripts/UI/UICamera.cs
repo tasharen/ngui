@@ -1760,7 +1760,7 @@ public class UICamera : MonoBehaviour
 		if ((useKeyboard || useController) && !disableController && !ignoreControllerInput) ProcessOthers();
 
 		// If it's time to show a tooltip, inform the object we're hovering over
-		if (useMouse && mHover != null)
+		if (useMouse && mHover != null && currentScheme == ControlScheme.Mouse)
 		{
 			float scroll = !string.IsNullOrEmpty(scrollAxisName) ? GetAxis(scrollAxisName) : 0f;
 
@@ -1930,7 +1930,7 @@ public class UICamera : MonoBehaviour
 		if (!isPressed && highlightChanged)
 		{
 			currentTouch = mMouse[0];
-			mTooltipTime = RealTime.time + tooltipDelay;
+			mTooltipTime = Time.unscaledTime + tooltipDelay;
 			currentTouchID = -1;
 			currentKey = KeyCode.Mouse0;
 			hoveredObject = currentTouch.current;
@@ -2241,6 +2241,7 @@ public class UICamera : MonoBehaviour
 		if (pressed)
 		{
 			if (mTooltip != null) ShowTooltip(null);
+			mTooltipTime = Time.unscaledTime + tooltipDelay;
 			currentTouch.pressStarted = true;
 			if (onPress != null && currentTouch.pressed)
 				onPress(currentTouch.pressed, false);
@@ -2260,8 +2261,6 @@ public class UICamera : MonoBehaviour
 				onPress(currentTouch.pressed, true);
 
 			Notify(currentTouch.pressed, "OnPress", true);
-
-			if (mTooltip != null) ShowTooltip(null);
 
 			// Change the selection
 			if (mSelected != currentTouch.pressed)
@@ -2459,7 +2458,7 @@ public class UICamera : MonoBehaviour
 
 	public void ProcessTouch (bool pressed, bool released)
 	{
-		if (pressed) mTooltipTime = Time.unscaledTime + tooltipDelay;
+		if (released) mTooltipTime = 0f;
 
 		// Whether we're using the mouse
 		bool isMouse = (currentScheme == ControlScheme.Mouse);
@@ -2476,14 +2475,18 @@ public class UICamera : MonoBehaviour
 			ProcessPress(pressed, click, drag);
 
 			// Hold event = show tooltip
-			if (currentTouch.pressed == currentTouch.current && mTooltipTime != 0f &&
-				currentTouch.clickNotification != ClickNotification.None &&
-				!currentTouch.dragStarted && currentTouch.deltaTime > tooltipDelay)
+			if (currentTouch.deltaTime > tooltipDelay)
 			{
-				mTooltipTime = 0f;
-				currentTouch.clickNotification = ClickNotification.None;
-				if (longPressTooltip) ShowTooltip(currentTouch.pressed);
-				Notify(currentTouch.current, "OnLongPress", null);
+				if (currentTouch.pressed == currentTouch.current && mTooltipTime != 0f && !currentTouch.dragStarted)
+				{
+					mTooltipTime = 0f;
+					currentTouch.clickNotification = ClickNotification.None;
+					if (longPressTooltip) ShowTooltip(currentTouch.pressed);
+					Notify(currentTouch.current, "OnLongPress", null);
+				}
+
+				// 0, none, false
+				// 0, basedondelta, false
 			}
 		}
 		else if (isMouse || pressed || released)
