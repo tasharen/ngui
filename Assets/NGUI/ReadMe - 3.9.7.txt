@@ -66,6 +66,7 @@ and it will not be included in the build of your game. It's only used in the edi
 - NEW: Added TweenFill that can be used to tween filled sprites' fill value.
 - FIX: UIButton no longer fires its OnClick notification from right and middle mouse button clicks.
 - FIX: Fix for duration 0 tweens not advancing their time properly.
+- FIX: Fix for long press tooltips not showing properly on touch screens half the time.
 
 3.9.6
 - NEW: Added NGUITools.Draw<T> function that can be used like GUI.Draw (just much more efficient).
