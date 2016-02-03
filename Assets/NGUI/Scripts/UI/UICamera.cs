@@ -2484,9 +2484,6 @@ public class UICamera : MonoBehaviour
 					if (longPressTooltip) ShowTooltip(currentTouch.pressed);
 					Notify(currentTouch.current, "OnLongPress", null);
 				}
-
-				// 0, none, false
-				// 0, basedondelta, false
 			}
 		}
 		else if (isMouse || pressed || released)
