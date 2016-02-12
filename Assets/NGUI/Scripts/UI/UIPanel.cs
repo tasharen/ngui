@@ -925,11 +925,9 @@ public class UIPanel : UIRect
 		mHalfPixelOffset = (Application.platform == RuntimePlatform.WindowsPlayer ||
 			Application.platform == RuntimePlatform.XBOX360 ||
 			Application.platform == RuntimePlatform.WindowsWebPlayer ||
-			Application.platform == RuntimePlatform.WindowsEditor);
-
-		// Only DirectX 9 needs the half-pixel offset
-		if (mHalfPixelOffset && SystemInfo.graphicsDeviceVersion.Contains("Direct3D"))
-			mHalfPixelOffset = (SystemInfo.graphicsShaderLevel < 40);
+			Application.platform == RuntimePlatform.WindowsEditor) &&
+			SystemInfo.graphicsDeviceVersion.Contains("Direct3D") &&
+			SystemInfo.graphicsShaderLevel < 40;
 	}
 
 	/// <summary>
