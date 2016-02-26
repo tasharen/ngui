@@ -220,6 +220,8 @@ public class UILabelInspector : UIWidgetInspector
 
 			GUI.skin.textField.wordWrap = ww;
 
+			NGUIEditorTools.DrawPaddedProperty("Modifier", serializedObject, "mModifier");
+
 			SerializedProperty ov = NGUIEditorTools.DrawPaddedProperty("Overflow", serializedObject, "mOverflow");
 			NGUISettings.overflowStyle = (UILabel.Overflow)ov.intValue;
 			if (NGUISettings.overflowStyle == UILabel.Overflow.ClampContent)

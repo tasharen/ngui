@@ -1865,10 +1865,26 @@ static public class NGUITools
 				if (s_GetSizeOfMainGameView == null)
 				{
 					System.Type type = System.Type.GetType("UnityEditor.GameView,UnityEditor");
+
+					// Pre-Unity 5.4
 					s_GetSizeOfMainGameView = type.GetMethod("GetSizeOfMainGameView",
-						System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+						System.Reflection.BindingFlags.Public |
+						System.Reflection.BindingFlags.NonPublic |
+						System.Reflection.BindingFlags.Static);
+
+					// Post-Unity 5.4
+					if (s_GetSizeOfMainGameView == null)
+						s_GetSizeOfMainGameView = type.GetMethod("GetMainGameViewTargetSize",
+							System.Reflection.BindingFlags.Public |
+							System.Reflection.BindingFlags.NonPublic |
+							System.Reflection.BindingFlags.Static);
 				}
-				mGameSize = (Vector2)s_GetSizeOfMainGameView.Invoke(null, null);
+
+				if (s_GetSizeOfMainGameView != null)
+				{
+					mGameSize = (Vector2)s_GetSizeOfMainGameView.Invoke(null, null);
+				}
+				else mGameSize = new Vector2(Screen.width, Screen.height);
 			}
 			return mGameSize;
 		}

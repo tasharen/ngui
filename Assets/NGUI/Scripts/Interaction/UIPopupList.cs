@@ -302,13 +302,16 @@ public class UIPopupList : UIWidgetContainer
 
 	public void Set (string value, bool notify = true)
 	{
-		mSelectedItem = value;
-		if (mSelectedItem == null) return;
+		if (mSelectedItem != value)
+		{
+			mSelectedItem = value;
+			if (mSelectedItem == null) return;
 #if UNITY_EDITOR
-		if (!Application.isPlaying) return;
+			if (!Application.isPlaying) return;
 #endif
-		if (notify && mSelectedItem != null)
-			TriggerCallbacks();
+			if (notify && mSelectedItem != null)
+				TriggerCallbacks();
+		}
 	}
 
 	/// <summary>
