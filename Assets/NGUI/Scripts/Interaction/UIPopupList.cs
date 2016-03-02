@@ -311,6 +311,8 @@ public class UIPopupList : UIWidgetContainer
 #endif
 			if (notify && mSelectedItem != null)
 				TriggerCallbacks();
+
+			mSelectedItem = null;
 		}
 	}
 

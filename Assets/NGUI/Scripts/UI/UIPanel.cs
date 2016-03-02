@@ -226,7 +226,9 @@ public class UIPanel : UIRect
 				mAlphaFrameID = -1;
 				mResized = true;
 				mAlpha = val;
-				SetDirty();
+				for (int i = 0, imax = drawCalls.Count; i < imax; ++i)
+					drawCalls[i].isDirty = true;
+				Invalidate(false);
 			}
 		}
 	}
