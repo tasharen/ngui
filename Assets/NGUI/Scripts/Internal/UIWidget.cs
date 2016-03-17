@@ -35,7 +35,7 @@ public class UIWidget : UIRect
 	[HideInInspector][SerializeField] protected int mDepth = 0;
 
 	public delegate void OnDimensionsChanged ();
-	public delegate void OnPostFillCallback (UIWidget widget, int bufferOffset, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols);
+	public delegate void OnPostFillCallback (UIWidget widget, int bufferOffset, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols);
 
 	/// <summary>
 	/// Notification triggered when the widget's dimensions or position changes.
@@ -1494,7 +1494,7 @@ public class UIWidget : UIRect
 	/// Append the local geometry buffers to the specified ones.
 	/// </summary>
 
-	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color32> c, BetterList<Vector3> n, BetterList<Vector4> t)
+	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color> c, BetterList<Vector3> n, BetterList<Vector4> t)
 	{
 		geometry.WriteToBuffers(v, u, c, n, t);
 	}
@@ -1537,7 +1537,7 @@ public class UIWidget : UIRect
 	/// Virtual function called by the UIPanel that fills the buffers.
 	/// </summary>
 
-	virtual public void OnFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
+	virtual public void OnFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
 	{
 		// Call this in your derived classes:
 		//if (onPostFill != null)

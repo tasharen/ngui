@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2016 Tasharen Entertainment
-            Version 3.9.7
+            Version 3.9.8
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,15 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.9.8
+- NEW: NGUI now uses Color instead of Color32 for colors, which work better with linear space colors.
+- NEW: Added a modifier setting to the UILabel that can automatically change the text prior to displaying it, such as making it uppercase/lowercase or calling a custom modifier function.
+- FIX: Better handling of Linear space lighting.
+- FIX: Changing UIPanel.alpha no longer invalidates the widgets underneath it (performance boost).
+- FIX: Font Maker should now work even in the 32-bit version of Unity 5.
+- FIX: Forcing OpenGL in Windows will no longer result in a blurry UI.
+- FIX: Fix for an issue in Unity 5.4.
 
 3.9.7
 - NEW: Added "events go to colliders" option to all UICameras, not just the first one.

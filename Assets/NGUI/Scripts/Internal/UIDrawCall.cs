@@ -54,7 +54,7 @@ public class UIDrawCall : MonoBehaviour
 	[HideInInspector][System.NonSerialized] public BetterList<Vector3> norms = new BetterList<Vector3>();
 	[HideInInspector][System.NonSerialized] public BetterList<Vector4> tans = new BetterList<Vector4>();
 	[HideInInspector][System.NonSerialized] public BetterList<Vector2> uvs = new BetterList<Vector2>();
-	[HideInInspector][System.NonSerialized] public BetterList<Color32> cols = new BetterList<Color32>();
+	[HideInInspector][System.NonSerialized] public BetterList<Color> cols = new BetterList<Color>();
 
 	Material		mMaterial;		// Material used by this draw call
 	Texture			mTexture;		// Main texture used by the material
@@ -449,7 +449,7 @@ public class UIDrawCall : MonoBehaviour
 
 					mMesh.vertices = verts.ToArray();
 					mMesh.uv = uvs.ToArray();
-					mMesh.colors32 = cols.ToArray();
+					mMesh.colors = cols.ToArray();
 
 					if (norms != null) mMesh.normals = norms.ToArray();
 					if (tans != null) mMesh.tangents = tans.ToArray();
@@ -464,7 +464,7 @@ public class UIDrawCall : MonoBehaviour
 
 					mMesh.vertices = verts.buffer;
 					mMesh.uv = uvs.buffer;
-					mMesh.colors32 = cols.buffer;
+					mMesh.colors = cols.buffer;
 
 					if (norms != null) mMesh.normals = norms.buffer;
 					if (tans != null) mMesh.tangents = tans.buffer;
@@ -480,7 +480,7 @@ public class UIDrawCall : MonoBehaviour
 
 				mMesh.vertices = verts.ToArray();
 				mMesh.uv = uvs.ToArray();
-				mMesh.colors32 = cols.ToArray();
+				mMesh.colors = cols.ToArray();
 
 				if (norms != null) mMesh.normals = norms.ToArray();
 				if (tans != null) mMesh.tangents = tans.ToArray();

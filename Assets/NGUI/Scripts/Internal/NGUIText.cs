@@ -1345,13 +1345,13 @@ static public class NGUIText
 		return fits && ((offset == textLength) || (lineCount <= Mathf.Min(maxLines, maxLineCount)));
 	}
 
-	static Color32 s_c0, s_c1;
+	static Color s_c0, s_c1;
 
 	/// <summary>
 	/// Print the specified text into the buffers.
 	/// </summary>
 
-	static public void Print (string text, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
+	static public void Print (string text, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
 	{
 		if (string.IsNullOrEmpty(text)) return;
 
@@ -1366,9 +1366,10 @@ static public class NGUIText
 		float x = 0f, y = 0f, maxX = 0f;
 		float sizeF = finalSize;
 
-		Color gb = tint * gradientBottom;
-		Color gt = tint * gradientTop;
-		Color32 uc = tint;
+		Color gb = (tint * gradientBottom).GammaToLinearSpace();
+		Color gt = (tint * gradientTop).GammaToLinearSpace();
+		Color gc = tint;
+		Color lc = gc.GammaToLinearSpace();
 		int textLength = text.Length;
 
 		Rect uvRect = new Rect();
@@ -1432,27 +1433,26 @@ static public class NGUIText
 			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
 				ref italic, ref underline, ref strikethrough, ref ignoreColor))
 			{
-				Color fc;
-
 				if (ignoreColor)
 				{
-					fc = mColors[mColors.size - 1];
-					fc.a *= mAlpha * tint.a;
+					gc = mColors[mColors.size - 1];
+					gc.a *= mAlpha * tint.a;
 				}
 				else
 				{
-					fc = tint * mColors[mColors.size - 1];
-					fc.a *= mAlpha;
+					gc = tint * mColors[mColors.size - 1];
+					gc.a *= mAlpha;
 				}
-				uc = fc;
+
+				lc = gc.GammaToLinearSpace();
 
 				for (int b = 0, bmax = mColors.size - 2; b < bmax; ++b)
-					fc.a *= mColors[b].a;
+					gc.a *= mColors[b].a;
 
 				if (gradient)
 				{
-					gb = gradientBottom * fc;
-					gt = gradientTop * fc;
+					gb = (gradientBottom * gc).GammaToLinearSpace();
+					gt = (gradientTop * gc).GammaToLinearSpace();
 				}
 				--i;
 				continue;
@@ -1517,12 +1517,12 @@ static public class NGUIText
 				{
 					if (symbolStyle == SymbolStyle.Colored)
 					{
-						for (int b = 0; b < 4; ++b) cols.Add(uc);
+						for (int b = 0; b < 4; ++b) cols.Add(lc);
 					}
 					else
 					{
-						Color32 col = Color.white;
-						col.a = uc.a;
+						Color col = Color.white;
+						col.a = lc.a;
 						for (int b = 0; b < 4; ++b) cols.Add(col);
 					}
 				}
@@ -1656,7 +1656,7 @@ static public class NGUIText
 						else
 						{
 							for (int j = 0, jmax = (bold ? 16 : 4); j < jmax; ++j)
-								cols.Add(uc);
+								cols.Add(lc);
 						}
 					}
 					else
@@ -1669,7 +1669,7 @@ static public class NGUIText
 						// - Should not be a part of the atlas (eastern fonts rarely are anyway).
 						// - Lower color precision
 
-						Color col = uc;
+						Color col = gc;
 
 						col *= 0.49f;
 
@@ -1681,7 +1681,7 @@ static public class NGUIText
 							case 8: col.a += 0.51f; break;
 						}
 
-						Color32 c = col;
+						Color c = col.GammaToLinearSpace();
 						for (int j = 0, jmax = (bold ? 16 : 4); j < jmax; ++j)
 							cols.Add(c);
 					}
@@ -1802,7 +1802,7 @@ static public class NGUIText
 					else
 					{
 						for (int j = 0, jmax = (bold ? 16 : 4); j < jmax; ++j)
-							cols.Add(uc);
+							cols.Add(lc);
 					}
 				}
 			}

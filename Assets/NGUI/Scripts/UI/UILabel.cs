@@ -1745,7 +1745,7 @@ public class UILabel : UIWidget
 			{
 				ApplyOffset(highlight.verts, startingVertices);
 
-				Color32 c = new Color(highlightColor.r, highlightColor.g, highlightColor.b, highlightColor.a * alpha);
+				Color c = new Color(highlightColor.r, highlightColor.g, highlightColor.b, highlightColor.a * alpha);
 
 				for (int i = startingVertices; i < highlight.verts.size; ++i)
 				{
@@ -1758,7 +1758,7 @@ public class UILabel : UIWidget
 
 		// Fill the caret UVs and colors
 		ApplyOffset(caret.verts, startingCaretVerts);
-		Color32 cc = new Color(caretColor.r, caretColor.g, caretColor.b, caretColor.a * alpha);
+		Color cc = new Color(caretColor.r, caretColor.g, caretColor.b, caretColor.a * alpha);
 
 		for (int i = startingCaretVerts; i < caret.verts.size; ++i)
 		{
@@ -1774,7 +1774,7 @@ public class UILabel : UIWidget
 	/// Draw the label.
 	/// </summary>
 
-	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols)
+	public override void OnFill (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
 	{
 		if (!isValid) return;
 
@@ -1783,14 +1783,6 @@ public class UILabel : UIWidget
 		col.a = finalAlpha;
 		
 		if (mFont != null && mFont.premultipliedAlphaShader) col = NGUITools.ApplyPMA(col);
-
-		if (QualitySettings.activeColorSpace == ColorSpace.Linear)
-		{
-			col.r = Mathf.GammaToLinearSpace(col.r);
-			col.g = Mathf.GammaToLinearSpace(col.g);
-			col.b = Mathf.GammaToLinearSpace(col.b);
-			col.a = Mathf.GammaToLinearSpace(col.a);
-		}
 
 		string text = processedText;
 		int start = verts.size;
@@ -1900,21 +1892,12 @@ public class UILabel : UIWidget
 	/// Apply a shadow effect to the buffer.
 	/// </summary>
 
-	public void ApplyShadow (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color32> cols, int start, int end, float x, float y)
+	public void ApplyShadow (BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols, int start, int end, float x, float y)
 	{
 		Color c = mEffectColor;
 		c.a *= finalAlpha;
 		if (bitmapFont != null && bitmapFont.premultipliedAlphaShader) c = NGUITools.ApplyPMA(c);
-
-		if (QualitySettings.activeColorSpace == ColorSpace.Linear)
-		{
-			c.r = Mathf.GammaToLinearSpace(c.r);
-			c.g = Mathf.GammaToLinearSpace(c.g);
-			c.b = Mathf.GammaToLinearSpace(c.b);
-			c.a = Mathf.GammaToLinearSpace(c.a);
-		}
-
-		Color32 col = c;
+		Color col = c.GammaToLinearSpace();
 
 		for (int i = start; i < end; ++i)
 		{
@@ -1927,18 +1910,17 @@ public class UILabel : UIWidget
 			v.y += y;
 			verts.buffer[i] = v;
 
-			Color32 uc = cols.buffer[i];
+			Color uc = cols.buffer[i];
 
-			if (uc.a == 255)
+			if (uc.a == 1f)
 			{
 				cols.buffer[i] = col;
 			}
 			else
 			{
 				Color fc = c;
-				fc.a = (uc.a / 255f * c.a);
-				if (QualitySettings.activeColorSpace == ColorSpace.Linear) fc.a = Mathf.GammaToLinearSpace(fc.a);
-				cols.buffer[i] = fc;
+				fc.a = uc.a * c.a;
+				cols.buffer[i] = fc.GammaToLinearSpace();
 			}
 		}
 	}

@@ -223,12 +223,13 @@ public class UIPanel : UIRect
 
 			if (mAlpha != val)
 			{
+				bool wasVisible = mAlpha > 0.001f;
 				mAlphaFrameID = -1;
 				mResized = true;
 				mAlpha = val;
 				for (int i = 0, imax = drawCalls.Count; i < imax; ++i)
 					drawCalls[i].isDirty = true;
-				Invalidate(false);
+				Invalidate(!wasVisible && mAlpha > 0.001f);
 			}
 		}
 	}
