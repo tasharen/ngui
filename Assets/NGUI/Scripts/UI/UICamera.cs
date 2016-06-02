@@ -128,6 +128,9 @@ public class UICamera : MonoBehaviour
 	public delegate bool GetKeyStateFunc (KeyCode key);
 	public delegate float GetAxisFunc (string name);
 	public delegate bool GetAnyKeyFunc ();
+	public delegate MouseOrTouch GetMouseDelegate (int button);
+	public delegate MouseOrTouch GetTouchDelegate (int id, bool createIfMissing);
+	public delegate void RemoveTouchDelegate (int id);
 
 	/// <summary>
 	/// GetKeyDown function -- return whether the specified key was pressed this Update().
@@ -175,7 +178,51 @@ public class UICamera : MonoBehaviour
 
 	static public GetAnyKeyFunc GetAnyKeyDown;
 
-	public delegate void OnScreenResize ();
+	/// <summary>
+	/// Get the details of the specified mouse button.
+	/// </summary>
+
+	static public GetMouseDelegate GetMouse = delegate(int button) { return mMouse[button]; };
+	
+	/// <summary>
+	/// Get or create a touch event. If you are trying to iterate through a list of active touches, use activeTouches instead.
+	/// </summary>
+
+	static public GetTouchDelegate GetTouch = delegate(int id, bool createIfMissing)
+	{
+		if (id < 0) return GetMouse(-id - 1);
+
+		for (int i = 0, imax = mTouchIDs.Count; i < imax; ++i)
+			if (mTouchIDs[i] == id) return activeTouches[i];
+
+		if (createIfMissing)
+		{
+			MouseOrTouch touch = new MouseOrTouch();
+			touch.pressTime = RealTime.time;
+			touch.touchBegan = true;
+			activeTouches.Add(touch);
+			mTouchIDs.Add(id);
+			return touch;
+		}
+		return null;
+	};
+
+	/// <summary>
+	/// Remove a touch event from the list.
+	/// </summary>
+
+	static public RemoveTouchDelegate RemoveTouch = delegate(int id)
+	{
+		for (int i = 0, imax = mTouchIDs.Count; i < imax; ++i)
+		{
+			if (mTouchIDs[i] == id)
+			{
+				mTouchIDs.RemoveAt(i);
+				activeTouches.RemoveAt(i);
+				return;
+			}
+		}
+	};
 
 	/// <summary>
 	/// Delegate triggered when the screen size changes for any reason.
@@ -183,6 +230,7 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	static public OnScreenResize onScreenResize;
+	public delegate void OnScreenResize ();
 
 	/// <summary>
 	/// Event type -- use "UI" for your user interfaces, and "World" for your game camera.
@@ -1540,52 +1588,6 @@ public class UICamera : MonoBehaviour
 			if (mGenericHandler != null && mGenericHandler != go)
 				mGenericHandler.SendMessage(funcName, obj, SendMessageOptions.DontRequireReceiver);
 			--mNotifying;
-		}
-	}
-
-	/// <summary>
-	/// Get the details of the specified mouse button.
-	/// </summary>
-
-	static public MouseOrTouch GetMouse (int button) { return mMouse[button]; }
-
-	/// <summary>
-	/// Get or create a touch event. If you are trying to iterate through a list of active touches, use activeTouches instead.
-	/// </summary>
-
-	static public MouseOrTouch GetTouch (int id, bool createIfMissing = false)
-	{
-		if (id < 0) return GetMouse(-id - 1);
-
-		for (int i = 0, imax = mTouchIDs.Count; i < imax; ++i)
-			if (mTouchIDs[i] == id) return activeTouches[i];
-
-		if (createIfMissing)
-		{
-			MouseOrTouch touch = new MouseOrTouch();
-			touch.pressTime = RealTime.time;
-			touch.touchBegan = true;
-			activeTouches.Add(touch);
-			mTouchIDs.Add(id);
-			return touch;
-		}
-		return null;
-	}
-
-	/// <summary>
-	/// Remove a touch event from the list.
-	/// </summary>
-
-	static public void RemoveTouch (int id)
-	{
-		for (int i = 0, imax = mTouchIDs.Count; i < imax; ++i)
-		{
-			if (mTouchIDs[i] == id)
-			{
-				mTouchIDs.RemoveAt(i);
-				activeTouches.RemoveAt(i);
-				return;
-			}
 		}
 	}
 

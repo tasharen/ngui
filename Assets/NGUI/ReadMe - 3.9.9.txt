@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2016 Tasharen Entertainment
-            Version 3.9.8
+            Version 3.9.9
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,12 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.9.9
+- NEW: Added customizable GetMouse, GetTouch and RemoveTouch delegates to UICamera replacing fixed Input calls. This makes all of NGUI's events go through user-settable delegates.
+- NEW: Sprite Animation script now has a frame offset index you can set if you want it to start at something other than 0.
+- NEW: UIScrollView now has a "constrain on drag" as an option rather than always being off.
+- FIX: UILabel resizing due to overflow settings will now trigger its UIWidget.onChange notification.
 
 3.9.8
 - NEW: NGUI now uses Color instead of Color32 for colors, which work better with linear space colors.

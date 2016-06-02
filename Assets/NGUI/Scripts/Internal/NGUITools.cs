@@ -1845,8 +1845,9 @@ static public class NGUITools
 
 #if UNITY_EDITOR
 	static int mSizeFrame = -1;
-	static System.Reflection.MethodInfo s_GetSizeOfMainGameView;
+	static Func<Vector2> s_GetSizeOfMainGameView;
 	static Vector2 mGameSize = Vector2.one;
+	[System.NonSerialized] static bool mCheckedMainViewFunc = false;
 
 	/// <summary>
 	/// Size of the game view cannot be retrieved from Screen.width and Screen.height when the game view is hidden.
@@ -1862,27 +1863,35 @@ static public class NGUITools
 			{
 				mSizeFrame = frame;
 
-				if (s_GetSizeOfMainGameView == null)
+				if (s_GetSizeOfMainGameView == null && !mCheckedMainViewFunc)
 				{
+					mCheckedMainViewFunc = true;
 					System.Type type = System.Type.GetType("UnityEditor.GameView,UnityEditor");
 
-					// Pre-Unity 5.4
-					s_GetSizeOfMainGameView = type.GetMethod("GetSizeOfMainGameView",
+					// Post-Unity 5.4
+					var methodInfo = type.GetMethod("GetMainGameViewTargetSize",
 						System.Reflection.BindingFlags.Public |
 						System.Reflection.BindingFlags.NonPublic |
 						System.Reflection.BindingFlags.Static);
 
-					// Post-Unity 5.4
-					if (s_GetSizeOfMainGameView == null)
-						s_GetSizeOfMainGameView = type.GetMethod("GetMainGameViewTargetSize",
+					// Pre-Unity 5.4
+					if (methodInfo == null)
+						methodInfo = type.GetMethod("GetSizeOfMainGameView",
 							System.Reflection.BindingFlags.Public |
 							System.Reflection.BindingFlags.NonPublic |
 							System.Reflection.BindingFlags.Static);
+
+					// Create the delegate
+					if (methodInfo != null)
+					{
+						s_GetSizeOfMainGameView = (Func<Vector2>)Delegate.CreateDelegate(typeof(Func<Vector2>), methodInfo);
+					}
+					else Debug.LogWarning("Unable to get the main game view size function");
 				}
 
 				if (s_GetSizeOfMainGameView != null)
 				{
-					mGameSize = (Vector2)s_GetSizeOfMainGameView.Invoke(null, null);
+					mGameSize = s_GetSizeOfMainGameView();
 				}
 				else mGameSize = new Vector2(Screen.width, Screen.height);
 			}
@@ -2291,6 +2300,25 @@ static public class NGUITools
 			c.a = Mathf.GammaToLinearSpace(c.a);
 		}
 		return c;
+	}
+
+	/// <summary>
+	/// Transforms this color from gamma to linear space, but only if the active color space is actually set to linear.
+	/// </summary>
+
+	static public Color GammaToLinearSpace (this Vector4 v)
+	{
+		if (mColorSpace == ColorSpace.Uninitialized)
+			mColorSpace = QualitySettings.activeColorSpace;
+
+		if (mColorSpace == ColorSpace.Linear)
+		{
+			v.x = Mathf.GammaToLinearSpace(v.x);
+			v.y = Mathf.GammaToLinearSpace(v.y);
+			v.z = Mathf.GammaToLinearSpace(v.z);
+			v.w = Mathf.GammaToLinearSpace(v.w);
+		}
+		return v;
 	}
 	static ColorSpace mColorSpace = ColorSpace.Uninitialized;
 }

@@ -133,9 +133,24 @@ public class UIDrawCall : MonoBehaviour
 
 	public string sortingLayerName
 	{
-		get { return (mRenderer != null) ? mRenderer.sortingLayerName : null; }
-		set { if (mRenderer != null && mRenderer.sortingLayerName != value) mRenderer.sortingLayerName = value; }
+		get
+		{
+			if (!string.IsNullOrEmpty(mSortingLayerName)) return mSortingLayerName;
+			if (mRenderer == null) return null;
+			mSortingLayerName = mRenderer.sortingLayerName;
+			return mSortingLayerName;
+		}
+		set
+		{
+			if (mRenderer != null && mSortingLayerName != value)
+			{
+				mSortingLayerName = value;
+				mRenderer.sortingLayerName = value;
+			}
+		}
 	}
+
+	[System.NonSerialized] string mSortingLayerName;
 
 	/// <summary>
 	/// Final render queue used to draw the draw call's geometry.
