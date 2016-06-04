@@ -60,6 +60,7 @@ and it will not be included in the build of your game. It's only used in the edi
 - NEW: Sprite Animation script now has a frame offset index you can set if you want it to start at something other than 0.
 - NEW: UIScrollView now has a "constrain on drag" as an option rather than always being off.
 - FIX: UILabel resizing due to overflow settings will now trigger its UIWidget.onChange notification.
+- FIX: Fix for a visibility issue caused by instantiating a panel off-screen then bringing it into view.
 
 3.9.8
 - NEW: NGUI now uses Color instead of Color32 for colors, which work better with linear space colors.
