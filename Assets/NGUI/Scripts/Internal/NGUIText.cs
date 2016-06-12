@@ -1173,6 +1173,12 @@ static public class NGUIText
 						c.a *= mColors[b].a;
 
 					--offset;
+
+					// Add the previous word to the final string
+					if (start < offset) sb.Append(text.Substring(start, offset - start + 1));
+					else sb.Append(ch);
+					start = offset + 1;
+
 					continue;
 				}
 			}
@@ -1315,9 +1321,11 @@ static public class NGUIText
 
 					if (wrapLineColors)
 					{
+						// Negate previous colors prior to the newline character
 						for (int i = 0; i < mColors.size; ++i)
 							sb.Insert(sb.Length - 1, "[-]");
 
+						// Add all the current colors before going forward
 						for (int i = 0; i < mColors.size; ++i)
 						{
 							sb.Append("[");
