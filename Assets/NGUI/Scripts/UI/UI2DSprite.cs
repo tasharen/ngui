@@ -328,8 +328,8 @@ public class UI2DSprite : UIBasicSprite
 			if (tex != null)
 			{
 				Rect rect = mSprite.rect;
-				int w = Mathf.RoundToInt(rect.width);
-				int h = Mathf.RoundToInt(rect.height);
+				int w = Mathf.RoundToInt(pixelSize * rect.width);
+				int h = Mathf.RoundToInt(pixelSize * rect.height);
 
 				if ((w & 1) == 1) ++w;
 				if ((h & 1) == 1) ++h;
