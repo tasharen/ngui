@@ -920,8 +920,8 @@ public class UICamera : MonoBehaviour
 				}
 			}
 
-			controller.current = null;
-			return null;
+			controller.current = selectedObject;
+			return controller.current;
 		}
 		set
 		{

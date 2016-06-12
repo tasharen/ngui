@@ -61,6 +61,7 @@ and it will not be included in the build of your game. It's only used in the edi
 - NEW: UIScrollView now has a "constrain on drag" as an option rather than always being off.
 - FIX: UILabel resizing due to overflow settings will now trigger its UIWidget.onChange notification.
 - FIX: Fix for a visibility issue caused by instantiating a panel off-screen then bringing it into view.
+- FIX: Fixed a bug with text wrapping not wrapping colors properly in some situations (UITextList).
 
 3.9.8
 - NEW: NGUI now uses Color instead of Color32 for colors, which work better with linear space colors.
