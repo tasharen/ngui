@@ -25,7 +25,7 @@ Shader "Hidden/Unlit/Premultiplied Colored (TextureClip)"
 			AlphaTest Off
 			Fog { Mode Off }
 			Offset -1, -1
-			ColorMask RGB
+			//ColorMask RGB
 			Blend One OneMinusSrcAlpha
 
 			CGPROGRAM

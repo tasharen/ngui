@@ -43,7 +43,7 @@ public abstract class UIBasicSprite : UIWidget
 	[HideInInspector][SerializeField] protected Type mType = Type.Simple;
 	[HideInInspector][SerializeField] protected FillDirection mFillDirection = FillDirection.Radial360;
 	[Range(0f, 1f)]
-	[HideInInspector][SerializeField] protected float mFillAmount = 1.0f;
+	[HideInInspector][SerializeField] protected float mFillAmount = 1f;
 	[HideInInspector][SerializeField] protected bool mInvert = false;
 	[HideInInspector][SerializeField] protected Flip mFlip = Flip.Nothing;
 	[HideInInspector][SerializeField] protected bool mApplyGradient = false;

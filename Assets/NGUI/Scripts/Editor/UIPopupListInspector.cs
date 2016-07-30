@@ -41,7 +41,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 			EditorUtility.SetDirty(mList);
 		}
 
-		if (mList.atlas == null)
+		if (mList.atlas == null && mList.background2DSprite == null && mList.highlight2DSprite == null)
 		{
 			mList.atlas = NGUISettings.atlas;
 			mList.backgroundSprite = NGUISettings.selectedSprite;

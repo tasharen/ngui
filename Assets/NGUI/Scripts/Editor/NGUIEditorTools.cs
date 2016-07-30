@@ -55,7 +55,7 @@ public static class NGUIEditorTools
 		get
 		{
 			if (mContrastTex == null) mContrastTex = CreateCheckerTex(
-				new Color(0f, 0.0f, 0f, 0.5f),
+				new Color(0f, 0f, 0f, 0.5f),
 				new Color(1f, 1f, 1f, 0.5f));
 			return mContrastTex;
 		}
@@ -2219,5 +2219,26 @@ public static class NGUIEditorTools
 	{
 		if (!NGUISettings.minimalisticLook)
 			GUILayout.Space(18f);
+	}
+
+	/// <summary>
+	/// Force the texture to be readable. Returns the asset database path to the texture.
+	/// </summary>
+
+	static public string MakeReadable (this Texture2D tex, bool readable = true)
+	{
+		string path = AssetDatabase.GetAssetPath(tex);
+
+		if (!string.IsNullOrEmpty(path))
+		{
+			TextureImporter textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
+
+			if (textureImporter != null && textureImporter.isReadable != readable)
+			{
+				textureImporter.isReadable = readable;
+				AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+			}
+		}
+		return path;
 	}
 }

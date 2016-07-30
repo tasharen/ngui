@@ -54,8 +54,15 @@ static public class NGUITools
 	{
 		get
 		{
+#if !UNITY_4_7
+			if (Application.platform == RuntimePlatform.WebGLPlayer) return false;
+#endif
+#if UNITY_4_7 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2 || UNITY_5_3
 			return Application.platform != RuntimePlatform.WindowsWebPlayer &&
 				Application.platform != RuntimePlatform.OSXWebPlayer;
+#else
+			return true;
+#endif
 		}
 	}
 
@@ -481,7 +488,8 @@ static public class NGUITools
 	{
 		GameObject go = new GameObject();
 #if UNITY_EDITOR
-		if (undo) UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
+		if (undo && !Application.isPlaying)
+			UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
 #endif
 		if (parent != null)
 		{
@@ -503,7 +511,8 @@ static public class NGUITools
 	{
 		GameObject go = GameObject.Instantiate(prefab) as GameObject;
 #if UNITY_EDITOR
-		UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
+		if (!Application.isPlaying)
+			UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
 #endif
 		if (go != null && parent != null)
 		{
@@ -1861,6 +1870,7 @@ static public class NGUITools
 
 			if (mSizeFrame != frame || !Application.isPlaying)
 			{
+				Profiler.BeginSample("Editor-only GC allocation (NGUITools.screenSize)");
 				mSizeFrame = frame;
 
 				if (s_GetSizeOfMainGameView == null && !mCheckedMainViewFunc)
@@ -1894,6 +1904,7 @@ static public class NGUITools
 					mGameSize = s_GetSizeOfMainGameView();
 				}
 				else mGameSize = new Vector2(Screen.width, Screen.height);
+				Profiler.EndSample();
 			}
 			return mGameSize;
 		}
