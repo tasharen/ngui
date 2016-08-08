@@ -1259,6 +1259,9 @@ public class UICamera : MonoBehaviour
 
 			// Convert to view space
 			currentCamera = cam.cachedCamera;
+#if !UNITY_4_7 && !UNITY_5_0 && !UNITY_5_1 && !UNITY_5_2
+			if (currentCamera.targetDisplay != 0) continue;
+#endif
 			Vector3 pos = currentCamera.ScreenToViewportPoint(inPos);
 			if (float.IsNaN(pos.x) || float.IsNaN(pos.y)) continue;
 

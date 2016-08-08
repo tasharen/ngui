@@ -100,7 +100,7 @@ static public class NGUIText
 		finalSize = Mathf.RoundToInt(fontSize / pixelDensity);
 		finalSpacingX = spacingX * fontScale;
 		finalLineHeight = (fontSize + spacingY) * fontScale;
-		useSymbols = (bitmapFont != null && bitmapFont.hasSymbols) && encoding && symbolStyle != SymbolStyle.None;
+		useSymbols = (dynamicFont != null || (bitmapFont != null && bitmapFont.hasSymbols)) && encoding && symbolStyle != SymbolStyle.None;
 
 #if DYNAMIC_FONT
 		Font font = dynamicFont;
