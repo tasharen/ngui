@@ -182,6 +182,12 @@ public class UIPopupList : UIWidgetContainer
 
 	public bool separatePanel = true;
 
+	/// <summary>
+	/// Amount by which the popup's border will overlap with the content that opened it.
+	/// </summary>
+	
+	public int overlap = 0;
+
 	public enum OpenOn
 	{
 		ClickOrTap,
@@ -941,13 +947,26 @@ public class UIPopupList : UIWidgetContainer
 			else if (atlas != null) mBackground = NGUITools.AddSprite(mChild, atlas, backgroundSprite, depth);
 			else return;
 
+			bool placeAbove = (position == Position.Above);
+
+			if (position == Position.Auto)
+			{
+				UICamera cam = UICamera.FindCameraForLayer(mSelection.layer);
+
+				if (cam != null)
+				{
+					Vector3 viewPos = cam.cachedCamera.WorldToViewportPoint(startingPosition);
+					placeAbove = (viewPos.y < 0.5f);
+				}
+			}
+
 			mBackground.pivot = UIWidget.Pivot.TopLeft;
 			mBackground.color = backgroundColor;
 
 			// We need to know the size of the background sprite for padding purposes
 			Vector4 bgPadding = mBackground.border;
 			mBgBorder = bgPadding.y;
-			mBackground.cachedTransform.localPosition = new Vector3(0f, bgPadding.y, 0f);
+			mBackground.cachedTransform.localPosition = new Vector3(0f, placeAbove ? bgPadding.y * 2f - overlap : overlap, 0f);
 
 			// Add a sprite used for the selection
 			if (highlight2DSprite != null)
@@ -973,7 +992,9 @@ public class UIPopupList : UIWidgetContainer
 			float fontHeight = activeFontSize;
 			float dynScale = activeFontScale;
 			float labelHeight = fontHeight * dynScale;
-			float x = 0f, y = -padding.y;
+			float lineHeight = labelHeight + padding.y;
+			float x = 0f, y = placeAbove ? bgPadding.y - padding.y - overlap : -padding.y - bgPadding.y + overlap;
+			float contentHeight = bgPadding.y * 2f + padding.y;
 			List<UILabel> labels = new List<UILabel>();
 
 			// Clear the selection if it's no longer present
@@ -999,8 +1020,9 @@ public class UIPopupList : UIWidgetContainer
 				lbl.alignment = alignment;
 				labels.Add(lbl);
 
-				y -= labelHeight;
-				y -= padding.y;
+				contentHeight += lineHeight;
+
+				y -= lineHeight;
 				x = Mathf.Max(x, lbl.printedSize.x);
 
 				// Add an event listener
@@ -1056,7 +1078,7 @@ public class UIPopupList : UIWidgetContainer
 
 			// Scale the background sprite to envelop the entire set of items
 			mBackground.width = Mathf.RoundToInt(x);
-			mBackground.height = Mathf.RoundToInt(-y + bgPadding.y);
+			mBackground.height = Mathf.RoundToInt(contentHeight);
 
 			// Set the label width to make alignment work
 			for (int i = 0, imax = labels.Count; i < imax; ++i)
@@ -1072,19 +1094,6 @@ public class UIPopupList : UIWidgetContainer
 			float h = labelHeight + hlspHeight * scaleFactor;
 			mHighlight.width = Mathf.RoundToInt(w);
 			mHighlight.height = Mathf.RoundToInt(h);
-
-			bool placeAbove = (position == Position.Above);
-
-			if (position == Position.Auto)
-			{
-				UICamera cam = UICamera.FindCameraForLayer(mSelection.layer);
-
-				if (cam != null)
-				{
-					Vector3 viewPos = cam.cachedCamera.WorldToViewportPoint(startingPosition);
-					placeAbove = (viewPos.y < 0.5f);
-				}
-			}
 
 			// If the list should be animated, let's animate it by expanding it
 			if (isAnimated)

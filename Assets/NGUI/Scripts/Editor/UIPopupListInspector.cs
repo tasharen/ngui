@@ -175,6 +175,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 
 			NGUIEditorTools.DrawProperty("Background", serializedObject, "backgroundColor");
 			NGUIEditorTools.DrawProperty("Highlight", serializedObject, "highlightColor");
+			NGUIEditorTools.DrawProperty("Overlap", serializedObject, "overlap", GUILayout.Width(110f));
 			NGUIEditorTools.DrawProperty("Animated", serializedObject, "isAnimated");
 			NGUIEditorTools.EndContents();
 		}
