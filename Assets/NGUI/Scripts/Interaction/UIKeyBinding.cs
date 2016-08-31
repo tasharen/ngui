@@ -107,7 +107,13 @@ public class UIKeyBinding : MonoBehaviour
 	/// Convenience function that checks whether the required modifier key is active.
 	/// </summary>
 
-	protected virtual bool IsModifierActive ()
+	protected virtual bool IsModifierActive () { return IsModifierActive(modifier); }
+
+	/// <summary>
+	/// Convenience function that checks whether the required modifier key is active.
+	/// </summary>
+
+	static public bool IsModifierActive (Modifier modifier)
 	{
 		if (modifier == Modifier.Any) return true;
 
@@ -206,7 +212,16 @@ public class UIKeyBinding : MonoBehaviour
 	/// Convert the key binding to its text format.
 	/// </summary>
 
-	public override string ToString () { return (modifier != Modifier.None) ? modifier + "+" + keyCode : keyCode.ToString(); }
+	public override string ToString () { return GetString(keyCode, modifier); }
+
+	/// <summary>
+	/// Convert the key binding to its text format.
+	/// </summary>
+
+	static public string GetString (KeyCode keyCode, Modifier modifier)
+	{
+		return (modifier != Modifier.None) ? modifier + "+" + keyCode : keyCode.ToString();
+	}
 
 	/// <summary>
 	/// Given the ToString() text, parse it for key and modifier information.
@@ -236,5 +251,20 @@ public class UIKeyBinding : MonoBehaviour
 			catch (System.Exception) { return false; }
 		}
 		return true;
+	}
+
+	/// <summary>
+	/// Get the currently active key modifier, if any.
+	/// </summary>
+
+	static public Modifier GetActiveModifier ()
+	{
+		UIKeyBinding.Modifier mod = UIKeyBinding.Modifier.None;
+
+		if (UICamera.GetKey(KeyCode.LeftAlt) || UICamera.GetKey(KeyCode.RightAlt)) mod = UIKeyBinding.Modifier.Alt;
+		else if (UICamera.GetKey(KeyCode.LeftShift) || UICamera.GetKey(KeyCode.RightShift)) mod = UIKeyBinding.Modifier.Shift;
+		else if (UICamera.GetKey(KeyCode.LeftControl) || UICamera.GetKey(KeyCode.RightControl)) mod = UIKeyBinding.Modifier.Control;
+
+		return mod;
 	}
 }

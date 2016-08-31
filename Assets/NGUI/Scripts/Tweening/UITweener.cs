@@ -463,9 +463,10 @@ public abstract class UITweener : MonoBehaviour
 		}
 #endif
 		comp.mStarted = false;
-		comp.duration = duration;
 		comp.mFactor = 0f;
-		comp.mAmountPerDelta = Mathf.Abs(comp.amountPerDelta);
+		comp.duration = duration;
+		comp.mDuration = duration;
+		comp.mAmountPerDelta = duration > 0f ? Mathf.Abs(1f / duration) : 1000f;
 		comp.style = Style.Once;
 		comp.animationCurve = new AnimationCurve(new Keyframe(0f, 0f, 0f, 1f), new Keyframe(1f, 1f, 1f, 0f));
 		comp.eventReceiver = null;

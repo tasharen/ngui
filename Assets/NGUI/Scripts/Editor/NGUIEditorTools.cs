@@ -12,7 +12,7 @@ using System.Reflection;
 /// Tools for the editor
 /// </summary>
 
-public static class NGUIEditorTools
+static public class NGUIEditorTools
 {
 	static Texture2D mBackdropTex;
 	static Texture2D mContrastTex;
@@ -826,7 +826,7 @@ public static class NGUIEditorTools
 	/// Draw the specified sprite.
 	/// </summary>
 
-	public static void DrawTexture (Texture2D tex, Rect rect, Rect uv, Color color)
+	static public void DrawTexture (Texture2D tex, Rect rect, Rect uv, Color color)
 	{
 		DrawTexture(tex, rect, uv, color, null);
 	}
@@ -835,7 +835,7 @@ public static class NGUIEditorTools
 	/// Draw the specified sprite.
 	/// </summary>
 
-	public static void DrawTexture (Texture2D tex, Rect rect, Rect uv, Color color, Material mat)
+	static public void DrawTexture (Texture2D tex, Rect rect, Rect uv, Color color, Material mat)
 	{
 		int w = Mathf.RoundToInt(tex.width * uv.width);
 		int h = Mathf.RoundToInt(tex.height * uv.height);

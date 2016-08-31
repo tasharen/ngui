@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2016 Tasharen Entertainment
-            Version 3.10.0
+            Version 3.10.1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,11 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.10.1
+- NEW: Added UICamera.ignoreAllEvents to easily disable all NGUI events.
+- FIX: Unity 5.4 editor on OSX: fixes for retina-related glitches of 5.4.
+- FIX: Gamma to linear conversion now happens in the draw call class and no longer needs to be set in each OnFill function.
 
 3.10.0
 - NEW: Added Texture2D.MakeReadable(true/false) -- a convenience extension for the editor. Not sure why this isn't built-in.

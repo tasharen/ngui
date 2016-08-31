@@ -1910,7 +1910,7 @@ public class UILabel : UIWidget
 		Color c = mEffectColor;
 		c.a *= finalAlpha;
 		if (bitmapFont != null && bitmapFont.premultipliedAlphaShader) c = NGUITools.ApplyPMA(c);
-		Color col = c.GammaToLinearSpace();
+		Color col = c;
 
 		for (int i = start; i < end; ++i)
 		{
@@ -1933,7 +1933,7 @@ public class UILabel : UIWidget
 			{
 				Color fc = c;
 				fc.a = uc.a * c.a;
-				cols.buffer[i] = fc.GammaToLinearSpace();
+				cols.buffer[i] = fc;
 			}
 		}
 	}

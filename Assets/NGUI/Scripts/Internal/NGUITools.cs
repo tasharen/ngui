@@ -478,13 +478,25 @@ static public class NGUITools
 	/// Add a new child game object.
 	/// </summary>
 
-	static public GameObject AddChild (this GameObject parent) { return AddChild(parent, true); }
+	static public GameObject AddChild (this GameObject parent) { return AddChild(parent, true, -1); }
 
 	/// <summary>
 	/// Add a new child game object.
 	/// </summary>
 
-	static public GameObject AddChild (this GameObject parent, bool undo)
+	static public GameObject AddChild (this GameObject parent, int layer) { return AddChild(parent, true, layer); }
+
+	/// <summary>
+	/// Add a new child game object.
+	/// </summary>
+
+	static public GameObject AddChild (this GameObject parent, bool undo) { return AddChild(parent, undo, -1); }
+
+	/// <summary>
+	/// Add a new child game object.
+	/// </summary>
+
+	static public GameObject AddChild (this GameObject parent, bool undo, int layer)
 	{
 		GameObject go = new GameObject();
 #if UNITY_EDITOR
@@ -498,7 +510,8 @@ static public class NGUITools
 			t.localPosition = Vector3.zero;
 			t.localRotation = Quaternion.identity;
 			t.localScale = Vector3.one;
-			go.layer = parent.layer;
+			if (layer == -1) go.layer = parent.layer;
+			else if (layer > -1 && layer < 32) go.layer = layer;
 		}
 		return go;
 	}
@@ -507,7 +520,13 @@ static public class NGUITools
 	/// Instantiate an object and add it to the specified parent.
 	/// </summary>
 
-	static public GameObject AddChild (this GameObject parent, GameObject prefab)
+	static public GameObject AddChild (this GameObject parent, GameObject prefab) { return parent.AddChild(prefab, -1); }
+
+	/// <summary>
+	/// Instantiate an object and add it to the specified parent.
+	/// </summary>
+
+	static public GameObject AddChild (this GameObject parent, GameObject prefab, int layer)
 	{
 		GameObject go = GameObject.Instantiate(prefab) as GameObject;
 #if UNITY_EDITOR
@@ -521,7 +540,8 @@ static public class NGUITools
 			t.localPosition = Vector3.zero;
 			t.localRotation = Quaternion.identity;
 			t.localScale = Vector3.one;
-			go.layer = parent.layer;
+			if (layer == -1) go.layer = parent.layer;
+			else if (layer > -1 && layer < 32) go.layer = layer;
 		}
 		return go;
 	}
@@ -840,6 +860,8 @@ static public class NGUITools
 				go.name = "UI Root";
 				root.scalingStyle = UIRoot.Scaling.Flexible;
 			}
+
+			root.UpdateScale();
 		}
 
 		// Find the first panel
@@ -900,7 +922,7 @@ static public class NGUITools
 			// Add a panel to the root
 			panel = root.gameObject.AddComponent<UIPanel>();
 #if UNITY_EDITOR
-			UnityEditor.Selection.activeGameObject = panel.gameObject;
+			if (!Application.isPlaying) UnityEditor.Selection.activeGameObject = panel.gameObject;
 #endif
 		}
 
@@ -1873,6 +1895,8 @@ static public class NGUITools
 				Profiler.BeginSample("Editor-only GC allocation (NGUITools.screenSize)");
 				mSizeFrame = frame;
 
+				// There seems to be a Unity 5.4 bug that returns invalid screen size when the mouse is clicked (wtf?) on OSX
+#if !UNITY_EDITOR_OSX
 				if (s_GetSizeOfMainGameView == null && !mCheckedMainViewFunc)
 				{
 					mCheckedMainViewFunc = true;
@@ -1903,7 +1927,9 @@ static public class NGUITools
 				{
 					mGameSize = s_GetSizeOfMainGameView();
 				}
-				else mGameSize = new Vector2(Screen.width, Screen.height);
+				else
+#endif
+					mGameSize = new Vector2(Screen.width, Screen.height);
 				Profiler.EndSample();
 			}
 			return mGameSize;
@@ -2305,31 +2331,13 @@ static public class NGUITools
 
 		if (mColorSpace == ColorSpace.Linear)
 		{
-			c.r = Mathf.GammaToLinearSpace(c.r);
-			c.g = Mathf.GammaToLinearSpace(c.g);
-			c.b = Mathf.GammaToLinearSpace(c.b);
-			c.a = Mathf.GammaToLinearSpace(c.a);
+			return new Color(
+				Mathf.GammaToLinearSpace(c.r),
+				Mathf.GammaToLinearSpace(c.g),
+				Mathf.GammaToLinearSpace(c.b),
+				Mathf.GammaToLinearSpace(c.a));
 		}
 		return c;
-	}
-
-	/// <summary>
-	/// Transforms this color from gamma to linear space, but only if the active color space is actually set to linear.
-	/// </summary>
-
-	static public Color GammaToLinearSpace (this Vector4 v)
-	{
-		if (mColorSpace == ColorSpace.Uninitialized)
-			mColorSpace = QualitySettings.activeColorSpace;
-
-		if (mColorSpace == ColorSpace.Linear)
-		{
-			v.x = Mathf.GammaToLinearSpace(v.x);
-			v.y = Mathf.GammaToLinearSpace(v.y);
-			v.z = Mathf.GammaToLinearSpace(v.z);
-			v.w = Mathf.GammaToLinearSpace(v.w);
-		}
-		return v;
 	}
 	static ColorSpace mColorSpace = ColorSpace.Uninitialized;
 }

@@ -340,7 +340,6 @@ public abstract class UIBasicSprite : UIWidget
 		Vector4 v = drawingDimensions;
 		Vector4 u = drawingUVs;
 		Color gc = drawingColor;
-		Color lc = gc.GammaToLinearSpace();
 
 		verts.Add(new Vector3(v.x, v.y));
 		verts.Add(new Vector3(v.x, v.w));
@@ -354,10 +353,10 @@ public abstract class UIBasicSprite : UIWidget
 
 		if (!mApplyGradient)
 		{
-			cols.Add(lc);
-			cols.Add(lc);
-			cols.Add(lc);
-			cols.Add(lc);
+			cols.Add(gc);
+			cols.Add(gc);
+			cols.Add(gc);
+			cols.Add(gc);
 		}
 		else
 		{
@@ -383,7 +382,6 @@ public abstract class UIBasicSprite : UIWidget
 		}
 
 		Color gc = drawingColor;
-		Color lc = gc.GammaToLinearSpace();
 		Vector4 v = drawingDimensions;
 
 		mTempPos[0].x = v.x;
@@ -455,10 +453,10 @@ public abstract class UIBasicSprite : UIWidget
 
 				if (!mApplyGradient)
 				{
-					cols.Add(lc);
-					cols.Add(lc);
-					cols.Add(lc);
-					cols.Add(lc);
+					cols.Add(gc);
+					cols.Add(gc);
+					cols.Add(gc);
+					cols.Add(gc);
 				}
 				else
 				{
@@ -481,11 +479,11 @@ public abstract class UIBasicSprite : UIWidget
 	{
 		if (y == 0 || y == 1)
 		{
-			cols.Add((color * mGradientBottom).GammaToLinearSpace());
+			cols.Add(color * mGradientBottom);
 		}
 		else if (y == 2 || y == 3)
 		{
-			cols.Add((color * mGradientTop).GammaToLinearSpace());
+			cols.Add(color * mGradientTop);
 		}
 	}
 
@@ -502,7 +500,7 @@ public abstract class UIBasicSprite : UIWidget
 		size *= pixelSize;
 		if (tex == null || size.x < 2f || size.y < 2f) return;
 
-		Color c = drawingColor.GammaToLinearSpace();
+		Color c = drawingColor;
 		Vector4 v = drawingDimensions;
 		Vector4 u;
 
@@ -588,7 +586,7 @@ public abstract class UIBasicSprite : UIWidget
 
 		Vector4 v = drawingDimensions;
 		Vector4 u = drawingUVs;
-		Color c = drawingColor.GammaToLinearSpace();
+		Color c = drawingColor;
 
 		// Horizontal and vertical filled sprites are simple -- just end the sprite prematurely
 		if (mFillDirection == FillDirection.Horizontal || mFillDirection == FillDirection.Vertical)
@@ -774,7 +772,7 @@ public abstract class UIBasicSprite : UIWidget
 			return;
 		}
 
-		Color c = drawingColor.GammaToLinearSpace();
+		Color c = drawingColor;
 		Vector4 v = drawingDimensions;
 		Vector2 tileSize = new Vector2(mInnerUV.width * tex.width, mInnerUV.height * tex.height);
 		tileSize *= pixelSize;

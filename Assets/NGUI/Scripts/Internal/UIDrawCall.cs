@@ -404,6 +404,8 @@ public class UIDrawCall : MonoBehaviour
 		}
 	}
 
+	static ColorSpace mColorSpace = ColorSpace.Uninitialized;
+
 	/// <summary>
 	/// Set the draw call's geometry.
 	/// </summary>
@@ -416,6 +418,22 @@ public class UIDrawCall : MonoBehaviour
 		// Safety check to ensure we get valid values
 		if (count > 0 && (count == uvs.size && count == cols.size) && (count % 4) == 0)
 		{
+			if (mColorSpace == ColorSpace.Uninitialized)
+				mColorSpace = QualitySettings.activeColorSpace;
+
+			if (mColorSpace == ColorSpace.Linear)
+			{
+				for (int i = 0; i < cols.size; ++i)
+				{
+					var c = cols[i];
+					c.r = Mathf.GammaToLinearSpace(c.r);
+					c.g = Mathf.GammaToLinearSpace(c.g);
+					c.b = Mathf.GammaToLinearSpace(c.b);
+					c.a = Mathf.GammaToLinearSpace(c.a);
+					cols[i] = c;
+				}
+			}
+
 			// Cache all components
 			if (mFilter == null) mFilter = gameObject.GetComponent<MeshFilter>();
 			if (mFilter == null) mFilter = gameObject.AddComponent<MeshFilter>();

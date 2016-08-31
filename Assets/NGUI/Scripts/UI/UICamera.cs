@@ -435,6 +435,12 @@ public class UICamera : MonoBehaviour
 	}
 
 	/// <summary>
+	/// If set to 'true', all events will be ignored until set to 'true'.
+	/// </summary>
+
+	static public bool ignoreAllEvents = false;
+
+	/// <summary>
 	/// If set to 'true', controller input will be flat-out ignored. Permanently, for all cameras.
 	/// </summary>
 
@@ -541,21 +547,24 @@ public class UICamera : MonoBehaviour
 		}
 		set
 		{
-			if (value == ControlScheme.Mouse)
+			if (mLastScheme != value)
 			{
-				currentKey = KeyCode.Mouse0;
-			}
-			else if (value == ControlScheme.Controller)
-			{
-				currentKey = KeyCode.JoystickButton0;
-			}
-			else if (value == ControlScheme.Touch)
-			{
-				currentKey = KeyCode.None;
-			}
-			else currentKey = KeyCode.Alpha0;
+				if (value == ControlScheme.Mouse)
+				{
+					currentKey = KeyCode.Mouse0;
+				}
+				else if (value == ControlScheme.Controller)
+				{
+					currentKey = KeyCode.JoystickButton0;
+				}
+				else if (value == ControlScheme.Touch)
+				{
+					currentKey = KeyCode.None;
+				}
+				else currentKey = KeyCode.Alpha0;
 
-			mLastScheme = value;
+				mLastScheme = value;
+			}
 		}
 	}
 
@@ -1700,6 +1709,8 @@ public class UICamera : MonoBehaviour
 	
 	void Start ()
 	{
+		list.Sort(CompareFunc);
+
 		if (eventType != EventType.World_3D && cachedCamera.transparencySortMode != TransparencySortMode.Orthographic)
 			cachedCamera.transparencySortMode = TransparencySortMode.Orthographic;
 
@@ -1738,6 +1749,9 @@ public class UICamera : MonoBehaviour
 
 	void Update ()
 	{
+		// Ignore events if asked for
+		if (ignoreAllEvents) return;
+
 		// Only the first UI layer should be processing events
 #if UNITY_EDITOR
 		if (!Application.isPlaying || !handlesEvents) return;
