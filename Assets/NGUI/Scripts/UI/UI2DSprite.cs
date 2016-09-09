@@ -119,6 +119,12 @@ public class UI2DSprite : UIBasicSprite
 	}
 
 	/// <summary>
+	/// Whether the sprite is going to have a fixed aspect ratio.
+	/// </summary>
+
+	public bool fixedAspect { get { return mFixedAspect; } set { mFixedAspect = value; } }
+
+	/// <summary>
 	/// Whether the texture is using a premultiplied alpha material.
 	/// </summary>
 

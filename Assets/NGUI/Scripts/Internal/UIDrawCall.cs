@@ -927,4 +927,17 @@ public class UIDrawCall : MonoBehaviour
 			}
 		}
 	}
+
+#if !UNITY_4_7 && !UNITY_5_0 && !UNITY_5_1 && !UNITY_5_2 && !UNITY_5_3
+	/// <summary>
+	/// Move all draw calls to the specified scene.
+	/// http://www.tasharen.com/forum/index.php?topic=13965.0
+	/// </summary>
+
+	static public void MoveToScene (UnityEngine.SceneManagement.Scene scene)
+	{
+		foreach (var dc in activeList) UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(dc.gameObject, scene);
+		foreach (var dc in inactiveList) UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(dc.gameObject, scene);
+	}
+#endif
 }
