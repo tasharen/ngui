@@ -60,6 +60,7 @@ and it will not be included in the build of your game. It's only used in the edi
 - FIX: Fixed an issue with Unity 5.4.1 in regards to the NGUI menu.
 - FIX: DragDropItem will now inverse transform the delta, so it should theoretically work even with rotated panels.
 - FIX: DragDropItem now again clears the scroll view reference after the drag operation completes.
+- FIX: Unity 5.4 DX9 bug work-around (no longer marking VBOs as dynamic).
 
 3.10.1
 - NEW: Added UICamera.ignoreAllEvents to easily disable all NGUI events.
