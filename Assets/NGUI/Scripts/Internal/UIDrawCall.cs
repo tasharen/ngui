@@ -450,7 +450,7 @@ public class UIDrawCall : MonoBehaviour
 					mMesh = new Mesh();
 					mMesh.hideFlags = HideFlags.DontSave;
 					mMesh.name = (mMaterial != null) ? "[NGUI] " + mMaterial.name : "[NGUI] Mesh";
-					mMesh.MarkDynamic();
+					if (dx9BugWorkaround == 0) mMesh.MarkDynamic();
 					setIndices = true;
 				}
 #if !UNITY_FLASH
@@ -704,12 +704,22 @@ public class UIDrawCall : MonoBehaviour
 		}
 	}
 
+	// Unity 5.4 bug work-around: http://www.tasharen.com/forum/index.php?topic=14839.0
+	static int dx9BugWorkaround = -1;
+
 	/// <summary>
 	/// Cache the property IDs.
 	/// </summary>
 
 	void Awake ()
 	{
+		if (dx9BugWorkaround == -1)
+		{
+			var pf = Application.platform;
+			dx9BugWorkaround = ((pf == RuntimePlatform.WindowsPlayer || pf == RuntimePlatform.XBOX360) &&
+				SystemInfo.graphicsShaderLevel < 40 && SystemInfo.graphicsDeviceVersion.Contains("Direct3D")) ? 1 : 0;
+		}
+
 		if (ClipRange == null)
 		{
 			ClipRange = new int[]
