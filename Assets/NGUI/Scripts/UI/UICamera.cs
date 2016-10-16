@@ -489,6 +489,12 @@ public class UICamera : MonoBehaviour
 	static public Vector3 lastWorldPosition = Vector3.zero;
 
 	/// <summary>
+	/// Last raycast into the world space.
+	/// </summary>
+
+	static public Ray lastWorldRay = new Ray();
+
+	/// <summary>
 	/// Last raycast hit prior to sending out the event. This is useful if you want detailed information
 	/// about what was actually hit in your OnClick, OnHover, and other event functions.
 	/// Note that this is not going to be valid if you're using 2D colliders.
@@ -719,6 +725,14 @@ public class UICamera : MonoBehaviour
 	// Mouse events
 	static MouseOrTouch[] mMouse = new MouseOrTouch[] { new MouseOrTouch(), new MouseOrTouch(), new MouseOrTouch() };
 
+	/// <summary>
+	/// Access to the mouse-related data. This is intended to be read-only.
+	/// </summary>
+
+	static public MouseOrTouch mouse0 { get { return mMouse[0]; } }
+	static public MouseOrTouch mouse1 { get { return mMouse[1]; } }
+	static public MouseOrTouch mouse2 { get { return mMouse[2]; } }
+
 	// Joystick/controller/keyboard event
 	static public MouseOrTouch controller = new MouseOrTouch();
 
@@ -784,15 +798,46 @@ public class UICamera : MonoBehaviour
 			for (int i = 0, imax = activeTouches.Count; i < imax; ++i)
 			{
 				MouseOrTouch touch = activeTouches[i];
-				if (touch.pressed != null && touch.pressed != fallThrough && NGUITools.FindInParents<UIRoot>(touch.pressed) != null)
-					return true;
+				if (touch.pressed != null && touch.pressed != fallThrough && NGUITools.FindInParents<UIRoot>(touch.pressed) != null) return true;
 			}
 
-			if (mMouse[0].current != null && mMouse[0].current != fallThrough && NGUITools.FindInParents<UIRoot>(mMouse[0].current) != null)
-				return true;
+			for (int i = 0; i < 3; ++i)
+			{
+				var m = mMouse[i];
+				if (m.current != null && m.current != fallThrough && NGUITools.FindInParents<UIRoot>(m.current) != null) return true;
+			}
 
-			if (controller.pressed != null && controller.pressed != fallThrough && NGUITools.FindInParents<UIRoot>(controller.pressed) != null)
-				return true;
+			if (controller.pressed != null && controller.pressed != fallThrough && NGUITools.FindInParents<UIRoot>(controller.pressed) != null) return true;
+
+			return false;
+		}
+	}
+
+	/// <summary>
+	/// Much like 'isOverUI', but also returns 'true' if there is currently an active mouse press on a UI element, or if a UI input has focus.
+	/// </summary>
+
+	static public bool uiHasFocus
+	{
+		get
+		{
+			if (inputHasFocus) return true;
+			if (currentTouch != null) return currentTouch.isOverUI;
+
+			for (int i = 0, imax = activeTouches.Count; i < imax; ++i)
+			{
+				MouseOrTouch touch = activeTouches[i];
+				if (touch.pressed != null && touch.pressed != fallThrough && NGUITools.FindInParents<UIRoot>(touch.pressed) != null) return true;
+			}
+
+			for (int i = 0; i < 3; ++i)
+			{
+				var m = mMouse[i];
+				if (m.pressed != null && m.pressed != fallThrough && NGUITools.FindInParents<UIRoot>(m.pressed) != null) return true;
+				if (m.current != null && m.current != fallThrough && NGUITools.FindInParents<UIRoot>(m.current) != null) return true;
+			}
+
+			if (controller.pressed != null && controller.pressed != fallThrough && NGUITools.FindInParents<UIRoot>(controller.pressed) != null) return true;
 
 			return false;
 		}
@@ -1286,7 +1331,13 @@ public class UICamera : MonoBehaviour
 
 			if (cam.eventType == EventType.World_3D)
 			{
+				lastWorldRay = ray;
+
+#if UNITY_4_7
 				if (Physics.Raycast(ray, out lastHit, dist, mask))
+#else
+				if (Physics.Raycast(ray, out lastHit, dist, mask, QueryTriggerInteraction.Ignore))
+#endif
 				{
 					lastWorldPosition = lastHit.point;
 					mRayHitObject = lastHit.collider.gameObject;
@@ -1302,7 +1353,11 @@ public class UICamera : MonoBehaviour
 			}
 			else if (cam.eventType == EventType.UI_3D)
 			{
+#if UNITY_4_7
 				RaycastHit[] hits = Physics.RaycastAll(ray, dist, mask);
+#else
+				RaycastHit[] hits = Physics.RaycastAll(ray, dist, mask, QueryTriggerInteraction.Collide);
+#endif
 
 				if (hits.Length > 1)
 				{
@@ -1347,6 +1402,7 @@ public class UICamera : MonoBehaviour
 						{
 							lastHit = mHits[b].hit;
 							mRayHitObject = mHits[b].go;
+							lastWorldRay = ray;
 							lastWorldPosition = mHits[b].point;
 							mHits.Clear();
 							return true;
@@ -1375,6 +1431,7 @@ public class UICamera : MonoBehaviour
 					if (IsVisible(hits[0].point, hits[0].collider.gameObject))
 					{
 						lastHit = hits[0];
+						lastWorldRay = ray;
 						lastWorldPosition = hits[0].point;
 						mRayHitObject = lastHit.collider.gameObject;
 						return true;

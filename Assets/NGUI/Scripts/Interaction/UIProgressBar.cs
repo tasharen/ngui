@@ -220,14 +220,14 @@ public class UIProgressBar : UIWidgetContainer
 
 			if (mStarted && before != value)
 			{
-				ForceUpdate();
-
 				if (notify && NGUITools.GetActive(this) && EventDelegate.IsValid(onChange))
 				{
 					current = this;
 					EventDelegate.Execute(onChange);
 					current = null;
 				}
+
+				ForceUpdate();
 			}
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
