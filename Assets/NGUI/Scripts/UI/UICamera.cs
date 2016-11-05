@@ -1344,7 +1344,7 @@ public class UICamera : MonoBehaviour
 
 					if (!cam.eventsGoToColliders)
 					{
-						Rigidbody rb = FindRootRigidbody(mRayHitObject.transform);
+						var rb = mRayHitObject.gameObject.GetComponentInParent<Rigidbody>();
 						if (rb != null) mRayHitObject = rb.gameObject;
 					}
 					return true;

@@ -631,6 +631,8 @@ public class UIPanelInspector : UIRectEditor
 				EditorUtility.SetDirty(mPanel);
 			}
 
+			serializedObject.DrawProperty("shadowMode");
+
 			GUILayout.BeginHorizontal();
 			bool cull = EditorGUILayout.Toggle("Cull", mPanel.cullWhileDragging, GUILayout.Width(100f));
 			GUILayout.Label("Cull widgets while dragging them", GUILayout.MinWidth(20f));

@@ -92,6 +92,9 @@ public abstract class UITweener : MonoBehaviour
 	[HideInInspector]
 	public int tweenGroup = 0;
 
+	[Tooltip("By default, Update() will be used for tweening. Setting this to 'true' will make the tween happen in FixedUpdate() insted.")]
+	public bool useFixedUpdate = false;
+
 	/// <summary>
 	/// Event delegates called when the animation finishes.
 	/// </summary>
@@ -157,16 +160,18 @@ public abstract class UITweener : MonoBehaviour
 	/// Update as soon as it's started so that there is no delay.
 	/// </summary>
 
-	protected virtual void Start () { Update(); }
+	protected virtual void Start () { DoUpdate(); }
+	protected void Update () { if (!useFixedUpdate) DoUpdate(); }
+	protected void FixedUpdate () { if (useFixedUpdate) DoUpdate(); }
 
 	/// <summary>
 	/// Update the tweening factor and call the virtual update function.
 	/// </summary>
 
-	void Update ()
+	protected void DoUpdate ()
 	{
-		float delta = ignoreTimeScale ? RealTime.deltaTime : Time.deltaTime;
-		float time = ignoreTimeScale ? RealTime.time : Time.time;
+		float delta = ignoreTimeScale && !useFixedUpdate ? RealTime.deltaTime : Time.deltaTime;
+		float time = ignoreTimeScale && !useFixedUpdate ? RealTime.time : Time.time;
 
 		if (!mStarted)
 		{

@@ -905,7 +905,10 @@ public class UIPopupList : UIWidgetContainer
 					Rigidbody2D rb = mChild.AddComponent<Rigidbody2D>();
 					rb.isKinematic = true;
 				}
-				mChild.AddComponent<UIPanel>().depth = 1000000;
+				
+				var panel = mChild.AddComponent<UIPanel>();
+				panel.depth = 1000000;
+				panel.sortingOrder = mPanel.sortingOrder;
 			}
 			current = this;
 

@@ -67,6 +67,9 @@ public class UIDrawCall : MonoBehaviour
 	Material		mDynamicMat;	// Instantiated material
 	int[]			mIndices;		// Cached indices
 
+#if !UNITY_4_7
+	ShadowMode mShadowMode = ShadowMode.None;
+#endif
 	bool mRebuildMat = true;
 	bool mLegacyShader = false;
 	int mRenderQueue = 3000;
@@ -82,13 +85,19 @@ public class UIDrawCall : MonoBehaviour
 	[System.NonSerialized]
 	bool mTextureClip = false;
 
-	public delegate void OnRenderCallback (Material mat);
-
 	/// <summary>
 	/// Callback that will be triggered at OnWillRenderObject() time.
 	/// </summary>
 
 	public OnRenderCallback onRender;
+	public delegate void OnRenderCallback (Material mat);
+
+	/// <summary>
+	/// Callback that will be triggered when a new draw call gets created.
+	/// </summary>
+
+	public OnCreateDrawCall onCreateDrawCall; 
+	public delegate void OnCreateDrawCall (UIDrawCall dc, MeshFilter filter, MeshRenderer ren);
 
 	/// <summary>
 	/// Render queue used by the draw call.
@@ -262,6 +271,53 @@ public class UIDrawCall : MonoBehaviour
 		}
 	}
 
+#if !UNITY_4_7
+	public enum ShadowMode
+	{
+		None,
+		Receive,
+		CastAndReceive,
+	}
+
+	/// <summary>
+	/// Shadow casting method.
+	/// </summary>
+
+	public ShadowMode shadowMode
+	{
+		get
+		{
+			return mShadowMode;
+		}
+		set
+		{
+			if (mShadowMode != value)
+			{
+				mShadowMode = value;
+
+				if (mRenderer != null)
+				{
+					if (mShadowMode == ShadowMode.None)
+					{
+						mRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+						mRenderer.receiveShadows = false;
+					}
+					else if (mShadowMode == ShadowMode.Receive)
+					{
+						mRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+						mRenderer.receiveShadows = true;
+					}
+					else
+					{
+						mRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+						mRenderer.receiveShadows = true;
+					}
+				}
+			}
+		}
+	}
+#endif
+
 	/// <summary>
 	/// The number of triangles in this draw call.
 	/// </summary>
@@ -366,19 +422,29 @@ public class UIDrawCall : MonoBehaviour
 
 	Material RebuildMaterial ()
 	{
-		// Destroy the old material
-		NGUITools.DestroyImmediate(mDynamicMat);
+#if UNITY_EDITOR
+		// This makes it possible to use a shared material while in edit mode
+		if (mMaterial == null || Application.isPlaying)
+#endif
+		{
+			// Destroy the old material
+			NGUITools.DestroyImmediate(mDynamicMat);
 
-		// Create a new material
-		CreateMaterial();
-		mDynamicMat.renderQueue = mRenderQueue;
+			// Create a new material
+			CreateMaterial();
+			mDynamicMat.renderQueue = mRenderQueue;
 
-		// Assign the main texture
-		if (mTexture != null) mDynamicMat.mainTexture = mTexture;
+			// Assign the main texture
+			if (mTexture != null) mDynamicMat.mainTexture = mTexture;
 
-		// Update the renderer
-		if (mRenderer != null) mRenderer.sharedMaterials = new Material[] { mDynamicMat };
-		return mDynamicMat;
+			// Update the renderer
+			if (mRenderer != null) mRenderer.sharedMaterials = new Material[] { mDynamicMat };
+			return mDynamicMat;
+		}
+#if UNITY_EDITOR
+		mRenderer.sharedMaterial = mMaterial;
+		return mMaterial;
+#endif
 	}
 
 	/// <summary>
@@ -546,6 +612,24 @@ public class UIDrawCall : MonoBehaviour
 #if UNITY_EDITOR
 				mRenderer.enabled = isActive;
 #endif
+#if !UNITY_4_7
+				if (mShadowMode == ShadowMode.None)
+				{
+					mRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+					mRenderer.receiveShadows = false;
+				}
+				else if (mShadowMode == ShadowMode.Receive)
+				{
+					mRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+					mRenderer.receiveShadows = true;
+				}
+				else
+				{
+					mRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+					mRenderer.receiveShadows = true;
+				}
+#endif
+				if (onCreateDrawCall != null) onCreateDrawCall(this, mFilter, mRenderer);
 			}
 			UpdateMaterials();
 		}
@@ -588,13 +672,13 @@ public class UIDrawCall : MonoBehaviour
 
 		for (int i = 0; i < vertexCount; i += 4)
 		{
-			rv[index++] = i;
+			rv[index++] = i + 2;
 			rv[index++] = i + 1;
-			rv[index++] = i + 2;
-
-			rv[index++] = i + 2;
-			rv[index++] = i + 3;
 			rv[index++] = i;
+
+			rv[index++] = i;
+			rv[index++] = i + 3;
+			rv[index++] = i + 2;
 		}
 
 		if (mCache.Count > maxIndexBufferCache) mCache.RemoveAt(0);

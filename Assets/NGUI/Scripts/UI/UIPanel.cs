@@ -47,6 +47,14 @@ public class UIPanel : UIRect
 	
 	public bool generateNormals = false;
 
+#if !UNITY_4_7
+	/// <summary>
+	/// Whether generated geometry will cast shadows.
+	/// </summary>
+
+	public UIDrawCall.ShadowMode shadowMode = UIDrawCall.ShadowMode.None;
+#endif
+
 	/// <summary>
 	/// Whether widgets drawn by this panel are static (won't move). This will improve performance.
 	/// </summary>
@@ -153,6 +161,12 @@ public class UIPanel : UIRect
 	/// </summary>
 
 	public OnClippingMoved onClipMove;
+
+	/// <summary>
+	/// Event callback that's triggered whenever the panel creates a new draw call.
+	/// </summary>
+
+	public UIDrawCall.OnCreateDrawCall onCreateDrawCall;
 
 	// Clip texture feature contributed by the community: http://www.tasharen.com/forum/index.php?topic=9268.0
 	[HideInInspector][SerializeField] Texture2D mClipTexture = null;
@@ -1366,6 +1380,7 @@ public class UIPanel : UIRect
 						dc.depthStart = w.depth;
 						dc.depthEnd = dc.depthStart;
 						dc.panel = this;
+						dc.onCreateDrawCall = onCreateDrawCall;
 					}
 					else
 					{
@@ -1523,6 +1538,9 @@ public class UIPanel : UIRect
 			dc.sortingOrder = mSortingOrder;
 			dc.sortingLayerName = mSortingLayerName;
 			dc.clipTexture = mClipTexture;
+#if !UNITY_4_7
+			dc.shadowMode = shadowMode;
+#endif
 		}
 	}
 
