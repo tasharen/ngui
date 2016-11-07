@@ -169,6 +169,14 @@ public class UIPanel : UIRect
 	public OnClippingMoved onClipMove;
 
 	/// <summary>
+	/// There may be cases where you will want to create a custom material per-widget in order to have unique draw calls.
+	/// If that's the case, set this delegate and return your newly created material. Note that it's up to you to cache this material for the next call.
+	/// </summary>
+
+	public OnCreateMaterial onCreateMaterial;
+	public delegate Material OnCreateMaterial (UIWidget widget, Material mat);
+
+	/// <summary>
 	/// Event callback that's triggered whenever the panel creates a new draw call.
 	/// </summary>
 
@@ -1360,6 +1368,8 @@ public class UIPanel : UIRect
 				Material mt = w.material;
 				Texture tx = w.mainTexture;
 				Shader sd = w.shader;
+
+				if (onCreateMaterial != null) mt = onCreateMaterial(w, mt);
 
 				if (mat != mt || tex != tx || sdr != sd)
 				{
