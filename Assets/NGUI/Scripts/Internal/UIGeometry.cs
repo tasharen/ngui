@@ -37,6 +37,14 @@ public class UIGeometry
 
 	public BetterList<Color> cols = new BetterList<Color>();
 
+	/// <summary>
+	/// Custom delegate called after WriteToBuffers finishes filling in the geometry.
+	/// Use it to apply any and all modifications to vertices that you need.
+	/// </summary>
+
+	public OnCustomWrite onCustomWrite;
+	public delegate void OnCustomWrite (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color> c, BetterList<Vector3> n, BetterList<Vector4> t, BetterList<Vector2> u2);
+
 	// Relative-to-panel vertices, normal, and tangent
 	BetterList<Vector3> mRtpVerts = new BetterList<Vector3>();
 	Vector3 mRtpNormal;
@@ -128,6 +136,8 @@ public class UIGeometry
 					u2.Add(uv2);
 				}
 			}
+
+			if (onCustomWrite != null) onCustomWrite(v, u, c, n, t, u2);
 		}
 	}
 }
