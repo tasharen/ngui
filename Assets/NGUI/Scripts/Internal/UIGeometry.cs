@@ -121,7 +121,7 @@ public class UIGeometry
 			{
 				Vector2 uv2;
 
-				for (int i = 0; i < mRtpVerts.size; ++i)
+				for (int i = 0; i < verts.size; ++i)
 				{
 					uv2.x = verts[i].x;
 					uv2.y = verts[i].y;
