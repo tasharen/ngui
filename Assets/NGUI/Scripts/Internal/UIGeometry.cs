@@ -92,7 +92,7 @@ public class UIGeometry
 	/// Step 3: Fill the specified buffer using the transformed values.
 	/// </summary>
 
-	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color> c, BetterList<Vector3> n, BetterList<Vector4> t)
+	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color> c, BetterList<Vector3> n, BetterList<Vector4> t, BetterList<Vector2> u2)
 	{
 		if (mRtpVerts != null && mRtpVerts.size > 0)
 		{
@@ -114,6 +114,18 @@ public class UIGeometry
 					c.Add(cols.buffer[i]);
 					n.Add(mRtpNormal);
 					t.Add(mRtpTan);
+				}
+			}
+
+			if (u2 != null)
+			{
+				Vector2 uv2;
+
+				for (int i = 0; i < mRtpVerts.size; ++i)
+				{
+					uv2.x = verts[i].x;
+					uv2.y = verts[i].y;
+					u2.Add(uv2);
 				}
 			}
 		}

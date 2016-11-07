@@ -54,6 +54,7 @@ public class UIDrawCall : MonoBehaviour
 	[HideInInspector][System.NonSerialized] public BetterList<Vector3> norms = new BetterList<Vector3>();
 	[HideInInspector][System.NonSerialized] public BetterList<Vector4> tans = new BetterList<Vector4>();
 	[HideInInspector][System.NonSerialized] public BetterList<Vector2> uvs = new BetterList<Vector2>();
+	[HideInInspector][System.NonSerialized] public BetterList<Vector2> uv2 = new BetterList<Vector2>();
 	[HideInInspector][System.NonSerialized] public BetterList<Color> cols = new BetterList<Color>();
 
 	Material		mMaterial;		// Material used by this draw call
@@ -247,7 +248,8 @@ public class UIDrawCall : MonoBehaviour
 		set
 		{
 			mTexture = value;
-			if (mDynamicMat != null) mDynamicMat.mainTexture = value;
+			if (mBlock == null) mBlock = new MaterialPropertyBlock();
+			mBlock.SetTexture("_MainTex", value);
 		}
 	}
 
@@ -434,9 +436,6 @@ public class UIDrawCall : MonoBehaviour
 			CreateMaterial();
 			mDynamicMat.renderQueue = mRenderQueue;
 
-			// Assign the main texture
-			if (mTexture != null) mDynamicMat.mainTexture = mTexture;
-
 			// Update the renderer
 			if (mRenderer != null) mRenderer.sharedMaterials = new Material[] { mDynamicMat };
 			return mDynamicMat;
@@ -523,6 +522,7 @@ public class UIDrawCall : MonoBehaviour
 				// If the buffer length doesn't match, we need to trim all buffers
 				bool trim = (uvs.buffer.Length != verts.buffer.Length) ||
 					(cols.buffer.Length != verts.buffer.Length) ||
+					(uv2.buffer != null && uv2.buffer.Length != uv2.buffer.Length) ||
 					(norms.buffer != null && norms.buffer.Length != verts.buffer.Length) ||
 					(tans.buffer != null && tans.buffer.Length != verts.buffer.Length);
 
@@ -548,10 +548,10 @@ public class UIDrawCall : MonoBehaviour
 
 					mMesh.vertices = verts.ToArray();
 					mMesh.uv = uvs.ToArray();
+					mMesh.uv2 = (uv2 != null && uv2.size == verts.size) ? uv2.ToArray() : null;
 					mMesh.colors = cols.ToArray();
-
-					if (norms != null) mMesh.normals = norms.ToArray();
-					if (tans != null) mMesh.tangents = tans.ToArray();
+					mMesh.normals = (norms != null && norms.size == verts.size) ? norms.ToArray() : null;
+					mMesh.tangents = (tans != null && tans.size == verts.size) ? tans.ToArray() : null;
 				}
 				else
 				{
@@ -563,10 +563,10 @@ public class UIDrawCall : MonoBehaviour
 
 					mMesh.vertices = verts.buffer;
 					mMesh.uv = uvs.buffer;
+					mMesh.uv2 = (uv2 != null && uv2.size == verts.size) ? uv2.buffer : null;
 					mMesh.colors = cols.buffer;
-
-					if (norms != null) mMesh.normals = norms.buffer;
-					if (tans != null) mMesh.tangents = tans.buffer;
+					mMesh.normals = (norms != null && norms.size == verts.size) ? norms.buffer : null;
+					mMesh.tangents = (tans != null && tans.size == verts.size) ? tans.buffer : null;
 				}
 #else
 				mTriangles = (verts.size >> 1);
@@ -579,10 +579,10 @@ public class UIDrawCall : MonoBehaviour
 
 				mMesh.vertices = verts.ToArray();
 				mMesh.uv = uvs.ToArray();
+				mMesh.uv2 = (uv2 != null && uv2.size == verts.size) ? uv2.ToArray() : null;
 				mMesh.colors = cols.ToArray();
-
-				if (norms != null) mMesh.normals = norms.ToArray();
-				if (tans != null) mMesh.tangents = tans.ToArray();
+				mMesh.normals = (norms != null && norms.size == verts.size) ? norms.ToArray() : null;
+				mMesh.tangents = (tans != null && tans.size == verts.size) ? tans.ToArray() : null;
 #endif
 				if (setIndices)
 				{
@@ -641,6 +641,7 @@ public class UIDrawCall : MonoBehaviour
 
 		verts.Clear();
 		uvs.Clear();
+		uv2.Clear();
 		cols.Clear();
 		norms.Clear();
 		tans.Clear();
@@ -692,10 +693,13 @@ public class UIDrawCall : MonoBehaviour
 	/// We also want to update the material's properties before it's actually used.
 	/// </summary>
 
+	protected MaterialPropertyBlock mBlock;
+
 	void OnWillRenderObject ()
 	{
 		UpdateMaterials();
 
+		if (mBlock != null) mRenderer.SetPropertyBlock(mBlock);
 		if (onRender != null) onRender(mDynamicMat ?? mMaterial);
 		if (mDynamicMat == null || mClipCount == 0) return;
 
@@ -953,6 +957,10 @@ public class UIDrawCall : MonoBehaviour
 
 			if (dc)
 			{
+#if SHOW_HIDDEN_OBJECTS && UNITY_EDITOR
+				if (UnityEditor.Selection.activeGameObject == dc.gameObject)
+					UnityEditor.Selection.activeGameObject = null;
+#endif
 				if (playing) NGUITools.SetActive(dc.gameObject, false);
 				else NGUITools.DestroyImmediate(dc.gameObject);
 			}
@@ -979,7 +987,15 @@ public class UIDrawCall : MonoBehaviour
 		for (int i = mInactiveList.size; i > 0; )
 		{
 			UIDrawCall dc = mInactiveList[--i];
-			if (dc) NGUITools.DestroyImmediate(dc.gameObject);
+
+			if (dc)
+			{
+#if SHOW_HIDDEN_OBJECTS && UNITY_EDITOR
+				if (UnityEditor.Selection.activeGameObject == dc.gameObject)
+					UnityEditor.Selection.activeGameObject = null;
+#endif
+				NGUITools.DestroyImmediate(dc.gameObject);
+			}
 		}
 		mInactiveList.Clear();
 	}
@@ -1017,6 +1033,10 @@ public class UIDrawCall : MonoBehaviour
 			else
 			{
 				mActiveList.Remove(dc);
+#if SHOW_HIDDEN_OBJECTS && UNITY_EDITOR
+				if (UnityEditor.Selection.activeGameObject == dc.gameObject)
+					UnityEditor.Selection.activeGameObject = null;
+#endif
 				NGUITools.DestroyImmediate(dc.gameObject);
 			}
 		}

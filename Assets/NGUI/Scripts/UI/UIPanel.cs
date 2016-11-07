@@ -42,10 +42,16 @@ public class UIPanel : UIRect
 	public bool showInPanelTool = true;
 
 	/// <summary>
-	/// Whether normals and tangents will be generated for all meshes
+	/// Whether normals and tangents will be generated for all meshes.
 	/// </summary>
 	
 	public bool generateNormals = false;
+
+	/// <summary>
+	/// Whether secondary UV coordinates will be generated for all meshes.
+	/// </summary>
+
+	public bool generateUV2 = false;
 
 #if !UNITY_4_7
 	/// <summary>
@@ -1392,8 +1398,8 @@ public class UIPanel : UIRect
 					w.drawCall = dc;
 
 					++count;
-					if (generateNormals) w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans);
-					else w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, null, null);
+					if (generateNormals) w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans, generateUV2 ? dc.uv2 : null);
+					else w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, null, null, generateUV2 ? dc.uv2 : null);
 
 					if (w.mOnRender != null)
 					{
@@ -1446,8 +1452,8 @@ public class UIPanel : UIRect
 					{
 						++count;
 						
-						if (generateNormals) w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans);
-						else w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, null, null);
+						if (generateNormals) w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans, generateUV2 ? dc.uv2 : null);
+						else w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, null, null, generateUV2 ? dc.uv2 : null);
 
 						if (w.mOnRender != null)
 						{

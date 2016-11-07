@@ -631,6 +631,18 @@ public class UIPanelInspector : UIRectEditor
 				EditorUtility.SetDirty(mPanel);
 			}
 
+			GUILayout.BeginHorizontal();
+			bool uv2 = EditorGUILayout.Toggle("UV2", mPanel.generateUV2, GUILayout.Width(100f));
+			GUILayout.Label("For custom shader effects", GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
+
+			if (mPanel.generateUV2 != uv2)
+			{
+				mPanel.generateUV2 = uv2;
+				mPanel.RebuildAllDrawCalls();
+				EditorUtility.SetDirty(mPanel);
+			}
+
 			serializedObject.DrawProperty("shadowMode");
 
 			GUILayout.BeginHorizontal();

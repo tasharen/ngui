@@ -1494,9 +1494,9 @@ public class UIWidget : UIRect
 	/// Append the local geometry buffers to the specified ones.
 	/// </summary>
 
-	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color> c, BetterList<Vector3> n, BetterList<Vector4> t)
+	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color> c, BetterList<Vector3> n, BetterList<Vector4> t, BetterList<Vector2> u2)
 	{
-		geometry.WriteToBuffers(v, u, c, n, t);
+		geometry.WriteToBuffers(v, u, c, n, t, u2);
 	}
 
 	/// <summary>
