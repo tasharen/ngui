@@ -1366,10 +1366,11 @@ public class UIPanel : UIRect
 			if (w.isVisible && w.hasVertices)
 			{
 				Material mt = w.material;
+				
+				if (onCreateMaterial != null) mt = onCreateMaterial(w, mt);
+
 				Texture tx = w.mainTexture;
 				Shader sd = w.shader;
-
-				if (onCreateMaterial != null) mt = onCreateMaterial(w, mt);
 
 				if (mat != mt || tex != tx || sdr != sd)
 				{
