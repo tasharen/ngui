@@ -24,10 +24,39 @@ public class UISprite : UIBasicSprite
 	[System.NonSerialized] bool mSpriteSet = false;
 
 	/// <summary>
-	/// Retrieve the material used by the font.
+	/// Main texture is assigned on the atlas.
 	/// </summary>
 
-	public override Material material { get { return (mAtlas != null) ? mAtlas.spriteMaterial : null; } }
+	public override Texture mainTexture
+	{
+		get
+		{
+			var mat = (mAtlas != null) ? mAtlas.spriteMaterial : null;
+			return (mat != null) ? mat.mainTexture : null;
+		}
+		set
+		{
+			base.mainTexture = value;
+		}
+	}
+
+	/// <summary>
+	/// Material comes from the base class first, and sprite atlas last.
+	/// </summary>
+
+	public override Material material
+	{
+		get
+		{
+			var mat = base.material;
+			if (mat != null) return mat;
+			return (mAtlas != null ? mAtlas.spriteMaterial : null);
+		}
+		set
+		{
+			base.material = value;
+		}
+	}
 
 	/// <summary>
 	/// Atlas used by this widget.

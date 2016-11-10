@@ -1425,6 +1425,31 @@ static public class NGUITools
 	}
 
 	/// <summary>
+	/// Given the root widget, adjust its position so that it fits on the screen.
+	/// </summary>
+
+	static public void FitOnScreen (this Camera cam, Transform t)
+	{
+		var bounds = NGUIMath.CalculateRelativeWidgetBounds(t, t);
+
+		var sp = cam.WorldToScreenPoint(t.position);
+		var min = sp + bounds.min;
+		var max = sp + bounds.max;
+
+		var sw = Screen.width;
+		var sh = Screen.height;
+		var offset = Vector2.zero;
+
+		if (min.x < 0f) offset.x = -min.x;
+		else if (max.x > sw) offset.x = sw - max.x;
+
+		if (min.y < 0f) offset.y = -min.y;
+		else if (max.y > sh) offset.y = sh - max.y;
+
+		if (offset.sqrMagnitude > 0f) t.localPosition += new Vector3(offset.x, offset.y, 0f);
+	}
+
+	/// <summary>
 	/// Fit the specified NGUI hierarchy on the screen.
 	/// Example: uiCamera.FitOnScreen(contentObjectTransform, UICamera.lastEventPosition);
 	/// </summary>

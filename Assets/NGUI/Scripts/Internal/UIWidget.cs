@@ -34,6 +34,9 @@ public class UIWidget : UIRect
 	[HideInInspector][SerializeField] protected int mHeight = 100;
 	[HideInInspector][SerializeField] protected int mDepth = 0;
 
+	[Tooltip("Custom material, if desired")]
+	[HideInInspector][SerializeField] protected Material mMat;
+
 	public delegate void OnDimensionsChanged ();
 	public delegate void OnPostFillCallback (UIWidget widget, int bufferOffset, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols);
 
@@ -557,18 +560,23 @@ public class UIWidget : UIRect
 	}
 
 	/// <summary>
-	/// Material used by the widget.
+	/// Custom material associated with the widget, if any.
 	/// </summary>
 
 	public virtual Material material
 	{
 		get
 		{
-			return null;
+			return mMat;
 		}
 		set
 		{
-			throw new System.NotImplementedException(GetType() + " has no material setter");
+			if (mMat != value)
+			{
+				RemoveFromPanel();
+				mMat = value;
+				MarkAsChanged();
+			}
 		}
 	}
 

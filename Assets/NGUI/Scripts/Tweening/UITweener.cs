@@ -476,6 +476,8 @@ public abstract class UITweener : MonoBehaviour
 		comp.animationCurve = new AnimationCurve(new Keyframe(0f, 0f, 0f, 1f), new Keyframe(1f, 1f, 1f, 0f));
 		comp.eventReceiver = null;
 		comp.callWhenFinished = null;
+		comp.onFinished.Clear();
+		if (comp.mTemp != null) comp.mTemp.Clear();
 		comp.enabled = true;
 		return comp;
 	}
