@@ -50,12 +50,12 @@ public class UIDrawCall : MonoBehaviour
 	[HideInInspector][System.NonSerialized] public UIPanel panel;
 	[HideInInspector][System.NonSerialized] public Texture2D clipTexture;
 	[HideInInspector][System.NonSerialized] public bool alwaysOnScreen = false;
-	[HideInInspector][System.NonSerialized] public BetterList<Vector3> verts = new BetterList<Vector3>();
-	[HideInInspector][System.NonSerialized] public BetterList<Vector3> norms = new BetterList<Vector3>();
-	[HideInInspector][System.NonSerialized] public BetterList<Vector4> tans = new BetterList<Vector4>();
-	[HideInInspector][System.NonSerialized] public BetterList<Vector2> uvs = new BetterList<Vector2>();
-	[HideInInspector][System.NonSerialized] public BetterList<Vector2> uv2 = new BetterList<Vector2>();
-	[HideInInspector][System.NonSerialized] public BetterList<Color> cols = new BetterList<Color>();
+	[HideInInspector][System.NonSerialized] public List<Vector3> verts = new List<Vector3>();
+	[HideInInspector][System.NonSerialized] public List<Vector3> norms = new List<Vector3>();
+	[HideInInspector][System.NonSerialized] public List<Vector4> tans = new List<Vector4>();
+	[HideInInspector][System.NonSerialized] public List<Vector2> uvs = new List<Vector2>();
+	[HideInInspector][System.NonSerialized] public List<Vector4> uv2 = new List<Vector4>();
+	[HideInInspector][System.NonSerialized] public List<Color> cols = new List<Color>();
 
 	Material		mMaterial;		// Material used by this draw call
 	Texture			mTexture;		// Main texture used by the material
@@ -478,17 +478,17 @@ public class UIDrawCall : MonoBehaviour
 	public void UpdateGeometry (int widgetCount)
 	{
 		this.widgetCount = widgetCount;
-		int count = verts.size;
+		int vertexCount = verts.Count;
 
 		// Safety check to ensure we get valid values
-		if (count > 0 && (count == uvs.size && count == cols.size) && (count % 4) == 0)
+		if (vertexCount > 0 && (vertexCount == uvs.Count && vertexCount == cols.Count) && (vertexCount % 4) == 0)
 		{
 			if (mColorSpace == ColorSpace.Uninitialized)
 				mColorSpace = QualitySettings.activeColorSpace;
 
 			if (mColorSpace == ColorSpace.Linear)
 			{
-				for (int i = 0; i < cols.size; ++i)
+				for (int i = 0; i < vertexCount; ++i)
 				{
 					var c = cols[i];
 					c.r = Mathf.GammaToLinearSpace(c.r);
@@ -503,10 +503,10 @@ public class UIDrawCall : MonoBehaviour
 			if (mFilter == null) mFilter = gameObject.GetComponent<MeshFilter>();
 			if (mFilter == null) mFilter = gameObject.AddComponent<MeshFilter>();
 
-			if (verts.size < 65000)
+			if (vertexCount < 65000)
 			{
 				// Populate the index buffer
-				int indexCount = (count >> 1) * 3;
+				int indexCount = (vertexCount >> 1) * 3;
 				bool setIndices = (mIndices == null || mIndices.Length != indexCount);
 
 				// Create the mesh
@@ -520,73 +520,45 @@ public class UIDrawCall : MonoBehaviour
 				}
 #if !UNITY_FLASH
 				// If the buffer length doesn't match, we need to trim all buffers
-				bool trim = (uvs.buffer.Length != verts.buffer.Length) ||
-					(cols.buffer.Length != verts.buffer.Length) ||
-					(uv2.buffer != null && uv2.buffer.Length != uv2.buffer.Length) ||
-					(norms.buffer != null && norms.buffer.Length != verts.buffer.Length) ||
-					(tans.buffer != null && tans.buffer.Length != verts.buffer.Length);
+				bool trim = uvs.Count != vertexCount || cols.Count != vertexCount || uv2.Count != vertexCount || norms.Count != vertexCount || tans.Count != vertexCount;
 
 				// Non-automatic render queues rely on Z position, so it's a good idea to trim everything
 				if (!trim && panel != null && panel.renderQueue != UIPanel.RenderQueue.Automatic)
-					trim = (mMesh == null || mMesh.vertexCount != verts.buffer.Length);
+					trim = (mMesh == null || mMesh.vertexCount != verts.Count);
 
 				// NOTE: Apparently there is a bug with Adreno devices:
 				// http://www.tasharen.com/forum/index.php?topic=8415.0
-#if !UNITY_ANDROID
+ #if !UNITY_ANDROID
 				// If the number of vertices in the buffer is less than half of the full buffer, trim it
-				if (!trim && (verts.size << 1) < verts.buffer.Length) trim = true;
+				if (!trim && (vertexCount << 1) < verts.Count) trim = true;
+ #endif
 #endif
-				mTriangles = (verts.size >> 1);
+				mTriangles = (vertexCount >> 1);
 
-				if (trim || verts.buffer.Length > 65000)
-				{
-					if (trim || mMesh.vertexCount != verts.size)
-					{
-						mMesh.Clear();
-						setIndices = true;
-					}
-
-					mMesh.vertices = verts.ToArray();
-					mMesh.uv = uvs.ToArray();
-					mMesh.uv2 = (uv2 != null && uv2.size == verts.size) ? uv2.ToArray() : null;
-					mMesh.colors = cols.ToArray();
-					mMesh.normals = (norms != null && norms.size == verts.size) ? norms.ToArray() : null;
-					mMesh.tangents = (tans != null && tans.size == verts.size) ? tans.ToArray() : null;
-				}
-				else
-				{
-					if (mMesh.vertexCount != verts.buffer.Length)
-					{
-						mMesh.Clear();
-						setIndices = true;
-					}
-
-					mMesh.vertices = verts.buffer;
-					mMesh.uv = uvs.buffer;
-					mMesh.uv2 = (uv2 != null && uv2.size == verts.size) ? uv2.buffer : null;
-					mMesh.colors = cols.buffer;
-					mMesh.normals = (norms != null && norms.size == verts.size) ? norms.buffer : null;
-					mMesh.tangents = (tans != null && tans.size == verts.size) ? tans.buffer : null;
-				}
-#else
-				mTriangles = (verts.size >> 1);
-
-				if (mMesh.vertexCount != verts.size)
+				if (mMesh.vertexCount != vertexCount)
 				{
 					mMesh.Clear();
 					setIndices = true;
 				}
 
+#if UNITY_4_7
 				mMesh.vertices = verts.ToArray();
 				mMesh.uv = uvs.ToArray();
-				mMesh.uv2 = (uv2 != null && uv2.size == verts.size) ? uv2.ToArray() : null;
 				mMesh.colors = cols.ToArray();
-				mMesh.normals = (norms != null && norms.size == verts.size) ? norms.ToArray() : null;
-				mMesh.tangents = (tans != null && tans.size == verts.size) ? tans.ToArray() : null;
+				mMesh.normals = ((norms != null && norms.Count == vertexCount) ? norms.ToArray() : null);
+				mMesh.tangents = ((tans != null && tans.Count == vertexCount) ? tans.ToArray() : null);
+#else
+				mMesh.SetVertices(verts);
+				mMesh.SetUVs(0, uvs);
+				mMesh.SetUVs(1, (uv2 != null && uv2.Count == vertexCount) ? uv2 : null);
+				mMesh.SetColors(cols);
+				mMesh.SetNormals((norms != null && norms.Count == vertexCount) ? norms : null);
+				mMesh.SetTangents((tans != null && tans.Count == vertexCount) ? tans : null);
 #endif
+
 				if (setIndices)
 				{
-					mIndices = GenerateCachedIndexBuffer(count, indexCount);
+					mIndices = GenerateCachedIndexBuffer(vertexCount, indexCount);
 					mMesh.triangles = mIndices;
 				}
 
@@ -601,7 +573,7 @@ public class UIDrawCall : MonoBehaviour
 			{
 				mTriangles = 0;
 				if (mFilter.mesh != null) mFilter.mesh.Clear();
-				Debug.LogError("Too many vertices on one panel: " + verts.size);
+				Debug.LogError("Too many vertices on one panel: " + vertexCount);
 			}
 
 			if (mRenderer == null) mRenderer = gameObject.GetComponent<MeshRenderer>();
@@ -636,7 +608,7 @@ public class UIDrawCall : MonoBehaviour
 		else
 		{
 			if (mFilter.mesh != null) mFilter.mesh.Clear();
-			Debug.LogError("UIWidgets must fill the buffer with 4 vertices per quad. Found " + count);
+			Debug.LogError("UIWidgets must fill the buffer with 4 vertices per quad. Found " + vertexCount);
 		}
 
 		verts.Clear();

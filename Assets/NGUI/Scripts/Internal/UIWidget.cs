@@ -37,20 +37,19 @@ public class UIWidget : UIRect
 	[Tooltip("Custom material, if desired")]
 	[HideInInspector][SerializeField] protected Material mMat;
 
-	public delegate void OnDimensionsChanged ();
-	public delegate void OnPostFillCallback (UIWidget widget, int bufferOffset, BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols);
-
 	/// <summary>
 	/// Notification triggered when the widget's dimensions or position changes.
 	/// </summary>
 
 	public OnDimensionsChanged onChange;
+	public delegate void OnDimensionsChanged ();
 
 	/// <summary>
 	/// Notification triggered after the widget's buffer has been filled.
 	/// </summary>
 
 	public OnPostFillCallback onPostFill;
+	public delegate void OnPostFillCallback (UIWidget widget, int bufferOffset, List<Vector3> verts, List<Vector2> uvs, List<Color> cols);
 
 	/// <summary>
 	/// Callback triggered when the widget is about to be renderered (OnWillRenderObject).
@@ -1502,7 +1501,7 @@ public class UIWidget : UIRect
 	/// Append the local geometry buffers to the specified ones.
 	/// </summary>
 
-	public void WriteToBuffers (BetterList<Vector3> v, BetterList<Vector2> u, BetterList<Color> c, BetterList<Vector3> n, BetterList<Vector4> t, BetterList<Vector2> u2)
+	public void WriteToBuffers (List<Vector3> v, List<Vector2> u, List<Color> c, List<Vector3> n, List<Vector4> t, List<Vector4> u2)
 	{
 		geometry.WriteToBuffers(v, u, c, n, t, u2);
 	}
@@ -1545,7 +1544,7 @@ public class UIWidget : UIRect
 	/// Virtual function called by the UIPanel that fills the buffers.
 	/// </summary>
 
-	virtual public void OnFill(BetterList<Vector3> verts, BetterList<Vector2> uvs, BetterList<Color> cols)
+	virtual public void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
 		// Call this in your derived classes:
 		//if (onPostFill != null)

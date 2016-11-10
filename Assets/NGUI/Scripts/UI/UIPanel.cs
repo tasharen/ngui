@@ -1374,7 +1374,7 @@ public class UIPanel : UIRect
 
 				if (mat != mt || tex != tx || sdr != sd)
 				{
-					if (dc != null && dc.verts.size != 0)
+					if (dc != null && dc.verts.Count != 0)
 					{
 						drawCalls.Add(dc);
 						dc.UpdateGeometry(count);
@@ -1422,7 +1422,7 @@ public class UIPanel : UIRect
 			else w.drawCall = null;
 		}
 
-		if (dc != null && dc.verts.size != 0)
+		if (dc != null && dc.verts.Count != 0)
 		{
 			drawCalls.Add(dc);
 			dc.UpdateGeometry(count);
@@ -1477,7 +1477,7 @@ public class UIPanel : UIRect
 				++i;
 			}
 
-			if (dc.verts.size != 0)
+			if (dc.verts.Count != 0)
 			{
 				dc.UpdateGeometry(count);
 				dc.onRender = mOnRender;
