@@ -127,7 +127,7 @@ public class UIPanel : UIRect
 #if UNITY_EDITOR
 				NGUITools.SetDirty(this);
 #endif
-				UpdateDrawCalls();
+				UpdateDrawCalls(list.IndexOf(this));
 			}
 		}
 	}
@@ -303,7 +303,7 @@ public class UIPanel : UIRect
 #if UNITY_EDITOR
 				NGUITools.SetDirty(this);
 #endif
-				UpdateDrawCalls();
+				UpdateDrawCalls(list.IndexOf(this));
 			}
 		}
 	}
@@ -399,7 +399,7 @@ public class UIPanel : UIRect
 				mClipping = value;
 				mMatrixFrame = -1;
 #if UNITY_EDITOR
-				if (!Application.isPlaying) UpdateDrawCalls();
+				if (!Application.isPlaying) UpdateDrawCalls(list.IndexOf(this));
 #endif
 			}
 		}
@@ -471,7 +471,7 @@ public class UIPanel : UIRect
 				// Call the event delegate
 				if (onClipMove != null) onClipMove(this);
 #if UNITY_EDITOR
-				if (!Application.isPlaying) UpdateDrawCalls();
+				if (!Application.isPlaying) UpdateDrawCalls(list.IndexOf(this));
 #endif
 			}
 		}
@@ -510,7 +510,7 @@ public class UIPanel : UIRect
 			{
 				mClipTexture = value;
 #if UNITY_EDITOR
-				if (!Application.isPlaying) UpdateDrawCalls();
+				if (!Application.isPlaying) UpdateDrawCalls(list.IndexOf(this));
 #endif
 			}
 		}
@@ -560,7 +560,7 @@ public class UIPanel : UIRect
 				if (sv != null) sv.UpdatePosition();
 				if (onClipMove != null) onClipMove(this);
 #if UNITY_EDITOR
-				if (!Application.isPlaying) UpdateDrawCalls();
+				if (!Application.isPlaying) UpdateDrawCalls(list.IndexOf(this));
 #endif
 			}
 		}
@@ -600,7 +600,7 @@ public class UIPanel : UIRect
 			{
 				mClipSoftness = value;
 #if UNITY_EDITOR
-				if (!Application.isPlaying) UpdateDrawCalls();
+				if (!Application.isPlaying) UpdateDrawCalls(list.IndexOf(this));
 #endif
 			}
 		}
@@ -1262,18 +1262,18 @@ public class UIPanel : UIRect
 				if (p.renderQueue == RenderQueue.Automatic)
 				{
 					p.startingRenderQueue = rq;
-					p.UpdateDrawCalls();
+					p.UpdateDrawCalls(i);
 					rq += p.drawCalls.Count;
 				}
 				else if (p.renderQueue == RenderQueue.StartAt)
 				{
-					p.UpdateDrawCalls();
+					p.UpdateDrawCalls(i);
 					if (p.drawCalls.Count != 0)
 						rq = Mathf.Max(rq, p.startingRenderQueue + p.drawCalls.Count);
 				}
 				else // Explicit
 				{
-					p.UpdateDrawCalls();
+					p.UpdateDrawCalls(i);
 					if (p.drawCalls.Count != 0)
 						rq = Mathf.Max(rq, p.startingRenderQueue + 1);
 				}
@@ -1492,7 +1492,7 @@ public class UIPanel : UIRect
 	/// Update all draw calls associated with the panel.
 	/// </summary>
 
-	void UpdateDrawCalls ()
+	void UpdateDrawCalls (int sortOrder)
 	{
 		Transform trans = cachedTransform;
 		bool isUI = usedForUI;
@@ -1552,7 +1552,7 @@ public class UIPanel : UIRect
 			dc.renderQueue = (renderQueue == RenderQueue.Explicit) ? startingRenderQueue : startingRenderQueue + i;
 			dc.alwaysOnScreen = alwaysOnScreen &&
 				(mClipping == UIDrawCall.Clipping.None || mClipping == UIDrawCall.Clipping.ConstrainButDontClip);
-			dc.sortingOrder = mSortingOrder;
+			dc.sortingOrder = (mSortingOrder == 0) ? sortOrder : mSortingOrder;
 			dc.sortingLayerName = mSortingLayerName;
 			dc.clipTexture = mClipTexture;
 #if !UNITY_4_7

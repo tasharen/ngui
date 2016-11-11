@@ -616,7 +616,10 @@ public class UIPanelInspector : UIRectEditor
 			GUILayout.EndHorizontal();
 
 			GUI.changed = false;
+			GUILayout.BeginHorizontal();
 			int so = EditorGUILayout.IntField("Sort Order", mPanel.sortingOrder, GUILayout.Width(120f));
+			if (so == 0) GUILayout.Label("Automatic", GUILayout.MinWidth(20f));
+			GUILayout.EndHorizontal();
 			if (GUI.changed) mPanel.sortingOrder = so;
 
 			GUILayout.BeginHorizontal();

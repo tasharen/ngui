@@ -340,7 +340,6 @@ public class UIDrawCall : MonoBehaviour
 	{
 		mTextureClip = false;
 		mLegacyShader = false;
-		mClipCount = (panel != null) ? panel.clipCount : 0;
 
 		string shaderName = (mShader != null) ? mShader.name :
 			((mMaterial != null) ? mMaterial.shader.name : "Unlit/Transparent Colored");
@@ -393,7 +392,7 @@ public class UIDrawCall : MonoBehaviour
 		{
 			mDynamicMat = new Material(mMaterial);
 			mDynamicMat.name = "[NGUI] " + mMaterial.name;
-			mDynamicMat.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
+			mDynamicMat.hideFlags = (HideFlags.DontSave | HideFlags.NotEditable);
 			mDynamicMat.CopyPropertiesFromMaterial(mMaterial);
 #if !UNITY_FLASH
 			string[] keywords = mMaterial.shaderKeywords;
@@ -424,9 +423,11 @@ public class UIDrawCall : MonoBehaviour
 
 	Material RebuildMaterial ()
 	{
+		mClipCount = (panel != null) ? panel.clipCount : 0;
+
 #if UNITY_EDITOR
 		// This makes it possible to use a shared material while in edit mode
-		if (mMaterial == null || Application.isPlaying)
+		if (mMaterial == null || mClipCount != 0 || Application.isPlaying)
 #endif
 		{
 			// Destroy the old material
