@@ -1298,6 +1298,11 @@ public class UICamera : MonoBehaviour
 		mLastPos = touch.pos;
 	}
 
+#if !UNITY_4_7
+	static RaycastHit[] mRayHits;
+	static Collider2D[] mOverlap;
+#endif
+
 	/// <summary>
 	/// Returns the object under the specified position.
 	/// </summary>
@@ -1354,16 +1359,17 @@ public class UICamera : MonoBehaviour
 			else if (cam.eventType == EventType.UI_3D)
 			{
 #if UNITY_4_7
-				RaycastHit[] hits = Physics.RaycastAll(ray, dist, mask);
+				RaycastHit[] mRayHits = Physics.RaycastAll(ray, dist, mask);
+				var hitCount = mRayHits.Length;
 #else
-				RaycastHit[] hits = Physics.RaycastAll(ray, dist, mask, QueryTriggerInteraction.Collide);
+				if (mRayHits == null) mRayHits = new RaycastHit[50];
+				var hitCount = Physics.RaycastNonAlloc(ray, mRayHits, dist, mask, QueryTriggerInteraction.Collide);
 #endif
-
-				if (hits.Length > 1)
+				if (hitCount > 1)
 				{
-					for (int b = 0; b < hits.Length; ++b)
+					for (int b = 0; b < hitCount; ++b)
 					{
-						GameObject go = hits[b].collider.gameObject;
+						GameObject go = mRayHits[b].collider.gameObject;
 						Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
 						UIWidget w = go.GetComponent<UIWidget>();
 						Profiler.EndSample();
@@ -1371,7 +1377,7 @@ public class UICamera : MonoBehaviour
 						if (w != null)
 						{
 							if (!w.isVisible) continue;
-							if (w.hitCheck != null && !w.hitCheck(hits[b].point)) continue;
+							if (w.hitCheck != null && !w.hitCheck(mRayHits[b].point)) continue;
 						}
 						else
 						{
@@ -1383,9 +1389,9 @@ public class UICamera : MonoBehaviour
 
 						if (mHit.depth != int.MaxValue)
 						{
-							mHit.hit = hits[b];
-							mHit.point = hits[b].point;
-							mHit.go = hits[b].collider.gameObject;
+							mHit.hit = mRayHits[b];
+							mHit.point = mRayHits[b].point;
+							mHit.go = mRayHits[b].collider.gameObject;
 							mHits.Add(mHit);
 						}
 					}
@@ -1410,9 +1416,9 @@ public class UICamera : MonoBehaviour
 					}
 					mHits.Clear();
 				}
-				else if (hits.Length == 1)
+				else if (hitCount == 1)
 				{
-					GameObject go = hits[0].collider.gameObject;
+					GameObject go = mRayHits[0].collider.gameObject;
 					Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
 					UIWidget w = go.GetComponent<UIWidget>();
 					Profiler.EndSample();
@@ -1420,7 +1426,7 @@ public class UICamera : MonoBehaviour
 					if (w != null)
 					{
 						if (!w.isVisible) continue;
-						if (w.hitCheck != null && !w.hitCheck(hits[0].point)) continue;
+						if (w.hitCheck != null && !w.hitCheck(mRayHits[0].point)) continue;
 					}
 					else
 					{
@@ -1428,11 +1434,11 @@ public class UICamera : MonoBehaviour
 						if (rect != null && rect.finalAlpha < 0.001f) continue;
 					}
 
-					if (IsVisible(hits[0].point, hits[0].collider.gameObject))
+					if (IsVisible(mRayHits[0].point, mRayHits[0].collider.gameObject))
 					{
-						lastHit = hits[0];
+						lastHit = mRayHits[0];
 						lastWorldRay = ray;
-						lastWorldPosition = hits[0].point;
+						lastWorldPosition = mRayHits[0].point;
 						mRayHitObject = lastHit.collider.gameObject;
 						return true;
 					}
@@ -1443,8 +1449,8 @@ public class UICamera : MonoBehaviour
 			{
 				if (m2DPlane.Raycast(ray, out dist))
 				{
-					Vector3 point = ray.GetPoint(dist);
-					Collider2D c2d = Physics2D.OverlapPoint(point, mask);
+					var point = ray.GetPoint(dist);
+					var c2d = Physics2D.OverlapPoint(point, mask);
 
 					if (c2d)
 					{
@@ -1466,13 +1472,18 @@ public class UICamera : MonoBehaviour
 				if (m2DPlane.Raycast(ray, out dist))
 				{
 					lastWorldPosition = ray.GetPoint(dist);
-					Collider2D[] hits = Physics2D.OverlapPointAll(lastWorldPosition, mask);
-
-					if (hits.Length > 1)
+#if UNITY_4_7
+					Collider2D[] mOverlap = Physics2D.OverlapPointAll(lastWorldPosition, mask);
+					var hitCount = mOverlap.Length;
+#else
+					if (mOverlap == null) mOverlap = new Collider2D[50];
+					var hitCount = Physics2D.OverlapPointNonAlloc(lastWorldPosition, mOverlap, mask);
+#endif
+					if (hitCount > 1)
 					{
-						for (int b = 0; b < hits.Length; ++b)
+						for (int b = 0; b < hitCount; ++b)
 						{
-							GameObject go = hits[b].gameObject;
+							GameObject go = mOverlap[b].gameObject;
 							Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
 							UIWidget w = go.GetComponent<UIWidget>();
 							Profiler.EndSample();
@@ -1515,11 +1526,11 @@ public class UICamera : MonoBehaviour
 						}
 						mHits.Clear();
 					}
-					else if (hits.Length == 1)
+					else if (hitCount == 1)
 					{
-						GameObject go = hits[0].gameObject;
+						var go = mOverlap[0].gameObject;
 						Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-						UIWidget w = go.GetComponent<UIWidget>();
+						var w = go.GetComponent<UIWidget>();
 						Profiler.EndSample();
 
 						if (w != null)
@@ -1529,7 +1540,7 @@ public class UICamera : MonoBehaviour
 						}
 						else
 						{
-							UIRect rect = NGUITools.FindInParents<UIRect>(go);
+							var rect = NGUITools.FindInParents<UIRect>(go);
 							if (rect != null && rect.finalAlpha < 0.001f) continue;
 						}
 

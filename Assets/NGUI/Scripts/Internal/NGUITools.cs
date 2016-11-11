@@ -552,10 +552,18 @@ static public class NGUITools
 
 	static public int CalculateRaycastDepth (GameObject go)
 	{
-		UIWidget w = go.GetComponent<UIWidget>();
-		if (w != null) return w.raycastDepth;
+		Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
+		var w = go.GetComponent<UIWidget>();
+		
+		if (w != null)
+		{
+			Profiler.EndSample();
+			return w.raycastDepth;
+		}
 
-		UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
+		var widgets = go.GetComponentsInChildren<UIWidget>();
+		Profiler.EndSample();
+		
 		if (widgets.Length == 0) return 0;
 
 		int depth = int.MaxValue;
@@ -1050,69 +1058,39 @@ static public class NGUITools
 
 	/// <summary>
 	/// Finds the specified component on the game object or one of its parents.
+	/// This function has become obsolete with Unity 4.3.
 	/// </summary>
 
 	static public T FindInParents<T> (GameObject go) where T : Component
 	{
 		if (go == null) return null;
-		// Commented out because apparently it causes Unity 4.5.3 to lag horribly:
-		// http://www.tasharen.com/forum/index.php?topic=10882.0
-//#if UNITY_4_3
- #if UNITY_FLASH
-		object comp = go.GetComponent<T>();
- #else
-		T comp = go.GetComponent<T>();
- #endif
-		if (comp == null)
-		{
-			Transform t = go.transform.parent;
 
-			while (t != null && comp == null)
-			{
-				comp = t.gameObject.GetComponent<T>();
-				t = t.parent;
-			}
-		}
- #if UNITY_FLASH
+		Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
+		var comp = go.GetComponentInParent<T>();
+		Profiler.EndSample();
+#if UNITY_FLASH
 		return (T)comp;
- #else
+#else
 		return comp;
- #endif
-//#else
-//		return go.GetComponentInParent<T>();
-//#endif
+#endif
 	}
 
 	/// <summary>
 	/// Finds the specified component on the game object or one of its parents.
+	/// This function has become obsolete with Unity 4.3.
 	/// </summary>
 
 	static public T FindInParents<T> (Transform trans) where T : Component
 	{
 		if (trans == null) return null;
-#if UNITY_4_3
- #if UNITY_FLASH
-		object comp = trans.GetComponent<T>();
- #else
-		T comp = trans.GetComponent<T>();
- #endif
-		if (comp == null)
-		{
-			Transform t = trans.transform.parent;
 
-			while (t != null && comp == null)
-			{
-				comp = t.gameObject.GetComponent<T>();
-				t = t.parent;
-			}
-		}
- #if UNITY_FLASH
+		Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
+		var comp = trans.GetComponentInParent<T>();
+		Profiler.EndSample();
+#if UNITY_FLASH
 		return (T)comp;
- #else
-		return comp;
- #endif
 #else
-		return trans.GetComponentInParent<T>();
+		return comp;
 #endif
 	}
 

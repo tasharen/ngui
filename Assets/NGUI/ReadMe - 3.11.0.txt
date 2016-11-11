@@ -71,6 +71,7 @@ and it will not be included in the build of your game. It's only used in the edi
 - NEW: NGUI raycasts into the world will now automatically ignore triggers if the event type is set to World_3D.
 - FIX: Popup list's panel now keeps the sorting order of its parent panel.
 - FIX: Tweener.Begin now always clears the onFinished callback list.
+- FIX: Eliminated GC allocations from raycasts.
 
 3.10.2
 - NEW: Added UIDrawCall.MoveToScene for Unity 5.4+ to make it easier to move the UI to another scene.
