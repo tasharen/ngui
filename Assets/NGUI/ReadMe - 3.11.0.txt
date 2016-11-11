@@ -56,7 +56,7 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
 
 3.11.0
-- NEW: It's now possible to specify a custom material on regular NGUI sprites, not just 2D sprites.
+- NEW: It's now possible to specify a custom material on regular NGUI sprites and labels.
 - NEW: Added UV2 support, specified on the panels. Secondary UVs can be easily used to add multi-texturing effects such as blended tiled backgrounds or simply detail textures, enhancing your UI's look.
 - NEW: Draw call now uses a material property block to specify the main texture as it works better at edit time.
 - NEW: UIGeometry now has a onCustomWrite delegate that can be used to modify the generated geometry as you see fit.

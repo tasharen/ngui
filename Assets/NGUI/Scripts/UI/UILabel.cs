@@ -66,7 +66,6 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] NGUIText.SymbolStyle mSymbols = NGUIText.SymbolStyle.Normal;
 	[HideInInspector][SerializeField] Vector2 mEffectDistance = Vector2.one;
 	[HideInInspector][SerializeField] Overflow mOverflow = Overflow.ShrinkContent;
-	[HideInInspector][SerializeField] Material mMaterial;
 	[HideInInspector][SerializeField] bool mApplyGradient = false;
 	[HideInInspector][SerializeField] Color mGradientTop = Color.white;
 	[HideInInspector][SerializeField] Color mGradientBottom = new Color(0.7f, 0.7f, 0.7f);
@@ -162,19 +161,32 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			if (mMaterial != null) return mMaterial;
+			if (mMat != null) return mMat;
 			if (mFont != null) return mFont.material;
 			if (mTrueTypeFont != null) return mTrueTypeFont.material;
 			return null;
 		}
 		set
 		{
-			if (mMaterial != value)
-			{
-				RemoveFromPanel();
-				mMaterial = value;
-				MarkAsChanged();
-			}
+			base.material = value;
+		}
+	}
+
+	/// <summary>
+	/// Label's main texture comes from the font itself.
+	/// </summary>
+
+	public override Texture mainTexture
+	{
+		get
+		{
+			if (mFont != null) return mFont.texture;
+			if (mTrueTypeFont != null) { var mat = mTrueTypeFont.material; if (mat != null) return mat.mainTexture; }
+			return null;
+		}
+		set
+		{
+			base.mainTexture = value;
 		}
 	}
 
