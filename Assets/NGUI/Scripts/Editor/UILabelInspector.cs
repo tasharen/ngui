@@ -156,8 +156,6 @@ public class UILabelInspector : UIWidgetInspector
 					EditorGUI.EndDisabledGroup();
 				}
 				GUILayout.EndHorizontal();
-
-				NGUIEditorTools.DrawProperty("Material", serializedObject, "mMaterial");
 			}
 			else if (uiFont != null)
 			{

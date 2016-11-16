@@ -14,6 +14,7 @@ Shader "Hidden/Unlit/Premultiplied Colored 1"
 			"Queue" = "Transparent"
 			"IgnoreProjector" = "True"
 			"RenderType" = "Transparent"
+			"DisableBatching" = "True"
 		}
 		
 		Pass

@@ -15,6 +15,7 @@ Shader "Hidden/Unlit/Premultiplied Colored (TextureClip)"
 			"Queue" = "Transparent"
 			"IgnoreProjector" = "True"
 			"RenderType" = "Transparent"
+			"DisableBatching" = "True"
 		}
 		
 		Pass

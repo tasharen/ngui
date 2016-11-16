@@ -14,6 +14,7 @@ Shader "Unlit/Premultiplied Colored"
 			"Queue" = "Transparent"
 			"IgnoreProjector" = "True"
 			"RenderType" = "Transparent"
+			"DisableBatching" = "True"
 		}
 
 		Pass
@@ -76,6 +77,7 @@ Shader "Unlit/Premultiplied Colored"
 			"Queue" = "Transparent"
 			"IgnoreProjector" = "True"
 			"RenderType" = "Transparent"
+			"DisableBatching" = "True"
 		}
 		
 		Pass

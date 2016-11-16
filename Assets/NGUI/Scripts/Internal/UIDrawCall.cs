@@ -133,8 +133,18 @@ public class UIDrawCall : MonoBehaviour
 
 	public int sortingOrder
 	{
-		get { return (mRenderer != null) ? mRenderer.sortingOrder : 0; }
-		set { if (mRenderer != null && mRenderer.sortingOrder != value) mRenderer.sortingOrder = value; }
+		get
+		{
+			return mSortingOrder;
+		}
+		set
+		{
+			if (mSortingOrder != value)
+			{
+				mSortingOrder = value;
+				if (mRenderer != null) mRenderer.sortingOrder = value;
+			}
+		}
 	}
 
 	/// <summary>
@@ -161,6 +171,7 @@ public class UIDrawCall : MonoBehaviour
 	}
 
 	[System.NonSerialized] string mSortingLayerName;
+	[System.NonSerialized] int mSortingOrder = 0;
 
 	/// <summary>
 	/// Final render queue used to draw the draw call's geometry.
@@ -423,28 +434,21 @@ public class UIDrawCall : MonoBehaviour
 
 	Material RebuildMaterial ()
 	{
-		mClipCount = (panel != null) ? panel.clipCount : 0;
+		// Destroy the old material
+		NGUITools.DestroyImmediate(mDynamicMat);
 
-#if UNITY_EDITOR
-		// This makes it possible to use a shared material while in edit mode
-		if (mMaterial == null || mClipCount != 0 || Application.isPlaying)
-#endif
+		// Create a new material
+		CreateMaterial();
+		mDynamicMat.renderQueue = mRenderQueue;
+
+		// Update the renderer
+		if (mRenderer != null)
 		{
-			// Destroy the old material
-			NGUITools.DestroyImmediate(mDynamicMat);
-
-			// Create a new material
-			CreateMaterial();
-			mDynamicMat.renderQueue = mRenderQueue;
-
-			// Update the renderer
-			if (mRenderer != null) mRenderer.sharedMaterials = new Material[] { mDynamicMat };
-			return mDynamicMat;
+			mRenderer.sharedMaterials = new Material[] { mDynamicMat };
+			mRenderer.sortingLayerName = mSortingLayerName;
+			mRenderer.sortingOrder = mSortingOrder;
 		}
-#if UNITY_EDITOR
-		mRenderer.sharedMaterial = mMaterial;
-		return mMaterial;
-#endif
+		return mDynamicMat;
 	}
 
 	/// <summary>
@@ -460,13 +464,6 @@ public class UIDrawCall : MonoBehaviour
 		{
 			RebuildMaterial();
 			mRebuildMat = false;
-		}
-		else if (mRenderer.sharedMaterial != mDynamicMat)
-		{
-#if UNITY_EDITOR
-			Debug.LogError("Hmm... This point got hit!");
-#endif
-			mRenderer.sharedMaterials = new Material[] { mDynamicMat };
 		}
 	}
 

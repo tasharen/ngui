@@ -394,7 +394,7 @@ public abstract class UITweener : MonoBehaviour
 		mAmountPerDelta = Mathf.Abs(amountPerDelta);
 		if (!forward) mAmountPerDelta = -mAmountPerDelta;
 		enabled = true;
-		Update();
+		DoUpdate();
 	}
 
 	/// <summary>
@@ -437,7 +437,7 @@ public abstract class UITweener : MonoBehaviour
 	/// Starts the tweening operation.
 	/// </summary>
 
-	static public T Begin<T> (GameObject go, float duration) where T : UITweener
+	static public T Begin<T> (GameObject go, float duration, float delay = 0f) where T : UITweener
 	{
 		T comp = go.GetComponent<T>();
 #if UNITY_FLASH
@@ -471,6 +471,7 @@ public abstract class UITweener : MonoBehaviour
 		comp.mFactor = 0f;
 		comp.duration = duration;
 		comp.mDuration = duration;
+		comp.delay = delay;
 		comp.mAmountPerDelta = duration > 0f ? Mathf.Abs(1f / duration) : 1000f;
 		comp.style = Style.Once;
 		comp.animationCurve = new AnimationCurve(new Keyframe(0f, 0f, 0f, 1f), new Keyframe(1f, 1f, 1f, 0f));
