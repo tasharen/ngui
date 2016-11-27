@@ -837,6 +837,21 @@ public class UILabel : UIWidget
 	}
 
 	/// <summary>
+	/// How many quads there are per printed character.
+	/// </summary>
+	
+	public int quadsPerCharacter
+	{
+		get
+		{
+			if (mEffectStyle == Effect.Shadow) return 2;
+			else if (mEffectStyle == Effect.Outline) return 5;
+			else if (mEffectStyle == Effect.Outline8) return 9;
+			return 1;
+		}
+	}
+
+	/// <summary>
 	/// Whether the label will automatically shrink its size in order to fit the maximum line width.
 	/// </summary>
 

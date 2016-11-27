@@ -389,11 +389,17 @@ public abstract class UITweener : MonoBehaviour
 	/// Manually activate the tweening process, reversing it if necessary.
 	/// </summary>
 
-	public void Play (bool forward)
+	public virtual void Play (bool forward)
 	{
 		mAmountPerDelta = Mathf.Abs(amountPerDelta);
 		if (!forward) mAmountPerDelta = -mAmountPerDelta;
-		enabled = true;
+
+		if (!enabled)
+		{
+			enabled = true;
+			mStarted = false;
+		}
+
 		DoUpdate();
 	}
 

@@ -57,24 +57,24 @@ public class UIDrawCall : MonoBehaviour
 	[HideInInspector][System.NonSerialized] public List<Vector4> uv2 = new List<Vector4>();
 	[HideInInspector][System.NonSerialized] public List<Color> cols = new List<Color>();
 
-	Material		mMaterial;		// Material used by this draw call
-	Texture			mTexture;		// Main texture used by the material
-	Shader			mShader;		// Shader used by the dynamically created material
-	int				mClipCount = 0;	// Number of times the draw call's content is getting clipped
-	Transform		mTrans;			// Cached transform
-	Mesh			mMesh;			// First generated mesh
-	MeshFilter		mFilter;		// Mesh filter for this draw call
-	MeshRenderer	mRenderer;		// Mesh renderer for this screen
-	Material		mDynamicMat;	// Instantiated material
-	int[]			mIndices;		// Cached indices
+	[System.NonSerialized] Material		mMaterial;		// Material used by this draw call
+	[System.NonSerialized] Texture		mTexture;		// Main texture used by the material
+	[System.NonSerialized] Shader		mShader;		// Shader used by the dynamically created material
+	[System.NonSerialized] int			mClipCount = 0;	// Number of times the draw call's content is getting clipped
+	[System.NonSerialized] Transform	mTrans;			// Cached transform
+	[System.NonSerialized] Mesh			mMesh;			// First generated mesh
+	[System.NonSerialized] MeshFilter	mFilter;		// Mesh filter for this draw call
+	[System.NonSerialized] MeshRenderer	mRenderer;		// Mesh renderer for this screen
+	[System.NonSerialized] Material		mDynamicMat;	// Instantiated material
+	[System.NonSerialized] int[]		mIndices;		// Cached indices
 
 #if !UNITY_4_7
-	ShadowMode mShadowMode = ShadowMode.None;
+	[System.NonSerialized] ShadowMode mShadowMode = ShadowMode.None;
 #endif
-	bool mRebuildMat = true;
-	bool mLegacyShader = false;
-	int mRenderQueue = 3000;
-	int mTriangles = 0;
+	[System.NonSerialized] bool mRebuildMat = true;
+	[System.NonSerialized] bool mLegacyShader = false;
+	[System.NonSerialized] int mRenderQueue = 3000;
+	[System.NonSerialized] int mTriangles = 0;
 
 	/// <summary>
 	/// Whether the draw call has changed recently.
@@ -83,8 +83,8 @@ public class UIDrawCall : MonoBehaviour
 	[System.NonSerialized]
 	public bool isDirty = false;
 
-	[System.NonSerialized]
-	bool mTextureClip = false;
+	[System.NonSerialized] bool mTextureClip = false;
+	[System.NonSerialized] bool mIsNew = true;
 
 	/// <summary>
 	/// Callback that will be triggered at OnWillRenderObject() time.
@@ -554,7 +554,6 @@ public class UIDrawCall : MonoBehaviour
 				mMesh.SetNormals((norms != null && norms.Count == vertexCount) ? norms : null);
 				mMesh.SetTangents((tans != null && tans.Count == vertexCount) ? tans : null);
 #endif
-
 				if (setIndices)
 				{
 					mIndices = GenerateCachedIndexBuffer(vertexCount, indexCount);
@@ -571,7 +570,7 @@ public class UIDrawCall : MonoBehaviour
 			else
 			{
 				mTriangles = 0;
-				if (mFilter.mesh != null) mFilter.mesh.Clear();
+				if (mMesh != null) mMesh.Clear();
 				Debug.LogError("Too many vertices on one panel: " + vertexCount);
 			}
 
@@ -600,8 +599,14 @@ public class UIDrawCall : MonoBehaviour
 					mRenderer.receiveShadows = true;
 				}
 #endif
+			}
+
+			if (mIsNew)
+			{
+				mIsNew = false;
 				if (onCreateDrawCall != null) onCreateDrawCall(this, mFilter, mRenderer);
 			}
+
 			UpdateMaterials();
 		}
 		else
@@ -991,6 +996,12 @@ public class UIDrawCall : MonoBehaviour
 	{
 		if (dc)
 		{
+			if (dc.onCreateDrawCall != null)
+			{
+				NGUITools.Destroy(dc.gameObject);
+				return;
+			}
+
 			dc.onRender = null;
 
 			if (Application.isPlaying)
@@ -999,6 +1010,7 @@ public class UIDrawCall : MonoBehaviour
 				{
 					NGUITools.SetActive(dc.gameObject, false);
 					mInactiveList.Add(dc);
+					dc.mIsNew = true;
 				}
 			}
 			else
