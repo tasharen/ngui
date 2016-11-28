@@ -68,7 +68,14 @@ public class UIDrawCall : MonoBehaviour
 	[System.NonSerialized] Material		mDynamicMat;	// Instantiated material
 	[System.NonSerialized] int[]		mIndices;		// Cached indices
 
-#if !UNITY_4_7
+#if UNITY_4_7
+	[System.NonSerialized] Vector3[] mTempVerts = null;
+	[System.NonSerialized] Vector2[] mTempUV0 = null;
+	[System.NonSerialized] Vector2[] mTempUV2 = null;
+	[System.NonSerialized] Color[] mTempCols = null;
+	[System.NonSerialized] Vector3[] mTempNormals = null;
+	[System.NonSerialized] Vector4[] mTempTans = null;
+#else
 	[System.NonSerialized] ShadowMode mShadowMode = ShadowMode.None;
 #endif
 	[System.NonSerialized] bool mRebuildMat = true;
@@ -539,13 +546,33 @@ public class UIDrawCall : MonoBehaviour
 					mMesh.Clear();
 					setIndices = true;
 				}
-
 #if UNITY_4_7
-				mMesh.vertices = verts.ToArray();
-				mMesh.uv = uvs.ToArray();
-				mMesh.colors = cols.ToArray();
-				mMesh.normals = ((norms != null && norms.Count == vertexCount) ? norms.ToArray() : null);
-				mMesh.tangents = ((tans != null && tans.Count == vertexCount) ? tans.ToArray() : null);
+				var hasUV2 = (uv2 != null && uv2.Count == vertexCount);
+				var hasNormals = (norms != null && norms.Count == vertexCount);
+				var hasTans = (tans != null && tans.Count == vertexCount);
+
+				if (mTempVerts == null || mTempVerts.Length < vertexCount) mTempVerts = new Vector3[vertexCount];
+				if (mTempUV0 == null || mTempUV0.Length < vertexCount) mTempUV0 = new Vector2[vertexCount];
+				if (mTempCols == null || mTempCols.Length < vertexCount) mTempCols = new Color[vertexCount];
+
+				if (hasUV2 && (mTempUV2 == null || mTempUV2.Length < vertexCount)) mTempUV2 = new Vector2[vertexCount];
+				if (hasNormals && (mTempNormals == null || mTempNormals.Length < vertexCount)) mTempNormals = new Vector3[vertexCount];
+				if (hasTans && (mTempTans == null || mTempTans.Length < vertexCount)) mTempTans = new Vector4[vertexCount];
+
+				verts.CopyTo(mTempVerts);
+				uvs.CopyTo(mTempUV0);
+				cols.CopyTo(mTempCols);
+
+				if (hasNormals) norms.CopyTo(mTempNormals);
+				if (hasTans) tans.CopyTo(mTempTans);
+				if (hasUV2) for (int i = 0, imax = verts.Count; i < imax; ++i) mTempUV2[i] = uv2[i];
+
+				mMesh.vertices = mTempVerts;
+				mMesh.uv = mTempUV0;
+				mMesh.colors = mTempCols;
+				mMesh.uv2 = hasUV2 ? mTempUV2 : null;
+				mMesh.normals = hasNormals ? mTempNormals : null;
+				mMesh.tangents = hasTans ? mTempTans : null;
 #else
 				mMesh.SetVertices(verts);
 				mMesh.SetUVs(0, uvs);
