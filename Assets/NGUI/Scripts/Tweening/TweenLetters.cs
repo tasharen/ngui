@@ -123,11 +123,17 @@ public class TweenLetters : UITweener
 				letterCenter = GetCenter(verts, firstVert, quadVerts);
 
 				var v = mLetter[letter].offset;
+#if UNITY_4_7
+				lerpPos = LerpUnclamped(mCurrent.pos + new Vector3(v.x, v.y, 0f), Vector3.zero, t);
+				lerpRot = Quaternion.Slerp(qRot, Quaternion.identity, t);
+				lerpScale = LerpUnclamped(mCurrent.scale, Vector3.one, t);
+				lerpAlpha = LerpUnclamped(mCurrent.alpha, 1f, t);
+#else
 				lerpPos = Vector3.LerpUnclamped(mCurrent.pos + new Vector3(v.x, v.y, 0f), Vector3.zero, t);
 				lerpRot = Quaternion.SlerpUnclamped(qRot, Quaternion.identity, t);
 				lerpScale = Vector3.LerpUnclamped(mCurrent.scale, Vector3.one, t);
 				lerpAlpha = Mathf.LerpUnclamped(mCurrent.alpha, 1f, t);
-
+#endif
 				mtx.SetTRS(lerpPos, lerpRot, lerpScale);
 
 				for (int iv = firstVert; iv < firstVert + quadVerts; ++iv)
@@ -145,6 +151,18 @@ public class TweenLetters : UITweener
 			}
 		}
 	}
+
+#if UNITY_4_7
+	static Vector3 LerpUnclamped (Vector3 a, Vector3 b, float f)
+	{
+		a.x = a.x + (b.x - a.x) * f;
+		a.y = a.y + (b.y - a.y) * f;
+		a.z = a.z + (b.z - a.z) * f;
+		return a;
+	}
+
+	static float LerpUnclamped (float a, float b, float f) { return a + (b - a) * f; }
+#endif
 
 	/// <summary>
 	/// Check every frame to see if the text has changed and mark the label as having been updated.
