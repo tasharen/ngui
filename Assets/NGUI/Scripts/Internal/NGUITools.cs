@@ -552,17 +552,29 @@ static public class NGUITools
 
 	static public int CalculateRaycastDepth (GameObject go)
 	{
+#if UNITY_5_5_OR_NEWER
+		UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
+#else
 		Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
+#endif
 		var w = go.GetComponent<UIWidget>();
 		
 		if (w != null)
 		{
+#if UNITY_5_5_OR_NEWER
+			UnityEngine.Profiling.Profiler.EndSample();
+#else
 			Profiler.EndSample();
+#endif
 			return w.raycastDepth;
 		}
 
 		var widgets = go.GetComponentsInChildren<UIWidget>();
+#if UNITY_5_5_OR_NEWER
+		UnityEngine.Profiling.Profiler.EndSample();
+#else
 		Profiler.EndSample();
+#endif
 		
 		if (widgets.Length == 0) return 0;
 
@@ -1065,9 +1077,15 @@ static public class NGUITools
 	{
 		if (go == null) return null;
 
+#if UNITY_5_5_OR_NEWER
+		UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
+		var comp = go.GetComponentInParent<T>();
+		UnityEngine.Profiling.Profiler.EndSample();
+#else
 		Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
 		var comp = go.GetComponentInParent<T>();
 		Profiler.EndSample();
+#endif
 #if UNITY_FLASH
 		return (T)comp;
 #else
@@ -1084,9 +1102,15 @@ static public class NGUITools
 	{
 		if (trans == null) return null;
 
+#if UNITY_5_5_OR_NEWER
+		UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
+		var comp = trans.GetComponentInParent<T>();
+		UnityEngine.Profiling.Profiler.EndSample();
+#else
 		Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
 		var comp = trans.GetComponentInParent<T>();
 		Profiler.EndSample();
+#endif
 #if UNITY_FLASH
 		return (T)comp;
 #else
@@ -1895,7 +1919,11 @@ static public class NGUITools
 
 			if (mSizeFrame != frame || !Application.isPlaying)
 			{
+#if UNITY_5_5_OR_NEWER
+				UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (NGUITools.screenSize)");
+#else
 				Profiler.BeginSample("Editor-only GC allocation (NGUITools.screenSize)");
+#endif
 				mSizeFrame = frame;
 
 				if (s_GetSizeOfMainGameView == null && !mCheckedMainViewFunc)
@@ -1934,7 +1962,11 @@ static public class NGUITools
 #endif
 				}
 				else mGameSize = new Vector2(Screen.width, Screen.height);
+#if UNITY_5_5_OR_NEWER
+				UnityEngine.Profiling.Profiler.EndSample();
+#else
 				Profiler.EndSample();
+#endif
 			}
 			return mGameSize;
 		}

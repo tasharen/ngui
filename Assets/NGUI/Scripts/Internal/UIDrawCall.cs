@@ -807,7 +807,11 @@ public class UIDrawCall : MonoBehaviour
 		if (dx9BugWorkaround == -1)
 		{
 			var pf = Application.platform;
+#if !UNITY_5_5_OR_NEWER
 			dx9BugWorkaround = ((pf == RuntimePlatform.WindowsPlayer || pf == RuntimePlatform.XBOX360) &&
+#else
+			dx9BugWorkaround = ((pf == RuntimePlatform.WindowsPlayer) &&
+#endif
 				SystemInfo.graphicsShaderLevel < 40 && SystemInfo.graphicsDeviceVersion.Contains("Direct3D")) ? 1 : 0;
 		}
 
