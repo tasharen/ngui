@@ -2262,7 +2262,11 @@ static public class NGUIEditorTools
 				if (readable)
 				{
 					mOriginal[path] = textureImporter.textureType;
+#if UNITY_5_5_OR_NEWER
 					textureImporter.textureType = TextureImporterType.Default;
+#else
+					textureImporter.textureType = TextureImporterType.Image;
+#endif
 				}
 				else
 				{
