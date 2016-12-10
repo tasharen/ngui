@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2016 Tasharen Entertainment
-            Version 3.11.0
+            Version 3.11.1
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,12 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.11.1
+- NEW: Added a 'keep value' option to the popup list that will make popup values persist even after it disappears, like it used to work before the change many versions back.
+- FIX: Popup list with values defined at edit time no longer has an initial value (unless the new 'keep value' is checked).
+- FIX: Capitalized versions of bbcode keywords like [B] will now work in addition to lowercase.
+- FIX: Backwards compatibility fixes with Unity 5.3.
 
 3.11.0
 - NEW: It's now possible to specify a custom material on regular NGUI sprites and labels.

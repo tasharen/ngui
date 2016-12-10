@@ -221,7 +221,7 @@ public class UIPopupList : UIWidgetContainer
 		"cleared when the popup is closed so that the same selection can be chosen again the next time the popup list is opened. " +
 		"If enabled, the selection will persist, but selecting the same choice in succession will not result in the onChange " +
 		"notification being triggered more than once.")]
-	public bool persistentSelection = false;
+	public bool keepValue = false;
 
 	[System.NonSerialized] protected GameObject mSelection;
 	[System.NonSerialized] protected int mOpenFrame = 0;
@@ -324,7 +324,7 @@ public class UIPopupList : UIWidgetContainer
 			if (notify && mSelectedItem != null)
 				TriggerCallbacks();
 
-			if (!persistentSelection) mSelectedItem = null;
+			if (!keepValue) mSelectedItem = null;
 		}
 	}
 
@@ -512,6 +512,14 @@ public class UIPopupList : UIWidgetContainer
 	{
 		if (mStarted) return;
 		mStarted = true;
+
+		if (keepValue)
+		{
+			var sel = mSelectedItem;
+			mSelectedItem = null;
+			value = sel;
+		}
+		else mSelectedItem = null;
 
 		// Auto-upgrade legacy functionality
 		if (textLabel != null)
