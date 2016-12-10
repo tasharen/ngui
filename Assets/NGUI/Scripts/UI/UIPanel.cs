@@ -1567,7 +1567,7 @@ public class UIPanel : UIRect
 			dc.renderQueue = (renderQueue == RenderQueue.Explicit) ? startingRenderQueue : startingRenderQueue + i;
 			dc.alwaysOnScreen = alwaysOnScreen &&
 				(mClipping == UIDrawCall.Clipping.None || mClipping == UIDrawCall.Clipping.ConstrainButDontClip);
-			dc.sortingOrder = (mSortingOrder == 0) ? sortOrder : mSortingOrder;
+			dc.sortingOrder = (mSortingOrder == 0 && renderQueue == RenderQueue.Automatic) ? sortOrder : mSortingOrder;
 			dc.sortingLayerName = mSortingLayerName;
 			dc.clipTexture = mClipTexture;
 #if !UNITY_4_7
