@@ -1904,7 +1904,7 @@ static public class NGUITools
 #if UNITY_EDITOR
 	static int mSizeFrame = -1;
 	static Func<Vector2> s_GetSizeOfMainGameView;
-	static Vector2 mGameSize = Vector2.one;
+	[System.NonSerialized] static Vector2 mGameSize = Vector2.one;
 	[System.NonSerialized] static bool mCheckedMainViewFunc = false;
 
 	/// <summary>
@@ -1954,12 +1954,12 @@ static public class NGUITools
 
 				if (s_GetSizeOfMainGameView != null)
 				{
-#if UNITY_EDITOR_OSX
+//#if UNITY_EDITOR_OSX
 					// There seems to be a Unity 5.4 bug that returns invalid screen size when the mouse is clicked (wtf?) on OSX
-					if (mGameSize.x == 1f && mGameSize.y == 1f) mGameSize = s_GetSizeOfMainGameView();
-#else
+					//if (mGameSize.x == 1f && mGameSize.y == 1f) mGameSize = s_GetSizeOfMainGameView();
+//#else
 					mGameSize = s_GetSizeOfMainGameView();
-#endif
+//#endif
 				}
 				else mGameSize = new Vector2(Screen.width, Screen.height);
 #if UNITY_5_5_OR_NEWER

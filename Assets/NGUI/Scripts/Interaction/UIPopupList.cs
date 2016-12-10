@@ -217,6 +217,12 @@ public class UIPopupList : UIWidgetContainer
 	[HideInInspector][SerializeField] protected List<UILabel> mLabelList = new List<UILabel>();
 	[HideInInspector][SerializeField] protected float mBgBorder = 0f;
 
+	[Tooltip("Whether the selection will be persistent even after the popup list is closed. By default the selection is " +
+		"cleared when the popup is closed so that the same selection can be chosen again the next time the popup list is opened. " +
+		"If enabled, the selection will persist, but selecting the same choice in succession will not result in the onChange " +
+		"notification being triggered more than once.")]
+	public bool persistentSelection = false;
+
 	[System.NonSerialized] protected GameObject mSelection;
 	[System.NonSerialized] protected int mOpenFrame = 0;
 
@@ -318,7 +324,7 @@ public class UIPopupList : UIWidgetContainer
 			if (notify && mSelectedItem != null)
 				TriggerCallbacks();
 
-			mSelectedItem = null;
+			if (!persistentSelection) mSelectedItem = null;
 		}
 	}
 
