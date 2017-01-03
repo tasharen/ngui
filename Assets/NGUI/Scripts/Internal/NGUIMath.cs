@@ -403,7 +403,7 @@ static public class NGUIMath
 
 	static public Bounds CalculateRelativeWidgetBounds (Transform trans)
 	{
-		return CalculateRelativeWidgetBounds(trans, trans, false);
+		return CalculateRelativeWidgetBounds(trans, trans, !trans.gameObject.activeSelf);
 	}
 
 	/// <summary>
@@ -421,7 +421,7 @@ static public class NGUIMath
 
 	static public Bounds CalculateRelativeWidgetBounds (Transform relativeTo, Transform content)
 	{
-		return CalculateRelativeWidgetBounds(relativeTo, content, false);
+		return CalculateRelativeWidgetBounds(relativeTo, content, !content.gameObject.activeSelf);
 	}
 
 	/// <summary>

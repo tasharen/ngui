@@ -177,6 +177,12 @@ public class UIPopupList : UIWidgetContainer
 	public bool isLocalized = false;
 
 	/// <summary>
+	/// Custom text modifier for child labels.
+	/// </summary>
+
+	public UILabel.Modifier textModifier = UILabel.Modifier.None;
+
+	/// <summary>
 	/// Whether a separate panel will be used to ensure that the popup will appear on top of everything else.
 	/// </summary>
 
@@ -345,7 +351,7 @@ public class UIPopupList : UIWidgetContainer
 	public virtual void AddItem (string text)
 	{
 		items.Add(text);
-		itemData.Add(null);
+		itemData.Add(text);
 	}
 
 	/// <summary>
@@ -926,21 +932,22 @@ public class UIPopupList : UIWidgetContainer
 			}
 			current = this;
 
+			var pTrans = separatePanel ? ((Component)mPanel.GetComponentInParent<UIRoot>() ?? mPanel).transform : mPanel.cachedTransform;
 			Transform t = mChild.transform;
-			t.parent = mPanel.cachedTransform;
+			t.parent = pTrans;
 
 			// Manually triggered popup list on some other game object
 			if (openOn == OpenOn.Manual && mSelection != gameObject)
 			{
 				startingPosition = UICamera.lastEventPosition;
-				min = mPanel.cachedTransform.InverseTransformPoint(mPanel.anchorCamera.ScreenToWorldPoint(startingPosition));
+				min = pTrans.InverseTransformPoint(mPanel.anchorCamera.ScreenToWorldPoint(startingPosition));
 				max = min;
 				t.localPosition = min;
 				startingPosition = t.position;
 			}
 			else
 			{
-				Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(mPanel.cachedTransform, transform, false, false);
+				Bounds bounds = NGUIMath.CalculateRelativeWidgetBounds(pTrans, transform, false, false);
 				min = bounds.min;
 				max = bounds.max;
 				t.localPosition = min;
@@ -1031,6 +1038,7 @@ public class UIPopupList : UIWidgetContainer
 				lbl.fontSize = fontSize;
 				lbl.fontStyle = fontStyle;
 				lbl.text = isLocalized ? Localization.Get(s) : s;
+				lbl.modifier = textModifier;
 				lbl.color = textColor;
 				lbl.cachedTransform.localPosition = new Vector3(bgPadding.x + padding.x - lbl.pivotOffset.x, y, -1f);
 				lbl.overflowMethod = UILabel.Overflow.ResizeFreely;

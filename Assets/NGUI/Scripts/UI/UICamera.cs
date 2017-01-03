@@ -546,9 +546,16 @@ public class UICamera : MonoBehaviour
 		{
 			if (mCurrentKey == KeyCode.None) return ControlScheme.Touch;
 			if (mCurrentKey >= KeyCode.JoystickButton0) return ControlScheme.Controller;
-			if (current != null && mLastScheme == ControlScheme.Controller &&
-				(mCurrentKey == current.submitKey0 || mCurrentKey == current.submitKey1))
+			
+			if (current != null)
+			{
+				if (mLastScheme == ControlScheme.Controller && (mCurrentKey == current.submitKey0 || mCurrentKey == current.submitKey1))
+					return ControlScheme.Controller;
+
+				if (current.useMouse) return ControlScheme.Mouse;
+				if (current.useTouch) return ControlScheme.Touch;
 				return ControlScheme.Controller;
+			}
 			return ControlScheme.Mouse;
 		}
 		set

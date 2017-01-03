@@ -1361,8 +1361,7 @@ public class UILabel : UIWidget
 				NGUIText.Update(false);
 
 				// Wrap the text
-				bool fits = NGUIText.WrapText(printedText, out mProcessedText, true, false,
-					mOverflowEllipsis && mOverflow == Overflow.ClampContent);
+				bool fits = NGUIText.WrapText(printedText, out mProcessedText, true, false, mOverflowEllipsis);
 
 				if (mOverflow == Overflow.ShrinkContent && !fits)
 				{

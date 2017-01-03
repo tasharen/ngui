@@ -15,7 +15,7 @@ using System.Collections.Generic;
 /// Inspector class used to edit UIPopupLists.
 /// </summary>
 
-[CustomEditor(typeof(UIPopupList))]
+[CustomEditor(typeof(UIPopupList), true)]
 public class UIPopupListInspector : UIWidgetContainerEditor
 {
 	enum FontType
@@ -272,6 +272,8 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 			NGUIEditorTools.DrawPadding();
 			NGUIEditorTools.SetLabelWidth(80f);
 			GUILayout.EndHorizontal();
+
+			NGUIEditorTools.DrawProperty("Modifier", serializedObject, "textModifier");
 
 			NGUIEditorTools.EndContents();
 		}

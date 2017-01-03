@@ -1215,14 +1215,17 @@ static public class NGUITools
 
 	static public bool IsChild (Transform parent, Transform child)
 	{
-		if (parent == null || child == null) return false;
+		return child.IsChildOf(parent);
 
-		while (child != null)
-		{
-			if (child == parent) return true;
-			child = child.parent;
-		}
-		return false;
+		// Legacy way of doing it prior to Unity adding IsChildOf
+		//if (parent == null || child == null) return false;
+
+		//while (child != null)
+		//{
+		//    if (child == parent) return true;
+		//    child = child.parent;
+		//}
+		//return false;
 	}
 
 	/// <summary>
@@ -1430,9 +1433,9 @@ static public class NGUITools
 	/// Given the root widget, adjust its position so that it fits on the screen.
 	/// </summary>
 
-	static public void FitOnScreen (this Camera cam, Transform t)
+	static public void FitOnScreen (this Camera cam, Transform t, bool considerInactive = false, bool considerChildren = true)
 	{
-		var bounds = NGUIMath.CalculateRelativeWidgetBounds(t, t);
+		var bounds = NGUIMath.CalculateRelativeWidgetBounds(t, t, considerInactive, considerChildren);
 
 		var sp = cam.WorldToScreenPoint(t.position);
 		var min = sp + bounds.min;
@@ -1466,10 +1469,10 @@ static public class NGUITools
 	/// Example: uiCamera.FitOnScreen(rootObjectTransform, contentObjectTransform, UICamera.lastEventPosition);
 	/// </summary>
 
-	static public void FitOnScreen (this Camera cam, Transform transform, Transform content, Vector3 pos)
+	static public void FitOnScreen (this Camera cam, Transform transform, Transform content, Vector3 pos, bool considerInactive = false)
 	{
 		Bounds b;
-		cam.FitOnScreen(transform, content, pos, out b);
+		cam.FitOnScreen(transform, content, pos, out b, considerInactive);
 	}
 
 	/// <summary>
@@ -1477,9 +1480,9 @@ static public class NGUITools
 	/// Example: uiCamera.FitOnScreen(rootObjectTransform, contentObjectTransform, UICamera.lastEventPosition);
 	/// </summary>
 
-	static public void FitOnScreen (this Camera cam, Transform transform, Transform content, Vector3 pos, out Bounds bounds)
+	static public void FitOnScreen (this Camera cam, Transform transform, Transform content, Vector3 pos, out Bounds bounds, bool considerInactive = false)
 	{
-		bounds = NGUIMath.CalculateRelativeWidgetBounds(transform, content);
+		bounds = NGUIMath.CalculateRelativeWidgetBounds(transform, content, considerInactive);
 
 		Vector3 min = bounds.min;
 		Vector3 max = bounds.max;

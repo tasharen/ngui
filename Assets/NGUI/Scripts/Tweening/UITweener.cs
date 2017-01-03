@@ -170,8 +170,8 @@ public abstract class UITweener : MonoBehaviour
 
 	protected void DoUpdate ()
 	{
-		float delta = ignoreTimeScale && !useFixedUpdate ? RealTime.deltaTime : Time.deltaTime;
-		float time = ignoreTimeScale && !useFixedUpdate ? RealTime.time : Time.time;
+		float delta = ignoreTimeScale && !useFixedUpdate ? Time.unscaledDeltaTime : Time.deltaTime;
+		float time = ignoreTimeScale && !useFixedUpdate ? Time.unscaledTime : Time.time;
 
 		if (!mStarted)
 		{
