@@ -1060,6 +1060,8 @@ public class UILabel : UIWidget
 
 	static void OnFontChanged (Font font)
 	{
+		++mFontChangedDepth;
+
 		for (int i = 0; i < mList.size; ++i)
 		{
 			UILabel lbl = mList[i];
@@ -1070,33 +1072,56 @@ public class UILabel : UIWidget
 
 				if (fnt == font)
 				{
-					fnt.RequestCharactersInTexture(lbl.printedText, lbl.mFinalFontSize, lbl.mFontStyle);
-					lbl.MarkAsChanged();
+					if (mTempLabels == null) mTempLabels = new List<UILabel>();
 
-					if (lbl.panel == null)
-						lbl.CreatePanel();
-
-					if (mTempDrawcalls == null)
-						mTempDrawcalls = new List<UIDrawCall>();
-
-					if (lbl.drawCall != null && !mTempDrawcalls.Contains(lbl.drawCall))
-						mTempDrawcalls.Add(lbl.drawCall);
+					if (!mTempLabels.Contains(lbl))
+					{
+						mTempLabels.Add(lbl);
+						lbl.UpdateNGUIText();
+						fnt.RequestCharactersInTexture(lbl.printedText, lbl.mFinalFontSize, lbl.mFontStyle);
+					}
 				}
 			}
 		}
 
-		if (mTempDrawcalls != null)
+		if (mFontChangedDepth == 1 && mTempLabels != null)
 		{
-			for (int i = 0, imax = mTempDrawcalls.Count; i < imax; ++i)
+			var frame = Time.frameCount;
+
+			for (int i = 0, imax = mTempLabels.Count; i < imax; ++i)
 			{
-				UIDrawCall dc = mTempDrawcalls[i];
-				if (dc.panel != null) dc.panel.FillDrawCall(dc);
+				var lbl = mTempLabels[i];
+				if (lbl.panel == null) lbl.CreatePanel();
+				lbl.MarkAsChanged();
+				lbl.UpdateGeometry(frame);
+
+				var dc = lbl.drawCall;
+
+				if (dc != null)
+				{
+					if (mTempDrawcalls == null) mTempDrawcalls = new List<UIDrawCall>();
+					if (!mTempDrawcalls.Contains(dc)) mTempDrawcalls.Add(dc);
+				}
 			}
-			mTempDrawcalls.Clear();
+
+			mTempLabels.Clear();
+
+			if (mTempDrawcalls != null)
+			{
+				for (int i = 0, imax = mTempDrawcalls.Count; i < imax; ++i)
+				{
+					var dc = mTempDrawcalls[i];
+					if (dc.panel != null) dc.panel.FillDrawCall(dc);
+				}
+				mTempDrawcalls.Clear();
+			}
 		}
+		--mFontChangedDepth;
 	}
 
-	static List<UIDrawCall> mTempDrawcalls;
+	[System.NonSerialized] static int mFontChangedDepth = 0;
+	[System.NonSerialized] static List<UIDrawCall> mTempDrawcalls;
+	[System.NonSerialized] static List<UILabel> mTempLabels;
 
 	/// <summary>
 	/// Get the sides of the rectangle relative to the specified transform.
