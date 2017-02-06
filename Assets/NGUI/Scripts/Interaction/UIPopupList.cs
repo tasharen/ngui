@@ -1,7 +1,7 @@
-//----------------------------------------------
+//-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2016 Tasharen Entertainment
-//----------------------------------------------
+// Copyright © 2011-2017 Tasharen Entertainment Inc
+//-------------------------------------------------
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -888,7 +888,7 @@ public class UIPopupList : UIWidgetContainer
 			// Ensure the popup's source has the selection
 			UICamera.selectedObject = (UICamera.hoveredObject ?? gameObject);
 			mSelection = UICamera.selectedObject;
-			source = UICamera.selectedObject;
+			source = mSelection;
 
 			if (source == null)
 			{

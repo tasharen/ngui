@@ -1,7 +1,7 @@
-//----------------------------------------------
+//-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2016 Tasharen Entertainment
-//----------------------------------------------
+// Copyright © 2011-2017 Tasharen Entertainment Inc
+//-------------------------------------------------
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -1281,13 +1281,7 @@ public class UILabel : UIWidget
 	/// Process the raw text, called when something changes.
 	/// </summary>
 
-	public void ProcessText () { ProcessText(false, true); }
-
-	/// <summary>
-	/// Process the raw text, called when something changes.
-	/// </summary>
-
-	void ProcessText (bool legacyMode, bool full)
+	public void ProcessText (bool legacyMode = false, bool full = true)
 	{
 		if (!isValid) return;
 
@@ -1361,7 +1355,7 @@ public class UILabel : UIWidget
 				NGUIText.Update(false);
 
 				// Wrap the text
-				bool fits = NGUIText.WrapText(printedText, out mProcessedText, true, false, mOverflowEllipsis);
+				bool fits = NGUIText.WrapText(printedText, out mProcessedText, false, false, mOverflowEllipsis);
 
 				if (mOverflow == Overflow.ShrinkContent && !fits)
 				{

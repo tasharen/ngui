@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2016 Tasharen Entertainment
-            Version 3.11.1
+            Version 3.11.2
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,11 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.11.2
+- FIX: Fix for the popup list not re-opening properly in some cases with touch input.
+- FIX: Rewrote how '...' gets appended at the end of wrapped labels, fixing its functionality when sup/subscript is used in the same label.
+- FIX: Reverted the ordering of triangles for UI, making them face the -Z again.
 
 3.11.1
 - NEW: Added a 'keep value' option to the popup list that will make popup values persist even after it disappears, like it used to work before the change many versions back.

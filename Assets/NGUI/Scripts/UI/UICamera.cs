@@ -1,7 +1,7 @@
-//----------------------------------------------
+//-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2016 Tasharen Entertainment
-//----------------------------------------------
+// Copyright © 2011-2017 Tasharen Entertainment Inc
+//-------------------------------------------------
 
 using UnityEngine;
 using System.Collections.Generic;
@@ -864,7 +864,7 @@ public class UICamera : MonoBehaviour
 	{
 		get
 		{
-			if (currentTouch != null && currentTouch.dragStarted) return currentTouch.current;
+			if (currentTouch != null && (currentScheme != ControlScheme.Mouse || currentTouch.dragStarted)) return currentTouch.current;
 			if (mHover && mHover.activeInHierarchy) return mHover;
 			mHover = null;
 			return null;
@@ -2007,7 +2007,7 @@ public class UICamera : MonoBehaviour
 		}
 
 		// We're currently using touches -- do nothing
-		if (currentScheme == ControlScheme.Touch) return;
+		if (currentScheme == ControlScheme.Touch && activeTouches.Count > 0) return;
 
 		currentTouch = mMouse[0];
 

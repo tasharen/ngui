@@ -1,7 +1,7 @@
-//----------------------------------------------
+//-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2016 Tasharen Entertainment
-//----------------------------------------------
+// Copyright © 2011-2017 Tasharen Entertainment Inc
+//-------------------------------------------------
 
 using UnityEngine;
 using System;
@@ -15,7 +15,13 @@ using System.Reflection;
 
 static public class NGUITools
 {
-	static AudioListener mListener;
+	[System.NonSerialized] static AudioListener mListener;
+
+	/// <summary>
+	/// Audio source used to play UI sounds. NGUI will create one for you automatically, but you can specify it yourself as well if you like.
+	/// </summary>
+
+	[System.NonSerialized] static public AudioSource audioSource;
 
 	static bool mLoaded = false;
 	static float mGlobalVolume = 1f;
@@ -122,18 +128,22 @@ static public class NGUITools
 
 			if (mListener != null && mListener.enabled && NGUITools.GetActive(mListener.gameObject))
 			{
+				if (!audioSource)
+				{
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-				AudioSource source = mListener.audio;
+					audioSource = mListener.audio;
 #else
-				AudioSource source = mListener.GetComponent<AudioSource>();
+					audioSource = mListener.GetComponent<AudioSource>();
 #endif
-				if (source == null) source = mListener.gameObject.AddComponent<AudioSource>();
+					if (audioSource == null) audioSource = mListener.gameObject.AddComponent<AudioSource>();
+				}
+
 #if !UNITY_FLASH
-				source.priority = 50;
-				source.pitch = pitch;
+				audioSource.priority = 50;
+				audioSource.pitch = pitch;
 #endif
-				source.PlayOneShot(clip, volume);
-				return source;
+				audioSource.PlayOneShot(clip, volume);
+				return audioSource;
 			}
 		}
 		return null;
