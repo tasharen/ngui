@@ -406,13 +406,28 @@ static public class NGUITools
 
 			if (w != null)
 			{
-				Vector3[] corners = w.localCorners;
+				var dr = w.drawRegion;
+
+				if (dr.x != 0f || dr.y != 0f || dr.z != 1f || dr.w != 1f)
+				{
+					var region = w.drawingDimensions;
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-				box.center = Vector3.Lerp(corners[0], corners[2], 0.5f);
+					box.center = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
 #else
-				box.offset = Vector3.Lerp(corners[0], corners[2], 0.5f);
+					box.offset = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
 #endif
-				box.size = corners[2] - corners[0];
+					box.size = new Vector3(region.z - region.x, region.w - region.y);
+				}
+				else
+				{
+					var corners = w.localCorners;
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
+					box.center = Vector3.Lerp(corners[0], corners[2], 0.5f);
+#else
+					box.offset = Vector3.Lerp(corners[0], corners[2], 0.5f);
+#endif
+					box.size = corners[2] - corners[0];
+				}
 			}
 			else
 			{
