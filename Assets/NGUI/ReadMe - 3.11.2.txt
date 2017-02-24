@@ -59,6 +59,9 @@ and it will not be included in the build of your game. It's only used in the edi
 - FIX: Fix for the popup list not re-opening properly in some cases with touch input.
 - FIX: Rewrote how '...' gets appended at the end of wrapped labels, fixing its functionality when sup/subscript is used in the same label.
 - FIX: Reverted the ordering of triangles for UI, making them face the -Z again.
+- FIX: Added code to NGUI's main default shaders (Unlit/Transparent Colored and Unlit/Text) to handle single pass VR.
+- FIX: Choosing to hide a side of an advanced sprite will now also hide corners on that side.
+- FIX: Small fix to how UIGrid and UITable would handle widgets with SpringPosition attached.
 
 3.11.1
 - NEW: Added a 'keep value' option to the popup list that will make popup values persist even after it disappears, like it used to work before the change many versions back.

@@ -44,6 +44,7 @@ Shader "Hidden/Unlit/Transparent Colored 2"
 				float4 vertex : POSITION;
 				half4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
 			struct v2f
@@ -52,6 +53,7 @@ Shader "Hidden/Unlit/Transparent Colored 2"
 				half4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
 				float4 worldPos : TEXCOORD1;
+				UNITY_VERTEX_OUTPUT_STEREO
 			};
 
 			float2 Rotate (float2 v, float2 rot)
@@ -66,6 +68,8 @@ Shader "Hidden/Unlit/Transparent Colored 2"
 
 			v2f vert (appdata_t v)
 			{
+				UNITY_SETUP_INSTANCE_ID(v);
+				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.color = v.color;
 				o.texcoord = v.texcoord;

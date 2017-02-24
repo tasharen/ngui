@@ -1072,7 +1072,7 @@ public class UILabel : UIWidget
 
 				if (fnt == font)
 				{
-					if (mTempLabels == null) mTempLabels = new List<UILabel>();
+					if (mTempLabels == null) mTempLabels = new BetterList<UILabel>();
 
 					if (!mTempLabels.Contains(lbl))
 					{
@@ -1088,9 +1088,9 @@ public class UILabel : UIWidget
 		{
 			var frame = Time.frameCount;
 
-			for (int i = 0, imax = mTempLabels.Count; i < imax; ++i)
+			for (int i = 0, imax = mTempLabels.size; i < imax; ++i)
 			{
-				var lbl = mTempLabels[i];
+				var lbl = mTempLabels.buffer[i];
 				if (lbl.panel == null) lbl.CreatePanel();
 				lbl.MarkAsChanged();
 				lbl.UpdateGeometry(frame);
@@ -1099,7 +1099,7 @@ public class UILabel : UIWidget
 
 				if (dc != null)
 				{
-					if (mTempDrawcalls == null) mTempDrawcalls = new List<UIDrawCall>();
+					if (mTempDrawcalls == null) mTempDrawcalls = new BetterList<UIDrawCall>();
 					if (!mTempDrawcalls.Contains(dc)) mTempDrawcalls.Add(dc);
 				}
 			}
@@ -1108,9 +1108,9 @@ public class UILabel : UIWidget
 
 			if (mTempDrawcalls != null)
 			{
-				for (int i = 0, imax = mTempDrawcalls.Count; i < imax; ++i)
+				for (int i = 0, imax = mTempDrawcalls.size; i < imax; ++i)
 				{
-					var dc = mTempDrawcalls[i];
+					var dc = mTempDrawcalls.buffer[i];
 					if (dc.panel != null) dc.panel.FillDrawCall(dc);
 				}
 				mTempDrawcalls.Clear();
@@ -1120,8 +1120,8 @@ public class UILabel : UIWidget
 	}
 
 	[System.NonSerialized] static int mFontChangedDepth = 0;
-	[System.NonSerialized] static List<UIDrawCall> mTempDrawcalls;
-	[System.NonSerialized] static List<UILabel> mTempLabels;
+	[System.NonSerialized] static BetterList<UIDrawCall> mTempDrawcalls;
+	[System.NonSerialized] static BetterList<UILabel> mTempLabels;
 
 	/// <summary>
 	/// Get the sides of the rectangle relative to the specified transform.
