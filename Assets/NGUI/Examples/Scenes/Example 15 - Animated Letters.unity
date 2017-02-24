@@ -278,6 +278,7 @@ MonoBehaviour:
   mSortingOrder: 0
   mSortingLayerName: 
   mClipOffset: {x: 0, y: 0}
+  useSortingOrder: 0
 --- !u!1 &536286098
 GameObject:
   m_ObjectHideFlags: 0
