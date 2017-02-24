@@ -25,13 +25,21 @@ Shader "Hidden/Unlit/Premultiplied Colored 1"
 			AlphaTest Off
 			Fog { Mode Off }
 			Offset -1, -1
-			//ColorMask RGB
 			Blend One OneMinusSrcAlpha
 
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
+
+			// Unity 4 compatibility
+			#ifndef UNITY_VERTEX_INPUT_INSTANCE_ID
+			#define UNITY_VERTEX_INPUT_INSTANCE_ID
+			#define UNITY_VERTEX_OUTPUT_STEREO
+			#define UNITY_SETUP_INSTANCE_ID(v)
+			#define UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(i)
+			#define UnityObjectToClipPos(v) mul(UNITY_MATRIX_MVP, v)
+			#endif
 
 			sampler2D _MainTex;
 			float4 _ClipRange0 = float4(0.0, 0.0, 1.0, 1.0);
@@ -42,6 +50,7 @@ Shader "Hidden/Unlit/Premultiplied Colored 1"
 				float4 vertex : POSITION;
 				half4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
 			struct v2f
@@ -50,12 +59,15 @@ Shader "Hidden/Unlit/Premultiplied Colored 1"
 				half4 color : COLOR;
 				float2 texcoord : TEXCOORD0;
 				float2 worldPos : TEXCOORD1;
+				UNITY_VERTEX_OUTPUT_STEREO
 			};
 
 			v2f vert (appdata_t v)
 			{
 				v2f o;
-				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+				UNITY_SETUP_INSTANCE_ID(v);
+				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.color = v.color;
 				o.texcoord = v.texcoord;
 				o.worldPos = v.vertex.xy * _ClipRange0.zw + _ClipRange0.xy;
