@@ -1677,8 +1677,6 @@ public class UIPanel : UIRect
 					}
 				}
 #endif
-				
-
 				// First update the widget's transform
 				if (w.UpdateTransform(frame) || mResized || (mHasMoved && !alwaysOnScreen))
 				{

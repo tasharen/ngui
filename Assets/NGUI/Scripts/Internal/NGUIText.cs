@@ -1641,7 +1641,7 @@ static public class NGUIText
 					}
 				}
 
-				if (finalSpacingX < 0f) w += finalSpacingX;
+				w += finalSpacingX;
 
 				v0x = glyph.v0.x + x;
 				v0y = glyph.v0.y - y;
