@@ -1834,11 +1834,8 @@ static public class NGUIText
 						}
 					}
 
-					if (strikethrough)
-					{
-						v0y = (-y + dash.v0.y);
-						v1y = (-y + dash.v1.y);
-					}
+					v0y = (-y + dash.v0.y);
+					v1y = (-y + dash.v1.y);
 
 					if (bold)
 					{
