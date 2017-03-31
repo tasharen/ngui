@@ -1060,13 +1060,49 @@ public class UILabel : UIWidget
 
 	static void OnFontChanged (Font font)
 	{
-		++mFontChangedDepth;
-
 		for (int i = 0; i < mList.size; ++i)
 		{
 			UILabel lbl = mList[i];
 
 			if (lbl != null)
+			{
+				Font fnt = lbl.trueTypeFont;
+
+				if (fnt == font)
+				{
+					fnt.RequestCharactersInTexture(lbl.mText, lbl.mFinalFontSize, lbl.mFontStyle);
+					lbl.MarkAsChanged();
+
+					if (lbl.panel == null)
+						lbl.CreatePanel();
+
+					if (mTempDrawcalls == null)
+						mTempDrawcalls = new BetterList<UIDrawCall>();
+
+					if (lbl.drawCall != null && !mTempDrawcalls.Contains(lbl.drawCall))
+						mTempDrawcalls.Add(lbl.drawCall);
+				}
+			}
+		}
+
+		if (mTempDrawcalls != null)
+		{
+			for (int i = 0, imax = mTempDrawcalls.size; i < imax; ++i)
+			{
+				UIDrawCall dc = mTempDrawcalls[i];
+				if (dc.panel != null) dc.panel.FillDrawCall(dc);
+			}
+			mTempDrawcalls.Clear();
+		}
+
+		// http://www.tasharen.com/forum/index.php?topic=15202.0
+		/*++mFontChangedDepth;
+
+		for (int i = 0; i < mList.size; ++i)
+		{
+			UILabel lbl = mList[i];
+
+			if (lbl != null)v [kp;' 5rfc328i0u
 			{
 				Font fnt = lbl.trueTypeFont;
 
@@ -1116,12 +1152,12 @@ public class UILabel : UIWidget
 				mTempDrawcalls.Clear();
 			}
 		}
-		--mFontChangedDepth;
+		--mFontChangedDepth;*/
 	}
 
-	[System.NonSerialized] static int mFontChangedDepth = 0;
+	//[System.NonSerialized] static int mFontChangedDepth = 0;
 	[System.NonSerialized] static BetterList<UIDrawCall> mTempDrawcalls;
-	[System.NonSerialized] static BetterList<UILabel> mTempLabels;
+	//[System.NonSerialized] static BetterList<UILabel> mTempLabels;
 
 	/// <summary>
 	/// Get the sides of the rectangle relative to the specified transform.

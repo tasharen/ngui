@@ -1714,9 +1714,10 @@ public class UIPanel : UIRect
 
 	public UIDrawCall FindDrawCall (UIWidget w)
 	{
-		Material mat = w.material;
-		Texture tex = w.mainTexture;
-		int depth = w.depth;
+		var mat = w.material;
+		var tex = w.mainTexture;
+		var shader = w.shader;
+		var depth = w.depth;
 
 		for (int i = 0; i < drawCalls.Count; ++i)
 		{
@@ -1726,7 +1727,7 @@ public class UIPanel : UIRect
 
 			if (dcStart <= depth && dcEnd >= depth)
 			{
-				if (dc.baseMaterial == mat && dc.mainTexture == tex)
+				if (dc.baseMaterial == mat && dc.shader == shader && dc.mainTexture == tex)
 				{
 					if (w.isVisible)
 					{

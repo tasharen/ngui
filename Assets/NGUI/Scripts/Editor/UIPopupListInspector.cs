@@ -127,6 +127,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 		}
 
 		NGUIEditorTools.DrawProperty("Position", serializedObject, "position");
+		NGUIEditorTools.DrawProperty("Selection", serializedObject, "selection");
 		NGUIEditorTools.DrawProperty("Alignment", serializedObject, "alignment");
 		NGUIEditorTools.DrawProperty("Open on", serializedObject, "openOn");
 		NGUIEditorTools.DrawProperty("On Top", serializedObject, "separatePanel");

@@ -18,7 +18,9 @@ public class TweenAlpha : UITweener
 	bool mCached = false;
 	UIRect mRect;
 	Material mMat;
+	Light mLight;
 	SpriteRenderer mSr;
+	float mBaseIntensity = 1f;
 
 	[System.Obsolete("Use 'value' instead")]
 	public float alpha { get { return this.value; } set { this.value = value; } }
@@ -31,9 +33,15 @@ public class TweenAlpha : UITweener
 
 		if (mRect == null && mSr == null)
 		{
-			Renderer ren = GetComponent<Renderer>();
-			if (ren != null) mMat = ren.material;
-			if (mMat == null) mRect = GetComponentInChildren<UIRect>();
+			mLight = GetComponent<Light>();
+
+			if (mLight == null)
+			{
+				Renderer ren = GetComponent<Renderer>();
+				if (ren != null) mMat = ren.material;
+				if (mMat == null) mRect = GetComponentInChildren<UIRect>();
+			}
+			else mBaseIntensity = mLight.intensity;
 		}
 	}
 
@@ -69,6 +77,10 @@ public class TweenAlpha : UITweener
 				Color c = mMat.color;
 				c.a = value;
 				mMat.color = c;
+			}
+			else if (mLight != null)
+			{
+				mLight.intensity = mBaseIntensity * value;
 			}
 		}
 	}

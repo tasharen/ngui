@@ -174,7 +174,7 @@ public class UICenterOnChild : MonoBehaviour
 					}
 					case UIScrollView.Movement.Vertical:
 					{
-						delta = totalDelta.y;
+						delta = -totalDelta.y;
 						break;
 					}
 					default:

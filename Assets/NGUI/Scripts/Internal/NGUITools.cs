@@ -503,7 +503,7 @@ static public class NGUITools
 	/// Add a new child game object.
 	/// </summary>
 
-	static public GameObject AddChild (this GameObject parent) { return AddChild(parent, true, -1); }
+	static public GameObject AddChild (GameObject parent) { return AddChild(parent, true, -1); }
 
 	/// <summary>
 	/// Add a new child game object.
@@ -523,7 +523,7 @@ static public class NGUITools
 
 	static public GameObject AddChild (this GameObject parent, bool undo, int layer)
 	{
-		GameObject go = new GameObject();
+		var go = new GameObject();
 #if UNITY_EDITOR
 		if (undo && !Application.isPlaying)
 			UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
@@ -553,20 +553,25 @@ static public class NGUITools
 
 	static public GameObject AddChild (this GameObject parent, GameObject prefab, int layer)
 	{
-		GameObject go = GameObject.Instantiate(prefab) as GameObject;
+		var go = GameObject.Instantiate(prefab) as GameObject;
 #if UNITY_EDITOR
 		if (!Application.isPlaying)
 			UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
 #endif
-		if (go != null && parent != null)
+		if (go != null)
 		{
-			Transform t = go.transform;
-			t.parent = parent.transform;
-			t.localPosition = Vector3.zero;
-			t.localRotation = Quaternion.identity;
-			t.localScale = Vector3.one;
-			if (layer == -1) go.layer = parent.layer;
-			else if (layer > -1 && layer < 32) go.layer = layer;
+			go.name = prefab.name;
+
+			if (parent != null)
+			{
+				Transform t = go.transform;
+				t.parent = parent.transform;
+				t.localPosition = Vector3.zero;
+				t.localRotation = Quaternion.identity;
+				t.localScale = Vector3.one;
+				if (layer == -1) go.layer = parent.layer;
+				else if (layer > -1 && layer < 32) go.layer = layer;
+			}
 		}
 		return go;
 	}

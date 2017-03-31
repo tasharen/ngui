@@ -32,6 +32,12 @@ public class UIPopupList : UIWidgetContainer
 		Below,
 	}
 
+	public enum Selection
+	{
+		OnPress,
+		OnClick,
+	}
+
 	/// <summary>
 	/// Atlas used by the sprites.
 	/// </summary>
@@ -120,6 +126,12 @@ public class UIPopupList : UIWidgetContainer
 	/// </summary>
 
 	public Position position = Position.Auto;
+
+	/// <summary>
+	/// Whether the popup item selection is chosen by pressing on it or by clicking on it.
+	/// </summary>
+
+	public Selection selection = Selection.OnPress;
 
 	/// <summary>
 	/// Label alignment to use.
@@ -292,9 +304,6 @@ public class UIPopupList : UIWidgetContainer
 			return (b != null && b.enabled);
 		}
 	}
-
-	[System.Obsolete("Use 'value' instead")]
-	public string selection { get { return value; } set { this.value = value; } }
 
 	/// <summary>
 	/// Whether the popup list is actually usable.
@@ -632,27 +641,33 @@ public class UIPopupList : UIWidgetContainer
 	}
 
 	/// <summary>
-	/// Event function triggered when the drop-down list item gets clicked on.
+	/// Event function triggered when the drop-down list item gets pressed on.
 	/// </summary>
 
 	protected virtual void OnItemPress (GameObject go, bool isPressed)
 	{
-		if (isPressed)
+		if (isPressed && selection == Selection.OnPress) OnItemClick(go);
+	}
+
+	/// <summary>
+	/// Event function triggered when the drop-down list item gets clicked on.
+	/// </summary>
+
+	protected virtual void OnItemClick (GameObject go)
+	{
+		Select(go.GetComponent<UILabel>(), true);
+
+		UIEventListener listener = go.GetComponent<UIEventListener>();
+		value = listener.parameter as string;
+		UIPlaySound[] sounds = GetComponents<UIPlaySound>();
+
+		for (int i = 0, imax = sounds.Length; i < imax; ++i)
 		{
-			Select(go.GetComponent<UILabel>(), true);
-
-			UIEventListener listener = go.GetComponent<UIEventListener>();
-			value = listener.parameter as string;
-			UIPlaySound[] sounds = GetComponents<UIPlaySound>();
-
-			for (int i = 0, imax = sounds.Length; i < imax; ++i)
-			{
-				UIPlaySound snd = sounds[i];
-				if (snd.trigger == UIPlaySound.Trigger.OnClick)
-					NGUITools.PlaySound(snd.audioClip, snd.volume, 1f);
-			}
-			CloseSelf();
+			UIPlaySound snd = sounds[i];
+			if (snd.trigger == UIPlaySound.Trigger.OnClick)
+				NGUITools.PlaySound(snd.audioClip, snd.volume, 1f);
 		}
+		CloseSelf();
 	}
 
 	/// <summary>
@@ -1054,6 +1069,7 @@ public class UIPopupList : UIWidgetContainer
 				UIEventListener listener = UIEventListener.Get(lbl.gameObject);
 				listener.onHover = OnItemHover;
 				listener.onPress = OnItemPress;
+				listener.onClick = OnItemClick;
 				listener.parameter = s;
 
 				// Move the selection here if this is the right label
