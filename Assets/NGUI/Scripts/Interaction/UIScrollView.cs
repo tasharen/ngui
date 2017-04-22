@@ -779,6 +779,7 @@ public class UIScrollView : MonoBehaviour
 			}
 			else if (centerOnChild)
 			{
+				if (mDragStarted && onDragFinished != null) onDragFinished();
 				centerOnChild.Recenter();
 			}
 			else

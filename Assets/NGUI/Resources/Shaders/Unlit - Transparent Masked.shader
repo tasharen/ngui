@@ -56,7 +56,7 @@ Shader "Unlit/Transparent Masked"
 
 			v2f vert (appdata_t v)
 			{
-				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.texcoord = v.texcoord;
 				o.texcoord1 = v.texcoord1;
 				o.color = v.color;

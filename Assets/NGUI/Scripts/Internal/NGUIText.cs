@@ -1400,6 +1400,9 @@ static public class NGUIText
 				}
 				else
 				{
+					// Skip spaces at the beginning of the line
+					while (start < offset && IsSpace(text[start])) ++start;
+
 					// Revert the position to the beginning of the word and reset the line
 					lineIsEmpty = true;
 					x = 0f;

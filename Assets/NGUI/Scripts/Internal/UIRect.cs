@@ -372,6 +372,7 @@ public abstract class UIRect : MonoBehaviour
 
 	protected Vector3 GetLocalPos (AnchorPoint ac, Transform trans)
 	{
+		if (ac.targetCam == null) FindCameraFor(ac);
 		if (anchorCamera == null || ac.targetCam == null)
 			return cachedTransform.localPosition;
 

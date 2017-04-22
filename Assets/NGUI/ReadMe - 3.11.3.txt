@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2016 Tasharen Entertainment
-            Version 3.11.2
+            Version 3.11.3
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,15 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.11.3
+- NEW: Popup list now has an option to control whether it opens on press or on click.
+- NEW: TweenAlpha is now able to tween light sources as well.
+- NEW: Better logic for UICamera.isOverUI, UICamera.uiHasFocus and UICamera.interactingWithUI.
+- FIX: UICenterOnChild will now scroll up/down in the proper direction when using the mouse wheel.
+- FIX: UIKeyBinding will now set the currentTouch to -1 before firing its OnBindingPress function.
+- FIX: Reverted UILabel.OnFontChanged (dynamic fonts) since it's now working how it used to (?)
+- FIX: Fix for underline and label spacing being broken.
 
 3.11.2
 - FIX: Fix for the popup list not re-opening properly in some cases with touch input.

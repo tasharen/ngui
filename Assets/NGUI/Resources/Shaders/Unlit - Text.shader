@@ -31,15 +31,6 @@ Shader "Unlit/Text"
 			#pragma fragment frag
 			#include "UnityCG.cginc"
 
-			// Unity 4 compatibility
-			#ifndef UNITY_VERTEX_INPUT_INSTANCE_ID
-			#define UNITY_VERTEX_INPUT_INSTANCE_ID
-			#define UNITY_VERTEX_OUTPUT_STEREO
-			#define UNITY_SETUP_INSTANCE_ID(v)
-			#define UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(i)
-			#define UnityObjectToClipPos(v) mul(UNITY_MATRIX_MVP, v)
-			#endif
-
 			struct appdata_t
 			{
 				float4 vertex : POSITION;
