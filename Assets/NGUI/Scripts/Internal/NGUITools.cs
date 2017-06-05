@@ -572,6 +572,7 @@ static public class NGUITools
 				if (layer == -1) go.layer = parent.layer;
 				else if (layer > -1 && layer < 32) go.layer = layer;
 			}
+			go.SetActive(true);
 		}
 		return go;
 	}
@@ -2000,6 +2001,9 @@ static public class NGUITools
 #else
 				Profiler.EndSample();
 #endif
+				#if UNITY_EDITOR && W2
+				if (mGameSize.magnitude > 4000f) Debug.LogWarning(mGameSize);
+				#endif
 			}
 			return mGameSize;
 		}

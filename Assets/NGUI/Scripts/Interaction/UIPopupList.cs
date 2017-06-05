@@ -332,6 +332,7 @@ public class UIPopupList : UIWidgetContainer
 		if (mSelectedItem != value)
 		{
 			mSelectedItem = value;
+
 			if (mSelectedItem == null) return;
 #if UNITY_EDITOR
 			if (!Application.isPlaying) return;
@@ -429,6 +430,7 @@ public class UIPopupList : UIWidgetContainer
 				// Legacy functionality support (for backwards compatibility)
 				eventReceiver.SendMessage(functionName, mSelectedItem, SendMessageOptions.DontRequireReceiver);
 			}
+
 			current = old;
 			mExecuting = false;
 		}
@@ -727,7 +729,15 @@ public class UIPopupList : UIWidgetContainer
 	/// Get rid of the popup dialog when the selection gets lost.
 	/// </summary>
 
-	protected virtual void OnSelect (bool isSelected) { if (!isSelected) CloseSelf(); }
+	protected virtual void OnSelect (bool isSelected)
+	{
+		if (!isSelected)
+		{
+			var sel = UICamera.selectedObject;
+			if (sel == null || !(sel == mChild || (mChild != null && sel != null && NGUITools.IsChild(mChild.transform, sel.transform))))
+				CloseSelf();
+		}
+	}
 
 	/// <summary>
 	/// Manually close the popup list.
@@ -879,7 +889,9 @@ public class UIPopupList : UIWidgetContainer
 		{
 			yield return null;
 
-			if (UICamera.selectedObject != mSelection)
+			var sel = UICamera.selectedObject;
+
+			if (sel != mSelection && (sel == null || !(sel == mChild || NGUITools.IsChild(mChild.transform, sel.transform))))
 			{
 				CloseSelf();
 				break;
@@ -1174,6 +1186,9 @@ public class UIPopupList : UIWidgetContainer
 				max = mPanel.cachedTransform.TransformPoint(max);
 				min = pt.InverseTransformPoint(min);
 				max = pt.InverseTransformPoint(max);
+				var adj = UIRoot.GetPixelSizeAdjustment(gameObject);
+				min /= adj;
+				max /= adj;
 			}
 
 			// Ensure that everything fits into the panel's visible range

@@ -385,6 +385,7 @@ public class UICamera : MonoBehaviour
 	/// Simulate a right-click on OSX when the Command key is held and a left-click is used (for trackpad).
 	/// </summary>
 
+	[Tooltip("If enabled, command-click will result in a right-click event on OSX")]
 	public bool commandClick = true;
 
 	/// <summary>
@@ -2819,7 +2820,7 @@ public class UICamera : MonoBehaviour
 			ProcessPress(pressed, click, drag);
 
 			// Hold event = show tooltip
-			if (currentTouch.deltaTime > tooltipDelay)
+			if (tooltipDelay != 0f && currentTouch.deltaTime > tooltipDelay)
 			{
 				if (currentTouch.pressed == currentTouch.current && mTooltipTime != 0f && !currentTouch.dragStarted)
 				{

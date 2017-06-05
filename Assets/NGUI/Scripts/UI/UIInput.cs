@@ -120,6 +120,8 @@ public class UIInput : MonoBehaviour
 	[System.NonSerialized]
 	public bool selectAllTextOnFocus = true;
 
+	public bool submitOnUnselect = false;
+
 	/// <summary>
 	/// What kind of validation to use with the input field's data.
 	/// </summary>
@@ -617,6 +619,8 @@ public class UIInput : MonoBehaviour
 
 		selection = null;
 		UpdateLabel();
+
+		if (submitOnUnselect) Submit();
 	}
 
 	/// <summary>

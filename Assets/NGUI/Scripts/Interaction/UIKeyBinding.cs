@@ -15,6 +15,9 @@ public class UIKeyBinding : MonoBehaviour
 {
 	static List<UIKeyBinding> mList = new List<UIKeyBinding>();
 
+#if W2
+	[Beebyte.Obfuscator.SkipRename]
+#endif
 	public enum Action
 	{
 		PressAndClick,
@@ -22,6 +25,9 @@ public class UIKeyBinding : MonoBehaviour
 		All,
 	}
 
+#if W2
+	[Beebyte.Obfuscator.SkipRename]
+#endif
 	public enum Modifier
 	{
 		Any,

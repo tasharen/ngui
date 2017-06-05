@@ -282,14 +282,14 @@ public class UIScrollView : MonoBehaviour
 
 			if (canMoveHorizontally)
 			{
-				if (b.min.x < clip.x - hx) return true;
-				if (b.max.x > clip.x + hx) return true;
+				if (b.min.x + 0.001f < clip.x - hx) return true;
+				if (b.max.x - 0.001f > clip.x + hx) return true;
 			}
 
 			if (canMoveVertically)
 			{
-				if (b.min.y < clip.y - hy) return true;
-				if (b.max.y > clip.y + hy) return true;
+				if (b.min.y + 0.001f < clip.y - hy) return true;
+				if (b.max.y - 0.001f > clip.y + hy) return true;
 			}
 			return false;
 		}

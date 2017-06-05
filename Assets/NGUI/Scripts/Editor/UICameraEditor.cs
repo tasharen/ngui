@@ -72,7 +72,6 @@ public class UICameraEditor : Editor
 
 			GUILayout.BeginHorizontal();
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("commandClick"), GUILayout.Width(140f));
-			GUILayout.Label("= Right-Click on OSX", GUILayout.MinWidth(30f));
 			GUILayout.EndHorizontal();
 
 			EditorGUI.BeginDisabledGroup(!mouse.boolValue && !touch.boolValue);

@@ -850,10 +850,12 @@ public class UIAtlasMaker : EditorWindow
 		//GUILayout.Label("or replace with trimmed pixels", GUILayout.MinWidth(70f));
 		//GUILayout.EndHorizontal();
 
+		#if !UNITY_5_6
 		GUILayout.BeginHorizontal();
 		NGUISettings.unityPacking = EditorGUILayout.Toggle("Unity Packer", NGUISettings.unityPacking, GUILayout.Width(100f));
 		GUILayout.Label("or custom packer", GUILayout.MinWidth(70f));
 		GUILayout.EndHorizontal();
+		#endif
 
 		GUILayout.BeginHorizontal();
 		NGUISettings.trueColorAtlas = EditorGUILayout.Toggle("Truecolor", NGUISettings.trueColorAtlas, GUILayout.Width(100f));
@@ -865,6 +867,7 @@ public class UIAtlasMaker : EditorWindow
 		GUILayout.Label("replace textures with sprites", GUILayout.MinWidth(70f));
 		GUILayout.EndHorizontal();
 
+		#if !UNITY_5_6
 		if (!NGUISettings.unityPacking)
 		{
 			GUILayout.BeginHorizontal();
@@ -872,6 +875,7 @@ public class UIAtlasMaker : EditorWindow
 			GUILayout.Label("if on, forces a square atlas texture", GUILayout.MinWidth(70f));
 			GUILayout.EndHorizontal();
 		}
+		#endif
 
 #if UNITY_IPHONE || UNITY_ANDROID
 		GUILayout.BeginHorizontal();
