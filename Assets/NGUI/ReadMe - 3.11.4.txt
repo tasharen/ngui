@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2016 Tasharen Entertainment
-            Version 3.11.3
+            Version 3.11.4
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,9 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.11.4
+- FIX: Assortment of various minor fixes for issues reported on the forums.
 
 3.11.3
 - NEW: Popup list now has an option to control whether it opens on press or on click.
