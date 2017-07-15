@@ -73,7 +73,7 @@ public class UILocalizeEditor : Editor
 							GUILayout.BeginHorizontal();
 							GUILayout.Label(keys[i], GUILayout.Width(66f));
 
-							if (GUILayout.Button(values[i], "AS TextArea", GUILayout.MinWidth(80f), GUILayout.MaxWidth(Screen.width - 110f)))
+							if (GUILayout.Button(values[i], NGUIEditorTools.textArea, GUILayout.MinWidth(80f), GUILayout.MaxWidth(Screen.width - 110f)))
 							{
 								(target as UILocalize).value = values[i];
 								GUIUtility.hotControl = 0;

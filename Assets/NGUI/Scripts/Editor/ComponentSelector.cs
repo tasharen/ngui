@@ -265,8 +265,8 @@ public class ComponentSelector : ScriptableWizard
 			else if (comp != null && EditorUtility.IsPersistent(comp.gameObject))
 				GUI.contentColor = new Color(0.6f, 0.8f, 1f);
 
-			retVal |= GUILayout.Button(obj.name, "AS TextArea", GUILayout.Width(160f), GUILayout.Height(20f));
-			retVal |= GUILayout.Button(path.Replace("Assets/", ""), "AS TextArea", GUILayout.Height(20f));
+			retVal |= GUILayout.Button(obj.name, NGUIEditorTools.textArea, GUILayout.Width(160f), GUILayout.Height(20f));
+			retVal |= GUILayout.Button(path.Replace("Assets/", ""), NGUIEditorTools.textArea, GUILayout.Height(20f));
 			GUI.contentColor = Color.white;
 
 			retVal |= GUILayout.Button("Select", "ButtonLeft", GUILayout.Width(60f), GUILayout.Height(16f));

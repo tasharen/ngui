@@ -214,7 +214,7 @@ public class UIPanelTool : EditorWindow
 		if (ent != null)
 		{
 			GUI.backgroundColor = ent.panel == selected ? Color.white : new Color(0.8f, 0.8f, 0.8f);
-			GUILayout.BeginHorizontal("AS TextArea", GUILayout.MinHeight(20f));
+			GUILayout.BeginHorizontal(NGUIEditorTools.textArea, GUILayout.MinHeight(20f));
 			GUI.backgroundColor = Color.white;
 		}
 		else

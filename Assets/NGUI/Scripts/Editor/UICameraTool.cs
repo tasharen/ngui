@@ -184,7 +184,7 @@ public class UICameraTool : EditorWindow
 		if (cam != null)
 		{
 			GUI.backgroundColor = highlight ? Color.white : new Color(0.8f, 0.8f, 0.8f);
-			GUILayout.BeginHorizontal("AS TextArea", GUILayout.MinHeight(20f));
+			GUILayout.BeginHorizontal(NGUIEditorTools.textArea, GUILayout.MinHeight(20f));
 			GUI.backgroundColor = Color.white;
 		}
 		else
