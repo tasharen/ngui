@@ -163,12 +163,19 @@ public class UILabelInspector : UIWidgetInspector
 				SerializedProperty prop = NGUIEditorTools.DrawProperty("Font Size", serializedObject, "mFontSize", GUILayout.Width(142f));
 
 				EditorGUI.BeginDisabledGroup(true);
+
 				if (!serializedObject.isEditingMultipleObjects)
 				{
-					if (mLabel.overflowMethod == UILabel.Overflow.ShrinkContent)
-						GUILayout.Label(" Actual: " + mLabel.finalFontSize + "/" + mLabel.defaultFontSize);
-					else GUILayout.Label(" Default: " + mLabel.defaultFontSize);
+					var printed = mLabel.finalFontSize;
+					var def = mLabel.defaultFontSize;
+
+					if (mLabel.overflowMethod == UILabel.Overflow.ShrinkContent && printed != mLabel.fontSize)
+					{
+						GUILayout.Label(" Printed: " + printed);
+					}
+					else if (printed != def) GUILayout.Label(" Default: " + def);
 				}
+
 				EditorGUI.EndDisabledGroup();
 
 				NGUISettings.fontSize = prop.intValue;
@@ -231,7 +238,13 @@ public class UILabelInspector : UIWidgetInspector
 			{
 				GUILayout.BeginHorizontal();
 				SerializedProperty s = NGUIEditorTools.DrawPaddedProperty("Max Width", serializedObject, "mOverflowWidth");
-				if (s != null && s.intValue < 1) GUILayout.Label("unlimited");
+
+				if (s != null)
+				{
+					if (s.intValue < 0) s.intValue = 0;
+					if (s.intValue == 0) GUILayout.Label("unlimited");
+				}
+
 				GUILayout.EndHorizontal();
 			}
 

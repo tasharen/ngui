@@ -473,7 +473,7 @@ public class UIPopupList : UIWidgetContainer
 		}
 
 		// Auto-upgrade to the true type font
-		if (trueTypeFont == null && bitmapFont != null && bitmapFont.isDynamic)
+		if (trueTypeFont == null && bitmapFont != null && bitmapFont.isDynamic && bitmapFont.replacement == null)
 		{
 			trueTypeFont = bitmapFont.dynamicFont;
 			bitmapFont = null;
@@ -498,18 +498,21 @@ public class UIPopupList : UIWidgetContainer
 		}
 		else if (fnt != null)
 		{
-			// Auto-upgrade from 3.0.2 and earlier
-			if (fnt.isDynamic)
+			if (fnt.replacement == null)
 			{
-				trueTypeFont = fnt.dynamicFont;
-				fontStyle = fnt.dynamicFontStyle;
-				fontSize = fnt.defaultSize;
-				mUseDynamicFont = true;
-			}
-			else
-			{
-				bitmapFont = fnt;
-				mUseDynamicFont = false;
+				// Auto-upgrade from 3.0.2 and earlier
+				if (fnt.isDynamic)
+				{
+					trueTypeFont = fnt.dynamicFont;
+					fontStyle = fnt.dynamicFontStyle;
+					fontSize = fnt.defaultSize;
+					mUseDynamicFont = true;
+				}
+				else
+				{
+					bitmapFont = fnt;
+					mUseDynamicFont = false;
+				}
 			}
 		}
 		else

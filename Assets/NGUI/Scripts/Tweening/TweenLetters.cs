@@ -151,7 +151,7 @@ public class TweenLetters : UITweener
 					verts[iv] = vert;
 
 					c = cols[iv];
-					c.a = lerpAlpha;
+					c.a *= lerpAlpha;
 					cols[iv] = c;
 				}
 			}

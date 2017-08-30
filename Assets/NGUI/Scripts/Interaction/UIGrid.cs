@@ -413,10 +413,9 @@ public class UIGrid : UIWidgetContainer
 				fy = Mathf.Lerp(-maxX * cellHeight, 0f, po.y);
 			}
 
-			for (int i = 0; i < myTrans.childCount; ++i)
+			foreach (var t in list)
 			{
-				Transform t = myTrans.GetChild(i);
-				SpringPosition sp = t.GetComponent<SpringPosition>();
+				var sp = t.GetComponent<SpringPosition>();
 
 				if (sp != null)
 				{

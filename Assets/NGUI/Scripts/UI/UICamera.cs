@@ -791,7 +791,7 @@ public class UICamera : MonoBehaviour
 	/// Object that should be showing the tooltip.
 	/// </summary>
 
-	static public GameObject tooltipObject { get { return mTooltip; } }
+	static public GameObject tooltipObject { get { return mTooltip; } set { ShowTooltip(value); } }
 
 #if !W2
 	/// <summary>

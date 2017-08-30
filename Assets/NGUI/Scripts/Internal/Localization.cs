@@ -553,10 +553,24 @@ static public class Localization
 		if (mOldDictionary.TryGetValue(key, out val)) return val;
 
 #if UNITY_EDITOR
-		if (warnIfMissing) Debug.LogWarning("Localization key not found: '" + key + "' for language " + lang);
+		if (warnIfMissing)
+		{
+			if (mIgnoreMissing == null) mIgnoreMissing = new HashSet<string>();
+
+			if (!mIgnoreMissing.Contains(key))
+			{
+				mIgnoreMissing.Add(key);
+				Debug.LogWarning("Localization key not found: '" + key + "' for language " + lang);
+			}
+		}
 #endif
 		return key;
 	}
+
+#if UNITY_EDITOR
+	[System.NonSerialized]
+	static HashSet<string> mIgnoreMissing = null;
+#endif
 
 	/// <summary>
 	/// Localize the specified value and format it.

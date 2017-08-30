@@ -33,6 +33,7 @@ static public class NGUIText
 		None,
 		Normal,
 		Colored,
+		NoOutline,
 	}
 
 	public class GlyphInfo
@@ -1616,7 +1617,14 @@ static public class NGUIText
 					else
 					{
 						Color col = Color.white;
-						col.a = gc.a;
+
+						if (symbolStyle == SymbolStyle.NoOutline)
+						{
+							col.r = -1f;
+							col.a = 0f;
+						}
+						else col.a = gc.a;
+
 						for (int b = 0; b < 4; ++b) cols.Add(col);
 					}
 				}

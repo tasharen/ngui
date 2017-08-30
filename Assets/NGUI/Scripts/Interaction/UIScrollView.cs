@@ -727,7 +727,7 @@ public class UIScrollView : MonoBehaviour
 
 	public void Press (bool pressed)
 	{
-		if (UICamera.currentScheme == UICamera.ControlScheme.Controller) return;
+		if (mPressed == pressed || UICamera.currentScheme == UICamera.ControlScheme.Controller) return;
 
 		if (smoothDragStart && pressed)
 		{
