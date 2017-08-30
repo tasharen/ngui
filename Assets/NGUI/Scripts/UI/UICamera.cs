@@ -2158,7 +2158,10 @@ public class UICamera : MonoBehaviour
 			currentKey = KeyCode.Mouse0;
 			posChanged = true;
 		}
-		else if (sqrMag > 0.001f) posChanged = true;
+		else if (sqrMag > 0.001f)
+		{
+			posChanged = true;
+		}
 
 		// Propagate the updates to the other mouse buttons
 		for (int i = 1; i < 3; ++i)
@@ -2172,14 +2175,19 @@ public class UICamera : MonoBehaviour
 		{
 			mNextRaycast = RealTime.time + 0.02f;
 			Raycast(currentTouch);
-			for (int i = 0; i < 3; ++i) mMouse[i].current = currentTouch.current;
+
+			if (mMouse[0].current != currentTouch.current)
+			{
+				currentKey = KeyCode.Mouse0;
+				posChanged = true;
+				for (int i = 0; i < 3; ++i) mMouse[i].current = currentTouch.current;
+			}
 		}
 
 		bool highlightChanged = (currentTouch.last != currentTouch.current);
 		bool wasPressed = (currentTouch.pressed != null);
 
-		if (!wasPressed)
-			hoveredObject = currentTouch.current;
+		if (!wasPressed && posChanged) hoveredObject = currentTouch.current;
 
 		currentTouchID = -1;
 		if (highlightChanged) currentKey = KeyCode.Mouse0;
