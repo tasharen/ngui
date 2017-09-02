@@ -2176,7 +2176,12 @@ public class UICamera : MonoBehaviour
 			mNextRaycast = RealTime.time + 0.02f;
 			Raycast(currentTouch);
 
-			if (mMouse[0].current != currentTouch.current)
+			if (isPressed)
+			{
+				posChanged = true;
+				for (int i = 0; i < 3; ++i) mMouse[i].current = currentTouch.current;
+			}
+			else if (mMouse[0].current != currentTouch.current)
 			{
 				currentKey = KeyCode.Mouse0;
 				posChanged = true;
@@ -2237,7 +2242,7 @@ public class UICamera : MonoBehaviour
 				currentTouchID = -1 - i;
 				currentKey = KeyCode.Mouse0 + i;
 			}
-	
+
 			// We don't want to update the last camera while there is a touch happening
 			if (pressed)
 			{
@@ -2245,7 +2250,7 @@ public class UICamera : MonoBehaviour
 				currentTouch.pressTime = RealTime.time;
 			}
 			else if (currentTouch.pressed != null) currentCamera = currentTouch.pressedCam;
-	
+
 			// Process the mouse events
 			ProcessTouch(pressed, unpressed);
 		}
