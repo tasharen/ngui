@@ -114,7 +114,7 @@ public class UIKeyNavigation : MonoBehaviour
 	protected virtual void OnEnable ()
 	{
 		list.Add(this);
-		if (mStarted) Start();
+		if (mStarted) Invoke("Start", 0.001f);
 	}
 
 	void Start ()
@@ -124,7 +124,7 @@ public class UIKeyNavigation : MonoBehaviour
 #endif
 		mStarted = true;
 		if (startsSelected && isColliderEnabled)
-			UICamera.hoveredObject = gameObject;
+			UICamera.selectedObject = gameObject;
 	}
 
 	protected virtual void OnDisable () { list.Remove(this); }

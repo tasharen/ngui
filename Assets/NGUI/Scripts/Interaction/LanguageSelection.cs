@@ -14,14 +14,18 @@ using UnityEngine;
 public class LanguageSelection : MonoBehaviour
 {
 	UIPopupList mList;
+	bool mStarted = false;
 
-	void Awake ()
+	void Awake () { mList = GetComponent<UIPopupList>(); }
+
+	void Start ()
 	{
-		mList = GetComponent<UIPopupList>();
+		mStarted = true;
 		Refresh();
+		EventDelegate.Add(mList.onChange, delegate() { Localization.language = UIPopupList.current.value; });
 	}
 
-	void Start () { EventDelegate.Add(mList.onChange, delegate() { Localization.language = UIPopupList.current.value; }); }
+	void OnEnable () { if (mStarted) Refresh(); }
 
 	/// <summary>
 	/// Immediately refresh the list of known languages.
@@ -39,4 +43,6 @@ public class LanguageSelection : MonoBehaviour
 			mList.value = Localization.language;
 		}
 	}
+
+	void OnLocalize () { Refresh(); } 
 }

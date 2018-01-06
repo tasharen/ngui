@@ -106,6 +106,12 @@ public abstract class UITweener : MonoBehaviour
 	[HideInInspector] public GameObject eventReceiver;
 	[HideInInspector] public string callWhenFinished;
 
+	/// <summary>
+	/// Custom time scale for this tween, if desired. Can be used to slow down or speed up the animation.
+	/// </summary>
+
+	[System.NonSerialized] public float timeScale = 1f;
+
 	bool mStarted = false;
 	float mStartTime = 0f;
 	float mDuration = 0f;
@@ -183,7 +189,7 @@ public abstract class UITweener : MonoBehaviour
 		if (time < mStartTime) return;
 
 		// Advance the sampling factor
-		mFactor += (duration == 0f) ? 1f : amountPerDelta * delta;
+		mFactor += (duration == 0f) ? 1f : amountPerDelta * delta * timeScale;
 
 		// Loop style simply resets the play factor after it exceeds 1.
 		if (style == Style.Loop)

@@ -493,16 +493,10 @@ static public class NGUITools
 	/// Convenience function that marks the specified object as dirty in the Unity Editor.
 	/// </summary>
 
-	static public void SetDirty (UnityEngine.Object obj)
+	static public void SetDirty (UnityEngine.Object obj, string undoName = "last change")
 	{
 #if UNITY_EDITOR
-		if (obj)
-		{
-			//if (obj is Component) Debug.Log(NGUITools.GetHierarchy((obj as Component).gameObject), obj);
-			//else if (obj is GameObject) Debug.Log(NGUITools.GetHierarchy(obj as GameObject), obj);
-			//else Debug.Log("Hmm... " + obj.GetType(), obj);
-			UnityEditor.EditorUtility.SetDirty(obj);
-		}
+		if (obj) UnityEditor.EditorUtility.SetDirty(obj);
 #endif
 	}
 
@@ -560,28 +554,52 @@ static public class NGUITools
 
 	static public GameObject AddChild (this GameObject parent, GameObject prefab, int layer)
 	{
-		var go = GameObject.Instantiate(prefab) as GameObject;
+#if UNITY_5_5_OR_NEWER
+		var go = (parent != null) ? UnityEngine.Object.Instantiate(prefab, parent.transform) : UnityEngine.Object.Instantiate(prefab);
 #if UNITY_EDITOR
-		if (!Application.isPlaying)
-			UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
+		if (!Application.isPlaying) UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
 #endif
 		if (go != null)
 		{
+			var t = go.transform;
 			go.name = prefab.name;
 
 			if (parent != null)
 			{
-				Transform t = go.transform;
-				t.parent = parent.transform;
-				t.localPosition = Vector3.zero;
-				t.localRotation = Quaternion.identity;
-				t.localScale = Vector3.one;
 				if (layer == -1) go.layer = parent.layer;
 				else if (layer > -1 && layer < 32) go.layer = layer;
 			}
+
+			t.localPosition = Vector3.zero;
+			t.localRotation = Quaternion.identity;
+			t.localScale = Vector3.one;
 			go.SetActive(true);
 		}
 		return go;
+#else
+		var go = GameObject.Instantiate(prefab) as GameObject;
+#if UNITY_EDITOR
+		if (!Application.isPlaying) UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
+#endif
+		if (go != null)
+		{
+			Transform t = go.transform;
+			go.name = prefab.name;
+
+			if (parent != null)
+			{
+				t.parent = parent.transform;
+				if (layer == -1) go.layer = parent.layer;
+				else if (layer > -1 && layer < 32) go.layer = layer;
+			}
+
+			t.localPosition = Vector3.zero;
+			t.localRotation = Quaternion.identity;
+			t.localScale = Vector3.one;
+			go.SetActive(true);
+		}
+		return go;
+#endif
 	}
 
 	/// <summary>

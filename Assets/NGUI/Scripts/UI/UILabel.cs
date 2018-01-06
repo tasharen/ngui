@@ -76,6 +76,7 @@ public class UILabel : UIWidget
 	[HideInInspector][SerializeField] float mFloatSpacingY = 0;
 	[HideInInspector][SerializeField] bool mOverflowEllipsis = false;
 	[HideInInspector][SerializeField] int mOverflowWidth = 0;
+	[HideInInspector] [SerializeField] int mOverflowHeight = 0;
 	[HideInInspector][SerializeField] Modifier mModifier = Modifier.None;
 
 	// Obsolete values
@@ -282,6 +283,7 @@ public class UILabel : UIWidget
 					mText = "";
 					MarkAsChanged();
 					ProcessAndRequest();
+					if (autoResizeBoxCollider) ResizeCollider();
 				}
 			}
 			else if (mText != value)
@@ -289,9 +291,9 @@ public class UILabel : UIWidget
 				mText = value;
 				MarkAsChanged();
 				ProcessAndRequest();
-			}
 
-			if (autoResizeBoxCollider) ResizeCollider();
+				if (autoResizeBoxCollider) ResizeCollider();
+			}
 		}
 	}
 
@@ -590,6 +592,29 @@ public class UILabel : UIWidget
 			if (mOverflowWidth != value)
 			{
 				mOverflowWidth = value;
+				MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Maximum height used when Resize Freely overflow type is enabled.
+	/// If the printed text exceeds this height, it will reduce the font size.
+	/// </summary>
+
+	public int overflowHeight
+	{
+		get
+		{
+			return mOverflowHeight;
+		}
+		set
+		{
+			if (value < 0) value = 0;
+
+			if (mOverflowHeight != value)
+			{
+				mOverflowHeight = value;
 				MarkAsChanged();
 			}
 		}
@@ -1391,9 +1416,19 @@ public class UILabel : UIWidget
 				NGUIText.rectWidth = 1000000;
 				NGUIText.regionWidth = 1000000;
 			}
-		}
 
-		if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
+			if (mOverflowHeight > 0)
+			{
+				NGUIText.rectHeight = mOverflowHeight;
+				NGUIText.regionHeight = mOverflowHeight;
+			}
+			else
+			{
+				NGUIText.rectHeight = 1000000;
+				NGUIText.regionHeight = 1000000;
+			}
+		}
+		else if (mOverflow == Overflow.ResizeFreely || mOverflow == Overflow.ResizeHeight)
 		{
 			NGUIText.rectHeight = 1000000;
 			NGUIText.regionHeight = 1000000;

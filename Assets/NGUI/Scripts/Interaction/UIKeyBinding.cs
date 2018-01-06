@@ -11,7 +11,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Key Binding")]
-public class UIKeyBinding : MonoBehaviour
+public class UIKeyBinding : MonoBehaviour, TNet.IStartable
 {
 	static List<UIKeyBinding> mList = new List<UIKeyBinding>();
 
@@ -89,6 +89,7 @@ public class UIKeyBinding : MonoBehaviour
 		return false;
 	}
 
+	protected virtual void Awake () { TNet.TNUpdater.AddStart(this); }
 	protected virtual void OnEnable () { mList.Add(this); }
 	protected virtual void OnDisable () { mList.Remove(this); }
 
@@ -96,7 +97,7 @@ public class UIKeyBinding : MonoBehaviour
 	/// If we're bound to an input field, subscribe to its Submit notification.
 	/// </summary>
 
-	protected virtual void Start ()
+	public virtual void OnStart ()
 	{
 		UIInput input = GetComponent<UIInput>();
 		mIsInput = (input != null);
@@ -155,7 +156,7 @@ public class UIKeyBinding : MonoBehaviour
 
 	protected virtual void Update ()
 	{
-		if (UICamera.inputHasFocus) return;
+		if (keyCode != KeyCode.Numlock && UICamera.inputHasFocus) return;
 		if (keyCode == KeyCode.None || !IsModifierActive()) return;
 #if WINDWARD && UNITY_ANDROID
 		// NVIDIA Shield controller has an odd bug where it can open the on-screen keyboard via a KeyCode.Return binding,
@@ -197,7 +198,7 @@ public class UIKeyBinding : MonoBehaviour
 			{
 				if (mIsInput)
 				{
-					if (!mIgnoreUp && !UICamera.inputHasFocus)
+					if (!mIgnoreUp && !(keyCode != KeyCode.Numlock && UICamera.inputHasFocus))
 					{
 						if (mPress) UICamera.selectedObject = gameObject;
 					}

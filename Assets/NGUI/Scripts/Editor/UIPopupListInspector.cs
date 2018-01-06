@@ -38,7 +38,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 			mList.ambigiousFont = NGUISettings.ambigiousFont;
 			mList.fontSize = NGUISettings.fontSize;
 			mList.fontStyle = NGUISettings.fontStyle;
-			EditorUtility.SetDirty(mList);
+			NGUITools.SetDirty(mList);
 		}
 
 		if (mList.atlas == null && mList.background2DSprite == null && mList.highlight2DSprite == null)
@@ -46,7 +46,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 			mList.atlas = NGUISettings.atlas;
 			mList.backgroundSprite = NGUISettings.selectedSprite;
 			mList.highlightSprite = NGUISettings.selectedSprite;
-			EditorUtility.SetDirty(mList);
+			NGUITools.SetDirty(mList);
 		}
 	}
 

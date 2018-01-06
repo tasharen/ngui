@@ -48,7 +48,7 @@ public class UIAtlasInspector : Editor
 				UIAtlas atl = sp.atlas;
 				sp.atlas = null;
 				sp.atlas = atl;
-				EditorUtility.SetDirty(sp);
+				NGUITools.SetDirty(sp);
 			}
 		}
 
@@ -61,7 +61,7 @@ public class UIAtlasInspector : Editor
 				UIFont font = lbl.bitmapFont;
 				lbl.bitmapFont = null;
 				lbl.bitmapFont = font;
-				EditorUtility.SetDirty(lbl);
+				NGUITools.SetDirty(lbl);
 			}
 		}
 	}

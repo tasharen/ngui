@@ -830,7 +830,13 @@ public class UICamera : MonoBehaviour
 
 				if (currentTouch != null)
 				{
-					mLastOverResult = currentTouch.isOverUI;
+					if (currentTouch.pressed != null)
+					{
+						mLastOverResult = IsPartOfUI(currentTouch.pressed);
+						return mLastOverResult;
+					}
+
+					mLastOverResult = IsPartOfUI(currentTouch.current);
 					return mLastOverResult;
 				}
 
@@ -849,7 +855,7 @@ public class UICamera : MonoBehaviour
 				{
 					var m = mMouse[i];
 
-					if (IsPartOfUI(m.current))
+					if (IsPartOfUI(m.pressed != null ? m.pressed : m.current))
 					{
 						mLastOverResult = true;
 						return mLastOverResult;

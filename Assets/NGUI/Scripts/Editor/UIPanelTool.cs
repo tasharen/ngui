@@ -232,7 +232,7 @@ public class UIPanelTool : EditorWindow
 			if (ent != null)
 			{
 				Selection.activeGameObject = ent.panel.gameObject;
-				EditorUtility.SetDirty(ent.panel.gameObject);
+				NGUITools.SetDirty(ent.panel.gameObject);
 			}
 		}
 
@@ -253,7 +253,7 @@ public class UIPanelTool : EditorWindow
 			if (val != EditorGUILayout.Toggle(val, GUILayout.Width(20f)))
 			{
 				ent.panel.widgetsAreStatic = !val;
-				EditorUtility.SetDirty(ent.panel.gameObject);
+				NGUITools.SetDirty(ent.panel.gameObject);
 #if !UNITY_3_5
 				if (NGUITransformInspector.instance != null)
 					NGUITransformInspector.instance.Repaint();

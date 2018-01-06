@@ -246,6 +246,17 @@ public class UILabelInspector : UIWidgetInspector
 				}
 
 				GUILayout.EndHorizontal();
+
+				GUILayout.BeginHorizontal();
+				s = NGUIEditorTools.DrawPaddedProperty("Max Height", serializedObject, "mOverflowHeight");
+
+				if (s != null)
+				{
+					if (s.intValue < 0) s.intValue = 0;
+					if (s.intValue == 0) GUILayout.Label("unlimited");
+				}
+
+				GUILayout.EndHorizontal();
 			}
 
 			NGUIEditorTools.DrawPaddedProperty("Alignment", serializedObject, "mAlignment");

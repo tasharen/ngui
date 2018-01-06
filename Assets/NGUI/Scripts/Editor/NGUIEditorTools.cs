@@ -1270,7 +1270,7 @@ static public class NGUIEditorTools
 			{
 				NGUIEditorTools.RegisterUndo("Uniform scaling fix", t);
 				t.localScale = Vector3.one;
-				EditorUtility.SetDirty(t);
+				NGUITools.SetDirty(t);
 			}
 			t = t.parent;
 		}
@@ -1758,7 +1758,7 @@ static public class NGUIEditorTools
 			foreach (Object obj in objects)
 			{
 				if (obj == null) continue;
-				EditorUtility.SetDirty(obj);
+				NGUITools.SetDirty(obj);
 			}
 		}
 	}

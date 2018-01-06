@@ -274,6 +274,7 @@ public class ByteReader
 				if (insideQuotes) continue;
 				mTemp.Add(line.Substring(wordStart, line.Length - wordStart));
 			}
+			else mTemp.Add("");
 			return mTemp;
 		}
 		return null;
