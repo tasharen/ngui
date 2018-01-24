@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2017 Tasharen Entertainment Inc
+// Copyright © 2011-2018 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -368,31 +368,107 @@ static public class NGUITools
 	{
 		if (box != null)
 		{
-			GameObject go = box.gameObject;
-			UIWidget w = go.GetComponent<UIWidget>();
+			var go = box.gameObject;
+			var w = go.GetComponent<UIWidget>();
 
 			if (w != null)
 			{
-				Vector4 dr = w.drawRegion;
+				var dr = w.drawRegion;
 
 				if (dr.x != 0f || dr.y != 0f || dr.z != 1f || dr.w != 1f)
 				{
-					Vector4 region = w.drawingDimensions;
+					var region = w.drawingDimensions;
 					box.center = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
 					box.size = new Vector3(region.z - region.x, region.w - region.y);
 				}
 				else
 				{
-					Vector3[] corners = w.localCorners;
+					var corners = w.localCorners;
 					box.center = Vector3.Lerp(corners[0], corners[2], 0.5f);
 					box.size = corners[2] - corners[0];
 				}
 			}
 			else
 			{
-				Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
+				var b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
 				box.center = b.center;
 				box.size = new Vector3(b.size.x, b.size.y, 0f);
+			}
+#if UNITY_EDITOR
+			NGUITools.SetDirty(box);
+#endif
+		}
+	}
+
+	/// <summary>
+	/// Adjust the widget's collider based on the depth of the widgets, as well as the widget's dimensions.
+	/// </summary>
+
+	static public void UpdateWidgetCollider (UIWidget w)
+	{
+		if (w == null) return;
+		var bc = w.GetComponent<BoxCollider>();
+		if (bc != null) UpdateWidgetCollider(w, bc);
+		else UpdateWidgetCollider(w, w.GetComponent<BoxCollider2D>());
+	}
+
+	/// <summary>
+	/// Adjust the widget's collider based on the depth of the widgets, as well as the widget's dimensions.
+	/// </summary>
+
+	static public void UpdateWidgetCollider (UIWidget w, BoxCollider box)
+	{
+		if (box != null && w != null)
+		{
+			var dr = w.drawRegion;
+
+			if (dr.x != 0f || dr.y != 0f || dr.z != 1f || dr.w != 1f)
+			{
+				var region = w.drawingDimensions;
+				box.center = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
+				box.size = new Vector3(region.z - region.x, region.w - region.y);
+			}
+			else
+			{
+				var corners = w.localCorners;
+				box.center = Vector3.Lerp(corners[0], corners[2], 0.5f);
+				box.size = corners[2] - corners[0];
+			}
+#if UNITY_EDITOR
+			NGUITools.SetDirty(box);
+#endif
+		}
+	}
+
+	// <summary>
+	/// Adjust the widget's collider based on the depth of the widgets, as well as the widget's dimensions.
+	/// </summary>
+
+	static public void UpdateWidgetCollider (UIWidget w, BoxCollider2D box)
+	{
+		if (box != null && w != null)
+		{
+			var dr = w.drawRegion;
+
+			if (dr.x != 0f || dr.y != 0f || dr.z != 1f || dr.w != 1f)
+			{
+				var region = w.drawingDimensions;
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
+				box.center = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
+#else
+				box.offset = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
+#endif
+				box.size = new Vector3(region.z - region.x, region.w - region.y);
+			}
+			else
+			{
+				var corners = w.localCorners;
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
+				box.center = Vector3.Lerp(corners[0], corners[2], 0.5f);
+#else
+				box.offset = Vector3.Lerp(corners[0], corners[2], 0.5f);
+#endif
+				box.size = corners[2] - corners[0];
 			}
 #if UNITY_EDITOR
 			NGUITools.SetDirty(box);

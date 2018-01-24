@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2017 Tasharen Entertainment Inc
+// Copyright © 2011-2018 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -804,7 +804,12 @@ public class UIWidget : UIRect
 	/// Adjust the widget's collider size to match the widget's dimensions.
 	/// </summary>
 
-	public void ResizeCollider () { if (NGUITools.GetActive(this)) NGUITools.UpdateWidgetCollider(gameObject); }
+	public void ResizeCollider ()
+	{
+		var bc = GetComponent<BoxCollider>();
+		if (bc != null) NGUITools.UpdateWidgetCollider(this, bc);
+		else NGUITools.UpdateWidgetCollider(this, GetComponent<BoxCollider2D>());
+	}
 
 	/// <summary>
 	/// Static widget comparison function used for depth sorting.
