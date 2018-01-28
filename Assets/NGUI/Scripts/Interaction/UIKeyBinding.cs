@@ -11,13 +11,14 @@ using System.Collections.Generic;
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Key Binding")]
+#if W2
 public class UIKeyBinding : MonoBehaviour, TNet.IStartable
+#else
+public class UIKeyBinding : MonoBehaviour
+#endif
 {
 	static List<UIKeyBinding> mList = new List<UIKeyBinding>();
 
-#if W2
-	[Beebyte.Obfuscator.SkipRename]
-#endif
 	public enum Action
 	{
 		PressAndClick,
@@ -25,9 +26,6 @@ public class UIKeyBinding : MonoBehaviour, TNet.IStartable
 		All,
 	}
 
-#if W2
-	[Beebyte.Obfuscator.SkipRename]
-#endif
 	public enum Modifier
 	{
 		Any,
@@ -89,7 +87,9 @@ public class UIKeyBinding : MonoBehaviour, TNet.IStartable
 		return false;
 	}
 
+#if W2
 	protected virtual void Awake () { TNet.TNUpdater.AddStart(this); }
+#endif
 	protected virtual void OnEnable () { mList.Add(this); }
 	protected virtual void OnDisable () { mList.Remove(this); }
 
@@ -97,7 +97,11 @@ public class UIKeyBinding : MonoBehaviour, TNet.IStartable
 	/// If we're bound to an input field, subscribe to its Submit notification.
 	/// </summary>
 
+#if W2
 	public virtual void OnStart ()
+#else
+	protected virtual void Start ()
+#endif
 	{
 		UIInput input = GetComponent<UIInput>();
 		mIsInput = (input != null);
