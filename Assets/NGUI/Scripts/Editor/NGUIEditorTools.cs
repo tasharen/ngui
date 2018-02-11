@@ -441,7 +441,7 @@ static public class NGUIEditorTools
 		TextureImporterSettings settings = new TextureImporterSettings();
 		ti.ReadTextureSettings(settings);
 
-		if (force || !settings.readable || settings.npotScale != TextureImporterNPOTScale.None || settings.alphaIsTransparency)
+		if (force || !settings.readable || settings.npotScale != TextureImporterNPOTScale.None)
 		{
 			settings.readable = true;
 #if !UNITY_4_7 && !UNITY_5_3 && !UNITY_5_4
@@ -453,8 +453,7 @@ static public class NGUIEditorTools
 #else
 			if (NGUISettings.trueColorAtlas) settings.textureFormat = TextureImporterFormat.AutomaticTruecolor;
 #endif
-			settings.npotScale = TextureImporterNPOTScale.None;
-			settings.alphaIsTransparency = false;
+			settings.npotScale = TextureImporterNPOTScale.None;			
 			ti.SetTextureSettings(settings);
 			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
 		}

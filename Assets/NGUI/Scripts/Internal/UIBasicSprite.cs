@@ -478,13 +478,38 @@ public abstract class UIBasicSprite : UIWidget
 	[System.Diagnostics.DebuggerStepThrough]
 	void AddVertexColours (List<Color> cols, ref Color color, int x, int y)
 	{
-		if (y == 0 || y == 1)
+		Vector4 br = border * pixelSize;
+		if (type == Type.Simple || (br.x == 0f && br.y == 0f && br.z == 0f && br.w == 0f))
 		{
-			cols.Add(color * mGradientBottom);
+			if (y == 0 || y == 1)
+			{
+				cols.Add(color * mGradientBottom);
+			}
+			else if (y == 2 || y == 3)
+			{
+				cols.Add(color * mGradientTop);
+			}
 		}
-		else if (y == 2 || y == 3)
+		else
 		{
-			cols.Add(color * mGradientTop);
+			if (y == 0)
+			{
+				cols.Add(color*mGradientBottom);
+			}
+			if (y == 1)
+			{
+				var gradient = Color.Lerp(mGradientBottom, mGradientTop, br.y / mHeight);
+				cols.Add(color*gradient);
+			}
+			if (y == 2)
+			{
+				var gradient = Color.Lerp(mGradientTop, mGradientBottom, br.w / mHeight);
+				cols.Add(color*gradient);
+			}
+			if (y == 3)
+			{
+				cols.Add(color*mGradientTop);
+			}
 		}
 	}
 
@@ -499,33 +524,48 @@ public abstract class UIBasicSprite : UIWidget
 
 		Vector2 size = new Vector2(mInnerUV.width * tex.width, mInnerUV.height * tex.height);
 		size *= pixelSize;
-		if (tex == null || size.x < 2f || size.y < 2f) return;
+		if (size.x < 2f || size.y < 2f) return;
 
 		Color c = drawingColor;
 		Vector4 v = drawingDimensions;
 		Vector4 u;
+		Vector4 p;
 
 		if (mFlip == Flip.Horizontally || mFlip == Flip.Both)
 		{
 			u.x = mInnerUV.xMax;
 			u.z = mInnerUV.xMin;
+			
+			p.x = padding.w * pixelSize;
+			p.z = padding.x * pixelSize;
 		}
 		else
 		{
 			u.x = mInnerUV.xMin;
 			u.z = mInnerUV.xMax;
+
+			p.x = padding.x * pixelSize;
+			p.z = padding.w * pixelSize;
 		}
 
 		if (mFlip == Flip.Vertically || mFlip == Flip.Both)
 		{
 			u.y = mInnerUV.yMax;
 			u.w = mInnerUV.yMin;
+
+			p.y = padding.w * pixelSize;
+			p.w = padding.y * pixelSize;
 		}
 		else
 		{
 			u.y = mInnerUV.yMin;
 			u.w = mInnerUV.yMax;
+
+			p.y = padding.y * pixelSize;
+			p.w = padding.w * pixelSize;
 		}
+
+		
 
 		float x0 = v.x;
 		float y0 = v.y;
@@ -533,8 +573,10 @@ public abstract class UIBasicSprite : UIWidget
 		float u0 = u.x;
 		float v0 = u.y;
 
+		
 		while (y0 < v.w)
 		{
+			y0 += p.y;
 			x0 = v.x;
 			float y1 = y0 + size.y;
 			float v1 = u.w;
@@ -547,6 +589,7 @@ public abstract class UIBasicSprite : UIWidget
 
 			while (x0 < v.z)
 			{
+				x0 += p.x;
 				float x1 = x0 + size.x;
 				float u1 = u.z;
 
@@ -571,9 +614,9 @@ public abstract class UIBasicSprite : UIWidget
 				cols.Add(c);
 				cols.Add(c);
 
-				x0 += size.x;
+				x0 += size.x + p.z;
 			}
-			y0 += size.y;
+			y0 += size.y + p.w;
 		}
 	}
 
