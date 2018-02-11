@@ -248,6 +248,14 @@ public abstract class UIBasicSprite : UIWidget
 
 	public virtual float pixelSize { get { return 1f; } }
 
+	/// <summary>
+	/// Trimmed space in the atlas around the sprite. X = left, Y = bottom, Z = right, W = top. Overridden in UISprite.
+	/// </summary>
+	protected virtual Vector4 padding
+	{
+		get { return new Vector4(0, 0, 0, 0); }
+	}
+
 #if UNITY_EDITOR
 	/// <summary>
 	/// Keep sane values.
