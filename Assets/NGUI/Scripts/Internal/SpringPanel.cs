@@ -117,7 +117,12 @@ public class SpringPanel : MonoBehaviour
 	static public SpringPanel Stop (GameObject go)
 	{
 		SpringPanel sp = go.GetComponent<SpringPanel>();
-		if (sp != null) enabled = false;
+
+		if (sp != null && sp.enabled)
+		{
+			if (sp.onFinished != null) sp.onFinished();
+			sp.enabled = false;
+		}
 		return sp;
 	}
 }
