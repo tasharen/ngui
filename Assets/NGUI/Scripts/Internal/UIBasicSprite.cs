@@ -538,13 +538,14 @@ public abstract class UIBasicSprite : UIWidget
 		Vector4 v = drawingDimensions;
 		Vector4 u;
 		Vector4 p;
+		var padding = this.padding;
 
 		if (mFlip == Flip.Horizontally || mFlip == Flip.Both)
 		{
 			u.x = mInnerUV.xMax;
 			u.z = mInnerUV.xMin;
 			
-			p.x = padding.w * pixelSize;
+			p.x = padding.z * pixelSize;
 			p.z = padding.x * pixelSize;
 		}
 		else
@@ -553,7 +554,7 @@ public abstract class UIBasicSprite : UIWidget
 			u.z = mInnerUV.xMax;
 
 			p.x = padding.x * pixelSize;
-			p.z = padding.w * pixelSize;
+			p.z = padding.z * pixelSize;
 		}
 
 		if (mFlip == Flip.Vertically || mFlip == Flip.Both)
