@@ -154,6 +154,9 @@ static public class Localization
 			{
 				var asset = Resources.Load<TextAsset>("Localization");
 				if (asset != null) bytes = asset.bytes;
+#if W2
+				else bytes = TNet.Tools.ReadFile("Localization.txt") ?? TNet.Tools.ReadFile("Localization.csv");
+#endif
 			}
 			else bytes = loadFunction("Localization");
 			localizationHasBeenSet = true;

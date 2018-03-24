@@ -2513,5 +2513,26 @@ static public class NGUITools
 		}
 		return c;
 	}
+
+	/// <summary>
+	/// Transforms this color from linear to gamma space, but only if the active color space is actually set to linear.
+	/// </summary>
+
+	static public Color LinearToGammaSpace (this Color c)
+	{
+		if (mColorSpace == ColorSpace.Uninitialized)
+			mColorSpace = QualitySettings.activeColorSpace;
+
+		if (mColorSpace == ColorSpace.Linear)
+		{
+			return new Color(
+				Mathf.LinearToGammaSpace(c.r),
+				Mathf.LinearToGammaSpace(c.g),
+				Mathf.LinearToGammaSpace(c.b),
+				Mathf.LinearToGammaSpace(c.a));
+		}
+		return c;
+	}
+
 	static ColorSpace mColorSpace = ColorSpace.Uninitialized;
 }

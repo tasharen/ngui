@@ -93,7 +93,7 @@ public class SpringPanel : MonoBehaviour
 			onFinished();
 			current = null;
 		}
-    }
+	}
 
 	/// <summary>
 	/// Start the tweening process.
@@ -110,11 +110,14 @@ public class SpringPanel : MonoBehaviour
 		return sp;
 	}
 
-	static public SpringPanel Stop(GameObject go)
+	/// <summary>
+	/// Stop the tweening process.
+	/// </summary>
+
+	static public SpringPanel Stop (GameObject go)
 	{
 		SpringPanel sp = go.GetComponent<SpringPanel>();
-		if (sp == null) sp = go.AddComponent<SpringPanel>();
-		sp.enabled = false;
+		if (sp != null) enabled = false;
 		return sp;
 	}
 }
