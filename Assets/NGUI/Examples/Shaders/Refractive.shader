@@ -40,6 +40,7 @@ Shader "Transparent/Refractive"
 			#pragma exclude_renderers gles
 			#pragma vertex vert
 			#pragma surface surf PPL alpha
+			#pragma target 3.0
 			#include "UnityCG.cginc"
 
 			sampler2D _GrabTexture;
