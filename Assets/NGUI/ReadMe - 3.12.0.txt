@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2016 Tasharen Entertainment
-            Version 3.11.4
+            Version 3.12.0
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,21 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.12.0
+- NEW: Popup list can now accept delegates when setting up the items programmatically (ideally anonymous delegates).
+- NEW: Added Localization.Format overloads for 3 parameters and less to avoid GC allocations.
+- NEW: Added UIWidget.SetColorNoAlpha helper function.
+- NEW: color.LinearToGammaSpace() helper extension to match color.GammaToLinear().
+- NEW: Added a fast path for updating a widget's collider if the collider is already known, and forced it to be used when the widget gets enabled.
+- NEW: Added the "No Outline" option to the symbol coloring style. The symbol won't have an outline even if the text does.
+- FIX: Fixed an issue with the font's actual printed size not being printed correctly in inspector in some situations.
+- FIX: Random minor fixes from the support forum.
+- FIX: Missing localization entry warnings will now only be shown once per keyword.
+- FIX: UICamera will no longer keep assigning UICamera.hoveredObject repeatedly while mouse events are enabled. It will now only be assigned if the hovered object changes, or the mouse moves.
+- FIX: Fixed some issues with NGUIText.InsertHyperlink/ReplaceLink.
+- Merged pull request #26 by Nicki Hansen.
+- Checked against Unity 4.7, 5.6, and 2018.1b2.
 
 3.11.4
 - FIX: Assortment of various minor fixes for issues reported on the forums.
