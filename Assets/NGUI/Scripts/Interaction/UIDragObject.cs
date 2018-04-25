@@ -14,7 +14,7 @@ using System.Collections;
 [AddComponentMenu("NGUI/Interaction/Drag Object")]
 public class UIDragObject : MonoBehaviour
 {
-	public enum DragEffect
+	[DoNotObfuscateNGUI] public enum DragEffect
 	{
 		None,
 		Momentum,

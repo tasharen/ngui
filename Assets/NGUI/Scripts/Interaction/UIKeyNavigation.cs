@@ -18,7 +18,7 @@ public class UIKeyNavigation : MonoBehaviour
 
 	static public BetterList<UIKeyNavigation> list = new BetterList<UIKeyNavigation>();
 
-	public enum Constraint
+	[DoNotObfuscateNGUI] public enum Constraint
 	{
 		None,
 		Vertical,

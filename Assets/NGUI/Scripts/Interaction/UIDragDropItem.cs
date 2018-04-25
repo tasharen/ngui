@@ -14,7 +14,7 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/Interaction/Drag and Drop Item")]
 public class UIDragDropItem : MonoBehaviour
 {
-	public enum Restriction
+	[DoNotObfuscateNGUI] public enum Restriction
 	{
 		None,
 		Horizontal,

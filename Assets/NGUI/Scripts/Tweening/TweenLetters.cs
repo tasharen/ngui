@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 public class TweenLetters : UITweener
 {
-	public enum AnimationLetterOrder { Forward, Reverse, Random }
+	[DoNotObfuscateNGUI] public enum AnimationLetterOrder { Forward, Reverse, Random }
 
 	class LetterProperties
 	{

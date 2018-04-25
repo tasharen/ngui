@@ -12,7 +12,7 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Button Message (Legacy)")]
 public class UIButtonMessage : MonoBehaviour
 {
-	public enum Trigger
+	[DoNotObfuscateNGUI] public enum Trigger
 	{
 		OnClick,
 		OnMouseOver,

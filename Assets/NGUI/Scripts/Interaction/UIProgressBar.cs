@@ -14,7 +14,7 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/Interaction/NGUI Progress Bar")]
 public class UIProgressBar : UIWidgetContainer
 {
-	public enum FillDirection
+	[DoNotObfuscateNGUI] public enum FillDirection
 	{
 		LeftToRight,
 		RightToLeft,

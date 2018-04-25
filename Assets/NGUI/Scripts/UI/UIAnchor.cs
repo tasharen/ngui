@@ -13,7 +13,7 @@ using UnityEngine;
 [AddComponentMenu("NGUI/UI/Anchor")]
 public class UIAnchor : MonoBehaviour
 {
-	public enum Side
+	[DoNotObfuscateNGUI] public enum Side
 	{
 		BottomLeft,
 		Left,

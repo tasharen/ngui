@@ -19,7 +19,7 @@ using Debug = UnityEngine.Debug;
 
 static public class NGUIText
 {
-	public enum Alignment
+	[DoNotObfuscateNGUI] public enum Alignment
 	{
 		Automatic,
 		Left,
@@ -28,7 +28,7 @@ static public class NGUIText
 		Justified,
 	}
 
-	public enum SymbolStyle
+	[DoNotObfuscateNGUI] public enum SymbolStyle
 	{
 		None,
 		Normal,

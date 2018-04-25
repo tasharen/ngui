@@ -17,7 +17,7 @@ public class UIWidgetInspector : UIRectEditor
 {
 	static public new UIWidgetInspector instance;
 
-	public enum Action
+	[DoNotObfuscateNGUI] public enum Action
 	{
 		None,
 		Move,

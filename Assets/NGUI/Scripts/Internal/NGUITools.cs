@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
+public class DoNotObfuscateNGUI : Attribute { }
+
 /// <summary>
 /// Helper class containing generic functions used throughout the UI library.
 /// </summary>

@@ -598,7 +598,69 @@ static public class Localization
 	/// Localize the specified value and format it.
 	/// </summary>
 
-	static public string Format (string key, params object[] parameters) { return string.Format(Get(key), parameters); }
+	static public string Format (string key, object parameter)
+	{
+		try
+		{
+			return string.Format(Get(key), parameter);
+		}
+		catch (System.Exception)
+		{
+			Debug.LogError("string.Format(1): " + key);
+			return key;
+		}
+	}
+
+	/// <summary>
+	/// Localize the specified value and format it.
+	/// </summary>
+
+	static public string Format (string key, object arg0, object arg1)
+	{
+		try
+		{
+			return string.Format(Get(key), arg0, arg1);
+		}
+		catch (System.Exception)
+		{
+			Debug.LogError("string.Format(2): " + key);
+			return key;
+		}
+	}
+
+	/// <summary>
+	/// Localize the specified value and format it.
+	/// </summary>
+
+	static public string Format (string key, object arg0, object arg1, object arg2)
+	{
+		try
+		{
+			return string.Format(Get(key), arg0, arg1, arg2);
+		}
+		catch (System.Exception)
+		{
+			Debug.LogError("string.Format(3): " + key);
+			return key;
+		}
+	}
+
+	/// <summary>
+	/// Localize the specified value and format it.
+	/// </summary>
+
+	static public string Format (string key, params object[] parameters)
+	{
+		try
+		{
+			return string.Format(Get(key), parameters);
+		}
+		catch (System.Exception)
+		{
+			Debug.LogError("string.Format(" + parameters.Length + "): " + key);
+			return key;
+		}
+	}
 
 	[System.Obsolete("Localization is now always active. You no longer need to check this property.")]
 	static public bool isActive { get { return true; } }

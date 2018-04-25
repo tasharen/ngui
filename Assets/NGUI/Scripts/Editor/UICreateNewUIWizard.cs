@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 public class UICreateNewUIWizard : EditorWindow
 {
-	public enum CameraType
+	[DoNotObfuscateNGUI] public enum CameraType
 	{
 		None,
 		Simple2D,

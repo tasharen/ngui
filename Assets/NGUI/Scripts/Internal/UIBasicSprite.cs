@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 public abstract class UIBasicSprite : UIWidget
 {
-	public enum Type
+	[DoNotObfuscateNGUI] public enum Type
 	{
 		Simple,
 		Sliced,
@@ -17,7 +17,7 @@ public abstract class UIBasicSprite : UIWidget
 		Advanced,
 	}
 
-	public enum FillDirection
+	[DoNotObfuscateNGUI] public enum FillDirection
 	{
 		Horizontal,
 		Vertical,
@@ -26,14 +26,14 @@ public abstract class UIBasicSprite : UIWidget
 		Radial360,
 	}
 
-	public enum AdvancedType
+	[DoNotObfuscateNGUI] public enum AdvancedType
 	{
 		Invisible,
 		Sliced,
 		Tiled,
 	}
 
-	public enum Flip
+	[DoNotObfuscateNGUI] public enum Flip
 	{
 		Nothing,
 		Horizontally,

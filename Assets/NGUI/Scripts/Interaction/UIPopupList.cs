@@ -25,14 +25,14 @@ public class UIPopupList : UIWidgetContainer
 
 	const float animSpeed = 0.15f;
 
-	public enum Position
+	[DoNotObfuscateNGUI] public enum Position
 	{
 		Auto,
 		Above,
 		Below,
 	}
 
-	public enum Selection
+	[DoNotObfuscateNGUI] public enum Selection
 	{
 		OnPress,
 		OnClick,
@@ -212,7 +212,7 @@ public class UIPopupList : UIWidgetContainer
 	
 	public int overlap = 0;
 
-	public enum OpenOn
+	[DoNotObfuscateNGUI] public enum OpenOn
 	{
 		ClickOrTap,
 		RightClick,

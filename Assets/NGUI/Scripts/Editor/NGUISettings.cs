@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 public class NGUISettings
 {
-	public enum ColorMode
+	[DoNotObfuscateNGUI] public enum ColorMode
 	{
 		Orange,
 		Green,

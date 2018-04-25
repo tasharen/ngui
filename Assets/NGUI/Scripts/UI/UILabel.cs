@@ -12,7 +12,7 @@ using Alignment = NGUIText.Alignment;
 [AddComponentMenu("NGUI/UI/NGUI Label")]
 public class UILabel : UIWidget
 {
-	public enum Effect
+	[DoNotObfuscateNGUI] public enum Effect
 	{
 		None,
 		Shadow,
@@ -20,7 +20,7 @@ public class UILabel : UIWidget
 		Outline8,
 	}
 
-	public enum Overflow
+	[DoNotObfuscateNGUI] public enum Overflow
 	{
 		ShrinkContent,
 		ClampContent,
@@ -28,14 +28,14 @@ public class UILabel : UIWidget
 		ResizeHeight,
 	}
 
-	public enum Crispness
+	[DoNotObfuscateNGUI] public enum Crispness
 	{
 		Never,
 		OnDesktop,
 		Always,
 	}
 
-	public enum Modifier
+	[DoNotObfuscateNGUI] public enum Modifier
 	{
 		None,
 		ToUppercase,

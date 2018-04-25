@@ -453,7 +453,7 @@ static public class NGUIEditorTools
 #else
 			if (NGUISettings.trueColorAtlas) settings.textureFormat = TextureImporterFormat.AutomaticTruecolor;
 #endif
-			settings.npotScale = TextureImporterNPOTScale.None;			
+			settings.npotScale = TextureImporterNPOTScale.None;
 			ti.SetTextureSettings(settings);
 			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
 		}

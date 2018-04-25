@@ -18,7 +18,7 @@ using UnityEditor;
 [CustomEditor(typeof(UILabel), true)]
 public class UILabelInspector : UIWidgetInspector
 {
-	public enum FontType
+	[DoNotObfuscateNGUI] public enum FontType
 	{
 		NGUI,
 		Unity,

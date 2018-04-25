@@ -17,7 +17,7 @@ public class UIScrollView : MonoBehaviour
 {
 	static public BetterList<UIScrollView> list = new BetterList<UIScrollView>();
 
-	public enum Movement
+	[DoNotObfuscateNGUI] public enum Movement
 	{
 		Horizontal,
 		Vertical,
@@ -25,14 +25,14 @@ public class UIScrollView : MonoBehaviour
 		Custom,
 	}
 
-	public enum DragEffect
+	[DoNotObfuscateNGUI] public enum DragEffect
 	{
 		None,
 		Momentum,
 		MomentumAndSpring,
 	}
 
-	public enum ShowCondition
+	[DoNotObfuscateNGUI] public enum ShowCondition
 	{
 		Always,
 		OnlyIfNeeded,

@@ -42,7 +42,7 @@ using UnityEditor;
 [RequireComponent(typeof(Camera))]
 public class UICamera : MonoBehaviour
 {
-	public enum ControlScheme
+	[DoNotObfuscateNGUI] public enum ControlScheme
 	{
 		Mouse,
 		Touch,
@@ -53,7 +53,7 @@ public class UICamera : MonoBehaviour
 	/// Whether the touch event will be sending out the OnClick notification at the end.
 	/// </summary>
 
-	public enum ClickNotification
+	[DoNotObfuscateNGUI] public enum ClickNotification
 	{
 		None,
 		Always,
@@ -111,7 +111,7 @@ public class UICamera : MonoBehaviour
 	/// Camera type controls how raycasts are handled by the UICamera.
 	/// </summary>
 
-	public enum EventType : int
+	[DoNotObfuscateNGUI] public enum EventType : int
 	{
 		World_3D,	// Perform a Physics.Raycast and sort by distance to the point that was hit.
 		UI_3D,		// Perform a Physics.Raycast and sort by widget depth.
@@ -252,7 +252,7 @@ public class UICamera : MonoBehaviour
 
 	public LayerMask eventReceiverMask = -1;
 
-	public enum ProcessEventsIn
+	[DoNotObfuscateNGUI] public enum ProcessEventsIn
 	{
 		Update,
 		LateUpdate,
@@ -2015,6 +2015,9 @@ public class UICamera : MonoBehaviour
 #if UNITY_EDITOR
 	void OnValidate () { Start(); }
 #endif
+
+	[ContextMenu("Start ignoring events")] void StartIgnoring () { ignoreAllEvents = true; }
+	[ContextMenu("Stop ignoring events")] void StopIgnoring () { ignoreAllEvents = false; }
 
 	/// <summary>
 	/// Check the input and send out appropriate events.

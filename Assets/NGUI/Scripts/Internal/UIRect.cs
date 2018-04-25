@@ -154,7 +154,7 @@ public abstract class UIRect : MonoBehaviour
 
 	public AnchorPoint topAnchor = new AnchorPoint(1f);
 
-	public enum AnchorUpdate
+	[DoNotObfuscateNGUI] public enum AnchorUpdate
 	{
 		OnEnable,
 		OnUpdate,

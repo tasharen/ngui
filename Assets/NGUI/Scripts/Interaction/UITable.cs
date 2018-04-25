@@ -17,13 +17,13 @@ public class UITable : UIWidgetContainer
 {
 	public delegate void OnReposition ();
 
-	public enum Direction
+	[DoNotObfuscateNGUI] public enum Direction
 	{
 		Down,
 		Up,
 	}
 
-	public enum Sorting
+	[DoNotObfuscateNGUI] public enum Sorting
 	{
 		None,
 		Alphabetic,

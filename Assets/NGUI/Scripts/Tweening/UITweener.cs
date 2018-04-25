@@ -19,7 +19,7 @@ public abstract class UITweener : MonoBehaviour
 
 	static public UITweener current;
 
-	public enum Method
+	[DoNotObfuscateNGUI] public enum Method
 	{
 		Linear,
 		EaseIn,
@@ -29,7 +29,7 @@ public abstract class UITweener : MonoBehaviour
 		BounceOut,
 	}
 
-	public enum Style
+	[DoNotObfuscateNGUI] public enum Style
 	{
 		Once,
 		Loop,

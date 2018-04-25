@@ -19,14 +19,14 @@ public class UIKeyBinding : MonoBehaviour
 {
 	static List<UIKeyBinding> mList = new List<UIKeyBinding>();
 
-	public enum Action
+	[DoNotObfuscateNGUI] public enum Action
 	{
 		PressAndClick,
 		Select,
 		All,
 	}
 
-	public enum Modifier
+	[DoNotObfuscateNGUI] public enum Modifier
 	{
 		Any,
 		Shift,

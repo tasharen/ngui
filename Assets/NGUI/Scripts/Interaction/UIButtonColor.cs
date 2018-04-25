@@ -13,7 +13,7 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Button Color")]
 public class UIButtonColor : UIWidgetContainer
 {
-	public enum State
+	[DoNotObfuscateNGUI] public enum State
 	{
 		Normal,
 		Hover,

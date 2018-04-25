@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 public class UICreateWidgetWizard : EditorWindow
 {
-	public enum WidgetType
+	[DoNotObfuscateNGUI] public enum WidgetType
 	{
 		Label,
 		Sprite,

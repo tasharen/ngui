@@ -21,14 +21,14 @@ public class UIRoot : MonoBehaviour
 
 	static public List<UIRoot> list = new List<UIRoot>();
 
-	public enum Scaling
+	[DoNotObfuscateNGUI] public enum Scaling
 	{
 		Flexible,
 		Constrained,
 		ConstrainedOnMobiles,
 	}
 
-	public enum Constraint
+	[DoNotObfuscateNGUI] public enum Constraint
 	{
 		Fit,
 		Fill,
