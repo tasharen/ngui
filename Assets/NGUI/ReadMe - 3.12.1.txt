@@ -56,6 +56,10 @@ and it will not be included in the build of your game. It's only used in the edi
  Version History
 -----------------
 
+3.12.1
+- NEW: Added an option to UIDragDropItem to make it work not just with press-and-hold but also with click-move-click dragging actions.
+- Improved the UIKeyBinding a bit (to string and from string conversion to be exact).
+
 3.12.0
 - NEW: Popup list can now accept delegates when setting up the items programmatically (ideally anonymous delegates).
 - NEW: Added Localization.Format overloads for 3 parameters and less to avoid GC allocations.
