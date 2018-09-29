@@ -359,7 +359,7 @@ public class UIGrid : UIWidgetContainer
 		int y = 0;
 		int maxX = 0;
 		int maxY = 0;
-		Transform myTrans = transform;
+		//Transform myTrans = transform;
 
 		// Re-add the children in the same order we have them in and position them accordingly
 		for (int i = 0, imax = list.Count; i < imax; ++i)

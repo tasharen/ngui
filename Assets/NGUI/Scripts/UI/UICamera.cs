@@ -38,7 +38,7 @@ using UnityEditor;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/NGUI Event System (UICamera)")]
+[AddComponentMenu("NGUI/UI/Event System (UICamera)")]
 [RequireComponent(typeof(Camera))]
 public class UICamera : MonoBehaviour
 {
@@ -2096,7 +2096,7 @@ public class UICamera : MonoBehaviour
 			}
 
 			if (currentScheme == ControlScheme.Mouse && showTooltips && mTooltipTime != 0f && !UIPopupList.isOpen && mMouse[0].dragged == null &&
-				(mTooltipTime < RealTime.time || GetKey(KeyCode.LeftShift) || GetKey(KeyCode.RightShift)))
+				(mTooltipTime < Time.unscaledTime || GetKey(KeyCode.LeftShift) || GetKey(KeyCode.RightShift)))
 			{
 				currentTouch = mMouse[0];
 				currentTouchID = -1;
@@ -2206,14 +2206,14 @@ public class UICamera : MonoBehaviour
 		currentTouchID = -1;
 		if (highlightChanged) currentKey = KeyCode.Mouse0;
 
-		if (!isPressed && posChanged && (!stickyTooltip || highlightChanged))
+		if (!isPressed && posChanged)
 		{
 			if (mTooltipTime != 0f)
 			{
 				// Delay the tooltip
 				mTooltipTime = Time.unscaledTime + tooltipDelay;
 			}
-			else if (mTooltip != null)
+			else if (mTooltip != null && (!stickyTooltip || highlightChanged))
 			{
 				// Hide the tooltip
 				ShowTooltip(null);
@@ -2899,4 +2899,14 @@ public class UICamera : MonoBehaviour
 	/// </summary>
 
 	static public bool HideTooltip () { return ShowTooltip(null); }
+
+	/// <summary>
+	/// Reset the tooltip timer, allowing the tooltip to show again even over the same widget.
+	/// </summary>
+
+	static public void ResetTooltip (float delay = 0.5f)
+	{
+		ShowTooltip(null);
+		mTooltipTime = Time.unscaledTime + delay;
+	}
 }

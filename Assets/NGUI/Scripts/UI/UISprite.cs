@@ -11,7 +11,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/NGUI Sprite")]
+[AddComponentMenu("NGUI/UI/Sprite")]
 public class UISprite : UIBasicSprite
 {
 	// Cached and saved values
@@ -235,15 +235,18 @@ public class UISprite : UIBasicSprite
 			return new Vector4(sp.borderLeft, sp.borderBottom, sp.borderRight, sp.borderTop);
 		}
 	}
+
 	/// <summary>
 	/// Trimmed space in the atlas around the sprite. X = left, Y = bottom, Z = right, W = top.
 	/// </summary>
+	
 	protected override Vector4 padding
 	{
 		get
 		{
-			UISpriteData sp = GetAtlasSprite();
+			var sp = GetAtlasSprite();
 			var p = new Vector4(0, 0, 0, 0);
+
 			if (sp != null)
 			{
 				p.x = sp.paddingLeft;
@@ -317,19 +320,18 @@ public class UISprite : UIBasicSprite
 	{
 		get
 		{
-			Vector2 offset = pivotOffset;
-
-			float x0 = -offset.x * mWidth;
-			float y0 = -offset.y * mHeight;
-			float x1 = x0 + mWidth;
-			float y1 = y0 + mHeight;
+			var offset = pivotOffset;
+			var x0 = -offset.x * mWidth;
+			var y0 = -offset.y * mHeight;
+			var x1 = x0 + mWidth;
+			var y1 = y0 + mHeight;
 
 			if (GetAtlasSprite() != null && mType != Type.Tiled)
 			{
-				int padLeft = mSprite.paddingLeft;
-				int padBottom = mSprite.paddingBottom;
-				int padRight = mSprite.paddingRight;
-				int padTop = mSprite.paddingTop;
+				var padLeft = mSprite.paddingLeft;
+				var padBottom = mSprite.paddingBottom;
+				var padRight = mSprite.paddingRight;
+				var padTop = mSprite.paddingTop;
 
 				if (mType != Type.Simple)
 				{
@@ -344,10 +346,10 @@ public class UISprite : UIBasicSprite
 					}
 				}
 
-				int w = mSprite.width + padLeft + padRight;
-				int h = mSprite.height + padBottom + padTop;
-				float px = 1f;
-				float py = 1f;
+				var w = mSprite.width + padLeft + padRight;
+				var h = mSprite.height + padBottom + padTop;
+				var px = 1f;
+				var py = 1f;
 
 				if (w > 0 && h > 0 && (mType == Type.Simple || mType == Type.Filled))
 				{
@@ -381,17 +383,21 @@ public class UISprite : UIBasicSprite
 				}
 			}
 
-			Vector4 br = (mAtlas != null) ? border * pixelSize : Vector4.zero;
+			if (mDrawRegion.x != 0f || mDrawRegion.y != 0f || mDrawRegion.z != 1f || mDrawRegion.w != 0f)
+			{
+				var br = (mAtlas != null) ? border * pixelSize : Vector4.zero;
 
-			float fw = br.x + br.z;
-			float fh = br.y + br.w;
+				var fw = br.x + br.z;
+				var fh = br.y + br.w;
 
-			float vx = Mathf.Lerp(x0, x1 - fw, mDrawRegion.x);
-			float vy = Mathf.Lerp(y0, y1 - fh, mDrawRegion.y);
-			float vz = Mathf.Lerp(x0 + fw, x1, mDrawRegion.z);
-			float vw = Mathf.Lerp(y0 + fh, y1, mDrawRegion.w);
+				var vx = Mathf.Lerp(x0, x1 - fw, mDrawRegion.x);
+				var vy = Mathf.Lerp(y0, y1 - fh, mDrawRegion.y);
+				var vz = Mathf.Lerp(x0 + fw, x1, mDrawRegion.z);
+				var vw = Mathf.Lerp(y0 + fh, y1, mDrawRegion.w);
 
-			return new Vector4(vx, vy, vz, vw);
+				return new Vector4(vx, vy, vz, vw);
+			}
+			return new Vector4(x0, y0, x1, y1);
 		}
 	}
 
@@ -466,10 +472,10 @@ public class UISprite : UIBasicSprite
 		base.MakePixelPerfect();
 		if (mType == Type.Tiled) return;
 
-		UISpriteData sp = GetAtlasSprite();
+		var sp = GetAtlasSprite();
 		if (sp == null) return;
 
-		Texture tex = mainTexture;
+		var tex = mainTexture;
 		if (tex == null) return;
 
 		if (mType == Type.Simple || mType == Type.Filled || !sp.hasBorder)
@@ -527,21 +533,21 @@ public class UISprite : UIBasicSprite
 
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
-		Texture tex = mainTexture;
+		var tex = mainTexture;
 		if (tex == null) return;
 
 		if (mSprite == null) mSprite = atlas.GetSprite(spriteName);
 		if (mSprite == null) return;
 
-		Rect outer = new Rect(mSprite.x, mSprite.y, mSprite.width, mSprite.height);
-		Rect inner = new Rect(mSprite.x + mSprite.borderLeft, mSprite.y + mSprite.borderTop,
+		var outer = new Rect(mSprite.x, mSprite.y, mSprite.width, mSprite.height);
+		var inner = new Rect(mSprite.x + mSprite.borderLeft, mSprite.y + mSprite.borderTop,
 			mSprite.width - mSprite.borderLeft - mSprite.borderRight,
 			mSprite.height - mSprite.borderBottom - mSprite.borderTop);
 
 		outer = NGUIMath.ConvertToTexCoords(outer, tex.width, tex.height);
 		inner = NGUIMath.ConvertToTexCoords(inner, tex.width, tex.height);
 
-		int offset = verts.Count;
+		var offset = verts.Count;
 		Fill(verts, uvs, cols, outer, inner);
 
 		if (onPostFill != null)

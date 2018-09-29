@@ -297,6 +297,19 @@ public abstract class UITweener : MonoBehaviour
 	void OnDisable () { mStarted = false; }
 
 	/// <summary>
+	/// Immediately finish the tween animation, if it's active.
+	/// </summary>
+
+	public void Finish ()
+	{
+		if (enabled)
+		{
+			Sample(mAmountPerDelta > 0f ? 1f : 0f, true);
+			enabled = false;
+		}
+	}
+
+	/// <summary>
 	/// Sample the tween at the specified factor.
 	/// </summary>
 

@@ -1444,7 +1444,7 @@ static public class NGUIText
 		if (wrapLineColors && mColors.size > 0) sb.Append("[-]");
 		finalText = sb.ToString();
 		mColors.Clear();
-		return fits && ((offset == textLength) || (lineCount <= Mathf.Min(maxLines, maxLineCount)));
+		return fits && ((offset == textLength) || (maxLines != 0 ? lineCount == maxLines : lineCount == 0));
 	}
 
 	static Color s_c0, s_c1;

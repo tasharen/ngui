@@ -35,9 +35,10 @@ public class SpringPanel : MonoBehaviour
 
 	public OnFinished onFinished;
 
-	UIPanel mPanel;
-	Transform mTrans;
-	UIScrollView mDrag;
+	[System.NonSerialized] UIPanel mPanel;
+	[System.NonSerialized] Transform mTrans;
+	[System.NonSerialized] UIScrollView mDrag;
+	[System.NonSerialized] float mDelta = 0f;
 
 	/// <summary>
 	/// Cache the transform.
@@ -54,22 +55,19 @@ public class SpringPanel : MonoBehaviour
 	/// Advance toward the target position.
 	/// </summary>
 
-	void Update ()
-	{
-	    AdvanceTowardsPosition();
-	}
+	void Update () { AdvanceTowardsPosition(); }
 
-    /// <summary>
-    /// Advance toward the target position.
+	/// <summary>
+	/// Advance toward the target position.
 	/// </summary>
 
 	protected virtual void AdvanceTowardsPosition ()
 	{
-		float delta = RealTime.deltaTime;
+		mDelta += RealTime.deltaTime;
 
-		bool trigger = false;
-		Vector3 before = mTrans.localPosition;
-		Vector3 after = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, delta);
+		var trigger = false;
+		var before = mTrans.localPosition;
+		var after = NGUIMath.SpringLerp(before, target, strength, mDelta);
 
 		if ((after - target).sqrMagnitude < 0.01f)
 		{
@@ -77,10 +75,18 @@ public class SpringPanel : MonoBehaviour
 			enabled = false;
 			trigger = true;
 		}
+
+		after.x = Mathf.Round(after.x);
+		after.y = Mathf.Round(after.y);
+		after.z = Mathf.Round(after.z);
+
+		if ((after - target).sqrMagnitude < 0.01f) return;
+		else mDelta = 0f;
+
 		mTrans.localPosition = after;
 
-		Vector3 offset = after - before;
-		Vector2 cr = mPanel.clipOffset;
+		var offset = after - before;
+		var cr = mPanel.clipOffset;
 		cr.x -= offset.x;
 		cr.y -= offset.y;
 		mPanel.clipOffset = cr;
@@ -101,7 +107,7 @@ public class SpringPanel : MonoBehaviour
 
 	static public SpringPanel Begin (GameObject go, Vector3 pos, float strength)
 	{
-		SpringPanel sp = go.GetComponent<SpringPanel>();
+		var sp = go.GetComponent<SpringPanel>();
 		if (sp == null) sp = go.AddComponent<SpringPanel>();
 		sp.target = pos;
 		sp.strength = strength;
@@ -116,7 +122,7 @@ public class SpringPanel : MonoBehaviour
 
 	static public SpringPanel Stop (GameObject go)
 	{
-		SpringPanel sp = go.GetComponent<SpringPanel>();
+		var sp = go.GetComponent<SpringPanel>();
 
 		if (sp != null && sp.enabled)
 		{

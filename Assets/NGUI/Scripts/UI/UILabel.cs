@@ -9,7 +9,7 @@ using System;
 using Alignment = NGUIText.Alignment;
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/NGUI Label")]
+[AddComponentMenu("NGUI/UI/Label")]
 public class UILabel : UIWidget
 {
 	[DoNotObfuscateNGUI] public enum Effect

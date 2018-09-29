@@ -244,9 +244,9 @@ public class UIKeyBinding : MonoBehaviour
 		modifier = Modifier.None;
 		if (string.IsNullOrEmpty(text)) return true;
 
-		if (text.Contains("+"))
+		if (text.Length > 2 && text.Contains("+") && text[text.Length - 1] != '+')
 		{
-			var parts = text.Split('+');
+			var parts = text.Split(new char[] { '+' }, 2);
 			key = NGUITools.CaptionToKey(parts[1]);
 			try { modifier = (Modifier)System.Enum.Parse(typeof(Modifier), parts[0]); }
 			catch (System.Exception) { return false; }

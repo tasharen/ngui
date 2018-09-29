@@ -301,10 +301,12 @@ static public class NGUIContextMenu
 				AddSiblingWidget("Create/Invisible Widget/Sibling", false, NGUISettings.AddWidget);
 				AddSiblingWidget("Create/Simple Texture/Sibling", false, NGUISettings.AddTexture);
 				AddSiblingWidget("Create/Unity 2D Sprite/Sibling", false, NGUISettings.Add2DSprite);
+				AddChildWidget("Create/Sprite Collection", false, NGUISettings.AddSpriteCollection);
 			}
 			else
 			{
 				AddChildWidget("Create/Sprite", false, NGUISettings.AddSprite);
+				AddChildWidget("Create/Sprite Collection", false, NGUISettings.AddSpriteCollection);
 				AddChildWidget("Create/Label", false, NGUISettings.AddLabel);
 				AddChildWidget("Create/Invisible Widget", false, NGUISettings.AddWidget);
 				AddChildWidget("Create/Simple Texture", false, NGUISettings.AddTexture);

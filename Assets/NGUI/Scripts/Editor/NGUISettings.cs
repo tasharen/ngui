@@ -534,6 +534,22 @@ public class NGUISettings
 	}
 
 	/// <summary>
+	/// Convenience method -- add a sprite collection.
+	/// </summary>
+
+	static public UISpriteCollection AddSpriteCollection (GameObject go)
+	{
+		UISpriteCollection w = NGUITools.AddWidget<UISpriteCollection>(go);
+		w.name = "Sprite Collection";
+		w.atlas = atlas;
+		w.pivot = pivot;
+		w.width = 100;
+		w.height = 100;
+		w.MakePixelPerfect();
+		return w;
+	}
+
+	/// <summary>
 	/// Convenience method -- add a label with default parameters.
 	/// </summary>
 

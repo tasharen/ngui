@@ -7,7 +7,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Inspector class used to edit UITextures.
+/// Inspector class used to edit UI sprites and textures.
 /// </summary>
 
 [CanEditMultipleObjects]

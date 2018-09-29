@@ -620,6 +620,24 @@ static public class NGUITools
 		return go;
 	}
 
+#if UNITY_5_5_OR_NEWER
+	/// <summary>
+	/// Instantiate an object and add it to the specified parent.
+	/// </summary>
+
+	static public GameObject AddChild (this Transform parent, GameObject prefab)
+	{
+		var go = UnityEngine.Object.Instantiate(prefab, parent.transform);
+		var t = go.transform;
+		t.parent = parent;
+		t.localPosition = Vector3.zero;
+		t.localRotation = Quaternion.identity;
+		t.localScale = Vector3.one;
+		go.SetActive(true);
+		return go;
+	}
+#endif
+
 	/// <summary>
 	/// Instantiate an object and add it to the specified parent.
 	/// </summary>
@@ -633,7 +651,7 @@ static public class NGUITools
 	static public GameObject AddChild (this GameObject parent, GameObject prefab, int layer)
 	{
 #if UNITY_5_5_OR_NEWER
-		var go = (parent != null) ? UnityEngine.Object.Instantiate(prefab, parent.transform) : UnityEngine.Object.Instantiate(prefab);
+		var go = UnityEngine.Object.Instantiate(prefab, parent.transform);
 #if UNITY_EDITOR
 		if (!Application.isPlaying) UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Create Object");
 #endif
@@ -2365,13 +2383,13 @@ static public class NGUITools
 			case KeyCode.Keypad7: return "K7";
 			case KeyCode.Keypad8: return "K8";
 			case KeyCode.Keypad9: return "K9";
-			case KeyCode.KeypadPeriod: return ".";
-			case KeyCode.KeypadDivide: return "/";
-			case KeyCode.KeypadMultiply: return "*";
-			case KeyCode.KeypadMinus: return "-";
-			case KeyCode.KeypadPlus: return "+";
-			case KeyCode.KeypadEnter: return "NT";
-			case KeyCode.KeypadEquals: return "=";
+			case KeyCode.KeypadPeriod: return "K.";
+			case KeyCode.KeypadDivide: return "K/";
+			case KeyCode.KeypadMultiply: return "K*";
+			case KeyCode.KeypadMinus: return "K-";
+			case KeyCode.KeypadPlus: return "K+";
+			case KeyCode.KeypadEnter: return "KE";
+			case KeyCode.KeypadEquals: return "KQ";
 			case KeyCode.UpArrow: return "UP";
 			case KeyCode.DownArrow: return "DN";
 			case KeyCode.RightArrow: return "LT";
@@ -2497,7 +2515,7 @@ static public class NGUITools
 		if (caption == "H") return KeyCode.H;
 		if (caption == "I") return KeyCode.I;
 		if (caption == "J") return KeyCode.J;
-		if (caption == "L") return KeyCode.K;
+		if (caption == "K") return KeyCode.K;
 		if (caption == "L") return KeyCode.L;
 		if (caption == "M") return KeyCode.M;
 		if (caption == "N") return KeyCode.N;
@@ -2524,13 +2542,13 @@ static public class NGUITools
 		if (caption == "K7") return KeyCode.Keypad7;
 		if (caption == "K8") return KeyCode.Keypad8;
 		if (caption == "K9") return KeyCode.Keypad9;
-		if (caption == ".") return KeyCode.KeypadPeriod;
-		if (caption == "/") return KeyCode.KeypadDivide;
-		if (caption == "*") return KeyCode.KeypadMultiply;
-		if (caption == "-") return KeyCode.KeypadMinus;
-		if (caption == "+") return KeyCode.KeypadPlus;
-		if (caption == "NT") return KeyCode.KeypadEnter;
-		if (caption == "=") return KeyCode.KeypadEquals;
+		if (caption == "K.") return KeyCode.KeypadPeriod;
+		if (caption == "K/") return KeyCode.KeypadDivide;
+		if (caption == "K*") return KeyCode.KeypadMultiply;
+		if (caption == "K-") return KeyCode.KeypadMinus;
+		if (caption == "K+") return KeyCode.KeypadPlus;
+		if (caption == "KE") return KeyCode.KeypadEnter;
+		if (caption == "KQ") return KeyCode.KeypadEquals;
 		if (caption == "UP") return KeyCode.UpArrow;
 		if (caption == "DN") return KeyCode.DownArrow;
 		if (caption == "LT") return KeyCode.RightArrow;
@@ -2581,16 +2599,16 @@ static public class NGUITools
 		if (caption == "(Start)") return KeyCode.JoystickButton7;
 		if (caption == "(LS)") return KeyCode.JoystickButton8;
 		if (caption == "(RS)") return KeyCode.JoystickButton9;
-		if (caption == "(J10)") return KeyCode.JoystickButton10;
-		if (caption == "(J11)") return KeyCode.JoystickButton11;
-		if (caption == "(J12)") return KeyCode.JoystickButton12;
-		if (caption == "(J13)") return KeyCode.JoystickButton13;
-		if (caption == "(J14)") return KeyCode.JoystickButton14;
-		if (caption == "(J15)") return KeyCode.JoystickButton15;
-		if (caption == "(J16)") return KeyCode.JoystickButton16;
-		if (caption == "(J17)") return KeyCode.JoystickButton17;
-		if (caption == "(J18)") return KeyCode.JoystickButton18;
-		if (caption == "(J19)") return KeyCode.JoystickButton19;
+		if (caption == "J10") return KeyCode.JoystickButton10;
+		if (caption == "J11") return KeyCode.JoystickButton11;
+		if (caption == "J12") return KeyCode.JoystickButton12;
+		if (caption == "J13") return KeyCode.JoystickButton13;
+		if (caption == "J14") return KeyCode.JoystickButton14;
+		if (caption == "J15") return KeyCode.JoystickButton15;
+		if (caption == "J16") return KeyCode.JoystickButton16;
+		if (caption == "J17") return KeyCode.JoystickButton17;
+		if (caption == "J18") return KeyCode.JoystickButton18;
+		if (caption == "J19") return KeyCode.JoystickButton19;
 		return KeyCode.None;
 	}
 

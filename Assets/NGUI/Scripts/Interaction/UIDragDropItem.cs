@@ -216,7 +216,7 @@ public class UIDragDropItem : MonoBehaviour
 
 	public virtual UIDragDropItem StartDragging ()
 	{
-		if (!interactable) return null;
+		if (!interactable || !transform || !transform.parent) return null;
 
 		if (!mDragging)
 		{

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [ExecuteInEditMode]
-[AddComponentMenu("NGUI/UI/NGUI Widget")]
+[AddComponentMenu("NGUI/UI/Invisible Widget")]
 public class UIWidget : UIRect
 {
 	[DoNotObfuscateNGUI] public enum Pivot
@@ -558,12 +558,11 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			Vector2 offset = pivotOffset;
-
-			float x0 = -offset.x * mWidth;
-			float y0 = -offset.y * mHeight;
-			float x1 = x0 + mWidth;
-			float y1 = y0 + mHeight;
+			var offset = pivotOffset;
+			var x0 = -offset.x * mWidth;
+			var y0 = -offset.y * mHeight;
+			var x1 = x0 + mWidth;
+			var y1 = y0 + mHeight;
 
 			return new Vector4(
 				mDrawRegion.x == 0f ? x0 : Mathf.Lerp(x0, x1, mDrawRegion.x),
@@ -1480,6 +1479,7 @@ public class UIWidget : UIRect
 						mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix;
 						mMatrixFrame = frame;
 					}
+
 					geometry.ApplyTransform(mLocalToPanel, panel.generateNormals);
 					mMoved = false;
 					mChanged = false;
