@@ -1116,7 +1116,7 @@ public class UILabel : UIWidget
 		{
 			for (int i = 0, imax = mTempDrawcalls.size; i < imax; ++i)
 			{
-				UIDrawCall dc = mTempDrawcalls[i];
+				var dc = mTempDrawcalls[i];
 				if (dc.panel != null) dc.panel.FillDrawCall(dc);
 			}
 			mTempDrawcalls.Clear();

@@ -574,7 +574,34 @@ static public class NGUITools
 	static public void SetDirty (UnityEngine.Object obj, string undoName = "last change")
 	{
 #if UNITY_EDITOR
+#if UNITY_2018_3_OR_NEWER
+	if (obj)
+	{
+		if (AssetDatabase.Contains(obj))
+		{
+			UnityEditor.EditorUtility.SetDirty(obj);
+		}
+		else if (!Application.isPlaying)
+		{
+			if (obj is Component)
+			{
+				var component = (Component)obj;
+				UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(component.gameObject.scene);
+			}
+			else if (obj is EditorWindow || obj is ScriptableObject)
+			{
+				UnityEditor.EditorUtility.SetDirty(obj);
+			}
+			else
+			{
+				UnityEditor.EditorUtility.SetDirty (obj);
+				UnityEditor.SceneManagement.EditorSceneManager.MarkAllScenesDirty();
+			}
+		}
+	}
+#else
 		if (obj) UnityEditor.EditorUtility.SetDirty(obj);
+#endif
 #endif
 	}
 
@@ -710,7 +737,7 @@ static public class NGUITools
 		Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
 #endif
 		var w = go.GetComponent<UIWidget>();
-		
+
 		if (w != null)
 		{
 #if UNITY_5_5_OR_NEWER
@@ -727,11 +754,11 @@ static public class NGUITools
 #else
 		Profiler.EndSample();
 #endif
-		
+
 		if (widgets.Length == 0) return 0;
 
 		int depth = int.MaxValue;
-		
+
 		for (int i = 0, imax = widgets.Length; i < imax; ++i)
 		{
 			if (widgets[i].enabled)
@@ -797,7 +824,7 @@ static public class NGUITools
 			if (panel != null)
 			{
 				UIPanel[] panels = go.GetComponentsInChildren<UIPanel>(true);
-				
+
 				for (int i = 0; i < panels.Length; ++i)
 				{
 					UIPanel p = panels[i];
@@ -1538,7 +1565,7 @@ static public class NGUITools
 		go.layer = layer;
 
 		Transform t = go.transform;
-		
+
 		for (int i = 0, imax = t.childCount; i < imax; ++i)
 		{
 			Transform child = t.GetChild(i);
@@ -1908,7 +1935,7 @@ static public class NGUITools
 			mSides[2] = cam.ViewportToWorldPoint(new Vector3(1f, 0.5f, depth));
 			mSides[3] = cam.ViewportToWorldPoint(new Vector3(0.5f, 0f, depth));
 		}
-		
+
 		if (relativeTo != null)
 		{
 			for (int i = 0; i < 4; ++i)

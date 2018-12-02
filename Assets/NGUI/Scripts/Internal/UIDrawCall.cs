@@ -103,7 +103,7 @@ public class UIDrawCall : MonoBehaviour
 	/// Callback that will be triggered when a new draw call gets created.
 	/// </summary>
 
-	public OnCreateDrawCall onCreateDrawCall; 
+	public OnCreateDrawCall onCreateDrawCall;
 	public delegate void OnCreateDrawCall (UIDrawCall dc, MeshFilter filter, MeshRenderer ren);
 
 	/// <summary>
@@ -480,7 +480,7 @@ public class UIDrawCall : MonoBehaviour
 	/// Set the draw call's geometry.
 	/// </summary>
 
-	public void UpdateGeometry (int widgetCount)
+	public void UpdateGeometry (int widgetCount, bool needsBounds)
 	{
 		this.widgetCount = widgetCount;
 		int vertexCount = verts.Count;
@@ -594,7 +594,11 @@ public class UIDrawCall : MonoBehaviour
 				if (setIndices)
 				{
 					mIndices = GenerateCachedIndexBuffer(vertexCount, indexCount);
+#if UNITY_5_4 || UNITY_5_5_OR_NEWER
+					mMesh.SetTriangles(mIndices, 0, needsBounds);
+#else
 					mMesh.triangles = mIndices;
+#endif
 				}
 
 #if !UNITY_FLASH
@@ -954,6 +958,10 @@ public class UIDrawCall : MonoBehaviour
 		GameObject go = new GameObject(name);
 		DontDestroyOnLoad(go);
 		UIDrawCall newDC = go.AddComponent<UIDrawCall>();
+#endif
+#if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
+		var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+		if (prefabStage != null) UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(go, prefabStage.scene);
 #endif
 		// Create the draw call
 		mActiveList.Add(newDC);

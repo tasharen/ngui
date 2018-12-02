@@ -300,6 +300,8 @@ public class UIButtonColor : UIWidgetContainer
 
 	public void UpdateColor (bool instant)
 	{
+		if (!mInitDone) return;
+
 		TweenColor tc;
 
 		if (tweenTarget != null)

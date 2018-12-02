@@ -23,6 +23,7 @@ namespace AnimationOrTween
 		OnSelect,
 		OnSelectTrue,
 		OnSelectFalse,
+		Manual,
 	}
 
 	[DoNotObfuscateNGUI] public enum Direction

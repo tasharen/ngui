@@ -285,6 +285,12 @@ public class UIPlayTween : MonoBehaviour
 	/// Activate the tweeners.
 	/// </summary>
 
+	public void Play () { Play(true); }
+
+	/// <summary>
+	/// Activate the tweeners.
+	/// </summary>
+
 	public void Play (bool forward)
 	{
 		mActive = 0;
