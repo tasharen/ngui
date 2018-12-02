@@ -325,7 +325,7 @@ public class UIAtlas : MonoBehaviour
 		if (mSprites.Count == 0) Upgrade();
 
 		BetterList<string> list = new BetterList<string>();
-		
+
 		for (int i = 0, imax = mSprites.Count; i < imax; ++i)
 		{
 			UISpriteData s = mSprites[i];
@@ -350,7 +350,7 @@ public class UIAtlas : MonoBehaviour
 		for (int i = 0, imax = mSprites.Count; i < imax; ++i)
 		{
 			UISpriteData s = mSprites[i];
-			
+
 			if (s != null && !string.IsNullOrEmpty(s.name) && string.Equals(match, s.name, StringComparison.OrdinalIgnoreCase))
 			{
 				list.Add(s.name);
@@ -366,7 +366,7 @@ public class UIAtlas : MonoBehaviour
 		for (int i = 0, imax = mSprites.Count; i < imax; ++i)
 		{
 			UISpriteData s = mSprites[i];
-			
+
 			if (s != null && !string.IsNullOrEmpty(s.name))
 			{
 				string tl = s.name.ToLower();
@@ -404,6 +404,58 @@ public class UIAtlas : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Replace all atlas reference of one atlas with another.
+	/// </summary>
+
+	static public void Replace (UIAtlas before, UIAtlas after)
+	{
+		var list = NGUITools.FindActive<UISprite>();
+
+		for (int i = 0, imax = list.Length; i < imax; ++i)
+		{
+			var sp = list[i];
+
+			if (sp.atlas == before)
+			{
+				sp.atlas = after;
+#if UNITY_EDITOR
+				NGUITools.SetDirty(sp);
+#endif
+			}
+		}
+
+		var fonts = Resources.FindObjectsOfTypeAll(typeof(UIFont)) as UIFont[];
+
+		for (int i = 0, imax = fonts.Length; i < imax; ++i)
+		{
+			var font = fonts[i];
+
+			if (font.atlas == before)
+			{
+				font.atlas = after;
+#if UNITY_EDITOR
+				NGUITools.SetDirty(font);
+#endif
+			}
+		}
+
+		var labels = NGUITools.FindActive<UILabel>();
+
+		for (int i = 0, imax = labels.Length; i < imax; ++i)
+		{
+			var lbl = labels[i];
+
+			if (lbl.bitmapFont != null && lbl.bitmapFont.atlas == before)
+			{
+				lbl.bitmapFont.atlas = after;
+#if UNITY_EDITOR
+				NGUITools.SetDirty(lbl);
+#endif
+			}
+		}
+	}
+
+	/// <summary>
 	/// Mark all widgets associated with this atlas as having changed.
 	/// </summary>
 
@@ -414,15 +466,15 @@ public class UIAtlas : MonoBehaviour
 #endif
 		if (mReplacement != null) mReplacement.MarkAsChanged();
 
-		UISprite[] list = NGUITools.FindActive<UISprite>();
+		var list = NGUITools.FindActive<UISprite>();
 
 		for (int i = 0, imax = list.Length; i < imax; ++i)
 		{
-			UISprite sp = list[i];
+			var sp = list[i];
 
 			if (CheckIfRelated(this, sp.atlas))
 			{
-				UIAtlas atl = sp.atlas;
+				var atl = sp.atlas;
 				sp.atlas = null;
 				sp.atlas = atl;
 #if UNITY_EDITOR
@@ -431,15 +483,15 @@ public class UIAtlas : MonoBehaviour
 			}
 		}
 
-		UIFont[] fonts = Resources.FindObjectsOfTypeAll(typeof(UIFont)) as UIFont[];
+		var fonts = Resources.FindObjectsOfTypeAll(typeof(UIFont)) as UIFont[];
 
 		for (int i = 0, imax = fonts.Length; i < imax; ++i)
 		{
-			UIFont font = fonts[i];
+			var font = fonts[i];
 
 			if (CheckIfRelated(this, font.atlas))
 			{
-				UIAtlas atl = font.atlas;
+				var atl = font.atlas;
 				font.atlas = null;
 				font.atlas = atl;
 #if UNITY_EDITOR
@@ -448,15 +500,15 @@ public class UIAtlas : MonoBehaviour
 			}
 		}
 
-		UILabel[] labels = NGUITools.FindActive<UILabel>();
+		var labels = NGUITools.FindActive<UILabel>();
 
 		for (int i = 0, imax = labels.Length; i < imax; ++i)
 		{
-			UILabel lbl = labels[i];
+			var lbl = labels[i];
 
 			if (lbl.bitmapFont != null && CheckIfRelated(this, lbl.bitmapFont.atlas))
 			{
-				UIFont font = lbl.bitmapFont;
+				var font = lbl.bitmapFont;
 				lbl.bitmapFont = null;
 				lbl.bitmapFont = font;
 #if UNITY_EDITOR
@@ -485,7 +537,7 @@ public class UIAtlas : MonoBehaviour
 				Sprite old = sprites[i];
 				Rect outer = old.outer;
 				Rect inner = old.inner;
-				
+
 				if (mCoordinates == Coordinates.TexCoords)
 				{
 					NGUIMath.ConvertToPixels(outer, width, height, true);
@@ -494,17 +546,17 @@ public class UIAtlas : MonoBehaviour
 
 				UISpriteData sd = new UISpriteData();
 				sd.name = old.name;
-				
+
 				sd.x = Mathf.RoundToInt(outer.xMin);
 				sd.y = Mathf.RoundToInt(outer.yMin);
 				sd.width = Mathf.RoundToInt(outer.width);
 				sd.height = Mathf.RoundToInt(outer.height);
-				
+
 				sd.paddingLeft = Mathf.RoundToInt(old.paddingLeft * outer.width);
 				sd.paddingRight = Mathf.RoundToInt(old.paddingRight * outer.width);
 				sd.paddingBottom = Mathf.RoundToInt(old.paddingBottom * outer.height);
 				sd.paddingTop = Mathf.RoundToInt(old.paddingTop * outer.height);
-				
+
 				sd.borderLeft = Mathf.RoundToInt(inner.xMin - outer.xMin);
 				sd.borderRight = Mathf.RoundToInt(outer.xMax - inner.xMax);
 				sd.borderBottom = Mathf.RoundToInt(outer.yMax - inner.yMax);

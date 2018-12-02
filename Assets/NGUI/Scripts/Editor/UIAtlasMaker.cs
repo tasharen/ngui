@@ -25,7 +25,7 @@ public class UIAtlasMaker : EditorWindow
 
 		// Temporary material -- same usage as the temporary game object
 		public Material tempMat;
-		
+
 		// Whether the texture is temporary and should be deleted
 		public bool temporaryTexture = false;
 
@@ -48,7 +48,7 @@ public class UIAtlasMaker : EditorWindow
 			tempMat = new Material(NGUISettings.atlas.spriteMaterial);
 			tempMat.hideFlags = HideFlags.HideAndDontSave;
 			tempMat.SetTexture("_MainTex", tex);
-			
+
 			tempGO = EditorUtility.CreateGameObjectWithHideFlags(name, HideFlags.HideAndDontSave, typeof(MeshRenderer));
 			tempGO.GetComponent<MeshRenderer>().sharedMaterial = tempMat;
 		}
@@ -147,7 +147,7 @@ public class UIAtlasMaker : EditorWindow
 	/// <summary>
 	/// Used to sort the sprites by pixels used
 	/// </summary>
-	
+
 	static int Compare (SpriteEntry a, SpriteEntry b)
 	{
 		// A is null b is not b is greater so put it at the front of the list
@@ -613,7 +613,7 @@ public class UIAtlasMaker : EditorWindow
 				if (tex == null) Debug.LogError("Failed to load the created atlas saved as " + newPath);
 				else atlas.spriteMaterial.mainTexture = tex;
 				ReleaseSprites(sprites);
-				
+
 				AssetDatabase.SaveAssets();
 				AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 			}
@@ -622,10 +622,10 @@ public class UIAtlasMaker : EditorWindow
 		else
 		{
 			if (!newTexture) NGUIEditorTools.ImportTexture(oldPath, false, true, !atlas.premultipliedAlpha);
-			
+
 			//Debug.LogError("Operation canceled: The selected sprites can't fit into the atlas.\n" +
 			//	"Keep large sprites outside the atlas (use UITexture), and/or use multiple atlases instead.");
-			
+
 			EditorUtility.DisplayDialog("Operation Canceled", "The selected sprites can't fit into the atlas.\n" +
 					"Keep large sprites outside the atlas (use UITexture), and/or use multiple atlases instead", "OK");
 			return false;
@@ -708,6 +708,74 @@ public class UIAtlasMaker : EditorWindow
 
 	static public void UpdateAtlas (UIAtlas atlas, List<SpriteEntry> sprites)
 	{
+#if UNITY_2018_3_OR_NEWER
+		// Contributed by B9 from https://discord.gg/tasharen
+		if (!PrefabUtility.IsPartOfPrefabAsset(atlas.gameObject))
+		{
+			Debug.LogWarning("Atlas is not sourced from prefab asset, ignoring the request to update it");
+			return;
+		}
+
+		var assetPath = AssetDatabase.GetAssetPath(atlas.gameObject);
+
+		if (string.IsNullOrEmpty(assetPath))
+		{
+			Debug.LogWarning("Atlas asset path could not be found, aborting");
+			return;
+		}
+
+		var assetRoot = PrefabUtility.LoadPrefabContents(assetPath);
+		var atlasTemp = assetRoot.GetComponent<UIAtlas>();
+
+		if (atlasTemp == null)
+		{
+			Debug.LogWarning("Atlas component could not be found in the loaded prefab, aborting");
+			PrefabUtility.UnloadPrefabContents(assetRoot);
+			return;
+		}
+
+		if (sprites.Count > 0)
+		{
+			// Combine all sprites into a single texture and save it
+			if (UpdateTexture(atlasTemp, sprites))
+			{
+				// Replace the sprites within the atlas
+				ReplaceSprites(atlasTemp, sprites);
+			}
+
+			// Release the temporary textures
+			ReleaseSprites(sprites);
+		}
+		else
+		{
+			atlasTemp.spriteList.Clear();
+			var texturePath = NGUIEditorTools.GetSaveableTexturePath(atlasTemp);
+			atlasTemp.spriteMaterial.mainTexture = null;
+			if (!string.IsNullOrEmpty(texturePath)) AssetDatabase.DeleteAsset(texturePath);
+		}
+
+		PrefabUtility.SaveAsPrefabAsset(assetRoot, assetPath);
+		Selection.activeGameObject = (NGUISettings.atlas != null) ? NGUISettings.atlas.gameObject : null;
+		EditorUtility.ClearProgressBar();
+
+		PrefabUtility.UnloadPrefabContents(assetRoot);
+		AssetDatabase.Refresh();
+
+		var assetUpdated = (GameObject)AssetDatabase.LoadMainAssetAtPath (assetPath);
+		var newAtlas = assetUpdated.GetComponent<UIAtlas>();
+		NGUISettings.atlas = newAtlas;
+		newAtlas.MarkAsChanged ();
+
+		var panels = NGUITools.FindActive<UIPanel>();
+
+		foreach (var panel in panels)
+		{
+			if (!panel.enabled) continue;
+			panel.enabled = false;
+			panel.enabled = true;
+		}
+		EditorUtility.CollectDependencies(panels);
+#else
 		if (sprites.Count > 0)
 		{
 			// Combine all sprites into a single texture and save it
@@ -733,6 +801,7 @@ public class UIAtlasMaker : EditorWindow
 		atlas.MarkAsChanged();
 		Selection.activeGameObject = (NGUISettings.atlas != null) ? NGUISettings.atlas.gameObject : null;
 		EditorUtility.ClearProgressBar();
+#endif
 	}
 
 	/// <summary>
