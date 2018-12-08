@@ -115,9 +115,9 @@ public class UIStretch : MonoBehaviour
 
 		if (uiCamera == null) uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
 		mRoot = NGUITools.FindInParents<UIRoot>(gameObject);
-		
+
 		Update();
-		
+
 		mStarted = true;
 	}
 
@@ -251,7 +251,7 @@ public class UIStretch : MonoBehaviour
 
 			if (mSprite != null)
 			{
-				float multiplier = (mSprite.atlas != null) ? mSprite.atlas.pixelSize : 1f;
+				float multiplier = (mSprite.atlas != null) ? mSprite.pixelSize : 1f;
 				size.x -= borderPadding.x * multiplier;
 				size.y -= borderPadding.y * multiplier;
 
@@ -279,7 +279,7 @@ public class UIStretch : MonoBehaviour
 
 				if (style != Style.Vertical)
 					cr.z = size.x - borderPadding.x;
-				
+
 				if (style != Style.Horizontal)
 					cr.w = size.y - borderPadding.y;
 
@@ -290,11 +290,11 @@ public class UIStretch : MonoBehaviour
 			{
 				if (style != Style.Vertical)
 					size.x -= borderPadding.x;
-				
+
 				if (style != Style.Horizontal)
 					size.y -= borderPadding.y;
 			}
-			
+
 			if (mTrans.localScale != size)
 				mTrans.localScale = size;
 

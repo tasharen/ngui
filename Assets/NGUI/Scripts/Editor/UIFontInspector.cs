@@ -175,13 +175,14 @@ public class UIFontInspector : Editor
 		}
 		else
 		{
-			ComponentSelector.Draw<UIAtlas>(mFont.atlas, OnSelectAtlas, true);
+			ComponentSelector.Draw(mFont.atlas, OnSelectAtlas, true);
 
 			if (mFont.atlas != null)
 			{
 				if (mFont.bmFont.isValid)
 				{
-					NGUIEditorTools.DrawAdvancedSpriteField(mFont.atlas, mFont.spriteName, SelectSprite, false);
+					if (mFont.atlas is NGUIAtlas) NGUIEditorTools.DrawAdvancedSpriteField(mFont.atlas as NGUIAtlas, mFont.spriteName, SelectSprite, false);
+					else if (mFont.atlas is UIAtlas) NGUIEditorTools.DrawAdvancedSpriteField(mFont.atlas as UIAtlas, mFont.spriteName, SelectSprite, false);
 				}
 				EditorGUILayout.Space();
 			}
@@ -486,7 +487,7 @@ public class UIFontInspector : Editor
 
 		if (mFont.atlas != null)
 		{
-			UISpriteData sd = mFont.atlas.GetSprite(bf.spriteName);
+			var sd = mFont.GetSprite(bf.spriteName);
 			if (sd == null) return;
 			offsetX = sd.x;
 			offsetY = sd.y + mFont.texHeight - sd.paddingTop;

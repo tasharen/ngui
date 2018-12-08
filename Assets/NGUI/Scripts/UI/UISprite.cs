@@ -15,7 +15,7 @@ using System.Collections.Generic;
 public class UISprite : UIBasicSprite
 {
 	// Cached and saved values
-	[HideInInspector][SerializeField] UIAtlas mAtlas;
+	[HideInInspector][SerializeField] Object mAtlas;
 	[HideInInspector][SerializeField] string mSpriteName;
 
 	// Deprecated, no longer used
@@ -32,7 +32,13 @@ public class UISprite : UIBasicSprite
 	{
 		get
 		{
-			var mat = (mAtlas != null) ? mAtlas.spriteMaterial : null;
+			Material mat = null;
+
+			if (mAtlas != null)
+			{
+				if (mAtlas is NGUIAtlas) mat = (mAtlas as NGUIAtlas).spriteMaterial;
+				else if (mAtlas is UIAtlas) mat = (mAtlas as UIAtlas).spriteMaterial;
+			}
 			return (mat != null) ? mat.mainTexture : null;
 		}
 		set
@@ -51,7 +57,13 @@ public class UISprite : UIBasicSprite
 		{
 			var mat = base.material;
 			if (mat != null) return mat;
-			return (mAtlas != null ? mAtlas.spriteMaterial : null);
+
+			if (mAtlas != null)
+			{
+				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).spriteMaterial;
+				if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).spriteMaterial;
+			}
+			return null;
 		}
 		set
 		{
@@ -63,7 +75,7 @@ public class UISprite : UIBasicSprite
 	/// Atlas used by this widget.
 	/// </summary>
 
-	public UIAtlas atlas
+	public Object atlas
 	{
 		get
 		{
@@ -82,10 +94,28 @@ public class UISprite : UIBasicSprite
 				// Automatically choose the first sprite
 				if (string.IsNullOrEmpty(mSpriteName))
 				{
-					if (mAtlas != null && mAtlas.spriteList.Count > 0)
+					if (mAtlas != null)
 					{
-						SetAtlasSprite(mAtlas.spriteList[0]);
-						mSpriteName = mSprite.name;
+						if (mAtlas is NGUIAtlas)
+						{
+							var atl = (mAtlas as NGUIAtlas);
+
+							if (atl.spriteList.Count > 0)
+							{
+								SetAtlasSprite(atl.spriteList[0]);
+								mSpriteName = mSprite.name;
+							}
+						}
+						else if (mAtlas is UIAtlas)
+						{
+							var atl = (mAtlas as UIAtlas);
+
+							if (atl.spriteList.Count > 0)
+							{
+								SetAtlasSprite(atl.spriteList[0]);
+								mSpriteName = mSprite.name;
+							}
+						}
 					}
 				}
 
@@ -99,6 +129,19 @@ public class UISprite : UIBasicSprite
 				}
 			}
 		}
+	}
+
+	/// <summary>
+	/// Convenience method that returns the chosen sprite inside the atlas.
+	/// </summary>
+
+	public UISpriteData GetSprite (string spriteName)
+	{
+		var a = atlas;
+		if (a == null) return null;
+		if (a is NGUIAtlas) return (a as NGUIAtlas).GetSprite(spriteName);
+		if (a is UIAtlas) return (a as UIAtlas).GetSprite(spriteName);
+		return null;
 	}
 
 	public override void MarkAsChanged ()
@@ -269,7 +312,16 @@ public class UISprite : UIBasicSprite
 	/// Size of the pixel -- used for drawing.
 	/// </summary>
 
-	override public float pixelSize { get { return mAtlas != null ? mAtlas.pixelSize : 1f; } }
+	override public float pixelSize
+	{
+		get
+		{
+			if (mAtlas == null) return 1f;
+			if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).pixelSize;
+			if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).pixelSize;
+			return 1f;
+		}
+	}
 
 	/// <summary>
 	/// Minimum allowed width for this widget.
@@ -412,7 +464,18 @@ public class UISprite : UIBasicSprite
 	/// Whether the texture is using a premultiplied alpha material.
 	/// </summary>
 
-	public override bool premultipliedAlpha { get { return (mAtlas != null) && mAtlas.premultipliedAlpha; } }
+	public override bool premultipliedAlpha
+	{
+		get
+		{
+			if (mAtlas != null)
+			{
+				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).premultipliedAlpha;
+				if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).premultipliedAlpha;
+			}
+			return false;
+		}
+	}
 
 	/// <summary>
 	/// Retrieve the atlas sprite referenced by the spriteName field.
@@ -422,27 +485,60 @@ public class UISprite : UIBasicSprite
 	{
 		if (!mSpriteSet) mSprite = null;
 
-		if (mSprite == null && mAtlas != null)
+		if (mSprite == null)
 		{
-			if (!string.IsNullOrEmpty(mSpriteName))
+			if (mAtlas != null)
 			{
-				UISpriteData sp = mAtlas.GetSprite(mSpriteName);
-				if (sp == null) return null;
-				SetAtlasSprite(sp);
-			}
-
-			if (mSprite == null && mAtlas.spriteList.Count > 0)
-			{
-				UISpriteData sp = mAtlas.spriteList[0];
-				if (sp == null) return null;
-				SetAtlasSprite(sp);
-
-				if (mSprite == null)
+				if (mAtlas is NGUIAtlas)
 				{
-					Debug.LogError(mAtlas.name + " seems to have a null sprite!");
-					return null;
+					var atl = (mAtlas as NGUIAtlas);
+
+					if (!string.IsNullOrEmpty(mSpriteName))
+					{
+						var sp = atl.GetSprite(mSpriteName);
+						if (sp == null) return null;
+						SetAtlasSprite(sp);
+					}
+
+					if (mSprite == null && atl.spriteList.Count > 0)
+					{
+						var sp = atl.spriteList[0];
+						if (sp == null) return null;
+						SetAtlasSprite(sp);
+
+						if (mSprite == null)
+						{
+							Debug.LogError(atl.name + " seems to have a null sprite!");
+							return null;
+						}
+						mSpriteName = mSprite.name;
+					}
 				}
-				mSpriteName = mSprite.name;
+				else if (mAtlas is UIAtlas)
+				{
+					var atl = (mAtlas as UIAtlas);
+
+					if (!string.IsNullOrEmpty(mSpriteName))
+					{
+						var sp = atl.GetSprite(mSpriteName);
+						if (sp == null) return null;
+						SetAtlasSprite(sp);
+					}
+
+					if (mSprite == null && atl.spriteList.Count > 0)
+					{
+						var sp = atl.spriteList[0];
+						if (sp == null) return null;
+						SetAtlasSprite(sp);
+
+						if (mSprite == null)
+						{
+							Debug.LogError(atl.name + " seems to have a null sprite!");
+							return null;
+						}
+						mSpriteName = mSprite.name;
+					}
+				}
 			}
 		}
 		return mSprite;
@@ -543,8 +639,7 @@ public class UISprite : UIBasicSprite
 		var tex = mainTexture;
 		if (tex == null) return;
 
-		if (mSprite == null) mSprite = atlas.GetSprite(spriteName);
-		if (mSprite == null) return;
+		if ((!mSpriteSet || mSprite == null) && GetAtlasSprite() == null) return;
 
 		var outer = new Rect(mSprite.x, mSprite.y, mSprite.width, mSprite.height);
 		var inner = new Rect(mSprite.x + mSprite.borderLeft, mSprite.y + mSprite.borderTop,

@@ -1258,6 +1258,33 @@ static public class NGUITools
 	/// It will be sliced if the sprite has an inner rect, and a regular sprite otherwise.
 	/// </summary>
 
+	static public UISprite AddSprite (this GameObject go, UnityEngine.Object atlas, string spriteName, int depth = int.MaxValue)
+	{
+		if (atlas is NGUIAtlas) return AddSprite(go, atlas as NGUIAtlas, spriteName, depth);
+		if (atlas is UIAtlas) return AddSprite(go, atlas as UIAtlas, spriteName, depth);
+		return null;
+	}
+
+	/// <summary>
+	/// Add a sprite appropriate for the specified atlas sprite.
+	/// It will be sliced if the sprite has an inner rect, and a regular sprite otherwise.
+	/// </summary>
+
+	static public UISprite AddSprite (this GameObject go, NGUIAtlas atlas, string spriteName, int depth = int.MaxValue)
+	{
+		UISpriteData sp = (atlas != null) ? atlas.GetSprite(spriteName) : null;
+		UISprite sprite = AddWidget<UISprite>(go, depth);
+		sprite.type = (sp == null || !sp.hasBorder) ? UISprite.Type.Simple : UISprite.Type.Sliced;
+		sprite.atlas = atlas;
+		sprite.spriteName = spriteName;
+		return sprite;
+	}
+
+	/// <summary>
+	/// Add a sprite appropriate for the specified atlas sprite.
+	/// It will be sliced if the sprite has an inner rect, and a regular sprite otherwise.
+	/// </summary>
+
 	static public UISprite AddSprite (this GameObject go, UIAtlas atlas, string spriteName, int depth = int.MaxValue)
 	{
 		UISpriteData sp = (atlas != null) ? atlas.GetSprite(spriteName) : null;

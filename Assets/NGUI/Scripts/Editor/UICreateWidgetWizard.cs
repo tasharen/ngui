@@ -330,7 +330,7 @@ public class UICreateWidgetWizard : EditorWindow
 			go = NGUITools.AddChild(go);
 			go.name = "Image Button";
 
-			UISpriteData sp = NGUISettings.atlas.GetSprite(mImage0);
+			UISpriteData sp = NGUISettings.GetSprite(mImage0);
 			UISprite sprite = NGUITools.AddWidget<UISprite>(go);
 			sprite.type = sp.hasBorder ? UISprite.Type.Sliced : UISprite.Type.Simple;
 			sprite.name = "Background";
@@ -524,8 +524,8 @@ public class UICreateWidgetWizard : EditorWindow
 			go.name = slider ? "Slider" : "Progress Bar";
 
 			// Background sprite
-			UISpriteData bgs = NGUISettings.atlas.GetSprite(mSliderBG);
-			UISprite back = (UISprite)NGUITools.AddWidget<UISprite>(go);
+			var bgs = NGUISettings.GetSprite(mSliderBG);
+			var back = NGUITools.AddWidget<UISprite>(go);
 
 			back.type = bgs.hasBorder ? UISprite.Type.Sliced : UISprite.Type.Simple;
 			back.name = "Background";
@@ -539,7 +539,7 @@ public class UICreateWidgetWizard : EditorWindow
 			back.MakePixelPerfect();
 
 			// Foreground sprite
-			UISpriteData fgs = NGUISettings.atlas.GetSprite(mSliderFG);
+			UISpriteData fgs = NGUISettings.GetSprite(mSliderFG);
 			UISprite front = NGUITools.AddWidget<UISprite>(go);
 			front.type = fgs.hasBorder ? UISprite.Type.Sliced : UISprite.Type.Simple;
 			front.name = "Foreground";
@@ -561,7 +561,7 @@ public class UICreateWidgetWizard : EditorWindow
 			// Thumb sprite
 			if (slider)
 			{
-				UISpriteData tbs = NGUISettings.atlas.GetSprite(mSliderTB);
+				UISpriteData tbs = NGUISettings.GetSprite(mSliderTB);
 				UISprite thb = NGUITools.AddWidget<UISprite>(go);
 
 				thb.type = tbs.hasBorder ? UISprite.Type.Sliced : UISprite.Type.Simple;
@@ -663,8 +663,8 @@ public class UICreateWidgetWizard : EditorWindow
 			go = NGUITools.AddChild(go);
 			go.name = isDropDown ? "Popup List" : "Popup Menu";
 
-			UISpriteData sphl = NGUISettings.atlas.GetSprite(mListHL);
-			UISpriteData spfg = NGUISettings.atlas.GetSprite(mListFG);
+			UISpriteData sphl = NGUISettings.GetSprite(mListHL);
+			UISpriteData spfg = NGUISettings.GetSprite(mListFG);
 
 			Vector2 hlPadding = new Vector2(Mathf.Max(4f, sphl.paddingLeft), Mathf.Max(4f, sphl.paddingTop));
 			Vector2 fgPadding = new Vector2(Mathf.Max(4f, spfg.paddingLeft), Mathf.Max(4f, spfg.paddingTop));
@@ -755,7 +755,7 @@ public class UICreateWidgetWizard : EditorWindow
 		if (go == null)
 		{
 			GUILayout.Label("You must create a UI first.");
-			
+
 			if (GUILayout.Button("Open the New UI Wizard"))
 			{
 				EditorWindow.GetWindow<UICreateNewUIWizard>(false, "New UI", true);
@@ -766,7 +766,7 @@ public class UICreateWidgetWizard : EditorWindow
 			GUILayout.Space(4f);
 
 			GUILayout.BeginHorizontal();
-			ComponentSelector.Draw<UIAtlas>(NGUISettings.atlas, OnSelectAtlas, false, GUILayout.Width(140f));
+			ComponentSelector.Draw(NGUISettings.atlas, OnSelectAtlas, false, GUILayout.Width(140f));
 			GUILayout.Label("Texture atlas used by widgets", GUILayout.Width(10000f));
 			GUILayout.EndHorizontal();
 

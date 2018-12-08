@@ -98,7 +98,6 @@ static public class NGUIMenu
 	#endregion
 #region Create
 
-#if NGUI_SO
 	[MenuItem("NGUI/Create/Atlas", false, 6)]
 	static public void CreateAtlas ()
 	{
@@ -106,13 +105,12 @@ static public class NGUIMenu
 		if (string.IsNullOrEmpty(path)) return;
 
 		NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
-		var atlas = ScriptableObject.CreateInstance<UIAtlas>();
+		var atlas = ScriptableObject.CreateInstance<NGUIAtlas>();
 		AssetDatabase.CreateAsset(atlas, path);
 		AssetDatabase.SaveAssets();
 		AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 		Selection.activeObject = atlas;
 	}
-#endif
 
 	[MenuItem("NGUI/Create/Sprite &#s", false, 6)]
 	static public void AddSprite ()

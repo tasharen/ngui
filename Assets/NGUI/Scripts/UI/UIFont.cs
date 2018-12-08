@@ -25,7 +25,7 @@ public class UIFont : MonoBehaviour
 	[HideInInspector][SerializeField] Material mMat;
 	[HideInInspector][SerializeField] Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
 	[HideInInspector][SerializeField] BMFont mFont = new BMFont();
-	[HideInInspector][SerializeField] UIAtlas mAtlas;
+	[HideInInspector][SerializeField] Object mAtlas;
 	[HideInInspector][SerializeField] UIFont mReplacement;
 
 	// List of symbols, such as emoticons like ":)", ":(", etc
@@ -109,11 +109,12 @@ public class UIFont : MonoBehaviour
 	/// Atlas used by the font, if any.
 	/// </summary>
 
-	public UIAtlas atlas
+	public Object atlas
 	{
 		get
 		{
-			return (mReplacement != null) ? mReplacement.atlas : mAtlas;
+			if (mReplacement != null) return mReplacement.atlas;
+			return mAtlas;
 		}
 		set
 		{
@@ -128,12 +129,27 @@ public class UIFont : MonoBehaviour
 
 				if (mAtlas != null)
 				{
-					mMat = mAtlas.spriteMaterial;
+					if (mAtlas is NGUIAtlas) mMat = (mAtlas as NGUIAtlas).spriteMaterial;
+					else if (mAtlas is UIAtlas) mMat = (mAtlas as UIAtlas).spriteMaterial;
+					else { mAtlas = null; mMat = null; }
 					if (sprite != null) mUVRect = uvRect;
 				}
 				MarkAsChanged();
 			}
 		}
+	}
+
+	/// <summary>
+	/// Convenience method that returns the chosen sprite inside the atlas.
+	/// </summary>
+
+	public UISpriteData GetSprite (string spriteName)
+	{
+		var a = atlas;
+		if (a == null) return null;
+		if (a is NGUIAtlas) return (a as NGUIAtlas).GetSprite(spriteName);
+		if (a is UIAtlas) return (a as UIAtlas).GetSprite(spriteName);
+		return null;
 	}
 
 	/// <summary>
@@ -146,7 +162,11 @@ public class UIFont : MonoBehaviour
 		{
 			if (mReplacement != null) return mReplacement.material;
 
-			if (mAtlas != null) return mAtlas.spriteMaterial;
+			if (mAtlas != null)
+			{
+				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).spriteMaterial;
+				else if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).spriteMaterial;
+			}
 
 			if (mMat != null)
 			{
@@ -195,7 +215,11 @@ public class UIFont : MonoBehaviour
 		{
 			if (mReplacement != null) return mReplacement.premultipliedAlphaShader;
 
-			if (mAtlas != null) return mAtlas.premultipliedAlpha;
+			if (mAtlas != null)
+			{
+				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).premultipliedAlpha;
+				else if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).premultipliedAlpha;
+			}
 
 			if (mPMA == -1)
 			{
@@ -335,16 +359,21 @@ public class UIFont : MonoBehaviour
 		{
 			if (mReplacement != null) return mReplacement.sprite;
 
-			if (mSprite == null && mAtlas != null && !string.IsNullOrEmpty(mFont.spriteName))
+			if (mSprite == null && mAtlas != null && mFont != null && !string.IsNullOrEmpty(mFont.spriteName))
 			{
-				mSprite = mAtlas.GetSprite(mFont.spriteName);
+				if (mAtlas is NGUIAtlas) mSprite = (mAtlas as NGUIAtlas).GetSprite(mFont.spriteName);
+				else if (mAtlas is UIAtlas) mSprite = (mAtlas as UIAtlas).GetSprite(mFont.spriteName);
 
-				if (mSprite == null) mSprite = mAtlas.GetSprite(name);
+				if (mSprite == null)
+				{
+					if (mAtlas is NGUIAtlas) mSprite = (mAtlas as NGUIAtlas).GetSprite(name);
+					else if (mAtlas is UIAtlas) mSprite = (mAtlas as UIAtlas).GetSprite(name);
+				}
+
 				if (mSprite == null) mFont.spriteName = null;
 				else UpdateUVRect();
 
-				for (int i = 0, imax = mSymbols.Count; i < imax; ++i)
-					symbols[i].MarkAsChanged();
+				for (int i = 0, imax = mSymbols.Count; i < imax; ++i) symbols[i].MarkAsChanged();
 			}
 			return mSprite;
 		}
@@ -446,7 +475,9 @@ public class UIFont : MonoBehaviour
 
 	void Trim ()
 	{
-		Texture tex = mAtlas.texture;
+		Texture tex = null;
+		if (mAtlas is NGUIAtlas) tex = (mAtlas as NGUIAtlas).texture;
+		else if (mAtlas is UIAtlas) tex = (mAtlas as UIAtlas).texture;
 
 		if (tex != null && mSprite != null)
 		{
@@ -534,7 +565,10 @@ public class UIFont : MonoBehaviour
 	public void UpdateUVRect ()
 	{
 		if (mAtlas == null) return;
-		Texture tex = mAtlas.texture;
+
+		Texture tex = null;
+		if (mAtlas is NGUIAtlas) tex = (mAtlas as NGUIAtlas).texture;
+		else if (mAtlas is UIAtlas) tex = (mAtlas as UIAtlas).texture;
 
 		if (tex != null)
 		{

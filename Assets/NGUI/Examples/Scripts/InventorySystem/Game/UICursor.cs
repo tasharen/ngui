@@ -21,7 +21,7 @@ public class UICursor : MonoBehaviour
 	Transform mTrans;
 	UISprite mSprite;
 
-	UIAtlas mAtlas;
+	Object mAtlas;
 	string mSpriteName;
 
 	/// <summary>
@@ -39,10 +39,10 @@ public class UICursor : MonoBehaviour
 	{
 		mTrans = transform;
 		mSprite = GetComponentInChildren<UISprite>();
-		
+
 		if (uiCamera == null)
 			uiCamera = NGUITools.FindCameraForLayer(gameObject.layer);
-		
+
 		if (mSprite != null)
 		{
 			mAtlas = mSprite.atlas;
@@ -105,7 +105,7 @@ public class UICursor : MonoBehaviour
 	/// Override the cursor with the specified sprite.
 	/// </summary>
 
-	static public void Set (UIAtlas atlas, string sprite)
+	static public void Set (Object atlas, string sprite)
 	{
 		if (instance != null && instance.mSprite)
 		{

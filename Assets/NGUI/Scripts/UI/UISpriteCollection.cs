@@ -39,15 +39,14 @@ public class UISpriteCollection : UIBasicSprite
 		/// Calculate the sprite's drawing dimensions.
 		/// </summary>
 
-		public Vector4 GetDrawingDimensions (UIAtlas atlas)
+		public Vector4 GetDrawingDimensions (float pixelSize)
 		{
 			var x0 = -pivot.x * width;
 			var y0 = -pivot.y * height;
 			var x1 = x0 + width;
 			var y1 = y0 + height;
-			var pixelSize = (atlas != null) ? atlas.pixelSize : 1f;
 
-			if (sprite != null && atlas != null && type != Type.Tiled)
+			if (sprite != null && type != Type.Tiled)
 			{
 				var padLeft = sprite.paddingLeft;
 				var padBottom = sprite.paddingBottom;
@@ -102,7 +101,7 @@ public class UISpriteCollection : UIBasicSprite
 		}
 	}
 
-	[HideInInspector, SerializeField] UIAtlas mAtlas;
+	[HideInInspector, SerializeField] Object mAtlas;
 
 	// List of individual sprites
 	[System.NonSerialized] Dictionary<object, Sprite> mSprites = new Dictionary<object, Sprite>();
@@ -118,7 +117,9 @@ public class UISpriteCollection : UIBasicSprite
 	{
 		get
 		{
-			var mat = (mAtlas != null) ? mAtlas.spriteMaterial : null;
+			Material mat = null;
+			if (mAtlas is NGUIAtlas) mat = (mAtlas as NGUIAtlas).spriteMaterial;
+			else if (mAtlas is UIAtlas) mat = (mAtlas as UIAtlas).spriteMaterial;
 			return (mat != null) ? mat.mainTexture : null;
 		}
 		set
@@ -137,7 +138,13 @@ public class UISpriteCollection : UIBasicSprite
 		{
 			var mat = base.material;
 			if (mat != null) return mat;
-			return (mAtlas != null ? mAtlas.spriteMaterial : null);
+
+			if (mAtlas != null)
+			{
+				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).spriteMaterial;
+				if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).spriteMaterial;
+			}
+			return null;
 		}
 		set
 		{
@@ -149,7 +156,7 @@ public class UISpriteCollection : UIBasicSprite
 	/// Atlas used by this widget.
 	/// </summary>
 
-	public UIAtlas atlas
+	public Object atlas
 	{
 		get
 		{
@@ -171,13 +178,35 @@ public class UISpriteCollection : UIBasicSprite
 	/// Size of the pixel -- used for drawing.
 	/// </summary>
 
-	override public float pixelSize { get { return mAtlas != null ? mAtlas.pixelSize : 1f; } }
+	override public float pixelSize
+	{
+		get
+		{
+			if (mAtlas != null)
+			{
+				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).pixelSize;
+				if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).pixelSize;
+			}
+			return 1f;
+		}
+	}
 
 	/// <summary>
 	/// Whether the texture is using a premultiplied alpha material.
 	/// </summary>
 
-	public override bool premultipliedAlpha { get { return (mAtlas != null) && mAtlas.premultipliedAlpha; } }
+	public override bool premultipliedAlpha
+	{
+		get
+		{
+			if (mAtlas != null)
+			{
+				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).premultipliedAlpha;
+				if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).premultipliedAlpha;
+			}
+			return false;
+		}
+	}
 
 	// <summary>
 	/// Sliced sprites generally have a border. X = left, Y = bottom, Z = right, W = top.
@@ -246,7 +275,7 @@ public class UISpriteCollection : UIBasicSprite
 			mInnerUV = NGUIMath.ConvertToTexCoords(inner, tex.width, tex.height);
 			mFlip = ent.flip;
 
-			var v = ent.GetDrawingDimensions(mAtlas);
+			var v = ent.GetDrawingDimensions(pixelSize);
 			var u = drawingUVs;
 
 			if (premultipliedAlpha) c = NGUITools.ApplyPMA(c);
@@ -344,7 +373,13 @@ public class UISpriteCollection : UIBasicSprite
 		}
 
 		var sprite = new Sprite();
-		sprite.sprite = mAtlas.GetSprite(spriteName);
+
+		if (mAtlas != null)
+		{
+			if (mAtlas is NGUIAtlas) sprite.sprite = (mAtlas as NGUIAtlas).GetSprite(spriteName);
+			else if (mAtlas is UIAtlas) sprite.sprite = (mAtlas as UIAtlas).GetSprite(spriteName);
+		}
+
 		if (sprite.sprite == null) return;
 
 		sprite.pos = pos;
@@ -526,7 +561,7 @@ public class UISpriteCollection : UIBasicSprite
 			var v = pos - ent.pos;
 			if (ent.rot != 0f) v = Rotate(v, -ent.rot);
 
-			var dims = ent.GetDrawingDimensions(mAtlas);
+			var dims = ent.GetDrawingDimensions(pixelSize);
 
 			if (v.x < dims.x) continue;
 			if (v.y < dims.y) continue;
@@ -552,7 +587,7 @@ public class UISpriteCollection : UIBasicSprite
 			var v = pos - ent.pos;
 			if (ent.rot != 0f) v = Rotate(v, -ent.rot);
 
-			var dims = ent.GetDrawingDimensions(mAtlas);
+			var dims = ent.GetDrawingDimensions(pixelSize);
 
 			if (v.x < dims.x) continue;
 			if (v.y < dims.y) continue;

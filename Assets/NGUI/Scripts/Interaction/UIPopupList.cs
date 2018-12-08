@@ -42,7 +42,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Atlas used by the sprites.
 	/// </summary>
 
-	public UIAtlas atlas;
+	public Object atlas;
 
 	/// <summary>
 	/// Font used by the labels.
@@ -209,7 +209,7 @@ public class UIPopupList : UIWidgetContainer
 	/// <summary>
 	/// Amount by which the popup's border will overlap with the content that opened it.
 	/// </summary>
-	
+
 	public int overlap = 0;
 
 	[DoNotObfuscateNGUI] public enum OpenOn
@@ -663,9 +663,16 @@ public class UIPopupList : UIWidgetContainer
 	protected virtual Vector3 GetHighlightPosition ()
 	{
 		if (mHighlightedLabel == null || mHighlight == null) return Vector3.zero;
-		
+
 		Vector4 border = mHighlight.border;
-		float scaleFactor = (atlas != null) ? atlas.pixelSize : 1f;
+		float scaleFactor = 1f;
+
+		if (atlas != null)
+		{
+			if (atlas is NGUIAtlas) scaleFactor = (atlas as NGUIAtlas).pixelSize;
+			else if (atlas is UIAtlas) scaleFactor = (atlas as UIAtlas).pixelSize;
+		}
+
 		float offsetX = border.x * scaleFactor;
 		float offsetY = border.w * scaleFactor;
 		return mHighlightedLabel.cachedTransform.localPosition + new Vector3(-offsetX, offsetY, 1f);
@@ -683,7 +690,7 @@ public class UIPopupList : UIWidgetContainer
 		if (mHighlight != null && mHighlightedLabel != null)
 		{
 			TweenPosition tp = mHighlight.GetComponent<TweenPosition>();
-			
+
 			while (tp != null && tp.enabled)
 			{
 				tp.to = GetHighlightPosition();
@@ -1022,7 +1029,7 @@ public class UIPopupList : UIWidgetContainer
 				panel.depth = 1000000;
 				panel.sortingOrder = mPanel.sortingOrder;
 			}
-			
+
 			current = this;
 
 			var pTrans = mPanel.cachedTransform;
@@ -1216,7 +1223,15 @@ public class UIPopupList : UIWidgetContainer
 			}
 
 			// Scale the highlight sprite to envelop a single item
-			float scaleFactor = (atlas != null) ? 2f * atlas.pixelSize : 2f;
+
+			float scaleFactor = 2f;
+
+			if (atlas != null)
+			{
+				if (atlas is NGUIAtlas) scaleFactor *= (atlas as NGUIAtlas).pixelSize;
+				else if (atlas is UIAtlas) scaleFactor *= (atlas as UIAtlas).pixelSize;
+			}
+
 			float w = x - (bgPadding.x + padding.x) * 2f + hlspLeft * scaleFactor;
 			float h = labelHeight + hlspHeight * scaleFactor;
 			mHighlight.width = Mathf.RoundToInt(w);

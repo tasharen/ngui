@@ -21,11 +21,13 @@ public class UISpriteInspector : UIBasicSpriteEditor
 	void OnSelectAtlas (Object obj)
 	{
 		serializedObject.Update();
-		SerializedProperty sp = serializedObject.FindProperty("mAtlas");
-		sp.objectReferenceValue = obj;
+
+		var oldAtlas = serializedObject.FindProperty("mAtlas");
+		if (oldAtlas != null) oldAtlas.objectReferenceValue = obj;
+
 		serializedObject.ApplyModifiedProperties();
 		NGUITools.SetDirty(serializedObject.targetObject);
-		NGUISettings.atlas = obj as UIAtlas;
+		NGUISettings.atlas = obj;
 	}
 
 	/// <summary>
@@ -48,24 +50,35 @@ public class UISpriteInspector : UIBasicSpriteEditor
 
 	protected override bool ShouldDrawProperties ()
 	{
+		var atlasProp = serializedObject.FindProperty("mAtlas");
+		var oldAtlas = atlasProp.objectReferenceValue as UIAtlas;
+		var newAtlas = atlasProp.objectReferenceValue as NGUIAtlas;
+
 		GUILayout.BeginHorizontal();
+
 		if (NGUIEditorTools.DrawPrefixButton("Atlas"))
-			ComponentSelector.Show<UIAtlas>(OnSelectAtlas);
-		SerializedProperty atlas = NGUIEditorTools.DrawProperty("", serializedObject, "mAtlas", GUILayout.MinWidth(20f));
+		{
+			if (oldAtlas != null) ComponentSelector.Show<UIAtlas>(OnSelectAtlas);
+			else ComponentSelector.Show<NGUIAtlas>(OnSelectAtlas);
+		}
+
+		var atlas = NGUIEditorTools.DrawProperty("", serializedObject, "mAtlas", GUILayout.MinWidth(20f));
 
 		if (GUILayout.Button("Edit", GUILayout.Width(40f)))
 		{
 			if (atlas != null)
 			{
-				UIAtlas atl = atlas.objectReferenceValue as UIAtlas;
-				NGUISettings.atlas = atl;
-				if (atl != null) NGUIEditorTools.Select(atl);
+				var obj = atlas.objectReferenceValue;
+				NGUISettings.atlas = obj;
+				if (obj != null) NGUIEditorTools.Select(obj);
 			}
 		}
-		GUILayout.EndHorizontal();
 
+		GUILayout.EndHorizontal();
 		SerializedProperty sp = serializedObject.FindProperty("mSpriteName");
-		NGUIEditorTools.DrawAdvancedSpriteField(atlas.objectReferenceValue as UIAtlas, sp.stringValue, SelectSprite, false);
+
+		if (oldAtlas != null) NGUIEditorTools.DrawAdvancedSpriteField(oldAtlas, sp.stringValue, SelectSprite, false);
+		else if (newAtlas != null) NGUIEditorTools.DrawAdvancedSpriteField(newAtlas, sp.stringValue, SelectSprite, false);
 
 		NGUIEditorTools.DrawProperty("Material", serializedObject, "mMat");
 		return true;
@@ -92,7 +105,7 @@ public class UISpriteInspector : UIBasicSpriteEditor
 		Texture2D tex = sprite.mainTexture as Texture2D;
 		if (tex == null) return;
 
-		UISpriteData sd = sprite.atlas.GetSprite(sprite.spriteName);
+		UISpriteData sd = sprite.GetSprite(sprite.spriteName);
 		NGUIEditorTools.DrawSprite(tex, rect, sd, sprite.color);
 	}
 }

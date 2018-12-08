@@ -131,7 +131,7 @@ public class UIFontMaker : EditorWindow
 			{
 				NGUIEditorTools.DrawHeader("Output", true);
 				NGUIEditorTools.BeginContents(false);
-				ComponentSelector.Draw<UIAtlas>(NGUISettings.atlas, OnSelectAtlas, false);
+				ComponentSelector.Draw(NGUISettings.atlas, OnSelectAtlas, false);
 				NGUIEditorTools.EndContents();
 			}
 			EditorGUI.EndDisabledGroup();
@@ -350,7 +350,7 @@ public class UIFontMaker : EditorWindow
 				{
 					NGUIEditorTools.DrawHeader("Output", true);
 					NGUIEditorTools.BeginContents(false);
-					ComponentSelector.Draw<UIAtlas>(NGUISettings.atlas, OnSelectAtlas, false);
+					ComponentSelector.Draw(NGUISettings.atlas, OnSelectAtlas, false);
 					NGUIEditorTools.EndContents();
 
 					if (ttf == null)

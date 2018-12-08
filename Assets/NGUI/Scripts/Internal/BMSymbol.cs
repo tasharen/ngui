@@ -44,7 +44,7 @@ public class BMSymbol
 	/// Validate this symbol, given the specified atlas.
 	/// </summary>
 
-	public bool Validate (UIAtlas atlas)
+	public bool Validate (Object atlas)
 	{
 		if (atlas == null) return false;
 
@@ -56,12 +56,21 @@ public class BMSymbol
 		{
 			if (string.IsNullOrEmpty(spriteName)) return false;
 
-			mSprite = (atlas != null) ? atlas.GetSprite(spriteName) : null;
+			Texture tex = null;
+
+			if (atlas is NGUIAtlas)
+			{
+				mSprite = (atlas as NGUIAtlas).GetSprite(spriteName);
+				tex = (atlas as NGUIAtlas).texture;
+			}
+			else if (atlas is UIAtlas)
+			{
+				mSprite = (atlas as UIAtlas).GetSprite(spriteName);
+				tex = (atlas as UIAtlas).texture;
+			}
 
 			if (mSprite != null)
 			{
-				Texture tex = atlas.texture;
-
 				if (tex == null)
 				{
 					mSprite = null;

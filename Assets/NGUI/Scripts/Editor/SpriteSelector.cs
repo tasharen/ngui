@@ -36,13 +36,14 @@ public class SpriteSelector : ScriptableWizard
 	{
 		NGUIEditorTools.SetLabelWidth(80f);
 
-		if (NGUISettings.atlas == null)
+		var atlas = NGUISettings.atlas;
+
+		if (atlas == null)
 		{
 			GUILayout.Label("No Atlas selected.", "LODLevelNotifyText");
 		}
 		else
 		{
-			UIAtlas atlas = NGUISettings.atlas;
 			bool close = false;
 			GUILayout.Label(atlas.name + " Sprites", "LODLevelNotifyText");
 			NGUIEditorTools.DrawSeparator();
@@ -62,7 +63,10 @@ public class SpriteSelector : ScriptableWizard
 			GUILayout.Space(84f);
 			GUILayout.EndHorizontal();
 
-			Texture2D tex = atlas.texture as Texture2D;
+			Texture2D tex = null;
+
+			if (atlas is NGUIAtlas) tex = (atlas as NGUIAtlas).texture as Texture2D;
+			else if (atlas is UIAtlas) tex = (atlas as UIAtlas).texture as Texture2D;
 
 			if (tex == null)
 			{
@@ -70,8 +74,17 @@ public class SpriteSelector : ScriptableWizard
 				return;
 			}
 
-			BetterList<string> sprites = atlas.GetListOfSprites(NGUISettings.partialSprite);
-			
+			BetterList<string> sprites = null;
+
+			if (atlas is NGUIAtlas) sprites = (atlas as NGUIAtlas).GetListOfSprites(NGUISettings.partialSprite);
+			else if (atlas is UIAtlas) sprites = (atlas as UIAtlas).GetListOfSprites(NGUISettings.partialSprite);
+
+			if (sprites == null)
+			{
+				GUILayout.Label("No sprites found");
+				return;
+			}
+
 			float size = 80f;
 			float padded = size + 10f;
 #if UNITY_4_7
@@ -98,7 +111,10 @@ public class SpriteSelector : ScriptableWizard
 
 					for (; offset < sprites.size; ++offset)
 					{
-						UISpriteData sprite = atlas.GetSprite(sprites[offset]);
+						UISpriteData sprite = null;
+
+						if (atlas is NGUIAtlas) sprite = (atlas as NGUIAtlas).GetSprite(sprites[offset]);
+						else if (atlas is UIAtlas) sprite = (atlas as UIAtlas).GetSprite(sprites[offset]);
 						if (sprite == null) continue;
 
 						// Button comes first
@@ -138,15 +154,15 @@ public class SpriteSelector : ScriptableWizard
 							NGUIEditorTools.DrawTiledTexture(rect, NGUIEditorTools.backdropTexture);
 							Rect uv = new Rect(sprite.x, sprite.y, sprite.width, sprite.height);
 							uv = NGUIMath.ConvertToTexCoords(uv, tex.width, tex.height);
-	
+
 							// Calculate the texture's scale that's needed to display the sprite in the clipped area
 							float scaleX = rect.width / uv.width;
 							float scaleY = rect.height / uv.height;
-	
+
 							// Stretch the sprite so that it will appear proper
 							float aspect = (scaleY / scaleX) / ((float)tex.height / tex.width);
 							Rect clipRect = rect;
-	
+
 							if (aspect != 1f)
 							{
 								if (aspect < 1f)
@@ -164,9 +180,9 @@ public class SpriteSelector : ScriptableWizard
 									clipRect.yMax -= padding;
 								}
 							}
-	
+
 							GUI.DrawTextureWithTexCoords(clipRect, tex, uv);
-	
+
 							// Draw the selection
 							if (NGUISettings.selectedSprite == sprite.name)
 							{

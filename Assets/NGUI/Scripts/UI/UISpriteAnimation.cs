@@ -106,23 +106,38 @@ public class UISpriteAnimation : MonoBehaviour
 		if (mSprite == null) mSprite = GetComponent<UISprite>();
 		mSpriteNames.Clear();
 
-		if (mSprite != null && mSprite.atlas != null)
+		if (mSprite != null)
 		{
-			List<UISpriteData> sprites = mSprite.atlas.spriteList;
+			var atlas = mSprite.atlas;
 
-			for (int i = 0, imax = sprites.Count; i < imax; ++i)
+			if (atlas != null)
 			{
-				UISpriteData sprite = sprites[i];
-
-				if (string.IsNullOrEmpty(mPrefix) || sprite.name.StartsWith(mPrefix))
+				if (atlas is NGUIAtlas)
 				{
-					mSpriteNames.Add(sprite.name);
+					var sprites = (atlas as NGUIAtlas).spriteList;
+
+					for (int i = 0, imax = sprites.Count; i < imax; ++i)
+					{
+						var sprite = sprites[i];
+						if (string.IsNullOrEmpty(mPrefix) || sprite.name.StartsWith(mPrefix)) mSpriteNames.Add(sprite.name);
+					}
+					mSpriteNames.Sort();
+				}
+				else if (atlas is UIAtlas)
+				{
+					var sprites = (atlas as UIAtlas).spriteList;
+
+					for (int i = 0, imax = sprites.Count; i < imax; ++i)
+					{
+						var sprite = sprites[i];
+						if (string.IsNullOrEmpty(mPrefix) || sprite.name.StartsWith(mPrefix)) mSpriteNames.Add(sprite.name);
+					}
+					mSpriteNames.Sort();
 				}
 			}
-			mSpriteNames.Sort();
 		}
 	}
-	
+
 	/// <summary>
 	/// Reset the animation to the beginning.
 	/// </summary>

@@ -9,13 +9,13 @@ using System.Collections.Generic;
 using System.IO;
 
 /// <summary>
-/// Inspector class used to edit the UIAtlas.
+/// Inspector class used to edit the NGUI Atlas.
 /// </summary>
 
-[CustomEditor(typeof(UIAtlas))]
-public class UIAtlasInspector : Editor
+[CustomEditor(typeof(NGUIAtlas))]
+public class NGUIAtlasInspector : Editor
 {
-	static public UIAtlasInspector instance;
+	static public NGUIAtlasInspector instance;
 
 	enum AtlasType
 	{
@@ -23,11 +23,11 @@ public class UIAtlasInspector : Editor
 		Reference,
 	}
 
-	UIAtlas mAtlas;
+	NGUIAtlas mAtlas;
 	AtlasType mType = AtlasType.Normal;
-	UIAtlas mReplacement = null;
+	NGUIAtlas mReplacement = null;
 
-	void OnEnable () { instance = this; mAtlas = target as UIAtlas; }
+	void OnEnable () { instance = this; mAtlas = target as NGUIAtlas; }
 	void OnDisable () { instance = null; }
 
 	/// <summary>
@@ -43,9 +43,9 @@ public class UIAtlasInspector : Editor
 
 		foreach (UISprite sp in sprites)
 		{
-			if (UIAtlas.CheckIfRelated(sp.atlas as UIAtlas, mAtlas) && sp.spriteName == sprite.name)
+			if (NGUIAtlas.CheckIfRelated(sp.atlas as NGUIAtlas, mAtlas) && sp.spriteName == sprite.name)
 			{
-				var atl = sp.atlas as UIAtlas;
+				var atl = sp.atlas as NGUIAtlas;
 				sp.atlas = null;
 				sp.atlas = atl;
 				NGUITools.SetDirty(sp);
@@ -56,7 +56,7 @@ public class UIAtlasInspector : Editor
 
 		foreach (UILabel lbl in labels)
 		{
-			if (lbl.bitmapFont != null && UIAtlas.CheckIfRelated(lbl.bitmapFont.atlas as UIAtlas, mAtlas) && lbl.bitmapFont.UsesSprite(sprite.name))
+			if (lbl.bitmapFont != null && NGUIAtlas.CheckIfRelated(lbl.bitmapFont.atlas as NGUIAtlas, mAtlas) && lbl.bitmapFont.UsesSprite(sprite.name))
 			{
 				UIFont font = lbl.bitmapFont;
 				lbl.bitmapFont = null;
@@ -78,7 +78,7 @@ public class UIAtlasInspector : Editor
 			//NGUIEditorTools.RegisterUndo("Atlas Change");
 			//NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
 
-			mAtlas.replacement = obj as UIAtlas;
+			mAtlas.replacement = obj as NGUIAtlas;
 			mReplacement = mAtlas.replacement;
 			NGUITools.SetDirty(mAtlas);
 			if (mReplacement == null) mType = AtlasType.Normal;
@@ -129,7 +129,7 @@ public class UIAtlasInspector : Editor
 
 		if (mType == AtlasType.Reference)
 		{
-			ComponentSelector.Draw<UIAtlas>(mAtlas.replacement, OnSelectAtlas, true);
+			ComponentSelector.Draw<NGUIAtlas>(mAtlas.replacement, OnSelectAtlas, true);
 
 			GUILayout.Space(6f);
 			EditorGUILayout.HelpBox("You can have one atlas simply point to " +
@@ -166,6 +166,19 @@ public class UIAtlasInspector : Editor
 
 		if (mat != null)
 		{
+			TextAsset ta = EditorGUILayout.ObjectField("TP Import", null, typeof(TextAsset), false) as TextAsset;
+
+			if (ta != null)
+			{
+				// Ensure that this atlas has valid import settings
+				if (mAtlas.texture != null) NGUIEditorTools.ImportTexture(mAtlas.texture, false, false, !mAtlas.premultipliedAlpha);
+
+				NGUIEditorTools.RegisterUndo("Import Sprites", mAtlas);
+				NGUIJson.LoadSpriteData(mAtlas, ta);
+				if (sprite != null) sprite = mAtlas.GetSprite(sprite.name);
+				mAtlas.MarkAsChanged();
+			}
+
 			float pixelSize = EditorGUILayout.FloatField("Pixel Size", mAtlas.pixelSize, GUILayout.Width(120f));
 
 			if (pixelSize != mAtlas.pixelSize)

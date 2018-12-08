@@ -21,11 +21,13 @@ public class UISpriteCollectionEditor : UIWidgetInspector
 	void OnSelectAtlas (Object obj)
 	{
 		serializedObject.Update();
-		SerializedProperty sp = serializedObject.FindProperty("mAtlas");
-		sp.objectReferenceValue = obj;
+
+		var oldAtlas = serializedObject.FindProperty("mAtlas");
+		if (oldAtlas != null) oldAtlas.objectReferenceValue = obj;
+
 		serializedObject.ApplyModifiedProperties();
 		NGUITools.SetDirty(serializedObject.targetObject);
-		NGUISettings.atlas = obj as UIAtlas;
+		NGUISettings.atlas = obj;
 	}
 
 	/// <summary>
@@ -35,19 +37,20 @@ public class UISpriteCollectionEditor : UIWidgetInspector
 	protected override bool ShouldDrawProperties ()
 	{
 		GUILayout.BeginHorizontal();
-		if (NGUIEditorTools.DrawPrefixButton("Atlas"))
-			ComponentSelector.Show<UIAtlas>(OnSelectAtlas);
-		SerializedProperty atlas = NGUIEditorTools.DrawProperty("", serializedObject, "mAtlas", GUILayout.MinWidth(20f));
+		if (NGUIEditorTools.DrawPrefixButton("Atlas")) ComponentSelector.Show<NGUIAtlas>(OnSelectAtlas);
+
+		var atlas = NGUIEditorTools.DrawProperty("", serializedObject, "mAtlas", GUILayout.MinWidth(20f));
 
 		if (GUILayout.Button("Edit", GUILayout.Width(40f)))
 		{
 			if (atlas != null)
 			{
-				UIAtlas atl = atlas.objectReferenceValue as UIAtlas;
-				NGUISettings.atlas = atl;
-				if (atl != null) NGUIEditorTools.Select(atl);
+				var obj = atlas.objectReferenceValue;
+				NGUISettings.atlas = obj;
+				if (obj != null) NGUIEditorTools.Select(obj);
 			}
 		}
+
 		GUILayout.EndHorizontal();
 
 		NGUIEditorTools.DrawProperty("Material", serializedObject, "mMat");

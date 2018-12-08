@@ -110,7 +110,7 @@ public class NGUISettings
 	/// </summary>
 
 	static public string GetString (string name, string defaultValue) { return EditorPrefs.GetString(name, defaultValue); }
-	
+
 	/// <summary>
 	/// Get a previously saved color value.
 	/// </summary>
@@ -139,7 +139,7 @@ public class NGUISettings
 		string val = GetString(name, defaultValue.ToString());
 		string[] names = System.Enum.GetNames(typeof(T));
 		System.Array values = System.Enum.GetValues(typeof(T));
-		
+
 		for (int i = 0; i < names.Length; ++i)
 		{
 			if (names[i] == val)
@@ -156,9 +156,9 @@ public class NGUISettings
 	{
 		string path = EditorPrefs.GetString(name);
 		if (string.IsNullOrEmpty(path)) return null;
-		
+
 		T retVal = NGUIEditorTools.LoadAsset<T>(path);
-		
+
 		if (retVal == null)
 		{
 			int id;
@@ -217,7 +217,7 @@ public class NGUISettings
 	{
 		get
 		{
-			Font fnt = Get<Font>("NGUI Dynamic Font", null);
+			var fnt = Get<Font>("NGUI Dynamic Font", null);
 			if (fnt != null) return fnt;
 			return Get<UIFont>("NGUI Bitmap Font", null);
 		}
@@ -241,10 +241,40 @@ public class NGUISettings
 		}
 	}
 
-	static public UIAtlas atlas
+	static public Object atlas
 	{
-		get { return Get<UIAtlas>("NGUI Atlas", null); }
-		set { Set("NGUI Atlas", value); }
+		get
+		{
+			var atl = Get<NGUIAtlas>("NGUI Atlas 2", null);
+			if (atl != null) return atl;
+			return Get<UIAtlas>("NGUI Atlas", null);
+		}
+		set
+		{
+			if (value == null)
+			{
+				Set("NGUI Atlas", null);
+				Set("NGUI Atlas 2", null);
+			}
+			else if (value is NGUIAtlas)
+			{
+				Set("NGUI Atlas", null);
+				Set("NGUI Atlas 2", value as NGUIAtlas);
+			}
+			else if (value is UIAtlas)
+			{
+				Set("NGUI Atlas", value as UIAtlas);
+				Set("NGUI Atlas 2", null);
+			}
+		}
+	}
+
+	static public UISpriteData GetSprite (string spriteName)
+	{
+		var atlas = NGUISettings.atlas;
+		if (atlas is NGUIAtlas) return (atlas as NGUIAtlas).GetSprite(spriteName);
+		if (atlas is UIAtlas) return (atlas as UIAtlas).GetSprite(spriteName);
+		return null;
 	}
 
 	static public Texture texture
@@ -519,12 +549,8 @@ public class NGUISettings
 		w.atlas = atlas;
 		w.spriteName = selectedSprite;
 
-		if (w.atlas != null && !string.IsNullOrEmpty(w.spriteName))
-		{
-			UISpriteData sp = w.atlas.GetSprite(w.spriteName);
-			if (sp != null && sp.hasBorder)
-				w.type = UISprite.Type.Sliced;
-		}
+		var sp = w.GetAtlasSprite();
+		if (sp != null && sp.hasBorder) w.type = UISprite.Type.Sliced;
 
 		w.pivot = pivot;
 		w.width = 100;
