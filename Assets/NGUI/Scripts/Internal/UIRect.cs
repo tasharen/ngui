@@ -1,5 +1,5 @@
 //-------------------------------------------------
-//            NGUI: Next-Gen UI kit
+//			  NGUI: Next-Gen UI kit
 // Copyright © 2011-2018 Tasharen Entertainment Inc
 //-------------------------------------------------
 
@@ -446,10 +446,10 @@ public abstract class UIRect : MonoBehaviour
 	protected virtual void Awake ()
 	{
 #if UNITY_2018_3_OR_NEWER
-        NGUITools.CheckForPrefabStage (gameObject); 
+		NGUITools.CheckForPrefabStage (gameObject); 
 #endif
 
-        mStarted = false;
+		mStarted = false;
 		mGo = gameObject;
 		mTrans = transform;
 	}

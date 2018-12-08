@@ -1,5 +1,5 @@
 //-------------------------------------------------
-//            NGUI: Next-Gen UI kit
+//			  NGUI: Next-Gen UI kit
 // Copyright © 2011-2018 Tasharen Entertainment Inc
 //-------------------------------------------------
 
@@ -159,36 +159,36 @@ static public class NGUITools
 	/// New WWW call can fail if the crossdomain policy doesn't check out. Exceptions suck. It's much more elegant to check for null instead.
 	/// </summary>
 
-//    static public WWW OpenURL (string url)
-//    {
+//	  static public WWW OpenURL (string url)
+//	  {
 //#if UNITY_FLASH
-//        Debug.LogError("WWW is not yet implemented in Flash");
-//        return null;
+//		  Debug.LogError("WWW is not yet implemented in Flash");
+//		  return null;
 //#else
-//        WWW www = null;
-//        try { www = new WWW(url); }
-//        catch (System.Exception ex) { Debug.LogError(ex.Message); }
-//        return www;
+//		  WWW www = null;
+//		  try { www = new WWW(url); }
+//		  catch (System.Exception ex) { Debug.LogError(ex.Message); }
+//		  return www;
 //#endif
-//    }
+//	  }
 
-//    /// <summary>
-//    /// New WWW call can fail if the crossdomain policy doesn't check out. Exceptions suck. It's much more elegant to check for null instead.
-//    /// </summary>
+//	  /// <summary>
+//	  /// New WWW call can fail if the crossdomain policy doesn't check out. Exceptions suck. It's much more elegant to check for null instead.
+//	  /// </summary>
 
-//    static public WWW OpenURL (string url, WWWForm form)
-//    {
-//        if (form == null) return OpenURL(url);
+//	  static public WWW OpenURL (string url, WWWForm form)
+//	  {
+//		  if (form == null) return OpenURL(url);
 //#if UNITY_FLASH
-//        Debug.LogError("WWW is not yet implemented in Flash");
-//        return null;
+//		  Debug.LogError("WWW is not yet implemented in Flash");
+//		  return null;
 //#else
-//        WWW www = null;
-//        try { www = new WWW(url, form); }
-//        catch (System.Exception ex) { Debug.LogError(ex != null ? ex.Message : "<null>"); }
-//        return www;
+//		  WWW www = null;
+//		  try { www = new WWW(url, form); }
+//		  catch (System.Exception ex) { Debug.LogError(ex != null ? ex.Message : "<null>"); }
+//		  return www;
 //#endif
-//    }
+//	  }
 
 	/// <summary>
 	/// Same as Random.Range, but the returned value is between min and max, inclusive.
@@ -605,43 +605,43 @@ static public class NGUITools
 #endif
 	}
 
-    static public void CheckForPrefabStage (GameObject gameObject)
-    {
-#if UNITY_EDITOR
+	static public void CheckForPrefabStage (GameObject gameObject)
+	{
+#if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
 
-        var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage (gameObject);
-        if (prefabStage == null)
-            return;
+		var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage (gameObject);
+		if (prefabStage == null)
+			return;
 
-        var rootsInParents = gameObject.GetComponentsInParent<UIRoot> (true);
-        var panelsInParents = gameObject.GetComponentsInParent<UIPanel> (true);
+		var rootsInParents = gameObject.GetComponentsInParent<UIRoot> (true);
+		var panelsInParents = gameObject.GetComponentsInParent<UIPanel> (true);
 
-        bool missingRoot = rootsInParents.Length == 0;
-        bool missingPanel = panelsInParents.Length == 0;
+		bool missingRoot = rootsInParents.Length == 0;
+		bool missingPanel = panelsInParents.Length == 0;
 
-        if (!missingRoot && !missingPanel)
-            return;
+		if (!missingRoot && !missingPanel)
+			return;
 
-        // Since this function is called from Awake/OnEnable, utilities like PrefabStage.prefabContentsRoot
-        // or Scene.GetRootGameObjects () aren't available at this point
+		// Since this function is called from Awake/OnEnable, utilities like PrefabStage.prefabContentsRoot
+		// or Scene.GetRootGameObjects () aren't available at this point
 
-        var instanceRoot = gameObject.transform;
-        while (instanceRoot.parent != null)
-            instanceRoot = instanceRoot.parent;
+		var instanceRoot = gameObject.transform;
+		while (instanceRoot.parent != null)
+			instanceRoot = instanceRoot.parent;
 
-        GameObject container = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags ("UIRoot (Environment)", HideFlags.DontSave);
-        container.layer = instanceRoot.gameObject.layer;
+		GameObject container = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags ("UIRoot (Environment)", HideFlags.DontSave);
+		container.layer = instanceRoot.gameObject.layer;
 
-        if (missingRoot)
-            container.AddComponent<UIRoot> ();
+		if (missingRoot)
+			container.AddComponent<UIRoot> ();
 
-        if (missingPanel)
-            container.AddComponent<UIPanel> ();
+		if (missingPanel)
+			container.AddComponent<UIPanel> ();
 
-        UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene (container, prefabStage.scene);
-        instanceRoot.SetParent (container.transform, false);
+		UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene (container, prefabStage.scene);
+		instanceRoot.SetParent (container.transform, false);
 #endif
-    }
+	}
 
 	/// <summary>
 	/// Add a new child game object.
@@ -1439,8 +1439,8 @@ static public class NGUITools
 
 		//while (child != null)
 		//{
-		//    if (child == parent) return true;
-		//    child = child.parent;
+		//	  if (child == parent) return true;
+		//	  child = child.parent;
 		//}
 		//return false;
 	}

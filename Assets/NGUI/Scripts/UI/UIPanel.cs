@@ -1,5 +1,5 @@
 //-------------------------------------------------
-//            NGUI: Next-Gen UI kit
+//			  NGUI: Next-Gen UI kit
 // Copyright © 2011-2018 Tasharen Entertainment Inc
 //-------------------------------------------------
 
@@ -697,9 +697,9 @@ public class UIPanel : UIRect
 
 				//if (anchorOffset && (mCam == null || mCam.transform.parent != cachedTransform))
 				//{
-				//    Vector3 off = cachedTransform.position;
-				//    for (int i = 0; i < 4; ++i)
-				//        corners[i] += off;
+				//	  Vector3 off = cachedTransform.position;
+				//	  for (int i = 0; i < 4; ++i)
+				//		  corners[i] += off;
 				//}
 				return corners;
 			}
@@ -1067,8 +1067,8 @@ public class UIPanel : UIRect
 				// Note that when enabling this, the 'if (rigidbody == null)' statement above should be adjusted as well.
 				//else
 				//{
-				//    Rigidbody2D rb = gameObject.AddComponent<Rigidbody2D>();
-				//    rb.isKinematic = true;
+				//	  Rigidbody2D rb = gameObject.AddComponent<Rigidbody2D>();
+				//	  rb.isKinematic = true;
 				//}
 			}
 		}
@@ -1456,19 +1456,19 @@ public class UIPanel : UIRect
 						if (rd > dc.depthEnd) dc.depthEnd = rd;
 					}
 
-                    // Important to check this since it can very well be null due to earlier safeToDraw condition
-                    if (dc != null)
-                    {
-                        ++count;
-                        if (generateNormals) w.WriteToBuffers (dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans, generateUV2 ? dc.uv2 : null);
-                        else w.WriteToBuffers (dc.verts, dc.uvs, dc.cols, null, null, generateUV2 ? dc.uv2 : null);
+					// Important to check this since it can very well be null due to earlier safeToDraw condition
+					if (dc != null)
+					{
+						++count;
+						if (generateNormals) w.WriteToBuffers (dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans, generateUV2 ? dc.uv2 : null);
+						else w.WriteToBuffers (dc.verts, dc.uvs, dc.cols, null, null, generateUV2 ? dc.uv2 : null);
 
-                        if (w.mOnRender != null)
-                        {
-                            if (mOnRender == null) mOnRender = w.mOnRender;
-                            else mOnRender += w.mOnRender;
-                        }
-                    }
+						if (w.mOnRender != null)
+						{
+							if (mOnRender == null) mOnRender = w.mOnRender;
+							else mOnRender += w.mOnRender;
+						}
+					}
 				}
 			}
 			else w.drawCall = null;

@@ -1,5 +1,5 @@
 //-------------------------------------------------
-//            NGUI: Next-Gen UI kit
+//			  NGUI: Next-Gen UI kit
 // Copyright © 2011-2018 Tasharen Entertainment Inc
 //-------------------------------------------------
 
@@ -922,18 +922,18 @@ public class UIDrawCall : MonoBehaviour
 		dc.manager = pan;
 
 #if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
-        // We need to perform this check here and not in Create (string) to get to manager reference
-        var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage ();
-        if (prefabStage != null && dc.manager != null)
-        {
-            // If prefab stage exists and new daw call
-            var stage = UnityEditor.SceneManagement.StageUtility.GetStageHandle (dc.manager.gameObject);
-            if (stage == prefabStage.stageHandle)
-                UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene (dc.gameObject, prefabStage.scene);
-        }
+		// We need to perform this check here and not in Create (string) to get to manager reference
+		var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage ();
+		if (prefabStage != null && dc.manager != null)
+		{
+			// If prefab stage exists and new daw call
+			var stage = UnityEditor.SceneManagement.StageUtility.GetStageHandle (dc.manager.gameObject);
+			if (stage == prefabStage.stageHandle)
+				UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene (dc.gameObject, prefabStage.scene);
+		}
 #endif
 
-        return dc;
+		return dc;
 	}
 
 	/// <summary>
