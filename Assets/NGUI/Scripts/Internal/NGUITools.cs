@@ -577,7 +577,7 @@ static public class NGUITools
 #if UNITY_2018_3_OR_NEWER
 	if (obj)
 	{
-		if (AssetDatabase.Contains(obj))
+		if (UnityEditor.AssetDatabase.Contains(obj))
 		{
 			UnityEditor.EditorUtility.SetDirty(obj);
 		}
@@ -588,7 +588,7 @@ static public class NGUITools
 				var component = (Component)obj;
 				UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(component.gameObject.scene);
 			}
-			else if (obj is EditorWindow || obj is ScriptableObject)
+			else if (obj is UnityEditor.EditorWindow || obj is ScriptableObject)
 			{
 				UnityEditor.EditorUtility.SetDirty(obj);
 			}
@@ -604,6 +604,44 @@ static public class NGUITools
 #endif
 #endif
 	}
+
+    static public void CheckForPrefabStage (GameObject gameObject)
+    {
+#if UNITY_EDITOR
+
+        var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage (gameObject);
+        if (prefabStage == null)
+            return;
+
+        var rootsInParents = gameObject.GetComponentsInParent<UIRoot> (true);
+        var panelsInParents = gameObject.GetComponentsInParent<UIPanel> (true);
+
+        bool missingRoot = rootsInParents.Length == 0;
+        bool missingPanel = panelsInParents.Length == 0;
+
+        if (!missingRoot && !missingPanel)
+            return;
+
+        // Since this function is called from Awake/OnEnable, utilities like PrefabStage.prefabContentsRoot
+        // or Scene.GetRootGameObjects () aren't available at this point
+
+        var instanceRoot = gameObject.transform;
+        while (instanceRoot.parent != null)
+            instanceRoot = instanceRoot.parent;
+
+        GameObject container = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags ("UIRoot (Environment)", HideFlags.DontSave);
+        container.layer = instanceRoot.gameObject.layer;
+
+        if (missingRoot)
+            container.AddComponent<UIRoot> ();
+
+        if (missingPanel)
+            container.AddComponent<UIPanel> ();
+
+        UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene (container, prefabStage.scene);
+        instanceRoot.SetParent (container.transform, false);
+#endif
+    }
 
 	/// <summary>
 	/// Add a new child game object.
