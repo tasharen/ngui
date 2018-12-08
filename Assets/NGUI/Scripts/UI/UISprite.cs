@@ -62,7 +62,7 @@ public class UISprite : UIBasicSprite
 	/// <summary>
 	/// Atlas used by this widget.
 	/// </summary>
- 
+
 	public UIAtlas atlas
 	{
 		get
@@ -101,10 +101,17 @@ public class UISprite : UIBasicSprite
 		}
 	}
 
+	public override void MarkAsChanged ()
+	{
+		mSprite = null;
+		mSpriteSet = false;
+		base.MarkAsChanged();
+	}
+
 	/// <summary>
 	/// Sprite within the atlas used to draw this widget.
 	/// </summary>
- 
+
 	public string spriteName
 	{
 		get
@@ -239,7 +246,7 @@ public class UISprite : UIBasicSprite
 	/// <summary>
 	/// Trimmed space in the atlas around the sprite. X = left, Y = bottom, Z = right, W = top.
 	/// </summary>
-	
+
 	protected override Vector4 padding
 	{
 		get
@@ -484,7 +491,7 @@ public class UISprite : UIBasicSprite
 			{
 				int x = Mathf.RoundToInt(pixelSize * (sp.width + sp.paddingLeft + sp.paddingRight));
 				int y = Mathf.RoundToInt(pixelSize * (sp.height + sp.paddingTop + sp.paddingBottom));
-				
+
 				if ((x & 1) == 1) ++x;
 				if ((y & 1) == 1) ++y;
 

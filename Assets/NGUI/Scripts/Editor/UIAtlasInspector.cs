@@ -27,7 +27,7 @@ public class UIAtlasInspector : Editor
 	AtlasType mType = AtlasType.Normal;
 	UIAtlas mReplacement = null;
 
-	void OnEnable () { instance = this; }
+	void OnEnable () { instance = this; mAtlas = target as UIAtlas; }
 	void OnDisable () { instance = null; }
 
 	/// <summary>
@@ -92,7 +92,12 @@ public class UIAtlasInspector : Editor
 	public override void OnInspectorGUI ()
 	{
 		NGUIEditorTools.SetLabelWidth(80f);
-		mAtlas = target as UIAtlas;
+
+		if (mAtlas == null)
+		{
+			EditorGUILayout.HelpBox("Invalid asset. Please re-create it.", MessageType.Error, true);
+			return;
+		}
 
 		UISpriteData sprite = (mAtlas != null) ? mAtlas.GetSprite(NGUISettings.selectedSprite) : null;
 
@@ -198,7 +203,7 @@ public class UIAtlasInspector : Editor
 			if (sprite != null)
 			{
 				if (sprite == null) return;
-					
+
 				Texture2D tex = mAtlas.spriteMaterial.mainTexture as Texture2D;
 
 				if (tex != null)
@@ -230,7 +235,7 @@ public class UIAtlasInspector : Editor
 					if (GUI.changed)
 					{
 						NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
-						
+
 						sprite.x = sizeA.x;
 						sprite.y = sizeA.y;
 						sprite.width = sizeB.x;

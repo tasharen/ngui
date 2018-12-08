@@ -95,8 +95,24 @@ static public class NGUIMenu
 		return (Selection.activeTransform != null);
 	}
 
-#endregion
+	#endregion
 #region Create
+
+#if NGUI_SO
+	[MenuItem("NGUI/Create/Atlas", false, 6)]
+	static public void CreateAtlas ()
+	{
+		string path = EditorUtility.SaveFilePanelInProject("Create Atlas", "New Atlas.asset", "asset", "Save atlas as...", NGUISettings.currentPath);
+		if (string.IsNullOrEmpty(path)) return;
+
+		NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
+		var atlas = ScriptableObject.CreateInstance<UIAtlas>();
+		AssetDatabase.CreateAsset(atlas, path);
+		AssetDatabase.SaveAssets();
+		AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+		Selection.activeObject = atlas;
+	}
+#endif
 
 	[MenuItem("NGUI/Create/Sprite &#s", false, 6)]
 	static public void AddSprite ()
@@ -565,7 +581,7 @@ static public class NGUIMenu
 	static public void SwitchTo2D ()
 	{
 		BoxCollider[] colliders = NGUITools.FindActive<BoxCollider>();
-		
+
 		for (int i = 0; i < colliders.Length; ++i)
 		{
 			BoxCollider c = colliders[i];
@@ -593,7 +609,7 @@ static public class NGUIMenu
 			NGUITools.SetDirty(go);
 
 			UIPanel p = NGUITools.FindInParents<UIPanel>(go);
-			
+
 			if (p != null)
 			{
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
@@ -647,7 +663,7 @@ static public class NGUIMenu
 			NGUITools.SetDirty(go);
 
 			UIPanel p = NGUITools.FindInParents<UIPanel>(go);
-			
+
 			if (p != null)
 			{
 				if (p.GetComponent<Rigidbody2D>() != null)
@@ -688,10 +704,10 @@ static public class NGUIMenu
 	{
 		if (SceneView.lastActiveSceneView == null) return false;
 		if (UICamera.list.size == 0) return false;
-		
+
 		GameObject go = Selection.activeGameObject ?? UICamera.list[0].gameObject;
 		if (go == null) return false;
-		
+
 		Camera cam = NGUITools.FindCameraForLayer(go.layer);
 		if (cam == null || !cam.orthographic) return false;
 		return true;

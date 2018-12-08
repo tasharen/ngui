@@ -221,7 +221,7 @@ public class ComponentSelector : ScriptableWizard
 			foreach (Object o in mObjects)
 				if (DrawObject(o))
 					sel = o;
-			
+
 			GUILayout.EndScrollView();
 
 			if (sel != null)
@@ -262,7 +262,7 @@ public class ComponentSelector : ScriptableWizard
 				path = "[Embedded]";
 				GUI.contentColor = new Color(0.7f, 0.7f, 0.7f);
 			}
-			else if (comp != null && EditorUtility.IsPersistent(comp.gameObject))
+			else if (comp && comp.gameObject && EditorUtility.IsPersistent(comp.gameObject))
 				GUI.contentColor = new Color(0.6f, 0.8f, 1f);
 
 			retVal |= GUILayout.Button(obj.name, NGUIEditorTools.textArea, GUILayout.Width(160f), GUILayout.Height(20f));

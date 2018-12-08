@@ -139,7 +139,7 @@ public class UIFontInspector : Editor
 			EditorGUILayout.HelpBox("Dynamic fonts require Unity 4.0 or higher.", MessageType.Error);
 #else
 			Font fnt = EditorGUILayout.ObjectField("TTF Font", mFont.dynamicFont, typeof(Font), false) as Font;
-			
+
 			if (fnt != mFont.dynamicFont)
 			{
 				NGUIEditorTools.RegisterUndo("Font change", mFont);
@@ -273,7 +273,7 @@ public class UIFontInspector : Editor
 							{
 								NGUISettings.atlas = mFont.atlas;
 								NGUISettings.selectedSprite = sym.spriteName;
-								NGUIEditorTools.Select(mFont.atlas.gameObject);
+								NGUIEditorTools.Select(mFont.atlas);
 							}
 						}
 

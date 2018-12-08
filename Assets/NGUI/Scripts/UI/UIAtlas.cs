@@ -11,8 +11,12 @@ using System;
 /// UI Atlas contains a collection of sprites inside one large texture atlas.
 /// </summary>
 
+#if NGUI_SO
+public class UIAtlas : ScriptableObject
+#else
 [AddComponentMenu("NGUI/UI/Atlas")]
 public class UIAtlas : MonoBehaviour
+#endif
 {
 	// Legacy functionality, removed in 3.0. Do not use.
 	[System.Serializable]
@@ -462,7 +466,7 @@ public class UIAtlas : MonoBehaviour
 	public void MarkAsChanged ()
 	{
 #if UNITY_EDITOR
-		NGUITools.SetDirty(gameObject);
+		NGUITools.SetDirty(this);
 #endif
 		if (mReplacement != null) mReplacement.MarkAsChanged();
 

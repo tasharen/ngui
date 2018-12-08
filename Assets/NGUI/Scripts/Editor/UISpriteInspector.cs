@@ -52,14 +52,14 @@ public class UISpriteInspector : UIBasicSpriteEditor
 		if (NGUIEditorTools.DrawPrefixButton("Atlas"))
 			ComponentSelector.Show<UIAtlas>(OnSelectAtlas);
 		SerializedProperty atlas = NGUIEditorTools.DrawProperty("", serializedObject, "mAtlas", GUILayout.MinWidth(20f));
-		
+
 		if (GUILayout.Button("Edit", GUILayout.Width(40f)))
 		{
 			if (atlas != null)
 			{
 				UIAtlas atl = atlas.objectReferenceValue as UIAtlas;
 				NGUISettings.atlas = atl;
-				if (atl != null) NGUIEditorTools.Select(atl.gameObject);
+				if (atl != null) NGUIEditorTools.Select(atl);
 			}
 		}
 		GUILayout.EndHorizontal();

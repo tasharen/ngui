@@ -17,7 +17,7 @@ static public class NGUIEditorTools
 	private static Texture2D mBackdropTex;
 	private static Texture2D mContrastTex;
 	private static Texture2D mGradientTex;
-	private static GameObject mPrevious;
+	private static Object mPrevious;
 
 	/// <summary>
 	/// Returns a blank usable 1x1 white texture.
@@ -569,7 +569,7 @@ static public class NGUIEditorTools
 
 		// No texture to use -- figure out a name using the atlas
 		path = AssetDatabase.GetAssetPath(atlas.GetInstanceID());
-		path = string.IsNullOrEmpty(path) ? "Assets/" + atlas.name + ".png" : path.Replace(".prefab", ".png");
+		path = string.IsNullOrEmpty(path) ? "Assets/" + atlas.name + ".png" : path.Replace(".asset", ".png");
 		return path;
 	}
 
@@ -1152,7 +1152,7 @@ static public class NGUIEditorTools
 				{
 					NGUISettings.atlas = atlas;
 					NGUISettings.selectedSprite = spriteName;
-					Select(atlas.gameObject);
+					Select(atlas);
 				}
 			}
 		}
@@ -1184,7 +1184,7 @@ static public class NGUIEditorTools
 		if (NGUISettings.atlas != null)
 		{
 			NGUISettings.selectedSprite = spriteName;
-			NGUIEditorTools.Select(NGUISettings.atlas.gameObject);
+			NGUIEditorTools.Select(NGUISettings.atlas);
 			RepaintSprites();
 		}
 	}
@@ -1199,7 +1199,7 @@ static public class NGUIEditorTools
 		{
 			NGUISettings.atlas = atlas;
 			NGUISettings.selectedSprite = spriteName;
-			NGUIEditorTools.Select(atlas.gameObject);
+			NGUIEditorTools.Select(atlas);
 			RepaintSprites();
 		}
 	}
@@ -1208,21 +1208,28 @@ static public class NGUIEditorTools
 	/// Select the specified game object and remember what was selected before.
 	/// </summary>
 
-	static public void Select (GameObject go)
+	static public void Select (Object obj)
 	{
 		mPrevious = Selection.activeGameObject;
-		Selection.activeGameObject = go;
+		Selection.activeObject = obj;
+#if UNITY_2018_3_OR_NEWER
+		OpenAsset(obj as GameObject);
+#endif
+	}
 
 #if UNITY_2018_3_OR_NEWER
+	// Contributed by B9 of https://discord.gg/tasharen
+	static void OpenAsset (GameObject go)
+	{
 		// Supporting opening of prefabs in Play mode is a bit of a can of worms if target might have ExecuteInEditMode
-		if (Application.isPlaying) return;
+		if (!go || Application.isPlaying) return;
 
 		// No point continuing if we're dealing with a traditional main stage object
 		bool partOfPrefabInstance = PrefabUtility.IsPartOfPrefabInstance (go);
 		bool partOfPrefabAsset = PrefabUtility.IsPartOfPrefabAsset (go);
 		if (!partOfPrefabInstance && !partOfPrefabAsset) return;
 
-		GameObject asset = partOfPrefabInstance ? PrefabUtility.GetCorrespondingObjectFromSource (go) : go;
+		var asset = partOfPrefabInstance ? PrefabUtility.GetCorrespondingObjectFromSource (go) : go;
 		string path = AssetDatabase.GetAssetPath (asset);
 
 		// var assetRoot = PrefabUtility.LoadPrefabContents (path);
@@ -1233,8 +1240,8 @@ static public class NGUIEditorTools
 
 		// Last second check to confirm we're definitely targeting an in-project prefab asset and not some random type like an image
 		if (PrefabUtility.IsPartOfAnyPrefab (asset)) AssetDatabase.OpenAsset (AssetDatabase.LoadAssetAtPath (path, asset.GetType ()));
-#endif
 	}
+#endif
 
 	/// <summary>
 	/// Select the previous game object.
@@ -1244,7 +1251,10 @@ static public class NGUIEditorTools
 	{
 		if (mPrevious != null)
 		{
-			Selection.activeGameObject = mPrevious;
+			Selection.activeObject = mPrevious;
+#if UNITY_2018_3_OR_NEWER
+			OpenAsset(mPrevious as GameObject);
+#endif
 			mPrevious = null;
 		}
 	}
@@ -1253,7 +1263,7 @@ static public class NGUIEditorTools
 	/// Previously selected game object.
 	/// </summary>
 
-	static public GameObject previousSelection { get { return mPrevious; } }
+	static public Object previousSelection { get { return mPrevious; } }
 
 	/// <summary>
 	/// Helper function that checks to see if the scale is uniform.

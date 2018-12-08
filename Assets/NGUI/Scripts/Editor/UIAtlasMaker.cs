@@ -799,7 +799,7 @@ public class UIAtlasMaker : EditorWindow
 		}
 
 		atlas.MarkAsChanged();
-		Selection.activeGameObject = (NGUISettings.atlas != null) ? NGUISettings.atlas.gameObject : null;
+		Selection.activeObject = NGUISettings.atlas;
 		EditorUtility.ClearProgressBar();
 #endif
 	}
@@ -992,8 +992,51 @@ public class UIAtlasMaker : EditorWindow
 
 			if (create)
 			{
-				string path = EditorUtility.SaveFilePanelInProject("Save As",
-					"New Atlas.prefab", "prefab", "Save atlas as...", NGUISettings.currentPath);
+#if NGUI_SO
+				var path = EditorUtility.SaveFilePanelInProject("Save As", "New Atlas.asset", "asset", "Save atlas as...", NGUISettings.currentPath);
+
+				if (!string.IsNullOrEmpty(path))
+				{
+					NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
+					var atlas = AssetDatabase.LoadAssetAtPath<UIAtlas>(path);
+					if (atlas == null) atlas = ScriptableObject.CreateInstance<UIAtlas>();
+					var matPath = path.Replace(".asset", ".mat");
+					replace = true;
+
+					// Try to load the material
+					var mat = AssetDatabase.LoadAssetAtPath(matPath, typeof(Material)) as Material;
+
+					// If the material doesn't exist, create it
+					if (mat == null)
+					{
+						Shader shader = Shader.Find(NGUISettings.atlasPMA ? "Unlit/Premultiplied Colored" : "Unlit/Transparent Colored");
+						mat = new Material(shader);
+
+						// Save the material
+						AssetDatabase.CreateAsset(mat, matPath);
+						AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+						// Load the material so it's usable
+						mat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+					}
+
+					// Create a new game object for the atlas
+					string atlasName = path.Replace(".prefab", "");
+					atlasName = atlasName.Substring(path.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
+
+					atlas.spriteMaterial = mat;
+
+					// Update the prefab
+					AssetDatabase.CreateAsset(atlas, path);
+					AssetDatabase.SaveAssets();
+					AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+					// Select the atlas
+					NGUISettings.atlas = AssetDatabase.LoadAssetAtPath<UIAtlas>(path);
+					Selection.activeObject = NGUISettings.atlas;
+				}
+#else
+				string path = EditorUtility.SaveFilePanelInProject("Save As", "New Atlas.prefab", "prefab", "Save atlas as...", NGUISettings.currentPath);
 
 				if (!string.IsNullOrEmpty(path))
 				{
@@ -1039,6 +1082,7 @@ public class UIAtlasMaker : EditorWindow
 					NGUISettings.atlas = go.GetComponent<UIAtlas>();
 					Selection.activeGameObject = go;
 				}
+#endif
 			}
 		}
 
@@ -1151,4 +1195,24 @@ public class UIAtlasMaker : EditorWindow
 		// Uncomment this line if you want to be able to force-sort the atlas
 		//if (NGUISettings.atlas != null && GUILayout.Button("Sort Alphabetically")) NGUISettings.atlas.SortAlphabetically();
 	}
+
+	/// <summary>
+	/// Save the specified atlas.
+	/// </summary>
+
+	//static public void Save (UIAtlas atlas)
+	//{
+	//	var path = AssetDatabase.GetAssetPath(atlas);
+
+	//	if (string.IsNullOrEmpty(path))
+	//	{
+	//		path = EditorUtility.SaveFilePanelInProject("Save As", "New Atlas.asset", "asset", "Save atlas as...", NGUISettings.currentPath);
+	//		if (string.IsNullOrEmpty(path)) return;
+	//	}
+
+	//	AssetDatabase.CreateAsset(atlas, path);
+	//	AssetDatabase.SaveAssets();
+
+	//	NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
+	//}
 }
