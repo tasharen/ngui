@@ -1456,17 +1456,19 @@ public class UIPanel : UIRect
 						if (rd > dc.depthEnd) dc.depthEnd = rd;
 					}
 
-					w.drawCall = dc;
+                    // Important to check this since it can very well be null due to earlier safeToDraw condition
+                    if (dc != null)
+                    {
+                        ++count;
+                        if (generateNormals) w.WriteToBuffers (dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans, generateUV2 ? dc.uv2 : null);
+                        else w.WriteToBuffers (dc.verts, dc.uvs, dc.cols, null, null, generateUV2 ? dc.uv2 : null);
 
-					++count;
-					if (generateNormals) w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, dc.norms, dc.tans, generateUV2 ? dc.uv2 : null);
-					else w.WriteToBuffers(dc.verts, dc.uvs, dc.cols, null, null, generateUV2 ? dc.uv2 : null);
-
-					if (w.mOnRender != null)
-					{
-						if (mOnRender == null) mOnRender = w.mOnRender;
-						else mOnRender += w.mOnRender;
-					}
+                        if (w.mOnRender != null)
+                        {
+                            if (mOnRender == null) mOnRender = w.mOnRender;
+                            else mOnRender += w.mOnRender;
+                        }
+                    }
 				}
 			}
 			else w.drawCall = null;

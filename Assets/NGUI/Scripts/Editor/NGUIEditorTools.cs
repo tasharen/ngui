@@ -1209,7 +1209,32 @@ static public class NGUIEditorTools
 	{
 		mPrevious = Selection.activeGameObject;
 		Selection.activeGameObject = go;
-	}
+
+#if UNITY_2018_3_OR_NEWER
+        // Supporting opening of prefabs in Play mode is a bit of a can of worms if target might have ExecuteInEditMode
+        if (Application.isPlaying)
+            return;
+
+        // No point continuing if we're dealing with a traditional main stage object
+        bool partOfPrefabInstance = PrefabUtility.IsPartOfPrefabInstance (go);
+        bool partOfPrefabAsset = PrefabUtility.IsPartOfPrefabAsset (go);
+        if (!partOfPrefabInstance && !partOfPrefabAsset)
+            return;
+
+        GameObject asset = partOfPrefabInstance ? PrefabUtility.GetCorrespondingObjectFromSource (go) : go;
+        string path = AssetDatabase.GetAssetPath (asset);
+
+        // var assetRoot = PrefabUtility.LoadPrefabContents (path);
+        // This API call above loads the prefab to an invisible scene and allows direct inspection without leaving main stage.
+        // Except it would require us to manage saving and disposing that temporary prefab stage scene and root and that's very hard
+        // when the user still has full access to main stage hierarchy and can select anything again, leaving us with no way
+        // to detect when cleanup is required. So, for now, I'd just load the selected asset exclusively and take over Editor view.
+
+        // Last second check to confirm we're definitely targeting an in-project prefab asset and not some random type like an image
+        if (PrefabUtility.IsPartOfAnyPrefab (asset))
+            AssetDatabase.OpenAsset (AssetDatabase.LoadAssetAtPath (path, asset.GetType ())); 
+#endif
+    }
 	
 	/// <summary>
 	/// Select the previous game object.
@@ -1219,7 +1244,7 @@ static public class NGUIEditorTools
 	{
 		if (mPrevious != null)
 		{
-			Selection.activeGameObject = mPrevious;
+            Selection.activeGameObject = mPrevious;
 			mPrevious = null;
 		}
 	}
@@ -1770,11 +1795,11 @@ static public class NGUIEditorTools
 	{
 #if !UNITY_4_3
 		UnityEditor.Tools.hidden = hide &&
- #if !UNITY_4_5
+#if !UNITY_4_5
 			(UnityEditor.Tools.current == UnityEditor.Tool.Rect) &&
- #else
+#else
 			(UnityEditor.Tools.current == UnityEditor.Tool.Move) &&
- #endif
+#endif
 			UIWidget.showHandlesWithMoveTool && !NGUISettings.showTransformHandles;
 #endif
 	}

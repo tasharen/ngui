@@ -920,7 +920,20 @@ public class UIDrawCall : MonoBehaviour
 		dc.renderQueue = pan.startingRenderQueue;
 		dc.sortingOrder = pan.sortingOrder;
 		dc.manager = pan;
-		return dc;
+
+#if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
+        // We need to perform this check here and not in Create (string) to get to manager reference
+        var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage ();
+        if (prefabStage != null && dc.manager != null)
+        {
+            // If prefab stage exists and new daw call
+            var stage = UnityEditor.SceneManagement.StageUtility.GetStageHandle (dc.manager.gameObject);
+            if (stage == prefabStage.stageHandle)
+                UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene (dc.gameObject, prefabStage.scene);
+        }
+#endif
+
+        return dc;
 	}
 
 	/// <summary>
@@ -958,10 +971,6 @@ public class UIDrawCall : MonoBehaviour
 		GameObject go = new GameObject(name);
 		DontDestroyOnLoad(go);
 		UIDrawCall newDC = go.AddComponent<UIDrawCall>();
-#endif
-#if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
-		var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
-		if (prefabStage != null) UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(go, prefabStage.scene);
 #endif
 		// Create the draw call
 		mActiveList.Add(newDC);

@@ -445,7 +445,11 @@ public abstract class UIRect : MonoBehaviour
 
 	protected virtual void Awake ()
 	{
-		mStarted = false;
+#if UNITY_2018_3_OR_NEWER
+        NGUITools.CheckForPrefabStage (gameObject); 
+#endif
+
+        mStarted = false;
 		mGo = gameObject;
 		mTrans = transform;
 	}
