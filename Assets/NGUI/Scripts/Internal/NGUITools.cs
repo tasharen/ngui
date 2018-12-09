@@ -2810,12 +2810,11 @@ static public class NGUITools
 			}
 		}
 
-		// TODO: Replace with INGUIFont
-		var fonts = Resources.FindObjectsOfTypeAll(typeof(UIFont)) as UIFont[];
+		var f0 = Resources.FindObjectsOfTypeAll<UIFont>();
 
-		for (int i = 0, imax = fonts.Length; i < imax; ++i)
+		for (int i = 0, imax = f0.Length; i < imax; ++i)
 		{
-			var font = fonts[i];
+			var font = f0[i];
 
 			if (font.atlas == before)
 			{
@@ -2826,11 +2825,11 @@ static public class NGUITools
 			}
 		}
 
-		var nfts = Resources.FindObjectsOfTypeAll(typeof(NGUIFont)) as NGUIFont[];
+		var f1 = Resources.FindObjectsOfTypeAll<NGUIFont>();
 
-		for (int i = 0, imax = nfts.Length; i < imax; ++i)
+		for (int i = 0, imax = f1.Length; i < imax; ++i)
 		{
-			var font = nfts[i];
+			var font = f1[i];
 
 			if (font.atlas == before)
 			{
@@ -2855,5 +2854,16 @@ static public class NGUITools
 #endif
 			}
 		}
+	}
+
+	/// <summary>
+	/// Helper function that determines whether the two atlases are related.
+	/// </summary>
+
+	static public bool CheckIfRelated (INGUIFont a, INGUIFont b)
+	{
+		if (a == null || b == null) return false;
+		if (a.isDynamic && b.isDynamic && a.dynamicFont.fontNames[0] == b.dynamicFont.fontNames[0]) return true;
+		return a == b || a.References(b) || b.References(a);
 	}
 }

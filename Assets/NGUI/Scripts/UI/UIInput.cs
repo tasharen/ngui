@@ -1331,24 +1331,9 @@ public class UIInput : MonoBehaviour
 				if (inputType == InputType.Password)
 				{
 					processed = "";
-
 					string asterisk = "*";
-
-					if (label.bitmapFont != null)
-					{
-						var b2 = label.bitmapFont as NGUIFont;
-
-						if (b2 != null)
-						{
-							if (b2.bmFont != null && b2.bmFont.GetGlyph('*') == null) asterisk = "x";
-						}
-						else
-						{
-							var oldFont = label.bitmapFont as UIFont;
-							if (oldFont != null) { if (oldFont.bmFont != null && oldFont.bmFont.GetGlyph('*') == null) asterisk = "x"; }
-						}
-					}
-
+					var fnt = label.bitmapFont as INGUIFont;
+					if (fnt != null && fnt.bmFont != null && fnt.bmFont.GetGlyph('*') == null) asterisk = "x";
 					for (int i = 0, imax = fullText.Length; i < imax; ++i) processed += asterisk;
 				}
 				else processed = fullText;

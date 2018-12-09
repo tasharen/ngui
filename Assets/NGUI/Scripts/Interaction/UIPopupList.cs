@@ -48,7 +48,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Font used by the labels.
 	/// </summary>
 
-	public UIFont bitmapFont;
+	public Object bitmapFont;
 
 	/// <summary>
 	/// True type font used by the labels. Alternative to specifying a bitmap font ('font').
@@ -65,7 +65,7 @@ public class UIPopupList : UIWidgetContainer
 		get
 		{
 			if (trueTypeFont != null) return trueTypeFont;
-			if (bitmapFont != null) return bitmapFont;
+			if (bitmapFont != null) return bitmapFont as Object;
 			return font;
 		}
 		set
@@ -76,9 +76,9 @@ public class UIPopupList : UIWidgetContainer
 				bitmapFont = null;
 				font = null;
 			}
-			else if (value is UIFont)
+			else if (value is INGUIFont)
 			{
-				bitmapFont = value as UIFont;
+				bitmapFont = value as Object;
 				trueTypeFont = null;
 				font = null;
 			}
@@ -334,13 +334,29 @@ public class UIPopupList : UIWidgetContainer
 	/// Active font size.
 	/// </summary>
 
-	protected int activeFontSize { get { return (trueTypeFont != null || bitmapFont == null) ? fontSize : bitmapFont.defaultSize; } }
+	protected int activeFontSize
+	{
+		get
+		{
+			if (trueTypeFont != null || bitmapFont == null) return fontSize;
+			var bm = bitmapFont as INGUIFont;
+			return (bm != null) ? bm.defaultSize : fontSize;
+		}
+	}
 
 	/// <summary>
 	/// Font scale applied to the popup list's text.
 	/// </summary>
 
-	protected float activeFontScale { get { return (trueTypeFont != null || bitmapFont == null) ? 1f : (float)fontSize / bitmapFont.defaultSize; } }
+	protected float activeFontScale
+	{
+		get
+		{
+			if (trueTypeFont != null || bitmapFont == null) return 1f;
+			var bm = bitmapFont as INGUIFont;
+			return (bm != null) ? (float)fontSize / bm.defaultSize : 1f;
+		}
+	}
 
 	/// <summary>
 	/// Scale needed to be applied to the popup in order for it to fit on the screen.
@@ -526,17 +542,19 @@ public class UIPopupList : UIWidgetContainer
 			font = null;
 		}
 
+		var bm = bitmapFont as INGUIFont;
+
 		// 'textScale' is no longer used
 		if (textScale != 0f)
 		{
-			fontSize = (bitmapFont != null) ? Mathf.RoundToInt(bitmapFont.defaultSize * textScale) : 16;
+			fontSize = (bm != null) ? Mathf.RoundToInt(bm.defaultSize * textScale) : 16;
 			textScale = 0f;
 		}
 
 		// Auto-upgrade to the true type font
-		if (trueTypeFont == null && bitmapFont != null && bitmapFont.isDynamic && bitmapFont.replacement == null)
+		if (trueTypeFont == null && bm != null && bm.isDynamic && bm.replacement == null)
 		{
-			trueTypeFont = bitmapFont.dynamicFont;
+			trueTypeFont = bm.dynamicFont;
 			bitmapFont = null;
 		}
 	}
@@ -545,8 +563,8 @@ public class UIPopupList : UIWidgetContainer
 
 	protected virtual void OnValidate ()
 	{
-		Font ttf = trueTypeFont;
-		UIFont fnt = bitmapFont;
+		var ttf = trueTypeFont;
+		var fnt = bitmapFont as INGUIFont;
 
 		bitmapFont = null;
 		trueTypeFont = null;
@@ -571,7 +589,7 @@ public class UIPopupList : UIWidgetContainer
 				}
 				else
 				{
-					bitmapFont = fnt;
+					bitmapFont = fnt as Object;
 					mUseDynamicFont = false;
 				}
 			}
@@ -1137,7 +1155,7 @@ public class UIPopupList : UIWidgetContainer
 				UILabel lbl = NGUITools.AddWidget<UILabel>(mChild, mBackground.depth + 2);
 				lbl.name = i.ToString();
 				lbl.pivot = UIWidget.Pivot.TopLeft;
-				lbl.bitmapFont = bitmapFont;
+				lbl.bitmapFont = bitmapFont as INGUIFont;
 				lbl.trueTypeFont = trueTypeFont;
 				lbl.fontSize = fontSize;
 				lbl.fontStyle = fontStyle;

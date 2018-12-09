@@ -158,11 +158,9 @@ public class UICreateWidgetWizard : EditorWindow
 
 	void OnSelectFont (Object obj)
 	{
-		Object fnt = obj as UIFont;
-
-		if (NGUISettings.ambigiousFont != fnt)
+		if (NGUISettings.ambigiousFont != obj)
 		{
-			NGUISettings.ambigiousFont = fnt;
+			NGUISettings.ambigiousFont = obj;
 			Repaint();
 		}
 	}

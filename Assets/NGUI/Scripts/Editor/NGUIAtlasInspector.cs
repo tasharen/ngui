@@ -23,11 +23,11 @@ public class NGUIAtlasInspector : Editor
 		Reference,
 	}
 
-	NGUIAtlas mAtlas;
-	AtlasType mType = AtlasType.Normal;
+	INGUIAtlas mAtlas;
 	INGUIAtlas mReplacement = null;
+	AtlasType mType = AtlasType.Normal;
 
-	void OnEnable () { instance = this; mAtlas = target as NGUIAtlas; }
+	void OnEnable () { instance = this; mAtlas = target as INGUIAtlas; }
 	void OnDisable () { instance = null; }
 
 	/// <summary>
@@ -58,29 +58,13 @@ public class NGUIAtlasInspector : Editor
 		{
 			if (lbl.bitmapFont == null) continue;
 
-			var bm = lbl.bitmapFont;
+			var font = lbl.bitmapFont;
 
-			if (bm is NGUIFont)
+			if (NGUITools.CheckIfRelated(font.atlas, mAtlas) && font.UsesSprite(sprite.name))
 			{
-				var font = bm as NGUIFont;
-
-				if (NGUITools.CheckIfRelated(font.atlas, mAtlas) && font.UsesSprite(sprite.name))
-				{
-					lbl.bitmapFont = null;
-					lbl.bitmapFont = font;
-					NGUITools.SetDirty(lbl);
-				}
-			}
-			else if (bm is UIFont)
-			{
-				var font = bm as UIFont;
-
-				if (NGUITools.CheckIfRelated(font.atlas, mAtlas) && font.UsesSprite(sprite.name))
-				{
-					lbl.bitmapFont = null;
-					lbl.bitmapFont = font;
-					NGUITools.SetDirty(lbl);
-				}
+				lbl.bitmapFont = null;
+				lbl.bitmapFont = font;
+				NGUITools.SetDirty(lbl);
 			}
 		}
 	}
@@ -101,7 +85,7 @@ public class NGUIAtlasInspector : Editor
 
 			mAtlas.replacement = rep;
 			mReplacement = mAtlas.replacement;
-			NGUITools.SetDirty(mAtlas);
+			NGUITools.SetDirty(mAtlas as Object);
 			if (mReplacement == null) mType = AtlasType.Normal;
 		}
 	}
@@ -164,9 +148,9 @@ public class NGUIAtlasInspector : Editor
 
 			if (mReplacement != (mAtlas as INGUIAtlas) && mAtlas.replacement != mReplacement)
 			{
-				NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
+				NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas as Object);
 				mAtlas.replacement = mReplacement;
-				NGUITools.SetDirty(mAtlas);
+				NGUITools.SetDirty(mAtlas as Object);
 			}
 			return;
 		}
@@ -176,7 +160,7 @@ public class NGUIAtlasInspector : Editor
 
 		if (mAtlas.spriteMaterial != mat)
 		{
-			NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
+			NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas as Object);
 			mAtlas.spriteMaterial = mat;
 
 			// Ensure that this atlas has valid import settings
@@ -194,7 +178,7 @@ public class NGUIAtlasInspector : Editor
 				// Ensure that this atlas has valid import settings
 				if (mAtlas.texture != null) NGUIEditorTools.ImportTexture(mAtlas.texture, false, false, !mAtlas.premultipliedAlpha);
 
-				NGUIEditorTools.RegisterUndo("Import Sprites", mAtlas);
+				NGUIEditorTools.RegisterUndo("Import Sprites", mAtlas as Object);
 				NGUIJson.LoadSpriteData(mAtlas, ta);
 				if (sprite != null) sprite = mAtlas.GetSprite(sprite.name);
 				mAtlas.MarkAsChanged();
@@ -204,7 +188,7 @@ public class NGUIAtlasInspector : Editor
 
 			if (pixelSize != mAtlas.pixelSize)
 			{
-				NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
+				NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas as Object);
 				mAtlas.pixelSize = pixelSize;
 			}
 		}
@@ -255,7 +239,7 @@ public class NGUIAtlasInspector : Editor
 
 					if (GUI.changed)
 					{
-						NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
+						NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas as Object);
 
 						sprite.x = sizeA.x;
 						sprite.y = sizeA.y;

@@ -34,9 +34,9 @@ public class NGUIFontInspector : Editor
 	static View mView = View.Font;
 	static bool mUseShader = false;
 
-	NGUIFont mFont;
+	INGUIFont mFont;
+	INGUIFont mReplacement = null;
 	FontType mType = FontType.Bitmap;
-	NGUIFont mReplacement = null;
 	string mSymbolSequence = "";
 	string mSymbolSprite = "";
 	BMSymbol mSelectedSymbol = null;
@@ -44,7 +44,7 @@ public class NGUIFontInspector : Editor
 
 	public override bool HasPreviewGUI () { return mView != View.Nothing; }
 
-	void OnEnable () { mFont = target as NGUIFont; }
+	void OnEnable () { mFont = target as INGUIFont; }
 
 	void OnSelectFont (Object obj)
 	{
@@ -52,16 +52,16 @@ public class NGUIFontInspector : Editor
 		//NGUIEditorTools.RegisterUndo("Font Change");
 		//NGUIEditorTools.RegisterUndo("Font Change", mFont);
 
-		mFont.replacement = obj as NGUIFont;
+		mFont.replacement = obj as INGUIFont;
 		mReplacement = mFont.replacement;
-		NGUITools.SetDirty(mFont);
+		NGUITools.SetDirty(mFont as Object);
 	}
 
 	void OnSelectAtlas (Object obj)
 	{
 		if (mFont != null && mFont.atlas != obj as INGUIAtlas)
 		{
-			NGUIEditorTools.RegisterUndo("Font Atlas", mFont);
+			NGUIEditorTools.RegisterUndo("Font Atlas", mFont as Object);
 			mFont.atlas = obj as INGUIAtlas;
 			MarkAsChanged();
 		}
@@ -73,7 +73,7 @@ public class NGUIFontInspector : Editor
 
 		foreach (UILabel lbl in labels)
 		{
-			if (NGUIFont.CheckIfRelated(lbl.bitmapFont as NGUIFont, mFont))
+			if (NGUITools.CheckIfRelated(lbl.bitmapFont as INGUIFont, mFont))
 			{
 				lbl.bitmapFont = null;
 				lbl.bitmapFont = mFont;
@@ -114,7 +114,7 @@ public class NGUIFontInspector : Editor
 
 		if (mType == FontType.Reference)
 		{
-			ComponentSelector.Draw<NGUIFont>(mFont.replacement, OnSelectFont, true);
+			ComponentSelector.Draw(mFont.replacement, OnSelectFont, true);
 
 			GUILayout.Space(6f);
 			EditorGUILayout.HelpBox("You can have one font simply point to " +
@@ -128,9 +128,9 @@ public class NGUIFontInspector : Editor
 
 			if (mReplacement != mFont && mFont.replacement != mReplacement)
 			{
-				NGUIEditorTools.RegisterUndo("Font Change", mFont);
+				NGUIEditorTools.RegisterUndo("Font Change", mFont as Object);
 				mFont.replacement = mReplacement;
-				NGUITools.SetDirty(mFont);
+				NGUITools.SetDirty(mFont as Object);
 			}
 			return;
 		}
@@ -143,7 +143,7 @@ public class NGUIFontInspector : Editor
 
 			if (fnt != mFont.dynamicFont)
 			{
-				NGUIEditorTools.RegisterUndo("Font change", mFont);
+				NGUIEditorTools.RegisterUndo("Font change", mFont as Object);
 				mFont.dynamicFont = fnt;
 			}
 
@@ -151,7 +151,7 @@ public class NGUIFontInspector : Editor
 
 			if (mFont.material != mat)
 			{
-				NGUIEditorTools.RegisterUndo("Font Material", mFont);
+				NGUIEditorTools.RegisterUndo("Font Material", mFont as Object);
 				mFont.material = mat;
 			}
 
@@ -163,13 +163,13 @@ public class NGUIFontInspector : Editor
 
 			if (size != mFont.defaultSize)
 			{
-				NGUIEditorTools.RegisterUndo("Font change", mFont);
+				NGUIEditorTools.RegisterUndo("Font change", mFont as Object);
 				mFont.defaultSize = size;
 			}
 
 			if (style != mFont.dynamicFontStyle)
 			{
-				NGUIEditorTools.RegisterUndo("Font change", mFont);
+				NGUIEditorTools.RegisterUndo("Font change", mFont as Object);
 				mFont.dynamicFontStyle = style;
 			}
 #endif
@@ -189,7 +189,7 @@ public class NGUIFontInspector : Editor
 
 				if (mFont.material != mat)
 				{
-					NGUIEditorTools.RegisterUndo("Font Material", mFont);
+					NGUIEditorTools.RegisterUndo("Font Material", mFont as Object);
 					mFont.material = mat;
 				}
 			}
@@ -212,8 +212,8 @@ public class NGUIFontInspector : Editor
 
 				if (data != null)
 				{
-					NGUIEditorTools.RegisterUndo("Import Font Data", mFont);
-					BMFontReader.Load(mFont.bmFont, mFont.name, data.bytes);
+					NGUIEditorTools.RegisterUndo("Import Font Data", mFont as Object);
+					BMFontReader.Load(mFont.bmFont, (mFont as Object).name, data.bytes);
 					mFont.MarkAsChanged();
 					resetWidthHeight = true;
 					Debug.Log("Imported " + mFont.bmFont.glyphCount + " characters");
@@ -244,7 +244,7 @@ public class NGUIFontInspector : Editor
 
 					if (mFont.uvRect != uvRect)
 					{
-						NGUIEditorTools.RegisterUndo("Font Pixel Rect", mFont);
+						NGUIEditorTools.RegisterUndo("Font Pixel Rect", mFont as Object);
 						mFont.uvRect = uvRect;
 					}
 					//NGUIEditorTools.DrawSeparator();
@@ -287,7 +287,7 @@ public class NGUIFontInspector : Editor
 
 						if (GUILayout.Button("X", GUILayout.Width(22f)))
 						{
-							NGUIEditorTools.RegisterUndo("Remove symbol", mFont);
+							NGUIEditorTools.RegisterUndo("Remove symbol", mFont as Object);
 							mSymbolSequence = sym.sequence;
 							mSymbolSprite = sym.spriteName;
 							symbols.Remove(sym);
@@ -313,7 +313,7 @@ public class NGUIFontInspector : Editor
 
 					if (GUILayout.Button("Add", GUILayout.Width(40f)) && isValid)
 					{
-						NGUIEditorTools.RegisterUndo("Add symbol", mFont);
+						NGUIEditorTools.RegisterUndo("Add symbol", mFont as Object);
 						mFont.AddSymbol(mSymbolSequence, mSymbolSprite);
 						mFont.MarkAsChanged();
 						mSymbolSequence = "";
@@ -425,7 +425,7 @@ public class NGUIFontInspector : Editor
 	{
 		if (mSelectedSymbol != null && mFont != null)
 		{
-			NGUIEditorTools.RegisterUndo("Change symbol", mFont);
+			NGUIEditorTools.RegisterUndo("Change symbol", mFont as Object);
 			mSelectedSymbol.spriteName = spriteName;
 			Repaint();
 			mFont.MarkAsChanged();
@@ -438,7 +438,7 @@ public class NGUIFontInspector : Editor
 
 	public override void OnPreviewGUI (Rect rect, GUIStyle background)
 	{
-		mFont = target as NGUIFont;
+		mFont = target as INGUIFont;
 		if (mFont == null) return;
 		Texture2D tex = mFont.texture;
 
@@ -450,10 +450,7 @@ public class NGUIFontInspector : Editor
 			{
 				NGUIEditorTools.DrawSprite(tex, rect, mFont.sprite, Color.white, m);
 			}
-			else
-			{
-				NGUIEditorTools.DrawTexture(tex, rect, new Rect(0f, 0f, 1f, 1f), Color.white, m);
-			}
+			else NGUIEditorTools.DrawTexture(tex, rect, new Rect(0f, 0f, 1f, 1f), Color.white, m);
 		}
 	}
 
@@ -463,7 +460,7 @@ public class NGUIFontInspector : Editor
 
 	void SelectSprite (string spriteName)
 	{
-		NGUIEditorTools.RegisterUndo("Font Sprite", mFont);
+		NGUIEditorTools.RegisterUndo("Font Sprite", mFont as Object);
 		mFont.spriteName = spriteName;
 		Repaint();
 	}

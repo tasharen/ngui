@@ -163,13 +163,8 @@ public class UILabel : UIWidget
 		get
 		{
 			if (mMat != null) return mMat;
-
-			if (mFont != null)
-			{
-				if (mFont is NGUIFont) return (mFont as NGUIFont).material;
-				if (mFont is UIFont) return (mFont as UIFont).material;
-			}
-
+			var bm = bitmapFont;
+			if (bm != null) return bm.material;
 			if (mTrueTypeFont != null) return mTrueTypeFont.material;
 			return null;
 		}
@@ -187,12 +182,8 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			if (mFont != null)
-			{
-				if (mFont is NGUIFont) return (mFont as NGUIFont).texture;
-				if (mFont is UIFont) return (mFont as UIFont).texture;
-			}
-
+			var bm = bitmapFont;
+			if (bm != null) return bm.texture;
 			if (mTrueTypeFont != null) { var mat = mTrueTypeFont.material; if (mat != null) return mat.mainTexture; }
 			return null;
 		}
@@ -203,24 +194,24 @@ public class UILabel : UIWidget
 	}
 
 	[Obsolete("Use UILabel.bitmapFont instead")]
-	public UnityEngine.Object font { get { return bitmapFont; } set { bitmapFont = value; } }
+	public UnityEngine.Object font { get { return bitmapFont as UnityEngine.Object; } set { bitmapFont = value as INGUIFont; } }
 
 	/// <summary>
 	/// Set the font used by this label.
 	/// </summary>
 
-	public UnityEngine.Object bitmapFont
+	public INGUIFont bitmapFont
 	{
 		get
 		{
-			return mFont;
+			return mFont as INGUIFont;
 		}
 		set
 		{
-			if (mFont != value)
+			if (mFont as INGUIFont != value)
 			{
 				RemoveFromPanel();
-				mFont = value;
+				mFont = value as UnityEngine.Object;
 				mTrueTypeFont = null;
 				MarkAsChanged();
 			}
@@ -235,20 +226,14 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			if (mFont != null)
-			{
-				if (mFont is NGUIFont) return (mFont as NGUIFont).atlas;
-				if (mFont is UIFont) return (mFont as UIFont).atlas;
-			}
+			var bm = bitmapFont;
+			if (bm != null) return bm.atlas;
 			return null;
 		}
 		set
 		{
-			if (mFont != null)
-			{
-				if (mFont is NGUIFont) (mFont as NGUIFont).atlas = value;
-				else if (mFont is UIFont) (mFont as UIFont).atlas = value;
-			}
+			var bm = bitmapFont;
+			if (bm != null) bm.atlas = value;
 		}
 	}
 
@@ -261,14 +246,8 @@ public class UILabel : UIWidget
 		get
 		{
 			if (mTrueTypeFont != null) return mTrueTypeFont;
-
-			if (mFont != null)
-			{
-				Font dyn = null;
-				if (mFont is NGUIFont) dyn = (mFont as NGUIFont).dynamicFont;
-				else if (mFont is UIFont) dyn = (mFont as UIFont).dynamicFont;
-				return dyn;
-			}
+			var bm = bitmapFont;
+			if (bm != null) return bm.dynamicFont;
 			return null;
 		}
 		set
@@ -282,8 +261,7 @@ public class UILabel : UIWidget
 				mFont = null;
 				SetActiveFont(value);
 				ProcessAndRequest();
-				if (mActiveTTF != null)
-					base.MarkAsChanged();
+				if (mActiveTTF != null) base.MarkAsChanged();
 			}
 		}
 	}
@@ -300,7 +278,7 @@ public class UILabel : UIWidget
 		}
 		set
 		{
-			UIFont bf = value as UIFont;
+			var bf = value as INGUIFont;
 			if (bf != null) bitmapFont = bf;
 			else trueTypeFont = value as Font;
 		}
@@ -349,12 +327,8 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			if (mFont != null)
-			{
-				if (mFont is NGUIFont) return (mFont as NGUIFont).defaultSize;
-				if (mFont is UIFont) return (mFont as UIFont).defaultSize;
-			}
-
+			var bm = bitmapFont;
+			if (bm != null) return bm.defaultSize;
 			if (trueTypeFont != null) return mFontSize;
 			return 16;
 		}
@@ -1341,7 +1315,7 @@ public class UILabel : UIWidget
 		if (NGUITools.GetActive(this))
 		{
 			var ttf = mTrueTypeFont;
-			var fnt = mFont;
+			var fnt = bitmapFont;
 
 			// If the true type font was not used before, but now it is, clear the font reference
 			if (!mUsingTTF && ttf != null) fnt = null;
@@ -1508,12 +1482,8 @@ public class UILabel : UIWidget
 				{
 					mScale = (float)ps / mFinalFontSize;
 
-					if (!isDynamic && mFont != null)
-					{
-						if (mFont is NGUIFont) NGUIText.fontScale = ((float)mFontSize / (mFont as NGUIFont).defaultSize) * mScale;
-						else if (mFont is UIFont) NGUIText.fontScale = ((float)mFontSize / (mFont as UIFont).defaultSize) * mScale;
-						else NGUIText.fontScale = mScale;
-					}
+					var bm = bitmapFont;
+					if (bm != null) NGUIText.fontScale = ((float)mFontSize / bm.defaultSize) * mScale;
 					else NGUIText.fontScale = mScale;
 				}
 
@@ -1978,11 +1948,8 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			if (mFont != null)
-			{
-				if (mFont is NGUIFont) return (mFont as NGUIFont).premultipliedAlphaShader;
-				if (mFont is UIFont) return (mFont as UIFont).premultipliedAlphaShader;
-			}
+			var bm = bitmapFont;
+			if (bm != null) return bm.premultipliedAlphaShader;
 			return false;
 		}
 	}
@@ -1991,11 +1958,8 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			if (mFont != null)
-			{
-				if (mFont is NGUIFont) return (mFont as NGUIFont).packedFontShader;
-				if (mFont is UIFont) return (mFont as UIFont).packedFontShader;
-			}
+			var bm = bitmapFont;
+			if (bm != null) return bm.packedFontShader;
 			return false;
 		}
 	}
@@ -2253,8 +2217,7 @@ public class UILabel : UIWidget
 
 		var bm = bitmapFont;
 		if (isDynamic) NGUIText.fontScale = mScale;
-		else if (bm is NGUIFont) NGUIText.fontScale = ((float)mFontSize / (bm as NGUIFont).defaultSize) * mScale;
-		else if (bm is UIFont) NGUIText.fontScale = ((float)mFontSize / (bm as UIFont).defaultSize) * mScale;
+		else if (bm != null) NGUIText.fontScale = ((float)mFontSize / bm.defaultSize) * mScale;
 		else NGUIText.fontScale = mScale;
 
 		if (bm != null)

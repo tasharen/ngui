@@ -132,23 +132,12 @@ public class UILabelInspector : UIWidgetInspector
 		{
 			var dynFont = (ttf != null) ? ttf.objectReferenceValue as Font : null;
 			var bmFont = (fnt != null) ? fnt.objectReferenceValue : null;
-			var nguiFont = bmFont as NGUIFont;
-			var uiFont = bmFont as UIFont;
+			var bm = bmFont as INGUIFont;
 
-			if (bmFont != null)
+			if (bm != null && bm.isDynamic)
 			{
-				if (nguiFont != null && nguiFont.isDynamic)
-				{
-					dynFont = nguiFont.dynamicFont;
-					nguiFont = null;
-					uiFont = null;
-				}
-				else if (uiFont != null && uiFont.isDynamic)
-				{
-					dynFont = uiFont.dynamicFont;
-					nguiFont = null;
-					uiFont = null;
-				}
+				dynFont = bm.dynamicFont;
+				bm = null;
 			}
 
 			if (dynFont != null)
@@ -275,14 +264,7 @@ public class UILabelInspector : UIWidgetInspector
 			if (dynFont != null)
 				NGUIEditorTools.DrawPaddedProperty("Keep crisp", serializedObject, "keepCrispWhenShrunk");
 
-			var bm = mLabel.bitmapFont;
-
-			if (bm != null)
-			{
-				if (bm is NGUIFont) EditorGUI.BeginDisabledGroup((bm as NGUIFont).packedFontShader);
-				else if (bm is UIFont) EditorGUI.BeginDisabledGroup((bm as UIFont).packedFontShader);
-				else EditorGUI.BeginDisabledGroup(false);
-			}
+			if (bm != null) EditorGUI.BeginDisabledGroup(bm.packedFontShader);
 			else EditorGUI.BeginDisabledGroup(false);
 
 			GUILayout.BeginHorizontal();
@@ -357,12 +339,7 @@ public class UILabelInspector : UIWidgetInspector
 			GUILayout.BeginHorizontal();
 			sp = NGUIEditorTools.DrawProperty("BBCode", serializedObject, "mEncoding", GUILayout.Width(100f));
 
-			if (bm != null)
-			{
-				if (bm is NGUIFont) EditorGUI.BeginDisabledGroup(!sp.boolValue || !(bm as NGUIFont).hasSymbols);
-				else if (bm is UIFont) EditorGUI.BeginDisabledGroup(!sp.boolValue || !(bm as UIFont).hasSymbols);
-				else EditorGUI.BeginDisabledGroup(true);
-			}
+			if (bm != null) EditorGUI.BeginDisabledGroup(!sp.boolValue || !bm.hasSymbols);
 			else EditorGUI.BeginDisabledGroup(true);
 
 			NGUIEditorTools.SetLabelWidth(60f);

@@ -116,7 +116,7 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 	[HideInInspector][SerializeField] float mPixelSize = 1f;
 
 	// Replacement atlas can be used to completely bypass this atlas, pulling the data from another one instead.
-	[HideInInspector][SerializeField] INGUIAtlas mReplacement;
+	[HideInInspector][SerializeField] UnityEngine.Object mReplacement;
 
 	// Whether the atlas is using a pre-multiplied alpha material. -1 = not checked. 0 = no. 1 = yes.
 	[System.NonSerialized] int mPMA = -1;
@@ -132,13 +132,16 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 	{
 		get
 		{
-			return (mReplacement != null) ? mReplacement.spriteMaterial : material;
+			var rep = replacement;
+			return (rep != null) ? rep.spriteMaterial : material;
 		}
 		set
 		{
-			if (mReplacement != null)
+			var rep = replacement;
+
+			if (rep != null)
 			{
-				mReplacement.spriteMaterial = value;
+				rep.spriteMaterial = value;
 			}
 			else
 			{
@@ -166,7 +169,8 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 	{
 		get
 		{
-			if (mReplacement != null) return mReplacement.premultipliedAlpha;
+			var rep = replacement;
+			if (rep != null) return rep.premultipliedAlpha;
 
 			if (mPMA == -1)
 			{
@@ -185,19 +189,15 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 	{
 		get
 		{
-			if (mReplacement != null) return mReplacement.spriteList;
+			var rep = replacement;
+			if (rep != null) return rep.spriteList;
 			return mSprites;
 		}
 		set
 		{
-			if (mReplacement != null)
-			{
-				mReplacement.spriteList = value;
-			}
-			else
-			{
-				mSprites = value;
-			}
+			var rep = replacement;
+			if (rep != null) rep.spriteList = value;
+			else mSprites = value;
 		}
 	}
 
@@ -205,7 +205,14 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 	/// Texture used by the atlas.
 	/// </summary>
 
-	public Texture texture { get { return (mReplacement != null) ? mReplacement.texture : (material != null ? material.mainTexture as Texture : null); } }
+	public Texture texture
+	{
+		get
+		{
+			var rep = replacement;
+			return (rep != null) ? rep.texture : (material != null ? material.mainTexture as Texture : null);
+		}
+	}
 
 	/// <summary>
 	/// Pixel size is a multiplier applied to widgets dimensions when performing MakePixelPerfect() pixel correction.
@@ -217,13 +224,16 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 	{
 		get
 		{
-			return (mReplacement != null) ? mReplacement.pixelSize : mPixelSize;
+			var rep = replacement;
+			return (rep != null) ? rep.pixelSize : mPixelSize;
 		}
 		set
 		{
-			if (mReplacement != null)
+			var rep = replacement;
+
+			if (rep != null)
 			{
-				mReplacement.pixelSize = value;
+				rep.pixelSize = value;
 			}
 			else
 			{
@@ -248,18 +258,19 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 	{
 		get
 		{
-			return mReplacement;
+			if (mReplacement == null) return null;
+			return mReplacement as INGUIAtlas;
 		}
 		set
 		{
 			var rep = value;
 			if (rep == this as INGUIAtlas) rep = null;
 
-			if (mReplacement != rep)
+			if (mReplacement as INGUIAtlas != rep)
 			{
 				if (rep != null && rep.replacement == this as INGUIAtlas) rep.replacement = null;
 				if (mReplacement != null) MarkAsChanged();
-				mReplacement = rep;
+				mReplacement = rep as UnityEngine.Object;
 				if (rep != null) material = null;
 				MarkAsChanged();
 			}
@@ -272,11 +283,10 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 
 	public UISpriteData GetSprite (string name)
 	{
-		if (mReplacement != null)
-		{
-			return mReplacement.GetSprite(name);
-		}
-		else if (!string.IsNullOrEmpty(name))
+		var rep = replacement;
+		if (rep != null) return rep.GetSprite(name);
+
+		if (!string.IsNullOrEmpty(name))
 		{
 			if (mSprites.Count == 0) return null;
 
@@ -358,7 +368,8 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 
 	public BetterList<string> GetListOfSprites ()
 	{
-		if (mReplacement != null) return mReplacement.GetListOfSprites();
+		var rep = replacement;
+		if (rep != null) return rep.GetListOfSprites();
 
 		var list = new BetterList<string>();
 
@@ -376,7 +387,8 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 
 	public BetterList<string> GetListOfSprites (string match)
 	{
-		if (mReplacement != null) return mReplacement.GetListOfSprites(match);
+		var rep = replacement;
+		if (rep != null) return rep.GetListOfSprites(match);
 		if (string.IsNullOrEmpty(match)) return GetListOfSprites();
 
 		var list = new BetterList<string>();
@@ -425,7 +437,8 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 	{
 		if (atlas == null) return false;
 		if (atlas == this as INGUIAtlas) return true;
-		return (mReplacement != null) ? mReplacement.References(atlas) : false;
+		var rep = replacement;
+		return (rep != null) ? rep.References(atlas) : false;
 	}
 
 	/// <summary>
@@ -437,7 +450,8 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 #if UNITY_EDITOR
 		NGUITools.SetDirty(this);
 #endif
-		if (mReplacement != null) mReplacement.MarkAsChanged();
+		var rep = replacement;
+		if (rep != null) rep.MarkAsChanged();
 
 		var list = NGUITools.FindActive<UISprite>();
 

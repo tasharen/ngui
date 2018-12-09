@@ -217,55 +217,29 @@ public class NGUISettings
 	{
 		get
 		{
-			var fnt = Get<Font>("NGUI Dynamic Font", null);
-			if (fnt != null) return fnt;
-			return Get<UIFont>("NGUI Bitmap Font", null);
+			var f0 = Get<Font>("NGUI Font", null);
+			if (f0 != null) return f0;
+
+			var f1 = Get<NGUIFont>("NGUI Font", null);
+			if (f1 != null) return f1;
+
+			return Get<UIFont>("NGUI Font", null);
 		}
-		set
-		{
-			if (value == null)
-			{
-				Set("NGUI Bitmap Font", null);
-				Set("NGUI Dynamic Font", null);
-			}
-			else if (value is Font)
-			{
-				Set("NGUI Bitmap Font", null);
-				Set("NGUI Dynamic Font", value as Font);
-			}
-			else if (value is UIFont)
-			{
-				Set("NGUI Bitmap Font", value as UIFont);
-				Set("NGUI Dynamic Font", null);
-			}
-		}
+		set { Set("NGUI Font", value); }
 	}
 
 	static public INGUIAtlas atlas
 	{
 		get
 		{
-			var atl = Get<NGUIAtlas>("NGUI Atlas 2", null);
+			var atl = Get<NGUIAtlas>("NGUI Atlas", null);
 			if (atl != null) return atl;
+
 			return Get<UIAtlas>("NGUI Atlas", null);
 		}
 		set
 		{
-			if (value == null)
-			{
-				Set("NGUI Atlas", null);
-				Set("NGUI Atlas 2", null);
-			}
-			else if (value is NGUIAtlas)
-			{
-				Set("NGUI Atlas", null);
-				Set("NGUI Atlas 2", value as NGUIAtlas);
-			}
-			else if (value is UIAtlas)
-			{
-				Set("NGUI Atlas", value as UIAtlas);
-				Set("NGUI Atlas 2", null);
-			}
+			Set("NGUI Atlas", value as Object);
 		}
 	}
 

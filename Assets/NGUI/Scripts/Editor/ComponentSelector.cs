@@ -26,6 +26,8 @@ public class ComponentSelector : ScriptableWizard
 
 	static string GetName (System.Type t)
 	{
+		if (t == typeof(INGUIAtlas)) return "Atlas";
+		if (t == typeof(INGUIFont)) return "Font";
 		string s = t.ToString();
 		s = s.Replace("UnityEngine.", "");
 		if (s.StartsWith("UI")) s = s.Substring(2);
@@ -96,25 +98,25 @@ public class ComponentSelector : ScriptableWizard
 
 	static public void Show (INGUIAtlas atlas, OnSelectionCallback cb)
 	{
-		if (atlas is UIAtlas) Show<UIAtlas>(cb);
-		else Show<NGUIAtlas>(cb);
+		if (atlas is UIAtlas) Show<UIAtlas>(cb, new string[] { ".prefab" });
+		else Show<NGUIAtlas>(cb, new string[] { ".asset" });
 	}
 
 	/// <summary>
 	/// Show the selection wizard.
 	/// </summary>
 
-	static public void Show<T> (OnSelectionCallback cb) where T : Object { Show<T>(cb, new string[] {".prefab"}); }
+	static public void Show<T> (OnSelectionCallback cb) { Show<T>(cb, new string[] {".prefab"}); }
 
 	/// <summary>
 	/// Show the selection wizard.
 	/// </summary>
 
-	static public void Show<T> (OnSelectionCallback cb, string[] extensions) where T : Object
+	static public void Show<T> (OnSelectionCallback cb, string[] extensions)
 	{
-		System.Type type = typeof(T);
-		string title = (type == typeof(UIAtlas) ? "Select an " : "Select a ") + GetName(type);
-		ComponentSelector comp = ScriptableWizard.DisplayWizard<ComponentSelector>(title);
+		var type = typeof(T);
+		string title = GetName(type) + " Selection";
+		var comp = ScriptableWizard.DisplayWizard<ComponentSelector>(title);
 		comp.mTitle = title;
 		comp.mType = type;
 		comp.mCallback = cb;
@@ -132,7 +134,7 @@ public class ComponentSelector : ScriptableWizard
 			{
 				for (int i = 0; i < comp.mObjects.Length; ++i)
 				{
-					Object obj = comp.mObjects[i];
+					var obj = comp.mObjects[i];
 					if (obj.name == "Arial") continue;
 					string path = AssetDatabase.GetAssetPath(obj);
 					if (string.IsNullOrEmpty(path)) comp.mObjects[i] = null;

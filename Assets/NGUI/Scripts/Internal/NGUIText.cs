@@ -53,61 +53,9 @@ static public class NGUIText
 	/// this data is not passed at all, but is rather set in a single place before calling the functions that use it.
 	/// </summary>
 
-	static NGUIFont bitmapFont0;
-	static UIFont bitmapFont1;
+	static public INGUIFont bitmapFont;
 
-	static public System.Object bitmapFont
-	{
-		get
-		{
-			if (bitmapFont0 != null) return bitmapFont0;
-			if (bitmapFont1 != null) return bitmapFont1;
-			return null;
-		}
-		set
-		{
-			bitmapFont0 = null;
-			bitmapFont1 = null;
-
-			for (int i = 0; i < 10; ++i)
-			{
-				if (value is NGUIFont)
-				{
-					bitmapFont0 = (value as NGUIFont);
-					bitmapFont1 = null;
-
-					if (bitmapFont0 != null)
-					{
-						dynamicFont = bitmapFont0.dynamicFont;
-						value = bitmapFont0.replacement;
-						if (value == null) break;
-					}
-					else break;
-				}
-				else if (value is UIFont)
-				{
-					bitmapFont0 = null;
-					bitmapFont1 = (value as UIFont);
-
-					if (bitmapFont1 != null)
-					{
-						dynamicFont = bitmapFont1.dynamicFont;
-						value = bitmapFont1.replacement;
-						if (value == null) break;
-					}
-					else break;
-				}
-				else
-				{
-					bitmapFont0 = null;
-					bitmapFont1 = null;
-					break;
-				}
-			}
-		}
-	}
-
-	static public bool isDynamic { get { return bitmapFont0 == null && bitmapFont1 == null; } }
+	static public bool isDynamic { get { return bitmapFont == null; } }
 
 #if DYNAMIC_FONT
 	static public Font dynamicFont;
@@ -222,8 +170,7 @@ static public class NGUIText
 
 	static public BMSymbol GetSymbol (string text, int index, int textLength)
 	{
-		if (bitmapFont0 != null) return bitmapFont0.MatchSymbol(text, index, textLength);
-		if (bitmapFont1 != null) return bitmapFont1.MatchSymbol(text, index, textLength);
+		if (bitmapFont != null) return bitmapFont.MatchSymbol(text, index, textLength);
 		return null;
 	}
 
@@ -244,8 +191,7 @@ static public class NGUIText
 			}
 
 			BMGlyph bmg = null;
-			if (bitmapFont0 != null) bmg = bitmapFont0.bmFont.GetGlyph(ch);
-			else if (bitmapFont1 != null) bmg = bitmapFont1.bmFont.GetGlyph(ch);
+			if (bitmapFont != null) bmg = bitmapFont.bmFont.GetGlyph(ch);
 
 			if (bmg != null)
 			{
@@ -285,8 +231,7 @@ static public class NGUIText
 			}
 
 			BMGlyph bmg = null;
-			if (bitmapFont0 != null) bmg = bitmapFont0.bmFont.GetGlyph(ch);
-			else if (bitmapFont1 != null) bmg = bitmapFont1.bmFont.GetGlyph(ch);
+			if (bitmapFont != null) bmg = bitmapFont.bmFont.GetGlyph(ch);
 
 			if (bmg != null)
 			{
@@ -1548,17 +1493,11 @@ static public class NGUIText
 		bool strikethrough = false;
 		bool ignoreColor = false;
 
-		if (bitmapFont0 != null)
+		if (bitmapFont != null)
 		{
-			uvRect = bitmapFont0.uvRect;
-			invX = uvRect.width / bitmapFont0.texWidth;
-			invY = uvRect.height / bitmapFont0.texHeight;
-		}
-		else if (bitmapFont1 != null)
-		{
-			uvRect = bitmapFont1.uvRect;
-			invX = uvRect.width / bitmapFont1.texWidth;
-			invY = uvRect.height / bitmapFont1.texHeight;
+			uvRect = bitmapFont.uvRect;
+			invX = uvRect.width / bitmapFont.texWidth;
+			invY = uvRect.height / bitmapFont.texHeight;
 		}
 
 		for (int i = 0; i < textLength; ++i)
