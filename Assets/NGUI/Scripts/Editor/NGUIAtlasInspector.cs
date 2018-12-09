@@ -25,7 +25,7 @@ public class NGUIAtlasInspector : Editor
 
 	NGUIAtlas mAtlas;
 	AtlasType mType = AtlasType.Normal;
-	NGUIAtlas mReplacement = null;
+	INGUIAtlas mReplacement = null;
 
 	void OnEnable () { instance = this; mAtlas = target as NGUIAtlas; }
 	void OnDisable () { instance = null; }
@@ -39,20 +39,20 @@ public class NGUIAtlasInspector : Editor
 		UISpriteData sprite = (mAtlas != null) ? mAtlas.GetSprite(NGUISettings.selectedSprite) : null;
 		if (sprite == null) return;
 
-		UISprite[] sprites = NGUITools.FindActive<UISprite>();
+		var sprites = NGUITools.FindActive<UISprite>();
 
 		foreach (UISprite sp in sprites)
 		{
-			if (NGUIAtlas.CheckIfRelated(sp.atlas as NGUIAtlas, mAtlas) && sp.spriteName == sprite.name)
+			if (NGUITools.CheckIfRelated(sp.atlas, mAtlas) && sp.spriteName == sprite.name)
 			{
-				var atl = sp.atlas as NGUIAtlas;
+				var atl = sp.atlas;
 				sp.atlas = null;
 				sp.atlas = atl;
 				NGUITools.SetDirty(sp);
 			}
 		}
 
-		UILabel[] labels = NGUITools.FindActive<UILabel>();
+		var labels = NGUITools.FindActive<UILabel>();
 
 		foreach (UILabel lbl in labels)
 		{
@@ -64,7 +64,7 @@ public class NGUIAtlasInspector : Editor
 			{
 				var font = bm as NGUIFont;
 
-				if (NGUIAtlas.CheckIfRelated(font.atlas as NGUIAtlas, mAtlas) && font.UsesSprite(sprite.name))
+				if (NGUITools.CheckIfRelated(font.atlas, mAtlas) && font.UsesSprite(sprite.name))
 				{
 					lbl.bitmapFont = null;
 					lbl.bitmapFont = font;
@@ -75,7 +75,7 @@ public class NGUIAtlasInspector : Editor
 			{
 				var font = bm as UIFont;
 
-				if (NGUIAtlas.CheckIfRelated(font.atlas as NGUIAtlas, mAtlas) && font.UsesSprite(sprite.name))
+				if (NGUITools.CheckIfRelated(font.atlas, mAtlas) && font.UsesSprite(sprite.name))
 				{
 					lbl.bitmapFont = null;
 					lbl.bitmapFont = font;
@@ -91,13 +91,15 @@ public class NGUIAtlasInspector : Editor
 
 	void OnSelectAtlas (Object obj)
 	{
-		if (mReplacement != obj)
+		var rep = obj as INGUIAtlas;
+
+		if (mReplacement != rep)
 		{
 			// Undo doesn't work correctly in this case... so I won't bother.
 			//NGUIEditorTools.RegisterUndo("Atlas Change");
 			//NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
 
-			mAtlas.replacement = obj as NGUIAtlas;
+			mAtlas.replacement = rep;
 			mReplacement = mAtlas.replacement;
 			NGUITools.SetDirty(mAtlas);
 			if (mReplacement == null) mType = AtlasType.Normal;
@@ -148,7 +150,7 @@ public class NGUIAtlasInspector : Editor
 
 		if (mType == AtlasType.Reference)
 		{
-			ComponentSelector.Draw<NGUIAtlas>(mAtlas.replacement, OnSelectAtlas, true);
+			ComponentSelector.Draw(mAtlas.replacement, OnSelectAtlas, true);
 
 			GUILayout.Space(6f);
 			EditorGUILayout.HelpBox("You can have one atlas simply point to " +
@@ -160,7 +162,7 @@ public class NGUIAtlasInspector : Editor
 				"one. All the sprites referencing this atlas " +
 				"will update their references to the new one.", MessageType.Info);
 
-			if (mReplacement != mAtlas && mAtlas.replacement != mReplacement)
+			if (mReplacement != (mAtlas as INGUIAtlas) && mAtlas.replacement != mReplacement)
 			{
 				NGUIEditorTools.RegisterUndo("Atlas Change", mAtlas);
 				mAtlas.replacement = mReplacement;
@@ -291,11 +293,11 @@ public class NGUIAtlasInspector : Editor
 						if (!string.IsNullOrEmpty(path))
 						{
 							NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
-							UIAtlasMaker.SpriteEntry se = UIAtlasMaker.ExtractSprite(mAtlas, sprite.name);
+							var se = UIAtlasMaker.ExtractSprite(mAtlas, sprite.name);
 
 							if (se != null)
 							{
-								byte[] bytes = se.tex.EncodeToPNG();
+								var bytes = se.tex.EncodeToPNG();
 								File.WriteAllBytes(path, bytes);
 								//AssetDatabase.ImportAsset(path);
 								if (se.temporaryTexture) DestroyImmediate(se.tex);

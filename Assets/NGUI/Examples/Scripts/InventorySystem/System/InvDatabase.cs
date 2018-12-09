@@ -43,7 +43,7 @@ public class InvDatabase : MonoBehaviour
 	/// UI atlas used for icons.
 	/// </summary>
 
-	public UIAtlas iconAtlas;
+	public Object iconAtlas;
 
 	/// <summary>
 	/// Add this database to the list.

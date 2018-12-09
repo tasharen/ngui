@@ -43,7 +43,7 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 
 		if (mList.atlas == null && mList.background2DSprite == null && mList.highlight2DSprite == null)
 		{
-			mList.atlas = NGUISettings.atlas;
+			mList.atlas = NGUISettings.atlas as Object;
 			mList.backgroundSprite = NGUISettings.selectedSprite;
 			mList.highlightSprite = NGUISettings.selectedSprite;
 			NGUITools.SetDirty(mList);
@@ -58,8 +58,8 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 	void OnSelectAtlas (Object obj)
 	{
 		RegisterUndo();
-		mList.atlas = obj as UIAtlas;
-		NGUISettings.atlas = mList.atlas;
+		mList.atlas = obj;
+		NGUISettings.atlas = obj as INGUIAtlas;
 	}
 
 	void OnBackground (string spriteName)
@@ -168,15 +168,18 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 			GUILayout.BeginHorizontal();
 			{
 				if (NGUIEditorTools.DrawPrefixButton("Atlas"))
-					ComponentSelector.Show<UIAtlas>(OnSelectAtlas);
+				{
+					if (mList.atlas is UIAtlas) ComponentSelector.Show<UIAtlas>(OnSelectAtlas);
+					else ComponentSelector.Show<NGUIAtlas>(OnSelectAtlas);
+				}
 				atlasSp = NGUIEditorTools.DrawProperty("", serializedObject, "atlas");
 			}
 			GUILayout.EndHorizontal();
 
 			if (atlasSp != null && atlasSp.objectReferenceValue != null)
 			{
-				NGUIEditorTools.DrawPaddedSpriteField("Background", mList.atlas, mList.backgroundSprite, OnBackground);
-				NGUIEditorTools.DrawPaddedSpriteField("Highlight", mList.atlas, mList.highlightSprite, OnHighlight);
+				NGUIEditorTools.DrawPaddedSpriteField("Background", mList.atlas as INGUIAtlas, mList.backgroundSprite, OnBackground);
+				NGUIEditorTools.DrawPaddedSpriteField("Highlight", mList.atlas as INGUIAtlas, mList.highlightSprite, OnHighlight);
 			}
 			else
 			{

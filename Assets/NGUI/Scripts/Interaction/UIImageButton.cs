@@ -92,8 +92,8 @@ public class UIImageButton : MonoBehaviour
 		var atlas = target.atlas;
 		if (atlas == null) return;
 
-		if (atlas is NGUIAtlas) { if ((atlas as NGUIAtlas).GetSprite(sprite) == null) return; }
-		else if (atlas is UIAtlas) { if ((atlas as UIAtlas).GetSprite(sprite) == null) return; }
+		var atl = atlas as INGUIAtlas;
+		if (atl == null || atl.GetSprite(sprite) == null) return;
 
 		target.spriteName = sprite;
 		if (pixelSnap) target.MakePixelPerfect();

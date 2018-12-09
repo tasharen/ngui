@@ -118,8 +118,8 @@ public class UISpriteCollection : UIBasicSprite
 		get
 		{
 			Material mat = null;
-			if (mAtlas is NGUIAtlas) mat = (mAtlas as NGUIAtlas).spriteMaterial;
-			else if (mAtlas is UIAtlas) mat = (mAtlas as UIAtlas).spriteMaterial;
+			var ia = atlas;
+			if (ia != null) mat = ia.spriteMaterial;
 			return (mat != null) ? mat.mainTexture : null;
 		}
 		set
@@ -139,11 +139,8 @@ public class UISpriteCollection : UIBasicSprite
 			var mat = base.material;
 			if (mat != null) return mat;
 
-			if (mAtlas != null)
-			{
-				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).spriteMaterial;
-				if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).spriteMaterial;
-			}
+			var ia = atlas;
+			if (ia != null) return ia.spriteMaterial;
 			return null;
 		}
 		set
@@ -156,18 +153,18 @@ public class UISpriteCollection : UIBasicSprite
 	/// Atlas used by this widget.
 	/// </summary>
 
-	public Object atlas
+	public INGUIAtlas atlas
 	{
 		get
 		{
-			return mAtlas;
+			return mAtlas as INGUIAtlas;
 		}
 		set
 		{
-			if (mAtlas != value)
+			if (mAtlas as INGUIAtlas != value)
 			{
 				RemoveFromPanel();
-				mAtlas = value;
+				mAtlas = value as UnityEngine.Object;
 				mSprites.Clear();
 				MarkAsChanged();
 			}
@@ -182,11 +179,8 @@ public class UISpriteCollection : UIBasicSprite
 	{
 		get
 		{
-			if (mAtlas != null)
-			{
-				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).pixelSize;
-				if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).pixelSize;
-			}
+			var ia = atlas;
+			if (ia != null) return ia.pixelSize;
 			return 1f;
 		}
 	}
@@ -199,11 +193,8 @@ public class UISpriteCollection : UIBasicSprite
 	{
 		get
 		{
-			if (mAtlas != null)
-			{
-				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).premultipliedAlpha;
-				if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).premultipliedAlpha;
-			}
+			var ia = atlas;
+			if (ia != null) return ia.premultipliedAlpha;
 			return false;
 		}
 	}
@@ -374,12 +365,8 @@ public class UISpriteCollection : UIBasicSprite
 
 		var sprite = new Sprite();
 
-		if (mAtlas != null)
-		{
-			if (mAtlas is NGUIAtlas) sprite.sprite = (mAtlas as NGUIAtlas).GetSprite(spriteName);
-			else if (mAtlas is UIAtlas) sprite.sprite = (mAtlas as UIAtlas).GetSprite(spriteName);
-		}
-
+		var ia = atlas;
+		if (ia != null) sprite.sprite = ia.GetSprite(spriteName);
 		if (sprite.sprite == null) return;
 
 		sprite.pos = pos;

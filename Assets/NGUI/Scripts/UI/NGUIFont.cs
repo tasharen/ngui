@@ -8,14 +8,18 @@
 
 using UnityEngine;
 using System.Collections.Generic;
-using System.Text;
+
+public interface INGUIFont
+{
+	BMFont bmFont { get; set; }
+}
 
 /// <summary>
 /// NGUI Font contains everything needed to be able to print text.
 /// </summary>
 
 [ExecuteInEditMode]
-public class NGUIFont : ScriptableObject
+public class NGUIFont : ScriptableObject, INGUIFont
 {
 	[HideInInspector][SerializeField] Material mMat;
 	[HideInInspector][SerializeField] Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
@@ -104,12 +108,12 @@ public class NGUIFont : ScriptableObject
 	/// Atlas used by the font, if any.
 	/// </summary>
 
-	public Object atlas
+	public INGUIAtlas atlas
 	{
 		get
 		{
 			if (mReplacement != null) return mReplacement.atlas;
-			return mAtlas;
+			return mAtlas as INGUIAtlas;
 		}
 		set
 		{
@@ -117,18 +121,22 @@ public class NGUIFont : ScriptableObject
 			{
 				mReplacement.atlas = value;
 			}
-			else if (mAtlas != value)
+			else if (mAtlas as INGUIAtlas != value)
 			{
 				mPMA = -1;
-				mAtlas = value;
+				mAtlas = value as UnityEngine.Object;
 
-				if (mAtlas != null)
+				if (value != null)
 				{
-					if (mAtlas is NGUIAtlas) mMat = (mAtlas as NGUIAtlas).spriteMaterial;
-					else if (mAtlas is UIAtlas) mMat = (mAtlas as UIAtlas).spriteMaterial;
-					else { mAtlas = null; mMat = null; }
+					mMat = value.spriteMaterial;
 					if (sprite != null) mUVRect = uvRect;
 				}
+				else
+				{
+					mAtlas = null;
+					mMat = null;
+				}
+
 				MarkAsChanged();
 			}
 		}
@@ -140,10 +148,8 @@ public class NGUIFont : ScriptableObject
 
 	public UISpriteData GetSprite (string spriteName)
 	{
-		var a = atlas;
-		if (a == null) return null;
-		if (a is NGUIAtlas) return (a as NGUIAtlas).GetSprite(spriteName);
-		if (a is UIAtlas) return (a as UIAtlas).GetSprite(spriteName);
+		var ia = atlas;
+		if (ia != null) return ia.GetSprite(spriteName);
 		return null;
 	}
 
@@ -157,11 +163,8 @@ public class NGUIFont : ScriptableObject
 		{
 			if (mReplacement != null) return mReplacement.material;
 
-			if (mAtlas != null)
-			{
-				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).spriteMaterial;
-				else if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).spriteMaterial;
-			}
+			var ia = mAtlas as INGUIAtlas;
+			if (ia != null) return ia.spriteMaterial;
 
 			if (mMat != null)
 			{
@@ -210,11 +213,8 @@ public class NGUIFont : ScriptableObject
 		{
 			if (mReplacement != null) return mReplacement.premultipliedAlphaShader;
 
-			if (mAtlas != null)
-			{
-				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).premultipliedAlpha;
-				else if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).premultipliedAlpha;
-			}
+			var ia = mAtlas as INGUIAtlas;
+			if (ia != null) return ia.premultipliedAlpha;
 
 			if (mPMA == -1)
 			{
@@ -350,17 +350,12 @@ public class NGUIFont : ScriptableObject
 		{
 			if (mReplacement != null) return mReplacement.sprite;
 
-			if (mSprite == null && mAtlas != null && mFont != null && !string.IsNullOrEmpty(mFont.spriteName))
+			var ia = mAtlas as INGUIAtlas;
+
+			if (mSprite == null && ia != null && mFont != null && !string.IsNullOrEmpty(mFont.spriteName))
 			{
-				if (mAtlas is NGUIAtlas) mSprite = (mAtlas as NGUIAtlas).GetSprite(mFont.spriteName);
-				else if (mAtlas is UIAtlas) mSprite = (mAtlas as UIAtlas).GetSprite(mFont.spriteName);
-
-				if (mSprite == null)
-				{
-					if (mAtlas is NGUIAtlas) mSprite = (mAtlas as NGUIAtlas).GetSprite(name);
-					else if (mAtlas is UIAtlas) mSprite = (mAtlas as UIAtlas).GetSprite(name);
-				}
-
+				mSprite = ia.GetSprite(mFont.spriteName);
+				if (mSprite == null) mSprite = ia.GetSprite(name);
 				if (mSprite == null) mFont.spriteName = null;
 				else UpdateUVRect();
 
@@ -467,8 +462,8 @@ public class NGUIFont : ScriptableObject
 	void Trim ()
 	{
 		Texture tex = null;
-		if (mAtlas is NGUIAtlas) tex = (mAtlas as NGUIAtlas).texture;
-		else if (mAtlas is UIAtlas) tex = (mAtlas as UIAtlas).texture;
+		var ia = mAtlas as INGUIAtlas;
+		if (ia != null) tex = ia.texture;
 
 		if (tex != null && mSprite != null)
 		{
@@ -556,8 +551,8 @@ public class NGUIFont : ScriptableObject
 		if (mAtlas == null) return;
 
 		Texture tex = null;
-		if (mAtlas is NGUIAtlas) tex = (mAtlas as NGUIAtlas).texture;
-		else if (mAtlas is UIAtlas) tex = (mAtlas as UIAtlas).texture;
+		var ia = mAtlas as INGUIAtlas;
+		if (ia != null) tex = ia.texture;
 
 		if (tex != null)
 		{

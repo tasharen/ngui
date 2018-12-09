@@ -145,9 +145,9 @@ public class UICreateWidgetWizard : EditorWindow
 
 	void OnSelectAtlas (Object obj)
 	{
-		if (NGUISettings.atlas != obj)
+		if (NGUISettings.atlas != obj as INGUIAtlas)
 		{
-			NGUISettings.atlas = obj as UIAtlas;
+			NGUISettings.atlas = obj as INGUIAtlas;
 			Repaint();
 		}
 	}
@@ -670,7 +670,7 @@ public class UICreateWidgetWizard : EditorWindow
 			Vector2 fgPadding = new Vector2(Mathf.Max(4f, spfg.paddingLeft), Mathf.Max(4f, spfg.paddingTop));
 
 			// Background sprite
-			UISprite sprite = NGUITools.AddSprite(go, NGUISettings.atlas, mListFG);
+			UISprite sprite = NGUITools.AddSprite(go, NGUISettings.atlas as INGUIAtlas, mListFG);
 			sprite.depth = depth;
 			sprite.atlas = NGUISettings.atlas;
 			sprite.pivot = UIWidget.Pivot.Left;
@@ -694,7 +694,7 @@ public class UICreateWidgetWizard : EditorWindow
 
 			// Add the popup list
 			UIPopupList list = go.AddComponent<UIPopupList>();
-			list.atlas = NGUISettings.atlas;
+			list.atlas = NGUISettings.atlas as Object;
 			list.ambigiousFont = NGUISettings.ambigiousFont;
 			list.fontSize = NGUISettings.fontSize;
 			list.fontStyle = NGUISettings.fontStyle;

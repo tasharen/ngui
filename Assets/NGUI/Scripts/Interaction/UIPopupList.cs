@@ -667,11 +667,8 @@ public class UIPopupList : UIWidgetContainer
 		Vector4 border = mHighlight.border;
 		float scaleFactor = 1f;
 
-		if (atlas != null)
-		{
-			if (atlas is NGUIAtlas) scaleFactor = (atlas as NGUIAtlas).pixelSize;
-			else if (atlas is UIAtlas) scaleFactor = (atlas as UIAtlas).pixelSize;
-		}
+		var atl = atlas as INGUIAtlas;
+		if (atl != null) scaleFactor = atl.pixelSize;
 
 		float offsetX = border.x * scaleFactor;
 		float offsetY = border.w * scaleFactor;
@@ -1077,7 +1074,7 @@ public class UIPopupList : UIWidgetContainer
 				sp2.sprite2D = background2DSprite;
 				mBackground = sp2;
 			}
-			else if (atlas != null) mBackground = NGUITools.AddSprite(mChild, atlas, backgroundSprite, depth);
+			else if (atlas != null) mBackground = NGUITools.AddSprite(mChild, atlas as INGUIAtlas, backgroundSprite, depth);
 			else return;
 
 			bool placeAbove = (position == Position.Above);
@@ -1108,7 +1105,7 @@ public class UIPopupList : UIWidgetContainer
 				sp2.sprite2D = highlight2DSprite;
 				mHighlight = sp2;
 			}
-			else if (atlas != null) mHighlight = NGUITools.AddSprite(mChild, atlas, highlightSprite, ++depth);
+			else if (atlas != null) mHighlight = NGUITools.AddSprite(mChild, atlas as INGUIAtlas, highlightSprite, ++depth);
 			else return;
 
 			float hlspHeight = 0f, hlspLeft = 0f;
@@ -1225,12 +1222,8 @@ public class UIPopupList : UIWidgetContainer
 			// Scale the highlight sprite to envelop a single item
 
 			float scaleFactor = 2f;
-
-			if (atlas != null)
-			{
-				if (atlas is NGUIAtlas) scaleFactor *= (atlas as NGUIAtlas).pixelSize;
-				else if (atlas is UIAtlas) scaleFactor *= (atlas as UIAtlas).pixelSize;
-			}
+			var atl = atlas as INGUIAtlas;
+			if (atl != null) scaleFactor *= atl.pixelSize;
 
 			float w = x - (bgPadding.x + padding.x) * 2f + hlspLeft * scaleFactor;
 			float h = labelHeight + hlspHeight * scaleFactor;

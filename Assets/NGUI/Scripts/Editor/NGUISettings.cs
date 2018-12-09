@@ -241,7 +241,7 @@ public class NGUISettings
 		}
 	}
 
-	static public Object atlas
+	static public INGUIAtlas atlas
 	{
 		get
 		{
@@ -272,9 +272,7 @@ public class NGUISettings
 	static public UISpriteData GetSprite (string spriteName)
 	{
 		var atlas = NGUISettings.atlas;
-		if (atlas is NGUIAtlas) return (atlas as NGUIAtlas).GetSprite(spriteName);
-		if (atlas is UIAtlas) return (atlas as UIAtlas).GetSprite(spriteName);
-		return null;
+		return atlas != null ? atlas.GetSprite(spriteName) : null;
 	}
 
 	static public Texture texture
@@ -651,7 +649,7 @@ public class NGUISettings
 
 	static void CopySprite (UISprite sp)
 	{
-		SetString("Atlas", NGUIEditorTools.ObjectToGUID(sp.atlas));
+		SetString("Atlas", NGUIEditorTools.ObjectToGUID(sp.atlas as UnityEngine.Object));
 		SetString("Sprite", sp.spriteName);
 		SetEnum("Sprite Type", sp.type);
 		SetEnum("Left Type", sp.leftType);

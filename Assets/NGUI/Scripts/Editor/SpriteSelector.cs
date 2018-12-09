@@ -45,7 +45,7 @@ public class SpriteSelector : ScriptableWizard
 		else
 		{
 			bool close = false;
-			GUILayout.Label(atlas.name + " Sprites", "LODLevelNotifyText");
+			GUILayout.Label((atlas as Object).name + " Sprites", "LODLevelNotifyText");
 			NGUIEditorTools.DrawSeparator();
 
 			GUILayout.BeginHorizontal();
@@ -63,10 +63,7 @@ public class SpriteSelector : ScriptableWizard
 			GUILayout.Space(84f);
 			GUILayout.EndHorizontal();
 
-			Texture2D tex = null;
-
-			if (atlas is NGUIAtlas) tex = (atlas as NGUIAtlas).texture as Texture2D;
-			else if (atlas is UIAtlas) tex = (atlas as UIAtlas).texture as Texture2D;
+			var tex = atlas.texture as Texture2D;
 
 			if (tex == null)
 			{
@@ -74,10 +71,7 @@ public class SpriteSelector : ScriptableWizard
 				return;
 			}
 
-			BetterList<string> sprites = null;
-
-			if (atlas is NGUIAtlas) sprites = (atlas as NGUIAtlas).GetListOfSprites(NGUISettings.partialSprite);
-			else if (atlas is UIAtlas) sprites = (atlas as UIAtlas).GetListOfSprites(NGUISettings.partialSprite);
+			var sprites = atlas.GetListOfSprites(NGUISettings.partialSprite);
 
 			if (sprites == null)
 			{
@@ -111,10 +105,7 @@ public class SpriteSelector : ScriptableWizard
 
 					for (; offset < sprites.size; ++offset)
 					{
-						UISpriteData sprite = null;
-
-						if (atlas is NGUIAtlas) sprite = (atlas as NGUIAtlas).GetSprite(sprites[offset]);
-						else if (atlas is UIAtlas) sprite = (atlas as UIAtlas).GetSprite(sprites[offset]);
+						var sprite = atlas.GetSprite(sprites[offset]);
 						if (sprite == null) continue;
 
 						// Button comes first
@@ -280,7 +271,7 @@ public class SpriteSelector : ScriptableWizard
 	/// Show the sprite selection wizard.
 	/// </summary>
 
-	static public void Show (SerializedObject ob, SerializedProperty pro, UIAtlas atlas)
+	static public void Show (SerializedObject ob, SerializedProperty pro, INGUIAtlas atlas)
 	{
 		if (instance != null)
 		{

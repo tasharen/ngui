@@ -80,9 +80,11 @@ public class UIFontMaker : EditorWindow
 
 	void OnSelectAtlas (Object obj)
 	{
-		if (NGUISettings.atlas != obj)
+		var atlas = obj as INGUIAtlas;
+
+		if (NGUISettings.atlas != atlas)
 		{
-			NGUISettings.atlas = obj as UIAtlas;
+			NGUISettings.atlas = atlas;
 			Repaint();
 		}
 	}

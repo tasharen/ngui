@@ -82,7 +82,7 @@ public class InvBaseItem
 	/// Atlas used for the item's icon.
 	/// </summary>
 
-	public UIAtlas iconAtlas;
+	public Object iconAtlas;
 
 	/// <summary>
 	/// Name of the icon's sprite within the atlas.

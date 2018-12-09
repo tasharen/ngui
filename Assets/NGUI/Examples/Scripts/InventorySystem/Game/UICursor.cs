@@ -21,7 +21,7 @@ public class UICursor : MonoBehaviour
 	Transform mTrans;
 	UISprite mSprite;
 
-	Object mAtlas;
+	INGUIAtlas mAtlas;
 	string mSpriteName;
 
 	/// <summary>
@@ -105,7 +105,7 @@ public class UICursor : MonoBehaviour
 	/// Override the cursor with the specified sprite.
 	/// </summary>
 
-	static public void Set (Object atlas, string sprite)
+	static public void Set (INGUIAtlas atlas, string sprite)
 	{
 		if (instance != null && instance.mSprite)
 		{

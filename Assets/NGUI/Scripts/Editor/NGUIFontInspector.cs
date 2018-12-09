@@ -59,10 +59,10 @@ public class NGUIFontInspector : Editor
 
 	void OnSelectAtlas (Object obj)
 	{
-		if (mFont != null && mFont.atlas != obj)
+		if (mFont != null && mFont.atlas != obj as INGUIAtlas)
 		{
 			NGUIEditorTools.RegisterUndo("Font Atlas", mFont);
-			mFont.atlas = obj as UIAtlas;
+			mFont.atlas = obj as INGUIAtlas;
 			MarkAsChanged();
 		}
 	}
@@ -180,11 +180,7 @@ public class NGUIFontInspector : Editor
 
 			if (mFont.atlas != null)
 			{
-				if (mFont.bmFont.isValid)
-				{
-					if (mFont.atlas is NGUIAtlas) NGUIEditorTools.DrawAdvancedSpriteField(mFont.atlas as NGUIAtlas, mFont.spriteName, SelectSprite, false);
-					else if (mFont.atlas is UIAtlas) NGUIEditorTools.DrawAdvancedSpriteField(mFont.atlas as UIAtlas, mFont.spriteName, SelectSprite, false);
-				}
+				if (mFont.bmFont.isValid) NGUIEditorTools.DrawAdvancedSpriteField(mFont.atlas, mFont.spriteName, SelectSprite, false);
 			}
 			else
 			{
@@ -283,7 +279,7 @@ public class NGUIFontInspector : Editor
 							{
 								NGUISettings.atlas = mFont.atlas;
 								NGUISettings.selectedSprite = sym.spriteName;
-								NGUIEditorTools.Select(mFont.atlas);
+								NGUIEditorTools.Select(mFont.atlas as Object);
 							}
 						}
 

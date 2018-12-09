@@ -109,12 +109,12 @@ public class UIFont : MonoBehaviour
 	/// Atlas used by the font, if any.
 	/// </summary>
 
-	public Object atlas
+	public INGUIAtlas atlas
 	{
 		get
 		{
 			if (mReplacement != null) return mReplacement.atlas;
-			return mAtlas;
+			return mAtlas as INGUIAtlas;
 		}
 		set
 		{
@@ -122,18 +122,18 @@ public class UIFont : MonoBehaviour
 			{
 				mReplacement.atlas = value;
 			}
-			else if (mAtlas != value)
+			else if (mAtlas as INGUIAtlas != value)
 			{
 				mPMA = -1;
-				mAtlas = value;
+				mAtlas = value as UnityEngine.Object;
 
-				if (mAtlas != null)
+				if (value != null)
 				{
-					if (mAtlas is NGUIAtlas) mMat = (mAtlas as NGUIAtlas).spriteMaterial;
-					else if (mAtlas is UIAtlas) mMat = (mAtlas as UIAtlas).spriteMaterial;
-					else { mAtlas = null; mMat = null; }
+					mMat = value.spriteMaterial;
 					if (sprite != null) mUVRect = uvRect;
 				}
+				else { mAtlas = null; mMat = null; }
+
 				MarkAsChanged();
 			}
 		}
@@ -145,10 +145,8 @@ public class UIFont : MonoBehaviour
 
 	public UISpriteData GetSprite (string spriteName)
 	{
-		var a = atlas;
-		if (a == null) return null;
-		if (a is NGUIAtlas) return (a as NGUIAtlas).GetSprite(spriteName);
-		if (a is UIAtlas) return (a as UIAtlas).GetSprite(spriteName);
+		var ia = atlas;
+		if (ia != null) return ia.GetSprite(spriteName);
 		return null;
 	}
 
@@ -162,11 +160,8 @@ public class UIFont : MonoBehaviour
 		{
 			if (mReplacement != null) return mReplacement.material;
 
-			if (mAtlas != null)
-			{
-				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).spriteMaterial;
-				else if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).spriteMaterial;
-			}
+			var ia = mAtlas as INGUIAtlas;
+			if (ia != null) return ia.spriteMaterial;
 
 			if (mMat != null)
 			{
@@ -215,11 +210,8 @@ public class UIFont : MonoBehaviour
 		{
 			if (mReplacement != null) return mReplacement.premultipliedAlphaShader;
 
-			if (mAtlas != null)
-			{
-				if (mAtlas is NGUIAtlas) return (mAtlas as NGUIAtlas).premultipliedAlpha;
-				else if (mAtlas is UIAtlas) return (mAtlas as UIAtlas).premultipliedAlpha;
-			}
+			var ia = mAtlas as INGUIAtlas;
+			if (ia != null) return ia.premultipliedAlpha;
 
 			if (mPMA == -1)
 			{
@@ -359,17 +351,12 @@ public class UIFont : MonoBehaviour
 		{
 			if (mReplacement != null) return mReplacement.sprite;
 
-			if (mSprite == null && mAtlas != null && mFont != null && !string.IsNullOrEmpty(mFont.spriteName))
+			var ia = mAtlas as INGUIAtlas;
+
+			if (mSprite == null && ia != null && mFont != null && !string.IsNullOrEmpty(mFont.spriteName))
 			{
-				if (mAtlas is NGUIAtlas) mSprite = (mAtlas as NGUIAtlas).GetSprite(mFont.spriteName);
-				else if (mAtlas is UIAtlas) mSprite = (mAtlas as UIAtlas).GetSprite(mFont.spriteName);
-
-				if (mSprite == null)
-				{
-					if (mAtlas is NGUIAtlas) mSprite = (mAtlas as NGUIAtlas).GetSprite(name);
-					else if (mAtlas is UIAtlas) mSprite = (mAtlas as UIAtlas).GetSprite(name);
-				}
-
+				mSprite = ia.GetSprite(mFont.spriteName);
+				if (mSprite == null) mSprite = ia.GetSprite(name);
 				if (mSprite == null) mFont.spriteName = null;
 				else UpdateUVRect();
 
@@ -476,8 +463,8 @@ public class UIFont : MonoBehaviour
 	void Trim ()
 	{
 		Texture tex = null;
-		if (mAtlas is NGUIAtlas) tex = (mAtlas as NGUIAtlas).texture;
-		else if (mAtlas is UIAtlas) tex = (mAtlas as UIAtlas).texture;
+		var ia = atlas;
+		if (ia != null) tex = ia.texture;
 
 		if (tex != null && mSprite != null)
 		{
@@ -564,11 +551,9 @@ public class UIFont : MonoBehaviour
 
 	public void UpdateUVRect ()
 	{
-		if (mAtlas == null) return;
-
-		Texture tex = null;
-		if (mAtlas is NGUIAtlas) tex = (mAtlas as NGUIAtlas).texture;
-		else if (mAtlas is UIAtlas) tex = (mAtlas as UIAtlas).texture;
+		var ia = mAtlas as INGUIAtlas;
+		if (ia == null) return;
+		var tex = ia.texture;
 
 		if (tex != null)
 		{

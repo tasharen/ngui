@@ -135,7 +135,9 @@ public class InvDatabaseInspector : Editor
 		else
 		{
 			// Database icon atlas
-			UIAtlas atlas = EditorGUILayout.ObjectField("Icon Atlas", db.iconAtlas, typeof(UIAtlas), false) as UIAtlas;
+			var atlas = db.iconAtlas;
+			if (atlas is UIAtlas) atlas = EditorGUILayout.ObjectField("Icon Atlas", atlas, typeof(UIAtlas), false) as UIAtlas;
+			else atlas = EditorGUILayout.ObjectField("Icon Atlas", atlas, typeof(NGUIAtlas), false) as NGUIAtlas;
 
 			if (atlas != db.iconAtlas)
 			{
@@ -243,10 +245,11 @@ public class InvDatabaseInspector : Editor
 				float iconSize = 64f;
 				bool drawIcon = false;
 				float extraSpace = 0f;
+				var ia = item.iconAtlas as INGUIAtlas;
 
-				if (item.iconAtlas != null)
+				if (ia != null)
 				{
-					BetterList<string> sprites = item.iconAtlas.GetListOfSprites();
+					var sprites = ia.GetListOfSprites();
 					sprites.Insert(0, "<None>");
 
 					int index = 0;
@@ -267,13 +270,13 @@ public class InvDatabaseInspector : Editor
 
 					// Draw the sprite selection popup
 					index = EditorGUILayout.Popup("Icon", index, sprites.ToArray());
-					UISpriteData sprite = (index > 0) ? item.iconAtlas.GetSprite(sprites[index]) : null;
+					UISpriteData sprite = (index > 0) ? ia.GetSprite(sprites[index]) : null;
 
 					if (sprite != null)
 					{
 						iconName = sprite.name;
 
-						Material mat = item.iconAtlas.spriteMaterial;
+						var mat = ia.spriteMaterial;
 
 						if (mat != null)
 						{

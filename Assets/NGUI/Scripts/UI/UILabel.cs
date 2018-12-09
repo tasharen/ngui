@@ -231,7 +231,7 @@ public class UILabel : UIWidget
 	/// Atlas reference, when the label is using a bitmap font.
 	/// </summary>
 
-	public UnityEngine.Object atlas
+	public INGUIAtlas atlas
 	{
 		get
 		{

@@ -1258,34 +1258,7 @@ static public class NGUITools
 	/// It will be sliced if the sprite has an inner rect, and a regular sprite otherwise.
 	/// </summary>
 
-	static public UISprite AddSprite (this GameObject go, UnityEngine.Object atlas, string spriteName, int depth = int.MaxValue)
-	{
-		if (atlas is NGUIAtlas) return AddSprite(go, atlas as NGUIAtlas, spriteName, depth);
-		if (atlas is UIAtlas) return AddSprite(go, atlas as UIAtlas, spriteName, depth);
-		return null;
-	}
-
-	/// <summary>
-	/// Add a sprite appropriate for the specified atlas sprite.
-	/// It will be sliced if the sprite has an inner rect, and a regular sprite otherwise.
-	/// </summary>
-
-	static public UISprite AddSprite (this GameObject go, NGUIAtlas atlas, string spriteName, int depth = int.MaxValue)
-	{
-		UISpriteData sp = (atlas != null) ? atlas.GetSprite(spriteName) : null;
-		UISprite sprite = AddWidget<UISprite>(go, depth);
-		sprite.type = (sp == null || !sp.hasBorder) ? UISprite.Type.Simple : UISprite.Type.Sliced;
-		sprite.atlas = atlas;
-		sprite.spriteName = spriteName;
-		return sprite;
-	}
-
-	/// <summary>
-	/// Add a sprite appropriate for the specified atlas sprite.
-	/// It will be sliced if the sprite has an inner rect, and a regular sprite otherwise.
-	/// </summary>
-
-	static public UISprite AddSprite (this GameObject go, UIAtlas atlas, string spriteName, int depth = int.MaxValue)
+	static public UISprite AddSprite (this GameObject go, INGUIAtlas atlas, string spriteName, int depth = int.MaxValue)
 	{
 		UISpriteData sp = (atlas != null) ? atlas.GetSprite(spriteName) : null;
 		UISprite sprite = AddWidget<UISprite>(go, depth);
@@ -2805,4 +2778,82 @@ static public class NGUITools
 	}
 
 	static ColorSpace mColorSpace = ColorSpace.Uninitialized;
+
+	/// <summary>
+	/// Helper function that determines whether the two atlases are related.
+	/// </summary>
+
+	static public bool CheckIfRelated (INGUIAtlas a, INGUIAtlas b)
+	{
+		if (a == null || b == null) return false;
+		return a == b || a.References(b) || b.References(a);
+	}
+
+	/// <summary>
+	/// Replace all atlas reference of one atlas with another.
+	/// </summary>
+
+	static public void Replace (INGUIAtlas before, INGUIAtlas after)
+	{
+		var list = FindActive<UISprite>();
+
+		for (int i = 0, imax = list.Length; i < imax; ++i)
+		{
+			var sp = list[i];
+
+			if (sp.atlas == before)
+			{
+				sp.atlas = after;
+#if UNITY_EDITOR
+				SetDirty(sp);
+#endif
+			}
+		}
+
+		// TODO: Replace with INGUIFont
+		var fonts = Resources.FindObjectsOfTypeAll(typeof(UIFont)) as UIFont[];
+
+		for (int i = 0, imax = fonts.Length; i < imax; ++i)
+		{
+			var font = fonts[i];
+
+			if (font.atlas == before)
+			{
+				font.atlas = after;
+#if UNITY_EDITOR
+				SetDirty(font);
+#endif
+			}
+		}
+
+		var nfts = Resources.FindObjectsOfTypeAll(typeof(NGUIFont)) as NGUIFont[];
+
+		for (int i = 0, imax = nfts.Length; i < imax; ++i)
+		{
+			var font = nfts[i];
+
+			if (font.atlas == before)
+			{
+				font.atlas = after;
+#if UNITY_EDITOR
+				SetDirty(font);
+#endif
+			}
+		}
+
+		var labels = FindActive<UILabel>();
+
+		for (int i = 0, imax = labels.Length; i < imax; ++i)
+		{
+			var lbl = labels[i];
+
+			if (lbl.bitmapFont != null && lbl.atlas == before)
+			{
+				lbl.atlas = after;
+#if UNITY_EDITOR
+				SetDirty(lbl);
+#endif
+			}
+		}
+	}
 }

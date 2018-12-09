@@ -57,6 +57,12 @@ public class ComponentSelector : ScriptableWizard
 		else cb(o);
 	}
 
+	static public void Draw (string buttonName, INGUIAtlas atlas, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options)
+	{
+		if (atlas is UIAtlas) Draw(buttonName, atlas as UIAtlas, cb, editButton, options);
+		else Draw(buttonName, atlas as NGUIAtlas, cb, editButton, options);
+	}
+
 	/// <summary>
 	/// Draw a button + object selection combo filtering specified types.
 	/// </summary>
@@ -64,6 +70,34 @@ public class ComponentSelector : ScriptableWizard
 	static public void Draw<T> (T obj, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options) where T : Object
 	{
 		Draw<T>(NGUITools.GetTypeName<T>(), obj, cb, editButton, options);
+	}
+
+	static public void Draw (INGUIAtlas atlas, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options)
+	{
+		if (atlas != null)
+		{
+			if (atlas is UIAtlas) Draw(atlas as UIAtlas, cb, editButton, options);
+			else Draw(atlas as NGUIAtlas, cb, editButton, options);
+		}
+	}
+
+	static public void Draw (INGUIFont font, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options)
+	{
+		if (font != null)
+		{
+			if (font is UIFont) Draw(font as UIFont, cb, editButton, options);
+			else Draw(font as NGUIFont, cb, editButton, options);
+		}
+	}
+
+	/// <summary>
+	/// Show the selection wizard.
+	/// </summary>
+
+	static public void Show (INGUIAtlas atlas, OnSelectionCallback cb)
+	{
+		if (atlas is UIAtlas) Show<UIAtlas>(cb);
+		else Show<NGUIAtlas>(cb);
 	}
 
 	/// <summary>

@@ -12,8 +12,8 @@ using System;
 /// This is the legacy atlas component, kept for full backwards compatibility. All newly created UIs should use NGUIAtlas-based atlases instead.
 /// </summary>
 
-//[AddComponentMenu("NGUI/UI/Atlas")] // No longer used as the scriptable object atlas is used instead
-public class UIAtlas : MonoBehaviour
+//[AddComponentMenu("NGUI/UI/Atlas")] // No longer used as the scriptable object NGUIAtlas is used instead
+public class UIAtlas : MonoBehaviour, INGUIAtlas
 {
 	// Legacy functionality, removed in 3.0. Do not use.
 	[System.Serializable]
@@ -53,17 +53,17 @@ public class UIAtlas : MonoBehaviour
 	[HideInInspector][SerializeField] float mPixelSize = 1f;
 
 	// Replacement atlas can be used to completely bypass this atlas, pulling the data from another one instead.
-	[HideInInspector][SerializeField] UIAtlas mReplacement;
+	[HideInInspector][SerializeField] INGUIAtlas mReplacement;
 
 	// Legacy functionality -- do not use
 	[HideInInspector][SerializeField] Coordinates mCoordinates = Coordinates.Pixels;
 	[HideInInspector][SerializeField] List<Sprite> sprites = new List<Sprite>();
 
 	// Whether the atlas is using a pre-multiplied alpha material. -1 = not checked. 0 = no. 1 = yes.
-	int mPMA = -1;
+	[System.NonSerialized] int mPMA = -1;
 
 	// Dictionary lookup to speed up sprite retrieval at run-time
-	Dictionary<string, int> mSpriteIndices = new Dictionary<string, int>();
+	[System.NonSerialized] Dictionary<string, int> mSpriteIndices = new Dictionary<string, int>();
 
 	/// <summary>
 	/// Material used by the atlas.
@@ -186,7 +186,7 @@ public class UIAtlas : MonoBehaviour
 	/// to another one (for example an HD atlas) is then a simple matter of setting this field on your dummy atlas.
 	/// </summary>
 
-	public UIAtlas replacement
+	public INGUIAtlas replacement
 	{
 		get
 		{
@@ -194,12 +194,12 @@ public class UIAtlas : MonoBehaviour
 		}
 		set
 		{
-			UIAtlas rep = value;
-			if (rep == this) rep = null;
+			var rep = value;
+			if (rep == this as INGUIAtlas) rep = null;
 
 			if (mReplacement != rep)
 			{
-				if (rep != null && rep.replacement == this) rep.replacement = null;
+				if (rep != null && rep.replacement == this as INGUIAtlas) rep.replacement = null;
 				if (mReplacement != null) MarkAsChanged();
 				mReplacement = rep;
 				if (rep != null) material = null;
@@ -268,27 +268,6 @@ public class UIAtlas : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Convenience function that returns the name of a random sprite that begins with the specified value.
-	/// </summary>
-
-	public string GetRandomSprite (string startsWith)
-	{
-		if (GetSprite(startsWith) == null)
-		{
-			System.Collections.Generic.List<UISpriteData> sprites = spriteList;
-			System.Collections.Generic.List<string> choices = new System.Collections.Generic.List<string>();
-
-			foreach (UISpriteData sd in sprites)
-			{
-				if (sd.name.StartsWith(startsWith))
-					choices.Add(sd.name);
-			}
-			return (choices.Count > 0) ? choices[UnityEngine.Random.Range(0, choices.Count)] : null;
-		}
-		return startsWith;
-	}
-
-	/// <summary>
 	/// Rebuild the sprite indices. Call this after modifying the spriteList at run time.
 	/// </summary>
 
@@ -341,7 +320,7 @@ public class UIAtlas : MonoBehaviour
 
 	public BetterList<string> GetListOfSprites (string match)
 	{
-		if (mReplacement) return mReplacement.GetListOfSprites(match);
+		if (mReplacement != null) return mReplacement.GetListOfSprites(match);
 		if (string.IsNullOrEmpty(match)) return GetListOfSprites();
 
 		if (mSprites.Count == 0) Upgrade();
@@ -387,73 +366,11 @@ public class UIAtlas : MonoBehaviour
 	/// Helper function that determines whether the atlas uses the specified one, taking replacements into account.
 	/// </summary>
 
-	bool References (UIAtlas atlas)
+	public bool References (INGUIAtlas atlas)
 	{
 		if (atlas == null) return false;
-		if (atlas == this) return true;
+		if (atlas == this as INGUIAtlas) return true;
 		return (mReplacement != null) ? mReplacement.References(atlas) : false;
-	}
-
-	/// <summary>
-	/// Helper function that determines whether the two atlases are related.
-	/// </summary>
-
-	static public bool CheckIfRelated (UIAtlas a, UIAtlas b)
-	{
-		if (a == null || b == null) return false;
-		return a == b || a.References(b) || b.References(a);
-	}
-
-	/// <summary>
-	/// Replace all atlas reference of one atlas with another.
-	/// </summary>
-
-	static public void Replace (UIAtlas before, UIAtlas after)
-	{
-		var list = NGUITools.FindActive<UISprite>();
-
-		for (int i = 0, imax = list.Length; i < imax; ++i)
-		{
-			var sp = list[i];
-
-			if (sp.atlas == before)
-			{
-				sp.atlas = after;
-#if UNITY_EDITOR
-				NGUITools.SetDirty(sp);
-#endif
-			}
-		}
-
-		var fonts = Resources.FindObjectsOfTypeAll(typeof(UIFont)) as UIFont[];
-
-		for (int i = 0, imax = fonts.Length; i < imax; ++i)
-		{
-			var font = fonts[i];
-
-			if (font.atlas == before)
-			{
-				font.atlas = after;
-#if UNITY_EDITOR
-				NGUITools.SetDirty(font);
-#endif
-			}
-		}
-
-		var labels = NGUITools.FindActive<UILabel>();
-
-		for (int i = 0, imax = labels.Length; i < imax; ++i)
-		{
-			var lbl = labels[i];
-
-			if (lbl.bitmapFont != null && lbl.atlas == before)
-			{
-				lbl.atlas = after;
-#if UNITY_EDITOR
-				NGUITools.SetDirty(lbl);
-#endif
-			}
-		}
 	}
 
 	/// <summary>
@@ -473,7 +390,7 @@ public class UIAtlas : MonoBehaviour
 		{
 			var sp = list[i];
 
-			if (CheckIfRelated(this, sp.atlas as UIAtlas))
+			if (NGUITools.CheckIfRelated(this, sp.atlas))
 			{
 				var atl = sp.atlas;
 				sp.atlas = null;
@@ -490,7 +407,7 @@ public class UIAtlas : MonoBehaviour
 		{
 			var font = fonts[i];
 
-			if (CheckIfRelated(this, font.atlas as UIAtlas))
+			if (NGUITools.CheckIfRelated(this, font.atlas))
 			{
 				var atl = font.atlas;
 				font.atlas = null;
@@ -507,7 +424,7 @@ public class UIAtlas : MonoBehaviour
 		{
 			var lbl = labels[i];
 
-			if (lbl.bitmapFont != null && CheckIfRelated(this, lbl.atlas as UIAtlas))
+			if (lbl.bitmapFont != null && NGUITools.CheckIfRelated(this, lbl.atlas))
 			{
 				var font = lbl.bitmapFont;
 				lbl.bitmapFont = null;
@@ -525,7 +442,11 @@ public class UIAtlas : MonoBehaviour
 
 	bool Upgrade ()
 	{
-		if (mReplacement) return mReplacement.Upgrade();
+		if (mReplacement != null)
+		{
+			var uiAtlas = mReplacement as UIAtlas;
+			if (uiAtlas != null) return uiAtlas.Upgrade();
+		}
 
 		if (mSprites.Count == 0 && sprites.Count > 0 && material)
 		{

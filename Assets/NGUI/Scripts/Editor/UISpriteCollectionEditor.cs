@@ -27,7 +27,7 @@ public class UISpriteCollectionEditor : UIWidgetInspector
 
 		serializedObject.ApplyModifiedProperties();
 		NGUITools.SetDirty(serializedObject.targetObject);
-		NGUISettings.atlas = obj;
+		NGUISettings.atlas = obj as INGUIAtlas;
 	}
 
 	/// <summary>
@@ -46,7 +46,7 @@ public class UISpriteCollectionEditor : UIWidgetInspector
 			if (atlas != null)
 			{
 				var obj = atlas.objectReferenceValue;
-				NGUISettings.atlas = obj;
+				NGUISettings.atlas = obj as INGUIAtlas;
 				if (obj != null) NGUIEditorTools.Select(obj);
 			}
 		}

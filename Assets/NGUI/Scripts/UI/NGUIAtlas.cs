@@ -8,10 +8,93 @@ using System.Collections.Generic;
 using System;
 
 /// <summary>
-/// UI Atlas contains a collection of sprites inside one large texture atlas.
+/// Generic interface for the atlas class, making it possible to support both the prefab-based UIAtlas and scriptable object-based NGUIAtlas.
 /// </summary>
 
-public class NGUIAtlas : ScriptableObject
+public interface INGUIAtlas
+{
+	/// <summary>
+	/// Material used by the atlas.
+	/// </summary>
+
+	Material spriteMaterial { get; set; }
+
+	/// <summary>
+	/// List of sprites within the atlas.
+	/// </summary>
+
+	List<UISpriteData> spriteList { get; set; }
+
+	/// <summary>
+	/// Texture used by the atlas.
+	/// </summary>
+
+	Texture texture { get; }
+
+	/// <summary>
+	/// Pixel size is a multiplier applied to widgets dimensions when performing MakePixelPerfect() pixel correction.
+	/// Most obvious use would be on retina screen displays. The resolution doubles, but with UIRoot staying the same
+	/// for layout purposes, you can still get extra sharpness by switching to an HD atlas that has pixel size set to 0.5.
+	/// </summary>
+
+	float pixelSize { get; set; }
+
+	/// <summary>
+	/// Whether the atlas is using a premultiplied alpha material.
+	/// </summary>
+
+	bool premultipliedAlpha { get; }
+
+	/// <summary>
+	/// Setting a replacement atlas value will cause everything using this atlas to use the replacement atlas instead.
+	/// Suggested use: set up all your widgets to use a dummy atlas that points to the real atlas. Switching that atlas
+	/// to another one (for example an HD atlas) is then a simple matter of setting this field on your dummy atlas.
+	/// </summary>
+
+	INGUIAtlas replacement { get; set; }
+
+	/// <summary>
+	/// Convenience function that retrieves a sprite by name.
+	/// </summary>
+
+	UISpriteData GetSprite (string name);
+
+	/// <summary>
+	/// Convenience function that retrieves a list of all sprite names.
+	/// </summary>
+
+	BetterList<string> GetListOfSprites ();
+
+	/// <summary>
+	/// Convenience function that retrieves a list of all sprite names that contain the specified phrase.
+	/// </summary>
+
+	BetterList<string> GetListOfSprites (string match);
+
+	/// <summary>
+	/// Helper function that determines whether the atlas uses the specified one, taking replacements into account.
+	/// </summary>
+
+	bool References (INGUIAtlas atlas);
+
+	/// <summary>
+	/// Mark all widgets associated with this atlas as having changed.
+	/// </summary>
+
+	void MarkAsChanged ();
+
+	/// <summary>
+	/// Sort the list of sprites within the atlas, making them alphabetical.
+	/// </summary>
+
+	void SortAlphabetically ();
+}
+
+/// <summary>
+/// NGUI Atlas contains a collection of sprites inside one large texture atlas. It's saved as a ScriptableObject.
+/// </summary>
+
+public class NGUIAtlas : ScriptableObject, INGUIAtlas
 {
 	/// <summary>
 	/// Legacy functionality, removed in 3.0. Do not use.
@@ -33,13 +116,13 @@ public class NGUIAtlas : ScriptableObject
 	[HideInInspector][SerializeField] float mPixelSize = 1f;
 
 	// Replacement atlas can be used to completely bypass this atlas, pulling the data from another one instead.
-	[HideInInspector][SerializeField] NGUIAtlas mReplacement;
+	[HideInInspector][SerializeField] INGUIAtlas mReplacement;
 
 	// Whether the atlas is using a pre-multiplied alpha material. -1 = not checked. 0 = no. 1 = yes.
-	int mPMA = -1;
+	[System.NonSerialized] int mPMA = -1;
 
 	// Dictionary lookup to speed up sprite retrieval at run-time
-	Dictionary<string, int> mSpriteIndices = new Dictionary<string, int>();
+	[System.NonSerialized] Dictionary<string, int> mSpriteIndices = new Dictionary<string, int>();
 
 	/// <summary>
 	/// Material used by the atlas.
@@ -161,7 +244,7 @@ public class NGUIAtlas : ScriptableObject
 	/// to another one (for example an HD atlas) is then a simple matter of setting this field on your dummy atlas.
 	/// </summary>
 
-	public NGUIAtlas replacement
+	public INGUIAtlas replacement
 	{
 		get
 		{
@@ -169,12 +252,12 @@ public class NGUIAtlas : ScriptableObject
 		}
 		set
 		{
-			NGUIAtlas rep = value;
-			if (rep == this) rep = null;
+			var rep = value;
+			if (rep == this as INGUIAtlas) rep = null;
 
 			if (mReplacement != rep)
 			{
-				if (rep != null && rep.replacement == this) rep.replacement = null;
+				if (rep != null && rep.replacement == this as INGUIAtlas) rep.replacement = null;
 				if (mReplacement != null) MarkAsChanged();
 				mReplacement = rep;
 				if (rep != null) material = null;
@@ -242,27 +325,6 @@ public class NGUIAtlas : ScriptableObject
 	}
 
 	/// <summary>
-	/// Convenience function that returns the name of a random sprite that begins with the specified value.
-	/// </summary>
-
-	public string GetRandomSprite (string startsWith)
-	{
-		if (GetSprite(startsWith) == null)
-		{
-			System.Collections.Generic.List<UISpriteData> sprites = spriteList;
-			System.Collections.Generic.List<string> choices = new System.Collections.Generic.List<string>();
-
-			foreach (UISpriteData sd in sprites)
-			{
-				if (sd.name.StartsWith(startsWith))
-					choices.Add(sd.name);
-			}
-			return (choices.Count > 0) ? choices[UnityEngine.Random.Range(0, choices.Count)] : null;
-		}
-		return startsWith;
-	}
-
-	/// <summary>
 	/// Rebuild the sprite indices. Call this after modifying the spriteList at run time.
 	/// </summary>
 
@@ -309,12 +371,12 @@ public class NGUIAtlas : ScriptableObject
 	}
 
 	/// <summary>
-	/// Convenience function that retrieves a list of all sprite names that contain the specified phrase
+	/// Convenience function that retrieves a list of all sprite names that contain the specified phrase.
 	/// </summary>
 
 	public BetterList<string> GetListOfSprites (string match)
 	{
-		if (mReplacement) return mReplacement.GetListOfSprites(match);
+		if (mReplacement != null) return mReplacement.GetListOfSprites(match);
 		if (string.IsNullOrEmpty(match)) return GetListOfSprites();
 
 		var list = new BetterList<string>();
@@ -359,125 +421,11 @@ public class NGUIAtlas : ScriptableObject
 	/// Helper function that determines whether the atlas uses the specified one, taking replacements into account.
 	/// </summary>
 
-	bool References (NGUIAtlas atlas)
+	public bool References (INGUIAtlas atlas)
 	{
 		if (atlas == null) return false;
-		if (atlas == this) return true;
+		if (atlas == this as INGUIAtlas) return true;
 		return (mReplacement != null) ? mReplacement.References(atlas) : false;
-	}
-
-	/// <summary>
-	/// Helper function that determines whether the two atlases are related.
-	/// </summary>
-
-	static public bool CheckIfRelated (NGUIAtlas a, NGUIAtlas b)
-	{
-		if (a == null || b == null) return false;
-		return a == b || a.References(b) || b.References(a);
-	}
-
-	/// <summary>
-	/// Replace all atlas reference of one atlas with another.
-	/// </summary>
-
-	static public void Replace (NGUIAtlas before, NGUIAtlas after)
-	{
-		var list = NGUITools.FindActive<UISprite>();
-
-		for (int i = 0, imax = list.Length; i < imax; ++i)
-		{
-			var sp = list[i];
-
-			if (sp.atlas == before)
-			{
-				sp.atlas = after;
-#if UNITY_EDITOR
-				NGUITools.SetDirty(sp);
-#endif
-			}
-		}
-
-		var fonts = Resources.FindObjectsOfTypeAll(typeof(UIFont)) as UIFont[];
-
-		for (int i = 0, imax = fonts.Length; i < imax; ++i)
-		{
-			var font = fonts[i];
-
-			if (font.atlas == before)
-			{
-				font.atlas = after;
-#if UNITY_EDITOR
-				NGUITools.SetDirty(font);
-#endif
-			}
-		}
-
-		var labels = NGUITools.FindActive<UILabel>();
-
-		for (int i = 0, imax = labels.Length; i < imax; ++i)
-		{
-			var lbl = labels[i];
-
-			if (lbl.bitmapFont != null && lbl.atlas == before)
-			{
-				lbl.atlas = after;
-#if UNITY_EDITOR
-				NGUITools.SetDirty(lbl);
-#endif
-			}
-		}
-	}
-
-	/// <summary>
-	/// Replace all atlas reference of one atlas with another.
-	/// </summary>
-
-	static public void Replace (UIAtlas before, NGUIAtlas after)
-	{
-		var list = NGUITools.FindActive<UISprite>();
-
-		for (int i = 0, imax = list.Length; i < imax; ++i)
-		{
-			var sp = list[i];
-
-			if (sp.atlas == before)
-			{
-				sp.atlas = after;
-#if UNITY_EDITOR
-				NGUITools.SetDirty(sp);
-#endif
-			}
-		}
-
-		var fonts = Resources.FindObjectsOfTypeAll(typeof(UIFont)) as UIFont[];
-
-		for (int i = 0, imax = fonts.Length; i < imax; ++i)
-		{
-			var font = fonts[i];
-
-			if (font.atlas == before)
-			{
-				font.atlas = after;
-#if UNITY_EDITOR
-				NGUITools.SetDirty(font);
-#endif
-			}
-		}
-
-		var labels = NGUITools.FindActive<UILabel>();
-
-		for (int i = 0, imax = labels.Length; i < imax; ++i)
-		{
-			var lbl = labels[i];
-
-			if (lbl.bitmapFont != null && lbl.atlas == before)
-			{
-				lbl.atlas = after;
-#if UNITY_EDITOR
-				NGUITools.SetDirty(lbl);
-#endif
-			}
-		}
 	}
 
 	/// <summary>
@@ -497,7 +445,7 @@ public class NGUIAtlas : ScriptableObject
 		{
 			var sp = list[i];
 
-			if (CheckIfRelated(this, sp.atlas as NGUIAtlas))
+			if (NGUITools.CheckIfRelated(this, sp.atlas))
 			{
 				var atl = sp.atlas;
 				sp.atlas = null;
@@ -508,13 +456,31 @@ public class NGUIAtlas : ScriptableObject
 			}
 		}
 
-		var fonts = Resources.FindObjectsOfTypeAll(typeof(UIFont)) as UIFont[];
+		var f0 = Resources.FindObjectsOfTypeAll<NGUIFont>();
 
-		for (int i = 0, imax = fonts.Length; i < imax; ++i)
+		for (int i = 0, imax = f0.Length; i < imax; ++i)
 		{
-			var font = fonts[i];
+			var font = f0[i];
+			if (font.atlas == null) continue;
 
-			if (CheckIfRelated(this, font.atlas as NGUIAtlas))
+			if (NGUITools.CheckIfRelated(this, font.atlas))
+			{
+				var atl = font.atlas;
+				font.atlas = null;
+				font.atlas = atl;
+#if UNITY_EDITOR
+				NGUITools.SetDirty(font);
+#endif
+			}
+		}
+
+		var f1 = Resources.FindObjectsOfTypeAll<UIFont>();
+
+		for (int i = 0, imax = f1.Length; i < imax; ++i)
+		{
+			var font = f1[i];
+
+			if (NGUITools.CheckIfRelated(this, font.atlas))
 			{
 				var atl = font.atlas;
 				font.atlas = null;
@@ -530,9 +496,11 @@ public class NGUIAtlas : ScriptableObject
 		for (int i = 0, imax = labels.Length; i < imax; ++i)
 		{
 			var lbl = labels[i];
+			if (lbl.atlas == null) continue;
 
-			if (lbl.bitmapFont != null && CheckIfRelated(this, lbl.atlas as NGUIAtlas))
+			if (NGUITools.CheckIfRelated(this, lbl.atlas))
 			{
+				var atl = lbl.atlas;
 				var font = lbl.bitmapFont;
 				lbl.bitmapFont = null;
 				lbl.bitmapFont = font;

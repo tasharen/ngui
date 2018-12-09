@@ -112,28 +112,14 @@ public class UISpriteAnimation : MonoBehaviour
 
 			if (atlas != null)
 			{
-				if (atlas is NGUIAtlas)
-				{
-					var sprites = (atlas as NGUIAtlas).spriteList;
+				var sprites = atlas.spriteList;
 
-					for (int i = 0, imax = sprites.Count; i < imax; ++i)
-					{
-						var sprite = sprites[i];
-						if (string.IsNullOrEmpty(mPrefix) || sprite.name.StartsWith(mPrefix)) mSpriteNames.Add(sprite.name);
-					}
-					mSpriteNames.Sort();
-				}
-				else if (atlas is UIAtlas)
+				for (int i = 0, imax = sprites.Count; i < imax; ++i)
 				{
-					var sprites = (atlas as UIAtlas).spriteList;
-
-					for (int i = 0, imax = sprites.Count; i < imax; ++i)
-					{
-						var sprite = sprites[i];
-						if (string.IsNullOrEmpty(mPrefix) || sprite.name.StartsWith(mPrefix)) mSpriteNames.Add(sprite.name);
-					}
-					mSpriteNames.Sort();
+					var sprite = sprites[i];
+					if (string.IsNullOrEmpty(mPrefix) || sprite.name.StartsWith(mPrefix)) mSpriteNames.Add(sprite.name);
 				}
+				mSpriteNames.Sort();
 			}
 		}
 	}

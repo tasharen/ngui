@@ -550,11 +550,10 @@ static public class NGUIEditorTools
 	/// Figures out the saveable filename for the texture of the specified atlas.
 	/// </summary>
 
-	static public string GetSaveableTexturePath (Object atlas)
+	static public string GetSaveableTexturePath (INGUIAtlas atlas)
 	{
-		if (atlas is NGUIAtlas) return GetSaveableTexturePath(atlas, (atlas as NGUIAtlas).texture as Texture2D);
-		if (atlas is UIAtlas) return GetSaveableTexturePath(atlas, (atlas as UIAtlas).texture as Texture2D);
-		return null;
+		if (atlas == null) return "";
+		return GetSaveableTexturePath(atlas as Object, atlas.texture as Texture2D);
 	}
 
 	/// <summary>
@@ -931,7 +930,7 @@ static public class NGUIEditorTools
 	/// Draw a sprite selection field.
 	/// </summary>
 
-	static public void DrawSpriteField (string label, Object atlas, string spriteName, SpriteSelector.Callback callback, params GUILayoutOption[] options)
+	static public void DrawSpriteField (string label, INGUIAtlas atlas, string spriteName, SpriteSelector.Callback callback, params GUILayoutOption[] options)
 	{
 		GUILayout.BeginHorizontal();
 		GUILayout.Label(label, GUILayout.Width(76f));
@@ -949,7 +948,7 @@ static public class NGUIEditorTools
 	/// Draw a sprite selection field.
 	/// </summary>
 
-	static public void DrawPaddedSpriteField (string label, Object atlas, string spriteName, SpriteSelector.Callback callback, params GUILayoutOption[] options)
+	static public void DrawPaddedSpriteField (string label, INGUIAtlas atlas, string spriteName, SpriteSelector.Callback callback, params GUILayoutOption[] options)
 	{
 		GUILayout.BeginHorizontal();
 		GUILayout.Label(label, GUILayout.Width(76f));
@@ -968,13 +967,12 @@ static public class NGUIEditorTools
 	/// Draw a sprite selection field.
 	/// </summary>
 
-	static public void DrawSpriteField (string label, string caption, Object atlas, string spriteName, SpriteSelector.Callback callback, params GUILayoutOption[] options)
+	static public void DrawSpriteField (string label, string caption, INGUIAtlas atlas, string spriteName, SpriteSelector.Callback callback, params GUILayoutOption[] options)
 	{
 		GUILayout.BeginHorizontal();
 		GUILayout.Label(label, GUILayout.Width(76f));
 
-		if (atlas is NGUIAtlas) { if ((atlas as NGUIAtlas).GetSprite(spriteName) == null) spriteName = ""; }
-		else if (atlas is UIAtlas) { if ((atlas as UIAtlas).GetSprite(spriteName) == null) spriteName = ""; }
+		if (atlas.GetSprite(spriteName) == null) spriteName = "";
 
 		if (GUILayout.Button(spriteName, "MiniPullDown", options))
 		{
@@ -995,10 +993,9 @@ static public class NGUIEditorTools
 	/// Draw a simple sprite selection button.
 	/// </summary>
 
-	static public bool DrawSpriteField (Object atlas, string spriteName, SpriteSelector.Callback callback, params GUILayoutOption[] options)
+	static public bool DrawSpriteField (INGUIAtlas atlas, string spriteName, SpriteSelector.Callback callback, params GUILayoutOption[] options)
 	{
-		if (atlas is NGUIAtlas) { if ((atlas as NGUIAtlas).GetSprite(spriteName) == null) spriteName = ""; }
-		else if (atlas is UIAtlas) { if ((atlas as UIAtlas).GetSprite(spriteName) == null) spriteName = ""; }
+		if (atlas.GetSprite(spriteName) == null) spriteName = "";
 
 		if (NGUIEditorTools.DrawPrefixButton(spriteName, options))
 		{
@@ -1064,7 +1061,7 @@ static public class NGUIEditorTools
 				EditorGUI.BeginDisabledGroup(atlas.hasMultipleDifferentValues);
 				{
 					if (GUILayout.Button(spriteName, "MiniPullDown", options))
-						SpriteSelector.Show(ob, sprite, atlas.objectReferenceValue as UIAtlas);
+						SpriteSelector.Show(ob, sprite, atlas.objectReferenceValue as INGUIAtlas);
 				}
 				EditorGUI.EndDisabledGroup();
 
@@ -1083,16 +1080,7 @@ static public class NGUIEditorTools
 	/// Convenience function that displays a list of sprites and returns the selected value.
 	/// </summary>
 
-	static public void DrawAdvancedSpriteField (Object atlas, string spriteName, SpriteSelector.Callback callback, bool editable, params GUILayoutOption[] options)
-	{
-		if (atlas is NGUIAtlas) DrawAdvancedSpriteField(atlas as NGUIAtlas, spriteName, callback, editable, options);
-	}
-
-	/// <summary>
-	/// Convenience function that displays a list of sprites and returns the selected value.
-	/// </summary>
-
-	static public void DrawAdvancedSpriteField (NGUIAtlas atlas, string spriteName, SpriteSelector.Callback callback, bool editable, params GUILayoutOption[] options)
+	static public void DrawAdvancedSpriteField (INGUIAtlas atlas, string spriteName, SpriteSelector.Callback callback, bool editable, params GUILayoutOption[] options)
 	{
 		if (atlas == null) return;
 
@@ -1133,7 +1121,7 @@ static public class NGUIEditorTools
 
 						if (sprite != null)
 						{
-							NGUIEditorTools.RegisterUndo("Edit Sprite Name", atlas);
+							NGUIEditorTools.RegisterUndo("Edit Sprite Name", atlas as UnityEngine.Object);
 							sprite.name = newName;
 
 							List<UISprite> sprites = FindAll<UISprite>();
@@ -1170,96 +1158,7 @@ static public class NGUIEditorTools
 				{
 					NGUISettings.atlas = atlas;
 					NGUISettings.selectedSprite = spriteName;
-					Select(atlas);
-				}
-			}
-		}
-		GUILayout.EndHorizontal();
-	}
-
-	/// <summary>
-	/// Convenience function that displays a list of sprites and returns the selected value.
-	/// </summary>
-
-	static public void DrawAdvancedSpriteField (UIAtlas atlas, string spriteName, SpriteSelector.Callback callback, bool editable, params GUILayoutOption[] options)
-	{
-		if (atlas == null) return;
-
-		// Give the user a warning if there are no sprites in the atlas
-		if (atlas.spriteList.Count == 0)
-		{
-			EditorGUILayout.HelpBox("No sprites found", MessageType.Warning);
-			return;
-		}
-
-		// Sprite selection drop-down list
-		GUILayout.BeginHorizontal();
-		{
-			if (NGUIEditorTools.DrawPrefixButton("Sprite"))
-			{
-				NGUISettings.atlas = atlas;
-				NGUISettings.selectedSprite = spriteName;
-				SpriteSelector.Show(callback);
-			}
-
-			if (editable)
-			{
-				if (!string.Equals(spriteName, mLastSprite))
-				{
-					mLastSprite = spriteName;
-					mEditedName = null;
-				}
-
-				string newName = GUILayout.TextField(string.IsNullOrEmpty(mEditedName) ? spriteName : mEditedName);
-
-				if (newName != spriteName)
-				{
-					mEditedName = newName;
-
-					if (GUILayout.Button("Rename", GUILayout.Width(60f)))
-					{
-						var sprite = atlas.GetSprite(spriteName);
-
-						if (sprite != null)
-						{
-							NGUIEditorTools.RegisterUndo("Edit Sprite Name", atlas);
-							sprite.name = newName;
-
-							List<UISprite> sprites = FindAll<UISprite>();
-
-							for (int i = 0; i < sprites.Count; ++i)
-							{
-								UISprite sp = sprites[i];
-
-								if (sp.atlas == atlas && sp.spriteName == spriteName)
-								{
-									NGUIEditorTools.RegisterUndo("Edit Sprite Name", sp);
-									sp.spriteName = newName;
-								}
-							}
-
-							mLastSprite = newName;
-							spriteName = newName;
-							mEditedName = null;
-
-							NGUISettings.atlas = atlas;
-							NGUISettings.selectedSprite = spriteName;
-						}
-					}
-				}
-			}
-			else
-			{
-				GUILayout.BeginHorizontal();
-				GUILayout.Label(spriteName, "HelpBox", GUILayout.Height(18f));
-				NGUIEditorTools.DrawPadding();
-				GUILayout.EndHorizontal();
-
-				if (GUILayout.Button("Edit", GUILayout.Width(40f)))
-				{
-					NGUISettings.atlas = atlas;
-					NGUISettings.selectedSprite = spriteName;
-					Select(atlas);
+					Select(atlas as UnityEngine.Object);
 				}
 			}
 		}
@@ -1291,22 +1190,7 @@ static public class NGUIEditorTools
 		if (NGUISettings.atlas != null)
 		{
 			NGUISettings.selectedSprite = spriteName;
-			NGUIEditorTools.Select(NGUISettings.atlas);
-			RepaintSprites();
-		}
-	}
-
-	/// <summary>
-	/// Select the specified atlas and sprite.
-	/// </summary>
-
-	static public void SelectSprite (UIAtlas atlas, string spriteName)
-	{
-		if (atlas != null)
-		{
-			NGUISettings.atlas = atlas;
-			NGUISettings.selectedSprite = spriteName;
-			NGUIEditorTools.Select(atlas);
+			NGUIEditorTools.Select(NGUISettings.atlas as Object);
 			RepaintSprites();
 		}
 	}
@@ -2026,7 +1910,7 @@ static public class NGUIEditorTools
 	/// Automatically upgrade all of the UITextures in the scene to Sprites if they can be found within the specified atlas.
 	/// </summary>
 
-	static public void UpgradeTexturesToSprites (Object atlas)
+	static public void UpgradeTexturesToSprites (INGUIAtlas atlas)
 	{
 		if (atlas == null) return;
 		List<UITexture> uits = FindAll<UITexture>();
@@ -2042,20 +1926,17 @@ static public class NGUIEditorTools
 			// Run through all the UI textures and change them to sprites
 			for (int i = 0; i < uits.Count; ++i)
 			{
-				UIWidget uiTexture = uits[i];
+				var uiTexture = uits[i];
 
 				if (uiTexture != null && uiTexture.mainTexture != null)
 				{
-					UISpriteData atlasSprite = null;
-
-					if (atlas is NGUIAtlas) atlasSprite = (atlas as NGUIAtlas).GetSprite(uiTexture.mainTexture.name);
-					else if (atlas is UIAtlas) atlasSprite = (atlas as UIAtlas).GetSprite(uiTexture.mainTexture.name);
+					var atlasSprite = atlas.GetSprite(uiTexture.mainTexture.name);
 
 					if (atlasSprite != null)
 					{
 						SerializedObject ob = ReplaceClass(uiTexture, spriteID);
 						ob.FindProperty("mSpriteName").stringValue = uiTexture.mainTexture.name;
-						ob.FindProperty("mAtlas").objectReferenceValue = atlas;
+						ob.FindProperty("mAtlas").objectReferenceValue = atlas as Object;
 						ob.ApplyModifiedProperties();
 					}
 				}

@@ -27,7 +27,7 @@ public class UISpriteInspector : UIBasicSpriteEditor
 
 		serializedObject.ApplyModifiedProperties();
 		NGUITools.SetDirty(serializedObject.targetObject);
-		NGUISettings.atlas = obj;
+		NGUISettings.atlas = obj as INGUIAtlas;
 	}
 
 	/// <summary>
@@ -51,35 +51,23 @@ public class UISpriteInspector : UIBasicSpriteEditor
 	protected override bool ShouldDrawProperties ()
 	{
 		var atlasProp = serializedObject.FindProperty("mAtlas");
-		var oldAtlas = atlasProp.objectReferenceValue as UIAtlas;
-		var newAtlas = atlasProp.objectReferenceValue as NGUIAtlas;
+		var atlas = atlasProp.objectReferenceValue as INGUIAtlas;
 
 		GUILayout.BeginHorizontal();
 
-		if (NGUIEditorTools.DrawPrefixButton("Atlas"))
-		{
-			if (oldAtlas != null) ComponentSelector.Show<UIAtlas>(OnSelectAtlas);
-			else ComponentSelector.Show<NGUIAtlas>(OnSelectAtlas);
-		}
+		if (NGUIEditorTools.DrawPrefixButton("Atlas")) ComponentSelector.Show(atlas, OnSelectAtlas);
 
-		var atlas = NGUIEditorTools.DrawProperty("", serializedObject, "mAtlas", GUILayout.MinWidth(20f));
+		atlasProp = NGUIEditorTools.DrawProperty("", serializedObject, "mAtlas", GUILayout.MinWidth(20f));
 
-		if (GUILayout.Button("Edit", GUILayout.Width(40f)))
+		if (GUILayout.Button("Edit", GUILayout.Width(40f)) && atlas != null)
 		{
-			if (atlas != null)
-			{
-				var obj = atlas.objectReferenceValue;
-				NGUISettings.atlas = obj;
-				if (obj != null) NGUIEditorTools.Select(obj);
-			}
+			NGUISettings.atlas = atlas;
+			NGUIEditorTools.Select(atlas as Object);
 		}
 
 		GUILayout.EndHorizontal();
-		SerializedProperty sp = serializedObject.FindProperty("mSpriteName");
-
-		if (oldAtlas != null) NGUIEditorTools.DrawAdvancedSpriteField(oldAtlas, sp.stringValue, SelectSprite, false);
-		else if (newAtlas != null) NGUIEditorTools.DrawAdvancedSpriteField(newAtlas, sp.stringValue, SelectSprite, false);
-
+		var sp = serializedObject.FindProperty("mSpriteName");
+		NGUIEditorTools.DrawAdvancedSpriteField(atlas, sp.stringValue, SelectSprite, false);
 		NGUIEditorTools.DrawProperty("Material", serializedObject, "mMat");
 		return true;
 	}
