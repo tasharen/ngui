@@ -630,7 +630,7 @@ public class UIInput : MonoBehaviour
 	/// <summary>
 	/// Update the text based on input.
 	/// </summary>
-	
+
 	protected virtual void Update ()
 	{
 #if UNITY_EDITOR
@@ -722,7 +722,7 @@ public class UIInput : MonoBehaviour
 		if (mKeyboard != null)
 		{
 			string text = (mKeyboard.done || !mKeyboard.active) ? mCached : mKeyboard.text;
- 
+
 			if (inputShouldBeHidden)
 			{
 				if (text != "|")
@@ -860,7 +860,7 @@ public class UIInput : MonoBehaviour
 		int frame = Time.frameCount;
 
 		if (mIgnoreKey == frame) return;
-		
+
 		if (mCam != null && (key == mCam.cancelKey0 || key == mCam.cancelKey1))
 		{
 			mIgnoreKey = frame;
@@ -1334,8 +1334,20 @@ public class UIInput : MonoBehaviour
 
 					string asterisk = "*";
 
-					if (label.bitmapFont != null && label.bitmapFont.bmFont != null &&
-						label.bitmapFont.bmFont.GetGlyph('*') == null) asterisk = "x";
+					if (label.bitmapFont != null)
+					{
+						var b2 = label.bitmapFont as NGUIFont;
+
+						if (b2 != null)
+						{
+							if (b2.bmFont != null && b2.bmFont.GetGlyph('*') == null) asterisk = "x";
+						}
+						else
+						{
+							var oldFont = label.bitmapFont as UIFont;
+							if (oldFont != null) { if (oldFont.bmFont != null && oldFont.bmFont.GetGlyph('*') == null) asterisk = "x"; }
+						}
+					}
 
 					for (int i = 0, imax = fullText.Length; i < imax; ++i) processed += asterisk;
 				}

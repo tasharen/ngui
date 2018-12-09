@@ -1211,8 +1211,8 @@ public class UIAtlasMaker : EditorWindow
 				if (!string.IsNullOrEmpty(path))
 				{
 					NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
-					var so = AssetDatabase.LoadAssetAtPath<NGUIAtlas>(path);
-					if (so == null) so = ScriptableObject.CreateInstance<NGUIAtlas>();
+					var asset = AssetDatabase.LoadAssetAtPath<NGUIAtlas>(path);
+					if (asset == null) asset = ScriptableObject.CreateInstance<NGUIAtlas>();
 					var matPath = path.Replace(".asset", ".mat");
 					replace = true;
 
@@ -1237,10 +1237,10 @@ public class UIAtlasMaker : EditorWindow
 					string atlasName = path.Replace(".prefab", "");
 					atlasName = atlasName.Substring(path.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
 
-					so.spriteMaterial = mat;
+					asset.spriteMaterial = mat;
 
 					// Update the prefab
-					AssetDatabase.CreateAsset(so, path);
+					AssetDatabase.CreateAsset(asset, path);
 					AssetDatabase.SaveAssets();
 					AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 

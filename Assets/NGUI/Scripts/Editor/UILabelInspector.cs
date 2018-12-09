@@ -37,13 +37,13 @@ public class UILabelInspector : UIWidgetInspector
 	void OnNGUIFont (Object obj)
 	{
 		serializedObject.Update();
-		
+
 		SerializedProperty sp = serializedObject.FindProperty("mFont");
 		sp.objectReferenceValue = obj;
 
 		sp = serializedObject.FindProperty("mTrueTypeFont");
 		sp.objectReferenceValue = null;
-		
+
 		serializedObject.ApplyModifiedProperties();
 		NGUISettings.ambigiousFont = obj;
 	}
@@ -51,7 +51,7 @@ public class UILabelInspector : UIWidgetInspector
 	void OnUnityFont (Object obj)
 	{
 		serializedObject.Update();
-		
+
 		SerializedProperty sp = serializedObject.FindProperty("mTrueTypeFont");
 		sp.objectReferenceValue = obj;
 
@@ -82,12 +82,11 @@ public class UILabelInspector : UIWidgetInspector
 		{
 			if (mFontType == FontType.NGUI)
 			{
-				ComponentSelector.Show<UIFont>(OnNGUIFont);
+				var bmf = mLabel.bitmapFont;
+				if (bmf != null && bmf is UIFont) ComponentSelector.Show<UIFont>(OnNGUIFont);
+				else ComponentSelector.Show<NGUIFont>(OnNGUIFont);
 			}
-			else
-			{
-				ComponentSelector.Show<Font>(OnUnityFont, new string[] { ".ttf", ".otf" });
-			}
+			else ComponentSelector.Show<Font>(OnUnityFont, new string[] { ".ttf", ".otf" });
 		}
 
 		bool isValid = false;
@@ -131,13 +130,25 @@ public class UILabelInspector : UIWidgetInspector
 
 		EditorGUI.BeginDisabledGroup(!isValid);
 		{
-			UIFont uiFont = (fnt != null) ? fnt.objectReferenceValue as UIFont : null;
-			Font dynFont = (ttf != null) ? ttf.objectReferenceValue as Font : null;
+			var dynFont = (ttf != null) ? ttf.objectReferenceValue as Font : null;
+			var bmFont = (fnt != null) ? fnt.objectReferenceValue : null;
+			var nguiFont = bmFont as NGUIFont;
+			var uiFont = bmFont as UIFont;
 
-			if (uiFont != null && uiFont.isDynamic)
+			if (bmFont != null)
 			{
-				dynFont = uiFont.dynamicFont;
-				uiFont = null;
+				if (nguiFont != null && nguiFont.isDynamic)
+				{
+					dynFont = nguiFont.dynamicFont;
+					nguiFont = null;
+					uiFont = null;
+				}
+				else if (uiFont != null && uiFont.isDynamic)
+				{
+					dynFont = uiFont.dynamicFont;
+					nguiFont = null;
+					uiFont = null;
+				}
 			}
 
 			if (dynFont != null)
@@ -145,19 +156,19 @@ public class UILabelInspector : UIWidgetInspector
 				GUILayout.BeginHorizontal();
 				{
 					EditorGUI.BeginDisabledGroup((ttf != null) ? ttf.hasMultipleDifferentValues : fnt.hasMultipleDifferentValues);
-					
+
 					SerializedProperty prop = NGUIEditorTools.DrawProperty("Font Size", serializedObject, "mFontSize", GUILayout.Width(142f));
 					NGUISettings.fontSize = prop.intValue;
-					
+
 					prop = NGUIEditorTools.DrawProperty("", serializedObject, "mFontStyle", GUILayout.MinWidth(40f));
 					NGUISettings.fontStyle = (FontStyle)prop.intValue;
-					
+
 					NGUIEditorTools.DrawPadding();
 					EditorGUI.EndDisabledGroup();
 				}
 				GUILayout.EndHorizontal();
 			}
-			else if (uiFont != null)
+			else if (bmFont != null)
 			{
 				GUILayout.BeginHorizontal();
 				SerializedProperty prop = NGUIEditorTools.DrawProperty("Font Size", serializedObject, "mFontSize", GUILayout.Width(142f));
@@ -264,7 +275,16 @@ public class UILabelInspector : UIWidgetInspector
 			if (dynFont != null)
 				NGUIEditorTools.DrawPaddedProperty("Keep crisp", serializedObject, "keepCrispWhenShrunk");
 
-			EditorGUI.BeginDisabledGroup(mLabel.bitmapFont != null && mLabel.bitmapFont.packedFontShader);
+			var bm = mLabel.bitmapFont;
+
+			if (bm != null)
+			{
+				if (bm is NGUIFont) EditorGUI.BeginDisabledGroup((bm as NGUIFont).packedFontShader);
+				else if (bm is UIFont) EditorGUI.BeginDisabledGroup((bm as UIFont).packedFontShader);
+				else EditorGUI.BeginDisabledGroup(false);
+			}
+			else EditorGUI.BeginDisabledGroup(false);
+
 			GUILayout.BeginHorizontal();
 			SerializedProperty gr = NGUIEditorTools.DrawProperty("Gradient", serializedObject, "mApplyGradient",
 			GUILayout.Width(95f));
@@ -331,12 +351,20 @@ public class UILabelInspector : UIWidgetInspector
 				NGUIEditorTools.SetLabelWidth(80f);
 				GUILayout.EndHorizontal();
 			}
-			
+
 			NGUIEditorTools.DrawProperty("Max Lines", serializedObject, "mMaxLineCount", GUILayout.Width(110f));
 
 			GUILayout.BeginHorizontal();
 			sp = NGUIEditorTools.DrawProperty("BBCode", serializedObject, "mEncoding", GUILayout.Width(100f));
-			EditorGUI.BeginDisabledGroup(!sp.boolValue || mLabel.bitmapFont == null || !mLabel.bitmapFont.hasSymbols);
+
+			if (bm != null)
+			{
+				if (bm is NGUIFont) EditorGUI.BeginDisabledGroup(!sp.boolValue || !(bm as NGUIFont).hasSymbols);
+				else if (bm is UIFont) EditorGUI.BeginDisabledGroup(!sp.boolValue || !(bm as UIFont).hasSymbols);
+				else EditorGUI.BeginDisabledGroup(true);
+			}
+			else EditorGUI.BeginDisabledGroup(true);
+
 			NGUIEditorTools.SetLabelWidth(60f);
 			NGUIEditorTools.DrawPaddedProperty("Symbols", serializedObject, "mSymbols");
 			NGUIEditorTools.SetLabelWidth(80f);

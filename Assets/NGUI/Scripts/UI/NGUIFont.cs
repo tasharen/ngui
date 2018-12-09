@@ -6,27 +6,22 @@
 // Dynamic font support contributed by the NGUI community members:
 // Unisip, zh4ox, Mudwiz, Nicki, DarkMagicCK.
 
-#if !UNITY_3_5
-#define DYNAMIC_FONT
-#endif
-
 using UnityEngine;
 using System.Collections.Generic;
 using System.Text;
 
 /// <summary>
-/// UIFont contains everything needed to be able to print text.
+/// NGUI Font contains everything needed to be able to print text.
 /// </summary>
 
 [ExecuteInEditMode]
-//[AddComponentMenu("NGUI/UI/NGUI Font")] // Replaced by NGUIFont, a Scriptable Object
-public class UIFont : MonoBehaviour
+public class NGUIFont : ScriptableObject
 {
 	[HideInInspector][SerializeField] Material mMat;
 	[HideInInspector][SerializeField] Rect mUVRect = new Rect(0f, 0f, 1f, 1f);
 	[HideInInspector][SerializeField] BMFont mFont = new BMFont();
 	[HideInInspector][SerializeField] Object mAtlas;
-	[HideInInspector][SerializeField] UIFont mReplacement;
+	[HideInInspector][SerializeField] NGUIFont mReplacement;
 
 	// List of symbols, such as emoticons like ":)", ":(", etc
 	[HideInInspector][SerializeField] List<BMSymbol> mSymbols = new List<BMSymbol>();
@@ -202,7 +197,7 @@ public class UIFont : MonoBehaviour
 	/// Whether the font is using a premultiplied alpha material.
 	/// </summary>
 
-	[System.Obsolete("Use UIFont.premultipliedAlphaShader instead")]
+	[System.Obsolete("Use NGUIFont.premultipliedAlphaShader instead")]
 	public bool premultipliedAlpha { get { return premultipliedAlphaShader; } }
 
 	/// <summary>
@@ -317,13 +312,9 @@ public class UIFont : MonoBehaviour
 	/// Whether this is a valid font.
 	/// </summary>
 
-#if DYNAMIC_FONT
 	public bool isValid { get { return mDynamicFont != null || mFont.isValid; } }
-#else
-	public bool isValid { get { return mFont.isValid; } }
-#endif
 
-	[System.Obsolete("Use UIFont.defaultSize instead")]
+	[System.Obsolete("Use NGUIFont.defaultSize instead")]
 	public int size
 	{
 		get { return defaultSize; }
@@ -385,7 +376,7 @@ public class UIFont : MonoBehaviour
 	/// another one (for example an eastern language one) is then a simple matter of setting this field on your dummy font.
 	/// </summary>
 
-	public UIFont replacement
+	public NGUIFont replacement
 	{
 		get
 		{
@@ -393,7 +384,7 @@ public class UIFont : MonoBehaviour
 		}
 		set
 		{
-			UIFont rep = value;
+			NGUIFont rep = value;
 			if (rep == this) rep = null;
 
 			if (mReplacement != rep)
@@ -497,7 +488,7 @@ public class UIFont : MonoBehaviour
 	/// Helper function that determines whether the font uses the specified one, taking replacements into account.
 	/// </summary>
 
-	bool References (UIFont font)
+	bool References (NGUIFont font)
 	{
 		if (font == null) return false;
 		if (font == this) return true;
@@ -508,12 +499,10 @@ public class UIFont : MonoBehaviour
 	/// Helper function that determines whether the two atlases are related.
 	/// </summary>
 
-	static public bool CheckIfRelated (UIFont a, UIFont b)
+	static public bool CheckIfRelated (NGUIFont a, NGUIFont b)
 	{
 		if (a == null || b == null) return false;
-#if DYNAMIC_FONT && !UNITY_FLASH
 		if (a.isDynamic && b.isDynamic && a.dynamicFont.fontNames[0] == b.dynamicFont.fontNames[0]) return true;
-#endif
 		return a == b || a.References(b) || b.References(a);
 	}
 
@@ -534,7 +523,7 @@ public class UIFont : MonoBehaviour
 	public void MarkAsChanged ()
 	{
 #if UNITY_EDITOR
-		NGUITools.SetDirty(gameObject);
+		NGUITools.SetDirty(this);
 #endif
 		if (mReplacement != null) mReplacement.MarkAsChanged();
 
@@ -545,9 +534,9 @@ public class UIFont : MonoBehaviour
 		{
 			UILabel lbl = labels[i];
 
-			if (lbl.enabled && NGUITools.GetActive(lbl.gameObject) && CheckIfRelated(this, lbl.bitmapFont as UIFont))
+			if (lbl.enabled && NGUITools.GetActive(lbl.gameObject) && CheckIfRelated(this, lbl.bitmapFont as NGUIFont))
 			{
-				var fnt = lbl.bitmapFont as UIFont;
+				NGUIFont fnt = lbl.bitmapFont as NGUIFont;
 				lbl.bitmapFont = null;
 				lbl.bitmapFont = fnt;
 			}

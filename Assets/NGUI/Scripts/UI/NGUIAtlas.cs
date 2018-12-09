@@ -418,9 +418,9 @@ public class NGUIAtlas : ScriptableObject
 		{
 			var lbl = labels[i];
 
-			if (lbl.bitmapFont != null && lbl.bitmapFont.atlas == before)
+			if (lbl.bitmapFont != null && lbl.atlas == before)
 			{
-				lbl.bitmapFont.atlas = after;
+				lbl.atlas = after;
 #if UNITY_EDITOR
 				NGUITools.SetDirty(lbl);
 #endif
@@ -470,9 +470,9 @@ public class NGUIAtlas : ScriptableObject
 		{
 			var lbl = labels[i];
 
-			if (lbl.bitmapFont != null && lbl.bitmapFont.atlas == before)
+			if (lbl.bitmapFont != null && lbl.atlas == before)
 			{
-				lbl.bitmapFont.atlas = after;
+				lbl.atlas = after;
 #if UNITY_EDITOR
 				NGUITools.SetDirty(lbl);
 #endif
@@ -531,7 +531,7 @@ public class NGUIAtlas : ScriptableObject
 		{
 			var lbl = labels[i];
 
-			if (lbl.bitmapFont != null && CheckIfRelated(this, lbl.bitmapFont.atlas as NGUIAtlas))
+			if (lbl.bitmapFont != null && CheckIfRelated(this, lbl.atlas as NGUIAtlas))
 			{
 				var font = lbl.bitmapFont;
 				lbl.bitmapFont = null;

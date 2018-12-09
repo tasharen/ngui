@@ -14,8 +14,8 @@ using System.Collections.Generic;
 /// Inspector class used to view and edit UIFonts.
 /// </summary>
 
-[CustomEditor(typeof(UIFont))]
-public class UIFontInspector : Editor
+[CustomEditor(typeof(NGUIFont))]
+public class NGUIFontInspector : Editor
 {
 	enum View
 	{
@@ -34,9 +34,9 @@ public class UIFontInspector : Editor
 	static View mView = View.Font;
 	static bool mUseShader = false;
 
-	UIFont mFont;
+	NGUIFont mFont;
 	FontType mType = FontType.Bitmap;
-	UIFont mReplacement = null;
+	NGUIFont mReplacement = null;
 	string mSymbolSequence = "";
 	string mSymbolSprite = "";
 	BMSymbol mSelectedSymbol = null;
@@ -44,13 +44,15 @@ public class UIFontInspector : Editor
 
 	public override bool HasPreviewGUI () { return mView != View.Nothing; }
 
+	void OnEnable () { mFont = target as NGUIFont; }
+
 	void OnSelectFont (Object obj)
 	{
 		// Undo doesn't work correctly in this case... so I won't bother.
 		//NGUIEditorTools.RegisterUndo("Font Change");
 		//NGUIEditorTools.RegisterUndo("Font Change", mFont);
 
-		mFont.replacement = obj as UIFont;
+		mFont.replacement = obj as NGUIFont;
 		mReplacement = mFont.replacement;
 		NGUITools.SetDirty(mFont);
 	}
@@ -71,7 +73,7 @@ public class UIFontInspector : Editor
 
 		foreach (UILabel lbl in labels)
 		{
-			if (UIFont.CheckIfRelated(lbl.bitmapFont as UIFont, mFont))
+			if (NGUIFont.CheckIfRelated(lbl.bitmapFont as NGUIFont, mFont))
 			{
 				lbl.bitmapFont = null;
 				lbl.bitmapFont = mFont;
@@ -81,7 +83,6 @@ public class UIFontInspector : Editor
 
 	public override void OnInspectorGUI ()
 	{
-		mFont = target as UIFont;
 		NGUIEditorTools.SetLabelWidth(80f);
 
 		GUILayout.Space(6f);
@@ -113,7 +114,7 @@ public class UIFontInspector : Editor
 
 		if (mType == FontType.Reference)
 		{
-			ComponentSelector.Draw<UIFont>(mFont.replacement, OnSelectFont, true);
+			ComponentSelector.Draw<NGUIFont>(mFont.replacement, OnSelectFont, true);
 
 			GUILayout.Space(6f);
 			EditorGUILayout.HelpBox("You can have one font simply point to " +
@@ -184,7 +185,6 @@ public class UIFontInspector : Editor
 					if (mFont.atlas is NGUIAtlas) NGUIEditorTools.DrawAdvancedSpriteField(mFont.atlas as NGUIAtlas, mFont.spriteName, SelectSprite, false);
 					else if (mFont.atlas is UIAtlas) NGUIEditorTools.DrawAdvancedSpriteField(mFont.atlas as UIAtlas, mFont.spriteName, SelectSprite, false);
 				}
-				EditorGUILayout.Space();
 			}
 			else
 			{
@@ -198,6 +198,15 @@ public class UIFontInspector : Editor
 				}
 			}
 
+			if (!mFont.isDynamic)
+			{
+				EditorGUI.BeginDisabledGroup(true);
+				EditorGUILayout.IntField("Default Size", mFont.defaultSize, GUILayout.Width(120f));
+				EditorGUI.EndDisabledGroup();
+			}
+
+			EditorGUILayout.Space();
+
 			// For updating the font's data when importing from an external source, such as the texture packer
 			bool resetWidthHeight = false;
 
@@ -208,7 +217,7 @@ public class UIFontInspector : Editor
 				if (data != null)
 				{
 					NGUIEditorTools.RegisterUndo("Import Font Data", mFont);
-					BMFontReader.Load(mFont.bmFont, NGUITools.GetHierarchy(mFont.gameObject), data.bytes);
+					BMFontReader.Load(mFont.bmFont, mFont.name, data.bytes);
 					mFont.MarkAsChanged();
 					resetWidthHeight = true;
 					Debug.Log("Imported " + mFont.bmFont.glyphCount + " characters");
@@ -433,7 +442,7 @@ public class UIFontInspector : Editor
 
 	public override void OnPreviewGUI (Rect rect, GUIStyle background)
 	{
-		mFont = target as UIFont;
+		mFont = target as NGUIFont;
 		if (mFont == null) return;
 		Texture2D tex = mFont.texture;
 

@@ -56,12 +56,31 @@ public class NGUIAtlasInspector : Editor
 
 		foreach (UILabel lbl in labels)
 		{
-			if (lbl.bitmapFont != null && NGUIAtlas.CheckIfRelated(lbl.bitmapFont.atlas as NGUIAtlas, mAtlas) && lbl.bitmapFont.UsesSprite(sprite.name))
+			if (lbl.bitmapFont == null) continue;
+
+			var bm = lbl.bitmapFont;
+
+			if (bm is NGUIFont)
 			{
-				UIFont font = lbl.bitmapFont;
-				lbl.bitmapFont = null;
-				lbl.bitmapFont = font;
-				NGUITools.SetDirty(lbl);
+				var font = bm as NGUIFont;
+
+				if (NGUIAtlas.CheckIfRelated(font.atlas as NGUIAtlas, mAtlas) && font.UsesSprite(sprite.name))
+				{
+					lbl.bitmapFont = null;
+					lbl.bitmapFont = font;
+					NGUITools.SetDirty(lbl);
+				}
+			}
+			else if (bm is UIFont)
+			{
+				var font = bm as UIFont;
+
+				if (NGUIAtlas.CheckIfRelated(font.atlas as NGUIAtlas, mAtlas) && font.UsesSprite(sprite.name))
+				{
+					lbl.bitmapFont = null;
+					lbl.bitmapFont = font;
+					NGUITools.SetDirty(lbl);
+				}
 			}
 		}
 	}

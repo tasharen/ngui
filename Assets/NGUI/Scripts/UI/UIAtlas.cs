@@ -446,9 +446,9 @@ public class UIAtlas : MonoBehaviour
 		{
 			var lbl = labels[i];
 
-			if (lbl.bitmapFont != null && lbl.bitmapFont.atlas == before)
+			if (lbl.bitmapFont != null && lbl.atlas == before)
 			{
-				lbl.bitmapFont.atlas = after;
+				lbl.atlas = after;
 #if UNITY_EDITOR
 				NGUITools.SetDirty(lbl);
 #endif
@@ -507,7 +507,7 @@ public class UIAtlas : MonoBehaviour
 		{
 			var lbl = labels[i];
 
-			if (lbl.bitmapFont != null && CheckIfRelated(this, lbl.bitmapFont.atlas as UIAtlas))
+			if (lbl.bitmapFont != null && CheckIfRelated(this, lbl.atlas as UIAtlas))
 			{
 				var font = lbl.bitmapFont;
 				lbl.bitmapFont = null;

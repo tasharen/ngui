@@ -364,9 +364,9 @@ public class NGUISettings
 		set { Set("NGUI FM Font", value); }
 	}
 
-	static public UIFont BMFont
+	static public Object BMFont
 	{
-		get { return Get<UIFont>("NGUI BM Font", null); }
+		get { return Get<Object>("NGUI BM Font", null); }
 		set { Set("NGUI BM Font", value); }
 	}
 
