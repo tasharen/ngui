@@ -50,3 +50,5 @@
 /Assets/Sprites
 /Assets/Sprites.meta
 /.vs
+*.unitypackage
+/ProjectSettings
