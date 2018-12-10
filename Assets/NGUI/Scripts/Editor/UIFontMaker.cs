@@ -80,6 +80,9 @@ public class UIFontMaker : EditorWindow
 
 	void OnSelectAtlas (Object obj)
 	{
+		// Legacy atlas support
+		if (obj != null && obj is GameObject) obj = (obj as GameObject).GetComponent<UIAtlas>();
+
 		var atlas = obj as INGUIAtlas;
 
 		if (NGUISettings.atlas != atlas)

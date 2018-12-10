@@ -20,6 +20,9 @@ public class UISpriteCollectionEditor : UIWidgetInspector
 
 	void OnSelectAtlas (Object obj)
 	{
+		// Legacy atlas support
+		if (obj != null && obj is GameObject) obj = (obj as GameObject).GetComponent<UIAtlas>();
+
 		serializedObject.Update();
 
 		var oldAtlas = serializedObject.FindProperty("mAtlas");

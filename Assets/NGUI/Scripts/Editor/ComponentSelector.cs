@@ -76,20 +76,14 @@ public class ComponentSelector : ScriptableWizard
 
 	static public void Draw (INGUIAtlas atlas, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options)
 	{
-		if (atlas != null)
-		{
-			if (atlas is UIAtlas) Draw(atlas as UIAtlas, cb, editButton, options);
-			else Draw(atlas as NGUIAtlas, cb, editButton, options);
-		}
+		if (atlas is UIAtlas) Draw(atlas as UIAtlas, cb, editButton, options);
+		else Draw(atlas as NGUIAtlas, cb, editButton, options);
 	}
 
 	static public void Draw (INGUIFont font, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options)
 	{
-		if (font != null)
-		{
-			if (font is UIFont) Draw(font as UIFont, cb, editButton, options);
-			else Draw(font as NGUIFont, cb, editButton, options);
-		}
+		if (font is UIFont) Draw(font as UIFont, cb, editButton, options);
+		else Draw(font as NGUIFont, cb, editButton, options);
 	}
 
 	/// <summary>
@@ -130,7 +124,7 @@ public class ComponentSelector : ScriptableWizard
 		else
 		{
 			// Remove invalid fonts (Lucida Grande etc)
-			if (typeof(T) == typeof(Font))
+			if (type == typeof(Font))
 			{
 				for (int i = 0; i < comp.mObjects.Length; ++i)
 				{

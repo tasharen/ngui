@@ -48,6 +48,9 @@ public class NGUIFontInspector : Editor
 
 	void OnSelectFont (Object obj)
 	{
+		// Legacy font support
+		if (obj != null && obj is GameObject) obj = (obj as GameObject).GetComponent<UIFont>();
+
 		// Undo doesn't work correctly in this case... so I won't bother.
 		//NGUIEditorTools.RegisterUndo("Font Change");
 		//NGUIEditorTools.RegisterUndo("Font Change", mFont);
@@ -59,6 +62,9 @@ public class NGUIFontInspector : Editor
 
 	void OnSelectAtlas (Object obj)
 	{
+		// Legacy atlas support
+		if (obj != null && obj is GameObject) obj = (obj as GameObject).GetComponent<UIAtlas>();
+
 		if (mFont != null && mFont.atlas != obj as INGUIAtlas)
 		{
 			NGUIEditorTools.RegisterUndo("Font Atlas", mFont as Object);

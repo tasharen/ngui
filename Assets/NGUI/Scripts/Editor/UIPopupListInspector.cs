@@ -57,6 +57,9 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 
 	void OnSelectAtlas (Object obj)
 	{
+		// Legacy atlas support
+		if (obj != null && obj is GameObject) obj = (obj as GameObject).GetComponent<UIAtlas>();
+
 		RegisterUndo();
 		mList.atlas = obj;
 		NGUISettings.atlas = obj as INGUIAtlas;

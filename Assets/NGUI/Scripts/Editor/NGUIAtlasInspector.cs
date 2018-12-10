@@ -75,6 +75,9 @@ public class NGUIAtlasInspector : Editor
 
 	void OnSelectAtlas (Object obj)
 	{
+		// Legacy atlas support
+		if (obj != null && obj is GameObject) obj = (obj as GameObject).GetComponent<UIAtlas>();
+
 		var rep = obj as INGUIAtlas;
 
 		if (mReplacement != rep)
@@ -153,6 +156,42 @@ public class NGUIAtlasInspector : Editor
 				NGUITools.SetDirty(mAtlas as Object);
 			}
 			return;
+		}
+
+		if (mAtlas is UIAtlas)
+		{
+			EditorGUILayout.HelpBox("Legacy atlas type should be upgraded in order to maintain compatibility with Unity 2018 and newer.", MessageType.Warning, true);
+
+			if (GUILayout.Button("Upgrade"))
+			{
+				var path = EditorUtility.SaveFilePanelInProject("Save As", (mAtlas as Object).name + ".asset", "asset", "Save atlas as...", NGUISettings.currentPath);
+
+				if (!string.IsNullOrEmpty(path))
+				{
+					NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
+					var asset = ScriptableObject.CreateInstance<NGUIAtlas>();
+					asset.spriteList = mAtlas.spriteList;
+					asset.spriteMaterial = mAtlas.spriteMaterial;
+
+					var atlasName = path.Replace(".asset", "");
+					atlasName = atlasName.Substring(path.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
+					asset.name = atlasName;
+
+					AssetDatabase.CreateAsset(asset, path);
+					AssetDatabase.SaveAssets();
+					AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+					asset = AssetDatabase.LoadAssetAtPath<NGUIAtlas>(path);
+					NGUISettings.atlas = asset;
+					Selection.activeObject = NGUISettings.atlas as Object;
+
+					if (asset != null)
+					{
+						mAtlas.replacement = asset;
+						mAtlas.MarkAsChanged();
+					}
+				}
+			}
 		}
 
 		//GUILayout.Space(6f);

@@ -20,6 +20,9 @@ public class UISpriteInspector : UIBasicSpriteEditor
 
 	void OnSelectAtlas (Object obj)
 	{
+		// Legacy atlas support
+		if (obj != null && obj is GameObject) obj = (obj as GameObject).GetComponent<UIAtlas>();
+
 		serializedObject.Update();
 
 		var oldAtlas = serializedObject.FindProperty("mAtlas");
@@ -51,7 +54,8 @@ public class UISpriteInspector : UIBasicSpriteEditor
 	protected override bool ShouldDrawProperties ()
 	{
 		var atlasProp = serializedObject.FindProperty("mAtlas");
-		var atlas = atlasProp.objectReferenceValue as INGUIAtlas;
+		var obj = atlasProp.objectReferenceValue;
+		var atlas = obj as INGUIAtlas;
 
 		GUILayout.BeginHorizontal();
 
@@ -64,6 +68,10 @@ public class UISpriteInspector : UIBasicSpriteEditor
 			NGUISettings.atlas = atlas;
 			NGUIEditorTools.Select(atlas as Object);
 		}
+
+		// Legacy atlas support
+		if (atlasProp.objectReferenceValue != null && atlasProp.objectReferenceValue is GameObject)
+			atlasProp.objectReferenceValue = (atlasProp.objectReferenceValue as GameObject).GetComponent<UIAtlas>();
 
 		GUILayout.EndHorizontal();
 		var sp = serializedObject.FindProperty("mSpriteName");
@@ -87,13 +95,13 @@ public class UISpriteInspector : UIBasicSpriteEditor
 
 	public override void OnPreviewGUI (Rect rect, GUIStyle background)
 	{
-		UISprite sprite = target as UISprite;
+		var sprite = target as UISprite;
 		if (sprite == null || !sprite.isValid) return;
 
-		Texture2D tex = sprite.mainTexture as Texture2D;
+		var tex = sprite.mainTexture as Texture2D;
 		if (tex == null) return;
 
-		UISpriteData sd = sprite.GetSprite(sprite.spriteName);
+		var sd = sprite.GetSprite(sprite.spriteName);
 		NGUIEditorTools.DrawSprite(tex, rect, sd, sprite.color);
 	}
 }

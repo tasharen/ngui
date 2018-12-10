@@ -90,6 +90,9 @@ public class UIAtlasMaker : EditorWindow
 
 	void OnSelectAtlas (Object obj)
 	{
+		// Legacy atlas support
+		if (obj != null && obj is GameObject) obj = (obj as GameObject).GetComponent<UIAtlas>();
+
 		if (NGUISettings.atlas != obj as INGUIAtlas)
 		{
 			NGUISettings.atlas = obj as INGUIAtlas;
@@ -1116,7 +1119,7 @@ public class UIAtlasMaker : EditorWindow
 					}
 
 					// Create a new game object for the atlas
-					string atlasName = path.Replace(".prefab", "");
+					var atlasName = path.Replace(".asset", "");
 					atlasName = atlasName.Substring(path.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
 
 					asset.spriteMaterial = mat;

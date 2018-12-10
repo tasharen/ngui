@@ -30,15 +30,18 @@ public class UILabelInspector : UIWidgetInspector
 	protected override void OnEnable ()
 	{
 		base.OnEnable();
-		SerializedProperty bit = serializedObject.FindProperty("mFont");
+		var bit = serializedObject.FindProperty("mFont");
 		mFontType = (bit != null && bit.objectReferenceValue != null) ? FontType.NGUI : FontType.Unity;
 	}
 
 	void OnNGUIFont (Object obj)
 	{
+		// Legacy font support
+		if (obj != null && obj is GameObject) obj = (obj as GameObject).GetComponent<UIFont>();
+
 		serializedObject.Update();
 
-		SerializedProperty sp = serializedObject.FindProperty("mFont");
+		var sp = serializedObject.FindProperty("mFont");
 		sp.objectReferenceValue = obj;
 
 		sp = serializedObject.FindProperty("mTrueTypeFont");
@@ -97,6 +100,10 @@ public class UILabelInspector : UIWidgetInspector
 		{
 			GUI.changed = false;
 			fnt = NGUIEditorTools.DrawProperty("", serializedObject, "mFont", GUILayout.MinWidth(40f));
+
+			// Legacy font support
+			if (fnt.objectReferenceValue != null && fnt.objectReferenceValue is GameObject)
+				fnt.objectReferenceValue = (fnt.objectReferenceValue as GameObject).GetComponent<UIFont>();
 
 			if (fnt.objectReferenceValue != null)
 			{

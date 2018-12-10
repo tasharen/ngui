@@ -145,6 +145,9 @@ public class UICreateWidgetWizard : EditorWindow
 
 	void OnSelectAtlas (Object obj)
 	{
+		// Legacy atlas support
+		if (obj != null && obj is GameObject) obj = (obj as GameObject).GetComponent<UIAtlas>();
+
 		if (NGUISettings.atlas != obj as INGUIAtlas)
 		{
 			NGUISettings.atlas = obj as INGUIAtlas;
@@ -158,6 +161,9 @@ public class UICreateWidgetWizard : EditorWindow
 
 	void OnSelectFont (Object obj)
 	{
+		// Legacy font support
+		if (obj != null && obj is GameObject) obj = (obj as GameObject).GetComponent<UIFont>();
+
 		if (NGUISettings.ambigiousFont != obj)
 		{
 			NGUISettings.ambigiousFont = obj;
