@@ -1456,6 +1456,8 @@ public class UIPanel : UIRect
 						if (rd > dc.depthEnd) dc.depthEnd = rd;
 					}
 
+					w.drawCall = dc;
+
 					// Important to check this since it can very well be null due to earlier safeToDraw condition
 					if (dc != null)
 					{
