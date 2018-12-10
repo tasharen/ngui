@@ -118,6 +118,12 @@ public class UIFont : MonoBehaviour, INGUIFont
 			var rep = replacement;
 			return (rep != null) ? rep.symbols : mSymbols;
 		}
+		set
+		{
+			var rep = replacement;
+			if (rep != null) rep.symbols = value;
+			else mSymbols = value;
+		}
 	}
 
 	/// <summary>

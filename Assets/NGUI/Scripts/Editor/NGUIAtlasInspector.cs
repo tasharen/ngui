@@ -36,7 +36,7 @@ public class NGUIAtlasInspector : Editor
 
 	void MarkSpriteAsDirty ()
 	{
-		UISpriteData sprite = (mAtlas != null) ? mAtlas.GetSprite(NGUISettings.selectedSprite) : null;
+		var sprite = (mAtlas != null) ? mAtlas.GetSprite(NGUISettings.selectedSprite) : null;
 		if (sprite == null) return;
 
 		var sprites = NGUITools.FindActive<UISprite>();

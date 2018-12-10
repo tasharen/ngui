@@ -44,7 +44,7 @@ public interface INGUIFont
 	/// List of symbols within the font.
 	/// </summary>
 
-	List<BMSymbol> symbols { get; }
+	List<BMSymbol> symbols { get; set; }
 
 	/// <summary>
 	/// Atlas used by the font, if any.
@@ -293,6 +293,12 @@ public class NGUIFont : ScriptableObject, INGUIFont
 		{
 			var rep = replacement;
 			return (rep != null) ? rep.symbols : mSymbols;
+		}
+		set
+		{
+			var rep = replacement;
+			if (rep != null) rep.symbols = value;
+			else mSymbols = value;
 		}
 	}
 

@@ -226,6 +226,46 @@ public class NGUIFontInspector : Editor
 				}
 			}
 
+			if (mFont is UIFont && mFont.bmFont.isValid)
+			{
+				EditorGUILayout.HelpBox("Legacy font type should be upgraded in order to maintain compatibility with Unity 2018 and newer.", MessageType.Warning, true);
+
+				if (GUILayout.Button("Upgrade"))
+				{
+					var path = EditorUtility.SaveFilePanelInProject("Save As", (mFont as Object).name + ".asset", "asset", "Save atlas as...", NGUISettings.currentPath);
+
+					if (!string.IsNullOrEmpty(path))
+					{
+						NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
+						var asset = ScriptableObject.CreateInstance<NGUIFont>();
+						asset.bmFont = mFont.bmFont;
+						asset.symbols = mFont.symbols;
+						asset.atlas = mFont.atlas;
+						asset.spriteName = mFont.spriteName;
+						asset.uvRect = mFont.uvRect;
+						asset.defaultSize = mFont.defaultSize;
+
+						var fontName = path.Replace(".asset", "");
+						fontName = fontName.Substring(path.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
+						asset.name = fontName;
+
+						AssetDatabase.CreateAsset(asset, path);
+						AssetDatabase.SaveAssets();
+						AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+						asset = AssetDatabase.LoadAssetAtPath<NGUIFont>(path);
+						NGUISettings.ambigiousFont = asset;
+						Selection.activeObject = asset;
+
+						if (asset != null)
+						{
+							mFont.replacement = asset;
+							mFont.MarkAsChanged();
+						}
+					}
+				}
+			}
+
 			if (mFont.bmFont.isValid)
 			{
 				Texture2D tex = mFont.texture;
