@@ -60,7 +60,7 @@ Shader "NGUI/Examples/Orc Armor"
 		{
 			half4 tex 	= tex2D(_MainTex, IN.uv_MainTex);
 			half4 maps  = tex2D(_MaskTex, IN.uv_MainTex);
-			
+
 			o.Albedo 	= lerp(tex.rgb, tex.rgb * _Color.rgb, tex.a);
 			o.Alpha 	= _Color.a;
 			o.Normal	= UnpackNormal(tex2D(_BumpMap, IN.uv_MainTex));
@@ -69,7 +69,7 @@ Shader "NGUI/Examples/Orc Armor"
 		}
 		ENDCG
 	}
-	
+
 	// Simple quality settings -- drop the bump map
 	SubShader
 	{
@@ -89,7 +89,7 @@ Shader "NGUI/Examples/Orc Armor"
 
 		void surf (Input IN, inout SurfaceOutput o)
 		{
-			half4 tex 	= tex2D(_MainTex, IN.uv_MainTex);			
+			half4 tex 	= tex2D(_MainTex, IN.uv_MainTex);
 			o.Albedo 	= lerp(tex.rgb, tex.rgb * _Color.rgb, tex.a);
 			o.Alpha 	= _Color.a;
 		}
