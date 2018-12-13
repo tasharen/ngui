@@ -1,9 +1,8 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
- Copyright © 2011-2016 Tasharen Entertainment
-            Version 3.12.1
-    http://www.tasharen.com/?page_id=197
-            support@tasharen.com
+ Copyright © 2011-2018 Tasharen Entertainment
+            Version 2018.3.0
+       https://discord.gg/tasharen/
 ----------------------------------------------
 
 Thank you for buying NGUI!
@@ -55,6 +54,13 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2018.3.0
+- NEW: As the name suggests, support for Unity 2018.3 and its new prefab workflow. Still supports previous versions, including Unity 5.6.
+- NEW: NGUI's atlases and fonts are now saved as ScriptableObjects instead of prefabs. To upgrade, select any old prefab-based atlas or font, and the Upgrade button will show up. BACK UP FIRST just in case! After the new asset gets created, the old atlas or font will be changed to Reference type, pointing to it. You can use the new asset directly, of course -- and if you are Unity savvy enough, you can swap their GUIDs from the meta files, effectively removing the need for the reference asset altogether.
+- NEW: Added a new widget type: Sprite Collection. It can be used to efficiently add thousands of sprites without the overhead of creating game objects. This is meant to be used from code by programmers, but can speed up the creation and modification of sprites by several orders of magnitude. In Sightseer it allowed the world map creation to go from 3348 ms down to 22 ms, for example.
+- NEW: Added UITweener.Finish() to immediately finish the tween, skipping to the end.
+- FIX: Some fixes for key binding text form serialization.
 
 3.12.1
 - NEW: Added an option to UIDragDropItem to make it work not just with press-and-hold but also with click-move-click dragging actions.
