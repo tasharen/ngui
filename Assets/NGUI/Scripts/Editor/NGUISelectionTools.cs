@@ -34,7 +34,7 @@ public class NGUISelectionTools
 			foreach (GameObject go in gos) NGUITools.SetActive(go, val);
 		}
 	}
-	
+
 	[MenuItem("GameObject/Selection/Clear Local Transform")]
 	static void ClearLocalTransform()
 	{
@@ -77,7 +77,7 @@ public class NGUISelectionTools
 			Selection.activeGameObject = newGameObject;
 		}
 	}
-	
+
 	[MenuItem("GameObject/Selection/List Dependencies")]
 	static void ListDependencies()
 	{
@@ -86,17 +86,17 @@ public class NGUISelectionTools
 			Debug.Log("Selection depends on the following assets:\n\n" + GetDependencyText(Selection.objects, false));
 		}
 	}
-	
+
 	//========================================================================================================
 
 #region Helper Functions
-	
+
 	class AssetEntry
 	{
 		public string path;
 		public List<System.Type> types = new List<System.Type>();
 	}
-	
+
 	/// <summary>
 	/// Helper function that checks to see if there are objects selected.
 	/// </summary>
@@ -110,11 +110,11 @@ public class NGUISelectionTools
 		}
 		return true;
 	}
-	
+
 	/// <summary>
 	/// Helper function that checks to see if there is an object with a Transform component selected.
 	/// </summary>
-	
+
 	static bool HasValidTransform()
 	{
 		if (Selection.activeTransform == null)
@@ -124,7 +124,7 @@ public class NGUISelectionTools
 		}
 		return true;
 	}
-	
+
 	/// <summary>
 	/// Helper function that checks to see if a prefab is currently selected.
 	/// </summary>
@@ -134,9 +134,7 @@ public class NGUISelectionTools
 		if (Selection.activeTransform != null)
 		{
 			// Check if the selected object is a prefab instance and display a warning
-			PrefabType type = PrefabUtility.GetPrefabType(Selection.activeGameObject);
-
-			if (type == PrefabType.PrefabInstance)
+			if (NGUIEditorTools.IsPrefabInstance(Selection.activeGameObject))
 			{
 				return EditorUtility.DisplayDialog("Losing prefab",
 					"This action will lose the prefab connection. Are you sure you wish to continue?",
@@ -145,27 +143,27 @@ public class NGUISelectionTools
 		}
 		return true;
 	}
-	
+
 	/// <summary>
 	/// Function that collects a list of file dependencies from the specified list of objects.
 	/// </summary>
-	
+
 	static List<AssetEntry> GetDependencyList (Object[] objects, bool reverse)
 	{
 		Object[] deps = reverse ? EditorUtility.CollectDeepHierarchy(objects) : EditorUtility.CollectDependencies(objects);
-		
+
 		List<AssetEntry> list = new List<AssetEntry>();
-		
+
 		foreach (Object obj in deps)
 		{
 			string path = AssetDatabase.GetAssetPath(obj);
-			
+
 			if (!string.IsNullOrEmpty(path))
 			{
-				bool found = false;
-				System.Type type = obj.GetType();
-				
-				foreach (AssetEntry ent in list)
+				var found = false;
+				var type = obj.GetType();
+
+				foreach (var ent in list)
 				{
 					if (ent.path.Equals(path))
 					{
@@ -174,37 +172,37 @@ public class NGUISelectionTools
 						break;
 					}
 				}
-				
+
 				if (!found)
 				{
-					AssetEntry ent = new AssetEntry();
+					var ent = new AssetEntry();
 					ent.path = path;
 					ent.types.Add(type);
 					list.Add(ent);
 				}
 			}
 		}
-		
+
 		deps = null;
 		objects = null;
 		return list;
 	}
-	
+
 	/// <summary>
 	/// Helper function that removes the Unity class prefix from the specified string.
 	/// </summary>
-	
+
 	static string RemovePrefix (string text)
 	{
 		text = text.Replace("UnityEngine.", "");
 		text = text.Replace("UnityEditor.", "");
 		return text;
 	}
-	
+
 	/// <summary>
 	/// Helper function that gets the dependencies of specified objects and returns them in text format.
 	/// </summary>
-	
+
 	static string GetDependencyText (Object[] objects, bool reverse)
 	{
 		List<AssetEntry> dependencies = GetDependencyList(objects, reverse);
@@ -214,28 +212,28 @@ public class NGUISelectionTools
 		foreach (AssetEntry ae in dependencies)
 		{
 			text = ae.path.Replace("Assets/", "");
-			
+
 			if (ae.types.Count > 1)
 			{
 				text += " (" + RemovePrefix(ae.types[0].ToString());
-			
+
 				for (int i = 1; i < ae.types.Count; ++i)
 				{
 					text += ", " + RemovePrefix(ae.types[i].ToString());
 				}
-				
+
 				text += ")";
 			}
 			list.Add(text);
 		}
-		
+
 		list.Sort();
-		
+
 		text = "";
 		foreach (string s in list) text += s + "\n";
 		list.Clear();
 		list = null;
-		
+
 		dependencies.Clear();
 		dependencies = null;
 		return text;

@@ -166,11 +166,15 @@ public class UIPrefabTool : EditorWindow
 #else
 			string path = EditorUtility.SaveFilePanelInProject("Save a prefab",
 				go.name + ".prefab", "prefab", "Save prefab as...", NGUISettings.currentPath);
-#endif	
+#endif
 			if (string.IsNullOrEmpty(path)) return;
 			NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
 
+#if UNITY_2018_3_OR_NEWER
+			go = PrefabUtility.SaveAsPrefabAsset(go, path);
+#else
 			go = PrefabUtility.CreatePrefab(path, go);
+#endif
 			if (go == null) return;
 
 			guid = NGUIEditorTools.ObjectToGUID(go);
@@ -381,7 +385,7 @@ public class UIPrefabTool : EditorWindow
 	{
 		UISnapshotPoint point = t.GetComponent<UISnapshotPoint>();
 		if (point != null) return point;
-		
+
 		for (int i = 0, imax = t.childCount; i < imax; ++i)
 		{
 			Transform c = t.GetChild(i);
@@ -610,7 +614,7 @@ public class UIPrefabTool : EditorWindow
 		//   NGUI Snapshot Point 0.1 10 45
 
 		Transform snapshot = FindChild(go.transform, "NGUI Snapshot Point");
-		
+
 		if (snapshot == null)
 		{
 			cam.nearClipPlane = near;

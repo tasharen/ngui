@@ -20,10 +20,15 @@ public class DownloadTexture : MonoBehaviour
 
 	IEnumerator Start ()
 	{
-		WWW www = new WWW(url);
+#if UNITY_2018_3_OR_NEWER
+		var www = UnityEngine.Networking.UnityWebRequest.Get(url);
+		yield return www.SendWebRequest();
+		mTex = UnityEngine.Networking.DownloadHandlerTexture.GetContent(www);
+#else
+		var www = new WWW(url);
 		yield return www;
 		mTex = www.texture;
-
+#endif
 		if (mTex != null)
 		{
 			UITexture ut = GetComponent<UITexture>();

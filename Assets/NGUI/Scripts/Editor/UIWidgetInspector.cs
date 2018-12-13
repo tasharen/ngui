@@ -173,7 +173,7 @@ public class UIWidgetInspector : UIRectEditor
 		for (int i = 0; i < worldPoints.Length; ++i)
 		{
 			float distance = GetScreenDistance(worldPoints[i], mousePos);
-			
+
 			if (distance < min)
 			{
 				index = i;
@@ -386,7 +386,7 @@ public class UIWidgetInspector : UIRectEditor
 			Vector3 v1 = HandleUtility.WorldToGUIPoint(theirPos);
 
 			Handles.BeginGUI();
-				
+
 			mYellowDot.Draw(rect, GUIContent.none, id);
 
 			Vector3 diff = v1 - v0;
@@ -446,7 +446,7 @@ public class UIWidgetInspector : UIRectEditor
 
 		Action actionUnderMouse = mAction;
 		Vector3[] handles = GetHandles(mWidget.worldCorners);
-		
+
 		NGUIHandles.DrawShadowedLine(handles, handles[0], handles[1], handlesColor);
 		NGUIHandles.DrawShadowedLine(handles, handles[1], handles[2], handlesColor);
 		NGUIHandles.DrawShadowedLine(handles, handles[2], handles[3], handlesColor);
@@ -479,7 +479,7 @@ public class UIWidgetInspector : UIRectEditor
 		resizable[7] = canResize;	// bottom
 
 		UILabel lbl = mWidget as UILabel;
-		
+
 		if (lbl != null)
 		{
 			if (lbl.overflowMethod == UILabel.Overflow.ResizeFreely)
@@ -511,16 +511,16 @@ public class UIWidgetInspector : UIRectEditor
 		resizable[1] = resizable[5] && resizable[4]; // top-left
 		resizable[2] = resizable[5] && resizable[6]; // top-right
 		resizable[3] = resizable[7] && resizable[6]; // bottom-right
-		
-		UIWidget.Pivot pivotUnderMouse = GetPivotUnderMouse(handles, e, resizable, true, ref actionUnderMouse);
-		
+
+		var pivotUnderMouse = GetPivotUnderMouse(handles, e, resizable, true, ref actionUnderMouse);
+
 		switch (type)
 		{
 			case EventType.Repaint:
 			{
 				Vector3 v0 = HandleUtility.WorldToGUIPoint(handles[0]);
 				Vector3 v2 = HandleUtility.WorldToGUIPoint(handles[2]);
-				
+
 				if ((v2 - v0).magnitude > 60f)
 				{
 					Vector3 v1 = HandleUtility.WorldToGUIPoint(handles[1]);
@@ -896,7 +896,7 @@ public class UIWidgetInspector : UIRectEditor
 			GUILayout.Space(3f);
 		}
 
-		PrefabType type = PrefabUtility.GetPrefabType(w.gameObject);
+		var isPrefab = NGUIEditorTools.IsPrefab(w.gameObject);
 
 		if (NGUIEditorTools.DrawHeader("Widget"))
 		{
@@ -904,8 +904,8 @@ public class UIWidgetInspector : UIRectEditor
 			if (NGUISettings.minimalisticLook) NGUIEditorTools.SetLabelWidth(70f);
 
 			DrawPivot(so, w);
-			DrawDepth(so, w, type == PrefabType.Prefab);
-			DrawDimensions(so, w, type == PrefabType.Prefab);
+			DrawDepth(so, w, isPrefab);
+			DrawDimensions(so, w, isPrefab);
 			if (NGUISettings.minimalisticLook) NGUIEditorTools.SetLabelWidth(70f);
 
 			SerializedProperty ratio = so.FindProperty("aspectRatio");

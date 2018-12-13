@@ -862,13 +862,13 @@ public class UIAtlasMaker : EditorWindow
 			}
 
 			PrefabUtility.SaveAsPrefabAsset(assetRoot, assetPath);
-			Selection.activeGameObject = (NGUISettings.atlas != null) ? NGUISettings.atlas.gameObject : null;
+			Selection.activeObject = NGUISettings.atlas as Object;
 			EditorUtility.ClearProgressBar();
 
 			PrefabUtility.UnloadPrefabContents(assetRoot);
 			AssetDatabase.Refresh();
 
-			var assetUpdated = (GameObject)AssetDatabase.LoadMainAssetAtPath (assetPath);
+			var assetUpdated = (GameObject)AssetDatabase.LoadMainAssetAtPath(assetPath);
 			var newAtlas = assetUpdated.GetComponent<UIAtlas>();
 			NGUISettings.atlas = newAtlas;
 			newAtlas.MarkAsChanged ();

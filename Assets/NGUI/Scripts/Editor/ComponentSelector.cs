@@ -155,9 +155,9 @@ public class ComponentSelector : ScriptableWizard
 
 		if (mExtensions != null)
 		{
-			string[] paths = AssetDatabase.GetAllAssetPaths();
-			bool isComponent = mType.IsSubclassOf(typeof(Component));
-			List<Object> list = new List<Object>();
+			var paths = AssetDatabase.GetAllAssetPaths();
+			var isComponent = mType.IsSubclassOf(typeof(Component));
+			var list = new List<Object>();
 
 			for (int i = 0; i < mObjects.Length; ++i)
 				if (mObjects[i] != null)
@@ -165,9 +165,8 @@ public class ComponentSelector : ScriptableWizard
 
 			for (int i = 0; i < paths.Length; ++i)
 			{
-				string path = paths[i];
-
-				bool valid = false;
+				var path = paths[i];
+				var valid = false;
 
 				for (int b = 0; b < mExtensions.Length; ++b)
 				{
@@ -181,18 +180,17 @@ public class ComponentSelector : ScriptableWizard
 				if (!valid) continue;
 
 				EditorUtility.DisplayProgressBar("Loading", "Searching assets, please wait...", (float)i / paths.Length);
-				Object obj = AssetDatabase.LoadMainAssetAtPath(path);
+				var obj = AssetDatabase.LoadMainAssetAtPath(path);
 				if (obj == null || list.Contains(obj)) continue;
 
 				if (!isComponent)
 				{
-					System.Type t = obj.GetType();
-					if (t == mType || t.IsSubclassOf(mType) && !list.Contains(obj))
-						list.Add(obj);
+					var t = obj.GetType();
+					if (t == mType || t.IsSubclassOf(mType) && !list.Contains(obj)) list.Add(obj);
 				}
-				else if (PrefabUtility.GetPrefabType(obj) == PrefabType.Prefab)
+				else if (NGUIEditorTools.IsPrefab(obj as GameObject))
 				{
-					Object t = (obj as GameObject).GetComponent(mType);
+					var t = (obj as GameObject).GetComponent(mType);
 					if (t != null && !list.Contains(t)) list.Add(t);
 				}
 			}

@@ -409,6 +409,51 @@ static public class NGUIEditorTools
 	}
 
 	/// <summary>
+	/// Returns 'true' if the specified object is a prefab.
+	/// </summary>
+
+	static public bool IsPrefab (GameObject go)
+	{
+#if UNITY_2018_3_OR_NEWER
+		return go != null && PrefabUtility.GetPrefabAssetType(go) == PrefabAssetType.Regular;
+#else
+		return go != null && PrefabUtility.GetPrefabType(go) == PrefabType.Prefab;
+#endif
+	}
+
+	/// <summary>
+	/// Returns 'true' if the specified object is a prefab instance.
+	/// </summary>
+
+	static public bool IsPrefabInstance (GameObject go)
+	{
+#if UNITY_2018_3_OR_NEWER
+		return go != null && PrefabUtility.GetPrefabInstanceStatus(go) == PrefabInstanceStatus.Connected;
+#else
+		return go != null && PrefabUtility.GetPrefabType(go) == PrefabType.PrefabInstance;
+#endif
+	}
+
+	/// <summary>
+	/// Given a game object, return its prefab (or itself if it's a prefab).
+	/// </summary>
+
+	static public GameObject GetPrefab (GameObject go)
+	{
+		if (go == null) return null;
+
+#if UNITY_2018_3_OR_NEWER
+		go = PrefabUtility.GetOutermostPrefabInstanceRoot(go);
+		if (go == null) return null;
+		return IsPrefab(go) ? go : PrefabUtility.GetCorrespondingObjectFromSource(go);
+#else
+		go = PrefabUtility.FindPrefabRoot(go);
+		if (go == null) return null;
+		return PrefabUtility.GetPrefabParent(go) as GameObject;
+#endif
+	}
+
+	/// <summary>
 	/// Helper function that checks to see if this action would break the prefab connection.
 	/// </summary>
 
@@ -418,10 +463,7 @@ static public class NGUIEditorTools
 
 		if (root.transform != null)
 		{
-			// Check if the selected object is a prefab instance and display a warning
-			PrefabType type = PrefabUtility.GetPrefabType(root);
-
-			if (type == PrefabType.PrefabInstance)
+			if (IsPrefabInstance(root))
 			{
 				return EditorUtility.DisplayDialog("Losing prefab",
 					"This action will lose the prefab connection. Are you sure you wish to continue?",
