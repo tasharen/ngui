@@ -1161,8 +1161,11 @@ public class UIAtlasMaker : EditorWindow
 					GUILayout.BeginHorizontal(NGUIEditorTools.textArea, GUILayout.MinHeight(20f));
 					GUI.backgroundColor = Color.white;
 					GUILayout.Label(index.ToString(), GUILayout.Width(24f));
-
+#if UNITY_2018_3_OR_NEWER
+					if (GUILayout.Button(iter.Key, "Label", GUILayout.Height(20f)))
+#else
 					if (GUILayout.Button(iter.Key, "OL TextField", GUILayout.Height(20f)))
+#endif
 						selection = iter.Key;
 
 					if (iter.Value == 2)
