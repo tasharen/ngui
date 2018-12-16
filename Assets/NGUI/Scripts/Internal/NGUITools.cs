@@ -427,18 +427,29 @@ static public class NGUITools
 			if (dr.x != 0f || dr.y != 0f || dr.z != 1f || dr.w != 1f)
 			{
 				var region = w.drawingDimensions;
-				box.center = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
-				box.size = new Vector3(region.z - region.x, region.w - region.y);
+				var c = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
+				var s = new Vector3(region.z - region.x, region.w - region.y);
+
+				if (c != box.center || s != box.size)
+				{
+					box.center = c;
+					box.size = s;
+					NGUITools.SetDirty(box);
+				}
 			}
 			else
 			{
 				var corners = w.localCorners;
-				box.center = Vector3.Lerp(corners[0], corners[2], 0.5f);
-				box.size = corners[2] - corners[0];
+				var c = Vector3.Lerp(corners[0], corners[2], 0.5f);
+				var s = corners[2] - corners[0];
+
+				if (c != box.center || s != box.size)
+				{
+					box.center = c;
+					box.size = s;
+					NGUITools.SetDirty(box);
+				}
 			}
-#if UNITY_EDITOR
-			NGUITools.SetDirty(box);
-#endif
 		}
 	}
 
@@ -455,22 +466,46 @@ static public class NGUITools
 			if (dr.x != 0f || dr.y != 0f || dr.z != 1f || dr.w != 1f)
 			{
 				var region = w.drawingDimensions;
+				var c = new Vector2((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
+				var s = new Vector2(region.z - region.x, region.w - region.y);
+
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-				box.center = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
+				if (c != box.center || s != box.size)
+				{
+					box.center = c;
+					box.size = s;
+					NGUITools.SetDirty(box);
+				}
 #else
-				box.offset = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
+				if (c != box.offset || s != box.size)
+				{
+					box.offset = c;
+					box.size = s;
+					NGUITools.SetDirty(box);
+				}
 #endif
-				box.size = new Vector3(region.z - region.x, region.w - region.y);
 			}
 			else
 			{
 				var corners = w.localCorners;
+				var c = Vector2.Lerp(corners[0], corners[2], 0.5f);
+				var s = (Vector2)(corners[2] - corners[0]);
+
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-				box.center = Vector3.Lerp(corners[0], corners[2], 0.5f);
+				if (c != box.center || s != box.size)
+				{
+					box.center = c;
+					box.size = s;
+					NGUITools.SetDirty(box);
+				}
 #else
-				box.offset = Vector3.Lerp(corners[0], corners[2], 0.5f);
+				if (c != box.offset || s != box.size)
+				{
+					box.offset = c;
+					box.size = s;
+					NGUITools.SetDirty(box);
+				}
 #endif
-				box.size = corners[2] - corners[0];
 			}
 #if UNITY_EDITOR
 			NGUITools.SetDirty(box);
@@ -496,22 +531,46 @@ static public class NGUITools
 				if (dr.x != 0f || dr.y != 0f || dr.z != 1f || dr.w != 1f)
 				{
 					var region = w.drawingDimensions;
+					var c = new Vector2((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
+					var s = new Vector2(region.z - region.x, region.w - region.y);
+
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-					box.center = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
+					if (c != box.center || s != box.size)
+					{
+						box.center = c;
+						box.size = s;
+						NGUITools.SetDirty(box);
+					}
 #else
-					box.offset = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
+					if (c != box.offset || s != box.size)
+					{
+						box.offset = c;
+						box.size = s;
+						NGUITools.SetDirty(box);
+					}
 #endif
-					box.size = new Vector3(region.z - region.x, region.w - region.y);
 				}
 				else
 				{
 					var corners = w.localCorners;
+					var c = Vector2.Lerp(corners[0], corners[2], 0.5f);
+					var s = (Vector2)(corners[2] - corners[0]);
+
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-					box.center = Vector3.Lerp(corners[0], corners[2], 0.5f);
+					if (c != box.center || s != box.size)
+					{
+						box.center = c;
+						box.size = s;
+						NGUITools.SetDirty(box);
+					}
 #else
-					box.offset = Vector3.Lerp(corners[0], corners[2], 0.5f);
+					if (c != box.offset || s != box.size)
+					{
+						box.offset = c;
+						box.size = s;
+						NGUITools.SetDirty(box);
+					}
 #endif
-					box.size = corners[2] - corners[0];
 				}
 			}
 			else
@@ -575,30 +634,23 @@ static public class NGUITools
 	{
 #if UNITY_EDITOR
 #if UNITY_2018_3_OR_NEWER
-	if (obj)
-	{
-		if (UnityEditor.AssetDatabase.Contains(obj))
+		if (obj)
 		{
 			UnityEditor.EditorUtility.SetDirty(obj);
-		}
-		else if (!Application.isPlaying)
-		{
-			if (obj is Component)
+
+			if (!UnityEditor.AssetDatabase.Contains(obj) && !Application.isPlaying)
 			{
-				var component = (Component)obj;
-				UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(component.gameObject.scene);
-			}
-			else if (obj is UnityEditor.EditorWindow || obj is ScriptableObject)
-			{
-				UnityEditor.EditorUtility.SetDirty(obj);
-			}
-			else
-			{
-				UnityEditor.EditorUtility.SetDirty (obj);
-				UnityEditor.SceneManagement.EditorSceneManager.MarkAllScenesDirty();
+				if (obj is Component)
+				{
+					var component = (Component)obj;
+					UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(component.gameObject.scene);
+				}
+				else if (!(obj is UnityEditor.EditorWindow || obj is ScriptableObject))
+				{
+					UnityEditor.SceneManagement.EditorSceneManager.MarkAllScenesDirty();
+				}
 			}
 		}
-	}
 #else
 		if (obj) UnityEditor.EditorUtility.SetDirty(obj);
 #endif

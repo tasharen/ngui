@@ -1831,22 +1831,16 @@ static public class NGUIEditorTools
 	}
 
 	/// <summary>
+	/// Create an undo point for the specified object.
+	/// </summary>
+
+	static public void RegisterUndo (string name, Object obj) { if (obj != null) UnityEditor.Undo.RecordObject(obj, name); }
+
+	/// <summary>
 	/// Create an undo point for the specified objects.
 	/// </summary>
 
-	static public void RegisterUndo (string name, params Object[] objects)
-	{
-		if (objects != null && objects.Length > 0)
-		{
-			UnityEditor.Undo.RecordObjects(objects, name);
-
-			foreach (Object obj in objects)
-			{
-				if (obj == null) continue;
-				NGUITools.SetDirty(obj);
-			}
-		}
-	}
+	static public void RegisterUndo (string name, params Object[] objects) { if (objects != null && objects.Length > 0) UnityEditor.Undo.RecordObjects(objects, name); }
 
 	/// <summary>
 	/// Unity 4.5+ makes it possible to hide the move tool.
@@ -1871,10 +1865,10 @@ static public class NGUIEditorTools
 
 	static public int GetClassID (System.Type type)
 	{
-		GameObject go = EditorUtility.CreateGameObjectWithHideFlags("Temp", HideFlags.HideAndDontSave);
-		Component uiSprite = go.AddComponent(type);
-		SerializedObject ob = new SerializedObject(uiSprite);
-		int classID = ob.FindProperty("m_Script").objectReferenceInstanceIDValue;
+		var go = EditorUtility.CreateGameObjectWithHideFlags("Temp", HideFlags.HideAndDontSave);
+		var uiSprite = go.AddComponent(type);
+		var ob = new SerializedObject(uiSprite);
+		var classID = ob.FindProperty("m_Script").objectReferenceInstanceIDValue;
 		NGUITools.DestroyImmediate(go);
 		return classID;
 	}
@@ -1894,8 +1888,8 @@ static public class NGUIEditorTools
 
 	static public SerializedObject ReplaceClass (MonoBehaviour mb, System.Type type)
 	{
-		int id = GetClassID(type);
-		SerializedObject ob = new SerializedObject(mb);
+		var id = GetClassID(type);
+		var ob = new SerializedObject(mb);
 		ob.Update();
 		ob.FindProperty("m_Script").objectReferenceInstanceIDValue = id;
 		ob.ApplyModifiedProperties();
@@ -1909,7 +1903,7 @@ static public class NGUIEditorTools
 
 	static public SerializedObject ReplaceClass (MonoBehaviour mb, int classID)
 	{
-		SerializedObject ob = new SerializedObject(mb);
+		var ob = new SerializedObject(mb);
 		ob.Update();
 		ob.FindProperty("m_Script").objectReferenceInstanceIDValue = classID;
 		ob.ApplyModifiedProperties();

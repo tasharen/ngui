@@ -33,12 +33,12 @@ public class UIButtonEditor : UIButtonColorEditor
 		DrawTransition();
 		DrawColors();
 
-		UIButton btn = target as UIButton;
+		var btn = target as UIButton;
 
 		if (btn.tweenTarget != null)
 		{
-			UISprite sprite = btn.tweenTarget.GetComponent<UISprite>();
-			UI2DSprite s2d = btn.tweenTarget.GetComponent<UI2DSprite>();
+			var sprite = btn.tweenTarget.GetComponent<UISprite>();
+			var s2d = btn.tweenTarget.GetComponent<UI2DSprite>();
 
 			if (sprite != null)
 			{
@@ -87,7 +87,8 @@ public class UIButtonEditor : UIButtonColorEditor
 			}
 		}
 
-		UIButton button = target as UIButton;
+		var button = target as UIButton;
 		NGUIEditorTools.DrawEvents("On Click", button, button.onClick, false);
+		//NGUIEditorTools.DrawProperty(serializedObject, "onClick");
 	}
 }
