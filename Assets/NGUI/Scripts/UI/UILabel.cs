@@ -2205,7 +2205,7 @@ public class UILabel : UIWidget
 		NGUIText.rectHeight = mHeight;
 		NGUIText.regionWidth = Mathf.RoundToInt(mWidth * (mDrawRegion.z - mDrawRegion.x));
 		NGUIText.regionHeight = Mathf.RoundToInt(mHeight * (mDrawRegion.w - mDrawRegion.y));
-		NGUIText.gradient = mApplyGradient && packedFontShader;
+		NGUIText.gradient = mApplyGradient && !packedFontShader;
 		NGUIText.gradientTop = mGradientTop;
 		NGUIText.gradientBottom = mGradientBottom;
 		NGUIText.encoding = mEncoding;
