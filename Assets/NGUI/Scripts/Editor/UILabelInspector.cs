@@ -95,10 +95,10 @@ public class UILabelInspector : UIWidgetInspector
 		bool isValid = false;
 		SerializedProperty fnt = null;
 		SerializedProperty ttf = null;
+		GUI.changed = false;
 
 		if (mFontType == FontType.NGUI)
 		{
-			GUI.changed = false;
 			fnt = NGUIEditorTools.DrawProperty("", serializedObject, "mFont", GUILayout.MinWidth(40f));
 
 			// Legacy font support
@@ -114,7 +114,6 @@ public class UILabelInspector : UIWidgetInspector
 		}
 		else
 		{
-			GUI.changed = false;
 			ttf = NGUIEditorTools.DrawProperty("", serializedObject, "mTrueTypeFont", GUILayout.MinWidth(40f));
 
 			if (ttf.objectReferenceValue != null)
@@ -153,7 +152,7 @@ public class UILabelInspector : UIWidgetInspector
 				{
 					EditorGUI.BeginDisabledGroup((ttf != null) ? ttf.hasMultipleDifferentValues : fnt.hasMultipleDifferentValues);
 
-					SerializedProperty prop = NGUIEditorTools.DrawProperty("Font Size", serializedObject, "mFontSize", GUILayout.Width(142f));
+					var prop = NGUIEditorTools.DrawProperty("Font Size", serializedObject, "mFontSize", GUILayout.Width(142f));
 					NGUISettings.fontSize = prop.intValue;
 
 					prop = NGUIEditorTools.DrawProperty("", serializedObject, "mFontStyle", GUILayout.MinWidth(40f));
@@ -167,7 +166,7 @@ public class UILabelInspector : UIWidgetInspector
 			else if (bmFont != null)
 			{
 				GUILayout.BeginHorizontal();
-				SerializedProperty prop = NGUIEditorTools.DrawProperty("Font Size", serializedObject, "mFontSize", GUILayout.Width(142f));
+				var prop = NGUIEditorTools.DrawProperty("Font Size", serializedObject, "mFontSize", GUILayout.Width(142f));
 
 				EditorGUI.BeginDisabledGroup(true);
 

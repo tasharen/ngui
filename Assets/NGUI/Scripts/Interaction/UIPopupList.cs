@@ -57,6 +57,28 @@ public class UIPopupList : UIWidgetContainer
 	public Font trueTypeFont;
 
 	/// <summary>
+	/// NGUI font interface, if it's using a bitmap font.
+	/// </summary>
+
+	public INGUIFont font
+	{
+		get
+		{
+			if (bitmapFont != null)
+			{
+				if (bitmapFont is GameObject) return (bitmapFont as GameObject).GetComponent<UIFont>();
+				return bitmapFont as INGUIFont;
+			}
+			return null;
+		}
+		set
+		{
+			bitmapFont = (value as Object);
+			trueTypeFont = null;
+		}
+	}
+
+	/// <summary>
 	/// Font used by the popup list. Conveniently wraps both dynamic and bitmap fonts into one property.
 	/// </summary>
 
@@ -65,8 +87,13 @@ public class UIPopupList : UIWidgetContainer
 		get
 		{
 			if (trueTypeFont != null) return trueTypeFont;
-			if (bitmapFont != null) return bitmapFont as Object;
-			return font;
+
+			if (bitmapFont != null)
+			{
+				if (bitmapFont is GameObject) return (bitmapFont as GameObject).GetComponent<UIFont>();
+				return bitmapFont as Object;
+			}
+			return null;
 		}
 		set
 		{
@@ -74,13 +101,16 @@ public class UIPopupList : UIWidgetContainer
 			{
 				trueTypeFont = value as Font;
 				bitmapFont = null;
-				font = null;
 			}
 			else if (value is INGUIFont)
 			{
 				bitmapFont = value as Object;
 				trueTypeFont = null;
-				font = null;
+			}
+			else if (value is GameObject)
+			{
+				bitmapFont = (value as GameObject).GetComponent<UIFont>();
+				trueTypeFont = null;
 			}
 		}
 	}
@@ -254,7 +284,6 @@ public class UIPopupList : UIWidgetContainer
 	[HideInInspector][SerializeField] GameObject eventReceiver;
 	[HideInInspector][SerializeField] string functionName = "OnSelectionChange";
 	[HideInInspector][SerializeField] float textScale = 0f;
-	[HideInInspector][SerializeField] UIFont font; // Use 'bitmapFont' instead
 
 	// This functionality is no longer needed as the same can be achieved by choosing a
 	// OnValueChange notification targeting a label's SetCurrentSelection function.
@@ -328,7 +357,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Whether the popup list is actually usable.
 	/// </summary>
 
-	protected bool isValid { get { return bitmapFont != null || trueTypeFont != null; } }
+	protected bool isValid { get { return ambigiousFont != null; } }
 
 	/// <summary>
 	/// Active font size.
@@ -338,8 +367,8 @@ public class UIPopupList : UIWidgetContainer
 	{
 		get
 		{
-			if (trueTypeFont != null || bitmapFont == null) return fontSize;
-			var bm = bitmapFont as INGUIFont;
+			var bm = font;
+			if (trueTypeFont != null || bm == null) return fontSize;
 			return (bm != null) ? bm.defaultSize : fontSize;
 		}
 	}
@@ -352,8 +381,8 @@ public class UIPopupList : UIWidgetContainer
 	{
 		get
 		{
-			if (trueTypeFont != null || bitmapFont == null) return 1f;
-			var bm = bitmapFont as INGUIFont;
+			var bm = font;
+			if (trueTypeFont != null || bm == null) return 1f;
 			return (bm != null) ? (float)fontSize / bm.defaultSize : 1f;
 		}
 	}
@@ -525,24 +554,7 @@ public class UIPopupList : UIWidgetContainer
 			functionName = null;
 		}
 
-		// 'font' is no longer used
-		if (font != null)
-		{
-			if (font.isDynamic)
-			{
-				trueTypeFont = font.dynamicFont;
-				fontStyle = font.dynamicFontStyle;
-				mUseDynamicFont = true;
-			}
-			else if (bitmapFont == null)
-			{
-				bitmapFont = font;
-				mUseDynamicFont = false;
-			}
-			font = null;
-		}
-
-		var bm = bitmapFont as INGUIFont;
+		var bm = font;
 
 		// 'textScale' is no longer used
 		if (textScale != 0f)
@@ -556,48 +568,6 @@ public class UIPopupList : UIWidgetContainer
 		{
 			trueTypeFont = bm.dynamicFont;
 			bitmapFont = null;
-		}
-	}
-
-	protected bool mUseDynamicFont = false;
-
-	protected virtual void OnValidate ()
-	{
-		var ttf = trueTypeFont;
-		var fnt = bitmapFont as INGUIFont;
-
-		bitmapFont = null;
-		trueTypeFont = null;
-
-		if (ttf != null && (fnt == null || !mUseDynamicFont))
-		{
-			bitmapFont = null;
-			trueTypeFont = ttf;
-			mUseDynamicFont = true;
-		}
-		else if (fnt != null)
-		{
-			if (fnt.replacement == null)
-			{
-				// Auto-upgrade from 3.0.2 and earlier
-				if (fnt.isDynamic)
-				{
-					trueTypeFont = fnt.dynamicFont;
-					fontStyle = fnt.dynamicFontStyle;
-					fontSize = fnt.defaultSize;
-					mUseDynamicFont = true;
-				}
-				else
-				{
-					bitmapFont = fnt as Object;
-					mUseDynamicFont = false;
-				}
-			}
-		}
-		else
-		{
-			trueTypeFont = ttf;
-			mUseDynamicFont = true;
 		}
 	}
 

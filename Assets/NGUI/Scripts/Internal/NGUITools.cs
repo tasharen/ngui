@@ -1516,14 +1516,14 @@ static public class NGUITools
 			// If there is even a single enabled child, then we're using a Unity 4.0-based nested active state scheme.
 			for (int i = 0, imax = t.childCount; i < imax; ++i)
 			{
-				Transform child = t.GetChild(i);
+				var child = t.GetChild(i);
 				if (child.gameObject.activeSelf) return;
 			}
 
 			// If this point is reached, then all the children are disabled, so we must be using a Unity 3.5-based active state scheme.
 			for (int i = 0, imax = t.childCount; i < imax; ++i)
 			{
-				Transform child = t.GetChild(i);
+				var child = t.GetChild(i);
 				Activate(child, true);
 			}
 		}
@@ -1571,7 +1571,7 @@ static public class NGUITools
 	[System.Diagnostics.DebuggerStepThrough]
 	static void CallCreatePanel (Transform t)
 	{
-		UIWidget w = t.GetComponent<UIWidget>();
+		var w = t.GetComponent<UIWidget>();
 		if (w != null) w.CreatePanel();
 		for (int i = 0, imax = t.childCount; i < imax; ++i)
 			CallCreatePanel(t.GetChild(i));
