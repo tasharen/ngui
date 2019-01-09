@@ -2216,8 +2216,16 @@ public class UILabel : UIWidget
 		NGUIText.spacingY = effectiveSpacingY;
 
 		var bm = bitmapFont;
-		if (isDynamic) NGUIText.fontScale = mScale;
-		else if (bm != null) NGUIText.fontScale = ((float)mFontSize / bm.defaultSize) * mScale;
+
+		if (isDynamic)
+		{
+			NGUIText.fontScale = mScale;
+		}
+		else if (bm != null)
+		{
+			bm = bm.finalFont;
+			NGUIText.fontScale = ((float)mFontSize / bm.defaultSize) * mScale;
+		}
 		else NGUIText.fontScale = mScale;
 
 		if (bm != null)

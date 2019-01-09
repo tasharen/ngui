@@ -351,6 +351,13 @@ public class UIPopupList : UIWidgetContainer
 			Collider2D b = GetComponent<Collider2D>();
 			return (b != null && b.enabled);
 		}
+		set
+		{
+			Collider c = GetComponent<Collider>();
+			if (c != null) { c.enabled = value; return; }
+			Collider2D b = GetComponent<Collider2D>();
+			if (b != null) { b.enabled = value; return; }
+		}
 	}
 
 	/// <summary>

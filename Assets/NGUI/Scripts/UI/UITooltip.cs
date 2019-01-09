@@ -191,7 +191,7 @@ public class UITooltip : MonoBehaviour
 	/// </summary>
 
 	static public void Show (string text) { if (mInstance != null) mInstance.SetText(text); }
-	
+
 	/// <summary>
 	/// Hide the tooltip.
 	/// </summary>

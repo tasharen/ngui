@@ -1163,19 +1163,20 @@ static public class NGUIEditorTools
 
 						if (sprite != null)
 						{
-							NGUIEditorTools.RegisterUndo("Edit Sprite Name", atlas as UnityEngine.Object);
+							RegisterUndo("Edit Sprite Name", atlas as Object);
 							sprite.name = newName;
 
-							List<UISprite> sprites = FindAll<UISprite>();
+							var sprites = FindAll<UISprite>();
 
 							for (int i = 0; i < sprites.Count; ++i)
 							{
-								UISprite sp = sprites[i];
+								var sp = sprites[i];
 
 								if (sp.atlas == atlas && sp.spriteName == spriteName)
 								{
-									NGUIEditorTools.RegisterUndo("Edit Sprite Name", sp);
+									RegisterUndo("Edit Sprite Name", sp);
 									sp.spriteName = newName;
+									NGUITools.SetDirty(sp, "Edit Sprite Name");
 								}
 							}
 
@@ -1183,6 +1184,7 @@ static public class NGUIEditorTools
 							spriteName = newName;
 							mEditedName = null;
 
+							NGUITools.SetDirty(atlas as Object, "Edit Sprite Name");
 							NGUISettings.atlas = atlas;
 							NGUISettings.selectedSprite = spriteName;
 						}

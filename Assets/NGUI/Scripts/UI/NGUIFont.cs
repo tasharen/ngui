@@ -121,6 +121,12 @@ public interface INGUIFont
 	INGUIFont replacement { get; set; }
 
 	/// <summary>
+	/// Checks the replacement references, returning the deepest-most font.
+	/// </summary>
+
+	INGUIFont finalFont { get; }
+
+	/// <summary>
 	/// Whether the font is dynamic.
 	/// </summary>
 
@@ -618,6 +624,25 @@ public class NGUIFont : ScriptableObject, INGUIFont
 	}
 
 	/// <summary>
+	/// Checks the replacement references, returning the deepest-most font.
+	/// </summary>
+
+	public INGUIFont finalFont
+	{
+		get
+		{
+			INGUIFont fnt = this;
+
+			for (int i = 0; i < 10; ++i)
+			{
+				var rep = fnt.replacement;
+				if (rep != null) fnt = rep;
+			}
+			return fnt;
+		}
+	}
+
+	/// <summary>
 	/// Whether the font is dynamic.
 	/// </summary>
 
@@ -800,9 +825,11 @@ public class NGUIFont : ScriptableObject, INGUIFont
 
 	BMSymbol GetSymbol (string sequence, bool createIfMissing)
 	{
-		for (int i = 0, imax = mSymbols.Count; i < imax; ++i)
+		var s = symbols;
+
+		for (int i = 0, imax = s.Count; i < imax; ++i)
 		{
-			BMSymbol sym = mSymbols[i];
+			BMSymbol sym = s[i];
 			if (sym.sequence == sequence) return sym;
 		}
 
@@ -810,7 +837,7 @@ public class NGUIFont : ScriptableObject, INGUIFont
 		{
 			BMSymbol sym = new BMSymbol();
 			sym.sequence = sequence;
-			mSymbols.Add(sym);
+			s.Add(sym);
 			return sym;
 		}
 		return null;
@@ -822,6 +849,9 @@ public class NGUIFont : ScriptableObject, INGUIFont
 
 	public BMSymbol MatchSymbol (string text, int offset, int textLength)
 	{
+		var rep = replacement;
+		if (rep != null) return rep.MatchSymbol(text, offset, textLength);
+
 		// No symbols present
 		int count = mSymbols.Count;
 		if (count == 0) return null;
@@ -830,13 +860,13 @@ public class NGUIFont : ScriptableObject, INGUIFont
 		// Run through all symbols
 		for (int i = 0; i < count; ++i)
 		{
-			BMSymbol sym = mSymbols[i];
+			var sym = mSymbols[i];
 
 			// If the symbol's length is longer, move on
 			int symbolLength = sym.length;
 			if (symbolLength == 0 || textLength < symbolLength) continue;
 
-			bool match = true;
+			var match = true;
 
 			// Match the characters
 			for (int c = 0; c < symbolLength; ++c)
@@ -860,6 +890,8 @@ public class NGUIFont : ScriptableObject, INGUIFont
 
 	public void AddSymbol (string sequence, string spriteName)
 	{
+		var rep = replacement;
+		if (rep != null) { rep.AddSymbol(sequence, spriteName); return; }
 		BMSymbol symbol = GetSymbol(sequence, true);
 		symbol.spriteName = spriteName;
 		MarkAsChanged();
@@ -871,6 +903,8 @@ public class NGUIFont : ScriptableObject, INGUIFont
 
 	public void RemoveSymbol (string sequence)
 	{
+		var rep = replacement;
+		if (rep != null) { rep.RemoveSymbol(sequence); return; }
 		BMSymbol symbol = GetSymbol(sequence, false);
 		if (symbol != null) symbols.Remove(symbol);
 		MarkAsChanged();
@@ -882,6 +916,8 @@ public class NGUIFont : ScriptableObject, INGUIFont
 
 	public void RenameSymbol (string before, string after)
 	{
+		var rep = replacement;
+		if (rep != null) { rep.RenameSymbol(before, after); return; }
 		BMSymbol symbol = GetSymbol(before, false);
 		if (symbol != null) symbol.sequence = after;
 		MarkAsChanged();
@@ -895,14 +931,14 @@ public class NGUIFont : ScriptableObject, INGUIFont
 	{
 		if (!string.IsNullOrEmpty(s))
 		{
-			if (s.Equals(spriteName))
-				return true;
+			if (s.Equals(spriteName)) return true;
+
+			var symbols = this.symbols;
 
 			for (int i = 0, imax = symbols.Count; i < imax; ++i)
 			{
-				BMSymbol sym = symbols[i];
-				if (s.Equals(sym.spriteName))
-					return true;
+				var sym = symbols[i];
+				if (s.Equals(sym.spriteName)) return true;
 			}
 		}
 		return false;

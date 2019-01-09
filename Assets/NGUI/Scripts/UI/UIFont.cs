@@ -442,6 +442,25 @@ public class UIFont : MonoBehaviour, INGUIFont
 	}
 
 	/// <summary>
+	/// Checks the replacement references, returning the deepest-most font.
+	/// </summary>
+
+	public INGUIFont finalFont
+	{
+		get
+		{
+			INGUIFont fnt = this;
+
+			for (int i = 0; i < 10; ++i)
+			{
+				var rep = fnt.replacement;
+				if (rep != null) fnt = rep;
+			}
+			return fnt;
+		}
+	}
+
+	/// <summary>
 	/// Whether the font is dynamic.
 	/// </summary>
 

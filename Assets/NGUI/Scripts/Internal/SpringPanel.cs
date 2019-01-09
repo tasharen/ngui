@@ -69,19 +69,22 @@ public class SpringPanel : MonoBehaviour
 		var before = mTrans.localPosition;
 		var after = NGUIMath.SpringLerp(before, target, strength, mDelta);
 
-		if ((after - target).sqrMagnitude < 0.01f)
+		if ((before - target).sqrMagnitude < 0.01f)
 		{
 			after = target;
 			enabled = false;
 			trigger = true;
+			mDelta = 0f;
 		}
+		else
+		{
+			after.x = Mathf.Round(after.x);
+			after.y = Mathf.Round(after.y);
+			after.z = Mathf.Round(after.z);
 
-		after.x = Mathf.Round(after.x);
-		after.y = Mathf.Round(after.y);
-		after.z = Mathf.Round(after.z);
-
-		if ((after - target).sqrMagnitude < 0.01f) return;
-		else mDelta = 0f;
+			if ((after - target).sqrMagnitude < 0.01f) return;
+			else mDelta = 0f;
+		}
 
 		mTrans.localPosition = after;
 

@@ -104,6 +104,8 @@ public class UIDragDropItem : MonoBehaviour
 		mDragScrollView = GetComponent<UIDragScrollView>();
 	}
 
+	[System.NonSerialized] static int mIgnoreClick = 0;
+
 	/// <summary>
 	/// Record the time the item was pressed on.
 	/// </summary>
@@ -130,6 +132,8 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void OnClick ()
 	{
+		if (mIgnoreClick == Time.frameCount) return;
+
 		if (clickToDrag && !mDragging && UICamera.currentTouchID == -1 && draggedItems.Count == 0)
 		{
 			mTouch = UICamera.currentTouch;
@@ -149,6 +153,7 @@ public class UIDragDropItem : MonoBehaviour
 	{
 		if (state && UICamera.currentTouchID != -1)
 		{
+			mIgnoreClick = Time.frameCount;
 			StopDragging(null);
 			UICamera.onPress -= OnGlobalPress;
 			UICamera.onClick -= OnGlobalClick;
@@ -158,6 +163,8 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected void OnGlobalClick (GameObject go)
 	{
+		mIgnoreClick = Time.frameCount;
+
 		if (UICamera.currentTouchID == -1) StopDragging(go);
 		else StopDragging(null);
 
