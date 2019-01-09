@@ -896,7 +896,7 @@ public class UIWidgetInspector : UIRectEditor
 			GUILayout.Space(3f);
 		}
 
-		var isPrefab = NGUIEditorTools.IsPrefab(w.gameObject);
+		var isPrefab = NGUIEditorTools.IsPrefab(w.gameObject) && !NGUIEditorTools.IsPrefabInstance(w.gameObject);
 
 		if (NGUIEditorTools.DrawHeader("Widget"))
 		{

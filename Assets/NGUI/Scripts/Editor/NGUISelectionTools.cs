@@ -48,6 +48,7 @@ public class NGUISelectionTools
 		}
 	}
 
+#if !UNITY_2018_3_OR_NEWER
 	[MenuItem("GameObject/Selection/Add New Child #&n")]
 	static void CreateLocalGameObject ()
 	{
@@ -77,6 +78,7 @@ public class NGUISelectionTools
 			Selection.activeGameObject = newGameObject;
 		}
 	}
+#endif
 
 	[MenuItem("GameObject/Selection/List Dependencies")]
 	static void ListDependencies()
