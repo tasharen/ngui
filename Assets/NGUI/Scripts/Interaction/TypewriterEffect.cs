@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -222,12 +222,12 @@ public class TypewriterEffect : MonoBehaviour
 		{
 			for (int i = 0; i < mFade.size; )
 			{
-				FadeEntry fe = mFade[i];
+				var fe = mFade.buffer[i];
 				fe.alpha += RealTime.deltaTime / fadeInTime;
-				
+
 				if (fe.alpha < 1f)
 				{
-					mFade[i] = fe;
+					mFade.buffer[i] = fe;
 					++i;
 				}
 				else mFade.RemoveAt(i);
@@ -247,7 +247,7 @@ public class TypewriterEffect : MonoBehaviour
 
 				for (int i = 0; i < mFade.size; ++i)
 				{
-					FadeEntry fe = mFade[i];
+					var fe = mFade.buffer[i];
 
 					if (i == 0)
 					{

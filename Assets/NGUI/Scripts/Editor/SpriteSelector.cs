@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEditor;
@@ -105,7 +105,7 @@ public class SpriteSelector : ScriptableWizard
 
 					for (; offset < sprites.size; ++offset)
 					{
-						var sprite = atlas.GetSprite(sprites[offset]);
+						var sprite = atlas.GetSprite(sprites.buffer[offset]);
 						if (sprite == null) continue;
 
 						// Button comes first

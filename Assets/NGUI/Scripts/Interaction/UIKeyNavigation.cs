@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -179,15 +179,15 @@ public class UIKeyNavigation : MonoBehaviour
 
 		for (int i = 0; i < list.size; ++i)
 		{
-			UIKeyNavigation nav = list[i];
+			var nav = list.buffer[i];
 			if (nav == this || nav.constraint == Constraint.Explicit || !nav.isColliderEnabled) continue;
 
 			// Ignore invisible widgets
-			UIWidget widget = nav.GetComponent<UIWidget>();
+			var widget = nav.GetComponent<UIWidget>();
 			if (widget != null && widget.alpha == 0f) continue;
 
 			// Reject objects that are not within a 45 degree angle of the desired direction
-			Vector3 dir = GetCenter(nav.gameObject) - myCenter;
+			var dir = GetCenter(nav.gameObject) - myCenter;
 			float dot = Vector3.Dot(myDir, dir.normalized);
 			if (dot < 0.707f) continue;
 
@@ -197,7 +197,7 @@ public class UIKeyNavigation : MonoBehaviour
 			dir.y *= y;
 
 			// Compare the distance
-			float mag = dir.sqrMagnitude;
+			var mag = dir.sqrMagnitude;
 			if (mag > min) continue;
 			go = nav.gameObject;
 			min = mag;
@@ -207,16 +207,16 @@ public class UIKeyNavigation : MonoBehaviour
 
 	static protected Vector3 GetCenter (GameObject go)
 	{
-		UIWidget w = go.GetComponent<UIWidget>();
-		UICamera cam = UICamera.FindCameraForLayer(go.layer);
+		var w = go.GetComponent<UIWidget>();
+		var cam = UICamera.FindCameraForLayer(go.layer);
 
 		if (cam != null)
 		{
-			Vector3 center = go.transform.position;
+			var center = go.transform.position;
 
 			if (w != null)
 			{
-				Vector3[] corners = w.worldCorners;
+				var corners = w.worldCorners;
 				center = (corners[0] + corners[2]) * 0.5f;
 			}
 
@@ -226,7 +226,7 @@ public class UIKeyNavigation : MonoBehaviour
 		}
 		else if (w != null)
 		{
-			Vector3[] corners = w.worldCorners;
+			var corners = w.worldCorners;
 			return (corners[0] + corners[2]) * 0.5f;
 		}
 		return go.transform.position;
@@ -269,7 +269,7 @@ public class UIKeyNavigation : MonoBehaviour
 
 		if (key == KeyCode.Tab)
 		{
-			GameObject go = onTab;
+			var go = onTab;
 
 			if (go == null)
 			{

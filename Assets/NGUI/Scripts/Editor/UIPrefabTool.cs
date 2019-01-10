@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEditor;
@@ -223,7 +223,7 @@ public class UIPrefabTool : EditorWindow
 		int index = (int)obj;
 		if (index < mItems.size && index > -1)
 		{
-			Item item = mItems[index];
+			Item item = mItems.buffer[index];
 			DestroyTexture(item);
 			mItems.RemoveAt(index);
 		}
@@ -237,8 +237,8 @@ public class UIPrefabTool : EditorWindow
 	Item FindItem (GameObject go)
 	{
 		for (int i = 0; i < mItems.size; ++i)
-			if (mItems[i].prefab == go)
-				return mItems[i];
+			if (mItems.buffer[i].prefab == go)
+				return mItems.buffer[i];
 		return null;
 	}
 
@@ -258,22 +258,22 @@ public class UIPrefabTool : EditorWindow
 
 		if (mItems.size > 0)
 		{
-			string guid = mItems[0].guid;
+			string guid = mItems.buffer[0].guid;
 			StringBuilder sb = new StringBuilder();
 			sb.Append(guid);
 
 			for (int i = 1; i < mItems.size; ++i)
 			{
-				guid = mItems[i].guid;
+				guid = mItems.buffer[i].guid;
 
 				if (string.IsNullOrEmpty(guid))
 				{
-					Debug.LogWarning("Unable to save " + mItems[i].prefab.name);
+					Debug.LogWarning("Unable to save " + mItems.buffer[i].prefab.name);
 				}
 				else
 				{
 					sb.Append('|');
-					sb.Append(mItems[i].guid);
+					sb.Append(mItems.buffer[i].guid);
 				}
 			}
 			data = sb.ToString();
@@ -330,7 +330,7 @@ public class UIPrefabTool : EditorWindow
 	{
 		for (int i = 0; i < mItems.size; ++i)
 		{
-			Item item = mItems[i];
+			Item item = mItems.buffer[i];
 
 			if (item.prefab == prefab)
 			{
@@ -707,7 +707,7 @@ public class UIPrefabTool : EditorWindow
 		if (mLights != null)
 		{
 			for (int i = 0; i < mLights.size; ++i)
-				mLights[i].enabled = true;
+				mLights.buffer[i].enabled = true;
 			mLights = null;
 		}
 	}
@@ -881,10 +881,10 @@ public class UIPrefabTool : EditorWindow
 			if (dragged != null && indices.size == indexUnderMouse)
 				indices.Add(-1);
 
-			if (mItems[i] != selection)
+			if (mItems.buffer[i] != selection)
 			{
 				if (string.IsNullOrEmpty(searchFilter) ||
-					mItems[i].prefab.name.IndexOf(searchFilter, System.StringComparison.CurrentCultureIgnoreCase) != -1)
+					mItems.buffer[i].prefab.name.IndexOf(searchFilter, System.StringComparison.CurrentCultureIgnoreCase) != -1)
 						indices.Add(i);
 			}
 			++i;
@@ -900,11 +900,11 @@ public class UIPrefabTool : EditorWindow
 
 			if (currentEvent.button == 0 && indexUnderMouse < indices.size)
 			{
-				int index = indices[indexUnderMouse];
+				int index = indices.buffer[indexUnderMouse];
 
 				if (index != -1 && index < mItems.size)
 				{
-					selection = mItems[index];
+					selection = mItems.buffer[index];
 					draggedObject = selection.prefab;
 					dragged = selection.prefab;
 					currentEvent.Use();
@@ -924,8 +924,8 @@ public class UIPrefabTool : EditorWindow
 
 			for (int i = 0; i < indices.size; ++i)
 			{
-				int index = indices[i];
-				Item ent = (index != -1) ? mItems[index] : selection;
+				int index = indices.buffer[i];
+				Item ent = (index != -1) ? mItems.buffer[index] : selection;
 
 				if (ent != null && ent.prefab == null)
 				{

@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -1120,7 +1120,7 @@ public class UILabel : UIWidget
 	{
 		for (int i = 0; i < mList.size; ++i)
 		{
-			UILabel lbl = mList[i];
+			UILabel lbl = mList.buffer[i];
 
 			if (lbl != null)
 			{
@@ -1147,7 +1147,7 @@ public class UILabel : UIWidget
 		{
 			for (int i = 0, imax = mTempDrawcalls.size; i < imax; ++i)
 			{
-				var dc = mTempDrawcalls[i];
+				var dc = mTempDrawcalls.buffer[i];
 				if (dc.panel != null) dc.panel.FillDrawCall(dc);
 			}
 			mTempDrawcalls.Clear();

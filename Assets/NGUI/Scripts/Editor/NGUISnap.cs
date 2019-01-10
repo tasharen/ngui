@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -139,18 +139,18 @@ static public class NGUISnap
 			Vector2 best = new Vector2(float.MaxValue, float.MaxValue);
 
 			for (int i = 0; i < mSnapCenter.size; ++i)
-				ChooseBest(ref best, mSnapCenter[i] - center);
+				ChooseBest(ref best, mSnapCenter.buffer[i] - center);
 
 			for (int i = 0; i < mSnapCorners.size; ++i)
 			{
-				ChooseBest(ref best, mSnapCorners[i] - bl);
-				ChooseBest(ref best, mSnapCorners[i] - tr);
+				ChooseBest(ref best, mSnapCorners.buffer[i] - bl);
+				ChooseBest(ref best, mSnapCorners.buffer[i] - tr);
 			}
 
 			if (Mathf.Abs(best.x) < SNAP_THRESHOLD) pos.x += best.x;
 			if (Mathf.Abs(best.y) < SNAP_THRESHOLD) pos.y += best.y;
 		}
-		
+
 		pos.x = Mathf.Round(pos.x);
 		pos.y = Mathf.Round(pos.y);
 		pos.z = Mathf.Round(pos.z);

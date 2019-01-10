@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 #if !UNITY_3_5
@@ -659,7 +659,7 @@ static public class NGUIText
 
 			if (colors != null && colors.size > 0)
 			{
-				c.a = colors[colors.size - 1].a;
+				c.a = colors.buffer[colors.size - 1].a;
 				if (premultiply && c.a != 1f)
 					c = Color.Lerp(mInvisible, c, c.a);
 				colors.Add(c);
@@ -1116,7 +1116,7 @@ static public class NGUIText
 		int currentCharacterIndex = mSizes.size;
 
 		while (currentCharacterIndex > 0 && remainingWidth > 0)
-			remainingWidth -= mSizes[--currentCharacterIndex];
+			remainingWidth -= mSizes.buffer[--currentCharacterIndex];
 
 		mSizes.Clear();
 
@@ -1226,7 +1226,7 @@ static public class NGUIText
 					for (int i = 0; i < mColors.size; ++i)
 					{
 						sb.Append("[");
-						sb.Append(NGUIText.EncodeColor(mColors[i]));
+						sb.Append(NGUIText.EncodeColor(mColors.buffer[i]));
 						sb.Append("]");
 					}
 				}
@@ -1267,17 +1267,17 @@ static public class NGUIText
 				{
 					if (ignoreColor)
 					{
-						c = mColors[mColors.size - 1];
+						c = mColors.buffer[mColors.size - 1];
 						c.a *= mAlpha * tint.a;
 					}
 					else
 					{
-						c = tint * mColors[mColors.size - 1];
+						c = tint * mColors.buffer[mColors.size - 1];
 						c.a *= mAlpha;
 					}
 
 					for (int b = 0, bmax = mColors.size - 2; b < bmax; ++b)
-						c.a *= mColors[b].a;
+						c.a *= mColors.buffer[b].a;
 				}
 
 				// Append the symbol
@@ -1382,7 +1382,7 @@ static public class NGUIText
 						for (int i = 0; i < mColors.size; ++i)
 						{
 							sb.Append("[");
-							sb.Append(NGUIText.EncodeColor(mColors[i]));
+							sb.Append(NGUIText.EncodeColor(mColors.buffer[i]));
 							sb.Append("]");
 						}
 					}
@@ -1430,7 +1430,7 @@ static public class NGUIText
 						for (int i = 0; i < mColors.size; ++i)
 						{
 							sb.Append("[");
-							sb.Append(NGUIText.EncodeColor(mColors[i]));
+							sb.Append(NGUIText.EncodeColor(mColors.buffer[i]));
 							sb.Append("]");
 						}
 					}
@@ -1536,17 +1536,17 @@ static public class NGUIText
 			{
 				if (ignoreColor)
 				{
-					gc = mColors[mColors.size - 1];
+					gc = mColors.buffer[mColors.size - 1];
 					gc.a *= mAlpha * tint.a;
 				}
 				else
 				{
-					gc = tint * mColors[mColors.size - 1];
+					gc = tint * mColors.buffer[mColors.size - 1];
 					gc.a *= mAlpha;
 				}
 
 				for (int b = 0, bmax = mColors.size - 2; b < bmax; ++b)
-					gc.a *= mColors[b].a;
+					gc.a *= mColors.buffer[b].a;
 
 				if (gradient)
 				{

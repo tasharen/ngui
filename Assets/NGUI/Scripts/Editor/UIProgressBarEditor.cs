@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -65,7 +65,7 @@ public class UIProgressBarEditor : UIWidgetContainerEditor
 
 			for (int i = 0; i < UIScrollView.list.size; ++i)
 			{
-				UIScrollView sv = UIScrollView.list[i];
+				UIScrollView sv = UIScrollView.list.buffer[i];
 
 				if (sv.horizontalScrollBar == sb || sv.verticalScrollBar == sb)
 				{

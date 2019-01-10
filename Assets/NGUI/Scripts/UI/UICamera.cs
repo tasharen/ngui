@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -518,7 +518,7 @@ public class UICamera : MonoBehaviour
 		get
 		{
 			if (list == null || list.size == 0) return null;
-			return list[0];
+			return list.buffer[0];
 		}
 	}
 
@@ -1049,7 +1049,7 @@ public class UICamera : MonoBehaviour
 				// Locate the appropriate camera for the new object
 				if (statesDiffer)
 				{
-					UICamera cam = (mHover != null) ? FindCameraForLayer(mHover.layer) : UICamera.list[0];
+					UICamera cam = (mHover != null) ? FindCameraForLayer(mHover.layer) : UICamera.list.buffer[0];
 
 					if (cam != null)
 					{
@@ -1091,7 +1091,7 @@ public class UICamera : MonoBehaviour
 			{
 				for (int i = 0; i < UIKeyNavigation.list.size; ++i)
 				{
-					UIKeyNavigation nav = UIKeyNavigation.list[i];
+					UIKeyNavigation nav = UIKeyNavigation.list.buffer[i];
 
 					if (nav && nav.constraint != UIKeyNavigation.Constraint.Explicit && nav.startsSelected)
 					{
@@ -1105,7 +1105,7 @@ public class UICamera : MonoBehaviour
 				{
 					for (int i = 0; i < UIKeyNavigation.list.size; ++i)
 					{
-						UIKeyNavigation nav = UIKeyNavigation.list[i];
+						UIKeyNavigation nav = UIKeyNavigation.list.buffer[i];
 
 						if (nav && nav.constraint != UIKeyNavigation.Constraint.Explicit)
 						{
@@ -1212,7 +1212,7 @@ public class UICamera : MonoBehaviour
 			// Set the camera for events
 			if (mSelected && statesDiffer)
 			{
-				UICamera cam = (mSelected != null) ? FindCameraForLayer(mSelected.layer) : UICamera.list[0];
+				UICamera cam = (mSelected != null) ? FindCameraForLayer(mSelected.layer) : UICamera.list.buffer[0];
 
 				if (cam != null)
 				{
@@ -1594,10 +1594,10 @@ public class UICamera : MonoBehaviour
 						if (IsVisible(ref mHits.buffer[b]))
 #endif
 						{
-							lastHit = mHits[b].hit;
-							mRayHitObject = mHits[b].go;
+							lastHit = mHits.buffer[b].hit;
+							mRayHitObject = mHits.buffer[b].go;
 							lastWorldRay = ray;
-							lastWorldPosition = mHits[b].point;
+							lastWorldPosition = mHits.buffer[b].point;
 							mHits.Clear();
 							return true;
 						}
@@ -1719,7 +1719,7 @@ public class UICamera : MonoBehaviour
 							if (IsVisible(ref mHits.buffer[b]))
 #endif
 							{
-								mRayHitObject = mHits[b].go;
+								mRayHitObject = mHits.buffer[b].go;
 								mHits.Clear();
 								return true;
 							}

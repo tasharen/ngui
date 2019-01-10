@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -435,7 +435,7 @@ public class UIWidget : UIRect
 			{
 				if (panel != null) panel.RemoveWidget(this);
 				mDepth = value;
-				
+
 				if (panel != null)
 				{
 					panel.AddWidget(this);

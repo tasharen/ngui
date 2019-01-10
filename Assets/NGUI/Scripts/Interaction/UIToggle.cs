@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -133,9 +133,9 @@ public class UIToggle : UIWidgetContainer
 	{
 		get
 		{
-			Collider c = GetComponent<Collider>();
+			var c = GetComponent<Collider>();
 			if (c != null) return c.enabled;
-			Collider2D b = GetComponent<Collider2D>();
+			var b = GetComponent<Collider2D>();
 			return (b != null && b.enabled);
 		}
 	}
@@ -151,7 +151,7 @@ public class UIToggle : UIWidgetContainer
 	{
 		for (int i = 0; i < list.size; ++i)
 		{
-			UIToggle toggle = list[i];
+			var toggle = list.buffer[i];
 			if (toggle != null && toggle.group == group && toggle.mIsActive)
 				return toggle;
 		}
@@ -242,9 +242,9 @@ public class UIToggle : UIWidgetContainer
 			{
 				for (int i = 0, imax = list.size; i < imax; )
 				{
-					UIToggle cb = list[i];
+					var cb = list.buffer[i];
 					if (cb != this && cb.group == group) cb.Set(false);
-					
+
 					if (list.size != imax)
 					{
 						imax = list.size;

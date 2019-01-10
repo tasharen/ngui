@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //			  NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 //#define SHOW_HIDDEN_OBJECTS
@@ -987,7 +987,7 @@ public class UIDrawCall : MonoBehaviour
 
 		for (int i = mActiveList.size; i > 0; )
 		{
-			UIDrawCall dc = mActiveList[--i];
+			var dc = mActiveList.buffer[--i];
 
 			if (dc)
 			{
@@ -1020,7 +1020,7 @@ public class UIDrawCall : MonoBehaviour
 	{
 		for (int i = mInactiveList.size; i > 0; )
 		{
-			UIDrawCall dc = mInactiveList[--i];
+			var dc = mInactiveList.buffer[--i];
 
 			if (dc)
 			{
@@ -1042,7 +1042,7 @@ public class UIDrawCall : MonoBehaviour
 	{
 		int count = 0;
 		for (int i = 0; i < mActiveList.size; ++i)
-			if (mActiveList[i].manager == panel) ++count;
+			if (mActiveList.buffer[i].manager == panel) ++count;
 		return count;
 	}
 

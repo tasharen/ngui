@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 #if !UNITY_3_5 && !UNITY_FLASH
@@ -261,7 +261,7 @@ public class UITextList : MonoBehaviour
 		}
 		else
 		{
-			ce = mParagraphs[0];
+			ce = mParagraphs.buffer[0];
 			mParagraphs.RemoveAt(0);
 		}
 

@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -13,14 +13,14 @@ using System.Collections.Generic;
 /// This will attempt to load the file called "French.txt" in the Resources folder,
 /// or a column "French" from the Localization.csv file in the Resources folder.
 /// If going down the TXT language file route, it's expected that the file is full of key = value pairs, like so:
-/// 
+///
 /// LABEL1 = Hello
 /// LABEL2 = Music
 /// Info = Localization Example
-/// 
+///
 /// In the case of the CSV file, the first column should be the "KEY". Other columns
 /// should be your localized text values, such as "French" for the first row:
-/// 
+///
 /// KEY,English,French
 /// LABEL1,Hello,Bonjour
 /// LABEL2,Music,Musique
@@ -48,7 +48,7 @@ static public class Localization
 	/// <summary>
 	/// Whether the localization dictionary has been loaded.
 	/// </summary>
- 
+
 	static public bool localizationHasBeenSet = false;
 
 	// Loaded languages, if any
@@ -295,13 +295,13 @@ static public class Localization
 
 			if (!localizationHasBeenSet)
 			{
-				mLanguage = PlayerPrefs.GetString("Language", header[0]);
+				mLanguage = PlayerPrefs.GetString("Language", header.buffer[0]);
 				localizationHasBeenSet = true;
 			}
 
 			for (int i = 0; i < header.size; ++i)
 			{
-				mLanguages[i] = header[i];
+				mLanguages[i] = header.buffer[i];
 				if (mLanguages[i] == mLanguage)
 					mLanguageIndex = i;
 			}
@@ -309,22 +309,22 @@ static public class Localization
 		else
 		{
 			languagesToAdd = new string[header.size];
-			for (int i = 0; i < header.size; ++i) languagesToAdd[i] = header[i];
+			for (int i = 0; i < header.size; ++i) languagesToAdd[i] = header.buffer[i];
 
 			// Automatically resize the existing languages and add the new language to the mix
 			for (int i = 0; i < header.size; ++i)
 			{
-				if (!HasLanguage(header[i]))
+				if (!HasLanguage(header.buffer[i]))
 				{
 					int newSize = mLanguages.Length + 1;
 #if UNITY_FLASH
-					string[] temp = new string[newSize];
+					var temp = new string[newSize];
 					for (int b = 0, bmax = arr.Length; b < bmax; ++b) temp[b] = mLanguages[b];
 					mLanguages = temp;
 #else
 					System.Array.Resize(ref mLanguages, newSize);
 #endif
-					mLanguages[newSize - 1] = header[i];
+					mLanguages[newSize - 1] = header.buffer[i];
 
 					var newDict = new Dictionary<string, string[]>();
 
@@ -355,7 +355,7 @@ static public class Localization
 		{
 			var temp = reader.ReadCSV();
 			if (temp == null || temp.size == 0) break;
-			if (string.IsNullOrEmpty(temp[0])) continue;
+			if (string.IsNullOrEmpty(temp.buffer[0])) continue;
 			AddCSV(temp, languagesToAdd, languageIndices);
 		}
 
@@ -384,9 +384,9 @@ static public class Localization
 	static void AddCSV (BetterList<string> newValues, string[] newLanguages, Dictionary<string, int> languageIndices)
 	{
 		if (newValues.size < 2) return;
-		string key = newValues[0];
+		var key = newValues.buffer[0];
 		if (string.IsNullOrEmpty(key)) return;
-		string[] copy = ExtractStrings(newValues, newLanguages, languageIndices);
+		var copy = ExtractStrings(newValues, newLanguages, languageIndices);
 
 		if (mDictionary.ContainsKey(key))
 		{
@@ -414,24 +414,24 @@ static public class Localization
 	{
 		if (newLanguages == null)
 		{
-			string[] values = new string[mLanguages.Length];
+			var values = new string[mLanguages.Length];
 			for (int i = 1, max = Mathf.Min(added.size, values.Length + 1); i < max; ++i)
-				values[i - 1] = added[i];
+				values[i - 1] = added.buffer[i];
 			return values;
 		}
 		else
 		{
 			string[] values;
-			string s = added[0];
+			var s = added.buffer[0];
 
 			if (!mDictionary.TryGetValue(s, out values))
 				values = new string[mLanguages.Length];
 
 			for (int i = 0, imax = newLanguages.Length; i < imax; ++i)
 			{
-				string language = newLanguages[i];
+				var language = newLanguages[i];
 				int index = languageIndices[language];
-				values[index] = added[i + 1];
+				values[index] = added.buffer[i + 1];
 			}
 			return values;
 		}
@@ -748,7 +748,7 @@ static public class Localization
 	{
 		// Check existing languages first
 		string[] kl = knownLanguages;
-		
+
 		if (kl == null)
 		{
 			mLanguages = new string[] { language };

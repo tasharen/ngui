@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -19,21 +19,21 @@ public class BetterList<T>
 #if UNITY_FLASH
 
 	List<T> mList = new List<T>();
-	
+
 	/// <summary>
 	/// Direct access to the buffer. Note that you should not use its 'Length' parameter, but instead use BetterList.size.
 	/// </summary>
-	
+
 	public T this[int i]
 	{
 		get { return mList[i]; }
 		set { mList[i] = value; }
 	}
-	
+
 	/// <summary>
 	/// Compatibility with the non-flash syntax.
 	/// </summary>
-	
+
 	public List<T> buffer { get { return mList; } }
 
 	/// <summary>
@@ -157,12 +157,13 @@ public class BetterList<T>
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Convenience function. I recommend using .buffer instead.
 	/// </summary>
 
 	[DebuggerHidden]
+	[System.Obsolete("Access the list.buffer[index] instead -- direct array access avoids a copy, so it can be much faster")]
 	public T this[int i]
 	{
 		get { return buffer[i]; }

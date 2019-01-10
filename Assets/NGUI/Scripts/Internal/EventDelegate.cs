@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 #if UNITY_EDITOR || !UNITY_FLASH
@@ -285,7 +285,7 @@ public class EventDelegate
 			return callback.Equals(mCachedCallback);
 #endif
 		}
-		
+
 		if (obj is EventDelegate)
 		{
 			EventDelegate del = obj as EventDelegate;
@@ -405,7 +405,7 @@ public class EventDelegate
 					Debug.LogError("Could not find method '" + mMethodName + "' on " + mTarget.GetType(), mTarget);
 					return;
 				}
-				
+
 				if (mMethod.ReturnType != typeof(void))
 				{
 					Debug.LogError(mTarget.GetType() + "." + mMethodName + " must have a 'void' return type.", mTarget);
@@ -532,7 +532,7 @@ public class EventDelegate
 
 					if (mTarget == null) msg += mMethod.Name;
 					else msg += mTarget.GetType() + "." + mMethod.Name;
-					
+
 					msg += ": " + ex.Message;
 					msg += "\n  Expected: ";
 
@@ -759,7 +759,7 @@ public class EventDelegate
 				if (del != null && del.Equals(ev))
 					return;
 			}
-			
+
 			EventDelegate copy = new EventDelegate(ev.target, ev.methodName);
 			copy.oneShot = oneShot;
 
@@ -786,7 +786,7 @@ public class EventDelegate
 			for (int i = 0, imax = list.Count; i < imax; ++i)
 			{
 				EventDelegate del = list[i];
-				
+
 				if (del != null && del.Equals(callback))
 				{
 					list.RemoveAt(i);

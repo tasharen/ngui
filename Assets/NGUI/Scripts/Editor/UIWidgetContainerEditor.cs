@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -15,7 +15,7 @@ using UnityEditor;
 public class UIWidgetContainerEditor : Editor
 {
 	static int mHash = "WidgetContainer".GetHashCode();
-	
+
 	Vector3 mStartPos = Vector3.zero;
 	Vector3 mStartDrag = Vector3.zero;
 	Vector2 mStartMouse = Vector2.zero;

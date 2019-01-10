@@ -1,6 +1,6 @@
 //-------------------------------------------------
 //            NGUI: Next-Gen UI kit
-// Copyright © 2011-2018 Tasharen Entertainment Inc
+// Copyright © 2011-2019 Tasharen Entertainment Inc
 //-------------------------------------------------
 
 using UnityEngine;
@@ -743,7 +743,7 @@ public class UIPanelInspector : UIRectEditor
 	protected override void DrawFinalProperties ()
 	{
 		base.DrawFinalProperties();
-		
+
 		if (GUILayout.Button("Show Draw Calls"))
 		{
 			NGUISettings.showAllDCs = false;
