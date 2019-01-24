@@ -296,6 +296,7 @@ public class NGUIAtlasInspector : Editor
 						sprite.borderTop = borderB.y;
 
 						MarkSpriteAsDirty();
+						NGUITools.SetDirty(mAtlas as Object);
 					}
 
 					GUILayout.Space(3f);
