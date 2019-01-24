@@ -684,7 +684,7 @@ static public class NGUIMenu
 	[MenuItem("NGUI/Extras/Align Scene View to UI", false, 10)]
 	static public void AlignSVToUI ()
 	{
-		GameObject go = Selection.activeGameObject ?? UICamera.list.buffer[0].gameObject;
+		var go = Selection.activeGameObject != null ? Selection.activeGameObject : UICamera.list.buffer[0].gameObject;
 		Camera cam = NGUITools.FindCameraForLayer(go.layer);
 		SceneView sv = SceneView.lastActiveSceneView;
 		Camera svc = sv.camera;
@@ -703,7 +703,7 @@ static public class NGUIMenu
 		if (SceneView.lastActiveSceneView == null) return false;
 		if (UICamera.list.size == 0) return false;
 
-		GameObject go = Selection.activeGameObject ?? UICamera.list.buffer[0].gameObject;
+		var go = Selection.activeGameObject != null ? Selection.activeGameObject : UICamera.list.buffer[0].gameObject;
 		if (go == null) return false;
 
 		Camera cam = NGUITools.FindCameraForLayer(go.layer);

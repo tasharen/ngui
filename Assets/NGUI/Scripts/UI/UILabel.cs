@@ -274,7 +274,7 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			return mFont ?? (UnityEngine.Object)mTrueTypeFont;
+			return mFont != null ? mFont : (UnityEngine.Object)mTrueTypeFont;
 		}
 		set
 		{

@@ -57,7 +57,7 @@ public class UIFontMaker : EditorWindow
 
 	void MarkAsChanged ()
 	{
-		Object obj = (Object)NGUISettings.FMFont ?? (Object)NGUISettings.BMFont;
+		var obj = NGUISettings.FMFont != null ? NGUISettings.FMFont : NGUISettings.BMFont;
 
 		if (obj != null)
 		{

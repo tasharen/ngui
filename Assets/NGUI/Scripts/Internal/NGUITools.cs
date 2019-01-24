@@ -1397,11 +1397,12 @@ static public class NGUITools
 		{
 			if (obj is Transform)
 			{
-				Transform t = (obj as Transform);
-				GameObject go = t.gameObject;
+				var t = (obj as Transform);
+				var go = t.gameObject;
 
 				if (Application.isPlaying)
 				{
+					go.SetActive(false);
 					t.parent = null;
 					UnityEngine.Object.Destroy(go);
 				}
@@ -1409,11 +1410,12 @@ static public class NGUITools
 			}
 			else if (obj is GameObject)
 			{
-				GameObject go = obj as GameObject;
-				Transform t = go.transform;
+				var go = obj as GameObject;
+				var t = go.transform;
 
 				if (Application.isPlaying)
 				{
+					go.SetActive(false);
 					t.parent = null;
 					UnityEngine.Object.Destroy(go);
 				}
