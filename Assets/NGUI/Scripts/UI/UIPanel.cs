@@ -257,9 +257,11 @@ public class UIPanel : UIRect
 				mAlphaFrameID = -1;
 				mResized = true;
 				mAlpha = val;
-				for (int i = 0, imax = drawCalls.Count; i < imax; ++i)
-					drawCalls[i].isDirty = true;
+				for (int i = 0, imax = drawCalls.Count; i < imax; ++i) drawCalls[i].isDirty = true;
 				Invalidate(!wasVisible && mAlpha > 0.001f);
+#if UNITY_EDITOR
+				NGUITools.SetDirty(this);
+#endif
 			}
 		}
 	}
