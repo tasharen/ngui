@@ -337,6 +337,9 @@ public class UIWidget : UIRect
 			{
 				mColor.a = value;
 				Invalidate(true);
+#if UNITY_EDITOR
+				NGUITools.SetDirty(this);
+#endif
 			}
 		}
 	}

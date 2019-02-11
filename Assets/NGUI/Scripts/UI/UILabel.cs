@@ -327,9 +327,9 @@ public class UILabel : UIWidget
 	{
 		get
 		{
+			if (trueTypeFont != null) return mFontSize;
 			var bm = bitmapFont;
 			if (bm != null) return bm.defaultSize;
-			if (trueTypeFont != null) return mFontSize;
 			return 16;
 		}
 	}
@@ -1483,7 +1483,7 @@ public class UILabel : UIWidget
 					mScale = (float)ps / mFinalFontSize;
 
 					var bm = bitmapFont;
-					if (bm != null) NGUIText.fontScale = ((float)mFontSize / bm.defaultSize) * mScale;
+					if (bm != null) NGUIText.fontScale = ((float)mFontSize / defaultFontSize) * mScale;
 					else NGUIText.fontScale = mScale;
 				}
 

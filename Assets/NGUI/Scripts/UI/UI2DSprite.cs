@@ -102,7 +102,7 @@ public class UI2DSprite : UIBasicSprite
 			}
 		}
 	}
-	
+
 	/// <summary>
 	/// Texture used by the UITexture. You can set it directly, without the need to specify a material.
 	/// </summary>
@@ -275,10 +275,10 @@ public class UI2DSprite : UIBasicSprite
 	{
 		if (nextSprite != null)
 		{
-			if (nextSprite != mSprite)
-				sprite2D = nextSprite;
+			if (nextSprite != mSprite) sprite2D = nextSprite;
 			nextSprite = null;
 		}
+
 		base.OnUpdate();
 
 		if (mFixedAspect)

@@ -15,11 +15,12 @@ using System.Collections.Generic;
 public class UISprite : UIBasicSprite
 {
 	// Cached and saved values
-	[HideInInspector][SerializeField] Object mAtlas;
-	[HideInInspector][SerializeField] string mSpriteName;
+	[HideInInspector] [SerializeField] Object mAtlas;
+	[HideInInspector] [SerializeField] string mSpriteName;
+	[HideInInspector] [SerializeField] bool mFixedAspect = false;
 
 	// Deprecated, no longer used
-	[HideInInspector][SerializeField] bool mFillCenter = true;
+	[HideInInspector] [SerializeField] bool mFillCenter = true;
 
 	[System.NonSerialized] protected UISpriteData mSprite;
 	[System.NonSerialized] bool mSpriteSet = false;
@@ -103,6 +104,24 @@ public class UISprite : UIBasicSprite
 					spriteName = sprite;
 					MarkAsChanged();
 				}
+			}
+		}
+	}
+
+
+	public bool fixedAspect
+	{
+		get
+		{
+			return mFixedAspect;
+		}
+		set
+		{
+			if (mFixedAspect != value)
+			{
+				mFixedAspect = value;
+				mDrawRegion = new Vector4(0f, 0f, 1f, 1f);
+				MarkAsChanged();
 			}
 		}
 	}
@@ -418,11 +437,19 @@ public class UISprite : UIBasicSprite
 
 			if (mDrawRegion.x != 0f || mDrawRegion.y != 0f || mDrawRegion.z != 1f || mDrawRegion.w != 0f)
 			{
-				var br = (mAtlas != null) ? border * pixelSize : Vector4.zero;
+				float fw, fh;
 
-				var fw = br.x + br.z;
-				var fh = br.y + br.w;
-
+				if (mFixedAspect)
+				{
+					fw = 0f;
+					fh = 0f;
+				}
+				else
+				{
+					var br = (mAtlas != null) ? border * pixelSize : Vector4.zero;
+					fw = (br.x + br.z);
+					fh = (br.y + br.w);
+				}
 				var vx = Mathf.Lerp(x0, x1 - fw, mDrawRegion.x);
 				var vy = Mathf.Lerp(y0, y1 - fh, mDrawRegion.y);
 				var vz = Mathf.Lerp(x0 + fw, x1, mDrawRegion.z);
@@ -570,6 +597,41 @@ public class UISprite : UIBasicSprite
 			mSpriteSet = true;
 			mSprite = null;
 			mChanged = true;
+		}
+
+		if (mFixedAspect)
+		{
+			if ((!mSpriteSet || mSprite == null) && GetAtlasSprite() == null) return;
+
+			if (mSprite != null)
+			{
+				var padLeft = mSprite.paddingLeft;
+				var padBottom = mSprite.paddingBottom;
+				var padRight = mSprite.paddingRight;
+				var padTop = mSprite.paddingTop;
+
+				int w = Mathf.RoundToInt(mSprite.width);
+				int h = Mathf.RoundToInt(mSprite.height);
+
+				w += padLeft + padRight;
+				h += padTop + padBottom;
+
+				float widgetWidth = mWidth;
+				float widgetHeight = mHeight;
+				float widgetAspect = widgetWidth / widgetHeight;
+				float textureAspect = (float)w / h;
+
+				if (textureAspect < widgetAspect)
+				{
+					float x = (widgetWidth - widgetHeight * textureAspect) / widgetWidth * 0.5f;
+					drawRegion = new Vector4(x, 0f, 1f - x, 1f);
+				}
+				else
+				{
+					float y = (widgetHeight - widgetWidth / textureAspect) / widgetHeight * 0.5f;
+					drawRegion = new Vector4(0f, y, 1f, 1f - y);
+				}
+			}
 		}
 	}
 
