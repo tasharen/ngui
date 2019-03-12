@@ -17,7 +17,7 @@ public class UIKeyBinding : MonoBehaviour, TNet.IStartable
 public class UIKeyBinding : MonoBehaviour
 #endif
 {
-	static List<UIKeyBinding> mList = new List<UIKeyBinding>();
+	static public List<UIKeyBinding> list = new List<UIKeyBinding>();
 
 	[DoNotObfuscateNGUI] public enum Action
 	{
@@ -77,19 +77,32 @@ public class UIKeyBinding : MonoBehaviour
 
 	static public bool IsBound (KeyCode key)
 	{
-		for (int i = 0, imax = mList.Count; i < imax; ++i)
+		for (int i = 0, imax = list.Count; i < imax; ++i)
 		{
-			UIKeyBinding kb = mList[i];
+			var kb = list[i];
 			if (kb != null && kb.keyCode == key) return true;
 		}
 		return false;
 	}
 
+	/// <summary>
+	/// Find the specified key binding by its game object's name.
+	/// </summary>
+
+	static public UIKeyBinding Find (string name)
+	{
+		for (int i = 0, imax = list.Count; i < imax; ++i)
+		{
+			if (list[i].name == name) return list[i];
+		}
+		return null;
+	}
+
 #if W2
 	protected virtual void Awake () { TNet.TNUpdater.AddStart(this); }
 #endif
-	protected virtual void OnEnable () { mList.Add(this); }
-	protected virtual void OnDisable () { mList.Remove(this); }
+	protected virtual void OnEnable () { list.Add(this); }
+	protected virtual void OnDisable () { list.Remove(this); }
 
 	/// <summary>
 	/// If we're bound to an input field, subscribe to its Submit notification.

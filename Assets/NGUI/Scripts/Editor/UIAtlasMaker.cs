@@ -700,7 +700,7 @@ public class UIAtlasMaker : EditorWindow
 		// Pack the sprites into this texture
 		if (PackTextures(tex, sprites))
 		{
-			byte[] bytes = tex.EncodeToPNG();
+			var bytes = tex.EncodeToPNG();
 			System.IO.File.WriteAllBytes(newPath, bytes);
 			bytes = null;
 
@@ -712,8 +712,33 @@ public class UIAtlasMaker : EditorWindow
 			// Update the atlas texture
 			if (newTexture)
 			{
-				if (tex == null) Debug.LogError("Failed to load the created atlas saved as " + newPath);
-				else spriteMaterial.mainTexture = tex;
+				if (tex == null)
+				{
+					Debug.LogError("Failed to load the created atlas saved as " + newPath);
+					EditorUtility.ClearProgressBar();
+				}
+				else
+				{
+					var mat = spriteMaterial;
+
+					if (mat == null)
+					{
+						var matPath = newPath.Replace(".png", ".mat");
+						var shader = Shader.Find(NGUISettings.atlasPMA ? "Unlit/Premultiplied Colored" : "Unlit/Transparent Colored");
+						mat = new Material(shader);
+
+						// Save the material
+						AssetDatabase.CreateAsset(mat, matPath);
+						AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+						// Load the material so it's usable
+						mat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+						spriteMaterial = mat;
+					}
+
+					mat.mainTexture = tex;
+				}
+
 				ReleaseSprites(sprites);
 
 				AssetDatabase.SaveAssets();

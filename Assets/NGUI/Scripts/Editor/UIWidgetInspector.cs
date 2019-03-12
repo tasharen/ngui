@@ -1032,8 +1032,6 @@ public class UIWidgetInspector : UIRectEditor
 
 	static void DrawDepth (SerializedObject so, UIWidget w, bool isPrefab)
 	{
-		if (isPrefab) return;
-
 		GUILayout.Space(2f);
 		GUILayout.BeginHorizontal();
 		{
@@ -1063,13 +1061,13 @@ public class UIWidgetInspector : UIRectEditor
 
 		int matchingDepths = 1;
 
-		UIPanel p = w.panel;
+		var p = w.panel;
 
 		if (p != null)
 		{
 			for (int i = 0, imax = p.widgets.Count; i < imax; ++i)
 			{
-				UIWidget pw = p.widgets[i];
+				var pw = p.widgets[i];
 				if (pw != w && pw.depth == w.depth)
 					++matchingDepths;
 			}

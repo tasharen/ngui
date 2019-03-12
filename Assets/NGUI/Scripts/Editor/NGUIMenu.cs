@@ -97,21 +97,6 @@ static public class NGUIMenu
 
 	#endregion
 #region Create
-
-	[MenuItem("NGUI/Create/Atlas", false, 6)]
-	static public void CreateAtlas ()
-	{
-		string path = EditorUtility.SaveFilePanelInProject("Create Atlas", "New Atlas.asset", "asset", "Save atlas as...", NGUISettings.currentPath);
-		if (string.IsNullOrEmpty(path)) return;
-
-		NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
-		var atlas = ScriptableObject.CreateInstance<NGUIAtlas>();
-		AssetDatabase.CreateAsset(atlas, path);
-		AssetDatabase.SaveAssets();
-		AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-		Selection.activeObject = atlas;
-	}
-
 	[MenuItem("NGUI/Create/Sprite &#s", false, 6)]
 	static public void AddSprite ()
 	{
@@ -170,6 +155,56 @@ static public class NGUIMenu
 
 	[MenuItem("NGUI/Create/", false, 6)]
 	static void AddBreaker123 () {}
+
+	[MenuItem("NGUI/Create/Font", false, 6)]
+	static void AddFont ()
+	{
+		var path = EditorUtility.SaveFilePanelInProject("Save As", "New Font.asset", "asset", "Save font as...", NGUISettings.currentPath);
+
+		if (!string.IsNullOrEmpty(path))
+		{
+			NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
+
+			var fontName = path.Replace(".asset", "");
+			fontName = fontName.Substring(path.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
+
+			var asset = ScriptableObject.CreateInstance<NGUIFont>();
+			asset.name = fontName;
+
+			AssetDatabase.CreateAsset(asset, path);
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+			asset = AssetDatabase.LoadAssetAtPath<NGUIFont>(path);
+			NGUISettings.ambigiousFont = asset;
+			Selection.activeObject = asset;
+		}
+	}
+
+	[MenuItem("NGUI/Create/Atlas", false, 6)]
+	static void AddAtlas ()
+	{
+		var path = EditorUtility.SaveFilePanelInProject("Save As", "New Atlas.asset", "asset", "Save atlas as...", NGUISettings.currentPath);
+
+		if (!string.IsNullOrEmpty(path))
+		{
+			NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
+
+			var fontName = path.Replace(".asset", "");
+			fontName = fontName.Substring(path.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
+
+			var asset = ScriptableObject.CreateInstance<NGUIAtlas>();
+			asset.name = fontName;
+
+			AssetDatabase.CreateAsset(asset, path);
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+			asset = AssetDatabase.LoadAssetAtPath<NGUIAtlas>(path);
+			NGUISettings.atlas = asset;
+			Selection.activeObject = asset;
+		}
+	}
 
 	[MenuItem("NGUI/Create/Anchor (Legacy)", false, 6)]
 	static void AddAnchor2 () { Add<UIAnchor>(); }

@@ -232,7 +232,7 @@ public class NGUIFontInspector : Editor
 
 				if (GUILayout.Button("Upgrade"))
 				{
-					var path = EditorUtility.SaveFilePanelInProject("Save As", (mFont as Object).name + ".asset", "asset", "Save atlas as...", NGUISettings.currentPath);
+					var path = EditorUtility.SaveFilePanelInProject("Save As", (mFont as Object).name + ".asset", "asset", "Save font as...", NGUISettings.currentPath);
 
 					if (!string.IsNullOrEmpty(path))
 					{

@@ -266,7 +266,7 @@ public class UIDrawCall : MonoBehaviour
 		{
 			mTexture = value;
 			if (mBlock == null) mBlock = new MaterialPropertyBlock();
-			mBlock.SetTexture("_MainTex", value ?? Texture2D.whiteTexture);
+			mBlock.SetTexture("_MainTex", value != null ? value : Texture2D.whiteTexture);
 		}
 	}
 
@@ -717,7 +717,7 @@ public class UIDrawCall : MonoBehaviour
 		UpdateMaterials();
 
 		if (mBlock != null) mRenderer.SetPropertyBlock(mBlock);
-		if (onRender != null) onRender(mDynamicMat ?? mMaterial);
+		if (onRender != null) onRender(mDynamicMat != null ? mDynamicMat : mMaterial);
 		if (mDynamicMat == null || mClipCount == 0) return;
 
 		if (mTextureClip)

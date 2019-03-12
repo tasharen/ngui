@@ -78,6 +78,7 @@ public class UICamera : MonoBehaviour
 		public GameObject current;		// Current game object under the touch or mouse
 		public GameObject pressed;		// Last game object to receive OnPress
 		public GameObject dragged;		// Game object that's being dragged
+		public GameObject lastClickGO;	// Last game object that received a click event (used for double click)
 
 		public float pressTime = 0f;	// When the touch event started
 		public float clickTime = 0f;	// The last time a click event was sent out
@@ -2663,6 +2664,7 @@ public class UICamera : MonoBehaviour
 			{
 				currentTouch.dragStarted = true;
 				currentTouch.delta = currentTouch.totalDelta;
+				currentTouch.clickNotification = ClickNotification.None;
 
 				// OnDragOver is sent for consistency, so that OnDragOut is always preceded by OnDragOver
 				isDragging = true;
@@ -2794,11 +2796,13 @@ public class UICamera : MonoBehaviour
 					if (onClick != null) onClick(currentTouch.pressed);
 					Notify(currentTouch.pressed, "OnClick", null);
 
-					if (currentTouch.clickTime + 0.35f > time)
+					if (currentTouch.clickTime + 0.35f > time && currentTouch.lastClickGO == currentTouch.pressed)
 					{
 						if (onDoubleClick != null) onDoubleClick(currentTouch.pressed);
 						Notify(currentTouch.pressed, "OnDoubleClick", null);
 					}
+
+					currentTouch.lastClickGO = currentTouch.pressed;
 					currentTouch.clickTime = time;
 				}
 			}
