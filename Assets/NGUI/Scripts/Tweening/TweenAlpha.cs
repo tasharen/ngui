@@ -15,15 +15,24 @@ public class TweenAlpha : UITweener
 	[Range(0f, 1f)] public float from = 1f;
 	[Range(0f, 1f)] public float to = 1f;
 
-	bool mCached = false;
-	UIRect mRect;
-	Material mMat;
-	Light mLight;
-	SpriteRenderer mSr;
-	float mBaseIntensity = 1f;
+	[Tooltip("If used on a renderer, the material should probably be cleaned up after this script gets destroyed...")]
+	public bool autoCleanup = false;
+
+	[Tooltip("Color to adjust")]
+	public string colorProperty;
+
+	[System.NonSerialized] bool mCached = false;
+	[System.NonSerialized] UIRect mRect;
+	[System.NonSerialized] Material mShared;
+	[System.NonSerialized] Material mMat;
+	[System.NonSerialized] Light mLight;
+	[System.NonSerialized] SpriteRenderer mSr;
+	[System.NonSerialized] float mBaseIntensity = 1f;
 
 	[System.Obsolete("Use 'value' instead")]
 	public float alpha { get { return this.value; } set { this.value = value; } }
+
+	void OnDestroy () { if (autoCleanup && mMat != null && mShared != mMat) { Destroy(mMat); mMat = null; } }
 
 	void Cache ()
 	{
@@ -37,8 +46,14 @@ public class TweenAlpha : UITweener
 
 			if (mLight == null)
 			{
-				Renderer ren = GetComponent<Renderer>();
-				if (ren != null) mMat = ren.material;
+				var ren = GetComponent<Renderer>();
+
+				if (ren != null)
+				{
+					mShared = ren.sharedMaterial;
+					mMat = ren.material;
+				}
+
 				if (mMat == null) mRect = GetComponentInChildren<UIRect>();
 			}
 			else mBaseIntensity = mLight.intensity;
@@ -56,7 +71,9 @@ public class TweenAlpha : UITweener
 			if (!mCached) Cache();
 			if (mRect != null) return mRect.alpha;
 			if (mSr != null) return mSr.color.a;
-			return mMat != null ? mMat.color.a : 1f;
+			if (mMat == null) return 1f;
+			if (string.IsNullOrEmpty(colorProperty)) return mMat.color.a;
+			return mMat.GetColor(colorProperty).a;
 		}
 		set
 		{
@@ -68,15 +85,24 @@ public class TweenAlpha : UITweener
 			}
 			else if (mSr != null)
 			{
-				Color c = mSr.color;
+				var c = mSr.color;
 				c.a = value;
 				mSr.color = c;
 			}
 			else if (mMat != null)
 			{
-				Color c = mMat.color;
-				c.a = value;
-				mMat.color = c;
+				if (string.IsNullOrEmpty(colorProperty))
+				{
+					var c = mMat.color;
+					c.a = value;
+					mMat.color = c;
+				}
+				else
+				{
+					var c = mMat.GetColor(colorProperty);
+					c.a = value;
+					mMat.SetColor(colorProperty, c);
+				}
 			}
 			else if (mLight != null)
 			{
@@ -97,7 +123,7 @@ public class TweenAlpha : UITweener
 
 	static public TweenAlpha Begin (GameObject go, float duration, float alpha, float delay = 0f)
 	{
-		TweenAlpha comp = UITweener.Begin<TweenAlpha>(go, duration, delay);
+		var comp = UITweener.Begin<TweenAlpha>(go, duration, delay);
 		comp.from = comp.value;
 		comp.to = alpha;
 

@@ -166,6 +166,7 @@ public class UISprite : UIBasicSprite
 				mSprite = null;
 				mChanged = true;
 				mSpriteSet = false;
+				MarkAsChanged();
 			}
 			else if (mSpriteName != value)
 			{
@@ -174,6 +175,7 @@ public class UISprite : UIBasicSprite
 				mSprite = null;
 				mChanged = true;
 				mSpriteSet = false;
+				MarkAsChanged();
 			}
 		}
 	}

@@ -667,9 +667,9 @@ public class UICamera : MonoBehaviour
 	/// Current touch, set before any event function gets called.
 	/// </summary>
 
-	static public MouseOrTouch currentTouch = null;
+	[System.NonSerialized] static public MouseOrTouch currentTouch = null;
 
-	static bool mInputFocus = false;
+	[System.NonSerialized] static bool mInputFocus = false;
 
 	/// <summary>
 	/// Whether an input field currently has focus.
@@ -685,7 +685,7 @@ public class UICamera : MonoBehaviour
 	}
 
 	// Obsolete, kept for backwards compatibility.
-	static GameObject mGenericHandler;
+	[System.NonSerialized] static GameObject mGenericHandler;
 
 	/// <summary>
 	/// If set, this game object will receive all events regardless of whether they were handled or not.
@@ -698,7 +698,7 @@ public class UICamera : MonoBehaviour
 	/// If events don't get handled, they will be forwarded to this game object.
 	/// </summary>
 
-	static public GameObject fallThrough;
+	[System.NonSerialized] static public GameObject fallThrough;
 
 	public delegate void MoveDelegate (Vector2 delta);
 	public delegate void VoidDelegate (GameObject go);
@@ -712,23 +712,23 @@ public class UICamera : MonoBehaviour
 	/// These notifications are sent out prior to the actual event going out.
 	/// </summary>
 
-	static public VoidDelegate onClick;
-	static public VoidDelegate onDoubleClick;
-	static public BoolDelegate onHover;
-	static public BoolDelegate onPress;
-	static public BoolDelegate onSelect;
-	static public FloatDelegate onScroll;
-	static public VectorDelegate onDrag;
-	static public VoidDelegate onDragStart;
-	static public ObjectDelegate onDragOver;
-	static public ObjectDelegate onDragOut;
-	static public VoidDelegate onDragEnd;
-	static public ObjectDelegate onDrop;
-	static public KeyCodeDelegate onKey;
-	static public KeyCodeDelegate onNavigate;
-	static public VectorDelegate onPan;
-	static public BoolDelegate onTooltip;
-	static public MoveDelegate onMouseMove;
+	[System.NonSerialized] static public VoidDelegate onClick;
+	[System.NonSerialized] static public VoidDelegate onDoubleClick;
+	[System.NonSerialized] static public BoolDelegate onHover;
+	[System.NonSerialized] static public BoolDelegate onPress;
+	[System.NonSerialized] static public BoolDelegate onSelect;
+	[System.NonSerialized] static public FloatDelegate onScroll;
+	[System.NonSerialized] static public VectorDelegate onDrag;
+	[System.NonSerialized] static public VoidDelegate onDragStart;
+	[System.NonSerialized] static public ObjectDelegate onDragOver;
+	[System.NonSerialized] static public ObjectDelegate onDragOut;
+	[System.NonSerialized] static public VoidDelegate onDragEnd;
+	[System.NonSerialized] static public ObjectDelegate onDrop;
+	[System.NonSerialized] static public KeyCodeDelegate onKey;
+	[System.NonSerialized] static public KeyCodeDelegate onNavigate;
+	[System.NonSerialized] static public VectorDelegate onPan;
+	[System.NonSerialized] static public BoolDelegate onTooltip;
+	[System.NonSerialized] static public MoveDelegate onMouseMove;
 
 	// Mouse events
 	static MouseOrTouch[] mMouse = new MouseOrTouch[] { new MouseOrTouch(), new MouseOrTouch(), new MouseOrTouch() };
@@ -742,28 +742,28 @@ public class UICamera : MonoBehaviour
 	static public MouseOrTouch mouse2 { get { return mMouse[2]; } }
 
 	// Joystick/controller/keyboard event
-	static public MouseOrTouch controller = new MouseOrTouch();
+	[System.NonSerialized] static public MouseOrTouch controller = new MouseOrTouch();
 
 	/// <summary>
 	/// List of all the active touches.
 	/// </summary>
 
-	static public List<MouseOrTouch> activeTouches = new List<MouseOrTouch>();
+	[System.NonSerialized] static public List<MouseOrTouch> activeTouches = new List<MouseOrTouch>();
 
 	// Used internally to store IDs of active touches
-	static List<int> mTouchIDs = new List<int>();
+	[System.NonSerialized] static List<int> mTouchIDs = new List<int>();
 
 	// Used to detect screen dimension changes
-	static int mWidth = 0;
-	static int mHeight = 0;
+	[System.NonSerialized] static int mWidth = 0;
+	[System.NonSerialized] static int mHeight = 0;
 
 	// Tooltip widget (mouse only)
-	static GameObject mTooltip = null;
+	[System.NonSerialized] static GameObject mTooltip = null;
 
 	// Mouse input is turned off on iOS
-	Camera mCam = null;
-	static float mTooltipTime = 0f;
-	float mNextRaycast = 0f;
+	[System.NonSerialized] Camera mCam = null;
+	[System.NonSerialized] static float mTooltipTime = 0f;
+	[System.NonSerialized] float mNextRaycast = 0f;
 
 	/// <summary>
 	/// Helper function that determines if this script should be handling the events.
@@ -785,7 +785,7 @@ public class UICamera : MonoBehaviour
 	/// Set to 'true' just before OnDrag-related events are sent. No longer needed, but kept for backwards compatibility.
 	/// </summary>
 
-	static public bool isDragging = false;
+	[System.NonSerialized] static public bool isDragging = false;
 
 	/// <summary>
 	/// Object that should be showing the tooltip.
@@ -855,7 +855,7 @@ public class UICamera : MonoBehaviour
 				{
 					var m = mMouse[i];
 
-					if (IsPartOfUI(m.pressed != null ? m.pressed : m.current))
+					if (IsPartOfUI(m.pressed != null ? m.pressed : (i == 0 ? m.current : null)))
 					{
 						mLastOverResult = true;
 						return mLastOverResult;
@@ -905,11 +905,19 @@ public class UICamera : MonoBehaviour
 					}
 				}
 
-				for (int i = 0; i < 3; ++i)
-				{
-					var m = mMouse[i];
+				var m = mMouse[0];
 
-					if (IsPartOfUI(m.pressed) || IsPartOfUI(m.current))
+				if (IsPartOfUI(m.pressed) || IsPartOfUI(m.current))
+				{
+					mLastFocusResult = true;
+					return mLastFocusResult;
+				}
+
+				for (int i = 1; i < 3; ++i)
+				{
+					m = mMouse[i];
+
+					if (IsPartOfUI(m.pressed))
 					{
 						mLastFocusResult = true;
 						return mLastFocusResult;
@@ -2193,13 +2201,13 @@ public class UICamera : MonoBehaviour
 			if (isPressed)
 			{
 				posChanged = true;
-				for (int i = 0; i < 3; ++i) mMouse[i].current = currentTouch.current;
+				for (int i = 1; i < 3; ++i) mMouse[i].current = currentTouch.current;
 			}
 			else if (mMouse[0].current != currentTouch.current)
 			{
 				currentKey = KeyCode.Mouse0;
 				posChanged = true;
-				for (int i = 0; i < 3; ++i) mMouse[i].current = currentTouch.current;
+				for (int i = 1; i < 3; ++i) mMouse[i].current = currentTouch.current;
 			}
 		}
 
@@ -2728,6 +2736,14 @@ public class UICamera : MonoBehaviour
 				}
 			}
 		}
+#if W2
+		else if (currentTouch.delta.y != 0f && (GetKey(KeyCode.LeftControl) || GetKey(KeyCode.LeftCommand)))
+		{
+			var f = currentTouch.delta.y * 0.001f;
+			if (onScroll != null) onScroll(mHover, f);
+			Notify(currentTouch.current, "OnScroll", f);
+		}
+#endif
 	}
 
 	/// <summary>

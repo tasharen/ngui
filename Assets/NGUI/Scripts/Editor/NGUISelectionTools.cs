@@ -24,17 +24,6 @@ public class NGUISelectionTools
 		}
 	}
 
-	[MenuItem("GameObject/Selection/Toggle 'Active' #&a")]
-	static void ActivateDeactivate()
-	{
-		if (HasValidTransform())
-		{
-			GameObject[] gos = Selection.gameObjects;
-			bool val = !NGUITools.GetActive(Selection.activeGameObject);
-			foreach (GameObject go in gos) NGUITools.SetActive(go, val);
-		}
-	}
-
 	[MenuItem("GameObject/Selection/Clear Local Transform")]
 	static void ClearLocalTransform()
 	{
@@ -49,6 +38,17 @@ public class NGUISelectionTools
 	}
 
 #if !UNITY_2018_3_OR_NEWER
+	[MenuItem("GameObject/Selection/Toggle 'Active' #&a")]
+	static void ActivateDeactivate ()
+	{
+		if (HasValidTransform())
+		{
+			GameObject[] gos = Selection.gameObjects;
+			bool val = !NGUITools.GetActive(Selection.activeGameObject);
+			foreach (GameObject go in gos) NGUITools.SetActive(go, val);
+		}
+	}
+
 	[MenuItem("GameObject/Selection/Add New Child #&n")]
 	static void CreateLocalGameObject ()
 	{

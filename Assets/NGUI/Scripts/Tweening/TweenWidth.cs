@@ -15,6 +15,14 @@ public class TweenWidth : UITweener
 {
 	public int from = 100;
 	public int to = 100;
+
+	[Tooltip("If set, 'from' value will be set to match the specified rectangle")]
+	public UIWidget fromTarget;
+
+	[Tooltip("If set, 'to' value will be set to match the specified rectangle")]
+	public UIWidget toTarget;
+
+	[Tooltip("Whether there is a table that should be updated")]
 	public bool updateTable = false;
 
 	UIWidget mWidget;
@@ -37,6 +45,9 @@ public class TweenWidth : UITweener
 
 	protected override void OnUpdate (float factor, bool isFinished)
 	{
+		if (fromTarget) from = fromTarget.width;
+		if (toTarget) to = toTarget.width;
+
 		value = Mathf.RoundToInt(from * (1f - factor) + to * factor);
 
 		if (updateTable)
@@ -56,7 +67,7 @@ public class TweenWidth : UITweener
 
 	static public TweenWidth Begin (UIWidget widget, float duration, int width)
 	{
-		TweenWidth comp = UITweener.Begin<TweenWidth>(widget.gameObject, duration);
+		var comp = UITweener.Begin<TweenWidth>(widget.gameObject, duration);
 		comp.from = widget.width;
 		comp.to = width;
 

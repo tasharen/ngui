@@ -1144,6 +1144,9 @@ static public class NGUIText
 		return WrapText(text, out finalText, false, wrapLineColors);
 	}
 
+	[System.NonSerialized]
+	static StringBuilder mSB;
+
 	/// <summary>
 	/// Text wrapping functionality. The 'width' and 'height' should be in pixels.
 	/// Returns 'true' if the requested text fits into the previously set dimensions.
@@ -1172,7 +1175,9 @@ static public class NGUIText
 		int textLength = text.Length;
 		Prepare(text);
 
-		StringBuilder sb = new StringBuilder();
+		if (mSB == null) mSB = new StringBuilder();
+		else mSB.Length = 0;
+
 		float maxWidth = regionWidth;
 		float x = 0f;
 		int start = 0, offset = 0, lineCount = 1, prev = 0;
@@ -1196,9 +1201,9 @@ static public class NGUIText
 
 		if (wrapLineColors)
 		{
-			sb.Append("[");
-			sb.Append(NGUIText.EncodeColor(c));
-			sb.Append("]");
+			mSB.Append("[");
+			mSB.Append(NGUIText.EncodeColor(c));
+			mSB.Append("]");
 		}
 
 		// Run through all characters
@@ -1215,19 +1220,19 @@ static public class NGUIText
 				x = 0f;
 
 				// Add the previous word to the final string
-				if (start < offset) sb.Append(text.Substring(start, offset - start + 1));
-				else sb.Append(ch);
+				if (start < offset) mSB.Append(text.Substring(start, offset - start + 1));
+				else mSB.Append(ch);
 
 				if (wrapLineColors)
 				{
 					for (int i = 0; i < mColors.size; ++i)
-						sb.Insert(sb.Length - 1, "[-]");
+						mSB.Insert(mSB.Length - 1, "[-]");
 
 					for (int i = 0; i < mColors.size; ++i)
 					{
-						sb.Append("[");
-						sb.Append(NGUIText.EncodeColor(mColors.buffer[i]));
-						sb.Append("]");
+						mSB.Append("[");
+						mSB.Append(NGUIText.EncodeColor(mColors.buffer[i]));
+						mSB.Append("]");
 					}
 				}
 
@@ -1248,9 +1253,9 @@ static public class NGUIText
 				if (lineCount == maxLineCount && useEllipsis && start < lastValidChar)
 				{
 					lineIsEmpty = false;
-					if (lastValidChar > start) sb.Append(text.Substring(start, lastValidChar - start + 1));
-					if (previousSubscript != 0) sb.Append("[/sub]");
-					sb.Append("...");
+					if (lastValidChar > start) mSB.Append(text.Substring(start, lastValidChar - start + 1));
+					if (previousSubscript != 0) mSB.Append("[/sub]");
+					mSB.Append("...");
 					start = offset;
 					break;
 				}
@@ -1258,7 +1263,7 @@ static public class NGUIText
 				// Append the previous word
 				if (lastValidChar + 1 > offset)
 				{
-					sb.Append(text.Substring(start, offset - start));
+					mSB.Append(text.Substring(start, offset - start));
 					start = offset;
 					lastValidChar = offset;
 				}
@@ -1281,8 +1286,8 @@ static public class NGUIText
 				}
 
 				// Append the symbol
-				if (start < offset) sb.Append(text.Substring(start, offset - start));
-				else sb.Append(ch);
+				if (start < offset) mSB.Append(text.Substring(start, offset - start));
+				else mSB.Append(ch);
 
 				start = offset--;
 				lastValidChar = start;
@@ -1328,14 +1333,14 @@ static public class NGUIText
 				// Adds "..." at the end of text that doesn't fit
 				if (lastLine && useEllipsis && start < lastValidChar && x < maxWidth && x > ew)
 				{
-					if (lastValidChar > start) sb.Append(text.Substring(start, lastValidChar - start + 1));
-					if (subscriptMode != 0) sb.Append("[/sub]");
-					sb.Append("...");
+					if (lastValidChar > start) mSB.Append(text.Substring(start, lastValidChar - start + 1));
+					if (subscriptMode != 0) mSB.Append("[/sub]");
+					mSB.Append("...");
 					start = offset;
 					break;
 				}
 
-				sb.Append(text.Substring(start, end + 1));
+				mSB.Append(text.Substring(start, end + 1));
 				lineIsEmpty = false;
 				start = offset + 1;
 			}
@@ -1352,18 +1357,18 @@ static public class NGUIText
 					// Adds "..." at the end of text that doesn't fit
 					if (useEllipsis && offset > 0)
 					{
-						if (lastValidChar > start) sb.Append(text.Substring(start, lastValidChar - start + 1));
-						if (subscriptMode != 0) sb.Append("[/sub]");
-						sb.Append("...");
+						if (lastValidChar > start) mSB.Append(text.Substring(start, lastValidChar - start + 1));
+						if (subscriptMode != 0) mSB.Append("[/sub]");
+						mSB.Append("...");
 						start = offset;
 						break;
 					}
 
 					// This is the first word on the line -- add it up to the character that fits
-					sb.Append(text.Substring(start, Mathf.Max(0, offset - start)));
+					mSB.Append(text.Substring(start, Mathf.Max(0, offset - start)));
 					if (!space && !eastern) fits = false;
 
-					if (wrapLineColors && mColors.size > 0) sb.Append("[-]");
+					if (wrapLineColors && mColors.size > 0) mSB.Append("[-]");
 
 					if (lineCount++ == maxLineCount)
 					{
@@ -1371,19 +1376,19 @@ static public class NGUIText
 						break;
 					}
 
-					if (keepCharCount) ReplaceSpaceWithNewline(ref sb);
-					else EndLine(ref sb);
+					if (keepCharCount) ReplaceSpaceWithNewline(ref mSB);
+					else EndLine(ref mSB);
 
 					if (wrapLineColors)
 					{
 						for (int i = 0; i < mColors.size; ++i)
-							sb.Insert(sb.Length - 1, "[-]");
+							mSB.Insert(mSB.Length - 1, "[-]");
 
 						for (int i = 0; i < mColors.size; ++i)
 						{
-							sb.Append("[");
-							sb.Append(NGUIText.EncodeColor(mColors.buffer[i]));
-							sb.Append("]");
+							mSB.Append("[");
+							mSB.Append(NGUIText.EncodeColor(mColors.buffer[i]));
+							mSB.Append("]");
 						}
 					}
 
@@ -1417,21 +1422,21 @@ static public class NGUIText
 					prev = 0;
 
 					if (lineCount++ == maxLineCount) break;
-					if (keepCharCount) ReplaceSpaceWithNewline(ref sb);
-					else EndLine(ref sb);
+					if (keepCharCount) ReplaceSpaceWithNewline(ref mSB);
+					else EndLine(ref mSB);
 
 					if (wrapLineColors)
 					{
 						// Negate previous colors prior to the newline character
 						for (int i = 0; i < mColors.size; ++i)
-							sb.Insert(sb.Length - 1, "[-]");
+							mSB.Insert(mSB.Length - 1, "[-]");
 
 						// Add all the current colors before going forward
 						for (int i = 0; i < mColors.size; ++i)
 						{
-							sb.Append("[");
-							sb.Append(NGUIText.EncodeColor(mColors.buffer[i]));
-							sb.Append("]");
+							mSB.Append("[");
+							mSB.Append(NGUIText.EncodeColor(mColors.buffer[i]));
+							mSB.Append("]");
 						}
 					}
 					continue;
@@ -1446,9 +1451,9 @@ static public class NGUIText
 			}
 		}
 
-		if (start < offset) sb.Append(text.Substring(start, offset - start));
-		if (wrapLineColors && mColors.size > 0) sb.Append("[-]");
-		finalText = sb.ToString();
+		if (start < offset) mSB.Append(text.Substring(start, offset - start));
+		if (wrapLineColors && mColors.size > 0) mSB.Append("[-]");
+		finalText = mSB.ToString();
 		mColors.Clear();
 		return fits && ((offset == textLength) || (maxLines != 0 ? lineCount == maxLineCount : lineCount == 0));
 	}
