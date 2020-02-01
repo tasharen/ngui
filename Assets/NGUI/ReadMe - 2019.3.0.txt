@@ -1,6 +1,6 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
- Copyright © 2011-2019 Tasharen Entertainment
+ Copyright © 2011-2020 Tasharen Entertainment
             Version 2019.3.0
        https://discord.gg/tasharen/
 ----------------------------------------------
@@ -56,6 +56,7 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
 
 2019.3.0
+- NEW: Added the Single Camera (old LWRP) example.
 - NEW: Added a 'fixed aspect' option to the UISprite, matching 2D sprite and UI texture.
 - FIX: Re-added NGUI menu -> Create -> Atlas and Font options that create empty ones.
 - FIX: Removed depth hiding of inspected widgets when examining prefabs.
