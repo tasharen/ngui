@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2019 Tasharen Entertainment
-            Version 2018.3.0
+            Version 2019.3.0
        https://discord.gg/tasharen/
 ----------------------------------------------
 
@@ -54,6 +54,20 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2019.3.0
+- NEW: Added a 'fixed aspect' option to the UISprite, matching 2D sprite and UI texture.
+- FIX: Re-added NGUI menu -> Create -> Atlas and Font options that create empty ones.
+- FIX: Removed depth hiding of inspected widgets when examining prefabs.
+- FIX: Double-click event will no longer happened when quickly tapping on two different objects.
+- FIX: Adjusting panel's alpha will now again work properly in edit time.
+- FIX: Editing sprite border and padding on the atlas will now correctly mark the atlas as edited.
+- FIX: Dynamic font's default scaling fix.
+- FIX: Changing widget alpha should immediately update the scene view in edit mode again.
+- FIX: "style not found" when examining the UILocalize component in Unity 2018+.
+- FIX: Fixed incorrect line wrapping on labels.
+- FIX: Made NGUIText.WrapText re-use the same StringBuilder rather than making a new one every time.
+
 
 2018.3.0
 - NEW: As the name suggests, support for Unity 2018.3 and its new prefab workflow. Still supports previous versions, including Unity 5.6.
