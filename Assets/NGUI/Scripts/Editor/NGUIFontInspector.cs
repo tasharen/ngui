@@ -249,7 +249,10 @@ public class NGUIFontInspector : Editor
 						fontName = fontName.Substring(path.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
 						asset.name = fontName;
 
-						AssetDatabase.CreateAsset(asset, path);
+						var existing = AssetDatabase.LoadMainAssetAtPath(path);
+						if (existing != null) EditorUtility.CopySerialized(asset, existing);
+						else AssetDatabase.CreateAsset(asset, path);
+
 						AssetDatabase.SaveAssets();
 						AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
@@ -541,17 +544,17 @@ public class NGUIFontInspector : Editor
 			offsetY = sd.y + mFont.texHeight - sd.paddingTop;
 		}
 
-		string path = AssetDatabase.GetAssetPath(mFont.texture);
-		Texture2D bfTex = NGUIEditorTools.ImportTexture(path, true, true, false);
-		Color32[] atlas = bfTex.GetPixels32();
+		var path = AssetDatabase.GetAssetPath(mFont.texture);
+		var bfTex = NGUIEditorTools.ImportTexture(path, true, true, false);
+		var atlas = bfTex.GetPixels32();
 
 		// First we need to extract textures for all the glyphs, making them bigger in the process
-		List<BMGlyph> glyphs = bf.glyphs;
-		List<Texture2D> glyphTextures = new List<Texture2D>(glyphs.Count);
+		var glyphs = bf.glyphs;
+		var glyphTextures = new List<Texture2D>(glyphs.Count);
 
 		for (int i = 0, imax = glyphs.Count; i < imax; ++i)
 		{
-			BMGlyph glyph = glyphs[i];
+			var glyph = glyphs[i];
 			if (glyph.width < 1 || glyph.height < 1) continue;
 
 			int width = glyph.width;
@@ -573,7 +576,7 @@ public class NGUIFontInspector : Editor
 			}
 
 			int size = width * height;
-			Color32[] colors = new Color32[size];
+			var colors = new Color32[size];
 			Color32 clear = background;
 			clear.a = 0;
 			for (int b = 0; b < size; ++b) colors[b] = clear;
@@ -641,12 +644,12 @@ public class NGUIFontInspector : Editor
 		}
 
 		// Pack all glyphs into a new texture
-		Texture2D final = new Texture2D(bfTex.width, bfTex.height, TextureFormat.ARGB32, false);
-		Rect[] rects = final.PackTextures(glyphTextures.ToArray(), 1);
+		var final = new Texture2D(bfTex.width, bfTex.height, TextureFormat.ARGB32, false);
+		var rects = final.PackTextures(glyphTextures.ToArray(), 1);
 		final.Apply();
 
 		// Make RGB channel use the background color (Unity makes it black by default)
-		Color32[] fcs = final.GetPixels32();
+		var fcs = final.GetPixels32();
 		Color32 bc = background;
 
 		for (int i = 0, imax = fcs.Length; i < imax; ++i)
@@ -669,10 +672,10 @@ public class NGUIFontInspector : Editor
 
 		for (int i = 0, imax = glyphs.Count; i < imax; ++i)
 		{
-			BMGlyph glyph = glyphs[i];
+			var glyph = glyphs[i];
 			if (glyph.width < 1 || glyph.height < 1) continue;
 
-			Rect rect = rects[index++];
+			var rect = rects[index++];
 			glyph.x = Mathf.RoundToInt(rect.x * tw);
 			glyph.y = Mathf.RoundToInt(rect.y * th);
 			glyph.width = Mathf.RoundToInt(rect.width * tw);
@@ -687,7 +690,7 @@ public class NGUIFontInspector : Editor
 		if (mFont.atlas == null)
 		{
 			// Save the final texture
-			byte[] bytes = final.EncodeToPNG();
+			var bytes = final.EncodeToPNG();
 			NGUITools.DestroyImmediate(final);
 			System.IO.File.WriteAllBytes(path, bytes);
 			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);

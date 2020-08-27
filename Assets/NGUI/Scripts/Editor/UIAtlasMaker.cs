@@ -297,20 +297,23 @@ public class UIAtlasMaker : EditorWindow
 	/// Create a list of sprites using the specified list of textures.
 	/// </summary>
 
-	static public List<SpriteEntry> CreateSprites (List<Texture> textures)
+	static public List<SpriteEntry> CreateSprites (List<Texture> textures, Texture editedTex = null, int editedPadding = 0)
 	{
-		List<SpriteEntry> list = new List<SpriteEntry>();
+		var list = new List<SpriteEntry>();
 
 		foreach (Texture tex in textures)
 		{
-			Texture2D oldTex = NGUIEditorTools.ImportTexture(tex, true, false, true);
+			var oldTex = NGUIEditorTools.ImportTexture(tex, true, false, true);
 			if (oldTex == null) oldTex = tex as Texture2D;
 			if (oldTex == null) continue;
 
+			var trim = NGUISettings.atlasTrimming;
+			if (editedTex != null && editedTex == oldTex) trim = true;
+
 			// If we aren't doing trimming, just use the texture as-is
-			if (!NGUISettings.atlasTrimming && !NGUISettings.atlasPMA)
+			if ((!trim && !NGUISettings.atlasPMA) && (editedTex == null || editedTex != oldTex))
 			{
-				SpriteEntry sprite = new SpriteEntry();
+				var sprite = new SpriteEntry();
 				sprite.SetRect(0, 0, oldTex.width, oldTex.height);
 				sprite.tex = oldTex;
 				sprite.name = oldTex.name;
@@ -320,8 +323,7 @@ public class UIAtlasMaker : EditorWindow
 			}
 
 			// If we want to trim transparent pixels, there is more work to be done
-			Color32[] pixels = oldTex.GetPixels32();
-
+			var pixels = oldTex.GetPixels32();
 			int xmin = oldTex.width;
 			int xmax = 0;
 			int ymin = oldTex.height;
@@ -330,13 +332,13 @@ public class UIAtlasMaker : EditorWindow
 			int oldHeight = oldTex.height;
 
 			// Find solid pixels
-			if (NGUISettings.atlasTrimming)
+			if (trim)
 			{
 				for (int y = 0, yw = oldHeight; y < yw; ++y)
 				{
 					for (int x = 0, xw = oldWidth; x < xw; ++x)
 					{
-						Color32 c = pixels[y * xw + x];
+						var c = pixels[y * xw + x];
 
 						if (c.a != 0)
 						{
@@ -359,9 +361,19 @@ public class UIAtlasMaker : EditorWindow
 			int newWidth  = (xmax - xmin) + 1;
 			int newHeight = (ymax - ymin) + 1;
 
-			if (newWidth > 0 && newHeight > 0)
+			var pw = newWidth;
+			var ph = newHeight;
+
+			if (editedTex != null && editedTex == oldTex)
 			{
-				SpriteEntry sprite = new SpriteEntry();
+				newWidth += editedPadding;
+				newHeight += editedPadding;
+			}
+			else editedPadding = 0;
+
+			if (pw > 0 && ph > 0)
+			{
+				var sprite = new SpriteEntry();
 				sprite.x = 0;
 				sprite.y = 0;
 				sprite.width = oldTex.width;
@@ -377,13 +389,13 @@ public class UIAtlasMaker : EditorWindow
 				else
 				{
 					// Copy the non-trimmed texture data into a temporary buffer
-					Color32[] newPixels = new Color32[newWidth * newHeight];
+					var newPixels = new Color32[newWidth * newHeight];
 
-					for (int y = 0; y < newHeight; ++y)
+					for (int y = 0; y < ph; ++y)
 					{
-						for (int x = 0; x < newWidth; ++x)
+						for (int x = 0; x < pw; ++x)
 						{
-							int newIndex = y * newWidth + x;
+							int newIndex = (y + editedPadding) * newWidth + x + editedPadding;
 							int oldIndex = (ymin + y) * oldWidth + (xmin + x);
 							if (NGUISettings.atlasPMA) newPixels[newIndex] = NGUITools.ApplyPMA(pixels[oldIndex]);
 							else newPixels[newIndex] = pixels[oldIndex];
@@ -776,11 +788,30 @@ public class UIAtlasMaker : EditorWindow
 	{
 		if (atlas != null && tex != null)
 		{
-			List<Texture> textures = new List<Texture>();
+			var textures = new List<Texture>();
 			textures.Add(tex);
-			List<SpriteEntry> sprites = CreateSprites(textures);
+			var sprites = CreateSprites(textures);
 			ExtractSprites(atlas, sprites);
 			UpdateAtlas(atlas, sprites);
+		}
+	}
+
+	/// <summary>
+	/// Add the specified texture to the atlas, or update an existing one.
+	/// </summary>
+
+	static public void AddOrUpdate (INGUIAtlas atlas, Texture2D tex, int pixelPadding)
+	{
+		if (atlas != null && tex != null)
+		{
+			var before = NGUISettings.atlasTrimming;
+			NGUISettings.atlasTrimming = true;
+			var textures = new List<Texture>();
+			textures.Add(tex);
+			var sprites = CreateSprites(textures, tex, pixelPadding);
+			ExtractSprites(atlas, sprites);
+			UpdateAtlas(atlas, sprites);
+			NGUISettings.atlasTrimming = before;
 		}
 	}
 
@@ -792,7 +823,7 @@ public class UIAtlasMaker : EditorWindow
 	{
 		if (atlas != null && se != null)
 		{
-			List<SpriteEntry> sprites = new List<SpriteEntry>();
+			var sprites = new List<SpriteEntry>();
 			sprites.Add(se);
 			ExtractSprites(atlas, sprites);
 			UpdateAtlas(atlas, sprites);
@@ -806,7 +837,7 @@ public class UIAtlasMaker : EditorWindow
 	void UpdateAtlas (List<Texture> textures, bool keepSprites)
 	{
 		// Create a list of sprites using the collected textures
-		List<SpriteEntry> sprites = CreateSprites(textures);
+		var sprites = CreateSprites(textures);
 
 		if (sprites.Count > 0)
 		{
@@ -1045,11 +1076,6 @@ public class UIAtlasMaker : EditorWindow
 			GUILayout.EndHorizontal();
 		}
 
-		//GUILayout.BeginHorizontal();
-		//NGUISettings.keepPadding = EditorGUILayout.Toggle("Keep Padding", NGUISettings.keepPadding, GUILayout.Width(100f));
-		//GUILayout.Label("or replace with trimmed pixels", GUILayout.MinWidth(70f));
-		//GUILayout.EndHorizontal();
-
 		#if !UNITY_5_6
 		GUILayout.BeginHorizontal();
 		NGUISettings.unityPacking = EditorGUILayout.Toggle("Unity Packer", NGUISettings.unityPacking, GUILayout.Width(100f));
@@ -1150,7 +1176,10 @@ public class UIAtlasMaker : EditorWindow
 					asset.spriteMaterial = mat;
 
 					// Update the prefab
-					AssetDatabase.CreateAsset(asset, path);
+					var existing = AssetDatabase.LoadMainAssetAtPath(path);
+					if (existing != null) EditorUtility.CopySerialized(asset, existing);
+					else AssetDatabase.CreateAsset(asset, path);
+
 					AssetDatabase.SaveAssets();
 					AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 

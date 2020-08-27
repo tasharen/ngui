@@ -188,6 +188,8 @@ public class UIFontMaker : EditorWindow
 			// Choose the font style if there are multiple faces present
 			if (mType == FontType.GeneratedBitmap)
 			{
+				NGUISettings.FMPadding = EditorGUILayout.IntField("Padding", NGUISettings.FMPadding, GUILayout.Width(120f));
+
 				if (!FreeType.isPresent)
 				{
 					string filename = (Application.platform == RuntimePlatform.WindowsEditor) ? "FreeType.dll" : "FreeType.dylib";
@@ -464,7 +466,8 @@ public class UIFontMaker : EditorWindow
 				NGUISettings.FMFont,
 				NGUISettings.FMSize, mFaceIndex,
 				NGUISettings.fontKerning,
-				NGUISettings.charsToInclude, 1, out bmFont, out tex))
+				NGUISettings.charsToInclude,
+				NGUISettings.FMPadding, out bmFont, out tex))
 			{
 				asset.bmFont = bmFont;
 				tex.name = fontName;
@@ -472,7 +475,7 @@ public class UIFontMaker : EditorWindow
 				if (NGUISettings.atlas != null)
 				{
 					// Add this texture to the atlas and destroy it
-					UIAtlasMaker.AddOrUpdate(NGUISettings.atlas, tex);
+					UIAtlasMaker.AddOrUpdate(NGUISettings.atlas, tex, NGUISettings.FMPadding);
 					NGUITools.DestroyImmediate(tex);
 					NGUISettings.fontTexture = null;
 					tex = null;
@@ -524,7 +527,10 @@ public class UIFontMaker : EditorWindow
 
 		if (asset != null)
 		{
-			AssetDatabase.CreateAsset(asset, path);
+			var existing = AssetDatabase.LoadMainAssetAtPath(path);
+			if (existing != null) EditorUtility.CopySerialized(asset, existing);
+			else AssetDatabase.CreateAsset(asset, path);
+
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 

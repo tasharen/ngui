@@ -793,7 +793,7 @@ public class UICamera : MonoBehaviour
 
 	static public GameObject tooltipObject { get { return mTooltip; } set { ShowTooltip(value); } }
 
-#if !W2
+#if !SIGHTSEER
 	/// <summary>
 	/// Whether this object is a part of the UI or not.
 	/// </summary>
@@ -2736,7 +2736,7 @@ public class UICamera : MonoBehaviour
 				}
 			}
 		}
-#if W2
+#if SIGHTSEER
 		else if (currentTouch.delta.y != 0f && (GetKey(KeyCode.LeftControl) || GetKey(KeyCode.LeftCommand)))
 		{
 			var f = currentTouch.delta.y * 0.001f;

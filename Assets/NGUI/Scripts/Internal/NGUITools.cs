@@ -122,7 +122,7 @@ static public class NGUITools
 
 				if (mListener == null)
 				{
-#if W2
+#if SIGHTSEER
 					var cam = MainCamera.instance;
 #else
 					var cam = Camera.main;
@@ -244,7 +244,7 @@ static public class NGUITools
 			if (cam && (cam.cullingMask & layerMask) != 0)
 				return cam;
 		}
-#if W2
+#if SIGHTSEER
 		cam = MainCamera.instance;
 #else
 		cam = Camera.main;
@@ -2241,9 +2241,6 @@ static public class NGUITools
 #else
 				Profiler.EndSample();
 #endif
-				#if UNITY_EDITOR && W2
-				if (mGameSize.magnitude > 4000f) Debug.LogWarning(mGameSize);
-				#endif
 			}
 			return mGameSize;
 		}

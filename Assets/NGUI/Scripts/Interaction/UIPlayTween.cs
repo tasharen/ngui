@@ -285,6 +285,7 @@ public class UIPlayTween : MonoBehaviour
 	/// Activate the tweeners.
 	/// </summary>
 
+	[ContextMenu("Play")]
 	public void Play () { Play(true); }
 
 	/// <summary>

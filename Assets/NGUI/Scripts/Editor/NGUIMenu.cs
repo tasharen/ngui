@@ -171,7 +171,10 @@ static public class NGUIMenu
 			var asset = ScriptableObject.CreateInstance<NGUIFont>();
 			asset.name = fontName;
 
-			AssetDatabase.CreateAsset(asset, path);
+			var existing = AssetDatabase.LoadMainAssetAtPath(path);
+			if (existing != null) EditorUtility.CopySerialized(asset, existing);
+			else AssetDatabase.CreateAsset(asset, path);
+
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
@@ -196,7 +199,10 @@ static public class NGUIMenu
 			var asset = ScriptableObject.CreateInstance<NGUIAtlas>();
 			asset.name = fontName;
 
-			AssetDatabase.CreateAsset(asset, path);
+			var existing = AssetDatabase.LoadMainAssetAtPath(path);
+			if (existing != null) EditorUtility.CopySerialized(asset, existing);
+			else AssetDatabase.CreateAsset(asset, path);
+
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 

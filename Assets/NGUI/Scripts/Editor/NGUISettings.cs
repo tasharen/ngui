@@ -312,6 +312,12 @@ public class NGUISettings
 		set { SetInt("NGUI FM Size", value); }
 	}
 
+	static public int FMPadding
+	{
+		get { return GetInt("NGUI FM Pad", 1); }
+		set { SetInt("NGUI FM Pad", value); }
+	}
+
 	static public bool fontKerning
 	{
 		get { return GetBool("NGUI Font Kerning", true); }
@@ -388,12 +394,6 @@ public class NGUISettings
 	{
 		get { return GetBool("NGUI AutoUpgrade", false); }
 		set { SetBool("NGUI AutoUpgrade", value); }
-	}
-
-	static public bool keepPadding
-	{
-		get { return GetBool("NGUI KeepPadding", false); }
-		set { SetBool("NGUI KeepPadding", value); }
 	}
 
 	static public bool forceSquareAtlas

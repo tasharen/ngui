@@ -254,7 +254,7 @@ public class UISpriteCollection : UIBasicSprite
 			if (mSprite == null) continue;
 
 			Color c = ent.color;
-			c.a = finalAlpha;
+			c.a *= finalAlpha;
 			if (c.a == 0f) continue;
 
 			var outer = new Rect(mSprite.x, mSprite.y, mSprite.width, mSprite.height);
