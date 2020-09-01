@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2019.3.0
+            Version 2020.1.2
        https://discord.gg/tasharen/
 ----------------------------------------------
 
@@ -55,6 +55,10 @@ and it will not be included in the build of your game. It's only used in the edi
  Version History
 -----------------
 
+2020.1.2
+- NEW: Added an Alpha Shader Property field to UIPanel. If specified, NGUI will set this value in the panel's shaders to the panel's alpha instead of mixing the panel's alpha with that of the widgets. You can use this to have panel alpha-fading effect differ from that of its children -- for example by specifying a "_Dither" property used by your shaders.
+- Unity 2020 update.
+
 2019.3.0
 - NEW: Added the Single Camera (old LWRP) example.
 - NEW: Added a 'fixed aspect' option to the UISprite, matching 2D sprite and UI texture.
@@ -68,7 +72,6 @@ and it will not be included in the build of your game. It's only used in the edi
 - FIX: "style not found" when examining the UILocalize component in Unity 2018+.
 - FIX: Fixed incorrect line wrapping on labels.
 - FIX: Made NGUIText.WrapText re-use the same StringBuilder rather than making a new one every time.
-
 
 2018.3.0
 - NEW: As the name suggests, support for Unity 2018.3 and its new prefab workflow. Still supports previous versions, including Unity 5.6.

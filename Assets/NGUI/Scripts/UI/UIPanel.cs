@@ -188,6 +188,9 @@ public class UIPanel : UIRect
 	// Panel's alpha (affects the alpha of all widgets)
 	[HideInInspector][SerializeField] float mAlpha = 1f;
 
+	// If set, panel's alpha will be adjusting this value in the material shaders instead of global alpha
+	[HideInInspector][SerializeField] string mAlphaProp;
+
 	// Clipping rectangle
 	[HideInInspector][SerializeField] UIDrawCall.Clipping mClipping = UIDrawCall.Clipping.None;
 	[HideInInspector][SerializeField] Vector4 mClipRange = new Vector4(0f, 0f, 300f, 200f);
@@ -259,6 +262,30 @@ public class UIPanel : UIRect
 				mAlpha = val;
 				for (int i = 0, imax = drawCalls.Count; i < imax; ++i) drawCalls[i].isDirty = true;
 				Invalidate(!wasVisible && mAlpha > 0.001f);
+#if UNITY_EDITOR
+				NGUITools.SetDirty(this);
+#endif
+			}
+		}
+	}
+
+	/// <summary>
+	/// If set, panel's alpha will be adjusting the specified value in the shaders (for example: "_Dither") instead of global alpha.
+	/// </summary>
+
+	public string alphaProperty
+	{
+		get
+		{
+			return mAlphaProp;
+		}
+		set
+		{
+			if (mAlphaProp != value)
+			{
+				mAlphaProp = value;
+				mResized = true;
+				Invalidate(true);
 #if UNITY_EDITOR
 				NGUITools.SetDirty(this);
 #endif
@@ -801,7 +828,8 @@ public class UIPanel : UIRect
 		{
 			mAlphaFrameID = frameID;
 			UIRect pt = parent;
-			finalAlpha = (parent != null) ? pt.CalculateFinalAlpha(frameID) * mAlpha : mAlpha;
+			finalAlpha = (parent != null) ? pt.CalculateFinalAlpha(frameID) : 1f;
+			if (string.IsNullOrEmpty(alphaProperty)) finalAlpha *= mAlpha;
 		}
 		return finalAlpha;
 	}
@@ -1394,7 +1422,13 @@ public class UIPanel : UIRect
 
 		if (mSortWidgets) SortWidgets();
 
-		for (int i = 0; i < widgets.Count; ++i)
+		if (!string.IsNullOrEmpty(mAlphaProp))
+		{
+			if (mOnRender == null) mOnRender = OnSetAlphaProp;
+			else mOnRender += OnSetAlphaProp;
+		}
+
+		for (int i = 0, imax = widgets.Count; i < imax; ++i)
 		{
 			UIWidget w = widgets[i];
 
@@ -1487,6 +1521,8 @@ public class UIPanel : UIRect
 		}
 	}
 
+	void OnSetAlphaProp (Material mat) { if (mat != null) mat.SetFloat(mAlphaProp, mAlpha); }
+
 	UIDrawCall.OnRenderCallback mOnRender;
 
 	/// <summary>
@@ -1510,7 +1546,13 @@ public class UIPanel : UIRect
 			dc.isDirty = false;
 			int count = 0;
 
-			for (int i = 0; i < widgets.Count; )
+			if (!string.IsNullOrEmpty(mAlphaProp))
+			{
+				if (mOnRender == null) mOnRender = OnSetAlphaProp;
+				else mOnRender += OnSetAlphaProp;
+			}
+
+			for (int i = 0, imax = widgets.Count; i < imax; )
 			{
 				UIWidget w = widgets[i];
 
@@ -1520,6 +1562,7 @@ public class UIPanel : UIRect
 					Debug.LogError("This should never happen");
 #endif
 					widgets.RemoveAt(i);
+					--imax;
 					continue;
 				}
 

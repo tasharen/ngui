@@ -415,6 +415,14 @@ public class UIPanelInspector : UIRectEditor
 			mPanel.alpha = alpha;
 		}
 
+		var alphaProp = EditorGUILayout.TextField("Shader Prop.", mPanel.alphaProperty);
+
+		if (alphaProp != mPanel.alphaProperty)
+		{
+			NGUIEditorTools.RegisterUndo("Panel Alpha", mPanel);
+			mPanel.alphaProperty = alphaProp;
+		}
+
 		GUILayout.BeginHorizontal();
 		{
 			EditorGUILayout.PrefixLabel("Depth");
