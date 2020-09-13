@@ -1951,15 +1951,15 @@ static public class NGUIEditorTools
 	static public void UpgradeTexturesToSprites (INGUIAtlas atlas)
 	{
 		if (atlas == null) return;
-		List<UITexture> uits = FindAll<UITexture>();
+		var uits = FindAll<UITexture>();
 
 		if (uits.Count > 0)
 		{
-			UIWidget selectedTex = (UIWidgetInspector.instance != null && UIWidgetInspector.instance.target != null) ?
+			var selectedTex = (UIWidgetInspector.instance != null && UIWidgetInspector.instance.target != null) ?
 				UIWidgetInspector.instance.target as UITexture : null;
 
 			// Determine the object instance ID of the UISprite class
-			int spriteID = GetClassID<UISprite>();
+			var spriteID = GetClassID<UISprite>();
 
 			// Run through all the UI textures and change them to sprites
 			for (int i = 0; i < uits.Count; ++i)
@@ -1972,7 +1972,45 @@ static public class NGUIEditorTools
 
 					if (atlasSprite != null)
 					{
-						SerializedObject ob = ReplaceClass(uiTexture, spriteID);
+						var ob = ReplaceClass(uiTexture, spriteID);
+						ob.FindProperty("mSpriteName").stringValue = uiTexture.mainTexture.name;
+						ob.FindProperty("mAtlas").objectReferenceValue = atlas as Object;
+						ob.ApplyModifiedProperties();
+					}
+				}
+			}
+
+			if (selectedTex != null)
+			{
+				// Repaint() doesn't work in this case because Unity doesn't realize that the underlying
+				// script type has changed and that a new editor script needs to be chosen.
+				//UIWidgetInspector.instance.Repaint();
+				Selection.activeGameObject = null;
+			}
+		}
+
+		var ui2s = FindAll<UI2DSprite>();
+
+		if (ui2s.Count > 0)
+		{
+			var selectedTex = (UIWidgetInspector.instance != null && UIWidgetInspector.instance.target != null) ?
+				UIWidgetInspector.instance.target as UI2DSprite : null;
+
+			// Determine the object instance ID of the UISprite class
+			var spriteID = GetClassID<UISprite>();
+
+			// Run through all the UI textures and change them to sprites
+			for (int i = 0; i < ui2s.Count; ++i)
+			{
+				var uiTexture = ui2s[i];
+
+				if (uiTexture != null && uiTexture.mainTexture != null)
+				{
+					var atlasSprite = atlas.GetSprite(uiTexture.mainTexture.name);
+
+					if (atlasSprite != null)
+					{
+						var ob = ReplaceClass(uiTexture, spriteID);
 						ob.FindProperty("mSpriteName").stringValue = uiTexture.mainTexture.name;
 						ob.FindProperty("mAtlas").objectReferenceValue = atlas as Object;
 						ob.ApplyModifiedProperties();

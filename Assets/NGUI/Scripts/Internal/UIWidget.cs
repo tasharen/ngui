@@ -381,7 +381,7 @@ public class UIWidget : UIRect
 	/// Set or get the value that specifies where the widget's pivot point should be.
 	/// </summary>
 
-	public Pivot pivot
+	public virtual Pivot pivot
 	{
 		get
 		{
@@ -391,18 +391,19 @@ public class UIWidget : UIRect
 		{
 			if (mPivot != value)
 			{
-				Vector3 before = worldCorners[0];
+				var rot = transform.rotation;
+				var invRot = Quaternion.Inverse(rot);
+				var before = invRot * worldCorners[0];
 
 				mPivot = value;
 				mChanged = true;
 
-				Vector3 after = worldCorners[0];
-
-				Transform t = cachedTransform;
-				Vector3 pos = t.position;
-				float z = t.localPosition.z;
-				pos.x += (before.x - after.x);
-				pos.y += (before.y - after.y);
+				var after = invRot * worldCorners[0];
+				var t = cachedTransform;
+				var pos = t.position;
+				var z = t.localPosition.z;
+				var offset = new Vector3(before.x - after.x, before.y - after.y, 0f);
+				pos += rot * offset;
 				cachedTransform.position = pos;
 
 				pos = cachedTransform.localPosition;
@@ -418,7 +419,7 @@ public class UIWidget : UIRect
 	/// Depth controls the rendering order -- lowest to highest.
 	/// </summary>
 
-	public int depth
+	public virtual int depth
 	{
 		get
 		{
@@ -437,6 +438,7 @@ public class UIWidget : UIRect
 			if (mDepth != value)
 			{
 				if (panel != null) panel.RemoveWidget(this);
+
 				mDepth = value;
 
 				if (panel != null)
@@ -604,7 +606,7 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			Material mat = material;
+			var mat = material;
 			return (mat != null) ? mat.mainTexture : null;
 		}
 		set
@@ -894,7 +896,7 @@ public class UIWidget : UIRect
 	/// Mark the widget as changed so that the geometry can be rebuilt.
 	/// </summary>
 
-	public void SetDirty ()
+	public virtual void SetDirty ()
 	{
 		if (drawCall != null)
 		{
@@ -1573,4 +1575,16 @@ public class UIWidget : UIRect
 		//if (onPostFill != null)
 		//	onPostFill(this, verts.size, verts, uvs, cols);
 	}
+
+	/// <summary>
+	/// Called when NGUI adds this widget to a panel.
+	/// </summary>
+
+	virtual public void OnAddToPanel (UIPanel p) { }
+
+	/// <summary>
+	/// Called when NGUI removes this widget from a panel.
+	/// </summary>
+
+	virtual public void OnRemoveFromPanel (UIPanel p) { }
 }

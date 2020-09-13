@@ -1332,7 +1332,7 @@ public class UIInput : MonoBehaviour
 				{
 					processed = "";
 					string asterisk = "*";
-					var fnt = label.bitmapFont as INGUIFont;
+					var fnt = label.font as INGUIFont;
 					if (fnt != null && fnt.bmFont != null && fnt.bmFont.GetGlyph('*') == null) asterisk = "x";
 					for (int i = 0, imax = fullText.Length; i < imax; ++i) processed += asterisk;
 				}

@@ -53,6 +53,12 @@ public class UIPlayTween : MonoBehaviour
 
 	public bool resetIfDisabled = false;
 
+	[Tooltip("If true, Play Tween will reset all associated tweens to their starting state at the very start, before activation triggers")]
+	public bool setState = false;
+
+	[Tooltip("Starting factor to assume, 0 being the start and 1 being the end"), Range(0f, 1f)]
+	public float startState = 0f;
+
 	/// <summary>
 	/// What to do if the tweenTarget game object is currently disabled.
 	/// </summary>
@@ -109,6 +115,37 @@ public class UIPlayTween : MonoBehaviour
 #if UNITY_EDITOR
 			NGUITools.SetDirty(this);
 #endif
+		}
+
+		if (setState && Application.isPlaying)
+		{
+			var go = (tweenTarget == null) ? gameObject : tweenTarget;
+			mTweens = includeChildren ? go.GetComponentsInChildren<UITweener>() : go.GetComponents<UITweener>();
+
+			if (mTweens.Length == 0)
+			{
+				// No tweeners found -- should we disable the object?
+				if (disableWhenFinished != DisableCondition.DoNotDisable)
+					NGUITools.SetActive(tweenTarget, false);
+			}
+			else
+			{
+				var forward = true;
+				if (playDirection == Direction.Reverse) forward = !forward;
+
+				for (int i = 0, imax = mTweens.Length; i < imax; ++i)
+				{
+					var tw = mTweens[i];
+
+					if (tw.tweenGroup == tweenGroup)
+					{
+						//tw.enabled = true;
+						tw.Play(forward ? startState == 1f : startState != 1f);
+						tw.Sample(forward ? startState : 1f - startState, true);
+						tw.enabled = false;
+					}
+				}
+			}
 		}
 	}
 

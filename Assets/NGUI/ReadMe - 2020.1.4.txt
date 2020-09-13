@@ -55,8 +55,13 @@ and it will not be included in the build of your game. It's only used in the edi
  Version History
 -----------------
 
-2020.1.2
+2020.1.4
+- NEW: Dynamic fonts now have full symbol (emoticons) support.
+- NEW: Added the ability to scale and offset symbols used by the fonts.
+- NEW: Added the ability to specify maximum symbol (emoticon) height on fonts. If exceeded while printing text, the symbols will be shrunk.
+- NEW: Added the ability to overwrite the space bar width in fonts.
 - NEW: Added an Alpha Shader Property field to UIPanel. If specified, NGUI will set this value in the panel's shaders to the panel's alpha instead of mixing the panel's alpha with that of the widgets. You can use this to have panel alpha-fading effect differ from that of its children -- for example by specifying a "_Dither" property used by your shaders.
+- FIX: Fixed pivot point changes moving widgets around if the camera wasn't looking down +Z.
 - Unity 2020 update.
 
 2019.3.0

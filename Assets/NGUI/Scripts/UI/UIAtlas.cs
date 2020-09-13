@@ -462,9 +462,9 @@ public class UIAtlas : MonoBehaviour, INGUIAtlas
 			if (NGUITools.CheckIfRelated(this, lbl.atlas))
 			{
 				var atl = lbl.atlas;
-				var font = lbl.bitmapFont;
-				lbl.bitmapFont = null;
-				lbl.bitmapFont = font;
+				var font = lbl.font;
+				lbl.font = null;
+				lbl.font = font;
 #if UNITY_EDITOR
 				NGUITools.SetDirty(lbl);
 #endif

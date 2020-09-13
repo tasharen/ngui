@@ -38,6 +38,21 @@ public class UIFont : MonoBehaviour, INGUIFont
 	[System.NonSerialized] int mPacked = -1;
 
 	/// <summary>
+	/// Explicitly specified font type. Legacy behaviour would always determine this automatically in the past.
+	/// </summary>
+
+	public NGUIFontType type
+	{
+		get
+		{
+			if (replacement != null) return NGUIFontType.Reference;
+			if (dynamicFont != null) return NGUIFontType.Dynamic;
+			return NGUIFontType.Bitmap;
+		}
+		set { }
+	}
+
+	/// <summary>
 	/// Access to the BMFont class directly.
 	/// </summary>
 
@@ -380,6 +395,25 @@ public class UIFont : MonoBehaviour, INGUIFont
 	}
 
 	/// <summary>
+	/// This feature was added after deprecating this class, so it's not actually used here.
+	/// </summary>
+
+	public int spaceWidth
+	{
+		get
+		{
+			var rep = replacement;
+			if (rep != null) return rep.spaceWidth;
+			return 0;
+		}
+		set
+		{
+			var rep = replacement;
+			if (rep != null) rep.spaceWidth = value;
+		}
+	}
+
+	/// <summary>
 	/// Retrieves the sprite used by the font, if any.
 	/// </summary>
 
@@ -583,11 +617,11 @@ public class UIFont : MonoBehaviour, INGUIFont
 		{
 			var lbl = labels[i];
 
-			if (lbl.enabled && NGUITools.GetActive(lbl.gameObject) && NGUITools.CheckIfRelated(this, lbl.bitmapFont as INGUIFont))
+			if (lbl.enabled && NGUITools.GetActive(lbl.gameObject) && NGUITools.CheckIfRelated(this, lbl.font as INGUIFont))
 			{
-				var fnt = lbl.bitmapFont;
-				lbl.bitmapFont = null;
-				lbl.bitmapFont = fnt;
+				var fnt = lbl.font;
+				lbl.font = null;
+				lbl.font = fnt;
 			}
 		}
 

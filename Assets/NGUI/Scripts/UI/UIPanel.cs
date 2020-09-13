@@ -1862,7 +1862,10 @@ public class UIPanel : UIRect
 				break;
 			}
 		}
+
 		FindDrawCall(w);
+
+		w.OnAddToPanel(this);
 	}
 
 	/// <summary>
@@ -1879,6 +1882,7 @@ public class UIPanel : UIRect
 
 			w.drawCall.isDirty = true;
 			w.drawCall = null;
+			w.OnRemoveFromPanel(this);
 		}
 	}
 

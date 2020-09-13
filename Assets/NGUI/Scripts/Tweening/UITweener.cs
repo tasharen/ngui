@@ -71,6 +71,16 @@ public abstract class UITweener : MonoBehaviour
 	[HideInInspector]
 	public float delay = 0f;
 
+	public enum DelayAffects
+	{
+		Forward,
+		Reverse,
+		Both,
+	}
+
+	[HideInInspector]
+	public DelayAffects delayAffects = DelayAffects.Both;
+
 	/// <summary>
 	/// How long is the duration of the tween?
 	/// </summary>
@@ -183,7 +193,9 @@ public abstract class UITweener : MonoBehaviour
 		{
 			delta = 0;
 			mStarted = true;
-			mStartTime = time + delay;
+			mStartTime = time;
+			if (mAmountPerDelta > 0f && (delayAffects == DelayAffects.Both || delayAffects == DelayAffects.Forward)) mStartTime += delay;
+			else if (mAmountPerDelta < 0f && (delayAffects == DelayAffects.Both || delayAffects == DelayAffects.Reverse)) mStartTime += delay;
 		}
 
 		if (time < mStartTime) return;
@@ -294,7 +306,7 @@ public abstract class UITweener : MonoBehaviour
 	/// Mark as not started when finished to enable delay on next play.
 	/// </summary>
 
-	void OnDisable () { mStarted = false; }
+	protected virtual void OnDisable () { mStarted = false; }
 
 	/// <summary>
 	/// Immediately finish the tween animation, if it's active.

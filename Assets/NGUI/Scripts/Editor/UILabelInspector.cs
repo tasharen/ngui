@@ -26,6 +26,8 @@ public class UILabelInspector : UIWidgetInspector
 
 	UILabel mLabel;
 	FontType mFontType;
+	bool mIsDynamic = false;
+	bool mHasSymbols = false;
 
 	protected override void OnEnable ()
 	{
@@ -65,12 +67,60 @@ public class UILabelInspector : UIWidgetInspector
 		NGUISettings.ambigiousFont = obj;
 	}
 
+	protected override void DrawWidgetSection (SerializedObject so, UIWidget w, bool isPrefab)
+	{
+		DrawPivot(so, w);
+
+		if (mIsDynamic && mHasSymbols)
+		{
+			DrawDepth(so, w, isPrefab, false);
+			DrawSymbolDepth(so, w as UILabel);
+		}
+		else DrawDepth(so, w, isPrefab);
+
+		DrawDimensions(so, w, isPrefab);
+	}
+
+	protected void DrawSymbolDepth (SerializedObject so, UILabel w)
+	{
+		if (w == null) return;
+
+		GUILayout.Space(2f);
+		GUILayout.BeginHorizontal();
+		{
+			EditorGUILayout.PrefixLabel("SymbolDepth");
+
+			if (GUILayout.Button("Back", GUILayout.MinWidth(46f)))
+			{
+				foreach (var go in Selection.gameObjects)
+				{
+					var pw = go.GetComponent<UILabel>();
+					if (pw != null) pw.symbolDepth = w.symbolDepth - 1;
+				}
+			}
+
+			NGUIEditorTools.DrawProperty("", so, "mSymbolDepth", GUILayout.MinWidth(20f));
+
+			if (GUILayout.Button("Forward", GUILayout.MinWidth(60f)))
+			{
+				foreach (var go in Selection.gameObjects)
+				{
+					var pw = go.GetComponent<UILabel>();
+					if (pw != null) pw.symbolDepth = w.symbolDepth + 1;
+				}
+			}
+		}
+		GUILayout.EndHorizontal();
+	}
+
 	/// <summary>
 	/// Draw the label's properties.
 	/// </summary>
 
 	protected override bool ShouldDrawProperties ()
 	{
+		mIsDynamic = false;
+		mHasSymbols = false;
 		mLabel = mWidget as UILabel;
 
 		GUILayout.BeginHorizontal();
@@ -85,7 +135,7 @@ public class UILabelInspector : UIWidgetInspector
 		{
 			if (mFontType == FontType.NGUI)
 			{
-				var bmf = mLabel.bitmapFont;
+				var bmf = mLabel.font;
 				if (bmf != null && bmf is UIFont) ComponentSelector.Show<UIFont>(OnNGUIFont);
 				else ComponentSelector.Show<NGUIFont>(OnNGUIFont);
 			}
@@ -126,11 +176,13 @@ public class UILabelInspector : UIWidgetInspector
 
 		GUILayout.EndHorizontal();
 
+#if UNITY_5_6
 		if (mFontType == FontType.Unity)
 		{
 			EditorGUILayout.HelpBox("Dynamic fonts suffer from issues in Unity itself where your characters may disappear, get garbled, or just not show at times. Use this feature at your own risk.\n\n" +
 				"When you do run into such issues, please submit a Bug Report to Unity via Help -> Report a Bug (as this is will be a Unity bug, not an NGUI one).", MessageType.Warning);
 		}
+#endif
 
 		NGUIEditorTools.DrawProperty("Material", serializedObject, "mMat");
 
@@ -143,11 +195,14 @@ public class UILabelInspector : UIWidgetInspector
 			if (bm != null && bm.isDynamic)
 			{
 				dynFont = bm.dynamicFont;
+				mHasSymbols = bm.hasSymbols;
 				bm = null;
 			}
 
 			if (dynFont != null)
 			{
+				mIsDynamic = true;
+
 				GUILayout.BeginHorizontal();
 				{
 					EditorGUI.BeginDisabledGroup((ttf != null) ? ttf.hasMultipleDifferentValues : fnt.hasMultipleDifferentValues);
@@ -345,9 +400,7 @@ public class UILabelInspector : UIWidgetInspector
 			GUILayout.BeginHorizontal();
 			sp = NGUIEditorTools.DrawProperty("BBCode", serializedObject, "mEncoding", GUILayout.Width(100f));
 
-			if (bm != null) EditorGUI.BeginDisabledGroup(!sp.boolValue || !bm.hasSymbols);
-			else EditorGUI.BeginDisabledGroup(true);
-
+			EditorGUI.BeginDisabledGroup(!mHasSymbols || !sp.boolValue);
 			NGUIEditorTools.SetLabelWidth(60f);
 			NGUIEditorTools.DrawPaddedProperty("Symbols", serializedObject, "mSymbols");
 			NGUIEditorTools.SetLabelWidth(80f);

@@ -31,8 +31,11 @@ public class UIPlayTweenEditor : Editor
 		GUI.changed = false;
 		GameObject tt = (GameObject)EditorGUILayout.ObjectField("Tween Target", tw.tweenTarget, typeof(GameObject), true);
 
-		bool inc = EditorGUILayout.Toggle("Include Children", tw.includeChildren);
-		int group = EditorGUILayout.IntField("Tween Group", tw.tweenGroup, GUILayout.Width(160f));
+		var ss = tw.startState;
+		var inc = EditorGUILayout.Toggle("Include Children", tw.includeChildren);
+		var setState = EditorGUILayout.Toggle("Start State", tw.setState);
+		if (setState) ss = EditorGUILayout.FloatField("   value", ss);
+		var group = EditorGUILayout.IntField("Tween Group", tw.tweenGroup, GUILayout.Width(160f));
 
 		AnimationOrTween.Trigger trigger = (AnimationOrTween.Trigger)EditorGUILayout.EnumPopup("Trigger condition", tw.trigger);
 		AnimationOrTween.Direction dir = (AnimationOrTween.Direction)EditorGUILayout.EnumPopup("Play direction", tw.playDirection);
@@ -46,6 +49,8 @@ public class UIPlayTweenEditor : Editor
 			NGUIEditorTools.RegisterUndo("Tween Change", tw);
 			tw.tweenTarget = tt;
 			tw.tweenGroup = group;
+			tw.setState = setState;
+			tw.startState = ss;
 			tw.includeChildren = inc;
 			tw.trigger = trigger;
 			tw.playDirection = dir;

@@ -56,14 +56,14 @@ public class NGUIAtlasInspector : Editor
 
 		foreach (UILabel lbl in labels)
 		{
-			if (lbl.bitmapFont == null) continue;
+			if (lbl.font == null) continue;
 
-			var font = lbl.bitmapFont;
+			var font = lbl.font;
 
 			if (NGUITools.CheckIfRelated(font.atlas, mAtlas) && font.UsesSprite(sprite.name))
 			{
-				lbl.bitmapFont = null;
-				lbl.bitmapFont = font;
+				lbl.font = null;
+				lbl.font = font;
 				NGUITools.SetDirty(lbl);
 			}
 		}

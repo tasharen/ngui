@@ -31,6 +31,7 @@ public class BMSymbol
 	public int offsetY	{ get { return mOffsetY; } }
 	public int width	{ get { return mWidth; } }
 	public int height	{ get { return mHeight; } }
+	public int paddedHeight { get { return mSprite != null ? mSprite.paddingTop + mSprite.paddingBottom + mSprite.height : mHeight; } }
 	public int advance	{ get { return mAdvance; } }
 	public Rect uvRect	{ get { return mUV; } }
 

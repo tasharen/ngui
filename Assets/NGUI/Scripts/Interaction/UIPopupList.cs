@@ -977,7 +977,7 @@ public class UIPopupList : UIWidgetContainer
 			StopCoroutine("CloseIfUnselected");
 
 			// Ensure the popup's source has the selection
-			UICamera.selectedObject = (UICamera.hoveredObject ?? gameObject);
+			UICamera.selectedObject = (UICamera.hoveredObject != null ? UICamera.hoveredObject : gameObject);
 			mSelection = UICamera.selectedObject;
 			source = mSelection;
 
@@ -1132,7 +1132,7 @@ public class UIPopupList : UIWidgetContainer
 				UILabel lbl = NGUITools.AddWidget<UILabel>(mChild, mBackground.depth + 2);
 				lbl.name = i.ToString();
 				lbl.pivot = UIWidget.Pivot.TopLeft;
-				lbl.bitmapFont = bitmapFont as INGUIFont;
+				lbl.font = bitmapFont as INGUIFont;
 				lbl.trueTypeFont = trueTypeFont;
 				lbl.fontSize = fontSize;
 				lbl.fontStyle = fontStyle;

@@ -735,6 +735,7 @@ public class UIDrawCall : MonoBehaviour
 		else if (!mLegacyShader)
 		{
 			UIPanel currentPanel = panel;
+			var rootScale = panel.cachedTransform.localScale;
 
 			for (int i = 0; currentPanel != null; )
 			{
@@ -747,8 +748,21 @@ public class UIDrawCall : MonoBehaviour
 					if (currentPanel != panel)
 					{
 						Vector3 pos = currentPanel.cachedTransform.InverseTransformPoint(panel.cachedTransform.position);
+						
 						cr.x -= pos.x;
 						cr.y -= pos.y;
+
+						if (rootScale.x != 0f && rootScale.x != 1f)
+						{
+							cr.x /= rootScale.x;
+							cr.z /= rootScale.x;
+						}
+
+						if (rootScale.y != 0f && rootScale.y != 1f)
+						{
+							cr.y /= rootScale.y;
+							cr.w /= rootScale.y;
+						}
 
 						Vector3 v0 = panel.cachedTransform.rotation.eulerAngles;
 						Vector3 v1 = currentPanel.cachedTransform.rotation.eulerAngles;
@@ -767,6 +781,7 @@ public class UIDrawCall : MonoBehaviour
 					// Pass the clipping parameters to the shader
 					SetClipping(i++, cr, currentPanel.clipSoftness, angle);
 				}
+
 				currentPanel = currentPanel.parentPanel;
 			}
 		}

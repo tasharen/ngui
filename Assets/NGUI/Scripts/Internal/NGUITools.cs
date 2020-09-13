@@ -2897,7 +2897,7 @@ static public class NGUITools
 		{
 			var lbl = labels[i];
 
-			if (lbl.bitmapFont != null && lbl.atlas == before)
+			if (lbl.font != null && lbl.atlas == before)
 			{
 				lbl.atlas = after;
 #if UNITY_EDITOR

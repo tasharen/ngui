@@ -3,10 +3,6 @@
 // Copyright © 2011-2020 Tasharen Entertainment Inc
 //-------------------------------------------------
 
-#if !UNITY_3_5
-#define DYNAMIC_FONT
-#endif
-
 using UnityEngine;
 using System.Text;
 using System.Diagnostics;
@@ -53,15 +49,12 @@ static public class NGUIText
 	/// this data is not passed at all, but is rather set in a single place before calling the functions that use it.
 	/// </summary>
 
-	static public INGUIFont bitmapFont;
+	static public INGUIFont nguiFont;
 
-	static public bool isDynamic { get { return bitmapFont == null; } }
-
-#if DYNAMIC_FONT
 	static public Font dynamicFont;
-#endif
 	static public GlyphInfo glyph = new GlyphInfo();
 
+	static public int spaceWidth = 0;
 	static public int fontSize = 16;
 	static public float fontScale = 1f;
 	static public float pixelDensity = 1f;
@@ -106,10 +99,9 @@ static public class NGUIText
 		finalSize = Mathf.RoundToInt(fontSize / pixelDensity);
 		finalSpacingX = spacingX * fontScale;
 		finalLineHeight = (fontSize + spacingY) * fontScale;
-		useSymbols = (dynamicFont != null || bitmapFont != null) && encoding && symbolStyle != SymbolStyle.None;
+		useSymbols = (nguiFont != null) && encoding && (symbolStyle != SymbolStyle.None);
 
-#if DYNAMIC_FONT
-		Font font = dynamicFont;
+		var font = dynamicFont;
 
 		if (font != null && request)
 		{
@@ -148,7 +140,6 @@ static public class NGUIText
 #endif
 			baseline = Mathf.Round(y0 + (finalSize - y0 + y1) * 0.5f);
 		}
-#endif
 	}
 
 	/// <summary>
@@ -158,10 +149,8 @@ static public class NGUIText
 	static public void Prepare (string text)
 	{
 		mColors.Clear();
-#if DYNAMIC_FONT
 		if (dynamicFont != null)
 			dynamicFont.RequestCharactersInTexture(text, finalSize, fontStyle);
-#endif
 	}
 
 	/// <summary>
@@ -170,7 +159,7 @@ static public class NGUIText
 
 	static public BMSymbol GetSymbol (string text, int index, int textLength)
 	{
-		if (bitmapFont != null) return bitmapFont.MatchSymbol(text, index, textLength);
+		if (nguiFont != null) return nguiFont.MatchSymbol(text, index, textLength);
 		return null;
 	}
 
@@ -180,7 +169,16 @@ static public class NGUIText
 
 	static public float GetGlyphWidth (int ch, int prev, float fontScale)
 	{
-		if (bitmapFont != null)
+		if (dynamicFont != null)
+		{
+			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fontStyle))
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
+			return mTempChar.width * fontScale * pixelDensity;
+#else
+			return mTempChar.advance * fontScale * pixelDensity;
+#endif
+		}
+		else if (nguiFont != null)
 		{
 			bool thinSpace = false;
 
@@ -191,7 +189,7 @@ static public class NGUIText
 			}
 
 			BMGlyph bmg = null;
-			if (bitmapFont != null) bmg = bitmapFont.bmFont.GetGlyph(ch);
+			if (nguiFont != null) bmg = nguiFont.bmFont.GetGlyph(ch);
 
 			if (bmg != null)
 			{
@@ -200,17 +198,6 @@ static public class NGUIText
 				return fontScale * ((prev != 0) ? adv + bmg.GetKerning(prev) : bmg.advance);
 			}
 		}
-#if DYNAMIC_FONT
-		else if (dynamicFont != null)
-		{
-			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fontStyle))
- #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-				return mTempChar.width * fontScale * pixelDensity;
- #else
-				return mTempChar.advance * fontScale * pixelDensity;
- #endif
-		}
-#endif
 		return 0f;
 	}
 
@@ -220,60 +207,11 @@ static public class NGUIText
 
 	static public GlyphInfo GetGlyph (int ch, int prev, float fontScale = 1f)
 	{
-		if (bitmapFont != null)
-		{
-			bool thinSpace = false;
-
-			if (ch == '\u2009')
-			{
-				thinSpace = true;
-				ch = ' ';
-			}
-
-			BMGlyph bmg = null;
-			if (bitmapFont != null) bmg = bitmapFont.bmFont.GetGlyph(ch);
-
-			if (bmg != null)
-			{
-				int kern = (prev != 0) ? bmg.GetKerning(prev) : 0;
-				glyph.v0.x = (prev != 0) ? bmg.offsetX + kern : bmg.offsetX;
-				glyph.v1.y = -bmg.offsetY;
-
-				glyph.v1.x = glyph.v0.x + bmg.width;
-				glyph.v0.y = glyph.v1.y - bmg.height;
-
-				glyph.u0.x = bmg.x;
-				glyph.u0.y = bmg.y + bmg.height;
-
-				glyph.u2.x = bmg.x + bmg.width;
-				glyph.u2.y = bmg.y;
-
-				glyph.u1.x = glyph.u0.x;
-				glyph.u1.y = glyph.u2.y;
-
-				glyph.u3.x = glyph.u2.x;
-				glyph.u3.y = glyph.u0.y;
-
-				int adv = bmg.advance;
-				if (thinSpace) adv >>= 1;
-				glyph.advance = adv + kern;
-				glyph.channel = bmg.channel;
-
-				if (fontScale != 1f)
-				{
-					glyph.v0 *= fontScale;
-					glyph.v1 *= fontScale;
-					glyph.advance *= fontScale;
-				}
-				return glyph;
-			}
-		}
-#if DYNAMIC_FONT
-		else if (dynamicFont != null)
+		if (dynamicFont != null)
 		{
 			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fontStyle))
 			{
- #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
+#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 				glyph.v0.x = mTempChar.vert.xMin;
 				glyph.v1.x = glyph.v0.x + mTempChar.vert.width;
 
@@ -313,11 +251,13 @@ static public class NGUIText
 
 				glyph.advance = mTempChar.advance;
 				glyph.channel = 0;
- #endif
+#endif
 				glyph.v0.x = Mathf.Round(glyph.v0.x);
 				glyph.v0.y = Mathf.Round(glyph.v0.y);
 				glyph.v1.x = Mathf.Round(glyph.v1.x);
 				glyph.v1.y = Mathf.Round(glyph.v1.y);
+
+				if (ch == ' ' && spaceWidth != 0) glyph.advance = spaceWidth;
 
 				float pd = fontScale * pixelDensity;
 
@@ -330,16 +270,62 @@ static public class NGUIText
 				return glyph;
 			}
 		}
-#endif
+		else if (nguiFont != null)
+		{
+			bool thinSpace = false;
+
+			if (ch == '\u2009')
+			{
+				thinSpace = true;
+				ch = ' ';
+			}
+
+			var bmg = nguiFont.bmFont.GetGlyph(ch);
+
+			if (bmg != null)
+			{
+				int kern = (prev != 0) ? bmg.GetKerning(prev) : 0;
+				glyph.v0.x = (prev != 0) ? bmg.offsetX + kern : bmg.offsetX;
+				glyph.v1.y = -bmg.offsetY;
+
+				glyph.v1.x = glyph.v0.x + bmg.width;
+				glyph.v0.y = glyph.v1.y - bmg.height;
+
+				glyph.u0.x = bmg.x;
+				glyph.u0.y = bmg.y + bmg.height;
+
+				glyph.u2.x = bmg.x + bmg.width;
+				glyph.u2.y = bmg.y;
+
+				glyph.u1.x = glyph.u0.x;
+				glyph.u1.y = glyph.u2.y;
+
+				glyph.u3.x = glyph.u2.x;
+				glyph.u3.y = glyph.u0.y;
+
+				int adv = bmg.advance;
+				if (ch == ' ' && spaceWidth != 0) adv = spaceWidth;
+
+				if (thinSpace) adv >>= 1;
+				glyph.advance = adv + kern;
+				glyph.channel = bmg.channel;
+
+				if (fontScale != 1f)
+				{
+					glyph.v0 *= fontScale;
+					glyph.v1 *= fontScale;
+					glyph.advance *= fontScale;
+				}
+				return glyph;
+			}
+		}
 		return null;
 	}
 
 	static Color mInvisible = new Color(0f, 0f, 0f, 0f);
 	static BetterList<Color> mColors = new BetterList<Color>();
 	static float mAlpha = 1f;
-#if DYNAMIC_FONT
 	static CharacterInfo mTempChar;
-#endif
 
 	/// <summary>
 	/// Parse Aa syntax alpha encoded in the string.
@@ -921,6 +907,36 @@ static public class NGUIText
 		if (i > 0 && IsSpace(s[i])) s[i] = '\n';
 	}
 
+	static float symbolScale
+	{
+		get
+		{
+			var font = nguiFont as NGUIFont;
+			if (font == null) return 1f;
+			return font.symbolScale * finalSize / font.defaultSize;
+		}
+	}
+
+	static float symbolOffset
+	{
+		get
+		{
+			var font = nguiFont as NGUIFont;
+			if (font == null) return 1f;
+			return font.symbolOffset;
+		}
+	}
+
+	static int symbolMaxHeight
+	{
+		get
+		{
+			var font = nguiFont as NGUIFont;
+			if (font == null) return 0;
+			return font.symbolMaxHeight;
+		}
+	}
+
 	/// <summary>
 	/// Get the printed size of the specified string. The returned value is in pixels.
 	/// </summary>
@@ -942,6 +958,8 @@ static public class NGUIText
 			bool underline = false;
 			bool strikethrough = false;
 			bool ignoreColor = false;
+			var symbolScale = NGUIText.symbolScale;
+			var symbolMaxHeight = NGUIText.symbolMaxHeight;
 
 			for (int i = 0; i < textLength; ++i)
 			{
@@ -978,7 +996,9 @@ static public class NGUIText
 
 				if (symbol != null)
 				{
-					var w = symbol.advance * scale;
+					var h = symbol.paddedHeight;
+					if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
+					var w = symbol.advance * scale * symbolScale;
 					var mx = x + w;
 
 					// Doesn't fit? Move down to the next line
@@ -1081,6 +1101,8 @@ static public class NGUIText
 		bool underline = false;
 		bool strikethrough = false;
 		bool ignoreColor = false;
+		var symbolScale = NGUIText.symbolScale;
+		var symbolMaxHeight = NGUIText.symbolMaxHeight;
 
 		for (int i = 0, imax = text.Length; i < imax; ++i)
 		{
@@ -1105,7 +1127,9 @@ static public class NGUIText
 			}
 			else
 			{
-				mSizes.Add(finalSpacingX + symbol.advance * scale);
+				var h = symbol.paddedHeight;
+				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
+				mSizes.Add(finalSpacingX + symbol.advance * scale * symbolScale);
 				for (int b = 0, bmax = symbol.sequence.Length - 1; b < bmax; ++b) mSizes.Add(0);
 				i += symbol.sequence.Length - 1;
 				prev = 0;
@@ -1193,6 +1217,8 @@ static public class NGUIText
 		bool strikethrough = false;
 		bool ignoreColor = false;
 		float ellipsisWidth = useEllipsis ? (finalSpacingX + GetGlyphWidth('.', '.', fontScale)) * 3f : finalSpacingX;
+		var symbolScale = NGUIText.symbolScale;
+		var symbolMaxHeight = NGUIText.symbolMaxHeight;
 		int lastValidChar = 0;
 
 		mColors.Add(c);
@@ -1295,7 +1321,7 @@ static public class NGUIText
 			}
 
 			// See if there is a symbol matching this text
-			BMSymbol symbol = useSymbols ? GetSymbol(text, offset, textLength) : null;
+			var symbol = useSymbols ? GetSymbol(text, offset, textLength) : null;
 
 			// Calculate how wide this symbol or character is going to be
 			float glyphWidth;
@@ -1308,7 +1334,12 @@ static public class NGUIText
 				if (w == 0f && !space) continue;
 				glyphWidth = finalSpacingX + w;
 			}
-			else glyphWidth = finalSpacingX + symbol.advance * scale;
+			else
+			{
+				var h = symbol.paddedHeight;
+				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
+				glyphWidth = finalSpacingX + symbol.advance * scale * symbolScale;
+			}
 
 			// Force pixel alignment
 			if (subscriptMode != 0) glyphWidth = Mathf.Round(glyphWidth);
@@ -1465,11 +1496,12 @@ static public class NGUIText
 	/// Print the specified text into the buffers.
 	/// </summary>
 
-	static public void Print (string text, List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
+	static public void Print (string text, List<Vector3> verts, List<Vector2> uvs, List<Color> cols, List<Vector3> sverts = null, List<Vector2> suvs = null, List<Color> scols = null)
 	{
 		if (string.IsNullOrEmpty(text)) return;
 
 		int indexOffset = verts.Count;
+		var sIndexOffset = (sverts != null) ? sverts.Count : 0;
 		Prepare(text);
 
 		// Start with the white tint
@@ -1478,7 +1510,6 @@ static public class NGUIText
 
 		int ch = 0, prev = 0;
 		float x = 0f, y = 0f, maxX = 0f;
-		float sizeF = finalSize;
 
 		Color gb = (tint * gradientBottom);
 		Color gt = (tint * gradientTop);
@@ -1487,7 +1518,7 @@ static public class NGUIText
 
 		Rect uvRect = new Rect();
 		float invX = 0f, invY = 0f;
-		float sizePD = sizeF * pixelDensity;
+		float sizePD = finalSize * pixelDensity;
 		float v0x, v1x, v1y, v0y, prevX = 0f, maxWidth = regionWidth + 0.01f;
 
 		// Advanced symbol support contributed by Rudy Pangestu.
@@ -1497,12 +1528,16 @@ static public class NGUIText
 		bool underline = false;
 		bool strikethrough = false;
 		bool ignoreColor = false;
+		var clear = new Color(0f, 0f, 0f, 0f);
+		var symbolScale = NGUIText.symbolScale;
+		var symbolOffset = NGUIText.symbolOffset;
+		var symbolMaxHeight = NGUIText.symbolMaxHeight;
 
-		if (bitmapFont != null)
+		if (dynamicFont == null && nguiFont != null)
 		{
-			uvRect = bitmapFont.uvRect;
-			invX = uvRect.width / bitmapFont.texWidth;
-			invY = uvRect.height / bitmapFont.texHeight;
+			uvRect = nguiFont.uvRect;
+			invX = uvRect.width / nguiFont.texWidth;
+			invY = uvRect.height / nguiFont.texHeight;
 		}
 
 		for (int i = 0; i < textLength; ++i)
@@ -1520,6 +1555,12 @@ static public class NGUIText
 				{
 					Align(verts, indexOffset, x - finalSpacingX);
 					indexOffset = verts.Count;
+
+					if (sverts != null)
+					{
+						Align(sverts, sIndexOffset, x - finalSpacingX);
+						sIndexOffset = sverts.Count;
+					}
 				}
 
 				x = 0;
@@ -1568,11 +1609,14 @@ static public class NGUIText
 
 			if (symbol != null)
 			{
-				v0x = x + symbol.offsetX * fontScale;
-				v1x = v0x + symbol.width * fontScale;
-				v1y = -(y + symbol.offsetY * fontScale);
-				v0y = v1y - symbol.height * fontScale;
-				var w = symbol.advance * scale;
+				var h = symbol.paddedHeight;
+				var mult = (symbolMaxHeight != 0 && h > symbolMaxHeight) ? (float)symbolMaxHeight / h : 1f;
+				var fs = fontScale * symbolScale * mult;
+				v0x = x + symbol.offsetX * fs;
+				v1x = v0x + symbol.width * fs;
+				v1y = -(y + symbol.offsetY * fs) + symbolOffset * mult;
+				v0y = v1y - symbol.height * fs;
+				var w = symbol.advance * scale * symbolScale * mult;
 
 				// Doesn't fit? Move down to the next line
 				if (x + w > maxWidth)
@@ -1583,6 +1627,12 @@ static public class NGUIText
 					{
 						Align(verts, indexOffset, x - finalSpacingX);
 						indexOffset = verts.Count;
+
+						if (sverts != null)
+						{
+							Align(sverts, sIndexOffset, x - finalSpacingX);
+							sIndexOffset = sverts.Count;
+						}
 					}
 
 					v0x -= x;
@@ -1600,6 +1650,14 @@ static public class NGUIText
 				verts.Add(new Vector3(v1x, v1y));
 				verts.Add(new Vector3(v1x, v0y));
 
+				if (sverts != null)
+				{
+					sverts.Add(new Vector3(v0x, v0y));
+					sverts.Add(new Vector3(v0x, v1y));
+					sverts.Add(new Vector3(v1x, v1y));
+					sverts.Add(new Vector3(v1x, v0y));
+				}
+
 				x += w + finalSpacingX;
 				i += symbol.length - 1;
 				prev = 0;
@@ -1613,21 +1671,44 @@ static public class NGUIText
 					float u1x = uv.xMax;
 					float u1y = uv.yMax;
 
-					uvs.Add(new Vector2(u0x, u0y));
-					uvs.Add(new Vector2(u0x, u1y));
-					uvs.Add(new Vector2(u1x, u1y));
-					uvs.Add(new Vector2(u1x, u0y));
+					if (suvs != null)
+					{
+						uvs.Add(new Vector2(1f, 1f));
+						uvs.Add(new Vector2(1f, 1f));
+						uvs.Add(new Vector2(1f, 1f));
+						uvs.Add(new Vector2(1f, 1f));
+
+						suvs.Add(new Vector2(u0x, u0y));
+						suvs.Add(new Vector2(u0x, u1y));
+						suvs.Add(new Vector2(u1x, u1y));
+						suvs.Add(new Vector2(u1x, u0y));
+					}
+					else
+					{
+						uvs.Add(new Vector2(u0x, u0y));
+						uvs.Add(new Vector2(u0x, u1y));
+						uvs.Add(new Vector2(u1x, u1y));
+						uvs.Add(new Vector2(u1x, u0y));
+					}
 				}
 
 				if (cols != null)
 				{
 					if (symbolStyle == SymbolStyle.Colored)
 					{
-						for (int b = 0; b < 4; ++b) cols.Add(gc);
+						if (scols != null)
+						{
+							for (int b = 0; b < 4; ++b)
+							{
+								cols.Add(clear);
+								scols.Add(gc);
+							}
+						}
+						else for (int b = 0; b < 4; ++b) cols.Add(gc);
 					}
 					else
 					{
-						Color col = Color.white;
+						var col = Color.white;
 
 						if (symbolStyle == SymbolStyle.NoOutline)
 						{
@@ -1636,7 +1717,15 @@ static public class NGUIText
 						}
 						else col.a = gc.a;
 
-						for (int b = 0; b < 4; ++b) cols.Add(col);
+						if (scols != null)
+						{
+							for (int b = 0; b < 4; ++b)
+							{
+								cols.Add(clear);
+								scols.Add(col);
+							}
+						}
+						else for (int b = 0; b < 4; ++b) cols.Add(col);
 					}
 				}
 			}
@@ -1679,6 +1768,12 @@ static public class NGUIText
 					{
 						Align(verts, indexOffset, x - finalSpacingX);
 						indexOffset = verts.Count;
+
+						if (sverts != null)
+						{
+							Align(sverts, sIndexOffset, x - finalSpacingX);
+							sIndexOffset = sverts.Count;
+						}
 					}
 
 					v0x -= x;
@@ -1715,7 +1810,7 @@ static public class NGUIText
 				// Texture coordinates
 				if (uvs != null)
 				{
-					if (bitmapFont != null)
+					if (dynamicFont == null && nguiFont != null)
 					{
 						glyph.u0.x = uvRect.xMin + invX * glyph.u0.x;
 						glyph.u2.x = uvRect.xMin + invX * glyph.u2.x;
@@ -1837,7 +1932,7 @@ static public class NGUIText
 
 					if (uvs != null)
 					{
-						if (bitmapFont != null)
+						if (dynamicFont == null && nguiFont != null)
 						{
 							dash.u0.x = uvRect.xMin + invX * dash.u0.x;
 							dash.u2.x = uvRect.xMin + invX * dash.u2.x;
@@ -1912,6 +2007,12 @@ static public class NGUIText
 		{
 			Align(verts, indexOffset, x - finalSpacingX);
 			indexOffset = verts.Count;
+
+			if (sverts != null)
+			{
+				Align(sverts, sIndexOffset, x - finalSpacingX);
+				sIndexOffset = sverts.Count;
+			}
 		}
 		mColors.Clear();
 	}
@@ -1941,6 +2042,8 @@ static public class NGUIText
 		bool underline = false;
 		bool strikethrough = false;
 		bool ignoreColor = false;
+		var symbolScale = NGUIText.symbolScale;
+		var symbolMaxHeight = NGUIText.symbolMaxHeight;
 
 		for (int i = 0; i < textLength; ++i)
 		{
@@ -2011,7 +2114,9 @@ static public class NGUIText
 			}
 			else
 			{
-				float w = symbol.advance * scale + finalSpacingX;
+				var h = symbol.paddedHeight;
+				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
+				float w = symbol.advance * scale * symbolScale + finalSpacingX;
 
 				if (x + w > maxWidth)
 				{
@@ -2060,6 +2165,8 @@ static public class NGUIText
 		bool underline = false;
 		bool strikethrough = false;
 		bool ignoreColor = false;
+		var symbolScale = NGUIText.symbolScale;
+		var symbolMaxHeight = NGUIText.symbolMaxHeight;
 
 		for (int i = 0; i < textLength; ++i)
 		{
@@ -2129,7 +2236,9 @@ static public class NGUIText
 			}
 			else
 			{
-				float w = symbol.advance * scale + finalSpacingX;
+				var h = symbol.paddedHeight;
+				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
+				float w = symbol.advance * scale * symbolScale + finalSpacingX;
 
 				if (x + w > maxWidth)
 				{
@@ -2191,6 +2300,8 @@ static public class NGUIText
 		bool underline = false;
 		bool strikethrough = false;
 		bool ignoreColor = false;
+		var symbolScale = NGUIText.symbolScale;
+		var symbolMaxHeight = NGUIText.symbolMaxHeight;
 
 		Vector2 last0 = Vector2.zero;
 		Vector2 last1 = Vector2.zero;
@@ -2266,7 +2377,15 @@ static public class NGUIText
 
 			// See if there is a symbol matching this text
 			var symbol = useSymbols ? GetSymbol(text, index, textLength) : null;
-			float w = (symbol != null) ? symbol.advance * scale : GetGlyphWidth(ch, prev, scale);
+			float w;
+
+			if (symbol != null)
+			{
+				var h = symbol.paddedHeight;
+				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
+				w = symbol.advance * scale * symbolScale;
+			}
+			else w = GetGlyphWidth(ch, prev, scale);
 
 			if (w != 0f)
 			{

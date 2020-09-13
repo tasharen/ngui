@@ -459,12 +459,6 @@ static public class NGUIMenu
 	[MenuItem("Assets/NGUI/", false, 0)]
 	static public void OpenSeparator2 () { }
 
-	[MenuItem("NGUI/Open/Prefab Toolbar", false, 9)]
-	static public void OpenPrefabTool ()
-	{
-		EditorWindow.GetWindow<UIPrefabTool>(false, "Prefab Toolbar", true).Show();
-	}
-
 	[MenuItem("NGUI/Open/Panel Tool", false, 9)]
 	static public void OpenPanelWizard ()
 	{
@@ -483,7 +477,13 @@ static public class NGUIMenu
 		EditorWindow.GetWindow<UICameraTool>(false, "Camera Tool", true).Show();
 	}
 
-	[MenuItem("NGUI/Open/Widget Wizard (Legacy)", false, 9)]
+	[MenuItem("NGUI/Open/Prefab Toolbar (Deprecated)", false, 9)]
+	static public void OpenPrefabTool ()
+	{
+		EditorWindow.GetWindow<UIPrefabTool>(false, "Prefab Toolbar", true).Show();
+	}
+
+	[MenuItem("NGUI/Open/Widget Wizard (Deprecated)", false, 9)]
 	static public void CreateWidgetWizard ()
 	{
 		EditorWindow.GetWindow<UICreateWidgetWizard>(false, "Widget Tool", true).Show();

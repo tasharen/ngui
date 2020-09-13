@@ -71,7 +71,7 @@ public class ComponentSelector : ScriptableWizard
 
 	static public void Draw<T> (T obj, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options) where T : Object
 	{
-		Draw<T>(NGUITools.GetTypeName<T>(), obj, cb, editButton, options);
+		Draw<T>(NGUITools.GetTypeName<T>().Replace("NGUI", "").Replace("UI", ""), obj, cb, editButton, options);
 	}
 
 	static public void Draw (INGUIAtlas atlas, OnSelectionCallback cb, bool editButton, params GUILayoutOption[] options)
