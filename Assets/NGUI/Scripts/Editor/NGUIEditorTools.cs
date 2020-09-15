@@ -1739,17 +1739,17 @@ static public class NGUIEditorTools
 
 	static public List<UIWidget> SceneViewRaycast (Vector2 mousePos)
 	{
-		List<UIWidget> list = new List<UIWidget>();
+		var list = new List<UIWidget>();
 
 		for (int i = 0; i < UIPanel.list.Count; ++i)
 		{
-			UIPanel p = UIPanel.list[i];
+			var p = UIPanel.list[i];
 
 			for (int b = 0; b < p.widgets.Count; ++b)
 			{
-				UIWidget w = p.widgets[b];
-				if (!w.isVisible) continue;
-				Vector3[] corners = w.worldCorners;
+				var w = p.widgets[b];
+				if (!w.isVisible || !w.isSelectable) continue;
+				var corners = w.worldCorners;
 				if (SceneViewDistanceToRectangle(corners, mousePos) == 0f)
 					list.Add(w);
 			}
@@ -1774,7 +1774,7 @@ static public class NGUIEditorTools
 	static public bool SelectWidget (GameObject start, Vector2 pos, bool inFront)
 	{
 		GameObject go = null;
-		List<UIWidget> widgets = SceneViewRaycast(pos);
+		var widgets = SceneViewRaycast(pos);
 		if (widgets == null || widgets.Count == 0) return false;
 		bool found = false;
 
@@ -1784,13 +1784,14 @@ static public class NGUIEditorTools
 			{
 				for (int i = 0; i < widgets.Count; ++i)
 				{
-					UIWidget w = widgets[i];
+					var w = widgets[i];
 
 					if (w.cachedGameObject == start)
 					{
 						found = true;
 						break;
 					}
+
 					go = w.cachedGameObject;
 				}
 			}

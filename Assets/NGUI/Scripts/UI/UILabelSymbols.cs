@@ -26,6 +26,8 @@ public class UILabelSymbols : UIWidget
 	[System.NonSerialized] public List<Vector2> symbolUVs = new List<Vector2>();
 	[System.NonSerialized] public List<Color> symbolCols = new List<Color>();
 
+	public override bool isSelectable { get { return false; } }
+
 	public override Material material
 	{
 		get

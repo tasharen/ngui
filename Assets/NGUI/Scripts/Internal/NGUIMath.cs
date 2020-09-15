@@ -354,6 +354,8 @@ static public class NGUIMath
 		return offset;
 	}
 
+	[System.NonSerialized] static System.Collections.Generic.List<UIWidget> s_widgets = new List<UIWidget>();
+
 	/// <summary>
 	/// Calculate the combined bounds of all widgets attached to the specified game object or its children (in world space).
 	/// </summary>
@@ -362,19 +364,30 @@ static public class NGUIMath
 	{
 		if (trans != null)
 		{
-			UIWidget[] widgets = trans.GetComponentsInChildren<UIWidget>() as UIWidget[];
-			if (widgets.Length == 0) return new Bounds(trans.position, Vector3.zero);
+			s_widgets.Clear();
+			trans.GetComponentsInChildren(s_widgets);
+
+			for (int i = 0, imax = s_widgets.Count; i < imax; ++i)
+			{
+				var w = s_widgets[i];
+
+				if (!w.isSelectable || !w.enabled)
+				{
+					s_widgets.RemoveAt(i--);
+					--imax;
+				}
+			}
+
+			if (s_widgets.Count == 0) return new Bounds(trans.position, Vector3.zero);
 
 			Vector3 vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
 			Vector3 vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 			Vector3 v;
 
-			for (int i = 0, imax = widgets.Length; i < imax; ++i)
+			for (int i = 0, imax = s_widgets.Count; i < imax; ++i)
 			{
-				UIWidget w = widgets[i];
-				if (!w.enabled) continue;
-
-				Vector3[] corners = w.worldCorners;
+				var w = s_widgets[i];
+				var corners = w.worldCorners;
 
 				for (int j = 0; j < 4; ++j)
 				{

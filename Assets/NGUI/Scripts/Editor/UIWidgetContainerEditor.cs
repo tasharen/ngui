@@ -26,6 +26,8 @@ public class UIWidgetContainerEditor : Editor
 
 	void OnDisable () { NGUIEditorTools.HideMoveTool(false); }
 
+	[System.NonSerialized] static System.Collections.Generic.List<UIWidget> mWidgets = new System.Collections.Generic.List<UIWidget>();
+
 	/// <summary>
 	/// Make it possible to easily drag the transform around.
 	/// </summary>
@@ -39,8 +41,20 @@ public class UIWidgetContainerEditor : Editor
 		if (mb.GetComponent<UIWidget>() != null) return;
 		if (mb.GetComponent<UIPanel>() != null) return;
 
+		mWidgets.Clear();
 		Transform t = mb.transform;
-		UIWidget[] widgets = t.GetComponentsInChildren<UIWidget>();
+		t.GetComponentsInChildren(mWidgets);
+
+		for (int i = 0, imax = mWidgets.Count; i < imax; ++i)
+		{
+			var w = mWidgets[i];
+
+			if (!w.isSelectable)
+			{
+				mWidgets.RemoveAt(i--);
+				--imax;
+			}
+		}
 
 		Event e = Event.current;
 		int id = GUIUtility.GetControlID(mHash, FocusType.Passive);
@@ -49,16 +63,16 @@ public class UIWidgetContainerEditor : Editor
 		Vector3[] corners = null;
 		Vector3[] handles = null;
 
-		if (widgets.Length > 0)
+		if (mWidgets.Count > 0)
 		{
 			Matrix4x4 worldToLocal = t.worldToLocalMatrix;
 			Matrix4x4 localToWorld = t.localToWorldMatrix;
 			Bounds bounds = new Bounds();
 
 			// Calculate the local bounds
-			for (int i = 0; i < widgets.Length; ++i)
+			for (int i = 0, imax = mWidgets.Count; i < imax; ++i)
 			{
-				Vector3[] wcs = widgets[i].worldCorners;
+				var wcs = mWidgets[i].worldCorners;
 
 				for (int b = 0; b < 4; ++b)
 				{

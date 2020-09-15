@@ -815,6 +815,8 @@ static public class NGUITools
 #endif
 	}
 
+	[System.NonSerialized] static System.Collections.Generic.List<UIWidget> s_widgets = new List<UIWidget>();
+
 	/// <summary>
 	/// Calculate the game object's depth based on the widgets within, and also taking panel depth into consideration.
 	/// </summary>
@@ -838,21 +840,32 @@ static public class NGUITools
 			return w.raycastDepth;
 		}
 
-		var widgets = go.GetComponentsInChildren<UIWidget>();
+		s_widgets.Clear();
+		go.GetComponentsInChildren(s_widgets);
 #if UNITY_5_5_OR_NEWER
 		UnityEngine.Profiling.Profiler.EndSample();
 #else
 		Profiler.EndSample();
 #endif
 
-		if (widgets.Length == 0) return 0;
+		for (int i = 0, imax = s_widgets.Count; i < imax; ++i)
+		{
+			var sw = s_widgets[i];
+
+			if (!sw.isSelectable || !sw.enabled)
+			{
+				s_widgets.RemoveAt(i--);
+				--imax;
+			}
+		}
+
+		if (s_widgets.Count == 0) return 0;
 
 		int depth = int.MaxValue;
 
-		for (int i = 0, imax = widgets.Length; i < imax; ++i)
+		for (int i = 0, imax = s_widgets.Count; i < imax; ++i)
 		{
-			if (widgets[i].enabled)
-				depth = Mathf.Min(depth, widgets[i].raycastDepth);
+			depth = Mathf.Min(depth, s_widgets[i].raycastDepth);
 		}
 		return depth;
 	}
@@ -866,9 +879,15 @@ static public class NGUITools
 		if (go)
 		{
 			int depth = -1;
-			UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
-			for (int i = 0, imax = widgets.Length; i < imax; ++i)
-				depth = Mathf.Max(depth, widgets[i].depth);
+
+			s_widgets.Clear();
+			go.GetComponentsInChildren(s_widgets);
+
+			for (int i = 0, imax = s_widgets.Count; i < imax; ++i)
+			{
+				var w = s_widgets[i];
+				if (w.isSelectable && w.enabled) depth = Mathf.Max(depth, w.depth);
+			}
 			return depth + 1;
 		}
 		return 0;
@@ -883,17 +902,22 @@ static public class NGUITools
 		if (go && ignoreChildrenWithColliders)
 		{
 			int depth = -1;
-			UIWidget[] widgets = go.GetComponentsInChildren<UIWidget>();
+			s_widgets.Clear();
+			go.GetComponentsInChildren(s_widgets);
 
-			for (int i = 0, imax = widgets.Length; i < imax; ++i)
+			for (int i = 0, imax = s_widgets.Count; i < imax; ++i)
 			{
-				UIWidget w = widgets[i];
+				var w = s_widgets[i];
+
+				if (w.isSelectable && w.enabled)
+				{
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-				if (w.cachedGameObject != go && (w.collider != null || w.GetComponent<Collider2D>() != null)) continue;
+					if (w.cachedGameObject != go && (w.collider != null || w.GetComponent<Collider2D>() != null)) continue;
 #else
-				if (w.cachedGameObject != go && (w.GetComponent<Collider>() != null || w.GetComponent<Collider2D>() != null)) continue;
+					if (w.cachedGameObject != go && (w.GetComponent<Collider>() != null || w.GetComponent<Collider2D>() != null)) continue;
 #endif
-				depth = Mathf.Max(depth, w.depth);
+					depth = Mathf.Max(depth, w.depth);
+				}
 			}
 			return depth + 1;
 		}
@@ -2728,9 +2752,9 @@ static public class NGUITools
 		return KeyCode.None;
 	}
 
-	static Dictionary<string, UIWidget> mWidgets = new Dictionary<string, UIWidget>();
-	static UIPanel mRoot;
-	static GameObject mGo;
+	[System.NonSerialized] static Dictionary<string, UIWidget> mWidgets = new Dictionary<string, UIWidget>();
+	[System.NonSerialized] static UIPanel mRoot;
+	[System.NonSerialized] static GameObject mGo;
 
 	public delegate void OnInitFunc<T> (T w) where T : UIWidget;
 

@@ -1296,6 +1296,12 @@ public class UIWidget : UIRect
 
 	void OnDestroy () { RemoveFromPanel(); }
 
+	/// <summary>
+	/// Whether this widget will be selectable in the scene view or not.
+	/// </summary>
+
+	public virtual bool isSelectable { get { return true; } }
+
 #if UNITY_EDITOR
 	static int mHandles = -1;
 
@@ -1349,9 +1355,9 @@ public class UIWidget : UIRect
 	/// Draw some selectable gizmos.
 	/// </summary>
 
-	void OnDrawGizmos ()
+	protected void OnDrawGizmos ()
 	{
-		if (isVisible && NGUITools.GetActive(this))
+		if (isVisible && isSelectable && NGUITools.GetActive(this))
 		{
 			if (UnityEditor.Selection.activeGameObject == gameObject && showHandles) return;
 

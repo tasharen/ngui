@@ -437,6 +437,7 @@ public class UIWidgetInspector : UIRectEditor
 		if (!UIWidget.showHandles) return;
 
 		mWidget = target as UIWidget;
+		if (!mWidget.isSelectable) return;
 
 		Transform t = mWidget.cachedTransform;
 

@@ -157,9 +157,9 @@ static public class NGUIText
 	/// Get the specified symbol.
 	/// </summary>
 
-	static public BMSymbol GetSymbol (string text, int index, int textLength)
+	static public BMSymbol GetSymbol (ref string text, int index, int textLength)
 	{
-		if (nguiFont != null) return nguiFont.MatchSymbol(text, index, textLength);
+		if (nguiFont != null) return nguiFont.MatchSymbol(ref text, index, textLength);
 		return null;
 	}
 
@@ -991,14 +991,14 @@ static public class NGUIText
 				}
 
 				// See if there is a symbol matching this text
-				var symbol = useSymbols ? GetSymbol(text, i, textLength) : null;
+				var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
 				var scale = (subscriptMode == 0) ? fontScale : fontScale * sizeShrinkage;
 
 				if (symbol != null)
 				{
 					var h = symbol.paddedHeight;
 					if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
-					var w = symbol.advance * scale * symbolScale;
+					var w = Mathf.Round(symbol.advance * scale * symbolScale);
 					var mx = x + w;
 
 					// Doesn't fit? Move down to the next line
@@ -1108,7 +1108,7 @@ static public class NGUIText
 		{
 			// See if there is a symbol matching this text
 			var scale = (subscriptMode == 0) ? fontScale : fontScale * sizeShrinkage;
-			var symbol = useSymbols ? GetSymbol(text, i, textLength) : null;
+			var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
 
 			// Color changing symbol
 			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
@@ -1129,7 +1129,7 @@ static public class NGUIText
 			{
 				var h = symbol.paddedHeight;
 				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
-				mSizes.Add(finalSpacingX + symbol.advance * scale * symbolScale);
+				mSizes.Add(finalSpacingX + Mathf.Round(symbol.advance * scale * symbolScale));
 				for (int b = 0, bmax = symbol.sequence.Length - 1; b < bmax; ++b) mSizes.Add(0);
 				i += symbol.sequence.Length - 1;
 				prev = 0;
@@ -1321,7 +1321,7 @@ static public class NGUIText
 			}
 
 			// See if there is a symbol matching this text
-			var symbol = useSymbols ? GetSymbol(text, offset, textLength) : null;
+			var symbol = useSymbols ? GetSymbol(ref text, offset, textLength) : null;
 
 			// Calculate how wide this symbol or character is going to be
 			float glyphWidth;
@@ -1338,7 +1338,7 @@ static public class NGUIText
 			{
 				var h = symbol.paddedHeight;
 				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
-				glyphWidth = finalSpacingX + symbol.advance * scale * symbolScale;
+				glyphWidth = finalSpacingX + Mathf.Round(symbol.advance * scale * symbolScale);
 			}
 
 			// Force pixel alignment
@@ -1604,7 +1604,7 @@ static public class NGUIText
 			}
 
 			// See if there is a symbol matching this text
-			var symbol = useSymbols ? GetSymbol(text, i, textLength) : null;
+			var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
 			var scale = (subscriptMode == 0) ? fontScale : fontScale * sizeShrinkage;
 
 			if (symbol != null)
@@ -1616,7 +1616,7 @@ static public class NGUIText
 				v1x = v0x + symbol.width * fs;
 				v1y = -(y + symbol.offsetY * fs) + symbolOffset * mult;
 				v0y = v1y - symbol.height * fs;
-				var w = symbol.advance * scale * symbolScale * mult;
+				var w = Mathf.Round(symbol.advance * scale * symbolScale * mult);
 
 				// Doesn't fit? Move down to the next line
 				if (x + w > maxWidth)
@@ -2082,7 +2082,7 @@ static public class NGUIText
 			}
 
 			// See if there is a symbol matching this text
-			var symbol = useSymbols ? GetSymbol(text, i, textLength) : null;
+			var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
 
 			if (symbol == null)
 			{
@@ -2116,7 +2116,7 @@ static public class NGUIText
 			{
 				var h = symbol.paddedHeight;
 				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
-				float w = symbol.advance * scale * symbolScale + finalSpacingX;
+				float w = Mathf.Round(symbol.advance * scale * symbolScale + finalSpacingX);
 
 				if (x + w > maxWidth)
 				{
@@ -2200,7 +2200,7 @@ static public class NGUIText
 			}
 
 			// See if there is a symbol matching this text
-			var symbol = useSymbols ? GetSymbol(text, i, textLength) : null;
+			var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
 
 			if (symbol == null)
 			{
@@ -2238,7 +2238,7 @@ static public class NGUIText
 			{
 				var h = symbol.paddedHeight;
 				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
-				float w = symbol.advance * scale * symbolScale + finalSpacingX;
+				float w = Mathf.Round(symbol.advance * scale * symbolScale + finalSpacingX);
 
 				if (x + w > maxWidth)
 				{
@@ -2376,14 +2376,14 @@ static public class NGUIText
 			}
 
 			// See if there is a symbol matching this text
-			var symbol = useSymbols ? GetSymbol(text, index, textLength) : null;
+			var symbol = useSymbols ? GetSymbol(ref text, index, textLength) : null;
 			float w;
 
 			if (symbol != null)
 			{
 				var h = symbol.paddedHeight;
 				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
-				w = symbol.advance * scale * symbolScale;
+				w = Mathf.Round(symbol.advance * scale * symbolScale);
 			}
 			else w = GetGlyphWidth(ch, prev, scale);
 

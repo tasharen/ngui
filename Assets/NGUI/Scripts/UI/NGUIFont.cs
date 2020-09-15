@@ -186,7 +186,7 @@ public interface INGUIFont
 	/// Retrieve the symbol at the beginning of the specified sequence, if a match is found.
 	/// </summary>
 
-	BMSymbol MatchSymbol (string text, int offset, int textLength);
+	BMSymbol MatchSymbol (ref string text, int offset, int textLength);
 
 	/// <summary>
 	/// Add a new symbol to the font.
@@ -233,6 +233,10 @@ public class NGUIFont : ScriptableObject, INGUIFont
 
 	// List of symbols, such as emoticons like ":)", ":(", etc
 	[HideInInspector, SerializeField] List<BMSymbol> mSymbols = new List<BMSymbol>();
+
+	// Embedded symbols are created from all of the atlas sprites the first time a sprite request is made.
+	// This allows for embedding sprites in text without emoticons by using [sp=X] syntax, where 'X' is the name of the sprite.
+	[System.NonSerialized] List<BMSymbol> mEmbeddedSymbols = null;
 
 	// Used for dynamic fonts
 	[HideInInspector, SerializeField] Font mDynamicFont;
@@ -1021,6 +1025,7 @@ public class NGUIFont : ScriptableObject, INGUIFont
 
 		// Clear all symbols
 		for (int i = 0, imax = symbols.Count; i < imax; ++i) symbols[i].MarkAsChanged();
+		mEmbeddedSymbols = null;
 	}
 
 	/// <summary>
@@ -1093,8 +1098,11 @@ public class NGUIFont : ScriptableObject, INGUIFont
 	/// Retrieve the symbol at the beginning of the specified sequence, if a match is found.
 	/// </summary>
 
-	public BMSymbol MatchSymbol (string text, int offset, int textLength)
+	public BMSymbol MatchSymbol (ref string text, int offset, int textLength)
 	{
+		var atl = symbolAtlas != null ? symbolAtlas : atlas;
+		if (atl == null) return null;
+
 		var s = symbols;
 		int count = s.Count;
 		if (count == 0) return null;
@@ -1122,7 +1130,56 @@ public class NGUIFont : ScriptableObject, INGUIFont
 			}
 
 			// Match found
-			if (match && sym.Validate(symbolAtlas != null ? symbolAtlas : atlas)) return sym;
+			if (match && sym.Validate(atl)) return sym;
+		}
+
+		// Support embedding sprites using [sp=X] syntax, where 'X' is the name of the sprite
+		if (text[offset] == '[' && offset + 6 < text.Length && text[offset + 1] == 's' && text[offset + 2] == 'p' && text[offset + 3] == '=')
+		{
+			// Create the embedded symbol list if it hasn't been created already
+			if (mEmbeddedSymbols == null)
+			{
+				mEmbeddedSymbols = new List<BMSymbol>();
+
+				var sprites = atl.spriteList;
+
+				foreach (var sp in sprites)
+				{
+					var bm = new BMSymbol();
+					bm.sequence = "[sp=" + sp.name + "]";
+					bm.spriteName = sp.name;
+					mEmbeddedSymbols.Add(bm);
+				}
+			}
+
+			// Run through the embedded symbol list
+			s = mEmbeddedSymbols;
+			count = s.Count;
+
+			// Run through all symbols
+			for (int i = 0; i < count; ++i)
+			{
+				var sym = s[i];
+
+				// If the symbol's length is longer, move on
+				int symbolLength = sym.length;
+				if (symbolLength == 0 || textLength < symbolLength) continue;
+
+				var match = true;
+
+				// Match the characters
+				for (int c = 0; c < symbolLength; ++c)
+				{
+					if (text[offset + c] != sym.sequence[c])
+					{
+						match = false;
+						break;
+					}
+				}
+
+				// Match found
+				if (match && sym.Validate(atl)) return sym;
+			}
 		}
 		return null;
 	}

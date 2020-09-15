@@ -697,7 +697,7 @@ public class UIFont : MonoBehaviour, INGUIFont
 	/// Retrieve the symbol at the beginning of the specified sequence, if a match is found.
 	/// </summary>
 
-	public BMSymbol MatchSymbol (string text, int offset, int textLength)
+	public BMSymbol MatchSymbol (ref string text, int offset, int textLength)
 	{
 		// No symbols present
 		int count = mSymbols.Count;
