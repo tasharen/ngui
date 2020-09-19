@@ -44,13 +44,13 @@ public class EnvelopContent : MonoBehaviour
 		}
 		else
 		{
-			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(transform.parent, targetRoot, !ignoreDisabled);
-			float x0 = b.min.x + padLeft;
-			float y0 = b.min.y + padBottom;
-			float x1 = b.max.x + padRight;
-			float y1 = b.max.y + padTop;
+			var b = NGUIMath.CalculateRelativeWidgetBounds(transform.parent, targetRoot, !ignoreDisabled);
+			var x0 = b.min.x + padLeft;
+			var y0 = b.min.y + padBottom;
+			var x1 = b.max.x + padRight;
+			var y1 = b.max.y + padTop;
 
-			UIWidget w = GetComponent<UIWidget>();
+			var w = GetComponent<UIWidget>();
 			w.SetRect(x0, y0, x1 - x0, y1 - y0);
 			BroadcastMessage("UpdateAnchors", SendMessageOptions.DontRequireReceiver);
 			NGUITools.UpdateWidgetCollider(gameObject);

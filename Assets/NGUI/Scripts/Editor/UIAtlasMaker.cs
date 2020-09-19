@@ -80,6 +80,8 @@ public class UIAtlasMaker : EditorWindow
 	Vector2 mScroll = Vector2.zero;
 	List<string> mDelNames = new List<string>();
 	INGUIAtlas mLastAtlas;
+	INGUITextureProcessor mProcessor;
+	GameObject mProcessorSrc;
 
 	void OnEnable () { instance = this; }
 	void OnDisable () { instance = null; }
@@ -110,7 +112,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Helper function that retrieves the list of currently selected textures.
 	/// </summary>
 
-	List<Texture> GetSelectedTextures ()
+	static List<Texture> GetSelectedTextures ()
 	{
 		var textures = new List<Texture>();
 		var names = new List<string>();
@@ -150,13 +152,13 @@ public class UIAtlasMaker : EditorWindow
 	/// Load the specified list of textures as Texture2Ds, fixing their import properties as necessary.
 	/// </summary>
 
-	static List<Texture2D> LoadTextures (List<Texture> textures)
+	static List<Texture> LoadTextures (List<Texture> textures)
 	{
-		List<Texture2D> list = new List<Texture2D>();
+		var list = new List<Texture>();
 
 		foreach (Texture tex in textures)
 		{
-			Texture2D t2 = NGUIEditorTools.ImportTexture(tex, true, false, true);
+			var t2 = NGUIEditorTools.ImportTexture(tex, true, false, true);
 			if (t2 != null) list.Add(t2);
 		}
 		return list;
@@ -247,7 +249,7 @@ public class UIAtlasMaker : EditorWindow
 		// If we have textures to work with, include them as well
 		if (textures.Count > 0)
 		{
-			List<string> texNames = new List<string>();
+			var texNames = new List<string>();
 			foreach (Texture tex in textures) texNames.Add(tex.name);
 			texNames.Sort();
 			foreach (string tex in texNames) spriteList.Add(tex, 2);
@@ -1101,7 +1103,32 @@ public class UIAtlasMaker : EditorWindow
 			GUILayout.Label("if on, forces a square atlas texture", GUILayout.MinWidth(70f));
 			GUILayout.EndHorizontal();
 		}
-		#endif
+#endif
+
+		GUI.changed = false;
+		GUILayout.BeginHorizontal();
+		mProcessorSrc = EditorGUILayout.ObjectField("Pre-processor", mProcessorSrc, typeof(GameObject), true) as GameObject;
+
+		if (mProcessorSrc != null)
+		{
+			var mbs = mProcessorSrc.GetComponents<MonoBehaviour>();
+
+			foreach (var mb in mbs)
+			{
+				mProcessor = mb as INGUITextureProcessor;
+				if (mProcessor != null) break;
+			}
+		}
+		else mProcessor = null;
+
+		GUILayout.EndHorizontal();
+
+		if (mProcessorSrc != null && mProcessor == null)
+		{
+			EditorGUILayout.HelpBox("No script implementing INGUITextureProcessor found", MessageType.Warning);
+		}
+
+		List<Texture> cleanup = null;
 
 #if UNITY_IPHONE || UNITY_ANDROID
 		GUILayout.BeginHorizontal();
@@ -1158,7 +1185,7 @@ public class UIAtlasMaker : EditorWindow
 					// If the material doesn't exist, create it
 					if (mat == null)
 					{
-						Shader shader = Shader.Find(NGUISettings.atlasPMA ? "Unlit/Premultiplied Colored" : "Unlit/Transparent Colored");
+						var shader = Shader.Find(NGUISettings.atlasPMA ? "Unlit/Premultiplied Colored" : "Unlit/Transparent Colored");
 						mat = new Material(shader);
 
 						// Save the material
@@ -1190,8 +1217,29 @@ public class UIAtlasMaker : EditorWindow
 			}
 		}
 
+		if ((mProcessor != null) && (update || replace))
+		{
+			textures = LoadTextures(textures);
+			mProcessor.PrepareToProcess(textures);
+			var result = new List<Texture>();
+
+			foreach (var tex in textures)
+			{
+				var final = mProcessor.Process(tex);
+				result.Add(final != null ? final : tex);
+
+				if (final != tex && final != null)
+				{
+					if (cleanup == null) cleanup = new List<Texture>();
+					cleanup.Add(final);
+				}
+			}
+
+			textures = result;
+		}
+
 		string selection = null;
-		Dictionary<string, int> spriteList = GetSpriteList(textures);
+		var spriteList = GetSpriteList(textures);
 
 		if (spriteList.Count > 0)
 		{
@@ -1205,6 +1253,7 @@ public class UIAtlasMaker : EditorWindow
 
 				bool delete = false;
 				int index = 0;
+
 				foreach (KeyValuePair<string, int> iter in spriteList)
 				{
 					++index;
@@ -1268,7 +1317,7 @@ public class UIAtlasMaker : EditorWindow
 				// If this sprite was marked for deletion, remove it from the atlas
 				if (delete)
 				{
-					List<SpriteEntry> sprites = new List<SpriteEntry>();
+					var sprites = new List<SpriteEntry>();
 					ExtractSprites(NGUISettings.atlas, sprites);
 
 					for (int i = sprites.Count; i > 0; )
@@ -1277,6 +1326,7 @@ public class UIAtlasMaker : EditorWindow
 						if (mDelNames.Contains(ent.name))
 							sprites.RemoveAt(i);
 					}
+
 					UpdateAtlas(NGUISettings.atlas, sprites);
 					mDelNames.Clear();
 					NGUIEditorTools.RepaintSprites();
@@ -1301,5 +1351,7 @@ public class UIAtlasMaker : EditorWindow
 
 		// Uncomment this line if you want to be able to force-sort the atlas
 		//if (NGUISettings.atlas != null && GUILayout.Button("Sort Alphabetically")) NGUISettings.atlas.SortAlphabetically();
+
+		if (cleanup != null) foreach (var tex in cleanup) DestroyImmediate(tex);
 	}
 }

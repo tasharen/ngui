@@ -445,15 +445,15 @@ static public class NGUIMath
 	{
 		if (content != null && relativeTo != null)
 		{
-			bool isSet = false;
-			Matrix4x4 toLocal = relativeTo.worldToLocalMatrix;
-			Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-			Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+			var isSet = false;
+			var toLocal = relativeTo.worldToLocalMatrix;
+			var min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+			var max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 			CalculateRelativeWidgetBounds(content, considerInactive, true, ref toLocal, ref min, ref max, ref isSet, considerChildren);
 
 			if (isSet)
 			{
-				Bounds b = new Bounds(min, Vector3.zero);
+				var b = new Bounds(min, Vector3.zero);
 				b.Encapsulate(max);
 				return b;
 			}
@@ -474,7 +474,7 @@ static public class NGUIMath
 		if (!considerInactive && !NGUITools.GetActive(content.gameObject)) return;
 
 		// If this isn't a root node, check to see if there is a panel present
-		UIPanel p = isRoot ? null : content.GetComponent<UIPanel>();
+		var p = isRoot ? null : content.GetComponent<UIPanel>();
 
 		// Ignore disabled panels as a disabled panel means invisible children
 		if (p != null && !p.enabled) return;
@@ -482,7 +482,7 @@ static public class NGUIMath
 		// If there is a clipped panel present simply include its dimensions
 		if (p != null && p.clipping != UIDrawCall.Clipping.None)
 		{
-			Vector3[] corners = p.worldCorners;
+			var corners = p.worldCorners;
 
 			for (int j = 0; j < 4; ++j)
 			{
@@ -502,15 +502,15 @@ static public class NGUIMath
 		else // No panel present
 		{
 			// If there is a widget present, include its bounds
-			UIWidget w = content.GetComponent<UIWidget>();
+			var w = content.GetComponent<UIWidget>();
 
-			if (w != null && w.enabled)
+			if (w != null && w.enabled && w.isSelectable)
 			{
-				Vector3[] corners = w.worldCorners;
+				var corners = w.worldCorners;
 
 				for (int j = 0; j < 4; ++j)
 				{
-					Vector3 v = toLocal.MultiplyPoint3x4(corners[j]);
+					var v = toLocal.MultiplyPoint3x4(corners[j]);
 
 					if (v.x > vMax.x) vMax.x = v.x;
 					if (v.y > vMax.y) vMax.y = v.y;

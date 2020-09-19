@@ -57,11 +57,14 @@ and it will not be included in the build of your game. It's only used in the edi
 
 2020.1.4
 - NEW: Dynamic fonts now have full symbol (emoticons) support.
+- NEW: Made it possible to embed sprites in labels just by referencing them using [sp=name] syntax, without the need to set up symbol associations.
 - NEW: Added the ability to scale and offset symbols used by the fonts.
 - NEW: Added the ability to specify maximum symbol (emoticon) height on fonts. If exceeded while printing text, the symbols will be shrunk.
 - NEW: Added the ability to overwrite the space bar width in fonts.
 - NEW: Added an Alpha Shader Property field to UIPanel. If specified, NGUI will set this value in the panel's shaders to the panel's alpha instead of mixing the panel's alpha with that of the widgets. You can use this to have panel alpha-fading effect differ from that of its children -- for example by specifying a "_Dither" property used by your shaders.
+- NEW: Added the ability to specify a texture pre-processor in the Atlas Maker that's able to modify textures prior to adding them to the atlas. This makes it possible to set up a custom renderer that does something like compositing an image from several sources or simply resizing the texture before the sprite gets added to the atlas.
 - FIX: Fixed pivot point changes moving widgets around if the camera wasn't looking down +Z.
+- FIX: Reduced the number of times NGUI's labels process text.
 - Unity 2020 update.
 
 2019.3.0

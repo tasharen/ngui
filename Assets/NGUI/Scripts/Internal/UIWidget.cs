@@ -480,12 +480,12 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			Vector2 offset = pivotOffset;
+			var offset = pivotOffset;
 
-			float x0 = -offset.x * mWidth;
-			float y0 = -offset.y * mHeight;
-			float x1 = x0 + mWidth;
-			float y1 = y0 + mHeight;
+			var x0 = -offset.x * mWidth;
+			var y0 = -offset.y * mHeight;
+			var x1 = x0 + mWidth;
+			var y1 = y0 + mHeight;
 
 			mCorners[0] = new Vector3(x0, y0);
 			mCorners[1] = new Vector3(x0, y1);
@@ -504,7 +504,7 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			Vector3[] cr = localCorners;
+			var cr = localCorners;
 			return cr[2] - cr[0];
 		}
 	}
@@ -517,7 +517,7 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			Vector3[] cr = localCorners;
+			var cr = localCorners;
 			return Vector3.Lerp(cr[0], cr[2], 0.5f);
 		}
 	}
@@ -530,14 +530,14 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-			Vector2 offset = pivotOffset;
+			var offset = pivotOffset;
 
-			float x0 = -offset.x * mWidth;
-			float y0 = -offset.y * mHeight;
-			float x1 = x0 + mWidth;
-			float y1 = y0 + mHeight;
+			var x0 = -offset.x * mWidth;
+			var y0 = -offset.y * mHeight;
+			var x1 = x0 + mWidth;
+			var y1 = y0 + mHeight;
 
-			Transform wt = cachedTransform;
+			var wt = cachedTransform;
 
 			mCorners[0] = wt.TransformPoint(x0, y0, 0f);
 			mCorners[1] = wt.TransformPoint(x0, y1, 0f);
@@ -772,7 +772,7 @@ public class UIWidget : UIRect
 
 	public float CalculateCumulativeAlpha (int frameID)
 	{
-		UIRect pt = parent;
+		var pt = parent;
 		return (pt != null) ? pt.CalculateFinalAlpha(frameID) * mColor.a : mColor.a;
 	}
 
@@ -782,19 +782,19 @@ public class UIWidget : UIRect
 
 	public override void SetRect (float x, float y, float width, float height)
 	{
-		Vector2 po = pivotOffset;
+		var po = pivotOffset;
 
-		float fx = Mathf.Lerp(x, x + width, po.x);
-		float fy = Mathf.Lerp(y, y + height, po.y);
+		var fx = Mathf.Lerp(x, x + width, po.x);
+		var fy = Mathf.Lerp(y, y + height, po.y);
 
-		int finalWidth = Mathf.FloorToInt(width + 0.5f);
-		int finalHeight = Mathf.FloorToInt(height + 0.5f);
+		var finalWidth = Mathf.FloorToInt(width + 0.5f);
+		var finalHeight = Mathf.FloorToInt(height + 0.5f);
 
 		if (po.x == 0.5f) finalWidth = ((finalWidth >> 1) << 1);
 		if (po.y == 0.5f) finalHeight = ((finalHeight >> 1) << 1);
 
-		Transform t = cachedTransform;
-		Vector3 pos = t.localPosition;
+		var t = cachedTransform;
+		var pos = t.localPosition;
 		pos.x = Mathf.Floor(fx + 0.5f);
 		pos.y = Mathf.Floor(fy + 0.5f);
 

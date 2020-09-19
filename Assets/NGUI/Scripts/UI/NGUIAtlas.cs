@@ -8,6 +8,20 @@ using System.Collections.Generic;
 using System;
 
 /// <summary>
+/// Simple interface that can be used anywhere. Used by the atlas maker to specify any desired custom processing that apply to textures before adding them to the atlas.
+/// The returned texture will be automatically destroyed after the atlas gets created (unless it matches the original).
+/// To create a pre-processor, have your script implement this interface, then reference the game object it's attached to in the Atlas Maker.
+/// Example usage: having an off-screen renderer that composits several sprites together (for example a skill icon), then renders it into a smaller texture.
+/// </summary>
+
+public interface INGUITextureProcessor
+{
+	void PrepareToProcess (List<Texture> textures);
+
+	Texture Process (Texture src);
+}
+
+/// <summary>
 /// Generic interface for the atlas class, making it possible to support both the prefab-based UIAtlas and scriptable object-based NGUIAtlas.
 /// </summary>
 

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 /// </summary>
 
 [AddComponentMenu("NGUI/Interaction/Key Binding")]
-#if SIGHTSEER
+#if TNET
 public class UIKeyBinding : MonoBehaviour, TNet.IStartable
 #else
 public class UIKeyBinding : MonoBehaviour
@@ -98,7 +98,7 @@ public class UIKeyBinding : MonoBehaviour
 		return null;
 	}
 
-#if SIGHTSEER
+#if TNET
 	protected virtual void Awake () { TNet.TNUpdater.AddStart(this); }
 #endif
 	protected virtual void OnEnable () { list.Add(this); }
@@ -108,7 +108,7 @@ public class UIKeyBinding : MonoBehaviour
 	/// If we're bound to an input field, subscribe to its Submit notification.
 	/// </summary>
 
-#if SIGHTSEER
+#if TNET
 	public virtual void OnStart ()
 #else
 	protected virtual void Start ()

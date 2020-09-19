@@ -122,7 +122,7 @@ static public class NGUITools
 
 				if (mListener == null)
 				{
-#if SIGHTSEER
+#if W2 || SIGHTSEER
 					var cam = MainCamera.instance;
 #else
 					var cam = Camera.main;
@@ -244,7 +244,7 @@ static public class NGUITools
 			if (cam && (cam.cullingMask & layerMask) != 0)
 				return cam;
 		}
-#if SIGHTSEER
+#if W2 || SIGHTSEER
 		cam = MainCamera.instance;
 #else
 		cam = Camera.main;

@@ -480,10 +480,10 @@ static public class NGUIEditorTools
 	static public bool MakeTextureReadable (string path, bool force)
 	{
 		if (string.IsNullOrEmpty(path)) return false;
-		TextureImporter ti = AssetImporter.GetAtPath(path) as TextureImporter;
+		var ti = AssetImporter.GetAtPath(path) as TextureImporter;
 		if (ti == null) return false;
 
-		TextureImporterSettings settings = new TextureImporterSettings();
+		var settings = new TextureImporterSettings();
 		ti.ReadTextureSettings(settings);
 
 		if (force || !settings.readable || settings.npotScale != TextureImporterNPOTScale.None)
@@ -567,7 +567,7 @@ static public class NGUIEditorTools
 			else if (!MakeTextureAnAtlas(path, force, alphaTransparency)) return null;
 			//return AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
 
-			Texture2D tex = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
+			var tex = AssetDatabase.LoadAssetAtPath(path, typeof(Texture2D)) as Texture2D;
 			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 			return tex;
 		}
@@ -582,7 +582,7 @@ static public class NGUIEditorTools
 	{
 		if (tex != null)
 		{
-			string path = AssetDatabase.GetAssetPath(tex.GetInstanceID());
+			var path = AssetDatabase.GetAssetPath(tex.GetInstanceID());
 			return ImportTexture(path, forInput, force, alphaTransparency);
 		}
 		return null;
@@ -2395,11 +2395,11 @@ static public class NGUIEditorTools
 
 	static public string MakeReadable (this Texture2D tex, bool readable = true)
 	{
-		string path = AssetDatabase.GetAssetPath(tex);
+		var path = AssetDatabase.GetAssetPath(tex);
 
-		if (!string.IsNullOrEmpty(path))
+		if (!string.IsNullOrEmpty(path) && !tex.isReadable)
 		{
-			TextureImporter textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
+			var textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
 
 			if (textureImporter != null && textureImporter.isReadable != readable)
 			{

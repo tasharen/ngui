@@ -939,11 +939,17 @@ public class UILabel : UIWidget
 	{
 		get
 		{
+			if (mLastWidth == 0 && mLastHeight == 0)
+			{
+				mLastWidth = mWidth;
+				mLastHeight = mHeight;
+			}
+
 			if (mLastWidth != mWidth || mLastHeight != mHeight)
 			{
 				mLastWidth = mWidth;
 				mLastHeight = mHeight;
-				mShouldBeProcessed = true;
+				shouldBeProcessed = true;
 			}
 
 			// Process the text if necessary
@@ -1433,8 +1439,8 @@ public class UILabel : UIWidget
 				trueTypeFont = ttf;
 				mUsingTTF = true;
 			}
+			else shouldBeProcessed = true;
 
-			shouldBeProcessed = true;
 			mAllowProcessing = true;
 			ProcessAndRequest();
 			if (autoResizeBoxCollider) ResizeCollider();
@@ -1481,7 +1487,7 @@ public class UILabel : UIWidget
 		mPremultiply = (material != null && material.shader != null && material.shader.name.Contains("Premultiplied"));
 
 		// Request the text within the font
-		ProcessAndRequest();
+		if (shouldBeProcessed) ProcessAndRequest();
 	}
 
 	/// <summary>
@@ -1617,6 +1623,8 @@ public class UILabel : UIWidget
 					{
 						mWidth = w;
 						mHeight = h;
+						mLastWidth = w;
+						mLastHeight = h;
 						if (onChange != null) onChange();
 					}
 				}
@@ -1630,6 +1638,7 @@ public class UILabel : UIWidget
 					if (mHeight != h)
 					{
 						mHeight = h;
+						mLastHeight = h;
 						if (onChange != null) onChange();
 					}
 				}
