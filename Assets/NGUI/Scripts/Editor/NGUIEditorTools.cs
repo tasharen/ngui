@@ -285,12 +285,30 @@ static public class NGUIEditorTools
 
 		if (Event.current.type == EventType.Repaint)
 		{
-			Texture2D tex = blankTexture;
-			Rect rect = GUILayoutUtility.GetLastRect();
+			var tex = blankTexture;
+			var rect = GUILayoutUtility.GetLastRect();
 			GUI.color = new Color(0f, 0f, 0f, 0.25f);
 			GUI.DrawTexture(new Rect(0f, rect.yMin + 6f, Screen.width, 4f), tex);
 			GUI.DrawTexture(new Rect(0f, rect.yMin + 6f, Screen.width, 1f), tex);
 			GUI.DrawTexture(new Rect(0f, rect.yMin + 9f, Screen.width, 1f), tex);
+			GUI.color = Color.white;
+		}
+	}
+
+	/// <summary>
+	/// Draw a visible thin separator in addition to adding some padding.
+	/// </summary>
+
+	static public void DrawThinSeparator ()
+	{
+		GUILayout.Space(4f);
+
+		if (Event.current.type == EventType.Repaint)
+		{
+			var tex = blankTexture;
+			var rect = GUILayoutUtility.GetLastRect();
+			GUI.color = new Color(0f, 0f, 0f, 0.25f);
+			GUI.DrawTexture(new Rect(0f, rect.yMin, Screen.width, 2f), tex);
 			GUI.color = Color.white;
 		}
 	}

@@ -1430,16 +1430,16 @@ public class UIPanel : UIRect
 
 		for (int i = 0, imax = widgets.Count; i < imax; ++i)
 		{
-			UIWidget w = widgets[i];
+			var w = widgets[i];
 
 			if (w.isVisible && w.hasVertices)
 			{
-				Material mt = w.material;
+				var mt = w.material;
 
 				if (onCreateMaterial != null) mt = onCreateMaterial(w, mt);
 
-				Texture tx = w.mainTexture;
-				Shader sd = w.shader;
+				var tx = w.mainTexture;
+				var sd = w.shader;
 
 				if (mat != mt || tex != tx || sdr != sd)
 				{

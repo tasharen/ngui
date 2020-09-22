@@ -343,14 +343,14 @@ public class UIDragDropItem : MonoBehaviour
 		if (UIDragDropRoot.root != null)
 			mTrans.parent = UIDragDropRoot.root;
 
-		Vector3 pos = mTrans.localPosition;
+		var pos = mTrans.localPosition;
 		pos.z = 0f;
 		mTrans.localPosition = pos;
 
-		TweenPosition tp = GetComponent<TweenPosition>();
+		var tp = GetComponent<TweenPosition>();
 		if (tp != null) tp.enabled = false;
 
-		SpringPosition sp = GetComponent<SpringPosition>();
+		var sp = GetComponent<SpringPosition>();
 		if (sp != null) sp.enabled = false;
 
 		// Notify the widgets that the parent has changed

@@ -1902,7 +1902,7 @@ static public class NGUITools
 
 	static public void MarkParentAsChanged (GameObject go)
 	{
-		UIRect[] rects = go.GetComponentsInChildren<UIRect>();
+		var rects = go.GetComponentsInChildren<UIRect>();
 		for (int i = 0, imax = rects.Length; i < imax; ++i)
 			rects[i].ParentHasChanged();
 	}
@@ -1915,7 +1915,7 @@ static public class NGUITools
 	{
 		get
 		{
-			TextEditor te = new TextEditor();
+			var te = new TextEditor();
 			te.Paste();
 #if UNITY_4_6 || UNITY_4_7 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2
 			return te.content.text;

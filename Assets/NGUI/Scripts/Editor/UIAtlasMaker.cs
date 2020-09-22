@@ -65,9 +65,9 @@ public class UIAtlasMaker : EditorWindow
 		{
 			if (temporaryTexture)
 			{
-				Object.DestroyImmediate(tempGO);
-				Object.DestroyImmediate(tempMat);
-				Object.DestroyImmediate(tex);
+				UnityEngine.Object.DestroyImmediate(tempGO);
+				UnityEngine.Object.DestroyImmediate(tempMat);
+				UnityEngine.Object.DestroyImmediate(tex);
 
 				tempGO = null;
 				tempMat = null;
@@ -90,7 +90,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Atlas selection callback.
 	/// </summary>
 
-	void OnSelectAtlas (Object obj)
+	void OnSelectAtlas (UnityEngine.Object obj)
 	{
 		// Legacy atlas support
 		if (obj != null && obj is GameObject) obj = (obj as GameObject).GetComponent<UIAtlas>();
@@ -121,7 +121,9 @@ public class UIAtlasMaker : EditorWindow
 		{
 			var objects = Selection.GetFiltered(typeof(Texture), SelectionMode.DeepAssets);
 
-			foreach (Object o in objects)
+			System.Array.Sort(objects, ObjNameComparer);
+
+			foreach (UnityEngine.Object o in objects)
 			{
 				var tex = o as Texture;
 				if (tex == null || tex.name == "Font Texture") continue;
@@ -146,6 +148,11 @@ public class UIAtlasMaker : EditorWindow
 			}
 		}
 		return textures;
+	}
+
+	static int ObjNameComparer (UnityEngine.Object x, UnityEngine.Object y)
+	{
+		return AssetDatabase.GetAssetPath(x).CompareTo(AssetDatabase.GetAssetPath(y));
 	}
 
 	/// <summary>
@@ -191,7 +198,7 @@ public class UIAtlasMaker : EditorWindow
 
 	static bool PackTextures (Texture2D tex, List<SpriteEntry> sprites)
 	{
-		Texture2D[] textures = new Texture2D[sprites.Count];
+		var textures = new Texture2D[sprites.Count];
 		Rect[] rects;
 
 #if UNITY_3_5 || UNITY_4_0
@@ -251,7 +258,7 @@ public class UIAtlasMaker : EditorWindow
 		{
 			var texNames = new List<string>();
 			foreach (Texture tex in textures) texNames.Add(tex.name);
-			texNames.Sort();
+			//texNames.Sort();
 			foreach (string tex in texNames) spriteList.Add(tex, 2);
 		}
 
@@ -643,10 +650,10 @@ public class UIAtlasMaker : EditorWindow
 			if (sprites != null)
 			{
 				Color32[] pixels = null;
-				int width = tex.width;
-				int height = tex.height;
-				float count = sprites.Count;
-				int index = 0;
+				var width = tex.width;
+				var height = tex.height;
+				var count = sprites.Count;
+				var index = 0;
 
 				foreach (UISpriteData es in sprites)
 				{
@@ -667,7 +674,7 @@ public class UIAtlasMaker : EditorWindow
 					if (!found)
 					{
 						if (pixels == null) pixels = tex.GetPixels32();
-						SpriteEntry sprite = ExtractSprite(es, pixels, width, height);
+						var sprite = ExtractSprite(es, pixels, width, height);
 						if (sprite != null) finalSprites.Add(sprite);
 					}
 				}
@@ -688,7 +695,7 @@ public class UIAtlasMaker : EditorWindow
 		// Get the texture for the atlas
 		var tex = atlasTexture;
 		var oldPath = (tex != null) ? AssetDatabase.GetAssetPath(tex.GetInstanceID()) : "";
-		var newPath = NGUIEditorTools.GetSaveableTexturePath(atlas as Object, atlasTexture);
+		var newPath = NGUIEditorTools.GetSaveableTexturePath(atlas as UnityEngine.Object, atlasTexture);
 
 		// Clear the read-only flag in texture file attributes
 		if (System.IO.File.Exists(newPath))
@@ -872,7 +879,7 @@ public class UIAtlasMaker : EditorWindow
 		// Contributed by B9 from https://discord.gg/tasharen
 		if (obj is UIAtlas) // Prefab-based atlas
 		{
-			Debug.LogWarning("Updating a legacy atlas: issues may occur. Please update the atlas to a new format that uses Scriptable Objects rather than Prefabs.", obj as Object);
+			Debug.LogWarning("Updating a legacy atlas: issues may occur. Please update the atlas to a new format that uses Scriptable Objects rather than Prefabs.", obj as UnityEngine.Object);
 			var atlas = (obj as UIAtlas);
 
 			if (!PrefabUtility.IsPartOfPrefabAsset(atlas.gameObject))
@@ -920,7 +927,7 @@ public class UIAtlasMaker : EditorWindow
 			}
 
 			PrefabUtility.SaveAsPrefabAsset(assetRoot, assetPath);
-			Selection.activeObject = NGUISettings.atlas as Object;
+			Selection.activeObject = NGUISettings.atlas as UnityEngine.Object;
 			EditorUtility.ClearProgressBar();
 
 			PrefabUtility.UnloadPrefabContents(assetRoot);
@@ -1212,7 +1219,7 @@ public class UIAtlasMaker : EditorWindow
 
 					// Select the atlas
 					NGUISettings.atlas = AssetDatabase.LoadAssetAtPath<NGUIAtlas>(path);
-					Selection.activeObject = NGUISettings.atlas as Object;
+					Selection.activeObject = NGUISettings.atlas as UnityEngine.Object;
 				}
 			}
 		}

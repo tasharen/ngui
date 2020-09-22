@@ -308,13 +308,13 @@ public class NGUIAtlasInspector : Editor
 
 					if (GUILayout.Button("Duplicate"))
 					{
-						UIAtlasMaker.SpriteEntry se = UIAtlasMaker.DuplicateSprite(mAtlas, sprite.name);
+						var se = UIAtlasMaker.DuplicateSprite(mAtlas, sprite.name);
 						if (se != null) NGUISettings.selectedSprite = se.name;
 					}
 
 					if (GUILayout.Button("Save As..."))
 					{
-						string path = EditorUtility.SaveFilePanel("Save As",
+						var path = EditorUtility.SaveFilePanel("Save As",
 							NGUISettings.currentPath, sprite.name + ".png", "png");
 
 						if (!string.IsNullOrEmpty(path))

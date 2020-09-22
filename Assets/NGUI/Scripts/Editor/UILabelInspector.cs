@@ -71,7 +71,7 @@ public class UILabelInspector : UIWidgetInspector
 	{
 		DrawPivot(so, w);
 
-		if (mIsDynamic && mHasSymbols)
+		if (mIsDynamic && mHasSymbols && so.FindProperty("mEncoding").boolValue)
 		{
 			DrawDepth(so, w, isPrefab, false);
 			DrawSymbolDepth(so, w as UILabel);

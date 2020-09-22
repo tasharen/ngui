@@ -58,6 +58,7 @@ and it will not be included in the build of your game. It's only used in the edi
 2020.1.4
 - NEW: Dynamic fonts now have full symbol (emoticons) support.
 - NEW: Made it possible to embed sprites in labels just by referencing them using [sp=name] syntax, without the need to set up symbol associations.
+- NEW: Panel Tool has been improved, and allows you to expand your panels to see exactly which widgets are causing new draw calls to occur.
 - NEW: Added the ability to scale and offset symbols used by the fonts.
 - NEW: Added the ability to specify maximum symbol (emoticon) height on fonts. If exceeded while printing text, the symbols will be shrunk.
 - NEW: Added the ability to overwrite the space bar width in fonts.
