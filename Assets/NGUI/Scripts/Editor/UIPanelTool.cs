@@ -69,6 +69,8 @@ public class UIPanelTool : EditorWindow
 		return panels;
 	}
 
+	Vector2 mPos;
+
 	/// <summary>
 	/// Draw the custom wizard.
 	/// </summary>
@@ -79,6 +81,7 @@ public class UIPanelTool : EditorWindow
 
 		if (panels != null && panels.Count > 0)
 		{
+			mPos = EditorGUILayout.BeginScrollView(mPos);
 			var selectedPanel = NGUITools.FindInParents<UIPanel>(Selection.activeGameObject);
 
 			if (mExamine)
@@ -180,6 +183,8 @@ public class UIPanelTool : EditorWindow
 					NGUITools.SetActive(selectedEntry.panel.gameObject, !selectedEntry.isEnabled);
 				}
 			}
+
+			EditorGUILayout.EndScrollView();
 		}
 		else
 		{
