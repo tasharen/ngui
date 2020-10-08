@@ -26,6 +26,12 @@ public class UISprite : UIBasicSprite
 	[System.NonSerialized] bool mSpriteSet = false;
 
 	/// <summary>
+	/// If set, will automatically make the sprite pixel-perfect every time it's changed.
+	/// </summary>
+
+	[System.NonSerialized] public bool autoMakePixelPerfect = false;
+
+	/// <summary>
 	/// Main texture is assigned on the atlas.
 	/// </summary>
 
@@ -176,6 +182,7 @@ public class UISprite : UIBasicSprite
 				mChanged = true;
 				mSpriteSet = false;
 				MarkAsChanged();
+				if (autoMakePixelPerfect) MakePixelPerfect();
 			}
 		}
 	}

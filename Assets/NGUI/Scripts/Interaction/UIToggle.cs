@@ -272,7 +272,7 @@ public class UIToggle : UIWidgetContainer
 
 			if (notify && current == null)
 			{
-				UIToggle tog = current;
+				var tog = current;
 				current = this;
 
 				if (EventDelegate.IsValid(onChange))
@@ -290,43 +290,43 @@ public class UIToggle : UIWidgetContainer
 			// Play the checkmark animation
 			if (animator != null)
 			{
-				ActiveAnimation aa = ActiveAnimation.Play(animator, null,
+				var aa = ActiveAnimation.Play(animator, null,
 					state ? Direction.Forward : Direction.Reverse,
 					EnableCondition.IgnoreDisabledState,
 					DisableCondition.DoNotDisable);
 				if (aa != null && (instantTween || !NGUITools.GetActive(this))) aa.Finish();
 			}
-			else if (activeAnimation != null)
+
+			if (activeAnimation != null)
 			{
-				ActiveAnimation aa = ActiveAnimation.Play(activeAnimation, null,
+				var aa = ActiveAnimation.Play(activeAnimation, null,
 					state ? Direction.Forward : Direction.Reverse,
 					EnableCondition.IgnoreDisabledState,
 					DisableCondition.DoNotDisable);
 				if (aa != null && (instantTween || !NGUITools.GetActive(this))) aa.Finish();
 			}
-			else if (tween != null)
+
+			if (tween != null)
 			{
-				bool isActive = NGUITools.GetActive(this);
+				var isActive = NGUITools.GetActive(this);
+
+				tween.Play(state);
+				if (instantTween || !isActive) tween.tweenFactor = state ? 1f : 0f;
 
 				if (tween.tweenGroup != 0)
 				{
-					UITweener[] tws = tween.GetComponentsInChildren<UITweener>(true);
+					var tws = gameObject.GetComponentsInChildren<UITweener>(true);
 
 					for (int i = 0, imax = tws.Length; i < imax; ++i)
 					{
-						UITweener t = tws[i];
+						var t = tws[i];
 
-						if (t.tweenGroup == tween.tweenGroup)
+						if (t != tween && t.tweenGroup == tween.tweenGroup)
 						{
 							t.Play(state);
 							if (instantTween || !isActive) t.tweenFactor = state ? 1f : 0f;
 						}
 					}
-				}
-				else
-				{
-					tween.Play(state);
-					if (instantTween || !isActive) tween.tweenFactor = state ? 1f : 0f;
 				}
 			}
 		}

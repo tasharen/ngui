@@ -70,11 +70,11 @@ public class UIGrid : UIWidgetContainer
 
 	public float cellHeight = 200f;
 
-	/// <summary>
-	/// Whether the grid will smoothly animate its children into the correct place.
-	/// </summary>
-
+	[Tooltip("Whether the grid will smoothly animate its children into the correct place.")]
 	public bool animateSmoothly = false;
+
+	[Tooltip("If 'true' and Animate Smoothly is also 'true', will check to see if elements have a TweenAlpha on them. If so, elements will appear in their target position instead of animating from the current position.")]
+	public bool animateFadeIn = false;
 
 	/// <summary>
 	/// Whether to ignore the disabled children or to treat them as being present.
@@ -315,7 +315,7 @@ public class UIGrid : UIWidgetContainer
 		}
 
 		// Get the list of children in their current order
-		List<Transform> list = GetChildList();
+		var list = GetChildList();
 
 		// Reset the position and order of all objects in the list
 		ResetPosition(list);
@@ -380,7 +380,16 @@ public class UIGrid : UIWidgetContainer
 				new Vector3(cellWidth * x, -cellHeight * y, depth) :
 				new Vector3(cellWidth * y, -cellHeight * x, depth);
 
-			if (animateSmoothly && Application.isPlaying && (pivot != UIWidget.Pivot.TopLeft || Vector3.SqrMagnitude(t.localPosition - pos) >= 0.0001f))
+			var smoothAnim = animateSmoothly && Application.isPlaying;
+
+			// Special case: if the element is currently invisible and is fading in, we want to position it in the right place right away
+			if (smoothAnim && animateFadeIn)
+			{
+				var tw = t.GetComponent<TweenAlpha>();
+				if (tw != null && tw.enabled && tw.value == 0f && tw.to == 1f) smoothAnim = false;
+			}
+
+			if (smoothAnim && (pivot != UIWidget.Pivot.TopLeft || Vector3.SqrMagnitude(t.localPosition - pos) >= 0.0001f))
 			{
 				var sp = SpringPosition.Begin(t.gameObject, pos, 15f);
 				sp.updateScrollView = true;

@@ -300,18 +300,17 @@ public class UITable : UIWidgetContainer
 		if (Application.isPlaying && !mInitDone && NGUITools.GetActive(this)) Init();
 
 		mReposition = false;
-		Transform myTrans = transform;
-		List<Transform> ch = GetChildList();
+		var myTrans = transform;
+		var ch = GetChildList();
 		if (ch.Count > 0) RepositionVariableSize(ch);
 
 		if (keepWithinPanel && mPanel != null)
 		{
 			mPanel.ConstrainTargetToBounds(myTrans, true);
-			UIScrollView sv = mPanel.GetComponent<UIScrollView>();
+			var sv = mPanel.GetComponent<UIScrollView>();
 			if (sv != null) sv.UpdateScrollbars(true);
 		}
 
-		if (onReposition != null)
-			onReposition();
+		if (onReposition != null) onReposition();
 	}
 }

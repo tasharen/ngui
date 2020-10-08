@@ -1036,6 +1036,7 @@ public class UILabel : UIWidget
 		base.OnInit();
 		mList.Add(this);
 		SetActiveFont(trueTypeFont);
+		if (shouldBeProcessed) ProcessAndRequest();
 		if (separateSymbols && mLabSym == null) CreateSymbolLabel();
 	}
 
@@ -1077,7 +1078,10 @@ public class UILabel : UIWidget
 	{
 		if (mLabSym == null)
 		{
-			mLabSym = NGUITools.AddChild<UILabelSymbols>(gameObject, false);
+			var go = gameObject.AddChild(false);
+			go.SetActive(false);
+			go.name = "Label Symbols";
+			mLabSym = go.AddComponent<UILabelSymbols>();
 			mLabSym.gameObject.hideFlags = HideFlags.HideAndDontSave;
 			mLabSym.label = this;
 			mLabSym.pivot = pivot;
@@ -1089,6 +1093,8 @@ public class UILabel : UIWidget
 			mLabSym.updateAnchors = AnchorUpdate.OnUpdate;
 			mLabSym.ResetAnchors();
 			mLabSym.UpdateAnchors();
+			go.SetActive(true);
+			mLabSym.Start();
 		}
 	}
 
@@ -1448,19 +1454,20 @@ public class UILabel : UIWidget
 	}
 #endif
 
-#if !UNITY_4_3 && !UNITY_4_5
 	[System.NonSerialized] static bool mTexRebuildAdded = false;
 
 	protected override void OnEnable ()
 	{
+		shouldBeProcessed = true;
+
 		base.OnEnable();
+
 		if (!mTexRebuildAdded)
 		{
 			mTexRebuildAdded = true;
 			Font.textureRebuilt += OnFontChanged;
 		}
 	}
-#endif
 
 	/// <summary>
 	/// Determine start-up values.

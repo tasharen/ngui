@@ -69,6 +69,12 @@ public class UILabelSymbols : UIWidget
 		}
 	}
 
+	protected override void OnDisable ()
+	{
+		base.OnDisable();
+		ClearCache();
+	}
+
 	public override void OnFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols)
 	{
 		var frame = Time.frameCount;

@@ -291,12 +291,12 @@ public class UIPlayTween : MonoBehaviour
 #endif
 		if (disableWhenFinished != DisableCondition.DoNotDisable && mTweens != null)
 		{
-			bool isFinished = true;
-			bool properDirection = true;
+			var isFinished = true;
+			var properDirection = true;
 
 			for (int i = 0, imax = mTweens.Length; i < imax; ++i)
 			{
-				UITweener tw = mTweens[i];
+				var tw = mTweens[i];
 				if (tw.tweenGroup != tweenGroup) continue;
 
 				if (tw.enabled)

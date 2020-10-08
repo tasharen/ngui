@@ -406,6 +406,7 @@ public abstract class UIRect : MonoBehaviour
 			mAnchorsCached = false;
 			mUpdateAnchors = true;
 		}
+
 		if (mStarted) OnInit();
 		mUpdateFrame = -1;
 	}
@@ -458,11 +459,14 @@ public abstract class UIRect : MonoBehaviour
 	/// Set anchor rect references on start.
 	/// </summary>
 
-	protected void Start ()
+	public void Start ()
 	{
-		mStarted = true;
-		OnInit();
-		OnStart();
+		if (!mStarted)
+		{
+			mStarted = true;
+			OnInit();
+			OnStart();
+		}
 	}
 
 	/// <summary>
