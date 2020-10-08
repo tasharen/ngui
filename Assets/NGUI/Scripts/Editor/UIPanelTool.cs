@@ -91,7 +91,7 @@ public class UIPanelTool : EditorWindow
 				ent.isEnabled = mExamine.gameObject.activeSelf;
 
 				NGUIEditorTools.SetLabelWidth(80f);
-				bool showAll = DrawRow(null, null, ent.isEnabled);
+				DrawRow(null, null, ent.isEnabled);
 				NGUIEditorTools.DrawSeparator();
 
 				DrawRow(ent, selectedPanel, ent.isEnabled);

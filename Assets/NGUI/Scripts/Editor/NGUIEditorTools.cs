@@ -2414,8 +2414,11 @@ static public class NGUIEditorTools
 	static public string MakeReadable (this Texture2D tex, bool readable = true)
 	{
 		var path = AssetDatabase.GetAssetPath(tex);
-
+#if UNITY_5_6
+		if (!string.IsNullOrEmpty(path))
+#else
 		if (!string.IsNullOrEmpty(path) && !tex.isReadable)
+#endif
 		{
 			var textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
 
