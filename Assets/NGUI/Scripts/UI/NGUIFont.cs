@@ -67,6 +67,12 @@ public interface INGUIFont
 	INGUIAtlas atlas { get; set; }
 
 	/// <summary>
+	/// Atlas used by the symbols, if any. Can match the 'atlas'.
+	/// </summary>
+
+	INGUIAtlas symbolAtlas { get; }
+
+	/// <summary>
 	/// Convenience method that returns the chosen sprite inside the atlas.
 	/// </summary>
 
@@ -192,7 +198,7 @@ public interface INGUIFont
 	/// Add a new symbol to the font.
 	/// </summary>
 
-	void AddSymbol (string sequence, string spriteName);
+	BMSymbol AddSymbol (string sequence, string spriteName);
 
 	/// <summary>
 	/// Remove the specified symbol from the font.
@@ -814,7 +820,8 @@ public class NGUIFont : ScriptableObject, INGUIFont
 				if (mSprite == null) mFont.spriteName = null;
 				else UpdateUVRect();
 
-				for (int i = 0, imax = mSymbols.Count; i < imax; ++i) symbols[i].MarkAsChanged();
+				var sym = symbols;
+				for (int i = 0, imax = sym.Count; i < imax; ++i) sym[i].MarkAsChanged();
 			}
 			return mSprite;
 		}
@@ -1024,7 +1031,8 @@ public class NGUIFont : ScriptableObject, INGUIFont
 		}
 
 		// Clear all symbols
-		for (int i = 0, imax = symbols.Count; i < imax; ++i) symbols[i].MarkAsChanged();
+		var sym = symbols;
+		for (int i = 0, imax = sym.Count; i < imax; ++i) sym[i].MarkAsChanged();
 		mEmbeddedSymbols = null;
 	}
 
@@ -1188,11 +1196,12 @@ public class NGUIFont : ScriptableObject, INGUIFont
 	/// Add a new symbol to the font.
 	/// </summary>
 
-	public void AddSymbol (string sequence, string spriteName)
+	public BMSymbol AddSymbol (string sequence, string spriteName)
 	{
 		var symbol = GetSymbol(sequence, true);
 		symbol.spriteName = spriteName;
 		MarkAsChanged();
+		return symbol;
 	}
 
 	/// <summary>

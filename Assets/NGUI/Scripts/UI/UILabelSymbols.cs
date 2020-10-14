@@ -52,6 +52,7 @@ public class UILabelSymbols : UIWidget
 		fillFrame = -1;
 	}
 
+#if UNITY_EDITOR
 	protected override void OnValidate ()
 	{
 		base.OnValidate();
@@ -68,6 +69,7 @@ public class UILabelSymbols : UIWidget
 			else DestroyImmediate(go);
 		}
 	}
+#endif
 
 	protected override void OnDisable ()
 	{

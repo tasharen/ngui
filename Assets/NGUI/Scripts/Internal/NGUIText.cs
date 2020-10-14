@@ -1694,7 +1694,7 @@ static public class NGUIText
 
 				if (cols != null)
 				{
-					if (symbolStyle == SymbolStyle.Colored)
+					if (symbolStyle == SymbolStyle.Colored || (symbolStyle == SymbolStyle.Normal && symbol.colored))
 					{
 						if (scols != null)
 						{

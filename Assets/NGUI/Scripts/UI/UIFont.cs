@@ -182,6 +182,8 @@ public class UIFont : MonoBehaviour, INGUIFont
 		}
 	}
 
+	public INGUIAtlas symbolAtlas { get { return atlas; } }
+
 	/// <summary>
 	/// Convenience method that returns the chosen sprite inside the atlas.
 	/// </summary>
@@ -433,7 +435,8 @@ public class UIFont : MonoBehaviour, INGUIFont
 				if (mSprite == null) mFont.spriteName = null;
 				else UpdateUVRect();
 
-				for (int i = 0, imax = mSymbols.Count; i < imax; ++i) symbols[i].MarkAsChanged();
+				var sym = symbols;
+				for (int i = 0, imax = sym.Count; i < imax; ++i) sym[i].MarkAsChanged();
 			}
 			return mSprite;
 		}
@@ -626,7 +629,8 @@ public class UIFont : MonoBehaviour, INGUIFont
 		}
 
 		// Clear all symbols
-		for (int i = 0, imax = symbols.Count; i < imax; ++i) symbols[i].MarkAsChanged();
+		var sym = symbols;
+		for (int i = 0, imax = sym.Count; i < imax; ++i) sym[i].MarkAsChanged();
 	}
 
 	/// <summary>
@@ -735,11 +739,12 @@ public class UIFont : MonoBehaviour, INGUIFont
 	/// Add a new symbol to the font.
 	/// </summary>
 
-	public void AddSymbol (string sequence, string spriteName)
+	public BMSymbol AddSymbol (string sequence, string spriteName)
 	{
-		BMSymbol symbol = GetSymbol(sequence, true);
+		var symbol = GetSymbol(sequence, true);
 		symbol.spriteName = spriteName;
 		MarkAsChanged();
+		return symbol;
 	}
 
 	/// <summary>
@@ -748,7 +753,7 @@ public class UIFont : MonoBehaviour, INGUIFont
 
 	public void RemoveSymbol (string sequence)
 	{
-		BMSymbol symbol = GetSymbol(sequence, false);
+		var symbol = GetSymbol(sequence, false);
 		if (symbol != null) symbols.Remove(symbol);
 		MarkAsChanged();
 	}
@@ -759,7 +764,7 @@ public class UIFont : MonoBehaviour, INGUIFont
 
 	public void RenameSymbol (string before, string after)
 	{
-		BMSymbol symbol = GetSymbol(before, false);
+		var symbol = GetSymbol(before, false);
 		if (symbol != null) symbol.sequence = after;
 		MarkAsChanged();
 	}

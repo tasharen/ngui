@@ -548,6 +548,16 @@ static public class Localization
 	}
 
 	/// <summary>
+	/// Localize the specified value. If the value is missing, 'fallback' value is used instead. No warning will be shown if the 'key' value is missing.
+	/// </summary>
+
+	static public string Get (string key, string fallback)
+	{
+		if (Has(key)) return Get(key);
+		return Get(fallback);
+	}
+
+	/// <summary>
 	/// Localize the specified value.
 	/// </summary>
 

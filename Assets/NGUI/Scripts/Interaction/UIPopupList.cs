@@ -1142,7 +1142,7 @@ public class UIPopupList : UIWidgetContainer
 				lbl.cachedTransform.localPosition = new Vector3(bgPadding.x + padding.x - lbl.pivotOffset.x, y, -1f);
 				lbl.overflowMethod = UILabel.Overflow.ResizeFreely;
 				lbl.alignment = alignment;
-				lbl.symbolStyle = NGUIText.SymbolStyle.Colored;
+				lbl.symbolStyle = NGUIText.SymbolStyle.Normal;
 				labels.Add(lbl);
 
 				contentHeight += lineHeight;

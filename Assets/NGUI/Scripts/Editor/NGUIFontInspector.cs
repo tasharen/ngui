@@ -31,6 +31,7 @@ public class NGUIFontInspector : Editor
 	INGUIFont mReplacement = null;
 	string mSymbolSequence = "";
 	string mSymbolSprite = "";
+	bool mSymbolColored = false;
 	BMSymbol mSelectedSymbol = null;
 	AnimationCurve mCurve = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f));
 
@@ -346,17 +347,22 @@ public class NGUIFontInspector : Editor
 
 				GUILayout.BeginHorizontal();
 				GUILayout.Label(sym.sequence, GUILayout.Width(40f));
-				if (NGUIEditorTools.DrawSpriteField(symbolAtlas, sym.spriteName, ChangeSymbolSprite, GUILayout.MinWidth(100f)))
-					mSelectedSymbol = sym;
 
-				if (GUILayout.Button("Edit", GUILayout.Width(40f)))
+				if (NGUIEditorTools.DrawSpriteField(symbolAtlas, sym.spriteName, ChangeSymbolSprite, GUILayout.MinWidth(100f))) mSelectedSymbol = sym;
+
+				var col = GUILayout.Toggle(sym.colored, new GUIContent(""), GUILayout.Width(16f));
+
+				if (col != sym.colored)
 				{
-					if (symbolAtlas != null)
-					{
-						NGUISettings.atlas = symbolAtlas;
-						NGUISettings.selectedSprite = sym.spriteName;
-						NGUIEditorTools.Select(symbolAtlas as Object);
-					}
+					sym.colored = col;
+					mFont.MarkAsChanged();
+				}
+
+				if (GUILayout.Button("Edit", GUILayout.Width(40f)) && symbolAtlas != null)
+				{
+					NGUISettings.atlas = symbolAtlas;
+					NGUISettings.selectedSprite = sym.spriteName;
+					NGUIEditorTools.Select(symbolAtlas as Object);
 				}
 
 				GUI.backgroundColor = Color.red;
@@ -375,7 +381,19 @@ public class NGUIFontInspector : Editor
 				++i;
 			}
 
-			if (symbols.Count > 0) GUILayout.Space(6f);
+			if (symbols.Count > 0)
+			{
+				if (Event.current.type == EventType.Repaint)
+				{
+					Texture2D tex = NGUIEditorTools.blankTexture;
+					Rect rect = GUILayoutUtility.GetLastRect();
+					GUI.color = new Color(0f, 0f, 0f, 0.25f);
+					GUI.DrawTexture(new Rect(20f, rect.yMin + 28f, Screen.width - 30f, 1f), tex);
+					GUI.color = Color.white;
+				}
+
+				GUILayout.Space(10f);
+			}
 
 			GUILayout.BeginHorizontal();
 			mSymbolSequence = EditorGUILayout.TextField(mSymbolSequence, GUILayout.Width(40f));
@@ -387,13 +405,21 @@ public class NGUIFontInspector : Editor
 			if (GUILayout.Button("Add", GUILayout.Width(40f)) && isValid)
 			{
 				NGUIEditorTools.RegisterUndo("Add symbol", mFont as Object);
-				mFont.AddSymbol(mSymbolSequence, mSymbolSprite);
+				var sym = mFont.AddSymbol(mSymbolSequence, mSymbolSprite);
+				sym.colored = mSymbolColored;
 				mFont.MarkAsChanged();
 				mSymbolSequence = "";
 				mSymbolSprite = "";
 			}
 			GUI.backgroundColor = Color.white;
 			GUILayout.EndHorizontal();
+
+			NGUIEditorTools.SetLabelWidth(42f);
+			GUILayout.BeginHorizontal();
+			mSymbolColored = EditorGUILayout.Toggle("Tinted", mSymbolColored, GUILayout.Width(60f));
+			GUILayout.Label("- affected by label's color by default");
+			GUILayout.EndHorizontal();
+			NGUIEditorTools.SetLabelWidth(80f);
 
 			if (symbols.Count == 0)
 			{
@@ -596,7 +622,7 @@ public class NGUIFontInspector : Editor
 		int offsetX = 0;
 		int offsetY = 0;
 
-		if (mFont.atlas != null)
+		if (mFont.symbolAtlas != null)
 		{
 			var sd = mFont.GetSprite(bf.spriteName);
 			if (sd == null) return;

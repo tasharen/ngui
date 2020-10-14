@@ -209,7 +209,7 @@ public class UIProgressBar : UIWidgetContainer
 	/// Set the progress bar's value. If setting the initial value, call Start() first.
 	/// </summary>
 
-	public void Set (float val, bool notify = true)
+	public bool Set (float val, bool notify = true)
 	{
 		val = Mathf.Clamp01(val);
 
@@ -233,6 +233,18 @@ public class UIProgressBar : UIWidgetContainer
 			if (!Application.isPlaying)
 				NGUITools.SetDirty(this);
 #endif
+			return true;
+		}
+		return false;
+	}
+
+	protected void OnEnable ()
+	{
+		if (mStarted && current == null && EventDelegate.IsValid(onChange))
+		{
+			current = this;
+			EventDelegate.Execute(onChange);
+			current = null;
 		}
 	}
 
@@ -252,7 +264,7 @@ public class UIProgressBar : UIWidgetContainer
 
 			OnStart();
 
-			if (current == null && onChange != null)
+			if (current == null && EventDelegate.IsValid(onChange))
 			{
 				current = this;
 				EventDelegate.Execute(onChange);

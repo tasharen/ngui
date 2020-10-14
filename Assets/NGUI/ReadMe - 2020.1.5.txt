@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2020.1.4
+            Version 2020.1.5
        https://discord.gg/tasharen/
 ----------------------------------------------
 
@@ -54,6 +54,11 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2020.1.5
+- NEW: You can now specify per-symbol colorization settings, choosing which symbols get affected by label colors and which don't.
+- FIX: UIProgressBar.onChange will execute when it's enabled.
+- FIX: Fixed the missing #UNITY_EDITOR define preventing building.
 
 2020.1.4
 - NEW: Dynamic fonts now have full symbol (emoticons) support.
