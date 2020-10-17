@@ -82,7 +82,9 @@ public class UIPanelTool : EditorWindow
 		if (panels != null && panels.Count > 0)
 		{
 			mPos = EditorGUILayout.BeginScrollView(mPos);
-			var selectedPanel = NGUITools.FindInParents<UIPanel>(Selection.activeGameObject);
+			var sel = Selection.activeGameObject;
+			var selectedPanel = (sel != null) ? sel.GetComponent<UIPanel>() : null;
+			if (sel != null && selectedPanel == null) selectedPanel = NGUITools.FindInParents<UIPanel>(sel);
 
 			if (mExamine)
 			{
@@ -249,7 +251,7 @@ public class UIPanelTool : EditorWindow
 
 		if (ent != null)
 		{
-			GUI.backgroundColor = (ent.panel == selected || mExamine == ent.panel) ? Color.white : new Color(0.8f, 0.8f, 0.8f, 0.15f);
+			GUI.backgroundColor = (ent.panel == selected || (mExamine != null && mExamine == ent.panel)) ? Color.white : new Color(0.8f, 0.8f, 0.8f, 0.15f);
 			GUILayout.BeginHorizontal(NGUIEditorTools.textArea, GUILayout.MinHeight(20f));
 			GUI.backgroundColor = Color.white;
 		}
@@ -258,7 +260,7 @@ public class UIPanelTool : EditorWindow
 			GUILayout.BeginHorizontal();
 		}
 
-		GUI.contentColor = (ent == null || ent.isEnabled) ? Color.white : new Color(0.5f, 0.5f, 0.5f);
+		GUI.contentColor = (ent == null || ent.panel.isActiveAndEnabled) ? Color.white : new Color(0.5f, 0.5f, 0.5f);
 
 		if (ent == null)
 		{

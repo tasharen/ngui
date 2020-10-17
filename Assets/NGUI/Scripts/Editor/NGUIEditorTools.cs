@@ -80,7 +80,7 @@ static public class NGUIEditorTools
 
 	private static Texture2D CreateDummyTex ()
 	{
-		Texture2D tex = new Texture2D(1, 1);
+		var tex = new Texture2D(1, 1);
 		tex.name = "[Generated] Dummy Texture";
 		tex.hideFlags = HideFlags.DontSave;
 		tex.filterMode = FilterMode.Point;
@@ -95,14 +95,24 @@ static public class NGUIEditorTools
 
 	private static Texture2D CreateCheckerTex (Color c0, Color c1)
 	{
-		Texture2D tex = new Texture2D(16, 16);
+		var tex = new Texture2D(128, 128);
 		tex.name = "[Generated] Checker Texture";
 		tex.hideFlags = HideFlags.DontSave;
 
-		for (int y = 0; y < 8; ++y) for (int x = 0; x < 8; ++x) tex.SetPixel(x, y, c1);
-		for (int y = 8; y < 16; ++y) for (int x = 0; x < 8; ++x) tex.SetPixel(x, y, c0);
-		for (int y = 0; y < 8; ++y) for (int x = 8; x < 16; ++x) tex.SetPixel(x, y, c0);
-		for (int y = 8; y < 16; ++y) for (int x = 8; x < 16; ++x) tex.SetPixel(x, y, c1);
+		for (int iy = 0; iy < 8; ++iy)
+		{
+			var oy = iy * 16;
+
+			for (int ix = 0; ix < 8; ++ix)
+			{
+				var ox = ix * 16;
+
+				for (int y = 0; y < 8; ++y) for (int x = 0; x < 8; ++x) tex.SetPixel(ox + x, oy + y, c1);
+				for (int y = 8; y < 16; ++y) for (int x = 0; x < 8; ++x) tex.SetPixel(ox + x, oy + y, c0);
+				for (int y = 0; y < 8; ++y) for (int x = 8; x < 16; ++x) tex.SetPixel(ox + x, oy + y, c0);
+				for (int y = 8; y < 16; ++y) for (int x = 8; x < 16; ++x) tex.SetPixel(ox + x, oy + y, c1);
+			}
+		}
 
 		tex.Apply();
 		tex.filterMode = FilterMode.Point;
@@ -140,20 +150,30 @@ static public class NGUIEditorTools
 
 	static public void DrawTiledTexture (Rect rect, Texture tex)
 	{
-		GUI.BeginGroup(rect);
-		{
-			int width = Mathf.RoundToInt(rect.width);
-			int height = Mathf.RoundToInt(rect.height);
+		int width = Mathf.RoundToInt(rect.width);
+		int height = Mathf.RoundToInt(rect.height);
+		var tw = tex.width;
+		var th = tex.height;
 
-			for (int y = 0; y < height; y += tex.height)
+		if (width <= tw && height <= th)
+		{
+			var tc = new Rect(0f, 0f, (float)width / tw, (float)height / th);
+			GUI.DrawTextureWithTexCoords(rect, tex, tc, true);
+		}
+		else
+		{
+			GUI.BeginGroup(rect);
 			{
-				for (int x = 0; x < width; x += tex.width)
+				for (int y = 0; y < height; y += th)
 				{
-					GUI.DrawTexture(new Rect(x, y, tex.width, tex.height), tex);
+					for (int x = 0; x < width; x += tw)
+					{
+						GUI.DrawTexture(new Rect(x, y, tw, th), tex);
+					}
 				}
 			}
+			GUI.EndGroup();
 		}
-		GUI.EndGroup();
 	}
 
 	/// <summary>

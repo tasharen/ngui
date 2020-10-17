@@ -4,7 +4,6 @@
 //-------------------------------------------------
 
 using UnityEngine;
-using System.Collections.Generic;
 
 /// <summary>
 /// Scroll bar functionality.

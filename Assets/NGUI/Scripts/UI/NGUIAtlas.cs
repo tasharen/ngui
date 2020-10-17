@@ -210,8 +210,16 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 		set
 		{
 			var rep = replacement;
-			if (rep != null) rep.spriteList = value;
-			else mSprites = value;
+
+			if (rep != null)
+			{
+				rep.spriteList = value;
+			}
+			else
+			{
+				mSprites = value;
+				mSpriteIndices.Clear();
+			}
 		}
 	}
 
@@ -304,64 +312,20 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 		{
 			if (mSprites.Count == 0) return null;
 
+			// Rebuild the dictionary if it's empty
+			if (mSpriteIndices.Count == 0)
+			{
+				for (int i = 0, imax = mSprites.Count; i < imax; ++i)
+					mSpriteIndices[mSprites[i].name] = i;
+			}
+
+			int index;
+
 			// O(1) lookup via a dictionary
-#if UNITY_EDITOR
-			if (Application.isPlaying)
-#endif
-			{
-				// The number of indices differs from the sprite list? Rebuild the indices.
-				if (mSpriteIndices.Count != mSprites.Count)
-					MarkSpriteListAsChanged();
-
-				int index;
-				if (mSpriteIndices.TryGetValue(name, out index))
-				{
-					// If the sprite is present, return it as-is
-					if (index > -1 && index < mSprites.Count) return mSprites[index];
-
-					// The sprite index was out of range -- perhaps the sprite was removed? Rebuild the indices.
-					MarkSpriteListAsChanged();
-
-					// Try to look up the index again
-					return mSpriteIndices.TryGetValue(name, out index) ? mSprites[index] : null;
-				}
-			}
-
-			// Sequential O(N) lookup.
-			for (int i = 0, imax = mSprites.Count; i < imax; ++i)
-			{
-				UISpriteData s = mSprites[i];
-
-				// string.Equals doesn't seem to work with Flash export
-				if (!string.IsNullOrEmpty(s.name) && name == s.name)
-				{
-#if UNITY_EDITOR
-					if (!Application.isPlaying) return s;
-#endif
-					// If this point was reached then the sprite is present in the non-indexed list,
-					// so the sprite indices should be updated.
-					MarkSpriteListAsChanged();
-					return s;
-				}
-			}
+			if (!mSpriteIndices.TryGetValue(name, out index)) return null;
+			return mSprites[index];
 		}
 		return null;
-	}
-
-	/// <summary>
-	/// Rebuild the sprite indices. Call this after modifying the spriteList at run time.
-	/// </summary>
-
-	public void MarkSpriteListAsChanged ()
-	{
-#if UNITY_EDITOR
-		if (Application.isPlaying)
-#endif
-		{
-			mSpriteIndices.Clear();
-			for (int i = 0, imax = mSprites.Count; i < imax; ++i)
-				mSpriteIndices[mSprites[i].name] = i;
-		}
 	}
 
 	/// <summary>
@@ -371,6 +335,7 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 	public void SortAlphabetically ()
 	{
 		mSprites.Sort(delegate(UISpriteData s1, UISpriteData s2) { return s1.name.CompareTo(s2.name); });
+		mSpriteIndices.Clear();
 #if UNITY_EDITOR
 		NGUITools.SetDirty(this);
 #endif
@@ -389,7 +354,7 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 
 		for (int i = 0, imax = mSprites.Count; i < imax; ++i)
 		{
-			UISpriteData s = mSprites[i];
+			var s = mSprites[i];
 			if (s != null && !string.IsNullOrEmpty(s.name)) list.Add(s.name);
 		}
 		return list;

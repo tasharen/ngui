@@ -50,6 +50,9 @@ public class UITable : UIWidgetContainer
 
 	public Sorting sorting = Sorting.None;
 
+	[Tooltip("Whether the sort order will be inverted")]
+	public bool inverted = false;
+
 	/// <summary>
 	/// Final pivot point for the table itself.
 	/// </summary>
@@ -121,9 +124,9 @@ public class UITable : UIWidgetContainer
 		// Sort the list using the desired sorting logic
 		if (sorting != Sorting.None)
 		{
-			if (sorting == Sorting.Alphabetic) list.Sort(UIGrid.SortByName);
-			else if (sorting == Sorting.Horizontal) list.Sort(UIGrid.SortHorizontal);
-			else if (sorting == Sorting.Vertical) list.Sort(UIGrid.SortVertical);
+			if (sorting == Sorting.Alphabetic) { if (inverted) list.Sort(UIGrid.SortByNameInv); else list.Sort(UIGrid.SortByName); }
+			else if (sorting == Sorting.Horizontal) { if (inverted) list.Sort(UIGrid.SortHorizontalInv); else list.Sort(UIGrid.SortHorizontal); }
+			else if (sorting == Sorting.Vertical) { if (inverted) list.Sort(UIGrid.SortVerticalInv); else list.Sort(UIGrid.SortVertical); }
 			else if (onCustomSort != null) list.Sort(onCustomSort);
 			else Sort(list);
 		}
@@ -135,6 +138,8 @@ public class UITable : UIWidgetContainer
 	/// </summary>
 
 	protected virtual void Sort (List<Transform> list) { list.Sort(UIGrid.SortByName); }
+
+	protected virtual void OnEnable () { mReposition = true; }
 
 	/// <summary>
 	/// Position the grid's contents when the script starts.

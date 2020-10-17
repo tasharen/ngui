@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2020.1.5
+            Version 2020.1.6
        https://discord.gg/tasharen/
 ----------------------------------------------
 
@@ -54,6 +54,13 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2020.1.6
+- NEW: Added an "inverted" option to UIGrid and UITable that simply flips the child sorting order.
+- NEW: Scroll view now has spring and dampen strength values exposed in inspector.
+- NEW: Added a new [t] symbol that forces all following symbols to be color tinted, regardless of their setting.
+- FIX: Made the sprite selection window significantly more performant, mainly by making NGUIAtlas.GetSprite faster.
+- FIX: Fixed Panel Tool selection indicator not visibly selecting the correct panel at times.
 
 2020.1.5
 - NEW: You can now specify per-symbol colorization settings, choosing which symbols get affected by label colors and which don't.

@@ -37,6 +37,8 @@ public class UIGridEditor : UIWidgetContainerEditor
 			{
 				EditorGUILayout.HelpBox("Horizontal and Vertical sortinig only works if the number of rows/columns remains at 0.", MessageType.Warning);
 			}
+
+			NGUIEditorTools.DrawProperty("Inverted", serializedObject, "inverted");
 		}
 
 		NGUIEditorTools.DrawProperty("Pivot", serializedObject, "pivot");

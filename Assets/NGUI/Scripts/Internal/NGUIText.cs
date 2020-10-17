@@ -442,7 +442,8 @@ static public class NGUIText
 		bool underline = false;
 		bool strikethrough = false;
 		bool ignoreColor = false;
-		return ParseSymbol(text, ref index, null, false, ref n, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor);
+		bool forceSpriteColor = false;
+		return ParseSymbol(text, ref index, null, false, ref n, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor);
 	}
 
 	/// <summary>
@@ -462,7 +463,7 @@ static public class NGUIText
 	/// </summary>
 
 	static public bool ParseSymbol (string text, ref int index, BetterList<Color> colors, bool premultiply,
-		ref int sub, ref bool bold, ref bool italic, ref bool underline, ref bool strike, ref bool ignoreColor)
+		ref int sub, ref bool bold, ref bool italic, ref bool underline, ref bool strike, ref bool ignoreColor, ref bool forceSpriteColor)
 	{
 		int length = text.Length;
 
@@ -511,6 +512,12 @@ static public class NGUIText
 				ignoreColor = true;
 				index += 3;
 				return true;
+
+				case "[t]":
+				case "[T]":
+				forceSpriteColor = true;
+				index += 3;
+				return true;
 			}
 		}
 
@@ -549,6 +556,12 @@ static public class NGUIText
 				case "[/c]":
 				case "[/C]":
 				ignoreColor = false;
+				index += 4;
+				return true;
+
+				case "[/t]":
+				case "[/T]":
+				forceSpriteColor = true;
 				index += 4;
 				return true;
 
@@ -690,14 +703,15 @@ static public class NGUIText
 				if (c == '[')
 				{
 					int sub = 0;
-					bool bold = false;
-					bool italic = false;
-					bool underline = false;
-					bool strikethrough = false;
-					bool ignoreColor = false;
+					var bold = false;
+					var italic = false;
+					var underline = false;
+					var strikethrough = false;
+					var ignoreColor = false;
+					var forceSpriteColor = false;
 					int retVal = i;
 
-					if (ParseSymbol(text, ref retVal, null, false, ref sub, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor))
+					if (ParseSymbol(text, ref retVal, null, false, ref sub, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 					{
 						text = text.Remove(i, retVal - i);
 						imax = text.Length;
@@ -953,11 +967,12 @@ static public class NGUIText
 			float x = 0f, y = 0f, maxX = 0f, maxWidth = regionWidth + 0.01f;
 			int textLength = text.Length;
 			int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
-			bool bold = false;
-			bool italic = false;
-			bool underline = false;
-			bool strikethrough = false;
-			bool ignoreColor = false;
+			var bold = false;
+			var italic = false;
+			var underline = false;
+			var strikethrough = false;
+			var ignoreColor = false;
+			var forceSpriteColor = false;
 			var symbolScale = NGUIText.symbolScale;
 			var symbolMaxHeight = NGUIText.symbolMaxHeight;
 
@@ -984,7 +999,7 @@ static public class NGUIText
 
 				// Color changing symbol
 				if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
-					ref italic, ref underline, ref strikethrough, ref ignoreColor))
+					ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 				{
 					--i;
 					continue;
@@ -1096,11 +1111,12 @@ static public class NGUIText
 
 		int textLength = text.Length, ch = 0, prev = 0;
 		int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
-		bool bold = false;
-		bool italic = false;
-		bool underline = false;
-		bool strikethrough = false;
-		bool ignoreColor = false;
+		var bold = false;
+		var italic = false;
+		var underline = false;
+		var strikethrough = false;
+		var ignoreColor = false;
+		var forceSpriteColor = false;
 		var symbolScale = NGUIText.symbolScale;
 		var symbolMaxHeight = NGUIText.symbolMaxHeight;
 
@@ -1112,7 +1128,7 @@ static public class NGUIText
 
 			// Color changing symbol
 			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
-				ref italic, ref underline, ref strikethrough, ref ignoreColor))
+				ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 			{
 				--i;
 				continue;
@@ -1211,11 +1227,12 @@ static public class NGUIText
 
 		Color c = tint;
 		int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
-		bool bold = false;
-		bool italic = false;
-		bool underline = false;
-		bool strikethrough = false;
-		bool ignoreColor = false;
+		var bold = false;
+		var italic = false;
+		var underline = false;
+		var strikethrough = false;
+		var ignoreColor = false;
+		var forceSpriteColor = false;
 		float ellipsisWidth = useEllipsis ? (finalSpacingX + GetGlyphWidth('.', '.', fontScale)) * 3f : finalSpacingX;
 		var symbolScale = NGUIText.symbolScale;
 		var symbolMaxHeight = NGUIText.symbolMaxHeight;
@@ -1273,7 +1290,7 @@ static public class NGUIText
 			var previousSubscript = subscriptMode;
 
 			// When encoded symbols such as [RrGgBb] or [-] are encountered, skip past them
-			if (encoding && ParseSymbol(text, ref offset, mColors, premultiply, ref subscriptMode, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor))
+			if (encoding && ParseSymbol(text, ref offset, mColors, premultiply, ref subscriptMode, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 			{
 				// Adds "..." at the end of text that doesn't fit
 				if (lineCount == maxLineCount && useEllipsis && start < lastValidChar)
@@ -1523,11 +1540,12 @@ static public class NGUIText
 
 		// Advanced symbol support contributed by Rudy Pangestu.
 		int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
-		bool bold = false;
-		bool italic = false;
-		bool underline = false;
-		bool strikethrough = false;
-		bool ignoreColor = false;
+		var bold = false;
+		var italic = false;
+		var underline = false;
+		var strikethrough = false;
+		var ignoreColor = false;
+		var forceSpriteColor = false;
 		var clear = new Color(0f, 0f, 0f, 0f);
 		var symbolScale = NGUIText.symbolScale;
 		var symbolOffset = NGUIText.symbolOffset;
@@ -1578,7 +1596,7 @@ static public class NGUIText
 
 			// Color changing symbol
 			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
-				ref italic, ref underline, ref strikethrough, ref ignoreColor))
+				ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 			{
 				if (ignoreColor)
 				{
@@ -1694,7 +1712,7 @@ static public class NGUIText
 
 				if (cols != null)
 				{
-					if (symbolStyle == SymbolStyle.Colored || (symbolStyle == SymbolStyle.Normal && symbol.colored))
+					if (symbolStyle == SymbolStyle.Colored || (symbolStyle == SymbolStyle.Normal && (forceSpriteColor || symbol.colored)))
 					{
 						if (scols != null)
 						{
@@ -2037,11 +2055,12 @@ static public class NGUIText
 		int textLength = text.Length, indexOffset = verts.Count, ch = 0, prev = 0;
 
 		int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
-		bool bold = false;
-		bool italic = false;
-		bool underline = false;
-		bool strikethrough = false;
-		bool ignoreColor = false;
+		var bold = false;
+		var italic = false;
+		var underline = false;
+		var strikethrough = false;
+		var ignoreColor = false;
+		var forceSpriteColor = false;
 		var symbolScale = NGUIText.symbolScale;
 		var symbolMaxHeight = NGUIText.symbolMaxHeight;
 
@@ -2075,7 +2094,7 @@ static public class NGUIText
 			}
 
 			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
-					ref italic, ref underline, ref strikethrough, ref ignoreColor))
+					ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 			{
 				--i;
 				continue;
@@ -2160,11 +2179,12 @@ static public class NGUIText
 		int textLength = text.Length, indexOffset = verts.Count, ch = 0, prev = 0;
 
 		int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
-		bool bold = false;
-		bool italic = false;
-		bool underline = false;
-		bool strikethrough = false;
-		bool ignoreColor = false;
+		var bold = false;
+		var italic = false;
+		var underline = false;
+		var strikethrough = false;
+		var ignoreColor = false;
+		var forceSpriteColor = false;
 		var symbolScale = NGUIText.symbolScale;
 		var symbolMaxHeight = NGUIText.symbolMaxHeight;
 
@@ -2193,7 +2213,7 @@ static public class NGUIText
 			}
 
 			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
-				ref italic, ref underline, ref strikethrough, ref ignoreColor))
+				ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 			{
 				--i;
 				continue;
@@ -2295,11 +2315,12 @@ static public class NGUIText
 		bool highlighting = false, caretSet = false;
 
 		int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
-		bool bold = false;
-		bool italic = false;
-		bool underline = false;
-		bool strikethrough = false;
-		bool ignoreColor = false;
+		var bold = false;
+		var italic = false;
+		var underline = false;
+		var strikethrough = false;
+		var ignoreColor = false;
+		var forceSpriteColor = false;
 		var symbolScale = NGUIText.symbolScale;
 		var symbolMaxHeight = NGUIText.symbolMaxHeight;
 
@@ -2369,7 +2390,7 @@ static public class NGUIText
 			}
 
 			if (encoding && ParseSymbol(text, ref index, mColors, premultiply, ref subscriptMode, ref bold,
-					ref italic, ref underline, ref strikethrough, ref ignoreColor))
+					ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 			{
 				--index;
 				continue;

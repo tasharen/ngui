@@ -96,10 +96,10 @@ public class UIScrollView : MonoBehaviour
 
 	public float momentumAmount = 35f;
 
-	/// <summary>
-	/// Strength of the spring dampening effect.
-	/// </summary>
+	[Tooltip("Strength of the spring effect when moving the contents back into viewable area")]
+	public float springStrength = 8f;
 
+	[Tooltip("Strength of the spring dampening effect.")]
 	public float dampenStrength = 9f;
 
 	/// <summary>
@@ -423,7 +423,7 @@ public class UIScrollView : MonoBehaviour
 				Vector3 pos = mTrans.localPosition + constraint;
 				pos.x = Mathf.Round(pos.x);
 				pos.y = Mathf.Round(pos.y);
-				SpringPanel.Begin(mPanel.gameObject, pos, 8f);
+				SpringPanel.Begin(mPanel.gameObject, pos, springStrength);
 			}
 			else
 			{

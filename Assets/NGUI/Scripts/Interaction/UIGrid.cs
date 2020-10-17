@@ -44,6 +44,9 @@ public class UIGrid : UIWidgetContainer
 
 	public Sorting sorting = Sorting.None;
 
+	[Tooltip("Whether the sort order will be inverted")]
+	public bool inverted = false;
+
 	/// <summary>
 	/// Final pivot point for the grid's content.
 	/// </summary>
@@ -135,9 +138,9 @@ public class UIGrid : UIWidgetContainer
 		// Sort the list using the desired sorting logic
 		if (sorting != Sorting.None && arrangement != Arrangement.CellSnap)
 		{
-			if (sorting == Sorting.Alphabetic) list.Sort(SortByName);
-			else if (sorting == Sorting.Horizontal) list.Sort(SortHorizontal);
-			else if (sorting == Sorting.Vertical) list.Sort(SortVertical);
+			if (sorting == Sorting.Alphabetic) { if (inverted) list.Sort(SortByNameInv); else list.Sort(SortByName); }
+			else if (sorting == Sorting.Horizontal) { if (inverted) list.Sort(SortHorizontalInv); else list.Sort(SortHorizontal); }
+			else if (sorting == Sorting.Vertical) { if (inverted) list.Sort(SortVerticalInv); else list.Sort(SortVertical); }
 			else if (onCustomSort != null) list.Sort(onCustomSort);
 			else Sort(list);
 		}
@@ -287,8 +290,11 @@ public class UIGrid : UIWidgetContainer
 
 	// Various generic sorting functions
 	static public int SortByName (Transform a, Transform b) { return string.Compare(a.name, b.name); }
+	static public int SortByNameInv (Transform a, Transform b) { return string.Compare(b.name, a.name); }
 	static public int SortHorizontal (Transform a, Transform b) { return a.localPosition.x.CompareTo(b.localPosition.x); }
+	static public int SortHorizontalInv (Transform a, Transform b) { return b.localPosition.x.CompareTo(a.localPosition.x); }
 	static public int SortVertical (Transform a, Transform b) { return b.localPosition.y.CompareTo(a.localPosition.y); }
+	static public int SortVerticalInv (Transform a, Transform b) { return a.localPosition.y.CompareTo(b.localPosition.y); }
 
 	/// <summary>
 	/// You can override this function, but in most cases it's easier to just set the onCustomSort delegate instead.
