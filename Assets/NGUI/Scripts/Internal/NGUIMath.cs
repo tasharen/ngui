@@ -71,7 +71,7 @@ static public class NGUIMath
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public int HexToDecimal (char ch)
+	static public int HexToDecimal (char ch, int defVal = 0xF)
 	{
 		switch (ch)
 		{
@@ -98,7 +98,7 @@ static public class NGUIMath
 			case 'f':
 			case 'F': return 0xF;
 		}
-		return 0xF;
+		return defVal;
 	}
 
 	/// <summary>
@@ -1110,7 +1110,7 @@ static public class NGUIMath
 	/// You can then assign the widget's localPosition to the returned value.
 	/// </summary>
 
-	static public Vector3 WorldToLocalPoint (Vector3 worldPos, Camera worldCam, Camera uiCam, Transform relativeTo)
+	static public Vector3 WorldToLocalPoint (Vector3 worldPos, Camera worldCam, Camera uiCam, Transform relativeTo = null)
 	{
 		worldPos = worldCam.WorldToViewportPoint(worldPos);
 		worldPos = uiCam.ViewportToWorldPoint(worldPos);

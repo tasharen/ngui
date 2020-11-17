@@ -1505,7 +1505,12 @@ public class UILabel : UIWidget
 	{
 		shouldBeProcessed = true;
 		base.MarkAsChanged();
-		if (mLabSym != null) mLabSym.MarkAsChanged();
+
+		if (mLabSym != null)
+		{
+			mLabSym.depth = mSymbolDepth;
+			mLabSym.MarkAsChanged();
+		}
 	}
 
 	/// <summary>
@@ -1601,7 +1606,7 @@ public class UILabel : UIWidget
 				NGUIText.Update(false);
 
 				// Wrap the text
-				bool fits = NGUIText.WrapText(printedText, out mProcessedText, false, false, mOverflow == Overflow.ClampContent && mOverflowEllipsis);
+				var fits = NGUIText.WrapText(printedText, out mProcessedText, false, false, mOverflow == Overflow.ClampContent && mOverflowEllipsis);
 
 				if (mOverflow == Overflow.ShrinkContent && !fits)
 				{
@@ -1610,7 +1615,7 @@ public class UILabel : UIWidget
 				}
 				else if (mOverflow == Overflow.ResizeFreely)
 				{
-					mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText);
+					mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText, false);
 
 					if (!fits && mOverflowWidth > 0)
 					{
@@ -1637,7 +1642,7 @@ public class UILabel : UIWidget
 				}
 				else if (mOverflow == Overflow.ResizeHeight)
 				{
-					mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText);
+					mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText, false);
 					int h = Mathf.Max(minHeight, Mathf.RoundToInt(mCalculatedSize.y));
 					if (regionY != 1f) h = Mathf.RoundToInt(h / regionY);
 					if ((h & 1) == 1) ++h;
@@ -1651,7 +1656,7 @@ public class UILabel : UIWidget
 				}
 				else
 				{
-					mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText);
+					mCalculatedSize = NGUIText.CalculatePrintedSize(mProcessedText, false);
 				}
 
 				// Upgrade to the new system

@@ -39,25 +39,25 @@ public class UIDragDropItem : MonoBehaviour
 
 	#region Common functionality
 
-	[System.NonSerialized] protected Transform mTrans;
-	[System.NonSerialized] protected Transform mParent;
-	[System.NonSerialized] protected Collider mCollider;
-	[System.NonSerialized] protected Collider2D mCollider2D;
-	[System.NonSerialized] protected UIButton mButton;
-	[System.NonSerialized] protected UIRoot mRoot;
-	[System.NonSerialized] protected UIGrid mGrid;
-	[System.NonSerialized] protected UITable mTable;
-	[System.NonSerialized] protected float mDragStartTime = 0f;
-	[System.NonSerialized] protected UIDragScrollView mDragScrollView = null;
-	[System.NonSerialized] protected bool mPressed = false;
-	[System.NonSerialized] protected bool mDragging = false;
-	[System.NonSerialized] protected UICamera.MouseOrTouch mTouch;
+	[NonSerialized] protected Transform mTrans;
+	[NonSerialized] protected Transform mParent;
+	[NonSerialized] protected Collider mCollider;
+	[NonSerialized] protected Collider2D mCollider2D;
+	[NonSerialized] protected UIButton mButton;
+	[NonSerialized] protected UIRoot mRoot;
+	[NonSerialized] protected UIGrid mGrid;
+	[NonSerialized] protected UITable mTable;
+	[NonSerialized] protected float mDragStartTime = 0f;
+	[NonSerialized] protected UIDragScrollView mDragScrollView = null;
+	[NonSerialized] protected bool mPressed = false;
+	[NonSerialized] protected bool mDragging = false;
+	[NonSerialized] protected UICamera.MouseOrTouch mTouch;
 
 	/// <summary>
 	/// List of items that are currently being dragged.
 	/// </summary>
 
-	[System.NonSerialized] static public List<UIDragDropItem> draggedItems = new List<UIDragDropItem>();
+	[NonSerialized] static public List<UIDragDropItem> draggedItems = new List<UIDragDropItem>();
 
 	/// <summary>
 	/// Whether this object is currently being dragged.
@@ -104,7 +104,7 @@ public class UIDragDropItem : MonoBehaviour
 		mDragScrollView = GetComponent<UIDragScrollView>();
 	}
 
-	[System.NonSerialized] static int mIgnoreClick = 0;
+	[NonSerialized] static int mIgnoreClick = 0;
 
 	/// <summary>
 	/// Record the time the item was pressed on.
@@ -366,7 +366,12 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void OnDragDropMove (Vector2 delta)
 	{
-		if (mParent != null) mTrans.localPosition += mTrans.InverseTransformDirection((Vector3)delta);
+		if (mParent != null)
+		{
+			var v3 = mTrans.InverseTransformDirection((Vector3)delta);
+			if (mRoot != null) v3 = mRoot.transform.TransformDirection(v3);
+			mTrans.localPosition += v3;
+		}
 	}
 
 	/// <summary>
@@ -387,7 +392,7 @@ public class UIDragDropItem : MonoBehaviour
 			else if (mCollider2D != null) mCollider2D.enabled = true;
 
 			// Is there a droppable container?
-			UIDragDropContainer container = surface ? NGUITools.FindInParents<UIDragDropContainer>(surface) : null;
+			var container = surface ? NGUITools.FindInParents<UIDragDropContainer>(surface) : null;
 
 			if (container != null)
 			{

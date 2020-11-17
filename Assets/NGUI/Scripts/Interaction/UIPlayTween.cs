@@ -318,6 +318,9 @@ public class UIPlayTween : MonoBehaviour
 		}
 	}
 
+	[ContextMenu("Stop")]
+	public void Stop () { if (mTweens != null) foreach(var tw in mTweens) tw.Finish(); }
+
 	/// <summary>
 	/// Activate the tweeners.
 	/// </summary>
@@ -360,7 +363,7 @@ public class UIPlayTween : MonoBehaviour
 			// Run through all located tween components
 			for (int i = 0, imax = mTweens.Length; i < imax; ++i)
 			{
-				UITweener tw = mTweens[i];
+				var tw = mTweens[i];
 
 				// If the tweener's group matches, we can work with it
 				if (tw.tweenGroup == tweenGroup)

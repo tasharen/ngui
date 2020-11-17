@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2020.1.6
+            Version 2020.1.7
        https://discord.gg/tasharen/
 ----------------------------------------------
 
@@ -54,6 +54,14 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2020.1.7
+- FIX: Fixed an issue with font wrapping when using dynamic fonts + italic/bold symbols.
+- FIX: Fixed widget depth adjustment field not updating the depth immediately.
+- FIX: NGUI's buttons and toggles will now automatically ignore duplicate click event that occur in the same frame.
+- FIX: UIDragDropItem now supports dragging of items along both XY and XZ axis.
+- FIX: Optimized some instances in text formatting where string.Substring could be eliminated when appending to the StringBuilder.
+- FIX: Reduced the number of times NGUI will try to request characters from the dynamic font.
 
 2020.1.6
 - NEW: Added an "inverted" option to UIGrid and UITable that simply flips the child sorting order.

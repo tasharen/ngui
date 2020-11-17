@@ -1047,18 +1047,28 @@ public class UIWidgetInspector : UIRectEditor
 			{
 				foreach (GameObject go in Selection.gameObjects)
 				{
-					UIWidget pw = go.GetComponent<UIWidget>();
+					var pw = go.GetComponent<UIWidget>();
 					if (pw != null) pw.depth = w.depth - 1;
 				}
 			}
 
+			GUI.changed = false;
 			NGUIEditorTools.DrawProperty("", so, "mDepth", GUILayout.MinWidth(20f));
+
+			if (GUI.changed)
+			{
+				foreach (GameObject go in Selection.gameObjects)
+				{
+					var pw = go.GetComponent<UIWidget>();
+					if (pw != null) pw.MarkAsChanged();
+				}
+			}
 
 			if (GUILayout.Button("Forward", GUILayout.MinWidth(60f)))
 			{
 				foreach (GameObject go in Selection.gameObjects)
 				{
-					UIWidget pw = go.GetComponent<UIWidget>();
+					var pw = go.GetComponent<UIWidget>();
 					if (pw != null) pw.depth = w.depth + 1;
 				}
 			}

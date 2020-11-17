@@ -105,6 +105,8 @@ public class UIToggle : UIWidgetContainer
 	[HideInInspector][SerializeField] string functionName = "OnActivate";
 	[HideInInspector][SerializeField] bool startsChecked = false; // Use 'startsActive' instead
 
+	[System.NonSerialized] int mIgnoreFrame = 0;
+
 	bool mIsActive = true;
 	bool mStarted = false;
 
@@ -158,7 +160,7 @@ public class UIToggle : UIWidgetContainer
 		return null;
 	}
 
-	void OnEnable () { list.Add(this); }
+	void OnEnable () { mIgnoreFrame = Time.frameCount; list.Add(this); }
 	void OnDisable () { list.Remove(this); }
 
 	/// <summary>
@@ -217,7 +219,16 @@ public class UIToggle : UIWidgetContainer
 	/// Check or uncheck on click.
 	/// </summary>
 
-	void OnClick () { if (enabled && isColliderEnabled && UICamera.currentTouchID != -2) value = !value; }
+	public void OnClick ()
+	{
+		if (mIgnoreFrame == Time.frameCount) return;
+
+		if (enabled && isColliderEnabled && UICamera.currentTouchID != -2)
+		{
+			mIgnoreFrame = Time.frameCount;
+			value = !value;
+		}
+	}
 
 	/// <summary>
 	/// Fade out or fade in the active sprite and notify the OnChange event listener.

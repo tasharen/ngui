@@ -99,7 +99,17 @@ public class UILabelInspector : UIWidgetInspector
 				}
 			}
 
+			GUI.changed = false;
 			NGUIEditorTools.DrawProperty("", so, "mSymbolDepth", GUILayout.MinWidth(20f));
+
+			if (GUI.changed)
+			{
+				foreach (GameObject go in Selection.gameObjects)
+				{
+					var pw = go.GetComponent<UIWidget>();
+					if (pw != null) pw.MarkAsChanged();
+				}
+			}
 
 			if (GUILayout.Button("Forward", GUILayout.MinWidth(60f)))
 			{
@@ -213,7 +223,20 @@ public class UILabelInspector : UIWidgetInspector
 					prop = NGUIEditorTools.DrawProperty("", serializedObject, "mFontStyle", GUILayout.MinWidth(40f));
 					NGUISettings.fontStyle = (FontStyle)prop.intValue;
 
-					NGUIEditorTools.DrawPadding();
+					if (!serializedObject.isEditingMultipleObjects)
+					{
+						var printed = mLabel.finalFontSize;
+
+						if (mLabel.overflowMethod == UILabel.Overflow.ShrinkContent && printed != mLabel.fontSize)
+						{
+							EditorGUI.BeginDisabledGroup(true);
+							GUILayout.Label(" Printed: " + printed);
+							EditorGUI.EndDisabledGroup();
+						}
+						else NGUIEditorTools.DrawPadding();
+					}
+					else NGUIEditorTools.DrawPadding();
+
 					EditorGUI.EndDisabledGroup();
 				}
 				GUILayout.EndHorizontal();
