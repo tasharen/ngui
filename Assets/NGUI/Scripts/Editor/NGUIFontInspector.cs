@@ -618,11 +618,11 @@ public class NGUIFontInspector : Editor
 
 	void ApplyEffect (Effect effect, Color foreground, Color background)
 	{
-		BMFont bf = mFont.bmFont;
-		int offsetX = 0;
-		int offsetY = 0;
+		var bf = mFont.bmFont;
+		var offsetX = 0;
+		var offsetY = 0;
 
-		if (mFont.symbolAtlas != null)
+		if (mFont.atlas != null)
 		{
 			var sd = mFont.GetSprite(bf.spriteName);
 			if (sd == null) return;
@@ -633,6 +633,8 @@ public class NGUIFontInspector : Editor
 		var path = AssetDatabase.GetAssetPath(mFont.texture);
 		var bfTex = NGUIEditorTools.ImportTexture(path, true, true, false);
 		var atlas = bfTex.GetPixels32();
+		var texW = bfTex.width;
+		var texH = bfTex.height;
 
 		// First we need to extract textures for all the glyphs, making them bigger in the process
 		var glyphs = bf.glyphs;
@@ -676,7 +678,7 @@ public class NGUIFontInspector : Editor
 						int fx = x + glyph.x + offsetX + 1;
 						int fy = y + (mFont.texHeight - glyph.y - glyph.height) + 1;
 						if (mFont.atlas != null) fy += bfTex.height - offsetY;
-						colors[x + y * width] = atlas[fx + fy * bfTex.width];
+						colors[x + y * width] = atlas[fx + fy * texW];
 					}
 				}
 			}
@@ -690,7 +692,7 @@ public class NGUIFontInspector : Editor
 						int fy = y + (mFont.texHeight - glyph.y - glyph.height);
 						if (mFont.atlas != null) fy += bfTex.height - offsetY;
 
-						Color c = atlas[fx + fy * bfTex.width];
+						Color c = atlas[fx + fy * texW];
 
 						if (effect == Effect.Border)
 						{
@@ -723,14 +725,14 @@ public class NGUIFontInspector : Editor
 				else if (effect == Effect.Outline) NGUIEditorTools.AddDepth(colors, width, height, NGUISettings.backgroundColor);
 			}
 
-			Texture2D tex = new Texture2D(width, height, TextureFormat.ARGB32, false);
+			var tex = new Texture2D(width, height, TextureFormat.ARGB32, false);
 			tex.SetPixels32(colors);
 			tex.Apply();
 			glyphTextures.Add(tex);
 		}
 
 		// Pack all glyphs into a new texture
-		var final = new Texture2D(bfTex.width, bfTex.height, TextureFormat.ARGB32, false);
+		var final = new Texture2D(texW, texH, TextureFormat.ARGB32, false);
 		var rects = final.PackTextures(glyphTextures.ToArray(), 1);
 		final.Apply();
 
@@ -793,8 +795,7 @@ public class NGUIFontInspector : Editor
 		}
 
 		// Cleanup
-		for (int i = 0; i < glyphTextures.Count; ++i)
-			NGUITools.DestroyImmediate(glyphTextures[i]);
+		for (int i = 0; i < glyphTextures.Count; ++i) NGUITools.DestroyImmediate(glyphTextures[i]);
 
 		// Refresh all labels
 		mFont.MarkAsChanged();

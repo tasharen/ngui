@@ -104,6 +104,8 @@ public class UIFontMaker : EditorWindow
 		Repaint();
 	}
 
+	[System.NonSerialized] static bool s_working = false;
+
 	/// <summary>
 	/// Draw the UI for this tool.
 	/// </summary>
@@ -378,7 +380,7 @@ public class UIFontMaker : EditorWindow
 			}
 		}
 
-		if (create == Create.None) return;
+		if (s_working || create == Create.None) return;
 
 		// Open the "Save As" file dialog
 		var path = EditorUtility.SaveFilePanelInProject("Save As", "New Font.asset", "asset", "Save font as...", NGUISettings.currentPath);
@@ -462,6 +464,8 @@ public class UIFontMaker : EditorWindow
 			BMFont bmFont;
 			Texture2D tex;
 
+			s_working = true;
+
 			if (FreeType.CreateFont(
 				NGUISettings.FMFont,
 				NGUISettings.FMSize, mFaceIndex,
@@ -521,8 +525,14 @@ public class UIFontMaker : EditorWindow
 					asset.atlas = null;
 					asset.material = mat;
 				}
+
+				s_working = false;
 			}
-			else return;
+			else
+			{
+				s_working = false;
+				return;
+			}
 		}
 
 		if (asset != null)
