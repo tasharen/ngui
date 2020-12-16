@@ -186,7 +186,11 @@ static public class NGUIText
 				{
 					if (mTempSB.Length != 0) dynamicFont.RequestCharactersInTexture(mTempSB.ToString(), finalSize, currentStyle);
 					currentStyle = styleNow;
+#if UNITY_5
+					mTempSB.Length = 0;
+#else
 					mTempSB.Clear();
+#endif
 				}
 
 				mTempSB.Append(text[i]);
@@ -196,7 +200,11 @@ static public class NGUIText
 			{
 				var s = mTempSB.ToString();
 				dynamicFont.RequestCharactersInTexture(s, finalSize, currentStyle);
+#if UNITY_5
+				mTempSB.Length = 0;
+#else
 				mTempSB.Clear();
+#endif
 			}
 		}
 	}
