@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2020.2.0
+            Version 2020.2.1
        https://discord.gg/tasharen/
 ----------------------------------------------
 
@@ -54,6 +54,9 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2020.2.1
+- FIX: Fixed a bold/italic issue with dynamic fonts when specified on the label rather than embedded via bbcode.
 
 2020.2.0
 - FIX: Fixed NGUI FontMaker causing Unity 2020 to crash by updating the FreeType DLL to 2.10.4.

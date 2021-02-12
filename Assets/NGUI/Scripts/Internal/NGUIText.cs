@@ -152,7 +152,7 @@ static public class NGUIText
 	{
 		if (dynamicFont != null)
 		{
-			if (!useSymbols)
+			if (!encoding || symbolStyle == SymbolStyle.None)
 			{
 				dynamicFont.RequestCharactersInTexture(text, finalSize, fontStyle);
 				return;
@@ -229,7 +229,7 @@ static public class NGUIText
 
 		if (dynamicFont != null)
 		{
-			var fs = FontStyle.Normal;
+			var fs = fontStyle;
 			if (bold && italic) fs = FontStyle.BoldAndItalic;
 			else if (italic) fs = FontStyle.Italic;
 			else if (bold) fs = FontStyle.Bold;
@@ -272,7 +272,7 @@ static public class NGUIText
 	{
 		if (dynamicFont != null)
 		{
-			var fs = FontStyle.Normal;
+			var fs = fontStyle;
 			if (bold && italic) fs = FontStyle.BoldAndItalic;
 			else if (italic) fs = FontStyle.Italic;
 			else if (bold) fs = FontStyle.Bold;

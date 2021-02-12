@@ -1036,7 +1036,7 @@ public class UILabel : UIWidget
 		base.OnInit();
 		mList.Add(this);
 		SetActiveFont(trueTypeFont);
-		if (shouldBeProcessed) ProcessAndRequest();
+		if (mChanged || shouldBeProcessed) ProcessAndRequest();
 		if (separateSymbols && mLabSym == null) CreateSymbolLabel();
 	}
 
