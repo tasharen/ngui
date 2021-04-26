@@ -491,18 +491,7 @@ public class UIDrawCall : MonoBehaviour
 			if (mColorSpace == ColorSpace.Uninitialized)
 				mColorSpace = QualitySettings.activeColorSpace;
 
-			if (mColorSpace == ColorSpace.Linear)
-			{
-				for (int i = 0; i < vertexCount; ++i)
-				{
-					var c = cols[i];
-					c.r = Mathf.GammaToLinearSpace(c.r);
-					c.g = Mathf.GammaToLinearSpace(c.g);
-					c.b = Mathf.GammaToLinearSpace(c.b);
-					c.a = Mathf.GammaToLinearSpace(c.a);
-					cols[i] = c;
-				}
-			}
+			if (mColorSpace == ColorSpace.Linear) for (int i = 0; i < vertexCount; ++i) cols[i] = cols[i].GammaToLinearSpace();
 
 			// Cache all components
 			if (mFilter == null) mFilter = gameObject.GetComponent<MeshFilter>();

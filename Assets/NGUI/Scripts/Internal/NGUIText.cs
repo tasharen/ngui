@@ -168,10 +168,11 @@ static public class NGUIText
 			var ignoreColor = false;
 			var forceSpriteColor = false;
 			var currentStyle = fontStyle;
+			var sub = 0;
 
 			for (int i = 0, imax = text.Length; i < imax; ++i)
 			{
-				if (ParseSymbol(text, ref i, null, false, ref i, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
+				if (ParseSymbol(text, ref i, null, false, ref sub, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 				{
 					--i;
 					continue;

@@ -2827,7 +2827,7 @@ static public class NGUITools
 				Mathf.GammaToLinearSpace(c.r),
 				Mathf.GammaToLinearSpace(c.g),
 				Mathf.GammaToLinearSpace(c.b),
-				Mathf.GammaToLinearSpace(c.a));
+				c.a);
 		}
 		return c;
 	}
@@ -2847,7 +2847,7 @@ static public class NGUITools
 				Mathf.LinearToGammaSpace(c.r),
 				Mathf.LinearToGammaSpace(c.g),
 				Mathf.LinearToGammaSpace(c.b),
-				Mathf.LinearToGammaSpace(c.a));
+				c.a);
 		}
 		return c;
 	}

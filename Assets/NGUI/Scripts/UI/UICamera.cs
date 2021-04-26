@@ -1209,8 +1209,19 @@ public class UICamera : MonoBehaviour
 #else
 				Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
 #endif
-				UIKeyNavigation nav = value.GetComponent<UIKeyNavigation>();
-				if (nav != null) controller.current = value;
+				var nav = value.GetComponent<UIKeyNavigation>();
+
+				if (nav != null)
+				{
+					controller.current = value;
+				}
+				else
+				{
+					// This makes it possible for UIInput to always respond to Escape, even if key navigation is not used
+					var input = value.GetComponent<UIInput>();
+					if (input != null) controller.current = value;
+				}
+
 #if UNITY_5_5_OR_NEWER
 				UnityEngine.Profiling.Profiler.EndSample();
 #else
