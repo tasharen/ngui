@@ -1113,7 +1113,8 @@ public class NGUIFont : ScriptableObject, INGUIFont
 
 		var s = symbols;
 		int count = s.Count;
-		if (count == 0) return null;
+		var sl = atl.spriteList;
+		if (sl == null || sl.Count == 0) return null;
 		textLength -= offset;
 
 		// Run through all symbols

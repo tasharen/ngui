@@ -52,3 +52,6 @@
 /.vs
 *.unitypackage
 /ProjectSettings
+/Logs
+/Packages
+/UserSettings
