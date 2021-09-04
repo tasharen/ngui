@@ -169,10 +169,11 @@ static public class NGUIText
 			var forceSpriteColor = false;
 			var currentStyle = fontStyle;
 			var sub = 0;
+			var fontScaleMult = 0f;
 
 			for (int i = 0, imax = text.Length; i < imax; ++i)
 			{
-				if (ParseSymbol(text, ref i, null, false, ref sub, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
+				if (ParseSymbol(text, ref i, null, false, ref sub, ref fontScaleMult, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 				{
 					--i;
 					continue;
@@ -572,7 +573,8 @@ static public class NGUIText
 		bool strikethrough = false;
 		bool ignoreColor = false;
 		bool forceSpriteColor = false;
-		return ParseSymbol(text, ref index, null, false, ref n, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor);
+		float fontScaleMult = 0f;
+		return ParseSymbol(text, ref index, null, false, ref n, ref fontScaleMult, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor);
 	}
 
 	/// <summary>
@@ -592,7 +594,7 @@ static public class NGUIText
 	/// </summary>
 
 	static public bool ParseSymbol (string text, ref int index, BetterList<Color> colors, bool premultiply,
-		ref int sub, ref bool bold, ref bool italic, ref bool underline, ref bool strike, ref bool ignoreColor, ref bool forceSpriteColor)
+		ref int sub, ref float fontScaleMult, ref bool bold, ref bool italic, ref bool underline, ref bool strike, ref bool ignoreColor, ref bool forceSpriteColor)
 	{
 		int length = text.Length;
 
@@ -618,6 +620,21 @@ static public class NGUIText
 			if (ch0 == 'c' || ch0 == 'C') { index += 3; ignoreColor = true; return true; }
 			if (ch0 == 't' || ch0 == 'T') { index += 3; forceSpriteColor = true; return true; }
 		}
+		else if (ch1 == '=')
+		{
+			// [y=0.75] syntax to scale the font size
+			if (ch0 == 'y' || ch0 == 'Y')
+			{
+				var closing = text.IndexOf(']', index + 4);
+
+				if (closing != -1 && float.TryParse(text.Substring(index + 3, closing - (index + 3)), out fontScaleMult))
+				{
+					sub = 0;
+					index = closing + 1;
+					return true;
+				}
+			}
+		}
 
 		if (index + 4 > length) return false;
 
@@ -633,6 +650,7 @@ static public class NGUIText
 				if (ch1 == 's' || ch1 == 'S') { index += 4; strike = false; return true; }
 				if (ch1 == 'c' || ch1 == 'C') { index += 4; ignoreColor = false; return true; }
 				if (ch1 == 't' || ch1 == 'T') { index += 4; forceSpriteColor = false; return true; }
+				if (ch1 == 'y' || ch1 == 'Y') { index += 4; sub = 0; fontScaleMult = 0f; return true; }
 			}
 
 			if (IsHex(ch0) && IsHex(ch1))
@@ -648,12 +666,50 @@ static public class NGUIText
 
 		char ch3 = text[index + 4];
 
-		if (ch3 == ']')
+		// [sub], [sup] and [sub=0.5] / [sup=0.5] style syntax
+		if ((ch0 == 's' || ch0 == 'S') && (ch1 == 'u' || ch1 == 'U'))
 		{
-			if ((ch0 == 's' || ch0 == 'S') && (ch1 == 'u' || ch1 == 'U'))
+			if (ch2 == 'b' || ch2 == 'B')
 			{
-				if (ch2 == 'b' || ch2 == 'B') { sub = 1; index += 5; return true; }
-				if (ch2 == 'p' || ch2 == 'P') { sub = 2; index += 5; return true; }
+				if (ch3 == ']')
+				{
+					sub = 1;
+					fontScaleMult = 0.75f;
+					index += 5;
+					return true;
+				}
+				else if (ch3 == '=')
+				{
+					var closing = text.IndexOf(']', index + 4);
+
+					if (closing != -1 && float.TryParse(text.Substring(index + 5, closing - (index + 5)), out fontScaleMult))
+					{
+						sub = 1;
+						index = closing + 1;
+						return true;
+					}
+				}
+			}
+			else if (ch2 == 'p' || ch2 == 'P')
+			{
+				if (ch3 == ']')
+				{
+					sub = 2;
+					fontScaleMult = 0.75f;
+					index += 5;
+					return true;
+				}
+				else if (ch3 == '=')
+				{
+					var closing = text.IndexOf(']', index + 4);
+
+					if (closing != -1 && float.TryParse(text.Substring(index + 5, closing - (index + 5)), out fontScaleMult))
+					{
+						sub = 2;
+						index = closing + 1;
+						return true;
+					}
+				}
 			}
 		}
 
@@ -667,8 +723,8 @@ static public class NGUIText
 			{
 				if ((ch1 == 's' || ch1 == 'S') && (ch2 == 'u' || ch2 == 'U'))
 				{
-					if (ch3 == 'b' || ch3 == 'B') { sub = 0; index += 6; return true; }
-					if (ch3 == 'p' || ch3 == 'P') { sub = 0; index += 6; return true; }
+					if (ch3 == 'b' || ch3 == 'B') { sub = 0; fontScaleMult = 0f; index += 6; return true; }
+					if (ch3 == 'p' || ch3 == 'P') { sub = 0; fontScaleMult = 0f; index += 6; return true; }
 				}
 				else if ((ch1 == 'u' || ch1 == 'U') && (ch2 == 'r' || ch2 == 'R'))
 				{
@@ -752,8 +808,9 @@ static public class NGUIText
 					var ignoreColor = false;
 					var forceSpriteColor = false;
 					int retVal = i;
+					var fontScaleMult = 0f;
 
-					if (ParseSymbol(text, ref retVal, null, false, ref sub, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
+					if (ParseSymbol(text, ref retVal, null, false, ref sub, ref fontScaleMult, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 					{
 						text = text.Remove(i, retVal - i);
 						imax = text.Length;
@@ -1009,7 +1066,7 @@ static public class NGUIText
 			int ch = 0, prev = 0;
 			float x = 0f, y = 0f, maxX = 0f, maxWidth = regionWidth + 0.01f;
 			int textLength = text.Length;
-			int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
+			int sub = 0;  // 0 = normal, 1 = subscript, 2 = superscript
 			var bold = false;
 			var italic = false;
 			var underline = false;
@@ -1018,10 +1075,19 @@ static public class NGUIText
 			var forceSpriteColor = false;
 			var symbolScale = NGUIText.symbolScale;
 			var symbolMaxHeight = NGUIText.symbolMaxHeight;
+			var fontScaleMult = 0f;
 
 			for (int i = 0; i < textLength; ++i)
 			{
 				ch = text[i];
+
+				// Color changing symbol
+				if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref sub, ref fontScaleMult, ref bold,
+					ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
+				{
+					--i;
+					continue;
+				}
 
 				// New line character -- skip to the next line
 				if (ch == '\n')
@@ -1040,17 +1106,9 @@ static public class NGUIText
 					continue;
 				}
 
-				// Color changing symbol
-				if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
-					ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
-				{
-					--i;
-					continue;
-				}
-
 				// See if there is a symbol matching this text
 				var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
-				var scale = (subscriptMode == 0) ? fontScale : fontScale * sizeShrinkage;
+				var scale = (sub == 0) ? (fontScaleMult == 0f ? fontScale : fontScale * fontScaleMult) : fontScale * fontScaleMult;
 
 				if (symbol != null)
 				{
@@ -1082,9 +1140,9 @@ static public class NGUIText
 					prev = ch;
 					var w = glyph.advance;
 
-					if (subscriptMode != 0)
+					if (sub != 0)
 					{
-						if (subscriptMode == 1)
+						if (sub == 1)
 						{
 							var f = fontScale * fontSize * 0.4f;
 							glyph.v0.y -= f;
@@ -1128,7 +1186,7 @@ static public class NGUIText
 					x = mx;
 
 					// Subscript may cause pixels to no longer be aligned
-					if (subscriptMode != 0) x = Mathf.Round(x);
+					if (sub != 0) x = Mathf.Round(x);
 
 					// No need to continue if this is a space character
 					if (IsSpace(ch)) continue;
@@ -1155,7 +1213,7 @@ static public class NGUIText
 		mColors.Clear();
 
 		int textLength = text.Length, ch = 0, prev = 0;
-		int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
+		int sub = 0;  // 0 = normal, 1 = subscript, 2 = superscript
 		var bold = false;
 		var italic = false;
 		var underline = false;
@@ -1164,20 +1222,19 @@ static public class NGUIText
 		var forceSpriteColor = false;
 		var symbolScale = NGUIText.symbolScale;
 		var symbolMaxHeight = NGUIText.symbolMaxHeight;
+		var fontScaleMult = 0f;
 
 		for (int i = 0, imax = text.Length; i < imax; ++i)
 		{
-			// See if there is a symbol matching this text
-			var scale = (subscriptMode == 0) ? fontScale : fontScale * sizeShrinkage;
-			var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
-
-			// Color changing symbol
-			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
+			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref sub, ref fontScaleMult, ref bold,
 				ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 			{
 				--i;
 				continue;
 			}
+
+			var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
+			var scale = (sub == 0) ? (fontScaleMult == 0f ? fontScale : fontScale * fontScaleMult) : fontScale * fontScaleMult;
 
 			if (symbol == null)
 			{
@@ -1272,7 +1329,7 @@ static public class NGUIText
 		var eastern = false;
 
 		Color c = tint;
-		var subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
+		var sub = 0;  // 0 = normal, 1 = subscript, 2 = superscript
 		var bold = false;
 		var italic = false;
 		var underline = false;
@@ -1283,6 +1340,7 @@ static public class NGUIText
 		var symbolScale = NGUIText.symbolScale;
 		var symbolMaxHeight = NGUIText.symbolMaxHeight;
 		var lastValidChar = 0;
+		var fontScaleMult = 0f;
 
 		mColors.Add(c);
 
@@ -1333,10 +1391,10 @@ static public class NGUIText
 			}
 
 			var lastLine = (lineIsEmpty || lineCount == maxLineCount);
-			var previousSubscript = subscriptMode;
+			var previousSubscript = sub;
 
 			// When encoded symbols such as [RrGgBb] or [-] are encountered, skip past them
-			if (encoding && ParseSymbol(text, ref offset, mColors, premultiply, ref subscriptMode, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
+			if (encoding && ParseSymbol(text, ref offset, mColors, premultiply, ref sub, ref fontScaleMult, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 			{
 				// Adds "..." at the end of text that doesn't fit
 				if (lineCount == maxLineCount && useEllipsis && start < lastValidChar)
@@ -1344,6 +1402,7 @@ static public class NGUIText
 					lineIsEmpty = false;
 					if (lastValidChar > start) mSB.Append(text, start, lastValidChar - start + 1);
 					if (previousSubscript != 0) mSB.Append("[/sub]");
+					else if (fontScaleMult != 0f) mSB.Append("[/y]");
 					mSB.Append("...");
 					start = offset;
 					break;
@@ -1388,7 +1447,7 @@ static public class NGUIText
 
 			// Calculate how wide this symbol or character is going to be
 			float glyphWidth;
-			var scale = (subscriptMode == 0) ? fontScale : fontScale * sizeShrinkage;
+			var scale = (sub == 0) ? (fontScaleMult == 0f ? fontScale : fontScale * fontScaleMult) : fontScale * fontScaleMult;
 
 			if (symbol == null)
 			{
@@ -1405,7 +1464,7 @@ static public class NGUIText
 			}
 
 			// Force pixel alignment
-			if (subscriptMode != 0) glyphWidth = Mathf.Round(glyphWidth);
+			if (sub != 0) glyphWidth = Mathf.Round(glyphWidth);
 
 			// Reduce the width
 			x += glyphWidth;
@@ -1428,7 +1487,8 @@ static public class NGUIText
 				if (lastLine && useEllipsis && start < lastValidChar && x < maxWidth && x > ew)
 				{
 					if (lastValidChar > start) mSB.Append(text, start, lastValidChar - start + 1);
-					if (subscriptMode != 0) mSB.Append("[/sub]");
+					if (sub != 0) mSB.Append("[/sub]");
+					else if (fontScaleMult != 0f) mSB.Append("[/y]");
 					mSB.Append("...");
 					start = offset;
 					break;
@@ -1452,7 +1512,8 @@ static public class NGUIText
 					if (useEllipsis && offset > 0)
 					{
 						if (lastValidChar > start) mSB.Append(text, start, lastValidChar - start + 1);
-						if (subscriptMode != 0) mSB.Append("[/sub]");
+						if (sub != 0) mSB.Append("[/sub]");
+						else if (fontScaleMult != 0f) mSB.Append("[/y]");
 						mSB.Append("...");
 						start = offset;
 						break;
@@ -1553,7 +1614,6 @@ static public class NGUIText
 	}
 
 	static Color s_c0, s_c1;
-	const float sizeShrinkage = 0.75f;
 
 	/// <summary>
 	/// Print the specified text into the buffers.
@@ -1586,7 +1646,7 @@ static public class NGUIText
 		float v0x, v1x, v1y, v0y, prevX = 0f, maxWidth = regionWidth + 0.01f;
 
 		// Advanced symbol support contributed by Rudy Pangestu.
-		int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
+		int sub = 0;  // 0 = normal, 1 = subscript, 2 = superscript
 		var bold = false;
 		var italic = false;
 		var underline = false;
@@ -1597,6 +1657,7 @@ static public class NGUIText
 		var symbolScale = NGUIText.symbolScale;
 		var symbolOffset = NGUIText.symbolOffset;
 		var symbolMaxHeight = NGUIText.symbolMaxHeight;
+		var fontScaleMult = 0f;
 
 		if (dynamicFont == null && nguiFont != null)
 		{
@@ -1610,6 +1671,33 @@ static public class NGUIText
 			ch = text[i];
 
 			prevX = x;
+
+			// Color changing symbol
+			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref sub, ref fontScaleMult, ref bold,
+				ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
+			{
+				if (ignoreColor)
+				{
+					gc = mColors.buffer[mColors.size - 1];
+					gc.a *= mAlpha * tint.a;
+				}
+				else
+				{
+					gc = tint * mColors.buffer[mColors.size - 1];
+					gc.a *= mAlpha;
+				}
+
+				for (int b = 0, bmax = mColors.size - 2; b < bmax; ++b)
+					gc.a *= mColors.buffer[b].a;
+
+				if (gradient)
+				{
+					gb = (gradientBottom * gc);
+					gt = (gradientTop * gc);
+				}
+				--i;
+				continue;
+			}
 
 			// New line character -- skip to the next line
 			if (ch == '\n')
@@ -1641,36 +1729,9 @@ static public class NGUIText
 				continue;
 			}
 
-			// Color changing symbol
-			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
-				ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
-			{
-				if (ignoreColor)
-				{
-					gc = mColors.buffer[mColors.size - 1];
-					gc.a *= mAlpha * tint.a;
-				}
-				else
-				{
-					gc = tint * mColors.buffer[mColors.size - 1];
-					gc.a *= mAlpha;
-				}
-
-				for (int b = 0, bmax = mColors.size - 2; b < bmax; ++b)
-					gc.a *= mColors.buffer[b].a;
-
-				if (gradient)
-				{
-					gb = (gradientBottom * gc);
-					gt = (gradientTop * gc);
-				}
-				--i;
-				continue;
-			}
-
 			// See if there is a symbol matching this text
 			var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
-			var scale = (subscriptMode == 0) ? fontScale : fontScale * sizeShrinkage;
+			var scale = (sub == 0) ? (fontScaleMult == 0f ? fontScale : fontScale * fontScaleMult) : fontScale * fontScaleMult;
 
 			if (symbol != null)
 			{
@@ -1802,9 +1863,9 @@ static public class NGUIText
 				prev = ch;
 				var w = glyph.advance;
 
-				if (subscriptMode != 0)
+				if (sub != 0)
 				{
-					if (subscriptMode == 1)
+					if (sub == 1)
 					{
 						var f = fontScale * fontSize * 0.4f;
 						glyph.v0.y -= f;
@@ -1816,6 +1877,12 @@ static public class NGUIText
 						glyph.v0.y += f;
 						glyph.v1.y += f;
 					}
+				}
+				else if (fontScaleMult != 0f)
+				{
+					var f = fontScale * (1f - fontScaleMult) * fontSize * 0.5f;
+					glyph.v0.y -= f;
+					glyph.v1.y -= f;
 				}
 
 				w += finalSpacingX;
@@ -1868,7 +1935,7 @@ static public class NGUIText
 				x += w;
 
 				// Subscript may cause pixels to no longer be aligned
-				if (subscriptMode != 0) x = Mathf.Round(x);
+				if (sub != 0) x = Mathf.Round(x);
 
 				// No need to continue if this is a space character
 				if (IsSpace(ch)) continue;
@@ -2111,7 +2178,7 @@ static public class NGUIText
 		float x = 0f, y = 0f, maxWidth = regionWidth + 0.01f;
 		int textLength = text.Length, indexOffset = verts.Count, ch = 0, prev = 0;
 
-		int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
+		int sub = 0;  // 0 = normal, 1 = subscript, 2 = superscript
 		var bold = false;
 		var italic = false;
 		var underline = false;
@@ -2120,12 +2187,20 @@ static public class NGUIText
 		var forceSpriteColor = false;
 		var symbolScale = NGUIText.symbolScale;
 		var symbolMaxHeight = NGUIText.symbolMaxHeight;
+		var fontScaleMult = 0f;
 
 		for (int i = 0; i < textLength; ++i)
 		{
 			ch = text[i];
 
-			var scale = (subscriptMode == 0) ? fontScale : fontScale * sizeShrinkage;
+			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref sub, ref fontScaleMult, ref bold,
+					ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
+			{
+				--i;
+				continue;
+			}
+
+			var scale = (sub == 0) ? (fontScaleMult == 0f ? fontScale : fontScale * fontScaleMult) : fontScale * fontScaleMult;
 			var halfSize = scale * 0.5f;
 
 			verts.Add(new Vector3(x, -y - halfSize));
@@ -2147,13 +2222,6 @@ static public class NGUIText
 			else if (ch < ' ')
 			{
 				prev = 0;
-				continue;
-			}
-
-			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
-					ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
-			{
-				--i;
 				continue;
 			}
 
@@ -2236,7 +2304,7 @@ static public class NGUIText
 		float x = 0f, y = 0f, maxWidth = regionWidth + 0.01f, fullSize = fontSize * fontScale;
 		int textLength = text.Length, indexOffset = verts.Count, ch = 0, prev = 0;
 
-		int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
+		int sub = 0;  // 0 = normal, 1 = subscript, 2 = superscript
 		var bold = false;
 		var italic = false;
 		var underline = false;
@@ -2245,11 +2313,20 @@ static public class NGUIText
 		var forceSpriteColor = false;
 		var symbolScale = NGUIText.symbolScale;
 		var symbolMaxHeight = NGUIText.symbolMaxHeight;
+		var fontScaleMult = 0f;
 
 		for (int i = 0; i < textLength; ++i)
 		{
 			ch = text[i];
-			var scale = (subscriptMode == 0) ? fontScale : fontScale * sizeShrinkage;
+
+			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref sub, ref fontScaleMult, ref bold,
+				ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
+			{
+				--i;
+				continue;
+			}
+
+			var scale = (sub == 0) ? (fontScaleMult == 0f ? fontScale : fontScale * fontScaleMult) : fontScale * fontScaleMult;
 
 			if (ch == '\n')
 			{
@@ -2267,13 +2344,6 @@ static public class NGUIText
 			else if (ch < ' ')
 			{
 				prev = 0;
-				continue;
-			}
-
-			if (encoding && ParseSymbol(text, ref i, mColors, premultiply, ref subscriptMode, ref bold,
-				ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
-			{
-				--i;
 				continue;
 			}
 
@@ -2373,7 +2443,7 @@ static public class NGUIText
 		int textLength = text.Length, index = 0, ch = 0, prev = 0;
 		bool highlighting = false, caretSet = false;
 
-		int subscriptMode = 0;  // 0 = normal, 1 = subscript, 2 = superscript
+		int sub = 0;  // 0 = normal, 1 = subscript, 2 = superscript
 		var bold = false;
 		var italic = false;
 		var underline = false;
@@ -2382,13 +2452,21 @@ static public class NGUIText
 		var forceSpriteColor = false;
 		var symbolScale = NGUIText.symbolScale;
 		var symbolMaxHeight = NGUIText.symbolMaxHeight;
+		var fontScaleMult = 0f;
 
 		Vector2 last0 = Vector2.zero;
 		Vector2 last1 = Vector2.zero;
 
 		for (; index < textLength; ++index)
 		{
-			var scale = (subscriptMode == 0) ? fontScale : fontScale * sizeShrinkage;
+			if (encoding && ParseSymbol(text, ref index, mColors, premultiply, ref sub, ref fontScaleMult, ref bold,
+						ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
+			{
+				--index;
+				continue;
+			}
+
+			var scale = (sub == 0) ? (fontScaleMult == 0f ? fontScale : fontScale * fontScaleMult) : fontScale * fontScaleMult;
 
 			// Print the caret
 			if (caret != null && !caretSet && caretPos <= index)
@@ -2445,13 +2523,6 @@ static public class NGUIText
 			else if (ch < ' ')
 			{
 				prev = 0;
-				continue;
-			}
-
-			if (encoding && ParseSymbol(text, ref index, mColors, premultiply, ref subscriptMode, ref bold,
-					ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
-			{
-				--index;
 				continue;
 			}
 
