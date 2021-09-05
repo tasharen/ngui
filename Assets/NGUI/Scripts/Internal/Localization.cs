@@ -152,10 +152,19 @@ static public class Localization
 		{
 			if (loadFunction == null)
 			{
-				var asset = Resources.Load<TextAsset>("Localization");
-				if (asset != null) bytes = asset.bytes;
+				var assets = Resources.LoadAll<TextAsset>("Localization");
+
+				if (assets != null && assets.Length > 0)
+				{
+					foreach (var a in assets)
+					{
+						LoadCSV(a.bytes, merge);
+						merge = true;
+					}
+					return true;
+				}
 #if TNET
-				else bytes = TNet.Tools.ReadFile("Localization.txt") ?? TNet.Tools.ReadFile("Localization.csv");
+				bytes = TNet.Tools.ReadFile("Localization.txt") ?? TNet.Tools.ReadFile("Localization.csv");
 #endif
 			}
 			else bytes = loadFunction("Localization");
@@ -275,10 +284,17 @@ static public class Localization
 	static bool LoadCSV (byte[] bytes, TextAsset asset, bool merge = false)
 	{
 		if (bytes == null) return false;
-		ByteReader reader = new ByteReader(bytes);
+		var reader = new ByteReader(bytes);
 
 		// The first line should contain "KEY", followed by languages.
 		var header = reader.ReadCSV();
+
+		if (header == null)
+		{
+			if (asset != null) Debug.LogError("Unable to parse " + asset.name + " as a CSV file", asset);
+			else Debug.LogError("Unable to parse the specified data as a CSV file");
+			return false;
+		}
 
 		// There must be at least two columns in a valid CSV file
 		if (header.size < 2) return false;

@@ -661,7 +661,7 @@ static public class NGUITools
 	{
 #if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
 
-		var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage (gameObject);
+		var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetPrefabStage (gameObject);
 		if (prefabStage == null)
 			return;
 

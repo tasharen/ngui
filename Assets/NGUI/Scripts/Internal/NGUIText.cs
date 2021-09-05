@@ -1880,6 +1880,7 @@ static public class NGUIText
 				}
 				else if (fontScaleMult != 0f)
 				{
+					// Centered vertical alignment of scaled text
 					var f = fontScale * (1f - fontScaleMult) * fontSize * 0.5f;
 					glyph.v0.y -= f;
 					glyph.v1.y -= f;

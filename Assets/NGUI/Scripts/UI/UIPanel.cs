@@ -1466,7 +1466,7 @@ public class UIPanel : UIRect
 #if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
 						if (!Application.isPlaying)
 						{
-							var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+							var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
 
 							if (prefabStage != null)
 							{

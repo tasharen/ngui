@@ -97,16 +97,10 @@ static public class NGUIContextMenu
 	static void ShowHelp23 (MenuCommand command) { NGUIHelp.Show(typeof(UICenterOnClick)); }
 
 	[MenuItem("CONTEXT/UITweener/Help")]
-	[MenuItem("CONTEXT/UIPlayTween/Help")]
 	static void ShowHelp24 (MenuCommand command) { NGUIHelp.Show(typeof(UITweener)); }
 
 	[MenuItem("CONTEXT/ActiveAnimation/Help")]
-	[MenuItem("CONTEXT/UIPlayAnimation/Help")]
 	static void ShowHelp25 (MenuCommand command) { NGUIHelp.Show(typeof(UIPlayAnimation)); }
-
-	[MenuItem("CONTEXT/UIScrollView/Help")]
-	[MenuItem("CONTEXT/UIDragScrollView/Help")]
-	static void ShowHelp26 (MenuCommand command) { NGUIHelp.Show(typeof(UIScrollView)); }
 
 	[MenuItem("CONTEXT/UIPanel/Help")]
 	static void ShowHelp27 (MenuCommand command) { NGUIHelp.Show(typeof(UIPanel)); }

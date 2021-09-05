@@ -107,7 +107,11 @@ public class UITexturePacker
 			storage[i].paddingY = (yPadding != 0);
 		}
 
+#if UNITY_5
 		texture.Resize(width, height);
+#else
+		texture.Reinitialize(width, height);
+#endif
 		texture.SetPixels(new Color[width * height]);
 
 		// The returned rects
