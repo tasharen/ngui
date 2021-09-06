@@ -1113,8 +1113,8 @@ static public class NGUIText
 				if (symbol != null)
 				{
 					var h = symbol.paddedHeight;
-					if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
-					var w = Mathf.Round(symbol.advance * scale * symbolScale);
+					if (!symbol.pixelPerfect && symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
+					var w = symbol.pixelPerfect ? symbol.advance : Mathf.Round(symbol.advance * scale * symbolScale);
 					var mx = x + w;
 
 					// Doesn't fit? Move down to the next line
@@ -1246,8 +1246,8 @@ static public class NGUIText
 			else
 			{
 				var h = symbol.paddedHeight;
-				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
-				mSizes.Add(finalSpacingX + Mathf.Round(symbol.advance * scale * symbolScale));
+				if (!symbol.pixelPerfect && symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
+				mSizes.Add(finalSpacingX + (symbol.pixelPerfect ? symbol.advance : Mathf.Round(symbol.advance * scale * symbolScale)));
 				for (int b = 0, bmax = symbol.sequence.Length - 1; b < bmax; ++b) mSizes.Add(0);
 				i += symbol.sequence.Length - 1;
 				prev = 0;
@@ -1459,8 +1459,8 @@ static public class NGUIText
 			else
 			{
 				var h = symbol.paddedHeight;
-				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
-				glyphWidth = finalSpacingX + Mathf.Round(symbol.advance * scale * symbolScale);
+				if (!symbol.pixelPerfect && symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
+				glyphWidth = finalSpacingX + (symbol.pixelPerfect ? symbol.advance : Mathf.Round(symbol.advance * scale * symbolScale));
 			}
 
 			// Force pixel alignment
@@ -1736,13 +1736,13 @@ static public class NGUIText
 			if (symbol != null)
 			{
 				var h = symbol.paddedHeight;
-				var mult = (symbolMaxHeight != 0 && h > symbolMaxHeight) ? (float)symbolMaxHeight / h : 1f;
-				var fs = fontScale * symbolScale * mult;
+				var mult = (!symbol.pixelPerfect && symbolMaxHeight != 0 && h > symbolMaxHeight) ? (float)symbolMaxHeight / h : 1f;
+				var fs = symbol.pixelPerfect ? 1f : fontScale * symbolScale * mult;
 				v0x = x + symbol.offsetX * fs;
 				v1x = v0x + symbol.width * fs;
 				v1y = -(y + symbol.offsetY * fs) + symbolOffset * mult;
 				v0y = v1y - symbol.height * fs;
-				var w = Mathf.Round(symbol.advance * scale * symbolScale * mult);
+				var w = symbol.pixelPerfect ? symbol.advance : Mathf.Round(symbol.advance * scale * symbolScale * mult);
 
 				// Doesn't fit? Move down to the next line
 				if (x + w > maxWidth)
@@ -2260,8 +2260,8 @@ static public class NGUIText
 			else
 			{
 				var h = symbol.paddedHeight;
-				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
-				float w = Mathf.Round(symbol.advance * scale * symbolScale + finalSpacingX);
+				if (!symbol.pixelPerfect && symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
+				float w = symbol.pixelPerfect ? symbol.advance + finalSpacingX : Mathf.Round(symbol.advance * scale * symbolScale + finalSpacingX);
 
 				if (x + w > maxWidth)
 				{
@@ -2386,8 +2386,8 @@ static public class NGUIText
 			else
 			{
 				var h = symbol.paddedHeight;
-				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
-				float w = Mathf.Round(symbol.advance * scale * symbolScale + finalSpacingX);
+				if (!symbol.pixelPerfect && symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
+				float w = symbol.pixelPerfect ? symbol.advance + finalSpacingX : Mathf.Round(symbol.advance * scale * symbolScale + finalSpacingX);
 
 				if (x + w > maxWidth)
 				{
@@ -2534,8 +2534,8 @@ static public class NGUIText
 			if (symbol != null)
 			{
 				var h = symbol.paddedHeight;
-				if (symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
-				w = Mathf.Round(symbol.advance * scale * symbolScale);
+				if (!symbol.pixelPerfect && symbolMaxHeight != 0 && h > symbolMaxHeight) scale *= (float)symbolMaxHeight / h;
+				w = symbol.pixelPerfect ? symbol.advance : Mathf.Round(symbol.advance * scale * symbolScale);
 			}
 			else w = GetGlyphWidth(ch, prev, scale, bold, italic);
 

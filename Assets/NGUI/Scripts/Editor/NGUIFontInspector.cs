@@ -32,6 +32,7 @@ public class NGUIFontInspector : Editor
 	string mSymbolSequence = "";
 	string mSymbolSprite = "";
 	bool mSymbolColored = false;
+	bool mSymPP = false;
 	BMSymbol mSelectedSymbol = null;
 	AnimationCurve mCurve = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f));
 
@@ -396,6 +397,14 @@ public class NGUIFontInspector : Editor
 			}
 
 			GUILayout.BeginHorizontal();
+			GUI.contentColor = EditorGUIUtility.isProSkin ? new Color(1f, 1f, 1f, 0.7f) : new Color(0f, 0f, 0f, 0.7f);
+			GUILayout.Label(" Add a New Symbol", "PreToolbar2", GUILayout.MinWidth(20f));
+			GUI.contentColor = Color.white;
+			GUILayout.EndHorizontal();
+
+			GUILayout.Space(2f);
+
+			GUILayout.BeginHorizontal();
 			mSymbolSequence = EditorGUILayout.TextField(mSymbolSequence, GUILayout.Width(40f));
 			NGUIEditorTools.DrawSpriteField(symbolAtlas, mSymbolSprite, SelectSymbolSprite);
 
@@ -407,6 +416,7 @@ public class NGUIFontInspector : Editor
 				NGUIEditorTools.RegisterUndo("Add symbol", mFont as Object);
 				var sym = mFont.AddSymbol(mSymbolSequence, mSymbolSprite);
 				sym.colored = mSymbolColored;
+				sym.pixelPerfect = mSymPP;
 				mFont.MarkAsChanged();
 				mSymbolSequence = "";
 				mSymbolSprite = "";
@@ -415,10 +425,17 @@ public class NGUIFontInspector : Editor
 			GUILayout.EndHorizontal();
 
 			NGUIEditorTools.SetLabelWidth(42f);
+
 			GUILayout.BeginHorizontal();
 			mSymbolColored = EditorGUILayout.Toggle("Tinted", mSymbolColored, GUILayout.Width(60f));
-			GUILayout.Label("- affected by label's color by default");
+			GUILayout.Label("- affected by label's color");
 			GUILayout.EndHorizontal();
+
+			GUILayout.BeginHorizontal();
+			mSymPP = !EditorGUILayout.Toggle("Scaled", !mSymPP, GUILayout.Width(60f));
+			GUILayout.Label("- affected by label's scaling");
+			GUILayout.EndHorizontal();
+
 			NGUIEditorTools.SetLabelWidth(80f);
 
 			if (symbols.Count == 0)
@@ -438,7 +455,15 @@ public class NGUIFontInspector : Editor
 					GUI.color = Color.white;
 				}
 
-				GUILayout.Space(6f);
+				GUILayout.Space(3f);
+
+				GUILayout.BeginHorizontal();
+				GUI.contentColor = EditorGUIUtility.isProSkin ? new Color(1f, 1f, 1f, 0.7f) : new Color(0f, 0f, 0f, 0.7f);
+				GUILayout.Label(" Global Modifiers", "PreToolbar2", GUILayout.MinWidth(20f));
+				GUI.contentColor = Color.white;
+				GUILayout.EndHorizontal();
+
+				GUILayout.Space(2f);
 
 				GUI.changed = false;
 				GUILayout.BeginHorizontal();

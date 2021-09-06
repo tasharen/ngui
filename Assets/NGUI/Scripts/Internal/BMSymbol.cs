@@ -15,6 +15,7 @@ public class BMSymbol
 	public string sequence;		// Character sequence, such as ":)"
 	public string spriteName;	// Name of the sprite in the atlas
 	public bool colored;		// Whether the label's color should apply to the symbol
+	public bool pixelPerfect;	// If set, the symbol won't be affected by label's scaling, and will always be printed pixel-perfect. Useful for things like line separators.
 
 	[System.NonSerialized] UISpriteData mSprite = null;
 	[System.NonSerialized] bool mIsValid = false;
