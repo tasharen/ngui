@@ -424,7 +424,7 @@ public class NGUIFontInspector : Editor
 			GUI.backgroundColor = Color.white;
 			GUILayout.EndHorizontal();
 
-			NGUIEditorTools.SetLabelWidth(42f);
+			NGUIEditorTools.SetLabelWidth(46f);
 
 			GUILayout.BeginHorizontal();
 			mSymbolColored = EditorGUILayout.Toggle("Tinted", mSymbolColored, GUILayout.Width(60f));
@@ -467,21 +467,27 @@ public class NGUIFontInspector : Editor
 
 				GUI.changed = false;
 				GUILayout.BeginHorizontal();
-				GUILayout.Label("Scale", GUILayout.Width(40f));
+				GUILayout.Label("Scale", GUILayout.Width(56f));
 				var scale = EditorGUILayout.FloatField(nguiFont.symbolScale, GUILayout.Width(50f));
 				GUILayout.Label("- scaling multiplier");
 				GUILayout.EndHorizontal();
 
 				GUILayout.BeginHorizontal();
-				GUILayout.Label("Offset", GUILayout.Width(40f));
+				GUILayout.Label("Offset", GUILayout.Width(56f));
 				var offset = EditorGUILayout.IntField(nguiFont.symbolOffset, GUILayout.Width(50f));
 				GUILayout.Label("- vertical offset");
 				GUILayout.EndHorizontal();
 
 				GUILayout.BeginHorizontal();
-				GUILayout.Label("Height", GUILayout.Width(40f));
+				GUILayout.Label("Height", GUILayout.Width(56f));
 				var height = EditorGUILayout.IntField(nguiFont.symbolMaxHeight, GUILayout.Width(50f));
-				GUILayout.Label("- maximum sprite height");
+				GUILayout.Label("- max symbol height");
+				GUILayout.EndHorizontal();
+
+				GUILayout.BeginHorizontal();
+				GUILayout.Label("Centered", GUILayout.Width(56f));
+				var center = EditorGUILayout.Toggle(nguiFont.symbolCentered, GUILayout.Width(50f));
+				GUILayout.Label("- vertical auto-centering");
 				GUILayout.EndHorizontal();
 
 				if (GUI.changed)
@@ -490,6 +496,7 @@ public class NGUIFontInspector : Editor
 					nguiFont.symbolScale = scale;
 					nguiFont.symbolOffset = offset;
 					nguiFont.symbolMaxHeight = height;
+					nguiFont.symbolCentered = center;
 					nguiFont.MarkAsChanged();
 				}
 			}

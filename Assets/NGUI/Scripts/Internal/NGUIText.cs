@@ -1050,6 +1050,16 @@ static public class NGUIText
 		}
 	}
 
+	static bool symbolCentered
+	{
+		get
+		{
+			var font = nguiFont as NGUIFont;
+			if (font == null) return false;
+			return font.symbolCentered;
+		}
+	}
+
 	/// <summary>
 	/// Get the printed size of the specified string. The returned value is in pixels.
 	/// </summary>
@@ -1743,6 +1753,16 @@ static public class NGUIText
 				v1y = -(y + symbol.offsetY * fs) + symbolOffset * mult;
 				v0y = v1y - symbol.height * fs;
 				var w = symbol.pixelPerfect ? symbol.advance : Mathf.Round(symbol.advance * scale * symbolScale * mult);
+
+				if (symbolCentered)
+				{
+					var symH = Mathf.RoundToInt(symbol.height * fs);
+					var fntH = Mathf.RoundToInt(fontScale * fontSize);
+					var diff = (symH - fntH) / 2;
+
+					v0y += diff;
+					v1y += diff;
+				}
 
 				// Doesn't fit? Move down to the next line
 				if (x + w > maxWidth)

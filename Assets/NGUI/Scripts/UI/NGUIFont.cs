@@ -236,6 +236,7 @@ public class NGUIFont : ScriptableObject, INGUIFont
 	[HideInInspector, SerializeField] float mSymbolScale = 1f;
 	[HideInInspector, SerializeField] int mSymbolOffset = 0;
 	[HideInInspector, SerializeField] int mSymbolMaxHeight = 0;
+	[HideInInspector, SerializeField] bool mSymbolCentered = false;
 
 	// List of symbols, such as emoticons like ":)", ":(", etc
 	[HideInInspector, SerializeField] List<BMSymbol> mSymbols = new List<BMSymbol>();
@@ -452,7 +453,7 @@ public class NGUIFont : ScriptableObject, INGUIFont
 	/// Convenience method that returns the chosen sprite inside the atlas.
 	/// </summary>
 
-	public UISpriteData GetSprite (string spriteName)
+	public UISpriteData GetSprite(string spriteName)
 	{
 		var ia = symbolAtlas;
 		if (ia == null) ia = atlas;
@@ -698,6 +699,26 @@ public class NGUIFont : ScriptableObject, INGUIFont
 			if (mSymbolMaxHeight != value)
 			{
 				mSymbolMaxHeight = value;
+				MarkAsChanged();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Symbols (emoticons) will be centered if this is 'true'. The alternative is they will be top-left aligned instead.
+	/// </summary>
+
+	public bool symbolCentered
+	{
+		get
+		{
+			return mSymbolCentered;
+		}
+		set
+		{
+			if (mSymbolCentered != value)
+			{
+				mSymbolCentered = value;
 				MarkAsChanged();
 			}
 		}
