@@ -468,25 +468,25 @@ public class NGUIFontInspector : Editor
 				GUI.changed = false;
 				GUILayout.BeginHorizontal();
 				GUILayout.Label("Scale", GUILayout.Width(56f));
-				var scale = EditorGUILayout.FloatField(nguiFont.symbolScale, GUILayout.Width(50f));
+				var scale = EditorGUILayout.FloatField(nguiFont.symbolScale, GUILayout.Width(40f));
 				GUILayout.Label("- scaling multiplier");
 				GUILayout.EndHorizontal();
 
 				GUILayout.BeginHorizontal();
 				GUILayout.Label("Offset", GUILayout.Width(56f));
-				var offset = EditorGUILayout.IntField(nguiFont.symbolOffset, GUILayout.Width(50f));
+				var offset = EditorGUILayout.IntField(nguiFont.symbolOffset, GUILayout.Width(40f));
 				GUILayout.Label("- vertical offset");
 				GUILayout.EndHorizontal();
 
 				GUILayout.BeginHorizontal();
 				GUILayout.Label("Height", GUILayout.Width(56f));
-				var height = EditorGUILayout.IntField(nguiFont.symbolMaxHeight, GUILayout.Width(50f));
+				var height = EditorGUILayout.IntField(nguiFont.symbolMaxHeight, GUILayout.Width(40f));
 				GUILayout.Label("- max symbol height");
 				GUILayout.EndHorizontal();
 
 				GUILayout.BeginHorizontal();
 				GUILayout.Label("Centered", GUILayout.Width(56f));
-				var center = EditorGUILayout.Toggle(nguiFont.symbolCentered, GUILayout.Width(50f));
+				var center = EditorGUILayout.Toggle(nguiFont.symbolCentered, GUILayout.Width(40f));
 				GUILayout.Label("- vertical auto-centering");
 				GUILayout.EndHorizontal();
 
