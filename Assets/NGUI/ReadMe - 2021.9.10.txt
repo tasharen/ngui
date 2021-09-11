@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2020.2.2
+            Version 2021.9.10
        https://discord.gg/tasharen/
 ----------------------------------------------
 
@@ -54,6 +54,14 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2021.9.10
+- NEW: Added support for being able to change font scaling mid-sentence using the [y=0.75]text[/y] syntax.
+- NEW: [sub] and [sup] tax can now a scaling modifier specified, for example [sub=0.8].
+- NEW: Localization now loads all files named "Localization" and will merge them together into one.
+- NEW: Added a "scaled" option to adding new symbols. If turned off, these sprites embedded in labels will remain pixel-perfect rather than being scaled with the label. Useful for line breaks and such.
+- NEW: Added an option to fonts that centers the symbols vertically.
+- FIX: Made the Symbols and Emoticons section of the NGUI Font Inspector more self-explanatory.
 
 2020.2.2
 - FIX: Fixed an issue where having [sub]/[sup] tags would cause Unity to lock up.
