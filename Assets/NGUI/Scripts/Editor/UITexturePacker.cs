@@ -107,10 +107,10 @@ public class UITexturePacker
 			storage[i].paddingY = (yPadding != 0);
 		}
 
-#if UNITY_5
-		texture.Resize(width, height);
-#else
+#if UNITY_2021_1_OR_NEWER
 		texture.Reinitialize(width, height);
+#else
+		texture.Resize(width, height);
 #endif
 		texture.SetPixels(new Color[width * height]);
 

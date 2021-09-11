@@ -1466,8 +1466,11 @@ public class UIPanel : UIRect
 #if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
 						if (!Application.isPlaying)
 						{
+#if UNITY_2021_1_OR_NEWER
 							var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
-
+#else
+							var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+#endif
 							if (prefabStage != null)
 							{
 								var prefabStageHandle = prefabStage.stageHandle;
@@ -1476,7 +1479,7 @@ public class UIPanel : UIRect
 							}
 						}
 #endif
-						if (safeToDraw)
+							if (safeToDraw)
 						{
 							dc = UIDrawCall.Create(this, mat, tex, sdr);
 							dc.depthStart = w.depth;

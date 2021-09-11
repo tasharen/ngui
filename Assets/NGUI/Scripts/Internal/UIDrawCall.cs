@@ -927,7 +927,11 @@ public class UIDrawCall : MonoBehaviour
 
 #if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
 		// We need to perform this check here and not in Create (string) to get to manager reference
+#if UNITY_2021_1_OR_NEWER
 		var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage ();
+#else
+		var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage();
+#endif
 		if (prefabStage != null && dc.manager != null)
 		{
 			// If prefab stage exists and new daw call
