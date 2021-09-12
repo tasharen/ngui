@@ -65,21 +65,19 @@ public class UITexturePacker
 		// Force square by sizing up
 		if (NGUISettings.forceSquareAtlas)
 		{
-			if (width > height)
-				height = width;
-			else if (height > width)
-				width = height;
+			if (width > height) height = width;
+			else if (height > width) width = height;
 		}
-		UITexturePacker bp = new UITexturePacker(width, height, false);
-		Storage[] storage = new Storage[textures.Length];
+
+		var bp = new UITexturePacker(width, height, false);
+		var storage = new Storage[textures.Length];
 
 		for (int i = 0; i < textures.Length; i++)
 		{
-			Texture2D tex = textures[i];
+			var tex = textures[i];
 			if (!tex) continue;
 
-			Rect rect = new Rect();
-
+			var rect = new Rect();
 			int xPadding = 1;
 			int yPadding = 1;
 
@@ -107,7 +105,7 @@ public class UITexturePacker
 			storage[i].paddingY = (yPadding != 0);
 		}
 
-#if UNITY_2021_1_OR_NEWER
+#if UNITY_2021_2_OR_NEWER
 		texture.Reinitialize(width, height);
 #else
 		texture.Resize(width, height);
@@ -115,22 +113,22 @@ public class UITexturePacker
 		texture.SetPixels(new Color[width * height]);
 
 		// The returned rects
-		Rect[] rects = new Rect[textures.Length];
+		var rects = new Rect[textures.Length];
 
 		for (int i = 0; i < textures.Length; i++)
 		{
-			Texture2D tex = textures[i];
+			var tex = textures[i];
 			if (!tex) continue;
 
-			Rect rect = storage[i].rect;
+			var rect = storage[i].rect;
 			int xPadding = (storage[i].paddingX ? padding : 0);
 			int yPadding = (storage[i].paddingY ? padding : 0);
-			Color[] colors = tex.GetPixels();
+			var colors = tex.GetPixels();
 
 			// Would be used to rotate the texture if need be.
 			if (rect.width != tex.width + xPadding)
 			{
-				Color[] newColors = tex.GetPixels();
+				var newColors = tex.GetPixels();
 
 				for (int x = 0; x < rect.width; x++)
 				{
@@ -157,16 +155,17 @@ public class UITexturePacker
 
 	public Rect Insert (int width, int height, FreeRectChoiceHeuristic method)
 	{
-		Rect newNode = new Rect();
-		int score1 = 0; // Unused in this function. We don't need to know the score after finding the position.
-		int score2 = 0;
+		var newNode = new Rect();
+		var unused0 = 0;
+		var unused1 = 0;
+
 		switch (method)
 		{
-			case FreeRectChoiceHeuristic.RectBestShortSideFit: newNode = FindPositionForNewNodeBestShortSideFit(width, height, ref score1, ref score2); break;
-			case FreeRectChoiceHeuristic.RectBottomLeftRule: newNode = FindPositionForNewNodeBottomLeft(width, height, ref score1, ref score2); break;
-			case FreeRectChoiceHeuristic.RectContactPointRule: newNode = FindPositionForNewNodeContactPoint(width, height, ref score1); break;
-			case FreeRectChoiceHeuristic.RectBestLongSideFit: newNode = FindPositionForNewNodeBestLongSideFit(width, height, ref score2, ref score1); break;
-			case FreeRectChoiceHeuristic.RectBestAreaFit: newNode = FindPositionForNewNodeBestAreaFit(width, height, ref score1, ref score2); break;
+			case FreeRectChoiceHeuristic.RectBestShortSideFit: newNode = FindPositionForNewNodeBestShortSideFit(width, height, ref unused0, ref unused1); break;
+			case FreeRectChoiceHeuristic.RectBottomLeftRule: newNode = FindPositionForNewNodeBottomLeft(width, height, ref unused0, ref unused1); break;
+			case FreeRectChoiceHeuristic.RectContactPointRule: newNode = FindPositionForNewNodeContactPoint(width, height, ref unused0); break;
+			case FreeRectChoiceHeuristic.RectBestLongSideFit: newNode = FindPositionForNewNodeBestLongSideFit(width, height, ref unused1, ref unused0); break;
+			case FreeRectChoiceHeuristic.RectBestAreaFit: newNode = FindPositionForNewNodeBestAreaFit(width, height, ref unused0, ref unused1); break;
 		}
 
 		if (newNode.height == 0)

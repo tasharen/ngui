@@ -660,7 +660,7 @@ static public class NGUITools
 	static public void CheckForPrefabStage (GameObject gameObject)
 	{
 #if UNITY_EDITOR && UNITY_2018_3_OR_NEWER
-#if UNITY_2021_1_OR_NEWER
+#if UNITY_2021_2_OR_NEWER
 		var prefabStage = UnityEditor.SceneManagement.PrefabStageUtility.GetPrefabStage(gameObject);
 #else
 		var prefabStage = UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(gameObject);
