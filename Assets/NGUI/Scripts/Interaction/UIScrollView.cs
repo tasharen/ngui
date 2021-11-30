@@ -457,6 +457,23 @@ public class UIScrollView : MonoBehaviour
 
 	public void UpdateScrollbars () { UpdateScrollbars(true); }
 
+	[System.NonSerialized] bool mUpdateScrollbars = false;
+
+	/// <summary>
+	/// Make scroll view update its scroll bars on the next update.
+	/// </summary>
+
+	public void QueueUpdateScrollbars () { mUpdateScrollbars = true; }
+
+	protected void Update ()
+	{
+		if (mUpdateScrollbars)
+		{
+			mUpdateScrollbars = false;
+			UpdateScrollbars(true);
+		}
+	}
+
 	/// <summary>
 	/// Update the values of the associated scroll bars.
 	/// </summary>
@@ -464,6 +481,8 @@ public class UIScrollView : MonoBehaviour
 	public virtual void UpdateScrollbars (bool recalculateBounds)
 	{
 		if (mPanel == null) return;
+
+		mUpdateScrollbars = false;
 
 		if (horizontalScrollBar != null || verticalScrollBar != null)
 		{

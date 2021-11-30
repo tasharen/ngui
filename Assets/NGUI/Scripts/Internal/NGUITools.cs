@@ -1459,11 +1459,11 @@ static public class NGUITools
 
 	static public void DestroyChildren (this Transform t)
 	{
-		bool isPlaying = Application.isPlaying;
+		var isPlaying = Application.isPlaying;
 
 		while (t.childCount != 0)
 		{
-			Transform child = t.GetChild(0);
+			var child = t.GetChild(0);
 
 			if (isPlaying)
 			{

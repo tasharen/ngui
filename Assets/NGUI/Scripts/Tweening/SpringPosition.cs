@@ -104,7 +104,26 @@ public class SpringPosition : MonoBehaviour
 		}
 
 		// Ensure that the scroll bars remain in sync
-		if (mSv != null) mSv.UpdateScrollbars(true);
+		if (mSv != null) mSv.QueueUpdateScrollbars();
+	}
+
+	/// <summary>
+	/// Immediately finish the animation.
+	/// </summary>
+
+	public void Finish ()
+	{
+		if (enabled)
+		{
+			if (worldSpace) transform.position = target;
+			else transform.localPosition = target;
+
+			NotifyListeners();
+			enabled = false;
+
+			// Ensure that the scroll bars remain in sync
+			if (mSv != null) mSv.QueueUpdateScrollbars();
+		}
 	}
 
 	/// <summary>

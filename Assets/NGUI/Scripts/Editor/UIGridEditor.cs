@@ -42,6 +42,7 @@ public class UIGridEditor : UIWidgetContainerEditor
 		}
 
 		NGUIEditorTools.DrawProperty("Pivot", serializedObject, "pivot");
+		NGUIEditorTools.DrawProperty("Expansion", serializedObject, "expansionStyle");
 		NGUIEditorTools.DrawProperty("Smooth Tween", serializedObject, "animateSmoothly");
 		NGUIEditorTools.DrawProperty("Hide Inactive", serializedObject, "hideInactive");
 		NGUIEditorTools.DrawProperty("Constrain to Panel", serializedObject, "keepWithinPanel");

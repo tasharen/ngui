@@ -110,8 +110,8 @@ public class UIButton : UIButtonColor
 				if (col != null)
 				{
 					col.enabled = value;
-					var buttons = GetComponents<UIButton>();
-					foreach (UIButton btn in buttons) btn.SetState(value ? State.Normal : State.Disabled, false);
+					var buttons = GetComponents<UIButtonColor>();
+					foreach (var btn in buttons) btn.SetState(value ? State.Normal : State.Disabled, false);
 				}
 				else
 				{
@@ -120,8 +120,8 @@ public class UIButton : UIButtonColor
 					if (c2d != null)
 					{
 						c2d.enabled = value;
-						var buttons = GetComponents<UIButton>();
-						foreach (UIButton btn in buttons) btn.SetState(value ? State.Normal : State.Disabled, false);
+						var buttons = GetComponents<UIButtonColor>();
+						foreach (var btn in buttons) btn.SetState(value ? State.Normal : State.Disabled, false);
 					}
 					else enabled = value;
 				}

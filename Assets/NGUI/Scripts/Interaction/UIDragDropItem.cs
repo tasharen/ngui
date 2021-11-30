@@ -132,7 +132,7 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void OnClick ()
 	{
-		if (mIgnoreClick == Time.frameCount) return;
+		if (!interactable || mIgnoreClick == Time.frameCount) return;
 
 		if (clickToDrag && !mDragging && UICamera.currentTouchID == -1 && draggedItems.Count == 0)
 		{

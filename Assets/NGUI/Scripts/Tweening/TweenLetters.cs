@@ -72,8 +72,8 @@ public class TweenLetters : UITweener
 		}
 	}
 
-	public AnimationProperties hoverOver;
-	public AnimationProperties hoverOut;
+	public AnimationProperties hoverOver = new AnimationProperties();
+	public AnimationProperties hoverOut = new AnimationProperties();
 
 	UILabel mLabel;
 	int mVertexCount = -1;
@@ -216,7 +216,7 @@ public class TweenLetters : UITweener
 	{
 		if (mLabel)
 		{
-			mLabel.enabled = !(isFinished && mCurrent == hoverOut && mCurrent.alpha == 0f);
+			mLabel.enabled = !(isFinished && mCurrent != null && mCurrent == hoverOut && mCurrent.alpha == 0f);
 			mLabel.MarkAsChanged();
 		}
 	}

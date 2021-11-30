@@ -496,7 +496,7 @@ public class NGUIFont : ScriptableObject, INGUIFont
 					return mDynamicFont.material;
 				}
 			}
-			return null;
+			return mMat;
 		}
 		set
 		{
@@ -1268,5 +1268,206 @@ public class NGUIFont : ScriptableObject, INGUIFont
 		}
 		return false;
 	}
+
+	#region Dynamic font kerning implementation
+
+	/// <summary>
+	/// Unity's dynamic font CharacterInfo struct is completely devoid of kerning-related information.
+	/// In order to get dynamic fonts to print correctly, kerning information has to be retrieved from FreeType directly, then saved.
+	/// This means that a part of the dynamic font is not, in fact, "dynamic", as there is no way of accessing this data outside of edit mode.
+	/// </summary>
+
+	[System.Serializable]
+	public struct KerningAdjustment
+	{
+		public int left;
+		public int right;
+		public int offset;
+	}
+
+	[HideInInspector, SerializeField] List<KerningAdjustment> mKerningAdjustments;
+
+	[System.NonSerialized] Dictionary<uint, short> mKerningCache;
+
+	/// <summary>
+	/// Returns the number of kerning pairs in this font.
+	/// </summary>
+
+	public int kerningCount
+	{
+		get
+		{
+			if (type == NGUIFontType.Reference)
+			{
+				var rep = replacement as NGUIFont;
+				if (rep != null) return rep.kerningCount;
+			}
+
+			if (type == NGUIFontType.Bitmap && bmFont != null)
+			{
+				var glyphs = bmFont.glyphs;
+				var count = 0;
+				if (glyphs != null) foreach(var g in glyphs) if (g.kerning != null) count += g.kerning.Count;
+				return count;
+			}
+			return mKerningAdjustments != null ? mKerningAdjustments.Count : 0;
+		}
+	}
+
+	/// <summary>
+	/// Kerning data for dynamic fonts. Unity is missing kerning information, so NGUI adds it at edit time.
+	/// Bitmap kerning data is stored differently (as it was coded that way ages ago), so it can't be retrieved as a single array.
+	/// </summary>
+
+	public List<KerningAdjustment> kerningData
+	{
+		get
+		{
+			if (type == NGUIFontType.Reference)
+			{
+				var rep = replacement as NGUIFont;
+				if (rep != null) return rep.kerningData;
+			}
+
+			if (type == NGUIFontType.Bitmap) return null;
+			return mKerningAdjustments;
+		}
+	}
+
+	/// <summary>
+	/// Retrieves the special amount by which to adjust the cursor position, given the specified previous character.
+	/// </summary>
+
+	public int GetKerning (int previousChar, int currentChar)
+	{
+		if (type == NGUIFontType.Reference)
+		{
+			var rep = replacement as NGUIFont;
+			if (rep != null) return rep.GetKerning(previousChar, currentChar);
+		}
+
+		if (previousChar == 0) return 0;
+
+		if (type == NGUIFontType.Bitmap)
+		{
+			var bf = bmFont;
+			if (bf == null) return 0;
+
+			var g = bf.GetGlyph(currentChar);
+			if (g == null) return 0;
+
+			return g.GetKerning(previousChar);
+		}
+
+		if (mKerningAdjustments == null || mKerningAdjustments.Count == 0) return 0;
+
+		if (mKerningCache == null)
+		{
+			mKerningCache = new Dictionary<uint, short>();
+
+			foreach (var adj in mKerningAdjustments)
+			{
+				var key = (((uint)adj.left << 16) | (uint)adj.right);
+				mKerningCache[key] = (short)adj.offset;
+			}
+		}
+
+		short retVal;
+		var lookup = (((uint)previousChar << 16) | (uint)currentChar);
+		if (mKerningCache.TryGetValue(lookup, out retVal)) return retVal;
+		return 0;
+	}
+
+	/// <summary>
+	/// Set the kerning data. This is meant to be used with dynamic fonts, since they are inherently missing kerning information in Unity.
+	/// </summary>
+
+	public void SetKerning (List<KerningAdjustment> kerning)
+	{
+		if (type == NGUIFontType.Reference)
+		{
+			var rep = replacement as NGUIFont;
+			if (rep != null) { rep.SetKerning(kerning); return; }
+		}
+
+		if (kerning != null && kerning.Count != 0)
+		{
+			mKerningAdjustments = new List<KerningAdjustment>();
+			mKerningCache = new Dictionary<uint, short>();
+
+			foreach (var k in kerning)
+			{
+				var lookup = (((uint)k.left << 16) | (uint)k.right);
+				mKerningAdjustments.Add(k);
+				mKerningCache[lookup] = (short)k.offset;
+			}
+
+			MarkAsChanged();
+		}
+		else if (mKerningAdjustments != null)
+		{
+			mKerningAdjustments = null;
+			mKerningCache = null;
+			MarkAsChanged();
+		}
+	}
+
+	/// <summary>
+	/// Add a new kerning entry to the character (or adjust an existing one).
+	/// </summary>
+
+	public void SetKerning (int previousChar, int currentChar, int amount)
+	{
+		if (type == NGUIFontType.Reference)
+		{
+			var rep = replacement as NGUIFont;
+			if (rep != null) { rep.SetKerning(previousChar, currentChar, amount); return; }
+		}
+
+		if (type == NGUIFontType.Bitmap)
+		{
+			var bf = bmFont;
+			if (bf == null) return;
+
+			var g = bf.GetGlyph(currentChar);
+			if (g == null) return;
+
+			g.SetKerning(previousChar, amount);
+			MarkAsChanged();
+			return;
+		}
+
+		if (mKerningAdjustments == null) mKerningAdjustments = new List<KerningAdjustment>();
+		if (mKerningCache == null) mKerningCache = new Dictionary<uint, short>();
+
+		var lookup = (((uint)previousChar << 16) | (uint)currentChar);
+		mKerningCache[lookup] = (short)amount;
+
+		for (int i = 0, imax = mKerningAdjustments.Count; i < imax; ++i)
+		{
+			var adj = mKerningAdjustments[i];
+
+			if (adj.left == previousChar && adj.right == currentChar)
+			{
+				if (adj.offset == amount) return;
+
+				if (amount == 0) { mKerningAdjustments.RemoveAt(i); MarkAsChanged(); return; }
+				adj.offset = amount;
+				mKerningAdjustments[i] = adj;
+				MarkAsChanged();
+				return;
+			}
+		}
+
+		if (amount == 0) return;
+
+		var a = new KerningAdjustment();
+		a.left = previousChar;
+		a.right = currentChar;
+		a.offset = amount;
+		mKerningAdjustments.Add(a);
+		MarkAsChanged();
+	}
+	#endregion
 }
 

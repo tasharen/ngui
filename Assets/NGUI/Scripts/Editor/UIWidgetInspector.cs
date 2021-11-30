@@ -941,6 +941,8 @@ public class UIWidgetInspector : UIRectEditor
 				}
 				GUILayout.EndHorizontal();
 			}
+
+			NGUIEditorTools.DrawProperty("Boundless", so.FindProperty("boundless"));
 			NGUIEditorTools.EndContents();
 		}
 	}

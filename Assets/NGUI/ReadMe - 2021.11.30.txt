@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2021.9.10
+            Version 2021.11.30
        https://discord.gg/tasharen/
 ----------------------------------------------
 
@@ -54,6 +54,16 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2021.11.30
+- NEW: NGUI will now automatically save kerning information when creating a TTF-referencing NGUI Font, since this information is still missing in Unity. NGUI pulls this data directly from the FreeType library.
+- NEW: It's now possible to edit kerning data on fonts via inspector.
+- NEW: UIGrid now has a new expansion style parameter that alters how children are positioned, allowing rows to be positioned above, columns to the left, and centered, all based on the chosen pivot point.
+- NEW: Added a new flag to widgets ("Boundless") that allow them to be ignored for bounds calculations.
+- FIX: UIGrid now keeps calling its OnReposition callback while children are springing into place.
+- FIX: Made TypewriterEffect behave better when it comes to resetting it to the beginning.
+- FIX: Removed some questionable code that was breaking ellipsis functionality in labels when symbols were used.
+- FIX: If no valid widgets were found, CalculateRelativeWidgetBounds will now use the specified transform's position in its bounds calculations rather than returning zeroed out position bounds.
 
 2021.9.10
 - NEW: Added support for being able to change font scaling mid-sentence using the [y=0.75]text[/y] syntax.

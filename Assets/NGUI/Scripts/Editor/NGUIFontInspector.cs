@@ -34,6 +34,9 @@ public class NGUIFontInspector : Editor
 	bool mSymbolColored = false;
 	bool mSymPP = false;
 	BMSymbol mSelectedSymbol = null;
+	char mKernLeft;
+	char mKernRight;
+	int mKernOffset;
 	AnimationCurve mCurve = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f));
 
 	public override bool HasPreviewGUI () { return mView != View.Nothing; }
@@ -210,6 +213,87 @@ public class NGUIFontInspector : Editor
 						lbl.font = font;
 						NGUITools.SetDirty(lbl);
 					}
+				}
+			}
+
+			if (mFont is NGUIFont)
+			{
+				var font = mFont as NGUIFont;
+				var df = font.dynamicFont;
+				var kc = font.kerningCount;
+
+				EditorGUILayout.LabelField("Kerning", kc + " entries", GUILayout.Width(160f));
+
+				if (NGUIEditorTools.DrawHeader("Kerning Data"))
+				{
+					NGUIEditorTools.BeginContents();
+
+					GUI.changed = false;
+					GUILayout.BeginHorizontal();
+					var s0 = GUILayout.TextField(mKernLeft != 0 ? mKernLeft.ToString() : "", GUILayout.Width(30f));
+					var s1 = GUILayout.TextField(mKernRight != 0 ? mKernRight.ToString() : "", GUILayout.Width(30f));
+
+					if (GUI.changed)
+					{
+						mKernLeft = string.IsNullOrEmpty(s0) ? (char)0 : s0[0];
+						mKernRight = string.IsNullOrEmpty(s1) ? (char)0 : s1[0];
+						mKernOffset = font.GetKerning(mKernLeft, mKernRight);
+					}
+
+					if (mKernLeft != 0 && mKernRight != 0)
+					{
+						var i0 = EditorGUILayout.IntSlider(mKernOffset, -9, 9);
+
+						if (i0 != mKernOffset)
+						{
+							mKernOffset = i0;
+							font.SetKerning(mKernLeft, mKernRight, i0);
+						}
+					}
+					else GUILayout.Label("Enter two characters");
+
+					GUILayout.EndHorizontal();
+
+					if (df != null)
+					{
+						if (kc == 0)
+						{
+							var add = GUILayout.Button("Auto-fill from font");
+
+							var chars = NGUISettings.charsToInclude;
+
+							if (string.IsNullOrEmpty(chars))
+							{
+								for (int i = 33; i < 127; ++i) chars += System.Convert.ToChar(i);
+								for (int i = 161; i < 256; ++i) chars += System.Convert.ToChar(i);
+							}
+
+							GUI.changed = false;
+							chars = EditorGUILayout.TextArea(chars, GUI.skin.textArea, GUILayout.Height(80f));
+							if (GUI.changed) NGUISettings.charsToInclude = chars;
+
+							if (add)
+							{
+								var kerning = FreeType.GetKerning(df, size, 0, chars);
+								font.SetKerning(kerning);
+							}
+						}
+						else
+						{
+							var delete = GUILayout.Button("Delete");
+
+							if (delete && EditorUtility.DisplayDialog("Confirm Delete", "Are you sure you want to delete all kerning data for this font?", "Delete", "Cancel"))
+							{
+								NGUIEditorTools.RegisterUndo("Delete Kerning Data", font as Object);
+								font.SetKerning(null);
+								mKernLeft = (char)0;
+								mKernRight = (char)0;
+								mKernOffset = 0;
+							}
+						}
+					}
+
+					NGUIEditorTools.EndContents();
 				}
 			}
 
@@ -611,7 +695,7 @@ public class NGUIFontInspector : Editor
 
 		if (mView != View.Nothing && tex != null)
 		{
-			Material m = (mUseShader ? mFont.material : null);
+			var m = (mUseShader ? mFont.material : null);
 
 			if (mView == View.Font && mFont.atlas != null && mFont.sprite != null)
 			{
@@ -710,6 +794,8 @@ public class NGUIFontInspector : Editor
 						int fx = x + glyph.x + offsetX + 1;
 						int fy = y + (mFont.texHeight - glyph.y - glyph.height) + 1;
 						if (mFont.atlas != null) fy += bfTex.height - offsetY;
+						fx = Mathf.Clamp(fx, 0, texW - 1);
+						fy = Mathf.Clamp(fy, 0, texH - 1);
 						colors[x + y * width] = atlas[fx + fy * texW];
 					}
 				}
@@ -723,6 +809,9 @@ public class NGUIFontInspector : Editor
 						int fx = x + glyph.x + offsetX;
 						int fy = y + (mFont.texHeight - glyph.y - glyph.height);
 						if (mFont.atlas != null) fy += bfTex.height - offsetY;
+
+						fx = Mathf.Clamp(fx, 0, texW - 1);
+						fy = Mathf.Clamp(fy, 0, texH - 1);
 
 						Color c = atlas[fx + fy * texW];
 

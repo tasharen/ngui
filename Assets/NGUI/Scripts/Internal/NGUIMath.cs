@@ -457,6 +457,7 @@ static public class NGUIMath
 				b.Encapsulate(max);
 				return b;
 			}
+			return new Bounds(toLocal.MultiplyPoint3x4(content.position), Vector3.zero);
 		}
 		return new Bounds(Vector3.zero, Vector3.zero);
 	}
@@ -504,7 +505,7 @@ static public class NGUIMath
 			// If there is a widget present, include its bounds
 			var w = content.GetComponent<UIWidget>();
 
-			if (w != null && w.enabled && w.isSelectable)
+			if (w != null && w.enabled && w.isSelectable && !w.boundless)
 			{
 				var corners = w.worldCorners;
 

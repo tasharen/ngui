@@ -24,6 +24,7 @@ public class UIForwardEvents : MonoBehaviour
 	public bool onDrop			= false;
 	public bool onSubmit		= false;
 	public bool onScroll		= false;
+	public bool onTooltip		= false;
 
 	void OnHover (bool isOver)
 	{
@@ -94,6 +95,14 @@ public class UIForwardEvents : MonoBehaviour
 		if (onScroll && target != null)
 		{
 			target.SendMessage("OnScroll", delta, SendMessageOptions.DontRequireReceiver);
+		}
+	}
+
+	void OnTooltip (bool show)
+	{
+		if (onTooltip && target != null)
+		{
+			target.SendMessage("OnTooltip", show, SendMessageOptions.DontRequireReceiver);
 		}
 	}
 }

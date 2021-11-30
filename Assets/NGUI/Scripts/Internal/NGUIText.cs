@@ -105,7 +105,7 @@ static public class NGUIText
 
 		if (font != null && request)
 		{
-			font.RequestCharactersInTexture(")_-", finalSize, fontStyle);
+			font.RequestCharactersInTexture(")_-.", finalSize, fontStyle);
 
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 			if (!font.GetCharacterInfo(')', out mTempChar, finalSize, fontStyle) || mTempChar.vert.height == 0f)
@@ -281,8 +281,17 @@ static public class NGUIText
 
 			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fs))
 			{
+				var kern = 0;
+				var nf = nguiFont as NGUIFont;
+
+				if (nf != null)
+				{
+					kern = nf.GetKerning(prev, ch);
+					if (kern != 0) kern = Mathf.RoundToInt(kern * ((float)finalSize / dynamicFont.fontSize));
+				}
+
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-				glyph.v0.x = mTempChar.vert.xMin;
+				glyph.v0.x = mTempChar.vert.xMin + kern;
 				glyph.v1.x = glyph.v0.x + mTempChar.vert.width;
 
 				glyph.v0.y = mTempChar.vert.yMax - baseline;
@@ -305,11 +314,11 @@ static public class NGUIText
 					glyph.u3 = new Vector2(glyph.u2.x, glyph.u0.y);
 				}
 
-				glyph.advance = mTempChar.width;
+				glyph.advance = mTempChar.width + kern;
 				glyph.channel = 0;
 #else
-				glyph.v0.x = mTempChar.minX;
-				glyph.v1.x = mTempChar.maxX;
+				glyph.v0.x = mTempChar.minX + kern;
+				glyph.v1.x = mTempChar.maxX + kern;
 
 				glyph.v0.y = mTempChar.maxY - baseline;
 				glyph.v1.y = mTempChar.minY - baseline;
@@ -319,7 +328,7 @@ static public class NGUIText
 				glyph.u2 = mTempChar.uvBottomRight;
 				glyph.u3 = mTempChar.uvTopRight;
 
-				glyph.advance = mTempChar.advance;
+				glyph.advance = mTempChar.advance + kern;
 				glyph.channel = 0;
 #endif
 				glyph.v0.x = Mathf.Round(glyph.v0.x);
@@ -343,7 +352,7 @@ static public class NGUIText
 				return glyph;
 			}
 		}
-		else if (nguiFont != null)
+		else if (nguiFont != null && nguiFont.bmFont != null)
 		{
 			bool thinSpace = false;
 
@@ -358,7 +367,7 @@ static public class NGUIText
 			if (bmg != null)
 			{
 				int kern = (prev != 0) ? bmg.GetKerning(prev) : 0;
-				glyph.v0.x = (prev != 0) ? bmg.offsetX + kern : bmg.offsetX;
+				glyph.v0.x = bmg.offsetX + kern;
 				glyph.v1.y = -bmg.offsetY;
 
 				glyph.v1.x = glyph.v0.x + bmg.width;
@@ -1406,18 +1415,6 @@ static public class NGUIText
 			// When encoded symbols such as [RrGgBb] or [-] are encountered, skip past them
 			if (encoding && ParseSymbol(text, ref offset, mColors, premultiply, ref sub, ref fontScaleMult, ref bold, ref italic, ref underline, ref strikethrough, ref ignoreColor, ref forceSpriteColor))
 			{
-				// Adds "..." at the end of text that doesn't fit
-				if (lineCount == maxLineCount && useEllipsis && start < lastValidChar)
-				{
-					lineIsEmpty = false;
-					if (lastValidChar > start) mSB.Append(text, start, lastValidChar - start + 1);
-					if (previousSubscript != 0) mSB.Append("[/sub]");
-					else if (fontScaleMult != 0f) mSB.Append("[/y]");
-					mSB.Append("...");
-					start = offset;
-					break;
-				}
-
 				// Append the previous word
 				if (lastValidChar + 1 > offset)
 				{
@@ -1524,7 +1521,8 @@ static public class NGUIText
 						if (lastValidChar > start) mSB.Append(text, start, lastValidChar - start + 1);
 						if (sub != 0) mSB.Append("[/sub]");
 						else if (fontScaleMult != 0f) mSB.Append("[/y]");
-						mSB.Append("...");
+						if (symbolStyle == SymbolStyle.None) mSB.Append("...");
+						else mSB.Append("[-][ff]...");
 						start = offset;
 						break;
 					}
@@ -2089,7 +2087,7 @@ static public class NGUIText
 				// Underline and strike-through contributed by Rudy Pangestu.
 				if (underline || strikethrough)
 				{
-					var dash = GetGlyph(strikethrough ? '-' : '_', prev, false, false, scale);
+					var dash = GetGlyph(strikethrough ? '-' : '_', 0, false, false, scale);
 					if (dash == null) continue;
 
 					if (uvs != null)
@@ -2113,8 +2111,13 @@ static public class NGUIText
 						}
 					}
 
-					v0y = (-y + dash.v0.y);
-					v1y = (-y + dash.v1.y);
+					// Dash has a soft border, so using its dimensions as-is results in a very thick line.
+					// To address this, I reduce the height of drawn strike-through line by 2 pixels.
+					var height = Mathf.Round(dash.v0.y - dash.v1.y);
+					height = Mathf.Max(height - 2f, 2f);
+
+					v0y = -y + dash.v0.y - 1f;
+					v1y = v0y - height;
 
 					if (useBold)
 					{

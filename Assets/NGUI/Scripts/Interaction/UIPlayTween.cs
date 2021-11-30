@@ -328,6 +328,9 @@ public class UIPlayTween : MonoBehaviour
 	[ContextMenu("Play")]
 	public void Play () { Play(true); }
 
+	[ContextMenu("Play in reverse")]
+	public void PlayReverse () { Play(false); }
+
 	/// <summary>
 	/// Activate the tweeners.
 	/// </summary>

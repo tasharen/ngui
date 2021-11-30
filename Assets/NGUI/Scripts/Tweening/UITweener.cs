@@ -408,12 +408,14 @@ public abstract class UITweener : MonoBehaviour
 	/// Play the tween forward.
 	/// </summary>
 
+	[ContextMenu("Play forward")]
 	public void PlayForward () { Play(true); }
 
 	/// <summary>
 	/// Play the tween in reverse.
 	/// </summary>
 	
+	[ContextMenu("Play in reverse")]
 	public void PlayReverse () { Play(false); }
 
 	/// <summary>

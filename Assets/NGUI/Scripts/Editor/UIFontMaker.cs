@@ -220,7 +220,7 @@ public class UIFontMaker : EditorWindow
 				}
 				else if (ttf != null)
 				{
-					string[] faces = FreeType.GetFaces(ttf);
+					var faces = FreeType.GetFaces(ttf);
 
 					if (faces != null)
 					{
@@ -409,6 +409,9 @@ public class UIFontMaker : EditorWindow
 			asset.dynamicFont = NGUISettings.FMFont;
 			asset.dynamicFontStyle = NGUISettings.fontStyle;
 			asset.defaultSize = NGUISettings.FMSize;
+
+			var kerning = FreeType.GetKerning(NGUISettings.FMFont, NGUISettings.FMSize, mFaceIndex, NGUISettings.charsToInclude);
+			asset.SetKerning(kerning);
 		}
 		else if (create == Create.Import)
 		{

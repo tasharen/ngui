@@ -472,8 +472,8 @@ static public class FreeType
 
 		if (ttf == null || !isPresent) return false;
 
-		IntPtr lib = IntPtr.Zero;
-		IntPtr face = IntPtr.Zero;
+		var lib = IntPtr.Zero;
+		var face = IntPtr.Zero;
 
 		if (FT_Init_FreeType(out lib) != 0)
 		{
@@ -481,7 +481,7 @@ static public class FreeType
 			return false;
 		}
 
-		string fileName = Application.dataPath.Substring(0, Application.dataPath.Length - "Assets".Length) +
+		var fileName = Application.dataPath.Substring(0, Application.dataPath.Length - "Assets".Length) +
 			UnityEditor.AssetDatabase.GetAssetPath(ttf);
 
 		if (!File.Exists(fileName))
@@ -498,10 +498,10 @@ static public class FreeType
 			font.charSize = size;
 
 			Color32 white = Color.white;
-			List<int> entries = new List<int>();
-			List<Texture2D> textures = new List<Texture2D>();
+			var entries = new List<int>();
+			var textures = new List<Texture2D>();
 
-			FT_FaceRec faceRec = (FT_FaceRec)Marshal.PtrToStructure(face, typeof(FT_FaceRec));
+			var faceRec = (FT_FaceRec)Marshal.PtrToStructure(face, typeof(FT_FaceRec));
 			FT_Set_Pixel_Sizes(face, 0, (uint)size);
 
 			// Calculate the baseline value that would let the printed font be centered vertically
@@ -514,10 +514,10 @@ static public class FreeType
 
 			// Space character is not renderable
 			FT_Load_Glyph(face, FT_Get_Char_Index(face, 32), FT_LOAD_DEFAULT);
-			FT_GlyphSlotRec space = (FT_GlyphSlotRec)Marshal.PtrToStructure(faceRec.glyph, typeof(FT_GlyphSlotRec));
+			var space = (FT_GlyphSlotRec)Marshal.PtrToStructure(faceRec.glyph, typeof(FT_GlyphSlotRec));
 
 			// Space is not visible and doesn't have a texture
-			BMGlyph spaceGlyph = font.GetGlyph(32, true);
+			var spaceGlyph = font.GetGlyph(32, true);
 			spaceGlyph.offsetX = 0;
 			spaceGlyph.offsetY = 0;
 			spaceGlyph.advance = (space.metrics.horiAdvance >> 6);
@@ -543,12 +543,14 @@ static public class FreeType
 				}
 			}
 
+			int kerningData = 0;
+
 			// Run through all requested characters
 			foreach (char ch in characters)
 			{
-				uint charIndex = FT_Get_Char_Index(face, (uint)ch);
+				var charIndex = FT_Get_Char_Index(face, (uint)ch);
 				FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT);
-				FT_GlyphSlotRec glyph = (FT_GlyphSlotRec)Marshal.PtrToStructure(faceRec.glyph, typeof(FT_GlyphSlotRec));
+				var glyph = (FT_GlyphSlotRec)Marshal.PtrToStructure(faceRec.glyph, typeof(FT_GlyphSlotRec));
 				FT_Render_Glyph(ref glyph, FT_Render_Mode.FT_RENDER_MODE_NORMAL);
 
 				var w = glyph.bitmap.width;
@@ -559,7 +561,7 @@ static public class FreeType
 					var buffer = new byte[w * h];
 					Marshal.Copy(glyph.bitmap.buffer, buffer, 0, buffer.Length);
 
-					var texture = new Texture2D(w,  h, UnityEngine.TextureFormat.ARGB32, false);
+					var texture = new Texture2D(w,  h, TextureFormat.ARGB32, false);
 					var colors = new Color32[w * h];
 
 					for (int i = 0, y = 0; y < h; ++y)
@@ -596,10 +598,21 @@ static public class FreeType
 							if (FT_Get_Kerning(face, ch2, ch, 0, out vec) != 0) continue;
 
 							int offset = (vec.x >> 6);
-							if (offset != 0) bmg.SetKerning((int)ch2, offset);
+
+							if (offset != 0)
+							{
+								++kerningData;
+								bmg.SetKerning((int)ch2, offset);
+							}
 						}
 					}
 				}
+			}
+
+			if (kerning)
+			{
+				if (kerningData == 0) Debug.LogWarning("The font doesn't appear to have any kerning information for the chosen characters", ttf);
+				else Debug.Log("Kerning data: " + kerningData + " entries", ttf);
 			}
 
 			// Create a packed texture with all the characters
@@ -670,5 +683,86 @@ static public class FreeType
 		if (lib != IntPtr.Zero) FT_Done_FreeType(lib);
 #endif
 		return (tex != null);
+	}
+
+	/// <summary>
+	/// Retrieve full kerning information from the specified font.
+	/// </summary>
+
+	static public List<NGUIFont.KerningAdjustment> GetKerning (Font ttf, int size, int faceIndex, string characters)
+	{
+		if (ttf == null) return null;
+		var list = new List<NGUIFont.KerningAdjustment>();
+
+		var lib = IntPtr.Zero;
+		var face = IntPtr.Zero;
+
+		if (FT_Init_FreeType(out lib) != 0)
+		{
+			Debug.LogError("Failed to initialize FreeType");
+			return null;
+		}
+
+		var fileName = Application.dataPath.Substring(0, Application.dataPath.Length - "Assets".Length) +
+			UnityEditor.AssetDatabase.GetAssetPath(ttf);
+
+		if (!File.Exists(fileName))
+		{
+			Debug.LogError("Unable to use the chosen font.");
+		}
+		else if (FT_New_Face(lib, fileName, faceIndex, out face) != 0)
+		{
+			Debug.LogError("Unable to use the chosen font (FT_New_Face).");
+		}
+		else
+		{
+			var faceRec = (FT_FaceRec)Marshal.PtrToStructure(face, typeof(FT_FaceRec));
+			FT_Set_Pixel_Sizes(face, 0, (uint)size);
+			characters = " " + characters;
+
+			// Run through all requested characters
+			foreach (char ch in characters)
+			{
+				var charIndex = FT_Get_Char_Index(face, (uint)ch);
+				FT_Load_Glyph(face, charIndex, FT_LOAD_NO_BITMAP);
+				//var glyph = (FT_GlyphSlotRec)Marshal.PtrToStructure(faceRec.glyph, typeof(FT_GlyphSlotRec));
+				//FT_Render_Glyph(ref glyph, FT_Render_Mode.FT_RENDER_MODE_NORMAL);
+
+				//var w = glyph.bitmap.width;
+				//var h = glyph.bitmap.rows;
+
+				//if (w > 0 && h > 0)
+				{
+					for (int b = 0; b < characters.Length; ++b)
+					{
+						uint ch2 = characters[b];
+						if (ch2 == ch) continue;
+
+						FT_Vector vec;
+						if (FT_Get_Kerning(face, ch2, ch, 0, out vec) != 0) continue;
+
+						int offset = (vec.x >> 6);
+
+						if (offset != 0)
+						{
+							var k = new NGUIFont.KerningAdjustment();
+							k.left = (int)ch2;
+							k.right = ch;
+							k.offset = offset;
+							list.Add(k);
+						}
+					}
+				}
+			}
+
+			if (list.Count == 0) Debug.LogWarning("The font doesn't appear to have any kerning information for the chosen characters. You will have to edit each combination manually.", ttf);
+			else Debug.Log("Kerning data: " + list.Count + " entries", ttf);
+		}
+
+		if (face != IntPtr.Zero) FT_Done_Face(face);
+#if !UNITY_3_5
+		if (lib != IntPtr.Zero) FT_Done_FreeType(lib);
+#endif
+		return list;
 	}
 }

@@ -34,6 +34,9 @@ public class UIWidget : UIRect
 	[HideInInspector][SerializeField] protected int mHeight = 100;
 	[HideInInspector][SerializeField] protected int mDepth = 0;
 
+	[Tooltip("Boundless widgets won't be used for bounds calculations. Useful for widgets inside scroll views that can go outside its bounds without forcing the rest of the contents to adjust.")]
+	public bool boundless = false;
+
 	[Tooltip("Custom material, if desired")]
 	[HideInInspector][SerializeField] protected Material mMat;
 
