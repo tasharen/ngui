@@ -133,10 +133,10 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 	[HideInInspector][SerializeField] UnityEngine.Object mReplacement;
 
 	// Whether the atlas is using a pre-multiplied alpha material. -1 = not checked. 0 = no. 1 = yes.
-	[System.NonSerialized] int mPMA = -1;
+	[NonSerialized] int mPMA = -1;
 
 	// Dictionary lookup to speed up sprite retrieval at run-time
-	[System.NonSerialized] Dictionary<string, int> mSpriteIndices = new Dictionary<string, int>();
+	[NonSerialized] Dictionary<string, int> mSpriteIndices = new Dictionary<string, int>();
 
 	/// <summary>
 	/// Material used by the atlas.
@@ -327,6 +327,12 @@ public class NGUIAtlas : ScriptableObject, INGUIAtlas
 		}
 		return null;
 	}
+
+	/// <summary>
+	/// Should be used when sprite names change for any reason.
+	/// </summary>
+
+	public void RebuildSpriteCache () { mSpriteIndices.Clear(); }
 
 	/// <summary>
 	/// Sort the list of sprites within the atlas, making them alphabetical.

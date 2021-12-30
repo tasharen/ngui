@@ -168,7 +168,7 @@ public class UIButtonColor : UIWidgetContainer
 			return;
 		}
 #endif
-		if (mInitDone) OnHover(UICamera.IsHighlighted(gameObject));
+		if (mInitDone && mState != State.Disabled) OnHover(UICamera.IsHighlighted(gameObject));
 
 		if (UICamera.currentTouch != null)
 		{
@@ -186,18 +186,18 @@ public class UIButtonColor : UIWidgetContainer
 #if UNITY_EDITOR
 		if (!Application.isPlaying) return;
 #endif
-		if (mInitDone && mState != State.Normal)
+		if (mInitDone && mState != State.Normal && mState != State.Disabled)
 		{
 			SetState(State.Normal, true);
 
 			if (tweenTarget != null)
 			{
-				TweenColor tc = tweenTarget.GetComponent<TweenColor>();
+				var tc = tweenTarget.GetComponent<TweenColor>();
 
 				if (tc != null)
 				{
 					tc.value = mDefaultColor;
-					tc.enabled = false;
+					tc.Finish();
 				}
 			}
 		}
@@ -317,7 +317,7 @@ public class UIButtonColor : UIWidgetContainer
 			if (instant && tc != null)
 			{
 				tc.value = tc.to;
-				tc.enabled = false;
+				tc.Finish();
 			}
 		}
 	}

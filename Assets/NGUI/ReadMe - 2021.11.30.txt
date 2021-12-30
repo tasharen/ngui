@@ -55,6 +55,12 @@ and it will not be included in the build of your game. It's only used in the edi
  Version History
 -----------------
 
+WIP: (unversioned)
+- NEW: Localization now supports randomly choosing one of the values from the localization data randomly, if the exact key match isn't found, but there are multiple key# values present instead. For example requesting 'test' when 'test0', 'test1' and 'test2' are present instead.
+- FIX: Typewriter effect now supports embedded symbols using the [sp=name] syntax properly.
+- FIX: Renaming sprites in the atlas inspector no longer makes them disappear from the list of sprites.
+- FIX: transform.DestroyChildren() will now use NGUITools.Destroy instead of Object.Destroy, which properly disables the unparented object.
+
 2021.11.30
 - NEW: NGUI will now automatically save kerning information when creating a TTF-referencing NGUI Font, since this information is still missing in Unity. NGUI pulls this data directly from the FreeType library.
 - NEW: It's now possible to edit kerning data on fonts via inspector.

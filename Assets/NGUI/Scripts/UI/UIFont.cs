@@ -683,13 +683,13 @@ public class UIFont : MonoBehaviour, INGUIFont
 	{
 		for (int i = 0, imax = mSymbols.Count; i < imax; ++i)
 		{
-			BMSymbol sym = mSymbols[i];
+			var sym = mSymbols[i];
 			if (sym.sequence == sequence) return sym;
 		}
 
 		if (createIfMissing)
 		{
-			BMSymbol sym = new BMSymbol();
+			var sym = new BMSymbol();
 			sym.sequence = sequence;
 			mSymbols.Add(sym);
 			return sym;
@@ -711,13 +711,13 @@ public class UIFont : MonoBehaviour, INGUIFont
 		// Run through all symbols
 		for (int i = 0; i < count; ++i)
 		{
-			BMSymbol sym = mSymbols[i];
+			var sym = mSymbols[i];
 
 			// If the symbol's length is longer, move on
 			int symbolLength = sym.length;
 			if (symbolLength == 0 || textLength < symbolLength) continue;
 
-			bool match = true;
+			var match = true;
 
 			// Match the characters
 			for (int c = 0; c < symbolLength; ++c)

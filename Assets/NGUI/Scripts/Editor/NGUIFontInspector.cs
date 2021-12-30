@@ -435,7 +435,7 @@ public class NGUIFontInspector : Editor
 
 				if (NGUIEditorTools.DrawSpriteField(symbolAtlas, sym.spriteName, ChangeSymbolSprite, GUILayout.MinWidth(100f))) mSelectedSymbol = sym;
 
-				var col = GUILayout.Toggle(sym.colored, new GUIContent(""), GUILayout.Width(16f));
+				var col = GUILayout.Toggle(sym.colored, new GUIContent("", "Whether the symbol should be affected by the label's color or not"), GUILayout.Width(16f));
 
 				if (col != sym.colored)
 				{

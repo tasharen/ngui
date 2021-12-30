@@ -1189,7 +1189,7 @@ static public class NGUIEditorTools
 					mEditedName = null;
 				}
 
-				string newName = GUILayout.TextField(string.IsNullOrEmpty(mEditedName) ? spriteName : mEditedName);
+				var newName = GUILayout.TextField(string.IsNullOrEmpty(mEditedName) ? spriteName : mEditedName);
 
 				if (newName != spriteName)
 				{
@@ -1221,6 +1221,9 @@ static public class NGUIEditorTools
 							mLastSprite = newName;
 							spriteName = newName;
 							mEditedName = null;
+
+							var na = atlas as NGUIAtlas;
+							if (na != null) na.RebuildSpriteCache();
 
 							NGUITools.SetDirty(atlas as Object, "Edit Sprite Name");
 							NGUISettings.atlas = atlas;

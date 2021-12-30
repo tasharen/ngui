@@ -107,11 +107,13 @@ public class UIButton : UIButtonColor
 #else
 				var col = gameObject.GetComponent<Collider>();
 #endif
+				var instant = !gameObject.activeInHierarchy;
+
 				if (col != null)
 				{
 					col.enabled = value;
 					var buttons = GetComponents<UIButtonColor>();
-					foreach (var btn in buttons) btn.SetState(value ? State.Normal : State.Disabled, false);
+					foreach (var btn in buttons) btn.SetState(value ? State.Normal : State.Disabled, instant);
 				}
 				else
 				{
@@ -121,7 +123,7 @@ public class UIButton : UIButtonColor
 					{
 						c2d.enabled = value;
 						var buttons = GetComponents<UIButtonColor>();
-						foreach (var btn in buttons) btn.SetState(value ? State.Normal : State.Disabled, false);
+						foreach (var btn in buttons) btn.SetState(value ? State.Normal : State.Disabled, instant);
 					}
 					else enabled = value;
 				}

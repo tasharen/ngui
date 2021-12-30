@@ -149,7 +149,23 @@ public class TypewriterEffect : MonoBehaviour
 
 			// Automatically skip all symbols
 			if (mLabel.supportEncoding)
-				while (NGUIText.ParseSymbol(mFullText, ref mCurrentOffset)) { }
+			{
+				NGUIText.nguiFont = mLabel.font;
+
+				for (; ; )
+				{
+					if (NGUIText.ParseSymbol(mFullText, ref mCurrentOffset)) continue;
+
+					var sym = NGUIText.GetSymbol(ref mFullText, mCurrentOffset, len);
+
+					if (sym != null)
+					{
+						mCurrentOffset += sym.length - 1;
+						continue;
+					}
+					break;
+				}
+			}
 
 			++mCurrentOffset;
 

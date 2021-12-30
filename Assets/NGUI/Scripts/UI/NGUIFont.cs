@@ -1129,6 +1129,7 @@ public class NGUIFont : ScriptableObject, INGUIFont
 
 	public BMSymbol MatchSymbol (ref string text, int offset, int textLength)
 	{
+		if (offset < 0 || offset >= textLength) return null;
 		var atl = symbolAtlas != null ? symbolAtlas : atlas;
 		if (atl == null) return null;
 

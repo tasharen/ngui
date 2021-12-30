@@ -684,7 +684,7 @@ static public class NGUITools
 		while (instanceRoot.parent != null)
 			instanceRoot = instanceRoot.parent;
 
-		GameObject container = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags ("UIRoot (Environment)", HideFlags.DontSave);
+		var container = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags ("UIRoot (Environment)", HideFlags.DontSave);
 		container.layer = instanceRoot.gameObject.layer;
 
 		if (missingRoot)
@@ -1272,7 +1272,7 @@ static public class NGUITools
 	{
 		for (int i = 0; i < t.childCount; ++i)
 		{
-			Transform child = t.GetChild(i);
+			var child = t.GetChild(i);
 			child.gameObject.layer = layer;
 			SetChildLayer(child, layer);
 		}
@@ -1459,18 +1459,10 @@ static public class NGUITools
 
 	static public void DestroyChildren (this Transform t)
 	{
-		var isPlaying = Application.isPlaying;
-
 		while (t.childCount != 0)
 		{
 			var child = t.GetChild(0);
-
-			if (isPlaying)
-			{
-				child.parent = null;
-				UnityEngine.Object.Destroy(child.gameObject);
-			}
-			else UnityEngine.Object.DestroyImmediate(child.gameObject);
+			Destroy(child.gameObject);
 		}
 	}
 

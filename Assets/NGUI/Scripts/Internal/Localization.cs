@@ -158,9 +158,12 @@ static public class Localization
 				{
 					foreach (var a in assets)
 					{
-						LoadCSV(a.bytes, merge);
+						LoadCSV(a.bytes, merge, false);
 						merge = true;
 					}
+
+					if (onLocalize != null) onLocalize();
+					UIRoot.Broadcast("OnLocalize");
 					return true;
 				}
 #if TNET
@@ -256,13 +259,13 @@ static public class Localization
 	/// Load the specified CSV file.
 	/// </summary>
 
-	static public bool LoadCSV (TextAsset asset, bool merge = false) { return LoadCSV(asset.bytes, asset, merge); }
+	static public bool LoadCSV (TextAsset asset, bool merge = false, bool notify = true) { return LoadCSV(asset.bytes, asset, merge, notify); }
 
 	/// <summary>
 	/// Load the specified CSV file.
 	/// </summary>
 
-	static public bool LoadCSV (byte[] bytes, bool merge = false) { return LoadCSV(bytes, null, merge); }
+	static public bool LoadCSV (byte[] bytes, bool merge = false, bool notify = true) { return LoadCSV(bytes, null, merge, notify); }
 
 	static bool mMerging = false;
 
@@ -281,7 +284,7 @@ static public class Localization
 	/// Load the specified CSV file.
 	/// </summary>
 
-	static bool LoadCSV (byte[] bytes, TextAsset asset, bool merge = false)
+	static bool LoadCSV (byte[] bytes, TextAsset asset, bool merge = false, bool notify = true)
 	{
 		if (bytes == null) return false;
 		var reader = new ByteReader(bytes);
@@ -385,7 +388,7 @@ static public class Localization
 			mMerging = false;
 		}
 
-		if (merge)
+		if (merge && notify)
 		{
 			if (onLocalize != null) onLocalize();
 			UIRoot.Broadcast("OnLocalize");
@@ -643,16 +646,43 @@ static public class Localization
 
 		if (mReplacement.TryGetValue(key, out val)) return val;
 
-		if (mLanguageIndex != -1 && mDictionary.TryGetValue(key, out vals))
+		if (mLanguageIndex != -1)
 		{
-			if (mLanguageIndex < vals.Length)
+			if (mDictionary.TryGetValue(key, out vals))
 			{
-				string s = vals[mLanguageIndex];
-				if (string.IsNullOrEmpty(s)) s = vals[0];
-				return s;
+				if (mLanguageIndex < vals.Length)
+				{
+					var s = vals[mLanguageIndex];
+					if (string.IsNullOrEmpty(s)) s = vals[0];
+					return s;
+				}
+				return vals[0];
 			}
-			return vals[0];
+			else if (mDictionary.ContainsKey(key + "0"))
+			{
+				// This is a special way of specifying multiple choice values from localization. Instead of specifying an exact value, like "test",
+				// you can specify several, labeled "test0", "test1", "test3", etc, then request them as "test". A random one will be returned.
+				// Up to 20 values are supported (0 through 19, inclusive).
+				var last = 0;
+
+				for (int i = 1; i < 20; ++i)
+				{
+					if (mDictionary.ContainsKey(key + i)) last = i;
+					else break;
+				}
+
+				mDictionary.TryGetValue(key + Random.Range(0, last + 1), out vals);
+
+				if (mLanguageIndex < vals.Length)
+				{
+					var s = vals[mLanguageIndex];
+					if (string.IsNullOrEmpty(s)) s = vals[0];
+					return s;
+				}
+				return vals[0];
+			}
 		}
+
 		if (mOldDictionary.TryGetValue(key, out val)) return val;
 
 #if UNITY_EDITOR
