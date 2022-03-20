@@ -1279,6 +1279,19 @@ public class UIInput : MonoBehaviour
 		if (mHighlight) mHighlight.enabled = false;
 		if (mCaret) mCaret.enabled = false;
 
+		if (!enabled || !gameObject.activeInHierarchy)
+		{
+#if !MOBILE
+			if (mOnGUI != null)
+			{
+				Destroy(mOnGUI);
+				mOnGUI = null;
+			}
+#endif
+			if (selection == this) OnDeselectEvent();
+		}
+		else isSelected = false;
+
 		if (mBlankTex)
 		{
 			NGUITools.Destroy(mBlankTex);

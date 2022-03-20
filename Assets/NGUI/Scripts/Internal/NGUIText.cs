@@ -1035,7 +1035,7 @@ static public class NGUIText
 		{
 			var font = nguiFont as NGUIFont;
 			if (font == null) return 1f;
-			return font.symbolScale * finalSize / font.defaultSize;
+			return font.symbolScale * fontSize / font.defaultSize;
 		}
 	}
 
