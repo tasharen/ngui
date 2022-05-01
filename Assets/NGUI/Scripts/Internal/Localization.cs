@@ -561,7 +561,13 @@ static public class Localization
 		}
 
 		if (mReplacement.ContainsKey(key)) return true;
-		if (mLanguageIndex != -1 && mDictionary.ContainsKey(key)) return true;
+
+		if (mLanguageIndex != -1)
+		{
+			if (mDictionary.ContainsKey(key)) return true;
+			if (mDictionary.ContainsKey(key + "0")) return true;
+		}
+
 		if (mOldDictionary.ContainsKey(key)) return true;
 		return false;
 	}

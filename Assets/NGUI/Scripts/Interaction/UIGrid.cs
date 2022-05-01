@@ -113,7 +113,6 @@ public class UIGrid : UIWidgetContainer
 	// Use the 'sorting' property instead
 	[HideInInspector][SerializeField] bool sorted = false;
 
-	protected bool mReposition = false;
 	protected UIPanel mPanel;
 	protected bool mInitDone = false;
 
@@ -121,7 +120,7 @@ public class UIGrid : UIWidgetContainer
 	/// Reposition the children on the next Update().
 	/// </summary>
 
-	public bool repositionNow { set { if (value) { mReposition = true; enabled = true; } } }
+	public bool repositionNow { set { if (value) { mSprings = null; enabled = true; } } }
 
 	/// <summary>
 	/// Get the current list of the grid's children.
@@ -275,7 +274,7 @@ public class UIGrid : UIWidgetContainer
 		else
 		{
 			Reposition();
-			enabled = false;
+			if (mSprings == null || mSprings.Count == 0) enabled = false;
 		}
 	}
 
@@ -351,7 +350,6 @@ public class UIGrid : UIWidgetContainer
 
 	protected virtual void ResetPosition (List<Transform> list)
 	{
-		mReposition = false;
 		if (mSprings != null) mSprings.Clear();
 
 		int x = 0;
@@ -407,15 +405,18 @@ public class UIGrid : UIWidgetContainer
 			if (smoothAnim)
 			{
 				var sp = t.gameObject.GetComponent<SpringPosition>();
-				if (sp != null) sp.Finish();
+				if (sp != null && sp.enabled) sp.Finish();
 			}
 
 			if (smoothAnim)
 			{
-				var sp = SpringPosition.Begin(t.gameObject, pos, 15f);
-				sp.ignoreTimeScale = true;
-				if (mSprings == null) mSprings = new List<SpringPosition>();
-				mSprings.Add(sp);
+				if (t.localPosition != pos)
+				{
+					var sp = SpringPosition.Begin(t.gameObject, pos, 15f);
+					sp.ignoreTimeScale = true;
+					if (mSprings == null) mSprings = new List<SpringPosition>();
+					mSprings.Add(sp);
+				}
 			}
 			else t.localPosition = pos;
 
@@ -474,8 +475,5 @@ public class UIGrid : UIWidgetContainer
 				}
 			}
 		}
-
-		// If there are springs active, stay enabled
-		if (mSprings != null && mSprings.Count != 0) enabled = true;
 	}
 }

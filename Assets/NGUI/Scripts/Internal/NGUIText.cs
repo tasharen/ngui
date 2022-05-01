@@ -1083,7 +1083,9 @@ static public class NGUIText
 			mColors.Clear();
 
 			int ch = 0, prev = 0;
-			float x = 0f, y = 0f, maxX = 0f, maxWidth = regionWidth + 0.01f;
+			float x = 0f, maxX = 0f, maxWidth = regionWidth + 0.01f;
+			var yOffset = Mathf.Round(spacingY * fontScale * 0.5f);
+			var y = yOffset;
 			int textLength = text.Length;
 			int sub = 0;  // 0 = normal, 1 = subscript, 2 = superscript
 			var bold = false;
@@ -1213,7 +1215,7 @@ static public class NGUIText
 			}
 
 			v.x = Mathf.Ceil(((x > maxX) ? x - finalSpacingX : maxX));
-			v.y = Mathf.Ceil((y + finalLineHeight));
+			v.y = Mathf.Ceil((y + finalLineHeight - yOffset));
 		}
 		return v;
 	}
@@ -1641,7 +1643,8 @@ static public class NGUIText
 		mAlpha = 1f;
 
 		int ch = 0, prev = 0;
-		float x = 0f, y = 0f, maxX = 0f;
+		float x = 0f, maxX = 0f;
+		var y = Mathf.Round(spacingY * fontScale * 0.5f);
 
 		Color gb = (tint * gradientBottom);
 		Color gt = (tint * gradientTop);
@@ -2199,7 +2202,8 @@ static public class NGUIText
 		Prepare(text);
 		mColors.Clear();
 
-		float x = 0f, y = 0f, maxWidth = regionWidth + 0.01f;
+		float x = 0f, maxWidth = regionWidth + 0.01f;
+		var y = Mathf.Round(spacingY * fontScale * 0.5f);
 		int textLength = text.Length, indexOffset = verts.Count, ch = 0, prev = 0;
 
 		int sub = 0;  // 0 = normal, 1 = subscript, 2 = superscript
@@ -2325,7 +2329,8 @@ static public class NGUIText
 		Prepare(text);
 		mColors.Clear();
 
-		float x = 0f, y = 0f, maxWidth = regionWidth + 0.01f, fullSize = fontSize * fontScale;
+		float x = 0f, maxWidth = regionWidth + 0.01f, fullSize = fontSize * fontScale;
+		var y = Mathf.Round(spacingY * fontScale * 0.5f);
 		int textLength = text.Length, indexOffset = verts.Count, ch = 0, prev = 0;
 
 		int sub = 0;  // 0 = normal, 1 = subscript, 2 = superscript
@@ -2461,7 +2466,8 @@ static public class NGUIText
 			start = caretPos;
 		}
 
-		float x = 0f, y = 0f, fs = fontSize * fontScale;
+		float x = 0f, fs = fontSize * fontScale;
+		var y = Mathf.Round(spacingY * fontScale * 0.5f);
 		int caretOffset = (caret != null) ? caret.Count : 0;
 		int highlightOffset = (highlight != null) ? highlight.Count : 0;
 		int textLength = text.Length, index = 0, ch = 0, prev = 0;

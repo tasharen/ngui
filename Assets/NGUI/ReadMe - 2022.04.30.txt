@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2021.11.30
+            Version 2022.04.30
        https://discord.gg/tasharen/
 ----------------------------------------------
 
@@ -55,11 +55,14 @@ and it will not be included in the build of your game. It's only used in the edi
  Version History
 -----------------
 
-WIP: (unversioned)
+2022.04.30
 - NEW: Localization now supports randomly choosing one of the values from the localization data randomly, if the exact key match isn't found, but there are multiple key# values present instead. For example requesting 'test' when 'test0', 'test1' and 'test2' are present instead.
 - FIX: Typewriter effect now supports embedded symbols using the [sp=name] syntax properly.
 - FIX: Renaming sprites in the atlas inspector no longer makes them disappear from the list of sprites.
 - FIX: transform.DestroyChildren() will now use NGUITools.Destroy instead of Object.Destroy, which properly disables the unparented object.
+- FIX: UIGrid should now properly wait on spring transitions to finish before disabling itself.
+- FIX: UIKeyBinding will now ignore its key press if the object it's on is currently involved in a drag & drop operation.
+- FIX: Changed how line spacing works vertically, to make text padded by half above and below instead of all below the line. This makes spaced text appear properly centered.
 
 2021.11.30
 - NEW: NGUI will now automatically save kerning information when creating a TTF-referencing NGUI Font, since this information is still missing in Unity. NGUI pulls this data directly from the FreeType library.

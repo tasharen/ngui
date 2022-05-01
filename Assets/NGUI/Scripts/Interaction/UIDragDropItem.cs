@@ -277,7 +277,13 @@ public class UIDragDropItem : MonoBehaviour
 	/// Called on the cloned object when it was duplicated.
 	/// </summary>
 
-	protected virtual void OnClone (GameObject original) { }
+	protected virtual void OnClone (GameObject original)
+	{
+		var o = original.GetComponent<UIDragDropItem>();
+		mParent = o.mParent;
+		mGrid = o.mGrid;
+		mTable = o.mTable;
+	}
 
 	/// <summary>
 	/// Perform the dragging.

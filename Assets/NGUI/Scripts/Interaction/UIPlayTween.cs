@@ -91,6 +91,12 @@ public class UIPlayTween : MonoBehaviour
 	bool mStarted = false;
 	int mActive = 0;
 	bool mActivated = false;
+	
+	/// <summary>
+	/// Whether the tween is currently playing.
+	/// </summary>
+
+	public bool isActive { get { return mActive > 0; } }
 
 	void Awake ()
 	{
@@ -319,7 +325,16 @@ public class UIPlayTween : MonoBehaviour
 	}
 
 	[ContextMenu("Stop")]
-	public void Stop () { if (mTweens != null) foreach(var tw in mTweens) tw.Finish(); }
+	public void Stop ()
+	{
+		if (mTweens != null) foreach(var tw in mTweens) tw.Finish();
+
+		if (mActive != 0)
+		{
+			mActive = 1;
+			OnFinished();
+		}
+	}
 
 	/// <summary>
 	/// Activate the tweeners.

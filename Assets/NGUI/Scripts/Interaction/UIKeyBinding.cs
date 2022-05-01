@@ -114,7 +114,7 @@ public class UIKeyBinding : MonoBehaviour
 	protected virtual void Start ()
 #endif
 	{
-		UIInput input = GetComponent<UIInput>();
+		var input = GetComponent<UIInput>();
 		mIsInput = (input != null);
 		if (input != null) EventDelegate.Add(input.onSubmit, OnSubmit);
 	}
@@ -173,6 +173,7 @@ public class UIKeyBinding : MonoBehaviour
 	{
 		if (keyCode != KeyCode.Numlock && UICamera.inputHasFocus) return;
 		if (keyCode == KeyCode.None || !IsModifierActive()) return;
+		if (UIDragDropItem.IsDragged(gameObject)) return;
 #if WINDWARD && UNITY_ANDROID
 		// NVIDIA Shield controller has an odd bug where it can open the on-screen keyboard via a KeyCode.Return binding,
 		// and then it can never be closed. I am disabling it here until I can track down the cause.
