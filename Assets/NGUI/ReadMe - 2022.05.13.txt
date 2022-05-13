@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2022.04.30
+            Version 2022.05.13
        https://discord.gg/tasharen/
 ----------------------------------------------
 
@@ -54,6 +54,9 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2022.05.13
+- FIX: Fix for an issue with UIInput and mobile keyboards.
 
 2022.04.30
 - NEW: Localization now supports randomly choosing one of the values from the localization data randomly, if the exact key match isn't found, but there are multiple key# values present instead. For example requesting 'test' when 'test0', 'test1' and 'test2' are present instead.
