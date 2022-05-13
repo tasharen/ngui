@@ -326,6 +326,9 @@ public class UIGrid : UIWidgetContainer
 		// Constrain everything to be within the panel's bounds
 		if (keepWithinPanel) ConstrainWithinPanel();
 
+		// Stay enabled until springs finish
+		if (mSprings != null && mSprings.Count != 0) enabled = true;
+
 		// Notify the listener
 		if (onReposition != null) onReposition();
 	}

@@ -3,7 +3,7 @@
 // Copyright © 2011-2020 Tasharen Entertainment Inc
 //-------------------------------------------------
 
-#if !UNITY_EDITOR && (UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_WP_8_1 || UNITY_BLACKBERRY || UNITY_WINRT || UNITY_METRO)
+#if !UNITY_EDITOR && (UNITY_IPHONE || UNITY_ANDROID || UNITY_WP8 || UNITY_WP_8_1 || UNITY_BLACKBERRY)
 #define MOBILE
 #endif
 
@@ -1268,7 +1268,19 @@ public class UIInput : MonoBehaviour
 	/// Ensure we've released the dynamically created resources.
 	/// </summary>
 
-	void OnDisable () { Cleanup(); }
+	void OnDisable ()
+	{
+		Cleanup();
+
+#if !MOBILE
+		if (mOnGUI != null)
+		{
+			Destroy(mOnGUI);
+			mOnGUI = null;
+		}
+#endif
+		if (selection == this) OnDeselectEvent();
+	}
 
 	/// <summary>
 	/// Cleanup.
@@ -1278,19 +1290,6 @@ public class UIInput : MonoBehaviour
 	{
 		if (mHighlight) mHighlight.enabled = false;
 		if (mCaret) mCaret.enabled = false;
-
-		if (!enabled || !gameObject.activeInHierarchy)
-		{
-#if !MOBILE
-			if (mOnGUI != null)
-			{
-				Destroy(mOnGUI);
-				mOnGUI = null;
-			}
-#endif
-			if (selection == this) OnDeselectEvent();
-		}
-		else isSelected = false;
 
 		if (mBlankTex)
 		{
