@@ -133,7 +133,8 @@ public class UIGrid : UIWidgetContainer
 
 		for (int i = 0; i < myTrans.childCount; ++i)
 		{
-			var go = myTrans.GetChild(i).gameObject;
+			var t = myTrans.GetChild(i);
+			var go = t.gameObject;
 
 			if (go && (!hideInactive || go.activeSelf))
 			{
