@@ -133,11 +133,11 @@ public class UIGrid : UIWidgetContainer
 
 		for (int i = 0; i < myTrans.childCount; ++i)
 		{
-			var t = myTrans.GetChild(i);
+			var go = myTrans.GetChild(i).gameObject;
 
-			if (!hideInactive || (t && t.gameObject.activeSelf))
+			if (go && (!hideInactive || go.activeSelf))
 			{
-				if (!UIDragDropItem.IsDragged(t.gameObject)) list.Add(t);
+				if (!UIDragDropItem.IsDragged(go)) list.Add(t);
 			}
 		}
 
@@ -308,6 +308,7 @@ public class UIGrid : UIWidgetContainer
 	public virtual void Reposition ()
 	{
 		if (Application.isPlaying && !mInitDone && NGUITools.GetActive(gameObject)) Init();
+		else if (mPanel == null) mPanel = NGUITools.FindInParents<UIPanel>(gameObject);
 
 		// Legacy functionality
 		if (sorted)

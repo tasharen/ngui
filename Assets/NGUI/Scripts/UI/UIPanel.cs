@@ -1310,14 +1310,31 @@ public class UIPanel : UIRect
 
 			// Update each panel in order
 			for (int i = 0, imax = list.Count; i < imax; ++i)
-				list[i].UpdateSelf();
+			{
+				var p = list[i];
+
+				if (p)
+				{
+					p.UpdateSelf();
+				}
+				else
+				{
+					// I've had this happen when I called ImmediatelyCreateDrawCalls() on a hierarchy that included a panel on a disabled game object.
+					// I've since addressed the problem by making sure that ImmediatelyCreateDrawCalls() now ignores disabled game objects, but
+					// leaving this warning just in case I do something weird in the future.
+					Debug.LogWarning("Improperly destroyed panel detected, removing", p);
+					list.Remove(p);
+					--i;
+					--imax;
+				}
+			}
 
 			int rq = 3000;
 
 			// Update all draw calls, making them draw in the right order
 			for (int i = 0, imax = list.Count; i < imax; ++i)
 			{
-				UIPanel p = list[i];
+				var p = list[i];
 
 				if (p.renderQueue == RenderQueue.Automatic)
 				{

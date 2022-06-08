@@ -65,7 +65,17 @@ public class UIDragDropItem : MonoBehaviour
 
 	static public bool IsDragged (GameObject go)
 	{
-		foreach (var drag in draggedItems) if (drag.gameObject == go) return true;
+		for (int i = 0; i < draggedItems.Count; ++i)
+		{
+			var drag = draggedItems[i];
+
+			if (!drag)
+			{
+				Debug.LogWarning("UIDragDropItem has been destroyed without calling its OnDragDropEnd() function");
+				draggedItems.RemoveAt(i--);
+			}
+			else if (drag.gameObject == go) return true;
+		}
 		return false;
 	}
 
@@ -321,7 +331,7 @@ public class UIDragDropItem : MonoBehaviour
 		}
 	}
 
-#endregion
+	#endregion
 
 	/// <summary>
 	/// Perform any logic related to starting the drag & drop operation.
@@ -329,8 +339,7 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void OnDragDropStart ()
 	{
-		if (!draggedItems.Contains(this))
-			draggedItems.Add(this);
+		if (!draggedItems.Contains(this)) draggedItems.Add(this);
 
 		// Automatically disable the scroll view
 		if (mDragScrollView != null) mDragScrollView.enabled = false;

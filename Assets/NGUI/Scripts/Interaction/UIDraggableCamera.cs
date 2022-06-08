@@ -13,56 +13,65 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Draggable Camera")]
 public class UIDraggableCamera : MonoBehaviour
 {
-	/// <summary>
-	/// Root object that will be used for drag-limiting bounds.
-	/// </summary>
-
+	[Tooltip("Root object that will be used for drag-limiting bounds.")]
 	public Transform rootForBounds;
 
-	/// <summary>
-	/// Scale value applied to the drag delta. Set X or Y to 0 to disallow dragging in that direction.
-	/// </summary>
-
+	[Tooltip("Scale value applied to the drag delta. Set X or Y to 0 to disallow dragging in that direction.")]
 	public Vector2 scale = Vector2.one;
 
-	/// <summary>
-	/// Effect the scroll wheel will have on the momentum.
-	/// </summary>
-
+	[Tooltip("Effect the scroll wheel will have on the momentum.")]
 	public float scrollWheelFactor = 0f;
 
-	/// <summary>
-	/// Effect to apply when dragging.
-	/// </summary>
+	[Tooltip("If specified to a non-zero range, the scroll wheel's functionality will be changed to altering the camera's orthographic size instead")]
+	public Vector2 scrollZoomRange;
 
+	[Tooltip("Effect to apply when dragging.")]
 	public UIDragObject.DragEffect dragEffect = UIDragObject.DragEffect.MomentumAndSpring;
 
-	/// <summary>
-	/// Whether the drag operation will be started smoothly, or if if it will be precise (but will have a noticeable "jump").
-	/// </summary>
-
+	[Tooltip("Whether the drag operation will be started smoothly, or if if it will be precise (but may have a noticeable jump).")]
 	public bool smoothDragStart = true;
 
-	/// <summary>
-	/// How much momentum gets applied when the press is released after dragging.
-	/// </summary>
-
+	[Tooltip("How much momentum gets applied when the press is released after dragging.")]
 	public float momentumAmount = 35f;
 
-	Camera mCam;
-	Transform mTrans;
-	bool mPressed = false;
-	Vector2 mMomentum = Vector2.zero;
-	Bounds mBounds;
-	float mScroll = 0f;
-	UIRoot mRoot;
-	bool mDragStarted = false;
+	[Tooltip("Additional padding to apply to the calculated bounds, in case you want to limit or expand the region")]
+	public Vector2 padding = Vector2.zero;
+
+	[Tooltip("If set, padding will be multiplied by the camera's orthographic size")]
+	public bool paddingIsRelative = true;
+
+	[System.NonSerialized] Camera mCam;
+	[System.NonSerialized] Transform mTrans;
+	[System.NonSerialized] bool mPressed = false;
+	[System.NonSerialized] Vector2 mMomentum = Vector2.zero;
+	[System.NonSerialized] Bounds mBounds;
+	[System.NonSerialized] float mScroll = 0f;
+	[System.NonSerialized] bool mDragStarted = false;
+
+	/// <summary>
+	/// Camera this script is working with.
+	/// </summary>
+
+	public Camera cachedCamera { get { return mCam; } }
 
 	/// <summary>
 	/// Current momentum, exposed just in case it's needed.
 	/// </summary>
 
 	public Vector2 currentMomentum { get { return mMomentum; } set { mMomentum = value; } }
+
+	/// <summary>
+	/// Zoom level if scroll zoom range is used.
+	/// </summary>
+
+	public float zoom
+	{
+		get
+		{
+			if (mCam == null || scrollZoomRange.x == 0f || scrollZoomRange.y == 0f) return 1f;
+			return Mathf.InverseLerp(scrollZoomRange.x, scrollZoomRange.y, mCam.orthographicSize);
+		}
+	}
 
 	/// <summary>
 	/// Cache the root.
@@ -72,7 +81,6 @@ public class UIDraggableCamera : MonoBehaviour
 	{
 		mCam = GetComponent<Camera>();
 		mTrans = transform;
-		mRoot = NGUITools.FindInParents<UIRoot>(gameObject);
 
 		if (rootForBounds == null)
 		{
@@ -87,16 +95,28 @@ public class UIDraggableCamera : MonoBehaviour
 
 	Vector3 CalculateConstrainOffset ()
 	{
-		if (rootForBounds == null || rootForBounds.childCount == 0) return Vector3.zero;
+		if (rootForBounds == null) return Vector3.zero;
 
-		Vector3 bottomLeft = new Vector3(mCam.rect.xMin * Screen.width, mCam.rect.yMin * Screen.height, 0f);
-		Vector3 topRight   = new Vector3(mCam.rect.xMax * Screen.width, mCam.rect.yMax * Screen.height, 0f);
+		var rect = mCam.rect;
+		var sw = Screen.width;
+		var sh = Screen.height;
+		var bottomLeft = new Vector3(rect.xMin * sw, rect.yMin * sh, 0f);
+		var topRight = new Vector3(rect.xMax * sw, rect.yMax * sh, 0f);
 
 		bottomLeft = mCam.ScreenToWorldPoint(bottomLeft);
 		topRight = mCam.ScreenToWorldPoint(topRight);
 
-		Vector2 minRect = new Vector2(mBounds.min.x, mBounds.min.y);
-		Vector2 maxRect = new Vector2(mBounds.max.x, mBounds.max.y);
+		var padding = this.padding;
+
+		if (paddingIsRelative)
+		{
+			var os = mCam.orthographicSize * 2f;
+			padding.x *= os * mCam.aspect;
+			padding.y *= os;
+		}
+
+		var minRect = new Vector2(mBounds.min.x - padding.x, mBounds.min.y - padding.y);
+		var maxRect = new Vector2(mBounds.max.x + padding.x, mBounds.max.y + padding.y);
 
 		return NGUIMath.ConstrainRect(minRect, maxRect, bottomLeft, topRight);
 	}
@@ -109,7 +129,7 @@ public class UIDraggableCamera : MonoBehaviour
 	{
 		if (mTrans != null && rootForBounds != null)
 		{
-			Vector3 offset = CalculateConstrainOffset();
+			var offset = CalculateConstrainOffset();
 
 			if (offset.sqrMagnitude > 0f)
 			{
@@ -119,7 +139,7 @@ public class UIDraggableCamera : MonoBehaviour
 				}
 				else
 				{
-					SpringPosition sp = SpringPosition.Begin(gameObject, mTrans.position - offset, 13f);
+					var sp = SpringPosition.Begin(gameObject, mTrans.position - offset, 13f);
 					sp.ignoreTimeScale = true;
 					sp.worldSpace = true;
 				}
@@ -148,10 +168,10 @@ public class UIDraggableCamera : MonoBehaviour
 
 				// Remove all momentum on press
 				mMomentum = Vector2.zero;
-				mScroll = 0f;
+				if (scrollZoomRange.x == 0f) mScroll = 0f;
 
 				// Disable the spring movement
-				SpringPosition sp = GetComponent<SpringPosition>();
+				var sp = GetComponent<SpringPosition>();
 				if (sp != null) sp.enabled = false;
 			}
 			else if (dragEffect == UIDragObject.DragEffect.MomentumAndSpring)
@@ -175,9 +195,18 @@ public class UIDraggableCamera : MonoBehaviour
 		}
 
 		UICamera.currentTouch.clickNotification = UICamera.ClickNotification.BasedOnDelta;
-		if (mRoot != null) delta *= mRoot.pixelSizeAdjustment;
 
-		Vector2 offset = Vector2.Scale(delta, -scale);
+		// I think this is no longer needed? Needs to be double-checked...
+		//if (mRoot != null) delta *= mRoot.pixelSizeAdjustment;
+
+		// Dragging should be relative to the orthographic size. If the size doesn't match the root's expected scale,
+		// meaning the camera is not pixel-perfect, then additional adjustments must be made in order for dragging to match the mouse movement.
+		var offset = Vector2.Scale(delta, -scale);
+		var scaleY = mTrans.lossyScale.y * Screen.height;
+		var camSize = mCam.orthographicSize * 2f;
+		offset *= camSize / scaleY;
+
+		// Move the camera
 		mTrans.localPosition += (Vector3)offset;
 
 		// Adjust the momentum
@@ -187,7 +216,7 @@ public class UIDraggableCamera : MonoBehaviour
 		if (dragEffect != UIDragObject.DragEffect.MomentumAndSpring && ConstrainToBounds(true))
 		{
 			mMomentum = Vector2.zero;
-			mScroll = 0f;
+			if (scrollZoomRange.x == 0f) mScroll = 0f;
 		}
 	}
 
@@ -215,16 +244,25 @@ public class UIDraggableCamera : MonoBehaviour
 		if (mPressed)
 		{
 			// Disable the spring movement
-			SpringPosition sp = GetComponent<SpringPosition>();
+			var sp = GetComponent<SpringPosition>();
 			if (sp != null) sp.enabled = false;
-			mScroll = 0f;
+			if (scrollZoomRange.x == 0f) mScroll = 0f;
 		}
 		else
 		{
-			mMomentum += scale * (mScroll * 20f);
-			mScroll = NGUIMath.SpringLerp(mScroll, 0f, 20f, delta);
+			if (scrollZoomRange.x == 0f)
+			{
+				mMomentum += scale * (mScroll * 20f);
+				mScroll = NGUIMath.SpringLerp(mScroll, 0f, 20f, delta);
+			}
+			else if (mCam.orthographic)
+			{
+				mCam.orthographicSize = Mathf.Clamp(NGUIMath.SpringLerp(mCam.orthographicSize, mCam.orthographicSize - mScroll, 1f, delta), scrollZoomRange.x, scrollZoomRange.y);
+				mScroll = NGUIMath.SpringLerp(mScroll, 0f, 5f, delta);
+				if (Mathf.Abs(mScroll) < 0.001f) mScroll = 0f;
+			}
 
-			if (mMomentum.magnitude > 0.01f)
+			if (mMomentum.magnitude > 0.01f || mScroll != 0f)
 			{
 				// Apply the momentum
 				mTrans.localPosition += (Vector3)NGUIMath.SpringDampen(ref mMomentum, 9f, delta);
@@ -232,12 +270,12 @@ public class UIDraggableCamera : MonoBehaviour
 
 				if (!ConstrainToBounds(dragEffect == UIDragObject.DragEffect.None))
 				{
-					SpringPosition sp = GetComponent<SpringPosition>();
+					var sp = GetComponent<SpringPosition>();
 					if (sp != null) sp.enabled = false;
 				}
 				return;
 			}
-			else mScroll = 0f;
+			else if (scrollZoomRange.x == 0f) mScroll = 0f;
 		}
 
 		// Dampen the momentum

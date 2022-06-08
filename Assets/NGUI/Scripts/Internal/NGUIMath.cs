@@ -1113,8 +1113,12 @@ static public class NGUIMath
 
 	static public Vector3 WorldToLocalPoint (Vector3 worldPos, Camera worldCam, Camera uiCam, Transform relativeTo = null)
 	{
-		worldPos = worldCam.WorldToViewportPoint(worldPos);
-		worldPos = uiCam.ViewportToWorldPoint(worldPos);
+		if (worldCam != uiCam)
+		{
+			worldPos = worldCam.WorldToViewportPoint(worldPos);
+			worldPos = uiCam.ViewportToWorldPoint(worldPos);
+		}
+
 		if (relativeTo == null) return worldPos;
 		relativeTo = relativeTo.parent;
 		if (relativeTo == null) return worldPos;
@@ -1131,8 +1135,12 @@ static public class NGUIMath
 
 	static public void OverlayPosition (this Transform trans, Vector3 worldPos, Camera worldCam, Camera myCam)
 	{
-		worldPos = worldCam.WorldToViewportPoint(worldPos);
-		worldPos = myCam.ViewportToWorldPoint(worldPos);
+		if (worldCam != myCam)
+		{
+			worldPos = worldCam.WorldToViewportPoint(worldPos);
+			worldPos = myCam.ViewportToWorldPoint(worldPos);
+		}
+
 		Transform parent = trans.parent;
 		trans.localPosition = (parent != null) ? parent.InverseTransformPoint(worldPos) : worldPos;
 	}

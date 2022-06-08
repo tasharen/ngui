@@ -22,26 +22,24 @@ public class ExampleDragDropItem : UIDragDropItem
 	{
 		if (surface != null)
 		{
-			ExampleDragDropSurface dds = surface.GetComponent<ExampleDragDropSurface>();
+			var dds = surface.GetComponent<ExampleDragDropSurface>();
 
 			if (dds != null)
 			{
-				GameObject child = NGUITools.AddChild(dds.gameObject, prefab);
+				var child = NGUITools.AddChild(dds.gameObject, prefab);
 				child.transform.localScale = dds.transform.localScale;
 
-				Transform trans = child.transform;
+				var trans = child.transform;
 				trans.position = UICamera.lastWorldPosition;
+				if (dds.rotatePlacedObject) trans.rotation = Quaternion.LookRotation(UICamera.lastHit.normal) * Quaternion.Euler(90f, 0f, 0f);
 
-				if (dds.rotatePlacedObject)
-				{
-					trans.rotation = Quaternion.LookRotation(UICamera.lastHit.normal) * Quaternion.Euler(90f, 0f, 0f);
-				}
-				
 				// Destroy this icon as it's no longer needed
+				base.OnDragDropRelease(surface);
 				NGUITools.Destroy(gameObject);
 				return;
 			}
 		}
+
 		base.OnDragDropRelease(surface);
 	}
 }

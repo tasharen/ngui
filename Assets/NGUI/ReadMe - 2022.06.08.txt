@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2022.05.13
+            Version 2022.06.08
        https://discord.gg/tasharen/
 ----------------------------------------------
 
@@ -54,6 +54,12 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2022.06.08
+- NEW: Added NGUI/Selection/Check for issues menu option that automatically checks the hierarchy for potential problems such as non-one scales and offsets that will cause floating point precision issues.
+- FIX: ExampleDragDropItem wasn't calling UIDragDropItem's OnDragDropRelease before destroying itself, causing the dragged object to remain in the list of dragged items.
+- FIX: Improvements to the UIDraggableCamera script, such as making it work with non-pixel perfect UIRoot scaling.
+- FIX: NGUITools.ExecuteAll will no longer call functions on disabled game objects. This fixes NGUITools.ImmediatelyCreateDrawCalls creating draw calls for disabled widgets.
 
 2022.05.13
 - FIX: Fix for an issue with UIInput and mobile keyboards.

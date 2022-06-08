@@ -80,10 +80,10 @@ public class SpringPosition : MonoBehaviour
 
 		if (worldSpace)
 		{
-			if (mThreshold == 0f) mThreshold = (target - mTrans.position).sqrMagnitude * 0.001f;
+			if (mThreshold == 0f) mThreshold = Mathf.Min((target - mTrans.position).magnitude * 0.01f, 0.01f);
 			mTrans.position = NGUIMath.SpringLerp(mTrans.position, target, strength, delta);
 
-			if (mThreshold >= (target - mTrans.position).sqrMagnitude)
+			if (mThreshold * mThreshold >= (target - mTrans.position).sqrMagnitude)
 			{
 				mTrans.position = target;
 				NotifyListeners();
@@ -92,10 +92,10 @@ public class SpringPosition : MonoBehaviour
 		}
 		else
 		{
-			if (mThreshold == 0f) mThreshold = (target - mTrans.localPosition).sqrMagnitude * 0.00001f;
+			if (mThreshold == 0f) mThreshold = Mathf.Min((target - mTrans.localPosition).magnitude * 0.01f, 0.01f);
 			mTrans.localPosition = NGUIMath.SpringLerp(mTrans.localPosition, target, strength, delta);
 
-			if (mThreshold >= (target - mTrans.localPosition).sqrMagnitude)
+			if (mThreshold * mThreshold >= (target - mTrans.localPosition).sqrMagnitude)
 			{
 				mTrans.localPosition = target;
 				NotifyListeners();
@@ -148,7 +148,7 @@ public class SpringPosition : MonoBehaviour
 
 	static public SpringPosition Begin (GameObject go, Vector3 pos, float strength)
 	{
-		SpringPosition sp = go.GetComponent<SpringPosition>();
+		var sp = go.GetComponent<SpringPosition>();
 		if (sp == null) sp = go.AddComponent<SpringPosition>();
 		sp.target = pos;
 		sp.strength = strength;

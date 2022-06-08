@@ -409,8 +409,8 @@ public class UIScrollView : MonoBehaviour
 	{
 		if (mPanel == null) return false;
 
-		Bounds b = bounds;
-		Vector3 constraint = mPanel.CalculateConstrainOffset(b.min, b.max);
+		var b = bounds;
+		var constraint = mPanel.CalculateConstrainOffset(b.min, b.max);
 
 		if (!horizontal) constraint.x = 0f;
 		if (!vertical) constraint.y = 0f;
@@ -420,7 +420,7 @@ public class UIScrollView : MonoBehaviour
 			if (!instant && dragEffect == DragEffect.MomentumAndSpring)
 			{
 				// Spring back into place
-				Vector3 pos = mTrans.localPosition + constraint;
+				var pos = mTrans.localPosition + constraint;
 				pos.x = Mathf.Round(pos.x);
 				pos.y = Mathf.Round(pos.y);
 				SpringPanel.Begin(mPanel.gameObject, pos, springStrength);

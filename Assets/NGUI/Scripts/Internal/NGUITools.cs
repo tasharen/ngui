@@ -2161,7 +2161,7 @@ static public class NGUITools
 #if !UNITY_EDITOR && (UNITY_WEBPLAYER || UNITY_FLASH || UNITY_METRO || UNITY_WP8 || UNITY_WP_8_1)
 			comp.SendMessage(funcName, SendMessageOptions.DontRequireReceiver);
 #else
-			MethodInfo method = comp.GetType().GetMethod(funcName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			var method = comp.GetType().GetMethod(funcName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 			if (method != null) method.Invoke(comp, null);
 #endif
 		}
@@ -2173,10 +2173,17 @@ static public class NGUITools
 
 	static public void ExecuteAll<T> (GameObject root, string funcName) where T : Component
 	{
-		Execute<T>(root, funcName);
-		Transform t = root.transform;
-		for (int i = 0, imax = t.childCount; i < imax; ++i)
-			ExecuteAll<T>(t.GetChild(i).gameObject, funcName);
+		if (root.activeInHierarchy)
+		{
+			Execute<T>(root, funcName);
+			var t = root.transform;
+
+			for (int i = 0, imax = t.childCount; i < imax; ++i)
+			{
+				var go = t.GetChild(i).gameObject;
+				ExecuteAll<T>(go, funcName);
+			}
+		}
 	}
 
 	/// <summary>
