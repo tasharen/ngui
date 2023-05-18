@@ -190,17 +190,17 @@ public class UITable : UIWidgetContainer
 		int cols = columns > 0 ? children.Count / columns + 1 : 1;
 		int rows = columns > 0 ? columns : children.Count;
 
-		Bounds[,] bounds = new Bounds[cols, rows];
-		Bounds[] boundsRows = new Bounds[rows];
-		Bounds[] boundsCols = new Bounds[cols];
+		var bounds = new Bounds[cols, rows];
+		var boundsRows = new Bounds[rows];
+		var boundsCols = new Bounds[cols];
 
 		int x = 0;
 		int y = 0;
 
 		for (int i = 0, imax = children.Count; i < imax; ++i)
 		{
-			Transform t = children[i];
-			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(t, !hideInactive);
+			var t = children[i];
+			var b = NGUIMath.CalculateRelativeWidgetBounds(t, !hideInactive);
 
 			Vector3 scale = t.localScale;
 			b.min = Vector3.Scale(b.min, scale);
@@ -265,7 +265,7 @@ public class UITable : UIWidgetContainer
 
 			float fx, fy;
 
-			Bounds b = NGUIMath.CalculateRelativeWidgetBounds(transform);
+			var b = NGUIMath.CalculateRelativeWidgetBounds(transform, !hideInactive);
 
 			fx = Mathf.Lerp(0f, b.size.x, po.x);
 			fy = Mathf.Lerp(-b.size.y, 0f, po.y);

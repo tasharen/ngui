@@ -340,8 +340,8 @@ public class UIPlayTween : MonoBehaviour
 	/// Activate the tweeners.
 	/// </summary>
 
-	[ContextMenu("Play")]
-	public void Play () { Play(true); }
+	[ContextMenu("Play Forward")]
+	public void PlayForward () { Play(true); }
 
 	[ContextMenu("Play in reverse")]
 	public void PlayReverse () { Play(false); }
@@ -350,7 +350,7 @@ public class UIPlayTween : MonoBehaviour
 	/// Activate the tweeners.
 	/// </summary>
 
-	public void Play (bool forward)
+	public void Play (bool forward = true)
 	{
 		mActive = 0;
 		GameObject go = (tweenTarget == null) ? gameObject : tweenTarget;

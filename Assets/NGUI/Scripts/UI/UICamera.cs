@@ -757,6 +757,10 @@ public class UICamera : MonoBehaviour
 	[System.NonSerialized] static int mWidth = 0;
 	[System.NonSerialized] static int mHeight = 0;
 
+	static public int screenWidth { get { return mWidth; } }
+
+	static public int screenHeight { get { return mHeight; } }
+
 	// Tooltip widget (mouse only)
 	[System.NonSerialized] static GameObject mTooltip = null;
 

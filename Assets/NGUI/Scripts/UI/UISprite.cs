@@ -444,7 +444,7 @@ public class UISprite : UIBasicSprite
 				}
 			}
 
-			if (mDrawRegion.x != 0f || mDrawRegion.y != 0f || mDrawRegion.z != 1f || mDrawRegion.w != 0f)
+			if (mDrawRegion.x != 0f || mDrawRegion.y != 0f || mDrawRegion.z != 1f || mDrawRegion.w != 1f)
 			{
 				float fw, fh;
 
@@ -459,6 +459,7 @@ public class UISprite : UIBasicSprite
 					fw = (br.x + br.z);
 					fh = (br.y + br.w);
 				}
+
 				var vx = Mathf.Lerp(x0, x1 - fw, mDrawRegion.x);
 				var vy = Mathf.Lerp(y0, y1 - fh, mDrawRegion.y);
 				var vz = Mathf.Lerp(x0 + fw, x1, mDrawRegion.z);

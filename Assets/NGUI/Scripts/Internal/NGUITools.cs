@@ -742,6 +742,21 @@ static public class NGUITools
 
 #if UNITY_5_5_OR_NEWER
 	/// <summary>
+	/// Add a child object.
+	/// </summary>
+
+	static public GameObject AddChild (this Transform parent)
+	{
+		var go = new GameObject();
+		var t = go.transform;
+		t.parent = parent;
+		t.localPosition = Vector3.zero;
+		t.localRotation = Quaternion.identity;
+		t.localScale = Vector3.one;
+		return go;
+	}
+
+	/// <summary>
 	/// Instantiate an object and add it to the specified parent.
 	/// </summary>
 

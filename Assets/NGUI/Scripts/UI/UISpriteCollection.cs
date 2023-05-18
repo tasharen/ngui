@@ -512,8 +512,7 @@ public class UISpriteCollection : UIBasicSprite
 
 	static Vector2 Rotate (Vector2 pos, float rot)
 	{
-		var dz = rot * Mathf.Deg2Rad;
-		var halfZ = dz * 0.5f;
+		var halfZ = rot * Mathf.Deg2Rad * 0.5f;
 		var sinz = Mathf.Sin(halfZ);
 		var cosz = Mathf.Cos(halfZ);
 		var num3 = sinz * 2f;
