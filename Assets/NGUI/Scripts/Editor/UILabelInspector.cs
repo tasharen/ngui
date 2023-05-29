@@ -205,7 +205,7 @@ public class UILabelInspector : UIWidgetInspector
 			if (bm != null && bm.isDynamic)
 			{
 				dynFont = bm.dynamicFont;
-				mHasSymbols = bm.hasSymbols;
+				mHasSymbols = bm.hasSymbols || (bm.symbolAtlas != null);
 				bm = null;
 			}
 

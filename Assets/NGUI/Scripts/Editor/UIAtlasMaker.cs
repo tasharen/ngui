@@ -431,7 +431,11 @@ public class UIAtlasMaker : EditorWindow
 	static public void ReleaseSprites (List<SpriteEntry> sprites)
 	{
 		foreach (SpriteEntry se in sprites) se.Release();
+
+		// This causes an issue in Unity 2022.2 onwards that gets resolved in version 2023.
+		#if !UNITY_2022
 		Resources.UnloadUnusedAssets();
+		#endif
 	}
 
 	/// <summary>

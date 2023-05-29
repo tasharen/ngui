@@ -28,7 +28,7 @@ Shader "Unlit/Transparent Colored"
 
 			CGPROGRAM
 			#pragma vertex vert
-			#pragma fragment frag			
+			#pragma fragment frag
 			#include "UnityCG.cginc"
 
 			sampler2D _MainTex;

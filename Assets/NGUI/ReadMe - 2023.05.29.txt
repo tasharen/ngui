@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2022.06.08
+            Version 2023.05.29
        https://discord.gg/tasharen/
 ----------------------------------------------
 
@@ -54,6 +54,10 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2023.05.29
+- FIX: Unity 2022 introduced a bug with unloading resources that gets fixed again in Unity 2023. Added a work-around for 2022.
+- FIX: Minor fixes, removal of deprecated platform enums and the like.
 
 2022.06.08
 - NEW: Added NGUI/Selection/Check for issues menu option that automatically checks the hierarchy for potential problems such as non-one scales and offsets that will cause floating point precision issues.

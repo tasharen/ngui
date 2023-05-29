@@ -1077,31 +1077,31 @@ public class UIPanel : UIRect
 		FindParent();
 
 		// Apparently having a rigidbody helps
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-		if (rigidbody == null && mParentPanel == null)
-#else
-		if (GetComponent<Rigidbody>() == null && mParentPanel == null)
-#endif
-		{
-			UICamera uic = (anchorCamera != null) ? mCam.GetComponent<UICamera>() : null;
+//#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
+//		if (rigidbody == null && mParentPanel == null)
+//#else
+//		if (GetComponent<Rigidbody>() == null && mParentPanel == null)
+//#endif
+//		{
+//			var uic = (anchorCamera != null) ? mCam.GetComponent<UICamera>() : null;
 
-			if (uic != null)
-			{
-				if (uic.eventType == UICamera.EventType.UI_3D || uic.eventType == UICamera.EventType.World_3D)
-				{
-					Rigidbody rb = gameObject.AddComponent<Rigidbody>();
-					rb.isKinematic = true;
-					rb.useGravity = false;
-				}
-				// It's unclear if this helps 2D physics or not, so leaving it disabled for now.
-				// Note that when enabling this, the 'if (rigidbody == null)' statement above should be adjusted as well.
-				//else
-				//{
-				//	  Rigidbody2D rb = gameObject.AddComponent<Rigidbody2D>();
-				//	  rb.isKinematic = true;
-				//}
-			}
-		}
+//			if (uic != null)
+//			{
+//				if (uic.eventType == UICamera.EventType.UI_3D || uic.eventType == UICamera.EventType.World_3D)
+//				{
+//					var rb = gameObject.AddComponent<Rigidbody>();
+//					rb.isKinematic = true;
+//					rb.useGravity = false;
+//				}
+//				// It's unclear if this helps 2D physics or not, so leaving it disabled for now.
+//				// Note that when enabling this, the 'if (rigidbody == null)' statement above should be adjusted as well.
+//				//else
+//				//{
+//				//	  Rigidbody2D rb = gameObject.AddComponent<Rigidbody2D>();
+//				//	  rb.isKinematic = true;
+//				//}
+//			}
+//		}
 
 		mRebuild = true;
 		mAlphaFrameID = -1;
