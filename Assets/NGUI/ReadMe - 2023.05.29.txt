@@ -56,6 +56,7 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
 
 2023.05.29
+- NEW: Added a UICircle -- a sprite type that can draw a circle. It's also a super basic example of creating a custom widget for NGUI.
 - FIX: Unity 2022 introduced a bug with unloading resources that gets fixed again in Unity 2023. Added a work-around for 2022.
 - FIX: Minor fixes, removal of deprecated platform enums and the like.
 

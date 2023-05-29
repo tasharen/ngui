@@ -179,6 +179,14 @@ static public class NGUIMenu
 		else Debug.Log("You must select a game object first.");
 	}
 
+	[MenuItem("NGUI/Create/Circle", false, 6)]
+	static public void AddCircle ()
+	{
+		GameObject go = NGUIEditorTools.SelectedRoot(true);
+		if (go != null) Selection.activeGameObject = NGUISettings.AddCircle(go).gameObject;
+		else Debug.Log("You must select a game object first.");
+	}
+
 	[MenuItem("NGUI/Create/", false, 6)]
 	static void AddBreaker123 () { }
 

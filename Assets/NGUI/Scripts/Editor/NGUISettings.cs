@@ -511,6 +511,23 @@ public class NGUISettings
 	}
 
 	/// <summary>
+	/// Convenience method -- add a circle.
+	/// </summary>
+
+	static public UICircle AddCircle (GameObject go)
+	{
+		var w = NGUITools.AddWidget<UICircle>(go);
+		w.name = "Circle";
+		w.atlas = atlas;
+		w.spriteName = selectedSprite;
+		w.pivot = pivot;
+		w.width = 100;
+		w.height = 100;
+		w.MakePixelPerfect();
+		return w;
+	}
+
+	/// <summary>
 	/// Convenience method -- add a sprite.
 	/// </summary>
 
