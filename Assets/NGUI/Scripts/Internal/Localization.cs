@@ -460,7 +460,7 @@ static public class Localization
 	/// Select the specified language from the previously loaded CSV file.
 	/// </summary>
 
-	static bool SelectLanguage (string language)
+	static bool SelectLanguage (in string language)
 	{
 		mLanguageIndex = -1;
 
@@ -486,7 +486,7 @@ static public class Localization
 	/// Load the specified asset and activate the localization.
 	/// </summary>
 
-	static public void Set (string languageName, Dictionary<string, string> dictionary)
+	static public void Set (in string languageName, Dictionary<string, string> dictionary)
 	{
 		mLanguage = languageName;
 		PlayerPrefs.SetString("Language", mLanguage);
@@ -505,7 +505,7 @@ static public class Localization
 	/// To set the multi-language value just modify Localization.dictionary directly.
 	/// </summary>
 
-	static public void Set (string key, string value)
+	static public void Set (in string key, in string value)
 	{
 		if (mOldDictionary.ContainsKey(key)) mOldDictionary[key] = value;
 		else mOldDictionary.Add(key, value);
@@ -515,7 +515,7 @@ static public class Localization
 	/// Whether the specified key is present in the localization.
 	/// </summary>
 
-	static public bool Has (string key)
+	static public bool Has (in string key)
 	{
 		if (string.IsNullOrEmpty(key)) return false;
 
@@ -576,7 +576,7 @@ static public class Localization
 	/// Localize the specified value. If the value is missing, 'fallback' value is used instead. No warning will be shown if the 'key' value is missing.
 	/// </summary>
 
-	static public string Get (string key, string fallback)
+	static public string Get (in string key, string fallback)
 	{
 		if (Has(key)) return Get(key);
 		return Get(fallback);
@@ -586,7 +586,7 @@ static public class Localization
 	/// Localize the specified value.
 	/// </summary>
 
-	static public string Get (string key, bool warnIfMissing = true)
+	static public string Get (in string key, bool warnIfMissing = true)
 	{
 		if (string.IsNullOrEmpty(key)) return null;
 

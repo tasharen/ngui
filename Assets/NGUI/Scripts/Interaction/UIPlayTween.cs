@@ -123,7 +123,11 @@ public class UIPlayTween : MonoBehaviour
 #endif
 		}
 
-		if (setState && Application.isPlaying)
+#if UNITY_EDITOR
+		if (!Application.isPlaying) return;
+#endif
+
+		if (setState)
 		{
 			var go = (tweenTarget == null) ? gameObject : tweenTarget;
 			mTweens = includeChildren ? go.GetComponentsInChildren<UITweener>() : go.GetComponents<UITweener>();
@@ -153,6 +157,8 @@ public class UIPlayTween : MonoBehaviour
 				}
 			}
 		}
+
+		if (trigger == Trigger.OnEnable) Play(playDirection != Direction.Reverse);
 	}
 
 	void OnEnable ()
@@ -162,7 +168,11 @@ public class UIPlayTween : MonoBehaviour
 #endif
 		if (mStarted) OnHover(UICamera.IsHighlighted(gameObject));
 
-		if (UICamera.currentTouch != null)
+		if (mStarted && trigger == Trigger.OnEnable)
+		{
+			Play(playDirection != Direction.Reverse);
+		}
+		else if (UICamera.currentTouch != null)
 		{
 			if (trigger == Trigger.OnPress || trigger == Trigger.OnPressTrue)
 				mActivated = (UICamera.currentTouch.pressed == gameObject);
@@ -171,7 +181,7 @@ public class UIPlayTween : MonoBehaviour
 				mActivated = (UICamera.currentTouch.current == gameObject);
 		}
 
-		UIToggle toggle = GetComponent<UIToggle>();
+		var toggle = GetComponent<UIToggle>();
 		if (toggle != null) EventDelegate.Add(toggle.onChange, OnToggle);
 	}
 
@@ -180,8 +190,8 @@ public class UIPlayTween : MonoBehaviour
 #if UNITY_EDITOR
 		if (!Application.isPlaying) return;
 #endif
-		UIToggle toggle = GetComponent<UIToggle>();
-		if (toggle != null) EventDelegate.Remove(toggle.onChange, OnToggle);
+		var toggle = GetComponent<UIToggle>();
+		if (toggle) EventDelegate.Remove(toggle.onChange, OnToggle);
 	}
 
 	void OnDragOver () { if (trigger == Trigger.OnHover) OnHover(true); }

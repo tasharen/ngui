@@ -149,7 +149,8 @@ public class SpriteSelector : ScriptableWizard
 							}
 							else
 							{
-								NGUIContextMenu.AddItem("Edit", false, EditSprite, sprite);
+								NGUIContextMenu.AddItem("Select", false, EditSprite, sprite);
+								NGUIContextMenu.AddItem("Save As", false, SaveAs, sprite);
 								NGUIContextMenu.AddItem("Delete", false, DeleteSprite, sprite);
 								NGUIContextMenu.Show();
 							}
@@ -237,6 +238,32 @@ public class SpriteSelector : ScriptableWizard
 		Close();
 	}
 
+	void SaveAs (object obj)
+	{
+		if (this == null) return;
+
+		var sprite = obj as UISpriteData;
+		var path = EditorUtility.SaveFilePanel("Save As", NGUISettings.currentPath, sprite.name + ".png", "png");
+
+		if (!string.IsNullOrEmpty(path))
+		{
+			NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
+			var se = UIAtlasMaker.ExtractSprite(NGUISettings.atlas, sprite.name);
+
+			if (se != null)
+			{
+				var bytes = se.tex.EncodeToPNG();
+				System.IO.File.WriteAllBytes(path, bytes);
+
+				if (se.temporaryTexture) DestroyImmediate(se.tex);
+
+				AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+				var tex = NGUIEditorTools.ImportTexture(path, true, true, true);
+				if (tex != null) Selection.activeObject = tex;
+			}
+		}
+	}
+
 	/// <summary>
 	/// Delete the sprite (context menu selection)
 	/// </summary>
@@ -244,9 +271,9 @@ public class SpriteSelector : ScriptableWizard
 	void DeleteSprite (object obj)
 	{
 		if (this == null) return;
-		UISpriteData sd = obj as UISpriteData;
+		var sd = obj as UISpriteData;
 
-		List<UIAtlasMaker.SpriteEntry> sprites = new List<UIAtlasMaker.SpriteEntry>();
+		var sprites = new List<UIAtlasMaker.SpriteEntry>();
 		UIAtlasMaker.ExtractSprites(NGUISettings.atlas, sprites);
 
 		for (int i = sprites.Count; i > 0; )

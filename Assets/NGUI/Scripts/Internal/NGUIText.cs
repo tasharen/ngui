@@ -227,10 +227,10 @@ static public class NGUIText
 
 	static public float GetGlyphWidth (int ch, int prev, float fontScale, bool bold, bool italic)
 	{
-		if (spaceWidth != 0 && ch == ' ') return Mathf.RoundToInt(spaceWidth * fontScale * pixelDensity * ((float)finalSize / dynamicFont.fontSize));
-
 		if (dynamicFont != null)
 		{
+			if (spaceWidth != 0 && ch == ' ') return Mathf.RoundToInt(spaceWidth * fontScale * pixelDensity * ((float)finalSize / dynamicFont.fontSize));
+
 			var fs = fontStyle;
 			if (bold && italic) fs = FontStyle.BoldAndItalic;
 			else if (italic) fs = FontStyle.Italic;

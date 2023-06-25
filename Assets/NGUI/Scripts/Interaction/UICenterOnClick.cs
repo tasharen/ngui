@@ -12,6 +12,9 @@ using UnityEngine;
 [AddComponentMenu("NGUI/Interaction/Center Scroll View on Click")]
 public class UICenterOnClick : MonoBehaviour
 {
+	[Range(1f, 32f), Tooltip("The higher the value, the faster the spring animation will be")]
+	public float springStrength = 6f;
+
 	void OnClick ()
 	{
 		UICenterOnChild center = NGUITools.FindInParents<UICenterOnChild>(gameObject);
@@ -24,11 +27,18 @@ public class UICenterOnClick : MonoBehaviour
 		}
 		else if (panel != null && panel.clipping != UIDrawCall.Clipping.None)
 		{
-			UIScrollView sv = panel.GetComponent<UIScrollView>();
-			Vector3 offset = -panel.cachedTransform.InverseTransformPoint(transform.position);
+			var sv = panel.GetComponentInParent<UIScrollView>();
+
+			if (!sv)
+			{
+				Debug.LogWarning("No scroll view found", this);
+				return;
+			}
+
+			var offset = -panel.cachedTransform.InverseTransformPoint(transform.position);
 			if (!sv.canMoveHorizontally) offset.x = panel.cachedTransform.localPosition.x;
 			if (!sv.canMoveVertically) offset.y = panel.cachedTransform.localPosition.y;
-			SpringPanel.Begin(panel.cachedGameObject, offset, 6f);
+			SpringPanel.Begin(panel.cachedGameObject, offset, springStrength);
 		}
 	}
 }

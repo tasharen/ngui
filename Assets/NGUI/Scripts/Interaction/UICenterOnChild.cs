@@ -42,6 +42,8 @@ public class UICenterOnChild : MonoBehaviour
 
 	UIScrollView mScrollView;
 	GameObject mCenteredObject;
+	int mCenteredIndex = 0;
+	int mTotalCount = 0;
 
 	/// <summary>
 	/// Game object that the draggable panel is currently centered on.
@@ -49,9 +51,24 @@ public class UICenterOnChild : MonoBehaviour
 
 	public GameObject centeredObject { get { return mCenteredObject; } }
 
+	/// <summary>
+	/// Index of the centered object.
+	/// </summary>
+
+	public int centeredIndex { get { return mCenteredIndex; } }
+
+	/// <summary>
+	/// Number of children that can be centered on.
+	/// </summary>
+
+	public int totalChildren { get { return mTotalCount; } }
+
 	void Start () { Recenter(); }
+	
 	void OnEnable () { if (mScrollView) { mScrollView.centerOnChild = this; Recenter(); } }
+	
 	void OnDisable () { if (mScrollView) mScrollView.centerOnChild = null; }
+	
 	void OnDragFinished () { if (enabled) Recenter(); }
 
 	/// <summary>
@@ -65,7 +82,13 @@ public class UICenterOnChild : MonoBehaviour
 	/// </summary>
 
 	[ContextMenu("Execute")]
-	public void Recenter ()
+	public void Recenter () { Recenter(0, 0); }
+
+	/// <summary>
+	/// Recenter the scroll view on the closest child, with the desired offset.
+	/// </summary>
+
+	public void Recenter (int offsetX, int offsetY)
 	{
 		if (mScrollView == null)
 		{
@@ -94,24 +117,25 @@ public class UICenterOnChild : MonoBehaviour
 		}
 		if (mScrollView.panel == null) return;
 
-		Transform trans = transform;
+		var trans = transform;
 		if (trans.childCount == 0) return;
 
 		// Calculate the panel's center in world coordinates
-		Vector3[] corners = mScrollView.panel.worldCorners;
-		Vector3 panelCenter = (corners[2] + corners[0]) * 0.5f;
+		var corners = mScrollView.panel.worldCorners;
+		var panelCenter = (corners[2] + corners[0]) * 0.5f;
 
 		// Offset this value by the momentum
-		Vector3 momentum = mScrollView.currentMomentum * mScrollView.momentumAmount;
-		Vector3 moveDelta = NGUIMath.SpringDampen(ref momentum, 9f, 2f);
-		Vector3 pickingPoint = panelCenter - moveDelta * 0.01f; // Magic number based on what "feels right"
+		var momentum = mScrollView.currentMomentum;
+		var moveDelta = NGUIMath.SpringDampen(ref momentum, mScrollView.dampenStrength, 0.02f); // Magic number based on what "feels right"
+		var pickingPoint = panelCenter - moveDelta;
 
-		float min = float.MaxValue;
+		var min = float.MaxValue;
 		Transform closest = null;
-		int index = 0;
-		int ignoredIndex = 0;
+		var index = 0;
+		mCenteredIndex = 0;
+		mTotalCount = 0;
 
-		UIGrid grid = GetComponent<UIGrid>();
+		var grid = GetComponent<UIGrid>();
 		List<Transform> list = null;
 
 		// Determine the closest child
@@ -119,38 +143,54 @@ public class UICenterOnChild : MonoBehaviour
 		{
 			list = grid.GetChildList();
 
-			for (int i = 0, imax = list.Count, ii = 0; i < imax; ++i)
+			if (offsetX != 0 || offsetY != 0) pickingPoint += trans.TransformDirection(offsetX * grid.cellWidth, offsetY * grid.cellHeight, 0f);
+
+			for (int i = 0, imax = list.Count; i < imax; ++i)
 			{
-				Transform t = list[i];
+				var t = list[i];
 				if (!t.gameObject.activeInHierarchy) continue;
-				float sqrDist = Vector3.SqrMagnitude(t.position - pickingPoint);
+
+				var sqrDist = Vector3.SqrMagnitude(t.position - pickingPoint);
 
 				if (sqrDist < min)
 				{
 					min = sqrDist;
 					closest = t;
 					index = i;
-					ignoredIndex = ii;
+					mCenteredIndex = mTotalCount;
 				}
-				++ii;
+
+				++mTotalCount;
 			}
 		}
 		else
 		{
-			for (int i = 0, imax = trans.childCount, ii = 0; i < imax; ++i)
+			if ((offsetX != 0 || offsetY != 0) && trans.childCount > 1)
 			{
-				Transform t = trans.GetChild(i);
+				var diff = trans.GetChild(1).position - trans.GetChild(0).position;
+				pickingPoint += trans.TransformDirection(offsetX * Mathf.Abs(diff.x), offsetY * Mathf.Abs(diff.y), 0f);
+			}
+
+			// Note that the children should be in order (left to right for horizontal movement).
+			// If they aren't in order, centering won't work properly, and children may get skipped while moving around.
+			// Using a grid forces this kind of positioning, but without it you have to make sure that the order is proper yourself.
+
+			for (int i = 0, imax = trans.childCount; i < imax; ++i)
+			{
+				var t = trans.GetChild(i);
 				if (!t.gameObject.activeInHierarchy) continue;
-				float sqrDist = Vector3.SqrMagnitude(t.position - pickingPoint);
+
+				var sqrDist = Vector3.SqrMagnitude(t.position - pickingPoint);
 
 				if (sqrDist < min)
 				{
 					min = sqrDist;
 					closest = t;
 					index = i;
-					ignoredIndex = ii;
+					mCenteredIndex = mTotalCount;
 				}
-				++ii;
+
+				++mTotalCount;
 			}
 		}
 
@@ -160,7 +200,7 @@ public class UICenterOnChild : MonoBehaviour
 			// If we're still on the same object
 			if (mCenteredObject != null && mCenteredObject.transform == (list != null ? list[index] : trans.GetChild(index)))
 			{
-				Vector3 totalDelta = UICamera.currentTouch.totalDelta;
+				var totalDelta = UICamera.currentTouch.totalDelta;
 				totalDelta = transform.rotation * totalDelta;
 
 				float delta = 0f;
@@ -191,38 +231,39 @@ public class UICenterOnChild : MonoBehaviour
 						// Next page
 						if (list != null)
 						{
-							if (ignoredIndex > 0)
+							if (mCenteredIndex > 0)
 							{
-								closest = list[ignoredIndex - 1];
+								closest = list[--mCenteredIndex];
 							}
-							else closest = (GetComponent<UIWrapContent>() == null) ? list[0] : list[list.Count - 1];
+							else closest = (GetComponent<UIWrapContent>() == null) ? list[mCenteredIndex = 0] : list[mCenteredIndex = list.Count - 1];
 						}
-						else if (ignoredIndex > 0)
+						else if (mCenteredIndex > 0)
 						{
-							closest = trans.GetChild(ignoredIndex - 1);
+							closest = trans.GetChild(--mCenteredIndex);
 						}
-						else closest = (GetComponent<UIWrapContent>() == null) ? trans.GetChild(0) : trans.GetChild(trans.childCount - 1);
+						else closest = (GetComponent<UIWrapContent>() == null) ? trans.GetChild(mCenteredIndex = 0) : trans.GetChild(mCenteredIndex = trans.childCount - 1);
 					}
 					else if (delta < -nextPageThreshold)
 					{
 						// Previous page
 						if (list != null)
 						{
-							if (ignoredIndex < list.Count - 1)
+							if (mCenteredIndex < list.Count - 1)
 							{
-								closest = list[ignoredIndex + 1];
+								closest = list[++mCenteredIndex];
 							}
 							else closest = (GetComponent<UIWrapContent>() == null) ? list[list.Count - 1] : list[0];
 						}
-						else if (ignoredIndex < trans.childCount - 1)
+						else if (mCenteredIndex < trans.childCount - 1)
 						{
-							closest = trans.GetChild(ignoredIndex + 1);
+							closest = trans.GetChild(++mCenteredIndex);
 						}
-						else closest = (GetComponent<UIWrapContent>() == null) ? trans.GetChild(trans.childCount - 1) : trans.GetChild(0);
+						else closest = (GetComponent<UIWrapContent>() == null) ? trans.GetChild(mCenteredIndex = trans.childCount - 1) : trans.GetChild(mCenteredIndex = 0);
 					}
 				}
 			}
 		}
+
 		CenterOn(closest, panelCenter);
 	}
 
@@ -234,13 +275,13 @@ public class UICenterOnChild : MonoBehaviour
 	{
 		if (target != null && mScrollView != null && mScrollView.panel != null)
 		{
-			Transform panelTrans = mScrollView.panel.cachedTransform;
+			var panelTrans = mScrollView.panel.cachedTransform;
 			mCenteredObject = target.gameObject;
 
 			// Figure out the difference between the chosen child and the panel's center in local coordinates
-			Vector3 cp = panelTrans.InverseTransformPoint(target.position);
-			Vector3 cc = panelTrans.InverseTransformPoint(panelCenter);
-			Vector3 localOffset = cp - cc;
+			var cp = panelTrans.InverseTransformPoint(target.position);
+			var cc = panelTrans.InverseTransformPoint(panelCenter);
+			var localOffset = cp - cc;
 
 			// Offset shouldn't occur if blocked
 			if (!mScrollView.canMoveHorizontally) localOffset.x = 0f;
@@ -253,7 +294,7 @@ public class UICenterOnChild : MonoBehaviour
 			{
 				panelTrans.localPosition = panelTrans.localPosition - localOffset;
 
-				Vector4 co = mScrollView.panel.clipOffset;
+				var co = mScrollView.panel.clipOffset;
 				co.x += localOffset.x;
 				co.y += localOffset.y;
 				mScrollView.panel.clipOffset = co;
@@ -282,9 +323,14 @@ public class UICenterOnChild : MonoBehaviour
 	{
 		if (mScrollView != null && mScrollView.panel != null)
 		{
-			Vector3[] corners = mScrollView.panel.worldCorners;
-			Vector3 panelCenter = (corners[2] + corners[0]) * 0.5f;
+			var corners = mScrollView.panel.worldCorners;
+			var panelCenter = (corners[2] + corners[0]) * 0.5f;
 			CenterOn(target, panelCenter);
 		}
 	}
+
+	public void MoveLeft () { Recenter(-1, 0); }
+	public void MoveRight () { Recenter(1, 0); }
+	public void MoveUp () { Recenter(0, 1); }
+	public void MoveDown () { Recenter(0, -1); }
 }

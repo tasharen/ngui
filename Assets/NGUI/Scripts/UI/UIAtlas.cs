@@ -222,7 +222,7 @@ public class UIAtlas : MonoBehaviour, INGUIAtlas
 	/// Convenience function that retrieves a sprite by name.
 	/// </summary>
 
-	public UISpriteData GetSprite (string name)
+	public UISpriteData GetSprite (in string name)
 	{
 		var rep = replacement;
 
@@ -331,7 +331,7 @@ public class UIAtlas : MonoBehaviour, INGUIAtlas
 	/// Convenience function that retrieves a list of all sprite names that contain the specified phrase
 	/// </summary>
 
-	public BetterList<string> GetListOfSprites (string match)
+	public BetterList<string> GetListOfSprites (in string match)
 	{
 		var rep = replacement;
 		if (rep != null) return rep.GetListOfSprites(match);

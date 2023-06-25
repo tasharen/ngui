@@ -470,8 +470,7 @@ public abstract class UIRect : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Rectangles need to update in a specific order -- parents before children.
-	/// When deriving from this class, override its OnUpdate() function instead.
+	/// Rectangles need to update in a specific order -- parents before children. Inherited classes should override its OnUpdate() function instead.
 	/// </summary>
 
 	public void Update ()
@@ -483,67 +482,66 @@ public abstract class UIRect : MonoBehaviour
 		}
 		else if (!mAnchorsCached) ResetAnchors();
 
-		int frame = Time.frameCount;
-
+		var frame = Time.frameCount;
 #if UNITY_EDITOR
-		if (mUpdateFrame != frame || !Application.isPlaying)
-#else
-		if (mUpdateFrame != frame)
-#endif
+		var isPlaying = Application.isPlaying;
+
+		if (mUpdateFrame != frame || !isPlaying)
 		{
-#if UNITY_EDITOR
-			if (updateAnchors == AnchorUpdate.OnUpdate || mUpdateAnchors || !Application.isPlaying)
-#else
-			if (updateAnchors == AnchorUpdate.OnUpdate || mUpdateAnchors)
-#endif
-			UpdateAnchorsInternal(frame);
+			if (mUpdateAnchors || !isPlaying) UpdateAnchorsInternal(frame);
+			else if (updateAnchors == AnchorUpdate.OnUpdate && !UpdateAnchorsInternal(frame)) updateAnchors = AnchorUpdate.OnEnable;
 
-			// Continue with the update
 			OnUpdate();
 		}
+#else
+		if (mUpdateFrame != frame)
+		{
+			if (mUpdateAnchors) UpdateAnchorsInternal(frame);
+			else if (updateAnchors == AnchorUpdate.OnUpdate && !UpdateAnchorsInternal(frame)) updateAnchors = AnchorUpdate.OnEnable;
+
+			OnUpdate();
+		}
+#endif
 	}
 
 	/// <summary>
 	/// Update anchors.
 	/// </summary>
 
-	protected void UpdateAnchorsInternal (int frame)
+	protected bool UpdateAnchorsInternal (int frame)
 	{
 		mUpdateFrame = frame;
 		mUpdateAnchors = false;
 
-		bool anchored = false;
+		var anchored = false;
 
 		if (leftAnchor.target)
 		{
 			anchored = true;
-			if (leftAnchor.rect != null && leftAnchor.rect.mUpdateFrame != frame)
-				leftAnchor.rect.Update();
+			if (leftAnchor.rect != null && leftAnchor.rect.mUpdateFrame != frame) leftAnchor.rect.Update();
 		}
 
 		if (bottomAnchor.target)
 		{
 			anchored = true;
-			if (bottomAnchor.rect != null && bottomAnchor.rect.mUpdateFrame != frame)
-				bottomAnchor.rect.Update();
+			if (bottomAnchor.rect != null && bottomAnchor.rect.mUpdateFrame != frame) bottomAnchor.rect.Update();
 		}
 
 		if (rightAnchor.target)
 		{
 			anchored = true;
-			if (rightAnchor.rect != null && rightAnchor.rect.mUpdateFrame != frame)
-				rightAnchor.rect.Update();
+			if (rightAnchor.rect != null && rightAnchor.rect.mUpdateFrame != frame) rightAnchor.rect.Update();
 		}
 
 		if (topAnchor.target)
 		{
 			anchored = true;
-			if (topAnchor.rect != null && topAnchor.rect.mUpdateFrame != frame)
-				topAnchor.rect.Update();
+			if (topAnchor.rect != null && topAnchor.rect.mUpdateFrame != frame) topAnchor.rect.Update();
 		}
 
 		// Update the dimensions using anchors
 		if (anchored) OnAnchor();
+		return anchored;
 	}
 
 	/// <summary>

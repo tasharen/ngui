@@ -9,14 +9,14 @@ using System.Collections.Generic;
 
 static public class NGUIContextMenu
 {
-	[MenuItem("Help/NGUI Documentation (v.2023.05.29)")]
+	[MenuItem("Help/NGUI Documentation (v.2023.06.25)")]
 	static void ShowHelp0 (MenuCommand command) { NGUIHelp.Show(); }
 
 	[MenuItem("Help/NGUI Support Archive (read-only)")]
 	static void ShowHelp01 (MenuCommand command) { Application.OpenURL("http://www.tasharen.com/forum/index.php?board=1.0"); }
 
 	[MenuItem("Help/NGUI Support Discord")]
-	static void ShowHelp02 (MenuCommand command) { Application.OpenURL("https://discord.gg/tasharen"); }
+	static void ShowHelp02 (MenuCommand command) { Application.OpenURL("https://discord.com/invite/tasharen"); }
 
 	[MenuItem("CONTEXT/UIWidget/Copy Widget")]
 	static void CopyStyle (MenuCommand command) { NGUISettings.CopyWidget(command.context as UIWidget); }

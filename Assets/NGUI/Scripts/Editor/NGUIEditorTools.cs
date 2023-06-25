@@ -1294,7 +1294,7 @@ static public class NGUIEditorTools
 	}
 
 #if UNITY_2018_3_OR_NEWER
-	// Contributed by B9 of https://discord.gg/tasharen
+	// Contributed by B9 of https://discord.com/invite/tasharen
 	static void OpenAsset (GameObject go)
 	{
 		// Supporting opening of prefabs in Play mode is a bit of a can of worms if target might have ExecuteInEditMode

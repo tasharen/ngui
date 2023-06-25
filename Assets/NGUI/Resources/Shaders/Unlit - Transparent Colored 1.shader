@@ -72,7 +72,7 @@ Shader "Hidden/Unlit/Transparent Colored 1"
 			
 				// Sample the texture
 				half4 col = tex2D(_MainTex, IN.texcoord) * IN.color;
-				col.a *= clamp( min(factor.x, factor.y), 0.0, 1.0);
+				col.a *= clamp(min(factor.x, factor.y), 0.0, 1.0);
 				return col;
 			}
 			ENDCG

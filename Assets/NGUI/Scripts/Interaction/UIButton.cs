@@ -292,7 +292,7 @@ public class UIButton : UIButtonColor
 	/// Convenience function that changes the sprite.
 	/// </summary>
 
-	protected void SetSprite (string sp)
+	protected void SetSprite (in string sp)
 	{
 		if (mSprite != null && !string.IsNullOrEmpty(sp) && mSprite.spriteName != sp)
 		{

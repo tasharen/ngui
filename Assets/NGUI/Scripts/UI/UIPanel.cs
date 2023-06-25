@@ -53,13 +53,11 @@ public class UIPanel : UIRect
 
 	public bool generateUV2 = false;
 
-#if !UNITY_4_7
 	/// <summary>
 	/// Whether generated geometry will cast shadows.
 	/// </summary>
 
 	public UIDrawCall.ShadowMode shadowMode = UIDrawCall.ShadowMode.None;
-#endif
 
 	/// <summary>
 	/// Whether widgets drawn by this panel are static (won't move). This will improve performance.
@@ -213,9 +211,6 @@ public class UIPanel : UIRect
 	static float[] mTemp = new float[4];
 	Vector2 mMin = Vector2.zero;
 	Vector2 mMax = Vector2.zero;
-#if !UNITY_5_5_OR_NEWER
-	bool mHalfPixelOffset = false;
-#endif
 	bool mSortWidgets = false;
 	bool mUpdateScroll = false;
 
@@ -376,27 +371,13 @@ public class UIPanel : UIRect
 	/// Whether the panel's drawn geometry needs to be offset by a half-pixel.
 	/// </summary>
 
-	public bool halfPixelOffset
-	{
-		get
-		{
-#if UNITY_5_5_OR_NEWER
-			return false;
-#else
-			return mHalfPixelOffset;
-#endif
-		}
-	}
+	public bool halfPixelOffset { get { return false; } }
 
 	/// <summary>
 	/// Whether the camera is used to draw UI geometry.
 	/// </summary>
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-	public bool usedForUI { get { return (anchorCamera != null && mCam.isOrthoGraphic); } }
-#else
 	public bool usedForUI { get { return (anchorCamera != null && mCam.orthographic); } }
-#endif
 
 	/// <summary>
 	/// Directx9 pixel offset, used for drawing.
@@ -406,24 +387,15 @@ public class UIPanel : UIRect
 	{
 		get
 		{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-			if (anchorCamera != null && mCam.isOrthoGraphic)
-#else
 			if (anchorCamera != null && mCam.orthographic)
-#endif
 			{
 				Vector2 size = GetWindowSize();
 				float pixelSize = (root != null) ? root.pixelSizeAdjustment : 1f;
 				float mod = (pixelSize / size.y) / mCam.orthographicSize;
 
-#if UNITY_5_5_OR_NEWER
 				bool x = false, y = false;
-#else
-				bool x = mHalfPixelOffset, y = mHalfPixelOffset;
-#endif
 				if ((Mathf.RoundToInt(size.x) & 1) == 1) x = !x;
 				if ((Mathf.RoundToInt(size.y) & 1) == 1) y = !y;
-
 				return new Vector3(x ? -mod : 0f, y ? mod : 0f);
 			}
 			return Vector3.zero;
@@ -1005,25 +977,6 @@ public class UIPanel : UIRect
 	}
 
 	/// <summary>
-	/// Cache components.
-	/// </summary>
-
-	protected override void Awake ()
-	{
-		base.Awake();
-
-#if !UNITY_5_5_OR_NEWER
-		mHalfPixelOffset = (Application.platform == RuntimePlatform.WindowsPlayer ||
- #if !UNITY_5_4
-			Application.platform == RuntimePlatform.WindowsWebPlayer ||
- #endif
-			Application.platform == RuntimePlatform.WindowsEditor) &&
-			SystemInfo.graphicsDeviceVersion.Contains("Direct3D") &&
-			SystemInfo.graphicsShaderLevel < 40;
-#endif
-	}
-
-	/// <summary>
 	/// Find the parent panel, if we have one.
 	/// </summary>
 
@@ -1300,11 +1253,7 @@ public class UIPanel : UIRect
 
 	void LateUpdate ()
 	{
-#if UNITY_EDITOR && !UNITY_5_5_OR_NEWER
-		if (mUpdateFrame != Time.frameCount || !Application.isPlaying)
-#else
 		if (mUpdateFrame != Time.frameCount)
-#endif
 		{
 			mUpdateFrame = Time.frameCount;
 
@@ -1684,9 +1633,7 @@ public class UIPanel : UIRect
 			dc.sortingOrder = useSortingOrder ? ((mSortingOrder == 0 && renderQueue == RenderQueue.Automatic) ? sortOrder : mSortingOrder) : 0;
 			dc.sortingLayerName = useSortingOrder ? mSortingLayerName : null;
 			dc.clipTexture = mClipTexture;
-#if !UNITY_4_7
 			dc.shadowMode = shadowMode;
-#endif
 		}
 	}
 

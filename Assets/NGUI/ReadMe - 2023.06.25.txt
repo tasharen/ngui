@@ -1,8 +1,8 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2023.05.29
-       https://discord.gg/tasharen/
+            Version 2023.06.25
+    https://discord.com/invite/tasharen
 ----------------------------------------------
 
 Thank you for buying NGUI!
@@ -54,6 +54,15 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2023.06.25
+- NEW: Added a Save As context menu option when right-clicking on a sprite in the sprite selection window.
+- NEW: Added an OnEnable type activation triggers to the Play Tween script.
+- FIX: Fixed all examples and prefabs to use the Unity's UI layer for simplicity.
+- FIX: Some minor tweaks to the scroll view behaviour in regards to how it dampens movement when the content goes out of the view.
+- FIX: Some tweaks to the Center on Child script for scroll views to make it behave better.
+- FIX: Started using the 'in' prefix for passing strings in some places. I've been replacing the copy with in-ref as I find them.
+- FIX: Got rid of some obsolete platform code.
 
 2023.05.29
 - NEW: Added a UICircle -- a sprite type that can draw a circle. It's also a super basic example of creating a custom widget for NGUI.
