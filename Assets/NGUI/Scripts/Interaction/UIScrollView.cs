@@ -973,7 +973,7 @@ public class UIScrollView : MonoBehaviour
 
 				// Adjust the momentum
 				if (dragEffect == DragEffect.None) mMomentum = Vector3.zero;
-				else mMomentum = Vector3.Lerp(mMomentum, mMomentum + offset * (momentumAmount * Time.unscaledTime), 0.67f);
+				else mMomentum = Vector3.Lerp(mMomentum, mMomentum + offset * (momentumAmount * 15f), 0.67f);
 
 				// Move the scroll view
 				if (!iOSDragEmulation || dragEffect != DragEffect.MomentumAndSpring)
@@ -1016,6 +1016,10 @@ public class UIScrollView : MonoBehaviour
 			}
 		}
 	}
+
+	// I used it to test low and high FPS behaviour of the scroll view
+	//[ContextMenu("High FPS")] void HighFPS () { Application.targetFrameRate = 0; }
+	//[ContextMenu("Low FPS")] void LowFPS () { Application.targetFrameRate = 30; }
 
 	[HideInInspector]
 	public UICenterOnChild centerOnChild = null;
