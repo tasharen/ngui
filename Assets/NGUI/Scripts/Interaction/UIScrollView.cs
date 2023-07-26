@@ -1017,10 +1017,6 @@ public class UIScrollView : MonoBehaviour
 		}
 	}
 
-	// I used it to test low and high FPS behaviour of the scroll view
-	//[ContextMenu("High FPS")] void HighFPS () { Application.targetFrameRate = 0; }
-	//[ContextMenu("Low FPS")] void LowFPS () { Application.targetFrameRate = 30; }
-
 	[HideInInspector]
 	public UICenterOnChild centerOnChild = null;
 

@@ -107,22 +107,6 @@ static public class NGUIText
 		{
 			font.RequestCharactersInTexture(")_-.", finalSize, fontStyle);
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-			if (!font.GetCharacterInfo(')', out mTempChar, finalSize, fontStyle) || mTempChar.vert.height == 0f)
-			{
-				font.RequestCharactersInTexture("A", finalSize, fontStyle);
-				{
-					if (!font.GetCharacterInfo('A', out mTempChar, finalSize, fontStyle))
-					{
-						baseline = 0f;
-						return;
-					}
-				}
-			}
-
-			float y0 = mTempChar.vert.yMax;
-			float y1 = mTempChar.vert.yMin;
-#else
 			if (!font.GetCharacterInfo(')', out mTempChar, finalSize, fontStyle) || mTempChar.maxY == 0f)
 			{
 				font.RequestCharactersInTexture("A", finalSize, fontStyle);
@@ -137,7 +121,7 @@ static public class NGUIText
 
 			float y0 = mTempChar.maxY;
 			float y1 = mTempChar.minY;
-#endif
+
 			baseline = Mathf.Round(y0 + (finalSize - y0 + y1) * 0.5f);
 		}
 	}
@@ -150,11 +134,13 @@ static public class NGUIText
 
 	static public void Prepare (string text)
 	{
-		if (dynamicFont != null)
+		var font = dynamicFont;
+
+		if (font != null)
 		{
 			if (!encoding || symbolStyle == SymbolStyle.None)
 			{
-				dynamicFont.RequestCharactersInTexture(text, finalSize, fontStyle);
+				font.RequestCharactersInTexture(text, finalSize, fontStyle);
 				return;
 			}
 
@@ -186,7 +172,7 @@ static public class NGUIText
 
 				if (currentStyle != styleNow)
 				{
-					if (mTempSB.Length != 0) dynamicFont.RequestCharactersInTexture(mTempSB.ToString(), finalSize, currentStyle);
+					if (mTempSB.Length != 0) font.RequestCharactersInTexture(mTempSB.ToString(), finalSize, currentStyle);
 					currentStyle = styleNow;
 #if UNITY_5
 					mTempSB.Length = 0;
@@ -201,7 +187,7 @@ static public class NGUIText
 			if (mTempSB.Length != 0)
 			{
 				var s = mTempSB.ToString();
-				dynamicFont.RequestCharactersInTexture(s, finalSize, currentStyle);
+				font.RequestCharactersInTexture(s, finalSize, currentStyle);
 #if UNITY_5
 				mTempSB.Length = 0;
 #else
@@ -227,21 +213,19 @@ static public class NGUIText
 
 	static public float GetGlyphWidth (int ch, int prev, float fontScale, bool bold, bool italic)
 	{
-		if (dynamicFont != null)
+		var font = dynamicFont;
+
+		if (font != null)
 		{
-			if (spaceWidth != 0 && ch == ' ') return Mathf.RoundToInt(spaceWidth * fontScale * pixelDensity * ((float)finalSize / dynamicFont.fontSize));
+			if (spaceWidth != 0 && ch == ' ') return Mathf.RoundToInt(spaceWidth * fontScale * pixelDensity * ((float)finalSize / font.fontSize));
 
 			var fs = fontStyle;
 			if (bold && italic) fs = FontStyle.BoldAndItalic;
 			else if (italic) fs = FontStyle.Italic;
 			else if (bold) fs = FontStyle.Bold;
 
-			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fs))
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-			return mTempChar.width * fontScale * pixelDensity;
-#else
+			if (font.GetCharacterInfo((char)ch, out mTempChar, finalSize, fs))
 			return mTempChar.advance * fontScale * pixelDensity;
-#endif
 		}
 		else if (nguiFont != null)
 		{
@@ -272,14 +256,16 @@ static public class NGUIText
 
 	static public GlyphInfo GetGlyph (int ch, int prev, bool bold, bool italic, float fontScale = 1f)
 	{
-		if (dynamicFont != null)
+		var font = dynamicFont;
+
+		if (font != null)
 		{
 			var fs = fontStyle;
 			if (bold && italic) fs = FontStyle.BoldAndItalic;
 			else if (italic) fs = FontStyle.Italic;
 			else if (bold) fs = FontStyle.Bold;
 
-			if (dynamicFont.GetCharacterInfo((char)ch, out mTempChar, finalSize, fs))
+			if (font.GetCharacterInfo((char)ch, out mTempChar, finalSize, fs))
 			{
 				var kern = 0;
 				var nf = nguiFont as NGUIFont;
@@ -287,36 +273,10 @@ static public class NGUIText
 				if (nf != null)
 				{
 					kern = nf.GetKerning(prev, ch);
-					if (kern != 0) kern = Mathf.RoundToInt(kern * ((float)finalSize / dynamicFont.fontSize));
+					if (kern != 0) kern = Mathf.RoundToInt(kern * ((float)finalSize / font.fontSize));
 				}
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-				glyph.v0.x = mTempChar.vert.xMin + kern;
-				glyph.v1.x = glyph.v0.x + mTempChar.vert.width;
 
-				glyph.v0.y = mTempChar.vert.yMax - baseline;
-				glyph.v1.y = glyph.v0.y - mTempChar.vert.height;
-
-				glyph.u0.x = mTempChar.uv.xMin;
-				glyph.u0.y = mTempChar.uv.yMin;
-
-				glyph.u2.x = mTempChar.uv.xMax;
-				glyph.u2.y = mTempChar.uv.yMax;
-
-				if (mTempChar.flipped)
-				{
-					glyph.u1 = new Vector2(glyph.u2.x, glyph.u0.y);
-					glyph.u3 = new Vector2(glyph.u0.x, glyph.u2.y);
-				}
-				else
-				{
-					glyph.u1 = new Vector2(glyph.u0.x, glyph.u2.y);
-					glyph.u3 = new Vector2(glyph.u2.x, glyph.u0.y);
-				}
-
-				glyph.advance = mTempChar.width + kern;
-				glyph.channel = 0;
-#else
 				glyph.v0.x = mTempChar.minX + kern;
 				glyph.v1.x = mTempChar.maxX + kern;
 
@@ -330,7 +290,7 @@ static public class NGUIText
 
 				glyph.advance = mTempChar.advance + kern;
 				glyph.channel = 0;
-#endif
+
 				glyph.v0.x = Mathf.Round(glyph.v0.x);
 				glyph.v0.y = Mathf.Round(glyph.v0.y);
 				glyph.v1.x = Mathf.Round(glyph.v1.x);
@@ -338,7 +298,7 @@ static public class NGUIText
 
 				if (ch == ' ' && spaceWidth != 0)
 				{
-					glyph.advance = Mathf.RoundToInt(spaceWidth * ((float)finalSize / dynamicFont.fontSize));
+					glyph.advance = Mathf.RoundToInt(spaceWidth * ((float)finalSize / font.fontSize));
 				}
 
 				float pd = fontScale * pixelDensity;
@@ -1751,7 +1711,7 @@ static public class NGUIText
 				var fs = symbol.pixelPerfect ? 1f : fontScale * symbolScale * mult;
 				v0x = x + symbol.offsetX * fs;
 				v1x = v0x + symbol.width * fs;
-				v1y = -(y + symbol.offsetY * fs) + symbolOffset * mult;
+				v1y = -(y + symbol.offsetY * fs) + symbolOffset;
 				v0y = v1y - symbol.height * fs;
 				var w = symbol.pixelPerfect ? symbol.advance : Mathf.Round(symbol.advance * scale * symbolScale * mult);
 

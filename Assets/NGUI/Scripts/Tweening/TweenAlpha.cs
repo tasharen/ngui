@@ -37,18 +37,16 @@ public class TweenAlpha : UITweener
 	void Cache ()
 	{
 		mCached = true;
-		mRect = GetComponent<UIRect>();
-		mSr = GetComponent<SpriteRenderer>();
 
-		if (mRect == null && mSr == null)
+		if (!TryGetComponent(out mRect) && !TryGetComponent(out mSr))
 		{
-			mLight = GetComponent<Light>();
+			TryGetComponent(out mLight);
 
 			if (mLight == null)
 			{
-				var ren = GetComponent<Renderer>();
+				Renderer ren;
 
-				if (ren != null)
+				if (TryGetComponent(out ren))
 				{
 					mShared = ren.sharedMaterial;
 					mMat = ren.material;

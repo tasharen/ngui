@@ -251,10 +251,7 @@ public abstract class UIBasicSprite : UIWidget
 	/// <summary>
 	/// Trimmed space in the atlas around the sprite. X = left, Y = bottom, Z = right, W = top. Overridden in UISprite.
 	/// </summary>
-	protected virtual Vector4 padding
-	{
-		get { return new Vector4(0, 0, 0, 0); }
-	}
+	protected virtual Vector4 padding { get { return new Vector4(0, 0, 0, 0); } }
 
 #if UNITY_EDITOR
 	/// <summary>
@@ -270,8 +267,8 @@ public abstract class UIBasicSprite : UIWidget
 
 #region Fill Functions
 	// Static variables to reduce garbage collection
-	static protected Vector2[] mTempPos = new Vector2[4];
-	static protected Vector2[] mTempUVs = new Vector2[4];
+	[System.NonSerialized] static protected Vector2[] mTempPos = new Vector2[4];
+	[System.NonSerialized] static protected Vector2[] mTempUVs = new Vector2[4];
 
 	/// <summary>
 	/// Convenience function that returns the drawn UVs after flipping gets considered.
@@ -382,7 +379,7 @@ public abstract class UIBasicSprite : UIWidget
 
 	protected void SlicedFill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols, ref Vector4 v, ref Vector4 u, ref Color gc)
 	{
-		Vector4 br = border * pixelSize;
+		var br = border * pixelSize;
 		
 		if (br.x == 0f && br.y == 0f && br.z == 0f && br.w == 0f)
 		{
@@ -483,7 +480,8 @@ public abstract class UIBasicSprite : UIWidget
 	[System.Diagnostics.DebuggerStepThrough]
 	void AddVertexColours (List<Color> cols, ref Color color, int x, int y)
 	{
-		Vector4 br = border * pixelSize;
+		var br = border * pixelSize;
+
 		if (type == Type.Simple || (br.x == 0f && br.y == 0f && br.z == 0f && br.w == 0f))
 		{
 			if (y == 0 || y == 1)

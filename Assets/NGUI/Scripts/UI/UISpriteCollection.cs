@@ -27,6 +27,7 @@ public class UISpriteCollection : UIBasicSprite
 		public UISpriteData sprite;
 		public Vector2 pos;
 		public float rot;
+		public float scale;
 		public float width;
 		public float height;
 		public Color32 color;
@@ -41,10 +42,12 @@ public class UISpriteCollection : UIBasicSprite
 
 		public Vector4 GetDrawingDimensions (float pixelSize)
 		{
-			var x0 = -pivot.x * width;
-			var y0 = -pivot.y * height;
-			var x1 = x0 + width;
-			var y1 = y0 + height;
+			var sw = width * scale;
+			var sh = height * scale;
+			var x0 = -pivot.x * sw;
+			var y0 = -pivot.y * sh;
+			var x1 = x0 + sw;
+			var y1 = y0 + sh;
 
 			if (sprite != null && type != Type.Tiled)
 			{
@@ -71,8 +74,8 @@ public class UISpriteCollection : UIBasicSprite
 					if ((w & 1) != 0) ++padRight;
 					if ((h & 1) != 0) ++padTop;
 
-					px = (1f / w) * width;
-					py = (1f / h) * height;
+					px = (1f / w) * sw;
+					py = (1f / h) * sh;
 				}
 
 				if (flip == Flip.Horizontally || flip == Flip.Both)
@@ -336,7 +339,7 @@ public class UISpriteCollection : UIBasicSprite
 	/// Add a new sprite entry to the collection.
 	/// </summary>
 
-	public void Add (object obj, string spriteName, Vector2 pos, float width, float height)
+	public void Add (object obj, in string spriteName, Vector2 pos, float width, float height)
 	{
 		AddSprite(obj, spriteName, pos, width, height, new Color32(255, 255, 255, 255), new Vector2(0.5f, 0.5f));
 	}
@@ -345,17 +348,27 @@ public class UISpriteCollection : UIBasicSprite
 	/// Add a new sprite entry to the collection.
 	/// </summary>
 
-	public void Add (object obj, string spriteName, Vector2 pos, float width, float height, Color32 color)
+	public void Add (object obj, in string spriteName, Vector2 pos, float width, float height, Color32 color)
 	{
 		AddSprite(obj, spriteName, pos, width, height, color, new Vector2(0.5f, 0.5f));
+	}
+
+	/// <summary>
+	/// Add a new sprite entry to the collection. Kept for backwards compatibility.
+	/// </summary>
+
+	[System.Obsolete("Use AddSprite that specified the scale")]
+	public void AddSprite (object id, in string spriteName, Vector2 pos, float width, float height, Color32 color, Vector2 pivot, float rot, Type type, Flip flip, bool enabled = true)
+	{
+		AddSprite(id, spriteName, pos, width, height, color, pivot, rot, 1f, type, flip, enabled);
 	}
 
 	/// <summary>
 	/// Add a new sprite entry to the collection.
 	/// </summary>
 
-	public void AddSprite (object id, string spriteName, Vector2 pos, float width, float height, Color32 color, Vector2 pivot,
-		float rot = 0f, Type type = Type.Simple, Flip flip = Flip.Nothing, bool enabled = true)
+	public void AddSprite (object id, in string spriteName, Vector2 pos, float width, float height, Color32 color, Vector2 pivot,
+		float rot = 0f, float scale = 1f, Type type = Type.Simple, Flip flip = Flip.Nothing, bool enabled = true)
 	{
 		if (mAtlas == null)
 		{
@@ -371,6 +384,7 @@ public class UISpriteCollection : UIBasicSprite
 
 		sprite.pos = pos;
 		sprite.rot = rot;
+		sprite.scale = scale;
 		sprite.width = width;
 		sprite.height = height;
 		sprite.color = color;
@@ -493,7 +507,59 @@ public class UISpriteCollection : UIBasicSprite
 		return false;
 	}
 
-#region Event handling
+	/// <summary>
+	/// Set the sprite's position, rotation, scale and alpha.
+	/// </summary>
+
+	public bool SetSprite (object id, Vector2 pos, float rot, float scale, float alpha = 1f)
+	{
+		Sprite sp;
+
+		if (mSprites.TryGetValue(id, out sp))
+		{
+			var ba = (byte)Mathf.RoundToInt(alpha * 255f);
+
+			if (sp.pos != pos || sp.rot != rot || sp.scale != scale || (sp.enabled ? sp.color.a : 0) != ba)
+			{
+				sp.pos = pos;
+				sp.rot = rot;
+				sp.scale = scale;
+				sp.color.a = ba;
+				sp.enabled = (alpha != 0f);
+				mSprites[id] = sp;
+				if (!mChanged) MarkAsChanged();
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Set the sprite's position, rotation, scale and color.
+	/// </summary>
+
+	public bool SetSprite (object id, Vector2 pos, float rot, float scale, Color color)
+	{
+		Sprite sp;
+
+		if (mSprites.TryGetValue(id, out sp))
+		{
+			if (sp.pos != pos || sp.rot != rot || sp.scale != scale || sp.color != color)
+			{
+				sp.pos = pos;
+				sp.rot = rot;
+				sp.scale = scale;
+				sp.color = color;
+				sp.enabled = (color.a != 0f);
+				mSprites[id] = sp;
+				if (!mChanged) MarkAsChanged();
+			}
+			return true;
+		}
+		return false;
+	}
+
+	#region Event handling
 	public delegate void OnHoverCB (object obj, bool isOver);
 	public delegate void OnPressCB (object obj, bool isPressed);
 	public delegate void OnClickCB (object obj);

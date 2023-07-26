@@ -78,7 +78,7 @@ public class UIGeometry
 	/// Step 2: Transform the vertices by the provided matrix.
 	/// </summary>
 
-	public void ApplyTransform (Matrix4x4 widgetToPanel, bool generateNormals = true)
+	public void ApplyTransform (in Matrix4x4 widgetToPanel, bool generateNormals = true)
 	{
 		if (verts.Count > 0)
 		{
@@ -89,7 +89,7 @@ public class UIGeometry
 			if (generateNormals)
 			{
 				mRtpNormal = widgetToPanel.MultiplyVector(Vector3.back).normalized;
-				Vector3 tangent = widgetToPanel.MultiplyVector(Vector3.right).normalized;
+				var tangent = widgetToPanel.MultiplyVector(Vector3.right).normalized;
 				mRtpTan = new Vector4(tangent.x, tangent.y, tangent.z, -1f);
 			}
 		}
@@ -100,7 +100,7 @@ public class UIGeometry
 	/// Step 3: Fill the specified buffer using the transformed values.
 	/// </summary>
 
-	public void WriteToBuffers (List<Vector3> v, List<Vector2> u, List<Color> c, List<Vector3> n, List<Vector4> t, List<Vector4> u2)
+	public void WriteToBuffers (List<Vector3> v, List<Vector2> u, List<Color> c, List<Vector3> n, List<Vector4> t, List<Vector4> u2, Vector4 dd)
 	{
 		if (mRtpVerts != null && mRtpVerts.Count > 0)
 		{
@@ -127,12 +127,14 @@ public class UIGeometry
 
 			if (u2 != null)
 			{
-				Vector4 uv2 = Vector4.zero;
+				var uv2 = Vector4.zero;
 
 				for (int i = 0, imax = verts.Count; i < imax; ++i)
 				{
 					uv2.x = verts[i].x;
 					uv2.y = verts[i].y;
+					uv2.z = (verts[i].x - dd.x) * dd.z;
+					uv2.w = (verts[i].y - dd.y) * dd.w;
 					u2.Add(uv2);
 				}
 			}

@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2023.06.25
+            Version 2023.07.26
     https://discord.com/invite/tasharen
 ----------------------------------------------
 
@@ -54,6 +54,12 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2023.97.26
+- NEW: When secondary UVs are requested on the panel, uv2.zw will now hold 0-1 range coordinates of the widget itself for simple texture overlay/mask effects.
+- NEW UISPriteCollection now has a scale value to use as well, for simple scaling effects on its sprites.
+- FIX: NGUI will now change all imported textures to be uncompressed when creating an atlas, matching how it used to work in older versions of Unity.
+- FIX: Changed how UIPlayTween determines if it's still active or not, simplifying it and fixing an issue where it can never end in some situations.
 
 2023.06.25
 - NEW: Added a Save As context menu option when right-clicking on a sprite in the sprite selection window.

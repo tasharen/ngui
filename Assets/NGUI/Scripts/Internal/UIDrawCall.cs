@@ -534,60 +534,19 @@ public class UIDrawCall : MonoBehaviour
 					mMesh.Clear();
 					setIndices = true;
 				}
-#if UNITY_4_7
-				var hasUV2 = (uv2 != null && uv2.Count == vertexCount);
-				var hasNormals = (norms != null && norms.Count == vertexCount);
-				var hasTans = (tans != null && tans.Count == vertexCount);
 
-				if (mTempVerts == null || mTempVerts.Length < vertexCount) mTempVerts = new Vector3[vertexCount];
-				if (mTempUV0 == null || mTempUV0.Length < vertexCount) mTempUV0 = new Vector2[vertexCount];
-				if (mTempCols == null || mTempCols.Length < vertexCount) mTempCols = new Color[vertexCount];
-
-				if (hasUV2 && (mTempUV2 == null || mTempUV2.Length < vertexCount)) mTempUV2 = new Vector2[vertexCount];
-				if (hasNormals && (mTempNormals == null || mTempNormals.Length < vertexCount)) mTempNormals = new Vector3[vertexCount];
-				if (hasTans && (mTempTans == null || mTempTans.Length < vertexCount)) mTempTans = new Vector4[vertexCount];
-
-				verts.CopyTo(mTempVerts);
-				uvs.CopyTo(mTempUV0);
-				cols.CopyTo(mTempCols);
-
-				if (hasNormals) norms.CopyTo(mTempNormals);
-				if (hasTans) tans.CopyTo(mTempTans);
-				if (hasUV2) for (int i = 0, imax = verts.Count; i < imax; ++i) mTempUV2[i] = uv2[i];
-
-				mMesh.vertices = mTempVerts;
-				mMesh.uv = mTempUV0;
-				mMesh.colors = mTempCols;
-				mMesh.uv2 = hasUV2 ? mTempUV2 : null;
-				mMesh.normals = hasNormals ? mTempNormals : null;
-				mMesh.tangents = hasTans ? mTempTans : null;
-#else
 				mMesh.SetVertices(verts);
 				mMesh.SetUVs(0, uvs);
 				mMesh.SetColors(cols);
 
- #if UNITY_5_4 || UNITY_5_5_OR_NEWER
 				mMesh.SetUVs(1, (uv2.Count == vertexCount) ? uv2 : null);
 				mMesh.SetNormals((norms.Count == vertexCount) ? norms : null);
 				mMesh.SetTangents((tans.Count == vertexCount) ? tans : null);
- #else
-				if (uv2.Count != vertexCount) uv2.Clear();
-				if (norms.Count != vertexCount) norms.Clear();
-				if (tans.Count != vertexCount) tans.Clear();
 
-				mMesh.SetUVs(1, uv2);
-				mMesh.SetNormals(norms);
-				mMesh.SetTangents(tans);
- #endif
-#endif
 				if (setIndices)
 				{
 					mIndices = GenerateCachedIndexBuffer(vertexCount, indexCount);
-#if UNITY_5_4 || UNITY_5_5_OR_NEWER
 					mMesh.SetTriangles(mIndices, 0, needsBounds);
-#else
-					mMesh.triangles = mIndices;
-#endif
 				}
 
 #if !UNITY_FLASH
@@ -612,7 +571,6 @@ public class UIDrawCall : MonoBehaviour
 #if UNITY_EDITOR
 				mRenderer.enabled = isActive;
 #endif
-#if !UNITY_4_7
 				if (mShadowMode == ShadowMode.None)
 				{
 					mRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -628,7 +586,6 @@ public class UIDrawCall : MonoBehaviour
 					mRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
 					mRenderer.receiveShadows = true;
 				}
-#endif
 			}
 
 			if (mIsNew)

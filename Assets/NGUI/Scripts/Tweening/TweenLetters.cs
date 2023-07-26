@@ -164,17 +164,11 @@ public class TweenLetters : UITweener
 
 				letterCenter = GetCenter(verts, firstVert, quadVerts);
 
-#if UNITY_4_7
-				lerpPos = LerpUnclamped(mLetter[letter].pos, Vector3.zero, t);
-				lerpRot = Quaternion.Slerp(mLetter[letter].rot, Quaternion.identity, t);
-				lerpScale = LerpUnclamped(mLetter[letter].scale, Vector3.one, t);
-				lerpAlpha = LerpUnclamped(mCurrent.alpha, 1f, t);
-#else
 				lerpPos = Vector3.LerpUnclamped(mLetter[letter].pos, Vector3.zero, t);
 				lerpRot = Quaternion.SlerpUnclamped(mLetter[letter].rot, Quaternion.identity, t);
 				lerpScale = Vector3.LerpUnclamped(mLetter[letter].scale, Vector3.one, t);
 				lerpAlpha = Mathf.LerpUnclamped(mCurrent.alpha, 1f, t);
-#endif
+
 				mtx.SetTRS(lerpPos, lerpRot, lerpScale);
 
 				for (int iv = firstVert; iv < firstVert + quadVerts; ++iv)
@@ -195,18 +189,6 @@ public class TweenLetters : UITweener
 		} catch (System.Exception) { enabled = false; }
 #endif
 	}
-
-#if UNITY_4_7
-	static Vector3 LerpUnclamped (Vector3 a, Vector3 b, float f)
-	{
-		a.x = a.x + (b.x - a.x) * f;
-		a.y = a.y + (b.y - a.y) * f;
-		a.z = a.z + (b.z - a.z) * f;
-		return a;
-	}
-
-	static float LerpUnclamped (float a, float b, float f) { return a + (b - a) * f; }
-#endif
 
 	/// <summary>
 	/// Check every frame to see if the text has changed and mark the label as having been updated.
@@ -242,18 +224,20 @@ public class TweenLetters : UITweener
 			mLetterOrder[i] = (mCurrent.animationOrder == AnimationLetterOrder.Reverse) ? letterCount - 1 - i : i;
 
 			var prop = new LetterProperties();
-			prop.pos = new Vector3(
-				Random.Range(mCurrent.pos1.x, mCurrent.pos2.x),
-				Random.Range(mCurrent.pos1.y, mCurrent.pos2.y),
-				Random.Range(mCurrent.pos1.z, mCurrent.pos2.z));
-			prop.rot = Quaternion.Euler(new Vector3(
+
+			prop.pos.x = Random.Range(mCurrent.pos1.x, mCurrent.pos2.x);
+			prop.pos.y = Random.Range(mCurrent.pos1.y, mCurrent.pos2.y);
+			prop.pos.z = Random.Range(mCurrent.pos1.z, mCurrent.pos2.z);
+
+			prop.rot = Quaternion.Euler(
 				Random.Range(mCurrent.rot1.x, mCurrent.rot2.x),
 				Random.Range(mCurrent.rot1.y, mCurrent.rot2.y),
-				Random.Range(mCurrent.rot1.z, mCurrent.rot2.z)));
-			prop.scale = new Vector3(
-				Random.Range(mCurrent.scale1.x, mCurrent.scale2.x),
-				Random.Range(mCurrent.scale1.y, mCurrent.scale2.y),
-				Random.Range(mCurrent.scale1.z, mCurrent.scale2.z));
+				Random.Range(mCurrent.rot1.z, mCurrent.rot2.z));
+
+			prop.scale.x = Random.Range(mCurrent.scale1.x, mCurrent.scale2.x);
+			prop.scale.y = Random.Range(mCurrent.scale1.y, mCurrent.scale2.y);
+			prop.scale.z = Random.Range(mCurrent.scale1.z, mCurrent.scale2.z);
+
 			mLetter[mLetterOrder[i]] = prop;
 		}
 

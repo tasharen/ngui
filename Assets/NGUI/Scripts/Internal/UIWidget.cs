@@ -1537,7 +1537,16 @@ public class UIWidget : UIRect
 
 	public void WriteToBuffers (List<Vector3> v, List<Vector2> u, List<Color> c, List<Vector3> n, List<Vector4> t, List<Vector4> u2)
 	{
-		geometry.WriteToBuffers(v, u, c, n, t, u2);
+		if (u2 != null)
+		{
+			var dd = drawingDimensions;
+			dd.z = (dd.z - dd.x);
+			dd.w = (dd.w - dd.y);
+			if (dd.z != 0f) dd.z = 1f / dd.z;
+			if (dd.w != 0f) dd.w = 1f / dd.w;
+			geometry.WriteToBuffers(v, u, c, n, t, u2, dd);
+		}
+		else geometry.WriteToBuffers(v, u, c, n, t, null, Vector4.zero);
 	}
 
 	/// <summary>

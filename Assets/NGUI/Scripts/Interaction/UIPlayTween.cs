@@ -87,16 +87,16 @@ public class UIPlayTween : MonoBehaviour
 	[HideInInspector][SerializeField] GameObject eventReceiver;
 	[HideInInspector][SerializeField] string callWhenFinished;
 
-	UITweener[] mTweens;
-	bool mStarted = false;
-	int mActive = 0;
-	bool mActivated = false;
+	[System.NonSerialized] UITweener[] mTweens;
+	[System.NonSerialized] bool mStarted = false;
+	[System.NonSerialized] bool mIsActive = false;
+	[System.NonSerialized] bool mActivated = false;
 	
 	/// <summary>
 	/// Whether the tween is currently playing.
 	/// </summary>
 
-	public bool isActive { get { return mActive > 0; } }
+	public bool isActive { get { return mIsActive; } }
 
 	void Awake ()
 	{
@@ -126,7 +126,6 @@ public class UIPlayTween : MonoBehaviour
 #if UNITY_EDITOR
 		if (!Application.isPlaying) return;
 #endif
-
 		if (setState)
 		{
 			var go = (tweenTarget == null) ? gameObject : tweenTarget;
@@ -140,8 +139,7 @@ public class UIPlayTween : MonoBehaviour
 			}
 			else
 			{
-				var forward = true;
-				if (playDirection == Direction.Reverse) forward = !forward;
+				var forward = (playDirection != Direction.Reverse);
 
 				for (int i = 0, imax = mTweens.Length; i < imax; ++i)
 				{
@@ -149,7 +147,6 @@ public class UIPlayTween : MonoBehaviour
 
 					if (tw.tweenGroup == tweenGroup)
 					{
-						//tw.enabled = true;
 						tw.Play(forward ? startState == 1f : startState != 1f);
 						tw.Sample(forward ? startState : 1f - startState, true);
 						tw.enabled = false;
@@ -305,9 +302,24 @@ public class UIPlayTween : MonoBehaviour
 #if UNITY_EDITOR
 		if (!Application.isPlaying) return;
 #endif
-		if (disableWhenFinished != DisableCondition.DoNotDisable && mTweens != null)
+		if (mTweens == null) return;
+		
+		var isFinished = true;
+		
+		for (int i = 0, imax = mTweens.Length; i < imax; ++i)
 		{
-			var isFinished = true;
+			var tw = mTweens[i];
+			if (tw.tweenGroup != tweenGroup) continue;
+
+			if (tw.enabled)
+			{
+				isFinished = false;
+				break;
+			}
+		}
+
+		if (isFinished && disableWhenFinished != DisableCondition.DoNotDisable)
+		{
 			var properDirection = true;
 
 			for (int i = 0, imax = mTweens.Length; i < imax; ++i)
@@ -315,20 +327,17 @@ public class UIPlayTween : MonoBehaviour
 				var tw = mTweens[i];
 				if (tw.tweenGroup != tweenGroup) continue;
 
-				if (tw.enabled)
-				{
-					isFinished = false;
-					break;
-				}
-				else if ((int)tw.direction != (int)disableWhenFinished)
+				if ((int)tw.direction != (int)disableWhenFinished)
 				{
 					properDirection = false;
+					break;
 				}
 			}
 
 			if (isFinished)
 			{
 				if (properDirection) NGUITools.SetActive(tweenTarget, false);
+				OnFinished();
 				mTweens = null;
 			}
 		}
@@ -339,9 +348,9 @@ public class UIPlayTween : MonoBehaviour
 	{
 		if (mTweens != null) foreach(var tw in mTweens) tw.Finish();
 
-		if (mActive != 0)
+		if (mIsActive)
 		{
-			mActive = 1;
+			mIsActive = false;
 			OnFinished();
 		}
 	}
@@ -362,7 +371,7 @@ public class UIPlayTween : MonoBehaviour
 
 	public void Play (bool forward = true)
 	{
-		mActive = 0;
+		mIsActive = false;
 		GameObject go = (tweenTarget == null) ? gameObject : tweenTarget;
 
 		if (!NGUITools.GetActive(go))
@@ -403,29 +412,24 @@ public class UIPlayTween : MonoBehaviour
 						NGUITools.SetActive(go, true);
 					}
 
-					++mActive;
+					mIsActive = true;
 
-					// Toggle or activate the tween component
 					if (playDirection == Direction.Toggle)
 					{
-						// Listen for tween finished messages
-						EventDelegate.Add(tw.onFinished, OnFinished, true);
 						tw.Toggle();
 					}
-					else
+					else if (resetOnPlay || (resetIfDisabled && !tw.enabled))
 					{
-						if (resetOnPlay || (resetIfDisabled && !tw.enabled))
-						{
-							tw.Play(forward);
-							tw.ResetToBeginning();
-						}
-						// Listen for tween finished messages
-						EventDelegate.Add(tw.onFinished, OnFinished, true);
 						tw.Play(forward);
+						tw.ResetToBeginning();
 					}
+					else tw.Play(forward);
 				}
 			}
 		}
+
+		// Can't have a start state after calling Play()
+		setState = false;
 	}
 
 	/// <summary>
@@ -434,7 +438,7 @@ public class UIPlayTween : MonoBehaviour
 
 	void OnFinished ()
 	{
-		if (--mActive == 0 && current == null)
+		if (current == null)
 		{
 			current = this;
 			EventDelegate.Execute(onFinished);

@@ -194,8 +194,8 @@ public abstract class UITweener : MonoBehaviour
 			delta = 0;
 			mStarted = true;
 			mStartTime = time;
-			if (mAmountPerDelta > 0f && (delayAffects == DelayAffects.Both || delayAffects == DelayAffects.Forward)) mStartTime += delay;
-			else if (mAmountPerDelta < 0f && (delayAffects == DelayAffects.Both || delayAffects == DelayAffects.Reverse)) mStartTime += delay;
+			if (amountPerDelta > 0f && (delayAffects == DelayAffects.Both || delayAffects == DelayAffects.Forward)) mStartTime += delay;
+			else if (amountPerDelta < 0f && (delayAffects == DelayAffects.Both || delayAffects == DelayAffects.Reverse)) mStartTime += delay;
 		}
 
 		if (time < mStartTime) return;

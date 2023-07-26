@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class UICircle : UISprite
 {
-	[Range(0.01f, 1f), Tooltip("Controls the thickness of the circle")]
+	[Range(0.001f, 1f), Tooltip("Controls the thickness of the circle")]
 	public float thickness = 0.1f;
 
 	[Range(16, 180), Tooltip("How many slices the circle will be made out of")]
