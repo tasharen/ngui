@@ -546,26 +546,13 @@ static public class NGUIMath
 	static public Vector3 SpringDampen (ref Vector3 velocity, float strength, float deltaTime)
 	{
 		if (deltaTime > 1f) deltaTime = 1f;
-		var dampeningFactor = 1f - strength * 0.001f;
-		var ms = deltaTime * 1000f;
-		var totalDampening = Mathf.Pow(dampeningFactor, ms);
-		var vTotal = velocity * ((totalDampening - 1f) / Mathf.Log(dampeningFactor));
-		velocity *= totalDampening;
-		return vTotal * deltaTime;
+		float dampeningFactor = 1f - strength * 0.001f;
+		int ms = Mathf.RoundToInt(deltaTime * 1000f);
+		float totalDampening = Mathf.Pow(dampeningFactor, ms);
+		Vector3 vTotal = velocity * ((totalDampening - 1f) / Mathf.Log(dampeningFactor));
+		velocity = velocity * totalDampening;
+		return vTotal * 0.06f;
 	}
-
-	#if TNET
-	static public TNet.Vector3D SpringDampen (ref TNet.Vector3D velocity, double strength, double deltaTime)
-	{
-		if (deltaTime > 1f) deltaTime = 1f;
-		var dampeningFactor = 1d - strength * 0.001d;
-		var ms = deltaTime * 1000d;
-		var totalDampening = MathD.Pow(dampeningFactor, ms);
-		var vTotal = velocity * ((totalDampening - 1d) / MathD.Log(dampeningFactor));
-		velocity *= totalDampening;
-		return vTotal * deltaTime;
-	}
-	#endif
 
 	/// <summary>
 	/// Same as the Vector3 version, it's a framerate-independent Lerp.
@@ -574,12 +561,12 @@ static public class NGUIMath
 	static public Vector2 SpringDampen (ref Vector2 velocity, float strength, float deltaTime)
 	{
 		if (deltaTime > 1f) deltaTime = 1f;
-		var dampeningFactor = 1f - strength * 0.001f;
-		var ms = deltaTime * 1000f;
-		var totalDampening = Mathf.Pow(dampeningFactor, ms);
-		var vTotal = velocity * ((totalDampening - 1f) / Mathf.Log(dampeningFactor));
-		velocity *= totalDampening;
-		return vTotal * deltaTime;
+		float dampeningFactor = 1f - strength * 0.001f;
+		int ms = Mathf.RoundToInt(deltaTime * 1000f);
+		float totalDampening = Mathf.Pow(dampeningFactor, ms);
+		Vector2 vTotal = velocity * ((totalDampening - 1f) / Mathf.Log(dampeningFactor));
+		velocity = velocity * totalDampening;
+		return vTotal * 0.06f;
 	}
 
 	/// <summary>

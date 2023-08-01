@@ -417,6 +417,7 @@ public class UIDragDropItem : MonoBehaviour
 				Vector3 pos = mTrans.localPosition;
 				pos.z = 0f;
 				mTrans.localPosition = pos;
+				mParent = mTrans.parent;
 			}
 			else
 			{
@@ -425,7 +426,6 @@ public class UIDragDropItem : MonoBehaviour
 			}
 
 			// Update the grid and table references
-			mParent = mTrans.parent;
 			mGrid = NGUITools.FindInParents<UIGrid>(mParent);
 			mTable = NGUITools.FindInParents<UITable>(mParent);
 

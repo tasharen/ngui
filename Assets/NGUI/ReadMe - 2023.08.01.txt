@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2023.07.26
+            Version 2023.08.01
     https://discord.com/invite/tasharen
 ----------------------------------------------
 
@@ -55,7 +55,11 @@ and it will not be included in the build of your game. It's only used in the edi
  Version History
 -----------------
 
-2023.97.26
+2023.08.01
+- NEW: Sprite collection now uses a list instead of a dictionary, as it can be sorted, making it possible to bring certain sub-sprites to the foreground and have events match the draw order properly.
+- FIX: Completely reverted the scroll view and NGUIMath changes back to 2 updates before since they apparently caused certain issues for some people.
+
+2023.07.26
 - NEW: When secondary UVs are requested on the panel, uv2.zw will now hold 0-1 range coordinates of the widget itself for simple texture overlay/mask effects.
 - NEW UISPriteCollection now has a scale value to use as well, for simple scaling effects on its sprites.
 - FIX: NGUI will now change all imported textures to be uncompressed when creating an atlas, matching how it used to work in older versions of Unity.

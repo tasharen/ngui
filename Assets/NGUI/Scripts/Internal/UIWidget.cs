@@ -305,6 +305,9 @@ public class UIWidget : UIRect
 				bool alphaChange = (mColor.a != value.a);
 				mColor = value;
 				Invalidate(alphaChange);
+#if UNITY_EDITOR
+				NGUITools.SetDirty(this);
+#endif
 			}
 		}
 	}
@@ -321,6 +324,9 @@ public class UIWidget : UIRect
 			mColor.g = c.g;
 			mColor.b = c.b;
 			Invalidate(false);
+#if UNITY_EDITOR
+			NGUITools.SetDirty(this);
+#endif
 		}
 	}
 

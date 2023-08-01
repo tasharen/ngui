@@ -24,6 +24,7 @@ public class UISpriteCollection : UIBasicSprite
 
 	public struct Sprite
 	{
+		public object obj;
 		public UISpriteData sprite;
 		public Vector2 pos;
 		public float rot;
@@ -107,7 +108,7 @@ public class UISpriteCollection : UIBasicSprite
 	[HideInInspector, SerializeField] Object mAtlas;
 
 	// List of individual sprites
-	[System.NonSerialized] Dictionary<object, Sprite> mSprites = new Dictionary<object, Sprite>();
+	[System.NonSerialized] List<Sprite> mSprites = new List<Sprite>();
 
 	// Only valid during the OnFill process
 	[System.NonSerialized] UISpriteData mSprite;
@@ -248,9 +249,8 @@ public class UISpriteCollection : UIBasicSprite
 		int offset = verts.Count;
 		var drawRegion = this.drawRegion;
 
-		foreach (var pair in mSprites)
+		foreach (var ent in mSprites)
 		{
-			var ent = pair.Value;
 			if (!ent.enabled) continue;
 
 			mSprite = ent.sprite;
@@ -382,6 +382,7 @@ public class UISpriteCollection : UIBasicSprite
 		if (ia != null) sprite.sprite = ia.GetSprite(spriteName);
 		if (sprite.sprite == null) return;
 
+		sprite.obj = id;
 		sprite.pos = pos;
 		sprite.rot = rot;
 		sprite.scale = scale;
@@ -392,9 +393,28 @@ public class UISpriteCollection : UIBasicSprite
 		sprite.type = type;
 		sprite.flip = flip;
 		sprite.enabled = enabled;
-		mSprites[id] = sprite;
+		mSprites.Add(sprite);
 
 		if (enabled && !mChanged) MarkAsChanged();
+	}
+
+	/// <summary>
+	/// Move the specified object to the forefront (so that it's rendered last).
+	/// </summary>
+
+	public bool MoveToFront (object id)
+	{
+		for (int i = 0, imax = mSprites.Count; i < imax; ++i)
+		{
+			if (mSprites[i].obj == id)
+			{
+				var sp = mSprites[i];
+				mSprites.RemoveAt(i);
+				mSprites.Add(sp);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/// <summary>
@@ -403,8 +423,7 @@ public class UISpriteCollection : UIBasicSprite
 
 	public Sprite? GetSprite (object id)
 	{
-		Sprite sp;
-		if (mSprites.TryGetValue(id, out sp)) return sp;
+		for (int i = 0, imax = mSprites.Count; i < imax; ++i) if (mSprites[i].obj == id) return mSprites[i];
 		return null;
 	}
 
@@ -414,10 +433,14 @@ public class UISpriteCollection : UIBasicSprite
 
 	public bool RemoveSprite (object id)
 	{
-		if (mSprites.Remove(id))
+		for (int i = 0, imax = mSprites.Count; i < imax; ++i)
 		{
-			if (!mChanged) MarkAsChanged();
-			return true;
+			if (mSprites[i].obj == id)
+			{
+				mSprites.RemoveAt(i);
+				if (!mChanged) MarkAsChanged();
+				return true;
+			}
 		}
 		return false;
 	}
@@ -426,9 +449,19 @@ public class UISpriteCollection : UIBasicSprite
 	/// Update the specified sprite.
 	/// </summary>
 
-	public bool SetSprite (object id, Sprite sp)
+	public bool SetSprite (Sprite sp)
 	{
-		mSprites[id] = sp;
+		for (int i = 0, imax = mSprites.Count; i < imax; ++i)
+		{
+			if (mSprites[i].obj == sp.obj)
+			{
+				mSprites[i] = sp;
+				if (!mChanged) MarkAsChanged();
+				return true;
+			}
+		}
+
+		mSprites.Add(sp);
 		if (!mChanged) MarkAsChanged();
 		return true;
 	}
@@ -453,8 +486,7 @@ public class UISpriteCollection : UIBasicSprite
 
 	public bool IsActive (object id)
 	{
-		Sprite sp;
-		if (mSprites.TryGetValue(id, out sp)) return sp.enabled;
+		for (int i = 0, imax = mSprites.Count; i < imax; ++i) if (mSprites[i].obj == id) return mSprites[i].enabled;
 		return false;
 	}
 
@@ -464,17 +496,20 @@ public class UISpriteCollection : UIBasicSprite
 
 	public bool SetActive (object id, bool visible)
 	{
-		Sprite sp;
-
-		if (mSprites.TryGetValue(id, out sp))
+		for (int i = 0, imax = mSprites.Count; i < imax; ++i)
 		{
-			if (sp.enabled != visible)
+			if (mSprites[i].obj == id)
 			{
-				sp.enabled = visible;
-				mSprites[id] = sp;
-				if (!mChanged) MarkAsChanged();
+				var sp = mSprites[i];
+
+				if (sp.enabled != visible)
+				{
+					sp.enabled = visible;
+					mSprites[i] = sp;
+					if (!mChanged) MarkAsChanged();
+				}
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}
@@ -485,24 +520,21 @@ public class UISpriteCollection : UIBasicSprite
 
 	public bool SetPosition (object id, Vector2 pos, bool visible = true)
 	{
-		Sprite sp;
-
-		if (mSprites.TryGetValue(id, out sp))
+		for (int i = 0, imax = mSprites.Count; i < imax; ++i)
 		{
-			if (sp.pos != pos)
+			if (mSprites[i].obj == id)
 			{
-				sp.pos = pos;
-				sp.enabled = visible;
-				mSprites[id] = sp;
-				if (!mChanged) MarkAsChanged();
+				var sp = mSprites[i];
+
+				if (sp.pos != pos || sp.enabled != visible)
+				{
+					sp.pos = pos;
+					sp.enabled = visible;
+					mSprites[i] = sp;
+					if (!mChanged) MarkAsChanged();
+				}
+				return true;
 			}
-			else if (sp.enabled != visible)
-			{
-				sp.enabled = visible;
-				mSprites[id] = sp;
-				if (!mChanged) MarkAsChanged();
-			}
-			return true;
 		}
 		return false;
 	}
@@ -513,23 +545,25 @@ public class UISpriteCollection : UIBasicSprite
 
 	public bool SetSprite (object id, Vector2 pos, float rot, float scale, float alpha = 1f)
 	{
-		Sprite sp;
-
-		if (mSprites.TryGetValue(id, out sp))
+		for (int i = 0, imax = mSprites.Count; i < imax; ++i)
 		{
-			var ba = (byte)Mathf.RoundToInt(alpha * 255f);
-
-			if (sp.pos != pos || sp.rot != rot || sp.scale != scale || (sp.enabled ? sp.color.a : 0) != ba)
+			if (mSprites[i].obj == id)
 			{
-				sp.pos = pos;
-				sp.rot = rot;
-				sp.scale = scale;
-				sp.color.a = ba;
-				sp.enabled = (alpha != 0f);
-				mSprites[id] = sp;
-				if (!mChanged) MarkAsChanged();
+				var sp = mSprites[i];
+				var ba = (byte)Mathf.RoundToInt(alpha * 255f);
+
+				if (sp.pos != pos || sp.rot != rot || sp.scale != scale || (sp.enabled ? sp.color.a : 0) != ba)
+				{
+					sp.pos = pos;
+					sp.rot = rot;
+					sp.scale = scale;
+					sp.color.a = ba;
+					sp.enabled = (alpha != 0f);
+					mSprites[i] = sp;
+					if (!mChanged) MarkAsChanged();
+				}
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}
@@ -540,21 +574,24 @@ public class UISpriteCollection : UIBasicSprite
 
 	public bool SetSprite (object id, Vector2 pos, float rot, float scale, Color color)
 	{
-		Sprite sp;
-
-		if (mSprites.TryGetValue(id, out sp))
+		for (int i = 0, imax = mSprites.Count; i < imax; ++i)
 		{
-			if (sp.pos != pos || sp.rot != rot || sp.scale != scale || sp.color != color)
+			if (mSprites[i].obj == id)
 			{
-				sp.pos = pos;
-				sp.rot = rot;
-				sp.scale = scale;
-				sp.color = color;
-				sp.enabled = (color.a != 0f);
-				mSprites[id] = sp;
-				if (!mChanged) MarkAsChanged();
+				var sp = mSprites[i];
+
+				if (sp.pos != pos || sp.rot != rot || sp.scale != scale || sp.color != color)
+				{
+					sp.pos = pos;
+					sp.rot = rot;
+					sp.scale = scale;
+					sp.color = color;
+					sp.enabled = (alpha != 0f);
+					mSprites[i] = sp;
+					if (!mChanged) MarkAsChanged();
+				}
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}
@@ -607,9 +644,9 @@ public class UISpriteCollection : UIBasicSprite
 	{
 		var pos = (Vector2)mTrans.InverseTransformPoint(worldPos);
 
-		foreach (var pair in mSprites)
+		for (int i = mSprites.Count; i > 0; )
 		{
-			var ent = pair.Value;
+			var ent = mSprites[--i];
 			var v = pos - ent.pos;
 			if (ent.rot != 0f) v = Rotate(v, -ent.rot);
 
@@ -620,7 +657,7 @@ public class UISpriteCollection : UIBasicSprite
 			if (v.x > dims.z) continue;
 			if (v.y > dims.w) continue;
 
-			return pair.Key;
+			return ent.obj;
 		}
 		return null;
 	}
@@ -633,9 +670,9 @@ public class UISpriteCollection : UIBasicSprite
 	{
 		var pos = (Vector2)mTrans.InverseTransformPoint(worldPos);
 
-		foreach (var pair in mSprites)
+		for (int i = mSprites.Count; i > 0;)
 		{
-			var ent = pair.Value;
+			var ent = mSprites[--i];
 			var v = pos - ent.pos;
 			if (ent.rot != 0f) v = Rotate(v, -ent.rot);
 
@@ -646,7 +683,7 @@ public class UISpriteCollection : UIBasicSprite
 			if (v.x > dims.z) continue;
 			if (v.y > dims.w) continue;
 
-			return pair.Value;
+			return ent;
 		}
 		return null;
 	}
