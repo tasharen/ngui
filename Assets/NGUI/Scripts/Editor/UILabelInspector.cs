@@ -135,13 +135,9 @@ public class UILabelInspector : UIWidgetInspector
 
 		GUILayout.BeginHorizontal();
 
-#if DYNAMIC_FONT
 		mFontType = (FontType)EditorGUILayout.EnumPopup(mFontType, "DropDown", GUILayout.Width(74f));
+
 		if (NGUIEditorTools.DrawPrefixButton("Font", GUILayout.Width(64f)))
-#else
-		mFontType = FontType.NGUI;
-		if (NGUIEditorTools.DrawPrefixButton("Font", GUILayout.Width(74f)))
-#endif
 		{
 			if (mFontType == FontType.NGUI)
 			{
@@ -315,7 +311,7 @@ public class UILabelInspector : UIWidgetInspector
 
 			SerializedProperty ov = NGUIEditorTools.DrawPaddedProperty("Overflow", serializedObject, "mOverflow");
 			NGUISettings.overflowStyle = (UILabel.Overflow)ov.intValue;
-			if (NGUISettings.overflowStyle == UILabel.Overflow.ClampContent)
+			if (NGUISettings.overflowStyle == UILabel.Overflow.ClampContent || mLabel.overflowWidth != 0 || mLabel.overflowHeight != 0)
 				NGUIEditorTools.DrawProperty("Use Ellipsis", serializedObject, "mOverflowEllipsis", GUILayout.Width(110f));
 
 			if (NGUISettings.overflowStyle == UILabel.Overflow.ResizeFreely)

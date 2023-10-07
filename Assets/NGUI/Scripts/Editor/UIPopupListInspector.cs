@@ -25,21 +25,13 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 	}
 
 	UIPopupList mList;
-	FontType mType;
+	FontType mFontType;
 
 	void OnEnable ()
 	{
 		var prop = serializedObject.FindProperty("trueTypeFont");
-		mType = (prop.objectReferenceValue == null) ? FontType.NGUI : FontType.Unity;
+		mFontType = (prop.objectReferenceValue == null) ? FontType.NGUI : FontType.Unity;
 		mList = target as UIPopupList;
-
-		//if (mList.ambigiousFont == null)
-		//{
-		//	mList.ambigiousFont = NGUISettings.ambigiousFont;
-		//	mList.fontSize = NGUISettings.fontSize;
-		//	mList.fontStyle = NGUISettings.fontStyle;
-		//	NGUITools.SetDirty(mList);
-		//}
 
 		if (mList.atlas == null && mList.background2DSprite == null && mList.highlight2DSprite == null)
 		{
@@ -81,12 +73,16 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 
 	void OnNGUIFont (Object obj)
 	{
+		// Legacy font support
 		if (obj != null && obj is GameObject) obj = (obj as GameObject).GetComponent<UIFont>();
 		serializedObject.Update();
+
 		var sp = serializedObject.FindProperty("bitmapFont");
 		sp.objectReferenceValue = obj;
+
 		sp = serializedObject.FindProperty("trueTypeFont");
 		sp.objectReferenceValue = null;
+
 		serializedObject.ApplyModifiedProperties();
 		NGUISettings.ambigiousFont = obj;
 	}
@@ -208,75 +204,75 @@ public class UIPopupListInspector : UIWidgetContainerEditor
 		{
 			NGUIEditorTools.BeginContents();
 
+			var isValid = false;
+			SerializedProperty fnt = null;
 			SerializedProperty ttf = null;
 
 			GUILayout.BeginHorizontal();
 			{
+				mFontType = (FontType)EditorGUILayout.EnumPopup(mFontType, GUILayout.Width(62f));
+
 				if (NGUIEditorTools.DrawPrefixButton("Font"))
 				{
-					if (mType == FontType.NGUI)
+					if (mFontType == FontType.NGUI)
 					{
-						var bmf = mList.bitmapFont;
+						var bmf = mList.font;
 						if (bmf != null && bmf is UIFont) ComponentSelector.Show<UIFont>(OnNGUIFont);
 						else ComponentSelector.Show<NGUIFont>(OnNGUIFont);
 					}
 					else ComponentSelector.Show<Font>(OnDynamicFont, new string[] { ".ttf", ".otf"});
 				}
 
-#if DYNAMIC_FONT
-				GUI.changed = false;
-				mType = (FontType)EditorGUILayout.EnumPopup(mType, GUILayout.Width(62f));
-
-				if (GUI.changed)
-				{
-					if (mType == FontType.NGUI) serializedObject.FindProperty("trueTypeFont").objectReferenceValue = null;
-					else serializedObject.FindProperty("bitmapFont").objectReferenceValue = null;
-				}
-#else
-				mType = FontType.Bitmap;
-#endif
 				GUI.changed = false;
 
-				if (mType == FontType.NGUI)
+				if (mFontType == FontType.NGUI)
 				{
-					var fnt = NGUIEditorTools.DrawProperty("", serializedObject, "bitmapFont", GUILayout.MinWidth(40f));
+					fnt = NGUIEditorTools.DrawProperty("", serializedObject, "bitmapFont", GUILayout.MinWidth(40f));
 
 					// Legacy font support
 					if (fnt.objectReferenceValue != null && fnt.objectReferenceValue is GameObject)
 						fnt.objectReferenceValue = (fnt.objectReferenceValue as GameObject).GetComponent<UIFont>();
 
-					if (GUI.changed)
+					if (fnt.objectReferenceValue != null)
 					{
-						serializedObject.FindProperty("trueTypeFont").objectReferenceValue = null;
+						if (GUI.changed) serializedObject.FindProperty("trueTypeFont").objectReferenceValue = null;
 						NGUISettings.ambigiousFont = fnt.objectReferenceValue;
+						isValid = true;
 					}
 				}
 				else
 				{
 					ttf = NGUIEditorTools.DrawProperty("", serializedObject, "trueTypeFont", GUILayout.MinWidth(40f));
 
-					if (GUI.changed)
+					if (ttf.objectReferenceValue != null)
 					{
-						serializedObject.FindProperty("bitmapFont").objectReferenceValue = null;
+						if (GUI.changed) serializedObject.FindProperty("bitmapFont").objectReferenceValue = null;
 						NGUISettings.ambigiousFont = ttf.objectReferenceValue;
+						isValid = true;
 					}
 				}
 			}
 			GUILayout.EndHorizontal();
 
-			if (ttf != null && ttf.objectReferenceValue != null)
+			EditorGUI.BeginDisabledGroup(!isValid);
 			{
-				GUILayout.BeginHorizontal();
+				if (ttf != null && ttf.objectReferenceValue != null)
 				{
-					EditorGUI.BeginDisabledGroup(ttf.hasMultipleDifferentValues);
-					NGUIEditorTools.DrawProperty("Font Size", serializedObject, "fontSize", GUILayout.Width(142f));
-					NGUIEditorTools.DrawProperty("", serializedObject, "fontStyle", GUILayout.MinWidth(40f));
-					NGUIEditorTools.DrawPadding();
-					EditorGUI.EndDisabledGroup();
+					GUILayout.BeginHorizontal();
+					{
+						EditorGUI.BeginDisabledGroup(ttf.hasMultipleDifferentValues);
+						NGUIEditorTools.DrawProperty("Font Size", serializedObject, "fontSize", GUILayout.Width(142f));
+						NGUIEditorTools.DrawProperty("", serializedObject, "fontStyle", GUILayout.MinWidth(40f));
+						NGUIEditorTools.DrawPadding();
+						EditorGUI.EndDisabledGroup();
+					}
+					GUILayout.EndHorizontal();
 				}
-				GUILayout.EndHorizontal();
+				else NGUIEditorTools.DrawProperty("Font Size", serializedObject, "fontSize", GUILayout.Width(142f));
+
+				NGUIEditorTools.DrawProperty("Symbol Style", serializedObject, "symbolStyle");
 			}
-			else NGUIEditorTools.DrawProperty("Font Size", serializedObject, "fontSize", GUILayout.Width(142f));
+			EditorGUI.EndDisabledGroup();
 
 			NGUIEditorTools.DrawProperty("Text Color", serializedObject, "textColor");
 

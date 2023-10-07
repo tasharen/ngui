@@ -79,6 +79,12 @@ public class UIDragDropItem : MonoBehaviour
 		return false;
 	}
 
+	/// <summary>
+	/// Checked before the drag operation can begin. Can be overwritten with conditions.
+	/// </summary>
+
+	public virtual bool canBeDragged { get { return true; } }
+
 	protected virtual void Awake ()
 	{
 		mTrans = transform;
@@ -142,7 +148,7 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void OnClick ()
 	{
-		if (!interactable || mIgnoreClick == Time.frameCount) return;
+		if (!interactable || mIgnoreClick == Time.frameCount || !canBeDragged) return;
 
 		if (clickToDrag && !mDragging && UICamera.currentTouchID == -1 && draggedItems.Count == 0)
 		{
@@ -189,7 +195,7 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void Update ()
 	{
-		if (restriction == Restriction.PressAndHold)
+		if (restriction == Restriction.PressAndHold && canBeDragged)
 		{
 			if (mPressed && !mDragging && mDragStartTime < RealTime.time)
 				StartDragging();
@@ -202,7 +208,7 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void OnDragStart ()
 	{
-		if (!interactable) return;
+		if (!interactable || !canBeDragged) return;
 		if (!enabled || mTouch != UICamera.currentTouch) return;
 
 		// If we have a restriction, check to see if its condition has been met first
@@ -224,6 +230,7 @@ public class UIDragDropItem : MonoBehaviour
 				return;
 			}
 		}
+
 		StartDragging();
 	}
 
@@ -233,7 +240,7 @@ public class UIDragDropItem : MonoBehaviour
 
 	public virtual UIDragDropItem StartDragging ()
 	{
-		if (!interactable || !transform || !transform.parent) return null;
+		if (!interactable || !canBeDragged || !transform || !transform.parent) return null;
 
 		if (!mDragging)
 		{
@@ -437,6 +444,25 @@ public class UIDragDropItem : MonoBehaviour
 
 			if (mTable != null) mTable.repositionNow = true;
 			if (mGrid != null) mGrid.repositionNow = true;
+		}
+
+		if (surface)
+		{
+			var cam = UICamera.FindCameraForLayer(surface.layer);
+
+			if (cam && !cam.eventsGoToColliders)
+			{
+				if (cam.eventType == UICamera.EventType.World_3D)
+				{
+					var rb = surface.GetComponentInParent<Rigidbody>();
+					if (rb) surface = rb.gameObject;
+				}
+				else if (cam.eventType == UICamera.EventType.World_2D)
+				{
+					var rb = surface.GetComponentInParent<Rigidbody2D>();
+					if (rb) surface = rb.gameObject;
+				}
+			}
 		}
 
 		// We're now done

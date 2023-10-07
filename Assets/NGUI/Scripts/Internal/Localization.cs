@@ -49,25 +49,25 @@ static public class Localization
 	/// Whether the localization dictionary has been loaded.
 	/// </summary>
 
-	static public bool localizationHasBeenSet = false;
+	[System.NonSerialized] static public bool localizationHasBeenSet = false;
 
 	// Loaded languages, if any
-	static string[] mLanguages = null;
+	[System.NonSerialized] static string[] mLanguages = null;
 
 	// Key = Value dictionary (single language)
-	static Dictionary<string, string> mOldDictionary = new Dictionary<string, string>();
+	[System.NonSerialized] static Dictionary<string, string> mOldDictionary = new Dictionary<string, string>();
 
 	// Key = Values dictionary (multiple languages)
-	static Dictionary<string, string[]> mDictionary = new Dictionary<string, string[]>();
+	[System.NonSerialized] static Dictionary<string, string[]> mDictionary = new Dictionary<string, string[]>();
 
 	// Replacement dictionary forces a specific value instead of the existing entry
-	static Dictionary<string, string> mReplacement = new Dictionary<string, string>();
+	[System.NonSerialized] static Dictionary<string, string> mReplacement = new Dictionary<string, string>();
 
 	// Index of the selected language within the multi-language dictionary
-	static int mLanguageIndex = -1;
+	[System.NonSerialized] static int mLanguageIndex = -1;
 
 	// Currently selected language
-	static string mLanguage;
+	[System.NonSerialized] static string mLanguage;
 
 	/// <summary>
 	/// Localization dictionary. Dictionary key is the localization key.
@@ -146,52 +146,95 @@ static public class Localization
 	static bool LoadDictionary (string value, bool merge = false)
 	{
 		// Try to load the Localization CSV
-		byte[] bytes = null;
+		var retVal = false;
+		localizationHasBeenSet = false;
 
-		if (!localizationHasBeenSet)
+		// Primary localization asset
+		var asset = Resources.Load<TextAsset>(value);
+
+		if (asset != null && LoadCSV(asset.bytes, merge, false))
 		{
-			if (loadFunction == null)
+			retVal = true;
+			merge = true;
+		}
+
+		// All other localization files in the Localization folder
+		var assets = Resources.LoadAll<TextAsset>("Localization");
+
+		if (assets != null && assets.Length > 0)
+		{
+			foreach (var a in assets)
 			{
-				var assets = Resources.LoadAll<TextAsset>("Localization");
-
-				if (assets != null && assets.Length > 0)
+				if (LoadCSV(a.bytes, merge, false))
 				{
-					foreach (var a in assets)
-					{
-						LoadCSV(a.bytes, merge, false);
-						merge = true;
-					}
-
-					if (onLocalize != null) onLocalize();
-					UIRoot.Broadcast("OnLocalize");
-					return true;
+					retVal = true;
+					merge = true;
 				}
-#if TNET
-				bytes = TNet.Tools.ReadFile("Localization.txt") ?? TNet.Tools.ReadFile("Localization.csv");
-#endif
 			}
-			else bytes = loadFunction("Localization");
-			localizationHasBeenSet = true;
 		}
 
-		// Try to load the localization file
-		if (LoadCSV(bytes, merge)) return true;
-		if (string.IsNullOrEmpty(value)) value = mLanguage;
-
-		// If this point was reached, the localization file was not present
-		if (string.IsNullOrEmpty(value)) return false;
-
-		// Not a referenced asset -- try to load it dynamically
-		if (loadFunction == null)
+		// Custom load function
+		if (loadFunction != null && LoadCSV(loadFunction(value), merge, false))
 		{
-			var asset = Resources.Load<TextAsset>(value);
-			if (asset != null) bytes = asset.bytes;
+			retVal = true;
+			merge = true;
 		}
-		else bytes = loadFunction(value);
 
-		if (bytes != null)
+#if TNET
+		// Dynamic resource loading from My Documents/<AppName>/Localization
+		if (Application.isPlaying)
 		{
-			Set(value, bytes);
+			var bytes = TNet.Tools.ReadFile("Localization.txt") ?? TNet.Tools.ReadFile("Localization.csv");
+
+			if (LoadCSV(bytes, merge, false))
+			{
+				retVal = true;
+				merge = true;
+			}
+
+			if (!string.IsNullOrEmpty(TNet.Tools.applicationDirectory))
+			{
+				var path = TNet.Tools.GetDocumentsPath("Localization");
+				var files = TNet.Tools.FindFiles(path, "*.txt");
+
+				if (files != null)
+				{
+					foreach (var f in files)
+					{
+						var b = TNet.Tools.ReadFile(f);
+
+						if (LoadCSV(b, merge, false))
+						{
+							retVal = true;
+							merge = true;
+						}
+					}
+				}
+
+				files = TNet.Tools.FindFiles(path, "*.csv");
+
+				if (files != null)
+				{
+					foreach (var f in files)
+					{
+						var b = TNet.Tools.ReadFile(f);
+
+						if (LoadCSV(b, merge, false))
+						{
+							retVal = true;
+							merge = true;
+						}
+					}
+				}
+			}
+		}
+#endif
+		localizationHasBeenSet = true;
+
+		if (retVal)
+		{
+			if (onLocalize != null) onLocalize();
+			UIRoot.Broadcast("OnLocalize");
 			return true;
 		}
 		return false;
@@ -235,7 +278,7 @@ static public class Localization
 
 	static public void Set (string languageName, byte[] bytes)
 	{
-		ByteReader reader = new ByteReader(bytes);
+		var reader = new ByteReader(bytes);
 		Set(languageName, reader.ReadDictionary());
 	}
 

@@ -201,9 +201,9 @@ static public class NGUIText
 	/// Get the specified symbol.
 	/// </summary>
 
-	static public BMSymbol GetSymbol (ref string text, int index, int textLength)
+	static public BMSymbol GetSymbol (in string text, int index, int textLength)
 	{
-		if (nguiFont != null) return nguiFont.MatchSymbol(ref text, index, textLength);
+		if (nguiFont != null) return nguiFont.MatchSymbol(text, index, textLength);
 		return null;
 	}
 
@@ -375,7 +375,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public float ParseAlpha (string text, int index)
+	static public float ParseAlpha (in string text, int index)
 	{
 		int a = (NGUIMath.HexToDecimal(text[index + 1]) << 4) | NGUIMath.HexToDecimal(text[index + 2]);
 		return Mathf.Clamp01(a / 255f);
@@ -387,7 +387,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public Color ParseColor (string text, int offset = 0) { return ParseColor24(text, offset); }
+	static public Color ParseColor (in string text, int offset = 0) { return ParseColor24(text, offset); }
 
 	/// <summary>
 	/// Parse a RrGgBb color encoded in the string.
@@ -395,7 +395,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public Color ParseColor24 (string text, int offset = 0)
+	static public Color ParseColor24 (in string text, int offset = 0)
 	{
 		int r = (NGUIMath.HexToDecimal(text[offset])     << 4) | NGUIMath.HexToDecimal(text[offset + 1]);
 		int g = (NGUIMath.HexToDecimal(text[offset + 2]) << 4) | NGUIMath.HexToDecimal(text[offset + 3]);
@@ -410,7 +410,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public bool ParseColor24 (ref string text, int offset, out Color c)
+	static public bool ParseColor24 (in string text, int offset, out Color c)
 	{
 		var d0 = NGUIMath.HexToDecimal(text[offset], -1);
 		var d1 = NGUIMath.HexToDecimal(text[offset + 1], -1);
@@ -437,7 +437,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public Color ParseColor32 (string text, int offset)
+	static public Color ParseColor32 (in string text, int offset)
 	{
 		int r = (NGUIMath.HexToDecimal(text[offset]) << 4) | NGUIMath.HexToDecimal(text[offset + 1]);
 		int g = (NGUIMath.HexToDecimal(text[offset + 2]) << 4) | NGUIMath.HexToDecimal(text[offset + 3]);
@@ -453,7 +453,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public bool ParseColor32 (ref string text, int offset, out Color c)
+	static public bool ParseColor32 (in string text, int offset, out Color c)
 	{
 		var d0 = NGUIMath.HexToDecimal(text[offset], -1);
 		var d1 = NGUIMath.HexToDecimal(text[offset + 1], -1);
@@ -491,7 +491,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public string EncodeColor (string text, Color c) { return "[c][" + EncodeColor24(c) + "]" + text + "[-][/c]"; }
+	static public string EncodeColor (in string text, Color c) { return "[c][" + EncodeColor24(c) + "]" + text + "[-][/c]"; }
 
 	/// <summary>
 	/// The reverse of ParseAlpha -- encodes a color in Aa format.
@@ -533,7 +533,7 @@ static public class NGUIText
 	/// Parse an embedded symbol, such as [FFAA00] (set color) or [-] (undo color change). Returns whether the index was adjusted.
 	/// </summary>
 
-	static public bool ParseSymbol (string text, ref int index)
+	static public bool ParseSymbol (in string text, ref int index)
 	{
 		int n = 0;
 		bool bold = false;
@@ -562,7 +562,7 @@ static public class NGUIText
 	/// Advanced symbol support originally contributed by Rudy Pangestu.
 	/// </summary>
 
-	static public bool ParseSymbol (string text, ref int index, BetterList<Color> colors, bool premultiply,
+	static public bool ParseSymbol (in string text, ref int index, BetterList<Color> colors, bool premultiply,
 		ref int sub, ref float fontScaleMult, ref bool bold, ref bool italic, ref bool underline, ref bool strike, ref bool ignoreColor, ref bool forceSpriteColor)
 	{
 		int length = text.Length;
@@ -723,7 +723,7 @@ static public class NGUIText
 		if (text[index + 7] == ']')
 		{
 			Color c;
-			if (!ParseColor24(ref text, index + 1, out c)) return false;
+			if (!ParseColor24(text, index + 1, out c)) return false;
 
 			if (colors != null && colors.size > 0)
 			{
@@ -741,7 +741,7 @@ static public class NGUIText
 		if (text[index + 9] == ']')
 		{
 			Color c;
-			if (!ParseColor32(ref text, index + 1, out c)) return false;
+			if (!ParseColor32(text, index + 1, out c)) return false;
 
 			if (colors != null)
 			{
@@ -1087,9 +1087,13 @@ static public class NGUIText
 					continue;
 				}
 
-				// See if there is a symbol matching this text
-				var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
 				var scale = (sub == 0) ? (fontScaleMult == 0f ? fontScale : fontScale * fontScaleMult) : fontScale * fontScaleMult;
+
+				// Parse encoding that repositions the X value
+				if (useSymbols && ParsePositionalEncoding(text, textLength, ch, ref i, ref prev, ref x)) continue;
+
+				// See if there is a symbol matching this text
+				var symbol = useSymbols ? GetSymbol(text, i, textLength) : null;
 
 				if (symbol != null)
 				{
@@ -1214,7 +1218,7 @@ static public class NGUIText
 				continue;
 			}
 
-			var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
+			var symbol = useSymbols ? GetSymbol(text, i, textLength) : null;
 			var scale = (sub == 0) ? (fontScaleMult == 0f ? fontScale : fontScale * fontScaleMult) : fontScale * fontScaleMult;
 
 			if (symbol == null)
@@ -1411,12 +1415,16 @@ static public class NGUIText
 				continue;
 			}
 
+			var scale = (sub == 0) ? (fontScaleMult == 0f ? fontScale : fontScale * fontScaleMult) : fontScale * fontScaleMult;
+
+			// Parse encoding that repositions the X value
+			if (useSymbols && ParsePositionalEncoding(text, textLength, ch, ref offset, ref prev, ref x)) continue;
+
 			// See if there is a symbol matching this text
-			var symbol = useSymbols ? GetSymbol(ref text, offset, textLength) : null;
+			var symbol = useSymbols ? GetSymbol(text, offset, textLength) : null;
 
 			// Calculate how wide this symbol or character is going to be
 			float glyphWidth;
-			var scale = (sub == 0) ? (fontScaleMult == 0f ? fontScale : fontScale * fontScaleMult) : fontScale * fontScaleMult;
 
 			if (symbol == null)
 			{
@@ -1586,10 +1594,40 @@ static public class NGUIText
 	static Color s_c0, s_c1;
 
 	/// <summary>
+	/// X repositioning support in the format of: [x=123], where the number represents the explicit value to set the X to.
+	/// </summary>
+
+	static bool ParsePositionalEncoding (in string text, int textLength, int ch, ref int i, ref int prev, ref float x)
+	{
+		if (ch == '[' && i + 5 < textLength)
+		{
+			if (text[i + 1] == 'x' && text[i + 2] == '=')
+			{
+				var toff = i + 3;
+				var end = text.IndexOf(']', toff);
+
+				if (end != -1)
+				{
+					int mx;
+
+					if (int.TryParse(text.Substring(toff, end - toff), out mx))
+					{
+						i = end;
+						x = mx;
+						prev = 0;
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	/// <summary>
 	/// Print the specified text into the buffers.
 	/// </summary>
 
-	static public void Print (string text, List<Vector3> verts, List<Vector2> uvs, List<Color> cols, List<Vector3> sverts = null, List<Vector2> suvs = null, List<Color> scols = null)
+	static public void Print (in string text, List<Vector3> verts, List<Vector2> uvs, List<Color> cols, List<Vector3> sverts = null, List<Vector2> suvs = null, List<Color> scols = null)
 	{
 		if (string.IsNullOrEmpty(text)) return;
 
@@ -1700,9 +1738,13 @@ static public class NGUIText
 				continue;
 			}
 
-			// See if there is a symbol matching this text
-			var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
 			var scale = (sub == 0) ? (fontScaleMult == 0f ? fontScale : fontScale * fontScaleMult) : fontScale * fontScaleMult;
+
+			// Parse encoding that repositions the X value
+			if (useSymbols && ParsePositionalEncoding(text, textLength, ch, ref i, ref prev, ref x)) continue;
+
+			// See if there is a symbol matching this text
+			var symbol = useSymbols ? GetSymbol(text, i, textLength) : null;
 
 			if (symbol != null)
 			{
@@ -2213,8 +2255,11 @@ static public class NGUIText
 				continue;
 			}
 
+			// Parse encoding that repositions the X value
+			if (useSymbols && ParsePositionalEncoding(text, textLength, ch, ref i, ref prev, ref x)) continue;
+
 			// See if there is a symbol matching this text
-			var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
+			var symbol = useSymbols ? GetSymbol(text, i, textLength) : null;
 
 			if (symbol == null)
 			{
@@ -2336,8 +2381,11 @@ static public class NGUIText
 				continue;
 			}
 
+			// Parse encoding that repositions the X value
+			if (useSymbols && ParsePositionalEncoding(text, textLength, ch, ref i, ref prev, ref x)) continue;
+
 			// See if there is a symbol matching this text
-			var symbol = useSymbols ? GetSymbol(ref text, i, textLength) : null;
+			var symbol = useSymbols ? GetSymbol(text, i, textLength) : null;
 
 			if (symbol == null)
 			{
@@ -2516,8 +2564,11 @@ static public class NGUIText
 				continue;
 			}
 
+			// Parse encoding that repositions the X value
+			if (useSymbols && ParsePositionalEncoding(text, textLength, ch, ref index, ref prev, ref x)) continue;
+
 			// See if there is a symbol matching this text
-			var symbol = useSymbols ? GetSymbol(ref text, index, textLength) : null;
+			var symbol = useSymbols ? GetSymbol(text, index, textLength) : null;
 			float w;
 
 			if (symbol != null)

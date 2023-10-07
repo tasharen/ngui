@@ -184,6 +184,7 @@ public class UIPlayTween : MonoBehaviour
 
 	void OnDisable ()
 	{
+		mIsActive = false;
 #if UNITY_EDITOR
 		if (!Application.isPlaying) return;
 #endif

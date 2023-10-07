@@ -478,7 +478,7 @@ public abstract class UIBasicSprite : UIWidget
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	void AddVertexColours (List<Color> cols, ref Color color, int x, int y)
+	protected void AddVertexColours (List<Color> cols, ref Color color, int x, int y)
 	{
 		var br = border * pixelSize;
 
@@ -495,24 +495,21 @@ public abstract class UIBasicSprite : UIWidget
 		}
 		else
 		{
-			if (y == 0)
-			{
-				cols.Add(color*mGradientBottom);
-			}
+			if (y == 0) cols.Add(color * mGradientBottom);
+
 			if (y == 1)
 			{
 				var gradient = Color.Lerp(mGradientBottom, mGradientTop, br.y / mHeight);
-				cols.Add(color*gradient);
+				cols.Add(color * gradient);
 			}
+			
 			if (y == 2)
 			{
 				var gradient = Color.Lerp(mGradientTop, mGradientBottom, br.w / mHeight);
-				cols.Add(color*gradient);
+				cols.Add(color * gradient);
 			}
-			if (y == 3)
-			{
-				cols.Add(color*mGradientTop);
-			}
+
+			if (y == 3) cols.Add(color * mGradientTop);
 		}
 	}
 
@@ -790,6 +787,21 @@ public abstract class UIBasicSprite : UIWidget
 		{
 			verts.Add(mTempPos[i]);
 			uvs.Add(mTempUVs[i]);
+		}
+
+		// Only adding filled color support for a basic horizontal fill. The sprite fill is hidden in inspector for filled sprites anyway.
+		if (mApplyGradient && mFillDirection == FillDirection.Horizontal)
+		{
+			AddVertexColours(cols, ref c, 1, 1);
+			AddVertexColours(cols, ref c, 1, 2);
+			AddVertexColours(cols, ref c, 2, 2);
+			AddVertexColours(cols, ref c, 2, 1);
+		}
+		else
+		{
+			cols.Add(c);
+			cols.Add(c);
+			cols.Add(c);
 			cols.Add(c);
 		}
 	}

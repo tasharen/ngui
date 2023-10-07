@@ -1965,7 +1965,8 @@ static public class NGUITools
 #if UNITY_FLASH
 		object comp = go.GetComponent<T>();
 #else
-		T comp = go.GetComponent<T>();
+		T comp;
+		go.TryGetComponent(out comp);
 #endif
 		if (comp == null)
 		{

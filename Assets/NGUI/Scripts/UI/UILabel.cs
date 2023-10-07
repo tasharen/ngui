@@ -1358,9 +1358,7 @@ public class UILabel : UIWidget
 		}
 		else overflowMethod = Overflow.ResizeFreely;
 
-		if (mMaxLineHeight != 0)
-			height = mMaxLineHeight;
-
+		if (mMaxLineHeight != 0) height = mMaxLineHeight;
 
 		if (mFont != null)
 		{
@@ -1606,7 +1604,8 @@ public class UILabel : UIWidget
 				NGUIText.Update(false);
 
 				// Wrap the text
-				var fits = NGUIText.WrapText(printedText, out mProcessedText, false, false, mOverflow == Overflow.ClampContent && mOverflowEllipsis);
+				var fits = NGUIText.WrapText(printedText, out mProcessedText, false, false, mOverflowEllipsis &&
+					(mOverflow == Overflow.ClampContent || mOverflowWidth != 0 || mOverflowHeight != 0));
 
 				if (mOverflow == Overflow.ShrinkContent && !fits)
 				{

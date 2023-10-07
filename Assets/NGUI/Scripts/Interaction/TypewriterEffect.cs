@@ -156,7 +156,7 @@ public class TypewriterEffect : MonoBehaviour
 				{
 					if (NGUIText.ParseSymbol(mFullText, ref mCurrentOffset)) continue;
 
-					var sym = NGUIText.GetSymbol(ref mFullText, mCurrentOffset, len);
+					var sym = NGUIText.GetSymbol(mFullText, mCurrentOffset, len);
 
 					if (sym != null)
 					{

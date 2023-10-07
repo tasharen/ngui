@@ -128,6 +128,12 @@ public class UIPopupList : UIWidgetContainer
 	public FontStyle fontStyle = FontStyle.Normal;
 
 	/// <summary>
+	/// Symbol style.
+	/// </summary>
+
+	public NGUIText.SymbolStyle symbolStyle = NGUIText.SymbolStyle.Normal;
+
+	/// <summary>
 	/// Name of the sprite used to create the popup's background.
 	/// </summary>
 
@@ -568,13 +574,6 @@ public class UIPopupList : UIWidgetContainer
 		{
 			fontSize = (bm != null) ? Mathf.RoundToInt(bm.defaultSize * textScale) : 16;
 			textScale = 0f;
-		}
-
-		// Auto-upgrade to the true type font
-		if (trueTypeFont == null && bm != null && bm.isDynamic && bm.replacement == null)
-		{
-			trueTypeFont = bm.dynamicFont;
-			bitmapFont = null;
 		}
 	}
 
@@ -1136,13 +1135,14 @@ public class UIPopupList : UIWidgetContainer
 				lbl.trueTypeFont = trueTypeFont;
 				lbl.fontSize = fontSize;
 				lbl.fontStyle = fontStyle;
+				lbl.symbolDepth = lbl.depth + 1;
 				lbl.text = isLocalized ? Localization.Get(s) : s;
 				lbl.modifier = textModifier;
 				lbl.color = textColor;
 				lbl.cachedTransform.localPosition = new Vector3(bgPadding.x + padding.x - lbl.pivotOffset.x, y, -1f);
 				lbl.overflowMethod = UILabel.Overflow.ResizeFreely;
 				lbl.alignment = alignment;
-				lbl.symbolStyle = NGUIText.SymbolStyle.Normal;
+				lbl.symbolStyle = symbolStyle;
 				labels.Add(lbl);
 
 				contentHeight += lineHeight;
