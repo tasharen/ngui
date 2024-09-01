@@ -7,86 +7,36 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// All children added to the game object with this script will be arranged into a table
-/// with rows and columns automatically adjusting their size to fit their content
-/// (think "table" tag in HTML).
+/// Much simplified version of the UITable that goes top-to-bottom and organizes the data into 1+ column, adding new independent columns past max height.
 /// </summary>
 
-[AddComponentMenu("NGUI/Interaction/Table")]
-public class UITable : UIWidgetContainer
+[AddComponentMenu("NGUI/Interaction/Table (Simplified)")]
+public class UISimpleTable : UIWidgetContainer
 {
 	public delegate void OnReposition ();
 
-	[DoNotObfuscateNGUI] public enum Direction
-	{
-		Down,
-		Up,
-	}
-
-	[DoNotObfuscateNGUI] public enum Sorting
-	{
-		None,
-		Alphabetic,
-		Horizontal,
-		Vertical,
-		Custom,
-	}
-
-	/// <summary>
-	/// How many columns there will be before a new line is started. 0 means unlimited.
-	/// </summary>
-
-	public int columns = 0;
-
-	/// <summary>
-	/// Which way the new lines will be added.
-	/// </summary>
-
-	public Direction direction = Direction.Down;
-
-	/// <summary>
-	/// How to sort the grid's elements.
-	/// </summary>
-
-	public Sorting sorting = Sorting.None;
+	[Tooltip("If the number of columns is 1, a maximum height can be used to automatically create a new column after the first one exceeds this value")]
+	public int maxHeight = 0;
 
 	[Tooltip("Whether the sort order will be inverted")]
 	public bool inverted = false;
 
-	/// <summary>
-	/// Final pivot point for the table itself.
-	/// </summary>
-
-	public UIWidget.Pivot pivot = UIWidget.Pivot.TopLeft;
-
-	/// <summary>
-	/// Final pivot point for the table's content.
-	/// </summary>
-
+	[Tooltip("Final pivot point for the table's content.")]
 	public UIWidget.Pivot cellAlignment = UIWidget.Pivot.TopLeft;
 
-	/// <summary>
-	/// Whether inactive children will be discarded from the table's calculations.
-	/// </summary>
+	[Tooltip("Final pivot point for the table itself.")]
+	public UIWidget.Pivot pivot = UIWidget.Pivot.TopLeft;
 
+	[Tooltip("Whether inactive children will be discarded from the table's calculations.")]
 	public bool hideInactive = true;
 
-	/// <summary>
-	/// Whether the parent container will be notified of the table's changes.
-	/// </summary>
-
+	[Tooltip("Whether the parent container will be notified of the table's changes.")]
 	public bool keepWithinPanel = false;
 
-	/// <summary>
-	/// Padding around each entry, in pixels.
-	/// </summary>
-
+	[Tooltip("Padding around each entry, in pixels.")]
 	public Vector2 padding = Vector2.zero;
 
-	/// <summary>
-	/// Extra padding between each entry, in pixels.
-	/// </summary>
-
+	[Tooltip("Extra padding between each entry, in pixels.")]
 	public Vector2 spacing = Vector2.zero;
 
 	/// <summary>
@@ -94,12 +44,6 @@ public class UITable : UIWidgetContainer
 	/// </summary>
 
 	public OnReposition onReposition;
-
-	/// <summary>
-	/// Custom sort delegate, used when the sorting method is set to 'custom'.
-	/// </summary>
-
-	public System.Comparison<Transform> onCustomSort;
 
 	protected UIPanel mPanel;
 	protected bool mInitDone = false;
@@ -126,24 +70,8 @@ public class UITable : UIWidgetContainer
 			if (!hideInactive || (t && NGUITools.GetActive(t.gameObject)))
 				list.Add(t);
 		}
-
-		// Sort the list using the desired sorting logic
-		if (sorting != Sorting.None)
-		{
-			if (sorting == Sorting.Alphabetic) { if (inverted) list.Sort(UIGrid.SortByNameInv); else list.Sort(UIGrid.SortByName); }
-			else if (sorting == Sorting.Horizontal) { if (inverted) list.Sort(UIGrid.SortHorizontalInv); else list.Sort(UIGrid.SortHorizontal); }
-			else if (sorting == Sorting.Vertical) { if (inverted) list.Sort(UIGrid.SortVerticalInv); else list.Sort(UIGrid.SortVertical); }
-			else if (onCustomSort != null) list.Sort(onCustomSort);
-			else Sort(list);
-		}
 		return list;
 	}
-
-	/// <summary>
-	/// Want your own custom sorting logic? Override this function.
-	/// </summary>
-
-	protected virtual void Sort (List<Transform> list) { list.Sort(UIGrid.SortByName); }
 
 	protected virtual void OnEnable () { mReposition = true; }
 
@@ -184,110 +112,79 @@ public class UITable : UIWidgetContainer
 
 	void OnValidate () { if (!Application.isPlaying && NGUITools.GetActive(this)) Reposition(); }
 
-	/// <summary>
-	/// Positions the grid items, taking their own size into consideration.
-	/// </summary>
-
 	protected void RepositionVariableSize (List<Transform> children)
 	{
-		float xOffset = 0;
-		float yOffset = 0;
+		var count = children.Count;
+		var bounds = new Bounds[count];
+		UISimpleTableHint stc;
 
-		int cols = columns > 0 ? children.Count / columns + 1 : 1;
-		int rows = columns > 0 ? columns : children.Count;
-
-		var bounds = new Bounds[cols, rows];
-		var boundsRows = new Bounds[rows];
-		var boundsCols = new Bounds[cols];
-
-		int x = 0;
-		int y = 0;
-
+		// Calculate the bounds of each child
 		for (int i = 0, imax = children.Count; i < imax; ++i)
 		{
 			var t = children[i];
 			var b = NGUIMath.CalculateRelativeWidgetBounds(t, !hideInactive);
 
-			Vector3 scale = t.localScale;
+			var scale = t.localScale;
 			b.min = Vector3.Scale(b.min, scale);
 			b.max = Vector3.Scale(b.max, scale);
-			bounds[y, x] = b;
-
-			boundsRows[x].Encapsulate(b);
-			boundsCols[y].Encapsulate(b);
-
-			if (++x >= columns && columns > 0)
-			{
-				x = 0;
-				++y;
-			}
+			bounds[i] = b;
 		}
 
-		x = 0;
-		y = 0;
-
-		Vector2 po = NGUIMath.GetPivotOffset(cellAlignment);
+		var offset = 0;
+		var xOffset = 0f;
+		var yOffset = 0f;
+		var lowestPoint = 0f;
+		var paragraph = 0f;
+		var height = 0f;
 
 		for (int i = 0, imax = children.Count; i < imax; ++i)
 		{
-			Transform t = children[i];
-			Bounds b = bounds[y, x];
-			Bounds br = boundsRows[x];
-			Bounds bc = boundsCols[y];
+			var b = bounds[i];
+			var nextHeight = height + b.size.y + spacing.y;
+			children[i].TryGetComponent(out stc);
 
-			Vector3 pos = t.localPosition;
-			pos.x = xOffset + b.extents.x - b.center.x;
-			pos.x -= Mathf.Lerp(0f, b.max.x - b.min.x - br.max.x + br.min.x, po.x) - padding.x;
-			
-			//if (i != 0) pos.x -= spacing.x;
-
-			if (direction == Direction.Down)
+			if (stc != null && stc.startNewRow)
 			{
-				pos.y = -yOffset - b.extents.y - b.center.y;
-				pos.y += Mathf.Lerp(b.max.y - b.min.y - bc.max.y + bc.min.y, 0f, po.y) - padding.y;
-			}
-			else
-			{
-				pos.y = yOffset + b.extents.y - b.center.y;
-				pos.y -= Mathf.Lerp(0f, b.max.y - b.min.y - bc.max.y + bc.min.y, po.y) - padding.y;
-			}
-
-			//if (i != 0) pos.y -= spacing.y;
-
-			xOffset += br.size.x + padding.x * 2f;
-			xOffset += spacing.x;
-
-			t.localPosition = pos;
-
-			if (++x >= columns && columns > 0)
-			{
-				x = 0;
-				++y;
-
+				AddColumn(children, bounds, offset, i, ref xOffset, ref yOffset);
+				
+				lowestPoint = Mathf.Min(lowestPoint, yOffset);
+				offset = i;
+				paragraph = lowestPoint;
 				xOffset = 0f;
-				yOffset += bc.size.y + padding.y * 2f;
-				yOffset += spacing.y;
+				yOffset = paragraph;
 			}
+			else if (maxHeight > 0 && (nextHeight > maxHeight || (stc != null && stc.startNewColumn)))
+			{
+				AddColumn(children, bounds, offset, i, ref xOffset, ref yOffset);
+				
+				lowestPoint = Mathf.Min(lowestPoint, yOffset);
+				offset = i;
+				yOffset = paragraph;
+				height = 0f;
+			}
+			else height = nextHeight;
 		}
+
+		// Add the final column
+		if (offset < children.Count) AddColumn(children, bounds, offset, children.Count, ref xOffset, ref yOffset);
 
 		// Apply the origin offset
 		if (pivot != UIWidget.Pivot.TopLeft)
 		{
-			po = NGUIMath.GetPivotOffset(pivot);
+			var b = NGUIMath.CalculateRelativeWidgetBounds(transform, !hideInactive);
+			var po = NGUIMath.GetPivotOffset(pivot);
 
 			float fx, fy;
-
-			var b = NGUIMath.CalculateRelativeWidgetBounds(transform, !hideInactive);
 
 			fx = Mathf.Lerp(0f, b.size.x, po.x);
 			fy = Mathf.Lerp(-b.size.y, 0f, po.y);
 
-			Transform myTrans = transform;
+			var myTrans = transform;
 
 			for (int i = 0; i < myTrans.childCount; ++i)
 			{
-				Transform t = myTrans.GetChild(i);
-				SpringPosition sp = t.GetComponent<SpringPosition>();
+				var t = myTrans.GetChild(i);
+				var sp = t.GetComponent<SpringPosition>();
 
 				if (sp != null)
 				{
@@ -298,13 +195,57 @@ public class UITable : UIWidgetContainer
 				}
 				else
 				{
-					Vector3 pos = t.localPosition;
+					var pos = t.localPosition;
 					pos.x -= fx;
 					pos.y -= fy;
 					t.localPosition = pos;
 				}
 			}
 		}
+	}
+
+	void AddColumn (List<Transform> children, Bounds[] bounds, int offset, int max, ref float xOffset, ref float yOffset)
+	{
+		// Determine the maximum width and height of the content's cells
+		var maxBounds = bounds[offset];
+		UISimpleTableHint stc;
+
+		for (int i = offset + 1; i < max; ++i)
+		{
+			var b = bounds[i];
+			
+			if (children[i].TryGetComponent(out stc) && stc.ignoreWidth)
+			{
+				var c = b.center;
+				var s = b.size;
+				c.x -= b.extents.x;
+				s.x = 0f;
+				b = new Bounds(c, s);
+			}
+
+			maxBounds.Encapsulate(b);
+		}
+
+		var po = NGUIMath.GetPivotOffset(cellAlignment);
+
+		for (int i = offset; i < max; ++i)
+		{
+			var b = bounds[i];
+			var t = children[i];
+
+			var pos = t.localPosition;
+
+			pos.x = xOffset + b.extents.x - b.center.x;
+			pos.x -= Mathf.Lerp(0f, b.max.x - b.min.x - maxBounds.max.x + maxBounds.min.x, po.x) - padding.x;
+			pos.y = yOffset - b.extents.y - b.center.y - padding.y;
+			if (i > offset) pos.y -= spacing.y;
+
+			t.localPosition = pos;
+
+			yOffset -= b.size.y + padding.y * 2f;
+		}
+		
+		xOffset += padding.x + maxBounds.size.x + spacing.x;
 	}
 
 	/// <summary>

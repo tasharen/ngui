@@ -549,13 +549,15 @@ public class UICamera : MonoBehaviour
 			if (mCurrentKey == KeyCode.None) return ControlScheme.Touch;
 			if (mCurrentKey >= KeyCode.JoystickButton0) return ControlScheme.Controller;
 
-			if (current != null)
+			var c = current;
+
+			if (c != null)
 			{
-				if (mLastScheme == ControlScheme.Controller && (mCurrentKey == current.submitKey0 || mCurrentKey == current.submitKey1))
+				if (mLastScheme == ControlScheme.Controller && (mCurrentKey == c.submitKey0 || mCurrentKey == c.submitKey1))
 					return ControlScheme.Controller;
 
-				if (current.useMouse) return ControlScheme.Mouse;
-				if (current.useTouch) return ControlScheme.Touch;
+				if (c.useMouse) return ControlScheme.Mouse;
+				if (c.useTouch) return ControlScheme.Touch;
 				return ControlScheme.Controller;
 			}
 			return ControlScheme.Mouse;
@@ -779,11 +781,8 @@ public class UICamera : MonoBehaviour
 	/// Caching is always preferable for performance.
 	/// </summary>
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-	public Camera cachedCamera { get { if (mCam == null) mCam = camera; return mCam; } }
-#else
-	public Camera cachedCamera { get { if (mCam == null) mCam = GetComponent<Camera>(); return mCam; } }
-#endif
+
+	public Camera cachedCamera { get { if (mCam == null) mCam = this.FastGetComponent<Camera>(); return mCam; } }
 
 	/// <summary>
 	/// Set to 'true' just before OnDrag-related events are sent. No longer needed, but kept for backwards compatibility.
@@ -1048,15 +1047,7 @@ public class UICamera : MonoBehaviour
 			{
 				if (mHover != controller.current)
 				{
-#if UNITY_5_5_OR_NEWER
-					UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-					if (mHover.GetComponent<UIKeyNavigation>() != null) controller.current = mHover;
-					UnityEngine.Profiling.Profiler.EndSample();
-#else
-					Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-					if (mHover.GetComponent<UIKeyNavigation>() != null) controller.current = mHover;
-					Profiler.EndSample();
-#endif
+					if (mHover.FastGetComponent<UIKeyNavigation>() != null) controller.current = mHover;
 				}
 
 				// Locate the appropriate camera for the new object
@@ -1208,12 +1199,7 @@ public class UICamera : MonoBehaviour
 
 			if (value != null)
 			{
-#if UNITY_5_5_OR_NEWER
-				UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-#else
-				Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-#endif
-				var nav = value.GetComponent<UIKeyNavigation>();
+				var nav = value.FastGetComponent<UIKeyNavigation>();
 
 				if (nav != null)
 				{
@@ -1222,15 +1208,9 @@ public class UICamera : MonoBehaviour
 				else
 				{
 					// This makes it possible for UIInput to always respond to Escape, even if key navigation is not used
-					var input = value.GetComponent<UIInput>();
+					var input = value.FastGetComponent<UIInput>();
 					if (input != null) controller.current = value;
 				}
-
-#if UNITY_5_5_OR_NEWER
-				UnityEngine.Profiling.Profiler.EndSample();
-#else
-				Profiler.EndSample();
-#endif
 			}
 
 			// Set the camera for events
@@ -1255,15 +1235,7 @@ public class UICamera : MonoBehaviour
 			// Set the selection
 			if (mSelected)
 			{
-#if UNITY_5_5_OR_NEWER
-				UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-				mInputFocus = (mSelected.activeInHierarchy && mSelected.GetComponent<UIInput>() != null);
-				UnityEngine.Profiling.Profiler.EndSample();
-#else
-				Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-				mInputFocus = (mSelected.activeInHierarchy && mSelected.GetComponent<UIInput>() != null);
-				Profiler.EndSample();
-#endif
+				mInputFocus = (mSelected.activeInHierarchy && mSelected.FastGetComponent<UIInput>() != null);
 				if (onSelect != null) onSelect(mSelected, true);
 				Notify(mSelected, "OnSelect", true);
 			}
@@ -1414,36 +1386,15 @@ public class UICamera : MonoBehaviour
 
 	static Rigidbody FindRootRigidbody (Transform trans)
 	{
-#if UNITY_5_5_OR_NEWER
-		UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-#else
-		Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-#endif
+		Rigidbody rb;
+		UIPanel p;
 
 		while (trans != null)
 		{
-			if (trans.GetComponent<UIPanel>() != null) break;
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-			Rigidbody rb = trans.rigidbody;
-#else
-			Rigidbody rb = trans.GetComponent<Rigidbody>();
-#endif
-			if (rb != null)
-			{
-#if UNITY_5_5_OR_NEWER
-				UnityEngine.Profiling.Profiler.EndSample();
-#else
-				Profiler.EndSample();
-#endif
-				return rb;
-			}
+			if (trans.TryGetComponent(out p)) break;
+			if (trans.TryGetComponent(out rb)) return rb;
 			trans = trans.parent;
 		}
-#if UNITY_5_5_OR_NEWER
-		UnityEngine.Profiling.Profiler.EndSample();
-#else
-		Profiler.EndSample();
-#endif
 		return null;
 	}
 
@@ -1453,36 +1404,15 @@ public class UICamera : MonoBehaviour
 
 	static Rigidbody2D FindRootRigidbody2D (Transform trans)
 	{
-#if UNITY_5_5_OR_NEWER
-		UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-#else
-		Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-#endif
+		Rigidbody2D rb;
+		UIPanel p;
 
 		while (trans != null)
 		{
-			if (trans.GetComponent<UIPanel>() != null) break;
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-			Rigidbody2D rb = trans.rigidbody2D;
-#else
-			Rigidbody2D rb = trans.GetComponent<Rigidbody2D>();
-#endif
-			if (rb != null)
-			{
-#if UNITY_5_5_OR_NEWER
-				UnityEngine.Profiling.Profiler.EndSample();
-#else
-				Profiler.EndSample();
-#endif
-				return rb;
-			}
+			if (trans.TryGetComponent(out p)) break;
+			if (trans.TryGetComponent(out rb)) return rb;
 			trans = trans.parent;
 		}
-#if UNITY_5_5_OR_NEWER
-		UnityEngine.Profiling.Profiler.EndSample();
-#else
-		Profiler.EndSample();
-#endif
 		return null;
 	}
 
@@ -1499,10 +1429,8 @@ public class UICamera : MonoBehaviour
 		mLastPos = touch.pos;
 	}
 
-#if !UNITY_4_7
 	static RaycastHit[] mRayHits;
 	static Collider2D[] mOverlap;
-#endif
 
 	/// <summary>
 	/// Returns the object under the specified position.
@@ -1519,9 +1447,8 @@ public class UICamera : MonoBehaviour
 
 			// Convert to view space
 			currentCamera = cam.cachedCamera;
-#if !UNITY_4_7 && !UNITY_5_0 && !UNITY_5_1 && !UNITY_5_2
-			if (currentCamera.targetDisplay != 0) continue;
-#endif
+			if (!currentCamera.enabled || currentCamera.targetDisplay != 0) continue;
+
 			var pos = currentCamera.ScreenToViewportPoint(inPos);
 			if (float.IsNaN(pos.x) || float.IsNaN(pos.y)) continue;
 
@@ -1538,11 +1465,8 @@ public class UICamera : MonoBehaviour
 			if (cam.eventType == EventType.World_3D)
 			{
 				lastWorldRay = ray;
-#if UNITY_4_7
-				if (Physics.Raycast(ray, out lastHit, dist, mask))
-#else
+				
 				if (Physics.Raycast(ray, out lastHit, dist, mask, QueryTriggerInteraction.Ignore))
-#endif
 				{
 					lastWorldPosition = lastHit.point;
 					mRayHitObject = lastHit.collider.gameObject;
@@ -1558,27 +1482,16 @@ public class UICamera : MonoBehaviour
 			}
 			else if (cam.eventType == EventType.UI_3D)
 			{
-#if UNITY_4_7
-				var mRayHits = Physics.RaycastAll(ray, dist, mask);
-				var hitCount = mRayHits.Length;
-#else
 				if (mRayHits == null) mRayHits = new RaycastHit[50];
 				var hitCount = Physics.RaycastNonAlloc(ray, mRayHits, dist, mask, QueryTriggerInteraction.Collide);
-#endif
+
 				if (hitCount > 1)
 				{
 					for (int b = 0; b < hitCount; ++b)
 					{
 						var go = mRayHits[b].collider.gameObject;
-#if UNITY_5_5_OR_NEWER
-						UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-						var w = go.GetComponent<UIWidget>();
-						UnityEngine.Profiling.Profiler.EndSample();
-#else
-						Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-						var w = go.GetComponent<UIWidget>();
-						Profiler.EndSample();
-#endif
+						var w = go.FastGetComponent<UIWidget>();
+
 						if (w != null)
 						{
 							if (!w.isVisible) continue;
@@ -1612,11 +1525,7 @@ public class UICamera : MonoBehaviour
 
 					for (int b = 0; b < mHits.size; ++b)
 					{
-#if UNITY_FLASH
-						if (IsVisible(mHits.buffer[b]))
-#else
 						if (IsVisible(ref mHits.buffer[b]))
-#endif
 						{
 							lastHit = mHits.buffer[b].hit;
 							mRayHitObject = mHits.buffer[b].go;
@@ -1630,16 +1539,8 @@ public class UICamera : MonoBehaviour
 				}
 				else if (hitCount == 1)
 				{
-					GameObject go = mRayHits[0].collider.gameObject;
-#if UNITY_5_5_OR_NEWER
-					UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-					UIWidget w = go.GetComponent<UIWidget>();
-					UnityEngine.Profiling.Profiler.EndSample();
-#else
-					Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-					UIWidget w = go.GetComponent<UIWidget>();
-					Profiler.EndSample();
-#endif
+					var go = mRayHits[0].collider.gameObject;
+					var w = go.FastGetComponent<UIWidget>();
 
 					if (w != null)
 					{
@@ -1690,27 +1591,16 @@ public class UICamera : MonoBehaviour
 				if (m2DPlane.Raycast(ray, out dist))
 				{
 					lastWorldPosition = ray.GetPoint(dist);
-#if UNITY_4_7
-					Collider2D[] mOverlap = Physics2D.OverlapPointAll(lastWorldPosition, mask);
-					var hitCount = mOverlap.Length;
-#else
+					
 					if (mOverlap == null) mOverlap = new Collider2D[50];
 					var hitCount = Physics2D.OverlapPointNonAlloc(lastWorldPosition, mOverlap, mask);
-#endif
+
 					if (hitCount > 1)
 					{
 						for (int b = 0; b < hitCount; ++b)
 						{
-							GameObject go = mOverlap[b].gameObject;
-#if UNITY_5_5_OR_NEWER
-							UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-							UIWidget w = go.GetComponent<UIWidget>();
-							UnityEngine.Profiling.Profiler.EndSample();
-#else
-							Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-							UIWidget w = go.GetComponent<UIWidget>();
-							Profiler.EndSample();
-#endif
+							var go = mOverlap[b].gameObject;
+							var w = go.FastGetComponent<UIWidget>();
 
 							if (w != null)
 							{
@@ -1737,11 +1627,7 @@ public class UICamera : MonoBehaviour
 
 						for (int b = 0; b < mHits.size; ++b)
 						{
-#if UNITY_FLASH
-							if (IsVisible(mHits.buffer[b]))
-#else
 							if (IsVisible(ref mHits.buffer[b]))
-#endif
 							{
 								mRayHitObject = mHits.buffer[b].go;
 								mHits.Clear();
@@ -1753,15 +1639,7 @@ public class UICamera : MonoBehaviour
 					else if (hitCount == 1)
 					{
 						var go = mOverlap[0].gameObject;
-#if UNITY_5_5_OR_NEWER
-						UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-						var w = go.GetComponent<UIWidget>();
-						UnityEngine.Profiling.Profiler.EndSample();
-#else
-						Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-						var w = go.GetComponent<UIWidget>();
-						Profiler.EndSample();
-#endif
+						var w = go.FastGetComponent<UIWidget>();
 
 						if (w != null)
 						{
@@ -1809,11 +1687,7 @@ public class UICamera : MonoBehaviour
 	/// Helper function to check if the specified hit is visible by the panel.
 	/// </summary>
 
-#if UNITY_FLASH
-	static bool IsVisible (DepthEntry de)
-#else
 	static bool IsVisible (ref DepthEntry de)
-#endif
 	{
 		UIPanel panel = NGUITools.FindInParents<UIPanel>(de.go);
 
@@ -2646,30 +2520,14 @@ public class UICamera : MonoBehaviour
 
 				if (currentTouch.pressed != null)
 				{
-#if UNITY_5_5_OR_NEWER
-					UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-					UIKeyNavigation nav = currentTouch.pressed.GetComponent<UIKeyNavigation>();
-					UnityEngine.Profiling.Profiler.EndSample();
-#else
-					Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-					UIKeyNavigation nav = currentTouch.pressed.GetComponent<UIKeyNavigation>();
-					Profiler.EndSample();
-#endif
+					var nav = currentTouch.pressed.FastGetComponent<UIKeyNavigation>();
 					if (nav != null) controller.current = currentTouch.pressed;
 				}
 
 				// Set the selection
 				if (mSelected)
 				{
-#if UNITY_5_5_OR_NEWER
-					UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-					mInputFocus = (mSelected.activeInHierarchy && mSelected.GetComponent<UIInput>() != null);
-					UnityEngine.Profiling.Profiler.EndSample();
-#else
-					Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-					mInputFocus = (mSelected.activeInHierarchy && mSelected.GetComponent<UIInput>() != null);
-					Profiler.EndSample();
-#endif
+					mInputFocus = (mSelected.activeInHierarchy && mSelected.FastGetComponent<UIInput>() != null);
 					if (onSelect != null) onSelect(mSelected, true);
 					Notify(mSelected, "OnSelect", true);
 				}
@@ -2751,14 +2609,14 @@ public class UICamera : MonoBehaviour
 				}
 			}
 		}
-#if W2
-		else if (currentTouch.delta.y != 0f && (GetKey(KeyCode.LeftControl) || GetKey(KeyCode.LeftCommand)))
-		{
-			var f = currentTouch.delta.y * 0.001f;
-			if (onScroll != null) onScroll(mHover, f);
-			Notify(currentTouch.current, "OnScroll", f);
-		}
-#endif
+//#if W2
+//		else if (currentTouch.delta.y != 0f && (GetKey(KeyCode.LeftControl) || GetKey(KeyCode.LeftCommand)))
+//		{
+//			var f = currentTouch.delta.y * 0.001f;
+//			if (onScroll != null) onScroll(mHover, f);
+//			Notify(currentTouch.current, "OnScroll", f);
+//		}
+//#endif
 	}
 
 	/// <summary>
@@ -2790,15 +2648,7 @@ public class UICamera : MonoBehaviour
 			// Send a hover message to the object
 			if (isMouse)
 			{
-#if UNITY_5_5_OR_NEWER
-				UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
 				var hasCollider = HasCollider(currentTouch.pressed);
-				UnityEngine.Profiling.Profiler.EndSample();
-#else
-				Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-				var hasCollider = HasCollider(currentTouch.pressed);
-				Profiler.EndSample();
-#endif
 
 				if (hasCollider)
 				{
@@ -2849,13 +2699,17 @@ public class UICamera : MonoBehaviour
 		currentTouch.dragged = null;
 	}
 
-	bool HasCollider (GameObject go)
+	static bool HasCollider (GameObject go)
 	{
 		if (go == null) return false;
-		Collider c = go.GetComponent<Collider>();
-		if (c != null) return c.enabled;
-		Collider2D b = go.GetComponent<Collider2D>();
-		return (b != null && b.enabled);
+
+		Collider c;
+		if (go.TryGetComponent(out c)) return c.enabled;
+
+		Collider2D c2;
+		if (go.TryGetComponent(out c2)) return c2.enabled;
+		
+		return false;
 	}
 
 	/// <summary>

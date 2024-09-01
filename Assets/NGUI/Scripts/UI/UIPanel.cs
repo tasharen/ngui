@@ -1264,7 +1264,9 @@ public class UIPanel : UIRect
 
 				if (p)
 				{
+					UnityEngine.Profiling.Profiler.BeginSample("UIPanel.UpdateSelf");
 					p.UpdateSelf();
+					UnityEngine.Profiling.Profiler.EndSample();
 				}
 				else
 				{
@@ -1278,6 +1280,7 @@ public class UIPanel : UIRect
 				}
 			}
 
+			UnityEngine.Profiling.Profiler.BeginSample("UIPanel.UpdateDrawCalls");
 			int rq = 3000;
 
 			// Update all draw calls, making them draw in the right order
@@ -1304,6 +1307,7 @@ public class UIPanel : UIRect
 						rq = Mathf.Max(rq, p.startingRenderQueue + 1);
 				}
 			}
+			UnityEngine.Profiling.Profiler.EndSample();
 		}
 	}
 
@@ -1643,6 +1647,8 @@ public class UIPanel : UIRect
 
 	void UpdateLayers ()
 	{
+		UnityEngine.Profiling.Profiler.BeginSample("UIPanel.UpdateLayers");
+
 		// Always move widgets to the panel's layer
 		if (mLayer != cachedGameObject.layer)
 		{
@@ -1659,6 +1665,8 @@ public class UIPanel : UIRect
 			for (int i = 0; i < drawCalls.Count; ++i)
 				drawCalls[i].gameObject.layer = mLayer;
 		}
+
+		UnityEngine.Profiling.Profiler.EndSample();
 	}
 
 	bool mForced = false;
@@ -1669,6 +1677,7 @@ public class UIPanel : UIRect
 
 	void UpdateWidgets()
 	{
+		UnityEngine.Profiling.Profiler.BeginSample("UIPanel.UpdateWidgets");
 		bool changed = false;
 		bool forceVisible = false;
 		bool clipped = hasCumulativeClipping;
@@ -1690,9 +1699,10 @@ public class UIPanel : UIRect
 
 		// Update all widgets
 		int frame = Time.frameCount;
+
 		for (int i = 0, imax = widgets.Count; i < imax; ++i)
 		{
-			UIWidget w = widgets[i];
+			var w = widgets[i];
 
 			// If the widget is visible, update it
 			if (w.panel == this && w.enabled)
@@ -1757,8 +1767,16 @@ public class UIPanel : UIRect
 		}
 
 		// Inform the changed event listeners
-		if (changed && onGeometryUpdated != null) onGeometryUpdated();
+		if (changed && onGeometryUpdated != null)
+		{
+			UnityEngine.Profiling.Profiler.BeginSample("UIPanel.UpdateWidgets (onGeometryUpdated)");
+			onGeometryUpdated();
+			UnityEngine.Profiling.Profiler.EndSample();
+		}
+
 		mResized = false;
+
+		UnityEngine.Profiling.Profiler.EndSample();
 	}
 
 	/// <summary>

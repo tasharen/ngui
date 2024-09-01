@@ -1151,6 +1151,26 @@ static public class NGUIMath
 	/// </summary>
 	/// <param name="worldPos">World position, visible by the worldCam</param>
 	/// <param name="worldCam">Camera that is able to see the worldPos</param>
+	/// <param name="myCam">Camera that is able to see the transform this function is called on</param>
+
+	static public void OverlayPosition (this Transform trans, Vector3 worldPos, Camera worldCam, Camera myCam, Vector3 offset)
+	{
+		if (worldCam != myCam)
+		{
+			worldPos = worldCam.WorldToViewportPoint(worldPos);
+			worldPos = myCam.ViewportToWorldPoint(worldPos);
+		}
+
+		Transform parent = trans.parent;
+		trans.localPosition = (parent != null) ? parent.InverseTransformPoint(worldPos) + offset : worldPos + offset;
+	}
+
+	/// <summary>
+	/// Helper function that can set the transform's position to be at the specified world position.
+	/// Ideal usage: positioning a UI element to be directly over a 3D point in space.
+	/// </summary>
+	/// <param name="worldPos">World position, visible by the worldCam</param>
+	/// <param name="worldCam">Camera that is able to see the worldPos</param>
 
 	static public void OverlayPosition (this Transform trans, Vector3 worldPos, Camera worldCam)
 	{

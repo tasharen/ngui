@@ -81,15 +81,15 @@ public class UIPlayAnimation : MonoBehaviour
 	[HideInInspector][SerializeField] GameObject eventReceiver;
 	[HideInInspector][SerializeField] string callWhenFinished;
 
-	bool mStarted = false;
-	bool mActivated = false;
-	bool dragHighlight = false;
+	[System.NonSerialized] bool mStarted = false;
+	[System.NonSerialized] bool mActivated = false;
+	[System.NonSerialized] bool dragHighlight = false;
 
 	bool dualState { get { return trigger == Trigger.OnPress || trigger == Trigger.OnHover; } }
 
 	void Awake ()
 	{
-		UIButton btn = GetComponent<UIButton>();
+		var btn = GetComponent<UIButton>();
 		if (btn != null) dragHighlight = btn.dragHighlight;
 
 		// Remove deprecated functionality if new one is used

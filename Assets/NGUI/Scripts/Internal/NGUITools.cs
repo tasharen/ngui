@@ -139,7 +139,7 @@ static public class NGUITools
 #if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
 					audioSource = mListener.audio;
 #else
-					audioSource = mListener.GetComponent<AudioSource>();
+					audioSource = mListener.FastGetComponent<AudioSource>();
 #endif
 					if (audioSource == null) audioSource = mListener.gameObject.AddComponent<AudioSource>();
 				}
@@ -282,8 +282,8 @@ static public class NGUITools
 		if (go != null)
 		{
 			// 3D collider
-			Collider col = go.GetComponent<Collider>();
-			BoxCollider box = col as BoxCollider;
+			var col = go.FastGetComponent<Collider>();
+			var box = col as BoxCollider;
 
 			if (box != null)
 			{
@@ -295,7 +295,7 @@ static public class NGUITools
 			if (col != null) return;
 
 			// 2D collider
-			BoxCollider2D box2 = go.GetComponent<BoxCollider2D>();
+			var box2 = go.FastGetComponent<BoxCollider2D>();
 
 			if (box2 != null)
 			{
@@ -312,7 +312,7 @@ static public class NGUITools
 #if UNITY_EDITOR
 				UnityEditor.Undo.RegisterCreatedObjectUndo(box2, "Add Collider");
 #endif
-				UIWidget widget = go.GetComponent<UIWidget>();
+				var widget = go.FastGetComponent<UIWidget>();
 				if (widget != null) widget.autoResizeBoxCollider = true;
 				UpdateWidgetCollider(box2, considerInactive);
 				return;
@@ -325,7 +325,7 @@ static public class NGUITools
 #endif
 				box.isTrigger = true;
 
-				UIWidget widget = go.GetComponent<UIWidget>();
+				var widget = go.FastGetComponent<UIWidget>();
 				if (widget != null) widget.autoResizeBoxCollider = true;
 				UpdateWidgetCollider(box, considerInactive);
 			}
@@ -350,14 +350,15 @@ static public class NGUITools
 	{
 		if (go != null)
 		{
-			BoxCollider bc = go.GetComponent<BoxCollider>();
+			var bc = go.FastGetComponent<BoxCollider>();
 
 			if (bc != null)
 			{
 				UpdateWidgetCollider(bc, considerInactive);
 				return;
 			}
-			BoxCollider2D box2 = go.GetComponent<BoxCollider2D>();
+
+			var box2 = go.FastGetComponent<BoxCollider2D>();
 			if (box2 != null) UpdateWidgetCollider(box2, considerInactive);
 		}
 	}
@@ -371,7 +372,7 @@ static public class NGUITools
 		if (box != null)
 		{
 			var go = box.gameObject;
-			var w = go.GetComponent<UIWidget>();
+			var w = go.FastGetComponent<UIWidget>();
 
 			if (w != null)
 			{
@@ -409,9 +410,31 @@ static public class NGUITools
 	static public void UpdateWidgetCollider (UIWidget w)
 	{
 		if (w == null) return;
-		var bc = w.GetComponent<BoxCollider>();
+		var bc = w.FastGetComponent<BoxCollider>();
 		if (bc != null) UpdateWidgetCollider(w, bc);
-		else UpdateWidgetCollider(w, w.GetComponent<BoxCollider2D>());
+		else UpdateWidgetCollider(w, w.FastGetComponent<BoxCollider2D>());
+	}
+
+	/// <summary>
+	/// GetComponent() allocates memory in Unity. TryGetComponent() does not, but it requires allocating a local variable just to do a null check. This fixes that.
+	/// </summary>
+
+	static public T FastGetComponent<T> (this Component c) where T : Component
+	{
+		T t;
+		if (c && c.TryGetComponent(out t)) return t;
+		return null;
+	}
+
+	/// <summary>
+	/// GetComponent() allocates memory in Unity. TryGetComponent() does not, but it requires allocating a local variable just to do a null check. This fixes that.
+	/// </summary>
+
+	static public T FastGetComponent<T> (this GameObject c) where T : Component
+	{
+		T t;
+		if (c && c.TryGetComponent(out t)) return t;
+		return null;
 	}
 
 	/// <summary>
@@ -469,21 +492,12 @@ static public class NGUITools
 				var c = new Vector2((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
 				var s = new Vector2(region.z - region.x, region.w - region.y);
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-				if (c != box.center || s != box.size)
-				{
-					box.center = c;
-					box.size = s;
-					NGUITools.SetDirty(box);
-				}
-#else
 				if (c != box.offset || s != box.size)
 				{
 					box.offset = c;
 					box.size = s;
 					NGUITools.SetDirty(box);
 				}
-#endif
 			}
 			else
 			{
@@ -491,21 +505,12 @@ static public class NGUITools
 				var c = Vector2.Lerp(corners[0], corners[2], 0.5f);
 				var s = (Vector2)(corners[2] - corners[0]);
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-				if (c != box.center || s != box.size)
-				{
-					box.center = c;
-					box.size = s;
-					NGUITools.SetDirty(box);
-				}
-#else
 				if (c != box.offset || s != box.size)
 				{
 					box.offset = c;
 					box.size = s;
 					NGUITools.SetDirty(box);
 				}
-#endif
 			}
 #if UNITY_EDITOR
 			NGUITools.SetDirty(box);
@@ -521,10 +526,10 @@ static public class NGUITools
 	{
 		if (box != null)
 		{
-			GameObject go = box.gameObject;
-			UIWidget w = go.GetComponent<UIWidget>();
+			var go = box.gameObject;
+			UIWidget w;
 
-			if (w != null)
+			if (go.TryGetComponent(out w))
 			{
 				var dr = w.drawRegion;
 
@@ -534,21 +539,12 @@ static public class NGUITools
 					var c = new Vector2((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
 					var s = new Vector2(region.z - region.x, region.w - region.y);
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-					if (c != box.center || s != box.size)
-					{
-						box.center = c;
-						box.size = s;
-						NGUITools.SetDirty(box);
-					}
-#else
 					if (c != box.offset || s != box.size)
 					{
 						box.offset = c;
 						box.size = s;
 						NGUITools.SetDirty(box);
 					}
-#endif
 				}
 				else
 				{
@@ -556,31 +552,18 @@ static public class NGUITools
 					var c = Vector2.Lerp(corners[0], corners[2], 0.5f);
 					var s = (Vector2)(corners[2] - corners[0]);
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-					if (c != box.center || s != box.size)
-					{
-						box.center = c;
-						box.size = s;
-						NGUITools.SetDirty(box);
-					}
-#else
 					if (c != box.offset || s != box.size)
 					{
 						box.offset = c;
 						box.size = s;
 						NGUITools.SetDirty(box);
 					}
-#endif
 				}
 			}
 			else
 			{
-				Bounds b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-				box.center = b.center;
-#else
+				var b = NGUIMath.CalculateRelativeWidgetBounds(go.transform, considerInactive);
 				box.offset = b.center;
-#endif
 				box.size = new Vector2(b.size.x, b.size.y);
 			}
 #if UNITY_EDITOR
@@ -841,30 +824,11 @@ static public class NGUITools
 
 	static public int CalculateRaycastDepth (GameObject go)
 	{
-#if UNITY_5_5_OR_NEWER
-		UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-#else
-		Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-#endif
-		var w = go.GetComponent<UIWidget>();
-
-		if (w != null)
-		{
-#if UNITY_5_5_OR_NEWER
-			UnityEngine.Profiling.Profiler.EndSample();
-#else
-			Profiler.EndSample();
-#endif
-			return w.raycastDepth;
-		}
+		UIWidget w;
+		if (go.TryGetComponent(out w)) return w.raycastDepth;
 
 		s_widgets.Clear();
 		go.GetComponentsInChildren(s_widgets);
-#if UNITY_5_5_OR_NEWER
-		UnityEngine.Profiling.Profiler.EndSample();
-#else
-		Profiler.EndSample();
-#endif
 
 		for (int i = 0, imax = s_widgets.Count; i < imax; ++i)
 		{
@@ -929,11 +893,9 @@ static public class NGUITools
 
 				if (w.isSelectable && w.enabled)
 				{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-					if (w.cachedGameObject != go && (w.collider != null || w.GetComponent<Collider2D>() != null)) continue;
-#else
-					if (w.cachedGameObject != go && (w.GetComponent<Collider>() != null || w.GetComponent<Collider2D>() != null)) continue;
-#endif
+					Collider c;
+					Collider2D c2;
+					if (w.cachedGameObject != go && (w.TryGetComponent(out c) || w.TryGetComponent(out c2))) continue;
 					depth = Mathf.Max(depth, w.depth);
 				}
 			}
@@ -951,9 +913,9 @@ static public class NGUITools
 	{
 		if (go != null)
 		{
-			UIPanel panel = go.GetComponent<UIPanel>();
-
-			if (panel != null)
+			UIPanel panel;
+			
+			if (go.TryGetComponent(out panel))
 			{
 				UIPanel[] panels = go.GetComponentsInChildren<UIPanel>(true);
 
@@ -1157,13 +1119,9 @@ static public class NGUITools
 		// If we are working with a different UI type, we need to treat it as a brand-new one instead
 		if (root != null)
 		{
-			UICamera cam = root.GetComponentInChildren<UICamera>();
+			var cam = root.GetComponentInChildren<UICamera>();
 
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-			if (cam != null && cam.camera.isOrthoGraphic == advanced3D)
-#else
-			if (cam != null && cam.GetComponent<Camera>().orthographic == advanced3D)
-#endif
+			if (cam != null && cam.FastGetComponent<Camera>().orthographic == advanced3D)
 			{
 				trans = null;
 				root = null;
@@ -1387,21 +1345,10 @@ static public class NGUITools
 	static public T FindInParents<T> (GameObject go) where T : Component
 	{
 		if (go == null) return null;
-
-#if UNITY_5_5_OR_NEWER
-		UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
+		UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponentInParent)");
 		var comp = go.GetComponentInParent<T>();
 		UnityEngine.Profiling.Profiler.EndSample();
-#else
-		Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-		var comp = go.GetComponentInParent<T>();
-		Profiler.EndSample();
-#endif
-#if UNITY_FLASH
-		return (T)comp;
-#else
 		return comp;
-#endif
 	}
 
 	/// <summary>
@@ -1413,20 +1360,10 @@ static public class NGUITools
 	{
 		if (trans == null) return null;
 
-#if UNITY_5_5_OR_NEWER
-		UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
+		UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (GetComponentInParent)");
 		var comp = trans.GetComponentInParent<T>();
 		UnityEngine.Profiling.Profiler.EndSample();
-#else
-		Profiler.BeginSample("Editor-only GC allocation (GetComponent)");
-		var comp = trans.GetComponentInParent<T>();
-		Profiler.EndSample();
-#endif
-#if UNITY_FLASH
-		return (T)comp;
-#else
 		return comp;
-#endif
 	}
 
 	/// <summary>
@@ -1607,10 +1544,9 @@ static public class NGUITools
 	[System.Diagnostics.DebuggerStepThrough]
 	static void CallCreatePanel (Transform t)
 	{
-		var w = t.GetComponent<UIWidget>();
-		if (w != null) w.CreatePanel();
-		for (int i = 0, imax = t.childCount; i < imax; ++i)
-			CallCreatePanel(t.GetChild(i));
+		UIWidget w;
+		if (t.TryGetComponent(out w)) w.CreatePanel();
+		for (int i = 0, imax = t.childCount; i < imax; ++i) CallCreatePanel(t.GetChild(i));
 	}
 
 	/// <summary>
@@ -1717,10 +1653,13 @@ static public class NGUITools
 
 	static public void MakePixelPerfect (Transform t)
 	{
-		UIWidget w = t.GetComponent<UIWidget>();
-		if (w != null) w.MakePixelPerfect();
+		UIWidget w;
+		if (t.TryGetComponent(out w)) w.MakePixelPerfect();
 
-		if (t.GetComponent<UIAnchor>() == null && t.GetComponent<UIRoot>() == null)
+		UIAnchor a;
+		UIRoot r;
+
+		if (!t.TryGetComponent(out a) && !t.TryGetComponent(out r))
 		{
 #if UNITY_EDITOR
 			RegisterUndo(t, "Make Pixel-Perfect");
@@ -1730,8 +1669,7 @@ static public class NGUITools
 		}
 
 		// Recurse into children
-		for (int i = 0, imax = t.childCount; i < imax; ++i)
-			MakePixelPerfect(t.GetChild(i));
+		for (int i = 0, imax = t.childCount; i < imax; ++i) MakePixelPerfect(t.GetChild(i));
 	}
 
 	/// <summary>
@@ -1789,26 +1727,31 @@ static public class NGUITools
 	{
 		bounds = NGUIMath.CalculateRelativeWidgetBounds(transform, content, considerInactive);
 
-		Vector3 min = bounds.min;
-		Vector3 max = bounds.max;
-		Vector3 size = bounds.size;
+		var min = bounds.min;
+		var max = bounds.max;
+		var size = bounds.size;
 
 		size.x += min.x;
 		size.y -= max.y;
+
+		var w = Screen.width;
+		var h = Screen.height;
+		var s = 1f;
 
 		if (cam != null)
 		{
 			// Since the screen can be of different than expected size, we want to convert
 			// mouse coordinates to view space, then convert that to world position.
-			pos.x = Mathf.Clamp01(pos.x / Screen.width);
-			pos.y = Mathf.Clamp01(pos.y / Screen.height);
+			pos.x = Mathf.Clamp01(pos.x / w);
+			pos.y = Mathf.Clamp01(pos.y / h);
 
 			// Calculate the ratio of the camera's target orthographic size to current screen size
 			float activeSize = cam.orthographicSize / transform.parent.lossyScale.y;
-			float ratio = (Screen.height * 0.5f) / activeSize;
+			float ratio = (h * 0.5f) / activeSize;
 
 			// Calculate the maximum on-screen size of the tooltip window
-			max = new Vector2(ratio * size.x / Screen.width, ratio * size.y / Screen.height);
+			max = new Vector2(ratio * size.x / w, ratio * Mathf.Min(size.y, h) / h);
+			s = (size.y > h) ? h / size.y : 1f;
 
 			// Limit the tooltip to always be visible
 			pos.x = Mathf.Min(pos.x, 1f - max.x);
@@ -1823,14 +1766,16 @@ static public class NGUITools
 		else
 		{
 			// Don't let the tooltip leave the screen area
-			if (pos.x + size.x > Screen.width) pos.x = Screen.width - size.x;
+			if (pos.x + size.x > w) pos.x = w - size.x;
 			if (pos.y - size.y < 0f) pos.y = size.y;
 
 			// Simple calculation that assumes that the camera is of fixed size
-			pos.x -= Screen.width * 0.5f;
-			pos.y -= Screen.height * 0.5f;
+			pos.x -= w * 0.5f;
+			pos.y -= h * 0.5f;
 		}
+
 		transform.localPosition = pos;
+		transform.localScale = new Vector3(s, s, s);
 	}
 
 	/// <summary>
@@ -1962,25 +1907,17 @@ static public class NGUITools
 
 	static public T AddMissingComponent<T> (this GameObject go) where T : Component
 	{
-#if UNITY_FLASH
-		object comp = go.GetComponent<T>();
-#else
 		T comp;
 		go.TryGetComponent(out comp);
-#endif
+		
 		if (comp == null)
 		{
 #if UNITY_EDITOR
-			if (!Application.isPlaying)
-				RegisterUndo(go, "Add " + typeof(T));
+			if (!Application.isPlaying) RegisterUndo(go, "Add " + typeof(T));
 #endif
 			comp = go.AddComponent<T>();
 		}
-#if UNITY_FLASH
-		return (T)comp;
-#else
 		return comp;
-#endif
 	}
 
 	// Temporary variable to avoid GC allocation
@@ -2235,11 +2172,7 @@ static public class NGUITools
 
 			if (mSizeFrame != frame || !Application.isPlaying)
 			{
-#if UNITY_5_5_OR_NEWER
 				UnityEngine.Profiling.Profiler.BeginSample("Editor-only GC allocation (NGUITools.screenSize)");
-#else
-				Profiler.BeginSample("Editor-only GC allocation (NGUITools.screenSize)");
-#endif
 				mSizeFrame = frame;
 
 				if (s_GetSizeOfMainGameView == null && !mCheckedMainViewFunc)
@@ -2278,11 +2211,7 @@ static public class NGUITools
 //#endif
 				}
 				else mGameSize = new Vector2(Screen.width, Screen.height);
-#if UNITY_5_5_OR_NEWER
 				UnityEngine.Profiling.Profiler.EndSample();
-#else
-				Profiler.EndSample();
-#endif
 			}
 			return mGameSize;
 		}
@@ -2550,8 +2479,8 @@ static public class NGUITools
 			case KeyCode.KeypadEquals: return "KQ";
 			case KeyCode.UpArrow: return "UP";
 			case KeyCode.DownArrow: return "DN";
-			case KeyCode.RightArrow: return "LT";
-			case KeyCode.LeftArrow: return "RT";
+			case KeyCode.RightArrow: return "RT";
+			case KeyCode.LeftArrow: return "LT";
 			case KeyCode.Insert: return "Ins";
 			case KeyCode.Home: return "Home";
 			case KeyCode.End: return "End";

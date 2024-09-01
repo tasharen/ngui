@@ -41,6 +41,8 @@ public class UIWrapContentEditor : Editor
 		GUILayout.Label("pixels");
 		GUILayout.EndHorizontal();
 
+		NGUIEditorTools.DrawProperty(serializedObject, "lastItemSize");
+
 		GUILayout.BeginHorizontal();
 		SerializedProperty sp1 = NGUIEditorTools.DrawProperty("Range Limit", serializedObject, "minIndex", GUILayout.Width(130f));
 		NGUIEditorTools.SetLabelWidth(20f);
@@ -51,7 +53,13 @@ public class UIWrapContentEditor : Editor
 
 		serializedObject.DrawProperty("hideInactive");
 
-		NGUIEditorTools.DrawProperty("Cull Content", serializedObject, "cullContent");
+		NGUIEditorTools.DrawProperty(serializedObject, "cullContent");
+		NGUIEditorTools.DrawProperty(serializedObject, "inverted");
+
+		NGUIEditorTools.DrawProperty(serializedObject, "leftIndicator");
+		NGUIEditorTools.DrawProperty(serializedObject, "rightIndicator");
+		NGUIEditorTools.DrawProperty(serializedObject, "aboveIndicator");
+		NGUIEditorTools.DrawProperty(serializedObject, "belowIndicator");
 
 		if (!string.IsNullOrEmpty(error))
 		{

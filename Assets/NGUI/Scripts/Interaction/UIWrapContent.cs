@@ -20,13 +20,14 @@ using System.Collections.Generic;
 [AddComponentMenu("NGUI/Interaction/Wrap Content")]
 public class UIWrapContent : MonoBehaviour
 {
-	public delegate void OnInitializeItem (GameObject go, int wrapIndex, int realIndex);
-
 	/// <summary>
 	/// Width or height of the child items for positioning purposes.
 	/// </summary>
 
 	public int itemSize = 100;
+
+	[Tooltip("Last item can be smaller than item size, allowing the indicator to not appear on that side")]
+	public int lastItemSize = 0;
 
 	/// <summary>
 	/// Whether the content will be automatically culled. Enabling this will improve performance in scroll views that contain a lot of items.
@@ -54,19 +55,50 @@ public class UIWrapContent : MonoBehaviour
 
 	public bool hideInactive = false;
 
+	[Tooltip("Inverted wrapped content will extend from the bottom upwards instead of from the top down.")]
+	public bool inverted = false;
+
 	/// <summary>
 	/// Callback that will be called every time an item needs to have its content updated.
-	/// The 'wrapIndex' is the index within the child list, and 'realIndex' is the index using position logic.
+	/// The first integer is the index within the child list, and the second integer is the index using the position logic (real index, between minIndex and maxIndex).
 	/// </summary>
 
-	public OnInitializeItem onInitializeItem;
+	public System.Action<GameObject, int, int> onInitializeItem;
 
-	protected Transform mTrans;
-	protected UIPanel mPanel;
-	protected UIScrollView mScroll;
-	protected bool mHorizontal = false;
-	protected bool mFirstTime = true;
-	protected List<Transform> mChildren = new List<Transform>();
+	/// <summary>
+	/// Called after the WrapContent() executes.
+	/// </summary>
+
+	public System.Action onPostWrapContent;
+
+	// The properties below are valid when onPostWrapContent gets called and can be used to indicate if there is content remaining to be scrolled towards.
+	
+	public bool contentAbove { get; private set; }
+
+	public bool contentBelow { get; private set; }
+
+	public bool contentLeft { get; private set; }
+
+	public bool contentRight { get; private set; }
+
+	[Tooltip("This game object will be enabled when there is more content off on the left side")]
+	public GameObject leftIndicator;
+
+	[Tooltip("This game object will be enabled when there is more content off on the right side")]
+	public GameObject rightIndicator;
+
+	[Tooltip("This game object will be enabled when there is more content above the scroll view")]
+	public GameObject aboveIndicator;
+
+	[Tooltip("This game object will be enabled when there is more content below the scroll view")]
+	public GameObject belowIndicator;
+
+	[System.NonSerialized] protected Transform mTrans;
+	[System.NonSerialized] protected UIPanel mPanel;
+	[System.NonSerialized] protected UIScrollView mScroll;
+	[System.NonSerialized] protected bool mHorizontal = false;
+	[System.NonSerialized] protected bool mInitDone = false;
+	[System.NonSerialized] protected List<Transform> mChildren = new List<Transform>();
 
 	/// <summary>
 	/// Initialize everything and register a callback with the UIPanel to be notified when the clipping region moves.
@@ -74,17 +106,44 @@ public class UIWrapContent : MonoBehaviour
 
 	protected virtual void Start ()
 	{
+		if (!mInitDone)
+		{
+			mInitDone = true;
+
+			CacheScrollView();
+			mScroll.GetComponent<UIPanel>().onClipMove = null;
+
+			SortBasedOnScrollMovement();
+			WrapContent(false);
+
+			//Debug.Log(contentLeft + " " + contentRight + " " + contentBelow + " " + contentAbove);
+
+			if (contentRight || contentLeft || contentAbove || contentBelow) mScroll.GetComponent<UIPanel>().onClipMove = OnMove;
+			else mScroll.GetComponent<UIPanel>().onClipMove = null;
+		}
+	}
+
+	/// <summary>
+	/// Recalculate all the wrapped child positions and reset to the beginning.
+	/// </summary>
+
+	[ContextMenu("Reposition")]
+	public void Reposition ()
+	{
+		if (!mInitDone) { enabled = true; return; }
+
 		SortBasedOnScrollMovement();
-		WrapContent();
-		if (mScroll != null) mScroll.GetComponent<UIPanel>().onClipMove = OnMove;
-		mFirstTime = false;
+		WrapContent(false);
+
+		if (contentRight || contentLeft || contentAbove || contentBelow) mScroll.GetComponent<UIPanel>().onClipMove = OnMove;
+		else mScroll.GetComponent<UIPanel>().onClipMove = null;
 	}
 
 	/// <summary>
 	/// Callback triggered by the UIPanel when its clipping region moves (for example when it's being scrolled).
 	/// </summary>
 
-	protected virtual void OnMove (UIPanel panel) { WrapContent(); }
+	protected virtual void OnMove (UIPanel panel) { WrapContent(false); }
 
 	/// <summary>
 	/// Immediately reposition all children.
@@ -97,9 +156,10 @@ public class UIWrapContent : MonoBehaviour
 
 		// Cache all children and place them in order
 		mChildren.Clear();
+
 		for (int i = 0; i < mTrans.childCount; ++i)
 		{
-			Transform t = mTrans.GetChild(i);
+			var t = mTrans.GetChild(i);
 			if (hideInactive && !t.gameObject.activeInHierarchy) continue;
 			mChildren.Add(t);
 		}
@@ -157,8 +217,8 @@ public class UIWrapContent : MonoBehaviour
 	{
 		for (int i = 0, imax = mChildren.Count; i < imax; ++i)
 		{
-			Transform t = mChildren[i];
-			t.localPosition = mHorizontal ? new Vector3(i * itemSize, 0f, 0f) : new Vector3(0f, -i * itemSize, 0f);
+			var t = mChildren[i];
+			t.localPosition = mHorizontal ? new Vector3(inverted ? -i * itemSize : i * itemSize, 0f, 0f) : new Vector3(0f, inverted ? i * itemSize : -i * itemSize, 0f);
 			UpdateItem(t, i);
 		}
 	}
@@ -167,49 +227,54 @@ public class UIWrapContent : MonoBehaviour
 	/// Wrap all content, repositioning all children as needed.
 	/// </summary>
 
-	public virtual void WrapContent ()
+	public virtual void WrapContent (bool firstTime)
 	{
-		float extents = itemSize * mChildren.Count * 0.5f;
-		Vector3[] corners = mPanel.worldCorners;
+		contentAbove = false;
+		contentBelow = false;
+		contentLeft = false;
+		contentRight = false;
+
+		var extents = itemSize * mChildren.Count * 0.5f;
+		var corners = mPanel.worldCorners;
 		
 		for (int i = 0; i < 4; ++i)
 		{
-			Vector3 v = corners[i];
+			var v = corners[i];
 			v = mTrans.InverseTransformPoint(v);
 			corners[i] = v;
 		}
 		
-		Vector3 center = Vector3.Lerp(corners[0], corners[2], 0.5f);
-		bool allWithinRange = true;
-		float ext2 = extents * 2f;
+		var center = Vector3.Lerp(corners[0], corners[2], 0.5f);
+		var ext2 = extents * 2f;
 
 		if (mHorizontal)
 		{
-			float min = corners[0].x - itemSize;
-			float max = corners[2].x + itemSize;
+			var min = corners[0].x - itemSize;
+			var max = corners[2].x + itemSize;
 
 			for (int i = 0, imax = mChildren.Count; i < imax; ++i)
 			{
-				Transform t = mChildren[i];
-				float distance = t.localPosition.x - center.x;
+				var t = mChildren[i];
+				var distance = t.localPosition.x - center.x;
+				var valid = true;
 
 				if (distance < -extents)
 				{
-					Vector3 pos = t.localPosition;
+					var pos = t.localPosition;
 					pos.x += ext2;
 					distance = pos.x - center.x;
-					int realIndex = Mathf.RoundToInt(pos.x / itemSize);
+					var realIndex = Mathf.RoundToInt(pos.x / itemSize);
 
 					if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
 					{
 						t.localPosition = pos;
-						UpdateItem(t, i);
+						valid = UpdateItem(t, i);
 					}
-					else allWithinRange = false;
+					else valid = UpdateItem(t, i, false);
 				}
 				else if (distance > extents)
 				{
-					Vector3 pos = t.localPosition;
+					var pos = t.localPosition;
 					pos.x -= ext2;
 					distance = pos.x - center.x;
 					int realIndex = Mathf.RoundToInt(pos.x / itemSize);
@@ -217,70 +282,116 @@ public class UIWrapContent : MonoBehaviour
 					if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
 					{
 						t.localPosition = pos;
-						UpdateItem(t, i);
+						valid = UpdateItem(t, i);
 					}
-					else allWithinRange = false;
+					else valid = UpdateItem(t, i, false);
 				}
-				else if (mFirstTime) UpdateItem(t, i);
+				else if (firstTime) valid = UpdateItem(t, i);
+				else valid = UpdateItem(t, i, false);
+
+				if (valid)
+				{
+					var x = t.localPosition.x;
+					if (x < corners[0].x) contentLeft = true;
+					if (x + (lastItemSize > 0 ? lastItemSize : itemSize) > corners[2].x) contentRight = true;
+				}
+
+				distance += mPanel.clipOffset.x - mTrans.localPosition.x;
 
 				if (cullContent)
 				{
-					distance += mPanel.clipOffset.x - mTrans.localPosition.x;
-					if (!UICamera.IsPressed(t.gameObject))
-						NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
+					if (!UICamera.IsPressed(t.gameObject)) NGUITools.SetActive(t.gameObject, valid && (distance > min && distance < max), false);
+					else NGUITools.SetActive(t.gameObject, valid, false);
 				}
+				else NGUITools.SetActive(t.gameObject, valid, false);
 			}
+
+			if (mScroll.currentMomentum.x < 0f) mScroll.restrictWithinPanel = !contentRight;
+			else if (mScroll.currentMomentum.x > 0f) mScroll.restrictWithinPanel = !contentLeft;
+			else mScroll.restrictWithinPanel = true;
+
+			mScroll.disableDragIfFits = !contentRight && !contentLeft;
 		}
 		else
 		{
-			float min = corners[0].y - itemSize;
-			float max = corners[2].y + itemSize;
+			var min = corners[0].y - itemSize;
+			var max = corners[2].y + itemSize;
 
 			for (int i = 0, imax = mChildren.Count; i < imax; ++i)
 			{
-				Transform t = mChildren[i];
-				float distance = t.localPosition.y - center.y;
+				var t = mChildren[i];
+				var distance = t.localPosition.y - center.y;
+				var valid = true;
 
 				if (distance < -extents)
 				{
-					Vector3 pos = t.localPosition;
+					var pos = t.localPosition;
 					pos.y += ext2;
 					distance = pos.y - center.y;
-					int realIndex = Mathf.RoundToInt(pos.y / itemSize);
+					var realIndex = Mathf.RoundToInt(pos.y / itemSize);
 
 					if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
 					{
 						t.localPosition = pos;
-						UpdateItem(t, i);
+						valid = UpdateItem(t, i);
 					}
-					else allWithinRange = false;
+					else valid = UpdateItem(t, i, false);
 				}
 				else if (distance > extents)
 				{
-					Vector3 pos = t.localPosition;
+					var pos = t.localPosition;
 					pos.y -= ext2;
 					distance = pos.y - center.y;
-					int realIndex = Mathf.RoundToInt(pos.y / itemSize);
+					var realIndex = Mathf.RoundToInt(pos.y / itemSize);
 
 					if (minIndex == maxIndex || (minIndex <= realIndex && realIndex <= maxIndex))
 					{
 						t.localPosition = pos;
-						UpdateItem(t, i);
+						valid = UpdateItem(t, i);
 					}
-					else allWithinRange = false;
+					else valid = UpdateItem(t, i, false);
 				}
-				else if (mFirstTime) UpdateItem(t, i);
+				else if (firstTime) valid = UpdateItem(t, i);
+				else valid = UpdateItem(t, i, false);
+
+				if (valid)
+				{
+					var y = t.localPosition.y;
+					if (y < corners[0].y) contentBelow = true;
+					if (y + (lastItemSize > 0 ? lastItemSize : itemSize) > corners[2].y) contentAbove = true;
+				}
+
+				distance += mPanel.clipOffset.y - mTrans.localPosition.y;
 
 				if (cullContent)
 				{
-					distance += mPanel.clipOffset.y - mTrans.localPosition.y;
-					if (!UICamera.IsPressed(t.gameObject))
-						NGUITools.SetActive(t.gameObject, (distance > min && distance < max), false);
+					if (!UICamera.IsPressed(t.gameObject)) NGUITools.SetActive(t.gameObject, valid && (distance > min && distance < max), false);
+					else NGUITools.SetActive(t.gameObject, valid, false);
 				}
+				else NGUITools.SetActive(t.gameObject, valid, false);
 			}
+
+			if (mScroll.currentMomentum.y < 0f) mScroll.restrictWithinPanel = !contentAbove;
+			else if (mScroll.currentMomentum.y > 0f) mScroll.restrictWithinPanel = !contentBelow;
+			else mScroll.restrictWithinPanel = true;
+
+			mScroll.disableDragIfFits = !contentAbove && !contentBelow;
 		}
-		mScroll.restrictWithinPanel = !allWithinRange;
+
+		SetIndicator(aboveIndicator, contentAbove);
+		SetIndicator(belowIndicator, contentBelow);
+		SetIndicator(leftIndicator, contentLeft);
+		SetIndicator(rightIndicator, contentRight);
+
 		mScroll.InvalidateBounds();
+
+		if (onPostWrapContent != null) onPostWrapContent();
+	}
+
+	void SetIndicator (GameObject go, bool state)
+	{
+		if (!go || go.activeSelf == state) return;
+		go.SetActive(state);
 	}
 
 	/// <summary>
@@ -299,14 +410,25 @@ public class UIWrapContent : MonoBehaviour
 	/// Want to update the content of items as they are scrolled? Override this function.
 	/// </summary>
 
-	protected virtual void UpdateItem (Transform item, int index)
+	protected virtual bool UpdateItem (Transform item, int index, bool changed = true)
 	{
-		if (onInitializeItem != null)
+		var realIndex = (mScroll.movement == UIScrollView.Movement.Vertical) ?
+			Mathf.RoundToInt(item.localPosition.y / itemSize) :
+			Mathf.RoundToInt(item.localPosition.x / itemSize);
+
+		if (realIndex >= minIndex && realIndex <= maxIndex)
 		{
-			int realIndex = (mScroll.movement == UIScrollView.Movement.Vertical) ?
-				Mathf.RoundToInt(item.localPosition.y / itemSize) :
-				Mathf.RoundToInt(item.localPosition.x / itemSize);
-			onInitializeItem(item.gameObject, index, realIndex);
+			if (changed)
+			{
+				item.name = index + " " + realIndex.ToString();
+				if (onInitializeItem != null) onInitializeItem(item.gameObject, index, realIndex);
+			}
+			return true;
+		}
+		else
+		{
+			if (changed) item.name = "Unused";
+			return false;
 		}
 	}
 }

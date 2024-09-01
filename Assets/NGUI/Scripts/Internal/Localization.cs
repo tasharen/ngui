@@ -626,10 +626,17 @@ static public class Localization
 	}
 
 	/// <summary>
+	/// Get the localized value of chosen key. The 'random seed' is used to retrieve a consistent result in case there are
+	/// multiple entries, for example when requesting "SomeKey" and the loc file has "SomeKey0", "SomeKey1" and "SomeKey2" instead.
+	/// </summary>
+
+	static public string Get (in string key, ulong randomSeed) { return Get(key, true, randomSeed); }
+
+	/// <summary>
 	/// Localize the specified value.
 	/// </summary>
 
-	static public string Get (in string key, bool warnIfMissing = true)
+	static public string Get (in string key, bool warnIfMissing = true, ulong randomSeed = 0)
 	{
 		if (string.IsNullOrEmpty(key)) return null;
 
@@ -720,6 +727,14 @@ static public class Localization
 					else break;
 				}
 
+				#if W2
+				if (randomSeed != 0)
+				{
+					var rg = new RandomGenerator((uint)randomSeed);
+					mDictionary.TryGetValue(key + rg.Range(0, last + 1), out vals);
+				}
+				else
+				#endif
 				mDictionary.TryGetValue(key + Random.Range(0, last + 1), out vals);
 
 				if (mLanguageIndex < vals.Length)

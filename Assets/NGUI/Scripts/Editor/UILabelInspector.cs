@@ -316,8 +316,10 @@ public class UILabelInspector : UIWidgetInspector
 
 			if (NGUISettings.overflowStyle == UILabel.Overflow.ResizeFreely)
 			{
+				NGUIEditorTools.DrawPaddedProperty("Min Width", serializedObject, "mMinWidth");
+
 				GUILayout.BeginHorizontal();
-				SerializedProperty s = NGUIEditorTools.DrawPaddedProperty("Max Width", serializedObject, "mOverflowWidth");
+				var s = NGUIEditorTools.DrawPaddedProperty("Max Width", serializedObject, "mOverflowWidth");
 
 				if (s != null)
 				{

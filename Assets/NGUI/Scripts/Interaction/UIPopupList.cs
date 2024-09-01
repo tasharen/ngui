@@ -526,7 +526,7 @@ public class UIPopupList : UIWidgetContainer
 	/// Trigger all event notification callbacks.
 	/// </summary>
 
-	protected void TriggerCallbacks ()
+	public void TriggerCallbacks ()
 	{
 		if (!mExecuting)
 		{
@@ -1121,7 +1121,10 @@ public class UIPopupList : UIWidgetContainer
 
 			// Clear the selection if it's no longer present
 			if (!items.Contains(mSelectedItem))
+			{
 				mSelectedItem = null;
+				TriggerCallbacks();
+			}
 
 			// Run through all items and create labels for each one
 			for (int i = 0, imax = items.Count; i < imax; ++i)

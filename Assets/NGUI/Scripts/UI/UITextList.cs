@@ -250,7 +250,7 @@ public class UITextList : MonoBehaviour
 	/// Add a new paragraph.
 	/// </summary>
 
-	public void Add (string text)
+	public void Add (in string text)
 	{
 		Paragraph ce = null;
 
@@ -294,6 +294,7 @@ public class UITextList : MonoBehaviour
 			{
 				string final;
 				Paragraph p = mParagraphs.buffer[i];
+				NGUIText.tint = Color.white;
 				NGUIText.WrapText(p.text, out final, false, true);
 				p.lines = final.Split('\n');
 				mTotalLines += p.lines.Length;

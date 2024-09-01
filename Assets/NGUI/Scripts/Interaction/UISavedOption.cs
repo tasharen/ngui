@@ -50,7 +50,7 @@ public class UISavedOption : MonoBehaviour
 		else if (mCheck != null)
 		{
 			EventDelegate.Add(mCheck.onChange, SaveState);
-			mCheck.value = (PlayerPrefs.GetInt(key, mCheck.startsActive ? 1 : 0) != 0);
+			mCheck.value = (PlayerPrefs.GetInt(key, mCheck.startsActive ? 1 : -1) == 1);
 		}
 		else if (mSlider != null)
 		{
@@ -106,7 +106,7 @@ public class UISavedOption : MonoBehaviour
 	/// Save the state.
 	/// </summary>
 
-	public void SaveState () { PlayerPrefs.SetInt(key, UIToggle.current.value ? 1 : 0); }
+	public void SaveState () { PlayerPrefs.SetInt(key, UIToggle.current.value ? 1 : -1); }
 
 	/// <summary>
 	/// Save the current progress.

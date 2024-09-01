@@ -171,8 +171,8 @@ public class UIDraggableCamera : MonoBehaviour
 				if (scrollZoomRange.x == 0f) mScroll = 0f;
 
 				// Disable the spring movement
-				var sp = GetComponent<SpringPosition>();
-				if (sp != null) sp.enabled = false;
+				SpringPosition sp;
+				if (TryGetComponent(out sp)) sp.enabled = false;
 			}
 			else if (dragEffect == UIDragObject.DragEffect.MomentumAndSpring)
 			{

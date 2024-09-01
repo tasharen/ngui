@@ -243,8 +243,7 @@ public class UIToggle : UIWidgetContainer
 		{
 			mIsActive = state;
 			startsActive = state;
-			if (activeSprite != null)
-				activeSprite.alpha = invertSpriteState ? (state ? 0f : 1f) : (state ? 1f : 0f);
+			if (activeSprite != null) activeSprite.alpha = invertSpriteState ? (state ? 0f : 1f) : (state ? 1f : 0f);
 		}
 		else if (mIsActive != state)
 		{

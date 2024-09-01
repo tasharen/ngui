@@ -1485,8 +1485,10 @@ public class UIWidget : UIRect
 
 				if (fillGeometry)
 				{
+					UnityEngine.Profiling.Profiler.BeginSample("UIWidget.OnFill");
 					geometry.Clear();
 					OnFill(geometry.verts, geometry.uvs, geometry.cols);
+					UnityEngine.Profiling.Profiler.EndSample();
 				}
 
 				if (geometry.hasVertices)
@@ -1501,6 +1503,7 @@ public class UIWidget : UIRect
 					}
 
 					geometry.ApplyTransform(mLocalToPanel, panel.generateNormals);
+
 					mMoved = false;
 					mChanged = false;
 					return true;
@@ -1527,6 +1530,7 @@ public class UIWidget : UIRect
 				mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix;
 				mMatrixFrame = frame;
 			}
+
 			geometry.ApplyTransform(mLocalToPanel, panel.generateNormals);
 			mMoved = false;
 			mChanged = false;

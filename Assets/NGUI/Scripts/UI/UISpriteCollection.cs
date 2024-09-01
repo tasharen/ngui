@@ -36,6 +36,7 @@ public class UISpriteCollection : UIBasicSprite
 		public Type type;
 		public Flip flip;
 		public bool enabled;
+		public bool reactsToEvents;
 
 		/// <summary>
 		/// Calculate the sprite's drawing dimensions.
@@ -112,6 +113,12 @@ public class UISpriteCollection : UIBasicSprite
 
 	// Only valid during the OnFill process
 	[System.NonSerialized] UISpriteData mSprite;
+
+	/// <summary>
+	/// All of the managed sprites.
+	/// </summary>
+
+	public List<Sprite> sprites { get { return mSprites; } }
 
 	/// <summary>
 	/// Main texture is assigned on the atlas.
@@ -368,7 +375,7 @@ public class UISpriteCollection : UIBasicSprite
 	/// </summary>
 
 	public void AddSprite (object id, in string spriteName, Vector2 pos, float width, float height, Color32 color, Vector2 pivot,
-		float rot = 0f, float scale = 1f, Type type = Type.Simple, Flip flip = Flip.Nothing, bool enabled = true)
+		float rot = 0f, float scale = 1f, Type type = Type.Simple, Flip flip = Flip.Nothing, bool enabled = true, bool reactsToEvents = true)
 	{
 		if (mAtlas == null)
 		{
@@ -393,6 +400,7 @@ public class UISpriteCollection : UIBasicSprite
 		sprite.type = type;
 		sprite.flip = flip;
 		sprite.enabled = enabled;
+		sprite.reactsToEvents = reactsToEvents;
 		mSprites.Add(sprite);
 
 		if (enabled && !mChanged) MarkAsChanged();
@@ -647,6 +655,8 @@ public class UISpriteCollection : UIBasicSprite
 		for (int i = mSprites.Count; i > 0; )
 		{
 			var ent = mSprites[--i];
+			if (!ent.reactsToEvents) continue;
+
 			var v = pos - ent.pos;
 			if (ent.rot != 0f) v = Rotate(v, -ent.rot);
 

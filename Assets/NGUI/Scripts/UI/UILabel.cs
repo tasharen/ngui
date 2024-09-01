@@ -75,6 +75,7 @@ public class UILabel : UIWidget
 	[HideInInspector, SerializeField] float mFloatSpacingX = 0;
 	[HideInInspector, SerializeField] float mFloatSpacingY = 0;
 	[HideInInspector, SerializeField] bool mOverflowEllipsis = false;
+	[HideInInspector, SerializeField] int mMinWidth = 0;
 	[HideInInspector, SerializeField] int mOverflowWidth = 0;
 	[HideInInspector, SerializeField] int mOverflowHeight = 0;
 	[HideInInspector, SerializeField] Modifier mModifier = Modifier.None;
@@ -584,6 +585,32 @@ public class UILabel : UIWidget
 		get
 		{
 			return mUseFloatSpacing ? mFloatSpacingX : mSpacingX;
+		}
+	}
+
+	/// <summary>
+	/// Label's minimum allowed width.
+	/// </summary>
+
+	public override int minWidth { get { return Mathf.Max(base.minWidth, mMinWidth); } }
+
+	/// <summary>
+	/// Label's minimum allowed width.
+	/// </summary>
+
+	public int underflowWidth
+	{
+		get
+		{
+			return mMinWidth;
+		}
+		set
+		{
+			if (mMinWidth != value)
+			{
+				mMinWidth = value;
+				MarkAsChanged();
+			}
 		}
 	}
 
@@ -2376,6 +2403,9 @@ public class UILabel : UIWidget
 				Localization.Get(UIPopupList.current.value) :
 				UIPopupList.current.value;
 		}
+		#if UNITY_EDITOR
+		else Debug.LogWarning("UIPopupList.current hasn't been set");
+		#endif
 	}
 
 	/// <summary>

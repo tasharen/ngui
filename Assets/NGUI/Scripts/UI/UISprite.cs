@@ -215,66 +215,6 @@ public class UISprite : UIBasicSprite
 	}
 
 	/// <summary>
-	/// Whether a gradient will be applied.
-	/// </summary>
-
-	public bool applyGradient
-	{
-		get
-		{
-			return mApplyGradient;
-		}
-		set
-		{
-			if (mApplyGradient != value)
-			{
-				mApplyGradient = value;
-				MarkAsChanged();
-			}
-		}
-	}
-
-	/// <summary>
-	/// Top gradient color.
-	/// </summary>
-
-	public Color gradientTop
-	{
-		get
-		{
-			return mGradientTop;
-		}
-		set
-		{
-			if (mGradientTop != value)
-			{
-				mGradientTop = value;
-				if (mApplyGradient) MarkAsChanged();
-			}
-		}
-	}
-
-	/// <summary>
-	/// Bottom gradient color.
-	/// </summary>
-
-	public Color gradientBottom
-	{
-		get
-		{
-			return mGradientBottom;
-		}
-		set
-		{
-			if (mGradientBottom != value)
-			{
-				mGradientBottom = value;
-				if (mApplyGradient) MarkAsChanged();
-			}
-		}
-	}
-
-	/// <summary>
 	/// Sliced sprites generally have a border. X = left, Y = bottom, Z = right, W = top.
 	/// </summary>
 

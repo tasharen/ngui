@@ -355,12 +355,13 @@ public class UIDrawCall : MonoBehaviour
 
 	void CreateMaterial ()
 	{
+		UnityEngine.Profiling.Profiler.BeginSample("UIDrawCall.CreateMaterial");
+
 		mTextureClip = false;
 		mLegacyShader = false;
 		mClipCount = panel.clipCount;
 
-		string shaderName = (mShader != null) ? mShader.name :
-			((mMaterial != null) ? mMaterial.shader.name : "Unlit/Transparent Colored");
+		var shaderName = (mShader != null) ? mShader.name : ((mMaterial != null) ? mMaterial.shader.name : "Unlit/Transparent Colored");
 
 		// Figure out the normal shader's name
 		shaderName = shaderName.Replace("GUI/Text Shader", "Unlit/Text");
@@ -374,8 +375,7 @@ public class UIDrawCall : MonoBehaviour
 			}
 		}
 
-		if (shaderName.StartsWith("Hidden/"))
-			shaderName = shaderName.Substring(7);
+		if (shaderName.StartsWith("Hidden/")) shaderName = shaderName.Substring(7);
 
 		// Legacy functionality
 		const string soft = " (SoftClip)";
@@ -408,14 +408,16 @@ public class UIDrawCall : MonoBehaviour
 
 		if (mMaterial != null)
 		{
+			UnityEngine.Profiling.Profiler.BeginSample("UIDrawCall.CreateMaterial (new copied material)");
 			mDynamicMat = new Material(mMaterial);
 			mDynamicMat.name = "[NGUI] " + mMaterial.name;
 			mDynamicMat.hideFlags = (HideFlags.DontSave | HideFlags.NotEditable);
+			UnityEngine.Profiling.Profiler.BeginSample("UIDrawCall.CreateMaterial (copy material properties)");
 			mDynamicMat.CopyPropertiesFromMaterial(mMaterial);
+			UnityEngine.Profiling.Profiler.EndSample();
 #if !UNITY_FLASH
-			string[] keywords = mMaterial.shaderKeywords;
-			for (int i = 0; i < keywords.Length; ++i)
-				mDynamicMat.EnableKeyword(keywords[i]);
+			var keywords = mMaterial.shaderKeywords;
+			for (int i = 0; i < keywords.Length; ++i) mDynamicMat.EnableKeyword(keywords[i]);
 #endif
 			// If there is a valid shader, assign it to the custom material
 			if (shader != null)
@@ -426,13 +428,19 @@ public class UIDrawCall : MonoBehaviour
 			{
 				Debug.LogError(shaderName + " shader doesn't have a clipped shader version for " + mClipCount + " clip regions");
 			}
+
+			UnityEngine.Profiling.Profiler.EndSample();
 		}
 		else
 		{
+			UnityEngine.Profiling.Profiler.BeginSample("UIDrawCall.CreateMaterial (new material)");
 			mDynamicMat = new Material(shader);
 			mDynamicMat.name = "[NGUI] " + shader.name;
 			mDynamicMat.hideFlags = HideFlags.DontSave | HideFlags.NotEditable;
+			UnityEngine.Profiling.Profiler.EndSample();
 		}
+
+		UnityEngine.Profiling.Profiler.EndSample();
 	}
 
 	/// <summary>
@@ -451,9 +459,11 @@ public class UIDrawCall : MonoBehaviour
 		// Update the renderer
 		if (mRenderer != null)
 		{
+			UnityEngine.Profiling.Profiler.BeginSample("UIDrawCall.RebuildMaterial");
 			mRenderer.sharedMaterials = new Material[] { mDynamicMat };
 			mRenderer.sortingLayerName = mSortingLayerName;
 			mRenderer.sortingOrder = mSortingOrder;
+			UnityEngine.Profiling.Profiler.EndSample();
 		}
 		return mDynamicMat;
 	}

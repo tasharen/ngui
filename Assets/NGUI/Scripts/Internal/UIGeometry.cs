@@ -80,6 +80,8 @@ public class UIGeometry
 
 	public void ApplyTransform (in Matrix4x4 widgetToPanel, bool generateNormals = true)
 	{
+		UnityEngine.Profiling.Profiler.BeginSample("UIGeometry.ApplyTransform");
+
 		if (verts.Count > 0)
 		{
 			mRtpVerts.Clear();
@@ -94,6 +96,8 @@ public class UIGeometry
 			}
 		}
 		else mRtpVerts.Clear();
+
+		UnityEngine.Profiling.Profiler.EndSample();
 	}
 
 	/// <summary>
@@ -102,6 +106,8 @@ public class UIGeometry
 
 	public void WriteToBuffers (List<Vector3> v, List<Vector2> u, List<Color> c, List<Vector3> n, List<Vector4> t, List<Vector4> u2, Vector4 dd)
 	{
+		UnityEngine.Profiling.Profiler.BeginSample("UIGeometry.WriteToBuffers");
+
 		if (mRtpVerts != null && mRtpVerts.Count > 0)
 		{
 			if (n == null)
@@ -141,5 +147,7 @@ public class UIGeometry
 
 			if (onCustomWrite != null) onCustomWrite(v, u, c, n, t, u2);
 		}
+
+		UnityEngine.Profiling.Profiler.EndSample();
 	}
 }

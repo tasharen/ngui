@@ -166,28 +166,49 @@ public class UIKeyBinding : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Whether the keybinding should react to key events.
+	/// </summary>
+
+	protected virtual bool Poll (out bool down, out bool up)
+	{
+		down = false;
+		up = false;
+
+		if (keyCode != KeyCode.Numlock && UICamera.inputHasFocus) return false;
+		if (keyCode == KeyCode.None || !IsModifierActive()) return false;
+		if (UIDragDropItem.IsDragged(gameObject)) return false;
+#if WINDWARD && UNITY_ANDROID
+		// NVIDIA Shield controller has an odd bug where it can open the on-screen keyboard via a KeyCode.Return binding,
+		// and then it can never be closed. I am disabling it here until I can track down the cause.
+		if (keyCode == KeyCode.Return && PlayerPrefs.GetInt("Start Chat") == 0) return false;
+#endif
+
+#if UNITY_FLASH
+		down = Input.GetKeyDown(keyCode);
+		up = Input.GetKeyUp(keyCode);
+#else
+		down = UICamera.GetKeyDown(keyCode);
+		up = UICamera.GetKeyUp(keyCode);
+#endif
+		return down || up;
+	}
+
+	/// <summary>
 	/// Process the key binding.
 	/// </summary>
 
 	protected virtual void Update ()
 	{
-		if (keyCode != KeyCode.Numlock && UICamera.inputHasFocus) return;
-		if (keyCode == KeyCode.None || !IsModifierActive()) return;
-		if (UIDragDropItem.IsDragged(gameObject)) return;
-#if WINDWARD && UNITY_ANDROID
-		// NVIDIA Shield controller has an odd bug where it can open the on-screen keyboard via a KeyCode.Return binding,
-		// and then it can never be closed. I am disabling it here until I can track down the cause.
-		if (keyCode == KeyCode.Return && PlayerPrefs.GetInt("Start Chat") == 0) return;
-#endif
+		bool keyDown, keyUp;
+		if (Poll(out keyDown, out keyUp)) React(keyDown, keyUp);
+	}
 
-#if UNITY_FLASH
-		bool keyDown = Input.GetKeyDown(keyCode);
-		bool keyUp = Input.GetKeyUp(keyCode);
-#else
-		bool keyDown = UICamera.GetKeyDown(keyCode);
-		bool keyUp = UICamera.GetKeyUp(keyCode);
-#endif
+	/// <summary>
+	/// React to key down or key up.
+	/// </summary>
 
+	protected void React (bool keyDown, bool keyUp)
+	{
 		if (keyDown) mPress = true;
 
 		if (action == Action.PressAndClick || action == Action.All)

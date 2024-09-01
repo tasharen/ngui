@@ -475,7 +475,7 @@ public class UIDragDropItem : MonoBehaviour
 	/// Called at the end of OnDragDropRelease, indicating that the cloned object should now be destroyed.
 	/// </summary>
 
-	protected virtual void DestroySelf () { NGUITools.Destroy(gameObject); }
+	protected virtual void DestroySelf () { Destroy(gameObject); }
 
 	/// <summary>
 	/// Function called when the object gets reparented after the drop operation finishes.
