@@ -89,39 +89,32 @@ public class UIButton : UIButtonColor
 		get
 		{
 			if (!enabled) return false;
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-			var col = collider;
-#else
-			var col = gameObject.GetComponent<Collider>();
-#endif
-			if (col && col.enabled) return true;
-			var c2d = GetComponent<Collider2D>();
-			return (c2d && c2d.enabled);
+			Collider c;
+			if (TryGetComponent(out c)) return c.enabled;
+			Collider2D c2;
+			if (TryGetComponent(out c2)) return c2.enabled;
+			return true;
 		}
 		set
 		{
 			if (isEnabled != value)
 			{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-				var col = collider;
-#else
-				var col = gameObject.GetComponent<Collider>();
-#endif
+				Collider c;
 				var instant = !gameObject.activeInHierarchy;
 
-				if (col != null)
+				if (TryGetComponent(out c))
 				{
-					col.enabled = value;
+					c.enabled = value;
 					var buttons = GetComponents<UIButtonColor>();
 					foreach (var btn in buttons) btn.SetState(value ? State.Normal : State.Disabled, instant);
 				}
 				else
 				{
-					var c2d = GetComponent<Collider2D>();
+					Collider2D c2;
 
-					if (c2d != null)
+					if (TryGetComponent(out c2))
 					{
-						c2d.enabled = value;
+						c2.enabled = value;
 						var buttons = GetComponents<UIButtonColor>();
 						foreach (var btn in buttons) btn.SetState(value ? State.Normal : State.Disabled, instant);
 					}
@@ -292,7 +285,7 @@ public class UIButton : UIButtonColor
 	/// Convenience function that changes the sprite.
 	/// </summary>
 
-	protected void SetSprite (in string sp)
+	protected void SetSprite (string sp)
 	{
 		if (mSprite != null && !string.IsNullOrEmpty(sp) && mSprite.spriteName != sp)
 		{

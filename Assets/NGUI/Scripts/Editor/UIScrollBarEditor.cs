@@ -17,15 +17,18 @@ public class UIScrollBarEditor : UIProgressBarEditor
 		float val = EditorGUILayout.Slider("Value", sb.value, 0f, 1f);
 		float size = EditorGUILayout.Slider("Size", sb.barSize, 0f, 1f);
 		float alpha = EditorGUILayout.Slider("Alpha", sb.alpha, 0f, 1f);
+		float sm = EditorGUILayout.Slider("Mouse Scroll", sb.mouseScroll, -0.1f, 0.1f);
 
 		if (sb.value != val ||
 			sb.barSize != size ||
-			sb.alpha != alpha)
+			sb.alpha != alpha ||
+			sb.mouseScroll != sm)
 		{
 			NGUIEditorTools.RegisterUndo("Scroll Bar Change", sb);
 			sb.value = val;
 			sb.barSize = size;
 			sb.alpha = alpha;
+			sb.mouseScroll = sm;
 			NGUITools.SetDirty(sb);
 
 			for (int i = 0; i < UIScrollView.list.size; ++i)

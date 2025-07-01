@@ -192,31 +192,31 @@ public interface INGUIFont
 	/// Retrieve the symbol at the beginning of the specified sequence, if a match is found.
 	/// </summary>
 
-	BMSymbol MatchSymbol (in string text, int offset, int textLength);
+	BMSymbol MatchSymbol (string text, int offset, int textLength);
 
 	/// <summary>
 	/// Add a new symbol to the font.
 	/// </summary>
 
-	BMSymbol AddSymbol (in string sequence, in string spriteName);
+	BMSymbol AddSymbol (string sequence, string spriteName);
 
 	/// <summary>
 	/// Remove the specified symbol from the font.
 	/// </summary>
 
-	void RemoveSymbol (in string sequence);
+	void RemoveSymbol (string sequence);
 
 	/// <summary>
 	/// Change an existing symbol's sequence to the specified value.
 	/// </summary>
 
-	void RenameSymbol (in string before, in string after);
+	void RenameSymbol (string before, string after);
 
 	/// <summary>
 	/// Whether the specified sprite is being used by the font.
 	/// </summary>
 
-	bool UsesSprite (in string s);
+	bool UsesSprite (string s);
 }
 
 /// <summary>
@@ -1127,7 +1127,7 @@ public class NGUIFont : ScriptableObject, INGUIFont
 	/// Retrieve the symbol at the beginning of the specified sequence, if a match is found.
 	/// </summary>
 
-	public BMSymbol MatchSymbol (in string text, int offset, int textLength)
+	public BMSymbol MatchSymbol (string text, int offset, int textLength)
 	{
 		if (offset < 0 || offset >= textLength) return null;
 		var atl = symbolAtlas != null ? symbolAtlas : atlas;
@@ -1219,7 +1219,7 @@ public class NGUIFont : ScriptableObject, INGUIFont
 	/// Add a new symbol to the font.
 	/// </summary>
 
-	public BMSymbol AddSymbol (in string sequence, in string spriteName)
+	public BMSymbol AddSymbol (string sequence, string spriteName)
 	{
 		var symbol = GetSymbol(sequence, true);
 		symbol.spriteName = spriteName;
@@ -1231,7 +1231,7 @@ public class NGUIFont : ScriptableObject, INGUIFont
 	/// Remove the specified symbol from the font.
 	/// </summary>
 
-	public void RemoveSymbol (in string sequence)
+	public void RemoveSymbol (string sequence)
 	{
 		var symbol = GetSymbol(sequence, false);
 		if (symbol != null) symbols.Remove(symbol);
@@ -1242,7 +1242,7 @@ public class NGUIFont : ScriptableObject, INGUIFont
 	/// Change an existing symbol's sequence to the specified value.
 	/// </summary>
 
-	public void RenameSymbol (in string before, in string after)
+	public void RenameSymbol (string before, string after)
 	{
 		var symbol = GetSymbol(before, false);
 		if (symbol != null) symbol.sequence = after;
@@ -1253,7 +1253,7 @@ public class NGUIFont : ScriptableObject, INGUIFont
 	/// Whether the specified sprite is being used by the font.
 	/// </summary>
 
-	public bool UsesSprite (in string s)
+	public bool UsesSprite (string s)
 	{
 		if (!string.IsNullOrEmpty(s))
 		{

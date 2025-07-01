@@ -19,6 +19,7 @@ public class UICircleEditor : UIWidgetInspector
 
 		NGUIEditorTools.DrawProperty("Thickness", serializedObject, "thickness");
 		NGUIEditorTools.DrawProperty("Slices", serializedObject, "slices");
+		NGUIEditorTools.DrawProperty("Range", serializedObject, "range");
 
 		base.DrawCustomProperties();
 	}

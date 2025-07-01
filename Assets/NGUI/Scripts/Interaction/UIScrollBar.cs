@@ -26,9 +26,16 @@ public class UIScrollBar : UISlider
 	// Deprecated functionality
 	[HideInInspector][SerializeField] float mScroll = 0f;
 	[HideInInspector][SerializeField] Direction mDir = Direction.Upgraded;
+	[HideInInspector][SerializeField] float mMouseScroll = 0.1f;
 
 	[System.Obsolete("Use 'value' instead")]
 	public float scrollValue { get { return this.value; } set { this.value = value; } }
+
+	/// <summary>
+	/// Amount by which the scroll bar will scroll with the mouse scrollwheel.
+	/// </summary>
+
+	public float mouseScroll { get { return mMouseScroll; } set { mMouseScroll = value; } }
 
 	/// <summary>
 	/// The size of the foreground bar in percent (0-1 range).
@@ -193,5 +200,16 @@ public class UIScrollBar : UISlider
 			}
 		}
 		else base.ForceUpdate();
+	}
+
+	protected void OnScroll (float amount)
+	{
+		if (mMouseScroll != 0f) value += amount * mMouseScroll;
+	}
+
+	public override void OnPan (Vector2 delta)
+	{
+		delta *= Mathf.Lerp(1f, 10f, Mathf.Max(0f, barSize - 0.65f) / 0.35f);
+		base.OnPan(delta);
 	}
 }

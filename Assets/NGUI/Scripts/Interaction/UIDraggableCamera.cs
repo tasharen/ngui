@@ -45,6 +45,7 @@ public class UIDraggableCamera : MonoBehaviour
 	[System.NonSerialized] bool mPressed = false;
 	[System.NonSerialized] Vector2 mMomentum = Vector2.zero;
 	[System.NonSerialized] Bounds mBounds;
+	[System.NonSerialized] bool mBoundsSet = false;
 	[System.NonSerialized] float mScroll = 0f;
 	[System.NonSerialized] bool mDragStarted = false;
 
@@ -125,10 +126,16 @@ public class UIDraggableCamera : MonoBehaviour
 	/// Constrain the current camera's position to be within the viewable area's bounds.
 	/// </summary>
 
-	public bool ConstrainToBounds (bool immediate)
+	public bool ConstrainToBounds (bool immediate = true, bool updateBounds = false)
 	{
 		if (mTrans != null && rootForBounds != null)
 		{
+			if (!mBoundsSet || updateBounds)
+			{
+				mBoundsSet = true;
+				mBounds = NGUIMath.CalculateAbsoluteWidgetBounds(rootForBounds);
+			}
+
 			var offset = CalculateConstrainOffset();
 
 			if (offset.sqrMagnitude > 0f)
@@ -164,6 +171,7 @@ public class UIDraggableCamera : MonoBehaviour
 			if (isPressed)
 			{
 				// Update the bounds
+				mBoundsSet = true;
 				mBounds = NGUIMath.CalculateAbsoluteWidgetBounds(rootForBounds);
 
 				// Remove all momentum on press

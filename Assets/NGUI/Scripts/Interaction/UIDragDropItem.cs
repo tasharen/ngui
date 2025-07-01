@@ -83,7 +83,7 @@ public class UIDragDropItem : MonoBehaviour
 	/// Checked before the drag operation can begin. Can be overwritten with conditions.
 	/// </summary>
 
-	public virtual bool canBeDragged { get { return true; } }
+	public virtual bool canBeDragged { get { return true; } set { } }
 
 	protected virtual void Awake ()
 	{
@@ -208,7 +208,7 @@ public class UIDragDropItem : MonoBehaviour
 
 	protected virtual void OnDragStart ()
 	{
-		if (!interactable || !canBeDragged) return;
+		if (!interactable || !canBeDragged || !mPressed) return;
 		if (!enabled || mTouch != UICamera.currentTouch) return;
 
 		// If we have a restriction, check to see if its condition has been met first

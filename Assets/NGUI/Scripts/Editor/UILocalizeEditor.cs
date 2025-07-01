@@ -8,7 +8,7 @@ using UnityEditor;
 using System.Collections.Generic;
 
 [CanEditMultipleObjects]
-[CustomEditor(typeof(UILocalize), true)]
+[CustomEditor(typeof(UILocalize), false)]
 public class UILocalizeEditor : Editor
 {
 	List<string> mKeys;

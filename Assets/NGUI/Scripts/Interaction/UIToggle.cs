@@ -34,10 +34,16 @@ public class UIToggle : UIWidgetContainer
 	public int group = 0;
 
 	/// <summary>
-	/// Sprite that's visible when the 'isActive' status is 'true'.
+	/// Sprite that's visible when the 'value' is 'true'.
 	/// </summary>
 
 	public UIWidget activeSprite;
+
+	/// <summary>
+	/// Sprite that's visible when 'value' is 'false'.
+	/// </summary>
+
+	public UIWidget inactiveSprite;
 
 	/// <summary>
 	/// If 'true', when checked the sprite will be hidden when the toggle is checked instead of when it's not.
@@ -195,8 +201,11 @@ public class UIToggle : UIWidgetContainer
 				checkAnimation = null;
 			}
 
-			if (Application.isPlaying && activeSprite != null)
-				activeSprite.alpha = invertSpriteState ? (startsActive ? 0f : 1f) : (startsActive ? 1f : 0f);
+			if (Application.isPlaying)
+			{
+				if (activeSprite != null) activeSprite.alpha = invertSpriteState ? (startsActive ? 0f : 1f) : (startsActive ? 1f : 0f);
+				if (inactiveSprite != null) inactiveSprite.alpha = invertSpriteState ? (startsActive ? 1f : 0f) : (startsActive ? 0f : 1f);
+			}
 
 			if (EventDelegate.IsValid(onChange))
 			{
@@ -219,6 +228,7 @@ public class UIToggle : UIWidgetContainer
 	/// Check or uncheck on click.
 	/// </summary>
 
+	[DoNotObfuscateNGUI]
 	public void OnClick ()
 	{
 		if (mIgnoreFrame == Time.frameCount) return;
@@ -229,6 +239,9 @@ public class UIToggle : UIWidgetContainer
 			value = !value;
 		}
 	}
+
+	[DoNotObfuscateNGUI] public void SetToTrue () { if (!value) value = true; }
+	[DoNotObfuscateNGUI] public void SetToFalse () { if (value) value = false; }
 
 	/// <summary>
 	/// Fade out or fade in the active sprite and notify the OnChange event listener.
@@ -244,6 +257,7 @@ public class UIToggle : UIWidgetContainer
 			mIsActive = state;
 			startsActive = state;
 			if (activeSprite != null) activeSprite.alpha = invertSpriteState ? (state ? 0f : 1f) : (state ? 1f : 0f);
+			if (inactiveSprite != null) inactiveSprite.alpha = invertSpriteState ? (state ? 1f : 0f) : (state ? 0f : 1f);
 		}
 		else if (mIsActive != state)
 		{
@@ -277,6 +291,19 @@ public class UIToggle : UIWidgetContainer
 				else
 				{
 					TweenAlpha.Begin(activeSprite.gameObject, 0.15f, invertSpriteState ? (mIsActive ? 0f : 1f) : (mIsActive ? 1f : 0f));
+				}
+			}
+
+			// Tween the color of the inactive sprite
+			if (inactiveSprite != null)
+			{
+				if (instantTween || !NGUITools.GetActive(this))
+				{
+					inactiveSprite.alpha = invertSpriteState ? (mIsActive ? 1f : 0f) : (mIsActive ? 0f : 1f);
+				}
+				else
+				{
+					TweenAlpha.Begin(inactiveSprite.gameObject, 0.15f, invertSpriteState ? (mIsActive ? 1f : 0f) : (mIsActive ? 0f : 1f));
 				}
 			}
 

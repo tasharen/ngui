@@ -244,7 +244,7 @@ static public class Localization
 	/// Load the specified language.
 	/// </summary>
 
-	static bool LoadAndSelect (string value)
+	static public bool LoadAndSelect (string value)
 	{
 		if (!string.IsNullOrEmpty(value))
 		{
@@ -310,6 +310,37 @@ static public class Localization
 
 	static public bool LoadCSV (byte[] bytes, bool merge = false, bool notify = true) { return LoadCSV(bytes, null, merge, notify); }
 
+	/// <summary>
+	/// Save the entire localization data into the specified path in CSV file format.
+	/// </summary>
+
+	static public void SaveCSV (string path)
+	{
+		var dict = dictionary;
+		var sb = new System.Text.StringBuilder();
+
+		foreach (var d in dict)
+		{
+			sb.Append(d.Key);
+
+			foreach (var v in d.Value)
+			{
+				sb.Append(",\"");
+				sb.Append(v);
+				sb.Append("\"");
+			}
+
+			sb.Append("\n");
+		}
+
+		string dir = System.IO.Path.GetDirectoryName(path);
+
+		if (!string.IsNullOrEmpty(dir) && !System.IO.Directory.Exists(dir))
+			System.IO.Directory.CreateDirectory(dir);
+
+		System.IO.File.WriteAllText(path, sb.ToString());
+	}
+
 	static bool mMerging = false;
 
 	/// <summary>
@@ -343,7 +374,12 @@ static public class Localization
 		}
 
 		// There must be at least two columns in a valid CSV file
-		if (header.size < 2) return false;
+		if (header.size < 2)
+		{
+			Debug.LogWarning("Invalid CSV file: expected at least two columns.", asset);
+			return false;
+		}
+
 		header.RemoveAt(0);
 
 		string[] languagesToAdd = null;
@@ -403,6 +439,7 @@ static public class Localization
 						arr[newSize - 1] = arr[0];
 						newDict.Add(pair.Key, arr);
 					}
+
 					mDictionary = newDict;
 				}
 			}
@@ -503,7 +540,7 @@ static public class Localization
 	/// Select the specified language from the previously loaded CSV file.
 	/// </summary>
 
-	static bool SelectLanguage (in string language)
+	static bool SelectLanguage (string language)
 	{
 		mLanguageIndex = -1;
 
@@ -529,7 +566,7 @@ static public class Localization
 	/// Load the specified asset and activate the localization.
 	/// </summary>
 
-	static public void Set (in string languageName, Dictionary<string, string> dictionary)
+	static public void Set (string languageName, Dictionary<string, string> dictionary)
 	{
 		mLanguage = languageName;
 		PlayerPrefs.SetString("Language", mLanguage);
@@ -548,7 +585,7 @@ static public class Localization
 	/// To set the multi-language value just modify Localization.dictionary directly.
 	/// </summary>
 
-	static public void Set (in string key, in string value)
+	static public void Set (string key, string value)
 	{
 		if (mOldDictionary.ContainsKey(key)) mOldDictionary[key] = value;
 		else mOldDictionary.Add(key, value);
@@ -558,7 +595,7 @@ static public class Localization
 	/// Whether the specified key is present in the localization.
 	/// </summary>
 
-	static public bool Has (in string key)
+	static public bool Has (string key)
 	{
 		if (string.IsNullOrEmpty(key)) return false;
 
@@ -619,10 +656,10 @@ static public class Localization
 	/// Localize the specified value. If the value is missing, 'fallback' value is used instead. No warning will be shown if the 'key' value is missing.
 	/// </summary>
 
-	static public string Get (in string key, string fallback)
+	static public string Get (string key, string fallback, bool warnIfMissing = true)
 	{
-		if (Has(key)) return Get(key);
-		return Get(fallback);
+		if (Has(key)) return Get(key, warnIfMissing);
+		return Get(fallback, warnIfMissing);
 	}
 
 	/// <summary>
@@ -630,13 +667,13 @@ static public class Localization
 	/// multiple entries, for example when requesting "SomeKey" and the loc file has "SomeKey0", "SomeKey1" and "SomeKey2" instead.
 	/// </summary>
 
-	static public string Get (in string key, ulong randomSeed) { return Get(key, true, randomSeed); }
+	static public string Get (string key, ulong randomSeed) { return Get(key, true, randomSeed); }
 
 	/// <summary>
 	/// Localize the specified value.
 	/// </summary>
 
-	static public string Get (in string key, bool warnIfMissing = true, ulong randomSeed = 0)
+	static public string Get (string key, bool warnIfMissing = true, ulong randomSeed = 0)
 	{
 		if (string.IsNullOrEmpty(key)) return null;
 
@@ -649,7 +686,7 @@ static public class Localization
 			return null;
 		}
 
-		string lang = language;
+		var lang = language;
 
 		if (mLanguageIndex == -1)
 		{
@@ -666,18 +703,19 @@ static public class Localization
 		if (mLanguageIndex == -1)
 		{
 			mLanguageIndex = 0;
-			mLanguage = mLanguages[0];
-			Debug.LogWarning("Language not found: " + lang);
+			language = mLanguages[0];
+			PlayerPrefs.SetString("Language", mLanguage);
+			Debug.LogWarning("Language not found: " + lang + ", switching to " + mLanguage);
 		}
 
 		string val;
 		string[] vals;
 
-		UICamera.ControlScheme scheme = UICamera.currentScheme;
+		var scheme = UICamera.currentScheme;
 
 		if (scheme == UICamera.ControlScheme.Touch)
 		{
-			string altKey = key + " Mobile";
+			var altKey = key + " Mobile";
 			if (mReplacement.TryGetValue(altKey, out val)) return val;
 
 			if (mLanguageIndex != -1 && mDictionary.TryGetValue(altKey, out vals))
@@ -689,7 +727,7 @@ static public class Localization
 		}
 		else if (scheme == UICamera.ControlScheme.Controller)
 		{
-			string altKey = key + " Controller";
+			var altKey = key + " Controller";
 			if (mReplacement.TryGetValue(altKey, out val)) return val;
 
 			if (mLanguageIndex != -1 && mDictionary.TryGetValue(altKey, out vals))
@@ -757,7 +795,7 @@ static public class Localization
 			if (!mIgnoreMissing.Contains(key))
 			{
 				mIgnoreMissing.Add(key);
-				Debug.LogWarning("Localization key not found: '" + key + "' for language " + lang);
+				Debug.LogWarning("Localization key not found: '" + key + "' for language " + mLanguage);
 			}
 		}
 #endif

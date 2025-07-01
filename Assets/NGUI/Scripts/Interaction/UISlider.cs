@@ -112,7 +112,7 @@ public class UISlider : UIProgressBar
 
 	protected void OnPressBackground (GameObject go, bool isPressed)
 	{
-		if (UICamera.currentScheme == UICamera.ControlScheme.Controller) return;
+		if (UICamera.currentScheme == UICamera.ControlScheme.Controller && UICamera.currentTouchID != -1) return;
 		mCam = UICamera.currentCamera;
 		value = ScreenToValue(UICamera.lastEventPosition);
 		if (!isPressed && onDragFinished != null) onDragFinished();
@@ -124,7 +124,7 @@ public class UISlider : UIProgressBar
 
 	protected void OnDragBackground (GameObject go, Vector2 delta)
 	{
-		if (UICamera.currentScheme == UICamera.ControlScheme.Controller) return;
+		if (UICamera.currentScheme == UICamera.ControlScheme.Controller && UICamera.currentTouchID != -1) return;
 		mCam = UICamera.currentCamera;
 		value = ScreenToValue(UICamera.lastEventPosition);
 	}
@@ -135,7 +135,7 @@ public class UISlider : UIProgressBar
 
 	protected void OnPressForeground (GameObject go, bool isPressed)
 	{
-		if (UICamera.currentScheme == UICamera.ControlScheme.Controller) return;
+		if (UICamera.currentScheme == UICamera.ControlScheme.Controller && UICamera.currentTouchID != -1) return;
 		mCam = UICamera.currentCamera;
 
 		if (isPressed)
@@ -152,7 +152,7 @@ public class UISlider : UIProgressBar
 
 	protected void OnDragForeground (GameObject go, Vector2 delta)
 	{
-		if (UICamera.currentScheme == UICamera.ControlScheme.Controller) return;
+		if (UICamera.currentScheme == UICamera.ControlScheme.Controller && UICamera.currentTouchID != -1) return;
 		mCam = UICamera.currentCamera;
 		value = mOffset + ScreenToValue(UICamera.lastEventPosition);
 	}

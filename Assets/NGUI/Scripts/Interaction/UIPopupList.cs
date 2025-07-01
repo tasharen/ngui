@@ -964,6 +964,9 @@ public class UIPopupList : UIWidgetContainer
 
 	public GameObject source;
 
+	[Tooltip("Depth at wich the popup panel will be created with")]
+	public int panelDepth = 10000;
+
 	/// <summary>
 	/// Show the popup list dialog.
 	/// </summary>
@@ -1017,7 +1020,7 @@ public class UIPopupList : UIWidgetContainer
 				}
 
 				var panel = mChild.AddComponent<UIPanel>();
-				panel.depth = 1000000;
+				panel.depth = panelDepth;
 				panel.sortingOrder = mPanel.sortingOrder;
 			}
 

@@ -13,6 +13,9 @@ public class UICircle : UISprite
 	[Range(16, 180), Tooltip("How many slices the circle will be made out of")]
 	public int slices = 90;
 
+	[MinMaxRange(-360f, 360f)]
+	public Vector2 range = new Vector2(0f, 360f);
+
 	// Do nothing
 	public override void MakePixelPerfect () { }
 
@@ -43,12 +46,16 @@ public class UICircle : UISprite
 		var v = new Vector4(x0, y0, x1, y1);
 		var c = drawingColor;
 		var centerV = new Vector3((v.x + v.z) * 0.5f, (v.y + v.w) * 0.5f, 0f);
-		var pi2 = Mathf.PI * 2f;
+		var d2r = Mathf.Deg2Rad;
+		var r = range.y - range.x;
+		if (r <= 0f) return;
+
+		var invR = 1f / r;
 
 		for (int i = 0; i < slices; ++i)
 		{
-			var a0 = ((float)i / slices) * pi2;
-			var a1 = ((float)(i + 1) / slices) * pi2;
+			var a0 = (Mathf.Lerp(range.x, range.y, (float)i / slices) - 90f) * d2r;
+			var a1 = (Mathf.Lerp(range.x, range.y, (float)(i + 1) / slices) - 90f) * d2r;
 
 			var c0 = Mathf.Cos(a0) * 0.5f + 0.5f;
 			var c1 = Mathf.Cos(a1) * 0.5f + 0.5f;

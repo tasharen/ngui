@@ -474,7 +474,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Duplicate the specified sprite.
 	/// </summary>
 
-	static public SpriteEntry DuplicateSprite (INGUIAtlas atlas, in string spriteName)
+	static public SpriteEntry DuplicateSprite (INGUIAtlas atlas, string spriteName)
 	{
 		if (atlas == null || atlas.texture == null) return null;
 		var sd = atlas.GetSprite(spriteName);
@@ -501,7 +501,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Duplicate the specified sprite.
 	/// </summary>
 
-	static public SpriteEntry DuplicateSprite (NGUIAtlas atlas, in string spriteName)
+	static public SpriteEntry DuplicateSprite (NGUIAtlas atlas, string spriteName)
 	{
 		if (atlas == null || atlas.texture == null) return null;
 		UISpriteData sd = atlas.GetSprite(spriteName);
@@ -528,7 +528,7 @@ public class UIAtlasMaker : EditorWindow
 	/// Extract the specified sprite from the atlas.
 	/// </summary>
 
-	static public SpriteEntry ExtractSprite (INGUIAtlas atlas, in string spriteName)
+	static public SpriteEntry ExtractSprite (INGUIAtlas atlas, string spriteName)
 	{
 		if (atlas == null || atlas.texture == null) return null;
 		var sd = atlas.GetSprite(spriteName);

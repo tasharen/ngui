@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2020 Tasharen Entertainment
-            Version 2023.08.01
+            Version 2025.07.01
     https://discord.com/invite/tasharen
 ----------------------------------------------
 
@@ -54,6 +54,15 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+2025.07.01
+Merge from Windward Horizon now that its development has finished. Changes such as:
+- Changes to UIKeyBinding making it work better with controller-based input.
+- Changes to UICamera with better controller support in mind.
+- New long press event type (OnLongPress).
+- Tweaks to UI scripts to make them work better with Time.timeScale being 0.
+- Fixed incorrect controller key binding captions.
+- Added a way to save localization as a CSV file.
 
 2023.08.01
 - NEW: Sprite collection now uses a list instead of a dictionary, as it can be sorted, making it possible to bring certain sub-sprites to the foreground and have events match the draw order properly.

@@ -45,8 +45,8 @@ public class TweenHeight : UITweener
 
 	protected override void OnUpdate (float factor, bool isFinished)
 	{
-		if (fromTarget) from = fromTarget.width;
-		if (toTarget) to = toTarget.width;
+		if (fromTarget) from = fromTarget.height;
+		if (toTarget) to = toTarget.height;
 
 		value = Mathf.RoundToInt(from * (1f - factor) + to * factor);
 

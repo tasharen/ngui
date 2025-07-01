@@ -85,7 +85,7 @@ public class UIImageButton : MonoBehaviour
 		else UpdateImage();
 	}
 
-	void SetSprite (in string sprite)
+	void SetSprite (string sprite)
 	{
 		if (string.IsNullOrEmpty(sprite)) return;
 

@@ -42,21 +42,18 @@ public class UIToggleInspector : UIWidgetContainerEditor
 		{
 			NGUIEditorTools.BeginContents();
 
-			var sprite = serializedObject.FindProperty("activeSprite");
 			var animator = serializedObject.FindProperty("animator");
 			var animation = serializedObject.FindProperty("activeAnimation");
 			var tween = serializedObject.FindProperty("tween");
 
-			if (sprite.objectReferenceValue != null)
+			var sprite = NGUIEditorTools.DrawProperty("Active Sprite", serializedObject, "activeSprite");
+			var inac = NGUIEditorTools.DrawProperty("Inactive Sprite", serializedObject, "inactiveSprite");
+
+			if (sprite.objectReferenceValue != null && inac.objectReferenceValue == null)
 			{
-				NGUIEditorTools.DrawProperty("Sprite", sprite, false);
 				serializedObject.DrawProperty("invertSpriteState", "Invert State");
 			}
-			else
-			{
-				NGUIEditorTools.DrawProperty("Sprite", serializedObject, "activeSprite");
-			}
-			
+
 			NGUIEditorTools.DrawProperty("Animator", animator, false);
 			NGUIEditorTools.DrawProperty("Animation", animation, false);
 			NGUIEditorTools.DrawProperty("Tween", tween, false);

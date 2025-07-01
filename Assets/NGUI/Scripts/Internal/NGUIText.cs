@@ -201,7 +201,7 @@ static public class NGUIText
 	/// Get the specified symbol.
 	/// </summary>
 
-	static public BMSymbol GetSymbol (in string text, int index, int textLength)
+	static public BMSymbol GetSymbol (string text, int index, int textLength)
 	{
 		if (nguiFont != null) return nguiFont.MatchSymbol(text, index, textLength);
 		return null;
@@ -375,7 +375,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public float ParseAlpha (in string text, int index)
+	static public float ParseAlpha (string text, int index)
 	{
 		int a = (NGUIMath.HexToDecimal(text[index + 1]) << 4) | NGUIMath.HexToDecimal(text[index + 2]);
 		return Mathf.Clamp01(a / 255f);
@@ -387,7 +387,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public Color ParseColor (in string text, int offset = 0) { return ParseColor24(text, offset); }
+	static public Color ParseColor (string text, int offset = 0) { return ParseColor24(text, offset); }
 
 	/// <summary>
 	/// Parse a RrGgBb color encoded in the string.
@@ -395,7 +395,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public Color ParseColor24 (in string text, int offset = 0)
+	static public Color ParseColor24 (string text, int offset = 0)
 	{
 		int r = (NGUIMath.HexToDecimal(text[offset])     << 4) | NGUIMath.HexToDecimal(text[offset + 1]);
 		int g = (NGUIMath.HexToDecimal(text[offset + 2]) << 4) | NGUIMath.HexToDecimal(text[offset + 3]);
@@ -410,7 +410,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public bool ParseColor24 (in string text, int offset, out Color c)
+	static public bool ParseColor24 (string text, int offset, out Color c)
 	{
 		var d0 = NGUIMath.HexToDecimal(text[offset], -1);
 		var d1 = NGUIMath.HexToDecimal(text[offset + 1], -1);
@@ -437,7 +437,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public Color ParseColor32 (in string text, int offset)
+	static public Color ParseColor32 (string text, int offset)
 	{
 		int r = (NGUIMath.HexToDecimal(text[offset]) << 4) | NGUIMath.HexToDecimal(text[offset + 1]);
 		int g = (NGUIMath.HexToDecimal(text[offset + 2]) << 4) | NGUIMath.HexToDecimal(text[offset + 3]);
@@ -453,7 +453,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public bool ParseColor32 (in string text, int offset, out Color c)
+	static public bool ParseColor32 (string text, int offset, out Color c)
 	{
 		var d0 = NGUIMath.HexToDecimal(text[offset], -1);
 		var d1 = NGUIMath.HexToDecimal(text[offset + 1], -1);
@@ -491,7 +491,7 @@ static public class NGUIText
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public string EncodeColor (in string text, Color c) { return "[c][" + EncodeColor24(c) + "]" + text + "[-][/c]"; }
+	static public string EncodeColor (string text, Color c) { return "[c][" + EncodeColor24(c) + "]" + text + "[-][/c]"; }
 
 	/// <summary>
 	/// The reverse of ParseAlpha -- encodes a color in Aa format.
@@ -533,7 +533,7 @@ static public class NGUIText
 	/// Parse an embedded symbol, such as [FFAA00] (set color) or [-] (undo color change). Returns whether the index was adjusted.
 	/// </summary>
 
-	static public bool ParseSymbol (in string text, ref int index)
+	static public bool ParseSymbol (string text, ref int index)
 	{
 		int n = 0;
 		bool bold = false;
@@ -562,7 +562,7 @@ static public class NGUIText
 	/// Advanced symbol support originally contributed by Rudy Pangestu.
 	/// </summary>
 
-	static public bool ParseSymbol (in string text, ref int index, BetterList<Color> colors, bool premultiply,
+	static public bool ParseSymbol (string text, ref int index, BetterList<Color> colors, bool premultiply,
 		ref int sub, ref float fontScaleMult, ref bool bold, ref bool italic, ref bool underline, ref bool strike, ref bool ignoreColor, ref bool forceSpriteColor)
 	{
 		int length = text.Length;
@@ -756,10 +756,24 @@ static public class NGUIText
 	}
 
 	/// <summary>
+	/// Removes all symbols from specified text, executing repeatedly so that nested symbols can't be included.
+	/// </summary>
+
+	static public string StripAllSymbols (string text, bool removeSprites = true)
+	{
+		for (; ; )
+		{
+			var s = StripSymbols(text, removeSprites);
+			if (s == text) return text;
+			text = s;
+		}
+	}
+
+	/// <summary>
 	/// Runs through the specified string and removes all symbols.
 	/// </summary>
 
-	static public string StripSymbols (string text)
+	static public string StripSymbols (string text, bool removeSprites = true)
 	{
 		if (text != null)
 		{
@@ -784,6 +798,27 @@ static public class NGUIText
 						text = text.Remove(i, retVal - i);
 						imax = text.Length;
 						continue;
+					}
+
+					// [sp=sprite] syntax handling
+					if (removeSprites && i + 3 < text.Length)
+					{
+						char ch0 = text[i + 1];
+						char ch1 = text[i + 2];
+						char ch2 = text[i + 3];
+
+						if (ch0 == 's' && ch1 == 'p' && ch2 == '=')
+						{
+							var closing = text.IndexOf(']', i + 3);
+
+							if (closing != -1)
+							{
+								retVal = closing + 1;
+								text = text.Remove(i, retVal - i);
+								imax = text.Length;
+								continue;
+							}
+						}
 					}
 				}
 				++i;
@@ -1597,7 +1632,7 @@ static public class NGUIText
 	/// X repositioning support in the format of: [x=123], where the number represents the explicit value to set the X to.
 	/// </summary>
 
-	static bool ParsePositionalEncoding (in string text, int textLength, int ch, ref int i, ref int prev, ref float x)
+	static bool ParsePositionalEncoding (string text, int textLength, int ch, ref int i, ref int prev, ref float x)
 	{
 		if (ch == '[' && i + 5 < textLength)
 		{
@@ -1627,7 +1662,7 @@ static public class NGUIText
 	/// Print the specified text into the buffers.
 	/// </summary>
 
-	static public void Print (in string text, List<Vector3> verts, List<Vector2> uvs, List<Color> cols, List<Vector3> sverts = null, List<Vector2> suvs = null, List<Color> scols = null)
+	static public void Print (string text, List<Vector3> verts, List<Vector2> uvs, List<Color> cols, List<Vector3> sverts = null, List<Vector2> suvs = null, List<Color> scols = null)
 	{
 		if (string.IsNullOrEmpty(text)) return;
 

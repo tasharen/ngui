@@ -319,6 +319,8 @@ public class UIPlayTween : MonoBehaviour
 			}
 		}
 
+		if (isFinished) mIsActive = false;
+
 		if (isFinished && disableWhenFinished != DisableCondition.DoNotDisable)
 		{
 			var properDirection = true;

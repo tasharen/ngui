@@ -152,13 +152,22 @@ public class ByteReader
 				if (end < max)
 				{
 					int ch = mBuffer[end++];
-					if (ch != '\n' && ch != '\r') continue;
+					
+					if (ch == '\r' && end < max && mBuffer[end] == '\n')
+					{
+						var line = ReadLine(mBuffer, mOffset, end - mOffset - 1);
+						mOffset = ++end;
+						return line;
+					}
+					else if (ch != '\n') continue;
 				}
 				else ++end;
 
-				string line = ReadLine(mBuffer, mOffset, end - mOffset - 1);
-				mOffset = end;
-				return line;
+				{
+					string line = ReadLine(mBuffer, mOffset, end - mOffset - 1);
+					mOffset = end;
+					return line;
+				}
 			}
 		}
 		mOffset = max;
@@ -176,15 +185,11 @@ public class ByteReader
 
 		while (canRead)
 		{
-			string line = ReadLine();
+			var line = ReadLine();
 			if (line == null) break;
 			if (line.StartsWith("//")) continue;
 
-#if UNITY_FLASH
-			string[] split = line.Split(separator, System.StringSplitOptions.RemoveEmptyEntries);
-#else
-			string[] split = line.Split(separator, 2, System.StringSplitOptions.RemoveEmptyEntries);
-#endif
+			var split = line.Split(separator, 2, System.StringSplitOptions.RemoveEmptyEntries);
 
 			if (split.Length == 2)
 			{
@@ -244,13 +249,15 @@ public class ByteReader
 					{
 						if (i + 1 >= imax)
 						{
-							mTemp.Add(line.Substring(wordStart, i - wordStart).Replace("\"\"", "\""));
+							var s = line.Substring(wordStart, i - wordStart).Replace("\"\"", "\"");
+							mTemp.Add(s);
 							return mTemp;
 						}
 
 						if (line[i + 1] != '"')
 						{
-							mTemp.Add(line.Substring(wordStart, i - wordStart).Replace("\"\"", "\""));
+							var s = line.Substring(wordStart, i - wordStart).Replace("\"\"", "\"");
+							mTemp.Add(s);
 							insideQuotes = false;
 
 							if (line[i + 1] == ',')

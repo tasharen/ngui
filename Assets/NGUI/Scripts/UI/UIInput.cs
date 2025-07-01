@@ -1522,31 +1522,58 @@ public class UIInput : MonoBehaviour
 		}
 		else if (validation == Validation.Name)
 		{
-			char lastChar = (text.Length > 0) ? text[Mathf.Clamp(pos, 0, text.Length - 1)] : ' ';
-			char nextChar = (text.Length > 0) ? text[Mathf.Clamp(pos + 1, 0, text.Length - 1)] : '\n';
+			return ValidateNameChar(text, pos, ch);
+		}
+		return (char)0;
+	}
 
-			if (ch >= 'a' && ch <= 'z')
-			{
-				// Space followed by a letter -- make sure it's capitalized
-				if (lastChar == ' ') return (char)(ch - 'a' + 'A');
-				return ch;
-			}
-			else if (ch >= 'A' && ch <= 'Z')
-			{
-				// Uppercase letters are only allowed after spaces (and apostrophes)
-				if (lastChar != ' ' && lastChar != '\'') return (char)(ch - 'A' + 'a');
-				return ch;
-			}
-			else if (ch == '\'')
-			{
-				// Don't allow more than one apostrophe
-				if (lastChar != ' ' && lastChar != '\'' && nextChar != '\'' && !text.Contains("'")) return ch;
-			}
-			else if (ch == ' ')
-			{
-				// Don't allow more than one space in a row
-				if (lastChar != ' ' && lastChar != '\'' && nextChar != ' ' && nextChar != '\'') return ch;
-			}
+	/// <summary>
+	/// Use the name validation to validate the specified text.
+	/// </summary>
+
+	static public string ValidateName (string text)
+	{
+		var sb = new StringBuilder();
+
+		foreach (var ch in text)
+		{
+			var v = ValidateNameChar(sb.ToString(), sb.Length, ch);
+			if (v == (char)0) continue;
+			sb.Append(v);
+		}
+		return sb.ToString();
+	}
+
+	/// <summary>
+	/// Validate the specified character using naming validation.
+	/// </summary>
+
+	static public char ValidateNameChar (string text, int pos, char ch)
+	{
+		char lastChar = (text.Length > 0) ? text[Mathf.Clamp(pos, 0, text.Length - 1)] : ' ';
+		char nextChar = (text.Length > 0) ? text[Mathf.Clamp(pos + 1, 0, text.Length - 1)] : '\n';
+
+		if (ch >= 'a' && ch <= 'z')
+		{
+			// Space followed by a letter -- make sure it's capitalized
+			if (lastChar == ' ') return (char)(ch - 'a' + 'A');
+			return ch;
+		}
+		else if (ch >= 'A' && ch <= 'Z')
+		{
+			// Uppercase letters are only allowed after spaces (and apostrophes)
+			if (lastChar != ' ' && lastChar != '\'') return (char)(ch - 'A' + 'a');
+			return ch;
+		}
+		else if (ch == '\'')
+		{
+			// Don't allow more than one apostrophe
+			if (lastChar != ' ' && lastChar != '\'' && nextChar != '\'' && !text.Contains("'")) return ch;
+		}
+		else if (ch == ' ')
+		{
+			// Don't allow more than one space in a row
+			if (lastChar != ' ' && lastChar != '\'' && nextChar != ' ' && nextChar != '\'') return ch;
 		}
 		return (char)0;
 	}

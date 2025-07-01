@@ -219,6 +219,23 @@ static public class NGUIMath
 	}
 
 	/// <summary>
+	/// Convert the specified RGBA32 integer to Color.
+	/// </summary>
+
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
+	static public Color UIntToColor (uint val)
+	{
+		float inv = 1f / 255f;
+		Color c = Color.black;
+		c.r = inv * ((val >> 24) & 0xFF);
+		c.g = inv * ((val >> 16) & 0xFF);
+		c.b = inv * ((val >> 8) & 0xFF);
+		c.a = inv * (val & 0xFF);
+		return c;
+	}
+
+	/// <summary>
 	/// Convert the specified integer to a human-readable string representing the binary value. Useful for debugging bytes.
 	/// </summary>
 
@@ -242,10 +259,15 @@ static public class NGUIMath
 
 	[System.Diagnostics.DebuggerHidden]
 	[System.Diagnostics.DebuggerStepThrough]
-	static public Color HexToColor (uint val)
-	{
-		return IntToColor((int)val);
-	}
+	static public Color HexToColor (int val) { return IntToColor(val); }
+
+	/// <summary>
+	/// Convenience conversion function, allowing hex format (0xRrGgBbAa).
+	/// </summary>
+
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
+	static public Color HexToColor (uint val) { return UIntToColor(val); }
 
 	/// <summary>
 	/// Convert from top-left based pixel coordinates to bottom-left based UV coordinates.
@@ -1116,6 +1138,7 @@ static public class NGUIMath
 		if (worldCam != uiCam)
 		{
 			worldPos = worldCam.WorldToViewportPoint(worldPos);
+			if (uiCam.orthographic) worldPos.z = worldPos.z < 0f ? -0.001f : 0.001f;
 			worldPos = uiCam.ViewportToWorldPoint(worldPos);
 		}
 
@@ -1138,6 +1161,7 @@ static public class NGUIMath
 		if (worldCam != myCam)
 		{
 			worldPos = worldCam.WorldToViewportPoint(worldPos);
+			if (myCam.orthographic) worldPos.z = worldPos.z < 0f ? -0.001f : 0.001f;
 			worldPos = myCam.ViewportToWorldPoint(worldPos);
 		}
 
@@ -1158,6 +1182,7 @@ static public class NGUIMath
 		if (worldCam != myCam)
 		{
 			worldPos = worldCam.WorldToViewportPoint(worldPos);
+			if (myCam.orthographic) worldPos.z = worldPos.z < 0f ? -0.001f : 0.001f;
 			worldPos = myCam.ViewportToWorldPoint(worldPos);
 		}
 

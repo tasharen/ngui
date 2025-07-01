@@ -61,6 +61,7 @@ public class UITextList : MonoBehaviour
 	[System.NonSerialized] protected int mTotalLines = 0;
 	[System.NonSerialized] protected int mLastWidth = 0;
 	[System.NonSerialized] protected int mLastHeight = 0;
+	[System.NonSerialized] protected int mLastSize = 0;
 	[System.NonSerialized] protected BetterList<Paragraph> mParagraphs;
 	[System.NonSerialized] protected bool mStarted = false;
 
@@ -202,7 +203,7 @@ public class UITextList : MonoBehaviour
 
 	void Update ()
 	{
-		if (isValid && (textLabel.width != mLastWidth || textLabel.height != mLastHeight))
+		if (isValid && (textLabel.width != mLastWidth || textLabel.height != mLastHeight || textLabel.fontSize != mLastSize))
 			Rebuild();
 	}
 
@@ -250,7 +251,7 @@ public class UITextList : MonoBehaviour
 	/// Add a new paragraph.
 	/// </summary>
 
-	public void Add (in string text)
+	public void Add (string text)
 	{
 		Paragraph ce = null;
 
@@ -281,6 +282,7 @@ public class UITextList : MonoBehaviour
 		{
 			mLastWidth = textLabel.width;
 			mLastHeight = textLabel.height;
+			mLastSize = textLabel.fontSize;
 
 			// Although we could simply use UILabel.Wrap, it would mean setting the same data
 			// over and over every paragraph, which is not ideal. It's faster to only do it once

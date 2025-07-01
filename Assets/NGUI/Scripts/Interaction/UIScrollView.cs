@@ -749,8 +749,11 @@ public class UIScrollView : MonoBehaviour
 
 	public void Press (bool pressed)
 	{
+#if W2
+		if (mPressed == pressed || (UICamera.currentScheme == UICamera.ControlScheme.Controller && !UIControllerCursor.isVisible)) return;
+#else
 		if (mPressed == pressed || UICamera.currentScheme == UICamera.ControlScheme.Controller) return;
-
+#endif
 		if (smoothDragStart && pressed)
 		{
 			mDragStarted = false;
@@ -822,7 +825,11 @@ public class UIScrollView : MonoBehaviour
 
 	public void Drag ()
 	{
+#if W2
+		if (!mPressed || (UICamera.currentScheme == UICamera.ControlScheme.Controller && !UIControllerCursor.isVisible)) return;
+#else
 		if (!mPressed || UICamera.currentScheme == UICamera.ControlScheme.Controller) return;
+#endif
 
 		if (enabled && NGUITools.GetActive(gameObject) && mShouldMove)
 		{
@@ -1033,7 +1040,7 @@ public class UIScrollView : MonoBehaviour
 				mScroll = 0f;
 				mMomentum = Vector3.zero;
 
-				SpringPanel sp = GetComponent<SpringPanel>();
+				var sp = GetComponent<SpringPanel>();
 				if (sp != null && sp.enabled) return;
 
 				mShouldMove = false;

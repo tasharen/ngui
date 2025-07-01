@@ -123,8 +123,12 @@ public class UIKeyNavigation : MonoBehaviour
 		if (!Application.isPlaying) return;
 #endif
 		mStarted = true;
+
 		if (startsSelected && isColliderEnabled)
+		{
 			UICamera.selectedObject = gameObject;
+			if (UICamera.currentScheme == UICamera.ControlScheme.Controller) UICamera.hoveredObject = gameObject;
+		}
 	}
 
 	protected virtual void OnDisable () { list.Remove(this); }
