@@ -69,6 +69,7 @@ public class TweenAlpha : UITweener
 			if (!mCached) Cache();
 			if (mRect != null) return mRect.alpha;
 			if (mSr != null) return mSr.color.a;
+			if (mLight != null) return (mBaseIntensity == 0f) ? 0f : Mathf.Clamp01(mLight.intensity / mBaseIntensity);
 			if (mMat == null) return 1f;
 			if (string.IsNullOrEmpty(colorProperty)) return mMat.color.a;
 			return mMat.GetColor(colorProperty).a;
@@ -105,6 +106,9 @@ public class TweenAlpha : UITweener
 			else if (mLight != null)
 			{
 				mLight.intensity = mBaseIntensity * value;
+
+				if (mLight.intensity < 0.001f) mLight.enabled = false;
+				else if (!mLight.enabled) mLight.enabled = true;
 			}
 		}
 	}

@@ -1123,7 +1123,7 @@ public class UIPopupList : UIWidgetContainer
 			List<UILabel> labels = new List<UILabel>();
 
 			// Clear the selection if it's no longer present
-			if (!items.Contains(mSelectedItem))
+			if (keepValue && !items.Contains(mSelectedItem))
 			{
 				mSelectedItem = null;
 				TriggerCallbacks();

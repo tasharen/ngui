@@ -17,13 +17,36 @@ public class DoNotObfuscateNGUI : Attribute { }
 
 static public class NGUITools
 {
-	[System.NonSerialized] static AudioListener mListener;
+	[NonSerialized] static public Action<string, string> SetString = PlayerPrefs.SetString;
+	[NonSerialized] static public Action<string, int> SetInt = PlayerPrefs.SetInt;
+	[NonSerialized] static public Action<string, float> SetFloat = PlayerPrefs.SetFloat;
+	[NonSerialized] static public GetStringFunc GetString = PlayerPrefs.GetString;
+	[NonSerialized] static public GetIntFunc GetInt = PlayerPrefs.GetInt;
+	[NonSerialized] static public GetFloatFunc GetFloat = PlayerPrefs.GetFloat;
+
+	public delegate string GetStringFunc (string key, string defVal = "");
+	public delegate int GetIntFunc (string key, int defVal = 0);
+	public delegate float GetFloatFunc (string key, float defVal = 0f);
+
+	/// <summary>
+	/// Convenience function that forwards the Set command to the right delegate.
+	/// </summary>
+
+	static public void Set (string key, object val)
+	{
+		if (val is int) SetInt(key, (int)val);
+		else if (val is float) SetFloat(key, (float)val);
+		else if (val is string) SetString(key, (string)val);
+		else if (val is bool) SetInt(key, (bool)val ? 1 : 0);
+	}
+
+	[NonSerialized] static AudioListener mListener;
 
 	/// <summary>
 	/// Audio source used to play UI sounds. NGUI will create one for you automatically, but you can specify it yourself as well if you like.
 	/// </summary>
 
-	[System.NonSerialized] static public AudioSource audioSource;
+	[NonSerialized] static public AudioSource audioSource;
 
 	static bool mLoaded = false;
 	static float mGlobalVolume = 1f;
@@ -39,7 +62,7 @@ static public class NGUITools
 			if (!mLoaded)
 			{
 				mLoaded = true;
-				mGlobalVolume = PlayerPrefs.GetFloat("Sound", 1f);
+				mGlobalVolume = NGUITools.GetFloat("Sound", 1f);
 			}
 			return mGlobalVolume;
 		}
@@ -49,7 +72,7 @@ static public class NGUITools
 			{
 				mLoaded = true;
 				mGlobalVolume = value;
-				PlayerPrefs.SetFloat("Sound", value);
+				NGUITools.SetFloat("Sound", value);
 			}
 		}
 	}
@@ -751,6 +774,16 @@ static public class NGUITools
 		t.localPosition = Vector3.zero;
 		t.localRotation = Quaternion.identity;
 		t.localScale = Vector3.one;
+
+#if UNITY_2022_1_OR_NEWER
+		Rigidbody rb;
+
+		if (go.TryGetComponent(out rb))
+		{
+			rb.position = t.position;
+			rb.rotation = t.rotation;
+		}
+#endif
 		go.SetActive(true);
 		return go;
 	}
@@ -787,6 +820,16 @@ static public class NGUITools
 			t.localPosition = Vector3.zero;
 			t.localRotation = Quaternion.identity;
 			t.localScale = Vector3.one;
+
+#if UNITY_2022_1_OR_NEWER
+			Rigidbody rb;
+
+			if (go.TryGetComponent(out rb))
+			{
+				rb.position = t.position;
+				rb.rotation = t.rotation;
+			}
+#endif
 			go.SetActive(true);
 		}
 		return go;
@@ -1737,6 +1780,14 @@ static public class NGUITools
 		var w = Screen.width;
 		var h = Screen.height;
 		var s = 1f;
+
+		var root = transform.GetComponentInParent<UIRoot>();
+
+		if (root)
+		{
+			if (root.minimumHeight > h) { pos.y *= (float)root.minimumHeight / h; h = root.minimumHeight; }
+			if (root.maximumHeight < h) { pos.y *= (float)root.maximumHeight / h; h = root.maximumHeight; }
+		}
 
 		if (cam != null)
 		{

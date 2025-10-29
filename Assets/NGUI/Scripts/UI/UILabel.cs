@@ -109,7 +109,7 @@ public class UILabel : UIWidget
 		get
 		{
 			if (trueTypeFont) return Mathf.RoundToInt(mScale * mFinalFontSize);
-			return Mathf.RoundToInt(mFontSize * mScale);
+			return Mathf.RoundToInt(fontSize * mScale);
 		}
 	}
 
@@ -330,7 +330,7 @@ public class UILabel : UIWidget
 	{
 		get
 		{
-			if (trueTypeFont != null) return mFontSize;
+			if (trueTypeFont != null) return fontSize;
 			var bm = font;
 			if (bm != null) return bm.defaultSize;
 			return 16;
@@ -345,6 +345,11 @@ public class UILabel : UIWidget
 	{
 		get
 		{
+#if W2
+			// Steam Deck verification "fix". So I don't have to redo the entire UI.
+			if (mFontSize == 20) return Screen.height < 1080 && Application.isPlaying ? 24 : 20;
+			else if (mFontSize == 16) return Screen.height < 1080 && Application.isPlaying ? 20 : 16;
+#endif
 			return mFontSize;
 		}
 		set
@@ -1624,7 +1629,7 @@ public class UILabel : UIWidget
 					mScale = (float)ps / mFinalFontSize;
 
 					var bm = font;
-					if (bm != null) NGUIText.fontScale = ((float)mFontSize / defaultFontSize) * mScale;
+					if (bm != null) NGUIText.fontScale = ((float)fontSize / defaultFontSize) * mScale;
 					else NGUIText.fontScale = mScale;
 				}
 
@@ -2465,7 +2470,7 @@ public class UILabel : UIWidget
 		else if (font != null)
 		{
 			font = font.finalFont;
-			NGUIText.fontScale = (font != null) ? ((float)mFontSize / font.defaultSize) * mScale : mScale;
+			NGUIText.fontScale = (font != null) ? ((float)fontSize / font.defaultSize) * mScale : mScale;
 		}
 		else NGUIText.fontScale = mScale;
 
@@ -2475,7 +2480,7 @@ public class UILabel : UIWidget
 		if (isDynamic && keepCrisp)
 		{
 			UIRoot rt = root;
-			if (rt != null) NGUIText.pixelDensity = (rt != null) ? rt.pixelSizeAdjustment : 1f;
+			if (rt != null) NGUIText.pixelDensity = (rt != null) ? rt.constrainedPixelSizeAdjustment : 1f;
 		}
 		else NGUIText.pixelDensity = 1f;
 

@@ -561,7 +561,7 @@ public class UIPrefabTool : EditorWindow
 		GameObject lightGO = NGUITools.AddChild(root);
 		Light light = lightGO.AddComponent<Light>();
 		light.type = LightType.Directional;
-		light.shadows = LightShadows.None;
+		light.shadows = UnityEngine.LightShadows.None;
 		light.color = Color.white;
 		light.intensity = 0.65f;
 		light.transform.rotation = Quaternion.LookRotation(lightDir);

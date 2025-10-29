@@ -416,7 +416,7 @@ public class UIWrapContent : MonoBehaviour
 			Mathf.RoundToInt(item.localPosition.y / itemSize) :
 			Mathf.RoundToInt(item.localPosition.x / itemSize);
 
-		if (realIndex >= minIndex && realIndex <= maxIndex)
+		if (minIndex == maxIndex || realIndex >= minIndex && realIndex <= maxIndex)
 		{
 			if (changed)
 			{

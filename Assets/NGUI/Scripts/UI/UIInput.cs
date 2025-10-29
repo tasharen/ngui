@@ -529,7 +529,7 @@ public class UIInput : MonoBehaviour
 		if (!string.IsNullOrEmpty(savedAs))
 		{
 			if (string.IsNullOrEmpty(val)) PlayerPrefs.DeleteKey(savedAs);
-			else PlayerPrefs.SetString(savedAs, val);
+			else NGUITools.SetString(savedAs, val);
 		}
 	}
 
@@ -1614,7 +1614,7 @@ public class UIInput : MonoBehaviour
 		{
 			string val = mValue.Replace("\\n", "\n");
 			mValue = "";
-			value = PlayerPrefs.HasKey(savedAs) ? PlayerPrefs.GetString(savedAs) : val;
+			value = PlayerPrefs.HasKey(savedAs) ? NGUITools.GetString(savedAs) : val;
 		}
 	}
 }

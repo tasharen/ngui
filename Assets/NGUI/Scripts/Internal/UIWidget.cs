@@ -656,13 +656,11 @@ public class UIWidget : UIRect
 	{
 		get
 		{
-#if UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7
-			BoxCollider box = collider as BoxCollider;
-#else
-			BoxCollider box = GetComponent<Collider>() as BoxCollider;
-#endif
-			if (box != null) return true;
-			return GetComponent<BoxCollider2D>() != null;
+			BoxCollider box;
+			if (TryGetComponent(out box)) return true;
+
+			BoxCollider2D b2;
+			return TryGetComponent(out b2);
 		}
 	}
 
@@ -834,9 +832,17 @@ public class UIWidget : UIRect
 
 	public void ResizeCollider ()
 	{
-		var bc = GetComponent<BoxCollider>();
-		if (bc != null) NGUITools.UpdateWidgetCollider(this, bc);
-		else NGUITools.UpdateWidgetCollider(this, GetComponent<BoxCollider2D>());
+		BoxCollider bc;
+
+		if (TryGetComponent(out bc))
+		{
+			NGUITools.UpdateWidgetCollider(this, bc);
+		}
+		else
+		{
+			BoxCollider2D b2;
+			if (TryGetComponent(out b2)) NGUITools.UpdateWidgetCollider(this, b2);
+		}
 	}
 
 	/// <summary>
@@ -1098,7 +1104,7 @@ public class UIWidget : UIRect
 
 	protected virtual void UpgradeFrom265 ()
 	{
-		Vector3 scale = cachedTransform.localScale;
+		var scale = cachedTransform.localScale;
 		mWidth = Mathf.Abs(Mathf.RoundToInt(scale.x));
 		mHeight = Mathf.Abs(Mathf.RoundToInt(scale.y));
 		NGUITools.UpdateWidgetCollider(gameObject, true);
@@ -1119,6 +1125,8 @@ public class UIWidget : UIRect
 		{
 			Debug.LogError("You should not place more than one widget on the same object. Weird stuff will happen!", this);
 		}
+
+		if (autoResizeBoxCollider && hasBoxCollider) ResizeCollider();
 #endif
 		CreatePanel();
 	}
@@ -1130,17 +1138,17 @@ public class UIWidget : UIRect
 	protected override void OnAnchor ()
 	{
 		float lt, bt, rt, tt;
-		Transform trans = cachedTransform;
-		Transform parent = trans.parent;
-		Vector3 pos = trans.localPosition;
-		Vector2 pvt = pivotOffset;
+		var trans = cachedTransform;
+		var parent = trans.parent;
+		var pos = trans.localPosition;
+		var pvt = pivotOffset;
 
 		// Attempt to fast-path if all anchors match
 		if (leftAnchor.target == bottomAnchor.target &&
 			leftAnchor.target == rightAnchor.target &&
 			leftAnchor.target == topAnchor.target)
 		{
-			Vector3[] sides = leftAnchor.GetSides(parent);
+			var sides = leftAnchor.GetSides(parent);
 
 			if (sides != null)
 			{
@@ -1153,7 +1161,7 @@ public class UIWidget : UIRect
 			else
 			{
 				// Anchored to a single transform
-				Vector3 lp = GetLocalPos(leftAnchor, parent);
+				var lp = GetLocalPos(leftAnchor, parent);
 				lt = lp.x + leftAnchor.absolute;
 				bt = lp.y + bottomAnchor.absolute;
 				rt = lp.x + rightAnchor.absolute;
@@ -1168,7 +1176,7 @@ public class UIWidget : UIRect
 			// Left anchor point
 			if (leftAnchor.target)
 			{
-				Vector3[] sides = leftAnchor.GetSides(parent);
+				var sides = leftAnchor.GetSides(parent);
 
 				if (sides != null)
 				{
@@ -1184,7 +1192,7 @@ public class UIWidget : UIRect
 			// Right anchor point
 			if (rightAnchor.target)
 			{
-				Vector3[] sides = rightAnchor.GetSides(parent);
+				var sides = rightAnchor.GetSides(parent);
 
 				if (sides != null)
 				{
@@ -1200,7 +1208,7 @@ public class UIWidget : UIRect
 			// Bottom anchor point
 			if (bottomAnchor.target)
 			{
-				Vector3[] sides = bottomAnchor.GetSides(parent);
+				var sides = bottomAnchor.GetSides(parent);
 
 				if (sides != null)
 				{
@@ -1216,7 +1224,7 @@ public class UIWidget : UIRect
 			// Top anchor point
 			if (topAnchor.target)
 			{
-				Vector3[] sides = topAnchor.GetSides(parent);
+				var sides = topAnchor.GetSides(parent);
 
 				if (sides != null)
 				{
@@ -1231,12 +1239,12 @@ public class UIWidget : UIRect
 		}
 
 		// Calculate the new position, width and height
-		Vector3 newPos = new Vector3(Mathf.Lerp(lt, rt, pvt.x), Mathf.Lerp(bt, tt, pvt.y), pos.z);
+		var newPos = new Vector3(Mathf.Lerp(lt, rt, pvt.x), Mathf.Lerp(bt, tt, pvt.y), pos.z);
 		newPos.x = Mathf.Round(newPos.x);
 		newPos.y = Mathf.Round(newPos.y);
 
-		int w = Mathf.FloorToInt(rt - lt + 0.5f);
-		int h = Mathf.FloorToInt(tt - bt + 0.5f);
+		var w = Mathf.FloorToInt(rt - lt + 0.5f);
+		var h = Mathf.FloorToInt(tt - bt + 0.5f);
 
 		// Maintain the aspect ratio if requested and possible
 		if (keepAspectRatio != AspectRatioSource.Free && aspectRatio != 0f)

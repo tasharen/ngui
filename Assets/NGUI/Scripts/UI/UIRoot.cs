@@ -212,6 +212,19 @@ public class UIRoot : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Same as pixelSizeAdjustment, but constrained within minimum and maximum height values.
+	/// </summary>
+
+	public float constrainedPixelSizeAdjustment
+	{
+		get
+		{
+			int height = Mathf.RoundToInt(Mathf.Clamp(NGUITools.screenSize.y, minimumHeight, maximumHeight));
+			return height == -1 ? 1f : GetPixelSizeAdjustment(height);
+		}
+	}
+
+	/// <summary>
 	/// Helper function that figures out the pixel size adjustment for the specified game object.
 	/// </summary>
 

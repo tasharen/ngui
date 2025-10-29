@@ -143,7 +143,7 @@ public class UIKeyBinding : MonoBehaviour, KeyEventBlocker
 #if WINDWARD && UNITY_ANDROID
 		// NVIDIA Shield controller has an odd bug where it can open the on-screen keyboard via a KeyCode.Return binding,
 		// and then it can never be closed. I am disabling it here until I can track down the cause.
-		if (keyCode == KeyCode.Return && PlayerPrefs.GetInt("Start Chat") == 0) return false;
+		if (keyCode == KeyCode.Return && NGUITools.GetInt("Start Chat") == 0) return false;
 #endif
 		down = UICamera.GetKeyDown(keyCode);
 		up = UICamera.GetKeyUp(keyCode);
@@ -237,10 +237,17 @@ public class UIKeyBinding : MonoBehaviour, KeyEventBlocker
 	{
 		if (isActive)
 		{
+			var frame = Time.frameCount;
+			if (frame == mFrameToIgnore) return;
+
 			bool keyDown, keyUp;
 			if (Poll(out keyDown, out keyUp)) React(keyDown, keyUp);
 		}
 	}
+
+	[System.NonSerialized] int mFrameToIgnore = 0;
+
+	void IgnoreIdenticalEventsThisFrame () { var frame = Time.frameCount; foreach (var kb in list) if (kb.ReactsTo(keyCode, modifier)) mFrameToIgnore = frame; }
 
 	/// <summary>
 	/// React to key down or key up.
@@ -318,6 +325,8 @@ public class UIKeyBinding : MonoBehaviour, KeyEventBlocker
 		}
 
 		if (keyUp) mPress = false;
+
+		if (keyDown || keyUp) IgnoreIdenticalEventsThisFrame();
 	}
 
 	protected virtual void OnBindingPress (bool pressed) { UICamera.Notify(gameObject, "OnPress", pressed); }
