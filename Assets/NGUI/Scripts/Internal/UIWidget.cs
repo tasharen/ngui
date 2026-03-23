@@ -150,7 +150,7 @@ public class UIWidget : UIRect
 	[System.NonSerialized] public bool fillGeometry = true;
 	[System.NonSerialized] protected bool mPlayMode = true;
 	[System.NonSerialized] protected Vector4 mDrawRegion = new Vector4(0f, 0f, 1f, 1f);
-	[System.NonSerialized] Matrix4x4 mLocalToPanel;
+	[System.NonSerialized] protected Matrix4x4 mLocalToPanel;
 	[System.NonSerialized] bool mIsVisibleByAlpha = true;
 	[System.NonSerialized] bool mIsVisibleByPanel = true;
 	[System.NonSerialized] bool mIsInFront = true;
@@ -1475,6 +1475,15 @@ public class UIWidget : UIRect
 	}
 
 	/// <summary>
+	/// Every time the widget's transform gets updated, the matrix used to transform the cached geometry also has to be updated.
+	/// </summary>
+
+	protected virtual void CalculateMatrix ()
+	{
+		mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix;
+	}
+
+	/// <summary>
 	/// Update the widget and fill its geometry if necessary. Returns whether something was changed.
 	/// </summary>
 
@@ -1506,7 +1515,7 @@ public class UIWidget : UIRect
 
 					if (mMatrixFrame != frame)
 					{
-						mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix;
+						CalculateMatrix();
 						mMatrixFrame = frame;
 					}
 
@@ -1535,7 +1544,7 @@ public class UIWidget : UIRect
 
 			if (mMatrixFrame != frame)
 			{
-				mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix;
+				CalculateMatrix();
 				mMatrixFrame = frame;
 			}
 

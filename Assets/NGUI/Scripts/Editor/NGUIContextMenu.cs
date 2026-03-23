@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 static public class NGUIContextMenu
 {
-	[MenuItem("Help/NGUI Documentation (v.2025.07.01)")]
+	[MenuItem("Help/NGUI Documentation (v.2026.03.23)")]
 	static void ShowHelp0 (MenuCommand command) { NGUIHelp.Show(); }
 
 	[MenuItem("Help/NGUI Support Archive (read-only)")]

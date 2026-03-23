@@ -2159,6 +2159,54 @@ public class UILabel : UIWidget
 		Fill(verts, uvs, cols, null, null, null);
 	}
 
+	[NonSerialized] float mPixelDensity = 1f;
+	[NonSerialized] Vector3 mPixelAdj = Vector3.zero;
+
+	protected override void CalculateMatrix ()
+	{
+		var t = cachedTransform;
+		mLocalToPanel = panel.worldToLocal * t.localToWorldMatrix;
+
+		// In order to keep the text crisp, it needs to be offset to begin on a whole pixel, which may or may not match the visible pixels
+		if (keepCrisp && trueTypeFont != null && mPixelDensity != 1f && mPixelDensity > 0f)
+		{
+			var inv = 1f / mPixelDensity;
+			var cam = UICamera.FindCameraForLayer(gameObject.layer);
+			if (!cam) return;
+
+			var pt = panel.transform;
+
+			// Calculate the top-left coordinates of the first character
+			var offset = pivotOffset;
+			var pos = t.localPosition;
+			var x = pos.x - offset.x * mWidth + mPixelAdj.x;
+			var y = pos.y - offset.y * mHeight + mHeight + mPixelAdj.y;
+
+			// If there is no rotation, then the relative-to-panel math is very simple. If there is rotation, then the label can't be pixel-perfect anyway, so it doesn't matter.
+			t = t.parent;
+
+			while (t != null)
+			{
+				var lp = t.localPosition;
+				x += lp.x;
+				y += lp.y;
+				if (t == pt) break;
+				t = t.parent;
+			}
+
+			var original = new Vector3(x, y, 0f);
+			var tp = original;
+			tp.x = Mathf.Round(Mathf.Round(tp.x) * inv);
+			tp.y = Mathf.Round(Mathf.Round(tp.y) * inv);
+			tp.z = Mathf.Round(Mathf.Round(tp.z) * inv);
+			tp /= inv;
+
+			// Calculate the difference between the original position and the adjusted position, and apply it to the matrix
+			var adj = tp - original;
+			if (adj.sqrMagnitude > 0.01f) mLocalToPanel = Matrix4x4.TRS(adj, Quaternion.identity, Vector3.one) * mLocalToPanel;
+		}
+	}
+
 	public void Fill (List<Vector3> verts, List<Vector2> uvs, List<Color> cols, List<Vector3> symbolVerts, List<Vector2> symbolUVs, List<Color> symbolCols)
 	{
 		if (!isValid) return;
@@ -2187,6 +2235,10 @@ public class UILabel : UIWidget
 			NGUIText.Print(text, verts, uvs, cols, symbolVerts, symbolUVs, symbolCols);
 		}
 		else NGUIText.Print(text, verts, uvs, cols);
+
+		mPixelDensity = NGUIText.pixelDensity;
+		if (mPixelDensity != 0f && start < verts.Count) mPixelAdj = verts[start];
+		else mPixelAdj = Vector3.zero;
 
 		NGUIText.nguiFont = null;
 		NGUIText.dynamicFont = null;
