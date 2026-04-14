@@ -1747,30 +1747,6 @@ public class UICamera : MonoBehaviour
 		return null;
 	}
 
-	/// <summary>
-	/// Using the keyboard will result in 1 or -1, depending on whether up or down keys have been pressed.
-	/// </summary>
-
-	static int GetDirection (KeyCode up, KeyCode down)
-	{
-		if (GetKeyDown(up)) { currentKey = up; return 1; }
-		if (GetKeyDown(down)) { currentKey = down; return -1; }
-		return 0;
-	}
-
-	/// <summary>
-	/// Using the keyboard will result in 1 or -1, depending on whether up or down keys have been pressed.
-	/// </summary>
-
-	static int GetDirection (KeyCode up0, KeyCode up1, KeyCode down0, KeyCode down1)
-	{
-		if (GetKeyDown(up0)) { currentKey = up0; return 1; }
-		if (GetKeyDown(up1)) { currentKey = up1; return 1; }
-		if (GetKeyDown(down0)) { currentKey = down0; return -1; }
-		if (GetKeyDown(down1)) { currentKey = down1; return -1; }
-		return 0;
-	}
-
 	// Used to ensure that joystick-based controls don't trigger that often
 	static float mNextEvent = 0f;
 
