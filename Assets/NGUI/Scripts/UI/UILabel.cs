@@ -2159,8 +2159,16 @@ public class UILabel : UIWidget
 		Fill(verts, uvs, cols, null, null, null);
 	}
 
-	[NonSerialized] float mPixelDensity = 1f;
-	[NonSerialized] Vector3 mPixelAdj = Vector3.zero;
+	[NonSerialized] Vector3 mFirstVertex = Vector3.zero;
+
+	/// <summary>
+	/// To make text look crisp, it needs to snap to pixel coordinates. Unity offers a way to do this in the shader with the
+	/// UnityPixelSnap() function, but it isn't quite enough when the UI uses a fixed size which doesn't match pixels,
+	/// because using shader-based pixel snap with a label that doesn't begin at a whole pixel on its own still results
+	/// in some glyph vertices being snapped to the left on one side of the glyph and to the right on the other, for example.
+	/// What I do in the function below is snap the printed text to begin at a whole pixel, which fixes the issue even
+	/// without the shader-based pixel snap.
+	/// </summary>
 
 	protected override void CalculateMatrix ()
 	{
@@ -2168,19 +2176,15 @@ public class UILabel : UIWidget
 		mLocalToPanel = panel.worldToLocal * t.localToWorldMatrix;
 
 		// In order to keep the text crisp, it needs to be offset to begin on a whole pixel, which may or may not match the visible pixels
-		if (keepCrisp && trueTypeFont != null && mPixelDensity != 1f && mPixelDensity > 0f)
+		if (keepCrisp)
 		{
-			var inv = 1f / mPixelDensity;
-			var cam = UICamera.FindCameraForLayer(gameObject.layer);
-			if (!cam) return;
-
 			var pt = panel.transform;
 
 			// Calculate the top-left coordinates of the first character
 			var offset = pivotOffset;
 			var pos = t.localPosition;
-			var x = pos.x - offset.x * mWidth + mPixelAdj.x;
-			var y = pos.y - offset.y * mHeight + mHeight + mPixelAdj.y;
+			var x = pos.x - offset.x * mWidth + mFirstVertex.x;
+			var y = pos.y - offset.y * mHeight + mHeight + mFirstVertex.y;
 
 			// If there is no rotation, then the relative-to-panel math is very simple. If there is rotation, then the label can't be pixel-perfect anyway, so it doesn't matter.
 			t = t.parent;
@@ -2196,10 +2200,9 @@ public class UILabel : UIWidget
 
 			var original = new Vector3(x, y, 0f);
 			var tp = original;
-			tp.x = Mathf.Round(Mathf.Round(tp.x) * inv);
-			tp.y = Mathf.Round(Mathf.Round(tp.y) * inv);
-			tp.z = Mathf.Round(Mathf.Round(tp.z) * inv);
-			tp /= inv;
+			tp.x = Mathf.Round(Mathf.Round(tp.x));
+			tp.y = Mathf.Round(Mathf.Round(tp.y));
+			tp.z = Mathf.Round(Mathf.Round(tp.z));
 
 			// Calculate the difference between the original position and the adjusted position, and apply it to the matrix
 			var adj = tp - original;
@@ -2236,9 +2239,20 @@ public class UILabel : UIWidget
 		}
 		else NGUIText.Print(text, verts, uvs, cols);
 
-		mPixelDensity = NGUIText.pixelDensity;
-		if (mPixelDensity != 0f && start < verts.Count) mPixelAdj = verts[start];
-		else mPixelAdj = Vector3.zero;
+		if (keepCrisp)
+		{
+			if (start < verts.Count)
+			{
+				mFirstVertex = verts[start];
+				mHasCustomMatrix = true;
+			}
+			else
+			{
+				mFirstVertex = Vector3.zero;
+				mHasCustomMatrix = false;
+			}
+		}
+		else mHasCustomMatrix = false;
 
 		NGUIText.nguiFont = null;
 		NGUIText.dynamicFont = null;
@@ -2460,9 +2474,9 @@ public class UILabel : UIWidget
 				Localization.Get(UIPopupList.current.value) :
 				UIPopupList.current.value;
 		}
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		else Debug.LogWarning("UIPopupList.current hasn't been set");
-		#endif
+#endif
 	}
 
 	/// <summary>

@@ -56,6 +56,7 @@ Shader "Unlit/Text"
 				UNITY_SETUP_INSTANCE_ID(v);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 				o.vertex = UnityObjectToClipPos(v.vertex);
+				//o.vertex = UnityPixelSnap(o.vertex); // Uncomment if the UI should snap to pixels for a forced crisp look
 				o.texcoord = v.texcoord;
 				o.color = v.color;
 				return o;

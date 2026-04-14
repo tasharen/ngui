@@ -59,6 +59,7 @@ Shader "Hidden/Unlit/Transparent Colored 1"
 				UNITY_SETUP_INSTANCE_ID(v);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 				o.vertex = UnityObjectToClipPos(v.vertex);
+				//o.vertex = UnityPixelSnap(o.vertex); // Uncomment if the UI should snap to pixels for a forced crisp look
 				o.color = v.color;
 				o.texcoord = v.texcoord;
 				o.worldPos = v.vertex.xy * _ClipRange0.zw + _ClipRange0.xy;

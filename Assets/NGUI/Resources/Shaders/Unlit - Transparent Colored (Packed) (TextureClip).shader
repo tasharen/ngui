@@ -55,6 +55,7 @@ Shader "Unlit/Transparent Colored (Packed) (TextureClip)"
 			{
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
+				//o.vertex = UnityPixelSnap(o.vertex); // Uncomment if the UI should snap to pixels for a forced crisp look
 				o.color = v.color;
 				o.texcoord = v.texcoord;
 				o.worldPos = TRANSFORM_TEX(v.vertex.xy, _MainTex);

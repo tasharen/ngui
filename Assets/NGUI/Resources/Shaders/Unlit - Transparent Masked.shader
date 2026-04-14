@@ -57,6 +57,7 @@ Shader "Unlit/Transparent Masked"
 			v2f vert (appdata_t v)
 			{
 				o.vertex = UnityObjectToClipPos(v.vertex);
+				//o.vertex = UnityPixelSnap(o.vertex); // Uncomment if the UI should snap to pixels for a forced crisp look
 				o.texcoord = v.texcoord;
 				o.texcoord1 = v.texcoord1;
 				o.color = v.color;

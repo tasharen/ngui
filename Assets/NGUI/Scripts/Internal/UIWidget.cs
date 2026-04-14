@@ -1474,14 +1474,12 @@ public class UIWidget : UIRect
 		return mMoved || mChanged;
 	}
 
-	/// <summary>
-	/// Every time the widget's transform gets updated, the matrix used to transform the cached geometry also has to be updated.
-	/// </summary>
+	// By default pixel snapping isn't needed. However labels set to pixel-perfect do.
+	// Unity's UnityPixelSnap() shader function isn't enough on its own.
+	// I use a variable instead of a virtual property to avoid the overhead of a virtual function call in the most common cases.
+	[System.NonSerialized] protected bool mHasCustomMatrix = false;
 
-	protected virtual void CalculateMatrix ()
-	{
-		mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix;
-	}
+	protected virtual void CalculateMatrix () { mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix; }
 
 	/// <summary>
 	/// Update the widget and fill its geometry if necessary. Returns whether something was changed.
@@ -1513,9 +1511,11 @@ public class UIWidget : UIRect
 					// Want to see what's being filled? Uncomment this line.
 					//Debug.Log("Fill " + name + " (" + Time.frameCount + ")");
 
+					// Every time the widget's transform gets updated, the matrix used to transform the cached geometry also has to be updated.
 					if (mMatrixFrame != frame)
 					{
-						CalculateMatrix();
+						if (mHasCustomMatrix) CalculateMatrix();
+						else mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix;
 						mMatrixFrame = frame;
 					}
 
@@ -1544,7 +1544,8 @@ public class UIWidget : UIRect
 
 			if (mMatrixFrame != frame)
 			{
-				CalculateMatrix();
+				if (mHasCustomMatrix) CalculateMatrix();
+				else mLocalToPanel = panel.worldToLocal * cachedTransform.localToWorldMatrix;
 				mMatrixFrame = frame;
 			}
 
