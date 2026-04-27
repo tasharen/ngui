@@ -1829,6 +1829,11 @@ static public class NGUIText
 					prevX = 0;
 				}
 
+				v0x = Mathf.Round(v0x);
+				v0y = Mathf.Round(v0y);
+				v1x = Mathf.Round(v1x);
+				v1y = Mathf.Round(v1y);
+
 				verts.Add(new Vector3(v0x, v0y));
 				verts.Add(new Vector3(v0x, v1y));
 				verts.Add(new Vector3(v1x, v1y));

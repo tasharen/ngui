@@ -2199,13 +2199,13 @@ public class UILabel : UIWidget
 			}
 
 			var original = new Vector3(x, y, 0f);
-			var tp = original;
-			tp.x = Mathf.Round(Mathf.Round(tp.x));
-			tp.y = Mathf.Round(Mathf.Round(tp.y));
-			tp.z = Mathf.Round(Mathf.Round(tp.z));
+			var snapped = original;
+			snapped.x = Mathf.Round(snapped.x);
+			snapped.y = Mathf.Round(snapped.y);
+			snapped.z = Mathf.Round(snapped.z);
 
 			// Calculate the difference between the original position and the adjusted position, and apply it to the matrix
-			var adj = tp - original;
+			var adj = snapped - original;
 			if (adj.sqrMagnitude > 0.01f) mLocalToPanel = Matrix4x4.TRS(adj, Quaternion.identity, Vector3.one) * mLocalToPanel;
 		}
 	}
